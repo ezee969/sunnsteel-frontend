@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
   const isProtectedPage =
     path.startsWith('/dashboard') ||
     path.startsWith('/workouts') ||
+    path.startsWith('/routines') ||
     path.startsWith('/profile') ||
     path.startsWith('/settings');
 
@@ -34,5 +35,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/login', '/signup', '/dashboard/:path*', '/workouts/:path*'],
+  matcher: [
+    '/login',
+    '/signup',
+    '/dashboard/:path*',
+    '/workouts/:path*',
+    '/routines/:path*',
+  ],
 };

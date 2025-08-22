@@ -1,19 +1,21 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
-import { cn } from '@/lib/utils';
+import React, { ReactNode, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Sidebar from '@/app/(protected)/components/Sidebar';
 import Header from '@/app/(protected)/components/Header';
 import { useAuthProtection } from '@/hooks/use-auth-protection';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { Loading } from '@/components/layout/loading';
 import { useUser } from '@/lib/api/hooks/useUser';
+import { ClipLoader } from 'react-spinners';
+import { cn } from '@/lib/utils';
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const pathname = usePathname();
   const { isLoading: isLoadingAuth } = useAuthProtection();
   const { isLoading: isLoadingUserProfile } = useUser();
   const {
@@ -23,10 +25,34 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     isMobileMenuOpen,
     setIsMobileMenuOpen,
   } = useSidebar();
-  const [activeNav, setActiveNav] = useState('dashboard');
+  
+  // Determine active nav based on current pathname
+  const getActiveNavFromPath = (path: string) => {
+    if (path.startsWith('/dashboard')) return 'dashboard';
+    if (path.startsWith('/routines')) return 'routines';
+    if (path.startsWith('/progress')) return 'progress';
+    if (path.startsWith('/exercises')) return 'exercises';
+    if (path.startsWith('/schedule')) return 'schedule';
+    if (path.startsWith('/achievements')) return 'achievements';
+    return 'dashboard'; // fallback
+  };
+
+  const [activeNav, setActiveNav] = useState(() => getActiveNavFromPath(pathname));
+
+  // Update activeNav when pathname changes
+  useEffect(() => {
+    setActiveNav(getActiveNavFromPath(pathname));
+  }, [pathname]);
 
   if (isLoadingAuth || isLoadingUserProfile) {
-    return <Loading />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-background/80">
+        <div className="flex flex-col items-center gap-4">
+          <ClipLoader color="#3b82f6" size={40} />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

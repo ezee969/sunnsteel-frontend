@@ -35,6 +35,7 @@ export const httpClient = {
       // Handle 401 by attempting token refresh
       if (response.status === 401 && secure) {
         try {
+          console.log('Refreshing token');
           const refreshed = await authService.refreshToken();
           if (refreshed) {
             // Retry with new token
@@ -42,6 +43,7 @@ export const httpClient = {
             return this.request<T>(endpoint, options);
           }
         } catch {
+          console.log('Refresh token failed, redirecting to login');
           // If refresh fails, redirect to login
           tokenService.clearAccessToken();
           window.location.href = '/login';

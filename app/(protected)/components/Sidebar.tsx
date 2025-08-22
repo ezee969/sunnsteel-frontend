@@ -27,19 +27,51 @@ type NavItem = {
   label: string;
   icon: LucideIcon;
   href: string;
+  disabled: boolean;
 };
 
 const SIDEBAR_NAV_ITEMS: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/dashboard' },
-  { id: 'routines', label: 'Routines', icon: Activity, href: '/routines' },
-  { id: 'progress', label: 'Progress', icon: TrendingUp, href: '/progress' },
-  { id: 'exercises', label: 'Exercises', icon: Weight, href: '/exercises' },
-  { id: 'schedule', label: 'Schedule', icon: Calendar, href: '/schedule' },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: Home,
+    href: '/dashboard',
+    disabled: false,
+  },
+  {
+    id: 'routines',
+    label: 'Routines',
+    icon: Activity,
+    href: '/routines',
+    disabled: false,
+  },
+  {
+    id: 'progress',
+    label: 'Progress',
+    icon: TrendingUp,
+    href: '/progress',
+    disabled: true,
+  },
+  {
+    id: 'exercises',
+    label: 'Exercises',
+    icon: Weight,
+    href: '/exercises',
+    disabled: true,
+  },
+  {
+    id: 'schedule',
+    label: 'Schedule',
+    icon: Calendar,
+    href: '/schedule',
+    disabled: true,
+  },
   {
     id: 'achievements',
     label: 'Achievements',
     icon: Medal,
     href: '/achievements',
+    disabled: true,
   },
 ] as const;
 
@@ -122,6 +154,7 @@ export default function Sidebar({
             <Button
               key={item.id}
               variant={activeNav === item.id ? 'default' : 'ghost'}
+              disabled={item.disabled}
               className={cn(
                 'justify-start gap-3 h-12 relative overflow-hidden group transition-all duration-300',
                 activeNav === item.id && 'bg-primary text-primary-foreground'
@@ -133,6 +166,10 @@ export default function Sidebar({
                 setTimeout(() => {
                   if (button) button.classList.remove('scale-95');
                   setActiveNav(item.id);
+                  // Close mobile sidebar after navigation
+                  if (isMobile) {
+                    setIsMobileMenuOpen(false);
+                  }
                 }, 100);
                 router.push(item.href);
               }}
@@ -166,6 +203,7 @@ export default function Sidebar({
           ))}
           <Separator className="my-4" />
           <Button
+            disabled={true}
             variant="ghost"
             className={cn(
               'justify-start gap-3 h-12 transition-all duration-300',

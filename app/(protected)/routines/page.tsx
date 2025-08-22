@@ -6,45 +6,57 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { WorkoutFilter } from './types';
 import WorkoutsList from './components/WorkoutsList';
-import ActiveWorkout from './components/ActiveWorkout';
+// import ActiveWorkout from './components/ActiveWorkout';
+import Link from 'next/link';
+import { useRoutines } from '@/lib/api/hooks/useRoutines';
 
 export default function RoutinesPage() {
   const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all');
+  const { data: routines, isLoading, error } = useRoutines();
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
+      {/* Header Section */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Routines
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
+            <p className="text-sm text-muted-foreground sm:text-base">
               Plan, track, and manage your workout routines.
             </p>
           </div>
-          <Button className="hidden sm:flex gap-2">
-            <Plus className="h-4 w-4" />
-            New Workout
+          <Button asChild className="hidden h-10 gap-2 sm:flex">
+            <Link href="/routines/new">
+              <Plus className="h-4 w-4" />
+              <span>Create Routine</span>
+            </Link>
           </Button>
         </div>
       </div>
 
-      {/* Mobile Create Button */}
-      <Button className="sm:hidden flex gap-2 mb-2">
-        <Plus className="h-4 w-4" />
-        New Workout
-      </Button>
+      {/* Mobile Create Button - Sticky at bottom on mobile */}
+      <div className="sticky bottom-4 z-10 sm:hidden">
+        <Button asChild className="w-full shadow-lg" size="lg">
+          <Link href="/routines/new" className="flex items-center justify-center gap-2">
+            <Plus className="h-5 w-5" />
+            <span>Create Routine</span>
+          </Link>
+        </Button>
+      </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr,300px]">
-        <div className="flex flex-col gap-4">
-          <WorkoutFilters
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-          />
-          <WorkoutsList filter={activeFilter} />
-        </div>
-        <ActiveWorkout className="hidden lg:block" />
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col gap-4">
+        <WorkoutFilters
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
+        <WorkoutsList
+          routines={routines}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </div>
   );
