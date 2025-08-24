@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Auto-Documentation Rules
 
 ## Contexto para el Agente
@@ -17,6 +21,7 @@ Como desarrollador, DEBES mantener la documentación del proyecto actualizada au
 ### Detección Automática de Cambios
 
 #### Frontend - Detectar y Documentar:
+
 - **Nuevas páginas** en `app/`
 - **Nuevos componentes** en `components/`
 - **Nuevos hooks** en `hooks/`
@@ -29,6 +34,7 @@ Como desarrollador, DEBES mantener la documentación del proyecto actualizada au
 - **Nuevas variables de entorno**
 
 #### Backend - Detectar y Documentar:
+
 - **Nuevos módulos** en `src/`
 - **Nuevos endpoints** en controllers
 - **Nuevos DTOs** y validaciones
@@ -48,12 +54,14 @@ Como desarrollador, DEBES mantener la documentación del proyecto actualizada au
 ### Formato de Actualización
 
 #### Para Archivos de Reglas:
+
 - Mantener estructura YAML al inicio
 - Actualizar secciones relevantes
 - Agregar nuevos patrones detectados
 - Mantener `alwaysApply: true`
 
 #### Para README.md:
+
 - Actualizar stack tecnológico si cambia
 - Agregar nuevos componentes
 - Actualizar estructura de directorios
@@ -83,6 +91,7 @@ git diff package.json
 ### Responsabilidades Específicas
 
 #### Para Frontend:
+
 - Mantener estructura de rutas actualizada
 - Documentar nuevos componentes UI
 - Actualizar patrones de estado
@@ -90,6 +99,7 @@ git diff package.json
 - Documentar nuevos hooks y servicios
 
 #### Para Backend:
+
 - Mantener lista de endpoints actualizada
 - Documentar nuevos módulos y servicios
 - Actualizar patrones de autenticación
@@ -98,6 +108,7 @@ git diff package.json
 ### Verificación de Consistencia
 
 Antes de finalizar cualquier tarea:
+
 1. **Verificar** que la documentación refleja el estado actual
 2. **Actualizar** archivos de reglas si es necesario
 3. **Confirmar** que README.md está actualizado
@@ -115,4 +126,5 @@ Antes de finalizar cualquier tarea:
 description:
 globs:
 alwaysApply: false
+
 ---

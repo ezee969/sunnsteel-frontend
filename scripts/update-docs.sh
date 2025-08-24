@@ -1,78 +1,81 @@
 #!/bin/bash
 
+set -euo pipefail
+BASE=${1:-HEAD~1}
+
 # Script para detectar cambios en la estructura del proyecto frontend y recordar actualizar documentación
 
 echo "🔍 Detecting frontend project structure changes..."
 
-# Frontend - Detectar nuevas páginas
-echo "📄 Checking for new pages..."
-NEW_PAGES=$(find app -name "page.tsx" -type f 2>/dev/null)
+# Frontend - Detectar páginas cambiadas
+echo "📄 Checking for changed pages since $BASE..."
+CHANGED_PAGES=$(git diff --name-only "$BASE" -- 'app/**/page.tsx' 2>/dev/null || true)
 
-# Detectar nuevos componentes
-echo "🧩 Checking for new components..."
-NEW_COMPONENTS=$(find components -name "*.tsx" -type f 2>/dev/null)
+# Detectar componentes cambiados
+echo "🧩 Checking for changed components since $BASE..."
+CHANGED_COMPONENTS=$(git diff --name-only "$BASE" -- 'components/**/*.tsx' 2>/dev/null || true)
 
-# Detectar nuevos hooks
-echo "🎣 Checking for new hooks..."
-NEW_HOOKS=$(find hooks -name "*.ts" -type f 2>/dev/null)
+# Detectar hooks cambiados
+echo "🎣 Checking for changed hooks since $BASE..."
+CHANGED_HOOKS=$(git diff --name-only "$BASE" -- 'hooks/**/*.ts' 2>/dev/null || true)
 
-# Detectar nuevos servicios
-echo "🔧 Checking for new services..."
-NEW_SERVICES=$(find lib/api -name "*.ts" -type f 2>/dev/null)
+# Detectar servicios cambiados
+echo "🔧 Checking for changed services since $BASE..."
+CHANGED_SERVICES=$(git diff --name-only "$BASE" -- 'lib/api/**/*.ts' 2>/dev/null || true)
 
-# Detectar nuevos schemas
-echo "📋 Checking for new schemas..."
-NEW_SCHEMAS=$(find schema -name "*.ts" -type f 2>/dev/null)
+# Detectar schemas cambiados
+echo "📋 Checking for changed schemas since $BASE..."
+CHANGED_SCHEMAS=$(git diff --name-only "$BASE" -- 'schema/**/*.ts' 2>/dev/null || true)
 
 # Detectar cambios en package.json
-echo "📦 Checking for package.json changes..."
-PACKAGE_CHANGES=$(git diff --name-only HEAD~1 | grep "package.json" 2>/dev/null)
+echo "📦 Checking for package.json changes since $BASE..."
+PACKAGE_CHANGES=$(git diff --name-only "$BASE" -- package.json 2>/dev/null || true)
 
-# Detectar nuevos providers
-echo "🔄 Checking for new providers..."
-NEW_PROVIDERS=$(find providers -name "*.tsx" -type f 2>/dev/null)
+# Detectar providers cambiados
+echo "🔄 Checking for changed providers since $BASE..."
+CHANGED_PROVIDERS=$(git diff --name-only "$BASE" -- 'providers/**/*.tsx' 2>/dev/null || true)
 
 echo ""
-echo "📋 SUMMARY OF DETECTED CHANGES:"
+echo "📋 SUMMARY OF DETECTED CHANGES (vs $BASE):"
 echo "================================"
 
-if [ ! -z "$NEW_PAGES" ]; then
-    echo "🆕 New pages detected:"
-    echo "$NEW_PAGES"
+if [ -n "$CHANGED_PAGES" ]; then
+    echo "🆕 Pages changed:"
+    echo "$CHANGED_PAGES"
     echo ""
 fi
 
-if [ ! -z "$NEW_COMPONENTS" ]; then
-    echo "🆕 New components detected:"
-    echo "$NEW_COMPONENTS"
+if [ -n "$CHANGED_COMPONENTS" ]; then
+    echo "🆕 Components changed:"
+    echo "$CHANGED_COMPONENTS"
     echo ""
 fi
 
-if [ ! -z "$NEW_HOOKS" ]; then
-    echo "🆕 New hooks detected:"
-    echo "$NEW_HOOKS"
+if [ -n "$CHANGED_HOOKS" ]; then
+    echo "🆕 Hooks changed:"
+    echo "$CHANGED_HOOKS"
     echo ""
 fi
 
-if [ ! -z "$NEW_SERVICES" ]; then
-    echo "🆕 New services detected:"
-    echo "$NEW_SERVICES"
+if [ -n "$CHANGED_SERVICES" ]; then
+    echo "🆕 Services changed:"
+    echo "$CHANGED_SERVICES"
     echo ""
 fi
 
-if [ ! -z "$NEW_SCHEMAS" ]; then
-    echo "🆕 New schemas detected:"
-    echo "$NEW_SCHEMAS"
+if [ -n "$CHANGED_SCHEMAS" ]; then
+    echo "🆕 Schemas changed:"
+    echo "$CHANGED_SCHEMAS"
     echo ""
 fi
 
-if [ ! -z "$NEW_PROVIDERS" ]; then
-    echo "🆕 New providers detected:"
-    echo "$NEW_PROVIDERS"
+if [ -n "$CHANGED_PROVIDERS" ]; then
+    echo "🆕 Providers changed:"
+    echo "$CHANGED_PROVIDERS"
     echo ""
 fi
 
-if [ ! -z "$PACKAGE_CHANGES" ]; then
+if [ -n "$PACKAGE_CHANGES" ]; then
     echo "📦 Package.json changes detected!"
     echo ""
 fi

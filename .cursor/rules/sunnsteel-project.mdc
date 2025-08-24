@@ -32,6 +32,10 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **`app/(auth)/signup/page.tsx`**: Página de registro
 - **`app/(protected)/dashboard/page.tsx`**: Dashboard principal
 - **`app/(protected)/routines/page.tsx`**: Gestión de rutinas
+ - Heart toggle en tarjetas de rutinas para favoritos
+ - ListChecks toggle para marcar rutinas como completadas
+- **`app/(protected)/routines/[id]/page.tsx`**: Detalle de rutina con controles para iniciar sesión por día o Quick Start
+- **`app/(protected)/workouts/sessions/[id]/page.tsx`**: Sesión activa de entrenamiento (mobile-first)
 - **`app/page.tsx`**: Página de inicio pública
 
 ### Directorios Principales
@@ -43,7 +47,14 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **`hooks/`**: Custom hooks (useAuthProtection, useSidebar)
 - **`lib/`**: Utilidades y servicios
   - `api/`: Servicios de API y hooks (9 servicios disponibles)
-  - `utils.ts`: Utilidades generales
+    - `workoutService.ts`:
+      - `startSession({ routineId, routineDayId, notes? })`
+      - `getActiveSession()`
+      - `getSessionById(id)`
+      - `finishSession(id, { status, notes? })`
+      - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
+      - `deleteSetLog(id, routineExerciseId, setNumber)`
+    - `utils.ts`: Utilidades generales
 - **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
 
 ### Middleware
@@ -70,10 +81,34 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
   - `authService.ts`: Servicios de autenticación
   - `userService.ts`: Servicios de usuario
   - `tokenService.ts`: Servicios de tokens
+  - `routineService.ts`:
+    - `toggleFavorite(id, isFavorite)`
+    - `toggleCompleted(id, isCompleted)`
+    - `getUserRoutines({ isFavorite?, isCompleted? })` soporta filtros vía querystring
+  - `workoutService.ts`:
+    - `startSession({ routineId, routineDayId, notes? })`
+    - `getActiveSession()`
+    - `getSessionById(id)`
+    - `finishSession(id, { status, notes? })`
+    - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
+    - `deleteSetLog(id, routineExerciseId, setNumber)`
 - **API Hooks**:
   - `useRegister.ts`, `useLogin.ts`, `useLogout.ts`
   - `useUser.ts`, `useRefreshToken.ts`
+  - `useRoutines.ts`:
+    - `useRoutines(filters?)` donde `filters` = `{ isFavorite?, isCompleted? }` y forma parte del `queryKey`
+    - `useToggleRoutineFavorite()` con optimistic updates
+    - `useToggleRoutineCompleted()` con optimistic updates
+  - `useWorkoutSession.ts`:
+    - `useStartSession()`
+    - `useActiveSession()`
+    - `useSession(id)`
+    - `useFinishSession(id)`
+    - `useUpsertSetLog(id)`
+    - `useDeleteSetLog(id)`
 - **Types**: `auth.type.ts` para tipos de autenticación
+  - `routine.type.ts`: `Routine` incluye `isFavorite: boolean` e `isCompleted: boolean`
+  - `workout.type.ts`: Tipos para `WorkoutSession`, `SetLog` y DTOs (start/finish/upsert)
 - **TanStack Query**: Para cache y estado del servidor
 - **Error Handling**: Manejo centralizado de errores
 
@@ -92,6 +127,14 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **Responsive Design**: Mobile-first approach
 - **Dark Mode**: Soporte para tema oscuro
 - **Accessibility**: Componentes accesibles con Radix
+- **Favorites UI**: Botón Heart accesible para marcar/desmarcar favoritos en `WorkoutsList`
+- **Completed UI**: Botón ListChecks accesible para marcar/desmarcar como completada en `WorkoutsList`
+ - **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
+ - **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open"; incluye Quick Start y selección de día.
+ - **Resume Banner**: Banner de reanudación de sesión activa en `app/(protected)/layout.tsx` visible cuando existe una sesión activa (oculto en la página de la sesión).
+ - **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx` para editar reps, peso, RPE y marcar completado por set; usa `useUpsertSetLog(id)` e invalida el query de la sesión.
+ - **Autosave Toggle Fix**: El autosave al alternar "Completed" ahora usa el siguiente estado (no el estado previo) para evitar condiciones de estado obsoleto.
+ - **Remove Set**: Botón "Remove" accesible por cada set que usa `useDeleteSetLog(id)` con optimistic updates y spinner mientras se elimina.
 
 ## Componentes Disponibles
 
@@ -123,6 +166,30 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - `npm run dev:all`: Frontend + Backend simultáneo
 - `npm run build`: Build de producción
 - `npm run lint`: Linting con ESLint
+ - `npm run test`: Ejecuta tests con Vitest una sola vez
+ - `npm run test:watch`: Ejecuta tests en modo watch
+ - `npm run test:coverage`: Ejecuta tests con cobertura (text + lcov)
+
+### Testing (Frontend)
+
+- Stack: Vitest + Testing Library (React) sobre `jsdom`.
+- Configuración: `vitest.config.ts`
+  - `test.environment = 'jsdom'`
+  - `test.globals = true`
+  - `resolve.alias` mapea `@` a la raíz del proyecto
+  - Cobertura con `@vitest/coverage-v8`
+- Setup global: `test/setup.ts` (jest-dom)
+- Utilidades de test: `test/utils.tsx` (helper `render`)
+- Tests iniciales:
+  - `test/lib/utils/time.test.ts` (helpers de tiempo)
+  - `test/components/ui/button.test.tsx` (render básico del Button)
+  - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
+
+### CI
+
+- Workflow: `.github/workflows/ci.yml`
+- Disparadores: push (main/master/develop) y todos los PRs
+- Pasos: `npm ci` → `npm run test:coverage` (Vitest + Coverage V8) → sube artefacto `coverage/`
 
 ## Patrones de Código
 
@@ -158,6 +225,12 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - `POST /api/auth/logout`: Cierre de sesión
 - `POST /api/auth/refresh`: Renovación de tokens
 - `GET /api/users/profile`: Perfil de usuario
+ - `POST /api/workouts/sessions/start`: Iniciar sesión de entrenamiento
+ - `GET /api/workouts/sessions/active`: Obtener sesión activa
+ - `GET /api/workouts/sessions/:id`: Obtener sesión por id
+ - `PATCH /api/workouts/sessions/:id/finish`: Finalizar sesión
+ - `PUT /api/workouts/sessions/:id/set-logs`: Upsert de registros de sets
+ - `DELETE /api/workouts/sessions/:id/set-logs/:routineExerciseId/:setNumber`: Eliminar un set log específico
 
 ### Autenticación Flow
 

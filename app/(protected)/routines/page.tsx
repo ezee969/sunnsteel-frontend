@@ -3,7 +3,7 @@
 import WorkoutFilters from './components/WorkoutFilters';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { WorkoutFilter } from './types';
 import WorkoutsList from './components/WorkoutsList';
 // import ActiveWorkout from './components/ActiveWorkout';
@@ -12,7 +12,15 @@ import { useRoutines } from '@/lib/api/hooks/useRoutines';
 
 export default function RoutinesPage() {
   const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all');
-  const { data: routines, isLoading, error } = useRoutines();
+
+  const listFilters = useMemo(() => {
+    if (activeFilter === 'favorites') return { isFavorite: true } as const;
+    if (activeFilter === 'completed') return { isCompleted: true } as const;
+    // 'all' and 'recent' currently map to no backend filters
+    return {} as const;
+  }, [activeFilter]);
+
+  const { data: routines, isLoading, error } = useRoutines(listFilters);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">

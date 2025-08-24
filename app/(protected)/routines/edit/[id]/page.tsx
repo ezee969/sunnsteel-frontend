@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -40,7 +40,9 @@ const STEPS = [
   { id: 4, title: 'Review & Update', description: 'Review and save changes' },
 ];
 
-export default function EditRoutinePage({ params }: { params: { id: string } }) {
+export default function EditRoutinePage() {
+  const params = useParams<{ id: string }>();
+  const routineId = (params?.id ?? '') as string;
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [visitedSteps, setVisitedSteps] = useState(new Set([1]));
@@ -51,7 +53,7 @@ export default function EditRoutinePage({ params }: { params: { id: string } }) 
     days: [],
   });
 
-  const { data: routine, isLoading, error } = useRoutine(params.id);
+  const { data: routine, isLoading, error } = useRoutine(routineId);
   const updateRoutineMutation = useUpdateRoutine();
   const createRoutineMutation = useCreateRoutine();
 
@@ -178,7 +180,7 @@ export default function EditRoutinePage({ params }: { params: { id: string } }) 
         return (
           <ReviewAndCreate
             data={routineData}
-            routineId={params.id}
+            routineId={routineId}
             isEditing={true}
             onComplete={() => {
               router.push('/routines');

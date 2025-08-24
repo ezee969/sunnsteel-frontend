@@ -9,6 +9,10 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { ClipLoader } from 'react-spinners';
 import { cn } from '@/lib/utils';
+import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
+import { Button } from '@/components/ui/button';
+import { Dumbbell } from 'lucide-react';
+import Link from 'next/link';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -38,6 +42,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const [activeNav, setActiveNav] = useState(() => getActiveNavFromPath(pathname));
+  const { data: activeSession } = useActiveSession();
+
+  const isOnSessionPage = pathname.startsWith('/workouts/sessions/');
 
   // Update activeNav when pathname changes
   useEffect(() => {
@@ -87,6 +94,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           isMobile={isMobile}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
+
+        {/* Active Session Banner */}
+        {!isOnSessionPage && activeSession?.id && (
+          <div className="px-3 sm:px-6">
+            <div className="mb-2 rounded-md border bg-primary/5 p-3 sm:p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm">
+                <Dumbbell className="h-4 w-4" />
+                <span>Active workout session in progress.</span>
+              </div>
+              <Button asChild size="sm" aria-label="Resume active session">
+                <Link href={`/workouts/sessions/${activeSession.id}`}>Resume</Link>
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Dashboard Content */}
         <main className="flex-1 overflow-auto p-3 sm:p-6">{children}</main>

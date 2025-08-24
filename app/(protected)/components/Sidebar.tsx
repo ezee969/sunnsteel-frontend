@@ -237,7 +237,7 @@ export default function Sidebar({
           )}
         >
           <Avatar className="h-10 w-10 border-2 border-primary/20">
-            <AvatarImage src="/placeholder-user.jpg" alt="User" />
+            <AvatarImage src="/logo.png" alt="User" />
             <AvatarFallback className="bg-primary/10 text-primary">
               {user?.name?.charAt(0)}
             </AvatarFallback>

@@ -7,12 +7,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: Error | null;
+  hasTriedRefresh: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  hasTriedRefresh: false,
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -61,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isAuthenticated,
     isLoading: refreshing,
     error: refreshError ? new Error('Authentication failed') : null,
+    hasTriedRefresh: refreshAttempted,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

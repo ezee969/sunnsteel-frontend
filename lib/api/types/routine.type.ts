@@ -28,6 +28,8 @@ export interface Routine {
   name: string;
   description?: string;
   isPeriodized: boolean;
+  isFavorite: boolean;
+  isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
   days: RoutineDay[];

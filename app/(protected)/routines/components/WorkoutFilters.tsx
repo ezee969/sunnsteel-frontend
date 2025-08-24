@@ -11,10 +11,10 @@ interface WorkoutFiltersProps {
 }
 
 const filters = [
-  { id: 'all', label: 'All Workout Routines', icon: LayoutGrid },
-  { id: 'recent', label: 'Recent', icon: Clock },
-  { id: 'favorites', label: 'Favorites', icon: Heart },
-  { id: 'completed', label: 'Completed', icon: ListChecks },
+  { id: 'all', label: 'All Workout Routines', icon: LayoutGrid, disabled: false },
+  { id: 'recent', label: 'Recent', icon: Clock, disabled: true },
+  { id: 'favorites', label: 'Favorites', icon: Heart, disabled: false },
+  { id: 'completed', label: 'Completed', icon: ListChecks, disabled: false },
 ] as const;
 
 export default function WorkoutFilters({
@@ -34,6 +34,7 @@ export default function WorkoutFilters({
               activeFilter === filter.id && 'bg-primary text-primary-foreground'
             )}
             onClick={() => onFilterChange(filter.id as WorkoutFilter)}
+            disabled={filter.disabled}
           >
             <filter.icon className="h-4 w-4 flex-shrink-0" />
             <span className="truncate">{filter.label}</span>

@@ -123,4 +123,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Make interactive elements clearly clickable */
+  button,
+  [role="button"],
+  a,
+  summary,
+  [data-slot="button"],
+  [data-clickable="true"],
+  [aria-haspopup],
+  [aria-controls] {
+    @apply cursor-pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"],
+  [disabled] {
+    @apply cursor-not-allowed;
+  }
 }

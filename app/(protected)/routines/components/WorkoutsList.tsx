@@ -11,7 +11,14 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, MoreVertical, PlusCircle, Loader2 } from 'lucide-react';
+import {
+  Dumbbell,
+  MoreVertical,
+  PlusCircle,
+  Loader2,
+  Heart,
+  ListChecks,
+} from 'lucide-react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -31,7 +38,13 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { Routine } from '@/lib/api/types/routine.type';
-import { useDeleteRoutine } from '@/lib/api/hooks/useRoutines';
+import {
+  useDeleteRoutine,
+  useToggleRoutineFavorite,
+  useToggleRoutineCompleted,
+} from '@/lib/api/hooks/useRoutines';
+import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useRouter } from 'next/navigation';
 import { ClipLoader } from 'react-spinners';
 
 interface WorkoutsListProps {
@@ -45,10 +58,24 @@ export default function WorkoutsList({
   isLoading,
   error,
 }: WorkoutsListProps) {
+  const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
+  const [favoriteActingId, setFavoriteActingId] = useState<string | null>(null);
+  const [completedActingId, setCompletedActingId] = useState<string | null>(null);
+  const [startActingId, setStartActingId] = useState<string | null>(null);
 
   const { mutate: deleteRoutine, isPending: isDeleting } = useDeleteRoutine();
+  const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
+    useToggleRoutineFavorite();
+  const { mutate: toggleCompleted, isPending: isTogglingCompleted } =
+    useToggleRoutineCompleted();
+  const { mutateAsync: startSession, isPending: isStarting } = useStartSession();
+
+  const dayName = (dayOfWeek: number) => {
+    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return names[dayOfWeek] ?? `Day ${dayOfWeek}`;
+  };
 
   const handleDeleteClick = (routineId: string) => {
     setSelectedRoutineId(routineId);
@@ -63,6 +90,45 @@ export default function WorkoutsList({
           setSelectedRoutineId(null);
         },
       });
+    }
+  };
+
+  const handleToggleFavorite = (routine: Routine) => {
+    if (!routine?.id) return;
+    setFavoriteActingId(routine.id);
+    toggleFavorite(
+      { id: routine.id, isFavorite: !routine.isFavorite },
+      {
+        onSettled: () => setFavoriteActingId(null),
+      }
+    );
+  };
+
+  const handleToggleCompleted = (routine: Routine) => {
+    if (!routine?.id) return;
+    setCompletedActingId(routine.id);
+    toggleCompleted(
+      { id: routine.id, isCompleted: !routine.isCompleted },
+      {
+        onSettled: () => setCompletedActingId(null),
+      }
+    );
+  };
+
+  const handleStartSession = async (
+    routineId: string,
+    routineDayId: string,
+  ) => {
+    try {
+      setStartActingId(routineId);
+      const session = await startSession({ routineId, routineDayId });
+      if (session?.id) {
+        router.push(`/workouts/sessions/${session.id}`);
+      }
+    } catch (err) {
+      console.error('Failed to start session', err);
+    } finally {
+      setStartActingId(null);
     }
   };
 
@@ -115,24 +181,131 @@ export default function WorkoutsList({
                     </CardDescription>
                   )}
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/routines/edit/${routine.id}`}>Edit</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onSelect={() => handleDeleteClick(routine.id)}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8"
+                    aria-label="Start session"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const first = routine.days?.[0];
+                      if (first) {
+                        void handleStartSession(routine.id, first.id);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const first = routine.days?.[0];
+                        if (first) {
+                          void handleStartSession(routine.id, first.id);
+                        }
+                      }
+                    }}
+                    disabled={isStarting && startActingId === routine.id}
+                  >
+                    {isStarting && startActingId === routine.id ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Dumbbell className="mr-2 h-4 w-4" />
+                    )}
+                    Start
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    aria-label={
+                      routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
+                    }
+                    aria-pressed={routine.isCompleted}
+                    onClick={() => handleToggleCompleted(routine)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleCompleted(routine);
+                      }
+                    }}
+                    disabled={isTogglingCompleted && completedActingId === routine.id}
+                  >
+                    {isTogglingCompleted && completedActingId === routine.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+                    ) : (
+                      <ListChecks
+                        className="h-4 w-4 text-emerald-600"
+                        fill={routine.isCompleted ? 'currentColor' : 'none'}
+                      />
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    aria-label={
+                      routine.isFavorite ? 'Unmark favorite' : 'Mark as favorite'
+                    }
+                    aria-pressed={routine.isFavorite}
+                    onClick={() => handleToggleFavorite(routine)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleFavorite(routine);
+                      }
+                    }}
+                    disabled={isTogglingFavorite && favoriteActingId === routine.id}
+                  >
+                    {isTogglingFavorite && favoriteActingId === routine.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-rose-500" />
+                    ) : (
+                      <Heart
+                        className="h-4 w-4 text-rose-500"
+                        fill={routine.isFavorite ? 'currentColor' : 'none'}
+                      />
+                    )}
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {routine.days.length > 0 && (
+                        <>
+                          <DropdownMenuItem className="pointer-events-none opacity-60">
+                            Start session with day
+                          </DropdownMenuItem>
+                          {routine.days.map((d) => (
+                            <DropdownMenuItem
+                              key={d.id}
+                              onSelect={() => handleStartSession(routine.id, d.id)}
+                              disabled={isStarting && startActingId === routine.id}
+                            >
+                              {dayName(d.dayOfWeek)}
+                            </DropdownMenuItem>
+                          ))}
+                          <div className="my-1 h-px bg-border" />
+                        </>
+                      )}
+                      <DropdownMenuItem asChild>
+                        <Link href={`/routines/${routine.id}`}>Open</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/routines/edit/${routine.id}`}>Edit</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onSelect={() => handleDeleteClick(routine.id)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </CardHeader>
               <CardContent className="p-4 pt-0 sm:px-6 sm:pb-4 sm:pt-0">
                 <div className="flex flex-wrap gap-2">
