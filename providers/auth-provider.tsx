@@ -39,11 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    console.log('Attempting token refresh...');
-
     refreshToken(undefined, {
       onSuccess: () => {
-        console.log('Token refresh successful');
         // Simply invalidate user queries to trigger refetch if needed
         queryClient.invalidateQueries({ queryKey: ['user'] });
       },

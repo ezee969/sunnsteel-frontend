@@ -1,21 +1,21 @@
-import { ReactElement, PropsWithChildren } from 'react'
-import { render as rtlRender } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React, { ReactElement } from 'react';
+import { render as rtlRender, RenderOptions } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export const render = (ui: ReactElement) => {
-  const Wrapper = ({ children }: PropsWithChildren) => <>{children}</>
-  return rtlRender(ui, { wrapper: Wrapper })
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
-export const createQueryWrapper = (client?: QueryClient) => {
-  const queryClient =
-    client ??
-    new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    })
-  const QueryWrapper = ({ children }: PropsWithChildren) => (
+function render(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
-  QueryWrapper.displayName = 'QueryWrapper'
-  return QueryWrapper
+  );
+  return rtlRender(ui, { wrapper: Wrapper, ...options });
 }
+
+export * from '@testing-library/react';
+export { render };

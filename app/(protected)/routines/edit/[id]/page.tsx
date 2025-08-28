@@ -12,26 +12,11 @@ import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo'
 import { TrainingDays } from '@/components/routines/create/TrainingDays';
 import { BuildDays } from '@/components/routines/create/BuildDays';
 import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
+import { RoutineWizardData } from '@/components/routines/create/types';
 import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks/useRoutines';
 import { RoutineDay, RoutineExercise } from '@/lib/api/types/routine.type';
 
-interface RoutineData {
-  name: string;
-  description?: string;
-  trainingDays: number[];
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+// Use shared RoutineWizardData
 
 const STEPS = [
   { id: 1, title: 'Basic Info', description: 'Name and description' },
@@ -46,7 +31,7 @@ export default function EditRoutinePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [visitedSteps, setVisitedSteps] = useState(new Set([1]));
-  const [routineData, setRoutineData] = useState<RoutineData>({
+  const [routineData, setRoutineData] = useState<RoutineWizardData>({
     name: '',
     description: '',
     trainingDays: [],
@@ -61,7 +46,7 @@ export default function EditRoutinePage() {
   useEffect(() => {
     if (routine) {
       // Transform the routine data to match our form state
-      const transformedData: RoutineData = {
+      const transformedData: RoutineWizardData = {
         name: routine.name,
         description: routine.description || '',
         trainingDays: routine.days.map((day: RoutineDay) => day.dayOfWeek),
@@ -71,7 +56,10 @@ export default function EditRoutinePage() {
             exerciseId: exercise.exercise.id,
             sets: exercise.sets.map((set, index) => ({
               setNumber: index + 1,
-              reps: set.reps,
+              repType: set.repType,
+              reps: set.reps ?? null,
+              minReps: set.minReps ?? null,
+              maxReps: set.maxReps ?? null,
               weight: set.weight,
             })),
             restSeconds: exercise.restSeconds,
@@ -83,7 +71,7 @@ export default function EditRoutinePage() {
     }
   }, [routine]);
 
-  const updateRoutineData = (updates: Partial<RoutineData>) => {
+  const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
     setRoutineData((prev) => ({ ...prev, ...updates }));
   };
 

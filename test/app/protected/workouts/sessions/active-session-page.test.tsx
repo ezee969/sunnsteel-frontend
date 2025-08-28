@@ -13,7 +13,6 @@ vi.mock('next/navigation', () => ({
 
 const finishMutate = vi.fn()
 const upsertMutate = vi.fn()
-const deleteMutate = vi.fn()
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
   useSession: () => ({
@@ -51,10 +50,7 @@ vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
     mutate: upsertMutate,
     isPending: false,
   }),
-  useDeleteSetLog: () => ({
-    mutate: deleteMutate,
-    isPending: false,
-  }),
+  // No delete in-session UI currently
 }))
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
@@ -89,8 +85,8 @@ describe('ActiveSessionPage', () => {
   it('autosaves on blur and toggles completion', async () => {
     render(<ActiveSessionPage />)
 
-    // Change reps and blur
-    const reps = screen.getByRole('spinbutton', { name: /reps/i }) as HTMLInputElement
+    // Change reps and blur (specifically the editable "Performed reps" input)
+    const reps = screen.getByRole('spinbutton', { name: /performed reps/i }) as HTMLInputElement
     fireEvent.change(reps, { target: { value: '12' } })
     fireEvent.blur(reps)
 
@@ -107,10 +103,8 @@ describe('ActiveSessionPage', () => {
     })
   })
 
-  it('removes a set log when clicking remove', async () => {
+  it('does not render remove set controls in-session', async () => {
     render(<ActiveSessionPage />)
-
-    fireEvent.click(screen.getByRole('button', { name: /remove set 1/i }))
-    expect(deleteMutate).toHaveBeenCalledWith({ routineExerciseId: 're1', setNumber: 1 })
+    expect(screen.queryByRole('button', { name: /remove set/i })).not.toBeInTheDocument()
   })
 })

@@ -1,6 +1,11 @@
+export type RepType = 'FIXED' | 'RANGE';
+
 export interface RoutineSet {
   setNumber: number;
-  reps: number;
+  repType: RepType;
+  reps?: number | null;
+  minReps?: number | null;
+  maxReps?: number | null;
   weight?: number;
 }
 
@@ -45,11 +50,21 @@ export interface CreateRoutineRequest {
     exercises: Array<{
       exerciseId: string;
       restSeconds: number;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
+      sets: Array<
+        | {
+            setNumber: number;
+            repType: 'FIXED';
+            reps: number;
+            weight?: number;
+          }
+        | {
+            setNumber: number;
+            repType: 'RANGE';
+            minReps: number;
+            maxReps: number;
+            weight?: number;
+          }
+      >;
     }>;
   }>;
 }

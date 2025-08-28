@@ -3,6 +3,7 @@
 import {
   Activity,
   Calendar,
+  Dumbbell,
   ChevronLeft,
   ChevronRight,
   Home,
@@ -36,6 +37,13 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     icon: Home,
     href: '/dashboard',
+    disabled: false,
+  },
+  {
+    id: 'workouts',
+    label: 'Workouts',
+    icon: Dumbbell,
+    href: '/workouts',
     disabled: false,
   },
   {

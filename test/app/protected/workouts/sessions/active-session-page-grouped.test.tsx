@@ -7,7 +7,6 @@ const push = vi.fn()
 const back = vi.fn()
 const finishMutate = vi.fn()
 const upsertMutate = vi.fn()
-const deleteMutate = vi.fn()
 
 // base mocks
 vi.mock('next/navigation', () => ({
@@ -62,10 +61,6 @@ vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
     mutate: upsertMutate,
     isPending: false,
   }),
-  useDeleteSetLog: () => ({
-    mutate: deleteMutate,
-    isPending: false,
-  }),
 }))
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
@@ -82,6 +77,10 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
               id: 're1',
               order: 2,
               exercise: { id: 'e1', name: 'Bench Press' },
+              sets: [
+                { setNumber: 1, reps: 10, weight: 100 },
+                { setNumber: 2, reps: 8, weight: 100 },
+              ],
             },
           ],
         },
@@ -102,19 +101,20 @@ describe('ActiveSessionPage GroupedLogs', () => {
     expect(screen.getByText('Bench Press')).toBeInTheDocument()
   })
 
-  it('adds next set via + Set and calls upsert with incremented setNumber and exercise meta', () => {
+  it('autosaves on blur in grouped view and includes exercise meta', () => {
     render(<ActiveSessionPage />)
 
-    const addBtn = screen.getByRole('button', { name: /add set for bench press/i })
-    fireEvent.click(addBtn)
+    const repsInputs = screen.getAllByRole('spinbutton', { name: /performed reps/i })
+    const firstReps = repsInputs[0] as HTMLInputElement
+    fireEvent.change(firstReps, { target: { value: '9' } })
+    fireEvent.blur(firstReps)
 
     expect(upsertMutate).toHaveBeenCalledWith(
       expect.objectContaining({
         routineExerciseId: 're1',
         exerciseId: 'e1',
-        setNumber: 3,
-        reps: 0,
-        isCompleted: false,
+        setNumber: 1,
+        reps: 9,
       })
     )
   })

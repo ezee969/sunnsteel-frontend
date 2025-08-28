@@ -183,6 +183,28 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 
 ## Contexto para el Agente
 
+### Update: Workout History
+
+- Nueva página protegida: `app/(protected)/workouts/history/page.tsx`
+  - Ruta: `/workouts/history`
+  - Filtros: `status`, `routineId`, `from`, `to`, `q`, `sort`
+  - Paginación: scroll infinito + botón "Load more" (`cursor`, `limit`)
+- Servicios/Hooks:
+  - [workoutService.listSessions(params)](cci:1://file:///home/ezequiel/Code/sunnsteel/frontend/lib/api/services/workoutService.ts:75:2-92:3) — llama a `GET /api/workouts/sessions`
+  - [useSessions(params)](cci:1://file:///home/ezequiel/Code/sunnsteel/frontend/lib/api/hooks/useWorkoutSession.ts:37:0-55:2) — `useInfiniteQuery` con [getNextPageParam](cci:1://file:///home/ezequiel/Code/sunnsteel/frontend/lib/api/hooks/useWorkoutSession.ts:51:6-51:57)
+- Endpoints Consumidos:
+  - `GET /api/workouts/sessions`
+
+Parámetros soportados:
+
+- `status`: `IN_PROGRESS` | `COMPLETED` | `ABORTED`
+- `routineId?`: string
+- `from?`, `to?`: `YYYY-MM-DD`
+- `q?`: string (busca en notas)
+- `sort?`: `finishedAt:desc|finishedAt:asc|startedAt:desc|startedAt:asc`
+- `cursor?`: string
+- `limit?`: number
+
 Cuando implementes funcionalidades:
 
 - Usa Next.js App Router patterns

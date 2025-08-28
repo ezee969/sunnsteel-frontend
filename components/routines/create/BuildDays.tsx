@@ -3,35 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Clock, Loader2, ChevronsUpDown } from 'lucide-react';
+import { Plus, Loader2, ChevronsUpDown } from 'lucide-react';
 import { useExercises } from '@/lib/api/hooks/useExercises';
-import { formatTime, parseTime } from '@/lib/utils/time';
+import { parseTime } from '@/lib/utils/time';
 import { Exercise } from '@/lib/api/types/exercise.type';
-
-interface RoutineData {
-  name: string;
-  description?: string;
-  trainingDays: number[];
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+import { RoutineWizardData } from './types';
+import { Input } from '@/components/ui/input';
+import { ExerciseCard } from './ExerciseCard';
 
 interface BuildDaysProps {
-  data: RoutineData;
-  onUpdate: (updates: Partial<RoutineData>) => void;
+  data: RoutineWizardData;
+  onUpdate: (updates: Partial<RoutineWizardData>) => void;
 }
 
 const DAYS_OF_WEEK = [
@@ -48,6 +32,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [selectedDay, setSelectedDay] = useState(0);
   const [exercisePickerOpen, setExercisePickerOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({});
+  const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
 
@@ -100,9 +86,9 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     if (dayIndex === -1) return;
 
-    const newExercise = {
+    const newExercise: RoutineWizardData['days'][number]['exercises'][number] = {
       exerciseId,
-      sets: [{ setNumber: 1, reps: 10, weight: undefined }],
+      sets: [{ setNumber: 1, repType: 'FIXED', reps: 10, weight: undefined }],
       restSeconds: 120, // 2 minutes default
     };
 
@@ -124,6 +110,84 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     onUpdate({ days: newDays });
   };
 
+  // Helpers: clamp and steppers for inputs (reps/min/max/weight)
+  const clamp = (value: number, min: number, max: number) => {
+    if (Number.isNaN(value)) return min;
+    return Math.min(max, Math.max(min, value));
+  };
+
+  const stepFixedReps = (
+    exerciseIndex: number,
+    setIndex: number,
+    delta: number
+  ) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    const set = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
+    const current = set.reps ?? 1;
+    const next = clamp(current + delta, 1, 50);
+    set.reps = next;
+    onUpdate({ days: newDays });
+  };
+
+  const stepRangeReps = (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps',
+    delta: number
+  ) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    const set = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
+    if (field === 'minReps') {
+      const currentMin = set.minReps ?? 1;
+      const nextMin = clamp(currentMin + delta, 1, 50);
+      set.minReps = nextMin;
+      if (
+        set.maxReps !== null &&
+        set.maxReps !== undefined &&
+        (set.maxReps as number) < nextMin
+      ) {
+        set.maxReps = nextMin;
+      }
+    } else {
+      const curMaxBase = set.maxReps ?? (set.minReps ?? 1);
+      const nextMax = clamp(curMaxBase + delta, 1, 50);
+      set.maxReps = nextMax;
+      if (
+        set.minReps !== null &&
+        set.minReps !== undefined &&
+        (set.minReps as number) > nextMax
+      ) {
+        set.minReps = nextMax;
+      }
+    }
+    onUpdate({ days: newDays });
+  };
+
+  const stepWeight = (
+    exerciseIndex: number,
+    setIndex: number,
+    delta: number
+  ) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    const set = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
+    const current = set.weight ?? 0;
+    const next = Math.max(0, Math.round((current + delta * 0.5) * 2) / 2);
+    set.weight = next;
+    onUpdate({ days: newDays });
+  };
+
   const addSet = (exerciseIndex: number) => {
     const newDays = [...data.days];
     const dayIndex = newDays.findIndex(
@@ -135,10 +199,14 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     const exercise = newDays[dayIndex].exercises[exerciseIndex];
     const newSetNumber = exercise.sets.length + 1;
 
+    const lastSet = exercise.sets[exercise.sets.length - 1];
     exercise.sets.push({
       setNumber: newSetNumber,
-      reps: exercise.sets[exercise.sets.length - 1]?.reps || 10,
-      weight: exercise.sets[exercise.sets.length - 1]?.weight,
+      repType: lastSet?.repType ?? 'FIXED',
+      reps: lastSet?.repType === 'FIXED' ? (lastSet?.reps ?? 10) : null,
+      minReps: lastSet?.repType === 'RANGE' ? (lastSet?.minReps ?? 8) : null,
+      maxReps: lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
+      weight: lastSet?.weight,
     });
 
     onUpdate({ days: newDays });
@@ -165,7 +233,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const updateSet = (
     exerciseIndex: number,
     setIndex: number,
-    field: 'reps' | 'weight',
+    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
     value: string
   ) => {
     const newDays = [...data.days];
@@ -175,13 +243,59 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     if (dayIndex === -1) return;
 
-    if (field === 'weight') {
-      newDays[dayIndex].exercises[exerciseIndex].sets[setIndex][field] = value
-        ? parseFloat(value)
-        : undefined;
-    } else {
-      newDays[dayIndex].exercises[exerciseIndex].sets[setIndex][field] =
-        parseInt(value) || 0;
+    const targetSet = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
+    if (field === 'repType') {
+      const nextType = (value as 'FIXED' | 'RANGE');
+      targetSet.repType = nextType;
+      if (nextType === 'FIXED') {
+        targetSet.reps = targetSet.reps ?? targetSet.minReps ?? 10;
+        targetSet.minReps = null;
+        targetSet.maxReps = null;
+      } else {
+        const fallback = targetSet.reps ?? 10;
+        targetSet.minReps = targetSet.minReps ?? Math.max(1, Math.min(50, fallback - 2));
+        targetSet.maxReps = targetSet.maxReps ?? Math.max(targetSet.minReps ?? 8, fallback + 2);
+        targetSet.reps = null;
+      }
+    } else if (field === 'weight') {
+      targetSet.weight = value === '' ? undefined : parseFloat(value);
+    } else if (field === 'reps') {
+      if (value === '') {
+        targetSet.reps = null;
+      } else {
+        const next = Math.max(1, Math.min(50, parseInt(value)));
+        targetSet.reps = Number.isNaN(next) ? null : next;
+      }
+    } else if (field === 'minReps') {
+      if (value === '') {
+        targetSet.minReps = null;
+      } else {
+        const next = Math.max(1, Math.min(50, parseInt(value)));
+        targetSet.minReps = Number.isNaN(next) ? null : next;
+      }
+      if (
+        targetSet.maxReps !== null &&
+        targetSet.maxReps !== undefined &&
+        targetSet.minReps !== null &&
+        (targetSet.minReps as number) > (targetSet.maxReps as number)
+      ) {
+        targetSet.maxReps = targetSet.minReps;
+      }
+    } else if (field === 'maxReps') {
+      if (value === '') {
+        targetSet.maxReps = null;
+      } else {
+        const next = Math.max(1, Math.min(50, parseInt(value)));
+        targetSet.maxReps = Number.isNaN(next) ? null : next;
+      }
+      if (
+        targetSet.minReps !== null &&
+        targetSet.minReps !== undefined &&
+        targetSet.maxReps !== null &&
+        (targetSet.maxReps as number) < (targetSet.minReps as number)
+      ) {
+        targetSet.minReps = targetSet.maxReps;
+      }
     }
 
     onUpdate({ days: newDays });
@@ -257,250 +371,111 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                           <Plus className="h-4 w-4" />
                           <span className="hidden xs:inline">Add Exercise</span>
                           <span className="xs:hidden">Add</span>
-                        </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-
-                      {exercisePickerOpen && (
-                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-1 bg-popover border rounded-md shadow-lg">
-                          <div className="p-2 border-b">
-                            <Input
-                              placeholder="Search exercises..."
-                              value={searchValue}
-                              onChange={(e) => setSearchValue(e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {exercisesLoading ? (
-                              <div className="flex items-center justify-center py-4 text-sm text-muted-foreground">
-                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                Loading exercises...
-                              </div>
-                            ) : filteredExercises.length === 0 ? (
-                              <div className="py-4 text-center text-sm text-muted-foreground">
-                                No exercises found.
-                              </div>
-                            ) : (
-                              <div className="p-1">
-                                {filteredExercises.map((exercise: Exercise) => (
-                                  <div
-                                    key={exercise.id}
-                                    onClick={() => addExercise(exercise.id)}
-                                    className="flex flex-col items-start p-2 hover:bg-accent rounded-sm cursor-pointer"
-                                  >
-                                    <div className="font-medium text-sm">
-                                      {exercise.name}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                      {exercise.primaryMuscle} • {exercise.equipment}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {!day || day.exercises.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <p>No exercises added yet</p>
-                        <p className="text-sm">
-                          Click &quot;Add Exercise&quot; to get started
-                        </p>
                       </div>
-                    ) : (
-                      <div className="space-y-6">
-                        {day.exercises.map((exercise, exerciseIndex) => {
-                          const exerciseData = exercises?.find(
-                            (e: Exercise) => e.id === exercise.exerciseId
-                          );
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
 
-                          return (
-                            <Card key={exerciseIndex} className="border-muted">
-                              <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <h4 className="font-medium">
-                                      {exerciseData?.name || 'Unknown Exercise'}
-                                    </h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      {exerciseData?.primaryMuscle} •{' '}
-                                      {exerciseData?.equipment}
-                                    </p>
+                    {exercisePickerOpen && (
+                      <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-1 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200">
+                        <div className="p-2 border-b">
+                          <Input
+                            aria-label="Search exercises"
+                            placeholder="Search exercises..."
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                          />
+                        </div>
+                        <div className="max-h-[240px] overflow-y-auto p-1">
+                          {exercisesLoading ? (
+                            <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Loading...
+                            </div>
+                          ) : filteredExercises.length > 0 ? (
+                            <div className="space-y-1">
+                              {filteredExercises.map((ex) => (
+                                <Button
+                                  key={ex.id}
+                                  variant="ghost"
+                                  className="w-full justify-start px-3 py-2"
+                                  onClick={() => addExercise(ex.id)}
+                                >
+                                  <div className="flex flex-col items-start">
+                                    <span className="text-sm font-medium">{ex.name}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {ex.primaryMuscle} • {ex.equipment}
+                                    </span>
                                   </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-2">
-                                      <Clock className="h-4 w-4 text-muted-foreground" />
-                                      <Input
-                                        placeholder="0:00"
-                                        value={formatTime(exercise.restSeconds)}
-                                        onChange={(e) =>
-                                          updateRestTime(
-                                            exerciseIndex,
-                                            e.target.value
-                                          )
-                                        }
-                                        className="w-16 text-sm"
-                                      />
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeExercise(exerciseIndex)}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </CardHeader>
-                              <CardContent>
-                                <div className="space-y-3">
-                                  <div className="grid grid-cols-12 gap-2 text-sm font-medium text-muted-foreground">
-                                    <div className="col-span-2">Set</div>
-                                    <div className="col-span-3">Reps</div>
-                                    <div className="col-span-3">Weight</div>
-                                    <div className="col-span-4"></div>
-                                  </div>
-
-                                  {exercise.sets.map((set, setIndex) => (
-                                    <div
-                                      key={setIndex}
-                                      className="grid grid-cols-12 gap-2 items-center"
-                                    >
-                                      <div className="col-span-2">
-                                        <Badge variant="outline">
-                                          {set.setNumber}
-                                        </Badge>
-                                      </div>
-                                      <div className="col-span-3">
-                                        <Input
-                                          type="number"
-                                          min="1"
-                                          max="50"
-                                          value={set.reps}
-                                          onChange={(e) =>
-                                            updateSet(
-                                              exerciseIndex,
-                                              setIndex,
-                                              'reps',
-                                              e.target.value
-                                            )
-                                          }
-                                          className="text-center"
-                                        />
-                                      </div>
-                                      <div className="col-span-3">
-                                        <Input
-                                          type="number"
-                                          min="0"
-                                          step="0.5"
-                                          placeholder="0"
-                                          value={set.weight || ''}
-                                          onChange={(e) =>
-                                            updateSet(
-                                              exerciseIndex,
-                                              setIndex,
-                                              'weight',
-                                              e.target.value
-                                            )
-                                          }
-                                          className="text-center"
-                                        />
-                                      </div>
-                                      <div className="col-span-4 flex justify-end">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() =>
-                                            removeSet(exerciseIndex, setIndex)
-                                          }
-                                          disabled={exercise.sets.length === 1}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  ))}
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => addSet(exerciseIndex)}
-                                    className="w-full mt-2"
-                                    disabled={exercise.sets.length >= 10}
-                                  >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Set
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
+                                </Button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="py-6 text-center text-sm text-muted-foreground">
+                              No exercises found
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            );
-          })}
-        </Tabs>
-      </div>
-
-      {/* Progress Summary */}
-      <Card className="mt-6">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            Routine Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.days.map((day) => {
-              const dayName = DAYS_OF_WEEK[day.dayOfWeek];
-              const exerciseCount = day.exercises.length;
-              const totalSets = day.exercises.reduce(
-                (sum, ex) => sum + ex.sets.length,
-                0
-              );
-              const isComplete = exerciseCount > 0;
-
-              return (
-                <div
-                  key={day.dayOfWeek}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
-                    isComplete
-                      ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
-                      : 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium text-sm">{dayName}</h5>
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        isComplete ? 'bg-green-500' : 'bg-orange-500'
-                      }`}
-                    />
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Exercises</span>
-                      <span className="font-medium">{exerciseCount}</span>
+                </CardHeader>
+                <CardContent>
+                  {day && day.exercises.length > 0 ? (
+                    <div className="space-y-4">
+                      {day.exercises.map((exercise, exerciseIndex) => {
+                        const exerciseData = exercises?.find(
+                          (ex: Exercise) => ex.id === exercise.exerciseId
+                        );
+
+                        return (
+                          <ExerciseCard
+                            key={exerciseIndex}
+                            tabIndex={tabIndex}
+                            exerciseIndex={exerciseIndex}
+                            exercise={exercise}
+                            exerciseData={exerciseData}
+                            expanded={(expandedMap?.[exerciseIndex] ?? true)}
+                            onToggleExpand={(idx) =>
+                              setExpandedMap((prev) => ({
+                                ...prev,
+                                [idx]: !(prev?.[idx] ?? true),
+                              }))
+                            }
+                            onRemoveExercise={removeExercise}
+                            onUpdateRestTime={updateRestTime}
+                            onAddSet={addSet}
+                            isRemovingSet={(exIdx, setIdx) => !!removingSets[`${exIdx}-${setIdx}`]}
+                            onRemoveSetAnimated={(exIdx, setIdx) => {
+                              const key = `${exIdx}-${setIdx}`;
+                              setRemovingSets((prev) => ({ ...prev, [key]: true }));
+                              setTimeout(() => {
+                                removeSet(exIdx, setIdx);
+                                setRemovingSets((prev) => {
+                                  const next = { ...prev };
+                                  delete next[key];
+                                  return next;
+                                });
+                              }, 180);
+                            }}
+                            onUpdateSet={updateSet}
+                            onStepFixedReps={stepFixedReps}
+                            onStepRangeReps={stepRangeReps}
+                            onStepWeight={stepWeight}
+                          />
+                        );
+                      })}
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Total Sets</span>
-                      <span className="font-medium">{totalSets}</span>
+                  ) : (
+                    <div className="text-center text-sm text-muted-foreground py-8">
+                      No exercises added yet. Use &quot;Add Exercise&quot; to start building your day.
                     </div>
-                  </div>
-                </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
               );
             })}
-          </div>
+          </Tabs>
 
           {/* Overall Stats */}
           <div className="mt-4 pt-4 border-t">
@@ -534,8 +509,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      
     </div>
   );
 }

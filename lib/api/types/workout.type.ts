@@ -29,6 +29,36 @@ export interface WorkoutSession {
   updatedAt: string;
   // When fetched with includeLogs=true on backend select
   setLogs?: SetLog[];
+  // Detailed session data
+  routine?: {
+    id: string;
+    name: string;
+    description?: string | null;
+  };
+  routineDay?: {
+    id: string;
+    dayOfWeek: number;
+    exercises: {
+      id: string;
+      order: number;
+      restSeconds?: number | null;
+      exercise: {
+        id: string;
+        name: string;
+        primaryMuscle?: string | null;
+        equipment?: string | null;
+      };
+      sets: {
+        id: string;
+        setNumber: number;
+        repType: 'FIXED' | 'RANGE';
+        reps?: number | null;
+        minReps?: number | null;
+        maxReps?: number | null;
+        weight?: number | null;
+      }[];
+    }[];
+  };
 }
 
 export interface StartWorkoutRequest {
@@ -52,4 +82,40 @@ export interface UpsertSetLogRequest {
   weight?: number;
   rpe?: number;
   isCompleted?: boolean;
+}
+
+// History/List types
+export type WorkoutSessionListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABORTED';
+
+export interface WorkoutSessionSummary {
+  id: string;
+  status: WorkoutSessionListStatus;
+  startedAt: string;
+  endedAt?: string | null;
+  durationSec?: number | null;
+  totalVolume?: number | null;
+  totalSets?: number | null;
+  totalExercises?: number | null;
+  notes?: string | null;
+  routine: {
+    id: string;
+    name: string;
+    dayName?: string | null;
+  };
+}
+
+export interface ListSessionsParams {
+  status?: WorkoutSessionListStatus;
+  routineId?: string;
+  from?: string; // ISO date
+  to?: string; // ISO date
+  q?: string;
+  cursor?: string;
+  limit?: number;
+  sort?: 'finishedAt:desc' | 'finishedAt:asc' | 'startedAt:desc' | 'startedAt:asc';
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  nextCursor?: string;
 }

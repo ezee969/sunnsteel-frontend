@@ -46,6 +46,7 @@ import {
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useRouter } from 'next/navigation';
 import { ClipLoader } from 'react-spinners';
+import { routineService } from '@/lib/api/services/routineService';
 
 interface WorkoutsListProps {
   routines: Routine[] | undefined;
@@ -115,13 +116,21 @@ export default function WorkoutsList({
     );
   };
 
-  const handleStartSession = async (
-    routineId: string,
-    routineDayId: string,
-  ) => {
+  const handleStartSessionForRoutine = async (routine: Routine, routineDayId?: string) => {
     try {
-      setStartActingId(routineId);
-      const session = await startSession({ routineId, routineDayId });
+      setStartActingId(routine.id);
+      let dayId = routineDayId ?? routine.days?.[0]?.id;
+      if (!dayId) {
+        // Fallback: fetch full routine details to get days
+        console.debug('[start-session] fetching routine details to get day');
+        const full = await routineService.getById(routine.id);
+        dayId = full.days?.[0]?.id;
+      }
+      if (!dayId) {
+        console.error('No routine day available to start a session');
+        return;
+      }
+      const session = await startSession({ routineId: routine.id, routineDayId: dayId });
       if (session?.id) {
         router.push(`/workouts/sessions/${session.id}`);
       }
@@ -190,18 +199,12 @@ export default function WorkoutsList({
                     aria-label="Start session"
                     onClick={(e) => {
                       e.preventDefault();
-                      const first = routine.days?.[0];
-                      if (first) {
-                        void handleStartSession(routine.id, first.id);
-                      }
+                      void handleStartSessionForRoutine(routine);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        const first = routine.days?.[0];
-                        if (first) {
-                          void handleStartSession(routine.id, first.id);
-                        }
+                        void handleStartSessionForRoutine(routine);
                       }
                     }}
                     disabled={isStarting && startActingId === routine.id}
@@ -221,6 +224,7 @@ export default function WorkoutsList({
                     aria-label={
                       routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
                     }
+                    disabled
                     aria-pressed={routine.isCompleted}
                     onClick={() => handleToggleCompleted(routine)}
                     onKeyDown={(e) => {
@@ -229,7 +233,9 @@ export default function WorkoutsList({
                         handleToggleCompleted(routine);
                       }
                     }}
-                    disabled={isTogglingCompleted && completedActingId === routine.id}
+                    // disabled={
+                    //   isTogglingCompleted && completedActingId === routine.id
+                    // }
                   >
                     {isTogglingCompleted && completedActingId === routine.id ? (
                       <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
@@ -282,7 +288,7 @@ export default function WorkoutsList({
                           {routine.days.map((d) => (
                             <DropdownMenuItem
                               key={d.id}
-                              onSelect={() => handleStartSession(routine.id, d.id)}
+                              onSelect={() => handleStartSessionForRoutine(routine, d.id)}
                               disabled={isStarting && startActingId === routine.id}
                             >
                               {dayName(d.dayOfWeek)}

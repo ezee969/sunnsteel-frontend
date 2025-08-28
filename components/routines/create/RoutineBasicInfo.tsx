@@ -3,28 +3,11 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-
-interface RoutineData {
-  name: string;
-  description?: string;
-  trainingDays: number[];
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+import { RoutineWizardData } from './types';
 
 interface RoutineBasicInfoProps {
-  data: RoutineData;
-  onUpdate: (updates: Partial<RoutineData>) => void;
+  data: RoutineWizardData;
+  onUpdate: (updates: Partial<RoutineWizardData>) => void;
 }
 
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {

@@ -5,6 +5,9 @@ import {
   StartWorkoutRequest,
   WorkoutSession,
   UpsertSetLogRequest,
+  ListSessionsParams,
+  PaginatedResponse,
+  WorkoutSessionSummary,
 } from '../types/workout.type';
 
 const WORKOUTS_API_URL = '/workouts';
@@ -19,10 +22,18 @@ export const workoutService = {
   },
 
   getActiveSession: async (): Promise<WorkoutSession | null> => {
-    return httpClient.request<WorkoutSession | null>(`${WORKOUTS_API_URL}/sessions/active`, {
-      method: 'GET',
-      secure: true,
-    });
+    const res = await httpClient.request<WorkoutSession | null>(
+      `${WORKOUTS_API_URL}/sessions/active`,
+      {
+        method: 'GET',
+        secure: true,
+      },
+    );
+    // Normalize empty or invalid responses to null
+    if (res && typeof res === 'object' && (res as WorkoutSession).id) {
+      return res as WorkoutSession;
+    }
+    return null;
   },
 
   getSessionById: async (id: string): Promise<WorkoutSession> => {
@@ -59,6 +70,25 @@ export const workoutService = {
         method: 'DELETE',
         secure: true,
       },
+    );
+  },
+
+  listSessions: async (
+    params: ListSessionsParams,
+  ): Promise<PaginatedResponse<WorkoutSessionSummary>> => {
+    const usp = new URLSearchParams();
+    if (params.status) usp.set('status', params.status);
+    if (params.routineId) usp.set('routineId', params.routineId);
+    if (params.from) usp.set('from', params.from);
+    if (params.to) usp.set('to', params.to);
+    if (params.q) usp.set('q', params.q);
+    if (params.cursor) usp.set('cursor', params.cursor);
+    if (params.limit != null) usp.set('limit', String(params.limit));
+    if (params.sort) usp.set('sort', params.sort);
+    const qs = usp.toString();
+    return httpClient.request<PaginatedResponse<WorkoutSessionSummary>>(
+      `${WORKOUTS_API_URL}/sessions${qs ? `?${qs}` : ''}`,
+      { method: 'GET', secure: true },
     );
   },
 };

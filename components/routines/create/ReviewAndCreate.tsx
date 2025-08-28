@@ -14,27 +14,10 @@ import { useExercises } from '@/lib/api/hooks/useExercises';
 import { formatTime } from '@/lib/utils/time';
 import { CreateRoutineRequest } from '@/lib/api/types/routine.type';
 import { Exercise } from '@/lib/api/types/exercise.type';
-
-interface RoutineData {
-  name: string;
-  description?: string;
-  trainingDays: number[];
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+import { RoutineWizardData } from './types';
 
 interface ReviewAndCreateProps {
-  data: RoutineData;
+  data: RoutineWizardData;
   routineId?: string;
   isEditing?: boolean;
   onComplete: () => void;
@@ -65,11 +48,28 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       exercises: day.exercises.map((exercise) => ({
         exerciseId: exercise.exerciseId,
         restSeconds: exercise.restSeconds,
-        sets: exercise.sets.map((set) => ({
-          setNumber: set.setNumber,
-          reps: set.reps,
-          weight: set.weight,
-        })),
+        sets: exercise.sets.map((set) => {
+          const baseSet = {
+            setNumber: set.setNumber,
+            repType: set.repType,
+            ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
+          };
+          
+          if (set.repType === 'FIXED') {
+            return {
+              ...baseSet,
+              repType: 'FIXED' as const,
+              reps: set.reps ?? 0,
+            };
+          } else {
+            return {
+              ...baseSet,
+              repType: 'RANGE' as const,
+              minReps: set.minReps ?? 0,
+              maxReps: set.maxReps ?? 0,
+            };
+          }
+        }),
       })),
     })),
   });
@@ -188,8 +188,10 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
                           <div className="flex flex-wrap gap-1.5">
                             {exercise.sets.map((set) => (
                               <Badge key={set.setNumber} variant="outline" className="text-xs font-normal">
-                                {set.reps} reps
-                                {set.weight && ` @ ${set.weight}kg`}
+                                {set.repType === 'FIXED'
+                                  ? `${set.reps ?? ''} reps`
+                                  : `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
+                                {set.weight ? ` @ ${set.weight}kg` : ''}
                               </Badge>
                             ))}
                           </div>

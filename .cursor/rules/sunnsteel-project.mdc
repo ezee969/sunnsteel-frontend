@@ -35,7 +35,11 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
  - Heart toggle en tarjetas de rutinas para favoritos
  - ListChecks toggle para marcar rutinas como completadas
 - **`app/(protected)/routines/[id]/page.tsx`**: Detalle de rutina con controles para iniciar sesión por día o Quick Start
+ - **`app/(protected)/routines/new/page.tsx`**: Creación de rutina (wizard)
+ - **`app/(protected)/routines/edit/[id]/page.tsx`**: Edición de rutina (wizard con mapeo desde backend a estado local)
+- **`app/(protected)/workouts/page.tsx`**: Índice de entrenamientos. Si existe sesión activa redirige a `/workouts/sessions/[id]`; de lo contrario, muestra un hub con CTAs para ir a Rutinas o al Dashboard.
 - **`app/(protected)/workouts/sessions/[id]/page.tsx`**: Sesión activa de entrenamiento (mobile-first)
+- **`app/(protected)/workouts/history/page.tsx`**: Historial de sesiones con filtros e infinite scroll
 - **`app/page.tsx`**: Página de inicio pública
 
 ### Directorios Principales
@@ -56,6 +60,22 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
       - `deleteSetLog(id, routineExerciseId, setNumber)`
     - `utils.ts`: Utilidades generales
 - **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
+
+### Routine Creation/Edit Wizard
+
+- Tipo compartido: `components/routines/create/types.ts` exporta `RoutineWizardData` y `RepType`.
+- Repeticiones por set:
+  - `repType`: `'FIXED' | 'RANGE'`
+  - `FIXED` → usar `reps`.
+  - `RANGE` → usar `minReps` y `maxReps`.
+- Componentes del wizard (todos usan el tipo compartido):
+  - `RoutineBasicInfo` → nombre/descripción
+  - `TrainingDays` → selección de `trainingDays`
+  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales
+  - `ReviewAndCreate` → prepara payload según `repType` y crea/actualiza la rutina
+- Páginas:
+  - Nueva: `app/(protected)/routines/new/page.tsx`
+  - Edición: `app/(protected)/routines/edit/[id]/page.tsx` (mapea rutina del backend a `RoutineWizardData`, incluyendo `repType/minReps/maxReps`)
 
 ### Middleware
 
@@ -89,6 +109,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
     - `startSession({ routineId, routineDayId, notes? })`
     - `getActiveSession()`
     - `getSessionById(id)`
+    - `listSessions({ status?, routineId?, from?, to?, q?, cursor?, limit?, sort? })`
     - `finishSession(id, { status, notes? })`
     - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
     - `deleteSetLog(id, routineExerciseId, setNumber)`
@@ -103,11 +124,12 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
     - `useStartSession()`
     - `useActiveSession()`
     - `useSession(id)`
+    - `useSessions(params)` (lista paginada de historial con filtros y cursor)
     - `useFinishSession(id)`
     - `useUpsertSetLog(id)`
-    - `useDeleteSetLog(id)`
 - **Types**: `auth.type.ts` para tipos de autenticación
   - `routine.type.ts`: `Routine` incluye `isFavorite: boolean` e `isCompleted: boolean`
+  - `components/routines/create/types.ts`: `RoutineWizardData` y `RepType` para el wizard de rutinas
   - `workout.type.ts`: Tipos para `WorkoutSession`, `SetLog` y DTOs (start/finish/upsert)
 - **TanStack Query**: Para cache y estado del servidor
 - **Error Handling**: Manejo centralizado de errores
@@ -131,10 +153,21 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **Completed UI**: Botón ListChecks accesible para marcar/desmarcar como completada en `WorkoutsList`
  - **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
  - **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open"; incluye Quick Start y selección de día.
+ - **Routine Wizard UX**: En `BuildDays`, inputs accesibles que cambian entre `reps` fijos o rango (`minReps`/`maxReps`) según `repType` por set; validaciones y previsualización en `ReviewAndCreate`.
+   - Refactor: `BuildDays` ahora compone `components/routines/create/ExerciseCard.tsx` (con `SetRow` interno) para modularizar la UI de ejercicios y sets.
+   - Jerarquía de header: el título del ejercicio se muestra por encima del timer/controles.
+   - `Rep Type` usa un `select` nativo (Fixed/Range) por set para mejor simplicidad y accesibilidad.
+   - Botones stepper (+/-) para `reps` y `weight` con clamping: fijos 1..50; rango `min`/`max` 1..50 con cross-clamp (min ≤ max); weight en incrementos de 0.5 (mínimo 0).
+   - Inputs de rango (`minReps`/`maxReps`) usan `type="text"` con `inputMode="numeric"` para permitir edición fluida.
  - **Resume Banner**: Banner de reanudación de sesión activa en `app/(protected)/layout.tsx` visible cuando existe una sesión activa (oculto en la página de la sesión).
- - **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx` para editar reps, peso, RPE y marcar completado por set; usa `useUpsertSetLog(id)` e invalida el query de la sesión.
+ - **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx`:
+   - Sin agregar/eliminar sets en sesión (estructura fija según la rutina).
+   - Reps planeadas: de solo lectura (no editables).
+   - Reps realizadas: input separado y editable.
+   - Peso: input editable con pista del peso planeado.
+   - RPE: no editable por ahora (oculto en la UI).
+   - Usa `useUpsertSetLog(id)` e invalida el query de la sesión; el endpoint de borrar existe pero no se expone en la UI.
  - **Autosave Toggle Fix**: El autosave al alternar "Completed" ahora usa el siguiente estado (no el estado previo) para evitar condiciones de estado obsoleto.
- - **Remove Set**: Botón "Remove" accesible por cada set que usa `useDeleteSetLog(id)` con optimistic updates y spinner mientras se elimina.
 
 ## Componentes Disponibles
 
@@ -227,6 +260,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - `GET /api/users/profile`: Perfil de usuario
  - `POST /api/workouts/sessions/start`: Iniciar sesión de entrenamiento
  - `GET /api/workouts/sessions/active`: Obtener sesión activa
+ - `GET /api/workouts/sessions`: Listado de sesiones (historial) con filtros y paginación
  - `GET /api/workouts/sessions/:id`: Obtener sesión por id
  - `PATCH /api/workouts/sessions/:id/finish`: Finalizar sesión
  - `PUT /api/workouts/sessions/:id/set-logs`: Upsert de registros de sets

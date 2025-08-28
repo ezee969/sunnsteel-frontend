@@ -1,15 +1,28 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useDeleteSetLog, useFinishSession, useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
+import { useFinishSession, useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dumbbell, Loader2, MoveLeft, Square, Trash } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { Dumbbell, Loader2, MoveLeft, Square, ChevronDown, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useState, useEffect, useCallback } from 'react'
 import { useRoutine } from '@/lib/api/hooks/useRoutines'
 import type { Routine } from '@/lib/api/types/routine.type'
+import type { SetLog } from '@/lib/api/types/workout.type'
+import { useDebounce } from '@/hooks/use-debounce'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const formatTime = (iso?: string | null) => {
   if (!iso) return '—'
@@ -25,12 +38,56 @@ export default function ActiveSessionPage() {
   const { data: session, isLoading, error } = useSession(idParam)
   const { mutate: finishSession, isPending: finishing } = useFinishSession(idParam)
   const { mutate: upsertSetLog, isPending: savingLog } = useUpsertSetLog(idParam)
-  const { data: routine } = useRoutine(session?.routineId ?? '')
-  const { mutate: deleteSetLog, isPending: removingLog } = useDeleteSetLog(idParam)
+    const { data: routine } = useRoutine(session?.routineId ?? '')
+
+  const [isConfirmingFinish, setIsConfirmingFinish] = useState(false)
+  const [finishStatus, setFinishStatus] = useState<'COMPLETED' | 'ABORTED' | null>(null)
+
+  const handleSaveSetLog = useCallback(
+    (payload: UpsertSetLogPayload) => {
+      upsertSetLog(payload)
+    },
+    [upsertSetLog],
+  )
+
+  // No delete of set logs in-session to keep structure fixed to routine template
 
   const handleBack = () => router.back()
 
-  const handleFinish = (status: 'COMPLETED' | 'ABORTED') => {
+  const handleFinishAttempt = (status: 'COMPLETED' | 'ABORTED') => {
+    if (status === 'ABORTED') {
+      setFinishStatus('ABORTED');
+      setIsConfirmingFinish(true);
+      return;
+    }
+
+    const day = routine?.days.find((d) => d.id === session?.routineDayId);
+    if (!day) {
+      setFinishStatus(status);
+      setIsConfirmingFinish(true);
+      return;
+    }
+
+    const completedSetLogs = new Set(
+      (session?.setLogs as SetLog[] | undefined)
+        ?.filter((l) => l.isCompleted)
+        .map((l) => `${l.routineExerciseId}-${l.setNumber}`)
+    );
+
+    const allSetsCompleted = day.exercises.every((re) =>
+      re.sets.every((set) => completedSetLogs.has(`${re.id}-${set.setNumber}`))
+    );
+
+    if (allSetsCompleted) {
+      executeFinish(status);
+    } else {
+      setFinishStatus(status);
+      setIsConfirmingFinish(true);
+    }
+  };
+
+  const executeFinish = (status: 'COMPLETED' | 'ABORTED') => {
+    if (!status) return
     finishSession(
       { status },
       {
@@ -39,6 +96,11 @@ export default function ActiveSessionPage() {
         },
       },
     )
+  }
+
+  const cancelFinish = () => {
+    setIsConfirmingFinish(false)
+    setFinishStatus(null)
   }
 
   if (isLoading) {
@@ -80,12 +142,15 @@ export default function ActiveSessionPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="text-sm text-muted-foreground">
-            Routine: <span className="font-medium">{session.routineId}</span>
+            Routine:{' '}
+            <span className="font-medium">
+              {routine?.name ?? session.routineId}
+            </span>
           </div>
           <div className="flex gap-2">
             <Button
               className="flex-1"
-              onClick={() => handleFinish('COMPLETED')}
+              onClick={() => handleFinishAttempt('COMPLETED')}
               disabled={finishing}
               aria-label="Finish session"
             >
@@ -99,7 +164,7 @@ export default function ActiveSessionPage() {
             <Button
               variant="secondary"
               className="flex-1"
-              onClick={() => handleFinish('ABORTED')}
+              onClick={() => handleFinishAttempt('ABORTED')}
               disabled={finishing}
               aria-label="Abort session"
             >
@@ -109,6 +174,25 @@ export default function ActiveSessionPage() {
         </CardContent>
       </Card>
 
+      <AlertDialog open={isConfirmingFinish} onOpenChange={setIsConfirmingFinish}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {finishStatus === 'COMPLETED'
+                ? 'You have incomplete sets. Are you sure you want to finish the session?'
+                : 'Are you sure you want to abort this session? All progress will be saved, but the session will be marked as aborted.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelFinish}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => executeFinish(finishStatus!)}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Set Logs List (grouped by exercise when routine is available) */}
       <div className="mt-4 space-y-3">
         <Card>
@@ -116,44 +200,36 @@ export default function ActiveSessionPage() {
             <CardTitle className="text-base">Set Logs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {!session.setLogs || session.setLogs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No set logs yet.</p>
-            ) : !routine ? (
+            {!routine ? (
               // Fallback simple list while routine metadata loads
               <div className="space-y-3">
-                {session.setLogs.map((log) => (
+                {session.setLogs?.map((log) => (
                   <LogRow
-                    key={log.id}
-                    setLogId={log.id}
+                    key={`${log.routineExerciseId}-${log.setNumber}`}
                     routineExerciseId={log.routineExerciseId}
                     exerciseId={log.exerciseId}
                     setNumber={log.setNumber}
-                    repsInitial={log.reps}
-                    weightInitial={log.weight}
-                    rpeInitial={log.rpe}
-                    isCompletedInitial={log.isCompleted}
-                    onSave={(payload) => upsertSetLog(payload)}
-                    onRemove={({ routineExerciseId, setNumber }) =>
-                      deleteSetLog({ routineExerciseId, setNumber })
-                    }
+                    reps={log.reps}
+                    weight={log.weight}
+                    rpe={log.rpe}
+                    isCompleted={log.isCompleted}
+                    onSave={handleSaveSetLog}
                     saving={savingLog}
-                    removing={removingLog}
                   />
                 ))}
+                {!session.setLogs || session.setLogs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No set logs yet.</p>
+                ) : null}
               </div>
             ) : (
               // Group by exercise using routine + routineDay metadata
               <GroupedLogs
-                logs={session.setLogs}
+                logs={session.setLogs ?? []}
                 routineId={session.routineId}
                 routineDayId={session.routineDayId}
                 routine={routine}
-                onSave={(payload) => upsertSetLog(payload)}
-                onRemove={({ routineExerciseId, setNumber }) =>
-                  deleteSetLog({ routineExerciseId, setNumber })
-                }
+                onSave={handleSaveSetLog}
                 saving={savingLog}
-                removing={removingLog}
               />
             )}
           </CardContent>
@@ -163,27 +239,29 @@ export default function ActiveSessionPage() {
   )
 }
 
-type LogRowProps = {
-  setLogId: string
+type UpsertSetLogPayload = {
   routineExerciseId: string
   exerciseId: string
   setNumber: number
-  repsInitial: number
-  weightInitial?: number
-  rpeInitial?: number
-  isCompletedInitial: boolean
+  reps: number
+  weight?: number
+  isCompleted?: boolean
+}
+
+type LogRowProps = {
+  routineExerciseId: string
+  exerciseId: string
+  setNumber: number
+  reps: number
+  weight?: number
+  rpe?: number
+  isCompleted: boolean
+  plannedReps?: number | null
+  plannedMinReps?: number | null
+  plannedMaxReps?: number | null
+  plannedWeight?: number | null
   saving: boolean
-  removing?: boolean
-  onSave: (payload: {
-    routineExerciseId: string
-    exerciseId: string
-    setNumber: number
-    reps: number
-    weight?: number
-    rpe?: number
-    isCompleted?: boolean
-  }) => void
-  onRemove: (payload: { routineExerciseId: string; setNumber: number }) => void
+  onSave: (payload: UpsertSetLogPayload) => void
 }
 
 type GroupedLogsProps = {
@@ -201,107 +279,117 @@ type GroupedLogsProps = {
   routineDayId: string
   routine: Routine
   saving: boolean
-  removing?: boolean
   onSave: LogRowProps['onSave']
-  onRemove: LogRowProps['onRemove']
 }
 
-const GroupedLogs = ({ logs, routine, routineDayId, saving, removing, onSave, onRemove }: GroupedLogsProps) => {
+const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLogsProps) => {
+  const [collapsedExercises, setCollapsedExercises] = useState<Set<string>>(new Set())
+
+  const toggleExercise = (exerciseId: string) => {
+    setCollapsedExercises(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(exerciseId)) {
+        newSet.delete(exerciseId)
+      } else {
+        newSet.add(exerciseId)
+      }
+      return newSet
+    })
+  }
+
   const day = routine.days.find((d) => d.id === routineDayId)
   if (!day) {
     return (
       <div className="space-y-3">
         {logs.map((log) => (
           <LogRow
-            key={log.id}
-            setLogId={log.id}
+            key={`${log.routineExerciseId}-${log.setNumber}`}
             routineExerciseId={log.routineExerciseId}
             exerciseId={log.exerciseId}
             setNumber={log.setNumber}
-            repsInitial={log.reps}
-            weightInitial={log.weight}
-            rpeInitial={log.rpe}
-            isCompletedInitial={log.isCompleted}
+            reps={log.reps}
+            weight={log.weight}
+            isCompleted={log.isCompleted}
             onSave={onSave}
-            onRemove={onRemove}
             saving={saving}
-            removing={removing}
           />
         ))}
       </div>
     )
   }
 
-  const exerciseMeta = new Map(
-    day.exercises.map((re) => [re.id, { name: re.exercise.name, order: re.order, exerciseId: re.exercise.id }]),
-  )
-
-  type Log = GroupedLogsProps['logs'][number]
-  const groupMap = new Map<string, Log[]>()
-  for (const log of logs) {
-    const arr = groupMap.get(log.routineExerciseId) ?? []
-    arr.push(log)
-    groupMap.set(log.routineExerciseId, arr)
-  }
-
-  const groups = Array.from(groupMap.entries()).sort((a, b) => {
-    const aOrder = exerciseMeta.get(a[0])?.order ?? 0
-    const bOrder = exerciseMeta.get(b[0])?.order ?? 0
-    return aOrder - bOrder
-  })
-
+  // Render according to routine template: exercises in order, sets as defined in routine
+  const exercises = [...day.exercises].sort((a, b) => a.order - b.order)
   return (
     <div className="space-y-4">
-      {groups.map(([reId, groupLogs]) => {
-        const meta = exerciseMeta.get(reId)
-        const title = meta?.name ?? 'Exercise'
-        const sorted = [...groupLogs].sort((x, y) => x.setNumber - y.setNumber)
+      {exercises.map((re) => {
+        const title = re.exercise.name
+        const isCollapsed = collapsedExercises.has(re.id)
+        // For each template set number, find a current log if exists
+        const templateSets = [...re.sets].sort((a, b) => a.setNumber - b.setNumber)
+        const completedSets = templateSets.filter(tpl => {
+          const log = logs.find(l => l.routineExerciseId === re.id && l.setNumber === tpl.setNumber)
+          return log?.isCompleted
+        }).length
+
+        const isExerciseCompleted = templateSets.length > 0 && completedSets === templateSets.length;
+        
         return (
-          <div key={reId} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold">{title}</div>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                aria-label={`Add set for ${title}`}
-                onClick={() => {
-                  const next = (sorted[sorted.length - 1]?.setNumber ?? 0) + 1
-                  if (!meta?.exerciseId) return
-                  onSave({
-                    routineExerciseId: reId,
-                    exerciseId: meta.exerciseId,
-                    setNumber: next,
-                    reps: 0,
-                    weight: undefined,
-                    rpe: undefined,
-                    isCompleted: false,
-                  })
-                }}
-              >
-                + Set
-              </Button>
+          <Card key={re.id} className="overflow-hidden">
+            <CardHeader 
+              className="pb-3 cursor-pointer select-none hover:bg-muted/50 transition-colors"
+              onClick={() => toggleExercise(re.id)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {isCollapsed ? (
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  {isExerciseCompleted && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                  <CardTitle className="text-base font-semibold">{title}</CardTitle>
+                </div>
+                <Badge 
+                  variant={isExerciseCompleted ? 'default' : 'outline'}
+                  className={`text-xs ${isExerciseCompleted ? 'border-green-600 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ''}`}>
+                  {completedSets}/{templateSets.length} sets
+                </Badge>
+              </div>
+            </CardHeader>
+            <div 
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                isCollapsed ? 'max-h-0' : 'max-h-[2000px]'
+              }`}
+            >
+              <CardContent className="pt-0 space-y-3">
+                {templateSets.map((tpl) => {
+                  const log = logs.find(
+                    (l) => l.routineExerciseId === re.id && l.setNumber === tpl.setNumber,
+                  )
+                  return (
+                    <LogRow
+                      key={`${re.id}-${tpl.setNumber}`}
+                      routineExerciseId={re.id}
+                      exerciseId={re.exercise.id}
+                      setNumber={tpl.setNumber}
+                      reps={log?.reps ?? 0}
+                      weight={log?.weight ?? tpl.weight}
+                      isCompleted={log?.isCompleted ?? false}
+                      plannedReps={tpl.reps}
+                      plannedMinReps={tpl.minReps}
+                      plannedMaxReps={tpl.maxReps}
+                      plannedWeight={tpl.weight}
+                      onSave={onSave}
+                      saving={saving}
+                    />
+                  )
+                })}
+              </CardContent>
             </div>
-            <div className="space-y-2">
-              {sorted.map((log) => (
-                <LogRow
-                  key={log.id}
-                  setLogId={log.id}
-                  routineExerciseId={log.routineExerciseId}
-                  exerciseId={log.exerciseId}
-                  setNumber={log.setNumber}
-                  repsInitial={log.reps}
-                  weightInitial={log.weight}
-                  rpeInitial={log.rpe}
-                  isCompletedInitial={log.isCompleted}
-                  onSave={onSave}
-                  onRemove={onRemove}
-                  saving={saving}
-                  removing={removing}
-                />
-              ))}
-            </div>
-          </div>
+          </Card>
         )
       })}
     </div>
@@ -312,113 +400,133 @@ const LogRow = ({
   routineExerciseId,
   exerciseId,
   setNumber,
-  repsInitial,
-  weightInitial,
-  rpeInitial,
-  isCompletedInitial,
+  reps,
+  weight,
+  isCompleted,
+  plannedReps,
+  plannedMinReps,
+  plannedMaxReps,
+  plannedWeight,
   saving,
-  removing,
   onSave,
-  onRemove,
 }: LogRowProps) => {
-  const [reps, setReps] = useState<number>(repsInitial)
-  const [weight, setWeight] = useState<number | undefined>(weightInitial)
-  const [rpe, setRpe] = useState<number | undefined>(rpeInitial)
-  const [isCompleted, setIsCompleted] = useState<boolean>(isCompletedInitial)
+  const [repsState, setReps] = useState<string>(reps > 0 ? String(reps) : '')
+  const [weightState, setWeight] = useState<string>(
+    weight !== undefined && weight !== null ? String(weight) : ''
+  )
+  const [isCompletedState, setIsCompleted] = useState<boolean>(isCompleted)
 
-  const handleSave = () => {
+  const debouncedReps = useDebounce(repsState, 1000)
+  const debouncedWeight = useDebounce(weightState, 1000)
+
+  useEffect(() => {
+    const currentReps = Number(debouncedReps)
+    const currentWeight = debouncedWeight === '' ? undefined : Number(debouncedWeight)
+
+    const hasChanged = currentReps !== reps || currentWeight !== weight
+    if (!hasChanged) return
+
     onSave({
       routineExerciseId,
       exerciseId,
       setNumber,
-      reps,
-      weight,
-      rpe,
-      isCompleted,
-    })
-  }
+      reps: Number(debouncedReps),
+      weight: debouncedWeight === '' ? undefined : Number(debouncedWeight),
+      isCompleted: isCompletedState,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedReps, debouncedWeight, onSave]);
+
+  const handleCompletionToggle = (checked: boolean) => {
+    setIsCompleted(checked);
+    onSave({
+      routineExerciseId,
+      exerciseId,
+      setNumber,
+      reps: Number(repsState),
+      weight: weightState === '' ? undefined : Number(weightState),
+      isCompleted: checked,
+    });
+  };
+
+  const plannedRepsText =
+    plannedMinReps && plannedMaxReps
+      ? `${plannedMinReps}-${plannedMaxReps}`
+      : plannedReps ?? '—';
 
   return (
-    <div className="rounded-md border p-3 sm:p-4">
-      <div className="mb-2 text-sm font-medium">Set {setNumber}</div>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-        <div className="col-span-1">
+    <div className={`rounded-lg border-2 p-4 transition-all duration-200 ${
+      isCompletedState 
+        ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20' 
+        : 'border-border bg-card'
+    }`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Badge variant={isCompletedState ? 'default' : 'outline'} className="text-xs">
+            Set {setNumber}
+          </Badge>
+          {isCompletedState && (
+            <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              ✓ Complete
+            </Badge>
+          )}
+        </div>
+        <Checkbox
+          checked={isCompletedState}
+          onCheckedChange={(checked: boolean | 'indeterminate') => handleCompletionToggle(Boolean(checked))}
+          aria-label="Mark set as complete"
+          disabled={saving}
+          className="h-5 w-5"
+        />
+      </div>
+      
+      <div className="space-y-4">
+        {/* Reps Section */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-muted-foreground">Reps</label>
+            <span className="text-xs text-muted-foreground">Target: {plannedRepsText}</span>
+          </div>
           <Input
             type="number"
             inputMode="numeric"
-            aria-label="Reps"
-            placeholder="Reps"
-            value={Number.isFinite(reps) ? reps : ''}
-            onChange={(e) => setReps(e.target.value === '' ? 0 : Number(e.target.value))}
-            onBlur={handleSave}
+            aria-label="Performed reps"
+            placeholder="Enter reps"
+            value={repsState}
+            onChange={(e) => setReps(e.target.value)}
+            disabled={saving}
+            className="text-center text-lg font-semibold h-12"
           />
         </div>
-        <div className="col-span-1">
+        
+        {/* Weight Section */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-muted-foreground">Weight (kg)</label>
+            <span className="text-xs text-muted-foreground">
+              Target: {plannedWeight ? `${plannedWeight} kg` : '—'}
+            </span>
+          </div>
           <Input
             type="number"
             inputMode="numeric"
-            aria-label="Weight"
-            placeholder="Weight"
-            value={weight ?? ''}
-            onChange={(e) => setWeight(e.target.value === '' ? undefined : Number(e.target.value))}
-            onBlur={handleSave}
+            step="0.5"
+            aria-label="Performed weight"
+            placeholder="Enter weight"
+            value={weightState}
+            onChange={(e) => setWeight(e.target.value)}
+            disabled={saving}
+            className="text-center text-lg font-semibold h-12"
           />
-        </div>
-        <div className="col-span-1">
-          <Input
-            type="number"
-            inputMode="numeric"
-            aria-label="RPE"
-            placeholder="RPE"
-            value={rpe ?? ''}
-            onChange={(e) => setRpe(e.target.value === '' ? undefined : Number(e.target.value))}
-            onBlur={handleSave}
-          />
-        </div>
-        <div className="col-span-3 flex items-center justify-end gap-2 sm:col-span-3">
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            aria-label={`Remove set ${setNumber}`}
-            onClick={() => onRemove({ routineExerciseId, setNumber })}
-            disabled={!!removing}
-          >
-            {removing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash className="mr-2 h-4 w-4" />}
-            Remove
-          </Button>
-          <Button
-            type="button"
-            variant={isCompleted ? 'secondary' : 'default'}
-            size="sm"
-            aria-label={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
-            onClick={() => {
-              setIsCompleted((prev) => {
-                const next = !prev
-                // autosave on toggle for better mobile UX using next state
-                setTimeout(() => {
-                  onSave({
-                    routineExerciseId,
-                    exerciseId,
-                    setNumber,
-                    reps,
-                    weight,
-                    rpe,
-                    isCompleted: next,
-                  })
-                }, 0)
-                return next
-              })
-            }}
-          >
-            {isCompleted ? 'Completed' : 'Not completed'}
-          </Button>
-          <Button type="button" size="sm" onClick={handleSave} disabled={saving} aria-label="Save set log">
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Save
-          </Button>
         </div>
       </div>
+      
+      {saving && (
+        <div className="flex items-center justify-center mt-3 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+          Saving...
+        </div>
+      )}
     </div>
-  )
+  );
 }

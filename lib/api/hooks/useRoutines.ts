@@ -126,7 +126,16 @@ export const useDeleteRoutine = () => {
 
   return useMutation<void, Error, string>({
     mutationFn: (id: string) => routineService.delete(id),
-    onSuccess: () => {
+    onSuccess: (_: void, id: string) => {
+      // Immediately remove from any cached routines lists (any filters)
+      queryClient.setQueriesData<Routine[]>({ queryKey: ROUTINES_QUERY_KEY }, (old) =>
+        (old ?? []).filter((r) => r.id !== id),
+      );
+
+      // Remove individual routine cache if present
+      queryClient.removeQueries({ queryKey: [...ROUTINES_QUERY_KEY, id] });
+
+      // Finally, invalidate lists to refetch from server and ensure consistency
       queryClient.invalidateQueries({ queryKey: ROUTINES_QUERY_KEY });
       // TODO: Add toast notification for success
     },

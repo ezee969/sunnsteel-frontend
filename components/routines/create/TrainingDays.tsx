@@ -6,28 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-
-interface RoutineData {
-  name: string;
-  description?: string;
-  trainingDays: number[];
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+import { RoutineWizardData } from './types';
 
 interface TrainingDaysProps {
-  data: RoutineData;
-  onUpdate: (updates: Partial<RoutineData>) => void;
+  data: RoutineWizardData;
+  onUpdate: (updates: Partial<RoutineWizardData>) => void;
 }
 
 const DAYS_OF_WEEK = [

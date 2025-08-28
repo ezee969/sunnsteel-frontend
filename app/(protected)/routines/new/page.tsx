@@ -12,29 +12,9 @@ import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo'
 import { TrainingDays } from '@/components/routines/create/TrainingDays';
 import { BuildDays } from '@/components/routines/create/BuildDays';
 import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
+import { RoutineWizardData } from '@/components/routines/create/types';
 
-interface RoutineData {
-  // Step 1: Basic Info
-  name: string;
-  description?: string;
-
-  // Step 2: Training Days
-  trainingDays: number[]; // Array of day numbers (0=Sun, 1=Mon, etc.)
-
-  // Step 3: Build Days
-  days: Array<{
-    dayOfWeek: number;
-    exercises: Array<{
-      exerciseId: string;
-      sets: Array<{
-        setNumber: number;
-        reps: number;
-        weight?: number;
-      }>;
-      restSeconds: number;
-    }>;
-  }>;
-}
+// Use shared RoutineWizardData type
 
 const STEPS = [
   { id: 1, title: 'Basic Info', description: 'Name and description' },
@@ -47,14 +27,14 @@ export default function CreateRoutinePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [visitedSteps, setVisitedSteps] = useState(new Set([1])); // Track visited steps
-  const [routineData, setRoutineData] = useState<RoutineData>({
+  const [routineData, setRoutineData] = useState<RoutineWizardData>({
     name: '',
     description: '',
     trainingDays: [],
     days: [],
   });
 
-  const updateRoutineData = (updates: Partial<RoutineData>) => {
+  const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
     setRoutineData((prev) => ({ ...prev, ...updates }));
   };
 
