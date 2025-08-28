@@ -17,5 +17,21 @@ function render(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   return rtlRender(ui, { wrapper: Wrapper, ...options });
 }
 
+export const createQueryWrapper = (client?: QueryClient) => {
+  const qc =
+    client ??
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  );
+  return Wrapper;
+};
+
 export * from '@testing-library/react';
 export { render };

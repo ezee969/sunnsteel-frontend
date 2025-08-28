@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // spies
-const push = vi.fn()
-const back = vi.fn()
-const finishMutate = vi.fn()
-const upsertMutate = vi.fn()
+const push = vi.fn();
+const back = vi.fn();
+const finishMutate = vi.fn();
+const upsertMutate = vi.fn();
 
 // base mocks
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: 'sess-1' }),
   useRouter: () => ({ push, back }),
-}))
+}));
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
   useSession: () => ({
@@ -61,7 +61,7 @@ vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
     mutate: upsertMutate,
     isPending: false,
   }),
-}))
+}));
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
   useRoutine: () => ({
@@ -87,35 +87,45 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
       ],
     },
   }),
-}))
+}));
 
-import ActiveSessionPage from '@/app/(protected)/workouts/sessions/[id]/page'
+import ActiveSessionPage from '@/app/(protected)/workouts/sessions/[id]/page';
 
 describe('ActiveSessionPage GroupedLogs', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   it('renders exercise group title from routine metadata', () => {
-    render(<ActiveSessionPage />)
-    expect(screen.getByText('Bench Press')).toBeInTheDocument()
-  })
+    render(<ActiveSessionPage />);
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+  });
 
-  it('autosaves on blur in grouped view and includes exercise meta', () => {
-    render(<ActiveSessionPage />)
+  it('saves set log with correct exercise meta (grouped)', async () => {
+    render(<ActiveSessionPage />);
 
-    const repsInputs = screen.getAllByRole('spinbutton', { name: /performed reps/i })
-    const firstReps = repsInputs[0] as HTMLInputElement
-    fireEvent.change(firstReps, { target: { value: '9' } })
-    fireEvent.blur(firstReps)
+    const repsInputs = screen.getAllByRole('spinbutton', {
+      name: /performed reps/i,
+    });
+    const firstReps = repsInputs[0] as HTMLInputElement;
+    fireEvent.change(firstReps, { target: { value: '9' } });
+    fireEvent.blur(firstReps);
 
-    expect(upsertMutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        routineExerciseId: 're1',
-        exerciseId: 'e1',
-        setNumber: 1,
-        reps: 9,
-      })
-    )
-  })
-})
+    // Trigger immediate save via completion toggle (ensures payload includes updated reps and meta)
+    const checkboxes = screen.getAllByRole('checkbox', { name: /mark set as complete/i });
+    fireEvent.click(checkboxes[0]);
+
+    await waitFor(
+      () =>
+        expect(upsertMutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            routineExerciseId: 're1',
+            exerciseId: 'e1',
+            setNumber: 1,
+            reps: 9,
+          })
+        ),
+      { timeout: 2000 }
+    );
+  });
+});

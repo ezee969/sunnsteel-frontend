@@ -212,7 +212,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
   - `resolve.alias` mapea `@` a la raíz del proyecto
   - Cobertura con `@vitest/coverage-v8`
 - Setup global: `test/setup.ts` (jest-dom)
-- Utilidades de test: `test/utils.tsx` (helper `render`)
+- Utilidades de test: `test/utils.tsx` (helper `render` y `createQueryWrapper(client?)` para envolver con `QueryClientProvider`)
 - Tests iniciales:
   - `test/lib/utils/time.test.ts` (helpers de tiempo)
   - `test/components/ui/button.test.tsx` (render básico del Button)

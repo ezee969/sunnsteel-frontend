@@ -111,9 +111,9 @@ project-root/
   - Dropdown allows selecting a specific day to start.
 - API Endpoints used:
   - `POST /api/workouts/sessions/start`
-  - `GET  /api/workouts/sessions/active`
-  - `GET  /api/workouts/sessions/:id`
-  - `GET  /api/workouts/sessions` (history list with filters & pagination)
+  - `GET /api/workouts/sessions/active`
+  - `GET /api/workouts/sessions/:id`
+  - `GET /api/workouts/sessions` (history list with filters & pagination)
   - `PATCH /api/workouts/sessions/:id/finish`
   - `PUT /api/workouts/sessions/:id/set-logs`
   - `DELETE /api/workouts/sessions/:id/set-logs/:routineExerciseId/:setNumber` (existe pero la UI no permite eliminar sets durante la sesión)
@@ -133,6 +133,7 @@ project-root/
   - `useFinishSession(id)`
   - `useUpsertSetLog(id)`
 - Active Session Page: `app/(protected)/workouts/sessions/[id]/page.tsx`
+
   - Mobile-first; shows status and basic controls to finish or abort.
   - Set Logs are rendered from the Routine template (exercises and their predefined sets, in order). Users do not add/remove sets during a session.
   - Each set shows planned values from the template:
@@ -178,7 +179,7 @@ project-root/
 - Stack: Vitest + Testing Library (React) with jsdom.
 - Config: `vitest.config.ts` sets jsdom, globals, coverage (v8), alias `@` to project root.
 - Setup: `test/setup.ts` extends Jest-DOM matchers.
-- Utilities: `test/utils.tsx` exports `render` helper.
+- Utilities: `test/utils.tsx` exports `render` helper and `createQueryWrapper(client?)` to provide a `QueryClientProvider` wrapper when needed (e.g., passing a custom QueryClient via RTL's `wrapper` option).
 - Examples:
   - Unit: `test/lib/utils/time.test.ts` covers `lib/utils/time.ts` helpers.
   - UI: `test/components/ui/button.test.tsx` renders `components/ui/button.tsx`.

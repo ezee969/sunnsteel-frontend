@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import React from 'react'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Mocks
-const push = vi.fn()
-const back = vi.fn()
+const push = vi.fn();
+const back = vi.fn();
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: 'sess-1' }),
   useRouter: () => ({ push, back }),
-}))
+}));
 
-const finishMutate = vi.fn()
-const upsertMutate = vi.fn()
+const finishMutate = vi.fn();
+const upsertMutate = vi.fn();
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
   useSession: () => ({
@@ -51,60 +51,86 @@ vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
     isPending: false,
   }),
   // No delete in-session UI currently
-}))
+}));
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
   useRoutine: () => ({ data: undefined }),
-}))
+}));
 
 // Import after mocks
-import ActiveSessionPage from '@/app/(protected)/workouts/sessions/[id]/page'
+import ActiveSessionPage from '@/app/(protected)/workouts/sessions/[id]/page';
 
 describe('ActiveSessionPage', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   it('finishes and navigates to dashboard on success', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup();
     // finish mutate should invoke onSuccess passed from component
     finishMutate.mockImplementation((_vars, opts?: { onSuccess?: () => void }) => {
-      opts?.onSuccess?.()
-    })
+      opts?.onSuccess?.();
+    });
 
-    render(<ActiveSessionPage />)
+    render(<ActiveSessionPage />);
 
-    await user.click(screen.getByRole('button', { name: /finish session/i }))
-    expect(finishMutate).toHaveBeenCalledWith({ status: 'COMPLETED' }, expect.any(Object))
-    expect(push).toHaveBeenCalledWith('/dashboard')
+    // Clicking Finish opens confirmation dialog (since routine day metadata is missing)
+    await user.click(screen.getByRole('button', { name: /finish session/i }));
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+    expect(finishMutate).toHaveBeenCalledWith(
+      { status: 'COMPLETED' },
+      expect.any(Object)
+    );
+    expect(push).toHaveBeenCalledWith('/dashboard');
 
-    await user.click(screen.getByRole('button', { name: /abort session/i }))
-    expect(finishMutate).toHaveBeenCalledWith({ status: 'ABORTED' }, expect.any(Object))
-  })
+    // Abort also requires confirmation
+    await user.click(screen.getByRole('button', { name: /abort session/i }));
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+    expect(finishMutate).toHaveBeenCalledWith(
+      { status: 'ABORTED' },
+      expect.any(Object)
+    );
+  });
 
   it('autosaves on blur and toggles completion', async () => {
-    render(<ActiveSessionPage />)
+    render(<ActiveSessionPage />);
 
     // Change reps and blur (specifically the editable "Performed reps" input)
-    const reps = screen.getByRole('spinbutton', { name: /performed reps/i }) as HTMLInputElement
-    fireEvent.change(reps, { target: { value: '12' } })
-    fireEvent.blur(reps)
+    const reps = screen.getByRole('spinbutton', {
+      name: /performed reps/i,
+    }) as HTMLInputElement;
+    fireEvent.change(reps, { target: { value: '12' } });
+    fireEvent.blur(reps);
 
-    expect(upsertMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ reps: 12, setNumber: 1, routineExerciseId: 're1', exerciseId: 'e1' })
-    )
+    await waitFor(
+      () =>
+        expect(upsertMutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reps: 12,
+            setNumber: 1,
+            routineExerciseId: 're1',
+            exerciseId: 'e1',
+          })
+        ),
+      { timeout: 2000 }
+    );
 
     // Toggle completed triggers autosave
-    fireEvent.click(screen.getByRole('button', { name: /mark as completed/i }))
-    await waitFor(() => {
-      expect(upsertMutate).toHaveBeenCalledWith(
-        expect.objectContaining({ isCompleted: true })
-      )
-    })
-  })
+    fireEvent.click(screen.getByRole('checkbox', { name: /mark set as complete/i }));
+    await waitFor(
+      () => {
+        expect(upsertMutate).toHaveBeenCalledWith(
+          expect.objectContaining({ isCompleted: true })
+        );
+      },
+      { timeout: 2000 }
+    );
+  });
 
   it('does not render remove set controls in-session', async () => {
-    render(<ActiveSessionPage />)
-    expect(screen.queryByRole('button', { name: /remove set/i })).not.toBeInTheDocument()
-  })
-})
+    render(<ActiveSessionPage />);
+    expect(
+      screen.queryByRole('button', { name: /remove set/i })
+    ).not.toBeInTheDocument();
+  });
+});
