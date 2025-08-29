@@ -1,4 +1,5 @@
 export type RepType = 'FIXED' | 'RANGE';
+export type ProgressionScheme = 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION';
 
 export interface RoutineSet {
   setNumber: number;
@@ -13,6 +14,8 @@ export interface RoutineExercise {
   id: string;
   order: number;
   restSeconds: number;
+  progressionScheme: ProgressionScheme;
+  minWeightIncrement: number;
   exercise: {
     id: string;
     name: string;
@@ -50,6 +53,8 @@ export interface CreateRoutineRequest {
     exercises: Array<{
       exerciseId: string;
       restSeconds: number;
+      progressionScheme: ProgressionScheme;
+      minWeightIncrement: number;
       sets: Array<
         | {
             setNumber: number;

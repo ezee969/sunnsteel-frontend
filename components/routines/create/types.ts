@@ -1,4 +1,5 @@
 export type RepType = 'FIXED' | 'RANGE';
+export type ProgressionScheme = 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION';
 
 export interface RoutineWizardData {
   name: string;
@@ -8,6 +9,8 @@ export interface RoutineWizardData {
     dayOfWeek: number;
     exercises: Array<{
       exerciseId: string;
+      progressionScheme: ProgressionScheme;
+      minWeightIncrement: number;
       sets: Array<{
         setNumber: number;
         repType: RepType;

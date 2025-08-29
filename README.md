@@ -64,15 +64,22 @@ project-root/
 
 ### Routine Creation/Edit Wizard
 
-- Shared type: `components/routines/create/types.ts` exports `RoutineWizardData` and `RepType`.
+- Shared type: `components/routines/create/types.ts` exports `RoutineWizardData`, `RepType`, and `ProgressionScheme`.
 - Rep types per set:
   - `repType: 'FIXED' | 'RANGE'`
   - When `FIXED`: use `reps`.
   - When `RANGE`: use `minReps` and `maxReps`.
+- Exercise progression schemes per exercise:
+  - `progressionScheme: 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION'`
+  - `minWeightIncrement`: number (default 2.5kg)
+  - **NONE**: No progression applied (default option)
+  - **DOUBLE_PROGRESSION**: Increases weight on all sets when all sets hit or exceed target reps
+  - **DYNAMIC_DOUBLE_PROGRESSION**: Increases weight per individual set when that set hits or exceed target reps
+  - **Note**: When progression is not NONE, all sets automatically use RANGE rep type (fixed reps are disabled)
 - Wizard steps/components (all use the shared type):
   - `RoutineBasicInfo` → name/description
   - `TrainingDays` → select `trainingDays`
-  - `BuildDays` → manage `days[].exercises[].sets[]` with per-set `repType` and conditional inputs
+  - `BuildDays` → manage `days[].exercises[].sets[]` with per-set `repType` and conditional inputs, plus progression settings
     - Mobile layout: set rows stack vertically on small screens; header row hidden on mobile for space.
     - Mobile/Desktop UX improvements:
       - Refactor: `BuildDays` now composes `components/routines/create/ExerciseCard.tsx` (with internal `SetRow`). This modularization improves readability and maintainability.

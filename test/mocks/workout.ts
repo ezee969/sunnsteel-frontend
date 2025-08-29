@@ -7,6 +7,8 @@ export const MOCK_SESSION_WITH_SETS: WorkoutSession = {
   routineDayId: 'day-1',
   startedAt: new Date().toISOString(),
   status: 'COMPLETED',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
   routineDay: {
     id: 'day-1',
     name: 'Test Day',
@@ -15,15 +17,18 @@ export const MOCK_SESSION_WITH_SETS: WorkoutSession = {
       {
         id: 're-1',
         order: 1,
-        notes: 'First exercise',
+        restSeconds: 120,
+        progressionScheme: 'DYNAMIC',
+        minWeightIncrement: 2.5,
         exercise: {
           id: 'ex-1',
           name: 'Exercise 1',
-          muscleGroups: ['CHEST'],
+          primaryMuscle: 'CHEST',
+          equipment: 'BARBELL',
         },
         sets: [
-          { setNumber: 1, reps: 8, repType: 'FIXED', weight: 50 },
-          { setNumber: 2, reps: 8, repType: 'FIXED', weight: 50 },
+          { id: 'set-1', setNumber: 1, reps: 8, repType: 'FIXED', weight: 50 },
+          { id: 'set-2', setNumber: 2, reps: 8, repType: 'FIXED', weight: 50 },
         ],
       },
     ],

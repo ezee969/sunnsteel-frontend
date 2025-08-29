@@ -82,6 +82,8 @@ fi
 
 echo "⚠️  REMINDER: Update documentation files:"
 echo "   - .cursor/rules/sunnsteel-project.mdc"
+echo "   - .windsurf/rules/sunnsteel-project-part-1.mdc"
+echo "   - .windsurf/rules/sunnsteel-project-part-2.mdc"
 echo "   - README.md"
 echo ""
 echo "💡 Run this script after making changes to detect what needs documentation updates." 

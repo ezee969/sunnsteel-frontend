@@ -48,6 +48,8 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       exercises: day.exercises.map((exercise) => ({
         exerciseId: exercise.exerciseId,
         restSeconds: exercise.restSeconds,
+        progressionScheme: exercise.progressionScheme,
+        minWeightIncrement: exercise.minWeightIncrement,
         sets: exercise.sets.map((set) => {
           const baseSet = {
             setNumber: set.setNumber,

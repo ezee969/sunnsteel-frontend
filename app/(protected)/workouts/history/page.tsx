@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -18,8 +18,19 @@ import type {
   ListSessionsParams,
 } from '@/lib/api/types/workout.type';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { ChevronDown } from 'lucide-react';
+import { useDebounce } from '@/hooks/use-debounce';
+import { ChevronDown, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+
+const getErrorMessage = (err: unknown): string => {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'string') return err;
+  if (err && typeof err === 'object' && 'message' in err) {
+    const m = (err as { message?: unknown }).message;
+    if (typeof m === 'string') return m;
+  }
+  return 'Failed to load sessions';
+};
 
 const STATUS_OPTIONS: Array<{ label: string; value?: WorkoutSessionListStatus }> = [
   { label: 'All', value: undefined },
@@ -40,29 +51,60 @@ const SORT_OPTIONS: Array<{
 
 export default function WorkoutHistoryPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const search = useSearchParams();
   // Filters state
-  const [status, setStatus] = useState<WorkoutSessionListStatus | undefined>(
-    'COMPLETED'
+  const [status, setStatus] = useState<WorkoutSessionListStatus | undefined>(() => {
+    const v = search.get('status') as WorkoutSessionListStatus | null;
+    return v ?? 'COMPLETED';
+  });
+  const [routineId, setRoutineId] = useState<string>(() => search.get('routineId') ?? '');
+  const [from, setFrom] = useState<string>(() => search.get('from') ?? '');
+  const [to, setTo] = useState<string>(() => search.get('to') ?? '');
+  const [q, setQ] = useState<string>(() => search.get('q') ?? '');
+  const [sort, setSort] = useState<NonNullable<ListSessionsParams['sort']>>(
+    () => ((search.get('sort') as NonNullable<ListSessionsParams['sort']>) ?? 'finishedAt:desc')
   );
-  const [routineId, setRoutineId] = useState<string>('');
-  const [from, setFrom] = useState<string>('');
-  const [to, setTo] = useState<string>('');
-  const [q, setQ] = useState<string>('');
-  const [sort, setSort] =
-    useState<NonNullable<ListSessionsParams['sort']>>('finishedAt:desc');
 
-  // Collapsible filters state
-  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
+  // Debounced search query for auto-apply
+  const debouncedQ = useDebounce(q, 250);
+
+  // Collapsible filters state (sync with URL)
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(() => {
+    return search.get('filters') === 'open';
+  });
   const filtersContentRef = useRef<HTMLDivElement | null>(null);
   const [filtersMaxHeight, setFiltersMaxHeight] = useState<number>(0);
   const { isMobile } = useSidebar();
   const hasInitRef = useRef(false);
-  // Default behavior: open on web (desktop), closed on mobile
+  const didMountRef = useRef(false);
+  // Default behavior: open on web (desktop), closed on mobile (only if no URL state)
   useEffect(() => {
     if (hasInitRef.current) return;
-    setIsFiltersOpen(!isMobile);
+    if (!search.has('filters')) {
+      setIsFiltersOpen(!isMobile);
+    }
     hasInitRef.current = true;
-  }, [isMobile]);
+  }, [isMobile, search]);
+
+  // Sync filters from URL when the search params change (e.g., back/forward navigation)
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    const s = search.get('status') as WorkoutSessionListStatus | null;
+    setStatus(s ?? undefined);
+    setRoutineId(search.get('routineId') ?? '');
+    setFrom(search.get('from') ?? '');
+    setTo(search.get('to') ?? '');
+    setQ(search.get('q') ?? '');
+    setSort(
+      (search.get('sort') as NonNullable<ListSessionsParams['sort']>) ??
+        'finishedAt:desc',
+    );
+    setIsFiltersOpen(search.get('filters') === 'open');
+  }, [search]);
 
   const params = useMemo(() => {
     return {
@@ -70,10 +112,10 @@ export default function WorkoutHistoryPage() {
       routineId: routineId || undefined,
       from: from || undefined,
       to: to || undefined,
-      q: q || undefined,
+      q: debouncedQ || undefined,
       sort,
     } as Omit<ListSessionsParams, 'cursor' | 'limit'>;
-  }, [status, routineId, from, to, q, sort]);
+  }, [status, routineId, from, to, debouncedQ, sort]);
 
   const { data: routines } = useRoutines();
   const {
@@ -86,6 +128,56 @@ export default function WorkoutHistoryPage() {
     fetchNextPage,
     refetch,
   } = useSessions({ ...params, limit: 20 });
+
+  // Helpers: URL sync and validations
+  const isDateInvalid = useMemo(() => {
+    return Boolean(from && to && from > to);
+  }, [from, to]);
+
+  const buildParams = (
+    overrides: Partial<{
+      status: WorkoutSessionListStatus | undefined;
+      routineId: string;
+      from: string;
+      to: string;
+      q: string;
+      sort: NonNullable<ListSessionsParams['sort']>;
+    }> = {},
+  ) => {
+    const nextStatus = Object.prototype.hasOwnProperty.call(overrides, 'status')
+      ? overrides.status
+      : status;
+    const nextRoutine = overrides.routineId ?? routineId;
+    const nextFrom = overrides.from ?? from;
+    const nextTo = overrides.to ?? to;
+    const nextQ = overrides.q ?? q;
+    const nextSort = overrides.sort ?? sort;
+
+    const datesValid = !(nextFrom && nextTo && nextFrom > nextTo);
+
+    return {
+      status: nextStatus,
+      routineId: nextRoutine || undefined,
+      from: datesValid ? nextFrom || undefined : undefined,
+      to: datesValid ? nextTo || undefined : undefined,
+      q: nextQ || undefined,
+      sort: nextSort,
+    } as Omit<ListSessionsParams, 'cursor' | 'limit'>;
+  };
+
+  const applyUrl = (p: Omit<ListSessionsParams, 'cursor' | 'limit'>, filtersOpen?: boolean) => {
+    const usp = new URLSearchParams();
+    if (p.status) usp.set('status', p.status);
+    if (p.routineId) usp.set('routineId', p.routineId);
+    if (p.from) usp.set('from', p.from);
+    if (p.to) usp.set('to', p.to);
+    if (p.q) usp.set('q', p.q);
+    if (p.sort) usp.set('sort', p.sort);
+    const shouldPersistFilters = filtersOpen ?? isFiltersOpen;
+    if (shouldPersistFilters) usp.set('filters', 'open');
+    const qs = usp.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
+  };
 
   // Infinite scroll via IntersectionObserver
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -124,9 +216,58 @@ export default function WorkoutHistoryPage() {
   }, [isFiltersOpen]);
 
   const handleApplyFilters = () => {
-    refetch();
-    // Auto-collapse filters after applying
+    const next = buildParams();
+    const willClose = true;
     setIsFiltersOpen(false);
+    applyUrl(next, !willClose); // false = closed
+    refetch();
+  };
+
+  const handleChangeStatus = (val: WorkoutSessionListStatus | undefined) => {
+    setStatus(val);
+    const next = buildParams({ status: val });
+    applyUrl(next);
+    refetch();
+  };
+
+  const handleChangeRoutine = (val: string) => {
+    setRoutineId(val);
+    const next = buildParams({ routineId: val });
+    applyUrl(next);
+    refetch();
+  };
+
+  const handleChangeSort = (val: NonNullable<ListSessionsParams['sort']>) => {
+    setSort(val);
+    const next = buildParams({ sort: val });
+    applyUrl(next);
+    refetch();
+  };
+
+  const handleClearAll = () => {
+    setStatus('COMPLETED');
+    setRoutineId('');
+    setFrom('');
+    setTo('');
+    setQ('');
+    setSort('finishedAt:desc');
+    const next = buildParams({
+      status: 'COMPLETED',
+      routineId: '',
+      from: '',
+      to: '',
+      q: '',
+      sort: 'finishedAt:desc',
+    });
+    applyUrl(next);
+    refetch();
+  };
+
+  const handleToggleFilters = () => {
+    const newOpen = !isFiltersOpen;
+    setIsFiltersOpen(newOpen);
+    const next = buildParams();
+    applyUrl(next, newOpen);
   };
 
   const items = useMemo(() => {
@@ -145,7 +286,7 @@ export default function WorkoutHistoryPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFiltersOpen((v) => !v)}
+              onClick={handleToggleFilters}
               aria-expanded={isFiltersOpen}
               aria-controls="workout-history-filters"
               className="inline-flex items-center gap-1"
@@ -184,10 +325,10 @@ export default function WorkoutHistoryPage() {
                     className="h-9 rounded-md border bg-background px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     value={status ?? ''}
                     onChange={(e) =>
-                      setStatus(
+                      handleChangeStatus(
                         (e.target.value || undefined) as
                           | WorkoutSessionListStatus
-                          | undefined
+                          | undefined,
                       )
                     }
                   >
@@ -209,7 +350,7 @@ export default function WorkoutHistoryPage() {
                     aria-label="Filter by routine"
                     className="h-9 rounded-md border bg-background px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     value={routineId}
-                    onChange={(e) => setRoutineId(e.target.value)}
+                    onChange={(e) => handleChangeRoutine(e.target.value)}
                   >
                     <option value="">All</option>
                     {(routines ?? []).map((r) => (
@@ -244,6 +385,9 @@ export default function WorkoutHistoryPage() {
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
                   />
+                  {isDateInvalid ? (
+                    <span className="text-xs text-destructive">From date must be before or equal to To date.</span>
+                  ) : null}
                 </div>
 
                 {/* Search */}
@@ -256,6 +400,9 @@ export default function WorkoutHistoryPage() {
                     placeholder="e.g., leg day, PR, soreness"
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleApplyFilters();
+                    }}
                   />
                 </div>
 
@@ -270,8 +417,8 @@ export default function WorkoutHistoryPage() {
                     className="h-9 rounded-md border bg-background px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     value={sort}
                     onChange={(e) =>
-                      setSort(
-                        e.target.value as NonNullable<ListSessionsParams['sort']>
+                      handleChangeSort(
+                        e.target.value as NonNullable<ListSessionsParams['sort']>,
                       )
                     }
                   >
@@ -288,6 +435,7 @@ export default function WorkoutHistoryPage() {
                     onClick={handleApplyFilters}
                     aria-label="Apply filters"
                     className="w-full"
+                    disabled={isDateInvalid}
                   >
                     Apply
                   </Button>
@@ -298,14 +446,114 @@ export default function WorkoutHistoryPage() {
 
           <Separator className="my-4" />
 
+          {/* Active filter chips */}
+          {(() => {
+            const chips: Array<{ key: string; label: string; onClear: () => void }> = [];
+            if (status) {
+              const lbl = STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status;
+              chips.push({
+                key: 'status',
+                label: `Status: ${lbl}`,
+                onClear: () => {
+                  setStatus(undefined);
+                  const next = buildParams({ status: undefined });
+                  applyUrl(next);
+                  refetch();
+                },
+              });
+            }
+            if (routineId) {
+              const name = (routines ?? []).find((r) => r.id === routineId)?.name ?? 'Unknown';
+              chips.push({
+                key: 'routine',
+                label: `Routine: ${name}`,
+                onClear: () => {
+                  setRoutineId('');
+                  const next = buildParams({ routineId: '' });
+                  applyUrl(next);
+                  refetch();
+                },
+              });
+            }
+            if (from || to) {
+              const label = from && to ? `Date: ${from} → ${to}` : from ? `From: ${from}` : `To: ${to}`;
+              chips.push({
+                key: 'date',
+                label,
+                onClear: () => {
+                  setFrom('');
+                  setTo('');
+                  const next = buildParams({ from: '', to: '' });
+                  applyUrl(next);
+                  refetch();
+                },
+              });
+            }
+            if (q) {
+              chips.push({
+                key: 'q',
+                label: `q: "${q}"`,
+                onClear: () => {
+                  setQ('');
+                  const next = buildParams({ q: '' });
+                  applyUrl(next);
+                  refetch();
+                },
+              });
+            }
+            if (sort && sort !== 'finishedAt:desc') {
+              const lbl = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? sort;
+              chips.push({
+                key: 'sort',
+                label: `Sort: ${lbl}`,
+                onClear: () => {
+                  setSort('finishedAt:desc');
+                  const next = buildParams({ sort: 'finishedAt:desc' });
+                  applyUrl(next);
+                  refetch();
+                },
+              });
+            }
+
+            if (chips.length === 0) return null;
+            return (
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                {chips.map((c) => (
+                  <span
+                    key={c.key}
+                    className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs"
+                  >
+                    <span>{c.label}</span>
+                    <button
+                      type="button"
+                      onClick={c.onClear}
+                      className="rounded-full p-0.5 hover:bg-muted"
+                      aria-label={`Clear ${c.key} filter`}
+                    >
+                      <X className="h-3 w-3" aria-hidden="true" />
+                    </button>
+                  </span>
+                ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearAll}
+                  aria-label="Clear all filters"
+                >
+                  Clear all
+                </Button>
+              </div>
+            );
+          })()}
+
           {/* List */}
           {isLoading ? (
             <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
               Loading sessions…
             </div>
           ) : isError ? (
-            <div className="text-sm text-destructive" role="alert">
-              {String(error)}
+            <div className="text-sm text-destructive" role="alert" aria-live="polite">
+              {getErrorMessage(error)}
             </div>
           ) : items.length === 0 ? (
             <div className="text-sm text-muted-foreground">
@@ -318,6 +566,15 @@ export default function WorkoutHistoryPage() {
                   key={s.id}
                   className="rounded-md border p-3 cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => router.push(`/workouts/history/${s.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open session ${s.status.toLowerCase()} for ${s.routine.name} started ${new Date(s.startedAt).toLocaleString()}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      router.push(`/workouts/history/${s.id}`);
+                    }
+                  }}
                 >
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <div className="font-medium">

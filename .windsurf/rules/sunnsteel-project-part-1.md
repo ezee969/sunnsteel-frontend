@@ -1,0 +1,254 @@
+---
+trigger: always_on
+---
+
+---
+
+## alwaysApply: true
+
+# Sunnsteel Frontend - Fitness Application
+
+Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entrenamiento.
+
+## Stack Tecnológico
+
+- **Framework**: Next.js 15.2.1 (App Router) con TypeScript
+- **UI Library**: React 19 con TailwindCSS v4
+- **Componentes**: Shadcn/ui con Radix UI primitives
+- **Estado**: TanStack Query (React Query) para server state
+- **Formularios**: React Hook Form con Zod validation
+- **Iconos**: Lucide React
+- **Fuentes**: Geist Sans y Geist Mono
+- **Autenticación**: JWT con refresh tokens
+
+## Estructura del Proyecto
+
+### App Router Structure
+
+- **`app/(auth)/`**: Páginas de autenticación (login, signup)
+- **`app/(protected)/`**: Páginas protegidas (dashboard, routines)
+- **`app/layout.tsx`**: Layout principal con providers
+- **`app/page.tsx`**: Página de inicio
+
+### Páginas Disponibles
+
+- **`app/(auth)/login/page.tsx`**: Página de inicio de sesión
+- **`app/(auth)/signup/page.tsx`**: Página de registro
+- **`app/(protected)/dashboard/page.tsx`**: Dashboard principal
+- **`app/(protected)/routines/page.tsx`**: Gestión de rutinas
+- Heart toggle en tarjetas de rutinas para favoritos
+- ListChecks toggle para marcar rutinas como completadas
+- **`app/(protected)/routines/[id]/page.tsx`**: Detalle de rutina con controles para iniciar sesión por día o Quick Start
+- **`app/(protected)/routines/new/page.tsx`**: Creación de rutina (wizard)
+- **`app/(protected)/routines/edit/[id]/page.tsx`**: Edición de rutina (wizard con mapeo desde backend a estado local)
+- **`app/(protected)/workouts/page.tsx`**: Índice de entrenamientos. Si existe sesión activa redirige a `/workouts/sessions/[id]`; de lo contrario, muestra un hub con CTAs para ir a Rutinas o al Dashboard.
+- **`app/(protected)/workouts/sessions/[id]/page.tsx`**: Sesión activa de entrenamiento (mobile-first)
+- **`app/(protected)/workouts/history/page.tsx`**: Historial de sesiones con filtros e infinite scroll
+- **`app/page.tsx`**: Página de inicio pública
+
+### Directorios Principales
+
+- **`components/`**: Componentes reutilizables
+  - `ui/`: Componentes base de Shadcn/ui (12 componentes disponibles)
+  - `layout/`: Componentes de layout
+- **`providers/`**: Context providers (Auth, App, Query)
+- **`hooks/`**: Custom hooks (useAuthProtection, useSidebar)
+- **`lib/`**: Utilidades y servicios
+  - `api/`: Servicios de API y hooks (9 servicios disponibles)
+    - `workoutService.ts`:
+      - `startSession({ routineId, routineDayId, notes? })`
+      - `getActiveSession()`
+      - `getSessionById(id)`
+      - `finishSession(id, { status, notes? })`
+      - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
+      - `deleteSetLog(id, routineExerciseId, setNumber)`
+    - `utils.ts`: Utilidades generales
+- **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
+
+### Routine Creation/Edit Wizard
+
+- Tipo compartido: `components/routines/create/types.ts` exporta `RoutineWizardData` y `RepType`.
+- Repeticiones por set:
+  - `repType`: `'FIXED' | 'RANGE'`
+  - `FIXED` → usar `reps`.
+  - `RANGE` → usar `minReps` y `maxReps`.
+- Componentes del wizard (todos usan el tipo compartido):
+  - `RoutineBasicInfo` → nombre/descripción
+  - `TrainingDays` → selección de `trainingDays`
+  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales
+  - `ReviewAndCreate` → prepara payload según `repType` y crea/actualiza la rutina
+- Páginas:
+  - Nueva: `app/(protected)/routines/new/page.tsx`
+  - Edición: `app/(protected)/routines/edit/[id]/page.tsx` (mapea rutina del backend a `RoutineWizardData`, incluyendo `repType/minReps/maxReps`)
+
+### Middleware
+
+- **`middleware.ts`**: Protección de rutas y redirecciones
+- Rutas protegidas: `/dashboard`, `/workouts`, `/profile`, `/settings`
+- Rutas de auth: `/login`, `/signup`
+
+## Patrones de Desarrollo
+
+### Autenticación
+
+- **AuthProvider**: Context para estado de autenticación
+- **useAuth**: Hook para acceder al estado de auth
+- **useAuthProtection**: Hook para proteger rutas
+- **useSidebar**: Hook para manejo de sidebar
+- **Token Management**: Access tokens en localStorage, refresh tokens en cookies
+- **Auto-refresh**: Renovación automática de tokens
+
+### API Integration
+
+- **httpClient**: Cliente HTTP centralizado con interceptors
+- **Services**:
+  - `authService.ts`: Servicios de autenticación
+  - `userService.ts`: Servicios de usuario
+  - `tokenService.ts`: Servicios de tokens
+  - `routineService.ts`:
+    - `toggleFavorite(id, isFavorite)`
+    - `toggleCompleted(id, isCompleted)`
+    - `getUserRoutines({ isFavorite?, isCompleted? })` soporta filtros vía querystring
+  - `workoutService.ts`:
+    - `startSession({ routineId, routineDayId, notes? })`
+    - `getActiveSession()`
+    - `getSessionById(id)`
+    - `listSessions({ status?, routineId?, from?, to?, q?, cursor?, limit?, sort? })`
+    - `finishSession(id, { status, notes? })`
+    - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
+    - `deleteSetLog(id, routineExerciseId, setNumber)`
+- **API Hooks**:
+  - `useRegister.ts`, `useLogin.ts`, `useLogout.ts`
+  - `useUser.ts`, `useRefreshToken.ts`
+  - `useRoutines.ts`:
+    - `useRoutines(filters?)` donde `filters` = `{ isFavorite?, isCompleted? }` y forma parte del `queryKey`
+    - `useToggleRoutineFavorite()` con optimistic updates
+    - `useToggleRoutineCompleted()` con optimistic updates
+  - `useWorkoutSession.ts`:
+    - `useStartSession()`
+    - `useActiveSession()`
+    - `useSession(id)`
+    - `useSessions(params)` (lista paginada de historial con filtros y cursor)
+    - `useFinishSession(id)`
+    - `useUpsertSetLog(id)`
+- **Types**: `auth.type.ts` para tipos de autenticación
+  - `routine.type.ts`: `Routine` incluye `isFavorite: boolean` e `isCompleted: boolean`
+  - `components/routines/create/types.ts`: `RoutineWizardData` y `RepType` para el wizard de rutinas
+  - `workout.type.ts`: Tipos para `WorkoutSession`, `SetLog` y DTOs (start/finish/upsert)
+- **TanStack Query**: Para cache y estado del servidor
+- **Error Handling**: Manejo centralizado de errores
+
+### Formularios
+
+- **React Hook Form**: Para manejo de formularios
+- **Zod Schemas**: Validación de tipos y runtime
+- **Schemas disponibles**:
+  - `loginSchema`: Validación de login
+  - `signupSchema`: Validación de registro
+
+### UI/UX
+
+- **Shadcn/ui**: Componentes base consistentes
+- **TailwindCSS**: Styling utility-first
+- **Responsive Design**: Mobile-first approach
+- **Dark Mode**: Soporte para tema oscuro
+- **Accessibility**: Componentes accesibles con Radix
+- **Favorites UI**: Botón Heart accesible para marcar/desmarcar favoritos en `WorkoutsList`
+- **Completed UI**: Botón ListChecks accesible para marcar/desmarcar como completada en `WorkoutsList`
+- **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
+- **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open"; incluye Quick Start y selección de día.
+- **Routine Wizard UX**: En `BuildDays`, inputs accesibles que cambian entre `reps` fijos o rango (`minReps`/`maxReps`) según `repType` por set; validaciones y previsualización en `ReviewAndCreate`.
+  - Refactor: `BuildDays` ahora compone `components/routines/create/ExerciseCard.tsx` (con `SetRow` interno) para modularizar la UI de ejercicios y sets.
+  - Jerarquía de header: el título del ejercicio se muestra por encima del timer/controles.
+  - `Rep Type` usa un `select` nativo (Fixed/Range) por set para mejor simplicidad y accesibilidad.
+  - Botones stepper (+/-) para `reps` y `weight` con clamping: fijos 1..50; rango `min`/`max` 1..50 con cross-clamp (min ≤ max); weight en incrementos de 0.5 (mínimo 0).
+  - Inputs de rango (`minReps`/`maxReps`) usan `type="text"` con `inputMode="numeric"` para permitir edición fluida.
+- **Resume Banner**: Banner de reanudación de sesión activa en `app/(protected)/layout.tsx` visible cuando existe una sesión activa (oculto en la página de la sesión).
+- **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx`:
+  - Sin agregar/eliminar sets en sesión (estructura fija según la rutina).
+  - Reps planeadas: de solo lectura (no editables).
+  - Reps realizadas: input separado y editable.
+  - Peso: input editable con pista del peso planeado.
+  - RPE: no editable por ahora (oculto en la UI).
+  - Usa `useUpsertSetLog(id)` e invalida el query de la sesión; el endpoint de borrar existe pero no se expone en la UI.
+- **Autosave Toggle Fix**: El autosave al alternar "Completed" ahora usa el siguiente estado (no el estado previo) para evitar condiciones de estado obsoleto.
+
+## Componentes Disponibles
+
+### UI Components (Shadcn)
+
+- **Form Components**: Button, Input, Label, Form
+- **Layout Components**: Card, Separator, Scroll Area
+- **Navigation**: Tabs, Dropdown Menu
+- **Data Display**: Avatar, Badge, Progress
+- **Loading**: Loading component
+
+### Layout Components
+
+- **Sidebar navigation**: Navegación lateral
+- **Protected route wrappers**: Envoltorios de rutas protegidas
+- **Auth layouts**: Layouts de autenticación
+- **Loading component**: Componente de carga
+
+## Configuración
+
+### Variables de Entorno
+
+- `NEXT_PUBLIC_API_URL`: URL del backend API
+- `NEXT_PUBLIC_FRONTEND_URL`: URL del frontend
+
+### Scripts Disponibles
+
+- `npm run dev`: Desarrollo con Turbopack
+- `npm run dev:all`: Frontend + Backend simultáneo
+- `npm run build`: Build de producción
+- `npm run lint`: Linting con ESLint
+- `npm run test`: Ejecuta tests con Vitest una sola vez
+- `npm run test:watch`: Ejecuta tests en modo watch
+- `npm run test:coverage`: Ejecuta tests con cobertura (text + lcov)
+
+### Testing (Frontend)
+
+- Stack: Vitest + Testing Library (React) sobre `jsdom`.
+- Configuración: `vitest.config.ts`
+  - `test.environment = 'jsdom'`
+  - `test.globals = true`
+  - `resolve.alias` mapea `@` a la raíz del proyecto
+  - Cobertura con `@vitest/coverage-v8`
+- Setup global: `test/setup.ts` (jest-dom)
+- Utilidades de test: `test/utils.tsx` (helper `render` y `createQueryWrapper(client?)` para envolver con `QueryClientProvider`)
+- Tests iniciales:
+  - `test/lib/utils/time.test.ts` (helpers de tiempo)
+  - `test/components/ui/button.test.tsx` (render básico del Button)
+  - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
+
+### CI
+
+- Workflow: `.github/workflows/ci.yml`
+- Disparadores: push (main/master/develop) y todos los PRs
+- Pasos: `npm ci` → `npm run test:coverage` (Vitest + Coverage V8) → sube artefacto `coverage/`
+
+## Patrones de Código
+
+### Imports y Aliases
+
+- `@/components`: Componentes
+- `@/lib`: Utilidades y servicios
+- `@/hooks`: Custom hooks
+- `@/providers`: Context providers
+- `@/schema`: Esquemas de validación
+
+### Convenciones
+
+- **Componentes**: PascalCase, functional components
+- **Hooks**: camelCase con prefijo "use"
+- **Services**: camelCase con sufijo "Service"
+- **Types**: PascalCase con sufijo "Type"
+- **Schemas**: camelCase con sufijo "Schema"
+
+### Manejo de Estado
+
+- **Server State**: TanStack Query
+- **Client State**: React Context + useState
+- **Form State**: React Hook Form
+- **Auth State**: AuthProvider context

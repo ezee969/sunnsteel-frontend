@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ChevronsUpDown, Clock, Minus, Plus, Trash2 } from 'lucide-react';
 import { Exercise } from '@/lib/api/types/exercise.type';
-import { RepType, RoutineWizardData } from './types';
+import { RepType, RoutineWizardData, ProgressionScheme } from './types';
 import { formatTime } from '@/lib/utils/time';
 
 export type RoutineSet = {
@@ -19,10 +19,43 @@ export type RoutineSet = {
   weight?: number;
 };
 
+interface ExerciseCardProps {
+  exercise: {
+    exerciseId: string;
+    progressionScheme: ProgressionScheme;
+    minWeightIncrement: number;
+    sets: RoutineSet[];
+    restSeconds: number;
+  };
+  exerciseIndex: number;
+  tabIndex: number;
+  onUpdateSet: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
+    value: string
+  ) => void;
+  onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  onStepRangeReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps',
+    delta: number
+  ) => void;
+  onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  onAddSet: (exerciseIndex: number) => void;
+  onRemoveSet: (exerciseIndex: number, setIndex: number) => void;
+  onRemoveExercise: (exerciseIndex: number) => void;
+  onUpdateRestTime: (exerciseIndex: number, time: string) => void;
+  onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void;
+  onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
+}
+
 interface SetRowProps {
   exerciseIndex: number;
   setIndex: number;
   set: RoutineSet;
+  progressionScheme: ProgressionScheme;
   onUpdateSet: (
     exerciseIndex: number,
     setIndex: number,
@@ -46,6 +79,7 @@ export const SetRow: FC<SetRowProps> = ({
   exerciseIndex,
   setIndex,
   set,
+  progressionScheme,
   onUpdateSet,
   onStepFixedReps,
   onStepRangeReps,
@@ -117,7 +151,8 @@ export const SetRow: FC<SetRowProps> = ({
               onChange={(e) =>
                 onUpdateSet(exerciseIndex, setIndex, 'repType', e.target.value)
               }
-              className="w-full h-9 rounded-md border bg-background px-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              disabled={progressionScheme !== 'NONE'}
+              className="w-full h-9 rounded-md border bg-background px-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="FIXED">Fixed Reps</option>
               <option value="RANGE">Rep Range</option>
@@ -339,6 +374,8 @@ interface ExerciseCardProps {
   onToggleExpand: (exerciseIndex: number) => void;
   onRemoveExercise: (exerciseIndex: number) => void;
   onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void;
+  onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void;
+  onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
   onAddSet: (exerciseIndex: number) => void;
   isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean;
   onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void;
@@ -357,6 +394,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onToggleExpand,
   onRemoveExercise,
   onUpdateRestTime,
+  onUpdateProgressionScheme,
+  onUpdateMinWeightIncrement,
   onAddSet,
   isRemovingSet,
   onRemoveSetAnimated,
@@ -443,8 +482,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             expanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
           }`}
         >
-          {/* Rest timer and controls */}
-          <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+          {/* Exercise configuration */}
+          <div className="mb-4 p-3 bg-muted/30 rounded-lg space-y-4">
+            {/* Rest timer */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -457,6 +497,83 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 onChange={(e) => onUpdateRestTime(exerciseIndex, e.target.value)}
                 className="w-20 h-8 text-sm text-center"
               />
+            </div>
+
+            {/* Progression scheme */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Progression</span>
+              </div>
+              <select
+                aria-label="Progression scheme"
+                value={exercise.progressionScheme}
+                onChange={(e) => {
+                  const newScheme = e.target.value as ProgressionScheme;
+                  onUpdateProgressionScheme(exerciseIndex, newScheme);
+                  
+                  // When progression is not NONE, force all sets to use RANGE rep type
+                  if (newScheme !== 'NONE') {
+                    exercise.sets.forEach((set, setIndex) => {
+                      onUpdateSet(exerciseIndex, setIndex, 'repType', 'RANGE');
+                      // Convert existing reps to range if needed
+                      if (set.repType === 'FIXED' && set.reps) {
+                        onUpdateSet(exerciseIndex, setIndex, 'minReps', set.reps.toString());
+                        onUpdateSet(exerciseIndex, setIndex, 'maxReps', set.reps.toString());
+                      }
+                    });
+                  }
+                }}
+                className="w-40 h-8 rounded-md border bg-background px-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="NONE">None</option>
+                <option value="DOUBLE_PROGRESSION">Double Progression</option>
+                <option value="DYNAMIC_DOUBLE_PROGRESSION">Dynamic Double Progression</option>
+              </select>
+            </div>
+
+            {/* Weight increment */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Weight Inc. (kg)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 p-0 shrink-0"
+                  aria-label="Decrease weight increment"
+                  onClick={() => onUpdateMinWeightIncrement(exerciseIndex, Math.max(0.25, exercise.minWeightIncrement - 0.25))}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.]?[0-9]*"
+                  autoComplete="off"
+                  aria-label="Minimum weight increment"
+                  placeholder="2.5"
+                  value={exercise.minWeightIncrement}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                    if (!isNaN(value) && value > 0) {
+                      onUpdateMinWeightIncrement(exerciseIndex, value);
+                    }
+                  }}
+                  className="w-20 h-8 text-sm text-center"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 p-0 shrink-0"
+                  aria-label="Increase weight increment"
+                  onClick={() => onUpdateMinWeightIncrement(exerciseIndex, exercise.minWeightIncrement + 0.25)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -477,6 +594,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 exerciseIndex={exerciseIndex}
                 setIndex={setIndex}
                 set={set}
+                progressionScheme={exercise.progressionScheme}
                 onUpdateSet={onUpdateSet}
                 onStepFixedReps={onStepFixedReps}
                 onStepRangeReps={onStepRangeReps}

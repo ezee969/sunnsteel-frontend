@@ -9,7 +9,7 @@ import { Plus, Loader2, ChevronsUpDown } from 'lucide-react';
 import { useExercises } from '@/lib/api/hooks/useExercises';
 import { parseTime } from '@/lib/utils/time';
 import { Exercise } from '@/lib/api/types/exercise.type';
-import { RoutineWizardData } from './types';
+import { RoutineWizardData, ProgressionScheme } from './types';
 import { Input } from '@/components/ui/input';
 import { ExerciseCard } from './ExerciseCard';
 
@@ -88,6 +88,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     const newExercise: RoutineWizardData['days'][number]['exercises'][number] = {
       exerciseId,
+      progressionScheme: 'NONE' as ProgressionScheme,
+      minWeightIncrement: 2.5, // Default weight increment
       sets: [{ setNumber: 1, repType: 'FIXED', reps: 10, weight: undefined }],
       restSeconds: 120, // 2 minutes default
     };
@@ -185,6 +187,26 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     const current = set.weight ?? 0;
     const next = Math.max(0, Math.round((current + delta * 0.5) * 2) / 2);
     set.weight = next;
+    onUpdate({ days: newDays });
+  };
+
+  const updateProgressionScheme = (exerciseIndex: number, scheme: ProgressionScheme) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    newDays[dayIndex].exercises[exerciseIndex].progressionScheme = scheme;
+    onUpdate({ days: newDays });
+  };
+
+  const updateMinWeightIncrement = (exerciseIndex: number, increment: number) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    newDays[dayIndex].exercises[exerciseIndex].minWeightIncrement = Math.max(0.25, increment);
     onUpdate({ days: newDays });
   };
 
@@ -443,7 +465,10 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                             }
                             onRemoveExercise={removeExercise}
                             onUpdateRestTime={updateRestTime}
+                            onUpdateProgressionScheme={updateProgressionScheme}
+                            onUpdateMinWeightIncrement={updateMinWeightIncrement}
                             onAddSet={addSet}
+                            onRemoveSet={removeSet}
                             isRemovingSet={(exIdx, setIdx) => !!removingSets[`${exIdx}-${setIdx}`]}
                             onRemoveSetAnimated={(exIdx, setIdx) => {
                               const key = `${exIdx}-${setIdx}`;

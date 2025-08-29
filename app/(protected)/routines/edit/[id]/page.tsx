@@ -54,6 +54,8 @@ export default function EditRoutinePage() {
           dayOfWeek: day.dayOfWeek,
           exercises: day.exercises.map((exercise: RoutineExercise) => ({
             exerciseId: exercise.exercise.id,
+            progressionScheme: exercise.progressionScheme || 'DYNAMIC',
+            minWeightIncrement: exercise.minWeightIncrement || 2.5,
             sets: exercise.sets.map((set, index) => ({
               setNumber: index + 1,
               repType: set.repType,

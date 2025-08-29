@@ -37,11 +37,15 @@ export interface WorkoutSession {
   };
   routineDay?: {
     id: string;
-    dayOfWeek: number;
+    name?: string;
+    order?: number;
+    dayOfWeek?: number;
     exercises: {
       id: string;
       order: number;
       restSeconds?: number | null;
+      progressionScheme: 'DYNAMIC' | 'DYNAMIC_DOUBLE';
+      minWeightIncrement: number;
       exercise: {
         id: string;
         name: string;
