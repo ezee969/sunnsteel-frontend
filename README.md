@@ -181,16 +181,63 @@ project-root/
   - Day buttons to start with a specific routine day.
   - From routines list dropdown, use "Open" to navigate to details page.
 
-### Testing
+### Testing (Frontend)
 
-- Stack: Vitest + Testing Library (React) with jsdom.
-- Config: `vitest.config.ts` sets jsdom, globals, coverage (v8), alias `@` to project root.
-- Setup: `test/setup.ts` extends Jest-DOM matchers.
-- Utilities: `test/utils.tsx` exports `render` helper and `createQueryWrapper(client?)` to provide a `QueryClientProvider` wrapper when needed (e.g., passing a custom QueryClient via RTL's `wrapper` option).
-- Examples:
-  - Unit: `test/lib/utils/time.test.ts` covers `lib/utils/time.ts` helpers.
-  - UI: `test/components/ui/button.test.tsx` renders `components/ui/button.tsx`.
-  - Page: `test/app/protected/workouts/sessions/active-session-page.test.tsx` covers finish/abort navigation and set log autosave/remove interactions for `app/(protected)/workouts/sessions/[id]/page.tsx`.
+- **Stack**: Vitest + Testing Library (React) sobre `jsdom`
+- **Framework**: Vitest para test runner, React Testing Library para component testing
+- **Coverage**: @vitest/coverage-v8 para reportes de cobertura
+- **Mocking**: vi (Vitest) para mocks y stubs
+
+#### Test Configuration
+
+- `vitest.config.ts`: Configuración principal
+  - `test.environment = 'jsdom'` para DOM testing
+  - `test.globals = true` para funciones globales
+  - `resolve.alias` mapea `@` a la raíz del proyecto
+- `test/setup.ts`: Setup global con jest-dom matchers
+- `test/utils.tsx`: Utilidades de test incluye `createQueryWrapper(client?)`
+
+#### Test Coverage
+
+Current test modules:
+- **Auth Components**: Login page, auth hooks (useLogin, useRegister, useLogout)
+- **Routine Components**: WorkoutsList component and routine hooks
+- **Workout Sessions**: Active session pages, session management
+- **UI Components**: Button and base component testing
+- **Utilities**: Time helpers and common functions
+
+#### Running Tests
+
+```bash
+# run all tests
+npm run test
+
+# run tests in watch mode
+npm run test:watch
+
+# run tests with coverage
+npm run test:coverage
+```
+
+#### Test Maintenance Guidelines
+
+⚠️ **Important**: When making code changes, always:
+
+1. **Update existing tests** if component interfaces or behavior changes
+2. **Add new tests** for new features, components, or bug fixes
+3. **Mock external dependencies** appropriately for unit tests
+4. **Use `createQueryWrapper`** for components that use React Query
+5. **Test user interactions** with fireEvent or userEvent
+6. **Verify accessibility** attributes in component tests
+7. **Run tests locally** before committing to catch issues early
+
+#### Writing New Tests
+
+- Use **Vitest syntax** (`vi.mock`, `describe`, `it`, `expect`)
+- Import from **`@testing-library/react`** for component testing
+- Use **`createQueryWrapper`** for components needing React Query
+- Follow **AAA pattern**: Arrange, Act, Assert
+- Test **behavior, not implementation** details for `app/(protected)/workouts/sessions/[id]/page.tsx`.
 
 Commands:
 
