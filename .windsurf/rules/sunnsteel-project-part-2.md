@@ -2,6 +2,53 @@
 trigger: always_on
 ---
 
+### Testing (Frontend)
+
+- Stack: Vitest + Testing Library (React) sobre `jsdom`.
+- Configuración: `vitest.config.ts`
+  - `test.environment = 'jsdom'`
+  - `test.globals = true`
+  - `resolve.alias` mapea `@` a la raíz del proyecto
+  - Cobertura con `@vitest/coverage-v8`
+- Setup global: `test/setup.ts` (jest-dom)
+  - Incluye un mock no-op de `Element.prototype.scrollIntoView` para evitar errores de Radix UI Select en jsdom.
+- Utilidades de test: `test/utils.tsx` (helper `render` y `createQueryWrapper(client?)` para envolver con `QueryClientProvider`)
+- Tests iniciales:
+  - `test/lib/utils/time.test.ts` (helpers de tiempo)
+  - `test/components/ui/button.test.tsx` (render básico del Button)
+  - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
+
+### CI
+
+- Workflow: `.github/workflows/ci.yml`
+- Disparadores: push (main/master/develop) y todos los PRs
+- Pasos: `npm ci` → `npm run test:coverage` (Vitest + Coverage V8) → sube artefacto `coverage/`
+
+## Patrones de Código
+
+### Imports y Aliases
+
+- `@/components`: Componentes
+- `@/lib`: Utilidades y servicios
+- `@/hooks`: Custom hooks
+- `@/providers`: Context providers
+- `@/schema`: Esquemas de validación
+
+### Convenciones
+
+- **Componentes**: PascalCase, functional components
+- **Hooks**: camelCase con prefijo "use"
+- **Services**: camelCase con sufijo "Service"
+- **Types**: PascalCase con sufijo "Type"
+- **Schemas**: camelCase con sufijo "Schema"
+
+### Manejo de Estado
+
+- **Server State**: TanStack Query
+- **Client State**: React Context + useState
+- **Form State**: React Hook Form
+- **Auth State**: AuthProvider context
+
 ## Integración con Backend
 
 ### Endpoints Consumidos

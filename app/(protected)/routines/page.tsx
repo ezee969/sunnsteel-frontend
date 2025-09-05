@@ -28,9 +28,6 @@ export default function RoutinesPage() {
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Routines
-            </h1>
             <p className="text-sm text-muted-foreground sm:text-base">
               Plan, track, and manage your workout routines.
             </p>
@@ -47,7 +44,10 @@ export default function RoutinesPage() {
       {/* Mobile Create Button - Sticky at bottom on mobile */}
       <div className="sticky bottom-4 z-10 sm:hidden">
         <Button asChild className="w-full shadow-lg" size="lg">
-          <Link href="/routines/new" className="flex items-center justify-center gap-2">
+          <Link
+            href="/routines/new"
+            className="flex items-center justify-center gap-2"
+          >
             <Plus className="h-5 w-5" />
             <span>Create Routine</span>
           </Link>
@@ -60,11 +60,7 @@ export default function RoutinesPage() {
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
         />
-        <WorkoutsList
-          routines={routines}
-          isLoading={isLoading}
-          error={error}
-        />
+        <WorkoutsList routines={routines} isLoading={isLoading} error={error} />
       </div>
     </div>
   );

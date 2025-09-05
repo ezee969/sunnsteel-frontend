@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/lib/api/hooks/useLogout';
 import { useUser } from '@/lib/api/hooks/useUser';
+import { ModeToggle } from '@/components/mode-toggle';
 
 interface HeaderProps {
   title: string;
@@ -50,6 +51,7 @@ export default function Header({
         <h1 className="text-xl font-semibold truncate">{title}</h1>
       </div>
       <div className="flex items-center gap-2">
+        <ModeToggle />
         <NotificationsDropdown />
         <UserDropdown />
       </div>

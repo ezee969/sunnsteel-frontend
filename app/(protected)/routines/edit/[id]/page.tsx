@@ -12,7 +12,7 @@ import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo'
 import { TrainingDays } from '@/components/routines/create/TrainingDays';
 import { BuildDays } from '@/components/routines/create/BuildDays';
 import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
-import { RoutineWizardData } from '@/components/routines/create/types';
+import { RoutineWizardData, ProgressionScheme } from '@/components/routines/create/types';
 import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks/useRoutines';
 import { RoutineDay, RoutineExercise } from '@/lib/api/types/routine.type';
 
@@ -24,6 +24,27 @@ const STEPS = [
   { id: 3, title: 'Build Days', description: 'Add exercises and sets' },
   { id: 4, title: 'Review & Update', description: 'Review and save changes' },
 ];
+
+// Normalize/compatibility mapping for legacy backend values
+// Backend may send 'DYNAMIC' | 'DYNAMIC_DOUBLE'; the wizard uses
+// 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'NONE'
+const mapProgressionScheme = (
+  value: string | undefined | null
+): ProgressionScheme => {
+  if (!value) return 'NONE';
+  switch (value) {
+    case 'NONE':
+    case 'DOUBLE_PROGRESSION':
+    case 'DYNAMIC_DOUBLE_PROGRESSION':
+      return value as ProgressionScheme;
+    case 'DYNAMIC':
+      return 'DOUBLE_PROGRESSION';
+    case 'DYNAMIC_DOUBLE':
+      return 'DYNAMIC_DOUBLE_PROGRESSION';
+    default:
+      return 'NONE';
+  }
+};
 
 export default function EditRoutinePage() {
   const params = useParams<{ id: string }>();
@@ -54,7 +75,9 @@ export default function EditRoutinePage() {
           dayOfWeek: day.dayOfWeek,
           exercises: day.exercises.map((exercise: RoutineExercise) => ({
             exerciseId: exercise.exercise.id,
-            progressionScheme: exercise.progressionScheme || 'DYNAMIC',
+            progressionScheme: mapProgressionScheme(
+              (exercise as unknown as { progressionScheme?: string }).progressionScheme
+            ),
             minWeightIncrement: exercise.minWeightIncrement || 2.5,
             sets: exercise.sets.map((set, index) => ({
               setNumber: index + 1,
@@ -92,23 +115,34 @@ export default function EditRoutinePage() {
   };
 
   const handleStepClick = (stepId: number) => {
-    // Allow navigation to any previously visited step
-    if (visitedSteps.has(stepId)) {
-      setCurrentStep(stepId);
+    // Navigation will be controlled by Stepper's canStepClick; do a minimal guard here.
+    setCurrentStep(stepId);
+  };
+
+  const isStepValid = (stepId: number) => {
+    switch (stepId) {
+      case 1:
+        return routineData.name.trim() !== '';
+      case 2:
+        return routineData.trainingDays.length > 0;
+      case 3:
+        return routineData.days.every((day: { exercises: Array<unknown> }) => day.exercises.length > 0);
+      case 4:
+        // Review step is considered valid if all previous steps are valid
+        return [1, 2, 3].every(isStepValid);
+      default:
+        return false;
     }
   };
 
+  const arePreviousStepsValid = (stepId: number) => {
+    if (stepId <= 1) return true;
+    const prevIds = Array.from({ length: stepId - 1 }, (_, i) => i + 1);
+    return prevIds.every(isStepValid);
+  };
+
   const canProceedToNextStep = () => {
-    switch (currentStep) {
-      case 1: // Basic Info
-        return routineData.name.trim() !== '';
-      case 2: // Training Days
-        return routineData.trainingDays.length > 0;
-      case 3: // Build Days
-        return routineData.days.every((day: { exercises: Array<unknown> }) => day.exercises.length > 0);
-      default:
-        return true;
-    }
+    return isStepValid(currentStep);
   };
 
   const handleCancel = () => {
@@ -206,14 +240,20 @@ export default function EditRoutinePage() {
         </p>
       </div>
 
-      {/* Stepper */}
-      <div className="mb-8">
-        <Stepper 
-          steps={STEPS} 
-          currentStep={currentStep} 
-          onStepClick={handleStepClick} 
-          visitedSteps={visitedSteps} 
-        />
+      {/* Stepper: sticky on top for easier navigation on mobile */}
+      <div className="sticky top-0 z-20 mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="py-2">
+          <Stepper 
+            steps={STEPS} 
+            currentStep={currentStep} 
+            onStepClick={handleStepClick} 
+            visitedSteps={visitedSteps}
+            // Allow clicking directly to any step whose previous steps are valid (edit flow)
+            canStepClick={(id) => arePreviousStepsValid(id) || visitedSteps.has(id)}
+            // Render completed state based on data validity (not only position)
+            completedSteps={new Set([1,2,3,4].filter((id) => id < currentStep && isStepValid(id)))}
+          />
+        </div>
       </div>
 
       {/* Main Content */}

@@ -54,7 +54,6 @@ describe('WorkoutsIndexPage', () => {
     const Wrapper = createQueryWrapper()
     render(<WorkoutsIndexPage />, { wrapper: Wrapper as React.ComponentType<{ children: React.ReactNode }> })
 
-    expect(screen.getByRole('heading', { name: /Workouts/i })).toBeInTheDocument()
     expect(screen.getByText(/No active workout session found/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Go to Routines/i })).toHaveAttribute('href', '/routines')
     expect(screen.getByRole('link', { name: /Dashboard/i })).toHaveAttribute('href', '/dashboard')

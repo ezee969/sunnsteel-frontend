@@ -1,17 +1,19 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { motion } from 'framer-motion';
 import { SignupHeader } from './components/SignupHeader';
 import { SignupForm } from './components/SignupForm';
 
-export const metadata: Metadata = {
-  title: 'Sunnsteel - Sign Up',
-  description: 'Join Sunnsteel and begin your fitness journey',
-};
-
 export default function SignupPage() {
   return (
-    <div className="animate-fade-in">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <SignupHeader />
       <SignupForm />
-    </div>
+    </motion.div>
   );
 }

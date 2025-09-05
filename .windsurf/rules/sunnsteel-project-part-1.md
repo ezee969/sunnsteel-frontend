@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-
-## alwaysApply: true
-
 # Sunnsteel Frontend - Fitness Application
 
 Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entrenamiento.
@@ -158,11 +154,31 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
 - **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open"; incluye Quick Start y selección de día.
 - **Routine Wizard UX**: En `BuildDays`, inputs accesibles que cambian entre `reps` fijos o rango (`minReps`/`maxReps`) según `repType` por set; validaciones y previsualización en `ReviewAndCreate`.
-  - Refactor: `BuildDays` ahora compone `components/routines/create/ExerciseCard.tsx` (con `SetRow` interno) para modularizar la UI de ejercicios y sets.
-  - Jerarquía de header: el título del ejercicio se muestra por encima del timer/controles.
-  - `Rep Type` usa un `select` nativo (Fixed/Range) por set para mejor simplicidad y accesibilidad.
-  - Botones stepper (+/-) para `reps` y `weight` con clamping: fijos 1..50; rango `min`/`max` 1..50 con cross-clamp (min ≤ max); weight en incrementos de 0.5 (mínimo 0).
-  - Inputs de rango (`minReps`/`maxReps`) usan `type="text"` con `inputMode="numeric"` para permitir edición fluida.
+- **Stepper Advanced Navigation (Edit Mode)**: El `Stepper` ahora acepta props avanzadas para control fino:
+  - `completedSteps?: Set<number>` para marcar pasos completos basados en validez de datos (no solo por posición).
+  - `canStepClick?: (stepId: number) => boolean` para habilitar clicks directos a pasos permitidos.
+  - En edición, el usuario puede saltar directamente a cualquier paso si todos los pasos previos son válidos, sin tener que navegar secuencialmente. En creación se mantiene el flujo secuencial.
+- Refactor: `BuildDays` ahora compone `components/routines/create/ExerciseCard.tsx` (con `SetRow` interno) para modularizar la UI de ejercicios y sets.
+- Jerarquía de header: el título del ejercicio se muestra por encima del timer/controles.
+- **Rep Type** y **Progression** usan el componente `Select` de shadcn/ui para consistencia visual, mejor alineación del popover y comportamiento de apertura/cierre confiable en mobile/desktop.
+- Botones stepper (+/-) para `reps` y `weight` con clamping: fijos 1..50; rango `min`/`max` 1..50 con cross-clamp (min ≤ max); weight en incrementos de 0.5 (mínimo 0).
+- Inputs de rango (`minReps`/`maxReps`) usan `type="text"` con `inputMode="numeric"` para permitir edición fluida.
+- **Skeleton Loaders**: `components/ui/skeleton.tsx` para estados de carga en `WorkoutsList` y página de sesión activa.
+- **Progress Bars**: `components/ui/progress.tsx` usado para:
+  - Progreso de sesión en `app/(protected)/workouts/sessions/[id]/page.tsx` (sets completados vs total).
+  - Indicador de finalización en tarjetas de `WorkoutsList`.
+- **Button Feedback**: Micro-interacciones sutiles al presionar botones (scale/translate) en `components/ui/button.tsx`.
+- **Sticky Navigation (Wizard)**:
+  - Stepper pegajoso en la parte superior en `app/(protected)/routines/new/page.tsx` y también en `app/(protected)/routines/edit/[id]/page.tsx`.
+  - Navegación inferior pegajosa (Previous/Next) en la página de creación para mejor alcance en mobile.
+- **Tabs de Días (BuildDays) UX Fixes**:
+  - El contador de ejercicios por día ahora siempre es visible como `Badge` y muestra `0` cuando el día está vacío.
+  - Se eliminó el scroll vertical en la fila de días y se forzó únicamente scroll horizontal en mobile.
+  - Estilos del `Badge` normalizados para evitar jumps de layout y aparición de scroll vertical intermitente.
+- **ExerciseCard Expand/Collapse (Smoother)**:
+- Animación simplificada tipo móvil: transición de `max-height` + `opacity` (300ms, ease-in-out) al expandir/contraer.
+- Se movió el padding al contenedor interno para evitar saltos de layout durante la transición.
+- Rotación del ícono `ChevronsUpDown` suavizada (300ms, ease-in-out).
 - **Resume Banner**: Banner de reanudación de sesión activa en `app/(protected)/layout.tsx` visible cuando existe una sesión activa (oculto en la página de la sesión).
 - **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx`:
   - Sin agregar/eliminar sets en sesión (estructura fija según la rutina).
@@ -181,7 +197,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **Layout Components**: Card, Separator, Scroll Area
 - **Navigation**: Tabs, Dropdown Menu
 - **Data Display**: Avatar, Badge, Progress
-- **Loading**: Loading component
+- **Loading**: Loading component, Skeleton
 
 ### Layout Components
 
@@ -206,49 +222,3 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - `npm run test`: Ejecuta tests con Vitest una sola vez
 - `npm run test:watch`: Ejecuta tests en modo watch
 - `npm run test:coverage`: Ejecuta tests con cobertura (text + lcov)
-
-### Testing (Frontend)
-
-- Stack: Vitest + Testing Library (React) sobre `jsdom`.
-- Configuración: `vitest.config.ts`
-  - `test.environment = 'jsdom'`
-  - `test.globals = true`
-  - `resolve.alias` mapea `@` a la raíz del proyecto
-  - Cobertura con `@vitest/coverage-v8`
-- Setup global: `test/setup.ts` (jest-dom)
-- Utilidades de test: `test/utils.tsx` (helper `render` y `createQueryWrapper(client?)` para envolver con `QueryClientProvider`)
-- Tests iniciales:
-  - `test/lib/utils/time.test.ts` (helpers de tiempo)
-  - `test/components/ui/button.test.tsx` (render básico del Button)
-  - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
-
-### CI
-
-- Workflow: `.github/workflows/ci.yml`
-- Disparadores: push (main/master/develop) y todos los PRs
-- Pasos: `npm ci` → `npm run test:coverage` (Vitest + Coverage V8) → sube artefacto `coverage/`
-
-## Patrones de Código
-
-### Imports y Aliases
-
-- `@/components`: Componentes
-- `@/lib`: Utilidades y servicios
-- `@/hooks`: Custom hooks
-- `@/providers`: Context providers
-- `@/schema`: Esquemas de validación
-
-### Convenciones
-
-- **Componentes**: PascalCase, functional components
-- **Hooks**: camelCase con prefijo "use"
-- **Services**: camelCase con sufijo "Service"
-- **Types**: PascalCase con sufijo "Type"
-- **Schemas**: camelCase con sufijo "Schema"
-
-### Manejo de Estado
-
-- **Server State**: TanStack Query
-- **Client State**: React Context + useState
-- **Form State**: React Hook Form
-- **Auth State**: AuthProvider context

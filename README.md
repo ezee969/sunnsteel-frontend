@@ -27,7 +27,8 @@ project-root/
 ├── providers/                     # Application providers
 │   ├── app-provider.tsx           #   Combined providers wrapper
 │   ├── query-provider.tsx         #   TanStack Query provider
-│   └── auth-provider.tsx          #   Auth context provider
+│   ├── auth-provider.tsx          #   Auth context provider
+│   └── theme-provider.tsx         #   next-themes ThemeProvider wrapper (attribute="class")
 ├── hooks/                         # Custom React hooks
 ├── utils/                         # General utility functions
 ├── types/                         # TypeScript type definitions
@@ -61,6 +62,8 @@ project-root/
 
 - **Sidebar navigation**: Navegación lateral
 - Nav items: Dashboard, Workouts, Routines. Future (disabled): Progress, Exercises, Schedule, Achievements.
+- **Protected Header (dynamic title)**: `app/(protected)/layout.tsx` sets the header title based on the current route:
+  - Dashboard, Workouts, Workout History, Active Session, Routines, New Routine, Edit Routine.
 
 ### Routine Creation/Edit Wizard
 
@@ -76,6 +79,8 @@ project-root/
   - **DOUBLE_PROGRESSION**: Increases weight on all sets when all sets hit or exceed target reps
   - **DYNAMIC_DOUBLE_PROGRESSION**: Increases weight per individual set when that set hits or exceed target reps
   - **Note**: When progression is not NONE, all sets automatically use RANGE rep type (fixed reps are disabled)
+  - **Weight Increment UI**: The "Weight Inc. (kg)" input only appears when progression is active (not `NONE`). On mobile, +/- buttons are hidden to prevent overflow; the input remains editable.
+  - **Edit compatibility mapping**: When editing existing routines, legacy backend values are mapped for compatibility — `'DYNAMIC'` ➜ `'DOUBLE_PROGRESSION'`, `'DYNAMIC_DOUBLE'` ➜ `'DYNAMIC_DOUBLE_PROGRESSION'`. Missing/unknown values default to `'NONE'`.
 - Wizard steps/components (all use the shared type):
   - `RoutineBasicInfo` → name/description
   - `TrainingDays` → select `trainingDays`
@@ -84,7 +89,8 @@ project-root/
     - Mobile/Desktop UX improvements:
       - Refactor: `BuildDays` now composes `components/routines/create/ExerciseCard.tsx` (with internal `SetRow`). This modularization improves readability and maintainability.
       - Exercise header: exercise title is displayed above the timer/controls for clearer hierarchy.
-      - Rep type uses a native select dropdown (Fixed/Range) for simpler interaction and accessibility.
+      - Rep type and progression scheme now use the shadcn/ui Select component for consistent styling and proper dropdown alignment/behavior across devices.
+      - Progression Select on mobile is width-constrained and the dropdown content is clamped to viewport to avoid overflow.
       - Stepper buttons (+/-) for reps and weight with clamping:
         - Fixed reps: 1..50
         - Range reps: min/max are individually stepped, clamped 1..50, and cross-clamped so min ≤ max
@@ -104,7 +110,7 @@ project-root/
   - `ReviewAndCreate` → prepares payload mapping sets according to `repType` and creates/updates routine
 - Pages:
   - New: `app/(protected)/routines/new/page.tsx`
-  - Edit: `app/(protected)/routines/edit/[id]/page.tsx` (maps backend routine to `RoutineWizardData` including `repType/minReps/maxReps`)
+  - Edit: `app/(protected)/routines/edit/[id]/page.tsx` (maps backend routine to `RoutineWizardData` including `repType/minReps/maxReps`). The Stepper is now sticky at the top like in the create page.
 
 ### Services
 
@@ -177,9 +183,84 @@ project-root/
 
 - Page: `app/(protected)/routines/[id]/page.tsx`
 - Start controls:
-  - Quick Start with first routine day.
-  - Day buttons to start with a specific routine day.
-  - From routines list dropdown, use "Open" to navigate to details page.
+  - Quick Start prefers today's day if available; otherwise uses the first routine day.
+  - Each day section includes its own Start button (inside the day panel).
+  - Weekday mismatch confirmation: if you start a day different from today, a dialog warns you and lets you proceed or cancel.
+  - Active session conflict handling: if there’s an in-progress session for another day, a dialog prompts you to resume the active session instead of starting a new one.
+- Routine structure display:
+  - Collapsible days using shadcn/Radix Accordion. Today's day is expanded by default and shows a "Today" badge.
+  - Accordion animation: content uses CSS `grid-template-rows` (0fr→1fr) + fade with `duration-300 ease-in-out` (see `components/ui/accordion.tsx`).
+  - Day header: weekday badge + day order + exercises count. Reduced redundancy from previous design (no separate day pill buttons at the top).
+  - Exercises per day: shows exercise name and rest seconds.
+  - Sets per exercise: lists set number and formatted reps (FIXED: `reps`; RANGE: `min-max`) with optional weight hints.
+- Loading & error states: skeletons during load, friendly error messages on failure.
+- Navigation: from routines list dropdown, select "Open" to navigate to details page.
+
+### Dashboard — Today’s Workouts
+
+- Component: `app/(protected)/dashboard/components/TodaysWorkouts.tsx`
+- Behavior:
+  - Fetches routines and filters the ones scheduled for today’s weekday.
+  - Displays loading skeletons, error state, or empty state with CTA to browse routines.
+  - Provides Start/Resume controls:
+    - Resume when an active session matches today’s routine day.
+    - Start when no matching active session exists.
+  - Details button navigates to `app/(protected)/routines/[id]/page.tsx`.
+  - Active session conflict dialog: if trying to start a different day from the active session’s day, shows a modal to resume the active session.
+  - Mobile UI:
+    - Cards only show the routine name and weekday badge (description is hidden to avoid clipping).
+    - Actions are displayed as a two-column grid of full-width buttons (Start/Resume and Details) to prevent text overlap/truncation.
+    - On larger screens, actions align inline to the right as before.
+- Hooks & utilities: `useRoutines`, `useActiveSession`, `useStartSession`, `getTodayDow()`, `weekdayName()`.
+
+### UI/UX Enhancements
+
+- **Skeleton Loaders**
+  - Reusable `Skeleton` component at `components/ui/skeleton.tsx`.
+  - Used in:
+    - `app/(protected)/workouts/sessions/[id]/page.tsx` (active session loading)
+    - `app/(protected)/routines/components/WorkoutsList.tsx` (list loading)
+    - `app/(protected)/layout.tsx` (protected layout global loading)
+    - `app/(protected)/routines/[id]/page.tsx` (routine details loading)
+- **Progress Bars**
+  - `components/ui/progress.tsx` displays:
+    - Session progress (completed sets vs total) in the Active Session page.
+    - Simple completion indicator in routine cards within WorkoutsList.
+- **Button Press Feedback**
+  - Subtle micro-interactions on `components/ui/button.tsx` using GPU transforms with active scale/translate for a haptic feel.
+- **Sticky Navigation (Routine Wizard)**
+  - `app/(protected)/routines/new/page.tsx`:
+    - Stepper is sticky at the top for quick step switching.
+    - Bottom navigation (Previous/Next) is sticky at the bottom for better mobile reachability.
+    - Added container bottom padding to ensure content never hides behind the sticky bar.
+  
+- **BuildDays Tabs (UX Fixes)**
+  - `components/routines/create/BuildDays.tsx`:
+    - The exercise count badge per day is always visible and shows 0 for empty days.
+    - Horizontal-only scrolling in the days row (no vertical scroll) with `overflow-y-hidden` and `whitespace-nowrap`.
+    - Normalized badge sizing to prevent layout jump and accidental vertical scrollbar.
+
+- **ExerciseCard Expand/Collapse (Smoother)**
+  - `components/routines/create/ExerciseCard.tsx`:
+    - Simplified mobile-like animation using `max-height` + `opacity` with 300ms ease-in-out.
+    - Padding moved to inner wrapper to prevent layout jump during the transition.
+    - Rotación del ícono `ChevronsUpDown` suavizada (300ms, ease-in-out).
+
+- **Theme Toggle (Dark/Light/System)**
+  - `ThemeProvider` global en `app/layout.tsx` usando `next-themes` con `attribute="class"`, `defaultTheme="system"` y `enableSystem`.
+  - `ModeToggle` agregado en:
+    - Header de rutas protegidas: `app/(protected)/components/Header.tsx`.
+    - Layout de auth: `app/(auth)/layout.tsx` (esquina superior derecha).
+  - Transición suave de colores: `body` aplica `transition-colors duration-300` en `app/globals.css`.
+  - Dependencia: `next-themes` agregada a `package.json`.
+
+- **Stepper Advanced Navigation (Edit Mode)**
+  - `components/ui/stepper.tsx` supports:
+    - `completedSteps?: Set<number>` to drive completed state by data validity.
+    - `canStepClick?: (stepId: number) => boolean` to unlock direct navigation.
+  - `app/(protected)/routines/edit/[id]/page.tsx`:
+    - Users can jump directly to any step when all previous steps are valid (based on current form data), avoiding forced sequential navigation.
+    - Create flow remains sequential; edit flow is flexible.
 
 ### Testing (Frontend)
 
@@ -195,6 +276,7 @@ project-root/
   - `test.globals = true` para funciones globales
   - `resolve.alias` mapea `@` a la raíz del proyecto
 - `test/setup.ts`: Setup global con jest-dom matchers
+  - Mock de `Element.prototype.scrollIntoView` (no-op) para evitar errores de Radix UI Select en jsdom
 - `test/utils.tsx`: Utilidades de test incluye `createQueryWrapper(client?)`
 
 #### Test Coverage

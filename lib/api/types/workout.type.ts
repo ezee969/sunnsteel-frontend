@@ -49,7 +49,8 @@ export interface WorkoutSession {
       exercise: {
         id: string;
         name: string;
-        primaryMuscle?: string | null;
+        primaryMuscles: string[];
+        secondaryMuscles: string[];
         equipment?: string | null;
       };
       sets: {

@@ -4,7 +4,12 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dumbbell, ChevronRight } from 'lucide-react';
 
@@ -33,7 +38,9 @@ export default function WorkoutsIndexPage() {
   if (active?.id) {
     return (
       <div className="flex h-[calc(100vh-300px)] items-center justify-center">
-        <div className="text-sm text-muted-foreground">Redirecting to your active session…</div>
+        <div className="text-sm text-muted-foreground">
+          Redirecting to your active session…
+        </div>
       </div>
     );
   }
@@ -42,13 +49,12 @@ export default function WorkoutsIndexPage() {
     <div className="mx-auto max-w-2xl p-4">
       <Card>
         <CardHeader>
-          <h1 className="text-xl font-semibold">Workouts</h1>
           <CardDescription>No active workout session found.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Start a new workout from one of your routines. You can begin with the first day
-            or pick a specific day from the routine dropdown.
+            Start a new workout from one of your routines. You can begin with the
+            first day or pick a specific day from the routine dropdown.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild>

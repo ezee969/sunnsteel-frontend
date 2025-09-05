@@ -168,12 +168,14 @@ export default function Sidebar({
                 activeNav === item.id && 'bg-primary text-primary-foreground'
               )}
               onClick={() => {
+                // Set active nav immediately for consistent visual state
+                setActiveNav(item.id);
+                
                 // Create a scale animation effect when clicked
                 const button = document.activeElement as HTMLElement;
                 if (button) button.classList.add('scale-95');
                 setTimeout(() => {
                   if (button) button.classList.remove('scale-95');
-                  setActiveNav(item.id);
                   // Close mobile sidebar after navigation
                   if (isMobile) {
                     setIsMobileMenuOpen(false);

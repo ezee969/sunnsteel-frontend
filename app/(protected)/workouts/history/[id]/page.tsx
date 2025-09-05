@@ -10,12 +10,14 @@ import { ArrowLeft, Clock, Dumbbell, Target, Weight } from 'lucide-react';
 import { useSession } from '@/lib/api/hooks/useWorkoutSession';
 import type { SetLog } from '@/lib/api/types/workout.type';
 import { formatTimeReadable } from '@/lib/utils/time';
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
 
 interface ExerciseGroup {
   exercise: {
     id: string;
     name: string;
-    primaryMuscle?: string | null;
+    primaryMuscles: string[];
+    secondaryMuscles: string[];
     equipment?: string | null;
   };
   plannedSets: {
@@ -177,7 +179,7 @@ export default function WorkoutDetailPage() {
                   <CardTitle className="text-lg">{group.exercise.name}</CardTitle>
                 </div>
                 <Badge variant="outline" className="text-xs">
-                  {group.exercise.primaryMuscle} • {group.exercise.equipment}
+                  {formatMuscleGroups(group.exercise.primaryMuscles)} • {group.exercise.equipment}
                 </Badge>
                 {collapsed[routineExerciseId] ? (
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />

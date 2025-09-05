@@ -13,3 +13,13 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '/',
 }));
+
+// Radix UI Select calls scrollIntoView on options; jsdom doesn't implement it.
+// Provide a no-op to avoid unhandled rejections in tests.
+if (!('scrollIntoView' in Element.prototype)) {
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    value: vi.fn(),
+    configurable: true,
+    writable: true,
+  });
+}

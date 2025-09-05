@@ -15,77 +15,95 @@ interface StepperProps {
   className?: string;
   onStepClick?: (stepId: number) => void;
   visitedSteps?: Set<number>;
+  // Optional advanced control:
+  // - completedSteps: specify which steps should render as completed, overriding the default (currentStep > id)
+  // - canStepClick: decide whether a given step is clickable, overriding the default (visitedSteps contains step)
+  completedSteps?: Set<number>;
+  canStepClick?: (stepId: number) => boolean;
 }
 
-export function Stepper({ steps, currentStep, className, onStepClick, visitedSteps }: StepperProps) {
+export function Stepper({
+  steps,
+  currentStep,
+  className,
+  onStepClick,
+  visitedSteps,
+  completedSteps,
+  canStepClick,
+}: StepperProps) {
   return (
     <div className={cn('w-full', className)}>
       {/* Mobile Version - Vertical Layout */}
       <div className="block sm:hidden">
         <div className="space-y-4">
           {steps.map((step) => {
-            const isCompleted = currentStep > step.id;
+            const isCompleted = completedSteps
+              ? completedSteps.has(step.id)
+              : currentStep > step.id;
             const isActive = currentStep === step.id;
-            const isClickable = visitedSteps?.has(step.id) && !isActive;
+            const canClick = canStepClick
+              ? canStepClick(step.id)
+              : visitedSteps?.has(step.id);
+            const isClickable = !!canClick && !isActive;
 
             return (
-              <div key={step.id} className="flex items-start gap-3">
+              <div key={step.id} className="flex items-start gap-4">
                 {/* Step Circle */}
                 <div
                   className={cn(
-                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all',
+                    'flex shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold cursor-pointer transition-all duration-200',
                     isCompleted
-                      ? 'border-green-500 bg-green-500 text-white cursor-pointer hover:bg-green-600 hover:border-green-600'
+                      ? 'border-green-500 bg-green-500 text-white hover:bg-green-600 hover:border-green-600 h-8 w-8'
                       : isActive
-                      ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100'
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100 h-10 w-10'
                       : isClickable
-                      ? 'border-blue-400 bg-blue-100 text-blue-700 cursor-pointer hover:bg-blue-200 hover:border-blue-500'
-                      : 'border-gray-300 bg-gray-50 text-gray-400'
+                      ? 'border-blue-400 bg-blue-100 text-blue-700 hover:bg-blue-200 hover:border-blue-500 h-8 w-8'
+                      : 'border-gray-300 bg-gray-50 text-gray-400 h-8 w-8'
                   )}
                   onClick={() => isClickable && onStepClick?.(step.id)}
                 >
                   {isCompleted ? (
-                    <Check className="h-5 w-5" />
+                    <Check className="h-4 w-4" />
                   ) : (
-                    <span>{step.id}</span>
+                    <span className={cn(isActive ? 'text-sm' : 'text-xs')}>
+                      {step.id}
+                    </span>
                   )}
                 </div>
 
                 {/* Step Content */}
-                <div 
-                  className={cn(
-                    "flex-1 min-w-0",
-                    isClickable && "cursor-pointer"
-                  )}
+                <div
+                  className={cn('flex-1 min-w-0', isClickable && 'cursor-pointer')}
                   onClick={() => isClickable && onStepClick?.(step.id)}
                 >
                   <div
                     className={cn(
                       'font-medium transition-colors',
                       isCompleted
-                        ? 'text-green-700 hover:text-green-800'
+                        ? 'text-green-700 hover:text-green-800 text-sm'
                         : isActive
-                        ? 'text-blue-600'
+                        ? 'text-blue-600 text-base font-semibold'
                         : isClickable
-                        ? 'text-blue-600 hover:text-blue-700'
-                        : 'text-gray-500'
+                        ? 'text-blue-600 hover:text-blue-700 text-sm'
+                        : 'text-gray-500 text-sm'
                     )}
                   >
                     {step.title}
                   </div>
-                  <div
-                    className={cn(
-                      'text-sm mt-1 transition-colors',
-                      isActive ? 'text-gray-600' : 'text-gray-400'
-                    )}
-                  >
-                    {step.description}
-                  </div>
+
+                  {/* Description - Only show for active step */}
+                  {isActive && (
+                    <div className="text-sm mt-2 text-gray-600 leading-relaxed">
+                      {step.description}
+                    </div>
+                  )}
                 </div>
 
                 {/* Active Indicator */}
                 {isActive && (
-                  <ChevronRight className="h-5 w-5 text-blue-500 mt-2" />
+                  <div className="mt-1">
+                    <ChevronRight className="h-4 w-4 text-blue-500" />
+                  </div>
                 )}
               </div>
             );
@@ -97,78 +115,85 @@ export function Stepper({ steps, currentStep, className, onStepClick, visitedSte
       <div className="hidden sm:block">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
-            const isCompleted = currentStep > step.id;
+            const isCompleted = completedSteps
+              ? completedSteps.has(step.id)
+              : currentStep > step.id;
             const isActive = currentStep === step.id;
-            const isClickable = visitedSteps?.has(step.id) && !isActive;
+            const canClick = canStepClick
+              ? canStepClick(step.id)
+              : visitedSteps?.has(step.id);
+            const isClickable = !!canClick && !isActive;
             const isLast = index === steps.length - 1;
 
             return (
               <div key={step.id} className="flex items-center flex-1">
                 {/* Step Container */}
-                <div 
+                <div
                   className={cn(
-                    "flex flex-col items-center flex-1",
-                    isClickable && "cursor-pointer"
+                    'flex flex-col items-center flex-1',
+                    isClickable && 'cursor-pointer hover:opacity-80'
                   )}
                   onClick={() => isClickable && onStepClick?.(step.id)}
                 >
                   {/* Step Circle */}
                   <div
                     className={cn(
-                      'flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all mb-3',
+                      'flex items-center justify-center rounded-full border-2 text-sm font-semibold mb-2 transition-all duration-200',
                       isCompleted
-                        ? 'border-green-500 bg-green-500 text-white shadow-lg shadow-green-100 hover:bg-green-600 hover:border-green-600'
+                        ? 'border-green-500 bg-green-500 text-white h-10 w-10'
                         : isActive
-                        ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100 ring-4 ring-blue-100'
+                        ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100 h-12 w-12'
                         : isClickable
-                        ? 'border-blue-400 bg-blue-100 text-blue-700 shadow-lg shadow-blue-50 hover:bg-blue-200 hover:border-blue-500'
-                        : 'border-gray-300 bg-white text-gray-400 hover:border-gray-400'
+                        ? 'border-blue-400 bg-blue-100 text-blue-700 hover:bg-blue-200 hover:border-blue-500 h-10 w-10'
+                        : 'border-gray-300 bg-gray-50 text-gray-400 h-10 w-10'
                     )}
                   >
                     {isCompleted ? (
-                      <Check className="h-6 w-6" />
+                      <Check className="h-5 w-5" />
                     ) : (
-                      <span className="text-base">{step.id}</span>
+                      <span>{step.id}</span>
                     )}
                   </div>
 
-                  {/* Step Labels */}
-                  <div className="text-center max-w-32">
-                    <div
-                      className={cn(
-                        'font-medium text-sm mb-1 transition-colors',
-                        isCompleted
-                          ? 'text-green-700 hover:text-green-800'
-                          : isActive
-                          ? 'text-blue-600'
-                          : isClickable
-                          ? 'text-blue-600 hover:text-blue-700'
-                          : 'text-gray-500'
-                      )}
-                    >
-                      {step.title}
-                    </div>
-                    <div
-                      className={cn(
-                        'text-xs transition-colors leading-tight',
-                        isActive ? 'text-gray-600' : 'text-gray-400'
-                      )}
-                    >
-                      {step.description}
-                    </div>
+                  {/* Step Title */}
+                  <div
+                    className={cn(
+                      'text-center font-medium transition-colors',
+                      isCompleted
+                        ? 'text-green-700 text-sm'
+                        : isActive
+                        ? 'text-blue-600 text-sm font-semibold'
+                        : isClickable
+                        ? 'text-blue-600 hover:text-blue-700 text-xs'
+                        : 'text-gray-500 text-xs'
+                    )}
+                  >
+                    {step.title}
+                  </div>
+
+                  {/* Step Description */}
+                  <div
+                    className={cn(
+                      'text-center text-xs mt-1 transition-colors',
+                      isActive ? 'text-gray-600' : 'text-gray-400'
+                    )}
+                  >
+                    {step.description}
                   </div>
                 </div>
 
                 {/* Connector Line */}
                 {!isLast && (
-                  <div className="flex-1 px-4 -mt-8">
-                    <div
-                      className={cn(
-                        'h-1 rounded-full transition-colors',
-                        isCompleted ? 'bg-green-500' : 'bg-gray-200'
-                      )}
-                    />
-                  </div>
+                  <div
+                    className={cn(
+                      'flex-1 h-0.5 mx-4 transition-colors duration-300',
+                      isCompleted
+                        ? 'bg-green-500'
+                        : isActive
+                        ? 'bg-blue-500'
+                        : 'bg-gray-300'
+                    )}
+                  />
                 )}
               </div>
             );

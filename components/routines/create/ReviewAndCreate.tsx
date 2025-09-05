@@ -12,6 +12,7 @@ import { CheckCircle, Clock, Loader2, Save } from 'lucide-react';
 import { useCreateRoutine, useUpdateRoutine } from '@/lib/api/hooks/useRoutines';
 import { useExercises } from '@/lib/api/hooks/useExercises';
 import { formatTime } from '@/lib/utils/time';
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
 import { CreateRoutineRequest } from '@/lib/api/types/routine.type';
 import { Exercise } from '@/lib/api/types/exercise.type';
 import { RoutineWizardData } from './types';
@@ -179,7 +180,7 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
                             <div>
                               <h5 className="font-medium">{exerciseData?.name}</h5>
                               <p className="text-xs text-muted-foreground">
-                                {exerciseData?.primaryMuscle} • {exerciseData?.equipment}
+                                {exerciseData?.primaryMuscles ? formatMuscleGroups(exerciseData.primaryMuscles) : 'Unknown'} • {exerciseData?.equipment}
                               </p>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">

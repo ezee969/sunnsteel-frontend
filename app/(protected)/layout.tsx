@@ -7,7 +7,7 @@ import Header from '@/app/(protected)/components/Header';
 import { useAuthProtection } from '@/hooks/use-auth-protection';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { useUser } from '@/lib/api/hooks/useUser';
-import { ClipLoader } from 'react-spinners';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
 import { Button } from '@/components/ui/button';
@@ -33,12 +33,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Determine active nav based on current pathname
   const getActiveNavFromPath = (path: string) => {
     if (path.startsWith('/dashboard')) return 'dashboard';
+    if (path.startsWith('/workouts')) return 'workouts';
     if (path.startsWith('/routines')) return 'routines';
     if (path.startsWith('/progress')) return 'progress';
     if (path.startsWith('/exercises')) return 'exercises';
     if (path.startsWith('/schedule')) return 'schedule';
     if (path.startsWith('/achievements')) return 'achievements';
     return 'dashboard'; // fallback
+  };
+
+  // Compute header title based on pathname
+  const getTitleFromPath = (path: string) => {
+    if (path.startsWith('/workouts/sessions')) return 'Active Session';
+    if (path.startsWith('/workouts/history')) return 'Workout History';
+    if (path.startsWith('/workouts')) return 'Workouts';
+    if (path.startsWith('/routines/new')) return 'New Routine';
+    if (path.startsWith('/routines/edit')) return 'Edit Routine';
+    if (path.startsWith('/routines')) return 'Routines';
+    if (path.startsWith('/dashboard')) return 'Dashboard';
+    return 'Dashboard';
   };
 
   const [activeNav, setActiveNav] = useState(() => getActiveNavFromPath(pathname));
@@ -54,9 +67,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   if (isLoadingAuth || isLoadingUserProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-background/80">
-        <div className="flex flex-col items-center gap-4">
-          <ClipLoader color="#3b82f6" size={40} />
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="w-full max-w-lg space-y-3 p-6">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
       </div>
     );
@@ -90,7 +105,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
       >
         <Header
-          title="Dashboard"
+          title={getTitleFromPath(pathname)}
           isMobile={isMobile}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />

@@ -9,6 +9,14 @@ import { ChevronsUpDown, Clock, Minus, Plus, Trash2 } from 'lucide-react';
 import { Exercise } from '@/lib/api/types/exercise.type';
 import { RepType, RoutineWizardData, ProgressionScheme } from './types';
 import { formatTime } from '@/lib/utils/time';
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export type RoutineSet = {
   setNumber: number;
@@ -145,18 +153,24 @@ export const SetRow: FC<SetRowProps> = ({
         <div className="sm:col-span-3">
           <div className="space-y-1">
             <div className="sm:hidden text-xs font-medium text-muted-foreground">Rep Type</div>
-            <select
-              aria-label="Rep type"
+            <Select
               value={set.repType}
-              onChange={(e) =>
-                onUpdateSet(exerciseIndex, setIndex, 'repType', e.target.value)
+              onValueChange={(val) =>
+                onUpdateSet(exerciseIndex, setIndex, 'repType', val)
               }
-              disabled={progressionScheme !== 'NONE'}
-              className="w-full h-9 rounded-md border bg-background px-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="FIXED">Fixed Reps</option>
-              <option value="RANGE">Rep Range</option>
-            </select>
+              <SelectTrigger
+                aria-label="Rep type"
+                className="w-full"
+                disabled={progressionScheme !== 'NONE'}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FIXED">Fixed Reps</SelectItem>
+                <SelectItem value="RANGE">Rep Range</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -430,7 +444,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   {exerciseData?.name || 'Exercise'}
                 </h4>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {exerciseData?.primaryMuscle} • {exerciseData?.equipment}
+                  {exerciseData?.primaryMuscles ? formatMuscleGroups(exerciseData.primaryMuscles) : 'Unknown'} • {exerciseData?.equipment}
                 </p>
               </div>
               {!expanded && (
@@ -458,7 +472,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               onClick={() => onToggleExpand(exerciseIndex)}
               className="h-8 w-8 p-0"
             >
-              <ChevronsUpDown className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+              <ChevronsUpDown className={`h-4 w-4 transition-transform duration-300 ease-in-out ${expanded ? 'rotate-180' : ''}`} />
             </Button>
             <Button
               variant="ghost"
@@ -473,13 +487,13 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className={`transition-all duration-300 ease-in-out overflow-hidden ${
-        expanded ? 'p-3 sm:p-4 pt-0' : 'p-0 max-h-0'
+      <CardContent className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+        expanded ? 'max-h-[1200px]' : 'max-h-0'
       }`}>
         <div
           id={`sets-${tabIndex}-${exerciseIndex}`}
-          className={`transition-all duration-300 ease-in-out ${
-            expanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+          className={`p-3 sm:p-4 pt-0 transition-opacity duration-300 ease-in-out ${
+            expanded ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {/* Exercise configuration */}
@@ -504,77 +518,106 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-muted-foreground">Progression</span>
               </div>
-              <select
-                aria-label="Progression scheme"
+              <Select
                 value={exercise.progressionScheme}
-                onChange={(e) => {
-                  const newScheme = e.target.value as ProgressionScheme;
+                onValueChange={(val) => {
+                  const newScheme = val as ProgressionScheme;
                   onUpdateProgressionScheme(exerciseIndex, newScheme);
-                  
+
                   // When progression is not NONE, force all sets to use RANGE rep type
                   if (newScheme !== 'NONE') {
                     exercise.sets.forEach((set, setIndex) => {
                       onUpdateSet(exerciseIndex, setIndex, 'repType', 'RANGE');
                       // Convert existing reps to range if needed
                       if (set.repType === 'FIXED' && set.reps) {
-                        onUpdateSet(exerciseIndex, setIndex, 'minReps', set.reps.toString());
-                        onUpdateSet(exerciseIndex, setIndex, 'maxReps', set.reps.toString());
+                        onUpdateSet(
+                          exerciseIndex,
+                          setIndex,
+                          'minReps',
+                          set.reps.toString()
+                        );
+                        onUpdateSet(
+                          exerciseIndex,
+                          setIndex,
+                          'maxReps',
+                          set.reps.toString()
+                        );
                       }
                     });
                   }
                 }}
-                className="w-40 h-8 rounded-md border bg-background px-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
               >
-                <option value="NONE">None</option>
-                <option value="DOUBLE_PROGRESSION">Double Progression</option>
-                <option value="DYNAMIC_DOUBLE_PROGRESSION">Dynamic Double Progression</option>
-              </select>
+                <SelectTrigger
+                  aria-label="Progression scheme"
+                  size="sm"
+                  className="w-36 sm:w-40 max-w-[60vw]"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
+                  <SelectItem value="NONE">None</SelectItem>
+                  <SelectItem value="DOUBLE_PROGRESSION">Double Progression</SelectItem>
+                  <SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">Dynamic Double Progression</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Weight increment */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Weight Inc. (kg)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="Decrease weight increment"
-                  onClick={() => onUpdateMinWeightIncrement(exerciseIndex, Math.max(0.25, exercise.minWeightIncrement - 0.25))}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <Input
-                  type="text"
-                  inputMode="decimal"
-                  pattern="[0-9]*[.]?[0-9]*"
-                  autoComplete="off"
-                  aria-label="Minimum weight increment"
-                  placeholder="2.5"
-                  value={exercise.minWeightIncrement}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
-                    if (!isNaN(value) && value > 0) {
-                      onUpdateMinWeightIncrement(exerciseIndex, value);
+            {/* Weight increment (only for active progression) */}
+            {exercise.progressionScheme !== 'NONE' && (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Weight Inc. (kg)</span>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="hidden sm:inline-flex h-8 w-8 p-0 shrink-0"
+                    aria-label="Decrease weight increment"
+                    onClick={() =>
+                      onUpdateMinWeightIncrement(
+                        exerciseIndex,
+                        Math.max(0.25, exercise.minWeightIncrement - 0.25)
+                      )
                     }
-                  }}
-                  className="w-20 h-8 text-sm text-center"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="Increase weight increment"
-                  onClick={() => onUpdateMinWeightIncrement(exerciseIndex, exercise.minWeightIncrement + 0.25)}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*[.]?[0-9]*"
+                    autoComplete="off"
+                    aria-label="Minimum weight increment"
+                    placeholder="2.5"
+                    value={exercise.minWeightIncrement}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                      if (!isNaN(value) && value > 0) {
+                        onUpdateMinWeightIncrement(exerciseIndex, value);
+                      }
+                    }}
+                    className="w-24 sm:w-20 h-8 text-sm text-center"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="hidden sm:inline-flex h-8 w-8 p-0 shrink-0"
+                    aria-label="Increase weight increment"
+                    onClick={() =>
+                      onUpdateMinWeightIncrement(
+                        exerciseIndex,
+                        exercise.minWeightIncrement + 0.25
+                      )
+                    }
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Desktop headers */}

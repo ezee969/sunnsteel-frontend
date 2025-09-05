@@ -23,7 +23,8 @@ export const MOCK_SESSION_WITH_SETS: WorkoutSession = {
         exercise: {
           id: 'ex-1',
           name: 'Exercise 1',
-          primaryMuscle: 'CHEST',
+          primaryMuscles: ['PECTORAL'],
+          secondaryMuscles: ['ANTERIOR_DELTOIDS', 'TRICEPS'],
           equipment: 'BARBELL',
         },
         sets: [

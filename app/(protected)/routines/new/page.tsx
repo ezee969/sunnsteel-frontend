@@ -100,30 +100,36 @@ export default function CreateRoutinePage() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8">
+    <div className="container max-w-4xl mx-auto py-3 sm:py-8 pb-20 sm:pb-24">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="mb-4 sm:mb-8">
+        <div className="flex items-center gap-2 mb-2 sm:mb-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleCancel}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 p-2 sm:px-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Routines
+            <span className="hidden sm:inline">Back to Routines</span>
           </Button>
         </div>
-        <h1 className="text-3xl font-bold">Create New Routine</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Create New Routine</h1>
+        <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
           Build your custom workout routine step by step
         </p>
       </div>
 
-      {/* Compact Stepper */}
-      {/* New Stepper */}
-      <div className="mb-8">
-        <Stepper steps={STEPS} currentStep={currentStep} onStepClick={handleStepClick} visitedSteps={visitedSteps} />
+      {/* Stepper: sticky on top for easier navigation on mobile */}
+      <div className="sticky top-0 z-20 mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="py-2">
+          <Stepper
+            steps={STEPS}
+            currentStep={currentStep}
+            onStepClick={handleStepClick}
+            visitedSteps={visitedSteps}
+          />
+        </div>
       </div>
 
       {/* Main Content */}
@@ -139,29 +145,30 @@ export default function CreateRoutinePage() {
         <CardContent className="p-6">{renderCurrentStep()}</CardContent>
       </Card>
 
-      {/* Navigation */}
-      {/* Navigation */}
-      <div className="mt-6 flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={currentStep === 1}
-          className="gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="sr-only sm:not-sr-only">Previous</span>
-        </Button>
-
-        {currentStep < STEPS.length ? (
+      {/* Sticky bottom navigation */}
+      <div className="sticky bottom-0 z-20 mt-6 border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="py-3 flex items-center justify-between">
           <Button
-            onClick={handleNext}
-            disabled={!canProceedToNextStep()}
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 1}
             className="gap-2"
           >
-            <span className="sr-only sm:not-sr-only">Next</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only sm:not-sr-only">Previous</span>
           </Button>
-        ) : null}
+
+          {currentStep < STEPS.length ? (
+            <Button
+              onClick={handleNext}
+              disabled={!canProceedToNextStep()}
+              className="gap-2"
+            >
+              <span className="sr-only sm:not-sr-only">Next</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          ) : null}
+        </div>
       </div>
     </div>
   );

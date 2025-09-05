@@ -1,17 +1,19 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { motion } from 'framer-motion';
 import { LoginHeader } from './components/LoginHeader';
 import { LoginForm } from './components/LoginForm';
 
-export const metadata: Metadata = {
-  title: 'Sunnsteel - Login',
-  description: 'Login to your fitness journey',
-};
-
 export default function LoginPage() {
   return (
-    <div className="animate-fade-in">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <LoginHeader />
       <LoginForm />
-    </div>
+    </motion.div>
   );
 }

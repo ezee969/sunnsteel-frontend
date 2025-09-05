@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Loader2, ChevronsUpDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useExercises } from '@/lib/api/hooks/useExercises';
 import { parseTime } from '@/lib/utils/time';
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
 import { Exercise } from '@/lib/api/types/exercise.type';
 import { RoutineWizardData, ProgressionScheme } from './types';
 import { Input } from '@/components/ui/input';
@@ -37,9 +39,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
 
-  const currentDay = data.days.find(
-    (d) => d.dayOfWeek === data.trainingDays[selectedDay]
-  );
+  // Note: we compute day-specific data on-demand below to avoid stale references
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -64,7 +64,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       const searchLower = searchValue.toLowerCase();
       const matchesSearch =
         exercise.name.toLowerCase().includes(searchLower) ||
-        exercise.primaryMuscle.toLowerCase().includes(searchLower) ||
+        exercise.primaryMuscles.some(muscle => muscle.toLowerCase().includes(searchLower)) ||
         exercise.equipment.toLowerCase().includes(searchLower);
 
       // Check if exercise is already added to current day
@@ -356,20 +356,20 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
           value={selectedDay.toString()}
           onValueChange={(value: string) => setSelectedDay(parseInt(value))}
         >
-          <TabsList className="flex w-full justify-start overflow-x-auto">
+          <TabsList className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap">
             {data.trainingDays.map((dayId, index) => (
               <TabsTrigger
                 key={dayId}
                 value={index.toString()}
-                className="flex-shrink-0"
+                className="flex-shrink-0 whitespace-nowrap"
               >
                 {DAYS_OF_WEEK[dayId]}
-                {currentDay && currentDay.exercises.length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {data.days.find((d) => d.dayOfWeek === dayId)?.exercises
-                      .length || 0}
-                  </Badge>
-                )}
+                <Badge
+                  variant="secondary"
+                  className="ml-2 h-5 min-w-[1.25rem] px-1 text-[10px] leading-none flex items-center justify-center"
+                >
+                  {data.days.find((d) => d.dayOfWeek === dayId)?.exercises?.length ?? 0}
+                </Badge>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -425,7 +425,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                                   <div className="flex flex-col items-start">
                                     <span className="text-sm font-medium">{ex.name}</span>
                                     <span className="text-xs text-muted-foreground">
-                                      {ex.primaryMuscle} • {ex.equipment}
+                                      {ex.primaryMuscles ? formatMuscleGroups(ex.primaryMuscles) : 'Unknown'} • {ex.equipment}
                                     </span>
                                   </div>
                                 </Button>
@@ -444,26 +444,33 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                 <CardContent>
                   {day && day.exercises.length > 0 ? (
                     <div className="space-y-4">
-                      {day.exercises.map((exercise, exerciseIndex) => {
-                        const exerciseData = exercises?.find(
-                          (ex: Exercise) => ex.id === exercise.exerciseId
-                        );
+                      <AnimatePresence>
+                        {day.exercises.map((exercise, exerciseIndex) => {
+                          const exerciseData = exercises?.find(
+                            (ex: Exercise) => ex.id === exercise.exerciseId
+                          );
 
-                        return (
-                          <ExerciseCard
-                            key={exerciseIndex}
-                            tabIndex={tabIndex}
-                            exerciseIndex={exerciseIndex}
-                            exercise={exercise}
-                            exerciseData={exerciseData}
-                            expanded={(expandedMap?.[exerciseIndex] ?? true)}
-                            onToggleExpand={(idx) =>
-                              setExpandedMap((prev) => ({
-                                ...prev,
-                                [idx]: !(prev?.[idx] ?? true),
-                              }))
-                            }
-                            onRemoveExercise={removeExercise}
+                          return (
+                            <motion.div
+                              key={`${exercise.exerciseId}-${exerciseIndex}`}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
+                            >
+                              <ExerciseCard
+                                tabIndex={tabIndex}
+                                exerciseIndex={exerciseIndex}
+                                exercise={exercise}
+                                exerciseData={exerciseData}
+                                expanded={(expandedMap?.[exerciseIndex] ?? true)}
+                                onToggleExpand={(idx) =>
+                                  setExpandedMap((prev) => ({
+                                    ...prev,
+                                    [idx]: !(prev?.[idx] ?? true),
+                                  }))
+                                }
+                                onRemoveExercise={removeExercise}
                             onUpdateRestTime={updateRestTime}
                             onUpdateProgressionScheme={updateProgressionScheme}
                             onUpdateMinWeightIncrement={updateMinWeightIncrement}
@@ -487,8 +494,10 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                             onStepRangeReps={stepRangeReps}
                             onStepWeight={stepWeight}
                           />
-                        );
-                      })}
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
                     </div>
                   ) : (
                     <div className="text-center text-sm text-muted-foreground py-8">

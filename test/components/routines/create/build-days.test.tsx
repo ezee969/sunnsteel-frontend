@@ -1,6 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import type { Matcher } from '@testing-library/dom'
 import { BuildDays } from '@/components/routines/create/BuildDays'
 import type { RoutineWizardData } from '@/components/routines/create/types'
 
@@ -11,8 +12,11 @@ vi.mock('@/lib/api/hooks/useExercises', () => ({
       {
         id: 'e1',
         name: 'Bench Press',
-        primaryMuscle: 'Chest',
+        primaryMuscles: ['PECTORAL'],
+        secondaryMuscles: ['ANTERIOR_DELTOIDS', 'TRICEPS'],
         equipment: 'Barbell',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       },
     ],
     isLoading: false,
@@ -20,6 +24,13 @@ vi.mock('@/lib/api/hooks/useExercises', () => ({
 }))
 
 describe('BuildDays - repType flows', () => {
+  const openSelectAndChoose = async (label: string, optionName: Matcher) => {
+    const trigger = screen.getByLabelText(label)
+    fireEvent.click(trigger)
+    const option = await screen.findByRole('option', { name: optionName })
+    fireEvent.click(option)
+  }
+
   const Wrapper: React.FC<{ initial: RoutineWizardData; onUpdate: (d: RoutineWizardData) => void }> = ({ initial, onUpdate }) => {
     const [data, setData] = React.useState<RoutineWizardData>(initial)
     const handleUpdate = (updates: Partial<RoutineWizardData>) => {
@@ -40,6 +51,8 @@ describe('BuildDays - repType flows', () => {
         exercises: [
           {
             exerciseId: 'e1',
+            progressionScheme: 'NONE',
+            minWeightIncrement: 2.5,
             restSeconds: 120,
             sets: [
               { setNumber: 1, repType: 'FIXED', reps: 10, minReps: null, maxReps: null, weight: 50 },
@@ -57,11 +70,11 @@ describe('BuildDays - repType flows', () => {
     onUpdate = vi.fn()
   })
 
-  it('switches from FIXED to RANGE and initializes min/max based on fallback', () => {
+  it('switches from FIXED to RANGE and initializes min/max based on fallback', async () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
-    const select = screen.getByLabelText('Rep type') as HTMLSelectElement
-    fireEvent.change(select, { target: { value: 'RANGE' } })
+    // shadcn/ui Select: open trigger and choose item
+    await openSelectAndChoose('Rep type', /Rep Range/i)
 
     expect(onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -85,8 +98,7 @@ describe('BuildDays - repType flows', () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
     // Switch to RANGE
-    const select = screen.getByLabelText('Rep type') as HTMLSelectElement
-    fireEvent.change(select, { target: { value: 'RANGE' } })
+    await openSelectAndChoose('Rep type', /Rep Range/i)
 
     onUpdate.mockClear()
 
@@ -115,8 +127,7 @@ describe('BuildDays - repType flows', () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
     // To RANGE first
-    const select = screen.getByLabelText('Rep type') as HTMLSelectElement
-    fireEvent.change(select, { target: { value: 'RANGE' } })
+    await openSelectAndChoose('Rep type', /Rep Range/i)
 
     // Increase min to 15 to have a deterministic fallback
     const minInput = (await screen.findByLabelText('Min reps')) as HTMLInputElement
@@ -125,7 +136,7 @@ describe('BuildDays - repType flows', () => {
     onUpdate.mockClear()
 
     // Back to FIXED: reps should adopt minReps (15) and min/max become null
-    fireEvent.change(select, { target: { value: 'FIXED' } })
+    await openSelectAndChoose('Rep type', /Fixed Reps/i)
 
     expect(onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({

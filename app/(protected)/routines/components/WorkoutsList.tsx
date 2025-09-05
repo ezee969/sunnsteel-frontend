@@ -45,8 +45,9 @@ import {
 } from '@/lib/api/hooks/useRoutines';
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useRouter } from 'next/navigation';
-import { ClipLoader } from 'react-spinners';
 import { routineService } from '@/lib/api/services/routineService';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
 
 interface WorkoutsListProps {
   routines: Routine[] | undefined;
@@ -143,10 +144,35 @@ export default function WorkoutsList({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex flex-col items-center gap-4">
-          <ClipLoader color="#3b82f6" size={40} />
-          <p className="text-muted-foreground">Loading workouts...</p>
+      <div className="px-1 sm:pr-4 sm:pl-0">
+        <div className="grid gap-3 sm:gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="p-4 sm:px-6 sm:py-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-2 pr-4">
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-60" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0 sm:px-6 sm:pb-4 sm:pt-0">
+                <div className="space-y-2 mb-3">
+                  <Skeleton className="h-3 w-full" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-28" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -314,6 +340,13 @@ export default function WorkoutsList({
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-0 sm:px-6 sm:pb-4 sm:pt-0">
+                <div className="space-y-1 mb-3">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Completion</span>
+                    <span>{routine.isCompleted ? '100%' : '0%'}</span>
+                  </div>
+                  <Progress value={routine.isCompleted ? 100 : 0} />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge
                     variant="outline"

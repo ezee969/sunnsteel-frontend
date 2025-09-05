@@ -13,6 +13,8 @@ import { useRoutine } from '@/lib/api/hooks/useRoutines'
 import type { Routine } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import { useDebounce } from '@/hooks/use-debounce'
+import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,8 +107,40 @@ export default function ActiveSessionPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[70vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin" />
+      <div className="p-3 sm:p-4 max-w-2xl mx-auto">
+        <div className="mb-3 flex items-center justify-between">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-5 w-40" />
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-40" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Skeleton className="h-5 w-52" />
+            <div className="space-y-2">
+              <Skeleton className="h-2 w-full" />
+              <Skeleton className="h-2 w-3/4" />
+            </div>
+            <div className="grid gap-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+        <div className="mt-4 space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     )
   }
@@ -121,6 +155,24 @@ export default function ActiveSessionPage() {
       </div>
     )
   }
+
+  // Compute overall progress when routine metadata is available
+  const dayMeta = routine?.days.find((d) => d.id === session.routineDayId)
+  const totalSets = dayMeta
+    ? dayMeta.exercises.reduce((acc, re) => acc + re.sets.length, 0)
+    : 0
+  const completedKeys = new Set(
+    (session.setLogs as SetLog[] | undefined)
+      ?.filter((l) => l.isCompleted)
+      .map((l) => `${l.routineExerciseId}-${l.setNumber}`)
+  )
+  const completedSets = dayMeta
+    ? dayMeta.exercises.reduce(
+        (acc, re) => acc + re.sets.filter((s) => completedKeys.has(`${re.id}-${s.setNumber}`)).length,
+        0,
+      )
+    : 0
+  const progressPct = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
 
   return (
     <div className="p-3 sm:p-4 max-w-2xl mx-auto">
@@ -147,6 +199,17 @@ export default function ActiveSessionPage() {
               {routine?.name ?? session.routineId}
             </span>
           </div>
+          {totalSets > 0 ? (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Progress</span>
+                <span>
+                  {completedSets}/{totalSets} sets ({progressPct}%)
+                </span>
+              </div>
+              <Progress value={progressPct} />
+            </div>
+          ) : null}
           <div className="flex gap-2">
             <Button
               className="flex-1"
