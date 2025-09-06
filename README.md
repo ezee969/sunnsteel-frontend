@@ -73,11 +73,12 @@ project-root/
   - When `FIXED`: use `reps`.
   - When `RANGE`: use `minReps` and `maxReps`.
 - Exercise progression schemes per exercise:
-  - `progressionScheme: 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION'`
+  - `progressionScheme: 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'PROGRAMMED_RTF'`
   - `minWeightIncrement`: number (default 2.5kg)
   - **NONE**: No progression applied (default option)
   - **DOUBLE_PROGRESSION**: Increases weight on all sets when all sets hit or exceed target reps
   - **DYNAMIC_DOUBLE_PROGRESSION**: Increases weight per individual set when that set hits or exceed target reps
+  - **PROGRAMMED_RTF**: Date-driven, fixed program that schedules 4 fixed sets + 1 AMRAP per week. Requires routine-level program settings (see below) and per-exercise RtF fields (Training Max and Rounding).
   - **Note**: When progression is not NONE, all sets automatically use RANGE rep type (fixed reps are disabled)
   - **Weight Increment UI**: The "Weight Inc. (kg)" input only appears when progression is active (not `NONE`). On mobile, +/- buttons are hidden to prevent overflow; the input remains editable.
   - **Edit compatibility mapping**: When editing existing routines, legacy backend values are mapped for compatibility — `'DYNAMIC'` ➜ `'DOUBLE_PROGRESSION'`, `'DYNAMIC_DOUBLE'` ➜ `'DYNAMIC_DOUBLE_PROGRESSION'`. Missing/unknown values default to `'NONE'`.
@@ -91,6 +92,8 @@ project-root/
       - Exercise header: exercise title is displayed above the timer/controls for clearer hierarchy.
       - Rep type and progression scheme now use the shadcn/ui Select component for consistent styling and proper dropdown alignment/behavior across devices.
       - Progression Select on mobile is width-constrained and the dropdown content is clamped to viewport to avoid overflow.
+      - PROGRAMMED_RTF adds per-exercise inputs: `TM (kg)` and `Rounding (kg)` with options 0.5, 1.0, 2.5, 5.0.
+      - TM (kg) validation UI: when RtF is selected and TM is missing/invalid, the TM input shows a red border and helper text. TM is clamped to 0–500 kg and rounded to 0.5 kg increments on change.
       - Stepper buttons (+/-) for reps and weight with clamping:
         - Fixed reps: 1..50
         - Range reps: min/max are individually stepped, clamped 1..50, and cross-clamped so min ≤ max
@@ -108,6 +111,17 @@ project-root/
         - Adding/removing sets animates in/out for clearer feedback.
     - Inputs: no forced leading zeros. Empty fields stay empty (not auto-filled with 0). Weight shows empty when undefined (no placeholder 0).
   - `ReviewAndCreate` → prepares payload mapping sets according to `repType` and creates/updates routine
+    - When any exercise uses `PROGRAMMED_RTF`, includes routine-level fields in the payload: `programWithDeloads`, `programStartDate` (yyyy-mm-dd), and `programTimezone` (IANA TZ).
+    - Per-exercise fields for RtF (`programTMKg`, `programRoundingKg`) are included only for exercises with `PROGRAMMED_RTF`.
+    - Safety net: if RtF is used and `programTimezone` is missing, the payload falls back to the browser IANA timezone during submission.
+
+#### RtF Program Settings (TrainingDays)
+
+- When any exercise is set to `PROGRAMMED_RTF`, the `TrainingDays` step shows a settings panel to configure:
+  - `Include deload weeks` (boolean)
+  - `Program start date` (date input)
+  - `Timezone (IANA)`
+- A hint warns when the selected start date weekday does not match the first selected training day.
 - Pages:
   - New: `app/(protected)/routines/new/page.tsx`
   - Edit: `app/(protected)/routines/edit/[id]/page.tsx` (maps backend routine to `RoutineWizardData` including `repType/minReps/maxReps`). The Stepper is now sticky at the top like in the create page.
@@ -116,6 +130,25 @@ project-root/
 
 - The canonical routines client is `lib/api/services/routineService.ts`.
 - Any previous `routinesService.ts` has been removed; use `routineService.ts` for all routines API calls.
+
+### Utilities
+
+- `lib/utils/reps-to-failure.ts`
+  - `generateRepsToFailureProgram(config, performance)`
+    - Strength variant: 5 sets (4 + 1 AMRAP).
+    - Deloads at 60% with goal `3x5 @ RPE 6` (no AMRAP target).
+  - `generateRepsToFailureHypertrophyProgram(config, performance)`
+    - Hypertrophy variant: 4 sets (3 + 1 AMRAP), uses weekly goals in `weeklyGoalDataHypertrophy`.
+    - Deloads at 60% with goal `4x5` and “no rep targets”.
+  - TM adjustment rules based on last set AMRAP vs target:
+    - 2+ reps below target: −5.00%
+    - 1 rep below target: −2.00%
+    - Exactly on target: 0.00%
+    - +1 rep: +0.50%
+    - +2 reps: +1.00%
+    - +3 reps: +1.50%
+    - +4 reps: +2.00%
+    - +5+ reps: +3.00%
 
 ### Feature: Workout Sessions
 

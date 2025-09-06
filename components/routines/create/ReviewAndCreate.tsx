@@ -39,43 +39,75 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
   const createRoutineMutation = useCreateRoutine();
   const updateRoutineMutation = useUpdateRoutine();
   const isLoading = isEditing ? updateRoutineMutation.isPending : createRoutineMutation.isPending;
+  const usesRtf = data.days.some((d) =>
+    d.exercises.some(
+      (ex) =>
+        ex.progressionScheme === 'PROGRAMMED_RTF' ||
+        ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    )
+  );
 
-  const prepareRoutineData = (): CreateRoutineRequest => ({
-    name: data.name,
-    description: data.description,
-    isPeriodized: false,
-    days: data.days.map((day) => ({
-      dayOfWeek: day.dayOfWeek,
-      exercises: day.exercises.map((exercise) => ({
-        exerciseId: exercise.exerciseId,
-        restSeconds: exercise.restSeconds,
-        progressionScheme: exercise.progressionScheme,
-        minWeightIncrement: exercise.minWeightIncrement,
-        sets: exercise.sets.map((set) => {
-          const baseSet = {
-            setNumber: set.setNumber,
-            repType: set.repType,
-            ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
-          };
-          
-          if (set.repType === 'FIXED') {
-            return {
-              ...baseSet,
-              repType: 'FIXED' as const,
-              reps: set.reps ?? 0,
-            };
-          } else {
+  const prepareRoutineData = (): CreateRoutineRequest => {
+    const usesRtf = data.days.some((d) =>
+      d.exercises.some(
+        (ex) =>
+          ex.progressionScheme === 'PROGRAMMED_RTF' ||
+          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+      )
+    );
+
+    const tz = (data.programTimezone ?? '').trim() || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return {
+      name: data.name,
+      description: data.description,
+      isPeriodized: false,
+      ...(usesRtf && {
+        programWithDeloads: data.programWithDeloads,
+        programStartDate: data.programStartDate,
+        programTimezone: tz,
+      }),
+      days: data.days.map((day) => ({
+        dayOfWeek: day.dayOfWeek,
+        exercises: day.exercises.map((exercise) => ({
+          exerciseId: exercise.exerciseId,
+          restSeconds: exercise.restSeconds,
+          progressionScheme:
+            exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+              ? 'PROGRAMMED_RTF'
+              : exercise.progressionScheme,
+          minWeightIncrement: exercise.minWeightIncrement,
+          ...((exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && {
+            ...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
+            ...(exercise.programRoundingKg !== undefined && {
+              programRoundingKg: exercise.programRoundingKg,
+            }),
+          }),
+          sets: exercise.sets.map((set) => {
+            const baseSet = {
+              setNumber: set.setNumber,
+              repType: set.repType,
+              ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
+            } as const;
+
+            if (set.repType === 'FIXED') {
+              return {
+                ...baseSet,
+                repType: 'FIXED' as const,
+                reps: set.reps ?? 0,
+              };
+            }
+
             return {
               ...baseSet,
               repType: 'RANGE' as const,
               minReps: set.minReps ?? 0,
               maxReps: set.maxReps ?? 0,
             };
-          }
-        }),
+          }),
+        })),
       })),
-    })),
-  });
+    };
+  };
 
   const handleSubmit = async () => {
     try {
@@ -208,6 +240,27 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      {/* Program Settings (RtF) */}
+      {usesRtf && (
+        <div className="rounded-lg border bg-card text-card-foreground p-4">
+          <h3 className="text-base font-semibold leading-none tracking-tight mb-3">Program Settings (RtF)</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div>
+              <p className="text-muted-foreground">Include deload weeks</p>
+              <p className="font-medium">{data.programWithDeloads ? 'Yes' : 'No'}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Start date</p>
+              <p className="font-medium">{data.programStartDate || 'Not set'}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Timezone</p>
+              <p className="font-medium">{data.programTimezone || 'Not set'}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary Stats */}
       <div className="rounded-lg border bg-card text-card-foreground p-4">

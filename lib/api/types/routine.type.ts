@@ -1,5 +1,9 @@
 export type RepType = 'FIXED' | 'RANGE';
-export type ProgressionScheme = 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION';
+export type ProgressionScheme =
+  | 'NONE'
+  | 'DOUBLE_PROGRESSION'
+  | 'DYNAMIC_DOUBLE_PROGRESSION'
+  | 'PROGRAMMED_RTF';
 
 export interface RoutineSet {
   setNumber: number;
@@ -16,6 +20,9 @@ export interface RoutineExercise {
   restSeconds: number;
   progressionScheme: ProgressionScheme;
   minWeightIncrement: number;
+  // RtF-specific (present when progressionScheme = PROGRAMMED_RTF)
+  programTMKg?: number;
+  programRoundingKg?: number;
   exercise: {
     id: string;
     name: string;
@@ -48,6 +55,10 @@ export interface CreateRoutineRequest {
   name: string;
   description?: string;
   isPeriodized: boolean;
+  // Routine-level program fields (only when any exercise uses PROGRAMMED_RTF)
+  programWithDeloads?: boolean; // true=21; false=18
+  programStartDate?: string; // yyyy-mm-dd
+  programTimezone?: string; // IANA TZ
   days: Array<{
     dayOfWeek: number;
     exercises: Array<{
@@ -55,6 +66,9 @@ export interface CreateRoutineRequest {
       restSeconds: number;
       progressionScheme: ProgressionScheme;
       minWeightIncrement: number;
+      // RtF-specific
+      programTMKg?: number;
+      programRoundingKg?: number;
       sets: Array<
         | {
             setNumber: number;

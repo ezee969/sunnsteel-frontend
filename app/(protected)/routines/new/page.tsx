@@ -66,7 +66,21 @@ export default function CreateRoutinePage() {
       case 2: // Training Days
         return routineData.trainingDays.length > 0;
       case 3: // Build Days
-        return routineData.days.every(day => day.exercises.length > 0);
+        {
+          const daysComplete = routineData.days.every(day => day.exercises.length > 0);
+          if (!daysComplete) return false;
+          // If any exercise uses PROGRAMMED_RTF, require programStartDate to proceed
+          const usesRtf = routineData.days.some((d) =>
+            d.exercises.some((ex) =>
+              ex.progressionScheme === 'PROGRAMMED_RTF' ||
+              ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            )
+          );
+          if (usesRtf) {
+            return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
+          }
+          return true;
+        }
       default:
         return true;
     }

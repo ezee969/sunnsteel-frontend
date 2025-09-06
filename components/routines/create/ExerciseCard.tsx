@@ -27,39 +27,7 @@ export type RoutineSet = {
   weight?: number;
 };
 
-interface ExerciseCardProps {
-  exercise: {
-    exerciseId: string;
-    progressionScheme: ProgressionScheme;
-    minWeightIncrement: number;
-    sets: RoutineSet[];
-    restSeconds: number;
-  };
-  exerciseIndex: number;
-  tabIndex: number;
-  onUpdateSet: (
-    exerciseIndex: number,
-    setIndex: number,
-    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-    value: string
-  ) => void;
-  onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
-  onStepRangeReps: (
-    exerciseIndex: number,
-    setIndex: number,
-    field: 'minReps' | 'maxReps',
-    delta: number
-  ) => void;
-  onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
-  onAddSet: (exerciseIndex: number) => void;
-  onRemoveSet: (exerciseIndex: number, setIndex: number) => void;
-  onRemoveExercise: (exerciseIndex: number) => void;
-  onUpdateRestTime: (exerciseIndex: number, time: string) => void;
-  onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void;
-  onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
-}
-
-interface SetRowProps {
+export const SetRow: FC<{
   exerciseIndex: number;
   setIndex: number;
   set: RoutineSet;
@@ -81,9 +49,7 @@ interface SetRowProps {
   onRemoveSet: () => void;
   isRemoving: boolean;
   disableRemove: boolean;
-}
-
-export const SetRow: FC<SetRowProps> = ({
+}> = ({
   exerciseIndex,
   setIndex,
   set,
@@ -390,13 +356,26 @@ interface ExerciseCardProps {
   onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void;
   onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void;
   onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
+  onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void;
+  onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void;
   onAddSet: (exerciseIndex: number) => void;
   isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean;
   onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void;
-  onUpdateSet: SetRowProps['onUpdateSet'];
-  onStepFixedReps: SetRowProps['onStepFixedReps'];
-  onStepRangeReps: SetRowProps['onStepRangeReps'];
-  onStepWeight: SetRowProps['onStepWeight'];
+  onRemoveSet?: (exerciseIndex: number, setIndex: number) => void; 
+  onUpdateSet: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
+    value: string
+  ) => void;
+  onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  onStepRangeReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps',
+    delta: number
+  ) => void;
+  onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
 }
 
 export const ExerciseCard: FC<ExerciseCardProps> = ({
@@ -410,6 +389,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onUpdateRestTime,
   onUpdateProgressionScheme,
   onUpdateMinWeightIncrement,
+  onUpdateProgramTMKg,
+  onUpdateProgramRoundingKg,
   onAddSet,
   isRemovingSet,
   onRemoveSetAnimated,
@@ -523,34 +504,12 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 onValueChange={(val) => {
                   const newScheme = val as ProgressionScheme;
                   onUpdateProgressionScheme(exerciseIndex, newScheme);
-
-                  // When progression is not NONE, force all sets to use RANGE rep type
-                  if (newScheme !== 'NONE') {
-                    exercise.sets.forEach((set, setIndex) => {
-                      onUpdateSet(exerciseIndex, setIndex, 'repType', 'RANGE');
-                      // Convert existing reps to range if needed
-                      if (set.repType === 'FIXED' && set.reps) {
-                        onUpdateSet(
-                          exerciseIndex,
-                          setIndex,
-                          'minReps',
-                          set.reps.toString()
-                        );
-                        onUpdateSet(
-                          exerciseIndex,
-                          setIndex,
-                          'maxReps',
-                          set.reps.toString()
-                        );
-                      }
-                    });
-                  }
                 }}
               >
                 <SelectTrigger
                   aria-label="Progression scheme"
                   size="sm"
-                  className="w-36 sm:w-40 max-w-[60vw]"
+                  className="w-44 sm:w-56 max-w-[60vw]"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -558,9 +517,75 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   <SelectItem value="NONE">None</SelectItem>
                   <SelectItem value="DOUBLE_PROGRESSION">Double Progression</SelectItem>
                   <SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">Dynamic Double Progression</SelectItem>
+                  <SelectItem value="PROGRAMMED_RTF">RtF (4 fixed + 1 AMRAP)</SelectItem>
+                  <SelectItem value="PROGRAMMED_RTF_HYPERTROPHY">RtF Hypertrophy (3 + 1 AMRAP)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* RtF per-exercise fields */}
+            {(() => {
+              const isRtf =
+                exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+                exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+              if (!isRtf) return null;
+              const tmMissing =
+                exercise.programTMKg === undefined || Number.isNaN(exercise.programTMKg as number);
+              const helpId = `tm-help-${tabIndex}-${exerciseIndex}`;
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-muted-foreground">TM (kg)</span>
+                      </div>
+                      <Input
+                        aria-label="Training Max (kg)"
+                        aria-invalid={tmMissing}
+                        aria-describedby={helpId}
+                        inputMode="decimal"
+                        pattern="[0-9]*[.]?[0-9]*"
+                        placeholder="e.g. 100"
+                        value={exercise.programTMKg ?? ''}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                          if (!Number.isNaN(val)) {
+                            onUpdateProgramTMKg(exerciseIndex, val);
+                          } else if (e.target.value === '') {
+                            onUpdateProgramTMKg(exerciseIndex, NaN);
+                          }
+                        }}
+                        className={`w-28 h-8 text-sm text-center ${tmMissing ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                      />
+                    </div>
+                    <p id={helpId} className={`text-[11px] ${tmMissing ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      {tmMissing
+                        ? 'Required for RtF. Range 0–500 kg, 0.5 increments.'
+                        : 'Range 0–500 kg, 0.5 increments.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">Rounding (kg)</span>
+                    </div>
+                    <Select
+                      value={(exercise.programRoundingKg ?? 2.5).toString()}
+                      onValueChange={(val) => onUpdateProgramRoundingKg(exerciseIndex, parseFloat(val))}
+                    >
+                      <SelectTrigger aria-label="Rounding increment" size="sm" className="w-28">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0.5">0.5</SelectItem>
+                        <SelectItem value="1">1.0</SelectItem>
+                        <SelectItem value="2.5">2.5</SelectItem>
+                        <SelectItem value="5">5.0</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Weight increment (only for active progression) */}
             {exercise.progressionScheme !== 'NONE' && (

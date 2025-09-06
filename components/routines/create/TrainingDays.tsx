@@ -3,8 +3,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RoutineWizardData } from './types';
 
@@ -50,6 +52,24 @@ const COMMON_SPLITS = [
 export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
   const { isMobile } = useSidebar();
   const [hasInteracted, setHasInteracted] = useState(data.trainingDays.length > 0);
+  const usesRtf = data.days.some((d) =>
+    d.exercises.some(
+      (ex) =>
+        ex.progressionScheme === 'PROGRAMMED_RTF' ||
+        ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    )
+  );
+
+  // Auto-fill timezone from browser when using RtF and not yet set
+  useEffect(() => {
+    if (!usesRtf) return;
+    const tz = data.programTimezone?.trim();
+    if (tz && tz.length > 0) return;
+    const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (browserTz) {
+      onUpdate({ programTimezone: browserTz });
+    }
+  }, [usesRtf, data.programTimezone, onUpdate]);
   const toggleDay = (dayId: number) => {
     const isSelected = data.trainingDays.includes(dayId);
     let newTrainingDays: number[];
@@ -219,6 +239,63 @@ export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
           </div>
         </div>
       </div>
+
+      {/* RtF Program Settings (shown only if any exercise uses RtF) */}
+      {usesRtf && (
+        <div className="bg-muted/30 p-3 md:p-4 rounded-lg space-y-3">
+          <h4 className="font-medium text-sm md:text-base">RtF Program Settings</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-muted-foreground">Include deload weeks</span>
+              <Checkbox
+                aria-label="Include deload weeks"
+                checked={!!data.programWithDeloads}
+                onCheckedChange={(checked) =>
+                  onUpdate({ programWithDeloads: Boolean(checked) })
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-muted-foreground">Program start date</span>
+              <Input
+                aria-label="Program start date"
+                type="date"
+                value={data.programStartDate ?? ''}
+                onChange={(e) => onUpdate({ programStartDate: e.target.value })}
+                className="w-40 h-8 text-sm text-center"
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-muted-foreground">Timezone (IANA)</span>
+              <Input
+                aria-label="Program timezone"
+                placeholder="e.g. America/New_York"
+                value={data.programTimezone ?? ''}
+                onChange={(e) => onUpdate({ programTimezone: e.target.value })}
+                className="w-56 h-8 text-sm text-center"
+              />
+            </div>
+          </div>
+          {/* Weekday consistency hint */}
+          {data.programStartDate && data.trainingDays.length > 0 && (
+            (() => {
+              const start = new Date(`${data.programStartDate}T00:00:00`);
+              const startWeekday = start.getDay();
+              const firstTraining = [...data.trainingDays].sort((a,b)=>a-b)[0];
+              const ok = startWeekday === firstTraining;
+              const weekdayName = DAYS_OF_WEEK[startWeekday]?.name ?? '';
+              const firstName = DAYS_OF_WEEK[firstTraining]?.name ?? '';
+              return (
+                <p className={`text-xs ${ok ? 'text-muted-foreground' : 'text-destructive'}`}>
+                  {ok
+                    ? `Start date falls on your first training day (${firstName}).`
+                    : `Warning: start date is ${weekdayName}, which does not match your first training day (${firstName}).`}
+                </p>
+              );
+            })()
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -59,6 +59,10 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
       - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
       - `deleteSetLog(id, routineExerciseId, setNumber)`
     - `utils.ts`: Utilidades generales
+  - `utils/reps-to-failure.ts`: Utilidades de programación RtF
+    - `generateRepsToFailureProgram(config, performance)`: variante de fuerza (5 sets: 4 + 1 AMRAP). Deloads al 60% con `3x5 @ RPE 6`.
+    - `generateRepsToFailureHypertrophyProgram(config, performance)`: variante de hipertrofia (4 sets: 3 + 1 AMRAP). Deloads al 60% con `4x5` y “no rep targets”.
+    - Reglas de ajuste de TM por desempeño en última serie AMRAP: −5% (−2+ reps), −2% (−1), 0% (objetivo), +0.5% (+1), +1% (+2), +1.5% (+3), +2% (+4), +3% (+5+).
 - **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
 
 ### Routine Creation/Edit Wizard
@@ -71,12 +75,32 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - Componentes del wizard (todos usan el tipo compartido):
   - `RoutineBasicInfo` → nombre/descripción
   - `TrainingDays` → selección de `trainingDays`
-  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales
+  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales, y progresión por ejercicio
   - `ReviewAndCreate` → prepara payload según `repType` y crea/actualiza la rutina
 - Páginas:
   - Nueva: `app/(protected)/routines/new/page.tsx`
   - Edición: `app/(protected)/routines/edit/[id]/page.tsx` (mapea rutina del backend a `RoutineWizardData`, incluyendo `repType/minReps/maxReps`)
   - Compatibilidad (Edit): Valores legados de backend para `progressionScheme` se mapean automáticamente — `'DYNAMIC'` → `'DOUBLE_PROGRESSION'`, `'DYNAMIC_DOUBLE'` → `'DYNAMIC_DOUBLE_PROGRESSION'`. Valores faltantes o desconocidos se normalizan a `'NONE'`.
+
+#### PROGRAMMED_RTF (RtF) — Integración Frontend
+
+- `progressionScheme` ahora incluye: `'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'PROGRAMMED_RTF'`.
+- En `BuildDays` cuando se selecciona `PROGRAMMED_RTF`:
+  - Se muestran campos por ejercicio:
+    - `programTMKg` (Training Max en kg)
+    - `programRoundingKg` (0.5 | 1.0 | 2.5 | 5.0)
+  - Si `scheme !== 'NONE'`, los sets se convierten automáticamente a `RANGE` (si eran `FIXED`) con `min=max=reps` como fallback, y se limpian `reps`.
+  - Se inicializa `programRoundingKg` a 2.5 si no estaba definido.
+- En `TrainingDays` se muestra un panel de configuración del programa RtF cuando cualquier ejercicio usa RtF:
+  - `programWithDeloads` (boolean)
+  - `programStartDate` (YYYY-MM-DD)
+  - `programTimezone` (IANA TZ)
+  - Aviso si el día de `programStartDate` no coincide con el primer día seleccionado en `trainingDays`.
+- Navegación/gating:
+  - Para avanzar de "Build Days" a "Review", si existe RtF se requiere `programStartDate`.
+- En `ReviewAndCreate` el payload incluye:
+  - Campos de rutina (solo si hay RtF): `programWithDeloads`, `programStartDate`, `programTimezone`.
+  - Por ejercicio (solo para RtF): `programTMKg`, `programRoundingKg`.
 
 ### Middleware
 
@@ -262,6 +286,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - Tests iniciales:
   - `test/lib/utils/time.test.ts` (helpers de tiempo)
   - `test/components/ui/button.test.tsx` (render básico del Button)
+  - `test/lib/utils/reps-to-failure-hypertrophy.test.ts` (utilidad RtF Hipertrofia)
   - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
 
 ### CI

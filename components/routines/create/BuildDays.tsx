@@ -38,6 +38,12 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
+  const usesRtf = data.days.some((d) =>
+    d.exercises.some((ex) =>
+      ex.progressionScheme === 'PROGRAMMED_RTF' ||
+      ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    )
+  );
 
   // Note: we compute day-specific data on-demand below to avoid stale references
 
@@ -98,6 +104,31 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     onUpdate({ days: newDays });
     setExercisePickerOpen(false);
     setSearchValue('');
+  };
+
+  const updateProgramTMKg = (exerciseIndex: number, tmKg: number) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    const val = Number.isNaN(tmKg)
+      ? undefined
+      : Math.min(500, Math.max(0, Math.round(tmKg * 2) / 2));
+    newDays[dayIndex].exercises[exerciseIndex].programTMKg = val;
+    onUpdate({ days: newDays });
+  };
+
+  const updateProgramRoundingKg = (exerciseIndex: number, roundingKg: number) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+    const allowed = [0.5, 1, 2.5, 5];
+    const val = allowed.includes(roundingKg) ? roundingKg : 2.5;
+    newDays[dayIndex].exercises[exerciseIndex].programRoundingKg = val;
+    onUpdate({ days: newDays });
   };
 
   const removeExercise = (exerciseIndex: number) => {
@@ -196,7 +227,28 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       (d) => d.dayOfWeek === data.trainingDays[selectedDay]
     );
     if (dayIndex === -1) return;
-    newDays[dayIndex].exercises[exerciseIndex].progressionScheme = scheme;
+    const ex = newDays[dayIndex].exercises[exerciseIndex];
+    ex.progressionScheme = scheme;
+
+    // If progression is enabled, ensure sets use RANGE and convert FIXED reps to min/max
+    if (scheme !== 'NONE') {
+      ex.sets.forEach((s) => {
+        if (s.repType === 'FIXED') {
+          const base = s.reps ?? s.minReps ?? s.maxReps ?? 8;
+          s.repType = 'RANGE';
+          s.minReps = Math.max(1, Math.min(50, base));
+          s.maxReps = Math.max(s.minReps as number, Math.min(50, base));
+          s.reps = null;
+        }
+      });
+    }
+
+    // Initialize RtF defaults
+    if (scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
+      if (typeof ex.programRoundingKg === 'undefined') ex.programRoundingKg = 2.5;
+      // TM left undefined until user inputs
+    }
+
     onUpdate({ days: newDays });
   };
 
@@ -351,6 +403,12 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
           <span className="text-destructive ml-1">*</span>
         </h3>
 
+        {usesRtf && !data.programStartDate && (
+          <div className="mb-4 p-3 rounded-md border border-amber-300 bg-amber-50 text-amber-900 text-sm">
+            RtF program detected. Please set your Program Start Date and Timezone in the &quot;Training Days&quot; step before proceeding to review.
+          </div>
+        )}
+
         {/* Day Tabs */}
         <Tabs
           value={selectedDay.toString()}
@@ -474,6 +532,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                             onUpdateRestTime={updateRestTime}
                             onUpdateProgressionScheme={updateProgressionScheme}
                             onUpdateMinWeightIncrement={updateMinWeightIncrement}
+                            onUpdateProgramTMKg={updateProgramTMKg}
+                            onUpdateProgramRoundingKg={updateProgramRoundingKg}
                             onAddSet={addSet}
                             onRemoveSet={removeSet}
                             isRemovingSet={(exIdx, setIdx) => !!removingSets[`${exIdx}-${setIdx}`]}

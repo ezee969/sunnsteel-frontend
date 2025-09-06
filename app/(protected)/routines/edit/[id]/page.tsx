@@ -36,6 +36,8 @@ const mapProgressionScheme = (
     case 'NONE':
     case 'DOUBLE_PROGRESSION':
     case 'DYNAMIC_DOUBLE_PROGRESSION':
+    case 'PROGRAMMED_RTF':
+    case 'PROGRAMMED_RTF_HYPERTROPHY':
       return value as ProgressionScheme;
     case 'DYNAMIC':
       return 'DOUBLE_PROGRESSION';
@@ -79,6 +81,9 @@ export default function EditRoutinePage() {
               (exercise as unknown as { progressionScheme?: string }).progressionScheme
             ),
             minWeightIncrement: exercise.minWeightIncrement || 2.5,
+            // RtF mapping (optional fields on backend response)
+            programTMKg: (exercise as unknown as { programTMKg?: number }).programTMKg,
+            programRoundingKg: (exercise as unknown as { programRoundingKg?: number }).programRoundingKg,
             sets: exercise.sets.map((set, index) => ({
               setNumber: index + 1,
               repType: set.repType,
@@ -90,6 +95,10 @@ export default function EditRoutinePage() {
             restSeconds: exercise.restSeconds,
           })),
         })),
+        // Routine-level program fields (present only if routine uses RtF)
+        programWithDeloads: (routine as unknown as { programWithDeloads?: boolean }).programWithDeloads,
+        programStartDate: (routine as unknown as { programStartDate?: string }).programStartDate,
+        programTimezone: (routine as unknown as { programTimezone?: string }).programTimezone,
       };
       
       setRoutineData(transformedData);
@@ -126,7 +135,20 @@ export default function EditRoutinePage() {
       case 2:
         return routineData.trainingDays.length > 0;
       case 3:
-        return routineData.days.every((day: { exercises: Array<unknown> }) => day.exercises.length > 0);
+        {
+          const daysComplete = routineData.days.every((day) => day.exercises.length > 0);
+          if (!daysComplete) return false;
+          const usesRtf = routineData.days.some((d) =>
+            d.exercises.some((ex) =>
+              ex.progressionScheme === 'PROGRAMMED_RTF' ||
+              ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            )
+          );
+          if (usesRtf) {
+            return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
+          }
+          return true;
+        }
       case 4:
         // Review step is considered valid if all previous steps are valid
         return [1, 2, 3].every(isStepValid);
