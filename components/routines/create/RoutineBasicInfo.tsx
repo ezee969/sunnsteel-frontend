@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RoutineWizardData } from './types';
 import {
   Select,
@@ -12,6 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon, Info } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface RoutineBasicInfoProps {
   data: RoutineWizardData;
@@ -19,6 +31,33 @@ interface RoutineBasicInfoProps {
 }
 
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const InfoTooltip = ({
+    content,
+    side = 'right',
+  }: {
+    content: string;
+    side?: 'top' | 'bottom' | 'left' | 'right';
+  }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Info className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side={side} className="max-w-xs">
+        <p>{content}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+
+  const selectedDate = data.programStartDate
+    ? new Date(data.programStartDate)
+    : undefined;
   // Auto-detect timezone when using Timeframe schedule and missing timezone
   useEffect(() => {
     if (data.programScheduleMode !== 'TIMEFRAME') return;
@@ -31,84 +70,116 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
   }, [data.programScheduleMode, data.programTimezone, onUpdate]);
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="routine-name">
-          Routine Name <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="routine-name"
-          placeholder="e.g., Push Pull Legs, Upper Lower, Full Body..."
-          value={data.name}
-          onChange={(e) => onUpdate({ name: e.target.value })}
-          className="text-lg"
-        />
-      </div>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="routine-name">
+            Routine Name <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="routine-name"
+            placeholder="e.g., Push Pull Legs, Upper Lower, Full Body..."
+            value={data.name}
+            onChange={(e) => onUpdate({ name: e.target.value })}
+            className="text-lg"
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="routine-description">Description (Optional)</Label>
-        <Textarea
-          id="routine-description"
-          placeholder="Describe your routine, goals, or any notes..."
-          value={data.description || ''}
-          onChange={(e) => onUpdate({ description: e.target.value })}
-          rows={4}
-        />
-      </div>
+        <div className="space-y-2">
+          <Label htmlFor="routine-description">Description (Optional)</Label>
+          <Textarea
+            id="routine-description"
+            placeholder="Describe your routine, goals, or any notes..."
+            value={data.description || ''}
+            onChange={(e) => onUpdate({ description: e.target.value })}
+            rows={4}
+          />
+        </div>
 
-      {/* Program Schedule */}
-      <div className="space-y-2">
-        <Label>Program Schedule</Label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Select
-              value={data.programScheduleMode ?? 'NONE'}
-              onValueChange={(val) => {
-                const mode = val as 'TIMEFRAME' | 'NONE';
-                const next: Partial<RoutineWizardData> = {
-                  programScheduleMode: mode,
-                };
-                // If switching to NONE, clear programStartDate to avoid stale gating
-                if (mode === 'NONE') {
-                  next.programStartDate = undefined;
-                }
-                onUpdate(next);
-              }}
-            >
-              <SelectTrigger
-                aria-label="Program schedule"
-                className="w-full sm:w-72"
-              >
-                <SelectValue placeholder="Choose schedule" />
-              </SelectTrigger>
-              <SelectContent className="max-w-[calc(100vw-2rem)]">
-                <SelectItem value="NONE">None (indefinite)</SelectItem>
-                <SelectItem value="TIMEFRAME">Timeframe (date-driven)</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              Choose &quot;Timeframe&quot; for programs that have a calendar start/end. Otherwise choose &quot;None&quot; for open-ended routines.
-            </p>
+        {/* Program Schedule */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Label>Program Schedule</Label>
+            <InfoTooltip
+              content="Choose 'Timeframe' for programs that have a calendar start/end. Otherwise choose 'None' for open-ended routines."
+              side="right"
+            />
           </div>
-
-          {data.programScheduleMode === 'TIMEFRAME' && (
+          <div className="space-y-3">
             <div className="space-y-1">
-              <Label htmlFor="program-start-date">Program start date</Label>
-              <Input
-                id="program-start-date"
-                aria-label="Program start date"
-                type="date"
-                value={data.programStartDate ?? ''}
-                onChange={(e) => onUpdate({ programStartDate: e.target.value })}
-                className="w-full sm:w-60 h-9"
-              />
-              <p className="text-xs text-muted-foreground">
-                Timezone is detected automatically.
-              </p>
+              <Select
+                value={data.programScheduleMode ?? 'NONE'}
+                onValueChange={(val) => {
+                  const mode = val as 'TIMEFRAME' | 'NONE';
+                  const next: Partial<RoutineWizardData> = {
+                    programScheduleMode: mode,
+                  };
+                  // If switching to NONE, clear programStartDate to avoid stale gating
+                  if (mode === 'NONE') {
+                    next.programStartDate = undefined;
+                  }
+                  onUpdate(next);
+                }}
+              >
+                <SelectTrigger
+                  aria-label="Program schedule"
+                  className="w-full sm:w-72"
+                >
+                  <SelectValue placeholder="Choose schedule" />
+                </SelectTrigger>
+                <SelectContent className="max-w-[calc(100vw-2rem)]">
+                  <SelectItem value="NONE">None (indefinite)</SelectItem>
+                  <SelectItem value="TIMEFRAME">Timeframe (date-driven)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          )}
+
+            {data.programScheduleMode === 'TIMEFRAME' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label>Program start date</Label>
+                  <InfoTooltip
+                    content="Select when your program begins. The timezone will be automatically detected based on your current location."
+                    side="right"
+                  />
+                </div>
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full sm:w-72 justify-start text-left font-normal',
+                        !selectedDate && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? (
+                        format(selectedDate, 'dd/MM/yyyy')
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          onUpdate({ programStartDate: format(date, 'yyyy-MM-dd') });
+                        } else {
+                          onUpdate({ programStartDate: undefined });
+                        }
+                        setCalendarOpen(false);
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { ChevronsUpDown, Clock, Minus, Plus, Trash2 } from 'lucide-react';
 import { Exercise } from '@/lib/api/types/exercise.type';
 import { RepType, RoutineWizardData, ProgressionScheme } from './types';
@@ -91,13 +92,13 @@ export const SetRow: FC<{
 
   return (
     <div
-      className={`bg-card border border-muted rounded-lg p-3 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-all duration-200 ${
+      className={`bg-card border border-muted rounded-lg p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-all duration-200 ${
         isRemoving
           ? 'animate-out fade-out-0 slide-out-to-top-2'
           : 'animate-in fade-in-0 slide-in-from-top-2'
       }`}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-2 items-start sm:items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-2 items-start sm:items-center">
         <div className="sm:col-span-2">
           <div className="flex items-center justify-between sm:justify-start">
             <Badge variant="outline" className="text-xs px-2 py-1">
@@ -109,7 +110,7 @@ export const SetRow: FC<{
               onClick={onRemoveSet}
               aria-label="Remove set"
               disabled={disableRemove}
-              className="sm:hidden h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+              className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
             >
               <Trash2 className="h-3 w-3" />
             </Button>
@@ -118,9 +119,9 @@ export const SetRow: FC<{
 
         <div className="sm:col-span-3">
           <div className="space-y-1">
-            <div className="sm:hidden text-xs font-medium text-muted-foreground">
+            <Label className="sm:hidden text-xs font-medium text-muted-foreground">
               Rep Type
-            </div>
+            </Label>
             <Select
               value={set.repType}
               onValueChange={(val) =>
@@ -132,7 +133,7 @@ export const SetRow: FC<{
                 className="w-full"
                 disabled={progressionScheme !== 'NONE'}
               >
-                <SelectValue />
+                <SelectValue className="truncate" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="FIXED">Fixed Reps</SelectItem>
@@ -144,16 +145,16 @@ export const SetRow: FC<{
 
         <div className="sm:col-span-3">
           <div className="space-y-1">
-            <div className="sm:hidden text-xs font-medium text-muted-foreground">
+            <Label className="sm:hidden text-xs font-medium text-muted-foreground">
               {set.repType === 'FIXED' ? 'Reps' : 'Rep Range'}
-            </div>
+            </Label>
             {set.repType === 'FIXED' ? (
               <div className="flex items-center gap-2 w-full">
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8 p-0 shrink-0"
+                  className="h-9 w-9 p-0 shrink-0 sm:hidden"
                   aria-label="Decrease reps"
                   onClick={() => onStepFixedReps(exerciseIndex, setIndex, -1)}
                 >
@@ -177,7 +178,7 @@ export const SetRow: FC<{
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8 p-0 shrink-0"
+                  className="h-9 w-9 p-0 shrink-0 sm:hidden"
                   aria-label="Increase reps"
                   onClick={() => onStepFixedReps(exerciseIndex, setIndex, 1)}
                 >
@@ -192,7 +193,7 @@ export const SetRow: FC<{
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 p-0 shrink-0 hidden sm:inline-flex"
+                      className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
                       aria-label="Decrease minimum reps"
                       onClick={() =>
                         onStepRangeReps(exerciseIndex, setIndex, 'minReps', -1)
@@ -219,13 +220,13 @@ export const SetRow: FC<{
                         );
                       }}
                       onBlur={handleCommitMin}
-                      className="text-center h-8 flex-1 min-w-0"
+                      className="text-center h-8 flex-1 min-w-0 sm:min-w-[64px]"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 p-0 shrink-0 hidden sm:inline-flex"
+                      className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
                       aria-label="Increase minimum reps"
                       onClick={() =>
                         onStepRangeReps(exerciseIndex, setIndex, 'minReps', 1)
@@ -240,7 +241,7 @@ export const SetRow: FC<{
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 p-0 shrink-0 hidden sm:inline-flex"
+                      className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
                       aria-label="Decrease maximum reps"
                       onClick={() =>
                         onStepRangeReps(exerciseIndex, setIndex, 'maxReps', -1)
@@ -273,7 +274,7 @@ export const SetRow: FC<{
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 p-0 shrink-0 hidden sm:inline-flex"
+                      className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
                       aria-label="Increase maximum reps"
                       onClick={() =>
                         onStepRangeReps(exerciseIndex, setIndex, 'maxReps', 1)
@@ -290,15 +291,15 @@ export const SetRow: FC<{
 
         <div className="sm:col-span-2">
           <div className="space-y-1">
-            <div className="sm:hidden text-xs font-medium text-muted-foreground">
-              Weight (kg)
-            </div>
+            <Label className="sm:hidden text-xs font-medium text-muted-foreground">
+              Weight
+            </Label>
             <div className="flex items-center gap-2 w-full">
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 p-0 shrink-0"
+                className="h-9 w-9 p-0 shrink-0 sm:hidden"
                 aria-label="Decrease weight"
                 onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
               >
@@ -322,7 +323,7 @@ export const SetRow: FC<{
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 p-0 shrink-0"
+                className="h-9 w-9 p-0 shrink-0 sm:hidden"
                 aria-label="Increase weight"
                 onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
               >
@@ -408,9 +409,22 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onStepWeight,
   disableTimeBasedProgressions,
 }) => {
+  const setRowRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+  const [setsExpanded, setSetsExpanded] = useState(true);
+
+  useEffect(() => {
+    if (!shouldScrollToLast) return;
+    const last = setRowRefs.current[exercise.sets.length - 1];
+    if (last) {
+      last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    setShouldScrollToLast(false);
+  }, [exercise.sets.length, shouldScrollToLast]);
+
   return (
-    <Card key={exerciseIndex} className="border-muted overflow-hidden">
-      <CardHeader className="p-2 sm:p-4">
+    <Card key={exerciseIndex} className="border-muted overflow-hidden p-0">
+      <CardHeader className="p-3 sm:p-4">
         <div className="flex items-center justify-between gap-3">
           {/* Exercise info - clickable to expand */}
           <div
@@ -430,10 +444,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
           >
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm sm:text-base truncate">
+                <h4 className="font-medium text-base sm:text-base truncate">
                   {exerciseData?.name || 'Exercise'}
                 </h4>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                <p
+                  className={`text-xs sm:text-sm text-muted-foreground truncate ${
+                    !expanded ? 'hidden sm:block' : ''
+                  }`}
+                >
                   {exerciseData?.primaryMuscles
                     ? formatMuscleGroups(exerciseData.primaryMuscles)
                     : 'Unknown'}{' '}
@@ -441,7 +459,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 </p>
               </div>
               {!expanded && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                   <Badge variant="secondary" className="text-xs px-2 py-0.5">
                     {exercise.sets.length} set{exercise.sets.length !== 1 ? 's' : ''}
                   </Badge>
@@ -489,40 +507,40 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
       <CardContent
         className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-          expanded ? 'max-h-[1200px]' : 'max-h-0'
+          expanded ? 'max-h-[3000px]' : 'max-h-0'
         }`}
       >
         <div
           id={`sets-${tabIndex}-${exerciseIndex}`}
-          className={`p-2 sm:p-1 pt-0 transition-opacity duration-300 ease-in-out ${
+          className={`p-0 sm:p-1 transition-opacity duration-300 ease-in-out ${
             expanded ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {/* Exercise configuration */}
-          <div className="mb-3 p-2 sm:p-1 bg-muted/30 rounded-lg space-y-3">
+          <div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-lg space-y-2 sm:space-y-3">
             {/* Rest timer */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">
+                <Label className="text-sm font-medium text-muted-foreground">
                   Rest
-                </span>
+                </Label>
               </div>
               <Input
                 aria-label="Rest time"
                 placeholder="0:00"
                 value={formatTime(exercise.restSeconds)}
                 onChange={(e) => onUpdateRestTime(exerciseIndex, e.target.value)}
-                className="w-20 h-8 text-sm text-center"
+                className="w-32 sm:w-40 h-9 text-sm text-center"
               />
             </div>
 
             {/* Progression scheme */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-muted-foreground">
+                <Label className="text-sm font-medium text-muted-foreground">
                   Progression
-                </span>
+                </Label>
               </div>
               <Select
                 value={exercise.progressionScheme}
@@ -534,9 +552,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 <SelectTrigger
                   aria-label="Progression scheme"
                   size="sm"
-                  className="w-full sm:w-56 max-w-none"
+                  className="w-32 sm:w-40 max-w-[60vw] h-9 truncate"
                 >
-                  <SelectValue />
+                  <SelectValue className="truncate" />
                 </SelectTrigger>
                 <SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
                   <SelectItem value="NONE">None</SelectItem>
@@ -589,16 +607,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 Number.isNaN(exercise.programTMKg as number);
               const helpId = `tm-help-${tabIndex}-${exerciseIndex}`;
               return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <div className="grid grid-cols-1 gap-2 sm:gap-3">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">
-                          TM (kg)
-                        </span>
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          TM
+                        </Label>
                       </div>
                       <Input
-                        aria-label="Training Max (kg)"
+                        aria-label="Training Max"
                         aria-invalid={tmMissing}
                         aria-describedby={helpId}
                         inputMode="decimal"
@@ -615,29 +633,19 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                             onUpdateProgramTMKg(exerciseIndex, NaN);
                           }
                         }}
-                        className={`w-32 sm:w-28 h-8 text-sm text-center ${
+                        className={`w-32 sm:w-40 h-8 text-sm text-center ${
                           tmMissing
                             ? 'border-destructive focus-visible:ring-destructive'
                             : ''
                         }`}
                       />
                     </div>
-                    <p
-                      id={helpId}
-                      className={`text-[11px] ${
-                        tmMissing ? 'text-destructive' : 'text-muted-foreground'
-                      }`}
-                    >
-                      {tmMissing
-                        ? 'Required for RtF. Range 0–500 kg, 0.5 increments.'
-                        : 'Range 0–500 kg, 0.5 increments.'}
-                    </p>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Rounding (kg)
-                      </span>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Rounding
+                      </Label>
                     </div>
                     <Select
                       value={(exercise.programRoundingKg ?? 2.5).toString()}
@@ -648,9 +656,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                       <SelectTrigger
                         aria-label="Rounding increment"
                         size="sm"
-                        className="w-32 sm:w-28"
+                        className="w-32 sm:w-40 truncate"
                       >
-                        <SelectValue />
+                        <SelectValue className="truncate" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="0.5">0.5</SelectItem>
@@ -668,26 +676,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             {exercise.progressionScheme !== 'NONE' && (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Weight Inc. (kg)
-                  </span>
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Weight Inc.
+                  </Label>
                 </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="hidden sm:inline-flex h-8 w-8 p-0 shrink-0"
-                    aria-label="Decrease weight increment"
-                    onClick={() =>
-                      onUpdateMinWeightIncrement(
-                        exerciseIndex,
-                        Math.max(0.25, exercise.minWeightIncrement - 0.25)
-                      )
-                    }
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
+                <div className="flex items-center gap-2 sm:gap-2">
                   <Input
                     type="text"
                     inputMode="decimal"
@@ -704,69 +697,112 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         onUpdateMinWeightIncrement(exerciseIndex, value);
                       }
                     }}
-                    className="w-28 sm:w-20 h-8 text-sm text-center"
+                    className="w-32 sm:w-40 h-9 text-sm text-center"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="hidden sm:inline-flex h-8 w-8 p-0 shrink-0"
-                    aria-label="Increase weight increment"
-                    onClick={() =>
-                      onUpdateMinWeightIncrement(
-                        exerciseIndex,
-                        exercise.minWeightIncrement + 0.25
-                      )
-                    }
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Desktop headers */}
-          <div className="hidden sm:grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground mb-2 px-1">
-            <div className="col-span-2">Set</div>
-            <div className="col-span-3">Type</div>
-            <div className="col-span-3">Reps</div>
-            <div className="col-span-2">Weight</div>
-            <div className="col-span-2"></div>
-          </div>
+          {/* Sets header with collapse/expand */}
+          {(() => {
+            const isRtFActive =
+              exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+              exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+            if (isRtFActive) {
+              // Hide sets UI entirely for RtF exercises
+              return null;
+            }
+            return (
+              <>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h5 className="text-sm font-medium">Sets</h5>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Toggle sets list"
+                    aria-expanded={setsExpanded}
+                    aria-controls={`sets-list-${tabIndex}-${exerciseIndex}`}
+                    onClick={() => setSetsExpanded((v) => !v)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronsUpDown
+                      className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
+                        setsExpanded ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </Button>
+                </div>
 
-          {/* Sets container */}
-          <div className="space-y-1.5">
-            {exercise.sets.map((set, setIndex) => (
-              <SetRow
-                key={setIndex}
-                exerciseIndex={exerciseIndex}
-                setIndex={setIndex}
-                set={set}
-                progressionScheme={exercise.progressionScheme}
-                onUpdateSet={onUpdateSet}
-                onStepFixedReps={onStepFixedReps}
-                onStepRangeReps={onStepRangeReps}
-                onStepWeight={onStepWeight}
-                onRemoveSet={() => onRemoveSetAnimated(exerciseIndex, setIndex)}
-                isRemoving={isRemovingSet(exerciseIndex, setIndex)}
-                disableRemove={exercise.sets.length === 1}
-              />
-            ))}
-          </div>
+                {setsExpanded && (
+                  <div id={`sets-list-${tabIndex}-${exerciseIndex}`}>
+                    {/* Desktop headers */}
+                    <div className="hidden sm:grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground mb-2 px-1">
+                      <div className="col-span-2">Set</div>
+                      <div className="col-span-3">Type</div>
+                      <div className="col-span-3">Reps</div>
+                      <div className="col-span-2">Weight</div>
+                      <div className="col-span-2"></div>
+                    </div>
 
-          {/* Add set button */}
-          <div className="mt-4 pt-3 border-t border-muted">
-            <Button
-              onClick={() => onAddSet(exerciseIndex)}
-              variant="outline"
-              className="w-full h-9"
-              disabled={exercise.sets.length >= 10}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Set
-            </Button>
-          </div>
+                    {/* Sets container */}
+                    <div className="space-y-1.5 px-2 sm:px-0">
+                      {exercise.sets.map((set, setIndex) => (
+                        <div
+                          key={setIndex}
+                          ref={(el) => {
+                            setRowRefs.current[setIndex] = el;
+                          }}
+                        >
+                          <SetRow
+                            exerciseIndex={exerciseIndex}
+                            setIndex={setIndex}
+                            set={set}
+                            progressionScheme={exercise.progressionScheme}
+                            onUpdateSet={onUpdateSet}
+                            onStepFixedReps={onStepFixedReps}
+                            onStepRangeReps={onStepRangeReps}
+                            onStepWeight={onStepWeight}
+                            onRemoveSet={() =>
+                              onRemoveSetAnimated(exerciseIndex, setIndex)
+                            }
+                            isRemoving={isRemovingSet(exerciseIndex, setIndex)}
+                            disableRemove={exercise.sets.length === 1}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add set button */}
+                    <div className="mt-3 pt-3 border-t border-muted px-2 sm:px-0 sm:border-0">
+                      <Button
+                        onClick={() => {
+                          setShouldScrollToLast(true);
+                          onAddSet(exerciseIndex);
+                        }}
+                        variant="outline"
+                        className="w-full h-10 text-base mb-3"
+                        disabled={
+                          exercise.sets.length >= 10 ||
+                          exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+                          exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                        }
+                        title={
+                          exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+                          exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                            ? 'Sets are handled by RtF progression'
+                            : undefined
+                        }
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Set
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </CardContent>
     </Card>

@@ -55,7 +55,7 @@ export function Stepper({
                     isCompleted
                       ? 'border-green-500 bg-green-500 text-white hover:bg-green-600 hover:border-green-600 h-8 w-8'
                       : isActive
-                      ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-lg shadow-blue-100 h-10 w-10'
+                      ? 'border-blue-500 bg-blue-50 text-blue-600  h-10 w-10'
                       : isClickable
                       ? 'border-blue-400 bg-blue-100 text-blue-700 hover:bg-blue-200 hover:border-blue-500 h-8 w-8'
                       : 'border-gray-300 bg-gray-50 text-gray-400 h-8 w-8'

@@ -1,0 +1,2 @@
+-En la vista mobile al crear/editar rutina, en el 3er paso "Build days" al seleccionar el boton "+ Add Set" para agregar una serie es posible que si la nueva serie no se agregar en el viewport actual, se navege smooth al usuario hacia ella atravez del scroll?  [HECHO]
+-

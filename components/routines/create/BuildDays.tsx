@@ -47,7 +47,9 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     if (canUseTimeframe) return;
     const hasAnyTimeBased = data.days.some((day) =>
       day.exercises.some(
-        (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+        (ex) =>
+          ex.progressionScheme === 'PROGRAMMED_RTF' ||
+          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
       )
     );
     if (!hasAnyTimeBased) return;
@@ -89,7 +91,9 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       const searchLower = searchValue.toLowerCase();
       const matchesSearch =
         exercise.name.toLowerCase().includes(searchLower) ||
-        exercise.primaryMuscles.some(muscle => muscle.toLowerCase().includes(searchLower)) ||
+        exercise.primaryMuscles.some((muscle) =>
+          muscle.toLowerCase().includes(searchLower)
+        ) ||
         exercise.equipment.toLowerCase().includes(searchLower);
 
       // Check if exercise is already added to current day
@@ -168,11 +172,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     return Math.min(max, Math.max(min, value));
   };
 
-  const stepFixedReps = (
-    exerciseIndex: number,
-    setIndex: number,
-    delta: number
-  ) => {
+  const stepFixedReps = (exerciseIndex: number, setIndex: number, delta: number) => {
     const newDays = [...data.days];
     const dayIndex = newDays.findIndex(
       (d) => d.dayOfWeek === data.trainingDays[selectedDay]
@@ -209,7 +209,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
         set.maxReps = nextMin;
       }
     } else {
-      const curMaxBase = set.maxReps ?? (set.minReps ?? 1);
+      const curMaxBase = set.maxReps ?? set.minReps ?? 1;
       const nextMax = clamp(curMaxBase + delta, 1, 50);
       set.maxReps = nextMax;
       if (
@@ -223,11 +223,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     onUpdate({ days: newDays });
   };
 
-  const stepWeight = (
-    exerciseIndex: number,
-    setIndex: number,
-    delta: number
-  ) => {
+  const stepWeight = (exerciseIndex: number, setIndex: number, delta: number) => {
     const newDays = [...data.days];
     const dayIndex = newDays.findIndex(
       (d) => d.dayOfWeek === data.trainingDays[selectedDay]
@@ -240,13 +236,17 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     onUpdate({ days: newDays });
   };
 
-  const updateProgressionScheme = (exerciseIndex: number, scheme: ProgressionScheme) => {
+  const updateProgressionScheme = (
+    exerciseIndex: number,
+    scheme: ProgressionScheme
+  ) => {
     const newDays = [...data.days];
     const dayIndex = newDays.findIndex(
       (d) => d.dayOfWeek === data.trainingDays[selectedDay]
     );
     if (dayIndex === -1) return;
     const ex = newDays[dayIndex].exercises[exerciseIndex];
+    const prevScheme = ex.progressionScheme;
     // Prevent selecting time-based schemes when schedule mode is NONE
     const isTimeBased =
       scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY';
@@ -254,6 +254,21 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       return; // ignore change
     }
     ex.progressionScheme = scheme;
+
+    // If switching to RtF, clear sets so the default first set is not present
+    if (scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
+      ex.sets = [];
+    }
+
+    // If switching away from RtF and there are no sets, restore a default first set
+    if (
+      (prevScheme === 'PROGRAMMED_RTF' || prevScheme === 'PROGRAMMED_RTF_HYPERTROPHY') &&
+      scheme !== 'PROGRAMMED_RTF' &&
+      scheme !== 'PROGRAMMED_RTF_HYPERTROPHY' &&
+      ex.sets.length === 0
+    ) {
+      ex.sets = [{ setNumber: 1, repType: 'FIXED', reps: 10, weight: undefined }];
+    }
 
     // If progression is enabled, ensure sets use RANGE and convert FIXED reps to min/max
     if (scheme !== 'NONE') {
@@ -283,7 +298,10 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       (d) => d.dayOfWeek === data.trainingDays[selectedDay]
     );
     if (dayIndex === -1) return;
-    newDays[dayIndex].exercises[exerciseIndex].minWeightIncrement = Math.max(0.25, increment);
+    newDays[dayIndex].exercises[exerciseIndex].minWeightIncrement = Math.max(
+      0.25,
+      increment
+    );
     onUpdate({ days: newDays });
   };
 
@@ -296,15 +314,22 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     if (dayIndex === -1) return;
 
     const exercise = newDays[dayIndex].exercises[exerciseIndex];
+    // Prevent adding sets when using time-based RtF progressions
+    if (
+      exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+      exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    ) {
+      return;
+    }
     const newSetNumber = exercise.sets.length + 1;
 
     const lastSet = exercise.sets[exercise.sets.length - 1];
     exercise.sets.push({
       setNumber: newSetNumber,
       repType: lastSet?.repType ?? 'FIXED',
-      reps: lastSet?.repType === 'FIXED' ? (lastSet?.reps ?? 10) : null,
-      minReps: lastSet?.repType === 'RANGE' ? (lastSet?.minReps ?? 8) : null,
-      maxReps: lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
+      reps: lastSet?.repType === 'FIXED' ? lastSet?.reps ?? 10 : null,
+      minReps: lastSet?.repType === 'RANGE' ? lastSet?.minReps ?? 8 : null,
+      maxReps: lastSet?.repType === 'RANGE' ? lastSet?.maxReps ?? 12 : null,
       weight: lastSet?.weight,
     });
 
@@ -344,7 +369,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     const targetSet = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
     if (field === 'repType') {
-      const nextType = (value as 'FIXED' | 'RANGE');
+      const nextType = value as 'FIXED' | 'RANGE';
       targetSet.repType = nextType;
       if (nextType === 'FIXED') {
         targetSet.reps = targetSet.reps ?? targetSet.minReps ?? 10;
@@ -352,8 +377,10 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
         targetSet.maxReps = null;
       } else {
         const fallback = targetSet.reps ?? 10;
-        targetSet.minReps = targetSet.minReps ?? Math.max(1, Math.min(50, fallback - 2));
-        targetSet.maxReps = targetSet.maxReps ?? Math.max(targetSet.minReps ?? 8, fallback + 2);
+        targetSet.minReps =
+          targetSet.minReps ?? Math.max(1, Math.min(50, fallback - 2));
+        targetSet.maxReps =
+          targetSet.maxReps ?? Math.max(targetSet.minReps ?? 8, fallback + 2);
         targetSet.reps = null;
       }
     } else if (field === 'weight') {
@@ -428,26 +455,25 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
           <span className="text-destructive ml-1">*</span>
         </h3>
 
-        {/* Removed amber reminder: start date now set in Basic Info and timezone auto-detected */}
-
         {/* Day Tabs */}
         <Tabs
           value={selectedDay.toString()}
           onValueChange={(value: string) => setSelectedDay(parseInt(value))}
         >
-          <TabsList className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap">
+          <TabsList className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 mb-2">
             {data.trainingDays.map((dayId, index) => (
               <TabsTrigger
                 key={dayId}
                 value={index.toString()}
-                className="flex-shrink-0 whitespace-nowrap"
+                className="flex-shrink-0 whitespace-nowrap h-10 px-4"
               >
                 {DAYS_OF_WEEK[dayId]}
                 <Badge
                   variant="secondary"
                   className="ml-2 h-5 min-w-[1.25rem] px-1 text-[10px] leading-none flex items-center justify-center"
                 >
-                  {data.days.find((d) => d.dayOfWeek === dayId)?.exercises?.length ?? 0}
+                  {data.days.find((d) => d.dayOfWeek === dayId)?.exercises?.length ??
+                    0}
                 </Badge>
               </TabsTrigger>
             ))}
@@ -459,174 +485,186 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
             return (
               <TabsContent key={dayId} value={tabIndex.toString()} className="mt-4">
                 <Card>
-                  <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-6">
+                  <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
                     <CardTitle>{DAYS_OF_WEEK[dayId]} Workout</CardTitle>
                     <div className="relative w-full sm:w-auto" ref={dropdownRef}>
                       <Button
                         onClick={() => setExercisePickerOpen(!exercisePickerOpen)}
                         variant="outline"
                         size="sm"
-                        className="justify-between w-full sm:min-w-[200px]"
+                        className="justify-between w-full sm:min-w-[200px] h-10"
                       >
                         <div className="flex items-center gap-2">
                           <Plus className="h-4 w-4" />
                           <span className="hidden xs:inline">Add Exercise</span>
                           <span className="xs:hidden">Add</span>
-                      </div>
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
+                        </div>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
 
-                    {exercisePickerOpen && (
-                      <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-1 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200">
-                        <div className="p-2 border-b">
-                          <Input
-                            aria-label="Search exercises"
-                            placeholder="Search exercises..."
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                          />
+                      {exercisePickerOpen && (
+                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200">
+                          <div className="p-3 border-b">
+                            <Input
+                              aria-label="Search exercises"
+                              placeholder="Search exercises..."
+                              value={searchValue}
+                              onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                          </div>
+                          <div className="max-h-[300px] overflow-y-auto p-2">
+                            {exercisesLoading ? (
+                              <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Loading...
+                              </div>
+                            ) : filteredExercises.length > 0 ? (
+                              <div className="space-y-1">
+                                {filteredExercises.map((ex) => (
+                                  <Button
+                                    key={ex.id}
+                                    variant="ghost"
+                                    className="w-full justify-start px-3 py-3 h-auto"
+                                    onClick={() => addExercise(ex.id)}
+                                  >
+                                    <div className="flex flex-col items-start">
+                                      <span className="text-sm font-medium">
+                                        {ex.name}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {ex.primaryMuscles
+                                          ? formatMuscleGroups(ex.primaryMuscles)
+                                          : 'Unknown'}{' '}
+                                        • {ex.equipment}
+                                      </span>
+                                    </div>
+                                  </Button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="py-6 text-center text-sm text-muted-foreground">
+                                No exercises found
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="max-h-[240px] overflow-y-auto p-1">
-                          {exercisesLoading ? (
-                            <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              Loading...
-                            </div>
-                          ) : filteredExercises.length > 0 ? (
-                            <div className="space-y-1">
-                              {filteredExercises.map((ex) => (
-                                <Button
-                                  key={ex.id}
-                                  variant="ghost"
-                                  className="w-full justify-start px-3 py-2"
-                                  onClick={() => addExercise(ex.id)}
-                                >
-                                  <div className="flex flex-col items-start">
-                                    <span className="text-sm font-medium">{ex.name}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {ex.primaryMuscles ? formatMuscleGroups(ex.primaryMuscles) : 'Unknown'} • {ex.equipment}
-                                    </span>
-                                  </div>
-                                </Button>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="py-6 text-center text-sm text-muted-foreground">
-                              No exercises found
-                            </div>
-                          )}
-                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 sm:p-6">
+                    {day && day.exercises.length > 0 ? (
+                      <div className="space-y-4">
+                        <AnimatePresence>
+                          {day.exercises.map((exercise, exerciseIndex) => {
+                            const exerciseData = exercises?.find(
+                              (ex: Exercise) => ex.id === exercise.exerciseId
+                            );
+
+                            return (
+                              <motion.div
+                                key={`${exercise.exerciseId}-${exerciseIndex}`}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                              >
+                                <ExerciseCard
+                                  tabIndex={tabIndex}
+                                  exerciseIndex={exerciseIndex}
+                                  exercise={exercise}
+                                  exerciseData={exerciseData}
+                                  expanded={expandedMap?.[exerciseIndex] ?? true}
+                                  onToggleExpand={(idx) =>
+                                    setExpandedMap((prev) => ({
+                                      ...prev,
+                                      [idx]: !(prev?.[idx] ?? true),
+                                    }))
+                                  }
+                                  onRemoveExercise={removeExercise}
+                                  onUpdateRestTime={updateRestTime}
+                                  onUpdateProgressionScheme={updateProgressionScheme}
+                                  onUpdateMinWeightIncrement={
+                                    updateMinWeightIncrement
+                                  }
+                                  onUpdateProgramTMKg={updateProgramTMKg}
+                                  onUpdateProgramRoundingKg={updateProgramRoundingKg}
+                                  onAddSet={addSet}
+                                  onRemoveSet={removeSet}
+                                  isRemovingSet={(exIdx, setIdx) =>
+                                    !!removingSets[`${exIdx}-${setIdx}`]
+                                  }
+                                  onRemoveSetAnimated={(exIdx, setIdx) => {
+                                    const key = `${exIdx}-${setIdx}`;
+                                    setRemovingSets((prev) => ({
+                                      ...prev,
+                                      [key]: true,
+                                    }));
+                                    setTimeout(() => {
+                                      removeSet(exIdx, setIdx);
+                                      setRemovingSets((prev) => {
+                                        const next = { ...prev };
+                                        delete next[key];
+                                        return next;
+                                      });
+                                    }, 180);
+                                  }}
+                                  onUpdateSet={updateSet}
+                                  onStepFixedReps={stepFixedReps}
+                                  onStepRangeReps={stepRangeReps}
+                                  onStepWeight={stepWeight}
+                                  disableTimeBasedProgressions={!canUseTimeframe}
+                                />
+                              </motion.div>
+                            );
+                          })}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <div className="text-center text-sm text-muted-foreground py-8">
+                        No exercises added yet. Use &quot;Add Exercise&quot; to start
+                        building your day.
                       </div>
                     )}
-                  </div>
-                </CardHeader>
-                <CardContent className="p-3 sm:p-6">
-                  {day && day.exercises.length > 0 ? (
-                    <div className="space-y-4">
-                      <AnimatePresence>
-                        {day.exercises.map((exercise, exerciseIndex) => {
-                          const exerciseData = exercises?.find(
-                            (ex: Exercise) => ex.id === exercise.exerciseId
-                          );
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
 
-                          return (
-                            <motion.div
-                              key={`${exercise.exerciseId}-${exerciseIndex}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.2, ease: 'easeInOut' }}
-                            >
-                              <ExerciseCard
-                                tabIndex={tabIndex}
-                                exerciseIndex={exerciseIndex}
-                                exercise={exercise}
-                                exerciseData={exerciseData}
-                                expanded={(expandedMap?.[exerciseIndex] ?? true)}
-                                onToggleExpand={(idx) =>
-                                  setExpandedMap((prev) => ({
-                                    ...prev,
-                                    [idx]: !(prev?.[idx] ?? true),
-                                  }))
-                                }
-                                onRemoveExercise={removeExercise}
-                            onUpdateRestTime={updateRestTime}
-                            onUpdateProgressionScheme={updateProgressionScheme}
-                            onUpdateMinWeightIncrement={updateMinWeightIncrement}
-                            onUpdateProgramTMKg={updateProgramTMKg}
-                            onUpdateProgramRoundingKg={updateProgramRoundingKg}
-                            onAddSet={addSet}
-                            onRemoveSet={removeSet}
-                            isRemovingSet={(exIdx, setIdx) => !!removingSets[`${exIdx}-${setIdx}`]}
-                            onRemoveSetAnimated={(exIdx, setIdx) => {
-                              const key = `${exIdx}-${setIdx}`;
-                              setRemovingSets((prev) => ({ ...prev, [key]: true }));
-                              setTimeout(() => {
-                                removeSet(exIdx, setIdx);
-                                setRemovingSets((prev) => {
-                                  const next = { ...prev };
-                                  delete next[key];
-                                  return next;
-                                });
-                              }, 180);
-                            }}
-                            onUpdateSet={updateSet}
-                            onStepFixedReps={stepFixedReps}
-                            onStepRangeReps={stepRangeReps}
-                            onStepWeight={stepWeight}
-                            disableTimeBasedProgressions={!canUseTimeframe}
-                          />
-                            </motion.div>
-                          );
-                        })}
-                      </AnimatePresence>
-                    </div>
-                  ) : (
-                    <div className="text-center text-sm text-muted-foreground py-8">
-                      No exercises added yet. Use &quot;Add Exercise&quot; to start building your day.
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-              );
-            })}
-          </Tabs>
-
-          {/* Overall Stats */}
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex justify-center gap-8 text-center">
-              <div>
-                <div className="text-2xl font-bold text-primary">
-                  {data.days.reduce((sum, day) => sum + day.exercises.length, 0)}
-                </div>
-                <div className="text-xs text-muted-foreground">Total Exercises</div>
+        {/* Overall Stats */}
+        <div className="mt-6 pt-5 border-t">
+          <div className="flex justify-center gap-6 sm:gap-8 text-center">
+            <div>
+              <div className="text-2xl font-bold text-primary">
+                {data.days.reduce((sum, day) => sum + day.exercises.length, 0)}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-primary">
-                  {data.days.reduce(
-                    (sum, day) =>
-                      sum +
-                      day.exercises.reduce(
-                        (exerciseSum, ex) => exerciseSum + ex.sets.length,
-                        0
-                      ),
-                    0
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground">Total Sets</div>
+              <div className="text-xs text-muted-foreground">Total Exercises</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-primary">
+                {data.days.reduce(
+                  (sum, day) =>
+                    sum +
+                    day.exercises.reduce(
+                      (exerciseSum, ex) => exerciseSum + ex.sets.length,
+                      0
+                    ),
+                  0
+                )}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-primary">
-                  {data.days.filter((day) => day.exercises.length > 0).length}/
-                  {data.days.length}
-                </div>
-                <div className="text-xs text-muted-foreground">Days Complete</div>
+              <div className="text-xs text-muted-foreground">Total Sets</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-primary">
+                {data.days.filter((day) => day.exercises.length > 0).length}/
+                {data.days.length}
               </div>
+              <div className="text-xs text-muted-foreground">Days Complete</div>
             </div>
           </div>
         </div>
-      
+      </div>
     </div>
   );
 }
