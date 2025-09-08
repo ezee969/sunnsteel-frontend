@@ -61,6 +61,7 @@ describe('BuildDays - PROGRAMMED_RTF_HYPERTROPHY flows', () => {
         ],
       },
     ],
+    programScheduleMode: 'TIMEFRAME',
     ...override,
   })
 
@@ -70,7 +71,7 @@ describe('BuildDays - PROGRAMMED_RTF_HYPERTROPHY flows', () => {
     onUpdate = vi.fn()
   })
 
-  it('switching to PROGRAMMED_RTF_HYPERTROPHY converts FIXED->RANGE, defaults rounding, and shows banner when missing start date', async () => {
+  it('switching to PROGRAMMED_RTF_HYPERTROPHY converts FIXED->RANGE and defaults rounding', async () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
     // Expand exercise for visibility
@@ -87,7 +88,6 @@ describe('BuildDays - PROGRAMMED_RTF_HYPERTROPHY flows', () => {
       expect.objectContaining({ repType: 'RANGE', reps: null, minReps: 10, maxReps: 10 })
     )
 
-    // Banner is visible when no programStartDate
-    expect(screen.getByText(/RtF program detected/i)).toBeInTheDocument()
+    // Banner removed; start date handled in Basic Info
   })
 })

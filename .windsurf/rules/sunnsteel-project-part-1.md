@@ -2,6 +2,10 @@
 trigger: always_on
 ---
 
+---
+
+## alwaysApply: true
+
 # Sunnsteel Frontend - Fitness Application
 
 Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entrenamiento.
@@ -30,7 +34,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 
 - **`app/(auth)/login/page.tsx`**: Página de inicio de sesión
 - **`app/(auth)/signup/page.tsx`**: Página de registro
-- **`app/(protected)/dashboard/page.tsx`**: Dashboard principal
+- **`app/(protected)/dashboard/page.tsx`**: Dashboard principal con widget dinámico "Today's Workouts" que lista rutinas del día actual y permite iniciar/reanudar sesiones o ver detalles.
 - **`app/(protected)/routines/page.tsx`**: Gestión de rutinas
 - Heart toggle en tarjetas de rutinas para favoritos
 - ListChecks toggle para marcar rutinas como completadas
@@ -59,6 +63,10 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
       - `upsertSetLog(id, { routineExerciseId, exerciseId, setNumber, reps, weight?, rpe?, isCompleted? })`
       - `deleteSetLog(id, routineExerciseId, setNumber)`
     - `utils.ts`: Utilidades generales
+  - `utils/reps-to-failure.ts`: Utilidades de programación RtF
+    - `generateRepsToFailureProgram(config, performance)`: variante de fuerza (5 sets: 4 + 1 AMRAP). Deloads al 60% con `3x5 @ RPE 6`.
+    - `generateRepsToFailureHypertrophyProgram(config, performance)`: variante de hipertrofia (4 sets: 3 + 1 AMRAP). Deloads al 60% con `4x5` y “no rep targets”.
+    - Reglas de ajuste de TM por desempeño en última serie AMRAP: −5% (−2+ reps), −2% (−1), 0% (objetivo), +0.5% (+1), +1% (+2), +1.5% (+3), +2% (+4), +3% (+5+).
 - **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
 
 ### Routine Creation/Edit Wizard
@@ -71,11 +79,38 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - Componentes del wizard (todos usan el tipo compartido):
   - `RoutineBasicInfo` → nombre/descripción
   - `TrainingDays` → selección de `trainingDays`
-  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales
+  - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales, y progresión por ejercicio
   - `ReviewAndCreate` → prepara payload según `repType` y crea/actualiza la rutina
 - Páginas:
   - Nueva: `app/(protected)/routines/new/page.tsx`
   - Edición: `app/(protected)/routines/edit/[id]/page.tsx` (mapea rutina del backend a `RoutineWizardData`, incluyendo `repType/minReps/maxReps`)
+  - Compatibilidad (Edit): Valores legados de backend para `progressionScheme` se mapean automáticamente — `'DYNAMIC'` → `'DOUBLE_PROGRESSION'`, `'DYNAMIC_DOUBLE'` → `'DYNAMIC_DOUBLE_PROGRESSION'`. Valores faltantes o desconocidos se normalizan a `'NONE'`.
+
+#### PROGRAMMED_RTF (RtF) — Integración Frontend
+
+- `progressionScheme` ahora incluye: `'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'PROGRAMMED_RTF'`.
+- En `BuildDays` cuando se selecciona `PROGRAMMED_RTF`:
+  - Se muestran campos por ejercicio:
+    - `programTMKg` (Training Max en kg)
+    - `programRoundingKg` (0.5 | 1.0 | 2.5 | 5.0)
+  - Si `scheme !== 'NONE'`, los sets se convierten automáticamente a `RANGE` (si eran `FIXED`) con `min=max=reps` como fallback, y se limpian `reps`.
+  - Se inicializa `programRoundingKg` a 2.5 si no estaba definido.
+- En `TrainingDays` se muestra un panel de configuración del programa RtF cuando cualquier ejercicio usa RtF:
+  - `programWithDeloads` (boolean)
+  - `programStartDate` (YYYY-MM-DD)
+  - `programTimezone` (IANA TZ)
+  - `programStartWeek` (solo creación): Default 1; rango 1..(18|21) según deloads. Si se apagan deloads y el valor supera 18, se clampa a 18.
+  - Aviso si el día de `programStartDate` no coincide con el primer día seleccionado en `trainingDays`.
+- Navegación/gating:
+  - Para avanzar de "Build Days" a "Review", si existe RtF se requiere `programStartDate`.
+- En `ReviewAndCreate` el payload incluye:
+  - Campos de rutina (solo si hay RtF): `programWithDeloads`, `programStartDate`, `programTimezone`.
+  - En creación, además `programStartWeek`.
+  - Por ejercicio (solo para RtF): `programTMKg`, `programRoundingKg`.
+
+Notas:
+
+- El backend persiste `programStartWeek` y lo retorna en las respuestas de rutina. La UI lo usa solo en la creación (create-only), y podría mostrarse de forma read-only en detalles más adelante.
 
 ### Middleware
 
@@ -141,84 +176,3 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **Schemas disponibles**:
   - `loginSchema`: Validación de login
   - `signupSchema`: Validación de registro
-
-### UI/UX
-
-- **Shadcn/ui**: Componentes base consistentes
-- **TailwindCSS**: Styling utility-first
-- **Responsive Design**: Mobile-first approach
-- **Dark Mode**: Soporte para tema oscuro
-- **Accessibility**: Componentes accesibles con Radix
-- **Favorites UI**: Botón Heart accesible para marcar/desmarcar favoritos en `WorkoutsList`
-- **Completed UI**: Botón ListChecks accesible para marcar/desmarcar como completada en `WorkoutsList`
-- **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
-- **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open"; incluye Quick Start y selección de día.
-- **Routine Wizard UX**: En `BuildDays`, inputs accesibles que cambian entre `reps` fijos o rango (`minReps`/`maxReps`) según `repType` por set; validaciones y previsualización en `ReviewAndCreate`.
-- **Stepper Advanced Navigation (Edit Mode)**: El `Stepper` ahora acepta props avanzadas para control fino:
-  - `completedSteps?: Set<number>` para marcar pasos completos basados en validez de datos (no solo por posición).
-  - `canStepClick?: (stepId: number) => boolean` para habilitar clicks directos a pasos permitidos.
-  - En edición, el usuario puede saltar directamente a cualquier paso si todos los pasos previos son válidos, sin tener que navegar secuencialmente. En creación se mantiene el flujo secuencial.
-- Refactor: `BuildDays` ahora compone `components/routines/create/ExerciseCard.tsx` (con `SetRow` interno) para modularizar la UI de ejercicios y sets.
-- Jerarquía de header: el título del ejercicio se muestra por encima del timer/controles.
-- **Rep Type** y **Progression** usan el componente `Select` de shadcn/ui para consistencia visual, mejor alineación del popover y comportamiento de apertura/cierre confiable en mobile/desktop.
-- Botones stepper (+/-) para `reps` y `weight` con clamping: fijos 1..50; rango `min`/`max` 1..50 con cross-clamp (min ≤ max); weight en incrementos de 0.5 (mínimo 0).
-- Inputs de rango (`minReps`/`maxReps`) usan `type="text"` con `inputMode="numeric"` para permitir edición fluida.
-- **Skeleton Loaders**: `components/ui/skeleton.tsx` para estados de carga en `WorkoutsList` y página de sesión activa.
-- **Progress Bars**: `components/ui/progress.tsx` usado para:
-  - Progreso de sesión en `app/(protected)/workouts/sessions/[id]/page.tsx` (sets completados vs total).
-  - Indicador de finalización en tarjetas de `WorkoutsList`.
-- **Button Feedback**: Micro-interacciones sutiles al presionar botones (scale/translate) en `components/ui/button.tsx`.
-- **Sticky Navigation (Wizard)**:
-  - Stepper pegajoso en la parte superior en `app/(protected)/routines/new/page.tsx` y también en `app/(protected)/routines/edit/[id]/page.tsx`.
-  - Navegación inferior pegajosa (Previous/Next) en la página de creación para mejor alcance en mobile.
-- **Tabs de Días (BuildDays) UX Fixes**:
-  - El contador de ejercicios por día ahora siempre es visible como `Badge` y muestra `0` cuando el día está vacío.
-  - Se eliminó el scroll vertical en la fila de días y se forzó únicamente scroll horizontal en mobile.
-  - Estilos del `Badge` normalizados para evitar jumps de layout y aparición de scroll vertical intermitente.
-- **ExerciseCard Expand/Collapse (Smoother)**:
-- Animación simplificada tipo móvil: transición de `max-height` + `opacity` (300ms, ease-in-out) al expandir/contraer.
-- Se movió el padding al contenedor interno para evitar saltos de layout durante la transición.
-- Rotación del ícono `ChevronsUpDown` suavizada (300ms, ease-in-out).
-- **Resume Banner**: Banner de reanudación de sesión activa en `app/(protected)/layout.tsx` visible cuando existe una sesión activa (oculto en la página de la sesión).
-- **Set Logs Editor**: Editor agrupado por ejercicio (cuando hay metadata de rutina vía `useRoutine`) en `app/(protected)/workouts/sessions/[id]/page.tsx`:
-  - Sin agregar/eliminar sets en sesión (estructura fija según la rutina).
-  - Reps planeadas: de solo lectura (no editables).
-  - Reps realizadas: input separado y editable.
-  - Peso: input editable con pista del peso planeado.
-  - RPE: no editable por ahora (oculto en la UI).
-  - Usa `useUpsertSetLog(id)` e invalida el query de la sesión; el endpoint de borrar existe pero no se expone en la UI.
-- **Autosave Toggle Fix**: El autosave al alternar "Completed" ahora usa el siguiente estado (no el estado previo) para evitar condiciones de estado obsoleto.
-
-## Componentes Disponibles
-
-### UI Components (Shadcn)
-
-- **Form Components**: Button, Input, Label, Form
-- **Layout Components**: Card, Separator, Scroll Area
-- **Navigation**: Tabs, Dropdown Menu
-- **Data Display**: Avatar, Badge, Progress
-- **Loading**: Loading component, Skeleton
-
-### Layout Components
-
-- **Sidebar navigation**: Navegación lateral
-- **Protected route wrappers**: Envoltorios de rutas protegidas
-- **Auth layouts**: Layouts de autenticación
-- **Loading component**: Componente de carga
-
-## Configuración
-
-### Variables de Entorno
-
-- `NEXT_PUBLIC_API_URL`: URL del backend API
-- `NEXT_PUBLIC_FRONTEND_URL`: URL del frontend
-
-### Scripts Disponibles
-
-- `npm run dev`: Desarrollo con Turbopack
-- `npm run dev:all`: Frontend + Backend simultáneo
-- `npm run build`: Build de producción
-- `npm run lint`: Linting con ESLint
-- `npm run test`: Ejecuta tests con Vitest una sola vez
-- `npm run test:watch`: Ejecuta tests en modo watch
-- `npm run test:coverage`: Ejecuta tests con cobertura (text + lcov)

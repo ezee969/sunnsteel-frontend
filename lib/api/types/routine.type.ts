@@ -47,6 +47,13 @@ export interface Routine {
   isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
+  // Optional program schedule fields (present for RtF routines when backend returns them)
+  programWithDeloads?: boolean;
+  programDurationWeeks?: number;
+  programStartWeek?: number;
+  programStartDate?: string; // ISO date string
+  programEndDate?: string;   // ISO date string
+  programTimezone?: string;  // IANA tz
   days: RoutineDay[];
 }
 
@@ -59,6 +66,7 @@ export interface CreateRoutineRequest {
   programWithDeloads?: boolean; // true=21; false=18
   programStartDate?: string; // yyyy-mm-dd
   programTimezone?: string; // IANA TZ
+  programStartWeek?: number; // 1..(18|21) only used on create
   days: Array<{
     dayOfWeek: number;
     exercises: Array<{

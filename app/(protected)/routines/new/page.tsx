@@ -32,6 +32,7 @@ export default function CreateRoutinePage() {
     description: '',
     trainingDays: [],
     days: [],
+    programScheduleMode: 'NONE',
   });
 
   const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
@@ -69,14 +70,14 @@ export default function CreateRoutinePage() {
         {
           const daysComplete = routineData.days.every(day => day.exercises.length > 0);
           if (!daysComplete) return false;
-          // If any exercise uses PROGRAMMED_RTF, require programStartDate to proceed
+          // Only gate on start date when schedule is TIMEFRAME and time-based progression is used
           const usesRtf = routineData.days.some((d) =>
             d.exercises.some((ex) =>
               ex.progressionScheme === 'PROGRAMMED_RTF' ||
               ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
             )
           );
-          if (usesRtf) {
+          if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
             return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
           }
           return true;
@@ -167,6 +168,7 @@ export default function CreateRoutinePage() {
             onClick={handlePrevious}
             disabled={currentStep === 1}
             className="gap-2"
+            aria-label="Previous"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only sm:not-sr-only">Previous</span>
@@ -177,6 +179,7 @@ export default function CreateRoutinePage() {
               onClick={handleNext}
               disabled={!canProceedToNextStep()}
               className="gap-2"
+              aria-label="Next"
             >
               <span className="sr-only sm:not-sr-only">Next</span>
               <ArrowRight className="h-4 w-4" />

@@ -61,10 +61,11 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       name: data.name,
       description: data.description,
       isPeriodized: false,
-      ...(usesRtf && {
+      ...(usesRtf && data.programScheduleMode === 'TIMEFRAME' && {
         programWithDeloads: data.programWithDeloads,
         programStartDate: data.programStartDate,
         programTimezone: tz,
+        ...(!isEditing && data.programStartWeek && { programStartWeek: data.programStartWeek }),
       }),
       days: data.days.map((day) => ({
         dayOfWeek: day.dayOfWeek,
@@ -214,6 +215,13 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
                               <p className="text-xs text-muted-foreground">
                                 {exerciseData?.primaryMuscles ? formatMuscleGroups(exerciseData.primaryMuscles) : 'Unknown'} • {exerciseData?.equipment}
                               </p>
+                              {(exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="text-[10px]">
+                                    {exercise.progressionScheme === 'PROGRAMMED_RTF' ? 'RtF' : 'RtF Hypertrophy'}
+                                  </Badge>
+                                </div>
+                              )}
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">
                               <Clock className="h-3 w-3" />
@@ -245,7 +253,7 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       {usesRtf && (
         <div className="rounded-lg border bg-card text-card-foreground p-4">
           <h3 className="text-base font-semibold leading-none tracking-tight mb-3">Program Settings (RtF)</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground">Include deload weeks</p>
               <p className="font-medium">{data.programWithDeloads ? 'Yes' : 'No'}</p>
@@ -258,6 +266,16 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
               <p className="text-muted-foreground">Timezone</p>
               <p className="font-medium">{data.programTimezone || 'Not set'}</p>
             </div>
+            {!isEditing && (
+              <div>
+                <p className="text-muted-foreground">Start Program Week</p>
+                {(() => {
+                  const total = data.programWithDeloads ? 21 : 18;
+                  const wk = Math.min(Math.max(data.programStartWeek ?? 1, 1), total);
+                  return <p className="font-medium">Week {wk} of {total}</p>;
+                })()}
+              </div>
+            )}
           </div>
         </div>
       )}

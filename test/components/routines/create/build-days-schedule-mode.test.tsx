@@ -1,7 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import type { Matcher } from '@testing-library/dom'
+import { render, screen, fireEvent } from '@/test/utils'
 import { BuildDays } from '@/components/routines/create/BuildDays'
 import type { RoutineWizardData } from '@/components/routines/create/types'
 
@@ -23,16 +22,14 @@ vi.mock('@/lib/api/hooks/useExercises', () => ({
   }),
 }))
 
-describe('BuildDays - PROGRAMMED_RTF flows', () => {
-  const openSelectAndChoose = async (label: string, optionName: Matcher) => {
+describe('BuildDays - Program Schedule mode NONE', () => {
+  const openSelect = (label: string) => {
     const trigger = screen.getByLabelText(label)
     fireEvent.click(trigger)
-    const option = await screen.findByRole('option', { name: optionName })
-    fireEvent.click(option)
   }
 
   const Wrapper: React.FC<{ initial: RoutineWizardData; onUpdate: (d: RoutineWizardData) => void }>
-  = ({ initial, onUpdate }) => {
+    = ({ initial, onUpdate }) => {
     const [data, setData] = React.useState<RoutineWizardData>(initial)
     const handleUpdate = (updates: Partial<RoutineWizardData>) => {
       const next = { ...data, ...updates }
@@ -62,7 +59,7 @@ describe('BuildDays - PROGRAMMED_RTF flows', () => {
         ],
       },
     ],
-    programScheduleMode: 'TIMEFRAME',
+    programScheduleMode: 'NONE',
     ...override,
   })
 
@@ -72,28 +69,47 @@ describe('BuildDays - PROGRAMMED_RTF flows', () => {
     onUpdate = vi.fn()
   })
 
-  // Reminder banner removed in new UX; start date is set in Basic Info.
+  it('auto-reverts time-based progression to NONE when schedule mode is NONE', () => {
+    const data = makeData({
+      days: [
+        {
+          dayOfWeek: 1,
+          exercises: [
+            {
+              exerciseId: 'e1',
+              progressionScheme: 'PROGRAMMED_RTF',
+              minWeightIncrement: 2.5,
+              restSeconds: 120,
+              sets: [
+                { setNumber: 1, repType: 'RANGE', reps: null, minReps: 8, maxReps: 12, weight: 50 },
+              ],
+            },
+          ],
+        },
+      ],
+    })
 
-  it('converts FIXED -> RANGE and defaults rounding to 2.5 when switching to PROGRAMMED_RTF', async () => {
+    render(<Wrapper initial={data} onUpdate={onUpdate} />)
+
+    // Expect state update normalizing progression to NONE
+    const updated = onUpdate.mock.calls[onUpdate.mock.calls.length - 1]?.[0] as RoutineWizardData
+    expect(updated.days[0].exercises[0].progressionScheme).toBe('NONE')
+  })
+
+  it('disables RtF options in progression select when schedule mode is NONE', async () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
-    // Expand exercise
-    fireEvent.click(screen.getByRole('button', { name: /toggle sets/i }))
+    // Expand exercise to show config
+    fireEvent.click(screen.getByRole('button', { name: /toggle exercise sets/i }))
 
-    onUpdate.mockClear()
+    // Open progression select
+    openSelect('Progression scheme')
 
-    // Select PROGRAMMED_RTF progression
-    await openSelectAndChoose('Progression scheme', /RtF \(4 fixed \+ 1 AMRAP\)/i)
+    // RtF options should be disabled
+    const rtfOption = await screen.findByRole('option', { name: /RtF \(4 fixed \+ 1 AMRAP\)/i })
+    const rtfHypOption = await screen.findByRole('option', { name: /RtF Hypertrophy \(3 \+ 1 AMRAP\)/i })
 
-    expect(onUpdate).toHaveBeenCalled()
-    const updated = onUpdate.mock.calls[onUpdate.mock.calls.length - 1][0] as RoutineWizardData
-
-    const ex = updated.days[0].exercises[0]
-    // Rounding default
-    expect(ex.programRoundingKg).toBe(2.5)
-    // Set conversion
-    expect(ex.sets[0]).toEqual(
-      expect.objectContaining({ repType: 'RANGE', reps: null, minReps: 10, maxReps: 10 }),
-    )
+    expect(rtfOption).toHaveAttribute('aria-disabled', 'true')
+    expect(rtfHypOption).toHaveAttribute('aria-disabled', 'true')
   })
 })

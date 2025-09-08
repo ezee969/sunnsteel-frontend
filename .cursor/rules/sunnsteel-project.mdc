@@ -68,14 +68,21 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 ### Routine Creation/Edit Wizard
 
 - Tipo compartido: `components/routines/create/types.ts` exporta `RoutineWizardData` y `RepType`.
+- `RoutineWizardData` incluye `programScheduleMode?: 'TIMEFRAME' | 'NONE'` para elegir si el programa es por calendario o indefinido.
 - Repeticiones por set:
   - `repType`: `'FIXED' | 'RANGE'`
   - `FIXED` → usar `reps`.
   - `RANGE` → usar `minReps` y `maxReps`.
 - Componentes del wizard (todos usan el tipo compartido):
   - `RoutineBasicInfo` → nombre/descripción
+    - Selector "Program Schedule": `None (indefinite)` o `Timeframe (date-driven)`.
+    - Si selecciona `Timeframe`, se muestra `Program start date` en el mismo paso.
+    - `programTimezone` se detecta automáticamente desde el navegador (no se solicita).
   - `TrainingDays` → selección de `trainingDays`
+    - Panel RtF solo cuando existe algún ejercicio con RtF.
+    - Incluye: `programWithDeloads` y `programStartWeek` (solo creación). La pista de consistencia de día de la semana usa la fecha configurada en Basic Info.
   - `BuildDays` → gestionar `days[].exercises[].sets[]` con `repType` por set e inputs condicionales, y progresión por ejercicio
+    - Cuando `programScheduleMode === 'NONE'`, las opciones de progresión con fecha (`PROGRAMMED_RTF` y `PROGRAMMED_RTF_HYPERTROPHY`) aparecen deshabilitadas y cualquier selección previa se normaliza a `NONE`.
   - `ReviewAndCreate` → prepara payload según `repType` y crea/actualiza la rutina
 - Páginas:
   - Nueva: `app/(protected)/routines/new/page.tsx`
@@ -93,14 +100,20 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
   - Se inicializa `programRoundingKg` a 2.5 si no estaba definido.
 - En `TrainingDays` se muestra un panel de configuración del programa RtF cuando cualquier ejercicio usa RtF:
   - `programWithDeloads` (boolean)
-  - `programStartDate` (YYYY-MM-DD)
-  - `programTimezone` (IANA TZ)
+  - `programStartDate` (YYYY-MM-DD) se configura en Basic Info; aquí solo se muestra la pista de consistencia.
+  - `programTimezone` (IANA TZ) se detecta automáticamente y no se solicita.
+  - `programStartWeek` (solo creación): Default 1; rango 1..(18|21) según deloads. Si se apagan deloads y el valor supera 18, se clampa a 18.
   - Aviso si el día de `programStartDate` no coincide con el primer día seleccionado en `trainingDays`.
 - Navegación/gating:
   - Para avanzar de "Build Days" a "Review", si existe RtF se requiere `programStartDate`.
 - En `ReviewAndCreate` el payload incluye:
-  - Campos de rutina (solo si hay RtF): `programWithDeloads`, `programStartDate`, `programTimezone`.
+  - Campos de rutina (solo si hay RtF y `programScheduleMode === 'TIMEFRAME'`): `programWithDeloads`, `programStartDate`, `programTimezone`.
+  - En creación, además `programStartWeek`.
   - Por ejercicio (solo para RtF): `programTMKg`, `programRoundingKg`.
+
+Notas:
+
+- El backend persiste `programStartWeek` y lo retorna en las respuestas de rutina. La UI lo usa solo en la creación (create-only), y podría mostrarse de forma read-only en detalles más adelante.
 
 ### Middleware
 
@@ -185,6 +198,7 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
  - **Start Session UX**: Botón "Start" (inicia con el primer día) y menú para seleccionar día en `WorkoutsList`; navegación a página de sesión activa.
  - **Routine Details UX**: Página de detalle accesible desde el dropdown de rutinas con opción "Open".
    - Quick Start prioriza el día de hoy si existe; si no, usa el primer día de la rutina.
+   - Gating: cuando `programEndDate` ya pasó (programa RtF completado), los botones de Start se deshabilitan y se muestra un badge "Program ended".
    - Días colapsables con Accordion (shadcn/Radix). El día de hoy aparece expandido por defecto y con badge "Today".
    - Header de cada día: badge de weekday + número de día + contador de ejercicios. Se eliminaron los pills superiores redundantes.
    - Cada panel de día incluye su propio botón "Start" para iniciar ese día específico.

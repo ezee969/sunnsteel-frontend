@@ -118,7 +118,9 @@ export const SetRow: FC<{
 
         <div className="sm:col-span-3">
           <div className="space-y-1">
-            <div className="sm:hidden text-xs font-medium text-muted-foreground">Rep Type</div>
+            <div className="sm:hidden text-xs font-medium text-muted-foreground">
+              Rep Type
+            </div>
             <Select
               value={set.repType}
               onValueChange={(val) =>
@@ -288,7 +290,9 @@ export const SetRow: FC<{
 
         <div className="sm:col-span-2">
           <div className="space-y-1">
-            <div className="sm:hidden text-xs font-medium text-muted-foreground">Weight (kg)</div>
+            <div className="sm:hidden text-xs font-medium text-muted-foreground">
+              Weight (kg)
+            </div>
             <div className="flex items-center gap-2 w-full">
               <Button
                 type="button"
@@ -354,14 +358,17 @@ interface ExerciseCardProps {
   onToggleExpand: (exerciseIndex: number) => void;
   onRemoveExercise: (exerciseIndex: number) => void;
   onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void;
-  onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void;
+  onUpdateProgressionScheme: (
+    exerciseIndex: number,
+    scheme: ProgressionScheme
+  ) => void;
   onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
   onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void;
   onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void;
   onAddSet: (exerciseIndex: number) => void;
   isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean;
   onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void;
-  onRemoveSet?: (exerciseIndex: number, setIndex: number) => void; 
+  onRemoveSet?: (exerciseIndex: number, setIndex: number) => void;
   onUpdateSet: (
     exerciseIndex: number,
     setIndex: number,
@@ -376,6 +383,7 @@ interface ExerciseCardProps {
     delta: number
   ) => void;
   onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  disableTimeBasedProgressions?: boolean;
 }
 
 export const ExerciseCard: FC<ExerciseCardProps> = ({
@@ -398,10 +406,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onStepFixedReps,
   onStepRangeReps,
   onStepWeight,
+  disableTimeBasedProgressions,
 }) => {
   return (
     <Card key={exerciseIndex} className="border-muted overflow-hidden">
-      <CardHeader className="p-3 sm:p-4">
+      <CardHeader className="p-2 sm:p-4">
         <div className="flex items-center justify-between gap-3">
           {/* Exercise info - clickable to expand */}
           <div
@@ -425,7 +434,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   {exerciseData?.name || 'Exercise'}
                 </h4>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  {exerciseData?.primaryMuscles ? formatMuscleGroups(exerciseData.primaryMuscles) : 'Unknown'} • {exerciseData?.equipment}
+                  {exerciseData?.primaryMuscles
+                    ? formatMuscleGroups(exerciseData.primaryMuscles)
+                    : 'Unknown'}{' '}
+                  • {exerciseData?.equipment}
                 </p>
               </div>
               {!expanded && (
@@ -435,7 +447,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   </Badge>
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    <span>{Math.floor(exercise.restSeconds / 60)}:{(exercise.restSeconds % 60).toString().padStart(2, '0')}</span>
+                    <span>
+                      {Math.floor(exercise.restSeconds / 60)}:
+                      {(exercise.restSeconds % 60).toString().padStart(2, '0')}
+                    </span>
                   </div>
                 </div>
               )}
@@ -453,7 +468,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               onClick={() => onToggleExpand(exerciseIndex)}
               className="h-8 w-8 p-0"
             >
-              <ChevronsUpDown className={`h-4 w-4 transition-transform duration-300 ease-in-out ${expanded ? 'rotate-180' : ''}`} />
+              <ChevronsUpDown
+                className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
+                  expanded ? 'rotate-180' : ''
+                }`}
+              />
             </Button>
             <Button
               variant="ghost"
@@ -468,22 +487,26 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-        expanded ? 'max-h-[1200px]' : 'max-h-0'
-      }`}>
+      <CardContent
+        className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+          expanded ? 'max-h-[1200px]' : 'max-h-0'
+        }`}
+      >
         <div
           id={`sets-${tabIndex}-${exerciseIndex}`}
-          className={`p-3 sm:p-4 pt-0 transition-opacity duration-300 ease-in-out ${
+          className={`p-2 sm:p-1 pt-0 transition-opacity duration-300 ease-in-out ${
             expanded ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {/* Exercise configuration */}
-          <div className="mb-4 p-3 bg-muted/30 rounded-lg space-y-4">
+          <div className="mb-3 p-2 sm:p-1 bg-muted/30 rounded-lg space-y-3">
             {/* Rest timer */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Rest</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Rest
+                </span>
               </div>
               <Input
                 aria-label="Rest time"
@@ -497,7 +520,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             {/* Progression scheme */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Progression</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Progression
+                </span>
               </div>
               <Select
                 value={exercise.progressionScheme}
@@ -509,18 +534,48 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 <SelectTrigger
                   aria-label="Progression scheme"
                   size="sm"
-                  className="w-44 sm:w-56 max-w-[60vw]"
+                  className="w-full sm:w-56 max-w-none"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
                   <SelectItem value="NONE">None</SelectItem>
-                  <SelectItem value="DOUBLE_PROGRESSION">Double Progression</SelectItem>
-                  <SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">Dynamic Double Progression</SelectItem>
-                  <SelectItem value="PROGRAMMED_RTF">RtF (4 fixed + 1 AMRAP)</SelectItem>
-                  <SelectItem value="PROGRAMMED_RTF_HYPERTROPHY">RtF Hypertrophy (3 + 1 AMRAP)</SelectItem>
+                  <SelectItem value="DOUBLE_PROGRESSION">
+                    Double Progression
+                  </SelectItem>
+                  <SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
+                    Dynamic Double Progression
+                  </SelectItem>
+                  <SelectItem
+                    value="PROGRAMMED_RTF"
+                    disabled={!!disableTimeBasedProgressions}
+                    title={
+                      disableTimeBasedProgressions
+                        ? 'Requires Timeframe schedule (set in Basic Info)'
+                        : undefined
+                    }
+                  >
+                    RtF (4 fixed + 1 AMRAP)
+                  </SelectItem>
+                  <SelectItem
+                    value="PROGRAMMED_RTF_HYPERTROPHY"
+                    disabled={!!disableTimeBasedProgressions}
+                    title={
+                      disableTimeBasedProgressions
+                        ? 'Requires Timeframe schedule (set in Basic Info)'
+                        : undefined
+                    }
+                  >
+                    RtF Hypertrophy (3 + 1 AMRAP)
+                  </SelectItem>
                 </SelectContent>
               </Select>
+              {disableTimeBasedProgressions && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Time-based progressions are disabled. Switch Program Schedule to
+                  Timeframe in Basic Info to enable.
+                </p>
+              )}
             </div>
 
             {/* RtF per-exercise fields */}
@@ -530,14 +585,17 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
               if (!isRtf) return null;
               const tmMissing =
-                exercise.programTMKg === undefined || Number.isNaN(exercise.programTMKg as number);
+                exercise.programTMKg === undefined ||
+                Number.isNaN(exercise.programTMKg as number);
               const helpId = `tm-help-${tabIndex}-${exerciseIndex}`;
               return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">TM (kg)</span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          TM (kg)
+                        </span>
                       </div>
                       <Input
                         aria-label="Training Max (kg)"
@@ -548,17 +606,28 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         placeholder="e.g. 100"
                         value={exercise.programTMKg ?? ''}
                         onChange={(e) => {
-                          const val = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                          const val = parseFloat(
+                            e.target.value.replace(/[^0-9.]/g, '')
+                          );
                           if (!Number.isNaN(val)) {
                             onUpdateProgramTMKg(exerciseIndex, val);
                           } else if (e.target.value === '') {
                             onUpdateProgramTMKg(exerciseIndex, NaN);
                           }
                         }}
-                        className={`w-28 h-8 text-sm text-center ${tmMissing ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                        className={`w-32 sm:w-28 h-8 text-sm text-center ${
+                          tmMissing
+                            ? 'border-destructive focus-visible:ring-destructive'
+                            : ''
+                        }`}
                       />
                     </div>
-                    <p id={helpId} className={`text-[11px] ${tmMissing ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    <p
+                      id={helpId}
+                      className={`text-[11px] ${
+                        tmMissing ? 'text-destructive' : 'text-muted-foreground'
+                      }`}
+                    >
                       {tmMissing
                         ? 'Required for RtF. Range 0–500 kg, 0.5 increments.'
                         : 'Range 0–500 kg, 0.5 increments.'}
@@ -566,13 +635,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-muted-foreground">Rounding (kg)</span>
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Rounding (kg)
+                      </span>
                     </div>
                     <Select
                       value={(exercise.programRoundingKg ?? 2.5).toString()}
-                      onValueChange={(val) => onUpdateProgramRoundingKg(exerciseIndex, parseFloat(val))}
+                      onValueChange={(val) =>
+                        onUpdateProgramRoundingKg(exerciseIndex, parseFloat(val))
+                      }
                     >
-                      <SelectTrigger aria-label="Rounding increment" size="sm" className="w-28">
+                      <SelectTrigger
+                        aria-label="Rounding increment"
+                        size="sm"
+                        className="w-32 sm:w-28"
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -591,7 +668,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             {exercise.progressionScheme !== 'NONE' && (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-muted-foreground">Weight Inc. (kg)</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Weight Inc. (kg)
+                  </span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Button
@@ -618,12 +697,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                     placeholder="2.5"
                     value={exercise.minWeightIncrement}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                      const value = parseFloat(
+                        e.target.value.replace(/[^0-9.]/g, '')
+                      );
                       if (!isNaN(value) && value > 0) {
                         onUpdateMinWeightIncrement(exerciseIndex, value);
                       }
                     }}
-                    className="w-24 sm:w-20 h-8 text-sm text-center"
+                    className="w-28 sm:w-20 h-8 text-sm text-center"
                   />
                   <Button
                     type="button"
@@ -655,7 +736,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
           </div>
 
           {/* Sets container */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {exercise.sets.map((set, setIndex) => (
               <SetRow
                 key={setIndex}

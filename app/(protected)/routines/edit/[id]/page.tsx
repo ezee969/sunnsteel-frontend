@@ -99,6 +99,7 @@ export default function EditRoutinePage() {
         programWithDeloads: (routine as unknown as { programWithDeloads?: boolean }).programWithDeloads,
         programStartDate: (routine as unknown as { programStartDate?: string }).programStartDate,
         programTimezone: (routine as unknown as { programTimezone?: string }).programTimezone,
+        programScheduleMode: ((routine as unknown as { programStartDate?: string }).programStartDate ? 'TIMEFRAME' : 'NONE'),
       };
       
       setRoutineData(transformedData);
@@ -144,7 +145,7 @@ export default function EditRoutinePage() {
               ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
             )
           );
-          if (usesRtf) {
+          if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
             return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
           }
           return true;
@@ -219,7 +220,7 @@ export default function EditRoutinePage() {
       case 1:
         return <RoutineBasicInfo data={routineData} onUpdate={updateRoutineData} />;
       case 2:
-        return <TrainingDays data={routineData} onUpdate={updateRoutineData} />;
+        return <TrainingDays data={routineData} onUpdate={updateRoutineData} isEditing />;
       case 3:
         return <BuildDays data={routineData} onUpdate={updateRoutineData} />;
       case 4:

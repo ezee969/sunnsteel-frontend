@@ -30,8 +30,11 @@ export interface RoutineWizardData {
       restSeconds: number;
     }>;
   }>;
+  // Program schedule mode: TIMEFRAME (date-driven) or NONE (indefinite)
+  programScheduleMode?: 'TIMEFRAME' | 'NONE';
   // Routine-level program settings (only used if any exercise is PROGRAMMED_RTF)
   programWithDeloads?: boolean; // true=21; false=18
   programStartDate?: string; // yyyy-mm-dd (local date)
   programTimezone?: string; // IANA tz
+  programStartWeek?: number; // 1..(18|21) only in create flow; default 1
 }

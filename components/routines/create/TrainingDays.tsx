@@ -3,16 +3,23 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RoutineWizardData } from './types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface TrainingDaysProps {
   data: RoutineWizardData;
   onUpdate: (updates: Partial<RoutineWizardData>) => void;
+  isEditing?: boolean; // when true, hide Start Week control (create-only feature)
 }
 
 const DAYS_OF_WEEK = [
@@ -49,7 +56,7 @@ const COMMON_SPLITS = [
   { name: 'Bro Split', days: [1, 2, 3, 4, 5], description: '5-day split: Mon-Fri' },
 ];
 
-export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
+export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDaysProps) {
   const { isMobile } = useSidebar();
   const [hasInteracted, setHasInteracted] = useState(data.trainingDays.length > 0);
   const usesRtf = data.days.some((d) =>
@@ -59,6 +66,8 @@ export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
         ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
     )
   );
+
+  const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21;
 
   // Auto-fill timezone from browser when using RtF and not yet set
   useEffect(() => {
@@ -70,6 +79,14 @@ export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
       onUpdate({ programTimezone: browserTz });
     }
   }, [usesRtf, data.programTimezone, onUpdate]);
+
+  // Default start week to 1 for RtF when unset
+  useEffect(() => {
+    if (!usesRtf) return;
+    if (!data.programStartWeek || data.programStartWeek < 1) {
+      onUpdate({ programStartWeek: 1 });
+    }
+  }, [usesRtf, data.programStartWeek, onUpdate]);
   const toggleDay = (dayId: number) => {
     const isSelected = data.trainingDays.includes(dayId);
     let newTrainingDays: number[];
@@ -240,41 +257,45 @@ export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
         </div>
       </div>
 
-      {/* RtF Program Settings (shown only if any exercise uses RtF) */}
+      {/* RtF Program Settings (shown only if any exercise uses RtF). Start date is configured in Basic Info. */}
       {usesRtf && (
         <div className="bg-muted/30 p-3 md:p-4 rounded-lg space-y-3">
           <h4 className="font-medium text-sm md:text-base">RtF Program Settings</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">Include deload weeks</span>
               <Checkbox
                 aria-label="Include deload weeks"
                 checked={!!data.programWithDeloads}
-                onCheckedChange={(checked) =>
-                  onUpdate({ programWithDeloads: Boolean(checked) })
-                }
+                onCheckedChange={(checked) => {
+                  const nextWithDeloads = Boolean(checked);
+                  const nextTotal = nextWithDeloads ? 21 : 18;
+                  const curStart = data.programStartWeek ?? 1;
+                  const clampedStart = Math.min(curStart, nextTotal);
+                  onUpdate({ programWithDeloads: nextWithDeloads, programStartWeek: clampedStart });
+                }}
               />
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm text-muted-foreground">Program start date</span>
-              <Input
-                aria-label="Program start date"
-                type="date"
-                value={data.programStartDate ?? ''}
-                onChange={(e) => onUpdate({ programStartDate: e.target.value })}
-                className="w-40 h-8 text-sm text-center"
-              />
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm text-muted-foreground">Timezone (IANA)</span>
-              <Input
-                aria-label="Program timezone"
-                placeholder="e.g. America/New_York"
-                value={data.programTimezone ?? ''}
-                onChange={(e) => onUpdate({ programTimezone: e.target.value })}
-                className="w-56 h-8 text-sm text-center"
-              />
-            </div>
+            {!isEditing && (
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-muted-foreground">Start program at week</span>
+                <Select
+                  value={String(Math.min(Math.max(data.programStartWeek ?? 1, 1), totalWeeks))}
+                  onValueChange={(val) => onUpdate({ programStartWeek: parseInt(val) })}
+                >
+                  <SelectTrigger aria-label="Program start week" className="w-40 h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: totalWeeks }, (_, i) => i + 1).map((wk) => (
+                      <SelectItem key={wk} value={String(wk)}>
+                        Week {wk} of {totalWeeks}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           {/* Weekday consistency hint */}
           {data.programStartDate && data.trainingDays.length > 0 && (

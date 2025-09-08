@@ -1,4 +1,12 @@
 ## Project structure
+#### Review (RtF)
+
+- The Review step includes a summary card “Program Settings (RtF)” showing:
+  - Include deload weeks: Yes/No
+  - Start date
+  - Timezone
+  - Start Program Week: `Week N of 18|21`
+
 
 ```
 project-root/
@@ -68,6 +76,7 @@ project-root/
 ### Routine Creation/Edit Wizard
 
 - Shared type: `components/routines/create/types.ts` exports `RoutineWizardData`, `RepType`, and `ProgressionScheme`.
+- `RoutineWizardData` incluye `programScheduleMode?: 'TIMEFRAME' | 'NONE'` para elegir si el programa es por calendario o indefinido.
 - Rep types per set:
   - `repType: 'FIXED' | 'RANGE'`
   - When `FIXED`: use `reps`.
@@ -83,9 +92,12 @@ project-root/
   - **Weight Increment UI**: The "Weight Inc. (kg)" input only appears when progression is active (not `NONE`). On mobile, +/- buttons are hidden to prevent overflow; the input remains editable.
   - **Edit compatibility mapping**: When editing existing routines, legacy backend values are mapped for compatibility — `'DYNAMIC'` ➜ `'DOUBLE_PROGRESSION'`, `'DYNAMIC_DOUBLE'` ➜ `'DYNAMIC_DOUBLE_PROGRESSION'`. Missing/unknown values default to `'NONE'`.
 - Wizard steps/components (all use the shared type):
-  - `RoutineBasicInfo` → name/description
+  - `RoutineBasicInfo` → name/description + Program Schedule
+    - Selector: `None (indefinite)` o `Timeframe (date-driven)`
+    - Si se elige `Timeframe`, se muestra `Program start date` aquí mismo y la `programTimezone` se detecta automáticamente del navegador (IANA TZ).
   - `TrainingDays` → select `trainingDays`
   - `BuildDays` → manage `days[].exercises[].sets[]` with per-set `repType` and conditional inputs, plus progression settings
+    - Cuando `programScheduleMode === 'NONE'`, las opciones de progresión con calendario (`PROGRAMMED_RTF` y `PROGRAMMED_RTF_HYPERTROPHY`) aparecen deshabilitadas y cualquier selección previa se normaliza a `NONE`.
     - Mobile layout: set rows stack vertically on small screens; header row hidden on mobile for space.
     - Mobile/Desktop UX improvements:
       - Refactor: `BuildDays` now composes `components/routines/create/ExerciseCard.tsx` (with internal `SetRow`). This modularization improves readability and maintainability.
@@ -111,20 +123,27 @@ project-root/
         - Adding/removing sets animates in/out for clearer feedback.
     - Inputs: no forced leading zeros. Empty fields stay empty (not auto-filled with 0). Weight shows empty when undefined (no placeholder 0).
   - `ReviewAndCreate` → prepares payload mapping sets according to `repType` and creates/updates routine
-    - When any exercise uses `PROGRAMMED_RTF`, includes routine-level fields in the payload: `programWithDeloads`, `programStartDate` (yyyy-mm-dd), and `programTimezone` (IANA TZ).
-    - Per-exercise fields for RtF (`programTMKg`, `programRoundingKg`) are included only for exercises with `PROGRAMMED_RTF`.
-    - Safety net: if RtF is used and `programTimezone` is missing, the payload falls back to the browser IANA timezone during submission.
+  - When any exercise uses `PROGRAMMED_RTF` and `programScheduleMode === 'TIMEFRAME'`, includes routine-level fields in the payload: `programWithDeloads`, `programStartDate` (yyyy-mm-dd), and `programTimezone` (IANA TZ).
+  - Create-only: `programStartWeek` is included when using `PROGRAMMED_RTF` (default 1; range 1..(18|21) depending on deloads).
+  - Per-exercise fields for RtF (`programTMKg`, `programRoundingKg`) are included only for exercises with `PROGRAMMED_RTF`.
+  - Safety net: if RtF is used and `programTimezone` is missing, the payload falls back to the browser IANA timezone during submission.
 
 #### RtF Program Settings (TrainingDays)
 
 - When any exercise is set to `PROGRAMMED_RTF`, the `TrainingDays` step shows a settings panel to configure:
   - `Include deload weeks` (boolean)
-  - `Program start date` (date input)
-  - `Timezone (IANA)`
-- A hint warns when the selected start date weekday does not match the first selected training day.
+  - `Start program at week` (create-only)
+    - Default: 1
+    - Range: 1..(18|21) depending on `Include deload weeks`
+    - If deloads are toggled off and the selected start week is > 18, the UI clamps it to 18
+- `Program start date` se configura en `RoutineBasicInfo`. A hint warns when the selected start date weekday does not match the first selected training day.
 - Pages:
   - New: `app/(protected)/routines/new/page.tsx`
   - Edit: `app/(protected)/routines/edit/[id]/page.tsx` (maps backend routine to `RoutineWizardData` including `repType/minReps/maxReps`). The Stepper is now sticky at the top like in the create page.
+
+Notes:
+
+- The backend persists `programStartWeek` and returns it in routine responses. The UI uses this field only during creation (create-only UX), but it may be displayed read-only in details in the future.
 
 ### Services
 
@@ -220,6 +239,7 @@ project-root/
   - Each day section includes its own Start button (inside the day panel).
   - Weekday mismatch confirmation: if you start a day different from today, a dialog warns you and lets you proceed or cancel.
   - Active session conflict handling: if there’s an in-progress session for another day, a dialog prompts you to resume the active session instead of starting a new one.
+  - Program gating: when `programEndDate` has passed (RtF program completed), Start controls are disabled and a "Program ended" badge is shown.
 - Routine structure display:
   - Collapsible days using shadcn/Radix Accordion. Today's day is expanded by default and shows a "Today" badge.
   - Accordion animation: content uses CSS `grid-template-rows` (0fr→1fr) + fade with `duration-300 ease-in-out` (see `components/ui/accordion.tsx`).

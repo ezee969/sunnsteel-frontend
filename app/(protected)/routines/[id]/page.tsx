@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { getTodayDow, weekdayName } from '@/lib/utils/date';
+import { getTodayDow, weekdayName, weeksRemainingFromEndDate } from '@/lib/utils/date';
 import type { RoutineDay, RoutineSet } from '@/lib/api/types/routine.type';
 import {
   Accordion,
@@ -41,6 +41,15 @@ import {
 const dayName = (dayOfWeek: number) => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return names[dayOfWeek] ?? `Day ${dayOfWeek}`;
+};
+
+const isProgramEnded = (programEndDate?: string): boolean => {
+  if (!programEndDate) return false;
+  const today = new Date();
+  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const end = new Date(programEndDate);
+  const endUTC = Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
+  return todayUTC > endUTC;
 };
 
 export default function RoutineDetailsPage() {
@@ -145,10 +154,18 @@ export default function RoutineDetailsPage() {
             {isLoading ? (
               <Skeleton className="h-5 w-28" />
             ) : (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Dumbbell className="h-3 w-3" />
-                <span>{routine?.days?.length ?? 0} days/week</span>
-              </Badge>
+              <div className="flex items-center gap-2">
+                {isProgramEnded(routine?.programEndDate) && (
+                  <Badge variant="outline">Program ended</Badge>
+                )}
+                {!isProgramEnded(routine?.programEndDate) && routine?.programEndDate && (
+                  <Badge variant="outline">{weeksRemainingFromEndDate(routine.programEndDate)} weeks left</Badge>
+                )}
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Dumbbell className="h-3 w-3" />
+                  <span>{routine?.days?.length ?? 0} days/week</span>
+                </Badge>
+              </div>
             )}
           </CardTitle>
           {isLoading ? (
@@ -166,7 +183,7 @@ export default function RoutineDetailsPage() {
                 type="button"
                 aria-label="Quick start session"
                 onClick={() => handleStart(quickStartDayId)}
-                disabled={!quickStartDayId || isStarting}
+                disabled={!quickStartDayId || isStarting || isProgramEnded(routine?.programEndDate)}
               >
                 {isStarting && startActingDayId === quickStartDayId ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -217,7 +234,7 @@ export default function RoutineDetailsPage() {
                           variant="secondary"
                           aria-label={`Start session for ${dayName(day.dayOfWeek)}`}
                           onClick={() => handleStart(day.id)}
-                          disabled={isStarting && startActingDayId === day.id}
+                          disabled={(isStarting && startActingDayId === day.id) || isProgramEnded(routine?.programEndDate)}
                           className="w-full sm:w-auto"
                         >
                           {isStarting && startActingDayId === day.id ? (

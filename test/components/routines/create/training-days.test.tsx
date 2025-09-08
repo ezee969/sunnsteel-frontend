@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@/test/utils';
 import { TrainingDays } from '@/components/routines/create/TrainingDays';
 import type { RoutineWizardData } from '@/components/routines/create/types';
 
-describe('TrainingDays - RtF panel, timezone autofill, weekday hint', () => {
+describe('TrainingDays - RtF panel, weekday hint', () => {
   const makeData = (override?: Partial<RoutineWizardData>): RoutineWizardData => ({
     name: 'Routine',
     description: '',
@@ -37,24 +37,6 @@ describe('TrainingDays - RtF panel, timezone autofill, weekday hint', () => {
   it('shows RtF Program Settings panel when any exercise uses RtF', () => {
     render(<TrainingDays data={makeData()} onUpdate={onUpdate} />);
     expect(screen.getByText(/RtF Program Settings/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Program start date/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Program timezone/i)).toBeInTheDocument();
-  });
-
-  it('auto-fills timezone from browser when missing and RtF is used', async () => {
-    const spy = vi
-      .spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions')
-      .mockReturnValue({ timeZone: 'America/New_York' } as any);
-
-    render(<TrainingDays data={makeData({ programTimezone: undefined })} onUpdate={onUpdate} />);
-
-    await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ programTimezone: 'America/New_York' })
-      );
-    });
-
-    spy.mockRestore();
   });
 
   it('shows weekday mismatch hint when start date weekday != first training day', () => {
@@ -75,5 +57,46 @@ describe('TrainingDays - RtF panel, timezone autofill, weekday hint', () => {
     expect(
       screen.getByText(/Start date falls on your first training day/i)
     ).toBeInTheDocument();
+  });
+
+  it('shows Start Program Week select on create for RtF and hides it on edit', () => {
+    const data = makeData();
+    const { rerender } = render(
+      <TrainingDays data={data} onUpdate={onUpdate} />
+    );
+
+    expect(
+      screen.getByLabelText(/Program start week/i)
+    ).toBeInTheDocument();
+
+    rerender(<TrainingDays data={data} onUpdate={onUpdate} isEditing />);
+    expect(
+      screen.queryByLabelText(/Program start week/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it('defaults programStartWeek to 1 when RtF is used and unset', async () => {
+    render(
+      <TrainingDays data={makeData({ programStartWeek: undefined })} onUpdate={onUpdate} />
+    );
+
+    await waitFor(() => {
+      expect(onUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ programStartWeek: 1 })
+      );
+    });
+  });
+
+  it('clamps programStartWeek when deloads toggled off (21 -> 18)', () => {
+    const data = makeData({ programWithDeloads: true, programStartWeek: 21 });
+    render(<TrainingDays data={data} onUpdate={onUpdate} />);
+
+    // Toggle off deloads
+    fireEvent.click(screen.getByLabelText(/Include deload weeks/i));
+
+    // Should clamp to 18
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ programWithDeloads: false, programStartWeek: 18 })
+    );
   });
 });

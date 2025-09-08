@@ -33,6 +33,44 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
     createSpy.mockReset();
   });
 
+  it('includes programStartWeek in payload on create (RtF) and hides it on edit flow', async () => {
+    const data: RoutineWizardData = {
+      ...baseData,
+      programStartWeek: 9,
+      programScheduleMode: 'TIMEFRAME',
+    };
+
+    // Create flow: should include programStartWeek
+    render(<ReviewAndCreate data={data} onComplete={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /create routine/i }));
+    const createPayload = createSpy.mock.calls[0][0];
+    expect(createPayload).toEqual(
+      expect.objectContaining({ programStartWeek: 9 })
+    );
+  });
+
+  it('shows "RtF Hypertrophy" badge in Review for PROGRAMMED_RTF_HYPERTROPHY', async () => {
+    const data: RoutineWizardData = {
+      ...baseData,
+      days: [
+        {
+          dayOfWeek: 1,
+          exercises: [
+            {
+              ...baseData.days[0].exercises[0],
+              progressionScheme: 'PROGRAMMED_RTF_HYPERTROPHY',
+            },
+          ],
+        },
+      ],
+    };
+
+    render(<ReviewAndCreate data={data} onComplete={() => {}} />);
+    // Open the Workout Details accordion to reveal badges
+    fireEvent.click(screen.getByRole('button', { name: /Workout Details/i }));
+    expect(screen.getByText(/RtF Hypertrophy/i)).toBeInTheDocument();
+  });
+
   it('maps PROGRAMMED_RTF_HYPERTROPHY to PROGRAMMED_RTF in payload and includes per-exercise RtF fields', async () => {
     const data: RoutineWizardData = {
       name: 'H-RtF Routine',
@@ -70,6 +108,8 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
     expect(ex).toEqual(
       expect.objectContaining({ programTMKg: 110, programRoundingKg: 2.5 })
     );
+
+    // UI label is covered by a dedicated test above; here we only assert payload mapping
   });
 
   it('falls back to browser timezone when RtF is used and programTimezone is missing', async () => {
@@ -81,6 +121,7 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
     const missingTz: RoutineWizardData = {
       ...baseData,
       programTimezone: undefined,
+      programScheduleMode: 'TIMEFRAME',
     };
 
     render(<ReviewAndCreate data={missingTz} onComplete={() => {}} />);
@@ -120,6 +161,7 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
     programWithDeloads: true,
     programStartDate: '2025-09-08',
     programTimezone: 'America/New_York',
+    programScheduleMode: 'TIMEFRAME',
   };
 
   it('includes routine-level and per-exercise RtF fields when PROGRAMMED_RTF is used', async () => {

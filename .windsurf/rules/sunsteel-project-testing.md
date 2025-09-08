@@ -2,67 +2,104 @@
 trigger: always_on
 ---
 
-## Testing Practices and Maintenance
+### Testing (Frontend)
 
-### Test Architecture Overview
+- Stack: Vitest + Testing Library (React) sobre `jsdom`.
+- Configuración: `vitest.config.ts`
+  - `test.environment = 'jsdom'`
+  - `test.globals = true`
+  - `resolve.alias` mapea `@` a la raíz del proyecto
+  - Cobertura con `@vitest/coverage-v8`
+- Setup global: `test/setup.ts` (jest-dom)
+  - Incluye un mock no-op de `Element.prototype.scrollIntoView` para evitar errores de Radix UI Select en jsdom.
+- Utilidades de test: `test/utils.tsx` (helper `render` y `createQueryWrapper(client?)` para envolver con `QueryClientProvider`)
+- Tests iniciales:
+  - `test/lib/utils/time.test.ts` (helpers de tiempo)
+  - `test/components/ui/button.test.tsx` (render básico del Button)
+  - `test/lib/utils/reps-to-failure-hypertrophy.test.ts` (utilidad RtF Hipertrofia)
+  - `test/app/protected/workouts/sessions/active-session-page.test.tsx` (tests de la página de sesión activa: finalizar/abortar con navegación y autosave/remove de set logs)
 
-- **Backend**: Jest + Supertest for unit and E2E tests with PostgreSQL integration
-- **Frontend**: Vitest + React Testing Library with jsdom environment
-- **CI/CD**: GitHub Actions for automated testing on push/PR events
+### CI
 
-### Current Test Coverage
+- Workflow: `.github/workflows/ci.yml`
+- Disparadores: push (main/master/develop) y todos los PRs
+- Pasos: `npm ci` → `npm run test:coverage` (Vitest + Coverage V8) → sube artefacto `coverage/`
 
-#### Backend Tests
+## Patrones de Código
 
-- **Auth Module**: AuthController, AuthService (login/register/logout/refresh)
-- **Users Module**: UsersController, UsersService (profile management)
-- **Exercises Module**: ExercisesController, ExercisesService (exercise catalog)
-- **Token Module**: TokenService (JWT and refresh token management)
-- **E2E Tests**: Complete API endpoint integration testing
+### Imports y Aliases
 
-#### Frontend Tests
+- `@/components`: Componentes
+- `@/lib`: Utilidades y servicios
+- `@/hooks`: Custom hooks
+- `@/providers`: Context providers
+- `@/schema`: Esquemas de validación
 
-- **Auth Components**: Login page, auth hooks (useLogin, useRegister, useLogout)
-- **Routine Components**: WorkoutsList component and routine hooks
-- **Workout Sessions**: Active session pages, session management
-- **UI Components**: Button and base component testing
-- **Utilities**: Time helpers and common functions
+### Convenciones
 
-### Test Maintenance Guidelines
+- **Componentes**: PascalCase, functional components
+- **Hooks**: camelCase con prefijo "use"
+- **Services**: camelCase con sufijo "Service"
+- **Types**: PascalCase con sufijo "Type"
+- **Schemas**: camelCase con sufijo "Schema"
 
-⚠️ **Critical**: When making code changes, ALWAYS:
+### Manejo de Estado
 
-1. **Update existing tests** if component interfaces or behavior changes
-2. **Add new tests** for new features, components, or bug fixes
-3. **Mock external dependencies** appropriately for unit tests
-4. **Use proper test patterns**:
-   - Backend: Mock Prisma, use test database for E2E
-   - Frontend: Use `createQueryWrapper` for React Query components
-5. **Test user interactions** with fireEvent or userEvent
-6. **Verify accessibility** attributes in component tests
-7. **Run tests locally** before committing to catch issues early
-8. **Update documentation** if test structure changes
+- **Server State**: TanStack Query
+- **Client State**: React Context + useState
+- **Form State**: React Hook Form
+- **Auth State**: AuthProvider context
 
-### Writing New Tests
+## Integración con Backend
 
-Frontend (Vitest + React Testing Library)
+### Endpoints Consumidos
 
-```typescript
-// Component test pattern
-import { render, screen, fireEvent } from '@testing-library/react';
-import { vi } from 'vitest';
-import { createQueryWrapper } from '@/test/utils';
-import MyComponent from './MyComponent';
+- `POST /api/auth/login`: Inicio de sesión
+- `POST /api/auth/register`: Registro
+- `POST /api/auth/logout`: Cierre de sesión
+- `POST /api/auth/refresh`: Renovación de tokens
+- `GET /api/users/profile`: Perfil de usuario
+- `POST /api/workouts/sessions/start`: Iniciar sesión de entrenamiento
+- `GET /api/workouts/sessions/active`: Obtener sesión activa
+- `GET /api/workouts/sessions`: Listado de sesiones (historial) con filtros y paginación
+- `GET /api/workouts/sessions/:id`: Obtener sesión por id
+- `PATCH /api/workouts/sessions/:id/finish`: Finalizar sesión
+- `PUT /api/workouts/sessions/:id/set-logs`: Upsert de registros de sets
+- `DELETE /api/workouts/sessions/:id/set-logs/:routineExerciseId/:setNumber`: Eliminar un set log específico
 
-vi.mock('@/lib/api/services/myService');
+### Autenticación Flow
 
-describe('MyComponent', () => {
-  it('should render and handle interaction', () => {
-    render(<MyComponent />, { wrapper: createQueryWrapper() });
+1. Login/Register → Access token en localStorage
+2. Refresh token en cookies (httpOnly)
+3. Auto-refresh cuando access token expira
+4. Logout → Limpia tokens y redirige
 
-    expect(screen.getByRole('button')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button'));
-    // Assert expected behavior
-  });
-});
-```
+## Características de la Aplicación
+
+### Funcionalidades Principales
+
+- **Dashboard**: Vista principal con estadísticas y rutinas
+- **Workout Management**: Gestión de rutinas de entrenamiento
+- **User Profile**: Perfil de usuario y configuración
+- **Authentication**: Sistema completo de auth
+
+### UX/UI Features
+
+- **Responsive**: Mobile-first design
+- **Loading States**: Estados de carga con TanStack Query
+- **Error Boundaries**: Manejo de errores
+- **Form Validation**: Validación en tiempo real
+- **Accessibility**: Componentes accesibles
+
+## Contexto para el Agente
+
+Cuando implementes funcionalidades:
+
+- Usa Next.js App Router patterns
+- Implementa autenticación con JWT
+- Sigue los patrones de TanStack Query
+- Usa Shadcn/ui para componentes
+- Valida formularios con Zod
+- Mantén responsive design
+- Considera accesibilidad
+- Integra con el backend NestJS

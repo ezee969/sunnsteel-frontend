@@ -46,6 +46,7 @@ import {
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useRouter } from 'next/navigation';
 import { routineService } from '@/lib/api/services/routineService';
+import { weeksRemainingFromEndDate } from '@/lib/utils/date';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 
@@ -77,6 +78,23 @@ export default function WorkoutsList({
   const dayName = (dayOfWeek: number) => {
     const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return names[dayOfWeek] ?? `Day ${dayOfWeek}`;
+  };
+
+  const isProgramEnded = (routine: Routine | undefined): boolean => {
+    if (!routine?.programEndDate) return false;
+    const today = new Date();
+    const todayUTC = Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const end = new Date(routine.programEndDate);
+    const endUTC = Date.UTC(
+      end.getUTCFullYear(),
+      end.getUTCMonth(),
+      end.getUTCDate()
+    );
+    return todayUTC > endUTC;
   };
 
   const handleDeleteClick = (routineId: string) => {
@@ -117,7 +135,10 @@ export default function WorkoutsList({
     );
   };
 
-  const handleStartSessionForRoutine = async (routine: Routine, routineDayId?: string) => {
+  const handleStartSessionForRoutine = async (
+    routine: Routine,
+    routineDayId?: string
+  ) => {
     try {
       setStartActingId(routine.id);
       let dayId = routineDayId ?? routine.days?.[0]?.id;
@@ -131,7 +152,10 @@ export default function WorkoutsList({
         console.error('No routine day available to start a session');
         return;
       }
-      const session = await startSession({ routineId: routine.id, routineDayId: dayId });
+      const session = await startSession({
+        routineId: routine.id,
+        routineDayId: dayId,
+      });
       if (session?.id) {
         router.push(`/workouts/sessions/${session.id}`);
       }
@@ -217,6 +241,16 @@ export default function WorkoutsList({
                   )}
                 </div>
                 <div className="flex items-center gap-1">
+                  {isProgramEnded(routine) && (
+                    <Badge variant="outline" className="mr-1">
+                      Program ended
+                    </Badge>
+                  )}
+                  {!isProgramEnded(routine) && routine.programEndDate && (
+                    <Badge variant="outline" className="mr-1">
+                      {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
+                    </Badge>
+                  )}
                   <Button
                     type="button"
                     variant="secondary"
@@ -233,7 +267,10 @@ export default function WorkoutsList({
                         void handleStartSessionForRoutine(routine);
                       }
                     }}
-                    disabled={isStarting && startActingId === routine.id}
+                    disabled={
+                      (isStarting && startActingId === routine.id) ||
+                      isProgramEnded(routine)
+                    }
                   >
                     {isStarting && startActingId === routine.id ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -314,8 +351,13 @@ export default function WorkoutsList({
                           {routine.days.map((d) => (
                             <DropdownMenuItem
                               key={d.id}
-                              onSelect={() => handleStartSessionForRoutine(routine, d.id)}
-                              disabled={isStarting && startActingId === routine.id}
+                              onSelect={() =>
+                                handleStartSessionForRoutine(routine, d.id)
+                              }
+                              disabled={
+                                (isStarting && startActingId === routine.id) ||
+                                isProgramEnded(routine)
+                              }
                             >
                               {dayName(d.dayOfWeek)}
                             </DropdownMenuItem>

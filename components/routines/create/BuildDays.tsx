@@ -38,14 +38,33 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
-  const usesRtf = data.days.some((d) =>
-    d.exercises.some((ex) =>
-      ex.progressionScheme === 'PROGRAMMED_RTF' ||
-      ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-    )
-  );
+  const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME';
 
   // Note: we compute day-specific data on-demand below to avoid stale references
+
+  // If schedule is NONE, ensure no time-based progression remains selected
+  useEffect(() => {
+    if (canUseTimeframe) return;
+    const hasAnyTimeBased = data.days.some((day) =>
+      day.exercises.some(
+        (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+      )
+    );
+    if (!hasAnyTimeBased) return;
+    const newDays = data.days.map((day) => ({
+      ...day,
+      exercises: day.exercises.map((ex) => {
+        if (
+          ex.progressionScheme === 'PROGRAMMED_RTF' ||
+          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+        ) {
+          return { ...ex, progressionScheme: 'NONE' as ProgressionScheme };
+        }
+        return ex;
+      }),
+    }));
+    onUpdate({ days: newDays });
+  }, [canUseTimeframe, data.days, onUpdate]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -228,6 +247,12 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     );
     if (dayIndex === -1) return;
     const ex = newDays[dayIndex].exercises[exerciseIndex];
+    // Prevent selecting time-based schemes when schedule mode is NONE
+    const isTimeBased =
+      scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+    if (isTimeBased && !canUseTimeframe) {
+      return; // ignore change
+    }
     ex.progressionScheme = scheme;
 
     // If progression is enabled, ensure sets use RANGE and convert FIXED reps to min/max
@@ -403,11 +428,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
           <span className="text-destructive ml-1">*</span>
         </h3>
 
-        {usesRtf && !data.programStartDate && (
-          <div className="mb-4 p-3 rounded-md border border-amber-300 bg-amber-50 text-amber-900 text-sm">
-            RtF program detected. Please set your Program Start Date and Timezone in the &quot;Training Days&quot; step before proceeding to review.
-          </div>
-        )}
+        {/* Removed amber reminder: start date now set in Basic Info and timezone auto-detected */}
 
         {/* Day Tabs */}
         <Tabs
@@ -436,9 +457,9 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
             const day = data.days.find((d) => d.dayOfWeek === dayId);
 
             return (
-              <TabsContent key={dayId} value={tabIndex.toString()} className="mt-6">
+              <TabsContent key={dayId} value={tabIndex.toString()} className="mt-4">
                 <Card>
-                  <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-6">
                     <CardTitle>{DAYS_OF_WEEK[dayId]} Workout</CardTitle>
                     <div className="relative w-full sm:w-auto" ref={dropdownRef}>
                       <Button
@@ -499,7 +520,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 sm:p-6">
                   {day && day.exercises.length > 0 ? (
                     <div className="space-y-4">
                       <AnimatePresence>
@@ -553,6 +574,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                             onStepFixedReps={stepFixedReps}
                             onStepRangeReps={stepRangeReps}
                             onStepWeight={stepWeight}
+                            disableTimeBasedProgressions={!canUseTimeframe}
                           />
                             </motion.div>
                           );

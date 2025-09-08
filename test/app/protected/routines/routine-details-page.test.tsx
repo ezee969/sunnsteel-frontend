@@ -55,6 +55,32 @@ describe('RoutineDetailsPage', () => {
     ...overrides,
   });
 
+  it('disables Start actions and shows Program ended when programEndDate is in the past', async () => {
+    routineMock = makeRoutine({
+      id: 'test-id',
+      name: 'RtF Program',
+      days: [
+        { id: 'd1', dayOfWeek: 1, order: 1, exercises: [] },
+      ],
+      programEndDate: '2000-01-01T00:00:00.000Z',
+    });
+
+    render(<RoutineDetailsPage />);
+
+    // Badge visible
+    expect(screen.getByText(/program ended/i)).toBeInTheDocument();
+
+    // Quick Start disabled
+    const quickStart = screen.getByRole('button', { name: /quick start session/i });
+    expect(quickStart).toBeDisabled();
+
+    // Day Start disabled
+    // Expand accordion first (Mon)
+    await screen.findByText('Mon');
+    const startDayBtn = screen.getByRole('button', { name: /start session for Mon/i });
+    expect(startDayBtn).toBeDisabled();
+  });
+
   const makeSession = (overrides?: Partial<WorkoutSession>): WorkoutSession => ({
     id: 'sess-default',
     userId: 'u-1',
