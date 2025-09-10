@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSessions } from '@/lib/api/hooks/useWorkoutSession';
 import { formatTimeReadable } from '@/lib/utils/time';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import { useRoutines } from '@/lib/api/hooks/useRoutines';
 import type {
   WorkoutSessionListStatus,
@@ -53,7 +53,7 @@ const SORT_OPTIONS: Array<{
   { label: 'Started (oldest)', value: 'startedAt:asc' },
 ];
 
-export default function WorkoutHistoryPage() {
+function WorkoutHistoryContent() {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
@@ -62,12 +62,16 @@ export default function WorkoutHistoryPage() {
     const v = search.get('status') as WorkoutSessionListStatus | null;
     return v ?? 'COMPLETED';
   });
-  const [routineId, setRoutineId] = useState<string>(() => search.get('routineId') ?? '');
+  const [routineId, setRoutineId] = useState<string>(
+    () => search.get('routineId') ?? ''
+  );
   const [from, setFrom] = useState<string>(() => search.get('from') ?? '');
   const [to, setTo] = useState<string>(() => search.get('to') ?? '');
   const [q, setQ] = useState<string>(() => search.get('q') ?? '');
   const [sort, setSort] = useState<NonNullable<ListSessionsParams['sort']>>(
-    () => ((search.get('sort') as NonNullable<ListSessionsParams['sort']>) ?? 'finishedAt:desc')
+    () =>
+      (search.get('sort') as NonNullable<ListSessionsParams['sort']>) ??
+      'finishedAt:desc'
   );
 
   // Debounced search query for auto-apply
@@ -105,7 +109,7 @@ export default function WorkoutHistoryPage() {
     setQ(search.get('q') ?? '');
     setSort(
       (search.get('sort') as NonNullable<ListSessionsParams['sort']>) ??
-        'finishedAt:desc',
+        'finishedAt:desc'
     );
     setIsFiltersOpen(search.get('filters') === 'open');
   }, [search]);
@@ -146,7 +150,7 @@ export default function WorkoutHistoryPage() {
       to: string;
       q: string;
       sort: NonNullable<ListSessionsParams['sort']>;
-    }> = {},
+    }> = {}
   ) => {
     const nextStatus = Object.prototype.hasOwnProperty.call(overrides, 'status')
       ? overrides.status
@@ -169,7 +173,10 @@ export default function WorkoutHistoryPage() {
     } as Omit<ListSessionsParams, 'cursor' | 'limit'>;
   };
 
-  const applyUrl = (p: Omit<ListSessionsParams, 'cursor' | 'limit'>, filtersOpen?: boolean) => {
+  const applyUrl = (
+    p: Omit<ListSessionsParams, 'cursor' | 'limit'>,
+    filtersOpen?: boolean
+  ) => {
     const usp = new URLSearchParams();
     if (p.status) usp.set('status', p.status);
     if (p.routineId) usp.set('routineId', p.routineId);
@@ -290,13 +297,17 @@ export default function WorkoutHistoryPage() {
         >
           <div className="relative h-full flex items-center px-4 sm:px-6">
             <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Training Archive</h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Browse and filter your sessions.</p>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                Training Archive
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Browse and filter your sessions.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       <Card>
@@ -351,7 +362,7 @@ export default function WorkoutHistoryPage() {
                       handleChangeStatus(
                         (e.target.value || undefined) as
                           | WorkoutSessionListStatus
-                          | undefined,
+                          | undefined
                       )
                     }
                   >
@@ -409,7 +420,9 @@ export default function WorkoutHistoryPage() {
                     onChange={(e) => setTo(e.target.value)}
                   />
                   {isDateInvalid ? (
-                    <span className="text-xs text-destructive">From date must be before or equal to To date.</span>
+                    <span className="text-xs text-destructive">
+                      From date must be before or equal to To date.
+                    </span>
                   ) : null}
                 </div>
 
@@ -441,7 +454,7 @@ export default function WorkoutHistoryPage() {
                     value={sort}
                     onChange={(e) =>
                       handleChangeSort(
-                        e.target.value as NonNullable<ListSessionsParams['sort']>,
+                        e.target.value as NonNullable<ListSessionsParams['sort']>
                       )
                     }
                   >
@@ -472,9 +485,11 @@ export default function WorkoutHistoryPage() {
 
           {/* Active filter chips */}
           {(() => {
-            const chips: Array<{ key: string; label: string; onClear: () => void }> = [];
+            const chips: Array<{ key: string; label: string; onClear: () => void }> =
+              [];
             if (status) {
-              const lbl = STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status;
+              const lbl =
+                STATUS_OPTIONS.find((o) => o.value === status)?.label ?? status;
               chips.push({
                 key: 'status',
                 label: `Status: ${lbl}`,
@@ -487,7 +502,8 @@ export default function WorkoutHistoryPage() {
               });
             }
             if (routineId) {
-              const name = (routines ?? []).find((r) => r.id === routineId)?.name ?? 'Unknown';
+              const name =
+                (routines ?? []).find((r) => r.id === routineId)?.name ?? 'Unknown';
               chips.push({
                 key: 'routine',
                 label: `Routine: ${name}`,
@@ -500,7 +516,12 @@ export default function WorkoutHistoryPage() {
               });
             }
             if (from || to) {
-              const label = from && to ? `Date: ${from} → ${to}` : from ? `From: ${from}` : `To: ${to}`;
+              const label =
+                from && to
+                  ? `Date: ${from} → ${to}`
+                  : from
+                  ? `From: ${from}`
+                  : `To: ${to}`;
               chips.push({
                 key: 'date',
                 label,
@@ -576,7 +597,11 @@ export default function WorkoutHistoryPage() {
               Loading sessions…
             </div>
           ) : isError ? (
-            <div className="text-sm text-destructive" role="alert" aria-live="polite">
+            <div
+              className="text-sm text-destructive"
+              role="alert"
+              aria-live="polite"
+            >
               {getErrorMessage(error)}
             </div>
           ) : items.length === 0 ? (
@@ -592,7 +617,9 @@ export default function WorkoutHistoryPage() {
                   onClick={() => router.push(`/workouts/history/${s.id}`)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Open session ${s.status.toLowerCase()} for ${s.routine.name} started ${new Date(s.startedAt).toLocaleString()}`}
+                  aria-label={`Open session ${s.status.toLowerCase()} for ${
+                    s.routine.name
+                  } started ${new Date(s.startedAt).toLocaleString()}`}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -664,5 +691,21 @@ export default function WorkoutHistoryPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function WorkoutHistoryPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-3xl p-4">
+          <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+            Loading workout history…
+          </div>
+        </div>
+      }
+    >
+      <WorkoutHistoryContent />
+    </Suspense>
   );
 }
