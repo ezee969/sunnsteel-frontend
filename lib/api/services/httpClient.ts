@@ -1,8 +1,8 @@
 import { tokenService } from './tokenService';
 import { authService } from './authService';
 
-// Base API URL
-const API_BASE_URL = 'http://localhost:4000/api';
+// Base API URL - use environment variable in production, localhost in development
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 interface ApiRequestConfig extends RequestInit {
   secure?: boolean;
@@ -36,11 +36,9 @@ function clearClientSessionCookie() {
 
 async function refreshAccessToken(): Promise<{ accessToken: string }> {
   if (!refreshingPromise) {
-    refreshingPromise = authService
-      .refreshToken()
-      .finally(() => {
-        refreshingPromise = null;
-      });
+    refreshingPromise = authService.refreshToken().finally(() => {
+      refreshingPromise = null;
+    });
   }
   return refreshingPromise;
 }
@@ -69,7 +67,9 @@ export const httpClient = {
     try {
       const isBrowser = typeof window !== 'undefined';
       const isAuthPageGlobal =
-        isBrowser && (window.location.pathname === '/login' || window.location.pathname === '/signup');
+        isBrowser &&
+        (window.location.pathname === '/login' ||
+          window.location.pathname === '/signup');
 
       // Never fire secure calls while on auth pages; abort early to avoid loops/noise
       if (secure && isAuthPageGlobal) {
@@ -94,7 +94,9 @@ export const httpClient = {
           (isBrowser && !!window.sessionStorage?.getItem('authShuttingDown'));
         const hasSessionCookie =
           typeof document !== 'undefined' &&
-          document.cookie.split(';').some((c) => c.trim().startsWith('has_session=true'));
+          document.cookie
+            .split(';')
+            .some((c) => c.trim().startsWith('has_session=true'));
 
         // If we are on auth pages, in the middle of logout, or there is no session cookie, do not attempt refresh
         if (!isBrowser || isAuthPage || isShuttingDown || !hasSessionCookie) {
@@ -140,7 +142,8 @@ export const httpClient = {
           // Non-JSON error body; keep default message
         }
         const isAuthRefresh = endpoint === '/auth/refresh';
-        const isExpected401 = response.status === 401 && (isAuthRefresh || isAuthPageGlobal);
+        const isExpected401 =
+          response.status === 401 && (isAuthRefresh || isAuthPageGlobal);
         const logFn = isExpected401 ? console.debug : console.error;
         logFn('[http] ←', response.status, method, url, {
           contentType,
