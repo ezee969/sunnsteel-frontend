@@ -1,4 +1,5 @@
 ## Project structure
+
 #### Review (RtF)
 
 - The Review step includes a summary card “Program Settings (RtF)” showing:
@@ -6,7 +7,6 @@
   - Start date
   - Timezone
   - Start Program Week: `Week N of 18|21`
-
 
 ```
 project-root/
@@ -43,6 +43,37 @@ project-root/
 ├── middleware.ts                  # Middleware for handling requests before reaching the route handlers
 └── public/                        # Static assets
 ```
+
+### Authentication (Frontend)
+
+- **Access token**: stored in `sessionStorage` (via `lib/api/services/tokenService.ts`) so it survives redirects (e.g., `/login` → `/dashboard`).
+- **Refresh token**: httpOnly cookie set by the backend.
+- **Session marker**: non-HttpOnly cookie `has_session=true` is set by the backend on login/register/google/refresh, and cleared on logout. It is used as a hint for client behavior, but redirects from auth pages now depend on the presence of `refresh_token`.
+- **Middleware**: `middleware.ts`
+  - Redirects from auth pages (`/login`, `/signup`) to `/dashboard` only when `refresh_token` is present.
+  - If a stale `has_session` exists without `refresh_token`, the middleware proactively clears `has_session` and allows access to auth pages (prevents login/dashboard redirect loops).
+  - Redirects unauthenticated users from protected pages to `/login` (checks `refresh_token` cookie presence).
+- **AuthProvider**: `providers/auth-provider.tsx`
+  - Skips initial refresh on auth pages to avoid noisy requests on `/login`.
+  - Treats auth as ready when an access token already exists (prevents skeleton lockups after redirect).
+- **httpClient**: `lib/api/services/httpClient.ts`
+  - Single-flight refresh to avoid storms.
+  - Skips refresh when on auth pages, during logout, or when `has_session` is not present.
+  - Reduces console noise for expected 401s.
+- **Logout UX**: `useLogout()` cancels in-flight queries, clears cache, sets one-shot flags to skip login’s silent refresh, then `router.replace('/login')` for a smooth transition.
+
+### Google Sign-In and One Tap
+
+- **Button**: The Login page initializes Google Identity Services and renders the “Sign in with Google” button. On credential callback, it calls `POST /api/auth/google` and sets the access token.
+- **One Tap**: Enabled with guarded `accounts.id.prompt()` (only when not authenticated, and not recently dismissed). Dismissal is remembered per session to avoid re-prompting.
+- **Script**: Loaded in `app/(auth)/login/page.tsx`; dispatches a `google-identity-ready` event so children can initialize reliably.
+- **Troubleshooting 403 from Google**: Ensure the OAuth Web Client’s Authorized JavaScript origins includes exactly `http://localhost:3000` and that `NEXT_PUBLIC_GOOGLE_CLIENT_ID` matches that client.
+
+### Environment Variables
+
+- `NEXT_PUBLIC_FRONTEND_URL` — Frontend absolute URL (used for metadata)
+- `NEXT_PUBLIC_API_URL` (optional in code, hardcoded default is `http://localhost:4000/api`)
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Google OAuth Web Client ID used by Google Identity Services
 
 ### Feature: Routine Favorites
 
@@ -121,7 +152,6 @@ project-root/
         - Exercise picker dropdown fades/zooms in.
         - Set list expands/collapses smoothly (height + opacity transition) when toggled.
         - Adding/removing sets animates in/out for clearer feedback.
-    - Inputs: no forced leading zeros. Empty fields stay empty (not auto-filled with 0). Weight shows empty when undefined (no placeholder 0).
   - `ReviewAndCreate` → prepares payload mapping sets according to `repType` and creates/updates routine
   - When any exercise uses `PROGRAMMED_RTF` and `programScheduleMode === 'TIMEFRAME'`, includes routine-level fields in the payload: `programWithDeloads`, `programStartDate` (yyyy-mm-dd), and `programTimezone` (IANA TZ).
   - Create-only: `programStartWeek` is included when using `PROGRAMMED_RTF` (default 1; range 1..(18|21) depending on deloads).
@@ -286,14 +316,15 @@ Notes:
     - Stepper is sticky at the top for quick step switching.
     - Bottom navigation (Previous/Next) is sticky at the bottom for better mobile reachability.
     - Added container bottom padding to ensure content never hides behind the sticky bar.
-  
 - **BuildDays Tabs (UX Fixes)**
+
   - `components/routines/create/BuildDays.tsx`:
     - The exercise count badge per day is always visible and shows 0 for empty days.
     - Horizontal-only scrolling in the days row (no vertical scroll) with `overflow-y-hidden` and `whitespace-nowrap`.
     - Normalized badge sizing to prevent layout jump and accidental vertical scrollbar.
 
 - **ExerciseCard Expand/Collapse (Smoother)**
+
   - `components/routines/create/ExerciseCard.tsx`:
     - Simplified mobile-like animation using `max-height` + `opacity` with 300ms ease-in-out.
     - Padding moved to inner wrapper to prevent layout jump during the transition.
@@ -307,6 +338,97 @@ Notes:
   - Transición suave de colores: `body` aplica `transition-colors duration-300` en `app/globals.css`.
   - Dependencia: `next-themes` agregada a `package.json`.
 
+### Design System — Classical Renaissance Theme
+
+- Palette tokens (CSS variables) in `app/globals.css`:
+  - Gold: `--ss-gold`, `--ss-gold-2` (gradient `--ss-grad-gold`)
+  - Bronze: `--ss-bronze`, `--ss-bronze-2` (gradient `--ss-grad-bronze`)
+  - Crimson: `--ss-crimson`, `--ss-crimson-2`
+  - Charcoal: `--ss-charcoal`, `--ss-charcoal-2`
+  - Accents: `--ss-ivory`, `--ss-cream`, `--ss-forest`, `--ss-purple`
+- Typography:
+  - Headings use Cinzel (via `next/font`), utility: `.heading-classical`.
+  - Body remains Geist Sans/Mono.
+- Utilities:
+  - `.bg-marble-light` for subtle marble veining (light/dark aware)
+  - `.text-gold` helper for quick gold accents (light/dark aware)
+- Buttons (shadcn) in `components/ui/button.tsx`:
+  - New variants: `classical` (gold gradient), `bronze` (bronze gradient), `marble` (subtle marble)
+  - Existing variants unchanged; prefer classical variants only for key CTAs to avoid overuse.
+- Cards in `components/ui/card.tsx`:
+  - Marble gradient background, gold-tinted border, softened depth
+  - `CardTitle` uses `.heading-classical`
+- Progress (used by StatCard):
+  - Gold gradient indicator applied locally in StatCard via class override; global Progress defaults unchanged.
+- Auth pages:
+  - `app/(auth)/layout.tsx` maps `bg-white dark:bg-black` correctly
+  - Overlays in `BackgroundOverlay.tsx` align to theme (white in light; black in dark)
+
+Primary color strategy
+
+- We keep the app primary neutral for forms, alerts, and base UI.
+- Gold is applied through the new variants and components for emphasis (CTAs, highlights, stat cards).
+- If desired later, we can remap global `--primary` to gold and re-check contrast.
+
+Iconography
+
+- Lucide icons are retained and styled for a classical feel (gold halos, carved look).
+- To switch to a custom classical set, provide monochrome SVGs; we’ll integrate via SVGR and an `Icon` wrapper.
+
+Protected Layout Backgrounds
+
+- The protected app layout (`app/(protected)/layout.tsx`) now renders marble backgrounds using local assets:
+  - Light: `/public/backgrounds/marble-light1536-x-1024.webp`
+  - Dark: `/public/backgrounds/marble-dark-1536-x-1024.webp`
+- CSS overlays: `ParchmentOverlay` (low opacity) and `GoldVignetteOverlay` (low intensity) are layered above for depth.
+- Loading state also uses the same background stack.
+
+ClassicalIcon (CSS mask)
+
+- Use `components/icons/ClassicalIcon.tsx` to render any icon from `/public/icons/classical/` with `currentColor`.
+- Props:
+  - `name`: one of the available SVG filenames (without `.svg`), e.g. `"laurel-wreath"`, `"compass"`, `"shield"`, `"dumbbell"`.
+  - `className`: apply size/color (e.g., `h-5 w-5 text-primary`).
+- Examples:
+```tsx
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+<ClassicalIcon name="laurel-wreath" className="h-5 w-5 text-yellow-500" aria-hidden />
+```
+
+Dashboard cards
+
+- `StatsOverview`: the mock "Calories Burned" card was replaced by "Training Consistency" (calendar motif).
+- `StatCard` refined with gold icon halo, classical numbers, and gold gradient progress.
+
+Rollout coverage (no functional changes)
+
+- Routines
+  - Workouts list: Start CTA uses `variant="classical"`; "weeks left" badge uses `variant="classical"`; card completion bars use `Progress variant="gold"`.
+  - Routine details: Quick Start and per-day Start use `variant="classical"`; Today badge uses `variant="classical"`; "weeks left" uses `variant="classical"`.
+  - Icons: Dumbbell glyphs on Start buttons and days/week badges replaced with `<ClassicalIcon name="dumbbell" />`.
+- Workouts
+
+  - Workouts hub: primary CTA (Go to Routines) uses `variant="classical"`.
+  - History: Apply Filters and Load More use `variant="classical"`. Hero added with heading "Training Archive" to avoid test collisions with the main H1.
+  - Active Session: Finish uses `variant="classical"`; session progress uses `Progress variant="gold"`. A shallow classical hero is rendered at the top.
+
+Hero banners (classical)
+
+- Dashboard (`app/(protected)/dashboard/page.tsx`): Hero using `/backgrounds/hero-greek-background.webp` + overlays and `OrnateCorners`.
+- Routines index (`app/(protected)/routines/page.tsx`): Slim hero using `/backgrounds/vertical-hero-greek-columns.webp`.
+- Routine details (`app/(protected)/routines/[id]/page.tsx`): Slim hero using `/backgrounds/alexander-the-great-statue-background.webp`.
+- Workouts history (`app/(protected)/workouts/history/page.tsx`): Slim hero using `/backgrounds/vertical-hero-greek-columns.webp` with h2 "Training Archive".
+- Active session (`app/(protected)/workouts/sessions/[id]/page.tsx`): Shallow hero using `/backgrounds/vertical-hero-greek-columns.webp`.
+- Routine wizard — New (`app/(protected)/routines/new/page.tsx`) and Edit (`app/(protected)/routines/edit/[id]/page.tsx`): Slim heroes using `/backgrounds/vertical-hero-greek-columns.webp`.
+
+Classical icons (CSS masked SVG)
+
+- `components/icons/ClassicalIcon.tsx` used in:
+  - Sidebar nav (`app/(protected)/components/Sidebar.tsx`) via `classicalName` mapping for each item.
+  - StatsOverview cards (compass, laurel-wreath, shield, two-dumbbells).
+  - Workouts List buttons/badges (dumbbell).
+  - Active Session title (dumbbell) and timers/hourglass where applicable.
+
 - **Stepper Advanced Navigation (Edit Mode)**
   - `components/ui/stepper.tsx` supports:
     - `completedSteps?: Set<number>` to drive completed state by data validity.
@@ -314,6 +436,61 @@ Notes:
   - `app/(protected)/routines/edit/[id]/page.tsx`:
     - Users can jump directly to any step when all previous steps are valid (based on current form data), avoiding forced sequential navigation.
     - Create flow remains sequential; edit flow is flexible.
+
+### CSS-based Background Overlays and Ornaments
+
+Components (no image assets required):
+
+- `components/backgrounds/ParchmentOverlay.tsx`
+  - Props: `opacity?: number` (0..1), `tint?: string`, `grain?: boolean`
+  - Purpose: a subtle parchment texture overlay using layered gradients.
+
+- `components/backgrounds/GoldVignetteOverlay.tsx`
+  - Props: `color?: string`, `intensity?: number` (0..1), `feather?: string`
+  - Purpose: warm gold vignette from edges/corners via radial-gradients.
+
+- `components/backgrounds/OrnateCorners.tsx`
+  - Props: `color?: string`, `thickness?: number`, `length?: number`, `radius?: number`, `inset?: number`
+  - Purpose: thin gold L-shaped ornaments at all four corners (CSS only).
+
+- `components/backgrounds/HeroBackdrop.tsx`
+  - Props: `src: string`, `blurPx?: number`, `overlayColor?: string`, `overlayGradient?: string`
+  - Purpose: blurred hero background wrapper with optional overlay; place content as children.
+
+Asset paths for future images (already created):
+
+- Backgrounds directory: `public/backgrounds/`
+  - Suggested filenames: `marble-light.webp`, `marble-dark.webp`, `parchment-overlay.png`, `vignette.png`, `hero-desktop.webp`, `hero-mobile.webp`
+
+Usage examples:
+
+```tsx
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
+import OrnateCorners from '@/components/backgrounds/OrnateCorners'
+
+export default function Hero() {
+  return (
+    <section className="relative h-[360px] sm:h-[420px] overflow-hidden rounded-2xl">
+      <HeroBackdrop src="/backgrounds/hero-desktop.webp" blurPx={18} overlayColor="rgba(0,0,0,0.25)">
+        <div className="relative h-full flex items-center justify-center text-center px-6">
+          <h1 className="heading-classical text-3xl sm:text-4xl">Sunnsteel Training</h1>
+          <p className="text-muted-foreground mt-2">Strength • Discipline • Craft</p>
+        </div>
+      </HeroBackdrop>
+      <ParchmentOverlay opacity={0.14} />
+      <GoldVignetteOverlay intensity={0.12} />
+      <OrnateCorners inset={12} length={32} thickness={1.5} />
+    </section>
+  )
+}
+```
+
+Notes:
+
+- These overlays are `position: absolute` and non-interactive (`pointer-events: none`). Wrap your target section in a `relative` container.
+- When you provide real hero images in `public/backgrounds/`, `HeroBackdrop` will blur them; otherwise, it can be combined with a CSS marble/solid base.
 
 ### Testing (Frontend)
 
@@ -335,6 +512,7 @@ Notes:
 #### Test Coverage
 
 Current test modules:
+
 - **Auth Components**: Login page, auth hooks (useLogin, useRegister, useLogout)
 - **Routine Components**: WorkoutsList component and routine hooks
 - **Workout Sessions**: Active session pages, session management
@@ -344,13 +522,10 @@ Current test modules:
 #### Running Tests
 
 ```bash
-# run all tests
 npm run test
 
-# run tests in watch mode
 npm run test:watch
 
-# run tests with coverage
 npm run test:coverage
 ```
 

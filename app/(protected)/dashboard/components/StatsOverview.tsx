@@ -1,11 +1,11 @@
-import { Dumbbell, Flame, Heart, TrendingUp } from 'lucide-react';
 import StatCard from './StatCard';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 export default function StatsOverview() {
   return (
     <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        icon={<Dumbbell className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
+        icon={<ClassicalIcon name="two-dumbbells" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
         title="Weekly Workouts"
         value="5"
         unit="/ 6"
@@ -15,17 +15,17 @@ export default function StatsOverview() {
         additionalText="+2"
       />
       <StatCard
-        icon={<Flame className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
-        title="Calories Burned"
-        value="1,248"
-        unit="kcal"
-        subtitle="Today's workout calories"
-        progress={62}
-        progressText="62% of daily goal"
-        additionalText="+320"
+        icon={<ClassicalIcon name="compass" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
+        title="Training Consistency"
+        value="4"
+        unit="/ 7"
+        subtitle="Active days this week"
+        progress={57}
+        progressText="57% of weekly target"
+        additionalText="Streak 3"
       />
       <StatCard
-        icon={<Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
+        icon={<ClassicalIcon name="shield" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
         title="Heart Rate"
         value="142"
         unit="BPM"
@@ -35,7 +35,7 @@ export default function StatsOverview() {
         additionalText="Zone 3"
       />
       <StatCard
-        icon={<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
+        icon={<ClassicalIcon name="laurel-wreath" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
         title="Strength Progress"
         value="+8%"
         subtitle="Overall strength increase"

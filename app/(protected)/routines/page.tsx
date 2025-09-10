@@ -9,6 +9,10 @@ import WorkoutsList from './components/WorkoutsList';
 // import ActiveWorkout from './components/ActiveWorkout';
 import Link from 'next/link';
 import { useRoutines } from '@/lib/api/hooks/useRoutines';
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 export default function RoutinesPage() {
   const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all');
@@ -24,6 +28,25 @@ export default function RoutinesPage() {
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
+      {/* Classical Hero */}
+      <section className="relative overflow-hidden rounded-xl border">
+        <HeroBackdrop
+          src="/backgrounds/vertical-hero-greek-columns.webp"
+          blurPx={16}
+          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
+          className="h-[180px] sm:h-[220px]"
+        >
+          <div className="relative h-full flex items-center px-4 sm:px-6">
+            <div>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Routines</h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">Plan, track, and refine your training.</p>
+            </div>
+          </div>
+        </HeroBackdrop>
+        <ParchmentOverlay opacity={0.08} />
+        <GoldVignetteOverlay intensity={0.10} />
+        <OrnateCorners inset={10} length={28} thickness={1.25} />
+      </section>
       {/* Header Section */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

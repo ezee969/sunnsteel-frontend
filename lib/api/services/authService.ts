@@ -7,6 +7,7 @@ import {
   RefreshResponse,
   RegisterCredentials,
   RegisterResponse,
+  GoogleLoginRequest,
 } from '../types/auth.type';
 
 export const authService = {
@@ -16,6 +17,13 @@ export const authService = {
       '/auth/login',
       credentials
     );
+    tokenService.setAccessToken(response.accessToken);
+    return response;
+  },
+
+  // Google Sign-In using ID token
+  async googleLogin(payload: GoogleLoginRequest): Promise<LoginResponse> {
+    const response = await httpClient.post<LoginResponse>('/auth/google', payload);
     tokenService.setAccessToken(response.accessToken);
     return response;
   },

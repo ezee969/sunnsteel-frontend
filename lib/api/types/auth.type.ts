@@ -37,3 +37,7 @@ export interface Tokens {
   accessToken: string;
   refreshToken?: string;
 }
+
+export interface GoogleLoginRequest {
+  idToken: string;
+}

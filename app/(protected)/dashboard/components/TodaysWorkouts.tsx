@@ -133,7 +133,7 @@ export default function TodaysWorkouts() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium truncate">{routine.name}</span>
-                    <Badge variant="outline">
+                    <Badge variant="classical">
                       <Calendar className="h-4 w-4" />
                       {weekdayName(day.dayOfWeek)}
                     </Badge>
@@ -143,6 +143,7 @@ export default function TodaysWorkouts() {
                   <Button
                     type="button"
                     className="w-full sm:w-auto"
+                    variant="classical"
                     aria-label={isActiveForThis ? 'Resume workout' : 'Start workout'}
                     onClick={() =>
                       isActiveForThis && active?.id

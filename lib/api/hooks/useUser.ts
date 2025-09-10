@@ -4,7 +4,7 @@ import { User } from '@/lib/api/types/auth.type';
 import { useAuth } from '@/providers/auth-provider';
 
 export function useUser() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasTriedRefresh } = useAuth();
 
   const {
     data: user,
@@ -14,7 +14,7 @@ export function useUser() {
   } = useQuery<User, Error>({
     queryKey: ['user', 'profile'],
     queryFn: () => userService.getProfile(),
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated && hasTriedRefresh, // Fetch only after refresh logic settled
     staleTime: 5 * 60 * 1000,
     retry: 2,
   });

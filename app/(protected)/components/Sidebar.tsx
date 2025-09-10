@@ -21,12 +21,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { useRouter } from 'next/navigation';
+import { ClassicalIcon, ClassicalIconName } from '@/components/icons/ClassicalIcon';
 // import logo from '@/public/logo.png';
 // import Image from 'next/image';
 type NavItem = {
   id: string;
   label: string;
   icon: LucideIcon;
+  classicalName?: ClassicalIconName;
   href: string;
   disabled: boolean;
 };
@@ -36,6 +38,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'dashboard',
     label: 'Dashboard',
     icon: Home,
+    classicalName: 'pillar-icon',
     href: '/dashboard',
     disabled: false,
   },
@@ -43,6 +46,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'workouts',
     label: 'Workouts',
     icon: Dumbbell,
+    classicalName: 'dumbbell',
     href: '/workouts',
     disabled: false,
   },
@@ -50,6 +54,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'routines',
     label: 'Routines',
     icon: Activity,
+    classicalName: 'scroll-unfurled',
     href: '/routines',
     disabled: false,
   },
@@ -57,6 +62,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'progress',
     label: 'Progress',
     icon: TrendingUp,
+    classicalName: 'compass',
     href: '/progress',
     disabled: true,
   },
@@ -64,6 +70,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'exercises',
     label: 'Exercises',
     icon: Weight,
+    classicalName: 'two-dumbbells',
     href: '/exercises',
     disabled: true,
   },
@@ -71,6 +78,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'schedule',
     label: 'Schedule',
     icon: Calendar,
+    classicalName: 'hourglass',
     href: '/schedule',
     disabled: true,
   },
@@ -78,6 +86,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
     id: 'achievements',
     label: 'Achievements',
     icon: Medal,
+    classicalName: 'laurel-crown',
     href: '/achievements',
     disabled: true,
   },
@@ -112,7 +121,9 @@ export default function Sidebar({
   return (
     <div
       className={cn(
-        'fixed inset-y-0 z-50 flex flex-col bg-card/80 backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
+        'fixed inset-y-0 z-50 flex flex-col backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
+        // Classical marble background + subtle border in gold tones
+        'bg-marble-light dark:bg-marble-light border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)]',
         isMobile
           ? isMobileMenuOpen
             ? 'left-0 w-[85%] max-w-[300px]'
@@ -122,6 +133,8 @@ export default function Sidebar({
           : 'left-0 w-20'
       )}
     >
+      {/* Golden vertical accent line */}
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[rgba(255,215,0,0.2)] via-[rgba(218,165,32,0.35)] to-[rgba(255,215,0,0.2)]" />
       <div className="flex h-16 items-center justify-between border-b px-4">
         <div
           className={cn(
@@ -130,7 +143,7 @@ export default function Sidebar({
           )}
         >
           {/* <Image src={logo} alt="logo" width={56} height={56} /> */}
-          <span className="text-xl">SUNNSTEEL</span>
+          <span className="text-xl heading-classical text-black dark:text-white">SUNNSTEEL</span>
         </div>
         {isSidebarOpen && isMobile && (
           <Button
@@ -190,14 +203,27 @@ export default function Sidebar({
                   activeNav === item.id ? 'opacity-100' : 'group-hover:opacity-100'
                 )}
               />
-              <item.icon
-                className={cn(
-                  'h-5 w-5 transition-all',
-                  activeNav === item.id
-                    ? 'text-primary-foreground'
-                    : 'text-muted-foreground group-hover:text-foreground'
-                )}
-              />
+              {item.classicalName ? (
+                <ClassicalIcon
+                  name={item.classicalName}
+                  aria-hidden
+                  className={cn(
+                    'h-5 w-5 transition-all',
+                    activeNav === item.id
+                      ? 'text-primary-foreground'
+                      : 'text-muted-foreground group-hover:text-foreground'
+                  )}
+                />
+              ) : (
+                <item.icon
+                  className={cn(
+                    'h-5 w-5 transition-all',
+                    activeNav === item.id
+                      ? 'text-primary-foreground'
+                      : 'text-muted-foreground group-hover:text-foreground'
+                  )}
+                />
+              )}
               <span
                 className={cn(
                   'transition-all duration-300',

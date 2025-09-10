@@ -11,14 +11,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dumbbell,
-  MoreVertical,
-  PlusCircle,
-  Loader2,
-  Heart,
-  ListChecks,
-} from 'lucide-react';
+import { MoreVertical, PlusCircle, Loader2, Heart, ListChecks } from 'lucide-react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -49,6 +42,7 @@ import { routineService } from '@/lib/api/services/routineService';
 import { weeksRemainingFromEndDate } from '@/lib/utils/date';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 interface WorkoutsListProps {
   routines: Routine[] | undefined;
@@ -213,7 +207,7 @@ export default function WorkoutsList({
         <p className="text-sm text-muted-foreground mb-4">
           Get started by creating a new routine.
         </p>
-        <Button asChild>
+        <Button asChild variant="classical">
           <Link href="/routines/new">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Routine
@@ -247,13 +241,13 @@ export default function WorkoutsList({
                     </Badge>
                   )}
                   {!isProgramEnded(routine) && routine.programEndDate && (
-                    <Badge variant="outline" className="mr-1">
+                    <Badge variant="classical" className="mr-1">
                       {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
                     </Badge>
                   )}
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="classical"
                     size="sm"
                     className="h-8"
                     aria-label="Start session"
@@ -275,7 +269,7 @@ export default function WorkoutsList({
                     {isStarting && startActingId === routine.id ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <Dumbbell className="mr-2 h-4 w-4" />
+                      <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
                     )}
                     Start
                   </Button>
@@ -387,14 +381,14 @@ export default function WorkoutsList({
                     <span>Completion</span>
                     <span>{routine.isCompleted ? '100%' : '0%'}</span>
                   </div>
-                  <Progress value={routine.isCompleted ? 100 : 0} />
+                  <Progress variant="gold" value={routine.isCompleted ? 100 : 0} />
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge
                     variant="outline"
                     className="flex items-center gap-1 text-xs sm:text-sm"
                   >
-                    <Dumbbell className="h-3 w-3 flex-shrink-0" />
+                    <ClassicalIcon name="dumbbell" className="h-3 w-3 flex-shrink-0" aria-hidden />
                     <span>{routine.days.length} days/week</span>
                   </Badge>
                   {routine.isPeriodized && (

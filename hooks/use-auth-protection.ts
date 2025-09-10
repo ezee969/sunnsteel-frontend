@@ -1,13 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth-provider';
 
 export function useAuthProtection() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, hasTriedRefresh } = useAuth();
-
-  // Consider auth loading until we've tried refresh at least once
-  const isLoading = useMemo(() => authLoading || !hasTriedRefresh, [authLoading, hasTriedRefresh]);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const isLoading = authLoading;
 
   // Redirect if not authenticated
   useEffect(() => {

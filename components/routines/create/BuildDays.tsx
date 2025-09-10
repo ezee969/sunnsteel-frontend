@@ -246,7 +246,6 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     );
     if (dayIndex === -1) return;
     const ex = newDays[dayIndex].exercises[exerciseIndex];
-    const prevScheme = ex.progressionScheme;
     // Prevent selecting time-based schemes when schedule mode is NONE
     const isTimeBased =
       scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY';
@@ -255,22 +254,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     }
     ex.progressionScheme = scheme;
 
-    // If switching to RtF, clear sets so the default first set is not present
-    if (scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
-      ex.sets = [];
-    }
-
-    // If switching away from RtF and there are no sets, restore a default first set
-    if (
-      (prevScheme === 'PROGRAMMED_RTF' || prevScheme === 'PROGRAMMED_RTF_HYPERTROPHY') &&
-      scheme !== 'PROGRAMMED_RTF' &&
-      scheme !== 'PROGRAMMED_RTF_HYPERTROPHY' &&
-      ex.sets.length === 0
-    ) {
-      ex.sets = [{ setNumber: 1, repType: 'FIXED', reps: 10, weight: undefined }];
-    }
-
-    // If progression is enabled, ensure sets use RANGE and convert FIXED reps to min/max
+    // Ensure sets remain present and convert FIXED -> RANGE for progression schemes
     if (scheme !== 'NONE') {
       ex.sets.forEach((s) => {
         if (s.repType === 'FIXED') {

@@ -26,9 +26,9 @@ export default function StatCard({
   additionalText,
 }: StatCardProps) {
   return (
-    <Card className="overflow-hidden border-none shadow-md bg-card hover:shadow-lg transition-all">
+    <Card className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all">
       <div className="absolute top-0 right-0 p-2 sm:p-4">
-        <div className="rounded-full bg-primary/10 p-1.5 sm:p-2">{icon}</div>
+        <div className="rounded-full p-1.5 sm:p-2 text-[color:var(--ss-gold)] dark:text-[color:var(--ss-gold-2)] bg-gradient-to-br from-[rgba(218,165,32,0.15)] to-transparent ring-1 ring-[rgba(218,165,32,0.35)] dark:ring-[rgba(255,215,0,0.35)]">{icon}</div>
       </div>
       <CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
         <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -37,7 +37,7 @@ export default function StatCard({
       </CardHeader>
       <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
         <div className="flex items-baseline gap-1">
-          <div className="text-xl sm:text-3xl font-bold">{value}</div>
+          <div className="text-xl sm:text-3xl font-bold heading-classical">{value}</div>
           {unit && (
             <div className="text-xs sm:text-sm text-muted-foreground">{unit}</div>
           )}
@@ -52,12 +52,13 @@ export default function StatCard({
             <Progress
               value={progress}
               max={progressMax}
-              className="h-1.5 sm:h-2 bg-primary/10"
+              variant="gold"
+              className="h-1.5 sm:h-2"
             />
             <div className="mt-1 flex justify-between text-[10px] sm:text-xs">
               <span className="text-muted-foreground">{progressText}</span>
               {additionalText && (
-                <span className="text-primary font-medium">{additionalText}</span>
+                <span className="text-[color:var(--ss-gold)] dark:text-[color:var(--ss-gold-2)] font-medium">{additionalText}</span>
               )}
             </div>
           </div>

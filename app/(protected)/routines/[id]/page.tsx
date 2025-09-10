@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dumbbell, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -37,6 +37,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 const dayName = (dayOfWeek: number) => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -133,6 +138,27 @@ export default function RoutineDetailsPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
+      {/* Classical Hero */}
+      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
+        <HeroBackdrop
+          src="/backgrounds/alexander-the-great-statue-background.webp"
+          blurPx={16}
+          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
+          className="h-[160px] sm:h-[200px]"
+        >
+          <div className="relative h-full flex items-center px-4 sm:px-6">
+            <div>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                {isLoading ? 'Routine' : routine?.name ?? 'Routine'}
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">Structure, schedule, and start.</p>
+            </div>
+          </div>
+        </HeroBackdrop>
+        <ParchmentOverlay opacity={0.08} />
+        <GoldVignetteOverlay intensity={0.10} />
+        <OrnateCorners inset={10} length={28} thickness={1.25} />
+      </section>
       <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/routines" className="underline-offset-2 hover:underline">
           Routines
@@ -159,10 +185,10 @@ export default function RoutineDetailsPage() {
                   <Badge variant="outline">Program ended</Badge>
                 )}
                 {!isProgramEnded(routine?.programEndDate) && routine?.programEndDate && (
-                  <Badge variant="outline">{weeksRemainingFromEndDate(routine.programEndDate)} weeks left</Badge>
+                  <Badge variant="classical">{weeksRemainingFromEndDate(routine.programEndDate)} weeks left</Badge>
                 )}
                 <Badge variant="outline" className="flex items-center gap-1">
-                  <Dumbbell className="h-3 w-3" />
+                  <ClassicalIcon name="dumbbell" className="h-3 w-3" aria-hidden />
                   <span>{routine?.days?.length ?? 0} days/week</span>
                 </Badge>
               </div>
@@ -184,11 +210,12 @@ export default function RoutineDetailsPage() {
                 aria-label="Quick start session"
                 onClick={() => handleStart(quickStartDayId)}
                 disabled={!quickStartDayId || isStarting || isProgramEnded(routine?.programEndDate)}
+                variant="classical"
               >
                 {isStarting && startActingDayId === quickStartDayId ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Dumbbell className="mr-2 h-4 w-4" />
+                  <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
                 )}
                 Start
               </Button>
@@ -217,7 +244,7 @@ export default function RoutineDetailsPage() {
                           Day {day.order}
                         </span>
                         {day.dayOfWeek === todayDow && (
-                          <Badge variant="secondary" className="ml-1">
+                          <Badge variant="classical" className="ml-1">
                             Today
                           </Badge>
                         )}
@@ -231,7 +258,7 @@ export default function RoutineDetailsPage() {
                         <Button
                           type="button"
                           size="sm"
-                          variant="secondary"
+                          variant="classical"
                           aria-label={`Start session for ${dayName(day.dayOfWeek)}`}
                           onClick={() => handleStart(day.id)}
                           disabled={(isStarting && startActingDayId === day.id) || isProgramEnded(routine?.programEndDate)}
@@ -240,7 +267,7 @@ export default function RoutineDetailsPage() {
                           {isStarting && startActingDayId === day.id ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <Dumbbell className="mr-2 h-4 w-4" />
+                            <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
                           )}
                           Start this day
                         </Button>

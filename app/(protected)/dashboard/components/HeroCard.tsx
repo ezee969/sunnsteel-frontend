@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 interface HeroCardProps {
   title: string;
@@ -23,7 +24,8 @@ export default function HeroCard({
   progressPercentage,
 }: HeroCardProps) {
   return (
-    <Card className="overflow-hidden border-none bg-gradient-to-r from-primary/80 to-primary shadow-lg">
+    <Card className="relative overflow-hidden border-none bg-gradient-to-r from-primary/80 to-primary shadow-lg">
+      <OrnateCorners inset={10} length={30} thickness={1.25} />
       <CardContent className="p-4 sm:p-8">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-3 sm:space-y-4">

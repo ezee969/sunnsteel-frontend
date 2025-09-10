@@ -1,7 +1,9 @@
 'use client';
 
 import React, { ReactNode, useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import Sidebar from '@/app/(protected)/components/Sidebar';
 import Header from '@/app/(protected)/components/Header';
 import { useAuthProtection } from '@/hooks/use-auth-protection';
@@ -13,6 +15,8 @@ import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
 import { Button } from '@/components/ui/button';
 import { Dumbbell } from 'lucide-react';
 import Link from 'next/link';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -66,7 +70,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (isLoadingAuth || isLoadingUserProfile) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-background/80">
+      <div className="flex min-h-screen items-center justify-center">
+        {/* Background during loading */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/backgrounds/marble-light1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover dark:hidden"
+          />
+          <Image
+            src="/backgrounds/marble-dark-1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover hidden dark:block"
+          />
+          <ParchmentOverlay opacity={0.06} />
+          <GoldVignetteOverlay intensity={0.06} />
+        </div>
         <div className="w-full max-w-lg space-y-3 p-6">
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-10 w-full" />
@@ -78,7 +101,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background to-background/80">
+    <div className="relative min-h-screen">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <Image
+          src="/backgrounds/marble-light1536-x-1024.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover dark:hidden"
+          priority={false}
+        />
+        <Image
+          src="/backgrounds/marble-dark-1536-x-1024.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover hidden dark:block"
+          priority={false}
+        />
+        <ParchmentOverlay opacity={0.06} />
+        <GoldVignetteOverlay intensity={0.06} />
+      </div>
+
+      <div className="flex min-h-screen">
       {/* Mobile Menu Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div
@@ -118,7 +164,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Dumbbell className="h-4 w-4" />
                 <span>Active workout session in progress.</span>
               </div>
-              <Button asChild size="sm" aria-label="Resume active session">
+              <Button asChild size="sm" variant="classical" aria-label="Resume active session">
                 <Link href={`/workouts/sessions/${activeSession.id}`}>Resume</Link>
               </Button>
             </div>
@@ -126,7 +172,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         )}
 
         {/* Dashboard Content */}
-        <main className="flex-1 overflow-auto p-3 sm:p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-3 sm:p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
       </div>
     </div>
   );

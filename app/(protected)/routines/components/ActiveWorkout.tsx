@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Play, Pause, SkipForward, Timer } from 'lucide-react';
+import { Play, Pause, SkipForward } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 interface ActiveWorkoutProps {
   className?: string;
@@ -13,7 +15,8 @@ interface ActiveWorkoutProps {
 
 export default function ActiveWorkout({ className }: ActiveWorkoutProps) {
   return (
-    <Card className={cn('', className)}>
+    <Card className={cn('relative', className)}>
+      <OrnateCorners inset={8} length={24} thickness={1.25} />
       <CardHeader>
         <CardTitle className="text-lg">Active Workout</CardTitle>
       </CardHeader>
@@ -23,7 +26,7 @@ export default function ActiveWorkout({ className }: ActiveWorkoutProps) {
             <span className="text-sm font-medium">Current Exercise</span>
             <span className="text-sm text-muted-foreground">3/8</span>
           </div>
-          <Progress value={37.5} />
+          <Progress variant="gold" value={37.5} />
         </div>
 
         <div className="space-y-4">
@@ -34,7 +37,7 @@ export default function ActiveWorkout({ className }: ActiveWorkoutProps) {
 
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Timer className="h-4 w-4 text-muted-foreground" />
+              <ClassicalIcon name="hourglass" className="h-4 w-4 text-muted-foreground" aria-hidden />
               <span className="text-xl font-semibold">01:30</span>
             </div>
             <div className="flex gap-2">

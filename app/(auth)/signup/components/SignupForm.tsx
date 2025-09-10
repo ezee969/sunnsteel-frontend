@@ -48,7 +48,7 @@ export function SignupForm() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="backdrop-blur-sm bg-black/30 dark:bg-white/30 rounded-2xl p-8 shadow-2xl border border-red-900/20 dark:border-red-200/20 transition-colors duration-700">
+      <div className="backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
         {isError && (
           <div className="p-3 text-sm bg-red-900/20 border border-red-500/30 rounded text-red-200 mb-6">
             {error?.message || 'Registration failed. Please try again.'}
@@ -62,7 +62,7 @@ export function SignupForm() {
               name="name"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-red-200/70 dark:text-red-800/70 transition-colors duration-700">
+                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
                     Full Name
                   </FormLabel>
                   <FormControl>
@@ -72,11 +72,11 @@ export function SignupForm() {
                       autoCapitalize="words"
                       autoComplete="name"
                       autoCorrect="off"
-                      className="bg-black/30 dark:bg-white/30 border-red-900/20 dark:border-red-200/20 text-white dark:text-black placeholder:text-red-200/30 dark:placeholder:text-red-800/30 focus:border-red-500/50 dark:focus:border-red-500/50 transition-colors duration-700"
+                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -86,7 +86,7 @@ export function SignupForm() {
               name="email"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-red-200/70 dark:text-red-800/70 transition-colors duration-700">
+                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
                     Email
                   </FormLabel>
                   <FormControl>
@@ -96,11 +96,11 @@ export function SignupForm() {
                       autoCapitalize="none"
                       autoComplete="email"
                       autoCorrect="off"
-                      className="bg-black/30 dark:bg-white/30 border-red-900/20 dark:border-red-200/20 text-white dark:text-black placeholder:text-red-200/30 dark:placeholder:text-red-800/30 focus:border-red-500/50 dark:focus:border-red-500/50 transition-colors duration-700"
+                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -110,18 +110,18 @@ export function SignupForm() {
               name="password"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-red-200/70 dark:text-red-800/70 transition-colors duration-700">
+                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
                     Password
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="••••••••"
-                      className="bg-black/30 dark:bg-white/30 border-red-900/20 dark:border-red-200/20 text-white dark:text-black placeholder:text-red-200/30 dark:placeholder:text-red-800/30 focus:border-red-500/50 dark:focus:border-red-500/50 transition-colors duration-700"
+                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -131,26 +131,28 @@ export function SignupForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-red-200/70 dark:text-red-800/70 transition-colors duration-700">
+                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
                     Confirm Password
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="••••••••"
-                      className="bg-black/30 dark:bg-white/30 border-red-900/20 dark:border-red-200/20 text-white dark:text-black placeholder:text-red-200/30 dark:placeholder:text-red-800/30 focus:border-red-500/50 dark:focus:border-red-500/50 transition-colors duration-700"
+                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-red-400" />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
 
             <Button
-              className="w-full bg-gradient-to-r from-[#8B0000] to-[#B8860B] text-white dark:text-black hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] font-semibold"
+              className="w-full hover:scale-[1.02] transition-transform duration-300 font-semibold"
+              variant="classical"
               type="submit"
               disabled={isPending}
+              aria-label={isPending ? 'Creating account' : 'Begin your journey'}
             >
               {isPending ? 'Creating account...' : 'Begin Your Journey'}
               {!isPending && <ChevronRight className="w-4 h-4 ml-2" />}
@@ -160,7 +162,7 @@ export function SignupForm() {
       </div>
 
       <div className="mt-8 text-center">
-        <p className="text-red-200/70 dark:text-red-800/70 transition-colors duration-700">
+        <p className="text-neutral-700/80 dark:text-neutral-300/80 transition-colors duration-700">
           Already have an account?{' '}
           <Link
             href="/login"

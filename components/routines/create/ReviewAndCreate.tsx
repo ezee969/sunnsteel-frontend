@@ -305,6 +305,7 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
           onClick={handleSubmit}
           disabled={isLoading}
           className="w-full sm:w-auto"
+          variant="classical"
         >
           {isLoading ? (
             <>

@@ -5,7 +5,7 @@ import { useFinishSession, useSession, useUpsertSetLog } from '@/lib/api/hooks/u
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dumbbell, Loader2, MoveLeft, Square, ChevronDown, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { Loader2, MoveLeft, Square, ChevronDown, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState, useEffect, useCallback } from 'react'
@@ -25,6 +25,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
+import OrnateCorners from '@/components/backgrounds/OrnateCorners'
 
 const formatTime = (iso?: string | null) => {
   if (!iso) return '—'
@@ -176,6 +181,25 @@ export default function ActiveSessionPage() {
 
   return (
     <div className="p-3 sm:p-4 max-w-2xl mx-auto">
+      {/* Classical Hero (shallow) */}
+      <section className="relative overflow-hidden rounded-xl border mb-3 sm:mb-4">
+        <HeroBackdrop
+          src="/backgrounds/vertical-hero-greek-columns.webp"
+          blurPx={16}
+          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
+          className="h-[120px] sm:h-[150px]"
+        >
+          <div className="relative h-full flex items-center px-4 sm:px-6">
+            <div>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Training Focus</h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">Steady pace. Solid reps.</p>
+            </div>
+          </div>
+        </HeroBackdrop>
+        <ParchmentOverlay opacity={0.08} />
+        <GoldVignetteOverlay intensity={0.10} />
+        <OrnateCorners inset={10} length={28} thickness={1.25} />
+      </section>
       <div className="mb-3 flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={handleBack} aria-label="Go back">
           <MoveLeft className="mr-2 h-4 w-4" /> Back
@@ -189,7 +213,7 @@ export default function ActiveSessionPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Dumbbell className="h-5 w-5" /> Active Session
+            <ClassicalIcon name="dumbbell" className="h-5 w-5" aria-hidden /> Active Session
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -207,7 +231,7 @@ export default function ActiveSessionPage() {
                   {completedSets}/{totalSets} sets ({progressPct}%)
                 </span>
               </div>
-              <Progress value={progressPct} />
+              <Progress variant="gold" value={progressPct} />
             </div>
           ) : null}
           <div className="flex gap-2">
@@ -216,6 +240,7 @@ export default function ActiveSessionPage() {
               onClick={() => handleFinishAttempt('COMPLETED')}
               disabled={finishing}
               aria-label="Finish session"
+              variant="classical"
             >
               {finishing ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -8,6 +8,43 @@ interface ApiRequestConfig extends RequestInit {
   secure?: boolean;
 }
 
+let refreshingPromise: Promise<{ accessToken: string }> | null = null;
+let hasRedirectedToLogin = false;
+let shuttingDown = false;
+
+export function setAuthShuttingDown(flag: boolean) {
+  shuttingDown = flag;
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      if (flag) {
+        window.sessionStorage.setItem('authShuttingDown', '1');
+      } else {
+        window.sessionStorage.removeItem('authShuttingDown');
+      }
+    }
+  } catch {}
+}
+
+function clearClientSessionCookie() {
+  try {
+    if (typeof document !== 'undefined') {
+      // Delete non-HttpOnly marker cookie
+      document.cookie = 'has_session=; Max-Age=0; path=/';
+    }
+  } catch {}
+}
+
+async function refreshAccessToken(): Promise<{ accessToken: string }> {
+  if (!refreshingPromise) {
+    refreshingPromise = authService
+      .refreshToken()
+      .finally(() => {
+        refreshingPromise = null;
+      });
+  }
+  return refreshingPromise;
+}
+
 export const httpClient = {
   async request<T>(endpoint: string, options: ApiRequestConfig = {}): Promise<T> {
     const { secure = false, ...fetchOptions } = options;
@@ -30,27 +67,61 @@ export const httpClient = {
     };
 
     try {
+      const isBrowser = typeof window !== 'undefined';
+      const isAuthPageGlobal =
+        isBrowser && (window.location.pathname === '/login' || window.location.pathname === '/signup');
+
+      // Never fire secure calls while on auth pages; abort early to avoid loops/noise
+      if (secure && isAuthPageGlobal) {
+        tokenService.clearAccessToken();
+        clearClientSessionCookie();
+        throw new Error('Session expired');
+      }
+
       const method = (config.method || 'GET').toUpperCase();
       console.debug('[http] →', method, url, { secure });
       const response = await fetch(url, config);
       const contentType = response.headers.get('content-type') || '';
       const contentLength = response.headers.get('content-length');
+      // reuse isAuthPageGlobal computed above
 
-      // Handle 401 by attempting token refresh
-      if (response.status === 401 && secure) {
+      // Handle 401 by attempting token refresh (single-flight)
+      if (response.status === 401 && secure && endpoint !== '/auth/refresh') {
+        const isBrowser = typeof window !== 'undefined';
+        const isAuthPage = isAuthPageGlobal;
+        const isShuttingDown =
+          shuttingDown ||
+          (isBrowser && !!window.sessionStorage?.getItem('authShuttingDown'));
+        const hasSessionCookie =
+          typeof document !== 'undefined' &&
+          document.cookie.split(';').some((c) => c.trim().startsWith('has_session=true'));
+
+        // If we are on auth pages, in the middle of logout, or there is no session cookie, do not attempt refresh
+        if (!isBrowser || isAuthPage || isShuttingDown || !hasSessionCookie) {
+          tokenService.clearAccessToken();
+          clearClientSessionCookie();
+          if (isBrowser && !isAuthPage && !hasRedirectedToLogin) {
+            hasRedirectedToLogin = true;
+            window.location.href = '/login';
+          }
+          throw new Error('Session expired');
+        }
         try {
-          console.log('Refreshing token');
-          const refreshed = await authService.refreshToken();
-          if (refreshed) {
-            // Retry with new token
+          console.debug('Refreshing token');
+          const refreshed = await refreshAccessToken();
+          if (refreshed?.accessToken) {
             tokenService.setAccessToken(refreshed.accessToken);
+            // Retry with new token
             return this.request<T>(endpoint, options);
           }
         } catch {
-          console.log('Refresh token failed, redirecting to login');
-          // If refresh fails, redirect to login
+          console.debug('Refresh token failed, redirecting to login');
           tokenService.clearAccessToken();
-          window.location.href = '/login';
+          clearClientSessionCookie();
+          if (!hasRedirectedToLogin && typeof window !== 'undefined') {
+            hasRedirectedToLogin = true;
+            window.location.href = '/login';
+          }
           throw new Error('Session expired');
         }
       }
@@ -68,7 +139,10 @@ export const httpClient = {
         } catch {
           // Non-JSON error body; keep default message
         }
-        console.error('[http] ←', response.status, method, url, {
+        const isAuthRefresh = endpoint === '/auth/refresh';
+        const isExpected401 = response.status === 401 && (isAuthRefresh || isAuthPageGlobal);
+        const logFn = isExpected401 ? console.debug : console.error;
+        logFn('[http] ←', response.status, method, url, {
           contentType,
           contentLength,
           rawPreview: raw?.slice(0, 200),

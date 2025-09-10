@@ -720,7 +720,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    aria-label="Toggle sets list"
+                    aria-label="Toggle set rows"
                     aria-expanded={setsExpanded}
                     aria-controls={`sets-list-${tabIndex}-${exerciseIndex}`}
                     onClick={() => setSetsExpanded((v) => !v)}

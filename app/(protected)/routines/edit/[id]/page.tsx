@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Stepper } from '@/components/ui/stepper';
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 // Step components
 import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo';
@@ -244,6 +248,25 @@ export default function EditRoutinePage() {
 
   return (
     <div className="container max-w-4xl mx-auto py-8">
+      {/* Classical Hero */}
+      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
+        <HeroBackdrop
+          src="/backgrounds/vertical-hero-greek-columns.webp"
+          blurPx={16}
+          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
+          className="h-[140px] sm:h-[180px]"
+        >
+          <div className="relative h-full flex items-center px-4 sm:px-6">
+            <div>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Refine Your Program</h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">Adjust days, progressions, and details.</p>
+            </div>
+          </div>
+        </HeroBackdrop>
+        <ParchmentOverlay opacity={0.08} />
+        <GoldVignetteOverlay intensity={0.10} />
+        <OrnateCorners inset={10} length={28} thickness={1.25} />
+      </section>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
@@ -311,6 +334,7 @@ export default function EditRoutinePage() {
             onClick={handleNext}
             disabled={!canProceedToNextStep() || isSubmitting}
             className="gap-2"
+            variant="classical"
           >
             {isSubmitting ? (
               <>

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dumbbell, ChevronRight } from 'lucide-react';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 export default function WorkoutsIndexPage() {
   const router = useRouter();
@@ -57,9 +58,9 @@ export default function WorkoutsIndexPage() {
             first day or pick a specific day from the routine dropdown.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button asChild>
+            <Button asChild variant="classical">
               <Link href="/routines">
-                <Dumbbell className="mr-2 h-4 w-4" />
+                <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
                 Go to Routines
               </Link>
             </Button>

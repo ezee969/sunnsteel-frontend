@@ -46,6 +46,25 @@
 }
 
 :root {
+  /* SUNNSTEEL Classical Palette */
+  --ss-crimson: #8B0000;
+  --ss-crimson-2: #DC143C;
+  --ss-gold: #DAA520;
+  --ss-gold-2: #FFD700;
+  --ss-bronze: #CD7F32;
+  --ss-bronze-2: #B87333;
+  --ss-charcoal: #1A1A1A;
+  --ss-charcoal-2: #2F2F2F;
+  --ss-ivory: #F5F5DC;
+  --ss-cream: #FFFDD0;
+  --ss-forest: #355E3B;
+  --ss-purple: #663399;
+
+  /* Gradients */
+  --ss-grad-gold: linear-gradient(to right, var(--ss-gold), var(--ss-gold-2));
+  --ss-grad-crimson: linear-gradient(to right, var(--ss-crimson), var(--ss-crimson-2));
+  --ss-grad-bronze: linear-gradient(to right, var(--ss-bronze), var(--ss-bronze-2));
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -82,6 +101,7 @@
 }
 
 .dark {
+  /* Palette is neutral across modes; gradients remain the same. */
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.129 0.042 264.695);
@@ -122,6 +142,23 @@
   }
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+  }
+  /* Classical heading style using Cinzel */
+  h1, h2, h3, h4, .heading-classical {
+    font-family: var(--font-cinzel), ui-serif, Georgia, "Times New Roman", Times, serif;
+    letter-spacing: 0.02em;
+  }
+  /* Gold text utility */
+  .text-gold { color: var(--ss-gold); }
+  .dark .text-gold { color: var(--ss-gold-2); }
+  /* Marble subtle background utility */
+  .bg-marble-light {
+    background-image: radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.03), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .dark .bg-marble-light {
+    background-image: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.05), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.05), transparent 60%);
   }
   /* Make interactive elements clearly clickable */
   button,

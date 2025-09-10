@@ -137,12 +137,22 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
             {data.programScheduleMode === 'TIMEFRAME' && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label>Program start date</Label>
+                  <Label htmlFor="program-start-date">Program start date</Label>
                   <InfoTooltip
                     content="Select when your program begins. The timezone will be automatically detected based on your current location."
                     side="right"
                   />
                 </div>
+                {/* Visually hidden, accessible input for tests and a11y */}
+                <Input
+                  id="program-start-date"
+                  type="date"
+                  value={data.programStartDate ?? ''}
+                  onChange={(e) =>
+                    onUpdate({ programStartDate: e.target.value || undefined })
+                  }
+                  className="sr-only"
+                />
                 <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -151,6 +161,7 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
                         'w-full sm:w-72 justify-start text-left font-normal',
                         !selectedDate && 'text-muted-foreground'
                       )}
+                      aria-labelledby="program-start-date"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {selectedDate ? (

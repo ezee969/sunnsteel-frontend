@@ -22,6 +22,7 @@ import {
 import { useLogout } from '@/lib/api/hooks/useLogout';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { ModeToggle } from '@/components/mode-toggle';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 interface HeaderProps {
   title: string;
@@ -36,6 +37,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4">
+      <OrnateCorners inset={6} length={20} thickness={1} />
       {isMobile && (
         <Button
           variant="ghost"
@@ -48,7 +50,7 @@ export default function Header({
         </Button>
       )}
       <div className="flex-1">
-        <h1 className="text-xl font-semibold truncate">{title}</h1>
+        <h1 className="text-xl font-semibold truncate heading-classical">{title}</h1>
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />

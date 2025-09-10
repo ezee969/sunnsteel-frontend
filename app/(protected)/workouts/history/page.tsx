@@ -21,6 +21,10 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useDebounce } from '@/hooks/use-debounce';
 import { ChevronDown, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 const getErrorMessage = (err: unknown): string => {
   if (err instanceof Error) return err.message;
@@ -276,6 +280,25 @@ export default function WorkoutHistoryPage() {
 
   return (
     <div className="mx-auto max-w-3xl p-4">
+      {/* Classical Hero */}
+      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
+        <HeroBackdrop
+          src="/backgrounds/vertical-hero-greek-columns.webp"
+          blurPx={16}
+          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
+          className="h-[160px] sm:h-[200px]"
+        >
+          <div className="relative h-full flex items-center px-4 sm:px-6">
+            <div>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Training Archive</h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">Browse and filter your sessions.</p>
+            </div>
+          </div>
+        </HeroBackdrop>
+        <ParchmentOverlay opacity={0.08} />
+        <GoldVignetteOverlay intensity={0.10} />
+        <OrnateCorners inset={10} length={28} thickness={1.25} />
+      </section>
       <Card>
         <CardHeader>
           <h1 className="text-xl font-semibold">Workout History</h1>
@@ -436,6 +459,7 @@ export default function WorkoutHistoryPage() {
                     aria-label="Apply filters"
                     className="w-full"
                     disabled={isDateInvalid}
+                    variant="classical"
                   >
                     Apply
                   </Button>
@@ -621,7 +645,7 @@ export default function WorkoutHistoryPage() {
                   <Button
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
-                    variant="outline"
+                    variant="classical"
                     aria-label="Load more"
                   >
                     {isFetchingNextPage ? 'Loading…' : 'Load more'}
