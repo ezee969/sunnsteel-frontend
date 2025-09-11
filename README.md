@@ -510,9 +510,15 @@ Notes:
 ### Progressive Web App (PWA)
 
 - Manifest: linked in `app/layout.tsx` → `manifest: '/site.webmanifest'`.
-- Service Worker: `public/sw.js` implements a simple cache-first strategy (install/activate/fetch) and precaches `/`, `/logo.png`, `/favicon.ico`, and `/site.webmanifest`.
-- Registration: `providers/pwa-provider.tsx` registers `/sw.js` when running in the browser; it is rendered from `app/layout.tsx`.
-- Requirements: served over HTTPS in production. iOS supports Add to Home Screen with some limitations.
+- Service Worker: `public/sw.js` implements:
+  - Network-first for navigations/HTML (fresh UI after deploy, offline fallback)
+  - Stale-while-revalidate for static assets (fast loads, background refresh)
+  - Versioned caches with cleanup on activate
+  - Message-based `SKIP_WAITING` to activate updates immediately
+- Registration: `providers/pwa-provider.tsx`
+  - Registers `/sw.js`
+  - Detects updates, sends `SKIP_WAITING`, reloads the page once on `controllerchange`
+- Requirements: HTTPS in production (localhost is allowed). iOS supports Add to Home Screen.
 - Optional: add a maskable icon to `public/icons/` and reference with `"purpose": "any maskable"` in `public/site.webmanifest`.
 
 ### Testing (Frontend)
