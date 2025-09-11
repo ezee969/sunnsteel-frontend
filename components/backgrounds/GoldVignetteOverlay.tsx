@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 export type GoldVignetteOverlayProps = {
   color?: string; // gold tint color
@@ -23,8 +24,13 @@ export const GoldVignetteOverlay: React.FC<GoldVignetteOverlayProps> = ({
   className,
   style,
 }) => {
-  const c = color;
-  const a = (alpha: number) => `rgba(${hexToRgb(c)}, ${alpha * intensity})`;
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const baseColor = isDark ? "#C8A83A" : color; // slightly cooler gold in dark mode
+  const effIntensity = isDark ? Math.min(intensity * 1.25, 0.25) : intensity;
+
+  const c = baseColor;
+  const a = (alpha: number) => `rgba(${hexToRgb(c)}, ${alpha * effIntensity})`;
 
   // Four corner radial gradients + a large center falloff to unify
   const layers: string[] = [

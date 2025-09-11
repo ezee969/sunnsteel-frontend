@@ -1,20 +1,32 @@
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
+'use client';
+
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import { useTheme } from 'next-themes';
 
 export function BackgroundOverlay() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
-      {/* Local hero background with blur + dark overlay */}
+      {/* Theme-aware marble background with blur + overlay */}
       <HeroBackdrop
-        src="/backgrounds/hero-greek-background.webp"
-        blurPx={18}
-        overlayGradient="linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 80%)"
+        src="/backgrounds/marble-light1536-x-1024.webp"
+        darkSrc="/backgrounds/marble-dark-1536-x-1024.webp"
+        blurPx={14}
+        overlayGradient={
+          isDark
+            ? 'linear-gradient(to top, rgba(0,0,0,0.0), rgba(0,0,0,0.0) 45%, rgba(0,0,0,0.0) 80%)'
+            : 'linear-gradient(to top, rgba(255,255,255,0.0), rgba(255,255,255,0.0) 45%, rgba(255,255,255,0.0) 80%)'
+        }
+        darkFilter=""
         className="absolute inset-0"
       />
       {/* Subtle parchment texture and gold vignette */}
-      <ParchmentOverlay opacity={0.10} />
-      <GoldVignetteOverlay intensity={0.10} />
+      <ParchmentOverlay opacity={isDark ? 0.1 : 0.08} />
+      <GoldVignetteOverlay intensity={isDark ? 0.16 : 0.1} />
     </div>
-  )
+  );
 }

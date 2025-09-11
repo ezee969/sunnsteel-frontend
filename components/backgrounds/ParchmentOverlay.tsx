@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
 
 export type ParchmentOverlayProps = {
   opacity?: number; // 0..1
@@ -18,36 +19,40 @@ export type ParchmentOverlayProps = {
  */
 export const ParchmentOverlay: React.FC<ParchmentOverlayProps> = ({
   opacity = 0.18,
-  tint = "#E5D6B8",
+  tint = '#E5D6B8',
   grain = true,
   className,
   style,
 }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const effectiveTint = isDark ? '#CDBFA3' : tint; // slightly cooler/darker in dark mode
+
   // Layered gradients: warm tint, faint vertical fibers, diagonal fibers, and optional grain dots
   const layers: string[] = [
     // Base warm tint
-    `linear-gradient(0deg, ${tint}, ${tint})`,
+    `linear-gradient(0deg, ${effectiveTint}, ${effectiveTint})`,
     // Vertical fibers
-    "repeating-linear-gradient( 90deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 6px )",
+    'repeating-linear-gradient( 90deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 6px )',
     // Diagonal fibers
-    "repeating-linear-gradient( 25deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 7px )",
+    'repeating-linear-gradient( 25deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 7px )',
   ];
 
   if (grain) {
     // Very subtle speckled grain
     layers.push(
-      "radial-gradient(circle at 20% 30%, rgba(0,0,0,0.025), rgba(0,0,0,0) 40%)," +
-        "radial-gradient(circle at 70% 60%, rgba(0,0,0,0.025), rgba(0,0,0,0) 35%)"
+      'radial-gradient(circle at 20% 30%, rgba(0,0,0,0.025), rgba(0,0,0,0) 40%),' +
+        'radial-gradient(circle at 70% 60%, rgba(0,0,0,0.025), rgba(0,0,0,0) 35%)'
     );
   }
 
   return (
     <div
       aria-hidden
-      className={cn("pointer-events-none absolute inset-0", className)}
+      className={cn('pointer-events-none absolute inset-0', className)}
       style={{
-        backgroundImage: layers.join(","),
-        backgroundBlendMode: "multiply, normal, normal, normal",
+        backgroundImage: layers.join(','),
+        backgroundBlendMode: 'multiply, normal, normal, normal',
         opacity,
         ...style,
       }}

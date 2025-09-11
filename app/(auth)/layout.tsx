@@ -2,8 +2,9 @@
 
 import type React from 'react';
 import { motion } from 'framer-motion';
-import { BackgroundOverlay } from './components/BackgroundOverlay';
+// import { BackgroundOverlay } from './components/BackgroundOverlay';
 import { ModeToggle } from '@/components/mode-toggle';
+import { BackgroundOverlay } from './components/BackgroundOverlay';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
