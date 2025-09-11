@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Check for token presence
+  // Read cookies available on the frontend domain
   const refreshToken = request.cookies.get('refresh_token')?.value;
-  const isAuthenticated = !!refreshToken;
-  const path = request.nextUrl.pathname;
   const hasSession = request.cookies.get('has_session')?.value === 'true';
+  const isAuthenticated = Boolean(hasSession || refreshToken);
+  const path = request.nextUrl.pathname;
 
   // Protected pages (redirect to login if not authenticated)
   const isProtectedPage =
@@ -16,23 +16,14 @@ export function middleware(request: NextRequest) {
     path.startsWith('/profile') ||
     path.startsWith('/settings');
 
-  // Auth pages: redirect only if refresh_token exists.
-  // If stale has_session exists without refresh_token, clear it and allow access.
+  // Auth pages: redirect if session marker is present
   const isAuthPage = path === '/login' || path === '/signup';
-  if (isAuthPage) {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-    if (hasSession && !isAuthenticated) {
-      const res = NextResponse.next();
-      res.cookies.delete('has_session');
-      return res;
-    }
+  if (isAuthPage && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Redirect unauthenticated users away from protected pages
   if (isProtectedPage && !isAuthenticated) {
-    // Remember where they were trying to go
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', path);
     return NextResponse.redirect(loginUrl);

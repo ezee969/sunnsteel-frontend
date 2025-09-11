@@ -1,4 +1,4 @@
-import { httpClient } from './httpClient';
+import { httpClient, setClientSessionCookie } from './httpClient';
 import { tokenService } from './tokenService';
 import {
   LoginCredentials,
@@ -18,6 +18,7 @@ export const authService = {
       credentials
     );
     tokenService.setAccessToken(response.accessToken);
+    setClientSessionCookie();
     return response;
   },
 
@@ -25,6 +26,7 @@ export const authService = {
   async googleLogin(payload: GoogleLoginRequest): Promise<LoginResponse> {
     const response = await httpClient.post<LoginResponse>('/auth/google', payload);
     tokenService.setAccessToken(response.accessToken);
+    setClientSessionCookie();
     return response;
   },
 
@@ -35,6 +37,7 @@ export const authService = {
       userData
     );
     tokenService.setAccessToken(response.accessToken);
+    setClientSessionCookie();
     return response;
   },
 
@@ -55,6 +58,7 @@ export const authService = {
       const response = await httpClient.post<RefreshResponse>('/auth/refresh');
       if (response && response.accessToken) {
         tokenService.setAccessToken(response.accessToken);
+        setClientSessionCookie();
       }
       return response;
     } catch (error) {

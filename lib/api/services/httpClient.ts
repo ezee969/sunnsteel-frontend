@@ -34,6 +34,16 @@ function clearClientSessionCookie() {
   } catch {}
 }
 
+export function setClientSessionCookie() {
+  try {
+    if (typeof document !== 'undefined') {
+      // Frontend-domain marker cookie so middleware can see session state in prod
+      const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+      document.cookie = `has_session=true; Max-Age=${maxAge}; Path=/`;
+    }
+  } catch {}
+}
+
 async function refreshAccessToken(): Promise<{ accessToken: string }> {
   if (!refreshingPromise) {
     refreshingPromise = authService.refreshToken().finally(() => {
@@ -113,6 +123,8 @@ export const httpClient = {
           const refreshed = await refreshAccessToken();
           if (refreshed?.accessToken) {
             tokenService.setAccessToken(refreshed.accessToken);
+            // Ensure client marker is present on successful refresh
+            setClientSessionCookie();
             // Retry with new token
             return this.request<T>(endpoint, options);
           }
