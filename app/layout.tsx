@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Cinzel } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { PwaProvider } from '@/providers/pwa-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     'bienestar',
     'rutinas',
     'gimnasio',
-    'ejercicio en casa'
+    'ejercicio en casa',
   ],
   authors: [{ name: 'Sunnsteel Team' }],
   creator: 'Sunnsteel',
@@ -70,9 +71,7 @@ export const metadata: Metadata = {
       { url: '/logo.png', sizes: '192x192', type: 'image/png' },
       { url: '/logo.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: [
-      { url: '/logo.png', sizes: '180x180', type: 'image/png' }
-    ],
+    apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/site.webmanifest',
 };
@@ -93,8 +92,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <PwaProvider />
           <AppProvider>{children}</AppProvider>
         </ThemeProvider>
       </body>

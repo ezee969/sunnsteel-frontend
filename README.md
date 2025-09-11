@@ -390,9 +390,14 @@ ClassicalIcon (CSS mask)
   - `name`: one of the available SVG filenames (without `.svg`), e.g. `"laurel-wreath"`, `"compass"`, `"shield"`, `"dumbbell"`.
   - `className`: apply size/color (e.g., `h-5 w-5 text-primary`).
 - Examples:
+
 ```tsx
-import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
-<ClassicalIcon name="laurel-wreath" className="h-5 w-5 text-yellow-500" aria-hidden />
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+<ClassicalIcon
+  name="laurel-wreath"
+  className="h-5 w-5 text-yellow-500"
+  aria-hidden
+/>;
 ```
 
 Dashboard cards
@@ -424,6 +429,7 @@ Hero banners (classical)
 Classical icons (CSS masked SVG)
 
 - `components/icons/ClassicalIcon.tsx` used in:
+
   - Sidebar nav (`app/(protected)/components/Sidebar.tsx`) via `classicalName` mapping for each item.
   - StatsOverview cards (compass, laurel-wreath, shield, two-dumbbells).
   - Workouts List buttons/badges (dumbbell).
@@ -442,14 +448,17 @@ Classical icons (CSS masked SVG)
 Components (no image assets required):
 
 - `components/backgrounds/ParchmentOverlay.tsx`
+
   - Props: `opacity?: number` (0..1), `tint?: string`, `grain?: boolean`
   - Purpose: a subtle parchment texture overlay using layered gradients.
 
 - `components/backgrounds/GoldVignetteOverlay.tsx`
+
   - Props: `color?: string`, `intensity?: number` (0..1), `feather?: string`
   - Purpose: warm gold vignette from edges/corners via radial-gradients.
 
 - `components/backgrounds/OrnateCorners.tsx`
+
   - Props: `color?: string`, `thickness?: number`, `length?: number`, `radius?: number`, `inset?: number`
   - Purpose: thin gold L-shaped ornaments at all four corners (CSS only).
 
@@ -465,17 +474,23 @@ Asset paths for future images (already created):
 Usage examples:
 
 ```tsx
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
-import OrnateCorners from '@/components/backgrounds/OrnateCorners'
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 export default function Hero() {
   return (
     <section className="relative h-[360px] sm:h-[420px] overflow-hidden rounded-2xl">
-      <HeroBackdrop src="/backgrounds/hero-desktop.webp" blurPx={18} overlayColor="rgba(0,0,0,0.25)">
+      <HeroBackdrop
+        src="/backgrounds/hero-desktop.webp"
+        blurPx={18}
+        overlayColor="rgba(0,0,0,0.25)"
+      >
         <div className="relative h-full flex items-center justify-center text-center px-6">
-          <h1 className="heading-classical text-3xl sm:text-4xl">Sunnsteel Training</h1>
+          <h1 className="heading-classical text-3xl sm:text-4xl">
+            Sunnsteel Training
+          </h1>
           <p className="text-muted-foreground mt-2">Strength • Discipline • Craft</p>
         </div>
       </HeroBackdrop>
@@ -483,7 +498,7 @@ export default function Hero() {
       <GoldVignetteOverlay intensity={0.12} />
       <OrnateCorners inset={12} length={32} thickness={1.5} />
     </section>
-  )
+  );
 }
 ```
 
@@ -491,6 +506,14 @@ Notes:
 
 - These overlays are `position: absolute` and non-interactive (`pointer-events: none`). Wrap your target section in a `relative` container.
 - When you provide real hero images in `public/backgrounds/`, `HeroBackdrop` will blur them; otherwise, it can be combined with a CSS marble/solid base.
+
+### Progressive Web App (PWA)
+
+- Manifest: linked in `app/layout.tsx` → `manifest: '/site.webmanifest'`.
+- Service Worker: `public/sw.js` implements a simple cache-first strategy (install/activate/fetch) and precaches `/`, `/logo.png`, `/favicon.ico`, and `/site.webmanifest`.
+- Registration: `providers/pwa-provider.tsx` registers `/sw.js` when running in the browser; it is rendered from `app/layout.tsx`.
+- Requirements: served over HTTPS in production. iOS supports Add to Home Screen with some limitations.
+- Optional: add a maskable icon to `public/icons/` and reference with `"purpose": "any maskable"` in `public/site.webmanifest`.
 
 ### Testing (Frontend)
 
