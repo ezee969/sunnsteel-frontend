@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/client';
 import { httpClient } from './httpClient';
+import type { Session } from '@supabase/supabase-js';
 
 export interface AuthResponse {
   user: {
@@ -113,8 +114,10 @@ class SupabaseAuthService {
    * Verify Supabase token with our backend
    */
   async verifyToken(token: string): Promise<AuthResponse> {
-    const response = await httpClient.post('/auth/supabase/verify', { token });
-    return response.data;
+    const response = await httpClient.post<AuthResponse>('/auth/supabase/verify', {
+      token,
+    });
+    return response;
   }
 
   /**
@@ -126,14 +129,18 @@ class SupabaseAuthService {
       throw new Error('No session available');
     }
 
-    // Set the token as Authorization header
-    const response = await httpClient.get('/auth/supabase/profile', {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
+    // Use the request method directly to set custom headers
+    const response = await httpClient.request<AuthResponse>(
+      '/auth/supabase/profile',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      }
+    );
 
-    return response.data;
+    return response;
   }
 
   /**
@@ -163,7 +170,7 @@ class SupabaseAuthService {
   /**
    * Listen to auth changes
    */
-  onAuthStateChange(callback: (event: string, session: any) => void) {
+  onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return supabase.auth.onAuthStateChange(callback);
   }
 
@@ -171,11 +178,11 @@ class SupabaseAuthService {
    * Migrate existing user (for migration phase)
    */
   async migrateUser(email: string, password: string) {
-    const response = await httpClient.post('/auth/supabase/migrate', {
+    const response = await httpClient.post<AuthResponse>('/auth/supabase/migrate', {
       email,
       password,
     });
-    return response.data;
+    return response;
   }
 }
 

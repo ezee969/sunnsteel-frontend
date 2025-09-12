@@ -27,7 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert-dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const migrationSchema = z
   .object({
@@ -75,7 +75,7 @@ export default function MigratePage() {
       { email: values.email, password: values.oldPassword },
       {
         onSuccess: (data) => {
-          setUserInfo({ email: data.email, userId: data.userId });
+          setUserInfo({ email: data.user.email, userId: data.user.id });
           setStep('migrate');
         },
       }

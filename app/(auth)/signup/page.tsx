@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { SignupHeader } from './components/SignupHeader';
-import { SignupForm } from './components/SignupForm';
+import { SupabaseSignupForm } from './components/SupabaseSignupForm';
 
 export default function SignupPage() {
   return (
@@ -10,10 +10,10 @@ export default function SignupPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       <SignupHeader />
-      <SignupForm />
+      <SupabaseSignupForm />
     </motion.div>
   );
 }
