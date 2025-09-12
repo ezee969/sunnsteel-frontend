@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
@@ -7,7 +8,10 @@ import { useTheme } from 'next-themes';
 
 export function BackgroundOverlay() {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
+  // Prevent hydration mismatch by deferring theme-based differences until mounted
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const isDark = mounted ? resolvedTheme === 'dark' : false;
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">

@@ -124,6 +124,8 @@ export default function Sidebar({
         'fixed inset-y-0 z-50 flex flex-col backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
         // Classical marble background + subtle border in gold tones
         'bg-marble-light dark:bg-marble-light border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)]',
+        // Ensure consistent background across mobile and desktop
+        'bg-sidebar/95 dark:bg-sidebar/95',
         isMobile
           ? isMobileMenuOpen
             ? 'left-0 w-[85%] max-w-[300px]'
@@ -142,8 +144,9 @@ export default function Sidebar({
             !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
           )}
         >
-          {/* <Image src={logo} alt="logo" width={56} height={56} /> */}
-          <span className="text-xl heading-classical text-black dark:text-white">SUNNSTEEL</span>
+          <span className="text-xl heading-classical text-black dark:text-white">
+            SUNNSTEEL
+          </span>
         </div>
         {isSidebarOpen && isMobile && (
           <Button
@@ -177,13 +180,14 @@ export default function Sidebar({
               variant={activeNav === item.id ? 'default' : 'ghost'}
               disabled={item.disabled}
               className={cn(
-                'justify-start gap-3 h-12 relative overflow-hidden group transition-all duration-300',
+                'gap-3 h-12 relative overflow-hidden group transition-all duration-300',
+                isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
                 activeNav === item.id && 'bg-primary text-primary-foreground'
               )}
               onClick={() => {
                 // Set active nav immediately for consistent visual state
                 setActiveNav(item.id);
-                
+
                 // Create a scale animation effect when clicked
                 const button = document.activeElement as HTMLElement;
                 if (button) button.classList.add('scale-95');

@@ -24,11 +24,10 @@ import { Viewport } from 'next';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Sunnsteel',
+    default: 'SUNSTEEL',
     template: '%s | Sunnsteel',
   },
-  description:
-    'Transforma tu rutina de ejercicios con Sunnsteel. Haz seguimiento de tus entrenamientos y logra tus metas fitness.',
+  description: 'More than a routine logbook.',
   keywords: [
     'fitness',
     'ejercicio',
@@ -40,7 +39,7 @@ export const metadata: Metadata = {
     'ejercicio en casa',
   ],
   authors: [{ name: 'Sunnsteel Team' }],
-  creator: 'Sunnsteel',
+  creator: 'SUNSTEEL',
   publisher: 'Sunnsteel',
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'
@@ -49,17 +48,16 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Sunnsteel - Tu Viaje Fitness',
-    description:
-      'Transforma tu rutina de ejercicios con Sunnsteel. Haz seguimiento de tus entrenamientos y logra tus metas fitness.',
+    title: 'SUNSTEEL',
+    description: 'More than a routine logbook.',
     url: '/',
-    siteName: 'Sunnsteel',
+    siteName: 'SUNSTEEL',
     images: [
       {
         url: '/logo.png',
         width: 1024,
         height: 1024,
-        alt: 'Sunnsteel - Plataforma Fitness',
+        alt: 'Sunnsteel - More than a routine logbook.',
       },
     ],
     locale: 'es_ES',

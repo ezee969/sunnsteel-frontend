@@ -6,7 +6,6 @@ import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { WorkoutFilter } from './types';
 import WorkoutsList from './components/WorkoutsList';
-// import ActiveWorkout from './components/ActiveWorkout';
 import Link from 'next/link';
 import { useRoutines } from '@/lib/api/hooks/useRoutines';
 import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
@@ -36,15 +35,19 @@ export default function RoutinesPage() {
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[180px] sm:h-[220px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Routines</h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Plan, track, and refine your training.</p>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                Routines
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Plan, track, and refine your training.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       {/* Header Section */}

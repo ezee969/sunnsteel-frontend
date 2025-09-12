@@ -20,7 +20,9 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const [refreshAttempted, setRefreshAttempted] = useState(() => authService.isAuthenticated());
+  const [refreshAttempted, setRefreshAttempted] = useState(() =>
+    authService.isAuthenticated()
+  );
   const pathname = usePathname();
 
   const {
@@ -39,7 +41,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // 2. We don't have an access token
     // 3. We're not currently refreshing
     // 4. We are not on an auth page (avoid noise on /login and /signup)
-    if (refreshAttempted || authService.isAuthenticated() || refreshing || isAuthPage) {
+    if (
+      refreshAttempted ||
+      authService.isAuthenticated() ||
+      refreshing ||
+      isAuthPage
+    ) {
       return;
     }
 
@@ -70,7 +77,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     isAuthenticated,
-    isLoading: refreshing,
+    // During SSR, always return false for isLoading to prevent hydration mismatch
+    isLoading: typeof window === 'undefined' ? false : refreshing,
     error: refreshError ? new Error('Authentication failed') : null,
     hasTriedRefresh: refreshAttempted,
   };

@@ -25,7 +25,11 @@ export const ParchmentOverlay: React.FC<ParchmentOverlayProps> = ({
   style,
 }) => {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
+  // Prevent hydration mismatch by deferring theme-based differences until mounted
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  // During SSR and before mount, assume light mode so server and client initial render match
+  const isDark = mounted ? resolvedTheme === 'dark' : false;
   const effectiveTint = isDark ? '#CDBFA3' : tint; // slightly cooler/darker in dark mode
 
   // Layered gradients: warm tint, faint vertical fibers, diagonal fibers, and optional grain dots

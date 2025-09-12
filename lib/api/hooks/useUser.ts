@@ -19,9 +19,12 @@ export function useUser() {
     retry: 2,
   });
 
+  // During SSR, always return false for isLoading to prevent hydration mismatch
+  const safeIsLoading = typeof window === 'undefined' ? false : isLoading;
+
   return {
     user,
-    isLoading,
+    isLoading: safeIsLoading,
     error,
     refetch,
   };
