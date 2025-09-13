@@ -291,11 +291,11 @@ function WorkoutHistoryContent() {
       <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
         <HeroBackdrop
           src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[160px] sm:h-[200px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
               <h2 className="heading-classical text-2xl sm:text-3xl text-white">
                 Training Archive

@@ -24,7 +24,10 @@ export const useSupabaseSignUp = () => {
       return await supabaseAuthService.signUp(email, password, name);
     },
     onSuccess: () => {
-      router.push('/dashboard');
+      // Add a small delay to ensure auth state updates before redirect
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 100);
     },
   });
 };
@@ -37,10 +40,25 @@ export const useSupabaseSignIn = () => {
 
   return useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      return await supabaseAuthService.signIn(email, password);
+      console.log('🚀 Login hook: Starting sign in process...');
+      const result = await supabaseAuthService.signIn(email, password);
+      console.log('🚀 Login hook: Sign in successful, got result:', {
+        userId: result.user?.id,
+      });
+      return result;
     },
-    onSuccess: () => {
-      router.push('/dashboard');
+    onSuccess: (data) => {
+      console.log('🚀 Login hook: onSuccess called with:', {
+        userId: data.user?.id,
+      });
+      // Add a small delay to ensure auth state updates before redirect
+      setTimeout(() => {
+        console.log('🚀 Login hook: Redirecting to dashboard...');
+        router.push('/dashboard');
+      }, 100);
+    },
+    onError: (error) => {
+      console.error('🚀 Login hook: onError called:', error);
     },
   });
 };

@@ -31,7 +31,7 @@ export default function RoutinesPage() {
       <section className="relative overflow-hidden rounded-xl border">
         <HeroBackdrop
           src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[180px] sm:h-[220px]"
         >

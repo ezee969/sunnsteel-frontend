@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-oswald);
+  --font-mono: var(--font-space-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,22 +47,26 @@
 
 :root {
   /* SUNNSTEEL Classical Palette */
-  --ss-crimson: #8B0000;
-  --ss-crimson-2: #DC143C;
-  --ss-gold: #DAA520;
-  --ss-gold-2: #FFD700;
-  --ss-bronze: #CD7F32;
-  --ss-bronze-2: #B87333;
-  --ss-charcoal: #1A1A1A;
-  --ss-charcoal-2: #2F2F2F;
-  --ss-ivory: #F5F5DC;
-  --ss-cream: #FFFDD0;
-  --ss-forest: #355E3B;
+  --ss-crimson: #8b0000;
+  --ss-crimson-2: #dc143c;
+  --ss-gold: #daa520;
+  --ss-gold-2: #ffd700;
+  --ss-bronze: #cd7f32;
+  --ss-bronze-2: #b87333;
+  --ss-charcoal: #1a1a1a;
+  --ss-charcoal-2: #2f2f2f;
+  --ss-ivory: #f5f5dc;
+  --ss-cream: #fffdd0;
+  --ss-forest: #355e3b;
   --ss-purple: #663399;
 
   /* Gradients */
   --ss-grad-gold: linear-gradient(to right, var(--ss-gold), var(--ss-gold-2));
-  --ss-grad-crimson: linear-gradient(to right, var(--ss-crimson), var(--ss-crimson-2));
+  --ss-grad-crimson: linear-gradient(
+    to right,
+    var(--ss-crimson),
+    var(--ss-crimson-2)
+  );
   --ss-grad-bronze: linear-gradient(to right, var(--ss-bronze), var(--ss-bronze-2));
 
   --background: oklch(1 0 0);
@@ -143,36 +147,54 @@
   body {
     @apply bg-background text-foreground transition-colors duration-300;
   }
-  /* Classical heading style using Cinzel */
-  h1, h2, h3, h4, .heading-classical {
-    font-family: var(--font-cinzel), ui-serif, Georgia, "Times New Roman", Times, serif;
-    letter-spacing: 0.02em;
+  /* Strong heading style using Bebas Neue */
+  h1,
+  h2,
+  h3,
+  h4,
+  .heading-classical {
+    font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.05em;
+    font-weight: 400;
+    text-transform: uppercase;
   }
   /* Gold text utility */
-  .text-gold { color: var(--ss-gold); }
-  .dark .text-gold { color: var(--ss-gold-2); }
+  .text-gold {
+    color: var(--ss-gold);
+  }
+  .dark .text-gold {
+    color: var(--ss-gold-2);
+  }
   /* Marble subtle background utility */
   .bg-marble-light {
-    background-image: radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.03), transparent 60%),
-      radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.03), transparent 60%);
+    background-image: radial-gradient(
+        ellipse at 30% 20%,
+        rgba(0, 0, 0, 0.03),
+        transparent 60%
+      ),
+      radial-gradient(ellipse at 70% 80%, rgba(0, 0, 0, 0.03), transparent 60%);
   }
   .dark .bg-marble-light {
-    background-image: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.05), transparent 60%),
-      radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.05), transparent 60%);
+    background-image: radial-gradient(
+        ellipse at 30% 20%,
+        rgba(255, 255, 255, 0.05),
+        transparent 60%
+      ),
+      radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.05), transparent 60%);
   }
   /* Make interactive elements clearly clickable */
   button,
-  [role="button"],
+  [role='button'],
   a,
   summary,
-  [data-slot="button"],
-  [data-clickable="true"],
+  [data-slot='button'],
+  [data-clickable='true'],
   [aria-haspopup],
   [aria-controls] {
     @apply cursor-pointer;
   }
   button:disabled,
-  [aria-disabled="true"],
+  [aria-disabled='true'],
   [disabled] {
     @apply cursor-not-allowed;
   }

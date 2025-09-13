@@ -1,5 +1,6 @@
 import { tokenService } from './tokenService';
 import { authService } from './authService';
+import { supabase } from '@/lib/supabase/client';
 
 // Base API URL - use environment variable in production, localhost in development
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
@@ -25,7 +26,7 @@ export function setAuthShuttingDown(flag: boolean) {
   } catch {}
 }
 
-function clearClientSessionCookie() {
+export function clearClientSessionCookie() {
   try {
     if (typeof document !== 'undefined') {
       // Delete non-HttpOnly marker cookie
@@ -63,9 +64,15 @@ export const httpClient = {
       ...(fetchOptions.headers as Record<string, string>),
     };
 
-    // Add auth header if secure request
     if (secure) {
-      Object.assign(headers, tokenService.getAuthHeader());
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        // Avoid sending any Authorization header until Supabase session is ready
+        throw new Error('Session expired');
+      }
+      headers.Authorization = `Bearer ${session.access_token}`;
     }
 
     const config: RequestInit = {

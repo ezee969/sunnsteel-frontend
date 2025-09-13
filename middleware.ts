@@ -1,49 +1,42 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Read cookies available on the frontend domain
-  const refreshToken = request.cookies.get('refresh_token')?.value;
-  const hasSession = request.cookies.get('has_session')?.value === 'true';
-  const isAuthenticated = Boolean(hasSession || refreshToken);
   const path = request.nextUrl.pathname;
 
-  // Prepare a base response we can attach debug headers to
-  const base = NextResponse.next();
-  base.headers.set('x-ss-debug-path', path);
-  base.headers.set('x-ss-debug-has-session', String(hasSession));
-  base.headers.set('x-ss-debug-has-rt', String(Boolean(refreshToken)));
+  // For now, let's disable middleware redirects and let the client-side auth handle it
+  // This is a temporary fix while we debug the SSR middleware issue
 
-  // Protected pages (redirect to login if not authenticated)
-  const isProtectedPage =
-    path.startsWith('/dashboard') ||
-    path.startsWith('/workouts') ||
-    path.startsWith('/routines') ||
-    path.startsWith('/profile') ||
-    path.startsWith('/settings');
+  // Check for any Supabase auth cookies to get a rough idea of auth state
+  const allCookies = request.cookies.getAll();
+  const supabaseAuthCookies = allCookies.filter(
+    ({ name }) =>
+      name.startsWith('sb-') &&
+      (name.includes('auth-token') || name.includes('access-token'))
+  );
 
-  // Auth pages: redirect if session marker is present
-  const isAuthPage = path === '/login' || path === '/signup';
-  if (isAuthPage && isAuthenticated) {
-    const res = NextResponse.redirect(new URL('/dashboard', request.url));
-    res.headers.set('x-ss-debug-redirect', 'login->/dashboard');
-    res.headers.set('x-ss-debug-has-session', String(hasSession));
-    res.headers.set('x-ss-debug-has-rt', String(Boolean(refreshToken)));
-    return res;
-  }
+  const hasAuthCookies = supabaseAuthCookies.length > 0;
 
-  // Redirect unauthenticated users away from protected pages
-  if (isProtectedPage && !isAuthenticated) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', path);
-    const res = NextResponse.redirect(loginUrl);
-    res.headers.set('x-ss-debug-redirect', `${path}->/login`);
-    res.headers.set('x-ss-debug-has-session', String(hasSession));
-    res.headers.set('x-ss-debug-has-rt', String(Boolean(refreshToken)));
-    return res;
-  }
+  const response = NextResponse.next();
 
-  return base;
+  // Add debug headers
+  response.headers.set('x-ss-debug-path', path);
+  response.headers.set(
+    'x-ss-debug-auth-cookies',
+    String(supabaseAuthCookies.length)
+  );
+  response.headers.set('x-ss-debug-has-auth', String(hasAuthCookies));
+
+  // Log for debugging
+  console.log('🛡️ Middleware:', {
+    path,
+    authCookies: supabaseAuthCookies.length,
+    cookieNames: supabaseAuthCookies.map(({ name }) => name),
+  });
+
+  // For now, we're disabling server-side redirects and letting the client handle auth
+  // This allows the auth provider to properly manage the authentication state
+
+  return response;
 }
 
 export const config = {

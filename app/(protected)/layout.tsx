@@ -1,8 +1,7 @@
 'use client';
 
 import React, { ReactNode, useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Sidebar from '@/app/(protected)/components/Sidebar';
 import Header from '@/app/(protected)/components/Header';
@@ -14,6 +13,7 @@ import { Dumbbell } from 'lucide-react';
 import Link from 'next/link';
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,6 +21,8 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useSupabaseAuth();
   const {
     isSidebarOpen,
     setIsSidebarOpen,
@@ -28,8 +30,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     isMobileMenuOpen,
     setIsMobileMenuOpen,
   } = useSidebar();
-
-  const [isAnimating, setIsAnimating] = useState(false);
 
   // Determine active nav based on current pathname
   const getActiveNavFromPath = (path: string) => {
@@ -57,18 +57,55 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const [activeNav, setActiveNav] = useState(() => getActiveNavFromPath(pathname));
   const { data: activeSession } = useActiveSession();
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const isOnSessionPage = pathname.startsWith('/workouts/sessions/');
+
+  // Client-side protection for all routes under (protected)
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   // Update activeNav when pathname changes
   useEffect(() => {
     setActiveNav(getActiveNavFromPath(pathname));
-    setIsAnimating(true);
-    const timer = setTimeout(() => setIsAnimating(false), 50);
+    // Trigger transition animation
+    setIsTransitioning(true);
+    const timer = setTimeout(() => setIsTransitioning(false), 50);
     return () => clearTimeout(timer);
   }, [pathname]);
 
   // Remove loading state handling - use loading.tsx files instead
+
+  // While determining/redirecting auth state, render a stable empty shell
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="relative min-h-screen">
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <Image
+            src="/backgrounds/marble-light1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover dark:hidden"
+            priority={false}
+          />
+          <Image
+            src="/backgrounds/marble-dark-1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover hidden dark:block"
+            priority={false}
+          />
+          <ParchmentOverlay opacity={0.06} />
+          <GoldVignetteOverlay intensity={0.06} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -148,21 +185,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Dashboard Content */}
           <main className="flex-1 overflow-auto p-3 sm:p-6">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={pathname}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                style={{
-                  minHeight: '100%',
-                }}
-                className={isAnimating ? 'opacity-0' : ''}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
+            <div
+              className={cn(
+                'min-h-full transition-all duration-300 ease-out',
+                isTransitioning
+                  ? 'opacity-0 translate-y-2'
+                  : 'opacity-100 translate-y-0'
+              )}
+            >
+              {children}
+            </div>
           </main>
         </div>
       </div>

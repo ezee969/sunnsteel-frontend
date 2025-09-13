@@ -29,7 +29,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { getTodayDow, weekdayName, weeksRemainingFromEndDate } from '@/lib/utils/date';
+import {
+  getTodayDow,
+  weekdayName,
+  weeksRemainingFromEndDate,
+} from '@/lib/utils/date';
 import type { RoutineDay, RoutineSet } from '@/lib/api/types/routine.type';
 import {
   Accordion,
@@ -142,21 +146,23 @@ export default function RoutineDetailsPage() {
       <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
         <HeroBackdrop
           src="/backgrounds/alexander-the-great-statue-background.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[160px] sm:h-[200px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
               <h2 className="heading-classical text-2xl sm:text-3xl text-white">
                 {isLoading ? 'Routine' : routine?.name ?? 'Routine'}
               </h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Structure, schedule, and start.</p>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Structure, schedule, and start.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
@@ -184,9 +190,12 @@ export default function RoutineDetailsPage() {
                 {isProgramEnded(routine?.programEndDate) && (
                   <Badge variant="outline">Program ended</Badge>
                 )}
-                {!isProgramEnded(routine?.programEndDate) && routine?.programEndDate && (
-                  <Badge variant="classical">{weeksRemainingFromEndDate(routine.programEndDate)} weeks left</Badge>
-                )}
+                {!isProgramEnded(routine?.programEndDate) &&
+                  routine?.programEndDate && (
+                    <Badge variant="classical">
+                      {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
+                    </Badge>
+                  )}
                 <Badge variant="outline" className="flex items-center gap-1">
                   <ClassicalIcon name="dumbbell" className="h-3 w-3" aria-hidden />
                   <span>{routine?.days?.length ?? 0} days/week</span>
@@ -209,13 +218,21 @@ export default function RoutineDetailsPage() {
                 type="button"
                 aria-label="Quick start session"
                 onClick={() => handleStart(quickStartDayId)}
-                disabled={!quickStartDayId || isStarting || isProgramEnded(routine?.programEndDate)}
+                disabled={
+                  !quickStartDayId ||
+                  isStarting ||
+                  isProgramEnded(routine?.programEndDate)
+                }
                 variant="classical"
               >
                 {isStarting && startActingDayId === quickStartDayId ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
+                  <ClassicalIcon
+                    name="dumbbell"
+                    className="mr-2 h-4 w-4"
+                    aria-hidden
+                  />
                 )}
                 Start
               </Button>
@@ -261,13 +278,20 @@ export default function RoutineDetailsPage() {
                           variant="classical"
                           aria-label={`Start session for ${dayName(day.dayOfWeek)}`}
                           onClick={() => handleStart(day.id)}
-                          disabled={(isStarting && startActingDayId === day.id) || isProgramEnded(routine?.programEndDate)}
+                          disabled={
+                            (isStarting && startActingDayId === day.id) ||
+                            isProgramEnded(routine?.programEndDate)
+                          }
                           className="w-full sm:w-auto"
                         >
                           {isStarting && startActingDayId === day.id ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
+                            <ClassicalIcon
+                              name="dumbbell"
+                              className="mr-2 h-4 w-4"
+                              aria-hidden
+                            />
                           )}
                           Start this day
                         </Button>

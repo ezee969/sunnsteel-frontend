@@ -1,20 +1,31 @@
-'use client'
+'use client';
 
-import { useParams, useRouter } from 'next/navigation'
-import { useFinishSession, useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, MoveLeft, Square, ChevronDown, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation';
+import {
+  useFinishSession,
+  useSession,
+  useUpsertSetLog,
+} from '@/lib/api/hooks/useWorkoutSession';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Loader2,
+  MoveLeft,
+  Square,
+  ChevronDown,
+  ChevronRight,
+  CheckCircle2,
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useState, useEffect, useCallback } from 'react'
-import { useRoutine } from '@/lib/api/hooks/useRoutines'
-import type { Routine } from '@/lib/api/types/routine.type'
-import type { SetLog } from '@/lib/api/types/workout.type'
-import { useDebounce } from '@/hooks/use-debounce'
-import { Progress } from '@/components/ui/progress'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useState, useEffect, useCallback } from 'react';
+import { useRoutine } from '@/lib/api/hooks/useRoutines';
+import type { Routine } from '@/lib/api/types/routine.type';
+import type { SetLog } from '@/lib/api/types/workout.type';
+import { useDebounce } from '@/hooks/use-debounce';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,42 +35,44 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
-import OrnateCorners from '@/components/backgrounds/OrnateCorners'
+} from '@/components/ui/alert-dialog';
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
+import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
+import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 
 const formatTime = (iso?: string | null) => {
-  if (!iso) return '—'
-  const d = new Date(iso)
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
 
 export default function ActiveSessionPage() {
-  const params = useParams<{ id: string | string[] }>()
-  const router = useRouter()
-  const idParam = Array.isArray(params.id) ? params.id[0] : params.id
+  const params = useParams<{ id: string | string[] }>();
+  const router = useRouter();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
 
-  const { data: session, isLoading, error } = useSession(idParam)
-  const { mutate: finishSession, isPending: finishing } = useFinishSession(idParam)
-  const { mutate: upsertSetLog, isPending: savingLog } = useUpsertSetLog(idParam)
-    const { data: routine } = useRoutine(session?.routineId ?? '')
+  const { data: session, isLoading, error } = useSession(idParam);
+  const { mutate: finishSession, isPending: finishing } = useFinishSession(idParam);
+  const { mutate: upsertSetLog, isPending: savingLog } = useUpsertSetLog(idParam);
+  const { data: routine } = useRoutine(session?.routineId ?? '');
 
-  const [isConfirmingFinish, setIsConfirmingFinish] = useState(false)
-  const [finishStatus, setFinishStatus] = useState<'COMPLETED' | 'ABORTED' | null>(null)
+  const [isConfirmingFinish, setIsConfirmingFinish] = useState(false);
+  const [finishStatus, setFinishStatus] = useState<'COMPLETED' | 'ABORTED' | null>(
+    null
+  );
 
   const handleSaveSetLog = useCallback(
     (payload: UpsertSetLogPayload) => {
-      upsertSetLog(payload)
+      upsertSetLog(payload);
     },
-    [upsertSetLog],
-  )
+    [upsertSetLog]
+  );
 
   // No delete of set logs in-session to keep structure fixed to routine template
 
-  const handleBack = () => router.back()
+  const handleBack = () => router.back();
 
   const handleFinishAttempt = (status: 'COMPLETED' | 'ABORTED') => {
     if (status === 'ABORTED') {
@@ -94,21 +107,21 @@ export default function ActiveSessionPage() {
   };
 
   const executeFinish = (status: 'COMPLETED' | 'ABORTED') => {
-    if (!status) return
+    if (!status) return;
     finishSession(
       { status },
       {
         onSuccess: () => {
-          router.push('/dashboard')
+          router.push('/dashboard');
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   const cancelFinish = () => {
-    setIsConfirmingFinish(false)
-    setFinishStatus(null)
-  }
+    setIsConfirmingFinish(false);
+    setFinishStatus(null);
+  };
 
   if (isLoading) {
     return (
@@ -147,7 +160,7 @@ export default function ActiveSessionPage() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error || !session) {
@@ -158,26 +171,29 @@ export default function ActiveSessionPage() {
         </Button>
         <p className="mt-4 text-destructive">Failed to load session.</p>
       </div>
-    )
+    );
   }
 
   // Compute overall progress when routine metadata is available
-  const dayMeta = routine?.days.find((d) => d.id === session.routineDayId)
+  const dayMeta = routine?.days.find((d) => d.id === session.routineDayId);
   const totalSets = dayMeta
     ? dayMeta.exercises.reduce((acc, re) => acc + re.sets.length, 0)
-    : 0
+    : 0;
   const completedKeys = new Set(
     (session.setLogs as SetLog[] | undefined)
       ?.filter((l) => l.isCompleted)
       .map((l) => `${l.routineExerciseId}-${l.setNumber}`)
-  )
+  );
   const completedSets = dayMeta
     ? dayMeta.exercises.reduce(
-        (acc, re) => acc + re.sets.filter((s) => completedKeys.has(`${re.id}-${s.setNumber}`)).length,
-        0,
+        (acc, re) =>
+          acc +
+          re.sets.filter((s) => completedKeys.has(`${re.id}-${s.setNumber}`)).length,
+        0
       )
-    : 0
-  const progressPct = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
+    : 0;
+  const progressPct =
+    totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
   return (
     <div className="p-3 sm:p-4 max-w-2xl mx-auto">
@@ -185,19 +201,23 @@ export default function ActiveSessionPage() {
       <section className="relative overflow-hidden rounded-xl border mb-3 sm:mb-4">
         <HeroBackdrop
           src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[120px] sm:h-[150px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Training Focus</h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Steady pace. Solid reps.</p>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                Training Focus
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Steady pace. Solid reps.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       <div className="mb-3 flex items-center justify-between">
@@ -213,15 +233,14 @@ export default function ActiveSessionPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <ClassicalIcon name="dumbbell" className="h-5 w-5" aria-hidden /> Active Session
+            <ClassicalIcon name="dumbbell" className="h-5 w-5" aria-hidden /> Active
+            Session
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="text-sm text-muted-foreground">
             Routine:{' '}
-            <span className="font-medium">
-              {routine?.name ?? session.routineId}
-            </span>
+            <span className="font-medium">{routine?.name ?? session.routineId}</span>
           </div>
           {totalSets > 0 ? (
             <div className="space-y-1">
@@ -324,68 +343,76 @@ export default function ActiveSessionPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 type UpsertSetLogPayload = {
-  routineExerciseId: string
-  exerciseId: string
-  setNumber: number
-  reps: number
-  weight?: number
-  isCompleted?: boolean
-}
+  routineExerciseId: string;
+  exerciseId: string;
+  setNumber: number;
+  reps: number;
+  weight?: number;
+  isCompleted?: boolean;
+};
 
 type LogRowProps = {
-  routineExerciseId: string
-  exerciseId: string
-  setNumber: number
-  reps: number
-  weight?: number
-  rpe?: number
-  isCompleted: boolean
-  plannedReps?: number | null
-  plannedMinReps?: number | null
-  plannedMaxReps?: number | null
-  plannedWeight?: number | null
-  saving: boolean
-  onSave: (payload: UpsertSetLogPayload) => void
-}
+  routineExerciseId: string;
+  exerciseId: string;
+  setNumber: number;
+  reps: number;
+  weight?: number;
+  rpe?: number;
+  isCompleted: boolean;
+  plannedReps?: number | null;
+  plannedMinReps?: number | null;
+  plannedMaxReps?: number | null;
+  plannedWeight?: number | null;
+  saving: boolean;
+  onSave: (payload: UpsertSetLogPayload) => void;
+};
 
 type GroupedLogsProps = {
   logs: Array<{
-    id: string
-    routineExerciseId: string
-    exerciseId: string
-    setNumber: number
-    reps: number
-    weight?: number
-    rpe?: number
-    isCompleted: boolean
-  }>
-  routineId: string
-  routineDayId: string
-  routine: Routine
-  saving: boolean
-  onSave: LogRowProps['onSave']
-}
+    id: string;
+    routineExerciseId: string;
+    exerciseId: string;
+    setNumber: number;
+    reps: number;
+    weight?: number;
+    rpe?: number;
+    isCompleted: boolean;
+  }>;
+  routineId: string;
+  routineDayId: string;
+  routine: Routine;
+  saving: boolean;
+  onSave: LogRowProps['onSave'];
+};
 
-const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLogsProps) => {
-  const [collapsedExercises, setCollapsedExercises] = useState<Set<string>>(new Set())
+const GroupedLogs = ({
+  logs,
+  routine,
+  routineDayId,
+  saving,
+  onSave,
+}: GroupedLogsProps) => {
+  const [collapsedExercises, setCollapsedExercises] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleExercise = (exerciseId: string) => {
-    setCollapsedExercises(prev => {
-      const newSet = new Set(prev)
+    setCollapsedExercises((prev) => {
+      const newSet = new Set(prev);
       if (newSet.has(exerciseId)) {
-        newSet.delete(exerciseId)
+        newSet.delete(exerciseId);
       } else {
-        newSet.add(exerciseId)
+        newSet.add(exerciseId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
-  const day = routine.days.find((d) => d.id === routineDayId)
+  const day = routine.days.find((d) => d.id === routineDayId);
   if (!day) {
     return (
       <div className="space-y-3">
@@ -403,28 +430,31 @@ const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLog
           />
         ))}
       </div>
-    )
+    );
   }
 
   // Render according to routine template: exercises in order, sets as defined in routine
-  const exercises = [...day.exercises].sort((a, b) => a.order - b.order)
+  const exercises = [...day.exercises].sort((a, b) => a.order - b.order);
   return (
     <div className="space-y-4">
       {exercises.map((re) => {
-        const title = re.exercise.name
-        const isCollapsed = collapsedExercises.has(re.id)
+        const title = re.exercise.name;
+        const isCollapsed = collapsedExercises.has(re.id);
         // For each template set number, find a current log if exists
-        const templateSets = [...re.sets].sort((a, b) => a.setNumber - b.setNumber)
-        const completedSets = templateSets.filter(tpl => {
-          const log = logs.find(l => l.routineExerciseId === re.id && l.setNumber === tpl.setNumber)
-          return log?.isCompleted
-        }).length
+        const templateSets = [...re.sets].sort((a, b) => a.setNumber - b.setNumber);
+        const completedSets = templateSets.filter((tpl) => {
+          const log = logs.find(
+            (l) => l.routineExerciseId === re.id && l.setNumber === tpl.setNumber
+          );
+          return log?.isCompleted;
+        }).length;
 
-        const isExerciseCompleted = templateSets.length > 0 && completedSets === templateSets.length;
-        
+        const isExerciseCompleted =
+          templateSets.length > 0 && completedSets === templateSets.length;
+
         return (
           <Card key={re.id} className="overflow-hidden">
-            <CardHeader 
+            <CardHeader
               className="pb-3 cursor-pointer select-none hover:bg-muted/50 transition-colors"
               onClick={() => toggleExercise(re.id)}
             >
@@ -437,17 +467,24 @@ const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLog
                       <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
-                  {isExerciseCompleted && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                  {isExerciseCompleted && (
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  )}
                   <CardTitle className="text-base font-semibold">{title}</CardTitle>
                 </div>
-                <Badge 
+                <Badge
                   variant={isExerciseCompleted ? 'default' : 'outline'}
-                  className={`text-xs ${isExerciseCompleted ? 'border-green-600 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : ''}`}>
+                  className={`text-xs ${
+                    isExerciseCompleted
+                      ? 'border-green-600 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      : ''
+                  }`}
+                >
                   {completedSets}/{templateSets.length} sets
                 </Badge>
               </div>
             </CardHeader>
-            <div 
+            <div
               className={`transition-all duration-300 ease-in-out overflow-hidden ${
                 isCollapsed ? 'max-h-0' : 'max-h-[2000px]'
               }`}
@@ -455,8 +492,9 @@ const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLog
               <CardContent className="pt-0 space-y-3">
                 {templateSets.map((tpl) => {
                   const log = logs.find(
-                    (l) => l.routineExerciseId === re.id && l.setNumber === tpl.setNumber,
-                  )
+                    (l) =>
+                      l.routineExerciseId === re.id && l.setNumber === tpl.setNumber
+                  );
                   return (
                     <LogRow
                       key={`${re.id}-${tpl.setNumber}`}
@@ -473,16 +511,16 @@ const GroupedLogs = ({ logs, routine, routineDayId, saving, onSave }: GroupedLog
                       onSave={onSave}
                       saving={saving}
                     />
-                  )
+                  );
                 })}
               </CardContent>
             </div>
           </Card>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
 const LogRow = ({
   routineExerciseId,
@@ -498,21 +536,22 @@ const LogRow = ({
   saving,
   onSave,
 }: LogRowProps) => {
-  const [repsState, setReps] = useState<string>(reps > 0 ? String(reps) : '')
+  const [repsState, setReps] = useState<string>(reps > 0 ? String(reps) : '');
   const [weightState, setWeight] = useState<string>(
     weight !== undefined && weight !== null ? String(weight) : ''
-  )
-  const [isCompletedState, setIsCompleted] = useState<boolean>(isCompleted)
+  );
+  const [isCompletedState, setIsCompleted] = useState<boolean>(isCompleted);
 
-  const debouncedReps = useDebounce(repsState, 1000)
-  const debouncedWeight = useDebounce(weightState, 1000)
+  const debouncedReps = useDebounce(repsState, 1000);
+  const debouncedWeight = useDebounce(weightState, 1000);
 
   useEffect(() => {
-    const currentReps = Number(debouncedReps)
-    const currentWeight = debouncedWeight === '' ? undefined : Number(debouncedWeight)
+    const currentReps = Number(debouncedReps);
+    const currentWeight =
+      debouncedWeight === '' ? undefined : Number(debouncedWeight);
 
-    const hasChanged = currentReps !== reps || currentWeight !== weight
-    if (!hasChanged) return
+    const hasChanged = currentReps !== reps || currentWeight !== weight;
+    if (!hasChanged) return;
 
     onSave({
       routineExerciseId,
@@ -543,37 +582,49 @@ const LogRow = ({
       : plannedReps ?? '—';
 
   return (
-    <div className={`rounded-lg border-2 p-4 transition-all duration-200 ${
-      isCompletedState 
-        ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20' 
-        : 'border-border bg-card'
-    }`}>
+    <div
+      className={`rounded-lg border-2 p-4 transition-all duration-200 ${
+        isCompletedState
+          ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20'
+          : 'border-border bg-card'
+      }`}
+    >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Badge variant={isCompletedState ? 'default' : 'outline'} className="text-xs">
+          <Badge
+            variant={isCompletedState ? 'default' : 'outline'}
+            className="text-xs"
+          >
             Set {setNumber}
           </Badge>
           {isCompletedState && (
-            <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            <Badge
+              variant="secondary"
+              className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+            >
               ✓ Complete
             </Badge>
           )}
         </div>
         <Checkbox
           checked={isCompletedState}
-          onCheckedChange={(checked: boolean | 'indeterminate') => handleCompletionToggle(Boolean(checked))}
+          onCheckedChange={(checked: boolean | 'indeterminate') =>
+            handleCompletionToggle(Boolean(checked))
+          }
           aria-label="Mark set as complete"
           disabled={saving}
           className="h-5 w-5"
         />
       </div>
-      
+
       <div className="space-y-4">
         {/* Reps Section */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-muted-foreground">Reps</label>
-            <span className="text-xs text-muted-foreground">Target: {plannedRepsText}</span>
+            <span className="text-xs text-muted-foreground">
+              Target: {plannedRepsText}
+            </span>
           </div>
           <Input
             type="number"
@@ -586,11 +637,13 @@ const LogRow = ({
             className="text-center text-lg font-semibold h-12"
           />
         </div>
-        
+
         {/* Weight Section */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-muted-foreground">Weight (kg)</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Weight (kg)
+            </label>
             <span className="text-xs text-muted-foreground">
               Target: {plannedWeight ? `${plannedWeight} kg` : '—'}
             </span>
@@ -608,7 +661,7 @@ const LogRow = ({
           />
         </div>
       </div>
-      
+
       {saving && (
         <div className="flex items-center justify-center mt-3 text-xs text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin mr-1" />
@@ -617,4 +670,4 @@ const LogRow = ({
       )}
     </div>
   );
-}
+};

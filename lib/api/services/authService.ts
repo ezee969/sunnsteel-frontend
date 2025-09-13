@@ -1,4 +1,9 @@
-import { httpClient, setClientSessionCookie } from './httpClient';
+import {
+  httpClient,
+  setClientSessionCookie,
+  clearClientSessionCookie,
+} from './httpClient';
+import { supabaseAuthService } from './supabaseAuthService';
 import { tokenService } from './tokenService';
 import {
   LoginCredentials,
@@ -59,13 +64,16 @@ export const authService = {
   // Logout user
   async logout(): Promise<LogoutResponse> {
     console.debug('[auth] logout → start');
-    const response = await httpClient.post<LogoutResponse>(
-      '/auth/logout',
-      undefined,
-      true
-    );
+    // Sign out from Supabase (clears Supabase auth cookies)
+    try {
+      await supabaseAuthService.signOut();
+    } catch {}
+    // Clear legacy/access token and client-side session marker
     tokenService.clearAccessToken();
+    clearClientSessionCookie();
     console.debug('[auth] logout ← success');
+    // We no longer call backend /auth/logout (legacy) to avoid noisy 401s
+    const response: LogoutResponse = { message: 'ok' };
     return response;
   },
 

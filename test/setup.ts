@@ -14,6 +14,12 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
+// Provide Supabase env vars for tests
+process.env.NEXT_PUBLIC_SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'test-anon-key';
+
 // Radix UI Select calls scrollIntoView on options; jsdom doesn't implement it.
 // Provide a no-op to avoid unhandled rejections in tests.
 if (!('scrollIntoView' in Element.prototype)) {

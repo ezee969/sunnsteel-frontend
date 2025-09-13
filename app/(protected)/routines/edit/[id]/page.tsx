@@ -3,7 +3,13 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Stepper } from '@/components/ui/stepper';
 import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
@@ -16,8 +22,15 @@ import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo'
 import { TrainingDays } from '@/components/routines/create/TrainingDays';
 import { BuildDays } from '@/components/routines/create/BuildDays';
 import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
-import { RoutineWizardData, ProgressionScheme } from '@/components/routines/create/types';
-import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks/useRoutines';
+import {
+  RoutineWizardData,
+  ProgressionScheme,
+} from '@/components/routines/create/types';
+import {
+  useRoutine,
+  useUpdateRoutine,
+  useCreateRoutine,
+} from '@/lib/api/hooks/useRoutines';
 import { RoutineDay, RoutineExercise } from '@/lib/api/types/routine.type';
 
 // Use shared RoutineWizardData
@@ -82,12 +95,16 @@ export default function EditRoutinePage() {
           exercises: day.exercises.map((exercise: RoutineExercise) => ({
             exerciseId: exercise.exercise.id,
             progressionScheme: mapProgressionScheme(
-              (exercise as unknown as { progressionScheme?: string }).progressionScheme
+              (exercise as unknown as { progressionScheme?: string })
+                .progressionScheme
             ),
             minWeightIncrement: exercise.minWeightIncrement || 2.5,
             // RtF mapping (optional fields on backend response)
-            programTMKg: (exercise as unknown as { programTMKg?: number }).programTMKg,
-            programRoundingKg: (exercise as unknown as { programRoundingKg?: number }).programRoundingKg,
+            programTMKg: (exercise as unknown as { programTMKg?: number })
+              .programTMKg,
+            programRoundingKg: (
+              exercise as unknown as { programRoundingKg?: number }
+            ).programRoundingKg,
             sets: exercise.sets.map((set, index) => ({
               setNumber: index + 1,
               repType: set.repType,
@@ -100,12 +117,18 @@ export default function EditRoutinePage() {
           })),
         })),
         // Routine-level program fields (present only if routine uses RtF)
-        programWithDeloads: (routine as unknown as { programWithDeloads?: boolean }).programWithDeloads,
-        programStartDate: (routine as unknown as { programStartDate?: string }).programStartDate,
-        programTimezone: (routine as unknown as { programTimezone?: string }).programTimezone,
-        programScheduleMode: ((routine as unknown as { programStartDate?: string }).programStartDate ? 'TIMEFRAME' : 'NONE'),
+        programWithDeloads: (routine as unknown as { programWithDeloads?: boolean })
+          .programWithDeloads,
+        programStartDate: (routine as unknown as { programStartDate?: string })
+          .programStartDate,
+        programTimezone: (routine as unknown as { programTimezone?: string })
+          .programTimezone,
+        programScheduleMode: (routine as unknown as { programStartDate?: string })
+          .programStartDate
+          ? 'TIMEFRAME'
+          : 'NONE',
       };
-      
+
       setRoutineData(transformedData);
     }
   }, [routine]);
@@ -118,7 +141,7 @@ export default function EditRoutinePage() {
     if (currentStep < STEPS.length) {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
-      setVisitedSteps(prev => new Set([...prev, nextStep]));
+      setVisitedSteps((prev) => new Set([...prev, nextStep]));
     }
   };
 
@@ -139,21 +162,26 @@ export default function EditRoutinePage() {
         return routineData.name.trim() !== '';
       case 2:
         return routineData.trainingDays.length > 0;
-      case 3:
-        {
-          const daysComplete = routineData.days.every((day) => day.exercises.length > 0);
-          if (!daysComplete) return false;
-          const usesRtf = routineData.days.some((d) =>
-            d.exercises.some((ex) =>
+      case 3: {
+        const daysComplete = routineData.days.every(
+          (day) => day.exercises.length > 0
+        );
+        if (!daysComplete) return false;
+        const usesRtf = routineData.days.some((d) =>
+          d.exercises.some(
+            (ex) =>
               ex.progressionScheme === 'PROGRAMMED_RTF' ||
               ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-            )
+          )
+        );
+        if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
+          return (
+            !!routineData.programStartDate &&
+            routineData.programStartDate.trim() !== ''
           );
-          if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
-            return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
-          }
-          return true;
         }
+        return true;
+      }
       case 4:
         // Review step is considered valid if all previous steps are valid
         return [1, 2, 3].every(isStepValid);
@@ -206,15 +234,14 @@ export default function EditRoutinePage() {
           </div>
           <h3 className="text-lg font-medium">Error loading routine</h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            {error.message || 'We couldn\'t load the routine data. Please check your connection and try again.'}
+            {error.message ||
+              "We couldn't load the routine data. Please check your connection and try again."}
           </p>
           <div className="flex justify-center gap-3 mt-4">
             <Button variant="outline" onClick={() => router.push('/routines')}>
               Back to Routines
             </Button>
-            <Button onClick={() => router.refresh()}>
-              Try Again
-            </Button>
+            <Button onClick={() => router.refresh()}>Try Again</Button>
           </div>
         </div>
       );
@@ -224,7 +251,9 @@ export default function EditRoutinePage() {
       case 1:
         return <RoutineBasicInfo data={routineData} onUpdate={updateRoutineData} />;
       case 2:
-        return <TrainingDays data={routineData} onUpdate={updateRoutineData} isEditing />;
+        return (
+          <TrainingDays data={routineData} onUpdate={updateRoutineData} isEditing />
+        );
       case 3:
         return <BuildDays data={routineData} onUpdate={updateRoutineData} />;
       case 4:
@@ -244,7 +273,8 @@ export default function EditRoutinePage() {
   };
 
   const isFirstStep = currentStep === 1;
-  const isSubmitting = createRoutineMutation.isPending || updateRoutineMutation.isPending;
+  const isSubmitting =
+    createRoutineMutation.isPending || updateRoutineMutation.isPending;
 
   return (
     <div className="container max-w-4xl mx-auto py-8">
@@ -252,19 +282,23 @@ export default function EditRoutinePage() {
       <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
         <HeroBackdrop
           src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[140px] sm:h-[180px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Refine Your Program</h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Adjust days, progressions, and details.</p>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                Refine Your Program
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Adjust days, progressions, and details.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       {/* Header */}
@@ -289,15 +323,19 @@ export default function EditRoutinePage() {
       {/* Stepper: sticky on top for easier navigation on mobile */}
       <div className="sticky top-0 z-20 mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="py-2">
-          <Stepper 
-            steps={STEPS} 
-            currentStep={currentStep} 
-            onStepClick={handleStepClick} 
+          <Stepper
+            steps={STEPS}
+            currentStep={currentStep}
+            onStepClick={handleStepClick}
             visitedSteps={visitedSteps}
             // Allow clicking directly to any step whose previous steps are valid (edit flow)
             canStepClick={(id) => arePreviousStepsValid(id) || visitedSteps.has(id)}
             // Render completed state based on data validity (not only position)
-            completedSteps={new Set([1,2,3,4].filter((id) => id < currentStep && isStepValid(id)))}
+            completedSteps={
+              new Set(
+                [1, 2, 3, 4].filter((id) => id < currentStep && isStepValid(id))
+              )
+            }
           />
         </div>
       </div>
@@ -312,9 +350,7 @@ export default function EditRoutinePage() {
             {STEPS[currentStep - 1].description}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-6">
-          {renderCurrentStep()}
-        </CardContent>
+        <CardContent className="p-6">{renderCurrentStep()}</CardContent>
       </Card>
 
       {/* Navigation */}

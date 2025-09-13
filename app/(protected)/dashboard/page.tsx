@@ -17,8 +17,8 @@ export default function Dashboard() {
       {/* Classical Hero */}
       <section className="relative overflow-hidden rounded-xl border">
         <HeroBackdrop
-          src="/backgrounds/hero-greek-background.webp"
-          blurPx={16}
+          src="/backgrounds/vertical-hero-greek-columns.webp"
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[160px] sm:h-[200px]"
         >

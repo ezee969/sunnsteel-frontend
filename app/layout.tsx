@@ -1,23 +1,29 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Cinzel } from 'next/font/google';
+import { Oswald, Space_Mono, Bebas_Neue } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PwaProvider } from '@/providers/pwa-provider';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const oswald = Oswald({
+  variable: '--font-oswald',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const spaceMono = Space_Mono({
+  variable: '--font-space-mono',
   subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
 });
 
-const cinzel = Cinzel({
-  variable: '--font-cinzel',
+const bebasNeue = Bebas_Neue({
+  variable: '--font-bebas-neue',
   subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
 });
 
 import { Viewport } from 'next';
@@ -91,7 +97,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased`}
+        className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaProvider />

@@ -67,6 +67,11 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
+      console.log('Session details:', {
+        hasSession: !!session,
+        accessToken: session?.access_token ? 'present' : 'missing',
+        userId: session?.user?.id,
+      });
 
       setSession(session);
       setError(null);
@@ -90,6 +95,12 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         // Clear all cached data on sign out
         queryClient.clear();
+        // Ensure any client-side session marker is cleared to avoid middleware/login loops
+        try {
+          if (typeof document !== 'undefined') {
+            document.cookie = 'has_session=; Max-Age=0; path=/';
+          }
+        } catch {}
       }
     });
 

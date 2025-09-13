@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { userService } from '@/lib/api/services/userService';
 import { User } from '@/lib/api/types/auth.type';
-import { useAuth } from '@/providers/auth-provider';
+import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 
 export function useUser() {
-  const { isAuthenticated, hasTriedRefresh } = useAuth();
+  const { session, isLoading: isLoadingSupabase } = useSupabaseAuth();
 
   const {
     data: user,
@@ -12,13 +12,12 @@ export function useUser() {
     error,
     refetch,
   } = useQuery<User, Error>({
-    queryKey: ['user', 'profile'],
+    queryKey: ['user'],
     queryFn: () => userService.getProfile(),
-    enabled: isAuthenticated && hasTriedRefresh, // Fetch only after refresh logic settled
+    enabled: !isLoadingSupabase && !!session,
     staleTime: 5 * 60 * 1000,
     retry: 2,
   });
-
   // During SSR, always return false for isLoading to prevent hydration mismatch
   const safeIsLoading = typeof window === 'undefined' ? false : isLoading;
 

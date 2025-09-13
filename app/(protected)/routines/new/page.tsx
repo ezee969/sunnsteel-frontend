@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Stepper } from '@/components/ui/stepper';
 import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
@@ -47,7 +53,7 @@ export default function CreateRoutinePage() {
     if (currentStep < STEPS.length) {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
-      setVisitedSteps(prev => new Set([...prev, nextStep]));
+      setVisitedSteps((prev) => new Set([...prev, nextStep]));
     }
   };
 
@@ -70,22 +76,28 @@ export default function CreateRoutinePage() {
         return routineData.name.trim() !== '';
       case 2: // Training Days
         return routineData.trainingDays.length > 0;
-      case 3: // Build Days
-        {
-          const daysComplete = routineData.days.every(day => day.exercises.length > 0);
-          if (!daysComplete) return false;
-          // Only gate on start date when schedule is TIMEFRAME and time-based progression is used
-          const usesRtf = routineData.days.some((d) =>
-            d.exercises.some((ex) =>
+      case 3: {
+        // Build Days
+        const daysComplete = routineData.days.every(
+          (day) => day.exercises.length > 0
+        );
+        if (!daysComplete) return false;
+        // Only gate on start date when schedule is TIMEFRAME and time-based progression is used
+        const usesRtf = routineData.days.some((d) =>
+          d.exercises.some(
+            (ex) =>
               ex.progressionScheme === 'PROGRAMMED_RTF' ||
               ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-            )
+          )
+        );
+        if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
+          return (
+            !!routineData.programStartDate &&
+            routineData.programStartDate.trim() !== ''
           );
-          if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
-            return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
-          }
-          return true;
         }
+        return true;
+      }
       default:
         return true;
     }
@@ -124,19 +136,23 @@ export default function CreateRoutinePage() {
       <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
         <HeroBackdrop
           src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={16}
+          blurPx={5}
           overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
           className="h-[140px] sm:h-[180px]"
         >
-          <div className="relative h-full flex items-center px-4 sm:px-6">
+          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
             <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">Design Your Program</h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">Build days, choose progression, set your path.</p>
+              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
+                Design Your Program
+              </h2>
+              <p className="text-white/85 text-sm sm:text-base mt-1">
+                Build days, choose progression, set your path.
+              </p>
             </div>
           </div>
         </HeroBackdrop>
         <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.10} />
+        <GoldVignetteOverlay intensity={0.1} />
         <OrnateCorners inset={10} length={28} thickness={1.25} />
       </section>
       {/* Header */}
