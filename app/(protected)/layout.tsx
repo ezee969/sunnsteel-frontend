@@ -15,6 +15,7 @@ import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 import { InitialLoadAnimation } from '@/components/InitialLoadAnimation';
+import { preloadAllCriticalComponents } from '@/lib/utils/dynamic-imports';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -77,6 +78,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const timer = setTimeout(() => setIsTransitioning(false), 50);
     return () => clearTimeout(timer);
   }, [pathname]);
+
+  // Preload critical components after initial auth check
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      // Preload with delay to not interfere with initial render
+      const timeoutId = setTimeout(() => {
+        preloadAllCriticalComponents().catch(error => {
+          console.warn('Failed to preload critical components:', error);
+        });
+      }, 2000); // 2 second delay
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isAuthenticated, isLoading]);
 
   // Remove loading state handling - use loading.tsx files instead
 

@@ -43,6 +43,7 @@ export const config = {
   matcher: [
     '/login',
     '/signup',
+    '/auth/callback',
     '/dashboard/:path*',
     '/workouts/:path*',
     '/routines/:path*',

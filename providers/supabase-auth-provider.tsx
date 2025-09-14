@@ -108,7 +108,7 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
   }, [queryClient]);
 
   // Skip loading on auth pages to avoid redirect loops
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/auth/callback';
   const contextIsLoading = isAuthPage ? false : isLoading;
 
   const value = {

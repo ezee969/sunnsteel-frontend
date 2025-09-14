@@ -20,8 +20,10 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/lib/api/hooks/useUser';
-import { useRouter } from 'next/navigation';
 import { ClassicalIcon, ClassicalIconName } from '@/components/icons/ClassicalIcon';
+import Link from 'next/link';
+import { useEffect, useCallback } from 'react';
+import { useNavigationPrefetch } from '@/hooks/use-navigation-prefetch';
 
 type NavItem = {
   id: string;
@@ -111,11 +113,30 @@ export default function Sidebar({
   setIsMobileMenuOpen,
 }: SidebarProps) {
   const { user } = useUser();
-  const router = useRouter();
+  const { prefetchPage, prefetchMainNavigation, isReady } = useNavigationPrefetch();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // Prefetch main navigation on component mount
+  useEffect(() => {
+    if (isReady) {
+      // Prefetch with a slight delay to not interfere with initial render
+      const timeoutId = setTimeout(() => {
+        prefetchMainNavigation({ immediate: true, priority: 'high' });
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isReady, prefetchMainNavigation]);
+
+  // Handle hover prefetching for individual routes
+  const handleNavHover = useCallback(
+    (href: string) => {
+      prefetchPage(href, { immediate: true, priority: 'high' });
+    },
+    [prefetchPage]
+  );
 
   return (
     <div
@@ -181,71 +202,74 @@ export default function Sidebar({
       <ScrollArea className="flex-1 py-4">
         <nav className="grid gap-2 px-2">
           {SIDEBAR_NAV_ITEMS.map((item) => (
-            <Button
+            <Link
               key={item.id}
-              variant={activeNav === item.id ? 'default' : 'ghost'}
-              disabled={item.disabled}
-              className={cn(
-                'gap-3 h-12 relative overflow-hidden group transition-all duration-300',
-                isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
-                activeNav === item.id && 'bg-primary text-primary-foreground'
-              )}
-              onClick={() => {
+              href={item.disabled ? '#' : item.href}
+              prefetch={!item.disabled}
+              onMouseEnter={() => !item.disabled && handleNavHover(item.href)}
+              onClick={(e) => {
+                if (item.disabled) {
+                  e.preventDefault();
+                  return;
+                }
                 // Set active nav immediately for consistent visual state
                 setActiveNav(item.id);
-
-                // Create a scale animation effect when clicked
-                const button = document.activeElement as HTMLElement;
-                if (button) button.classList.add('scale-95');
-                setTimeout(() => {
-                  if (button) button.classList.remove('scale-95');
-                  // Close mobile sidebar after navigation
-                  if (isMobile) {
-                    setIsMobileMenuOpen(false);
-                  }
-                }, 100);
-                router.push(item.href);
+                // Close mobile sidebar after navigation
+                if (isMobile) {
+                  setIsMobileMenuOpen(false);
+                }
               }}
             >
-              <div
+              <Button
+                variant={activeNav === item.id ? 'default' : 'ghost'}
+                disabled={item.disabled}
                 className={cn(
-                  'absolute inset-0 opacity-0 bg-gradient-to-r from-primary/10 to-primary/5 transition-opacity',
-                  activeNav === item.id ? 'opacity-100' : 'group-hover:opacity-100'
+                  'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
+                  isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
+                  activeNav === item.id && 'bg-primary text-primary-foreground'
                 )}
-              />
-              {item.classicalName ? (
-                <ClassicalIcon
-                  name={item.classicalName}
-                  aria-hidden
-                  className={cn(
-                    'h-5 w-5 transition-all',
-                    activeNav === item.id
-                      ? 'text-primary-foreground'
-                      : 'text-muted-foreground group-hover:text-foreground'
-                  )}
-                />
-              ) : (
-                <item.icon
-                  className={cn(
-                    'h-5 w-5 transition-all',
-                    activeNav === item.id
-                      ? 'text-primary-foreground'
-                      : 'text-muted-foreground group-hover:text-foreground'
-                  )}
-                />
-              )}
-              <span
-                className={cn(
-                  'transition-all duration-300',
-                  !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
-                )}
+                asChild={false}
               >
-                {item.label}
-              </span>
-              {activeNav === item.id && (
-                <div className="absolute right-0 top-0 h-full w-1 bg-primary-foreground/20" />
-              )}
-            </Button>
+                <div
+                  className={cn(
+                    'absolute inset-0 opacity-0 bg-gradient-to-r from-primary/10 to-primary/5 transition-opacity',
+                    activeNav === item.id ? 'opacity-100' : 'group-hover:opacity-100'
+                  )}
+                />
+                {item.classicalName ? (
+                  <ClassicalIcon
+                    name={item.classicalName}
+                    aria-hidden
+                    className={cn(
+                      'h-5 w-5 transition-all',
+                      activeNav === item.id
+                        ? 'text-primary-foreground'
+                        : 'text-muted-foreground group-hover:text-foreground'
+                    )}
+                  />
+                ) : (
+                  <item.icon
+                    className={cn(
+                      'h-5 w-5 transition-all',
+                      activeNav === item.id
+                        ? 'text-primary-foreground'
+                        : 'text-muted-foreground group-hover:text-foreground'
+                    )}
+                  />
+                )}
+                <span
+                  className={cn(
+                    'transition-all duration-300',
+                    !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
+                  )}
+                >
+                  {item.label}
+                </span>
+                {activeNav === item.id && (
+                  <div className="absolute right-0 top-0 h-full w-1 bg-primary-foreground/20" />
+                )}
+              </Button>
+            </Link>
           ))}
           <Separator className="my-4" />
           <Button
