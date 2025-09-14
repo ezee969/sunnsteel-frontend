@@ -31,6 +31,8 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession';
 import { getTodayDow, weekdayName } from '@/lib/utils/date';
 import { Routine, RoutineDay } from '@/lib/api/types/routine.type';
+import ClassicalIcon from '@/components/icons/ClassicalIcon';
+import { cn } from '@/lib/utils';
 
 export default function TodaysWorkouts() {
   const router = useRouter();
@@ -101,7 +103,11 @@ export default function TodaysWorkouts() {
         <CardContent>
           <Button asChild aria-label="Go to routines">
             <Link href="/routines">
-              <Dumbbell className="mr-2 h-4 w-4" />
+              <ClassicalIcon
+                name={'scroll-unfurled'}
+                aria-hidden
+                className={cn('h-4 w-4 transition-all', 'text-primary-foreground')}
+              />
               Browse Routines
             </Link>
           </Button>

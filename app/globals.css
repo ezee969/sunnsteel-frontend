@@ -165,6 +165,14 @@
   .dark .text-gold {
     color: var(--ss-gold-2);
   }
+
+  /* Gold border utility */
+  .border-gold {
+    border-color: var(--ss-gold);
+  }
+  .dark .border-gold {
+    border-color: var(--ss-gold-2);
+  }
   /* Marble subtle background utility */
   .bg-marble-light {
     background-image: radial-gradient(

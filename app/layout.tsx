@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Oswald, Space_Mono, Bebas_Neue } from 'next/font/google';
+import { Oswald, Space_Mono, Bebas_Neue, Cinzel } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
@@ -23,6 +23,13 @@ const bebasNeue = Bebas_Neue({
   variable: '--font-bebas-neue',
   subsets: ['latin'],
   weight: ['400'],
+  display: 'swap',
+});
+
+const cinzel = Cinzel({
+  variable: '--font-cinzel',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   display: 'swap',
 });
 
@@ -97,7 +104,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
-        className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} antialiased`}
+        className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaProvider />

@@ -5,7 +5,13 @@ export default function StatsOverview() {
   return (
     <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        icon={<ClassicalIcon name="two-dumbbells" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
+        icon={
+          <ClassicalIcon
+            name="two-dumbbells"
+            className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+            aria-hidden
+          />
+        }
         title="Weekly Workouts"
         value="5"
         unit="/ 6"
@@ -15,7 +21,13 @@ export default function StatsOverview() {
         additionalText="+2"
       />
       <StatCard
-        icon={<ClassicalIcon name="compass" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
+        icon={
+          <ClassicalIcon
+            name="compass"
+            className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+            aria-hidden
+          />
+        }
         title="Training Consistency"
         value="4"
         unit="/ 7"
@@ -25,7 +37,13 @@ export default function StatsOverview() {
         additionalText="Streak 3"
       />
       <StatCard
-        icon={<ClassicalIcon name="shield" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
+        icon={
+          <ClassicalIcon
+            name="shield"
+            className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+            aria-hidden
+          />
+        }
         title="Heart Rate"
         value="142"
         unit="BPM"
@@ -35,7 +53,13 @@ export default function StatsOverview() {
         additionalText="Zone 3"
       />
       <StatCard
-        icon={<ClassicalIcon name="laurel-wreath" className="h-4 w-4 sm:h-5 sm:w-5 text-primary" aria-hidden />}
+        icon={
+          <ClassicalIcon
+            name="laurel-wreath"
+            className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+            aria-hidden
+          />
+        }
         title="Strength Progress"
         value="+8%"
         subtitle="Overall strength increase"

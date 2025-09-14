@@ -14,6 +14,7 @@ import Link from 'next/link';
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
+import { InitialLoadAnimation } from '@/components/InitialLoadAnimation';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -108,96 +109,100 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <Image
-          src="/backgrounds/marble-light1536-x-1024.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover dark:hidden"
-          priority={false}
-        />
-        <Image
-          src="/backgrounds/marble-dark-1536-x-1024.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover hidden dark:block"
-          priority={false}
-        />
-        <ParchmentOverlay opacity={0.06} />
-        <GoldVignetteOverlay intensity={0.06} />
-      </div>
-
-      <div className="flex min-h-screen">
-        {/* Mobile Menu Overlay */}
-        {isMobile && isMobileMenuOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
-            onClick={() => setIsMobileMenuOpen(false)}
+    <InitialLoadAnimation>
+      <div className="relative min-h-screen">
+        {/* Background */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <Image
+            src="/backgrounds/marble-light1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover dark:hidden"
+            priority={false}
           />
-        )}
+          <Image
+            src="/backgrounds/marble-dark-1536-x-1024.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover hidden dark:block"
+            priority={false}
+          />
+          <ParchmentOverlay opacity={0.06} />
+          <GoldVignetteOverlay intensity={0.06} />
+        </div>
 
-        <Sidebar
-          isMobile={isMobile}
-          isSidebarOpen={isSidebarOpen}
-          isMobileMenuOpen={isMobileMenuOpen}
-          activeNav={activeNav}
-          setActiveNav={setActiveNav}
-          setIsSidebarOpen={setIsSidebarOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
-
-        {/* Main Content */}
-        <div
-          className={cn(
-            'flex flex-col flex-1 transition-all duration-300',
-            isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
+        <div className="flex min-h-screen">
+          {/* Mobile Menu Overlay */}
+          {isMobile && isMobileMenuOpen && (
+            <div
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
           )}
-        >
-          <Header
-            title={getTitleFromPath(pathname)}
+
+          <Sidebar
             isMobile={isMobile}
+            isSidebarOpen={isSidebarOpen}
+            isMobileMenuOpen={isMobileMenuOpen}
+            activeNav={activeNav}
+            setActiveNav={setActiveNav}
+            setIsSidebarOpen={setIsSidebarOpen}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
 
-          {/* Active Session Banner */}
-          {!isOnSessionPage && activeSession?.id && (
-            <div className="px-3 sm:px-6">
-              <div className="mb-2 rounded-md border bg-primary/5 p-3 sm:p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Dumbbell className="h-4 w-4" />
-                  <span>Active workout session in progress.</span>
-                </div>
-                <Button
-                  asChild
-                  size="sm"
-                  variant="classical"
-                  aria-label="Resume active session"
-                >
-                  <Link href={`/workouts/sessions/${activeSession.id}`}>Resume</Link>
-                </Button>
-              </div>
-            </div>
-          )}
+          {/* Main Content */}
+          <div
+            className={cn(
+              'flex flex-col flex-1 transition-all duration-300',
+              isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
+            )}
+          >
+            <Header
+              title={getTitleFromPath(pathname)}
+              isMobile={isMobile}
+              setIsMobileMenuOpen={setIsMobileMenuOpen}
+            />
 
-          {/* Dashboard Content */}
-          <main className="flex-1 overflow-auto p-3 sm:p-6">
-            <div
-              className={cn(
-                'min-h-full transition-all duration-300 ease-out',
-                isTransitioning
-                  ? 'opacity-0 translate-y-2'
-                  : 'opacity-100 translate-y-0'
-              )}
-            >
-              {children}
-            </div>
-          </main>
+            {/* Active Session Banner */}
+            {!isOnSessionPage && activeSession?.id && (
+              <div className="px-3 sm:px-6">
+                <div className="mb-2 rounded-md border bg-primary/5 p-3 sm:p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Dumbbell className="h-4 w-4" />
+                    <span>Active workout session in progress.</span>
+                  </div>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="classical"
+                    aria-label="Resume active session"
+                  >
+                    <Link href={`/workouts/sessions/${activeSession.id}`}>
+                      Resume
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Dashboard Content */}
+            <main className="flex-1 overflow-auto p-3 sm:p-6">
+              <div
+                className={cn(
+                  'min-h-full transition-all duration-300 ease-out',
+                  isTransitioning
+                    ? 'opacity-0 translate-y-2'
+                    : 'opacity-100 translate-y-0'
+                )}
+              >
+                {children}
+              </div>
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </InitialLoadAnimation>
   );
 }

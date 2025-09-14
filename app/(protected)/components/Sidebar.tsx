@@ -22,8 +22,7 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { useRouter } from 'next/navigation';
 import { ClassicalIcon, ClassicalIconName } from '@/components/icons/ClassicalIcon';
-// import logo from '@/public/logo.png';
-// import Image from 'next/image';
+
 type NavItem = {
   id: string;
   label: string;
@@ -144,7 +143,14 @@ export default function Sidebar({
             !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
           )}
         >
-          <span className="text-xl heading-classical text-black dark:text-white">
+          <span
+            className="text-xl font-black tracking-wider text-black dark:text-white"
+            style={{
+              fontFamily: '"Cinzel", "Times New Roman", serif',
+              letterSpacing: '0.05em',
+              fontWeight: '900',
+            }}
+          >
             SUNNSTEEL
           </span>
         </div>
