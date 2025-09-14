@@ -50,12 +50,6 @@ export function SupabaseLoginForm() {
       <div className="relative backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
         <TopLoadingBar show={isPending || isGooglePending} />
 
-        {/* Show migration notice */}
-        <div className="p-3 text-sm bg-blue-900/20 border border-blue-500/30 rounded text-blue-200 mb-6">
-          🔄 We&apos;ve upgraded our authentication system. If you have an existing
-          account, use your same credentials.
-        </div>
-
         {isError && (
           <div className="p-3 text-sm bg-red-900/20 border border-red-500/30 rounded text-red-200 mb-6">
             {error?.message || 'Login failed. Please try again.'}
