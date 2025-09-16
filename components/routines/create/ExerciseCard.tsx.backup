@@ -672,8 +672,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               );
             })()}
 
-            {/* Weight increment (only for non-RtF progression schemes) */}
-            {exercise.progressionScheme !== 'NONE' && exercise.progressionScheme !== 'PROGRAMMED_RTF' && exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
+            {/* Weight increment (only for active progression) */}
+            {exercise.progressionScheme !== 'NONE' && (
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Label className="text-sm font-medium text-muted-foreground">
