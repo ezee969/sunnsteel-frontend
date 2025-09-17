@@ -55,21 +55,9 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
     </Tooltip>
   );
 
-  // Parse date string as local date to avoid timezone issues
   const selectedDate = data.programStartDate
-    ? (() => {
-        const [year, month, day] = data.programStartDate.split('-').map(Number);
-        const date = new Date(year, month - 1, day); // month is 0-indexed
-        console.log('🔍 [DEBUG] selectedDate parsing:', {
-          originalString: data.programStartDate,
-          parsedDate: date,
-          displayDate: date.toLocaleDateString(),
-          isoString: date.toISOString()
-        });
-        return date;
-      })()
+    ? new Date(data.programStartDate)
     : undefined;
-
   // Auto-detect timezone when using Timeframe schedule and missing timezone
   useEffect(() => {
     if (data.programScheduleMode !== 'TIMEFRAME') return;
@@ -188,37 +176,13 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
                       mode="single"
                       selected={selectedDate}
                       onSelect={(date) => {
-                        console.log('🔍 [DEBUG] Calendar onSelect called:', {
-                          selectedDate: date,
-                          displayDate: date?.toLocaleDateString(),
-                          isoString: date?.toISOString(),
-                          getDate: date?.getDate(),
-                          getMonth: date?.getMonth(),
-                          getFullYear: date?.getFullYear()
-                        });
-                        
                         if (date) {
-                          // Format date as local date string to avoid timezone issues
-                          const year = date.getFullYear();
-                          const month = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
-                          const day = String(date.getDate()).padStart(2, '0');
-                          const formattedDate = `${year}-${month}-${day}`;
-                          
-                          console.log('🔍 [DEBUG] Formatted date string:', {
-                            formattedDate,
-                            originalDate: date,
-                            components: { year, month, day }
-                          });
-                          
-                          onUpdate({ programStartDate: formattedDate });
+                          onUpdate({ programStartDate: format(date, 'yyyy-MM-dd') });
                         } else {
-                          console.log('🔍 [DEBUG] Clearing date selection');
                           onUpdate({ programStartDate: undefined });
                         }
                         setCalendarOpen(false);
                       }}
-                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
