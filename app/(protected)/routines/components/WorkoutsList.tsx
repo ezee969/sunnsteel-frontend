@@ -269,7 +269,11 @@ export default function WorkoutsList({
                     {isStarting && startActingId === routine.id ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
+                      <ClassicalIcon
+                        name="dumbbell"
+                        className="mr-2 h-4 w-4"
+                        aria-hidden
+                      />
                     )}
                     Start
                   </Button>
@@ -388,7 +392,11 @@ export default function WorkoutsList({
                     variant="outline"
                     className="flex items-center gap-1 text-xs sm:text-sm"
                   >
-                    <ClassicalIcon name="dumbbell" className="h-3 w-3 flex-shrink-0" aria-hidden />
+                    <ClassicalIcon
+                      name="dumbbell"
+                      className="h-3 w-3 flex-shrink-0"
+                      aria-hidden
+                    />
                     <span>{routine.days.length} days/week</span>
                   </Badge>
                   {routine.isPeriodized && (

@@ -12,10 +12,7 @@ import {
 } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Stepper } from '@/components/ui/stepper';
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
-import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import HeroSection from '@/components/layout/HeroSection';
 
 // Step components
 import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo';
@@ -75,12 +72,15 @@ export default function CreateRoutinePage() {
       case 1: // Basic Info
         const hasName = routineData.name.trim() !== '';
         if (!hasName) return false;
-        
+
         // If Timeframe is selected, require program start date
         if (routineData.programScheduleMode === 'TIMEFRAME') {
-          return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
+          return (
+            !!routineData.programStartDate &&
+            routineData.programStartDate.trim() !== ''
+          );
         }
-        
+
         return true;
       case 2: // Training Days
         return routineData.trainingDays.length > 0;
@@ -139,30 +139,15 @@ export default function CreateRoutinePage() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-3 sm:py-8 pb-20 sm:pb-24">
+    <div>
       {/* Classical Hero */}
-      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
-        <HeroBackdrop
-          src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={5}
-          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
-          className="h-[140px] sm:h-[180px]"
-        >
-          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
-            <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
-                Design Your Program
-              </h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">
-                Build days, choose progression, set your path.
-              </p>
-            </div>
-          </div>
-        </HeroBackdrop>
-        <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.1} />
-        <OrnateCorners inset={10} length={28} thickness={1.25} />
-      </section>
+      <HeroSection
+        imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
+        heightClass="h-[140px] sm:h-[180px]"
+        sectionClassName="mb-4 sm:mb-6"
+        title={<>Design Your Program</>}
+        subtitle={<>Build days, choose progression, set your path.</>}
+      />
       {/* Header */}
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-2 mb-2 sm:mb-4">

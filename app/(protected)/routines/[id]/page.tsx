@@ -41,10 +41,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
-import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import HeroSection from '@/components/layout/HeroSection';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 const dayName = (dayOfWeek: number) => {
@@ -143,28 +140,13 @@ export default function RoutineDetailsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       {/* Classical Hero */}
-      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
-        <HeroBackdrop
-          src="/backgrounds/alexander-the-great-statue-background.webp"
-          blurPx={5}
-          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
-          className="h-[160px] sm:h-[200px]"
-        >
-          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
-            <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
-                {isLoading ? 'Routine' : routine?.name ?? 'Routine'}
-              </h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">
-                Structure, schedule, and start.
-              </p>
-            </div>
-          </div>
-        </HeroBackdrop>
-        <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.1} />
-        <OrnateCorners inset={10} length={28} thickness={1.25} />
-      </section>
+      <HeroSection
+        imageSrc="/backgrounds/alexander-the-great-statue-background.webp"
+        heightClass="h-[160px] sm:h-[200px]"
+        sectionClassName="mb-4 sm:mb-6"
+        title={<>{isLoading ? 'Routine' : routine?.name ?? 'Routine'}</>}
+        subtitle={<>Structure, schedule, and start.</>}
+      />
       <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="/routines" className="underline-offset-2 hover:underline">
           Routines

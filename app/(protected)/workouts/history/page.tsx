@@ -21,10 +21,7 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useDebounce } from '@/hooks/use-debounce';
 import { ChevronDown, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
-import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import HeroSection from '@/components/layout/HeroSection';
 
 const getErrorMessage = (err: unknown): string => {
   if (err instanceof Error) return err.message;
@@ -288,28 +285,13 @@ function WorkoutHistoryContent() {
   return (
     <div className="mx-auto max-w-3xl p-4">
       {/* Classical Hero */}
-      <section className="relative overflow-hidden rounded-xl border mb-4 sm:mb-6">
-        <HeroBackdrop
-          src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={5}
-          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
-          className="h-[160px] sm:h-[200px]"
-        >
-          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
-            <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
-                Training Archive
-              </h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">
-                Browse and filter your sessions.
-              </p>
-            </div>
-          </div>
-        </HeroBackdrop>
-        <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.1} />
-        <OrnateCorners inset={10} length={28} thickness={1.25} />
-      </section>
+      <HeroSection
+        imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
+        heightClass="h-[160px] sm:h-[200px]"
+        sectionClassName="mb-4 sm:mb-6"
+        title={<>Training Archive</>}
+        subtitle={<>Browse and filter your sessions.</>}
+      />
       <Card>
         <CardHeader>
           <h1 className="text-xl font-semibold">Workout History</h1>

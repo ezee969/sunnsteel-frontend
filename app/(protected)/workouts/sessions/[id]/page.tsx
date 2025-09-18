@@ -37,10 +37,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop';
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
-import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import HeroSection from '@/components/layout/HeroSection';
 
 const formatTime = (iso?: string | null) => {
   if (!iso) return '—';
@@ -198,28 +195,13 @@ export default function ActiveSessionPage() {
   return (
     <div className="p-3 sm:p-4 max-w-2xl mx-auto">
       {/* Classical Hero (shallow) */}
-      <section className="relative overflow-hidden rounded-xl border mb-3 sm:mb-4">
-        <HeroBackdrop
-          src="/backgrounds/vertical-hero-greek-columns.webp"
-          blurPx={5}
-          overlayGradient="linear-gradient(to right, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 75%)"
-          className="h-[120px] sm:h-[150px]"
-        >
-          <div className="relative h-full flex items-center px-6 py-4 sm:px-8 sm:py-6">
-            <div>
-              <h2 className="heading-classical text-2xl sm:text-3xl text-white">
-                Training Focus
-              </h2>
-              <p className="text-white/85 text-sm sm:text-base mt-1">
-                Steady pace. Solid reps.
-              </p>
-            </div>
-          </div>
-        </HeroBackdrop>
-        <ParchmentOverlay opacity={0.08} />
-        <GoldVignetteOverlay intensity={0.1} />
-        <OrnateCorners inset={10} length={28} thickness={1.25} />
-      </section>
+      <HeroSection
+        imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
+        heightClass="h-[120px] sm:h-[150px]"
+        sectionClassName="mb-3 sm:mb-4"
+        title={<>Training Focus</>}
+        subtitle={<>Steady pace. Solid reps.</>}
+      />
       <div className="mb-3 flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={handleBack} aria-label="Go back">
           <MoveLeft className="mr-2 h-4 w-4" /> Back
