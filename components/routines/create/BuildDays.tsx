@@ -37,6 +37,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({});
   const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const exerciseRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
   const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME';
 
@@ -107,6 +109,35 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       return matchesSearch && !isAlreadyAdded;
     }) || [];
 
+  // Scroll after render to target exercise card if queued
+
+  // After days update, if we have a pending target, scroll to it (with small retries)
+  useEffect(() => {
+    if (!pendingScrollKey) return;
+
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const tryScroll = () => {
+      const el = exerciseRefs.current[pendingScrollKey!];
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+        const target = absoluteTop - window.innerHeight / 2 + rect.height / 2;
+        window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+        setPendingScrollKey(null);
+        return;
+      }
+      attempts += 1;
+      if (attempts < maxAttempts) {
+        requestAnimationFrame(tryScroll);
+      }
+    };
+
+    const raf = requestAnimationFrame(tryScroll);
+    return () => cancelAnimationFrame(raf);
+  }, [pendingScrollKey, data.days]);
+
   const addExercise = (exerciseId: string) => {
     const newDays = [...data.days];
     const dayIndex = newDays.findIndex(
@@ -123,10 +154,14 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
       restSeconds: 120, // 2 minutes default
     };
 
+    const newExerciseIndex = newDays[dayIndex].exercises.length;
     newDays[dayIndex].exercises.push(newExercise);
     onUpdate({ days: newDays });
     setExercisePickerOpen(false);
     setSearchValue('');
+
+    // Queue scroll to the newly added exercise after render
+    setPendingScrollKey(`${exerciseId}-${newExerciseIndex}`);
   };
 
   const updateProgramTMKg = (exerciseIndex: number, tmKg: number) => {
@@ -487,7 +522,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                       </Button>
 
                       {exercisePickerOpen && (
-                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200">
+                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200 max-h-[400px] overflow-hidden">
                           <div className="p-3 border-b">
                             <Input
                               aria-label="Search exercises"
@@ -547,6 +582,12 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                             return (
                               <motion.div
                                 key={`${exercise.exerciseId}-${exerciseIndex}`}
+                                ref={(el) => {
+                                  exerciseRefs.current[
+                                    `${exercise.exerciseId}-${exerciseIndex}`
+                                  ] = el;
+                                }}
+                                className="scroll-mt-24"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}

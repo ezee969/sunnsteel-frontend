@@ -16,14 +16,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Info } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { InfoTooltip } from '@/components/InfoTooltip';
 
 interface RoutineBasicInfoProps {
   data: RoutineWizardData;
@@ -32,28 +28,6 @@ interface RoutineBasicInfoProps {
 
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
-
-  const InfoTooltip = ({
-    content,
-    side = 'right',
-  }: {
-    content: string;
-    side?: 'top' | 'bottom' | 'left' | 'right';
-  }) => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors"
-        >
-          <Info className="w-3 h-3 text-muted-foreground" />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side={side} className="max-w-xs">
-        <p>{content}</p>
-      </TooltipContent>
-    </Tooltip>
-  );
 
   // Parse date string as local date to avoid timezone issues
   const selectedDate = data.programStartDate
@@ -64,7 +38,7 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
           originalString: data.programStartDate,
           parsedDate: date,
           displayDate: date.toLocaleDateString(),
-          isoString: date.toISOString()
+          isoString: date.toISOString(),
         });
         return date;
       })()
@@ -188,28 +162,13 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
                       mode="single"
                       selected={selectedDate}
                       onSelect={(date) => {
-                        console.log('🔍 [DEBUG] Calendar onSelect called:', {
-                          selectedDate: date,
-                          displayDate: date?.toLocaleDateString(),
-                          isoString: date?.toISOString(),
-                          getDate: date?.getDate(),
-                          getMonth: date?.getMonth(),
-                          getFullYear: date?.getFullYear()
-                        });
-                        
                         if (date) {
                           // Format date as local date string to avoid timezone issues
                           const year = date.getFullYear();
                           const month = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
                           const day = String(date.getDate()).padStart(2, '0');
                           const formattedDate = `${year}-${month}-${day}`;
-                          
-                          console.log('🔍 [DEBUG] Formatted date string:', {
-                            formattedDate,
-                            originalDate: date,
-                            components: { year, month, day }
-                          });
-                          
+
                           onUpdate({ programStartDate: formattedDate });
                         } else {
                           console.log('🔍 [DEBUG] Clearing date selection');
@@ -217,8 +176,9 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
                         }
                         setCalendarOpen(false);
                       }}
-                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                      initialFocus
+                      disabled={(date) =>
+                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                      }
                     />
                   </PopoverContent>
                 </Popover>

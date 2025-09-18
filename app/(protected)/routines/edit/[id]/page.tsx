@@ -159,7 +159,15 @@ export default function EditRoutinePage() {
   const isStepValid = (stepId: number) => {
     switch (stepId) {
       case 1:
-        return routineData.name.trim() !== '';
+        const hasName = routineData.name.trim() !== '';
+        if (!hasName) return false;
+        
+        // If Timeframe is selected, require program start date
+        if (routineData.programScheduleMode === 'TIMEFRAME') {
+          return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
+        }
+        
+        return true;
       case 2:
         return routineData.trainingDays.length > 0;
       case 3: {

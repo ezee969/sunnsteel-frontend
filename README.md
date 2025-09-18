@@ -598,26 +598,31 @@ npm run test:coverage# Coverage (text + lcov)
 ## Performance Optimizations
 
 ### Navigation Performance
+
 - **Route Prefetching**: Next.js Link prefetching + programmatic prefetching on hover/mount
 - **Data Prefetching**: TanStack Query prefetching for critical API calls (routines, active sessions)
 - **Intelligent Caching**: Coordinated prefetching hook prevents duplicate requests
 
 ### PWA Enhancements
+
 - **Enhanced Service Worker**: Cache-first for critical pages, stale-while-revalidate for API calls
 - **Background Prefetching**: Critical pages prefetched on service worker activation
 - **Offline Support**: Cached pages and API responses for offline functionality
 
 ### Loading Performance
+
 - **Dynamic Imports**: Code splitting with preloading for heavy components (RoutineWizard, WorkoutSession)
 - **Instant Loading States**: Skeleton screens for immediate visual feedback
 - **Progressive Loading**: Content loads progressively while maintaining interactivity
 
 ### Monitoring & Analytics
+
 - **Performance Monitoring**: Core Web Vitals tracking (LCP, FID, CLS)
 - **Navigation Timing**: Track route transition performance
 - **Cache Analytics**: Monitor prefetch hit rates and performance gains
 
 ### Expected Results
+
 - **Navigation Speed**: <200ms for prefetched routes, <500ms for non-prefetched
 - **Cache Hit Rate**: 90%+ for main navigation, 80%+ for API calls
 - **User Experience**: Instant visual feedback, smooth transitions, offline capability

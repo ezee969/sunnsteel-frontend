@@ -16,11 +16,11 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
   useEffect(() => {
     const contentTimer = setTimeout(() => {
       setShowContent(true);
-    }, 2200);
+    }, 3200);
 
     const exitTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 3200);
+    }, 3500);
 
     return () => {
       clearTimeout(contentTimer);
@@ -50,18 +50,18 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
             >
               {/* Primary background - optimized for different screen sizes */}
               <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-black" />
-              
+
               {/* Desktop: Use larger background image */}
               <div className="hidden lg:block absolute inset-0">
                 <Image
-                  src="/backgrounds/hero-greek-background.webp"
+                  src="/backgrounds/statue-inside-building.webp"
                   alt="Classical Hero Background"
                   fill
                   className="object-cover object-center opacity-60"
                   priority
                 />
               </div>
-              
+
               {/* Mobile/Tablet: Use the angel image which works well */}
               <div className="lg:hidden absolute inset-0">
                 <Image
@@ -72,16 +72,17 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                   priority
                 />
               </div>
-              
+
               {/* Gradient overlays for better text readability and edge blending */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-              
+
               {/* Vignette effect for edge darkening */}
-              <div 
+              <div
                 className="absolute inset-0"
                 style={{
-                  background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.8) 100%)'
+                  background:
+                    'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.8) 100%)',
                 }}
               />
             </motion.div>
@@ -144,7 +145,8 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                   style={{
                     color: '#B8860B',
                     fontFamily: '"Cinzel", "Times New Roman", serif',
-                    textShadow: '0 0 10px rgba(184, 134, 11, 0.6), 1px 1px 2px rgba(0,0,0,0.8)',
+                    textShadow:
+                      '0 0 10px rgba(184, 134, 11, 0.6), 1px 1px 2px rgba(0,0,0,0.8)',
                     letterSpacing: '0.1em',
                   }}
                   initial={{ opacity: 0, y: 20 }}
@@ -183,9 +185,9 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                     <ClassicalIcon
                       name={item.name as 'shield' | 'torch' | 'laurel-crown'}
                       className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mb-1 sm:mb-2"
-                      style={{ 
+                      style={{
                         color: '#DAA520',
-                        filter: 'drop-shadow(0 0 8px rgba(218, 165, 32, 0.4))'
+                        filter: 'drop-shadow(0 0 8px rgba(218, 165, 32, 0.4))',
                       }}
                     />
                     <span

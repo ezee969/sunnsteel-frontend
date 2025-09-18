@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { InfoTooltip } from '@/components/InfoTooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export type RoutineSet = {
   setNumber: number;
@@ -412,6 +414,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   const setRowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
   const [setsExpanded, setSetsExpanded] = useState(true);
+  const [weightIncInput, setWeightIncInput] = useState<string>(
+    exercise.minWeightIncrement !== undefined && exercise.minWeightIncrement !== null
+      ? String(exercise.minWeightIncrement)
+      : ''
+  );
 
   useEffect(() => {
     if (!shouldScrollToLast) return;
@@ -421,6 +428,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
     }
     setShouldScrollToLast(false);
   }, [exercise.sets.length, shouldScrollToLast]);
+
+  // Sync local weight increment input when parent value changes
+  useEffect(() => {
+    const parentVal = exercise.minWeightIncrement;
+    setWeightIncInput(
+      parentVal !== undefined && parentVal !== null ? String(parentVal) : ''
+    );
+  }, [exercise.minWeightIncrement]);
 
   return (
     <Card key={exerciseIndex} className="border-muted overflow-hidden p-0">
@@ -541,6 +556,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                 <Label className="text-sm font-medium text-muted-foreground">
                   Progression
                 </Label>
+                {disableTimeBasedProgressions && (
+                  <TooltipProvider>
+                    <InfoTooltip
+                      content="Time-based progressions are disabled. Switch Program Schedule to Timeframe in Basic Info to enable."
+                      side="right"
+                    />
+                  </TooltipProvider>
+                )}
               </div>
               <Select
                 value={exercise.progressionScheme}
@@ -588,12 +611,6 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   </SelectItem>
                 </SelectContent>
               </Select>
-              {disableTimeBasedProgressions && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Time-based progressions are disabled. Switch Program Schedule to
-                  Timeframe in Basic Info to enable.
-                </p>
-              )}
             </div>
 
             {/* RtF per-exercise fields */}
@@ -673,35 +690,56 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             })()}
 
             {/* Weight increment (only for non-RtF progression schemes) */}
-            {exercise.progressionScheme !== 'NONE' && exercise.progressionScheme !== 'PROGRAMMED_RTF' && exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Weight Inc.
-                  </Label>
+            {exercise.progressionScheme !== 'NONE' &&
+              exercise.progressionScheme !== 'PROGRAMMED_RTF' &&
+              exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Weight Inc.
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2 sm:gap-2">
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*[.]?[0-9]*"
+                      autoComplete="off"
+                      aria-label="Minimum weight increment"
+                      placeholder="2.5"
+                      value={weightIncInput}
+                      onChange={(e) => {
+                        // Allow only digits and a single dot; allow empty string
+                        const raw = e.target.value;
+                        const sanitized = raw
+                          .replace(/[^0-9.]/g, '')
+                          .replace(/(\..*)\./g, '$1');
+                        setWeightIncInput(sanitized);
+                      }}
+                      onBlur={() => {
+                        const trimmed = weightIncInput.trim();
+                        if (trimmed === '') {
+                          // Keep empty display; do not update parent to avoid forcing a value back
+                          return;
+                        }
+                        const value = parseFloat(trimmed);
+                        if (!Number.isNaN(value) && value > 0) {
+                          onUpdateMinWeightIncrement(exerciseIndex, value);
+                        } else {
+                          // Re-sync from parent if invalid
+                          const parentVal = exercise.minWeightIncrement;
+                          setWeightIncInput(
+                            parentVal !== undefined && parentVal !== null
+                              ? String(parentVal)
+                              : ''
+                          );
+                        }
+                      }}
+                      className="w-32 sm:w-40 h-9 text-sm text-center"
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-2">
-                  <Input
-                    type="text"
-                    inputMode="decimal"
-                    pattern="[0-9]*[.]?[0-9]*"
-                    autoComplete="off"
-                    aria-label="Minimum weight increment"
-                    placeholder="2.5"
-                    value={exercise.minWeightIncrement}
-                    onChange={(e) => {
-                      const value = parseFloat(
-                        e.target.value.replace(/[^0-9.]/g, '')
-                      );
-                      if (!isNaN(value) && value > 0) {
-                        onUpdateMinWeightIncrement(exerciseIndex, value);
-                      }
-                    }}
-                    className="w-32 sm:w-40 h-9 text-sm text-center"
-                  />
-                </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/* Sets header with collapse/expand */}

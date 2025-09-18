@@ -73,7 +73,15 @@ export default function CreateRoutinePage() {
   const canProceedToNextStep = () => {
     switch (currentStep) {
       case 1: // Basic Info
-        return routineData.name.trim() !== '';
+        const hasName = routineData.name.trim() !== '';
+        if (!hasName) return false;
+        
+        // If Timeframe is selected, require program start date
+        if (routineData.programScheduleMode === 'TIMEFRAME') {
+          return !!routineData.programStartDate && routineData.programStartDate.trim() !== '';
+        }
+        
+        return true;
       case 2: // Training Days
         return routineData.trainingDays.length > 0;
       case 3: {
