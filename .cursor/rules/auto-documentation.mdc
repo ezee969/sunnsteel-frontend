@@ -12,8 +12,8 @@ Como desarrollador, DEBES mantener la documentación del proyecto actualizada au
 
 ### Cuando detectes cambios, SIEMPRE actualiza:
 
-1. **Archivos de reglas** (`.cursor/rules/*.mdc`)
-2. **Archivos de reglas** (`.windsurf/rules/*.md`)
+1. **Archivos de reglas Cursor** (`.cursor/rules/*.mdc`)
+2. **Archivos de reglas Windsurf** (`.windsurf/rules/*.md`)
 3. **README.md** del proyecto
 4. **Documentación de componentes**
 5. **Estructura de directorios**
