@@ -1,0 +1,946 @@
+{
+  "name": "ULPPL",
+  "description": "",
+  "isPeriodized": false,
+  "programStartDate": "2025-09-22",
+  "programTimezone": "America/Cordoba",
+  "days": [
+    {
+      "dayOfWeek": 1,
+      "exercises": [
+        {
+          "exerciseId": "a64c45ac-cb44-4330-ba3f-900f08b9d87c",
+          "restSeconds": 180,
+          "progressionScheme": "PROGRAMMED_RTF",
+          "minWeightIncrement": 2.5,
+          "programTMKg": 113,
+          "programRoundingKg": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "minReps": 10,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "f62fc73c-a4ec-402c-9fd6-288bc7e47bd6",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 65,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 60,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 55,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "6be8b95e-4533-4aee-b100-0fcd5616160c",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 90,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 85,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 85,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "ad3b37f5-d40b-4418-9ef4-4c72edc157b6",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 85,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 80,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 75,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "9d274f90-d199-4f9a-b200-15e1b406b404",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 40,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 35,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "8027fbbb-476f-44db-b872-6db75e63bfd8",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 40,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 35,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "8ddd935f-7f6e-4d04-9417-0e7bb5b7ddbb",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "b1d554fd-8771-45a1-b47f-b29bcc2499ab",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 8,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 8,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 8,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dayOfWeek": 2,
+      "exercises": [
+        {
+          "exerciseId": "fa36ae8d-704d-4664-8401-8752d2fd6721",
+          "restSeconds": 180,
+          "progressionScheme": "PROGRAMMED_RTF",
+          "minWeightIncrement": 2.5,
+          "programTMKg": 114,
+          "programRoundingKg": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "minReps": 8,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "5c719707-91dd-403d-adff-8735e57946b7",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 125,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 115,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 110,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "c8ee35cd-e091-4a0d-a05f-2f12b1737cbb",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 82,
+              "minReps": 12,
+              "maxReps": 14
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 76,
+              "minReps": 12,
+              "maxReps": 14
+            }
+          ]
+        },
+        {
+          "exerciseId": "0480449d-8bee-469b-aa47-d55304aca103",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 60,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 55,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 50,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "0d5de953-ebde-4708-a9d2-6ff8f2f53ab7",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "55aa9f89-2261-41d0-8533-f75d97b45409",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 12,
+              "minReps": 12,
+              "maxReps": 14
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 12,
+              "maxReps": 14
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 12,
+              "maxReps": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dayOfWeek": 4,
+      "exercises": [
+        {
+          "exerciseId": "da293926-1713-4872-b80d-beabf62bfdde",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 65,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 60,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 60,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "a6a3e533-f9a0-431d-aa9e-f2fecfd18ffa",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 80,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 75,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 75,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "fb0e87a7-1e9b-4beb-baf8-148ca6772d9b",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 20,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "48ce9cc5-1aaf-40e0-9244-c11abed4979b",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 20,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "9beb022c-a8e3-4f3a-9563-653a746ab62a",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 82,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 78,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "49d8bcaa-be58-4ebd-9e3c-33cf902a0c53",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "8ddd935f-7f6e-4d04-9417-0e7bb5b7ddbb",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "3e710f89-fc9f-4d4f-a4f5-ab7c10d67b8f",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 6,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 6,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 6,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dayOfWeek": 5,
+      "exercises": [
+        {
+          "exerciseId": "7785aaf6-9c03-413e-affd-f7e342d6b080",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 90,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 85,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 80,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "09fa1914-12ab-4b94-be8e-b55d2b5a1d10",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 35,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "f62fc73c-a4ec-402c-9fd6-288bc7e47bd6",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 50,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 45,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 40,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "ad62ac78-e64c-49cb-83d2-092584a7f5c0",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 15,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 15,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "7081e393-f9b5-4485-958c-19a40d69c1d6",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 30,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "93d7f7ce-f55a-4ccc-b3d6-f180e56b28f0",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 5,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 5,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "cb0c5de6-3b75-471d-b70f-2026d2d9330f",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 20,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "57cff80e-ec7f-41c5-b489-2803c0dfbe74",
+          "restSeconds": 120,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 10,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "dayOfWeek": 6,
+      "exercises": [
+        {
+          "exerciseId": "c8ee35cd-e091-4a0d-a05f-2f12b1737cbb",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 84,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 78,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 74,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 4,
+              "repType": "RANGE",
+              "weight": 70,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "59227744-9af5-496a-91cb-4a3b4c9418e8",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 65,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 60,
+              "minReps": 6,
+              "maxReps": 8
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 55,
+              "minReps": 6,
+              "maxReps": 8
+            }
+          ]
+        },
+        {
+          "exerciseId": "4965dd91-6269-4591-8dd5-58d2bcab4eec",
+          "restSeconds": 180,
+          "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 80,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 75,
+              "minReps": 8,
+              "maxReps": 10
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 70,
+              "minReps": 8,
+              "maxReps": 10
+            }
+          ]
+        },
+        {
+          "exerciseId": "47805a9f-ab82-4eac-b4e7-9d7d30d57246",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 3,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 4,
+              "repType": "RANGE",
+              "weight": 25,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        },
+        {
+          "exerciseId": "0480449d-8bee-469b-aa47-d55304aca103",
+          "restSeconds": 120,
+          "progressionScheme": "DOUBLE_PROGRESSION",
+          "minWeightIncrement": 2.5,
+          "sets": [
+            {
+              "setNumber": 1,
+              "repType": "RANGE",
+              "weight": 55,
+              "minReps": 10,
+              "maxReps": 12
+            },
+            {
+              "setNumber": 2,
+              "repType": "RANGE",
+              "weight": 50,
+              "minReps": 10,
+              "maxReps": 12
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

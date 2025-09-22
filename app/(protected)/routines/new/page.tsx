@@ -167,8 +167,7 @@ export default function CreateRoutinePage() {
         </p>
       </div>
 
-      {/* Stepper: sticky on top for easier navigation on mobile */}
-      <div className="sticky top-0 z-20 mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className=" mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="py-2">
           <Stepper
             steps={STEPS}

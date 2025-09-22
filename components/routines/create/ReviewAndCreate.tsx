@@ -34,11 +34,32 @@ const DAYS_OF_WEEK = [
   'Saturday',
 ];
 
-export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete }: ReviewAndCreateProps) {
+export function ReviewAndCreate({
+  data,
+  routineId,
+  isEditing = false,
+  onComplete,
+}: ReviewAndCreateProps) {
   const { data: exercises } = useExercises();
   const createRoutineMutation = useCreateRoutine();
   const updateRoutineMutation = useUpdateRoutine();
-  const isLoading = isEditing ? updateRoutineMutation.isPending : createRoutineMutation.isPending;
+  const isLoading = isEditing
+    ? updateRoutineMutation.isPending
+    : createRoutineMutation.isPending;
+
+  // Format date as dd/mm/yyyy
+  const formatDateForDisplay = (dateString?: string): string => {
+    if (!dateString) return 'Not set';
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return 'Invalid date';
+    }
+  };
   const usesRtf = data.days.some((d) =>
     d.exercises.some(
       (ex) =>
@@ -56,17 +77,21 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       )
     );
 
-    const tz = (data.programTimezone ?? '').trim() || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const tz =
+      (data.programTimezone ?? '').trim() ||
+      Intl.DateTimeFormat().resolvedOptions().timeZone;
     return {
       name: data.name,
       description: data.description,
       isPeriodized: false,
-      ...(usesRtf && data.programScheduleMode === 'TIMEFRAME' && {
-        programWithDeloads: data.programWithDeloads,
-        programStartDate: data.programStartDate,
-        programTimezone: tz,
-        ...(!isEditing && data.programStartWeek && { programStartWeek: data.programStartWeek }),
-      }),
+      ...(usesRtf &&
+        data.programScheduleMode === 'TIMEFRAME' && {
+          programWithDeloads: data.programWithDeloads,
+          programStartDate: data.programStartDate,
+          programTimezone: tz,
+          ...(!isEditing &&
+            data.programStartWeek && { programStartWeek: data.programStartWeek }),
+        }),
       days: data.days.map((day) => ({
         dayOfWeek: day.dayOfWeek,
         exercises: day.exercises.map((exercise) => ({
@@ -77,8 +102,11 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
               ? 'PROGRAMMED_RTF'
               : exercise.progressionScheme,
           minWeightIncrement: exercise.minWeightIncrement,
-          ...((exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && {
-            ...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
+          ...((exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+            exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && {
+            ...(exercise.programTMKg !== undefined && {
+              programTMKg: exercise.programTMKg,
+            }),
             ...(exercise.programRoundingKg !== undefined && {
               programRoundingKg: exercise.programRoundingKg,
             }),
@@ -87,7 +115,8 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
             const baseSet = {
               setNumber: set.setNumber,
               repType: set.repType,
-              ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
+              ...(set.weight !== undefined &&
+                set.weight !== null && { weight: set.weight }),
             } as const;
 
             if (set.repType === 'FIXED') {
@@ -113,13 +142,16 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
   const handleSubmit = async () => {
     try {
       const routineData = prepareRoutineData();
-      
+
       if (isEditing && routineId) {
-        await updateRoutineMutation.mutateAsync({ id: routineId, data: routineData });
+        await updateRoutineMutation.mutateAsync({
+          id: routineId,
+          data: routineData,
+        });
       } else {
         await createRoutineMutation.mutateAsync(routineData);
       }
-      
+
       onComplete();
     } catch (error) {
       console.error(`Failed to ${isEditing ? 'update' : 'create'} routine:`, error);
@@ -140,7 +172,7 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
 
   return (
     <div className="space-y-6">
-      <Accordion type="single" collapsible defaultValue='item-1' className="w-full">
+      <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
         {/* Basic Info */}
         <AccordionItem value="item-1">
           <AccordionTrigger>
@@ -156,7 +188,9 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
             </div>
             {data.description && (
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Description</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Description
+                </p>
                 <p className="text-sm text-muted-foreground">{data.description}</p>
               </div>
             )}
@@ -213,12 +247,19 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
                             <div>
                               <h5 className="font-medium">{exerciseData?.name}</h5>
                               <p className="text-xs text-muted-foreground">
-                                {exerciseData?.primaryMuscles ? formatMuscleGroups(exerciseData.primaryMuscles) : 'Unknown'} • {exerciseData?.equipment}
+                                {exerciseData?.primaryMuscles
+                                  ? formatMuscleGroups(exerciseData.primaryMuscles)
+                                  : 'Unknown'}{' '}
+                                • {exerciseData?.equipment}
                               </p>
-                              {(exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && (
+                              {(exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+                                exercise.progressionScheme ===
+                                  'PROGRAMMED_RTF_HYPERTROPHY') && (
                                 <div className="mt-1 flex flex-wrap gap-1">
                                   <Badge variant="outline" className="text-[10px]">
-                                    {exercise.progressionScheme === 'PROGRAMMED_RTF' ? 'RtF' : 'RtF Hypertrophy'}
+                                    {exercise.progressionScheme === 'PROGRAMMED_RTF'
+                                      ? 'RtF'
+                                      : 'RtF Hypertrophy'}
                                   </Badge>
                                 </div>
                               )}
@@ -230,7 +271,11 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {exercise.sets.map((set) => (
-                              <Badge key={set.setNumber} variant="outline" className="text-xs font-normal">
+                              <Badge
+                                key={set.setNumber}
+                                variant="outline"
+                                className="text-xs font-normal"
+                              >
                                 {set.repType === 'FIXED'
                                   ? `${set.reps ?? ''} reps`
                                   : `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
@@ -252,27 +297,34 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
       {/* Program Settings (RtF) */}
       {usesRtf && (
         <div className="rounded-lg border bg-card text-card-foreground p-4">
-          <h3 className="text-base font-semibold leading-none tracking-tight mb-3">Program Settings (RtF)</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
+          <h3 className="text-base font-semibold leading-none tracking-tight mb-3">
+            Program Settings (RtF)
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground">Include deload weeks</p>
               <p className="font-medium">{data.programWithDeloads ? 'Yes' : 'No'}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Start date</p>
-              <p className="font-medium">{data.programStartDate || 'Not set'}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Timezone</p>
-              <p className="font-medium">{data.programTimezone || 'Not set'}</p>
+              <p className="font-medium">
+                {formatDateForDisplay(data.programStartDate)}
+              </p>
             </div>
             {!isEditing && (
               <div>
                 <p className="text-muted-foreground">Start Program Week</p>
                 {(() => {
                   const total = data.programWithDeloads ? 21 : 18;
-                  const wk = Math.min(Math.max(data.programStartWeek ?? 1, 1), total);
-                  return <p className="font-medium">Week {wk} of {total}</p>;
+                  const wk = Math.min(
+                    Math.max(data.programStartWeek ?? 1, 1),
+                    total
+                  );
+                  return (
+                    <p className="font-medium">
+                      Week {wk} of {total}
+                    </p>
+                  );
                 })()}
               </div>
             )}
@@ -282,10 +334,14 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
 
       {/* Summary Stats */}
       <div className="rounded-lg border bg-card text-card-foreground p-4">
-        <h3 className="text-base font-semibold leading-none tracking-tight mb-3 text-center">Routine Summary</h3>
+        <h3 className="text-base font-semibold leading-none tracking-tight mb-3 text-center">
+          Routine Summary
+        </h3>
         <div className="flex justify-around text-center">
           <div>
-            <p className="text-xl font-bold text-primary">{data.trainingDays.length}</p>
+            <p className="text-xl font-bold text-primary">
+              {data.trainingDays.length}
+            </p>
             <p className="text-xs text-muted-foreground">Days</p>
           </div>
           <div>
@@ -338,4 +394,3 @@ export function ReviewAndCreate({ data, routineId, isEditing = false, onComplete
     </div>
   );
 }
-

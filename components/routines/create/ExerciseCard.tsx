@@ -41,6 +41,11 @@ export const SetRow: FC<{
     field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
     value: string
   ) => void;
+  onValidateMinMaxReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps'
+  ) => void;
   onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
   onStepRangeReps: (
     exerciseIndex: number,
@@ -58,6 +63,7 @@ export const SetRow: FC<{
   set,
   progressionScheme,
   onUpdateSet,
+  onValidateMinMaxReps,
   onStepFixedReps,
   onStepRangeReps,
   onStepWeight,
@@ -68,6 +74,9 @@ export const SetRow: FC<{
   // Local input state for range fields to allow smooth typing without premature clamping
   const [minInput, setMinInput] = useState<string>(set.minReps?.toString() ?? '');
   const [maxInput, setMaxInput] = useState<string>(set.maxReps?.toString() ?? '');
+  const [weightInput, setWeightInput] = useState<string>(
+    set.weight !== undefined && set.weight !== null ? String(set.weight) : ''
+  );
 
   // Sync local state when set changes from parent updates (e.g., steppers, cross-clamp)
   useEffect(() => {
@@ -82,14 +91,41 @@ export const SetRow: FC<{
     );
   }, [set.maxReps]);
 
+  useEffect(() => {
+    setWeightInput(
+      set.weight !== undefined && set.weight !== null ? String(set.weight) : ''
+    );
+  }, [set.weight]);
+
   const handleCommitMin = () => {
     const trimmed = minInput.trim();
     onUpdateSet(exerciseIndex, setIndex, 'minReps', trimmed === '' ? '' : trimmed);
+    // Apply cross-validation after committing the value
+    onValidateMinMaxReps(exerciseIndex, setIndex, 'minReps');
   };
 
   const handleCommitMax = () => {
     const trimmed = maxInput.trim();
     onUpdateSet(exerciseIndex, setIndex, 'maxReps', trimmed === '' ? '' : trimmed);
+    // Apply cross-validation after committing the value
+    onValidateMinMaxReps(exerciseIndex, setIndex, 'maxReps');
+  };
+
+  const handleCommitWeight = () => {
+    const trimmed = weightInput.trim();
+    if (trimmed === '') {
+      onUpdateSet(exerciseIndex, setIndex, 'weight', '');
+      return;
+    }
+    const value = parseFloat(trimmed);
+    if (!Number.isNaN(value) && value >= 0) {
+      onUpdateSet(exerciseIndex, setIndex, 'weight', String(value));
+    } else {
+      // Re-sync from parent if invalid
+      setWeightInput(
+        set.weight !== undefined && set.weight !== null ? String(set.weight) : ''
+      );
+    }
   };
 
   return (
@@ -303,6 +339,7 @@ export const SetRow: FC<{
                 size="icon"
                 className="h-9 w-9 p-0 shrink-0 sm:hidden"
                 aria-label="Decrease weight"
+                disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
                 onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
               >
                 <Minus className="h-3 w-3" />
@@ -314,12 +351,21 @@ export const SetRow: FC<{
                 autoComplete="off"
                 aria-label="Weight"
                 placeholder="0"
-                value={set.weight ?? ''}
+                value={weightInput}
                 onChange={(e) => {
-                  const next = e.target.value.replace(/[^0-9.]/g, '');
-                  onUpdateSet(exerciseIndex, setIndex, 'weight', next);
+                  const raw = e.target.value;
+                  const sanitized = raw
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*)\./g, '$1'); // Allow only one dot
+                  setWeightInput(sanitized);
                 }}
-                className="text-center h-8 flex-1 min-w-0"
+                onBlur={handleCommitWeight}
+                disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
+                className={`text-center h-8 flex-1 min-w-0 ${
+                  progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+                    ? 'cursor-not-allowed opacity-60'
+                    : ''
+                }`}
               />
               <Button
                 type="button"
@@ -327,6 +373,7 @@ export const SetRow: FC<{
                 size="icon"
                 className="h-9 w-9 p-0 shrink-0 sm:hidden"
                 aria-label="Increase weight"
+                disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
                 onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
               >
                 <Plus className="h-3 w-3" />
@@ -378,6 +425,11 @@ interface ExerciseCardProps {
     field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
     value: string
   ) => void;
+  onValidateMinMaxReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps'
+  ) => void;
   onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
   onStepRangeReps: (
     exerciseIndex: number,
@@ -406,6 +458,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   isRemovingSet,
   onRemoveSetAnimated,
   onUpdateSet,
+  onValidateMinMaxReps,
   onStepFixedReps,
   onStepRangeReps,
   onStepWeight,
@@ -439,48 +492,62 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
   return (
     <Card key={exerciseIndex} className="border-muted overflow-hidden p-0">
-      <CardHeader className="p-3 sm:p-4">
-        <div className="flex items-center justify-between gap-3">
-          {/* Exercise info - clickable to expand */}
-          <div
-            className="flex-1 cursor-pointer min-w-0"
-            role="button"
-            tabIndex={0}
-            aria-label="Toggle exercise sets"
-            aria-expanded={expanded}
-            aria-controls={`sets-${tabIndex}-${exerciseIndex}`}
-            onClick={() => onToggleExpand(exerciseIndex)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onToggleExpand(exerciseIndex);
-              }
-            }}
-          >
+      <CardHeader
+        className={`cursor-pointer transition-all duration-200 hover:bg-muted/30 ${
+          expanded ? 'p-3 sm:p-4' : 'p-2 sm:p-3'
+        }`}
+        role="button"
+        tabIndex={0}
+        aria-label="Toggle exercise sets"
+        aria-expanded={expanded}
+        aria-controls={`sets-${tabIndex}-${exerciseIndex}`}
+        onClick={() => onToggleExpand(exerciseIndex)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggleExpand(exerciseIndex);
+          }
+        }}
+      >
+        <div
+          className={`flex items-center justify-between ${
+            expanded ? 'gap-3' : 'gap-2'
+          }`}
+        >
+          {/* Exercise info */}
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-base sm:text-base truncate">
-                  {exerciseData?.name || 'Exercise'}
-                </h4>
-                <p
-                  className={`text-xs sm:text-sm text-muted-foreground truncate ${
-                    !expanded ? 'hidden sm:block' : ''
+                <h4
+                  className={`font-medium truncate ${
+                    expanded ? 'text-base sm:text-base' : 'text-sm sm:text-base'
                   }`}
                 >
-                  {exerciseData?.primaryMuscles
-                    ? formatMuscleGroups(exerciseData.primaryMuscles)
-                    : 'Unknown'}{' '}
-                  • {exerciseData?.equipment}
-                </p>
+                  {exerciseData?.name || 'Exercise'}
+                </h4>
+                {expanded && (
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                    {exerciseData?.primaryMuscles
+                      ? formatMuscleGroups(exerciseData.primaryMuscles)
+                      : 'Unknown'}{' '}
+                    • {exerciseData?.equipment}
+                  </p>
+                )}
               </div>
               {!expanded && (
-                <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground shrink-0">
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                    {exercise.sets.length} set{exercise.sets.length !== 1 ? 's' : ''}
-                  </Badge>
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                  {exercise.progressionScheme !== 'PROGRAMMED_RTF' &&
+                    exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0.5 h-5"
+                      >
+                        {exercise.sets.length}
+                      </Badge>
+                    )}
+                  <div className="flex items-center gap-0.5">
                     <Clock className="h-3 w-3" />
-                    <span>
+                    <span className="text-[10px] sm:text-xs">
                       {Math.floor(exercise.restSeconds / 60)}:
                       {(exercise.restSeconds % 60).toString().padStart(2, '0')}
                     </span>
@@ -498,12 +565,15 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               aria-label="Toggle sets"
               aria-expanded={expanded}
               aria-controls={`sets-${tabIndex}-${exerciseIndex}`}
-              onClick={() => onToggleExpand(exerciseIndex)}
-              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand(exerciseIndex);
+              }}
+              className={`p-0 ${expanded ? 'h-8 w-8' : 'h-6 w-6'}`}
             >
               <ChevronsUpDown
-                className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
-                  expanded ? 'rotate-180' : ''
+                className={`transition-transform duration-300 ease-in-out ${
+                  expanded ? 'h-4 w-4 rotate-180' : 'h-3 w-3'
                 }`}
               />
             </Button>
@@ -511,10 +581,15 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               variant="ghost"
               size="sm"
               aria-label="Remove exercise"
-              onClick={() => onRemoveExercise(exerciseIndex)}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveExercise(exerciseIndex);
+              }}
+              className={`p-0 text-muted-foreground hover:text-destructive ${
+                expanded ? 'h-8 w-8' : 'h-6 w-6'
+              }`}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
             </Button>
           </div>
         </div>
@@ -798,6 +873,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                             set={set}
                             progressionScheme={exercise.progressionScheme}
                             onUpdateSet={onUpdateSet}
+                            onValidateMinMaxReps={onValidateMinMaxReps}
                             onStepFixedReps={onStepFixedReps}
                             onStepRangeReps={onStepRangeReps}
                             onStepWeight={onStepWeight}

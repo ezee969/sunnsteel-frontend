@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Loader2, ChevronsUpDown } from 'lucide-react';
+import { Plus, Loader2, ChevronsUpDown, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useExercises } from '@/lib/api/hooks/useExercises';
 import { parseTime } from '@/lib/utils/time';
@@ -14,6 +14,26 @@ import { Exercise } from '@/lib/api/types/exercise.type';
 import { RoutineWizardData, ProgressionScheme } from './types';
 import { Input } from '@/components/ui/input';
 import { ExerciseCard } from './ExerciseCard';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  UniqueIdentifier,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface BuildDaysProps {
   data: RoutineWizardData;
@@ -41,6 +61,24 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
   const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME';
+
+  // Drag and drop state
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [draggedExercise, setDraggedExercise] = useState<
+    RoutineWizardData['days'][number]['exercises'][number] | null
+  >(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Note: we compute day-specific data on-demand below to avoid stale references
 
@@ -98,15 +136,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
         ) ||
         exercise.equipment.toLowerCase().includes(searchLower);
 
-      // Check if exercise is already added to current day
-      const currentDayData = data.days.find(
-        (d) => d.dayOfWeek === data.trainingDays[selectedDay]
-      );
-      const isAlreadyAdded = currentDayData?.exercises.some(
-        (ex) => ex.exerciseId === exercise.id
-      );
-
-      return matchesSearch && !isAlreadyAdded;
+      // Allow duplicates: do not exclude already-added exercises
+      return matchesSearch;
     }) || [];
 
   // Scroll after render to target exercise card if queued
@@ -157,8 +188,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     const newExerciseIndex = newDays[dayIndex].exercises.length;
     newDays[dayIndex].exercises.push(newExercise);
     onUpdate({ days: newDays });
+    // Close dropdown but keep exercises list (including duplicates)
     setExercisePickerOpen(false);
-    setSearchValue('');
 
     // Queue scroll to the newly added exercise after render
     setPendingScrollKey(`${exerciseId}-${newExerciseIndex}`);
@@ -268,6 +299,20 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     const current = set.weight ?? 0;
     const next = Math.max(0, Math.round((current + delta * 0.5) * 2) / 2);
     set.weight = next;
+
+    // For Double Progression, sync weight across all sets when first set is modified
+    if (
+      newDays[dayIndex].exercises[exerciseIndex].progressionScheme ===
+        'DOUBLE_PROGRESSION' &&
+      setIndex === 0
+    ) {
+      newDays[dayIndex].exercises[exerciseIndex].sets.forEach((s, idx) => {
+        if (idx !== 0) {
+          s.weight = next;
+        }
+      });
+    }
+
     onUpdate({ days: newDays });
   };
 
@@ -298,6 +343,16 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
           s.minReps = Math.max(1, Math.min(50, base));
           s.maxReps = Math.max(s.minReps as number, Math.min(50, base));
           s.reps = null;
+        }
+      });
+    }
+
+    // For Double Progression, sync all sets to have the same weight as the first set
+    if (scheme === 'DOUBLE_PROGRESSION' && ex.sets.length > 0) {
+      const firstSetWeight = ex.sets[0].weight;
+      ex.sets.forEach((set, idx) => {
+        if (idx > 0) {
+          set.weight = firstSetWeight;
         }
       });
     }
@@ -343,14 +398,24 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     const newSetNumber = exercise.sets.length + 1;
 
     const lastSet = exercise.sets[exercise.sets.length - 1];
-    exercise.sets.push({
+    const newSet = {
       setNumber: newSetNumber,
       repType: lastSet?.repType ?? 'FIXED',
       reps: lastSet?.repType === 'FIXED' ? lastSet?.reps ?? 10 : null,
       minReps: lastSet?.repType === 'RANGE' ? lastSet?.minReps ?? 8 : null,
       maxReps: lastSet?.repType === 'RANGE' ? lastSet?.maxReps ?? 12 : null,
       weight: lastSet?.weight,
-    });
+    };
+
+    // For Double Progression, use the first set's weight instead of the last set's weight
+    if (
+      exercise.progressionScheme === 'DOUBLE_PROGRESSION' &&
+      exercise.sets.length > 0
+    ) {
+      newSet.weight = exercise.sets[0].weight;
+    }
+
+    exercise.sets.push(newSet);
 
     onUpdate({ days: newDays });
   };
@@ -369,6 +434,43 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     newDays[dayIndex].exercises[exerciseIndex].sets.forEach((set, index) => {
       set.setNumber = index + 1;
     });
+
+    onUpdate({ days: newDays });
+  };
+
+  const validateMinMaxReps = (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps'
+  ) => {
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex === -1) return;
+
+    const targetSet = newDays[dayIndex].exercises[exerciseIndex].sets[setIndex];
+
+    // Apply cross-validation
+    if (field === 'minReps') {
+      if (
+        targetSet.maxReps !== null &&
+        targetSet.maxReps !== undefined &&
+        targetSet.minReps !== null &&
+        (targetSet.minReps as number) > (targetSet.maxReps as number)
+      ) {
+        targetSet.maxReps = targetSet.minReps;
+      }
+    } else if (field === 'maxReps') {
+      if (
+        targetSet.minReps !== null &&
+        targetSet.minReps !== undefined &&
+        targetSet.maxReps !== null &&
+        (targetSet.maxReps as number) < (targetSet.minReps as number)
+      ) {
+        targetSet.minReps = targetSet.maxReps;
+      }
+    }
 
     onUpdate({ days: newDays });
   };
@@ -403,7 +505,21 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
         targetSet.reps = null;
       }
     } else if (field === 'weight') {
-      targetSet.weight = value === '' ? undefined : parseFloat(value);
+      const newWeight = value === '' ? undefined : parseFloat(value);
+      targetSet.weight = newWeight;
+
+      // For Double Progression, sync weight across all sets when first set is modified
+      if (
+        newDays[dayIndex].exercises[exerciseIndex].progressionScheme ===
+          'DOUBLE_PROGRESSION' &&
+        setIndex === 0
+      ) {
+        newDays[dayIndex].exercises[exerciseIndex].sets.forEach((set, idx) => {
+          if (idx !== 0) {
+            set.weight = newWeight;
+          }
+        });
+      }
     } else if (field === 'reps') {
       if (value === '') {
         targetSet.reps = null;
@@ -418,28 +534,12 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
         const next = Math.max(1, Math.min(50, parseInt(value)));
         targetSet.minReps = Number.isNaN(next) ? null : next;
       }
-      if (
-        targetSet.maxReps !== null &&
-        targetSet.maxReps !== undefined &&
-        targetSet.minReps !== null &&
-        (targetSet.minReps as number) > (targetSet.maxReps as number)
-      ) {
-        targetSet.maxReps = targetSet.minReps;
-      }
     } else if (field === 'maxReps') {
       if (value === '') {
         targetSet.maxReps = null;
       } else {
         const next = Math.max(1, Math.min(50, parseInt(value)));
         targetSet.maxReps = Number.isNaN(next) ? null : next;
-      }
-      if (
-        targetSet.minReps !== null &&
-        targetSet.minReps !== undefined &&
-        targetSet.maxReps !== null &&
-        (targetSet.maxReps as number) < (targetSet.minReps as number)
-      ) {
-        targetSet.minReps = targetSet.maxReps;
       }
     }
 
@@ -456,6 +556,55 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     newDays[dayIndex].exercises[exerciseIndex].restSeconds = parseTime(timeStr);
     onUpdate({ days: newDays });
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    setActiveId(active.id);
+
+    // Find the dragged exercise
+    const dayIndex = data.days.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+    if (dayIndex !== -1) {
+      const exerciseIndex = parseInt(active.id.toString().split('-')[1]);
+      const exercise = data.days[dayIndex].exercises[exerciseIndex];
+      setDraggedExercise(exercise);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      setActiveId(null);
+      setDraggedExercise(null);
+      return;
+    }
+
+    const newDays = [...data.days];
+    const dayIndex = newDays.findIndex(
+      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
+    );
+
+    if (dayIndex === -1) {
+      setActiveId(null);
+      setDraggedExercise(null);
+      return;
+    }
+
+    const oldIndex = parseInt(active.id.toString().split('-')[1]);
+    const newIndex = parseInt(over.id.toString().split('-')[1]);
+
+    if (oldIndex !== newIndex) {
+      const exercises = newDays[dayIndex].exercises;
+      newDays[dayIndex].exercises = arrayMove(exercises, oldIndex, newIndex);
+      onUpdate({ days: newDays });
+    }
+
+    setActiveId(null);
+    setDraggedExercise(null);
   };
 
   if (data.trainingDays.length === 0) {
@@ -572,78 +721,134 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                   </CardHeader>
                   <CardContent className="p-4 sm:p-6">
                     {day && day.exercises.length > 0 ? (
-                      <div className="space-y-4">
-                        <AnimatePresence>
-                          {day.exercises.map((exercise, exerciseIndex) => {
-                            const exerciseData = exercises?.find(
-                              (ex: Exercise) => ex.id === exercise.exerciseId
-                            );
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext
+                          items={day.exercises.map(
+                            (_, index) => `exercise-${index}`
+                          )}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          <div className="space-y-4">
+                            <AnimatePresence>
+                              {day.exercises.map((exercise, exerciseIndex) => {
+                                const exerciseData = exercises?.find(
+                                  (ex: Exercise) => ex.id === exercise.exerciseId
+                                );
 
-                            return (
-                              <motion.div
-                                key={`${exercise.exerciseId}-${exerciseIndex}`}
-                                ref={(el) => {
-                                  exerciseRefs.current[
-                                    `${exercise.exerciseId}-${exerciseIndex}`
-                                  ] = el;
-                                }}
-                                className="scroll-mt-24"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                              >
-                                <ExerciseCard
-                                  tabIndex={tabIndex}
-                                  exerciseIndex={exerciseIndex}
-                                  exercise={exercise}
-                                  exerciseData={exerciseData}
-                                  expanded={expandedMap?.[exerciseIndex] ?? true}
-                                  onToggleExpand={(idx) =>
-                                    setExpandedMap((prev) => ({
-                                      ...prev,
-                                      [idx]: !(prev?.[idx] ?? true),
-                                    }))
-                                  }
-                                  onRemoveExercise={removeExercise}
-                                  onUpdateRestTime={updateRestTime}
-                                  onUpdateProgressionScheme={updateProgressionScheme}
-                                  onUpdateMinWeightIncrement={
-                                    updateMinWeightIncrement
-                                  }
-                                  onUpdateProgramTMKg={updateProgramTMKg}
-                                  onUpdateProgramRoundingKg={updateProgramRoundingKg}
-                                  onAddSet={addSet}
-                                  onRemoveSet={removeSet}
-                                  isRemovingSet={(exIdx, setIdx) =>
-                                    !!removingSets[`${exIdx}-${setIdx}`]
-                                  }
-                                  onRemoveSetAnimated={(exIdx, setIdx) => {
-                                    const key = `${exIdx}-${setIdx}`;
-                                    setRemovingSets((prev) => ({
-                                      ...prev,
-                                      [key]: true,
-                                    }));
-                                    setTimeout(() => {
-                                      removeSet(exIdx, setIdx);
-                                      setRemovingSets((prev) => {
-                                        const next = { ...prev };
-                                        delete next[key];
-                                        return next;
-                                      });
-                                    }, 180);
-                                  }}
-                                  onUpdateSet={updateSet}
-                                  onStepFixedReps={stepFixedReps}
-                                  onStepRangeReps={stepRangeReps}
-                                  onStepWeight={stepWeight}
-                                  disableTimeBasedProgressions={!canUseTimeframe}
-                                />
-                              </motion.div>
-                            );
-                          })}
-                        </AnimatePresence>
-                      </div>
+                                return (
+                                  <motion.div
+                                    key={`${exercise.exerciseId}-${exerciseIndex}`}
+                                    ref={(el) => {
+                                      exerciseRefs.current[
+                                        `${exercise.exerciseId}-${exerciseIndex}`
+                                      ] = el;
+                                    }}
+                                    className="scroll-mt-24"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{
+                                      duration: 0.2,
+                                      ease: 'easeInOut',
+                                    }}
+                                  >
+                                    <SortableExerciseCard
+                                      id={`exercise-${exerciseIndex}`}
+                                      tabIndex={tabIndex}
+                                      exerciseIndex={exerciseIndex}
+                                      exercise={exercise}
+                                      exerciseData={exerciseData}
+                                      expanded={expandedMap?.[exerciseIndex] ?? true}
+                                      onToggleExpand={(idx) =>
+                                        setExpandedMap((prev) => ({
+                                          ...prev,
+                                          [idx]: !(prev?.[idx] ?? true),
+                                        }))
+                                      }
+                                      onRemoveExercise={removeExercise}
+                                      onUpdateRestTime={updateRestTime}
+                                      onUpdateProgressionScheme={
+                                        updateProgressionScheme
+                                      }
+                                      onUpdateMinWeightIncrement={
+                                        updateMinWeightIncrement
+                                      }
+                                      onUpdateProgramTMKg={updateProgramTMKg}
+                                      onUpdateProgramRoundingKg={
+                                        updateProgramRoundingKg
+                                      }
+                                      onAddSet={addSet}
+                                      onRemoveSet={removeSet}
+                                      isRemovingSet={(exIdx, setIdx) =>
+                                        !!removingSets[`${exIdx}-${setIdx}`]
+                                      }
+                                      onRemoveSetAnimated={(exIdx, setIdx) => {
+                                        const key = `${exIdx}-${setIdx}`;
+                                        setRemovingSets((prev) => ({
+                                          ...prev,
+                                          [key]: true,
+                                        }));
+                                        setTimeout(() => {
+                                          removeSet(exIdx, setIdx);
+                                          setRemovingSets((prev) => {
+                                            const next = { ...prev };
+                                            delete next[key];
+                                            return next;
+                                          });
+                                        }, 180);
+                                      }}
+                                      onUpdateSet={updateSet}
+                                      onValidateMinMaxReps={validateMinMaxReps}
+                                      onStepFixedReps={stepFixedReps}
+                                      onStepRangeReps={stepRangeReps}
+                                      onStepWeight={stepWeight}
+                                      disableTimeBasedProgressions={!canUseTimeframe}
+                                    />
+                                  </motion.div>
+                                );
+                              })}
+                            </AnimatePresence>
+                          </div>
+                        </SortableContext>
+                        <DragOverlay>
+                          {activeId && draggedExercise ? (
+                            <div className="opacity-50">
+                              <ExerciseCard
+                                tabIndex={tabIndex}
+                                exerciseIndex={0}
+                                exercise={draggedExercise}
+                                exerciseData={exercises?.find(
+                                  (ex: Exercise) =>
+                                    ex.id === draggedExercise.exerciseId
+                                )}
+                                expanded={false}
+                                onToggleExpand={() => {}}
+                                onRemoveExercise={() => {}}
+                                onUpdateRestTime={() => {}}
+                                onUpdateProgressionScheme={() => {}}
+                                onUpdateMinWeightIncrement={() => {}}
+                                onUpdateProgramTMKg={() => {}}
+                                onUpdateProgramRoundingKg={() => {}}
+                                onAddSet={() => {}}
+                                onRemoveSet={() => {}}
+                                isRemovingSet={() => false}
+                                onRemoveSetAnimated={() => {}}
+                                onUpdateSet={() => {}}
+                                onValidateMinMaxReps={() => {}}
+                                onStepFixedReps={() => {}}
+                                onStepRangeReps={() => {}}
+                                onStepWeight={() => {}}
+                                disableTimeBasedProgressions={!canUseTimeframe}
+                              />
+                            </div>
+                          ) : null}
+                        </DragOverlay>
+                      </DndContext>
                     ) : (
                       <div className="text-center text-sm text-muted-foreground py-8">
                         No exercises added yet. Use &quot;Add Exercise&quot; to start
@@ -693,3 +898,78 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     </div>
   );
 }
+
+// Sortable wrapper for ExerciseCard
+interface SortableExerciseCardProps {
+  id: string;
+  tabIndex: number;
+  exerciseIndex: number;
+  exercise: RoutineWizardData['days'][number]['exercises'][number];
+  exerciseData?: Exercise;
+  expanded: boolean;
+  onToggleExpand: (exerciseIndex: number) => void;
+  onRemoveExercise: (exerciseIndex: number) => void;
+  onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void;
+  onUpdateProgressionScheme: (
+    exerciseIndex: number,
+    scheme: ProgressionScheme
+  ) => void;
+  onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
+  onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void;
+  onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void;
+  onAddSet: (exerciseIndex: number) => void;
+  isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean;
+  onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void;
+  onRemoveSet?: (exerciseIndex: number, setIndex: number) => void;
+  onUpdateSet: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
+    value: string
+  ) => void;
+  onValidateMinMaxReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps'
+  ) => void;
+  onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  onStepRangeReps: (
+    exerciseIndex: number,
+    setIndex: number,
+    field: 'minReps' | 'maxReps',
+    delta: number
+  ) => void;
+  onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
+  disableTimeBasedProgressions?: boolean;
+}
+
+const SortableExerciseCard: React.FC<SortableExerciseCardProps> = ({
+  id,
+  ...props
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="relative">
+        <div
+          {...listeners}
+          className="absolute left-0 top-0 bottom-0 w-6 flex items-center justify-center cursor-grab active:cursor-grabbing hover:bg-muted/50 rounded-l-md transition-colors"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="ml-6">
+          <ExerciseCard {...props} />
+        </div>
+      </div>
+    </div>
+  );
+};
