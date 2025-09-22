@@ -640,6 +640,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   </TooltipProvider>
                 )}
               </div>
+              {disableTimeBasedProgressions && (
+                <span className="text-xs text-muted-foreground italic">
+                  Time-based progressions are disabled
+                </span>
+              )}
               <Select
                 value={exercise.progressionScheme}
                 onValueChange={(val) => {
@@ -890,6 +895,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                     {/* Add set button */}
                     <div className="mt-3 pt-3 border-t border-muted px-2 sm:px-0 sm:border-0">
                       <Button
+                        data-testid={`add-set-btn-${tabIndex}-${exerciseIndex}`}
                         onClick={() => {
                           setShouldScrollToLast(true);
                           onAddSet(exerciseIndex);
