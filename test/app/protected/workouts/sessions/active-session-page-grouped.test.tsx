@@ -15,6 +15,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
+  markSetPending: vi.fn(),
   useSession: () => ({
     data: {
       id: 'sess-1',

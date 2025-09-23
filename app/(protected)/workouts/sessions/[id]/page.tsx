@@ -26,6 +26,8 @@ import type { SetLog } from '@/lib/api/types/workout.type';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSaveState, saveStateLabel } from '@/lib/utils/save-status-store';
+import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,7 +54,7 @@ export default function ActiveSessionPage() {
 
   const { data: session, isLoading, error } = useSession(idParam);
   const { mutate: finishSession, isPending: finishing } = useFinishSession(idParam);
-  const { mutate: upsertSetLog, isPending: savingLog } = useUpsertSetLog(idParam);
+  const { mutate: upsertSetLog } = useUpsertSetLog(idParam);
   const { data: routine } = useRoutine(session?.routineId ?? '');
 
   const [isConfirmingFinish, setIsConfirmingFinish] = useState(false);
@@ -295,6 +297,7 @@ export default function ActiveSessionPage() {
                 {session.setLogs?.map((log) => (
                   <LogRow
                     key={`${log.routineExerciseId}-${log.setNumber}`}
+                    sessionId={session.id}
                     routineExerciseId={log.routineExerciseId}
                     exerciseId={log.exerciseId}
                     setNumber={log.setNumber}
@@ -303,7 +306,6 @@ export default function ActiveSessionPage() {
                     rpe={log.rpe}
                     isCompleted={log.isCompleted}
                     onSave={handleSaveSetLog}
-                    saving={savingLog}
                   />
                 ))}
                 {!session.setLogs || session.setLogs.length === 0 ? (
@@ -317,8 +319,8 @@ export default function ActiveSessionPage() {
                 routineId={session.routineId}
                 routineDayId={session.routineDayId}
                 routine={routine}
+                sessionId={session.id}
                 onSave={handleSaveSetLog}
-                saving={savingLog}
               />
             )}
           </CardContent>
@@ -338,6 +340,7 @@ type UpsertSetLogPayload = {
 };
 
 type LogRowProps = {
+  sessionId: string;
   routineExerciseId: string;
   exerciseId: string;
   setNumber: number;
@@ -349,7 +352,6 @@ type LogRowProps = {
   plannedMinReps?: number | null;
   plannedMaxReps?: number | null;
   plannedWeight?: number | null;
-  saving: boolean;
   onSave: (payload: UpsertSetLogPayload) => void;
 };
 
@@ -367,7 +369,7 @@ type GroupedLogsProps = {
   routineId: string;
   routineDayId: string;
   routine: Routine;
-  saving: boolean;
+  sessionId: string;
   onSave: LogRowProps['onSave'];
 };
 
@@ -375,7 +377,7 @@ const GroupedLogs = ({
   logs,
   routine,
   routineDayId,
-  saving,
+  sessionId,
   onSave,
 }: GroupedLogsProps) => {
   const [collapsedExercises, setCollapsedExercises] = useState<Set<string>>(
@@ -401,6 +403,7 @@ const GroupedLogs = ({
         {logs.map((log) => (
           <LogRow
             key={`${log.routineExerciseId}-${log.setNumber}`}
+            sessionId={sessionId}
             routineExerciseId={log.routineExerciseId}
             exerciseId={log.exerciseId}
             setNumber={log.setNumber}
@@ -408,7 +411,6 @@ const GroupedLogs = ({
             weight={log.weight}
             isCompleted={log.isCompleted}
             onSave={onSave}
-            saving={saving}
           />
         ))}
       </div>
@@ -480,6 +482,7 @@ const GroupedLogs = ({
                   return (
                     <LogRow
                       key={`${re.id}-${tpl.setNumber}`}
+                      sessionId={sessionId}
                       routineExerciseId={re.id}
                       exerciseId={re.exercise.id}
                       setNumber={tpl.setNumber}
@@ -491,7 +494,6 @@ const GroupedLogs = ({
                       plannedMaxReps={tpl.maxReps}
                       plannedWeight={tpl.weight}
                       onSave={onSave}
-                      saving={saving}
                     />
                   );
                 })}
@@ -505,6 +507,7 @@ const GroupedLogs = ({
 };
 
 const LogRow = ({
+  sessionId,
   routineExerciseId,
   exerciseId,
   setNumber,
@@ -515,7 +518,6 @@ const LogRow = ({
   plannedMinReps,
   plannedMaxReps,
   plannedWeight,
-  saving,
   onSave,
 }: LogRowProps) => {
   const [repsState, setReps] = useState<string>(reps > 0 ? String(reps) : '');
@@ -523,9 +525,11 @@ const LogRow = ({
     weight !== undefined && weight !== null ? String(weight) : ''
   );
   const [isCompletedState, setIsCompleted] = useState<boolean>(isCompleted);
-
-  const debouncedReps = useDebounce(repsState, 1000);
-  const debouncedWeight = useDebounce(weightState, 1000);
+  const debouncedReps = useDebounce(repsState, 800);
+  const debouncedWeight = useDebounce(weightState, 800);
+  const saveState = useSaveState(
+    `set:${sessionId}:${routineExerciseId}:${setNumber}`
+  );
 
   useEffect(() => {
     const currentReps = Number(debouncedReps);
@@ -548,6 +552,7 @@ const LogRow = ({
 
   const handleCompletionToggle = (checked: boolean) => {
     setIsCompleted(checked);
+    markSetPending(sessionId, routineExerciseId, setNumber);
     onSave({
       routineExerciseId,
       exerciseId,
@@ -588,13 +593,27 @@ const LogRow = ({
             </Badge>
           )}
         </div>
+        <div className="flex items-center gap-1">
+          {saveState === 'saving' && (
+            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+          )}
+          {saveState === 'error' && (
+            <span className="text-xs text-red-600">Error</span>
+          )}
+          {saveState === 'saved' && (
+            <span className="text-xs text-green-600">Saved</span>
+          )}
+          {saveState === 'pending' && (
+            <span className="text-xs text-amber-600">Unsaved</span>
+          )}
+        </div>
         <Checkbox
           checked={isCompletedState}
           onCheckedChange={(checked: boolean | 'indeterminate') =>
             handleCompletionToggle(Boolean(checked))
           }
           aria-label="Mark set as complete"
-          disabled={saving}
+          disabled={saveState === 'saving'}
           className="h-5 w-5"
         />
       </div>
@@ -614,8 +633,11 @@ const LogRow = ({
             aria-label="Performed reps"
             placeholder="Enter reps"
             value={repsState}
-            onChange={(e) => setReps(e.target.value)}
-            disabled={saving}
+            onChange={(e) => {
+              setReps(e.target.value);
+              markSetPending(sessionId, routineExerciseId, setNumber);
+            }}
+            disabled={saveState === 'saving'}
             className="text-center text-lg font-semibold h-12"
           />
         </div>
@@ -637,17 +659,18 @@ const LogRow = ({
             aria-label="Performed weight"
             placeholder="Enter weight"
             value={weightState}
-            onChange={(e) => setWeight(e.target.value)}
-            disabled={saving}
+            onChange={(e) => {
+              setWeight(e.target.value);
+              markSetPending(sessionId, routineExerciseId, setNumber);
+            }}
+            disabled={saveState === 'saving'}
             className="text-center text-lg font-semibold h-12"
           />
         </div>
       </div>
-
-      {saving && (
+      {saveState !== 'idle' && saveState !== 'pending' && saveState !== 'saving' && (
         <div className="flex items-center justify-center mt-3 text-xs text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin mr-1" />
-          Saving...
+          {saveStateLabel(saveState)}
         </div>
       )}
     </div>

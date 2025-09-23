@@ -4,15 +4,20 @@ import { CreateRoutineRequest, Routine } from '../types/routine.type';
 
 const ROUTINES_QUERY_KEY = ['routines'] as const;
 
-export const useRoutines = (filters?: {
-  isFavorite?: boolean;
-  isCompleted?: boolean;
-}) => {
+function serializeFilters(filters?: { isFavorite?: boolean; isCompleted?: boolean }) {
+  if (!filters) return 'nofilters'
+  const entries = Object.entries(filters).filter(([, v]) => v !== undefined)
+  if (!entries.length) return 'nofilters'
+  entries.sort(([a], [b]) => a.localeCompare(b))
+  return entries.map(([k, v]) => `${k}:${v}`).join('|')
+}
+
+export const useRoutines = (filters?: { isFavorite?: boolean; isCompleted?: boolean }) => {
   return useQuery<Routine[], Error>({
-    queryKey: [...ROUTINES_QUERY_KEY, filters ?? {}],
+    queryKey: [...ROUTINES_QUERY_KEY, serializeFilters(filters)],
     queryFn: () => routineService.getUserRoutines(filters),
-  });
-};
+  })
+}
 
 type ToggleFavoriteContext = {
   previousList?: Routine[];

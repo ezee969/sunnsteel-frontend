@@ -14,6 +14,12 @@ export default defineConfig({
     globals: true,
     css: true,
     include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    // Exclude removed legacy auth hook test (Supabase migration)
+    exclude: [
+      'test/lib/api/hooks/useAuth.test.tsx',
+      'test/lib/api/hooks/useAuth.test.skip.ts',
+      'node_modules',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

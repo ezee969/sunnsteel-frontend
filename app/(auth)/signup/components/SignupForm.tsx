@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { useRegister } from '@/lib/api/hooks/useRegister';
+import { useSupabaseEmailAuth } from '@/lib/api/hooks';
 import { useForm } from 'react-hook-form';
 import { SignupFormValues, signupSchema } from '@/schema/signup-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import {
   Form,
   FormControl,
@@ -19,8 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export function SignupForm() {
-  const router = useRouter();
-  const { mutate: register, isPending, isError, error } = useRegister();
+  const { signUp, isSigningUp, signupError } = useSupabaseEmailAuth();
 
   // Initialize form with react-hook-form and zod resolver
   const form = useForm<SignupFormValues>({
@@ -34,24 +32,24 @@ export function SignupForm() {
   });
 
   // Form submission handler
-  function onSubmit(values: SignupFormValues) {
+  async function onSubmit(values: SignupFormValues) {
     // Remove confirmPassword before sending to API
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword, ...userData } = values;
+    const { confirmPassword, ...userData } = values
 
-    register(userData, {
-      onSuccess: () => {
-        router.push('/login');
-      },
-    });
+    try {
+      await signUp(userData.email, userData.password, userData.name)
+    } catch (error) {
+      console.error('Signup failed:', error)
+    }
   }
 
   return (
     <div className="w-full max-w-md">
       <div className="backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
-        {isError && (
+        {signupError && (
           <div className="p-3 text-sm bg-red-900/20 border border-red-500/30 rounded text-red-200 mb-6">
-            {error?.message || 'Registration failed. Please try again.'}
+            {signupError?.message || 'Registration failed. Please try again.'}
           </div>
         )}
 
@@ -151,11 +149,11 @@ export function SignupForm() {
               className="w-full hover:scale-[1.02] transition-transform duration-300 font-semibold"
               variant="classical"
               type="submit"
-              disabled={isPending}
-              aria-label={isPending ? 'Creating account' : 'Begin your journey'}
+              disabled={isSigningUp}
+              aria-label={isSigningUp ? 'Creating account' : 'Begin your journey'}
             >
-              {isPending ? 'Creating account...' : 'Begin Your Journey'}
-              {!isPending && <ChevronRight className="w-4 h-4 ml-2" />}
+              {isSigningUp ? 'Creating account...' : 'Begin Your Journey'}
+              {!isSigningUp && <ChevronRight className="w-4 h-4 ml-2" />}
             </Button>
           </form>
         </Form>

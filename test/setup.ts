@@ -29,3 +29,12 @@ if (!('scrollIntoView' in Element.prototype)) {
     writable: true,
   });
 }
+
+// jsdom does not implement window.alert - mock to silence warnings
+if (!('alert' in window)) {
+  // @ts-ignore
+  window.alert = vi.fn();
+} else {
+  // override existing (noop in real browser env not needed, but safe here)
+  window.alert = vi.fn();
+}

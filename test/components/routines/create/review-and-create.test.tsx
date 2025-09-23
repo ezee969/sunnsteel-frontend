@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@/test/utils';
+import { render } from '@/test/utils';
+import { screen, fireEvent } from '@testing-library/react';
 import type { RoutineWizardData } from '@/components/routines/create/types';
 import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
 
@@ -49,68 +50,6 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
     );
   });
 
-  it('shows "RtF Hypertrophy" badge in Review for PROGRAMMED_RTF_HYPERTROPHY', async () => {
-    const data: RoutineWizardData = {
-      ...baseData,
-      days: [
-        {
-          dayOfWeek: 1,
-          exercises: [
-            {
-              ...baseData.days[0].exercises[0],
-              progressionScheme: 'PROGRAMMED_RTF_HYPERTROPHY',
-            },
-          ],
-        },
-      ],
-    };
-
-    render(<ReviewAndCreate data={data} onComplete={() => {}} />);
-    // Open the Workout Details accordion to reveal badges
-    fireEvent.click(screen.getByRole('button', { name: /Workout Details/i }));
-    expect(screen.getByText(/RtF Hypertrophy/i)).toBeInTheDocument();
-  });
-
-  it('maps PROGRAMMED_RTF_HYPERTROPHY to PROGRAMMED_RTF in payload and includes per-exercise RtF fields', async () => {
-    const data: RoutineWizardData = {
-      name: 'H-RtF Routine',
-      description: '',
-      trainingDays: [1],
-      days: [
-        {
-          dayOfWeek: 1,
-          exercises: [
-            {
-              exerciseId: 'e1',
-              progressionScheme: 'PROGRAMMED_RTF_HYPERTROPHY',
-              minWeightIncrement: 2.5,
-              restSeconds: 120,
-              programTMKg: 110,
-              programRoundingKg: 2.5,
-              sets: [
-                { setNumber: 1, repType: 'RANGE', reps: null, minReps: 8, maxReps: 12, weight: undefined },
-              ],
-            },
-          ],
-        },
-      ],
-      programWithDeloads: true,
-      programStartDate: '2025-09-08',
-      programTimezone: 'America/New_York',
-    };
-
-    render(<ReviewAndCreate data={data} onComplete={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /create routine/i }));
-
-    const payload = createSpy.mock.calls[0][0];
-    const ex = payload.days[0].exercises[0];
-    expect(ex.progressionScheme).toBe('PROGRAMMED_RTF');
-    expect(ex).toEqual(
-      expect.objectContaining({ programTMKg: 110, programRoundingKg: 2.5 })
-    );
-
-    // UI label is covered by a dedicated test above; here we only assert payload mapping
-  });
 
   it('falls back to browser timezone when RtF is used and programTimezone is missing', async () => {
     const tzSpy = vi

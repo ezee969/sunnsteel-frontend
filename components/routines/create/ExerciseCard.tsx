@@ -536,8 +536,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               </div>
               {!expanded && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
-                  {exercise.progressionScheme !== 'PROGRAMMED_RTF' &&
-                    exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
+                  {exercise.progressionScheme !== 'PROGRAMMED_RTF' && (
                       <Badge
                         variant="secondary"
                         className="text-[10px] px-1.5 py-0.5 h-5"
@@ -678,26 +677,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   >
                     RtF (4 fixed + 1 AMRAP)
                   </SelectItem>
-                  <SelectItem
-                    value="PROGRAMMED_RTF_HYPERTROPHY"
-                    disabled={!!disableTimeBasedProgressions}
-                    title={
-                      disableTimeBasedProgressions
-                        ? 'Requires Timeframe schedule (set in Basic Info)'
-                        : undefined
-                    }
-                  >
-                    RtF Hypertrophy (3 + 1 AMRAP)
-                  </SelectItem>
+                  {/* Removed PROGRAMMED_RTF_HYPERTROPHY option (deprecated) */}
                 </SelectContent>
               </Select>
             </div>
 
             {/* RtF per-exercise fields */}
             {(() => {
-              const isRtf =
-                exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-                exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+              const isRtf = exercise.progressionScheme === 'PROGRAMMED_RTF'
               if (!isRtf) return null;
               const tmMissing =
                 exercise.programTMKg === undefined ||
@@ -771,8 +758,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
             {/* Weight increment (only for non-RtF progression schemes) */}
             {exercise.progressionScheme !== 'NONE' &&
-              exercise.progressionScheme !== 'PROGRAMMED_RTF' &&
-              exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
+              exercise.progressionScheme !== 'PROGRAMMED_RTF' && (
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Label className="text-sm font-medium text-muted-foreground">
@@ -824,9 +810,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
           {/* Sets header with collapse/expand */}
           {(() => {
-            const isRtFActive =
-              exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-              exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+            const isRtFActive = exercise.progressionScheme === 'PROGRAMMED_RTF'
             if (isRtFActive) {
               // Hide sets UI entirely for RtF exercises
               return null;
@@ -904,12 +888,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         className="w-full h-10 text-base mb-3"
                         disabled={
                           exercise.sets.length >= 10 ||
-                          exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-                          exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                          exercise.progressionScheme === 'PROGRAMMED_RTF'
                         }
                         title={
-                          exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-                          exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                          exercise.progressionScheme === 'PROGRAMMED_RTF'
                             ? 'Sets are handled by RtF progression'
                             : undefined
                         }

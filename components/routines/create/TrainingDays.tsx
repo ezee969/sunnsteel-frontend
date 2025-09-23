@@ -8,6 +8,18 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RoutineWizardData } from './types';
+import { useMemo } from 'react';
+import { generateRepsToFailureProgram } from '@/lib/utils/reps-to-failure';
+import { useState as useReactState } from 'react';
+import { deriveAdjustmentsFromLog, TmTrendBuffer } from '@/lib/analytics/tm-trend';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Select as UiSelect, SelectTrigger as UiSelectTrigger, SelectContent as UiSelectContent, SelectItem as UiSelectItem, SelectValue as UiSelectValue } from '@/components/ui/select';
 import {
   Select,
   SelectContent,
@@ -60,14 +72,47 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
   const { isMobile } = useSidebar();
   const [hasInteracted, setHasInteracted] = useState(data.trainingDays.length > 0);
   const usesRtf = data.days.some((d) =>
-    d.exercises.some(
-      (ex) =>
-        ex.progressionScheme === 'PROGRAMMED_RTF' ||
-        ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-    )
-  );
+    d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+  )
 
   const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21;
+
+  // Generate a lightweight preview (first 6 weeks) of RtF program when any exercise uses RtF.
+  const rtfExercises = useMemo(
+    () => data.days.flatMap(d => d.exercises).filter(e => e.progressionScheme === 'PROGRAMMED_RTF'),
+    [data.days]
+  )
+  const [previewExerciseId, setPreviewExerciseId] = useReactState<string | undefined>(
+    rtfExercises[0]?.exerciseId
+  )
+  const selectedExercise = rtfExercises.find(e => e.exerciseId === previewExerciseId) || rtfExercises[0]
+  const rtfPreview = useMemo(() => {
+    if (!usesRtf || !selectedExercise) return [] as { week: number; goal: string; weight: number }[]
+    const tm = selectedExercise.programTMKg ?? 100
+    const rounding = selectedExercise.programRoundingKg ?? 5
+    const style = data.programStyle || 'STANDARD'
+    const withDeloads = data.programWithDeloads !== false
+    const logs = generateRepsToFailureProgram({ initialWeight: tm, style, withDeloads, roundingIncrementKg: rounding }, [])
+    return logs.slice(0, 6).map(l => ({ week: l.week, goal: l.goal, weight: l.weight }))
+  }, [selectedExercise, data.programStyle, data.programWithDeloads, usesRtf])
+
+  // Full program generation (memoized) for modal & analytics
+  const fullProgram = useMemo(() => {
+    if (!usesRtf || !selectedExercise) return [] as ReturnType<typeof generateRepsToFailureProgram>
+    const tm = selectedExercise.programTMKg ?? 100
+    const rounding = selectedExercise.programRoundingKg ?? 5
+    const style = data.programStyle || 'STANDARD'
+    const withDeloads = data.programWithDeloads !== false
+    return generateRepsToFailureProgram({ initialWeight: tm, style, withDeloads, roundingIncrementKg: rounding }, [])
+  }, [selectedExercise, data.programStyle, data.programWithDeloads, usesRtf])
+
+  // Basic in-memory analytics (derive TM adjustments)
+  const tmTrend = useMemo(() => {
+    if (!fullProgram.length) return null
+    const buffer = new TmTrendBuffer()
+    deriveAdjustmentsFromLog(fullProgram, (data.programStyle || 'STANDARD'), selectedExercise?.exerciseId).forEach(e => buffer.push(e))
+    return buffer.snapshot(data.programStyle || 'STANDARD', selectedExercise?.exerciseId)
+  }, [fullProgram, data.programStyle, selectedExercise])
 
   // Auto-fill timezone from browser when using RtF and not yet set
   useEffect(() => {
@@ -267,12 +312,18 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
               <Checkbox
                 aria-label="Include deload weeks"
                 checked={!!data.programWithDeloads}
-                onCheckedChange={(checked) => {
-                  const nextWithDeloads = Boolean(checked);
-                  const nextTotal = nextWithDeloads ? 21 : 18;
-                  const curStart = data.programStartWeek ?? 1;
-                  const clampedStart = Math.min(curStart, nextTotal);
-                  onUpdate({ programWithDeloads: nextWithDeloads, programStartWeek: clampedStart });
+                onCheckedChange={(checked: boolean) => {
+                  const nextWithDeloads = Boolean(checked)
+                  const nextTotal = nextWithDeloads ? 21 : 18
+                  const curStart = data.programStartWeek ?? 1
+                  let clampedStart = Math.min(curStart, nextTotal)
+                  if (!nextWithDeloads && curStart > 18) {
+                    // Provide immediate user feedback; keep minimal intrusive approach
+                    // eslint-disable-next-line no-alert
+                    alert('Deload weeks removed: start week adjusted to 18 (max for no-deload program).')
+                    clampedStart = 18
+                  }
+                  onUpdate({ programWithDeloads: nextWithDeloads, programStartWeek: clampedStart })
                 }}
               />
             </div>
@@ -314,6 +365,92 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
                 </p>
               );
             })()
+          )}
+
+          {/* Program preview */}
+          {usesRtf && rtfPreview.length > 0 && (
+            <div className="mt-2 border rounded-md bg-background overflow-hidden">
+              <div className="px-2 py-1.5 text-xs font-medium bg-muted/60 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  Program Preview (first 6 weeks – {data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy' : 'Standard'})
+                  {rtfExercises.length > 1 && (
+                    <UiSelect value={previewExerciseId} onValueChange={val => setPreviewExerciseId(val)}>
+                      <UiSelectTrigger className="h-6 w-40 text-xs">
+                        <UiSelectValue placeholder="Exercise" />
+                      </UiSelectTrigger>
+                      <UiSelectContent>
+                        {rtfExercises.map(ex => (
+                          <UiSelectItem key={ex.exerciseId} value={ex.exerciseId}>{ex.exerciseId}</UiSelectItem>
+                        ))}
+                      </UiSelectContent>
+                    </UiSelect>
+                  )}
+                </span>
+                <span className="text-muted-foreground flex items-center gap-2">
+                  {data.programWithDeloads ? '21 weeks total' : '18 weeks total'}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]">View full program</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Full Program ({data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy' : 'Standard'})</DialogTitle>
+                      </DialogHeader>
+                      <div className="max-h-[60vh] overflow-auto border rounded-md">
+                        <table className="w-full text-xs">
+                          <thead className="sticky top-0 bg-background">
+                            <tr className="border-b">
+                              <th className="px-2 py-1 text-left">Week</th>
+                              <th className="px-2 py-1 text-left">Goal</th>
+                              <th className="px-2 py-1 text-left">Top Set Load</th>
+                              <th className="px-2 py-1 text-left">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fullProgram.map(row => (
+                              <tr key={row.week} className="border-b last:border-b-0">
+                                <td className="px-2 py-1">{row.week}</td>
+                                <td className="px-2 py-1 whitespace-nowrap max-w-[180px] truncate" title={row.goal}>{row.goal}</td>
+                                <td className="px-2 py-1">{row.weight}kg</td>
+                                <td className="px-2 py-1 whitespace-nowrap max-w-[220px] truncate" title={row.action}>{row.action}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {tmTrend && tmTrend.adjustments.length > 0 && (
+                        <div className="mt-3 text-xs space-y-1">
+                          <p className="font-medium">TM Adjustments</p>
+                          <ul className="list-disc ml-4 space-y-0.5">
+                            {tmTrend.adjustments.map(a => (
+                              <li key={a.week}>W{a.week}: {a.previousTm.toFixed(1)} → {a.newTm.toFixed(1)}kg ({a.percentChange >=0 ? '+' : ''}{a.percentChange.toFixed(1)}%)</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                </span>
+              </div>
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left border-b">
+                    <th className="px-2 py-1 font-medium">Week</th>
+                    <th className="px-2 py-1 font-medium">Goal</th>
+                    <th className="px-2 py-1 font-medium">Top Set Load</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rtfPreview.map(row => (
+                    <tr key={row.week} className="border-b last:border-b-0">
+                      <td className="px-2 py-1">{row.week}</td>
+                      <td className="px-2 py-1 whitespace-nowrap max-w-[140px] truncate" title={row.goal}>{row.goal}</td>
+                      <td className="px-2 py-1">{row.weight}kg</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

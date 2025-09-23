@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { workoutService } from '../services/workoutService';
-import { useAuth } from '@/providers/auth-provider';
+import { setSaveState } from '@/lib/utils/save-status-store';
+// Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
+import { useAuth } from '@/providers/use-auth-adapter';
 import {
   FinishWorkoutRequest,
   StartWorkoutRequest,
@@ -19,11 +21,12 @@ const qk = {
 };
 
 export const useActiveSession = () => {
-  const { isAuthenticated, hasTriedRefresh } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   return useQuery({
     queryKey: qk.active,
     queryFn: () => workoutService.getActiveSession(),
-    enabled: hasTriedRefresh && isAuthenticated,
+    // Only run once auth is resolved and user is authenticated
+    enabled: !isLoading && isAuthenticated,
   });
 };
 
@@ -38,22 +41,28 @@ export const useSession = (id: string) => {
 export const useSessions = (
   params: Omit<ListSessionsParams, 'cursor' | 'limit'> & { limit?: number },
 ) => {
-  const { isAuthenticated, hasTriedRefresh } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const { limit = 20, ...rest } = params;
   return useInfiniteQuery<{
-    items: WorkoutSessionSummary[];
-    nextCursor?: string;
-  }>(
-    {
-      queryKey: qk.sessions(rest),
-      queryFn: ({ pageParam }) =>
-        workoutService.listSessions({ ...rest, cursor: pageParam as string | undefined, limit }),
-      initialPageParam: undefined,
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      enabled: hasTriedRefresh && isAuthenticated,
-    },
-  );
+    items: WorkoutSessionSummary[]
+    nextCursor?: string
+  }>({
+    queryKey: qk.sessions(rest),
+    queryFn: ({ pageParam }) =>
+      workoutService.listSessions({
+        ...rest,
+        cursor: (pageParam as string | undefined) ?? undefined,
+        limit,
+      }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: !isLoading && isAuthenticated,
+  })
 };
+// Exposed utility to mark a set as locally dirty (pending) before debounce/autosave
+export function markSetPending(sessionId: string, routineExerciseId: string, setNumber: number) {
+  setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`,'pending')
+}
 
 export const useStartSession = () => {
   const qc = useQueryClient();
@@ -93,7 +102,7 @@ export const useStartSession = () => {
       const fallback = await workoutService.getActiveSession();
       return fallback as WorkoutSession;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: WorkoutSession | undefined) => {
       if (!data) return;
       qc.setQueryData(qk.active, data);
       if (data.id) {
@@ -108,7 +117,7 @@ export const useFinishSession = (id: string) => {
   return useMutation({
     mutationFn: (data: FinishWorkoutRequest) =>
       workoutService.finishSession(id, data),
-    onSuccess: (session) => {
+    onSuccess: (session: WorkoutSession) => {
       qc.setQueryData(qk.session(id), session);
       qc.invalidateQueries({ queryKey: qk.active });
     },
@@ -118,13 +127,36 @@ export const useFinishSession = (id: string) => {
 export const useUpsertSetLog = (id: string) => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: UpsertSetLogRequest): Promise<SetLog> =>
-      workoutService.upsertSetLog(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: qk.session(id) });
+    mutationFn: async (data: UpsertSetLogRequest): Promise<SetLog> => {
+      // Mark as pending (user modified fields) right before network
+      setSaveState(
+        `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
+        'saving'
+      )
+      const result = await workoutService.upsertSetLog(id, data)
+      return result
     },
-  });
-};
+    onMutate: (data: UpsertSetLogRequest) => {
+      setSaveState(
+        `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
+        'saving'
+      )
+    },
+    onSuccess: (_res, data) => {
+      setSaveState(
+        `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
+        'saved'
+      )
+      qc.invalidateQueries({ queryKey: qk.session(id) })
+    },
+    onError: (_err, data) => {
+      setSaveState(
+        `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
+        'error'
+      )
+    },
+  })
+}
 
 export const useDeleteSetLog = (id: string) => {
   const qc = useQueryClient();
@@ -136,14 +168,14 @@ export const useDeleteSetLog = (id: string) => {
       routineExerciseId: string;
       setNumber: number;
     }) => workoutService.deleteSetLog(id, routineExerciseId, setNumber),
-    onMutate: async (vars) => {
+    onMutate: async (vars: { routineExerciseId: string; setNumber: number }) => {
       await qc.cancelQueries({ queryKey: qk.session(id) });
       const previous = qc.getQueryData<WorkoutSession>(qk.session(id));
       if (previous) {
         const next: WorkoutSession = {
           ...previous,
           setLogs: (previous.setLogs ?? []).filter(
-            (l) =>
+            (l: SetLog) =>
               !(
                 l.routineExerciseId === vars.routineExerciseId &&
                 l.setNumber === vars.setNumber
@@ -154,7 +186,7 @@ export const useDeleteSetLog = (id: string) => {
       }
       return { previous } as { previous?: WorkoutSession };
     },
-    onError: (_err, _vars, ctx) => {
+    onError: (_err: unknown, _vars: { routineExerciseId: string; setNumber: number }, ctx: { previous?: WorkoutSession } | undefined) => {
       if (ctx?.previous) {
         qc.setQueryData(qk.session(id), ctx.previous);
       }

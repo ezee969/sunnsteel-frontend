@@ -1,9 +1,6 @@
-export type RepType = 'FIXED' | 'RANGE';
-export type ProgressionScheme =
-  | 'NONE'
-  | 'DOUBLE_PROGRESSION'
-  | 'DYNAMIC_DOUBLE_PROGRESSION'
-  | 'PROGRAMMED_RTF';
+// Re-export shared primitive enums to maintain backwards compatible imports.
+import type { RepType, ProgressionScheme } from './routine.shared'
+export type { RepType, ProgressionScheme } from './routine.shared'
 
 export interface RoutineSet {
   setNumber: number;
@@ -42,7 +39,7 @@ export interface Routine {
   userId: string;
   name: string;
   description?: string;
-  isPeriodized: boolean;
+    programStyle?: 'STANDARD' | 'HYPERTROPHY';
   isFavorite: boolean;
   isCompleted: boolean;
   createdAt: string;
@@ -94,4 +91,5 @@ export interface CreateRoutineRequest {
       >;
     }>;
   }>;
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }

@@ -1,5 +1,61 @@
 ## Project structure
 
+```
+project-root/
+├── app/                                   # Next.js App Router (RSC by default)
+│   ├── layout.tsx                         # Root layout (fonts, theme + AppProvider)
+│   ├── (auth)/                            # Public auth surfaces
+│   │   ├── layout.tsx                     # Auth-specific layout (background + mode toggle)
+│   │   ├── login/                         # Email / OAuth login
+│   │   │   └── components/                # Login form pieces (SupabaseLoginForm, headers)
+│   │   ├── signup/                        # Registration flow (Supabase signup)
+│   │   └── auth/callback/                 # OAuth provider redirect handler
+│   └── (protected)/                       # All authenticated application routes
+│       ├── layout.tsx                     # Shell: sidebar, header, session banner, bg
+│       ├── dashboard/                     # Landing dashboard (stats, today, programs)
+│       │   └── components/                # Dashboard cards (StatsOverview, etc.)
+│       ├── routines/                      # Routines listing & CRUD entry points
+│       │   ├── components/                # Filters, listing, active workout, etc.
+│       │   ├── new/                       # Create wizard wrapper page
+│       │   ├── edit/[id]/                 # Edit wizard wrapper page
+│       │   └── [id]/                      # Routine details & start controls
+│       ├── workouts/                      # Workout hub + history + sessions
+│       │   ├── history/                   # Infinite history listing
+│       │   └── sessions/[id]/             # Active workout session logging UI
+│       └── loading.tsx / ...              # Route-level loading boundaries
+├── components/                            # Reusable + design system abstractions
+│   ├── ui/                                # Shadcn-based primitives (button, card, etc.)
+│   ├── backgrounds/                       # Pure-CSS decorative overlays (vignette, etc.)
+│   ├── icons/                             # Masked SVG classical icon wrapper
+│   └── routines/                          # Routine wizard (create/edit) components
+│       └── create/                        # BuildDays, ExerciseCard, etc.
+├── providers/                             # Global context & infra providers
+│   ├── app-provider.tsx                   # Aggregates Query + Supabase auth
+│   ├── supabase-auth-provider.tsx         # Source of truth (Supabase + backend verify)
+│   ├── query-provider.tsx                 # TanStack Query client config
+│   ├── theme-provider.tsx                 # next-themes integration
+│   └── pwa-provider.tsx                   # Service worker registration & updates
+├── lib/                                   # Application logic (domain + infra)
+│   ├── api/
+│   │   ├── services/                      # HTTP layer: httpClient + domain services
+│   │   ├── hooks/                         # React Query hooks (routines, workouts, user)
+│   │   └── types/                         # Transport DTO & entity typing
+│   ├── supabase/                          # Supabase JS client factory
+│   ├── utils/                             # Domain / math / formatting helpers
+│   │   ├── performance-monitor.ts         # (Perf instrumentation scaffolding)
+│   │   └── dynamic-imports.tsx            # Dynamic import + preload orchestration
+│   └── api/**                             # API hooks & services (Supabase session auth only)
+├── hooks/                                 # Standalone React hooks (debounce, sidebar)
+├── public/                                # Static assets (backgrounds, icons, manifest)
+├── schema/                                # Zod schemas (auth forms)
+├── test/                                  # Vitest + RTL test suites
+├── middleware.ts                          # (Currently no redirect logic; debug headers)
+├── components.json                        # Shadcn component registry
+└── package.json
+```
+
+
+
 #### Review (RtF)
 
 - The Review step includes a summary card “Program Settings (RtF)” showing:
@@ -8,59 +64,56 @@
   - Timezone
   - Start Program Week: `Week N of 18|21`
 
-```
-project-root/
-├── app/                           # Next.js App Router
-│   ├── layout.tsx                 # Root layout with providers
-│   ├── (auth)/                    # Auth route group
-│   │   ├── login/                 #   Login page
-│   │   └── signup/                #   Registration page
-│   └── (protected)/               # Protected routes
-│       ├── dashboard/             #   Dashboard page
-│       ├── routines/              #   Routines page
-│       ├── workouts/              #   Workouts pages
-│       │   ├── page.tsx           #     Index: redirects to active session or shows hub
-│       │   ├── history/            #     Workout history page
-│       │   └── sessions/[id]/     #     Active session page
-│       └── layout.tsx             #   Protected routes layout
-├── components/                    # Reusable UI components
-│   ├── ui/                        #   Base UI components
-│   └── routines/                  #   Routine management components
-├── lib/                           # Application logic
-│   ├── api/                       #   API integration with TanStack Query
-│   │   ├── hooks/                 #     Domain hooks (auth, routines, user)
-│   │   ├── services/              #     HTTP services (auth, user, routine)
-│   │   └── types/                 #     API request/response types
-│   └── utils/                     #   Utilities
-├── providers/                     # Application providers
-│   ├── app-provider.tsx           #   Combined providers wrapper
-│   ├── query-provider.tsx         #   TanStack Query provider
-│   ├── auth-provider.tsx          #   Auth context provider
-│   └── theme-provider.tsx         #   next-themes ThemeProvider wrapper (attribute="class")
-├── hooks/                         # Custom React hooks
-├── utils/                         # General utility functions
-├── types/                         # TypeScript type definitions
-├── middleware.ts                  # Middleware for handling requests before reaching the route handlers
-└── public/                        # Static assets
-```
-
 ### Authentication (Frontend)
 
-- **Access token**: stored in `sessionStorage` (via `lib/api/services/tokenService.ts`) so it survives redirects (e.g., `/login` → `/dashboard`).
-- **Refresh token**: httpOnly cookie set by the backend.
-- **Session marker**: non-HttpOnly cookie `has_session=true` is set by the backend on login/register/google/refresh, and cleared on logout. It is used as a hint for client behavior, but redirects from auth pages now depend on the presence of `refresh_token`.
-- **Middleware**: `middleware.ts`
-  - Redirects from auth pages (`/login`, `/signup`) to `/dashboard` only when `refresh_token` is present.
-  - If a stale `has_session` exists without `refresh_token`, the middleware proactively clears `has_session` and allows access to auth pages (prevents login/dashboard redirect loops).
-  - Redirects unauthenticated users from protected pages to `/login` (checks `refresh_token` cookie presence).
-- **AuthProvider**: `providers/auth-provider.tsx`
-  - Skips initial refresh on auth pages to avoid noisy requests on `/login`.
-  - Treats auth as ready when an access token already exists (prevents skeleton lockups after redirect).
-- **httpClient**: `lib/api/services/httpClient.ts`
-  - Single-flight refresh to avoid storms.
-  - Skips refresh when on auth pages, during logout, or when `has_session` is not present.
-  - Reduces console noise for expected 401s.
-- **Logout UX**: `useLogout()` cancels in-flight queries, clears cache, sets one-shot flags to skip login’s silent refresh, then `router.replace('/login')` for a smooth transition.
+Authentication is now fully powered by Supabase. Legacy custom access/refresh token handling, session marker cookie logic, and the separate `auth-provider.tsx` + `tokenService.ts` have been removed.
+
+- Supabase session (managed by `@supabase/supabase-js`) is the single source of truth.
+- `supabase-auth-provider.tsx`:
+  - Fetches initial session and verifies it with backend (`/auth/supabase/verify`) to load/create profile.
+  - Subscribes to `onAuthStateChange` and re‑verifies on sign-in.
+  - Clears React Query cache on sign-out to drop stale user-bound data.
+- `httpClient`:
+  - Adds `Authorization: Bearer <supabase_access_token>` automatically when `secure: true`.
+  - No manual refresh dance; 401s bubble up and the UI can redirect or prompt login if needed.
+- Middleware currently only sets debug headers (SSR redirect logic is temporarily disabled pending future refinement).
+- Logout simply calls Supabase `signOut()`, which triggers provider cleanup.
+
+#### Supabase Migration & Legacy Auth Test Removal
+
+As of the Supabase migration (September 2025):
+
+- All legacy custom auth hooks (`useLogin`, `useLogout`, `useRegister`, `useGoogleLogin`, `useRefreshToken`) and the previous token refresh logic were **removed**.
+- The legacy test file `test/lib/api/hooks/useAuth.test.tsx` (which targeted the old token-based flow) was deleted and explicitly excluded in `vitest.config.ts` via:
+
+  ```ts
+  test: {
+    // ...existing config
+    exclude: [
+      'test/lib/api/hooks/useAuth.test.tsx',
+      'test/lib/api/hooks/useAuth.test.skip.ts',
+      'node_modules',
+    ],
+  }
+  ```
+
+- This exclusion prevents stale reintroduction via local filesystem or merge artifacts from resurrecting a broken suite.
+
+If you want to add new authentication-related tests:
+
+1. Use the unified `supabase-auth-provider.tsx` and (if needed) the app-level provider wrapper from `providers/app-provider.tsx` in your test harness.
+2. Prefer integration-style tests that exercise user flows (sign in, sign out) through UI components rather than low-level hook mutation mocks.
+3. If you introduce a new custom hook (e.g. `useAuth` adapter utilities), create a new test file with a distinct name such as `useAuthAdapter.test.tsx` to avoid colliding with the excluded patterns.
+4. Remove or adjust the exclusion entry in `vitest.config.ts` if you intentionally need a file named `useAuth.test.tsx` (not recommended—choose a more specific name for clarity).
+5. Do **not** reintroduce manual access / refresh token handling—Supabase session access tokens are injected automatically by `httpClient` when `secure: true`.
+
+Rationale:
+
+- Avoids maintenance of redundant auth logic (single source of truth: Supabase session) and reduces test flakiness tied to mock token lifecycles.
+- Keeps test intent focused on user-facing behavior instead of implementation details of session refresh.
+
+If a future enhancement requires custom auth assertions (e.g. role-based gating), add focused tests under `test/app/(protected)/...` exercising the relevant guard or component, rather than resurrecting the deleted legacy file name.
+
 
 ### Google Sign-In and One Tap
 
@@ -183,12 +236,16 @@ Notes:
 ### Utilities
 
 - `lib/utils/reps-to-failure.ts`
-  - `generateRepsToFailureProgram(config, performance)`
-    - Strength variant: 5 sets (4 + 1 AMRAP).
-    - Deloads at 60% with goal `3x5 @ RPE 6` (no AMRAP target).
-  - `generateRepsToFailureHypertrophyProgram(config, performance)`
-    - Hypertrophy variant: 4 sets (3 + 1 AMRAP), uses weekly goals in `weeklyGoalDataHypertrophy`.
-    - Deloads at 60% with goal `4x5` and “no rep targets”.
+  - `generateRepsToFailureProgram(config, performance)` (unified)
+    - `config.style`: `'STANDARD' | 'HYPERTROPHY'` (default `'STANDARD'`).
+    - STANDARD: 5 sets (4 straight + 1 AMRAP) per programmed week.
+    - HYPERTROPHY: 4 sets (3 straight + 1 AMRAP) with its own weekly table.
+    - `config.withDeloads` (default true): when false, deload weeks are removed and the plan reindexes to 18 continuous weeks.
+    - `config.roundingIncrementKg` (default 5): rounds prescribed load to nearest increment.
+    - Deload handling:
+      - STANDARD: goal string `3x5 @ RPE 6` (no AMRAP target) at ~60% TM.
+      - HYPERTROPHY: goal string like `4x5 @ 60% (no rep targets)`.
+  - `generateRepsToFailureHypertrophyProgram(config, performance)` remains as a backward-compatible wrapper that forces `{ style: 'HYPERTROPHY' }`.
   - TM adjustment rules based on last set AMRAP vs target:
     - 2+ reps below target: −5.00%
     - 1 rep below target: −2.00%
@@ -198,6 +255,10 @@ Notes:
     - +3 reps: +1.50%
     - +4 reps: +2.00%
     - +5+ reps: +3.00%
+  - Notes:
+    - Performance array uses ORIGINAL week numbers (1..21) even if deloads removed; generator maps prior-week performance correctly.
+    - When deload weeks removed, displayed `week` in output is reindexed (1..18).
+    - Output log fields: `week`, `tm`, `weight`, `goal`, `action` (narrative including TM adjustments).
 
 ### Feature: Workout Sessions
 
@@ -542,7 +603,7 @@ Notes:
 
 Current test modules:
 
-- **Auth Components**: Login page, auth hooks (useLogin, useRegister, useLogout)
+- **Auth Components**: Login / Signup pages now use `useSupabaseEmailLogin`, `useSupabaseEmailSignup`, `useSupabaseLogout`
 - **Routine Components**: WorkoutsList component and routine hooks
 - **Workout Sessions**: Active session pages, session management
 - **UI Components**: Button and base component testing

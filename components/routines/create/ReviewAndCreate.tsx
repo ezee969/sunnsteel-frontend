@@ -61,21 +61,13 @@ export function ReviewAndCreate({
     }
   };
   const usesRtf = data.days.some((d) =>
-    d.exercises.some(
-      (ex) =>
-        ex.progressionScheme === 'PROGRAMMED_RTF' ||
-        ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-    )
-  );
+    d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+  )
 
   const prepareRoutineData = (): CreateRoutineRequest => {
     const usesRtf = data.days.some((d) =>
-      d.exercises.some(
-        (ex) =>
-          ex.progressionScheme === 'PROGRAMMED_RTF' ||
-          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-      )
-    );
+      d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+    )
 
     const tz =
       (data.programTimezone ?? '').trim() ||
@@ -89,6 +81,7 @@ export function ReviewAndCreate({
           programWithDeloads: data.programWithDeloads,
           programStartDate: data.programStartDate,
           programTimezone: tz,
+          ...(data.programStyle && { programStyle: data.programStyle }),
           ...(!isEditing &&
             data.programStartWeek && { programStartWeek: data.programStartWeek }),
         }),
@@ -97,13 +90,9 @@ export function ReviewAndCreate({
         exercises: day.exercises.map((exercise) => ({
           exerciseId: exercise.exerciseId,
           restSeconds: exercise.restSeconds,
-          progressionScheme:
-            exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-              ? 'PROGRAMMED_RTF'
-              : exercise.progressionScheme,
+          progressionScheme: exercise.progressionScheme,
           minWeightIncrement: exercise.minWeightIncrement,
-          ...((exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-            exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && {
+          ...(exercise.progressionScheme === 'PROGRAMMED_RTF' && {
             ...(exercise.programTMKg !== undefined && {
               programTMKg: exercise.programTMKg,
             }),
@@ -252,14 +241,10 @@ export function ReviewAndCreate({
                                   : 'Unknown'}{' '}
                                 • {exerciseData?.equipment}
                               </p>
-                              {(exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-                                exercise.progressionScheme ===
-                                  'PROGRAMMED_RTF_HYPERTROPHY') && (
+                              {exercise.progressionScheme === 'PROGRAMMED_RTF' && (
                                 <div className="mt-1 flex flex-wrap gap-1">
                                   <Badge variant="outline" className="text-[10px]">
-                                    {exercise.progressionScheme === 'PROGRAMMED_RTF'
-                                      ? 'RtF'
-                                      : 'RtF Hypertrophy'}
+                                    RtF
                                   </Badge>
                                 </div>
                               )}
@@ -306,6 +291,10 @@ export function ReviewAndCreate({
               <p className="font-medium">{data.programWithDeloads ? 'Yes' : 'No'}</p>
             </div>
             <div>
+              <p className="text-muted-foreground">Program style</p>
+              <p className="font-medium">{data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy (8–12 focus)' : 'Standard (Strength focus)'}</p>
+            </div>
+            <div>
               <p className="text-muted-foreground">Start date</p>
               <p className="font-medium">
                 {formatDateForDisplay(data.programStartDate)}
@@ -328,6 +317,10 @@ export function ReviewAndCreate({
                 })()}
               </div>
             )}
+            <div>
+              <p className="text-muted-foreground">Total weeks</p>
+              <p className="font-medium">{data.programWithDeloads ? 21 : 18}</p>
+            </div>
           </div>
         </div>
       )}

@@ -96,7 +96,7 @@ describe('BuildDays - Program Schedule mode NONE', () => {
     expect(updated.days[0].exercises[0].progressionScheme).toBe('NONE')
   })
 
-  it('disables RtF options in progression select when schedule mode is NONE', async () => {
+  it('disables RtF option in progression select when schedule mode is NONE', async () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
     // Expand exercise to show config
@@ -107,9 +107,6 @@ describe('BuildDays - Program Schedule mode NONE', () => {
 
     // RtF options should be disabled
     const rtfOption = await screen.findByRole('option', { name: /RtF \(4 fixed \+ 1 AMRAP\)/i })
-    const rtfHypOption = await screen.findByRole('option', { name: /RtF Hypertrophy \(3 \+ 1 AMRAP\)/i })
-
     expect(rtfOption).toHaveAttribute('aria-disabled', 'true')
-    expect(rtfHypOption).toHaveAttribute('aria-disabled', 'true')
   })
 })

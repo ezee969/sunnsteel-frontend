@@ -40,6 +40,8 @@ export default function CreateRoutinePage() {
     trainingDays: [],
     days: [],
     programScheduleMode: 'NONE',
+    programWithDeloads: true,
+    programStyle: 'STANDARD',
   });
 
   const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
@@ -93,11 +95,9 @@ export default function CreateRoutinePage() {
         // Only gate on start date when schedule is TIMEFRAME and time-based progression is used
         const usesRtf = routineData.days.some((d) =>
           d.exercises.some(
-            (ex) =>
-              ex.progressionScheme === 'PROGRAMMED_RTF' ||
-              ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            (ex) => ex.progressionScheme === 'PROGRAMMED_RTF'
           )
-        );
+        )
         if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
           return (
             !!routineData.programStartDate &&

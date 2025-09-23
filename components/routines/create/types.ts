@@ -1,10 +1,6 @@
-export type RepType = 'FIXED' | 'RANGE';
-export type ProgressionScheme =
-  | 'NONE'
-  | 'DOUBLE_PROGRESSION'
-  | 'DYNAMIC_DOUBLE_PROGRESSION'
-  | 'PROGRAMMED_RTF'
-  | 'PROGRAMMED_RTF_HYPERTROPHY';
+import type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
+export type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
+// If hypertrophy variant becomes supported backend-side, extend shared enum there.
 
 export interface RoutineWizardData {
   name: string;
@@ -37,4 +33,6 @@ export interface RoutineWizardData {
   programStartDate?: string; // yyyy-mm-dd (local date)
   programTimezone?: string; // IANA tz
   programStartWeek?: number; // 1..(18|21) only in create flow; default 1
+  // New: style (rep band focus) for RtF program; front-end metadata for now
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }

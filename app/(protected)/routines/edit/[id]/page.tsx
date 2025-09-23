@@ -51,7 +51,6 @@ const mapProgressionScheme = (
     case 'DOUBLE_PROGRESSION':
     case 'DYNAMIC_DOUBLE_PROGRESSION':
     case 'PROGRAMMED_RTF':
-    case 'PROGRAMMED_RTF_HYPERTROPHY':
       return value as ProgressionScheme;
     case 'DYNAMIC':
       return 'DOUBLE_PROGRESSION';
@@ -124,6 +123,8 @@ export default function EditRoutinePage() {
           .programStartDate
           ? 'TIMEFRAME'
           : 'NONE',
+        // Front-end only metadata (default STANDARD if absent)
+        programStyle: (routine as unknown as { programStyle?: 'STANDARD' | 'HYPERTROPHY' }).programStyle || 'STANDARD',
       };
 
       setRoutineData(transformedData);
@@ -175,8 +176,7 @@ export default function EditRoutinePage() {
         const usesRtf = routineData.days.some((d) =>
           d.exercises.some(
             (ex) =>
-              ex.progressionScheme === 'PROGRAMMED_RTF' ||
-              ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+              ex.progressionScheme === 'PROGRAMMED_RTF'
           )
         );
         if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {

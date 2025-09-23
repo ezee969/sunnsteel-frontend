@@ -22,7 +22,11 @@ vi.mock('@/lib/api/hooks/useExercises', () => ({
   }),
 }))
 
-describe('BuildDays - PROGRAMMED_RTF_HYPERTROPHY flows', () => {
+// Updated: hypertrophy variant collapsed into base PROGRAMMED_RTF. This test now
+// validates generic PROGRAMMED_RTF behavior (conversion FIXED -> RANGE and
+// default rounding assignment). File name retained to preserve historical
+// reference; can be renamed in a future cleanup.
+describe('BuildDays - PROGRAMMED_RTF flows (legacy hypertrophy test)', () => {
   const openSelectAndChoose = async (label: string, optionName: Matcher) => {
     const trigger = screen.getByLabelText(label)
     fireEvent.click(trigger)
@@ -71,19 +75,19 @@ describe('BuildDays - PROGRAMMED_RTF_HYPERTROPHY flows', () => {
     onUpdate = vi.fn()
   })
 
-  it('switching to PROGRAMMED_RTF_HYPERTROPHY converts FIXED->RANGE and defaults rounding', async () => {
+  it('switching to PROGRAMMED_RTF converts FIXED->RANGE and defaults rounding', async () => {
     render(<Wrapper initial={makeData()} onUpdate={onUpdate} />)
 
     // Expand exercise for visibility
     fireEvent.click(screen.getByRole('button', { name: /toggle sets/i }))
 
-    await openSelectAndChoose('Progression scheme', /RtF Hypertrophy \(3 \+ 1 AMRAP\)/i)
+    await openSelectAndChoose('Progression scheme', /RtF \(4 fixed \+ 1 AMRAP\)/i)
 
     expect(onUpdate).toHaveBeenCalled()
     const updated = onUpdate.mock.calls[onUpdate.mock.calls.length - 1][0] as RoutineWizardData
     const ex = updated.days[0].exercises[0]
 
-    expect(ex.programRoundingKg).toBe(2.5)
+  expect(ex.programRoundingKg).toBe(2.5)
     expect(ex.sets[0]).toEqual(
       expect.objectContaining({ repType: 'RANGE', reps: null, minReps: 10, maxReps: 10 })
     )

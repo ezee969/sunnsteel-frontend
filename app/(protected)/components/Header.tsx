@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLogout } from '@/lib/api/hooks/useLogout';
+import { useSupabaseLogout } from '@/lib/api/hooks/useSupabaseEmailAuth';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { ModeToggle } from '@/components/mode-toggle';
 import OrnateCorners from '@/components/backgrounds/OrnateCorners';
@@ -139,7 +139,7 @@ function NotificationItem({
 
 function UserDropdown() {
   const { user } = useUser();
-  const { mutate: logout } = useLogout();
+  const { mutate: logout } = useSupabaseLogout();
   const handleLogout = () => {
     logout();
   };

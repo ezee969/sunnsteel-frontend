@@ -86,20 +86,13 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   useEffect(() => {
     if (canUseTimeframe) return;
     const hasAnyTimeBased = data.days.some((day) =>
-      day.exercises.some(
-        (ex) =>
-          ex.progressionScheme === 'PROGRAMMED_RTF' ||
-          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-      )
-    );
+      day.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+    )
     if (!hasAnyTimeBased) return;
     const newDays = data.days.map((day) => ({
       ...day,
       exercises: day.exercises.map((ex) => {
-        if (
-          ex.progressionScheme === 'PROGRAMMED_RTF' ||
-          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-        ) {
+        if (ex.progressionScheme === 'PROGRAMMED_RTF') {
           return { ...ex, progressionScheme: 'NONE' as ProgressionScheme };
         }
         return ex;
@@ -327,8 +320,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     if (dayIndex === -1) return;
     const ex = newDays[dayIndex].exercises[exerciseIndex];
     // Prevent selecting time-based schemes when schedule mode is NONE
-    const isTimeBased =
-      scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+    const isTimeBased = scheme === 'PROGRAMMED_RTF'
     if (isTimeBased && !canUseTimeframe) {
       return; // ignore change
     }
@@ -358,7 +350,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     }
 
     // Initialize RtF defaults
-    if (scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
+    if (scheme === 'PROGRAMMED_RTF') {
       if (typeof ex.programRoundingKg === 'undefined') ex.programRoundingKg = 2.5;
       // TM left undefined until user inputs
     }
@@ -389,10 +381,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
     const exercise = newDays[dayIndex].exercises[exerciseIndex];
     // Prevent adding sets when using time-based RtF progressions
-    if (
-      exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-      exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-    ) {
+    if (exercise.progressionScheme === 'PROGRAMMED_RTF') {
       return;
     }
     const newSetNumber = exercise.sets.length + 1;
