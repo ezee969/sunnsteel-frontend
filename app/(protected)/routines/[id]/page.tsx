@@ -43,6 +43,8 @@ import {
 } from '@/components/ui/accordion';
 import HeroSection from '@/components/layout/HeroSection';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+import TmAdjustmentPanel from '@/components/routines/TmAdjustmentPanel';
+import ProgramStyleBadge from '@/components/routines/ProgramStyleBadge';
 
 const dayName = (dayOfWeek: number) => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -78,6 +80,24 @@ export default function RoutineDetailsPage() {
     [routine?.days, todayDow]
   );
   const quickStartDayId = todayDayId ?? firstDayId;
+
+  // RTF exercises detection for TM adjustment functionality
+  const rtfExercises = useMemo(() => {
+    if (!routine?.days) return [];
+    
+    return routine.days.flatMap(day => 
+      day.exercises
+        .filter(ex => ex.progressionScheme === 'PROGRAMMED_RTF')
+        .map(ex => ({
+          id: ex.id,
+          exerciseId: ex.exercise.id,
+          exerciseName: ex.exercise.name,
+          programTMKg: ex.programTMKg,
+        }))
+    );
+  }, [routine?.days]);
+
+  const hasRtfExercises = rtfExercises.length > 0;
 
   const proceedStart = async (routineDayId?: string) => {
     if (!routineId || !routineDayId) return;
@@ -182,6 +202,9 @@ export default function RoutineDetailsPage() {
                   <ClassicalIcon name="dumbbell" className="h-3 w-3" aria-hidden />
                   <span>{routine?.days?.length ?? 0} days/week</span>
                 </Badge>
+                {hasRtfExercises && (
+                  <ProgramStyleBadge style={routine?.programStyle} />
+                )}
               </div>
             )}
           </CardTitle>
@@ -311,6 +334,17 @@ export default function RoutineDetailsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* TM Adjustment Panel - Only shown for routines with RTF exercises */}
+      {hasRtfExercises && (
+        <div className="mt-6">
+          <TmAdjustmentPanel 
+            routineId={routineId}
+            rtfExercises={rtfExercises}
+            programStyle={routine?.programStyle}
+          />
+        </div>
+      )}
 
       {/* Active session conflict dialog */}
       <AlertDialog open={activeConflictOpen} onOpenChange={setActiveConflictOpen}>

@@ -39,7 +39,8 @@ export interface Routine {
   userId: string;
   name: string;
   description?: string;
-    programStyle?: 'STANDARD' | 'HYPERTROPHY';
+  isPeriodized: boolean;
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
   isFavorite: boolean;
   isCompleted: boolean;
   createdAt: string;

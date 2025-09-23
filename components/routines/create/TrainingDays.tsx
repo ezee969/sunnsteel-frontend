@@ -308,6 +308,23 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
           <h4 className="font-medium text-sm md:text-base">RtF Program Settings</h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-muted-foreground">Program style</span>
+              <Select
+                value={data.programStyle || 'STANDARD'}
+                onValueChange={(value) => onUpdate({ 
+                  programStyle: value as 'STANDARD' | 'HYPERTROPHY' 
+                })}
+              >
+                <SelectTrigger aria-label="Program style" className="w-40 h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="STANDARD">Standard</SelectItem>
+                  <SelectItem value="HYPERTROPHY">Hypertrophy</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">Include deload weeks</span>
               <Checkbox
                 aria-label="Include deload weeks"
@@ -319,7 +336,6 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
                   let clampedStart = Math.min(curStart, nextTotal)
                   if (!nextWithDeloads && curStart > 18) {
                     // Provide immediate user feedback; keep minimal intrusive approach
-                    // eslint-disable-next-line no-alert
                     alert('Deload weeks removed: start week adjusted to 18 (max for no-deload program).')
                     clampedStart = 18
                   }

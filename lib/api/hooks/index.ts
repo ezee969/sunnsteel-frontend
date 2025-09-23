@@ -4,3 +4,4 @@ export * from './useUser'
 // Auth-specific hooks now come from providers (see use-auth-adapter)
 export * from './useSupabaseEmailAuth'
 export * from './useExercises'
+export * from './use-tm-adjustments'

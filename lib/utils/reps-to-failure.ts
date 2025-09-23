@@ -113,7 +113,7 @@ export function generateRepsToFailureProgram(
   const base = style === 'HYPERTROPHY' ? weeklyGoalDataHypertrophy : STANDARD_TABLE
   const withDeloads = config.withDeloads !== false
   const roundingInc = config.roundingIncrementKg ?? 5
-  const filtered = withDeloads ? base : base.filter(w => !(w as any).isDeload)
+  const filtered = withDeloads ? base : base.filter(w => !('isDeload' in w && w.isDeload))
 
   const logs: RepsToFailureLog[] = []
   let currentTM = config.initialWeight
@@ -124,30 +124,34 @@ export function generateRepsToFailureProgram(
     if (displayWeek === 1) action = `Starting TM: ${currentTM.toFixed(1)}kg.`
     else {
       // previous kept week original week number
-      const prevOriginalWeek = (filtered[idx - 1] as any).week
+      const prevWeekData = filtered[idx - 1]
+      const prevOriginalWeek = prevWeekData.week
       const prevPerf = performance.find(p => p.week === prevOriginalWeek)
-      const prevGoal = base.find(g => g.week === prevOriginalWeek) as any
-      if (prevPerf && !prevGoal?.isDeload) {
-        const newTM = adjustTM(prevPerf.repsOnLastSet, prevGoal.amrapTarget!, currentTM)
+      const prevGoal = base.find(g => g.week === prevOriginalWeek)
+      
+      if (prevPerf && prevGoal && !('isDeload' in prevGoal && prevGoal.isDeload)) {
+        const standardGoal = prevGoal as StandardWeek | HypertrophyWeek
+        const newTM = adjustTM(prevPerf.repsOnLastSet, standardGoal.amrapTarget, currentTM)
         const delta = newTM - currentTM
         if (delta !== 0) {
           const pct = (delta / currentTM) * 100
-          action = `Last week: ${prevPerf.repsOnLastSet}/${prevGoal.amrapTarget!} reps. TM adjusted from ${currentTM.toFixed(1)} to ${newTM.toFixed(1)}kg (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%).`
+          action = `Last week: ${prevPerf.repsOnLastSet}/${standardGoal.amrapTarget} reps. TM adjusted from ${currentTM.toFixed(1)} to ${newTM.toFixed(1)}kg (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%).`
         } else {
-          action = `Last week: ${prevPerf.repsOnLastSet}/${prevGoal.amrapTarget!} reps. TM unchanged at ${currentTM.toFixed(1)}kg.`
+          action = `Last week: ${prevPerf.repsOnLastSet}/${standardGoal.amrapTarget} reps. TM unchanged at ${currentTM.toFixed(1)}kg.`
         }
         currentTM = newTM
       }
     }
 
-    if ('isDeload' in goal) {
-      const pct = (goal as any).intensity ?? 0.6
+    if ('isDeload' in goal && goal.isDeload) {
+      const deloadGoal = goal as DeloadWeek
+      const pct = deloadGoal.intensity ?? 0.6
       logs.push({
         week: displayWeek,
         tm: currentTM,
         weight: roundToNearest(currentTM * pct, roundingInc),
         goal: style === 'HYPERTROPHY'
-          ? `${(goal as any).sets ?? 4}x${(goal as any).reps ?? 5} @ ${(pct * 100).toFixed(0)}% (no rep targets)`
+          ? `${deloadGoal.sets ?? 4}x${deloadGoal.reps ?? 5} @ ${(pct * 100).toFixed(0)}% (no rep targets)`
           : '3x5 @ RPE 6',
         action: 'Deload Week'
       })

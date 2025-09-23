@@ -240,7 +240,7 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground leading-snug">
-            These settings apply to any exercise using the RtF progression. You can still edit each exercise's Training Max (TM) and rounding increment individually when you add them.
+            These settings apply to any exercise using the RtF progression. You can still edit each exercise&apos;s Training Max (TM) and rounding increment individually when you add them.
           </p>
         </div>
       </div>
