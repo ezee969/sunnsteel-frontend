@@ -797,6 +797,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                                       onStepRangeReps={stepRangeReps}
                                       onStepWeight={stepWeight}
                                       disableTimeBasedProgressions={!canUseTimeframe}
+                                      programStyle={data.programStyle}
                                     />
                                   </motion.div>
                                 );
@@ -833,6 +834,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                                 onStepRangeReps={() => {}}
                                 onStepWeight={() => {}}
                                 disableTimeBasedProgressions={!canUseTimeframe}
+                                programStyle={data.programStyle}
                               />
                             </div>
                           ) : null}
@@ -930,6 +932,7 @@ interface SortableExerciseCardProps {
   ) => void;
   onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
   disableTimeBasedProgressions?: boolean;
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }
 
 const SortableExerciseCard: React.FC<SortableExerciseCardProps> = ({

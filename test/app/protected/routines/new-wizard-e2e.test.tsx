@@ -93,7 +93,7 @@ describe('CreateRoutinePage wizard E2E', () => {
     // Now RtF should be enabled; open select
     const progSelect2 = screen.getByLabelText('Progression scheme')
     fireEvent.click(progSelect2)
-    const enabledRtf = await screen.findByRole('option', { name: /RtF \(4 fixed \+ 1 AMRAP\)/i })
+    const enabledRtf = await screen.findByRole('option', { name: /RtF \(4 sets \+ 1 AMRAP\)/i })
     expect(enabledRtf).not.toHaveAttribute('aria-disabled', 'true')
     fireEvent.click(enabledRtf)
 

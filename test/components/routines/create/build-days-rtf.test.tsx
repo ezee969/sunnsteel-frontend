@@ -83,7 +83,7 @@ describe('BuildDays - PROGRAMMED_RTF flows', () => {
     onUpdate.mockClear()
 
     // Select PROGRAMMED_RTF progression
-    await openSelectAndChoose('Progression scheme', /RtF \(4 fixed \+ 1 AMRAP\)/i)
+    await openSelectAndChoose('Progression scheme', /RtF \(4 sets \+ 1 AMRAP\)/i)
 
     expect(onUpdate).toHaveBeenCalled()
     const updated = onUpdate.mock.calls[onUpdate.mock.calls.length - 1][0] as RoutineWizardData

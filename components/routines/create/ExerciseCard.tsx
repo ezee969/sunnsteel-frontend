@@ -439,6 +439,7 @@ interface ExerciseCardProps {
   ) => void;
   onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
   disableTimeBasedProgressions?: boolean;
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }
 
 export const ExerciseCard: FC<ExerciseCardProps> = ({
@@ -463,6 +464,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onStepRangeReps,
   onStepWeight,
   disableTimeBasedProgressions,
+  programStyle,
 }) => {
   const setRowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
@@ -675,7 +677,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         : undefined
                     }
                   >
-                    RtF (4 fixed + 1 AMRAP)
+                    {programStyle === 'HYPERTROPHY' ? 'RtF Hypertrophy (3 sets + 1 AMRAP)' : 'RtF (4 sets + 1 AMRAP)'}
                   </SelectItem>
                   {/* Removed PROGRAMMED_RTF_HYPERTROPHY option (deprecated) */}
                 </SelectContent>
@@ -703,18 +705,25 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         aria-label="Training Max"
                         aria-invalid={tmMissing}
                         aria-describedby={helpId}
+                        type="text"
                         inputMode="decimal"
                         pattern="[0-9]*[.]?[0-9]*"
-                        placeholder="e.g. 100"
-                        value={exercise.programTMKg ?? ''}
+                        placeholder="e.g. 110.5"
+                        value={exercise.programTMKg !== undefined && !Number.isNaN(exercise.programTMKg) ? String(exercise.programTMKg) : ''}
                         onChange={(e) => {
-                          const val = parseFloat(
-                            e.target.value.replace(/[^0-9.]/g, '')
-                          );
-                          if (!Number.isNaN(val)) {
-                            onUpdateProgramTMKg(exerciseIndex, val);
-                          } else if (e.target.value === '') {
+                          const raw = e.target.value;
+                          // Allow digits, one decimal point, and empty string
+                          const sanitized = raw
+                            .replace(/[^0-9.]/g, '')
+                            .replace(/(\..*)\./g, '$1'); // Allow only one dot
+                          
+                          if (sanitized === '') {
                             onUpdateProgramTMKg(exerciseIndex, NaN);
+                          } else {
+                            const val = parseFloat(sanitized);
+                            if (!Number.isNaN(val) && val > 0) {
+                              onUpdateProgramTMKg(exerciseIndex, val);
+                            }
                           }
                         }}
                         className={`w-32 sm:w-40 h-8 text-sm text-center ${
@@ -892,7 +901,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         }
                         title={
                           exercise.progressionScheme === 'PROGRAMMED_RTF'
-                            ? 'Sets are handled by RtF progression'
+                            ? `Sets are handled by RtF progression (${programStyle === 'HYPERTROPHY' ? '3 sets + 1 AMRAP' : '4 sets + 1 AMRAP'})`
                             : undefined
                         }
                       >

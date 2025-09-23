@@ -106,7 +106,7 @@ describe('BuildDays - Program Schedule mode NONE', () => {
     openSelect('Progression scheme')
 
     // RtF options should be disabled
-    const rtfOption = await screen.findByRole('option', { name: /RtF \(4 fixed \+ 1 AMRAP\)/i })
+    const rtfOption = await screen.findByRole('option', { name: /RtF \(4 sets \+ 1 AMRAP\)/i })
     expect(rtfOption).toHaveAttribute('aria-disabled', 'true')
   })
 })
