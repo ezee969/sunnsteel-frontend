@@ -20,14 +20,6 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { InfoTooltip } from '@/components/InfoTooltip';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select as UiSelect,
-  SelectTrigger as UiSelectTrigger,
-  SelectValue as UiSelectValue,
-  SelectContent as UiSelectContent,
-  SelectItem as UiSelectItem,
-} from '@/components/ui/select'; // reuse existing styled select for style choice
 
 interface RoutineBasicInfoProps {
   data: RoutineWizardData;
@@ -193,55 +185,6 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
               </div>
             )}
           </div>
-        </div>
-
-        {/* RtF Program Options (always visible so user can pre-select before adding exercises) */}
-        <div className="space-y-3 border-t pt-4">
-          <div className="flex items-center gap-2">
-            <Label>RtF Style & Options</Label>
-            <InfoTooltip
-              content="Configure Reps-to-Failure program parameters. Style sets the primary rep band focus (Standard = strength leaning 5/4/3 wave, Hypertrophy = higher rep 10→6). Deload weeks can be removed ( program shrinks from 21 to 18 weeks )."
-              side="right"
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Style (Rep Band)</Label>
-              <UiSelect
-                value={data.programStyle ?? 'STANDARD'}
-                onValueChange={(val) => onUpdate({ programStyle: val as 'STANDARD' | 'HYPERTROPHY' })}
-              >
-                <UiSelectTrigger className="w-full sm:w-60" aria-label="RtF style">
-                  <UiSelectValue />
-                </UiSelectTrigger>
-                <UiSelectContent>
-                  <UiSelectItem value="STANDARD">Standard (5/4/3 strength bias)</UiSelectItem>
-                  <UiSelectItem value="HYPERTROPHY">Hypertrophy (10→6 higher volume)</UiSelectItem>
-                </UiSelectContent>
-              </UiSelect>
-            </div>
-            <div className="flex flex-col justify-between gap-1">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-                Include Deload Weeks
-                <InfoTooltip content="When OFF the deload weeks (7,14,21) are removed and the plan compresses to 18 continuous weeks." />
-              </Label>
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  checked={data.programWithDeloads !== false}
-                  onCheckedChange={(checked: boolean) =>
-                    onUpdate({ programWithDeloads: !!checked })
-                  }
-                  aria-label="Include deload weeks"
-                />
-                <span className="text-sm text-muted-foreground">
-                  {data.programWithDeloads === false ? 'Removed (18w)' : 'Included (21w)'}
-                </span>
-              </div>
-            </div>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-snug">
-            These settings apply to any exercise using the RtF progression. You can still edit each exercise&apos;s Training Max (TM) and rounding increment individually when you add them.
-          </p>
         </div>
       </div>
     </TooltipProvider>
