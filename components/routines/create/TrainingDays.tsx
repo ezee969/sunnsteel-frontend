@@ -79,7 +79,9 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
 
   // Generate a lightweight preview (first 6 weeks) of RtF program when any exercise uses RtF.
   const rtfExercises = useMemo(
-    () => data.days.flatMap(d => d.exercises).filter(e => e.progressionScheme === 'PROGRAMMED_RTF'),
+    () => data.days.flatMap(d => d.exercises).filter(e => 
+      e.progressionScheme === 'PROGRAMMED_RTF' || e.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    ),
     [data.days]
   )
   const [previewExerciseId, setPreviewExerciseId] = useReactState<string | undefined>(
@@ -90,29 +92,36 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
     if (!usesRtf || !selectedExercise) return [] as { week: number; goal: string; weight: number }[]
     const tm = selectedExercise.programTMKg ?? 100
     const rounding = selectedExercise.programRoundingKg ?? 5
-    const style = data.programStyle || 'STANDARD'
+    // Use the exercise's progression scheme to determine style
+    const isHypertrophy = selectedExercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    const style = isHypertrophy ? 'HYPERTROPHY' : 'STANDARD'
     const withDeloads = data.programWithDeloads !== false
     const logs = generateRepsToFailureProgram({ initialWeight: tm, style, withDeloads, roundingIncrementKg: rounding }, [])
     return logs.slice(0, 6).map(l => ({ week: l.week, goal: l.goal, weight: l.weight }))
-  }, [selectedExercise, data.programStyle, data.programWithDeloads, usesRtf])
+  }, [selectedExercise, data.programWithDeloads, usesRtf])
 
   // Full program generation (memoized) for modal & analytics
   const fullProgram = useMemo(() => {
     if (!usesRtf || !selectedExercise) return [] as ReturnType<typeof generateRepsToFailureProgram>
     const tm = selectedExercise.programTMKg ?? 100
     const rounding = selectedExercise.programRoundingKg ?? 5
-    const style = data.programStyle || 'STANDARD'
+    // Use the exercise's progression scheme to determine style
+    const isHypertrophy = selectedExercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    const style = isHypertrophy ? 'HYPERTROPHY' : 'STANDARD'
     const withDeloads = data.programWithDeloads !== false
     return generateRepsToFailureProgram({ initialWeight: tm, style, withDeloads, roundingIncrementKg: rounding }, [])
-  }, [selectedExercise, data.programStyle, data.programWithDeloads, usesRtf])
+  }, [selectedExercise, data.programWithDeloads, usesRtf])
 
   // Basic in-memory analytics (derive TM adjustments)
   const tmTrend = useMemo(() => {
     if (!fullProgram.length) return null
     const buffer = new TmTrendBuffer()
-    deriveAdjustmentsFromLog(fullProgram, (data.programStyle || 'STANDARD'), selectedExercise?.exerciseId).forEach(e => buffer.push(e))
-    return buffer.snapshot(data.programStyle || 'STANDARD', selectedExercise?.exerciseId)
-  }, [fullProgram, data.programStyle, selectedExercise])
+    // Use the exercise's progression scheme to determine style
+    const isHypertrophy = selectedExercise?.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+    const style = isHypertrophy ? 'HYPERTROPHY' : 'STANDARD'
+    deriveAdjustmentsFromLog(fullProgram, style, selectedExercise?.exerciseId).forEach(e => buffer.push(e))
+    return buffer.snapshot(style, selectedExercise?.exerciseId)
+  }, [fullProgram, selectedExercise])
 
   // Auto-fill timezone from browser when using RtF and not yet set
   useEffect(() => {
@@ -208,12 +217,22 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
                 className={cn(
                   'cursor-pointer transition-all hover:bg-muted/50 active:scale-[0.98]',
                   'border-border/50',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   JSON.stringify(data.trainingDays.sort()) === JSON.stringify(split.days.sort())
                     ? 'ring-1 ring-primary bg-muted/30'
                     : '',
                   isMobile ? 'h-16' : 'h-20'
                 )}
+                role="button"
+                tabIndex={0}
+                aria-label={`Select ${split.name} training split (${split.days.length} days)`}
                 onClick={() => selectSplit(split.days)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectSplit(split.days);
+                  }
+                }}
               >
                 <CardContent className="p-1.5 md:p-2 h-full">
                   <div className="flex flex-col h-full justify-between">
@@ -306,24 +325,7 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
       {usesRtf && (
         <div className="bg-muted/30 p-3 md:p-4 rounded-lg space-y-3">
           <h4 className="font-medium text-sm md:text-base">RtF Program Settings</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm text-muted-foreground">Program style</span>
-              <Select
-                value={data.programStyle || 'STANDARD'}
-                onValueChange={(value) => onUpdate({ 
-                  programStyle: value as 'STANDARD' | 'HYPERTROPHY' 
-                })}
-              >
-                <SelectTrigger aria-label="Program style" className="w-40 h-8 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="STANDARD">Standard</SelectItem>
-                  <SelectItem value="HYPERTROPHY">Hypertrophy</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm text-muted-foreground">Include deload weeks</span>
               <Checkbox
@@ -388,7 +390,7 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
             <div className="mt-2 border rounded-md bg-background overflow-hidden">
               <div className="px-2 py-1.5 text-xs font-medium bg-muted/60 flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  Program Preview (first 6 weeks – {data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy' : 'Standard'})
+                  Program Preview (first 6 weeks)
                   {rtfExercises.length > 1 && (
                     <UiSelect value={previewExerciseId} onValueChange={val => setPreviewExerciseId(val)}>
                       <UiSelectTrigger className="h-6 w-40 text-xs">
@@ -410,7 +412,7 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl">
                       <DialogHeader>
-                        <DialogTitle>Full Program ({data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy' : 'Standard'})</DialogTitle>
+                        <DialogTitle>Full Program</DialogTitle>
                       </DialogHeader>
                       <div className="max-h-[60vh] overflow-auto border rounded-md">
                         <table className="w-full text-xs">

@@ -7,6 +7,8 @@ export const routineService = {
   getUserRoutines: async (filters?: {
     isFavorite?: boolean;
     isCompleted?: boolean;
+    include?: string[]; // e.g., ['rtfGoals']
+    week?: number; // for RTF goals
   }): Promise<Routine[]> => {
     const qs = new URLSearchParams();
     if (typeof filters?.isFavorite === 'boolean') {
@@ -14,6 +16,12 @@ export const routineService = {
     }
     if (typeof filters?.isCompleted === 'boolean') {
       qs.set('isCompleted', String(filters.isCompleted));
+    }
+    if (filters?.include?.length) {
+      qs.set('include', filters.include.join(','));
+    }
+    if (typeof filters?.week === 'number') {
+      qs.set('week', String(filters.week));
     }
 
     const url = `${ROUTINES_API_URL}${qs.toString() ? `?${qs.toString()}` : ''}`;
@@ -23,8 +31,20 @@ export const routineService = {
     });
   },
 
-  getById: async (id: string): Promise<Routine> => {
-    return httpClient.request<Routine>(`${ROUTINES_API_URL}/${id}`, {
+  getById: async (id: string, options?: {
+    include?: string[]; // e.g., ['rtfGoals']
+    week?: number; // for RTF goals
+  }): Promise<Routine> => {
+    const qs = new URLSearchParams();
+    if (options?.include?.length) {
+      qs.set('include', options.include.join(','));
+    }
+    if (typeof options?.week === 'number') {
+      qs.set('week', String(options.week));
+    }
+
+    const url = `${ROUTINES_API_URL}/${id}${qs.toString() ? `?${qs.toString()}` : ''}`;
+    return httpClient.request<Routine>(url, {
       method: 'GET',
       secure: true,
     });

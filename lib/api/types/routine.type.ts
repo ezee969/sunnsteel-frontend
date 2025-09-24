@@ -1,6 +1,7 @@
 // Re-export shared primitive enums to maintain backwards compatible imports.
 import type { RepType, ProgressionScheme } from './routine.shared'
 export type { RepType, ProgressionScheme } from './routine.shared'
+import type { RtfWeekGoals } from './rtf.types'
 
 export interface RoutineSet {
   setNumber: number;
@@ -52,6 +53,8 @@ export interface Routine {
   programStartDate?: string; // ISO date string
   programEndDate?: string;   // ISO date string
   programTimezone?: string;  // IANA tz
+  // RTF week goals (populated when ?include=rtfGoals is used)
+  rtfGoals?: RtfWeekGoals;
   days: RoutineDay[];
 }
 

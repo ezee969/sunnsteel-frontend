@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 
 export default function WorkoutsIndexPage() {
   const router = useRouter();
+  const { preloadOnHover } = useComponentPreloading();
   const { data: active, isLoading } = useActiveSession();
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function WorkoutsIndexPage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/workouts/history">View History</Link>
+              <Link href="/workouts/history" {...preloadOnHover('workoutHistoryPage')}>View History</Link>
             </Button>
             <Button asChild variant="secondary">
               <Link href="/dashboard">

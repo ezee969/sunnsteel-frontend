@@ -1,7 +1,15 @@
 export * from './useRoutines'
 export * from './useWorkoutSession'
 export * from './useUser'
-// Auth-specific hooks now come from providers (see use-auth-adapter)
-export * from './useSupabaseEmailAuth'
 export * from './useExercises'
 export * from './use-tm-adjustments'
+export * from './useRtF'
+
+// Auth-specific hooks
+export * from './useSupabaseAuth'
+export * from './useSupabaseEmailAuth'
+export * from './useLogin'
+export * from './useLogout'
+export * from './useRegister'
+export * from './useRefreshToken'
+export * from './useGoogleLogin'

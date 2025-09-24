@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Dumbbell, ChevronRight, CalendarDays, Calendar } from 'lucide-react';
+import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
 import { useRoutines } from '@/lib/api/hooks/useRoutines';
 import {
   useActiveSession,
@@ -36,6 +37,7 @@ import { cn } from '@/lib/utils';
 
 export default function TodaysWorkouts() {
   const router = useRouter();
+  const { preloadOnHover } = useComponentPreloading();
   const { data: routines, isLoading, error } = useRoutines();
   const { data: active } = useActiveSession();
   const { mutateAsync: startSession, isPending } = useStartSession();
@@ -157,6 +159,7 @@ export default function TodaysWorkouts() {
                         : handleStart(routine.id, day.id)
                     }
                     disabled={isPending}
+                    {...preloadOnHover('activeWorkoutSession')}
                   >
                     <Dumbbell className="mr-2 h-4 w-4" />
                     {isActiveForThis ? 'Resume' : 'Start'}

@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Loader2, ChevronsUpDown, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useExercises } from '@/lib/api/hooks/useExercises';
+import { useExercises } from '@/lib/api/hooks';
 import { parseTime } from '@/lib/utils/time';
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
-import { Exercise } from '@/lib/api/types/exercise.type';
+import { Exercise } from '@/lib/api/types';
 import { RoutineWizardData, ProgressionScheme } from './types';
 import { Input } from '@/components/ui/input';
 import { ExerciseCard } from './ExerciseCard';
@@ -350,7 +350,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     }
 
     // Initialize RtF defaults
-    if (scheme === 'PROGRAMMED_RTF') {
+    if (scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
       if (typeof ex.programRoundingKg === 'undefined') ex.programRoundingKg = 2.5;
       // TM left undefined until user inputs
     }
@@ -797,7 +797,6 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                                       onStepRangeReps={stepRangeReps}
                                       onStepWeight={stepWeight}
                                       disableTimeBasedProgressions={!canUseTimeframe}
-                                      programStyle={data.programStyle}
                                     />
                                   </motion.div>
                                 );
@@ -834,7 +833,6 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                                 onStepRangeReps={() => {}}
                                 onStepWeight={() => {}}
                                 disableTimeBasedProgressions={!canUseTimeframe}
-                                programStyle={data.programStyle}
                               />
                             </div>
                           ) : null}
@@ -932,7 +930,6 @@ interface SortableExerciseCardProps {
   ) => void;
   onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
   disableTimeBasedProgressions?: boolean;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }
 
 const SortableExerciseCard: React.FC<SortableExerciseCardProps> = ({

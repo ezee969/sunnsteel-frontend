@@ -40,6 +40,42 @@ export const preloadComponents = {
   dashboardPage: () => {
     import('@/app/(protected)/dashboard/page');
   },
+
+  // Wizard pages - heavy routine creation flow
+  newRoutinePage: () => {
+    import('@/app/(protected)/routines/new/page');
+  },
+
+  editRoutinePage: () => {
+    import('@/app/(protected)/routines/edit/[id]/page');
+  },
+
+  // Wizard components - loaded dynamically during routine creation
+  trainingDaysWizard: () => {
+    import('@/components/routines/create/TrainingDays');
+  },
+
+  buildDaysWizard: () => {
+    import('@/components/routines/create/BuildDays');
+  },
+
+  reviewCreateWizard: () => {
+    import('@/components/routines/create/ReviewAndCreate');
+  },
+
+  // Active workout session - heavy real-time component
+  activeWorkoutSession: () => {
+    import('@/app/(protected)/workouts/sessions/[id]/page');
+  },
+
+  // Workout history components
+  workoutHistoryPage: () => {
+    import('@/app/(protected)/workouts/history/page');
+  },
+
+  workoutHistoryDetail: () => {
+    import('@/app/(protected)/workouts/history/[id]/page');
+  },
 };
 
 /**

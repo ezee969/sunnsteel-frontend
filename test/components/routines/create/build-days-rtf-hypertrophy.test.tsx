@@ -81,7 +81,7 @@ describe('BuildDays - PROGRAMMED_RTF flows (legacy hypertrophy test)', () => {
     // Expand exercise for visibility
     fireEvent.click(screen.getByRole('button', { name: /toggle sets/i }))
 
-    await openSelectAndChoose('Progression scheme', /RtF \(4 sets \+ 1 AMRAP\)/i)
+    await openSelectAndChoose('Progression scheme', /RtF Hypertrophy \(4 sets: 3 \+ 1 AMRAP\)/i)
 
     expect(onUpdate).toHaveBeenCalled()
     const updated = onUpdate.mock.calls[onUpdate.mock.calls.length - 1][0] as RoutineWizardData

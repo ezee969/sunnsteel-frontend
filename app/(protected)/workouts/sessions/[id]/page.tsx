@@ -26,7 +26,7 @@ import type { SetLog } from '@/lib/api/types/workout.type';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useSaveState, saveStateLabel } from '@/lib/utils/save-status-store';
+import { useSaveState, saveStateLabel, setSaveState } from '@/lib/utils/save-status-store';
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
 import {
   AlertDialog,
@@ -537,7 +537,14 @@ const LogRow = ({
       debouncedWeight === '' ? undefined : Number(debouncedWeight);
 
     const hasChanged = currentReps !== reps || currentWeight !== weight;
-    if (!hasChanged) return;
+    
+    if (!hasChanged) {
+      // Cancel pending state if values reverted to original
+      if (saveState === 'pending') {
+        setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'idle');
+      }
+      return;
+    }
 
     onSave({
       routineExerciseId,
@@ -549,6 +556,22 @@ const LogRow = ({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedReps, debouncedWeight, onSave]);
+
+  // Check immediate values (before debounce) to provide instant feedback
+  useEffect(() => {
+    const currentReps = Number(repsState);
+    const currentWeight = weightState === '' ? undefined : Number(weightState);
+    const hasImmediateChange = currentReps !== reps || currentWeight !== weight;
+    
+    if (hasImmediateChange && saveState === 'idle') {
+      // Only mark as pending if we're not already in a save flow
+      markSetPending(sessionId, routineExerciseId, setNumber);
+    } else if (!hasImmediateChange && saveState === 'pending') {
+      // Cancel pending immediately if reverted before debounce
+      setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'idle');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [repsState, weightState, reps, weight, saveState]);
 
   const handleCompletionToggle = (checked: boolean) => {
     setIsCompleted(checked);
@@ -635,7 +658,6 @@ const LogRow = ({
             value={repsState}
             onChange={(e) => {
               setReps(e.target.value);
-              markSetPending(sessionId, routineExerciseId, setNumber);
             }}
             disabled={saveState === 'saving'}
             className="text-center text-lg font-semibold h-12"
@@ -661,16 +683,38 @@ const LogRow = ({
             value={weightState}
             onChange={(e) => {
               setWeight(e.target.value);
-              markSetPending(sessionId, routineExerciseId, setNumber);
             }}
             disabled={saveState === 'saving'}
             className="text-center text-lg font-semibold h-12"
           />
         </div>
       </div>
-      {saveState !== 'idle' && saveState !== 'pending' && saveState !== 'saving' && (
-        <div className="flex items-center justify-center mt-3 text-xs text-muted-foreground">
-          {saveStateLabel(saveState)}
+      {saveState !== 'idle' && (
+        <div className="flex items-center justify-center mt-3 text-xs">
+          {saveState === 'pending' && (
+            <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
+              Unsaved
+            </span>
+          )}
+          {saveState === 'saving' && (
+            <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full animate-pulse"></span>
+              Saving…
+            </span>
+          )}
+          {saveState === 'saved' && (
+            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
+              Saved
+            </span>
+          )}
+          {saveState === 'error' && (
+            <span className="flex items-center gap-1 text-red-600 dark:text-red-400">
+              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
+              Error
+            </span>
+          )}
         </div>
       )}
     </div>

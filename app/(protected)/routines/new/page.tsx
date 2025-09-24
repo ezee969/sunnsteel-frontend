@@ -41,7 +41,6 @@ export default function CreateRoutinePage() {
     days: [],
     programScheduleMode: 'NONE',
     programWithDeloads: true,
-    programStyle: 'STANDARD',
   });
 
   const updateRoutineData = (updates: Partial<RoutineWizardData>) => {

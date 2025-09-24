@@ -27,8 +27,8 @@ import {
   useRoutine,
   useUpdateRoutine,
   useCreateRoutine,
-} from '@/lib/api/hooks/useRoutines';
-import { RoutineDay, RoutineExercise } from '@/lib/api/types/routine.type';
+} from '@/lib/api/hooks';
+import { RoutineDay, RoutineExercise } from '@/lib/api/types';
 
 // Use shared RoutineWizardData
 
@@ -51,6 +51,7 @@ const mapProgressionScheme = (
     case 'DOUBLE_PROGRESSION':
     case 'DYNAMIC_DOUBLE_PROGRESSION':
     case 'PROGRAMMED_RTF':
+    case 'PROGRAMMED_RTF_HYPERTROPHY':
       return value as ProgressionScheme;
     case 'DYNAMIC':
       return 'DOUBLE_PROGRESSION';
@@ -124,7 +125,7 @@ export default function EditRoutinePage() {
           ? 'TIMEFRAME'
           : 'NONE',
         // Front-end only metadata (default STANDARD if absent)
-        programStyle: (routine as unknown as { programStyle?: 'STANDARD' | 'HYPERTROPHY' }).programStyle || 'STANDARD',
+        // programStyle removed (per-exercise style now derived from progressionScheme)
       };
 
       setRoutineData(transformedData);

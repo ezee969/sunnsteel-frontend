@@ -1,3 +1,9 @@
+<!--
+NOTE: This file tracks near-term frontend improvements. For structured
+roadmaps and historical completion reports, see docs/roadmaps and
+docs/history. Do not duplicate roadmap tables here.
+-->
+
 # Frontend Improvement & Modernization Plan
 
 This document tracks actionable, low-risk improvements separated from the main `README.md`.
@@ -14,24 +20,27 @@ Routing currently trusts **client-side guards** (middleware is disabled for SSR 
 
 Dynamic preloading (`lib/utils/dynamic-imports.tsx`) covers dashboard stats; can be extended to wizard/session flows.
 
+### Backend Coordination
+For RtF related backend roadmap tasks see backend: `docs/roadmaps/RTF_ENHANCEMENTS.md` (tasks RTF-B01..B13). Frontend counterparts will mirror with F-codes when added.
+
 ---
 ## 2. Quick Win Improvement Opportunities
 
 | Area | Issue / Observation | Low-effort Action | Effort | Impact |
 |------|---------------------|-------------------|--------|--------|
 | Auth duplication | Two providers (`auth-provider`, `supabase-auth-provider`) | ✅ Unified on Supabase provider; legacy removed | S | DONE |
-| Routine types duplication | `RepType` / `ProgressionScheme` duplicated; extra hypertrophy enum only in wizard | Create `lib/api/types/routine.shared.ts` used by both API + wizard; export union including hypertrophy variant (feature-flag if needed) | S | M |
+| Routine types duplication | `RepType` / `ProgressionScheme` duplicated; extra hypertrophy enum only in wizard | ✅ Created `lib/api/types/routine.shared.ts` with unified types + barrel exports | S | DONE |
 | `httpClient` complexity | Mixed legacy token + Supabase session logic | ✅ Simplified to Supabase session only (no legacy refresh) | M | DONE |
-| Env safety | No runtime validation of `NEXT_PUBLIC_*` vars | Add `schema/env.client.ts` (Zod) + `validateClientEnv()` in `AppProvider` (one-time) | S | M |
-| Barrel exports | Deep relative import chains | Add `lib/api/hooks/index.ts`, `lib/api/services/index.ts`, `lib/api/types/index.ts` | S | M |
-| Preloading scope | Only dashboard stats + a few pages | Extend `preloadComponents` to wizard pages & active session; trigger on sidebar hover/idle | S | M |
-| Middleware | Disabled (only debug headers) | Reintroduce minimal edge redirect: if protected route && no Supabase auth cookie prefix -> `/login` | M | H |
-| Performance metrics | `performance-monitor.ts` unused | Add hydration + first data fetch timing logs (opt‑in) | S | M |
-| Accessibility | Some clickable divs lack keyboard semantics | Refactor to `<button>` or add `role="button"` + key handlers | S | M |
-| Error boundaries | Missing `error.tsx` for some route groups | Add `error.tsx` to `routines`, `workouts`, wizard pages with retry | S | M |
-| Query key stability | Filters object identity may cause refetch churn | Normalize filters (serialize or stable sort) before passing to queryKey | S | S |
-| Set log autosave UX | Silent debounce may confuse user | Add transient “● Saved” / “Unsaved” indicator & cancel if unchanged before debounce fires | M | M |
-| Design tokens docs | Colors only described in prose | Create `STYLE_GUIDE.md` enumerating CSS vars + usage rules | S | S |
+| Env safety | No runtime validation of `NEXT_PUBLIC_*` vars | ✅ Added `schema/env.client.ts` (Zod) + `validateClientEnv()` in `AppProvider` | S | DONE |
+| Barrel exports | Deep relative import chains | ✅ Added `lib/api/hooks/index.ts`, `lib/api/services/index.ts` with import cleanup | S | DONE |
+| Preloading scope | Only dashboard stats + a few pages | ✅ Extended `preloadComponents` with wizard pages & active sessions; added hover preloading to Create/Start buttons | S | DONE |
+| Middleware | Disabled (only debug headers) | ✅ Implemented edge redirect for protected routes without Supabase auth cookies → `/login` | M | DONE |
+| Performance metrics | `performance-monitor.ts` unused | ✅ Added hydration + first data fetch timing with opt-in debug panel | S | DONE |
+| Accessibility | Some clickable divs lack keyboard semantics | ✅ Refactored to proper button semantics with keyboard handlers | S | DONE |
+| Error boundaries | Missing `error.tsx` for some route groups | ✅ Added `error.tsx` to workout sessions and routine editing with retry | S | DONE |
+| Query key stability | Filters object identity may cause refetch churn | ✅ Normalized filters with stable serialization in useRoutines and useSessions | S | DONE |
+| Set log autosave UX | Silent debounce may confuse user | ✅ Added "● Saved" / "Unsaved" indicators with instant feedback & cancel unchanged | M | DONE |
+| Design tokens docs | Colors only described in prose | ✅ Created `STYLE_GUIDE.md` with CSS vars + usage rules & patterns | S | DONE |
 
 Legend: Effort (S=Small, M=Medium, L=Large), Impact (H=High, M=Medium, S=Small)
 
@@ -40,10 +49,10 @@ Legend: Effort (S=Small, M=Medium, L=Large), Impact (H=High, M=Medium, S=Small)
 
 2. Env validation (DONE)
 5. Add `error.tsx` boundaries (routines/workouts) (DONE)
-6. Barrel exports for hooks/services/types (PENDING)
-8. Accessibility adjustments (exercise expanders, collapsibles) (PENDING)
-9. (Optional) Performance instrumentation hook (PENDING)
-10. UX feedback for set log autosave (PENDING)
+6. Barrel exports for hooks/services/types (DONE)
+8. Accessibility adjustments (exercise expanders, collapsibles) (DONE) 
+9. (Optional) Performance instrumentation hook (DONE)
+10. UX feedback for set log autosave (DONE)
 
 ---
 ## 4. Implementation Sketches
@@ -163,4 +172,3 @@ Remove style-dependent UI + payload fields; existing saved routines default to s
 
 ---
 Pending your confirmation of the assumptions above before coding Phase 1.
-

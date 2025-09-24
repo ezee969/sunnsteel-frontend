@@ -9,12 +9,12 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Clock, Loader2, Save } from 'lucide-react';
-import { useCreateRoutine, useUpdateRoutine } from '@/lib/api/hooks/useRoutines';
-import { useExercises } from '@/lib/api/hooks/useExercises';
+import { useCreateRoutine, useUpdateRoutine } from '@/lib/api/hooks';
+import { useExercises } from '@/lib/api/hooks';
 import { formatTime } from '@/lib/utils/time';
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
-import { CreateRoutineRequest } from '@/lib/api/types/routine.type';
-import { Exercise } from '@/lib/api/types/exercise.type';
+import { CreateRoutineRequest } from '@/lib/api/types';
+import { Exercise } from '@/lib/api/types';
 import { RoutineWizardData } from './types';
 
 interface ReviewAndCreateProps {
@@ -61,12 +61,12 @@ export function ReviewAndCreate({
     }
   };
   const usesRtf = data.days.some((d) =>
-    d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+    d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY')
   )
 
   const prepareRoutineData = (): CreateRoutineRequest => {
     const usesRtf = data.days.some((d) =>
-      d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF')
+      d.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY')
     )
 
     const tz =
@@ -81,7 +81,6 @@ export function ReviewAndCreate({
           programWithDeloads: data.programWithDeloads,
           programStartDate: data.programStartDate,
           programTimezone: tz,
-          ...(data.programStyle && { programStyle: data.programStyle }),
           ...(!isEditing &&
             data.programStartWeek && { programStartWeek: data.programStartWeek }),
         }),
@@ -92,7 +91,7 @@ export function ReviewAndCreate({
           restSeconds: exercise.restSeconds,
           progressionScheme: exercise.progressionScheme,
           minWeightIncrement: exercise.minWeightIncrement,
-          ...(exercise.progressionScheme === 'PROGRAMMED_RTF' && {
+          ...((exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && {
             ...(exercise.programTMKg !== undefined && {
               programTMKg: exercise.programTMKg,
             }),
@@ -241,10 +240,10 @@ export function ReviewAndCreate({
                                   : 'Unknown'}{' '}
                                 • {exerciseData?.equipment}
                               </p>
-                              {exercise.progressionScheme === 'PROGRAMMED_RTF' && (
+                              {(exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') && (
                                 <div className="mt-1 flex flex-wrap gap-1">
                                   <Badge variant="outline" className="text-[10px]">
-                                    RtF
+                                    {exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY' ? 'RtF Hypertrophy' : 'RtF Standard'}
                                   </Badge>
                                 </div>
                               )}
@@ -289,10 +288,6 @@ export function ReviewAndCreate({
             <div>
               <p className="text-muted-foreground">Include deload weeks</p>
               <p className="font-medium">{data.programWithDeloads ? 'Yes' : 'No'}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Program style</p>
-              <p className="font-medium">{data.programStyle === 'HYPERTROPHY' ? 'Hypertrophy (8–12 focus)' : 'Standard (Strength focus)'}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Start date</p>

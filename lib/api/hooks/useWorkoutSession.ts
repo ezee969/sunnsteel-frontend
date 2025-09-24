@@ -13,11 +13,29 @@ import {
   WorkoutSessionSummary,
 } from '../types/workout.type';
 
+// Serialize params object to ensure stable query keys
+function serializeSessionParams(params: Omit<ListSessionsParams, 'cursor' | 'limit'>) {
+  if (!params || typeof params !== 'object') return 'no-params';
+  const entries = Object.entries(params)
+    .filter(([, v]) => v !== undefined && v !== null)
+    .sort(([a], [b]) => a.localeCompare(b));
+  
+  if (!entries.length) return 'no-params';
+  
+  return entries.map(([k, v]) => {
+    // Handle different value types
+    if (typeof v === 'object') {
+      return `${k}:${JSON.stringify(v)}`;
+    }
+    return `${k}:${v}`;
+  }).join('|');
+}
+
 const qk = {
   active: ['workout', 'session', 'active'] as const,
   session: (id: string) => ['workout', 'session', id] as const,
   sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
-    ['workout', 'sessions', params] as const,
+    ['workout', 'sessions', serializeSessionParams(params)] as const,
 };
 
 export const useActiveSession = () => {

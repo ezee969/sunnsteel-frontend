@@ -1,22 +1,42 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { routineService } from '../services/routineService';
 import { CreateRoutineRequest, Routine } from '../types/routine.type';
+import { usePerformanceQuery } from '@/hooks/use-performance-query';
+import { rtfApi } from '../etag-client';
 
 const ROUTINES_QUERY_KEY = ['routines'] as const;
 
-function serializeFilters(filters?: { isFavorite?: boolean; isCompleted?: boolean }) {
+function serializeFilters(filters?: { 
+  isFavorite?: boolean; 
+  isCompleted?: boolean;
+  include?: string[];
+  week?: number;
+}) {
   if (!filters) return 'nofilters'
   const entries = Object.entries(filters).filter(([, v]) => v !== undefined)
   if (!entries.length) return 'nofilters'
   entries.sort(([a], [b]) => a.localeCompare(b))
-  return entries.map(([k, v]) => `${k}:${v}`).join('|')
+  // Special handling for array values like include
+  return entries.map(([k, v]) => {
+    if (Array.isArray(v)) {
+      return `${k}:${v.sort().join(',')}`
+    }
+    return `${k}:${v}`
+  }).join('|')
 }
 
-export const useRoutines = (filters?: { isFavorite?: boolean; isCompleted?: boolean }) => {
-  return useQuery<Routine[], Error>({
-    queryKey: [...ROUTINES_QUERY_KEY, serializeFilters(filters)],
+export const useRoutines = (filters?: { 
+  isFavorite?: boolean; 
+  isCompleted?: boolean;
+  include?: string[];
+  week?: number;
+}) => {
+  const filterKey = serializeFilters(filters);
+  
+  return usePerformanceQuery<Routine[], Error>({
+    queryKey: [...ROUTINES_QUERY_KEY, filterKey],
     queryFn: () => routineService.getUserRoutines(filters),
-  })
+  }, `Routines Load (${filterKey})`);
 }
 
 type ToggleFavoriteContext = {
@@ -149,6 +169,26 @@ export const useDeleteRoutine = () => {
       console.error('Error deleting routine:', error);
     },
   });
+};
+
+/**
+ * Hook to get RTF week goals for a specific routine with ETag caching
+ * RTF-F15: useRtFWeekGoals hook - Include+fallback logic with ETag optimization
+ */
+export const useRtFWeekGoals = (routineId: string, week?: number) => {
+  return usePerformanceQuery<Routine, Error>({
+    queryKey: ['routine', routineId, 'rtfGoals', week ?? 'current'],
+    queryFn: async () => {
+      // Use ETag client for caching optimization
+      const response = await rtfApi.getWeekGoals(routineId, week, {
+        maxAge: 3 * 60 * 1000 // 3 minutes cache (week goals change frequently)
+      })
+      return response.data as Routine
+    },
+    enabled: !!routineId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  }, `RTF Week Goals (${routineId}, week: ${week ?? 'current'})`);
 };
 
 export const useCreateRoutine = () => {

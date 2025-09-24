@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, PlusCircle, Loader2, Heart, ListChecks } from 'lucide-react';
 import Link from 'next/link';
+import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +57,7 @@ export default function WorkoutsList({
   error,
 }: WorkoutsListProps) {
   const router = useRouter();
+  const { preloadOnHover } = useComponentPreloading();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
   const [favoriteActingId, setFavoriteActingId] = useState<string | null>(null);
@@ -208,7 +210,7 @@ export default function WorkoutsList({
           Get started by creating a new routine.
         </p>
         <Button asChild variant="classical">
-          <Link href="/routines/new">
+          <Link href="/routines/new" {...preloadOnHover('newRoutinePage')}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Routine
           </Link>
@@ -265,6 +267,7 @@ export default function WorkoutsList({
                       (isStarting && startActingId === routine.id) ||
                       isProgramEnded(routine)
                     }
+                    {...preloadOnHover('activeWorkoutSession')}
                   >
                     {isStarting && startActingId === routine.id ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

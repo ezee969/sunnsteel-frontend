@@ -47,6 +47,17 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
               session.access_token
             );
             setUser(userProfile.user);
+            // Mark client-side session for middleware detection
+            try {
+              if (typeof document !== 'undefined') {
+                document.cookie = [
+                  'has_session=1',
+                  'Path=/',
+                  'Max-Age=604800', // 7 days
+                  'SameSite=Lax',
+                ].join('; ');
+              }
+            } catch {}
           } catch (err) {
             console.error('Failed to verify token with backend:', err);
             setError(err as Error);
@@ -83,6 +94,17 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
             session.access_token
           );
           setUser(userProfile.user);
+          // Mark client-side session for middleware detection
+          try {
+            if (typeof document !== 'undefined') {
+              document.cookie = [
+                'has_session=1',
+                'Path=/',
+                'Max-Age=604800', // 7 days
+                'SameSite=Lax',
+              ].join('; ');
+            }
+          } catch {}
 
           // Invalidate queries to refetch with new auth state
           queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -90,6 +112,12 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
           console.error('Failed to verify token with backend:', err);
           setError(err as Error);
           setUser(null);
+          // Best-effort: clear marker on verification failure
+          try {
+            if (typeof document !== 'undefined') {
+              document.cookie = 'has_session=; Max-Age=0; path=/';
+            }
+          } catch {}
         }
       } else {
         setUser(null);

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { ChevronsUpDown, Clock, Minus, Plus, Trash2 } from 'lucide-react';
-import { Exercise } from '@/lib/api/types/exercise.type';
+import { Exercise } from '@/lib/api/types';
 import { RepType, RoutineWizardData, ProgressionScheme } from './types';
 import { formatTime } from '@/lib/utils/time';
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups';
@@ -439,7 +439,6 @@ interface ExerciseCardProps {
   ) => void;
   onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
   disableTimeBasedProgressions?: boolean;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
 }
 
 export const ExerciseCard: FC<ExerciseCardProps> = ({
@@ -464,7 +463,6 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
   onStepRangeReps,
   onStepWeight,
   disableTimeBasedProgressions,
-  programStyle,
 }) => {
   const setRowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
@@ -677,16 +675,26 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         : undefined
                     }
                   >
-                    {programStyle === 'HYPERTROPHY' ? 'RtF Hypertrophy (3 sets + 1 AMRAP)' : 'RtF (4 sets + 1 AMRAP)'}
+                    RtF Standard (5 sets: 4 + 1 AMRAP)
                   </SelectItem>
-                  {/* Removed PROGRAMMED_RTF_HYPERTROPHY option (deprecated) */}
+                  <SelectItem
+                    value="PROGRAMMED_RTF_HYPERTROPHY"
+                    disabled={!!disableTimeBasedProgressions}
+                    title={
+                      disableTimeBasedProgressions
+                        ? 'Requires Timeframe schedule (set in Basic Info)'
+                        : undefined
+                    }
+                  >
+                    RtF Hypertrophy (4 sets: 3 + 1 AMRAP)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* RtF per-exercise fields */}
             {(() => {
-              const isRtf = exercise.progressionScheme === 'PROGRAMMED_RTF'
+              const isRtf = exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
               if (!isRtf) return null;
               const tmMissing =
                 exercise.programTMKg === undefined ||
@@ -767,7 +775,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
             {/* Weight increment (only for non-RtF progression schemes) */}
             {exercise.progressionScheme !== 'NONE' &&
-              exercise.progressionScheme !== 'PROGRAMMED_RTF' && (
+              exercise.progressionScheme !== 'PROGRAMMED_RTF' && 
+              exercise.progressionScheme !== 'PROGRAMMED_RTF_HYPERTROPHY' && (
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Label className="text-sm font-medium text-muted-foreground">
@@ -819,7 +828,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 
           {/* Sets header with collapse/expand */}
           {(() => {
-            const isRtFActive = exercise.progressionScheme === 'PROGRAMMED_RTF'
+            const isRtFActive = exercise.progressionScheme === 'PROGRAMMED_RTF' || exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
             if (isRtFActive) {
               // Hide sets UI entirely for RtF exercises
               return null;
@@ -897,11 +906,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         className="w-full h-10 text-base mb-3"
                         disabled={
                           exercise.sets.length >= 10 ||
-                          exercise.progressionScheme === 'PROGRAMMED_RTF'
+                          exercise.progressionScheme === 'PROGRAMMED_RTF' ||
+                          exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
                         }
                         title={
                           exercise.progressionScheme === 'PROGRAMMED_RTF'
-                            ? `Sets are handled by RtF progression (${programStyle === 'HYPERTROPHY' ? '3 sets + 1 AMRAP' : '4 sets + 1 AMRAP'})`
+                            ? 'Sets are handled by RtF Standard progression (5 sets: 4 + 1 AMRAP)'
+                            : exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                            ? 'Sets are handled by RtF Hypertrophy progression (4 sets: 3 + 1 AMRAP)'
                             : undefined
                         }
                       >

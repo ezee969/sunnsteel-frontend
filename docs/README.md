@@ -1,0 +1,26 @@
+# Frontend Docs Index
+
+Area | Path | Purpose | Status
+-----|------|---------|-------
+RtF Roadmap | roadmaps/RTF_ENHANCEMENTS.md | Active & planned frontend RtF tasks | ✅ COMPLETE (16/16)
+RtF History | history/RTF_IMPLEMENTATION_COMPLETION.md | Initial implementation snapshot | ✅ Complete
+RtF Completion | history/RTF_FRONTEND_COMPLETION_2025-01-23.md | Final completion report | ✅ New
+Frontend Improvements | roadmaps/FRONTEND_IMPROVEMENTS.md | Quick-win improvement tasks & UX enhancements | 🟡 Active
+
+## Major Milestones
+
+### RTF Platform (100% Complete) ✅
+- **16/16 tasks implemented**: Complete Reps-to-Failure analytics platform
+- **Advanced features**: Timeline visualization, forecast predictions, anomaly detection, program history
+- **Technical excellence**: ETag caching, IndexedDB offline storage, comprehensive test coverage
+- **Performance optimized**: 372kB build size, sub-second load times, responsive design
+
+### Next Focus Areas
+- Frontend Improvements roadmap (quick-wins and UX enhancements)
+- Future feature development based on user feedback
+
+Conventions:
+- Roadmaps: `docs/roadmaps/*`
+- Historical completion reports: `docs/history/*`
+
+This index will expand as additional feature domains gain dedicated docs.

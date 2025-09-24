@@ -4,6 +4,7 @@ import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PwaProvider } from '@/providers/pwa-provider';
+import { PerformanceDebugPanel } from '@/components/PerformanceDebugPanel';
 
 const oswald = Oswald({
   variable: '--font-oswald',
@@ -109,6 +110,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaProvider />
           <AppProvider>{children}</AppProvider>
+          <PerformanceDebugPanel />
         </ThemeProvider>
       </body>
     </html>

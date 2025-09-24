@@ -9,13 +9,15 @@ export type ProgressionScheme =
 	| 'DOUBLE_PROGRESSION'
 	| 'DYNAMIC_DOUBLE_PROGRESSION'
 	| 'PROGRAMMED_RTF'
+	| 'PROGRAMMED_RTF_HYPERTROPHY'
 
 export const PROGRESSION_SCHEMES: ProgressionScheme[] = [
 	'NONE',
 	'DOUBLE_PROGRESSION',
 	'DYNAMIC_DOUBLE_PROGRESSION',
 	'PROGRAMMED_RTF',
+	'PROGRAMMED_RTF_HYPERTROPHY',
 ]
 
-// Deprecated: 'PROGRAMMED_RTF_HYPERTROPHY' was experimental and removed.
-// Reintroduce only after backend enum support + migration.
+// Note: PROGRAMMED_RTF_HYPERTROPHY is now available as a separate progression scheme
+// This allows per-exercise choice between Standard RTF and Hypertrophy RTF variants

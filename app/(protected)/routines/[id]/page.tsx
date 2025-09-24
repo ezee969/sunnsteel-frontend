@@ -45,6 +45,7 @@ import HeroSection from '@/components/layout/HeroSection';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 import TmAdjustmentPanel from '@/components/routines/TmAdjustmentPanel';
 import ProgramStyleBadge from '@/components/routines/ProgramStyleBadge';
+import { RtfDashboard } from '@/components/routines/RtfDashboard';
 
 const dayName = (dayOfWeek: number) => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -87,7 +88,10 @@ export default function RoutineDetailsPage() {
     
     return routine.days.flatMap(day => 
       day.exercises
-        .filter(ex => ex.progressionScheme === 'PROGRAMMED_RTF')
+        .filter(ex => 
+          ex.progressionScheme === 'PROGRAMMED_RTF' || 
+          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+        )
         .map(ex => ({
           id: ex.id,
           exerciseId: ex.exercise.id,
@@ -343,6 +347,13 @@ export default function RoutineDetailsPage() {
             rtfExercises={rtfExercises}
             programStyle={routine?.programStyle}
           />
+        </div>
+      )}
+
+      {/* RTF Dashboard - Timeline, Forecast, and Week Goals */}
+      {hasRtfExercises && (
+        <div className="mt-6">
+          <RtfDashboard routineId={routineId} />
         </div>
       )}
 
