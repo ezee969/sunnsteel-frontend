@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { format } from 'date-fns';
 
 interface TrainingDaysProps {
   data: RoutineWizardData;
@@ -76,6 +77,31 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
   )
 
   const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21;
+
+  // Get the weekday from the program start date if it exists
+  const programStartWeekday = data.programStartDate
+    ? (() => {
+        const [year, month, day] = data.programStartDate.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        return date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      })()
+    : null;
+
+  // Auto-select the program start day if it's set and not already selected
+  useEffect(() => {
+    if (programStartWeekday !== null && !data.trainingDays.includes(programStartWeekday)) {
+      const newTrainingDays = [...data.trainingDays, programStartWeekday].sort();
+      const newDays = newTrainingDays.map((dayId) => ({
+        dayOfWeek: dayId,
+        exercises: data.days.find((d) => d.dayOfWeek === dayId)?.exercises || [],
+      }));
+      
+      onUpdate({
+        trainingDays: newTrainingDays,
+        days: newDays,
+      });
+    }
+  }, [programStartWeekday, data.trainingDays, data.days, onUpdate]);
 
   // Generate a lightweight preview (first 6 weeks) of RtF program when any exercise uses RtF.
   const rtfExercises = useMemo(
@@ -142,6 +168,11 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
     }
   }, [usesRtf, data.programStartWeek, onUpdate]);
   const toggleDay = (dayId: number) => {
+    // Prevent deselecting the program start day
+    if (programStartWeekday !== null && dayId === programStartWeekday) {
+      return; // Don't allow deselecting the program start day
+    }
+
     const isSelected = data.trainingDays.includes(dayId);
     let newTrainingDays: number[];
 
@@ -199,6 +230,26 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
 
   return (
     <div className="space-y-4 md:space-y-6">
+      {/* Program Start Date Notice */}
+      {data.programStartDate && programStartWeekday !== null && (
+        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 md:p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mt-0.5">
+              <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">i</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                Program Start Day Selected
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                Your program starts on {format(new Date(data.programStartDate + 'T00:00:00'), 'EEEE, MMMM d, yyyy')}. 
+                This day ({DAYS_OF_WEEK[programStartWeekday]?.name}) has been automatically selected and cannot be deselected.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
         <h3 className="text-base md:text-lg font-medium mb-3 md:mb-4">
           Which days will you train?
@@ -258,29 +309,42 @@ export function TrainingDays({ data, onUpdate, isEditing = false }: TrainingDays
             Or select days manually:
           </p>
           <div className="grid grid-cols-7 gap-1 md:gap-2">
-            {DAYS_OF_WEEK.map((day) => (
-              <Button
-                key={day.id}
-                variant={data.trainingDays.includes(day.id) ? 'default' : 'outline'}
-                onClick={() => toggleDay(day.id)}
-                className={cn(
-                  'flex flex-col h-auto p-1.5 md:p-3 text-xs md:text-sm',
-                  isMobile && 'h-10 w-10 p-0 flex items-center justify-center'
-                )}
-                size={isMobile ? 'icon' : 'sm'}
-              >
-                {isMobile ? (
-                  <span className="font-medium text-xs">{day.short.charAt(0)}</span>
-                ) : (
-                  <>
-                    <span className="font-medium">{day.short}</span>
-                    <span className="hidden sm:block text-[10px] md:text-xs opacity-80">
-                      {day.name.substring(0, 3)}
-                    </span>
-                  </>
-                )}
-              </Button>
-            ))}
+            {DAYS_OF_WEEK.map((day) => {
+              const isSelected = data.trainingDays.includes(day.id);
+              const isLocked = programStartWeekday !== null && day.id === programStartWeekday;
+              
+              return (
+                <Button
+                  key={day.id}
+                  variant={isSelected ? 'default' : 'outline'}
+                  onClick={() => toggleDay(day.id)}
+                  disabled={isLocked}
+                  className={cn(
+                    'flex flex-col h-auto p-1.5 md:p-3 text-xs md:text-sm relative',
+                    isMobile && 'h-10 w-10 p-0 flex items-center justify-center',
+                    isLocked && 'bg-primary text-primary-foreground cursor-not-allowed opacity-90'
+                  )}
+                  size={isMobile ? 'icon' : 'sm'}
+                  title={isLocked ? 'This day is locked as your program start date' : undefined}
+                >
+                  {isMobile ? (
+                    <span className="font-medium text-xs">{day.short.charAt(0)}</span>
+                  ) : (
+                    <>
+                      <span className="font-medium">{day.short}</span>
+                      <span className="hidden sm:block text-[10px] md:text-xs opacity-80">
+                        {day.name.substring(0, 3)}
+                      </span>
+                    </>
+                  )}
+                  {isLocked && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-[8px] font-bold">🔒</span>
+                    </div>
+                  )}
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>

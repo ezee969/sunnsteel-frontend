@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Loader2, ChevronsUpDown, GripVertical } from 'lucide-react';
+import { Plus, Loader2, ChevronsUpDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useExercises } from '@/lib/api/hooks';
 import { parseTime } from '@/lib/utils/time';
@@ -14,26 +14,6 @@ import { Exercise } from '@/lib/api/types';
 import { RoutineWizardData, ProgressionScheme } from './types';
 import { Input } from '@/components/ui/input';
 import { ExerciseCard } from './ExerciseCard';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  UniqueIdentifier,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 interface BuildDaysProps {
   data: RoutineWizardData;
@@ -61,24 +41,6 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null);
   const { data: exercises, isLoading: exercisesLoading } = useExercises();
   const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME';
-
-  // Drag and drop state
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [draggedExercise, setDraggedExercise] = useState<
-    RoutineWizardData['days'][number]['exercises'][number] | null
-  >(null);
-
-  // Drag and drop sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   // Note: we compute day-specific data on-demand below to avoid stale references
 
@@ -547,55 +509,6 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     onUpdate({ days: newDays });
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    setActiveId(active.id);
-
-    // Find the dragged exercise
-    const dayIndex = data.days.findIndex(
-      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
-    );
-    if (dayIndex !== -1) {
-      const exerciseIndex = parseInt(active.id.toString().split('-')[1]);
-      const exercise = data.days[dayIndex].exercises[exerciseIndex];
-      setDraggedExercise(exercise);
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) {
-      setActiveId(null);
-      setDraggedExercise(null);
-      return;
-    }
-
-    const newDays = [...data.days];
-    const dayIndex = newDays.findIndex(
-      (d) => d.dayOfWeek === data.trainingDays[selectedDay]
-    );
-
-    if (dayIndex === -1) {
-      setActiveId(null);
-      setDraggedExercise(null);
-      return;
-    }
-
-    const oldIndex = parseInt(active.id.toString().split('-')[1]);
-    const newIndex = parseInt(over.id.toString().split('-')[1]);
-
-    if (oldIndex !== newIndex) {
-      const exercises = newDays[dayIndex].exercises;
-      newDays[dayIndex].exercises = arrayMove(exercises, oldIndex, newIndex);
-      onUpdate({ days: newDays });
-    }
-
-    setActiveId(null);
-    setDraggedExercise(null);
-  };
-
   if (data.trainingDays.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -660,16 +573,17 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                       </Button>
 
                       {exercisePickerOpen && (
-                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[300px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200 max-h-[400px] overflow-hidden">
+                        <div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full  sm:w-[300px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200 max-h-[400px] overflow-hidden">
                           <div className="p-3 border-b">
                             <Input
                               aria-label="Search exercises"
                               placeholder="Search exercises..."
                               value={searchValue}
                               onChange={(e) => setSearchValue(e.target.value)}
+                              className='border-none focus:ring-0 focus-visible:ring-0'
                             />
                           </div>
-                          <div className="max-h-[300px] overflow-y-auto p-2">
+                          <div className="max-h-[200px] overflow-y-auto p-2">
                             {exercisesLoading ? (
                               <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -710,134 +624,86 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                   </CardHeader>
                   <CardContent className="p-4 sm:p-6">
                     {day && day.exercises.length > 0 ? (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragStart={handleDragStart}
-                        onDragEnd={handleDragEnd}
-                      >
-                        <SortableContext
-                          items={day.exercises.map(
-                            (_, index) => `exercise-${index}`
-                          )}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          <div className="space-y-4">
-                            <AnimatePresence>
-                              {day.exercises.map((exercise, exerciseIndex) => {
-                                const exerciseData = exercises?.find(
-                                  (ex: Exercise) => ex.id === exercise.exerciseId
-                                );
+                      <div className="space-y-4">
+                        <AnimatePresence>
+                          {day.exercises.map((exercise, exerciseIndex) => {
+                            const exerciseData = exercises?.find(
+                              (ex: Exercise) => ex.id === exercise.exerciseId
+                            );
 
-                                return (
-                                  <motion.div
-                                    key={`${exercise.exerciseId}-${exerciseIndex}`}
-                                    ref={(el) => {
-                                      exerciseRefs.current[
-                                        `${exercise.exerciseId}-${exerciseIndex}`
-                                      ] = el;
-                                    }}
-                                    className="scroll-mt-24"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{
-                                      duration: 0.2,
-                                      ease: 'easeInOut',
-                                    }}
-                                  >
-                                    <SortableExerciseCard
-                                      id={`exercise-${exerciseIndex}`}
-                                      tabIndex={tabIndex}
-                                      exerciseIndex={exerciseIndex}
-                                      exercise={exercise}
-                                      exerciseData={exerciseData}
-                                      expanded={expandedMap?.[exerciseIndex] ?? true}
-                                      onToggleExpand={(idx) =>
-                                        setExpandedMap((prev) => ({
-                                          ...prev,
-                                          [idx]: !(prev?.[idx] ?? true),
-                                        }))
-                                      }
-                                      onRemoveExercise={removeExercise}
-                                      onUpdateRestTime={updateRestTime}
-                                      onUpdateProgressionScheme={
-                                        updateProgressionScheme
-                                      }
-                                      onUpdateMinWeightIncrement={
-                                        updateMinWeightIncrement
-                                      }
-                                      onUpdateProgramTMKg={updateProgramTMKg}
-                                      onUpdateProgramRoundingKg={
-                                        updateProgramRoundingKg
-                                      }
-                                      onAddSet={addSet}
-                                      onRemoveSet={removeSet}
-                                      isRemovingSet={(exIdx, setIdx) =>
-                                        !!removingSets[`${exIdx}-${setIdx}`]
-                                      }
-                                      onRemoveSetAnimated={(exIdx, setIdx) => {
-                                        const key = `${exIdx}-${setIdx}`;
-                                        setRemovingSets((prev) => ({
-                                          ...prev,
-                                          [key]: true,
-                                        }));
-                                        setTimeout(() => {
-                                          removeSet(exIdx, setIdx);
-                                          setRemovingSets((prev) => {
-                                            const next = { ...prev };
-                                            delete next[key];
-                                            return next;
-                                          });
-                                        }, 180);
-                                      }}
-                                      onUpdateSet={updateSet}
-                                      onValidateMinMaxReps={validateMinMaxReps}
-                                      onStepFixedReps={stepFixedReps}
-                                      onStepRangeReps={stepRangeReps}
-                                      onStepWeight={stepWeight}
-                                      disableTimeBasedProgressions={!canUseTimeframe}
-                                    />
-                                  </motion.div>
-                                );
-                              })}
-                            </AnimatePresence>
-                          </div>
-                        </SortableContext>
-                        <DragOverlay>
-                          {activeId && draggedExercise ? (
-                            <div className="opacity-50">
-                              <ExerciseCard
-                                tabIndex={tabIndex}
-                                exerciseIndex={0}
-                                exercise={draggedExercise}
-                                exerciseData={exercises?.find(
-                                  (ex: Exercise) =>
-                                    ex.id === draggedExercise.exerciseId
-                                )}
-                                expanded={false}
-                                onToggleExpand={() => {}}
-                                onRemoveExercise={() => {}}
-                                onUpdateRestTime={() => {}}
-                                onUpdateProgressionScheme={() => {}}
-                                onUpdateMinWeightIncrement={() => {}}
-                                onUpdateProgramTMKg={() => {}}
-                                onUpdateProgramRoundingKg={() => {}}
-                                onAddSet={() => {}}
-                                onRemoveSet={() => {}}
-                                isRemovingSet={() => false}
-                                onRemoveSetAnimated={() => {}}
-                                onUpdateSet={() => {}}
-                                onValidateMinMaxReps={() => {}}
-                                onStepFixedReps={() => {}}
-                                onStepRangeReps={() => {}}
-                                onStepWeight={() => {}}
-                                disableTimeBasedProgressions={!canUseTimeframe}
-                              />
-                            </div>
-                          ) : null}
-                        </DragOverlay>
-                      </DndContext>
+                            return (
+                              <motion.div
+                                key={`${exercise.exerciseId}-${exerciseIndex}`}
+                                ref={(el) => {
+                                  exerciseRefs.current[
+                                    `${exercise.exerciseId}-${exerciseIndex}`
+                                  ] = el;
+                                }}
+                                className="scroll-mt-24"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{
+                                  duration: 0.2,
+                                  ease: 'easeInOut',
+                                }}
+                              >
+                                <ExerciseCard
+                                  tabIndex={tabIndex}
+                                  exerciseIndex={exerciseIndex}
+                                  exercise={exercise}
+                                  exerciseData={exerciseData}
+                                  expanded={expandedMap?.[exerciseIndex] ?? true}
+                                  onToggleExpand={(idx) =>
+                                    setExpandedMap((prev) => ({
+                                      ...prev,
+                                      [idx]: !(prev?.[idx] ?? true),
+                                    }))
+                                  }
+                                  onRemoveExercise={removeExercise}
+                                  onUpdateRestTime={updateRestTime}
+                                  onUpdateProgressionScheme={
+                                    updateProgressionScheme
+                                  }
+                                  onUpdateMinWeightIncrement={
+                                    updateMinWeightIncrement
+                                  }
+                                  onUpdateProgramTMKg={updateProgramTMKg}
+                                  onUpdateProgramRoundingKg={
+                                    updateProgramRoundingKg
+                                  }
+                                  onAddSet={addSet}
+                                  onRemoveSet={removeSet}
+                                  isRemovingSet={(exIdx, setIdx) =>
+                                    !!removingSets[`${exIdx}-${setIdx}`]
+                                  }
+                                  onRemoveSetAnimated={(exIdx, setIdx) => {
+                                    const key = `${exIdx}-${setIdx}`;
+                                    setRemovingSets((prev) => ({
+                                      ...prev,
+                                      [key]: true,
+                                    }));
+                                    setTimeout(() => {
+                                      removeSet(exIdx, setIdx);
+                                      setRemovingSets((prev) => {
+                                        const next = { ...prev };
+                                        delete next[key];
+                                        return next;
+                                      });
+                                    }, 180);
+                                  }}
+                                  onUpdateSet={updateSet}
+                                  onValidateMinMaxReps={validateMinMaxReps}
+                                  onStepFixedReps={stepFixedReps}
+                                  onStepRangeReps={stepRangeReps}
+                                  onStepWeight={stepWeight}
+                                  disableTimeBasedProgressions={!canUseTimeframe}
+                                />
+                              </motion.div>
+                            );
+                          })}
+                        </AnimatePresence>
+                      </div>
                     ) : (
                       <div className="text-center text-sm text-muted-foreground py-8">
                         No exercises added yet. Use &quot;Add Exercise&quot; to start
@@ -887,78 +753,3 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
     </div>
   );
 }
-
-// Sortable wrapper for ExerciseCard
-interface SortableExerciseCardProps {
-  id: string;
-  tabIndex: number;
-  exerciseIndex: number;
-  exercise: RoutineWizardData['days'][number]['exercises'][number];
-  exerciseData?: Exercise;
-  expanded: boolean;
-  onToggleExpand: (exerciseIndex: number) => void;
-  onRemoveExercise: (exerciseIndex: number) => void;
-  onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void;
-  onUpdateProgressionScheme: (
-    exerciseIndex: number,
-    scheme: ProgressionScheme
-  ) => void;
-  onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void;
-  onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void;
-  onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void;
-  onAddSet: (exerciseIndex: number) => void;
-  isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean;
-  onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void;
-  onRemoveSet?: (exerciseIndex: number, setIndex: number) => void;
-  onUpdateSet: (
-    exerciseIndex: number,
-    setIndex: number,
-    field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-    value: string
-  ) => void;
-  onValidateMinMaxReps: (
-    exerciseIndex: number,
-    setIndex: number,
-    field: 'minReps' | 'maxReps'
-  ) => void;
-  onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void;
-  onStepRangeReps: (
-    exerciseIndex: number,
-    setIndex: number,
-    field: 'minReps' | 'maxReps',
-    delta: number
-  ) => void;
-  onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void;
-  disableTimeBasedProgressions?: boolean;
-}
-
-const SortableExerciseCard: React.FC<SortableExerciseCardProps> = ({
-  id,
-  ...props
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <div className="relative">
-        <div
-          {...listeners}
-          className="absolute left-0 top-0 bottom-0 w-6 flex items-center justify-center cursor-grab active:cursor-grabbing hover:bg-muted/50 rounded-l-md transition-colors"
-          aria-label="Drag to reorder"
-        >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
-        </div>
-        <div className="ml-6">
-          <ExerciseCard {...props} />
-        </div>
-      </div>
-    </div>
-  );
-};

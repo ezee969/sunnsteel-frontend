@@ -14,18 +14,22 @@ export async function middleware(request: NextRequest) {
     path.startsWith(route)
   );
 
-  // Use a lightweight session marker set by the client after verification
-  const hasValidSession = request.cookies.get('has_session')?.value === '1';
+  // Check for session using secure HttpOnly cookie (preferred) or fallback to client marker
+  const secureSession = request.cookies.get('ss_session')?.value === '1';
+  const clientMarker = request.cookies.get('has_session')?.value === '1';
+  const hasValidSession = secureSession || clientMarker;
 
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
     console.log('[middleware] Auth check:', {
       path,
       hasValidSession,
+      secureSession,
+      clientMarker,
       allCookieNames: request.cookies.getAll().map(c => c.name),
       isProtectedRoute,
       isPublicRoute,
-      note: 'Using has_session cookie for detection'
+      note: 'Using ss_session (secure) or has_session (fallback) cookies'
     });
   }
 

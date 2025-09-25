@@ -14,7 +14,6 @@ export default function Dashboard() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[160px] sm:h-[200px]"
         title={<>Forge Your Path</>}
         subtitle={<>Strength • Discipline • Craft</>}
       />

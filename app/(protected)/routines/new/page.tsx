@@ -142,7 +142,6 @@ export default function CreateRoutinePage() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[140px] sm:h-[180px]"
         sectionClassName="mb-4 sm:mb-6"
         title={<>Design Your Program</>}
         subtitle={<>Build days, choose progression, set your path.</>}

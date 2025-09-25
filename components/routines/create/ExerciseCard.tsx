@@ -472,6 +472,11 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
       ? String(exercise.minWeightIncrement)
       : ''
   );
+  const [tmInput, setTmInput] = useState<string>(
+    exercise.programTMKg !== undefined && !Number.isNaN(exercise.programTMKg)
+      ? String(exercise.programTMKg)
+      : ''
+  );
 
   useEffect(() => {
     if (!shouldScrollToLast) return;
@@ -489,6 +494,14 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
       parentVal !== undefined && parentVal !== null ? String(parentVal) : ''
     );
   }, [exercise.minWeightIncrement]);
+
+  // Sync local TM input when parent value changes
+  useEffect(() => {
+    const parentVal = exercise.programTMKg;
+    setTmInput(
+      parentVal !== undefined && !Number.isNaN(parentVal) ? String(parentVal) : ''
+    );
+  }, [exercise.programTMKg]);
 
   return (
     <Card key={exerciseIndex} className="border-muted overflow-hidden p-0">
@@ -639,11 +652,6 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                   </TooltipProvider>
                 )}
               </div>
-              {disableTimeBasedProgressions && (
-                <span className="text-xs text-muted-foreground italic">
-                  Time-based progressions are disabled
-                </span>
-              )}
               <Select
                 value={exercise.progressionScheme}
                 onValueChange={(val) => {
@@ -716,8 +724,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         type="text"
                         inputMode="decimal"
                         pattern="[0-9]*[.]?[0-9]*"
-                        placeholder="e.g. 110.5"
-                        value={exercise.programTMKg !== undefined && !Number.isNaN(exercise.programTMKg) ? String(exercise.programTMKg) : ''}
+                        placeholder="e.g. 110"
+                        value={tmInput}
                         onChange={(e) => {
                           const raw = e.target.value;
                           // Allow digits, one decimal point, and empty string
@@ -725,12 +733,24 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                             .replace(/[^0-9.]/g, '')
                             .replace(/(\..*)\./g, '$1'); // Allow only one dot
                           
-                          if (sanitized === '') {
+                          setTmInput(sanitized);
+                        }}
+                        onBlur={() => {
+                          const trimmed = tmInput.trim();
+                          if (trimmed === '') {
                             onUpdateProgramTMKg(exerciseIndex, NaN);
                           } else {
-                            const val = parseFloat(sanitized);
+                            const val = parseFloat(trimmed);
                             if (!Number.isNaN(val) && val > 0) {
                               onUpdateProgramTMKg(exerciseIndex, val);
+                            } else {
+                              // Re-sync from parent if invalid
+                              const parentVal = exercise.programTMKg;
+                              setTmInput(
+                                parentVal !== undefined && !Number.isNaN(parentVal)
+                                  ? String(parentVal)
+                                  : ''
+                              );
                             }
                           }
                         }}

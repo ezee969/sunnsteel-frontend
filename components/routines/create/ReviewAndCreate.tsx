@@ -84,10 +84,12 @@ export function ReviewAndCreate({
           ...(!isEditing &&
             data.programStartWeek && { programStartWeek: data.programStartWeek }),
         }),
-      days: data.days.map((day) => ({
+      days: data.days.map((day, dayIndex) => ({
         dayOfWeek: day.dayOfWeek,
-        exercises: day.exercises.map((exercise) => ({
+        order: dayIndex,
+        exercises: day.exercises.map((exercise, exerciseIndex) => ({
           exerciseId: exercise.exerciseId,
+          order: exerciseIndex,
           restSeconds: exercise.restSeconds,
           progressionScheme: exercise.progressionScheme,
           minWeightIncrement: exercise.minWeightIncrement,

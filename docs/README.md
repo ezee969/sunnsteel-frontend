@@ -24,3 +24,20 @@ Conventions:
 - Historical completion reports: `docs/history/*`
 
 This index will expand as additional feature domains gain dedicated docs.
+
+## Hydration-Safe Client UI Elements
+
+Some UI elements that rely on client-only APIs (e.g. `crypto.randomUUID()` in
+the toast system or time-based mutation) are deferred until after mount to
+avoid React hydration mismatch warnings. Example: the toast container now
+checks `mounted` (via `useEffect`) and adds `suppressHydrationWarning` to the
+container root. If adding new ephemeral UI containers (portals, overlays,
+notifications) follow the same pattern:
+
+1. Render nothing until `mounted === true`.
+2. Avoid invoking non-deterministic functions during SSR.
+3. Add `suppressHydrationWarning` only at the minimal element boundary.
+4. Keep accessible live region attributes (`aria-live`, `aria-relevant`) on the
+	client-rendered element once mounted.
+
+This keeps server HTML stable while preserving accessibility semantics.

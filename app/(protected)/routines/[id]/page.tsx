@@ -166,7 +166,6 @@ export default function RoutineDetailsPage() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/alexander-the-great-statue-background.webp"
-        heightClass="h-[160px] sm:h-[200px]"
         sectionClassName="mb-4 sm:mb-6"
         title={<>{isLoading ? 'Routine' : routine?.name ?? 'Routine'}</>}
         subtitle={<>Structure, schedule, and start.</>}

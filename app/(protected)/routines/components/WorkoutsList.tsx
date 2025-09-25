@@ -37,10 +37,11 @@ import {
   useToggleRoutineFavorite,
   useToggleRoutineCompleted,
 } from '@/lib/api/hooks/useRoutines';
-import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useStartSession, useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useRouter } from 'next/navigation';
 import { routineService } from '@/lib/api/services/routineService';
 import { weeksRemainingFromEndDate } from '@/lib/utils/date';
+import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
@@ -70,6 +71,8 @@ export default function WorkoutsList({
   const { mutate: toggleCompleted, isPending: isTogglingCompleted } =
     useToggleRoutineCompleted();
   const { mutateAsync: startSession, isPending: isStarting } = useStartSession();
+  const [lastStartReused, setLastStartReused] = useState(false);
+  const { data: activeSession } = useActiveSession();
 
   const dayName = (dayOfWeek: number) => {
     const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -148,10 +151,11 @@ export default function WorkoutsList({
         console.error('No routine day available to start a session');
         return;
       }
-      const session = await startSession({
+      const session: any = await startSession({
         routineId: routine.id,
         routineDayId: dayId,
       });
+      setLastStartReused(!!session?._reused);
       if (session?.id) {
         router.push(`/workouts/sessions/${session.id}`);
       }
@@ -223,9 +227,20 @@ export default function WorkoutsList({
     <div className="h-full">
       <ScrollArea className="h-[calc(100vh-300px)] sm:h-[calc(100vh-350px)] lg:h-[calc(100vh-300px)]">
         <div className="grid gap-3 px-1 sm:gap-4 sm:pr-4 sm:pl-0">
-          {routines.map((routine) => (
-            <Card key={routine.id} className="transition-shadow hover:shadow-md">
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 sm:px-6 sm:py-4">
+          {routines.map((routine) => {
+            const isActiveRoutine =
+              activeSession?.status === 'IN_PROGRESS' &&
+              activeSession?.routineId === routine.id;
+            
+            return (
+              <Card 
+                key={routine.id} 
+                className={cn(
+                  "transition-colors",
+                  isActiveRoutine && "border-l-4 border-l-yellow-500 bg-yellow-50/30 dark:bg-yellow-950/20"
+                )}
+              >
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 sm:px-6 sm:py-4">
                 <div className="space-y-1 pr-2">
                   <CardTitle className="text-base font-semibold sm:text-lg">
                     {routine.name}
@@ -247,39 +262,73 @@ export default function WorkoutsList({
                       {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
                     </Badge>
                   )}
-                  <Button
-                    type="button"
-                    variant="classical"
-                    size="sm"
-                    className="h-8"
-                    aria-label="Start session"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      void handleStartSessionForRoutine(routine);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        void handleStartSessionForRoutine(routine);
-                      }
-                    }}
-                    disabled={
-                      (isStarting && startActingId === routine.id) ||
-                      isProgramEnded(routine)
+                  {(() => {
+                    if (isActiveRoutine) {
+                      return (
+                        <Button
+                          type="button"
+                          variant="classical"
+                          size="sm"
+                          className="h-8 relative pl-6 pr-3"
+                          aria-label="Resume active workout session"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (activeSession?.id) {
+                              router.push(`/workouts/sessions/${activeSession.id}`);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              if (activeSession?.id) {
+                                router.push(`/workouts/sessions/${activeSession.id}`);
+                              }
+                            }
+                          }}
+                          {...preloadOnHover('activeWorkoutSession')}
+                        >
+                          {/* Subtle active indicator */}
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-current opacity-70" />
+                          Resume
+                        </Button>
+                      );
                     }
-                    {...preloadOnHover('activeWorkoutSession')}
-                  >
-                    {isStarting && startActingId === routine.id ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <ClassicalIcon
-                        name="dumbbell"
-                        className="mr-2 h-4 w-4"
-                        aria-hidden
-                      />
-                    )}
-                    Start
-                  </Button>
+                    return (
+                      <Button
+                        type="button"
+                        variant="classical"
+                        size="sm"
+                        className="h-8"
+                        aria-label="Start session"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          void handleStartSessionForRoutine(routine);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            void handleStartSessionForRoutine(routine);
+                          }
+                        }}
+                        disabled={
+                          (isStarting && startActingId === routine.id) ||
+                          isProgramEnded(routine)
+                        }
+                        {...preloadOnHover('activeWorkoutSession')}
+                      >
+                        {isStarting && startActingId === routine.id ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <ClassicalIcon
+                            name="dumbbell"
+                            className="mr-2 h-4 w-4"
+                            aria-hidden
+                          />
+                        )}
+                        {lastStartReused ? 'Resume' : 'Start'}
+                      </Button>
+                    );
+                  })()}
                   <Button
                     type="button"
                     variant="ghost"
@@ -410,7 +459,8 @@ export default function WorkoutsList({
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       </ScrollArea>
 

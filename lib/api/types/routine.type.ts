@@ -70,8 +70,10 @@ export interface CreateRoutineRequest {
   programStartWeek?: number; // 1..(18|21) only used on create
   days: Array<{
     dayOfWeek: number;
+    order?: number;
     exercises: Array<{
       exerciseId: string;
+      order?: number;
       restSeconds: number;
       progressionScheme: ProgressionScheme;
       minWeightIncrement: number;

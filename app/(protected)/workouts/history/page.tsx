@@ -287,7 +287,6 @@ function WorkoutHistoryContent() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[160px] sm:h-[200px]"
         sectionClassName="mb-4 sm:mb-6"
         title={<>Training Archive</>}
         subtitle={<>Browse and filter your sessions.</>}

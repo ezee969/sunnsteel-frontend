@@ -287,7 +287,6 @@ export default function EditRoutinePage() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[140px] sm:h-[180px]"
         sectionClassName="mb-4 sm:mb-6"
         title={<>Refine Your Program</>}
         subtitle={<>Adjust days, progressions, and details.</>}

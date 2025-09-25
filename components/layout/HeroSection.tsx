@@ -8,8 +8,6 @@ export interface HeroSectionProps {
   imageSrc: string;
   title: ReactNode;
   subtitle?: ReactNode;
-  // heightClass is accepted for backward compatibility but ignored to enforce consistency
-  heightClass?: string;
   overlayGradient?: string;
   blurPx?: number;
   sectionClassName?: string;
@@ -26,7 +24,7 @@ export const HeroSection = ({
   innerClassName = '',
 }: HeroSectionProps) => {
   // Enforce consistent hero height across the app and reduce mobile height footprint
-  const computedHeightClass = 'h-[110px] sm:h-[180px]';
+  const computedHeightClass = 'h-[110px] sm:h-[150px]';
   return (
     <section
       className={`relative overflow-hidden rounded-xl border ${sectionClassName}`}

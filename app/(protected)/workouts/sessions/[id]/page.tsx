@@ -199,7 +199,6 @@ export default function ActiveSessionPage() {
       {/* Classical Hero (shallow) */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[120px] sm:h-[150px]"
         sectionClassName="mb-3 sm:mb-4"
         title={<>Training Focus</>}
         subtitle={<>Steady pace. Solid reps.</>}

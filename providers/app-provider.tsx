@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 // import { store } from '@/lib/redux/store';
 import { QueryProvider } from './query-provider';
 import { SupabaseAuthProvider } from './supabase-auth-provider';
+import { AppToastProvider } from './toast-provider';
 import { useEffect } from 'react';
 import { assertClientEnv } from '@/schema/env.client';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
@@ -34,7 +35,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // <Provider store={store}>
     // {/* </Provider> */}
     <QueryProvider>
-      <SupabaseAuthProvider>{children}</SupabaseAuthProvider>
+      <SupabaseAuthProvider>
+        <AppToastProvider>
+          {children}
+        </AppToastProvider>
+      </SupabaseAuthProvider>
     </QueryProvider>
   );
 }

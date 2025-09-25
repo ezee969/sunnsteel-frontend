@@ -34,7 +34,6 @@ export default function RoutinesPage() {
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        heightClass="h-[180px] sm:h-[220px]"
         title={<>Routines</>}
         subtitle={<>Plan, track, and refine your training.</>}
       />

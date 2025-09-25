@@ -108,14 +108,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             className="object-cover dark:hidden"
             priority={false}
           />
-          <Image
+          {/* <Image
             src="/backgrounds/marble-dark-1536-x-1024.webp"
             alt=""
             fill
             sizes="100vw"
             className="object-cover hidden dark:block"
             priority={false}
-          />
+          /> */}
           <ParchmentOverlay opacity={0.06} />
           <GoldVignetteOverlay intensity={0.06} />
         </div>
@@ -136,14 +136,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             className="object-cover dark:hidden"
             priority={false}
           />
-          <Image
+          {/* <Image
             src="/backgrounds/marble-dark-1536-x-1024.webp"
             alt=""
             fill
             sizes="100vw"
             className="object-cover hidden dark:block"
             priority={false}
-          />
+          /> */}
           <ParchmentOverlay opacity={0.06} />
           <GoldVignetteOverlay intensity={0.06} />
         </div>
@@ -182,10 +182,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* Active Session Banner */}
             {!isOnSessionPage && activeSession?.id && (
-              <div className="px-3 sm:px-6">
-                <div className="mb-2 rounded-md border bg-primary/5 p-3 sm:p-4 flex items-center justify-between">
+              <div className="px-3 sm:px-6 mt-2">
+                <div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm">
-                    <Dumbbell className="h-4 w-4" />
+                    <Dumbbell className="h-3 w-3" />
                     <span>Active workout session in progress.</span>
                   </div>
                   <Button

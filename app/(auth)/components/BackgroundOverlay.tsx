@@ -18,7 +18,7 @@ export function BackgroundOverlay() {
       {/* Theme-aware marble background with blur + overlay */}
       <HeroBackdrop
         src="/backgrounds/marble-light1536-x-1024.webp"
-        darkSrc="/backgrounds/marble-dark-1536-x-1024.webp"
+        // darkSrc="/backgrounds/marble-dark-1536-x-1024.webp"
         blurPx={14}
         overlayGradient={
           isDark

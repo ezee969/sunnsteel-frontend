@@ -126,9 +126,18 @@ class SupabaseAuthService {
    * Sign out
    */
   async signOut(): Promise<void> {
+    // Sign out from Supabase
     const { error } = await supabase.auth.signOut();
     if (error) {
       throw new Error(error.message);
+    }
+
+    // Clear server-side session cookie
+    try {
+      await httpClient.post('/auth/supabase/logout');
+    } catch (err) {
+      // Don't fail the logout if backend call fails
+      console.warn('Failed to clear server session:', err);
     }
   }
 
