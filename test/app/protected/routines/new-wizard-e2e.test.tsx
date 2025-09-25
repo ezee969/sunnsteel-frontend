@@ -1,8 +1,8 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@/test/utils'
-import CreateRoutinePage from '@/app/(protected)/routines/new/page'
-import { createQueryWrapper } from '@/test/utils'
+import { render, screen, fireEvent, waitFor } from '../../../utils'
+import CreateRoutinePage from '../../../../app/(protected)/routines/new/page'
+import { createQueryWrapper } from '../../../utils'
 
 // Spies
 const createSpy = vi.fn()
@@ -69,14 +69,15 @@ describe('CreateRoutinePage wizard E2E', () => {
     fireEvent.click(screen.getByRole('button', { name: /Add/i }))
     fireEvent.click(await screen.findByRole('button', { name: /Bench Press/i }))
 
-    // Inline hint (time-based progressions disabled on NONE schedule)
-    expect(
-      screen.getByText(/Time-based progressions are disabled/i)
-    ).toBeInTheDocument()
+    // Attempt to open progression select and confirm RtF option is disabled
+    const progSelect = screen.getByLabelText('Progression scheme')
+    fireEvent.click(progSelect)
+    const rtfOptionDisabled = await screen.findByRole('option', { name: /RtF Standard \(5 sets: 4 \+ 1 AMRAP\)/i })
+    expect(rtfOptionDisabled.getAttribute('aria-disabled')).toBe('true')
 
-    // Go back to Step 1: use Previous twice
-    fireEvent.click(screen.getByRole('button', { name: /Previous/i }))
-    fireEvent.click(screen.getByRole('button', { name: /Previous/i }))
+    // Go back to Step 1: use Previous twice (aria-label only on mobile)
+    fireEvent.click(screen.getByLabelText('Previous'))
+    fireEvent.click(screen.getByLabelText('Previous'))
 
     // Switch schedule to Timeframe and set start date
     const scheduleSelect = screen.getByLabelText('Program schedule')
@@ -87,18 +88,18 @@ describe('CreateRoutinePage wizard E2E', () => {
     fireEvent.change(startDate, { target: { value: '2025-09-08' } })
 
     // Next -> Training Days, Next -> Build Days
-    fireEvent.click(screen.getByRole('button', { name: /Next/i }))
-    fireEvent.click(screen.getByRole('button', { name: /Next/i }))
+    fireEvent.click(screen.getByLabelText('Next'))
+    fireEvent.click(screen.getByLabelText('Next'))
 
     // Now RtF should be enabled; open select
     const progSelect2 = screen.getByLabelText('Progression scheme')
     fireEvent.click(progSelect2)
     const enabledRtf = await screen.findByRole('option', { name: /RtF Standard \(5 sets: 4 \+ 1 AMRAP\)/i })
-    expect(enabledRtf).not.toHaveAttribute('aria-disabled', 'true')
+  expect(enabledRtf.getAttribute('aria-disabled')).not.toBe('true')
     fireEvent.click(enabledRtf)
 
     // Advance to Review
-    fireEvent.click(screen.getByRole('button', { name: /Next/i }))
+    fireEvent.click(screen.getByLabelText('Next'))
 
     // Submit
     fireEvent.click(screen.getByRole('button', { name: /Create Routine/i }))

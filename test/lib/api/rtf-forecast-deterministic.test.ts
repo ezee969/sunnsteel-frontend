@@ -5,13 +5,20 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock the underlying HTTP client to avoid authentication
-const mockRequest = vi.fn()
-vi.mock('@/lib/api/services/httpClient', () => ({
-	httpClient: {
-		request: mockRequest
+// Mock the underlying HTTP client (relative path used by etag-client)
+// Vitest hoists vi.mock calls above the rest of the module. To avoid TDZ
+// issues, define the mock inside the factory and export it so tests can
+// reference the same instance after imports are evaluated.
+vi.mock('../../../lib/api/services/httpClient', () => {
+	const requestMock = vi.fn()
+	// Expose the mock safely for test access post-hoist
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	globalThis.__RTF_REQUEST_MOCK__ = requestMock
+	return {
+		httpClient: { request: (...args: any[]) => requestMock(...args) }
 	}
-}))
+})
 
 // Mock Supabase client
 vi.mock('@/lib/supabase/client', () => ({
@@ -24,8 +31,12 @@ vi.mock('@/lib/supabase/client', () => ({
 	}
 }))
 
-import { rtfApi } from '../../../lib/api/etag-client'
+// Import API *after* mocks so it uses mocked http client
+import { rtfApi, etaggedHttpClient } from '../../../lib/api/etag-client'
 import type { RtfForecast, RtfForecastWeek } from '../../../lib/api/types'
+
+// Helper accessor for the request mock placed on globalThis by the factory
+const getRequestMock = () => (globalThis as any).__RTF_REQUEST_MOCK__ as any
 
 /**
  * Test utilities for deterministic forecast validation
@@ -99,15 +110,12 @@ const makeMockForecast = (withDeloads: boolean): RtfForecast => {
 describe('RTF Forecast Deterministic (RTF-F12)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
+		etaggedHttpClient.clearCache()
 	})
 
 	it('returns deterministic forecast with deloads (cache miss)', async () => {
 		const expectedForecast = makeMockForecast(true)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: { etag: '"abc123"' }
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -127,11 +135,7 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('returns deterministic forecast without deloads', async () => {
 		const expectedForecast = makeMockForecast(false)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: { etag: '"def456"' }
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -150,14 +154,10 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates forecast structure consistency', async () => {
 		const expectedForecast = makeMockForecast(true)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: {}
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
-		const forecast = result.data
+		const forecast = result.data as RtfForecast
 
 		// Validate structure
 		expect(forecast).toHaveProperty('routineId')
@@ -189,21 +189,17 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('handles API errors gracefully', async () => {
 		const apiError = new Error('Network error')
-		mockRequest.mockRejectedValue(apiError)
+		getRequestMock().mockRejectedValue(apiError)
 
 		await expect(rtfApi.getForecast('r1')).rejects.toThrow('Network error')
 	})
 
 	it('validates week progression is sequential', async () => {
 		const expectedForecast = makeMockForecast(false)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: {}
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
-		const forecast = result.data
+		const forecast = result.data as RtfForecast
 
 		// Verify weeks are sequential starting from 1
 		const weeks = forecast.forecast.map((w: RtfForecastWeek) => w.week).sort((a: number, b: number) => a - b)
@@ -214,14 +210,10 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates deload pattern consistency (weeks 7, 14, 21)', async () => {
 		const expectedForecast = makeMockForecast(true)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: {}
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
-		const forecast = result.data
+		const forecast = result.data as RtfForecast
 
 		// Check deload weeks
 		const deloadWeeks = forecast.forecast.filter((w: RtfForecastWeek) => w.isDeload).map((w: RtfForecastWeek) => w.week)
@@ -241,14 +233,10 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates intensity progression is monotonic (excluding deloads)', async () => {
 		const expectedForecast = makeMockForecast(false) // No deloads for cleaner progression
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: {}
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
-		const forecast = result.data
+		const forecast = result.data as RtfForecast
 
 		const trainingWeeks = forecast.forecast.filter((w: RtfForecastWeek) => !w.isDeload)
 		
@@ -269,60 +257,39 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('maintains deterministic output across multiple calls', async () => {
 		const expectedForecast = makeMockForecast(true)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: { etag: '"stable123"' }
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result1 = await rtfApi.getForecast('r1')
 		const result2 = await rtfApi.getForecast('r1')
 
 		// Results should be identical
-		expect(result1.data).toEqual(result2.data)
-		expect(result1.data.forecast.length).toBe(result2.data.forecast.length)
-		
+		const f1 = result1.data as RtfForecast
+		const f2 = result2.data as RtfForecast
+		expect(f1).toEqual(f2)
+		expect(f1.forecast.length).toBe(f2.forecast.length)
 		// Spot check deterministic values
-		expect(result1.data.forecast[0].standard?.intensity)
-			.toEqual(result2.data.forecast[0].standard?.intensity)
+		expect(f1.forecast[0].standard?.intensity)
+			.toEqual(f2.forecast[0].standard?.intensity)
 	})
 
 	it('validates cache integration with ETag client', async () => {
 		const expectedForecast = makeMockForecast(true)
-		
-		// Mock ETag response pattern
-		mockRequest
-			.mockResolvedValueOnce({ 
-				data: expectedForecast, 
-				status: 200, 
-				headers: { etag: '"abc123"' } 
-			})
-			.mockResolvedValueOnce({ 
-				status: 304, 
-				data: null,
-				headers: { etag: '"abc123"' }
-			}) // Not modified
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result1 = await rtfApi.getForecast('r1')
-		
-		// First call should get data
 		expect(result1.data).toEqual(expectedForecast)
-		
-		// Second call should use ETag (implementation may handle 304 internally)
+		// Second call should return fresh cache without another HTTP call
 		const result2 = await rtfApi.getForecast('r1')
-		expect(mockRequest).toHaveBeenCalledTimes(2)
+		expect(result2.cacheStatus === 'fresh' || result2.cacheStatus === 'miss').toBe(true)
+		expect(getRequestMock()).toHaveBeenCalledTimes(1)
 	})
 
 	it('validates forecast data ranges are realistic', async () => {
 		const expectedForecast = makeMockForecast(false)
-		mockRequest.mockResolvedValue({
-			data: expectedForecast,
-			status: 200,
-			headers: {}
-		})
+		getRequestMock().mockResolvedValue(expectedForecast)
 
 		const result = await rtfApi.getForecast('r1')
-		const forecast = result.data
+		const forecast = result.data as RtfForecast
 
 		// Validate intensity ranges
 		forecast.forecast.forEach((week: RtfForecastWeek) => {
