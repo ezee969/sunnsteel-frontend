@@ -156,7 +156,17 @@ export function ReviewAndCreate({
   const totalSets = data.days.reduce(
     (sum, day) =>
       sum +
-      day.exercises.reduce((exerciseSum, ex) => exerciseSum + ex.sets.length, 0),
+      day.exercises.reduce((exerciseSum, ex) => {
+        // For RtF progressions, use the appropriate set count
+        if (ex.progressionScheme === 'PROGRAMMED_RTF') {
+          return exerciseSum + 5; // 4 fixed + 1 AMRAP
+        }
+        if (ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
+          return exerciseSum + 4; // 3 fixed + 1 AMRAP
+        }
+        // For other progressions, use the actual sets length
+        return exerciseSum + ex.sets.length;
+      }, 0),
     0
   );
 
@@ -256,18 +266,46 @@ export function ReviewAndCreate({
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
-                            {exercise.sets.map((set) => (
-                              <Badge
-                                key={set.setNumber}
-                                variant="outline"
-                                className="text-xs font-normal"
-                              >
-                                {set.repType === 'FIXED'
-                                  ? `${set.reps ?? ''} reps`
-                                  : `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
-                                {set.weight ? ` @ ${set.weight}kg` : ''}
-                              </Badge>
-                            ))}
+                            {(() => {
+                              const isRtfStandard = exercise.progressionScheme === 'PROGRAMMED_RTF';
+                              const isRtfHypertrophy = exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY';
+                              
+                              if (isRtfStandard || isRtfHypertrophy) {
+                                const setCount = isRtfStandard ? 5 : 4;
+                                const fixedSets = setCount - 1;
+                                const repRange = isRtfStandard ? '5-8' : '8-12';
+                                
+                                return (
+                                  <>
+                                    <Badge variant="outline" className="text-xs font-normal">
+                                      {fixedSets} × {repRange} reps (fixed)
+                                    </Badge>
+                                    <Badge variant="outline" className="text-xs font-normal">
+                                      1 × AMRAP set
+                                    </Badge>
+                                    {exercise.programTMKg && (
+                                      <Badge variant="secondary" className="text-xs font-normal">
+                                        TM: {exercise.programTMKg}kg
+                                      </Badge>
+                                    )}
+                                  </>
+                                );
+                              }
+                              
+                              // For non-RtF exercises, show the actual sets
+                              return exercise.sets.map((set) => (
+                                <Badge
+                                  key={set.setNumber}
+                                  variant="outline"
+                                  className="text-xs font-normal"
+                                >
+                                  {set.repType === 'FIXED'
+                                    ? `${set.reps ?? ''} reps`
+                                    : `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
+                                  {set.weight ? ` @ ${set.weight}kg` : ''}
+                                </Badge>
+                              ));
+                            })()}
                           </div>
                         </div>
                       );
