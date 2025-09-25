@@ -549,14 +549,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               </div>
               {!expanded && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
-                  {exercise.progressionScheme !== 'PROGRAMMED_RTF' && (
-                      <Badge
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0.5 h-5"
-                      >
-                        {exercise.sets.length}
-                      </Badge>
-                    )}
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-1.5 py-0.5 h-5"
+                  >
+                    {exercise.progressionScheme === 'PROGRAMMED_RTF' 
+                      ? 5 
+                      : exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                      ? 4
+                      : exercise.sets.length}
+                  </Badge>
                   <div className="flex items-center gap-0.5">
                     <Clock className="h-3 w-3" />
                     <span className="text-[10px] sm:text-xs">
