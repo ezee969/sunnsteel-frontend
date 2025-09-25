@@ -273,7 +273,7 @@ export function ReviewAndCreate({
                               if (isRtfStandard || isRtfHypertrophy) {
                                 const setCount = isRtfStandard ? 5 : 4;
                                 const fixedSets = setCount - 1;
-                                const repRange = isRtfStandard ? '5-8' : '8-12';
+                                const repRange = isRtfStandard ? '1-5' : '5-10';
                                 
                                 return (
                                   <>
