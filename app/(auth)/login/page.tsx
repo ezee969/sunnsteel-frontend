@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LoginHeader } from './components/LoginHeader';
 import { SupabaseLoginForm } from './components/SupabaseLoginForm';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 
-export default function LoginPage() {
+// Force dynamic rendering to avoid SSG issues with useSearchParams
+export const dynamic = 'force-dynamic';
+
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading } = useSupabaseAuth();
@@ -76,5 +79,13 @@ export default function LoginPage() {
       <LoginHeader />
       <SupabaseLoginForm />
     </motion.div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

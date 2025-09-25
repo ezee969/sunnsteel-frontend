@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 import { useRtFTimeline, useRtFWeekGoals } from '@/lib/api/hooks'
 import { cn } from '@/lib/utils'
-import type { RtfTimelineEntry, RtfExerciseGoal } from '@/lib/api/types'
+import type { RtfTimelineEntry } from '@/lib/api/types'
 
 interface AnomalyNotificationSurfaceProps {
   routineId: string
@@ -280,7 +280,7 @@ export function AnomalyNotificationSurface({
   onDismissAnomaly 
 }: AnomalyNotificationSurfaceProps) {
   const { data: timeline, isLoading: timelineLoading } = useRtFTimeline(routineId)
-  const { data: routine, isLoading: goalsLoading } = useRtFWeekGoals(routineId, currentWeek)
+  const { isLoading: goalsLoading } = useRtFWeekGoals(routineId, currentWeek)
   
   const anomalies = useMemo(() => {
     if (!timeline?.timeline) return []

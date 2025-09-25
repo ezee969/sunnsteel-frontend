@@ -400,7 +400,7 @@ export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModa
             
             <ScrollArea className="h-full pr-4">
               <div className="space-y-3">
-                {snapshots.slice().reverse().map((snapshot, index) => (
+                {snapshots.slice().reverse().map((snapshot) => (
                   <SnapshotCard
                     key={snapshot.id}
                     snapshot={snapshot}

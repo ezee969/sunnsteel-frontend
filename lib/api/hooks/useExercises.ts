@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { exercisesService } from '../services/exercisesService';
 import { usePerformanceQuery } from '@/hooks/use-performance-query';
 

@@ -151,10 +151,10 @@ export default function WorkoutsList({
         console.error('No routine day available to start a session');
         return;
       }
-      const session: any = await startSession({
+      const session = await startSession({
         routineId: routine.id,
         routineDayId: dayId,
-      });
+      }) as { id?: string; _reused?: boolean };
       setLastStartReused(!!session?._reused);
       if (session?.id) {
         router.push(`/workouts/sessions/${session.id}`);

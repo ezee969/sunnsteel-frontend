@@ -26,7 +26,7 @@ import type { SetLog } from '@/lib/api/types/workout.type';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useSaveState, saveStateLabel, setSaveState } from '@/lib/utils/save-status-store';
+import { useSaveState, setSaveState } from '@/lib/utils/save-status-store';
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
 import {
   AlertDialog,
