@@ -24,6 +24,35 @@ const clamp = (value: number, min: number, max: number) => {
 const roundToIncrement = (value: number, increment: number) =>
 	Math.round(value / increment) * increment
 
+/**
+ * Provide mutation helpers to modify the selected day's routine data.
+ *
+ * The hook locates the currently selected training day in `data.days` and exposes functions
+ * to add/remove exercises and sets, update progression, reps, weights, rest, and related program
+ * fields. When a mutation is applied the hook calls `onUpdate` with an updated `days` array.
+ * If the selected day is not present, mutations are no-ops and no update is emitted.
+ *
+ * @param data - The routine wizard state containing `days` to mutate
+ * @param onUpdate - Callback invoked with partial updates to the routine data (e.g., `{ days: [...] }`)
+ * @param selectedDayIndex - Index into `trainingDays` indicating the currently selected target day
+ * @param trainingDays - Array of day-of-week identifiers used to find the corresponding entry in `data.days`
+ * @param canUseTimeframe - Whether time-based progression schemes are allowed
+ * @returns An object of mutation helpers:
+ * - addExercise(exerciseId): adds an exercise to the selected day and returns the new exercise index or null
+ * - removeExercise(exerciseIndex): removes an exercise from the selected day
+ * - updateProgramTMKg(exerciseIndex, tmKg): sets an exercise's program TM (rounded and clamped)
+ * - updateProgramRoundingKg(exerciseIndex, roundingKg): sets program rounding (validated against allowed values)
+ * - updateProgressionScheme(exerciseIndex, scheme): updates an exercise's progression scheme (respects timeframe)
+ * - updateMinWeightIncrement(exerciseIndex, increment): updates an exercise's minimum weight increment (clamped)
+ * - addSet(exerciseIndex): appends a set to an exercise
+ * - removeSet(exerciseIndex, setIndex): removes a set and renumbers remaining sets
+ * - stepFixedReps(exerciseIndex, setIndex, delta): adjusts fixed reps by `delta` (clamped)
+ * - stepRangeReps(exerciseIndex, setIndex, field, delta): adjusts min/max reps by `delta` (keeps min/max consistent)
+ * - stepWeight(exerciseIndex, setIndex, delta): adjusts a set's weight by `delta * WEIGHT_STEP` (rounded, >= 0)
+ * - updateSet(exerciseIndex, setIndex, field, value): updates a specific set field (`repType`, `reps`, `minReps`, `maxReps`, `weight`)
+ * - validateMinMaxReps(exerciseIndex, setIndex, field): ensures min/max reps are not inverted
+ * - setRestSeconds(exerciseIndex, restSeconds): sets rest seconds for an exercise
+ */
 export function useRoutineDayMutations({
 	data,
 	onUpdate,

@@ -5,6 +5,12 @@ interface RoutinesSkeletonListProps {
   count?: number
 }
 
+/**
+ * Render a vertical list of skeleton loading cards representing routines.
+ *
+ * @param count - Number of skeleton cards to render (defaults to 3)
+ * @returns A JSX element containing `count` skeleton cards used as loading placeholders
+ */
 export function RoutinesSkeletonList({ count = 3 }: RoutinesSkeletonListProps) {
   return (
     <div className="px-1 sm:pr-4 sm:pl-0">
