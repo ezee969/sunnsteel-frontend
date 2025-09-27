@@ -14,9 +14,9 @@ Como desarrollador, DEBES mantener la documentación del proyecto actualizada au
 
 1. **Archivos de reglas** (`.cursor/rules/*.mdc`)
 2. **README.md** del proyecto
-3. **Documentación de componentes**
-4. **Estructura de directorios**
-5. **Patrones de código**
+3. **Documentación de componentes en el folder ./docs**
+4. **Estructura de directorios en el folder ./docs**
+5. **Patrones de código en el folder ./docs**
 
 ### Detección Automática de Cambios
 
@@ -123,8 +123,5 @@ Antes de finalizar cualquier tarea:
 ## Recordatorio Constante
 
 **NO OLVIDES**: Cada cambio significativo en el proyecto DEBE reflejarse en la documentación. La documentación desactualizada es peor que la falta de documentación.
-description:
-globs:
-alwaysApply: false
 
 ---

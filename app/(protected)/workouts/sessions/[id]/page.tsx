@@ -24,7 +24,7 @@ import { useRoutine } from '@/lib/api/hooks/useRoutines';
 import type { Routine } from '@/lib/api/types/routine.type';
 import type { SetLog } from '@/lib/api/types/workout.type';
 import { useDebounce } from '@/hooks/use-debounce';
-import { Progress } from '@/components/ui/progress';
+import { RoutineProgress } from '@/features/routines/components/RoutineProgress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSaveState, setSaveState } from '@/lib/utils/save-status-store';
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
@@ -226,15 +226,11 @@ export default function ActiveSessionPage() {
             <span className="font-medium">{routine?.name ?? session.routineId}</span>
           </div>
           {totalSets > 0 ? (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Progress</span>
-                <span>
-                  {completedSets}/{totalSets} sets ({progressPct}%)
-                </span>
-              </div>
-              <Progress variant="gold" value={progressPct} />
-            </div>
+            <RoutineProgress
+              label="Progress"
+              value={progressPct}
+              rightText={`${completedSets}/${totalSets} sets (${progressPct}%)`}
+            />
           ) : null}
           <div className="flex gap-2">
             <Button

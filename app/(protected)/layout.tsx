@@ -3,8 +3,8 @@
 import React, { ReactNode, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Sidebar from '@/app/(protected)/components/Sidebar';
-import Header from '@/app/(protected)/components/Header';
+import Sidebar from '@/features/shell/components/Sidebar';
+import Header from '@/features/shell/components/Header';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';

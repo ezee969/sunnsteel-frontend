@@ -93,20 +93,15 @@ function stableFilters<T extends Record<string, unknown>>(f: T | undefined) {
 ```
 
 - Full design token extraction into tooling (post-MVP)
-
-| Auth unification | All references to legacy `useAuth` removed except adapter file; `auth-provider.tsx` deletable |
-| Reduced bundle | `auth-provider` & unused legacy refresh logic removed → bundle diff negative |
-
----
----
 ## 8. Next Action Proposal
+
+| ID | Scope | Action | Effort | Impact | Owner |
+|----|-------|--------|--------|--------|-------|
+| FE-ARCH-01 | Component architecture | Introduce `features/` domain tree (`features/routines`, `features/shell`) and migrate reusable components (Header, Sidebar, RtF suite, wizard) out of route folders | M | H | Frontend |
+| FE-ARCH-02 | Import hygiene | Update imports/tests to use `@/features/...` barrels, remove `@/app/(protected)/components/*` references | M | H | Frontend |
+| FE-ARCH-03 | Documentation | Refresh `README.md`, `docs/README.md`, add `docs/reference/frontend-architecture.md` detailing placement rules | S | M | Frontend |
+
 ## 9. (Planned) Reintroduction of PROGRAMMED_RTF_HYPERTROPHY Variant
-
-
-### 9.1 Goals
-1. Avoid UI-only ghost enum values that drift from persisted data.
-2. Provide clear differentiated semantics (not just a label) vs `PROGRAMMED_RTF`.
-3. Keep rollback simple if usage is low.
 
 ### 9.2 Proposed Phased Implementation
 

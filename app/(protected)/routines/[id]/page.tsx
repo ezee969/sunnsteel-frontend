@@ -43,9 +43,9 @@ import {
 } from '@/components/ui/accordion';
 import HeroSection from '@/components/layout/HeroSection';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
-import TmAdjustmentPanel from '@/components/routines/TmAdjustmentPanel';
-import ProgramStyleBadge from '@/components/routines/ProgramStyleBadge';
-import { RtfDashboard } from '@/components/routines/RtfDashboard';
+import TmAdjustmentPanel from '@/features/routines/components/TmAdjustmentPanel';
+import ProgramStyleBadge from '@/features/routines/components/ProgramStyleBadge';
+import { RtfDashboard } from '@/features/routines/components/RtfDashboard';
 
 const dayName = (dayOfWeek: number) => {
   const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

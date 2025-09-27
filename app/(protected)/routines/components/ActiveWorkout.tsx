@@ -2,12 +2,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Play, Pause, SkipForward } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+import { RoutineProgress } from '@/features/routines/components/RoutineProgress';
 
 interface ActiveWorkoutProps {
   className?: string;
@@ -21,13 +21,7 @@ export default function ActiveWorkout({ className }: ActiveWorkoutProps) {
         <CardTitle className="text-lg">Active Workout</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Current Exercise</span>
-            <span className="text-sm text-muted-foreground">3/8</span>
-          </div>
-          <Progress variant="gold" value={37.5} />
-        </div>
+        <RoutineProgress label="Current Exercise" rightText="3/8" value={37.5} />
 
         <div className="space-y-4">
           <div className="flex flex-col gap-1">

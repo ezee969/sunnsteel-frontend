@@ -15,14 +15,14 @@ import { Stepper } from '@/components/ui/stepper';
 import HeroSection from '@/components/layout/HeroSection';
 
 // Step components
-import { RoutineBasicInfo } from '@/components/routines/create/RoutineBasicInfo';
-import { TrainingDays } from '@/components/routines/create/TrainingDays';
-import { BuildDays } from '@/components/routines/create/BuildDays';
-import { ReviewAndCreate } from '@/components/routines/create/ReviewAndCreate';
+import { RoutineBasicInfo } from '@/features/routines/wizard/RoutineBasicInfo';
+import { TrainingDays } from '@/features/routines/wizard/TrainingDays';
+import { BuildDays } from '@/features/routines/wizard/BuildDays';
+import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate';
 import {
   RoutineWizardData,
   ProgressionScheme,
-} from '@/components/routines/create/types';
+} from '@/features/routines/wizard/types';
 import {
   useRoutine,
   useUpdateRoutine,

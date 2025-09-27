@@ -4,6 +4,7 @@
   "isPeriodized": false,
   "programStartDate": "2025-09-22",
   "programTimezone": "America/Cordoba",
+  "programWithDeloads": true,
   "days": [
     {
       "dayOfWeek": 1,
