@@ -42,6 +42,24 @@ interface SetRowProps {
 	disableRemove: boolean
 }
 
+/**
+ * Render a responsive row UI for editing a single exercise set in the routine wizard.
+ *
+ * @param exerciseIndex - Index of the parent exercise containing this set
+ * @param setIndex - Index of this set within the exercise
+ * @param set - The set data to display and edit
+ * @param progressionScheme - Progression mode; when not `'NONE'` rep type selection is disabled, and when `'DOUBLE_PROGRESSION'` weight editing is disabled for non-first sets
+ * @param onUpdateSet - Callback to update a specific field of the set (`repType`, `reps`, `minReps`, `maxReps`, `weight`)
+ * @param onValidateMinMaxReps - Callback invoked to validate min/max rep values after edits
+ * @param onStepFixedReps - Callback invoked to increment/decrement fixed reps by a delta
+ * @param onStepRangeReps - Callback invoked to increment/decrement `minReps` or `maxReps` by a delta
+ * @param onStepWeight - Callback invoked to increment/decrement weight by a delta
+ * @param onRemoveSet - Callback to remove this set
+ * @param isRemoving - When true, apply removal animation/state
+ * @param disableRemove - When true, disable remove controls
+ *
+ * @returns The rendered set row element
+ */
 export function SetRow({
 	exerciseIndex,
 	setIndex,

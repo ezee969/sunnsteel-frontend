@@ -13,6 +13,12 @@ interface ActiveWorkoutProps {
   className?: string;
 }
 
+/**
+ * Render the Active Workout card showing current exercise progress, timer controls, and upcoming exercises.
+ *
+ * @param className - Optional additional className applied to the root Card container
+ * @returns A React element representing the Active Workout card
+ */
 export default function ActiveWorkout({ className }: ActiveWorkoutProps) {
   return (
     <Card className={cn('relative', className)}>

@@ -32,6 +32,17 @@ interface TrainingDaysProps {
 	readonly isEditing?: boolean
 }
 
+/**
+ * Render the training-days selection UI for the routine wizard.
+ *
+ * Renders quick-select presets, manual weekday toggles, a selected-days summary,
+ * and conditional RtF program settings (deload toggle, start-week selector, previews).
+ *
+ * @param data - Current RoutineWizardData object representing the wizard state
+ * @param onUpdate - Callback invoked with partial updates to the wizard data
+ * @param isEditing - If true, hide controls that change program structure (for example, the start-week selector)
+ * @returns The rendered React element for the training-days step of the wizard
+ */
 export function TrainingDays({
 	data,
 	onUpdate,

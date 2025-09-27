@@ -6,6 +6,13 @@ interface RoutineMetaBadgesProps {
   isPeriodized?: boolean
 }
 
+/**
+ * Renders a compact set of badges describing routine metadata.
+ *
+ * @param daysPerWeek - Number of training days per week shown in the dumbbell badge.
+ * @param isPeriodized - If true, includes an additional "Periodized" badge.
+ * @returns A JSX element containing the days-per-week badge and, when applicable, a periodization badge.
+ */
 export function RoutineMetaBadges({ daysPerWeek, isPeriodized }: RoutineMetaBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">

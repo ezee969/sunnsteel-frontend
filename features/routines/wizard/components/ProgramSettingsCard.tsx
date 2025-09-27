@@ -10,6 +10,16 @@ interface ProgramSettingsCardProps {
 	isEditing: boolean
 }
 
+/**
+ * Render a card displaying Run the F* program settings when RtF is enabled.
+ *
+ * Shows whether deload weeks are included, the formatted start date, total program weeks,
+ * and — when not editing — the current start program week (e.g., "Week 1 of 12").
+ *
+ * @param data - Routine wizard data used to compute and display program dates and week info
+ * @param isEditing - When true, omits the "Start Program Week" field from the rendered card
+ * @returns The card element with program settings when RtF is enabled, or `null` when it is not
+ */
 export function ProgramSettingsCard({ data, usesRtf, isEditing }: ProgramSettingsCardProps) {
 	if (!usesRtf) {
 		return null

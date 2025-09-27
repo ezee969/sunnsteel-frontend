@@ -27,6 +27,17 @@ const DAYS_OF_WEEK = [
   'Saturday',
 ];
 
+/**
+ * Render the training-day builder UI used by the routine wizard.
+ *
+ * Renders tabs for each selected training day, per-day cards that list and manage exercises
+ * (add, remove, reorder-agnostic operations), controls for progression, sets, reps, weights,
+ * and an exercise picker that scrolls newly added exercises into view.
+ *
+ * @param data - Current routine wizard state used to populate days, exercises, and schedule mode
+ * @param onUpdate - Callback invoked with partial updates to the RoutineWizardData
+ * @returns A JSX element containing the training-days builder interface
+ */
 export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({});
   const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});

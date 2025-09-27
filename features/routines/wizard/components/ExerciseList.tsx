@@ -29,6 +29,14 @@ export interface ExerciseListProps {
 	registerRef: (key: string, node: HTMLDivElement | null) => void
 }
 
+/**
+ * Render a vertical list of ExerciseCard components for a routine day, or an empty-state message when the day has no exercises.
+ *
+ * @param registerRef - Callback invoked with a unique key and the corresponding exercise container DOM node; used to register or unregister nodes for scrolling/measurement.
+ * @param disableTimeBasedProgressions - When `true`, disables time-based progression controls in each ExerciseCard.
+ *
+ * @returns The rendered list of exercise cards for the provided `day`, or an empty-state message when the day contains no exercises.
+ */
 export function ExerciseList({
 	tabIndex,
 	day,

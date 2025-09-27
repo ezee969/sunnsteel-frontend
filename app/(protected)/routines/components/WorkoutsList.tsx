@@ -25,6 +25,14 @@ interface WorkoutsListProps {
   error: Error | null;
 }
 
+/**
+ * Render a scrollable list of routine cards, handling loading, error, empty states, and a delete confirmation dialog.
+ *
+ * @param routines - The list of routines to display; if `undefined` or empty, an empty state is shown.
+ * @param isLoading - When `true`, renders a skeleton placeholder list instead of routines.
+ * @param error - If provided, renders an error message describing the failure.
+ * @returns The component's rendered UI as a React element.
+ */
 export default function WorkoutsList({
   routines,
   isLoading,

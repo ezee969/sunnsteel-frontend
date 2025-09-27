@@ -26,6 +26,18 @@ interface ReviewAndCreateProps {
 	onComplete: () => void
 }
 
+/**
+ * Render a review-and-submit UI for creating or updating a workout routine.
+ *
+ * Displays a multi-section review of the provided routine data, program settings, summary statistics,
+ * and a primary action to submit (create or update) the routine. Also shows brief post-submission guidance.
+ *
+ * @param data - RoutineWizardData containing the routine details to review
+ * @param routineId - Optional ID of an existing routine being edited
+ * @param isEditing - When true, the component renders in edit mode (changes labels and icons accordingly)
+ * @param onComplete - Callback invoked after the submission process completes
+ * @returns The rendered JSX element for the review-and-create workflow
+ */
 export function ReviewAndCreate({
 	data,
 	routineId,

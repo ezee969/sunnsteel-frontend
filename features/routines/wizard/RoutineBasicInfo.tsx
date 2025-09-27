@@ -15,6 +15,15 @@ interface RoutineBasicInfoProps {
   onUpdate: (updates: Partial<RoutineWizardData>) => void;
 }
 
+/**
+ * Render the basic information section of a routine creation wizard.
+ *
+ * Renders inputs for routine name and optional description and provides program schedule controls (mode selector and start date picker). State is derived from `data` and updates are applied via `onUpdate`.
+ *
+ * @param data - Current routine wizard data used to populate inputs and schedule controls
+ * @param onUpdate - Callback to apply partial updates to the routine wizard data
+ * @returns The rendered UI for routine basic information, including name, description, and program schedule controls
+ */
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
   const { name, description, handleNameChange, handleDescriptionChange } =
     useRoutineMetadataForm({ data, onUpdate });

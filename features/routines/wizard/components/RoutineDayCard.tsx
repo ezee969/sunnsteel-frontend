@@ -13,6 +13,15 @@ interface RoutineDayCardProps {
 	exerciseMap: Record<string, Exercise>
 }
 
+/**
+ * Render a card summarizing a routine day and its exercises.
+ *
+ * Renders the day's name, a badge with the number of exercises, and a list of exercise summaries including name, primary muscles, equipment, rest, and set information.
+ *
+ * @param day - A day entry from RoutineWizardData['days'] (contains dayOfWeek and exercises).
+ * @param exerciseMap - A lookup map of Exercise objects keyed by exercise ID used to resolve exercise metadata.
+ * @returns The JSX element for the day's routine card.
+ */
 export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 	const displayName = DAYS_OF_WEEK[day.dayOfWeek]
 
