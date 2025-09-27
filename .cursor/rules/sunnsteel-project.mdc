@@ -42,11 +42,12 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
 - **`app/(protected)/workouts/history/page.tsx`**: Historial de sesiones con filtros e infinite scroll
 - **`app/page.tsx`**: Página de inicio pública
 
-### Directorios Principales
+-### Directorios Principales
 
-- **`components/`**: Componentes reutilizables
-  - `ui/`: Componentes base de Shadcn/ui (12 componentes disponibles)
-  - `layout/`: Componentes de layout
+- **`components/`**: Componentes reutilizables (design system, fondos, iconos)
+- **`features/`**: Módulos orientados a dominio
+  - `shell/`: Sidebar, header, banners y otros elementos de la cáscara protegida
+  - `routines/`: Rutinas, RtF dashboards y wizard completo
 - **`providers/`**: Context providers (Auth, App, Query)
 - **`hooks/`**: Custom hooks (useAuthProtection, useSidebar)
 - **`lib/`**: Utilidades y servicios
@@ -65,9 +66,9 @@ Este es el proyecto frontend para Sunnsteel, una aplicación de fitness y entren
     - Reglas de ajuste de TM por desempeño en última serie AMRAP: −5% (−2+ reps), −2% (−1), 0% (objetivo), +0.5% (+1), +1% (+2), +1.5% (+3), +2% (+4), +3% (+5+).
 - **`schema/`**: Esquemas de validación Zod (loginSchema, signupSchema)
 
-### Routine Creation/Edit Wizard
+-### Routine Creation/Edit Wizard
 
-- Tipo compartido: `components/routines/create/types.ts` exporta `RoutineWizardData` y `RepType`.
+- Tipo compartido: `features/routines/wizard/types.ts` exporta `RoutineWizardData`, `RepType` y `ProgressionScheme`.
 - `RoutineWizardData` incluye `programScheduleMode?: 'TIMEFRAME' | 'NONE'` para elegir si el programa es por calendario o indefinido.
 - Repeticiones por set:
   - `repType`: `'FIXED' | 'RANGE'`

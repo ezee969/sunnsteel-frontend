@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import {
   useSupabaseSignIn,
   useSupabaseGoogleSignIn,
@@ -55,6 +56,37 @@ export function SupabaseLoginForm() {
             {error?.message || 'Login failed. Please try again.'}
           </div>
         )}
+
+        {/* Google Sign-In Button */}
+        <Button
+          variant="outline"
+          className="w-full bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white hover:bg-white/90 dark:hover:bg-black/50 transition-colors duration-700"
+          onClick={handleGoogleSignIn}
+          disabled={isPending || isGooglePending}
+          type="button"
+          aria-label={isGooglePending ? 'Signing in with Google' : 'Sign in with Google'}
+        >
+          {isGooglePending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Image
+              src="/icons/google-icon-logo-svgrepo-com.svg"
+              alt="Google"
+              width={16}
+              height={16}
+              className="mr-2 h-4 w-4"
+              priority={false}
+            />
+          )}
+          Google
+        </Button>
+
+        {/* Separator */}
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
+          <span className="text-xs text-neutral-700/70 dark:text-neutral-300/70">or</span>
+          <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
+        </div>
 
         <Form {...form}>
           <form
@@ -124,24 +156,7 @@ export function SupabaseLoginForm() {
           </form>
         </Form>
 
-        {/* Separator + Google Sign-In Button  */}
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
-          <span className="text-xs text-neutral-700/70 dark:text-neutral-300/70">
-            or
-          </span>
-          <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white hover:bg-white/90 dark:hover:bg-black/50 transition-colors duration-700"
-          onClick={handleGoogleSignIn}
-          disabled={isPending || isGooglePending}
-          type="button"
-        >
-          {isGooglePending ? 'Redirecting...' : 'Continue with Google'}
-        </Button>
+        
       </div>
 
       <div className="mt-8 text-center">

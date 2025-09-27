@@ -52,15 +52,15 @@ export const preloadComponents = {
 
   // Wizard components - loaded dynamically during routine creation
   trainingDaysWizard: () => {
-    import('@/components/routines/create/TrainingDays');
+    import('@/features/routines/wizard/TrainingDays');
   },
 
   buildDaysWizard: () => {
-    import('@/components/routines/create/BuildDays');
+    import('@/features/routines/wizard/BuildDays');
   },
 
   reviewCreateWizard: () => {
-    import('@/components/routines/create/ReviewAndCreate');
+    import('@/features/routines/wizard/ReviewAndCreate');
   },
 
   // Active workout session - heavy real-time component

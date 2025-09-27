@@ -26,9 +26,13 @@ project-root/
 ├── components/                            # Reusable + design system abstractions
 │   ├── ui/                                # Shadcn-based primitives (button, card, etc.)
 │   ├── backgrounds/                       # Pure-CSS decorative overlays (vignette, etc.)
-│   ├── icons/                             # Masked SVG classical icon wrapper
-│   └── routines/                          # Routine wizard (create/edit) components
-│       └── create/                        # BuildDays, ExerciseCard, etc.
+│   └── icons/                             # Masked SVG classical icon wrapper
+├── features/                              # Feature-oriented modules (UI + logic)
+│   ├── shell/                             # Application chrome (sidebar, header, banners)
+│   │   └── components/                    # `Sidebar`, `Header`, `ActiveSessionBanner`
+│   └── routines/                          # Routine dashboards, RtF widgets, wizard
+│       ├── components/                    # RtF dashboard cards & shared routine UI
+│       └── wizard/                        # `BuildDays`, `TrainingDays`, `ReviewAndCreate`, types
 ├── providers/                             # Global context & infra providers
 │   ├── app-provider.tsx                   # Aggregates Query + Supabase auth
 │   ├── supabase-auth-provider.tsx         # Source of truth (Supabase + backend verify)
@@ -49,6 +53,9 @@ project-root/
 ├── public/                                # Static assets (backgrounds, icons, manifest)
 ├── schema/                                # Zod schemas (auth forms)
 ├── test/                                  # Vitest + RTL test suites
+│   ├── app/                               # Route-level interactions
+│   ├── features/                          # Feature-specific suites (e.g., routines wizard)
+│   └── components/                        # Design system primitives
 ├── middleware.ts                          # (Currently no redirect logic; debug headers)
 ├── components.json                        # Shadcn component registry
 └── package.json
@@ -61,7 +68,6 @@ project-root/
 - The Review step includes a summary card “Program Settings (RtF)” showing:
   - Include deload weeks: Yes/No
   - Start date
-  - Timezone
   - Start Program Week: `Week N of 18|21`
 
 ### Authentication (Frontend)

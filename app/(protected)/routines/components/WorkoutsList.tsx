@@ -1,25 +1,5 @@
 'use client';
-
-import { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MoreVertical, PlusCircle, Loader2, Heart, ListChecks } from 'lucide-react';
-import Link from 'next/link';
-import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,19 +12,12 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { Routine } from '@/lib/api/types/routine.type';
-import {
-  useDeleteRoutine,
-  useToggleRoutineFavorite,
-  useToggleRoutineCompleted,
-} from '@/lib/api/hooks/useRoutines';
-import { useStartSession, useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
-import { useRouter } from 'next/navigation';
-import { routineService } from '@/lib/api/services/routineService';
-import { weeksRemainingFromEndDate } from '@/lib/utils/date';
-import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
-import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useRoutineListActions } from '@/features/routines/hooks/useRoutineListActions';
+import { RoutinesSkeletonList } from '@/features/routines/components/RoutinesSkeletonList';
+import { EmptyRoutinesState } from '@/features/routines/components/EmptyRoutinesState';
+import { RoutineCard } from '@/features/routines/components/RoutineCard';
+import { Loader2 } from 'lucide-react';
 
 interface WorkoutsListProps {
   routines: Routine[] | undefined;
@@ -57,149 +30,29 @@ export default function WorkoutsList({
   isLoading,
   error,
 }: WorkoutsListProps) {
-  const router = useRouter();
-  const { preloadOnHover } = useComponentPreloading();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
-  const [favoriteActingId, setFavoriteActingId] = useState<string | null>(null);
-  const [completedActingId, setCompletedActingId] = useState<string | null>(null);
-  const [startActingId, setStartActingId] = useState<string | null>(null);
-
-  const { mutate: deleteRoutine, isPending: isDeleting } = useDeleteRoutine();
-  const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
-    useToggleRoutineFavorite();
-  const { mutate: toggleCompleted, isPending: isTogglingCompleted } =
-    useToggleRoutineCompleted();
-  const { mutateAsync: startSession, isPending: isStarting } = useStartSession();
-  const [lastStartReused, setLastStartReused] = useState(false);
+  const {
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    favoriteActingId,
+    completedActingId,
+    startActingId,
+    lastStartReused,
+    isDeleting,
+    isTogglingFavorite,
+    isTogglingCompleted,
+    isStarting,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleToggleFavorite,
+    handleToggleCompleted,
+    handleStartSessionForRoutine,
+  } = useRoutineListActions();
   const { data: activeSession } = useActiveSession();
 
-  const dayName = (dayOfWeek: number) => {
-    const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return names[dayOfWeek] ?? `Day ${dayOfWeek}`;
-  };
-
-  const isProgramEnded = (routine: Routine | undefined): boolean => {
-    if (!routine?.programEndDate) return false;
-    const today = new Date();
-    const todayUTC = Date.UTC(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-    const end = new Date(routine.programEndDate);
-    const endUTC = Date.UTC(
-      end.getUTCFullYear(),
-      end.getUTCMonth(),
-      end.getUTCDate()
-    );
-    return todayUTC > endUTC;
-  };
-
-  const handleDeleteClick = (routineId: string) => {
-    setSelectedRoutineId(routineId);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (selectedRoutineId) {
-      deleteRoutine(selectedRoutineId, {
-        onSuccess: () => {
-          setIsDeleteDialogOpen(false);
-          setSelectedRoutineId(null);
-        },
-      });
-    }
-  };
-
-  const handleToggleFavorite = (routine: Routine) => {
-    if (!routine?.id) return;
-    setFavoriteActingId(routine.id);
-    toggleFavorite(
-      { id: routine.id, isFavorite: !routine.isFavorite },
-      {
-        onSettled: () => setFavoriteActingId(null),
-      }
-    );
-  };
-
-  const handleToggleCompleted = (routine: Routine) => {
-    if (!routine?.id) return;
-    setCompletedActingId(routine.id);
-    toggleCompleted(
-      { id: routine.id, isCompleted: !routine.isCompleted },
-      {
-        onSettled: () => setCompletedActingId(null),
-      }
-    );
-  };
-
-  const handleStartSessionForRoutine = async (
-    routine: Routine,
-    routineDayId?: string
-  ) => {
-    try {
-      setStartActingId(routine.id);
-      let dayId = routineDayId ?? routine.days?.[0]?.id;
-      if (!dayId) {
-        // Fallback: fetch full routine details to get days
-        console.debug('[start-session] fetching routine details to get day');
-        const full = await routineService.getById(routine.id);
-        dayId = full.days?.[0]?.id;
-      }
-      if (!dayId) {
-        console.error('No routine day available to start a session');
-        return;
-      }
-      const session = await startSession({
-        routineId: routine.id,
-        routineDayId: dayId,
-      }) as { id?: string; _reused?: boolean };
-      setLastStartReused(!!session?._reused);
-      if (session?.id) {
-        router.push(`/workouts/sessions/${session.id}`);
-      }
-    } catch (err) {
-      console.error('Failed to start session', err);
-    } finally {
-      setStartActingId(null);
-    }
-  };
+  
 
   if (isLoading) {
-    return (
-      <div className="px-1 sm:pr-4 sm:pl-0">
-        <div className="grid gap-3 sm:gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="p-4 sm:px-6 sm:py-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="space-y-2 pr-4">
-                    <Skeleton className="h-5 w-40" />
-                    <Skeleton className="h-4 w-60" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-8 w-16" />
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
-                    <Skeleton className="h-8 w-8" />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-0 sm:px-6 sm:pb-4 sm:pt-0">
-                <div className="space-y-2 mb-3">
-                  <Skeleton className="h-3 w-full" />
-                </div>
-                <div className="flex gap-2">
-                  <Skeleton className="h-6 w-28" />
-                  <Skeleton className="h-6 w-24" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <RoutinesSkeletonList />;
   }
 
   if (error) {
@@ -207,20 +60,7 @@ export default function WorkoutsList({
   }
 
   if (!routines || routines.length === 0) {
-    return (
-      <div className="flex h-[calc(100vh-300px)] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-        <h3 className="text-2xl font-bold tracking-tight">You have no routines</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Get started by creating a new routine.
-        </p>
-        <Button asChild variant="classical">
-          <Link href="/routines/new" {...preloadOnHover('newRoutinePage')}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create Routine
-          </Link>
-        </Button>
-      </div>
-    );
+    return <EmptyRoutinesState />;
   }
 
   return (
@@ -231,234 +71,25 @@ export default function WorkoutsList({
             const isActiveRoutine =
               activeSession?.status === 'IN_PROGRESS' &&
               activeSession?.routineId === routine.id;
-            
+
             return (
-              <Card 
-                key={routine.id} 
-                className={cn(
-                  "transition-colors",
-                  isActiveRoutine && "border-l-4 border-l-yellow-500 bg-yellow-50/30 dark:bg-yellow-950/20"
-                )}
-              >
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 sm:px-6 sm:py-4">
-                <div className="space-y-1 pr-2">
-                  <CardTitle className="text-base font-semibold sm:text-lg">
-                    {routine.name}
-                  </CardTitle>
-                  {routine.description && (
-                    <CardDescription className="line-clamp-2 text-sm sm:text-base">
-                      {routine.description}
-                    </CardDescription>
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  {isProgramEnded(routine) && (
-                    <Badge variant="outline" className="mr-1">
-                      Program ended
-                    </Badge>
-                  )}
-                  {!isProgramEnded(routine) && routine.programEndDate && (
-                    <Badge variant="classical" className="mr-1">
-                      {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
-                    </Badge>
-                  )}
-                  {(() => {
-                    if (isActiveRoutine) {
-                      return (
-                        <Button
-                          type="button"
-                          variant="classical"
-                          size="sm"
-                          className="h-8 relative pl-6 pr-3"
-                          aria-label="Resume active workout session"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (activeSession?.id) {
-                              router.push(`/workouts/sessions/${activeSession.id}`);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              if (activeSession?.id) {
-                                router.push(`/workouts/sessions/${activeSession.id}`);
-                              }
-                            }
-                          }}
-                          {...preloadOnHover('activeWorkoutSession')}
-                        >
-                          {/* Subtle active indicator */}
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-current opacity-70" />
-                          Resume
-                        </Button>
-                      );
-                    }
-                    return (
-                      <Button
-                        type="button"
-                        variant="classical"
-                        size="sm"
-                        className="h-8"
-                        aria-label="Start session"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          void handleStartSessionForRoutine(routine);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            void handleStartSessionForRoutine(routine);
-                          }
-                        }}
-                        disabled={
-                          (isStarting && startActingId === routine.id) ||
-                          isProgramEnded(routine)
-                        }
-                        {...preloadOnHover('activeWorkoutSession')}
-                      >
-                        {isStarting && startActingId === routine.id ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <ClassicalIcon
-                            name="dumbbell"
-                            className="mr-2 h-4 w-4"
-                            aria-hidden
-                          />
-                        )}
-                        {lastStartReused ? 'Resume' : 'Start'}
-                      </Button>
-                    );
-                  })()}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    aria-label={
-                      routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
-                    }
-                    disabled
-                    aria-pressed={routine.isCompleted}
-                    onClick={() => handleToggleCompleted(routine)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleToggleCompleted(routine);
-                      }
-                    }}
-                    // disabled={
-                    //   isTogglingCompleted && completedActingId === routine.id
-                    // }
-                  >
-                    {isTogglingCompleted && completedActingId === routine.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
-                    ) : (
-                      <ListChecks
-                        className="h-4 w-4 text-emerald-600"
-                        fill={routine.isCompleted ? 'currentColor' : 'none'}
-                      />
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    aria-label={
-                      routine.isFavorite ? 'Unmark favorite' : 'Mark as favorite'
-                    }
-                    aria-pressed={routine.isFavorite}
-                    onClick={() => handleToggleFavorite(routine)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleToggleFavorite(routine);
-                      }
-                    }}
-                    disabled={isTogglingFavorite && favoriteActingId === routine.id}
-                  >
-                    {isTogglingFavorite && favoriteActingId === routine.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-rose-500" />
-                    ) : (
-                      <Heart
-                        className="h-4 w-4 text-rose-500"
-                        fill={routine.isFavorite ? 'currentColor' : 'none'}
-                      />
-                    )}
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {routine.days.length > 0 && (
-                        <>
-                          <DropdownMenuItem className="pointer-events-none opacity-60">
-                            Start session with day
-                          </DropdownMenuItem>
-                          {routine.days.map((d) => (
-                            <DropdownMenuItem
-                              key={d.id}
-                              onSelect={() =>
-                                handleStartSessionForRoutine(routine, d.id)
-                              }
-                              disabled={
-                                (isStarting && startActingId === routine.id) ||
-                                isProgramEnded(routine)
-                              }
-                            >
-                              {dayName(d.dayOfWeek)}
-                            </DropdownMenuItem>
-                          ))}
-                          <div className="my-1 h-px bg-border" />
-                        </>
-                      )}
-                      <DropdownMenuItem asChild>
-                        <Link href={`/routines/${routine.id}`}>Open</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/routines/edit/${routine.id}`}>Edit</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onSelect={() => handleDeleteClick(routine.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-0 sm:px-6 sm:pb-4 sm:pt-0">
-                <div className="space-y-1 mb-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Completion</span>
-                    <span>{routine.isCompleted ? '100%' : '0%'}</span>
-                  </div>
-                  <Progress variant="gold" value={routine.isCompleted ? 100 : 0} />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Badge
-                    variant="outline"
-                    className="flex items-center gap-1 text-xs sm:text-sm"
-                  >
-                    <ClassicalIcon
-                      name="dumbbell"
-                      className="h-3 w-3 flex-shrink-0"
-                      aria-hidden
-                    />
-                    <span>{routine.days.length} days/week</span>
-                  </Badge>
-                  {routine.isPeriodized && (
-                    <Badge variant="outline" className="text-xs sm:text-sm">
-                      Periodized
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+              <RoutineCard
+                key={routine.id}
+                routine={routine}
+                isActiveRoutine={isActiveRoutine}
+                activeSessionId={activeSession?.id}
+                onStartSession={handleStartSessionForRoutine}
+                onToggleCompleted={handleToggleCompleted}
+                onToggleFavorite={handleToggleFavorite}
+                onDelete={handleDeleteClick}
+                isStarting={isStarting}
+                startActingId={startActingId}
+                lastStartReused={lastStartReused}
+                isTogglingCompleted={isTogglingCompleted}
+                completedActingId={completedActingId}
+                isTogglingFavorite={isTogglingFavorite}
+                favoriteActingId={favoriteActingId}
+              />
             );
           })}
         </div>
