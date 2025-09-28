@@ -133,6 +133,23 @@ If a future enhancement requires custom auth assertions (e.g. role-based gating)
 - `NEXT_PUBLIC_FRONTEND_URL` — Frontend absolute URL (used for metadata)
 - `NEXT_PUBLIC_API_URL` (optional in code, hardcoded default is `http://localhost:4000/api`)
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Google OAuth Web Client ID used by Google Identity Services
+- `NEXT_PUBLIC_SITE_URL` — Explicit site base URL used to build OAuth callback URL
+  - Dev example: `http://localhost:3000`
+  - Prod example: `https://sunnsteel-frontend.vercel.app`
+
+#### Supabase OAuth Callback & Redirect Flow
+
+- Login route is typically visited as `/login?redirectTo=/some/protected/path` (set by `middleware.ts`).
+- Clicking “Sign in with Google” calls `useSupabaseGoogleSignIn(callbackUrl)` which forwards the intended destination into the OAuth flow.
+- Service `supabaseAuthService.signInWithGoogle(callbackUrl)` builds:
+  - `redirectTo = ${SITE_URL}/auth/callback?callbackUrl=${encodeURIComponent(callbackUrl)}`
+  - `SITE_URL` prefers `NEXT_PUBLIC_SITE_URL`, otherwise falls back to `window.location.origin`.
+- The callback page at `app/(auth)/auth/callback/page.tsx` reads `callbackUrl` and navigates there on success, defaulting to `/dashboard` when absent.
+
+Allowed Redirect URLs in Supabase (Auth → URL Configuration):
+
+- `http://localhost:3000/auth/callback`
+- `https://sunnsteel-frontend.vercel.app/auth/callback`
 
 ### Feature: Routine Favorites
 

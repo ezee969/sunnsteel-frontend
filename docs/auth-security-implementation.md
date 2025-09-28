@@ -29,22 +29,10 @@ This document outlines the enhanced authentication security implementation that 
 - **Automatic Cleanup**: Cleared on verification failure and logout
 - **Logout Endpoint**: `POST /auth/supabase/logout` for server-side cleanup
 
-### 3. Enhanced Middleware Protection (`middleware.ts`)
-- **Dual Detection**: Checks both secure `ss_session` (preferred) and fallback `has_session` cookies
-- **Route Protection**: Re-enabled for `/dashboard`, `/workouts`, `/routines`
-- **Smart Redirects**: Authenticated users redirected away from auth pages
-- **Debug Logging**: Comprehensive logging for development troubleshooting
-
-### 4. Integrated Logout Flow (`lib/api/services/supabaseAuthService.ts`)
-- **Complete Cleanup**: Calls both Supabase sign-out and backend logout endpoint
-- **Graceful Degradation**: Continues logout even if backend call fails
-- **Session Invalidation**: Ensures all session markers are cleared
-
-## Security Benefits
-
-### Production-Grade Protection
-- **HttpOnly Cookies**: Prevent XSS access to session tokens
-- **Secure Transmission**: HTTPS-only in production
+- `lib/api/services/supabaseAuthService.ts` → `signInWithGoogle(callbackUrl?)`
+- `lib/api/hooks/useSupabaseAuth.ts` → `useSupabaseGoogleSignIn()`, `useSupabaseSignIn()`
+- `app/(auth)/auth/callback/page.tsx` → reads `callbackUrl`, redirects
+- `app/(auth)/login/components/SupabaseLoginForm.tsx` → reads `redirectTo` and passes it to both flows
 - **SameSite Protection**: CSRF attack prevention
 - **Server-Side Validation**: No reliance on client-side state
 

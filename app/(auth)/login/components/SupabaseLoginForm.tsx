@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import {
   useSupabaseSignIn,
@@ -26,6 +27,8 @@ export function SupabaseLoginForm() {
   const { mutate: signIn, isPending, isError, error } = useSupabaseSignIn();
   const { mutate: googleSignIn, isPending: isGooglePending } =
     useSupabaseGoogleSignIn();
+  const searchParams = useSearchParams();
+  const targetRedirect = searchParams.get('redirectTo') || '/dashboard';
 
   // Initialize form with react-hook-form and zod resolver
   const form = useForm<LoginFormValues>({
@@ -38,12 +41,12 @@ export function SupabaseLoginForm() {
 
   // Form submission handler
   function onSubmit(values: LoginFormValues) {
-    signIn(values);
+    signIn({ ...values, redirectTo: targetRedirect });
   }
 
   // Handle Google Sign-In
   function handleGoogleSignIn() {
-    googleSignIn();
+    googleSignIn(targetRedirect);
   }
 
   return (

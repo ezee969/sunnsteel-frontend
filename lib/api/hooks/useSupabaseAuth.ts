@@ -39,7 +39,15 @@ export const useSupabaseSignIn = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async ({ email, password }: { email: string; password: string }) => {
+    mutationFn: async ({
+      email,
+      password,
+      redirectTo,
+    }: {
+      email: string;
+      password: string;
+      redirectTo?: string;
+    }) => {
       console.log('🚀 Login hook: Starting sign in process...');
       const result = await supabaseAuthService.signIn(email, password);
       console.log('🚀 Login hook: Sign in successful, got result:', {
@@ -47,14 +55,15 @@ export const useSupabaseSignIn = () => {
       });
       return result;
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       console.log('🚀 Login hook: onSuccess called with:', {
         userId: data.user?.id,
       });
       // Add a small delay to ensure auth state updates before redirect
       setTimeout(() => {
         console.log('🚀 Login hook: Redirecting to dashboard...');
-        router.push('/dashboard');
+        const target = variables?.redirectTo || '/dashboard';
+        router.push(target);
       }, 100);
     },
     onError: (error) => {
@@ -68,8 +77,8 @@ export const useSupabaseSignIn = () => {
  */
 export const useSupabaseGoogleSignIn = () => {
   return useMutation({
-    mutationFn: async () => {
-      const result = await supabaseAuthService.signInWithGoogle();
+    mutationFn: async (callbackUrl?: string) => {
+      const result = await supabaseAuthService.signInWithGoogle(callbackUrl);
       // Redirect to Google OAuth
       window.location.href = result.url;
       return result;

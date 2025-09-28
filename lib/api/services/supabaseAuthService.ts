@@ -107,11 +107,22 @@ class SupabaseAuthService {
   /**
    * Sign in with Google
    */
-  async signInWithGoogle(): Promise<{ url: string }> {
+  async signInWithGoogle(callbackUrl?: string): Promise<{ url: string }> {
+    // Prefer explicit site URL from env (useful behind proxies), fallback to window.origin
+    const siteUrl =
+      (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_SITE_URL) ||
+      (typeof window !== 'undefined' ? window.location.origin : '');
+
+    const callbackPath = '/auth/callback';
+    const redirectBase = `${siteUrl}${callbackPath}`;
+    const redirectTo = callbackUrl
+      ? `${redirectBase}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+      : redirectBase;
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo,
       },
     });
 

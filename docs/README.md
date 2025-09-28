@@ -7,6 +7,7 @@
 |RtF Completion | history/RTF_FRONTEND_COMPLETION_2025-01-23.md | Final completion report | ✅ New
 |Frontend Improvements | roadmaps/FRONTEND_IMPROVEMENTS.md | Quick-win improvement tasks & UX enhancements | 🟡 Active
 |Frontend Architecture | reference/frontend-architecture.md | Current feature-based module layout & placement rules | ✅ New
+|Auth & Security | auth-security-implementation.md | Auth flow, middleware cookies, OAuth callback and redirects | ✅ Updated
 
 ## Major Milestones
 
