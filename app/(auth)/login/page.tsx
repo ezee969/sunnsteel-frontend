@@ -50,24 +50,9 @@ function LoginContent() {
     );
   }
 
-  // If authenticated, show loading state while redirecting
-  if (isAuthenticated) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <div className="text-center">
-          <div className="rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto animate-spin" />
-          <p className="mt-2 text-gray-600">Redirecting to dashboard...</p>
-          <p className="mt-1 text-sm text-gray-500">
-            If nothing happens, <a href="/dashboard" className="underline">click here</a>.
-          </p>
-        </div>
-      </motion.div>
-    );
-  }
+  // When already authenticated, avoid rendering an extra loader to reduce flicker.
+  // The effect above will immediately replace to the target route.
+  if (isAuthenticated) return null;
 
   return (
     <motion.div

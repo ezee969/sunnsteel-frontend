@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
+import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService';
 
 // Force this page to be client-side only to avoid prerendering issues
 export const dynamic = 'force-dynamic';
@@ -11,20 +11,26 @@ export const dynamic = 'force-dynamic';
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading, error } = useSupabaseAuth();
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
+    const sanitizePath = (p: string) => (p?.startsWith('/') ? p : '/dashboard');
+
     const handleAuthCallback = async () => {
       try {
         console.log('🔄 Auth callback: Processing OAuth callback...');
 
-        // Handle the OAuth callback - this will trigger the auth state change
+        // Retrieve Supabase session created by OAuth provider
         const { data, error } = await supabase.auth.getSession();
-
         if (error) {
-          console.error('🔄 Auth callback error:', error);
-          router.push('/login?error=callback_error');
+          console.error('🔄 Auth callback error (getSession):', error);
+          router.replace('/login?error=callback_error');
+          return;
+        }
+
+        if (!data.session) {
+          console.warn('🔄 Auth callback: No session found, redirecting to login');
+          router.replace('/login?error=no_session');
           return;
         }
 
@@ -33,36 +39,40 @@ function AuthCallbackContent() {
           userId: data.session?.user?.id,
         });
 
-        // Let the auth provider handle the session verification
-        // We'll wait for it to update the auth state
+        // Verify with backend immediately to set secure HttpOnly cookie (ss_session)
+        try {
+          await supabaseAuthService.verifyToken(data.session.access_token);
+          // Best-effort client marker for middleware fallback
+          try {
+            if (typeof document !== 'undefined') {
+              document.cookie = [
+                'has_session=1',
+                'Path=/',
+                'Max-Age=604800', // 7 days
+                'SameSite=Lax',
+              ].join('; ');
+            }
+          } catch {}
+        } catch (verifyErr) {
+          console.error('🔄 Auth callback: Backend verification failed:', verifyErr);
+          router.replace('/login?error=verify_failed');
+          return;
+        }
+
+        // Redirect to intended destination (or dashboard) without adding to history
+        const raw = searchParams.get('callbackUrl') || '/dashboard';
+        const target = sanitizePath(raw);
+        router.replace(target);
+      } catch (err) {
+        console.error('🔄 Auth callback unexpected error:', err);
+        router.replace('/login?error=callback_error');
+      } finally {
         setIsProcessing(false);
-      } catch (error) {
-        console.error('🔄 Auth callback error:', error);
-        router.push('/login?error=callback_error');
       }
     };
 
     handleAuthCallback();
-  }, [router]);
-
-  // Once auth provider has processed the session, redirect accordingly
-  useEffect(() => {
-    if (!isProcessing && !isLoading) {
-      if (isAuthenticated) {
-        console.log(
-          '🔄 Auth callback: User authenticated, redirecting to dashboard'
-        );
-        const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-        router.push(callbackUrl);
-      } else if (error) {
-        console.log('🔄 Auth callback: Authentication error, redirecting to login');
-        router.push('/login?error=auth_failed');
-      } else {
-        console.log('🔄 Auth callback: No session, redirecting to login');
-        router.push('/login');
-      }
-    }
-  }, [isProcessing, isLoading, isAuthenticated, error, router, searchParams]);
+  }, [router, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
