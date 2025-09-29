@@ -8,6 +8,7 @@
 |Frontend Improvements | roadmaps/FRONTEND_IMPROVEMENTS.md | Quick-win improvement tasks & UX enhancements | 🟡 Active
 |Frontend Architecture | reference/frontend-architecture.md | Current feature-based module layout & placement rules | ✅ New
 |Auth & Security | auth-security-implementation.md | Auth flow, middleware cookies, OAuth callback and redirects | ✅ Updated
+|Documentation Templates | templates/ | Standardized templates for components, hooks, APIs, and ADRs | ✅ New
 
 ## Major Milestones
 
