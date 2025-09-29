@@ -146,17 +146,24 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
           <p className="text-sm text-muted-foreground">
             {isRtfExercise ? 'Configured Sets:' : 'Sets:'}
           </p>
-          {exercise.sets.map((set, index) => (
-            <div key={set.id || index} className="text-sm flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
-                {index + 1}
-              </span>
-              <span>
-                {set.reps || set.minReps || 0} reps @ {set.weight || 0}kg
-                {set.rpe && ` (RPE ${set.rpe})`}
-              </span>
-            </div>
-          ))}
+          {exercise.sets.map((set, index) => {
+            const repDisplay =
+              set.minReps && set.maxReps
+                ? `${set.minReps}-${set.maxReps}`
+                : set.reps || set.minReps || 0;
+
+            return (
+              <div key={set.id || index} className="text-sm flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                  {index + 1}
+                </span>
+                <span>
+                  {repDisplay} reps @ {set.weight || 0}kg
+                  {set.rpe && ` (RPE ${set.rpe})`}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
 

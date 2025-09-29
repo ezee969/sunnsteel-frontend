@@ -166,7 +166,7 @@ export function RoutineCard({
               ) : (
                 <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
               )}
-              {lastStartReused ? 'Resume' : 'Start'} TEST
+              {lastStartReused ? 'Resume' : 'Start'}
             </Button>
           )}
           <Button
