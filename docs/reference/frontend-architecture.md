@@ -5,7 +5,7 @@ This document outlines key structure and patterns relevant to the Routines area 
 ## Feature Structure
 
 - `features/routines/components/`
-  - `RoutineCard.tsx`: Presentational card for a routine row (header, actions, progress, badges)
+  - `RoutineCard.tsx`: Presentational card for a routine row (header, actions, progress, badges) with date validation for workout scheduling
   - `ProgramStatusBadge.tsx`: Shows "Program ended" or `X weeks left` based on `programEndDate`
   - `RoutinesSkeletonList.tsx`: Reusable loading skeleton for routines list
   - `EmptyRoutinesState.tsx`: Reusable empty-state with CTA to create a routine
@@ -24,6 +24,8 @@ This document outlines key structure and patterns relevant to the Routines area 
 - `lib/utils/date.ts`
   - `weekdayName(dow, style)`: Short/long weekday names used across UI
   - `weeksRemainingFromEndDate(dateISO)`: Computes weeks left (date-only)
+  - `validateWorkoutDate(routineDays, todayDow)`: Validates if a routine can be started today based on scheduled days
+  - `validateRoutineDayDate(routineDay)`: Validates if a specific routine day can be started today
 - `lib/utils/a11y.ts`
   - `onPressEnterOrSpace(handler)`: Consistent keyboard activation helper
 

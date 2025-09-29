@@ -80,13 +80,13 @@ export function RoutineCard({
   const router = useRouter()
   const { preloadOnHover } = useComponentPreloading()
   
-  // Date validation
+  // Date validation for workout scheduling
   const todayDow = getTodayDow()
   const workoutValidation = validateWorkoutDate(routine.days)
   const canStartToday = workoutValidation.isValid
   const todayRoutineDay = routine.days?.find(day => day.dayOfWeek === todayDow)
   
-  // Determine if the start button should be disabled
+  // Determine if the start button should be disabled based on validation and routine state
   const isStartDisabled = (isStarting && startActingId === routine.id) || 
                           isProgramEnded(routine) || 
                           (!isActiveRoutine && !canStartToday)

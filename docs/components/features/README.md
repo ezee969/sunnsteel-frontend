@@ -5,7 +5,7 @@ Brief documentation for feature-specific components organized by domain.
 ## Routines Components
 
 ### Core Components
-- **RoutineCard** - Individual routine display with actions
+- **RoutineCard** - Individual routine display with actions and date validation for workout scheduling
 - **EmptyRoutinesState** - Empty state for routine lists
 - **RoutinesSkeletonList** - Loading skeleton for routine lists
 - **RoutineProgress** - Progress visualization for routines

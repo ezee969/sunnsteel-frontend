@@ -51,7 +51,7 @@ export default function TodaysWorkouts() {
         const day = r.days?.find((d: RoutineDay) => d.dayOfWeek === todayDow);
         if (!day) return null;
         
-        // Validate if this routine day can be started today
+        // Validate if this routine day can be started today based on scheduling rules
         const validation = validateRoutineDayDate(day);
         const canStartToday = validation.isValid;
         
