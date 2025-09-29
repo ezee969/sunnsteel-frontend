@@ -10,6 +10,13 @@ import type { RoutineDay } from '@/lib/api/types/routine.type';
 
 interface RoutineDayAccordionProps {
   days: RoutineDay[];
+  routine: {
+    id: string;
+    programStartDate?: string | null;
+    programDurationWeeks?: number | null;
+    programTimezone?: string | null;
+    programWithDeloads?: boolean | null;
+  };
   activeSession?: any;
   isStarting: boolean;
   startActingDayId: string | null;
@@ -28,6 +35,7 @@ interface RoutineDayAccordionProps {
  */
 export const RoutineDayAccordion = ({
   days,
+  routine,
   activeSession,
   isStarting,
   startActingDayId,
@@ -40,10 +48,6 @@ export const RoutineDayAccordion = ({
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return dayNames[dayOfWeek] || 'Unknown';
   };
-
-  const renderExercise = (exercise: any) => (
-    <ExerciseCard key={exercise.id} exercise={exercise} />
-  );
 
   return (
     <Accordion type="multiple" className="w-full">
@@ -95,7 +99,19 @@ export const RoutineDayAccordion = ({
             <AccordionContent>
               <div className="pt-4 space-y-4">
                 {day.exercises && day.exercises.length > 0 ? (
-                  day.exercises.map(renderExercise)
+                  day.exercises.map((exercise) => (
+                    <ExerciseCard 
+                      key={exercise.id} 
+                      exercise={exercise} 
+                      routineId={routine.id}
+                      routine={{
+                        programStartDate: routine.programStartDate,
+                        programDurationWeeks: routine.programDurationWeeks,
+                        programTimezone: routine.programTimezone,
+                        programWithDeloads: routine.programWithDeloads
+                      }}
+                    />
+                  ))
                 ) : (
                   <p className="text-muted-foreground text-sm">No exercises configured for this day.</p>
                 )}

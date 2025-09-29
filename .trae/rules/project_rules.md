@@ -1,5 +1,8 @@
 # Sunsteel Frontend - Project Rules & Development Guidelines
 
+## Mandatory Post-Task Documentation
+Document every relevant code change immediately after completing each task. Update the docs/ hierarchy (components, pages, hooks, services, types, utils, reference, roadmaps/history) to reflect behavior, props contracts, and usage examples. Do not mark a task complete until documentation updates are added.
+
 ## Project Overview
 
 Sunsteel is a comprehensive fitness application built with Next.js 15, featuring a classical Renaissance design theme and modern web technologies. This document serves as the authoritative reference for development practices, architectural patterns, and coding standards.

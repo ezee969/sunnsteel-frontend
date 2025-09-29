@@ -169,4 +169,19 @@ test('should debounce value changes', () => {
 ## Related Documentation
 - [API Hooks](../api/README.md) - Server state management hooks
 - [Components](../components/README.md) - Component documentation
-- [Architecture](../architecture/README.md) - System architecture
+- [Architecture](../architecture/README.md) - System architecture### useRtFWeekGoals
+
+Signature: (routineId: string, week?: number)
+
+Usage:
+`	s
+const { data } = useRtFWeekGoals(
+  isRtf && routineId ? routineId : '',
+  isRtf && currentWeek ? currentWeek : undefined
+);
+`
+
+Notes:
+- Pass empty string/undefined to prevent fetch when conditions arent met.
+- Internal logic handles enabled state; do not pass a third options parameter.
+- Hook uses ETag-aware client with React Query caching.

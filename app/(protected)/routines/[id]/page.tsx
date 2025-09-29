@@ -153,6 +153,13 @@ export default function RoutineDetailsPage() {
           <h2 className="text-xl font-semibold">Routine Days</h2>
           <RoutineDayAccordion
             days={routine.days}
+            routine={{
+              id: routine.id,
+              programStartDate: routine.programStartDate,
+              programDurationWeeks: routine.programDurationWeeks,
+              programTimezone: routine.programTimezone,
+              programWithDeloads: routine.programWithDeloads
+            }}
             activeSession={activeSession}
             isStarting={sessionManager.isStarting}
             startActingDayId={sessionManager.startActingDayId}
