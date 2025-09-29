@@ -24,7 +24,7 @@ import type { Routine } from '@/lib/api/types/routine.type'
 import { ProgramStatusBadge } from './ProgramStatusBadge'
 import { RoutineProgress } from './RoutineProgress'
 import { RoutineMetaBadges } from './RoutineMetaBadges'
-import { weekdayName } from '@/lib/utils/date'
+import { weekdayName, getTodayDow, validateWorkoutDate, validateRoutineDayDate } from '@/lib/utils/date'
 import { onPressEnterOrSpace } from '@/lib/utils/a11y'
 
 function isProgramEnded(routine: Routine | undefined): boolean {
@@ -79,6 +79,17 @@ export function RoutineCard({
 }: RoutineCardProps) {
   const router = useRouter()
   const { preloadOnHover } = useComponentPreloading()
+  
+  // Date validation
+  const todayDow = getTodayDow()
+  const workoutValidation = validateWorkoutDate(routine.days)
+  const canStartToday = workoutValidation.isValid
+  const todayRoutineDay = routine.days?.find(day => day.dayOfWeek === todayDow)
+  
+  // Determine if the start button should be disabled
+  const isStartDisabled = (isStarting && startActingId === routine.id) || 
+                          isProgramEnded(routine) || 
+                          (!isActiveRoutine && !canStartToday)
 
   return (
     <Card
@@ -135,14 +146,19 @@ export function RoutineCard({
               aria-label="Start session"
               onClick={(e) => {
                 e.preventDefault()
-                onStartSession(routine)
+                if (canStartToday) {
+                  onStartSession(routine, todayRoutineDay?.id)
+                }
               }}
               onKeyDown={(e) => {
-                onPressEnterOrSpace(() => onStartSession(routine))(e)
+                onPressEnterOrSpace(() => {
+                  if (canStartToday) {
+                    onStartSession(routine, todayRoutineDay?.id)
+                  }
+                })(e)
               }}
-              disabled={
-                (isStarting && startActingId === routine.id) || isProgramEnded(routine)
-              }
+              disabled={isStartDisabled}
+              title={!canStartToday ? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}` : undefined}
               {...preloadOnHover('activeWorkoutSession')}
             >
               {isStarting && startActingId === routine.id ? (
@@ -150,7 +166,7 @@ export function RoutineCard({
               ) : (
                 <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
               )}
-              {lastStartReused ? 'Resume' : 'Start'}
+              {lastStartReused ? 'Resume' : 'Start'} TEST
             </Button>
           )}
           <Button
@@ -209,15 +225,21 @@ export function RoutineCard({
                   <DropdownMenuItem className="pointer-events-none opacity-60">
                     Start session with day
                   </DropdownMenuItem>
-                  {routine.days.map((d) => (
-                    <DropdownMenuItem
-                      key={d.id}
-                      onSelect={() => onStartSession(routine, d.id)}
-                      disabled={(isStarting && startActingId === routine.id) || isProgramEnded(routine)}
-                    >
-                      {weekdayName(d.dayOfWeek, 'short')}
-                    </DropdownMenuItem>
-                  ))}
+                  {routine.days.map((d) => {
+                    const dayValidation = validateRoutineDayDate(d);
+                    const canStartThisDay = dayValidation.isValid;
+                    
+                    return (
+                      <DropdownMenuItem
+                        key={d.id}
+                        onSelect={() => onStartSession(routine, d.id)}
+                        disabled={(isStarting && startActingId === routine.id) || isProgramEnded(routine) || !canStartThisDay}
+                        title={!canStartThisDay ? `This day is not scheduled for ${weekdayName(d.dayOfWeek, 'long')}` : undefined}
+                      >
+                        {weekdayName(d.dayOfWeek, 'short')}
+                      </DropdownMenuItem>
+                    );
+                  })}
                   <div className="my-1 h-px bg-border" />
                 </>
               )}

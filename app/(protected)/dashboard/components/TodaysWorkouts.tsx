@@ -30,7 +30,7 @@ import {
   useActiveSession,
   useStartSession,
 } from '@/lib/api/hooks/useWorkoutSession';
-import { getTodayDow, weekdayName } from '@/lib/utils/date';
+import { getTodayDow, weekdayName, validateRoutineDayDate } from '@/lib/utils/date';
 import { Routine, RoutineDay } from '@/lib/api/types/routine.type';
 import ClassicalIcon from '@/components/icons/ClassicalIcon';
 import { cn } from '@/lib/utils';
@@ -50,9 +50,14 @@ export default function TodaysWorkouts() {
       .map((r: Routine) => {
         const day = r.days?.find((d: RoutineDay) => d.dayOfWeek === todayDow);
         if (!day) return null;
-        return { routine: r, day } as { routine: Routine; day: RoutineDay };
+        
+        // Validate if this routine day can be started today
+        const validation = validateRoutineDayDate(day);
+        const canStartToday = validation.isValid;
+        
+        return { routine: r, day, canStartToday } as { routine: Routine; day: RoutineDay; canStartToday: boolean };
       })
-      .filter((x): x is { routine: Routine; day: RoutineDay } => Boolean(x));
+      .filter((x): x is { routine: Routine; day: RoutineDay; canStartToday: boolean } => Boolean(x));
   }, [routines, todayDow]);
 
   const handleStart = async (routineId: string, routineDayId: string) => {
@@ -130,7 +135,7 @@ export default function TodaysWorkouts() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {todays.map(({ routine, day }) => {
+          {todays.map(({ routine, day, canStartToday }) => {
             const isActiveForThis =
               active?.status === 'IN_PROGRESS' && active?.routineDayId === day.id;
             return (
@@ -158,7 +163,8 @@ export default function TodaysWorkouts() {
                         ? router.push(`/workouts/sessions/${active.id}`)
                         : handleStart(routine.id, day.id)
                     }
-                    disabled={isPending}
+                    disabled={isPending || (!isActiveForThis && !canStartToday)}
+                    title={!canStartToday && !isActiveForThis ? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}` : undefined}
                     {...preloadOnHover('activeWorkoutSession')}
                   >
                     <Dumbbell className="mr-2 h-4 w-4" />

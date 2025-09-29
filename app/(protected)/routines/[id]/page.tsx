@@ -1,416 +1,177 @@
-'use client';
+'use client'
 
-import { useParams, useRouter } from 'next/navigation';
-import { useRoutine } from '@/lib/api/hooks/useRoutines';
-import {
-  useActiveSession,
-  useStartSession,
-} from '@/lib/api/hooks/useWorkoutSession';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
-  getTodayDow,
-  weekdayName,
-  weeksRemainingFromEndDate,
-} from '@/lib/utils/date';
-import type { RoutineDay, RoutineSet } from '@/lib/api/types/routine.type';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import HeroSection from '@/components/layout/HeroSection';
-import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
-import TmAdjustmentPanel from '@/features/routines/components/TmAdjustmentPanel';
-import ProgramStyleBadge from '@/features/routines/components/ProgramStyleBadge';
-import { RtfDashboard } from '@/features/routines/components/RtfDashboard';
-
-const dayName = (dayOfWeek: number) => {
-  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  return names[dayOfWeek] ?? `Day ${dayOfWeek}`;
-};
-
-const isProgramEnded = (programEndDate?: string): boolean => {
-  if (!programEndDate) return false;
-  const today = new Date();
-  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const end = new Date(programEndDate);
-  const endUTC = Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
-  return todayUTC > endUTC;
-};
+import { useParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Play, Calendar } from 'lucide-react'
+import { useRoutine } from '@/lib/api/hooks/useRoutines'
+import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
+import { useToggleRoutineFavorite, useToggleRoutineCompleted } from '@/lib/api/hooks/useRoutines'
+import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
+import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
+import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
+import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
+import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
+import { getDayName } from '@/features/routines/utils/routine-detail.utils'
+import { validateRoutineDayDate } from '@/lib/utils/date'
 
 export default function RoutineDetailsPage() {
-  const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const routineId = params?.id as string;
+  const params = useParams()
+  const router = useRouter()
+  const routineId = params.id as string
 
-  const { data: routine, isLoading, error } = useRoutine(routineId);
-  const { mutateAsync: startSession, isPending: isStarting } = useStartSession();
-  const [startActingDayId, setStartActingDayId] = useState<string | null>(null);
-  const { data: active } = useActiveSession();
-  const [activeConflictOpen, setActiveConflictOpen] = useState(false);
-  const [dateConfirmOpen, setDateConfirmOpen] = useState(false);
-  const [pendingDayId, setPendingDayId] = useState<string | null>(null);
-  const todayDow = getTodayDow();
+  // Data fetching
+  const { data: routine, isLoading } = useRoutine(routineId)
+  const { data: activeSession } = useActiveSession()
 
-  const firstDayId = useMemo(() => routine?.days?.[0]?.id, [routine?.days]);
-  const todayDayId = useMemo(
-    () => routine?.days?.find((d) => d.dayOfWeek === todayDow)?.id,
-    [routine?.days, todayDow]
-  );
-  const quickStartDayId = todayDayId ?? firstDayId;
+  // Mutations
+  const { mutateAsync: toggleFavorite, isPending: isTogglingFavorite } = useToggleRoutineFavorite()
+  const { mutateAsync: toggleCompleted, isPending: isTogglingCompleted } = useToggleRoutineCompleted()
 
-  // RTF exercises detection for TM adjustment functionality
-  const rtfExercises = useMemo(() => {
-    if (!routine?.days) return [];
-    
-    return routine.days.flatMap(day => 
-      day.exercises
-        .filter(ex => 
-          ex.progressionScheme === 'PROGRAMMED_RTF' || 
-          ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-        )
-        .map(ex => ({
-          id: ex.id,
-          exerciseId: ex.exercise.id,
-          exerciseName: ex.exercise.name,
-          programTMKg: ex.programTMKg,
-        }))
-    );
-  }, [routine?.days]);
+  // Custom hooks
+  const sessionManager = useWorkoutSessionManager(routineId, routine)
+  const routineData = useRoutineData(routine)
 
-  const hasRtfExercises = rtfExercises.length > 0;
-
-  const proceedStart = async (routineDayId?: string) => {
-    if (!routineId || !routineDayId) return;
+  // Handlers
+  const handleToggleFavorite = async () => {
+    if (!routine) return
     try {
-      setStartActingDayId(routineDayId);
-      const session = await startSession({ routineId, routineDayId });
-      if (session?.id) router.push(`/workouts/sessions/${session.id}`);
-    } catch (e) {
-      console.error('Failed to start session', e);
-    } finally {
-      setStartActingDayId(null);
+      await toggleFavorite({ id: routine.id, isFavorite: !routine.isFavorite })
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error)
     }
-  };
-
-  const handleStart = (routineDayId?: string) => {
-    if (!routineId || !routineDayId || !routine?.days) return;
-
-    // 1) Active session conflict: only allow resuming
-    if (active?.id && active.routineDayId !== routineDayId) {
-      setActiveConflictOpen(true);
-      return;
-    }
-
-    // 2) Date mismatch confirmation
-    const day = routine.days.find((d) => d.id === routineDayId);
-    if (day && day.dayOfWeek !== todayDow) {
-      setPendingDayId(routineDayId);
-      setDateConfirmOpen(true);
-      return;
-    }
-
-    // 3) Start immediately
-    void proceedStart(routineDayId);
-  };
-
-  const formatSet = (set: RoutineSet): string => {
-    if (set.repType === 'FIXED') {
-      const reps = set.reps ?? 0;
-      const weight = set.weight != null ? ` @ ${set.weight}` : '';
-      return `${reps} reps${weight}`;
-    }
-    const min = set.minReps ?? 0;
-    const max = set.maxReps ?? min;
-    const weight = set.weight != null ? ` @ ${set.weight}` : '';
-    return `${min}-${max} reps${weight}`;
-  };
-
-  if (!isLoading && error) {
-    return <p className="text-destructive">Error: {error.message}</p>;
   }
 
-  if (!isLoading && !routine) {
+  const handleToggleCompleted = async () => {
+    if (!routine) return
+    try {
+      await toggleCompleted({ id: routine.id, isCompleted: !routine.isCompleted })
+    } catch (error) {
+      console.error('Failed to toggle completed:', error)
+    }
+  }
+
+  if (isLoading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">Routine not found.</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-muted rounded w-1/3"></div>
+          <div className="h-4 bg-muted rounded w-2/3"></div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 bg-muted rounded"></div>
+            ))}
+          </div>
+        </div>
       </div>
-    );
+    )
+  }
+
+  if (!routine) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Routine not found</h1>
+          <Button onClick={() => router.push('/routines')}>
+            Back to Routines
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      {/* Classical Hero */}
-      <HeroSection
-        imageSrc="/backgrounds/alexander-the-great-statue-background.webp"
-        sectionClassName="mb-4 sm:mb-6"
-        title={<>{isLoading ? 'Routine' : routine?.name ?? 'Routine'}</>}
-        subtitle={<>Structure, schedule, and start.</>}
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header */}
+      <RoutineHeader
+        routine={routine}
+        daysPerWeek={routineData.daysPerWeek}
+        hasProgram={routineData.hasProgram}
+        programStyleText={routineData.programStyleText}
+        onBack={() => router.push('/routines')}
+        onEdit={() => router.push(`/routines/${routine.id}/edit`)}
+        onToggleFavorite={handleToggleFavorite}
+        onToggleCompleted={handleToggleCompleted}
+        isToggling={isTogglingFavorite || isTogglingCompleted}
       />
-      <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/routines" className="underline-offset-2 hover:underline">
-          Routines
-        </Link>
-        <span>/</span>
-        {isLoading ? (
-          <Skeleton className="inline-block h-4 w-32 align-middle" />
-        ) : (
-          <span>{routine?.name ?? ''}</span>
-        )}
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>
-              {isLoading ? <Skeleton className="h-6 w-40" /> : routine?.name ?? ''}
-            </span>
-            {isLoading ? (
-              <Skeleton className="h-5 w-28" />
-            ) : (
-              <div className="flex items-center gap-2">
-                {isProgramEnded(routine?.programEndDate) && (
-                  <Badge variant="outline">Program ended</Badge>
-                )}
-                {!isProgramEnded(routine?.programEndDate) &&
-                  routine?.programEndDate && (
-                    <Badge variant="classical">
-                      {weeksRemainingFromEndDate(routine.programEndDate)} weeks left
-                    </Badge>
+      {/* Quick Start Section */}
+      {routine.days && routine.days.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Quick Start</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {routine.days.map((day) => {
+              const isToday = day.dayOfWeek === sessionManager.todayDow
+              const hasActiveSession = activeSession?.routineDayId === day.id
+              const isLoadingThisDay = sessionManager.isStarting && sessionManager.startActingDayId === day.id
+              
+              // Check if this day can be started today
+              const dayValidation = validateRoutineDayDate(day)
+              const canStartToday = dayValidation.isValid
+
+              return (
+                <Button
+                  key={day.id}
+                  variant={hasActiveSession ? "default" : isToday ? "secondary" : "outline"}
+                  className="h-auto p-4 flex flex-col items-start gap-2"
+                  disabled={routineData.programEnded || isLoadingThisDay || (!hasActiveSession && !canStartToday)}
+                  onClick={() => sessionManager.handleStart(day.id, activeSession)}
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    {isToday && <Calendar className="h-4 w-4" />}
+                    <span className="font-medium">{getDayName(day.dayOfWeek)}</span>
+                    {isLoadingThisDay && (
+                      <div className="ml-auto h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    )}
+                    {!isLoadingThisDay && (
+                      <Play className="h-4 w-4 ml-auto" />
+                    )}
+                  </div>
+                  <div className="text-xs text-left opacity-75">
+                    {day.exercises?.length || 0} exercises
+                  </div>
+                  {hasActiveSession && (
+                    <div className="text-xs font-medium text-primary">
+                      Resume Session
+                    </div>
                   )}
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <ClassicalIcon name="dumbbell" className="h-3 w-3" aria-hidden />
-                  <span>{routine?.days?.length ?? 0} days/week</span>
-                </Badge>
-                {hasRtfExercises && (
-                  <ProgramStyleBadge style={routine?.programStyle} />
-                )}
-              </div>
-            )}
-          </CardTitle>
-          {isLoading ? (
-            <Skeleton className="h-4 w-3/5" />
-          ) : routine?.description ? (
-            <CardDescription>{routine.description}</CardDescription>
-          ) : null}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            {isLoading ? (
-              <Skeleton className="h-10 w-36" />
-            ) : (
-              <Button
-                type="button"
-                aria-label="Quick start session"
-                onClick={() => handleStart(quickStartDayId)}
-                disabled={
-                  !quickStartDayId ||
-                  isStarting ||
-                  isProgramEnded(routine?.programEndDate)
-                }
-                variant="classical"
-              >
-                {isStarting && startActingDayId === quickStartDayId ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <ClassicalIcon
-                    name="dumbbell"
-                    className="mr-2 h-4 w-4"
-                    aria-hidden
-                  />
-                )}
-                Start
-              </Button>
-            )}
+                  {!hasActiveSession && !canStartToday && (
+                    <div className="text-xs font-medium text-muted-foreground">
+                      Not scheduled for today
+                    </div>
+                  )}
+                </Button>
+              )
+            })}
           </div>
+        </div>
+      )}
 
-          {/* Routine structure - collapsible days */}
-          <div className="mt-2">
-            {isLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : (
-              <Accordion
-                type="multiple"
-                defaultValue={todayDayId ? [todayDayId] : []}
-              >
-                {routine?.days?.map((day: RoutineDay) => (
-                  <AccordionItem key={day.id} value={day.id}>
-                    <AccordionTrigger>
-                      <div className="flex w-full items-center gap-2">
-                        <Badge variant="outline">{weekdayName(day.dayOfWeek)}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Day {day.order}
-                        </span>
-                        {day.dayOfWeek === todayDow && (
-                          <Badge variant="classical" className="ml-1">
-                            Today
-                          </Badge>
-                        )}
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          {day.exercises.length} exercises
-                        </span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="mb-2 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="classical"
-                          aria-label={`Start session for ${dayName(day.dayOfWeek)}`}
-                          onClick={() => handleStart(day.id)}
-                          disabled={
-                            (isStarting && startActingDayId === day.id) ||
-                            isProgramEnded(routine?.programEndDate)
-                          }
-                          className="w-full sm:w-auto"
-                        >
-                          {isStarting && startActingDayId === day.id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <ClassicalIcon
-                              name="dumbbell"
-                              className="mr-2 h-4 w-4"
-                              aria-hidden
-                            />
-                          )}
-                          Start this day
-                        </Button>
-                      </div>
-                      <div className="space-y-2">
-                        {day.exercises.map((ex) => (
-                          <div key={ex.id} className="rounded-md border p-2">
-                            <div className="flex items-center justify-between">
-                              <span className="font-medium">{ex.exercise.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                Rest {ex.restSeconds}s
-                              </span>
-                            </div>
-                            <ul className="mt-1 grid grid-cols-1 gap-1 sm:grid-cols-2">
-                              {ex.sets.map((s) => (
-                                <li
-                                  key={`${ex.id}:${s.setNumber}`}
-                                  className="text-sm text-muted-foreground"
-                                >
-                                  <span className="mr-2 inline-block rounded bg-background px-2 py-0.5 text-xs font-medium">
-                                    Set {s.setNumber}
-                                  </span>
-                                  {formatSet(s)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* TM Adjustment Panel - Only shown for routines with RTF exercises */}
-      {hasRtfExercises && (
-        <div className="mt-6">
-          <TmAdjustmentPanel 
-            routineId={routineId}
-            rtfExercises={rtfExercises}
-            programStyle={routine?.programStyle}
+      {/* Routine Days */}
+      {routine.days && routine.days.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Routine Days</h2>
+          <RoutineDayAccordion
+            days={routine.days}
+            activeSession={activeSession}
+            isStarting={sessionManager.isStarting}
+            startActingDayId={sessionManager.startActingDayId}
+            programEnded={routineData.programEnded}
+            onStartWorkout={(dayId) => sessionManager.handleStart(dayId, activeSession)}
           />
         </div>
       )}
 
-      {/* RTF Dashboard - Timeline, Forecast, and Week Goals */}
-      {hasRtfExercises && (
-        <div className="mt-6">
-          <RtfDashboard routineId={routineId} />
-        </div>
-      )}
-
-      {/* Active session conflict dialog */}
-      <AlertDialog open={activeConflictOpen} onOpenChange={setActiveConflictOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Active workout in progress</AlertDialogTitle>
-            <AlertDialogDescription>
-              You already have an active session
-              {active?.routine?.name ? ` for "${active.routine.name}"` : ''}. You can
-              resume it now. Starting another workout is not supported while a
-              session is in progress.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                active?.id && router.push(`/workouts/sessions/${active.id}`)
-              }
-            >
-              Go to Active Session
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Date mismatch confirmation */}
-      <AlertDialog open={dateConfirmOpen} onOpenChange={setDateConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Start a different day?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Today is {weekdayName(todayDow, 'long')}. You are about to start{' '}
-              {weekdayName(
-                routine?.days?.find((d) => d.id === pendingDayId)?.dayOfWeek ??
-                  todayDow,
-                'long'
-              )}
-              . Do you want to proceed?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                const toStart = pendingDayId;
-                setDateConfirmOpen(false);
-                setPendingDayId(null);
-                void proceedStart(toStart ?? undefined);
-              }}
-            >
-              Start Anyway
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Dialogs */}
+      <WorkoutDialogs
+        activeConflictOpen={sessionManager.activeConflictOpen}
+        onActiveConflictClose={sessionManager.closeAllDialogs}
+        dateValidationOpen={sessionManager.dateValidationOpen}
+        onDateValidationClose={sessionManager.closeAllDialogs}
+        dateConfirmOpen={sessionManager.dateConfirmOpen}
+        onDateConfirm={sessionManager.handleDateConfirm}
+        onDateConfirmClose={sessionManager.closeAllDialogs}
+      />
     </div>
-  );
+  )
 }
