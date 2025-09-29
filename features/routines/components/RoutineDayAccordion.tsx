@@ -58,8 +58,8 @@ export const RoutineDayAccordion = ({
 
         return (
           <AccordionItem key={day.id} value={day.id}>
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center justify-between w-full pr-4">
+            <div className="flex items-center justify-between w-full border-b">
+              <AccordionTrigger className="hover:no-underline flex-1 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     {isToday && <Calendar className="h-4 w-4 text-primary" />}
@@ -71,16 +71,14 @@ export const RoutineDayAccordion = ({
                     </Badge>
                   )}
                 </div>
-                
+              </AccordionTrigger>
+              
+              <div className="px-4 py-2">
                 <Button
                   size="sm"
                   variant={hasActiveSession ? "default" : "outline"}
                   disabled={programEnded || isLoadingThisDay || (!hasActiveSession && !canStartToday)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onStartWorkout(day.id);
-                  }}
-                  className="ml-auto"
+                  onClick={() => onStartWorkout(day.id)}
                 >
                   {isLoadingThisDay ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -92,7 +90,7 @@ export const RoutineDayAccordion = ({
                   )}
                 </Button>
               </div>
-            </AccordionTrigger>
+            </div>
             
             <AccordionContent>
               <div className="pt-4 space-y-4">
