@@ -78,10 +78,11 @@ describe('LoginPage', () => {
 		})
 		mockSearchParams.get.mockReturnValue(null)
 
-		render(<LoginPage />)
+		const { container } = render(<LoginPage />)
 
 		expect(mockReplace).toHaveBeenCalledWith('/dashboard')
-		expect(screen.getByText('Redirecting to dashboard...')).toBeDefined()
+		// When authenticated, component returns null (no content rendered)
+		expect(container.firstChild).toBeNull()
 	})
 
 	it('redirects to specified path when authenticated with redirectTo param', () => {
@@ -91,10 +92,11 @@ describe('LoginPage', () => {
 		})
 		mockSearchParams.get.mockReturnValue('/workouts')
 
-		render(<LoginPage />)
+		const { container } = render(<LoginPage />)
 
 		expect(mockReplace).toHaveBeenCalledWith('/workouts')
-		expect(screen.getByText('Redirecting to dashboard...')).toBeDefined()
+		// When authenticated, component returns null (no content rendered)
+		expect(container.firstChild).toBeNull()
 	})
 
 	it('sanitizes redirectTo param to prevent external redirects', () => {
@@ -104,23 +106,10 @@ describe('LoginPage', () => {
 		})
 		mockSearchParams.get.mockReturnValue('https://evil.com/steal-data')
 
-		render(<LoginPage />)
+		const { container } = render(<LoginPage />)
 
 		expect(mockReplace).toHaveBeenCalledWith('/dashboard')
-		expect(screen.getByText('Redirecting to dashboard...')).toBeDefined()
-	})
-
-	it('provides manual fallback link when authenticated', () => {
-		;(useSupabaseAuth as any).mockReturnValue({
-			isAuthenticated: true,
-			isLoading: false
-		})
-		mockSearchParams.get.mockReturnValue(null)
-
-		render(<LoginPage />)
-
-		const fallbackLink = screen.getByText('click here')
-		expect(fallbackLink).toBeDefined()
-		expect(fallbackLink.closest('a')).toHaveProperty('href', expect.stringContaining('/dashboard'))
+		// When authenticated, component returns null (no content rendered)
+		expect(container.firstChild).toBeNull()
 	})
 })

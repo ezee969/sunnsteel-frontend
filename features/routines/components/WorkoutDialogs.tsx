@@ -14,6 +14,7 @@ interface WorkoutDialogsProps {
   // Active session conflict dialog
   activeConflictOpen: boolean;
   onActiveConflictClose: () => void;
+  onGoToActiveSession?: () => void;
   
   // Date validation dialog
   dateValidationOpen: boolean;
@@ -36,6 +37,7 @@ interface WorkoutDialogsProps {
 export const WorkoutDialogs = ({
   activeConflictOpen,
   onActiveConflictClose,
+  onGoToActiveSession,
   dateValidationOpen,
   onDateValidationClose,
   dateConfirmOpen,
@@ -57,6 +59,11 @@ export const WorkoutDialogs = ({
             <Button variant="outline" onClick={onActiveConflictClose}>
               Cancel
             </Button>
+            {onGoToActiveSession && (
+              <Button onClick={onGoToActiveSession}>
+                Go to Active Session
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

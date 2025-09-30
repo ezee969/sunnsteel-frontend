@@ -183,8 +183,8 @@ export const rtfApi = {
    */
   getWeekGoals: (routineId: string, week?: number, options?: { maxAge?: number }) => {
     const endpoint = week
-      ? `/workouts/routines/${routineId}?week=${week}&include=rtfGoals`
-      : `/workouts/routines/${routineId}?include=rtfGoals`
+      ? `/workouts/routines/${routineId}/rtf-week-goals?week=${week}`
+      : `/workouts/routines/${routineId}/rtf-week-goals`
     return etaggedHttpClient.conditionalGet(endpoint, {
       ...options,
       secure: true

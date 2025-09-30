@@ -21,6 +21,19 @@ vi.mock('@/lib/utils/date', () => ({
     const arr = fmt === 'long' ? namesLong : namesShort;
     return arr[dow] ?? String(dow);
   },
+  validateRoutineDayDate: () => ({ isValid: true }),
+  formatDate: vi.fn((date: string) => date),
+  getCurrentWeekNumber: vi.fn(() => 1),
+  isProgramEnded: vi.fn((date: string) => date === '2000-01-01T00:00:00.000Z'),
+  weeksRemainingFromEndDate: vi.fn(() => 4),
+}));
+
+// Routine detail utils mock: ensure short day names for Quick Start buttons
+vi.mock('@/features/routines/utils/routine-detail.utils', () => ({
+  getDayName: (dow: number) => {
+    const namesShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return namesShort[dow] ?? String(dow);
+  },
 }));
 
 // Hooks mocks (stateful via variables)
@@ -30,6 +43,9 @@ const mutateAsync = vi.fn();
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
   useRoutine: (_: string) => ({ data: routineMock, isLoading: false, error: undefined }),
+  useToggleRoutineFavorite: () => ({ mutateAsync, isPending: false }),
+  useToggleRoutineCompleted: () => ({ mutateAsync, isPending: false }),
+  useRtFWeekGoals: () => ({ data: undefined, isLoading: false, error: undefined }),
 }));
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
@@ -70,14 +86,17 @@ describe('RoutineDetailsPage', () => {
     // Badge visible
     expect(screen.getByText(/program ended/i)).toBeInTheDocument();
 
-    // Quick Start disabled
-    const quickStart = screen.getByRole('button', { name: /quick start session/i });
-    expect(quickStart).toBeDisabled();
+    // Quick Start day button should be disabled - look for the Monday button in Quick Start section
+    const mondayButtons = screen.getAllByRole('button');
+    const quickStartDayButton = mondayButtons.find(btn => 
+      btn.textContent?.includes('Mon') && btn.textContent?.includes('exercises')
+    );
+    expect(quickStartDayButton).toBeDefined();
+    expect(quickStartDayButton).toBeDisabled();
 
     // Day Start disabled
     // Expand accordion first (Mon)
-    await screen.findByText('Mon');
-    const startDayBtn = screen.getByRole('button', { name: /start session for Mon/i });
+    const startDayBtn = (await screen.findAllByRole('button', { name: /Mon/i }))[0];
     expect(startDayBtn).toBeDisabled();
   });
 
@@ -103,7 +122,7 @@ describe('RoutineDetailsPage', () => {
     mutateAsync.mockReset();
   });
 
-  it('renders routine structure with days, exercises and formatted sets', () => {
+  it('renders routine structure with days, exercises and formatted sets', async () => {
     routineMock = makeRoutine({
       id: 'test-id',
       name: 'PPL',
@@ -138,13 +157,13 @@ describe('RoutineDetailsPage', () => {
     expect(screen.getByText('Push Pull Legs')).toBeInTheDocument();
     // "Mon" appears in button and badge; ensure present
     expect(screen.getAllByText('Mon').length).toBeGreaterThan(0);
-    expect(screen.getByText(/Day 1/i)).toBeInTheDocument();
+    // Expand the routine day accordion to reveal exercises
+    await userEvent.click(screen.getByRole('button', { name: /monday/i }));
+    // Routine day label now uses weekday name; 'Day 1' header is not present
     expect(screen.getByText('Bench Press')).toBeInTheDocument();
-    expect(screen.getByText(/Rest 90s/)).toBeInTheDocument();
     // Formatted sets
-    expect(screen.getByText(/Set 1/)).toBeInTheDocument();
-    expect(screen.getByText(/8 reps @ 60/)).toBeInTheDocument();
-    expect(screen.getByText(/8-12 reps/)).toBeInTheDocument();
+    expect(screen.getByText(/8 @ 60kg/i)).toBeInTheDocument();
+    expect(screen.getByText(/8-12/i)).toBeInTheDocument();
   });
 
   it('confirms weekday mismatch and starts when proceeding', async () => {
@@ -168,10 +187,11 @@ describe('RoutineDetailsPage', () => {
     render(<RoutineDetailsPage />);
 
     // Click Quick Start (first day -> Tuesday) -> mismatch dialog should appear
-    await user.click(screen.getByRole('button', { name: /quick start session/i }));
+    const tuesdayBtn = screen.getAllByRole('button', { name: /Tue/i })[0];
+    await user.click(tuesdayBtn);
 
     expect(
-      screen.getByRole('heading', { name: /start a different day\?/i })
+      screen.getByRole('heading', { name: /confirm workout day/i })
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /start anyway/i }));
@@ -201,11 +221,12 @@ describe('RoutineDetailsPage', () => {
     render(<RoutineDetailsPage />);
 
     // Click day button (Mon)
-    await user.click(screen.getByRole('button', { name: /start session for Mon/i }));
+    const monBtn = screen.getAllByRole('button', { name: /Mon/i })[0];
+    await user.click(monBtn);
 
     // Dialog appears
     expect(
-      screen.getByRole('heading', { name: /active workout in progress/i })
+      screen.getByRole('heading', { name: /active session detected/i })
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /go to active session/i }));

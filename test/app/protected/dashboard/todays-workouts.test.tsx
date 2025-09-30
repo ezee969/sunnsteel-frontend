@@ -19,6 +19,11 @@ vi.mock('@/lib/utils/date', () => ({
     const long = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return (fmt === 'long' ? long : short)[dow] ?? String(dow);
   },
+  validateRoutineDayDate: (day: { dayOfWeek: number }) => ({
+    isValid: day.dayOfWeek === 1,
+    reason: day.dayOfWeek === 1 ? null : 'Not scheduled for today',
+    dowMatchesToday: day.dayOfWeek === 1,
+  }),
 }));
 
 // Stateful mocks

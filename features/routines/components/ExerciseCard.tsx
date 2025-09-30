@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRtFWeekGoals } from '@/lib/api/hooks/useRoutines';
 import { getCurrentProgramWeek, isDeloadWeek, getRtfVariant, isRtfProgressionScheme } from '@/lib/utils/rtf-week-calculator';
 import { useMemo } from 'react';
-import type { RtfExerciseGoal } from '@/lib/api/types';
+import { RtfExerciseGoal } from '@/lib/api/types/rtf.types';
 
 interface ExerciseCardProps {
   exercise: {
@@ -13,6 +13,8 @@ interface ExerciseCardProps {
       name: string;
     };
     progressionScheme?: string;
+    programTMKg?: number;
+    programRoundingKg?: number;
     sets?: {
       id?: string;
       setNumber?: number;
@@ -25,6 +27,7 @@ interface ExerciseCardProps {
   };
   routineId?: string;
   routine?: {
+    id?: string;
     programStartDate?: string | null;
     programDurationWeeks?: number | null;
     programTimezone?: string | null;
@@ -56,11 +59,13 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
     );
   }, [routine?.programStartDate, routine?.programDurationWeeks, routine?.programTimezone]);
 
-  // Fetch RtF week goals if this is an RtF exercise
+  // Determine if this is an RtF exercise based on progressionScheme
   const isRtfExercise = exercise.progressionScheme && isRtfProgressionScheme(exercise.progressionScheme);
+  
+  // Fetch RtF week goals for the routine - only fetch if we have the necessary data
   const { data: rtfData } = useRtFWeekGoals(
-    isRtfExercise && routineId ? routineId : '',
-    isRtfExercise && currentWeek ? currentWeek : undefined
+    routine?.id || '',
+    currentWeek || undefined
   );
 
   // Find the specific exercise goal for this exercise
@@ -81,6 +86,7 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
   }, [currentWeek, routine?.programWithDeloads]);
 
   const rtfVariant = exercise.progressionScheme ? getRtfVariant(exercise.progressionScheme) : null;
+
 
   return (
     <div className="border rounded-lg p-4 bg-card">
@@ -109,7 +115,7 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
       </div>
 
       {/* RtF-specific display */}
-      {isRtfExercise && exerciseGoal && (
+      {exerciseGoal && (
         <div className="mb-3 p-3 bg-muted/50 rounded-md">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">Week {currentWeek} Goals</span>
@@ -129,6 +135,16 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
             </div>
           </div>
           
+          {/* Working weight display */}
+          {exerciseGoal.workingWeightKg !== undefined && (
+            <div className="mt-2 pt-2 border-t border-muted">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Working Weight:</span>
+                <span className="font-medium">{exerciseGoal.workingWeightKg}kg</span>
+              </div>
+            </div>
+          )}
+          
           {exerciseGoal.amrapTarget && !exerciseGoal.isDeload && (
             <div className="mt-2 pt-2 border-t border-muted">
               <div className="flex items-center justify-between text-sm">
@@ -140,17 +156,28 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
         </div>
       )}
       
-      {/* Traditional set display for non-RtF or when RtF data is not available */}
-      {exercise.sets && exercise.sets.length > 0 && (
+      {/* Traditional set display for non-RtF exercises or when RtF data is not available */}
+      {!exerciseGoal && exercise.sets && exercise.sets.length > 0 && (
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
             {isRtfExercise ? 'Configured Sets:' : 'Sets:'}
           </p>
           {exercise.sets.map((set, index) => {
-            const repDisplay =
-              set.minReps && set.maxReps
-                ? `${set.minReps}-${set.maxReps}`
-                : set.reps || set.minReps || 0;
+            // Since exerciseGoal is not available, use original logic for all exercises
+            const repDisplay = set.minReps && set.maxReps
+              ? `${set.minReps}-${set.maxReps}`
+              : String(set.reps || set.minReps || 0);
+
+            // For RtF exercises, calculate weight from TM and current week intensity
+            let displayWeight = set.weight || 0;
+            
+            if (isRtfExercise && currentWeek && routine?.programWithDeloads !== undefined && exercise.programTMKg) {
+              // Calculate intensity for current week (simplified calculation)
+              // This is a fallback when RtF data is not available
+              const baseIntensity = 0.7 + (currentWeek - 1) * 0.01; // Simple progression
+              const roundingKg = exercise.programRoundingKg || 2.5;
+              displayWeight = Math.round((exercise.programTMKg * baseIntensity) / roundingKg) * roundingKg;
+            }
 
             return (
               <div key={set.id || index} className="text-sm flex items-center gap-2">
@@ -158,7 +185,7 @@ export const ExerciseCard = ({ exercise, routineId, routine }: ExerciseCardProps
                   {index + 1}
                 </span>
                 <span>
-                  {repDisplay} reps @ {set.weight || 0}kg
+                  {repDisplay} @ {displayWeight}kg
                   {set.rpe && ` (RPE ${set.rpe})`}
                 </span>
               </div>

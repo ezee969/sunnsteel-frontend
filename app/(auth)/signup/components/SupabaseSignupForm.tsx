@@ -48,7 +48,7 @@ export function SupabaseSignupForm() {
 
   // Handle Google Sign-Up
   function handleGoogleSignUp() {
-    googleSignUp();
+    googleSignUp('/dashboard');
   }
 
   return (

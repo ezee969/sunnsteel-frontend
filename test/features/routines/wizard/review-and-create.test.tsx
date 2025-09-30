@@ -131,7 +131,7 @@ describe('ReviewAndCreate - RtF payload mapping', () => {
                 programTMKg: 100,
                 programRoundingKg: 2.5,
                 sets: expect.arrayContaining([
-                  expect.objectContaining({ setNumber: 1, repType: 'RANGE', minReps: 8, maxReps: 12 }),
+                  expect.objectContaining({ setNumber: 1, repType: 'FIXED', reps: 5 }),
                 ]),
               }),
             ]),

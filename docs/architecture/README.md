@@ -515,13 +515,329 @@ const secureRequest = async (endpoint: string, options: RequestOptions) => {
 }
 ```
 
+## Dialog-to-Navigation Flow Architecture
+
+### Dialog System Overview
+
+The application uses a sophisticated dialog system that integrates seamlessly with navigation patterns to handle complex user interactions, particularly around workout session management and conflict resolution.
+
+### Dialog Flow Patterns
+
+```mermaid
+graph TD
+    A[User Action] --> B{Check Active Session}
+    B -->|No Active Session| C[Direct Action]
+    B -->|Active Session| D[Show Conflict Dialog]
+    D --> E{User Choice}
+    E -->|Continue Current| F[Navigate to Active Session]
+    E -->|Start New| G[Show Confirmation Dialog]
+    G --> H{Confirm Action}
+    H -->|Yes| I[Finish Current & Start New]
+    H -->|No| J[Cancel Action]
+    F --> K[Update Session State]
+    I --> L[Update Session State]
+    K --> M[Navigate to Session]
+    L --> M
+```
+
+### Core Dialog Components
+
+1. **ActiveSessionConflictDialog**: Handles conflicts when starting new sessions
+2. **DateValidationErrorDialog**: Manages date-related validation errors
+3. **DateConfirmationDialog**: Confirms date selections and actions
+
+### Navigation Integration Patterns
+
+#### 1. Conflict Resolution Navigation
+
+```typescript
+// Active session conflict resolution
+const handleActiveSessionConflict = useCallback(async () => {
+  const activeSession = await workoutService.getActiveSession()
+  
+  if (activeSession) {
+    // Show conflict dialog with navigation options
+    setActiveSessionConflict({
+      isOpen: true,
+      activeSession,
+      onGoToActive: () => {
+        router.push(`/workouts/${activeSession.id}`)
+        setActiveSessionConflict(prev => ({ ...prev, isOpen: false }))
+      },
+      onStartNew: () => {
+        // Show confirmation dialog for starting new session
+        setDateConfirmation({
+          isOpen: true,
+          onConfirm: async () => {
+            await finishSession(activeSession.id, 'CANCELLED')
+            await startNewSession()
+          }
+        })
+      }
+    })
+  }
+}, [router, finishSession, startNewSession])
+```
+
+#### 2. State Synchronization Navigation
+
+```typescript
+// Synchronize navigation with session state
+const useWorkoutSessionNavigation = () => {
+  const router = useRouter()
+  const { data: activeSession } = useQuery({
+    queryKey: ['activeSession'],
+    queryFn: workoutService.getActiveSession
+  })
+  
+  const navigateToActiveSession = useCallback(() => {
+    if (activeSession) {
+      router.push(`/workouts/${activeSession.id}`)
+    }
+  }, [activeSession, router])
+  
+  return { navigateToActiveSession, hasActiveSession: !!activeSession }
+}
+```
+
+#### 3. Multi-Route Session Handling
+
+```typescript
+// Handle active sessions across multiple routes
+const useActiveSessionGuard = (routeName: string) => {
+  const { data: activeSession } = useActiveSession()
+  const router = useRouter()
+  
+  useEffect(() => {
+    if (activeSession && routeName !== 'workout-session') {
+      // Show notification about active session
+      toast({
+        title: "Active Workout Session",
+        description: "You have an active workout session",
+        action: (
+          <Button 
+            onClick={() => router.push(`/workouts/${activeSession.id}`)}
+            variant="outline"
+          >
+            Go to Session
+          </Button>
+        )
+      })
+    }
+  }, [activeSession, routeName, router])
+}
+```
+
+### Dialog State Management
+
+#### 1. Compound Dialog State
+
+```typescript
+interface WorkoutDialogState {
+  activeSessionConflict: {
+    isOpen: boolean
+    activeSession?: WorkoutSession
+    onGoToActive?: () => void
+    onStartNew?: () => void
+  }
+  dateValidationError: {
+    isOpen: boolean
+    message?: string
+    onClose?: () => void
+  }
+  dateConfirmation: {
+    isOpen: boolean
+    message?: string
+    onConfirm?: () => void
+    onCancel?: () => void
+  }
+}
+```
+
+#### 2. Dialog State Synchronization
+
+```typescript
+// Synchronize dialog state with navigation
+const useDialogNavigation = () => {
+  const [dialogState, setDialogState] = useState<WorkoutDialogState>({
+    activeSessionConflict: { isOpen: false },
+    dateValidationError: { isOpen: false },
+    dateConfirmation: { isOpen: false }
+  })
+  
+  const closeAllDialogs = useCallback(() => {
+    setDialogState({
+      activeSessionConflict: { isOpen: false },
+      dateValidationError: { isOpen: false },
+      dateConfirmation: { isOpen: false }
+    })
+  }, [])
+  
+  // Close dialogs on route change
+  useEffect(() => {
+    const handleRouteChange = () => closeAllDialogs()
+    router.events.on('routeChangeStart', handleRouteChange)
+    return () => router.events.off('routeChangeStart', handleRouteChange)
+  }, [closeAllDialogs])
+  
+  return { dialogState, setDialogState, closeAllDialogs }
+}
+```
+
+### Navigation Flow Optimization
+
+#### 1. Prefetch Active Session Routes
+
+```typescript
+// Prefetch likely navigation targets
+const usePrefetchActiveSession = () => {
+  const router = useRouter()
+  const { data: activeSession } = useActiveSession()
+  
+  useEffect(() => {
+    if (activeSession) {
+      // Prefetch the active session route
+      router.prefetch(`/workouts/${activeSession.id}`)
+    }
+  }, [activeSession, router])
+}
+```
+
+#### 2. Optimistic Navigation Updates
+
+```typescript
+// Optimistic navigation with rollback
+const useOptimisticSessionNavigation = () => {
+  const queryClient = useQueryClient()
+  const router = useRouter()
+  
+  const navigateWithOptimisticUpdate = useCallback(async (
+    sessionId: string,
+    optimisticData: Partial<WorkoutSession>
+  ) => {
+    // Optimistically update cache
+    queryClient.setQueryData(['session', sessionId], optimisticData)
+    
+    try {
+      // Navigate immediately
+      await router.push(`/workouts/${sessionId}`)
+      
+      // Validate with server
+      await queryClient.invalidateQueries(['session', sessionId])
+    } catch (error) {
+      // Rollback on error
+      queryClient.invalidateQueries(['session', sessionId])
+      throw error
+    }
+  }, [queryClient, router])
+  
+  return { navigateWithOptimisticUpdate }
+}
+```
+
+### Error Handling in Dialog Navigation
+
+#### 1. Navigation Error Recovery
+
+```typescript
+// Handle navigation errors in dialog flows
+const useDialogNavigationErrorHandler = () => {
+  const [error, setError] = useState<string | null>(null)
+  
+  const handleNavigationError = useCallback((error: Error, context: string) => {
+    console.error(`Navigation error in ${context}:`, error)
+    
+    setError(`Failed to navigate: ${error.message}`)
+    
+    // Show error dialog
+    toast({
+      title: "Navigation Error",
+      description: error.message,
+      variant: "destructive"
+    })
+  }, [])
+  
+  return { error, handleNavigationError, clearError: () => setError(null) }
+}
+```
+
+#### 2. Session State Recovery
+
+```typescript
+// Recover from inconsistent session states
+const useSessionStateRecovery = () => {
+  const queryClient = useQueryClient()
+  
+  const recoverSessionState = useCallback(async () => {
+    try {
+      // Force refresh session data
+      await queryClient.invalidateQueries(['activeSession'])
+      await queryClient.invalidateQueries(['sessions'])
+      
+      // Verify session consistency
+      const activeSession = await workoutService.getActiveSession()
+      
+      if (!activeSession) {
+        // Clear any stale session references
+        queryClient.removeQueries(['session'])
+      }
+    } catch (error) {
+      console.error('Session state recovery failed:', error)
+    }
+  }, [queryClient])
+  
+  return { recoverSessionState }
+}
+```
+
+### Performance Considerations
+
+1. **Dialog Lazy Loading**: Load dialog components only when needed
+2. **Navigation Prefetching**: Prefetch likely navigation targets
+3. **State Debouncing**: Debounce rapid state changes during navigation
+4. **Memory Management**: Clean up dialog state on unmount
+
+### Testing Dialog Navigation Flows
+
+```typescript
+// Test dialog navigation integration
+describe('Dialog Navigation Integration', () => {
+  it('should navigate to active session from conflict dialog', async () => {
+    const mockActiveSession = createMockSession()
+    mockWorkoutService.getActiveSession.mockResolvedValue(mockActiveSession)
+    
+    render(<WorkoutDialogs {...defaultProps} />)
+    
+    // Trigger conflict dialog
+    fireEvent.click(screen.getByText('Go to Active Session'))
+    
+    await waitFor(() => {
+      expect(mockRouter.push).toHaveBeenCalledWith(`/workouts/${mockActiveSession.id}`)
+    })
+  })
+  
+  it('should handle navigation errors gracefully', async () => {
+    mockRouter.push.mockRejectedValue(new Error('Navigation failed'))
+    
+    render(<WorkoutDialogs {...defaultProps} />)
+    
+    fireEvent.click(screen.getByText('Go to Active Session'))
+    
+    await waitFor(() => {
+      expect(screen.getByText(/navigation error/i)).toBeInTheDocument()
+    })
+  })
+})
+```
+
 ## Testing Architecture
 
 ### Testing Strategy
 
 1. **Unit Tests**: Individual components and utilities
 2. **Integration Tests**: Feature workflows and API integration
-3. **E2E Tests**: Critical user journeys (future)
+3. **Dialog Flow Tests**: Dialog-to-navigation integration testing
+4. **E2E Tests**: Critical user journeys (future)
 
 ### Testing Patterns
 
@@ -546,6 +862,29 @@ describe('useRoutines', () => {
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
     })
+  })
+})
+
+// Dialog navigation testing
+describe('useDialogNavigation', () => {
+  it('should close dialogs on route change', async () => {
+    const { result } = renderHook(() => useDialogNavigation())
+    
+    // Open dialog
+    act(() => {
+      result.current.setDialogState({
+        activeSessionConflict: { isOpen: true },
+        dateValidationError: { isOpen: false },
+        dateConfirmation: { isOpen: false }
+      })
+    })
+    
+    // Simulate route change
+    act(() => {
+      mockRouter.events.emit('routeChangeStart')
+    })
+    
+    expect(result.current.dialogState.activeSessionConflict.isOpen).toBe(false)
   })
 })
 ```

@@ -9,6 +9,22 @@
 |Frontend Architecture | reference/frontend-architecture.md | Current feature-based module layout & placement rules | ✅ New
 |Auth & Security | auth-security-implementation.md | Auth flow, middleware cookies, OAuth callback and redirects | ✅ Updated
 |Documentation Templates | templates/ | Standardized templates for components, hooks, APIs, and ADRs | ✅ New
+|Reference Documentation | reference/ | Technical reference including utilities and specifications | ✅ New
+
+## Documentation Structure
+
+### Core Documentation
+- [Architecture](architecture/) - System design, patterns, and technical decisions
+- [API Services](api/) - Backend integration and service documentation
+- [Components](components/) - UI component documentation and usage
+- [Hooks](hooks/) - Custom React hooks and state management
+- [Reference](reference/) - Technical reference and utility documentation
+
+### Development Resources
+- [Getting Started](getting-started/) - Installation and setup guides
+- [Development](development/) - Development patterns and testing strategies
+- [Examples](examples/) - Code examples and integration patterns
+- [Templates](templates/) - Documentation and code templates
 
 ## Major Milestones
 

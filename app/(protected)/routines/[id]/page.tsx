@@ -173,6 +173,11 @@ export default function RoutineDetailsPage() {
       <WorkoutDialogs
         activeConflictOpen={sessionManager.activeConflictOpen}
         onActiveConflictClose={sessionManager.closeAllDialogs}
+        onGoToActiveSession={() => {
+          if (activeSession?.id) {
+            router.push(`/workouts/sessions/${activeSession.id}`)
+          }
+        }}
         dateValidationOpen={sessionManager.dateValidationOpen}
         onDateValidationClose={sessionManager.closeAllDialogs}
         dateConfirmOpen={sessionManager.dateConfirmOpen}

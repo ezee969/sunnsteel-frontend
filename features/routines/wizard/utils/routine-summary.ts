@@ -2,12 +2,12 @@ import { CreateRoutineRequest } from '@/lib/api/types'
 import type { RoutineWizardData } from '../types'
 import type { ProgressionScheme } from '../types'
 import {
-	isRtFExercise,
-	isRtFHypertrophy,
-	isRtFStandard,
-	getRtfSetSummary,
-	RTF_HYPERTROPHY_SET_COUNT,
-	RTF_STANDARD_SET_COUNT,
+  isRtFExercise,
+  isRtFHypertrophy,
+  isRtFStandard,
+  getRtfSetSummary,
+  RTF_HYPERTROPHY_SET_COUNT,
+  RTF_STANDARD_SET_COUNT,
 } from './progression.helpers'
 
 export {
@@ -28,7 +28,7 @@ export const DAYS_OF_WEEK = [
 ] as const
 
 export const hasRtFExercises = (data: RoutineWizardData) =>
-	data.days.some((day) => day.exercises.some((exercise) => isRtFExercise(exercise.progressionScheme)))
+  data.days.some((day) => day.exercises.some((exercise) => isRtFExercise(exercise.progressionScheme)))
 
 export interface RoutineTotals {
 	trainingDays: number
@@ -68,71 +68,130 @@ export const getProgramWeekInfo = (data: RoutineWizardData) => {
 }
 
 export const resolveProgramTimezone = (data: RoutineWizardData) => {
-	const candidate = (data.programTimezone ?? '').trim()
-	if (candidate.length > 0) {
-		return candidate
-	}
-	return Intl.DateTimeFormat().resolvedOptions().timeZone
+  const candidateRaw = (data.programTimezone ?? '').trim()
+  const normalize = (tz: string) => {
+    const map: Record<string, string> = {
+      'America/Buenos_Aires': 'America/Argentina/Buenos_Aires',
+    }
+    return map[tz] ?? tz
+  }
+  const isValid = (tz: string) => {
+    try {
+      // Prefer modern API when available
+      const supported = (Intl as any).supportedValuesOf?.('timeZone') as string[] | undefined
+      if (Array.isArray(supported)) {
+        return supported.includes(tz)
+      }
+      // Fallback: attempt formatting using provided timeZone
+      new Intl.DateTimeFormat('en-US', { timeZone: tz }).format(new Date())
+      return true
+    } catch {
+      return false
+    }
+  }
+  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const candidate = candidateRaw ? normalize(candidateRaw) : browserTz
+  if (candidate && isValid(candidate)) return candidate
+  if (browserTz && isValid(browserTz)) return browserTz
+  return 'UTC'
 }
 
 interface BuildRoutineRequestOptions {
-	isEditing: boolean
-	usesRtf?: boolean
-	timezone?: string
+  isEditing: boolean
+  usesRtf?: boolean
+  timezone?: string
 }
 
 export const buildRoutineRequest = (
-	data: RoutineWizardData,
-	{ isEditing, usesRtf, timezone }: BuildRoutineRequestOptions,
+  data: RoutineWizardData,
+  { isEditing, usesRtf, timezone }: BuildRoutineRequestOptions,
 ): CreateRoutineRequest => {
-	const rtF = usesRtf ?? hasRtFExercises(data)
-	const tz = timezone ?? resolveProgramTimezone(data)
-	return {
-		name: data.name,
-		description: data.description,
-		isPeriodized: false,
-		...(rtF &&
-			data.programScheduleMode === 'TIMEFRAME' && {
-				programWithDeloads: data.programWithDeloads,
-				programStartDate: data.programStartDate,
-				programTimezone: tz,
-				...(!isEditing && data.programStartWeek && { programStartWeek: data.programStartWeek }),
-			}),
-		days: data.days.map((day, dayIndex) => ({
-			dayOfWeek: day.dayOfWeek,
-			order: dayIndex,
-			exercises: day.exercises.map((exercise, exerciseIndex) => ({
-				exerciseId: exercise.exerciseId,
-				order: exerciseIndex,
-				restSeconds: exercise.restSeconds,
-				progressionScheme: exercise.progressionScheme,
-				minWeightIncrement: exercise.minWeightIncrement,
-				...(isRtFExercise(exercise.progressionScheme) && {
-					...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
-					...(exercise.programRoundingKg !== undefined && { programRoundingKg: exercise.programRoundingKg }),
-				}),
-				sets: exercise.sets.map((set) => {
-					const baseSet = {
-						setNumber: set.setNumber,
-						...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
-					}
+  const rtF = usesRtf ?? hasRtFExercises(data)
+  const tz = timezone ?? resolveProgramTimezone(data)
+  const deriveProgramStyle = (): 'STANDARD' | 'HYPERTROPHY' | undefined => {
+    const hasHyp = data.days.some((day) =>
+      day.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'),
+    )
+    const hasStd = data.days.some((day) =>
+      day.exercises.some((ex) => ex.progressionScheme === 'PROGRAMMED_RTF'),
+    )
+    if (hasHyp) return 'HYPERTROPHY'
+    if (hasStd) return 'STANDARD'
+    return undefined
+  }
+  const programStyle = deriveProgramStyle()
 
-					if (set.repType === 'FIXED') {
-						return {
-							...baseSet,
-							repType: 'FIXED' as const,
-							reps: set.reps ?? 0,
-						}
-					}
+  const canonicalRtfSetsFor = (scheme: ProgressionScheme) => {
+    if (scheme === 'PROGRAMMED_RTF_HYPERTROPHY') {
+      // 3 fixed sets at 10 reps + 1 AMRAP placeholder
+      return [
+        { setNumber: 1, repType: 'FIXED' as const, reps: 10 },
+        { setNumber: 2, repType: 'FIXED' as const, reps: 10 },
+        { setNumber: 3, repType: 'FIXED' as const, reps: 10 },
+        { setNumber: 4, repType: 'FIXED' as const, reps: 1 },
+      ]
+    }
+    if (scheme === 'PROGRAMMED_RTF') {
+      // 4 fixed sets at 5 reps + 1 AMRAP placeholder
+      return [
+        { setNumber: 1, repType: 'FIXED' as const, reps: 5 },
+        { setNumber: 2, repType: 'FIXED' as const, reps: 5 },
+        { setNumber: 3, repType: 'FIXED' as const, reps: 5 },
+        { setNumber: 4, repType: 'FIXED' as const, reps: 5 },
+        { setNumber: 5, repType: 'FIXED' as const, reps: 1 },
+      ]
+    }
+    return []
+  }
+  return {
+    name: data.name,
+    description: data.description,
+    isPeriodized: false,
+    ...(rtF &&
+      data.programScheduleMode === 'TIMEFRAME' && {
+        programWithDeloads: data.programWithDeloads,
+        programStartDate: data.programStartDate,
+        programTimezone: tz,
+        ...(programStyle && { programStyle }),
+        ...(!isEditing && data.programStartWeek && { programStartWeek: data.programStartWeek }),
+      }),
+    days: data.days.map((day, dayIndex) => ({
+      dayOfWeek: day.dayOfWeek,
+      order: dayIndex,
+      exercises: day.exercises.map((exercise, exerciseIndex) => ({
+        exerciseId: exercise.exerciseId,
+        order: exerciseIndex,
+        restSeconds: exercise.restSeconds,
+        progressionScheme: exercise.progressionScheme,
+        minWeightIncrement: exercise.minWeightIncrement,
+        ...(isRtFExercise(exercise.progressionScheme) && {
+          ...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
+          ...(exercise.programRoundingKg !== undefined && { programRoundingKg: exercise.programRoundingKg }),
+        }),
+        sets: isRtFExercise(exercise.progressionScheme)
+          ? canonicalRtfSetsFor(exercise.progressionScheme)
+          : exercise.sets.map((set) => {
+              const baseSet = {
+                setNumber: set.setNumber,
+                ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
+              }
 
-					return {
-						...baseSet,
-						repType: 'RANGE' as const,
-						minReps: set.minReps ?? 0,
-						maxReps: set.maxReps ?? 0,
-					}
-				}),
-			})),
-		})),
-	}
-	}
+              if (set.repType === 'FIXED') {
+                return {
+                  ...baseSet,
+                  repType: 'FIXED' as const,
+                  reps: set.reps ?? 0,
+                }
+              }
+
+              return {
+                ...baseSet,
+                repType: 'RANGE' as const,
+                minReps: set.minReps ?? 0,
+                maxReps: set.maxReps ?? 0,
+              }
+            }),
+      })),
+    })),
+  }
+}

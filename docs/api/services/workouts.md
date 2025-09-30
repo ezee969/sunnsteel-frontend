@@ -526,7 +526,11 @@ const completedSession = await workoutService.finishSession(session.id, {
 });
 ```
 
-### Session Management
+### Active Session Management & Navigation
+
+The workout service provides comprehensive active session management with built-in conflict resolution and navigation patterns.
+
+#### Basic Session Check
 
 ```typescript
 // Check for active session on app start
@@ -538,12 +542,182 @@ if (activeSession) {
   // No active session, user can start new one
   console.log('No active workout session');
 }
+```
 
-// Get session history
+#### Active Session Conflict Resolution
+
+When attempting to start a new workout while an active session exists, the API returns the existing session with a `reused: true` flag for idempotent behavior:
+
+```typescript
+// Attempt to start new session
+try {
+  const response = await workoutService.startSession({
+    routineId: 'routine-456',
+    routineDayId: 'day-789'
+  });
+  
+  if (response.reused) {
+    // Existing session was returned instead of creating new one
+    console.log('Active session detected:', response.id);
+    
+    // Handle navigation to active session
+    handleActiveSessionConflict(response);
+  } else {
+    // New session created successfully
+    console.log('New session started:', response.id);
+  }
+} catch (error) {
+  console.error('Failed to start session:', error);
+}
+```
+
+#### Navigation Patterns for Active Sessions
+
+```typescript
+import { useRouter } from 'next/navigation';
+import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager';
+
+// Component-level active session management
+const WorkoutStartButton = ({ routineId, routine }) => {
+  const router = useRouter();
+  const sessionManager = useWorkoutSessionManager(routineId, routine);
+  
+  const handleStartWorkout = async () => {
+    try {
+      const response = await sessionManager.startWorkout();
+      
+      if (response.reused) {
+        // Show conflict dialog with navigation option
+        sessionManager.showActiveConflictDialog();
+      } else {
+        // Navigate to new session
+        router.push(`/workouts/sessions/${response.id}`);
+      }
+    } catch (error) {
+      console.error('Failed to start workout:', error);
+    }
+  };
+  
+  const handleGoToActiveSession = () => {
+    router.push('/workouts/sessions/active');
+    sessionManager.closeActiveConflictDialog();
+  };
+  
+  return (
+    <>
+      <button onClick={handleStartWorkout}>
+        Start Workout
+      </button>
+      
+      {/* Active session conflict dialog */}
+      <WorkoutDialogs
+        activeConflictOpen={sessionManager.showActiveConflictDialog}
+        onActiveConflictClose={sessionManager.closeActiveConflictDialog}
+        onGoToActiveSession={handleGoToActiveSession}
+        // ... other dialog props
+      />
+    </>
+  );
+};
+```
+
+#### Session State Synchronization
+
+```typescript
+// Real-time session state management
+const useActiveSessionSync = () => {
+  const [activeSession, setActiveSession] = useState<WorkoutSession | null>(null);
+  const router = useRouter();
+  
+  // Check for active session on mount
+  useEffect(() => {
+    const checkActiveSession = async () => {
+      try {
+        const session = await workoutService.getActiveSession();
+        setActiveSession(session);
+      } catch (error) {
+        console.error('Failed to check active session:', error);
+      }
+    };
+    
+    checkActiveSession();
+  }, []);
+  
+  // Navigate to active session
+  const goToActiveSession = useCallback(() => {
+    if (activeSession) {
+      router.push(`/workouts/sessions/${activeSession.id}`);
+    } else {
+      router.push('/workouts/sessions/active');
+    }
+  }, [activeSession, router]);
+  
+  // Clear active session state on completion
+  const clearActiveSession = useCallback(() => {
+    setActiveSession(null);
+  }, []);
+  
+  return {
+    activeSession,
+    goToActiveSession,
+    clearActiveSession,
+    hasActiveSession: !!activeSession
+  };
+};
+```
+
+#### Multi-Route Active Session Handling
+
+```typescript
+// Handle active session conflicts across different routes
+const useGlobalActiveSessionHandler = () => {
+  const router = useRouter();
+  
+  const handleActiveSessionConflict = useCallback(async (
+    targetRoutineId: string,
+    activeSession: WorkoutSession
+  ) => {
+    // Check if active session belongs to target routine
+    if (activeSession.routineId === targetRoutineId) {
+      // Same routine - navigate to active session
+      router.push(`/workouts/sessions/${activeSession.id}`);
+      return;
+    }
+    
+    // Different routine - show conflict dialog
+    const userChoice = await showActiveSessionDialog({
+      activeRoutineName: activeSession.routine.name,
+      targetRoutineName: await getRoutineName(targetRoutineId)
+    });
+    
+    if (userChoice === 'go-to-active') {
+      router.push(`/workouts/sessions/${activeSession.id}`);
+    } else if (userChoice === 'finish-current') {
+      // Navigate to active session to finish it first
+      router.push(`/workouts/sessions/${activeSession.id}?action=finish`);
+    }
+    // If cancelled, stay on current page
+  }, [router]);
+  
+  return { handleActiveSessionConflict };
+};
+```
+
+### Session History & Analytics
+
+```typescript
+// Get session history with filtering
 const history = await workoutService.listSessions({
   status: 'COMPLETED',
   limit: 10,
   sort: 'startedAt:desc'
+});
+
+// Get sessions for specific routine
+const routineSessions = await workoutService.listSessions({
+  routineId: 'routine-123',
+  from: '2024-01-01T00:00:00Z',
+  to: '2024-01-31T23:59:59Z'
 });
 ```
 

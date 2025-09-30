@@ -20,6 +20,8 @@ export interface RtfExerciseGoal {
   setsPlanned: number;
   amrapTarget: number | null;
   amrapSetNumber: number | null;
+  workingWeightKg?: number;
+  trainingMaxKg?: number;
 }
 
 /**
