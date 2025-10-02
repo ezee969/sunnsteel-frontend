@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import {
   useSupabaseSignIn,
   useSupabaseGoogleSignIn,
@@ -29,6 +30,7 @@ export function SupabaseLoginForm() {
     useSupabaseGoogleSignIn();
   const searchParams = useSearchParams();
   const targetRedirect = searchParams.get('redirectTo') || '/dashboard';
+  const [showPassword, setShowPassword] = useState(false);
 
   // Initialize form with react-hook-form and zod resolver
   const form = useForm<LoginFormValues>({
@@ -51,12 +53,18 @@ export function SupabaseLoginForm() {
 
   return (
     <div className="relative w-full max-w-md">
-      <div className="relative backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
+      <div className="relative backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
         <TopLoadingBar show={isPending || isGooglePending} />
 
         {isError && (
-          <div className="p-3 text-sm bg-red-900/20 border border-red-500/30 rounded text-red-200 mb-6">
-            {error?.message || 'Login failed. Please try again.'}
+          <div className="p-3 sm:p-4 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg text-red-800 dark:text-red-200 mb-4 sm:mb-6 flex items-start gap-2 sm:gap-3">
+            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium mb-1">Unable to sign in</p>
+              <p className="text-xs opacity-90">
+                {error?.message || 'Please check your credentials and try again.'}
+              </p>
+            </div>
           </div>
         )}
 
@@ -85,7 +93,7 @@ export function SupabaseLoginForm() {
         </Button>
 
         {/* Separator */}
-        <div className="my-6 flex items-center gap-3">
+        <div className="my-4 sm:my-5 md:my-6 flex items-center gap-2 sm:gap-3">
           <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
           <span className="text-xs text-neutral-700/70 dark:text-neutral-300/70">or</span>
           <div className="h-px flex-1 bg-neutral-800/20 dark:bg-neutral-200/20" />
@@ -94,7 +102,7 @@ export function SupabaseLoginForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-5 md:space-y-6"
             aria-busy={isPending || isGooglePending}
           >
             <FormField
@@ -102,22 +110,26 @@ export function SupabaseLoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
-                    Email
+                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700 text-sm font-medium">
+                    Email Address
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="name@example.com"
-                      type="email"
-                      autoCapitalize="none"
-                      autoComplete="email"
-                      autoCorrect="off"
-                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
-                      disabled={isPending || isGooglePending}
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500/60 dark:text-neutral-400/50" />
+                      <Input
+                        placeholder="name@example.com"
+                        type="email"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        autoCorrect="off"
+                        autoFocus
+                        className="pl-10 bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-all duration-300 h-11"
+                        disabled={isPending || isGooglePending}
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
-                  <FormMessage className="text-red-500 dark:text-red-400" />
+                  <FormMessage className="text-red-600 dark:text-red-400 text-xs" />
                 </FormItem>
               )}
             />
@@ -127,33 +139,67 @@ export function SupabaseLoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700">
-                    Password
-                  </FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-neutral-800/80 dark:text-neutral-200/80 transition-colors duration-700 text-sm font-medium">
+                      Password
+                    </FormLabel>
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                      tabIndex={-1}
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      className="bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-colors duration-700"
-                      disabled={isPending || isGooglePending}
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500/60 dark:text-neutral-400/50" />
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        autoComplete="current-password"
+                        className="pl-10 pr-10 bg-white/80 dark:bg-black/40 border border-amber-500/20 dark:border-amber-300/20 text-black dark:text-white placeholder:text-neutral-500/60 dark:placeholder:text-neutral-400/50 focus:border-amber-400/50 dark:focus:border-amber-400/50 focus-visible:ring-amber-400/30 transition-all duration-300 h-11"
+                        disabled={isPending || isGooglePending}
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500/60 dark:text-neutral-400/50 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                        disabled={isPending || isGooglePending}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </FormControl>
-                  <FormMessage className="text-red-500 dark:text-red-400" />
+                  <FormMessage className="text-red-600 dark:text-red-400 text-xs" />
                 </FormItem>
               )}
             />
 
             <Button
-              className="w-full hover:scale-[1.02] transition-transform duration-300 font-semibold"
+              className="w-full hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 font-semibold h-11 text-base mt-2"
               variant="classical"
               type="submit"
               disabled={isPending || isGooglePending}
               aria-label={isPending || isGooglePending ? 'Signing you in' : 'Log in'}
             >
-              {isPending || isGooglePending ? 'Signing you in...' : 'Log in'}
-              {!isPending && !isGooglePending && (
-                <ChevronRight className="w-4 h-4 ml-2" />
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing you in...
+                </>
+              ) : (
+                <>
+                  Log in
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </>
               )}
             </Button>
           </form>
@@ -162,12 +208,12 @@ export function SupabaseLoginForm() {
         
       </div>
 
-      <div className="mt-8 text-center">
-        <p className="text-neutral-700/80 dark:text-neutral-300/80 transition-colors duration-700">
+      <div className="mt-6 sm:mt-8 text-center">
+        <p className="text-sm text-neutral-700/80 dark:text-neutral-300/80 transition-colors duration-700">
           Ready to begin your ascension?{' '}
           <Link
             href="/signup"
-            className="text-[#FFD700] dark:text-[#B8860B] hover:text-red-300 dark:hover:text-red-700 transition-colors font-medium"
+            className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors font-semibold underline-offset-4 hover:underline"
           >
             Join Now
           </Link>

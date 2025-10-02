@@ -18,19 +18,19 @@ export function BackgroundOverlay() {
       {/* Theme-aware marble background with blur + overlay */}
       <HeroBackdrop
         src="/backgrounds/marble-light1536-x-1024.webp"
-        // darkSrc="/backgrounds/marble-dark-1536-x-1024.webp"
+        darkSrc="/backgrounds/marble-dark-1536-x-1024.webp"
         blurPx={14}
         overlayGradient={
           isDark
-            ? 'linear-gradient(to top, rgba(0,0,0,0.0), rgba(0,0,0,0.0) 45%, rgba(0,0,0,0.0) 80%)'
-            : 'linear-gradient(to top, rgba(255,255,255,0.0), rgba(255,255,255,0.0) 45%, rgba(255,255,255,0.0) 80%)'
+            ? 'linear-gradient(to bottom, rgba(10,10,10,0.7), rgba(15,15,15,0.8) 50%, rgba(10,10,10,0.85))'
+            : 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.5))'
         }
-        darkFilter=""
+        darkFilter="brightness(0.4) saturate(0.8)"
         className="absolute inset-0"
       />
       {/* Subtle parchment texture and gold vignette */}
-      <ParchmentOverlay opacity={isDark ? 0.1 : 0.08} />
-      <GoldVignetteOverlay intensity={isDark ? 0.16 : 0.1} />
+      <ParchmentOverlay opacity={isDark ? 0.12 : 0.08} />
+      <GoldVignetteOverlay intensity={isDark ? 0.2 : 0.1} />
     </div>
   );
 }
