@@ -16,6 +16,7 @@
           "minWeightIncrement": 2.5,
           "programTMKg": 113,
           "programRoundingKg": 2.5,
+          "programStyle": "HYPERTROPHY",
           "sets": [
             {
               "setNumber": 1,
@@ -226,6 +227,7 @@
           "minWeightIncrement": 2.5,
           "programTMKg": 114,
           "programRoundingKg": 2.5,
+          "programStyle": "HYPERTROPHY",
           "sets": [
             {
               "setNumber": 1,

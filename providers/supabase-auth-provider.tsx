@@ -84,6 +84,14 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
         userId: session?.user?.id,
       });
 
+      // Ignore TOKEN_REFRESHED events to prevent infinite loops
+      // Token refresh doesn't change user data, just refreshes the JWT
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed, skipping verification to prevent loop');
+        setSession(session);
+        return;
+      }
+
       setSession(session);
       setError(null);
 
