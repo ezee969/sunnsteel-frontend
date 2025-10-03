@@ -1,61 +1,94 @@
-# Frontend Docs Index
+# Frontend Documentation Index
 
-| Area | Path | Purpose | Status
-|-----|------|---------|-------
-|RtF Roadmap | roadmaps/RTF_ENHANCEMENTS.md | Active & planned frontend RtF tasks | ✅ COMPLETE (16/16)
-|RtF History | history/RTF_IMPLEMENTATION_COMPLETION.md | Initial implementation snapshot | ✅ Complete
-|RtF Completion | history/RTF_FRONTEND_COMPLETION_2025-01-23.md | Final completion report | ✅ New
-|Frontend Improvements | roadmaps/FRONTEND_IMPROVEMENTS.md | Quick-win improvement tasks & UX enhancements | 🟡 Active
-|Frontend Architecture | reference/frontend-architecture.md | Current feature-based module layout & placement rules | ✅ New
-|Auth & Security | auth-security-implementation.md | Auth flow, middleware cookies, OAuth callback and redirects | ✅ Updated
-|Documentation Templates | templates/ | Standardized templates for components, hooks, APIs, and ADRs | ✅ New
-|Reference Documentation | reference/ | Technical reference including utilities and specifications | ✅ New
+A comprehensive, navigable index of all frontend documentation. Use the category sections below to quickly find guides, references, and templates.
 
-## Documentation Structure
+## Quick Links
+- Overview: [Comprehensive Documentation Plan](./COMPREHENSIVE_DOCUMENTATION_PLAN.md)
+- Security: [Auth & Security Implementation](./auth-security-implementation.md)
 
-### Core Documentation
-- [Architecture](architecture/) - System design, patterns, and technical decisions
-- [API Services](api/) - Backend integration and service documentation
-- [Components](components/) - UI component documentation and usage
-- [Hooks](hooks/) - Custom React hooks and state management
-- [Reference](reference/) - Technical reference and utility documentation
+## Getting Started
+- [Getting Started (Overview)](./getting-started/README.md)
+- [Installation](./getting-started/installation.md)
+- [Troubleshooting](./getting-started/troubleshooting.md)
 
-### Development Resources
-- [Getting Started](getting-started/) - Installation and setup guides
-- [Development](development/) - Development patterns and testing strategies
-- [Examples](examples/) - Code examples and integration patterns
-- [Templates](templates/) - Documentation and code templates
+## Architecture
+- [Architecture (Overview)](./architecture/README.md)
+- [Data Flow](./architecture/data-flow.md)
+- ADRs (Architecture Decision Records):
+  - [ADRs Index](./architecture/adrs/README.md)
+  - [ADR-0001: Next.js App Router](./architecture/adrs/adr-0001-nextjs-app-router.md)
+  - [ADR-0002: React Query State Management](./architecture/adrs/adr-0002-react-query-state-management.md)
+  - [ADR-0003: Supabase Authentication](./architecture/adrs/adr-0003-supabase-authentication.md)
 
-## Major Milestones
+## API Integration
+- [API Docs (Overview)](./api/README.md)
+- Services:
+  - [Authentication](./api/services/authentication.md)
+  - [Exercises](./api/services/exercises.md)
+  - [Routines](./api/services/routines.md)
+  - [Training Max Adjustments](./api/services/tm-adjustments.md)
+  - [Users](./api/services/users.md)
+  - [Workouts](./api/services/workouts.md)
 
-### RTF Platform (100% Complete) ✅
-- **16/16 tasks implemented**: Complete Reps-to-Failure analytics platform
-- **Technical excellence**: ETag caching, IndexedDB offline storage, comprehensive test coverage
-- **Performance optimized**: 372kB build size, sub-second load times, responsive design
+## Components
+- [Components (Overview)](./components/README.md)
+- Backgrounds:
+  - [HeroBackdrop](./components/backgrounds/HeroBackdrop.md)
+  - [OrnateCorners](./components/backgrounds/OrnateCorners.md)
+  - [ParchmentOverlay](./components/backgrounds/ParchmentOverlay.md)
+- Custom:
+  - [InfoTooltip](./components/custom/InfoTooltip.md)
+  - [InitialLoadAnimation](./components/custom/InitialLoadAnimation.md)
+  - [PerformanceDebugPanel](./components/custom/PerformanceDebugPanel.md)
+- Features:
+  - [Features (Overview)](./components/features/README.md)
+  - [Workout Dialogs](./components/features/workout-dialogs.md)
+- Icons:
+  - [ClassicalIcon](./components/icons/ClassicalIcon.md)
+- Layout:
+  - [HeroSection](./components/layout/HeroSection.md)
 
-### Next Focus Areas
-- Frontend Improvements roadmap (quick-wins and UX enhancements)
-- Future feature development based on user feedback
+## Hooks
+- [Hooks (Overview)](./hooks/README.md)
 
-Conventions:
-- Roadmaps: `docs/roadmaps/*`
-- Historical completion reports: `docs/history/*`
+## Development
+- [Development (Overview)](./development/README.md)
+- [Testing Patterns](./development/testing-patterns.md)
 
-This index will expand as additional feature domains gain dedicated docs.
+## Examples
+- [Examples (Overview)](./examples/README.md)
+- [Backend API Integration](./examples/backend-api-integration.md)
 
-## Hydration-Safe Client UI Elements
+## Reference
+- [Reference (Overview)](./reference/README.md)
+- [Frontend Architecture Reference](./reference/frontend-architecture.md)
+- [Wizard Schedule](./reference/wizard-schedule.md)
+- Utils:
+  - [RTF Week Calculator](./reference/utils/rtf-week-calculator.md)
 
-Some UI elements that rely on client-only APIs (e.g. `crypto.randomUUID()` in
-the toast system or time-based mutation) are deferred until after mount to
-avoid React hydration mismatch warnings. Example: the toast container now
-checks `mounted` (via `useEffect`) and adds `suppressHydrationWarning` to the
-container root. If adding new ephemeral UI containers (portals, overlays,
-notifications) follow the same pattern:
+## Roadmaps
+- [Frontend Improvements](./roadmaps/FRONTEND_IMPROVEMENTS.md)
+- [RTF Enhancements](./roadmaps/RTF_ENHANCEMENTS.md)
 
-1. Render nothing until `mounted === true`.
-2. Avoid invoking non-deterministic functions during SSR.
-3. Add `suppressHydrationWarning` only at the minimal element boundary.
-4. Keep accessible live region attributes (`aria-live`, `aria-relevant`) on the
-	client-rendered element once mounted.
+## History
+- [RTF Implementation Completion](./history/RTF_IMPLEMENTATION_COMPLETION.md)
+- [RTF Frontend Completion (2025-01-23)](./history/RTF_FRONTEND_COMPLETION_2025-01-23.md)
 
-This keeps server HTML stable while preserving accessibility semantics.
+## Templates
+- [Templates (Overview)](./templates/README.md)
+- [ADR Template](./templates/adr-template.md)
+- [API Service Template](./templates/api-service-template.md)
+- [Component Template](./templates/component-template.md)
+- [Hook Template](./templates/hook-template.md)
+
+## Conventions
+- Documentation lives under `./docs/` and uses relative links for navigation.
+- ADRs are organized under `./docs/architecture/adrs/`.
+- API services are under `./docs/api/services/`.
+
+## Notes on Client-Only UI Elements
+UI elements that rely on client-only APIs (e.g., `crypto.randomUUID()` or time-based mutations) are deferred until after mount to avoid hydration mismatch warnings. When adding ephemeral UI containers (portals, overlays, notifications):
+- Render nothing until `mounted === true`.
+- Avoid non-deterministic functions during SSR.
+- Add `suppressHydrationWarning` only at the minimal element boundary.
+- Keep accessible live region attributes (`aria-live`, `aria-relevant`) on the client-rendered element once mounted.
