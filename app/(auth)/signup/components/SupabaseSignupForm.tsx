@@ -137,11 +137,12 @@ export function SupabaseSignupForm() {
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Image
-              src="/google-icon.svg"
+              src="/icons/google-icon-logo-svgrepo-com.svg"
               alt="Google"
-              width={20}
-              height={20}
-              className="mr-2"
+              width={16}
+              height={16}
+              className="mr-2 h-4 w-4"
+              priority={false}
             />
           )}
           Continue with Google
