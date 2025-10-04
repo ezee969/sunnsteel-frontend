@@ -4,6 +4,23 @@
 
 This document outlines comprehensive testing patterns and best practices for the Sunnsteel Frontend application, with special focus on dialog components, async interactions, navigation testing, and component integration patterns.
 
+## Recent Test Fixes & Improvements
+
+### SetLogInput Component Test Fixes (January 2025)
+
+Fixed multiple test failures in `set-log-input.test.tsx` related to:
+
+1. **Multiple Element Queries**: Updated assertions to use `getAllByText().toHaveLength(n)` instead of `getByText()` when multiple instances of text exist in the component
+2. **Styling Test Improvements**: Added `data-testid="set-log-container"` to the main container for reliable element targeting in tests
+3. **Import Path Corrections**: Fixed import paths from `@/test/utils` to `@/__tests__/utils` to match the actual file structure
+4. **Save State Indicators**: Properly handled dual display of save states (header and footer) in the component
+
+**Key Learnings:**
+- The `SetLogInput` component displays save state indicators in both header and footer sections
+- Use `data-testid` attributes for reliable element targeting in complex component hierarchies
+- Always verify import paths match the actual project structure
+- Consider component architecture when writing assertions (single vs. multiple element instances)
+
 ## Table of Contents
 
 1. [Testing Setup & Configuration](#testing-setup--configuration)

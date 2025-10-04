@@ -1,77 +1,73 @@
-# Prompt para GitHub Copilot - Refactorización de Componente
+Prompt for Component Refactoring
+Context
+I have a React component with many lines of code that needs to be refactored to improve maintainability and code reusability.
+Instructions
+Analyze this complete component and identify refactoring opportunities following these priorities:
+1. Business Logic Extraction
 
-## Contexto
-Tengo un componente React de muchas líneas que necesita ser refactorizado para mejorar la mantenibilidad y reutilización del código.
+Identify complex logic that can be extracted into custom hooks
+Look for repeating state and effect patterns
+Find calculations or data transformations that can be modularized
+Suggest hooks for: form handling, API calls, validations, etc.
 
-## Instrucciones para Copilot
+2. Reusable UI Components
 
-**Analiza este componente completo y identifica oportunidades de refactorización siguiendo estas prioridades:**
+Detect repetitive or similar JSX blocks
+Identify UI elements that could be independent components
+Look for repeating layout or structure patterns
+Suggest components for: buttons, modals, lists, forms, cards, etc.
 
-### 1. Extracción de Lógica de Negocio
-- Identifica lógica compleja que pueda extraerse a custom hooks
-- Busca patrones de estado y efectos que se repitan
-- Encuentra cálculos o transformaciones de datos que puedan modularizarse
-- Sugiere hooks para: manejo de formularios, llamadas API, validaciones, etc.
+3. Utilities and Helpers
 
-### 2. Componentes UI Reutilizables
-- Detecta bloques JSX repetitivos o similares
-- Identifica elementos UI que podrían ser componentes independientes
-- Busca patrones de layout o estructura que se repitan
-- Sugiere componentes para: botones, modales, listas, formularios, cards, etc.
+Find utility functions that can be extracted
+Identify constants or configurations that should be in separate files
+Look for reusable validations or data transformations
 
-### 3. Utilidades y Helpers
-- Encuentra funciones utilitarias que puedan extraerse
-- Identifica constantes o configuraciones que deberían estar en archivos separados
-- Busca validaciones o transformaciones de datos reutilizables
+4. Refactor Structure
+For each identified opportunity, provide:
 
-### 4. Estructura del Refactor
-Para cada oportunidad identificada, proporciona:
-- **Qué extraer**: Descripción clara del código a extraer
-- **Por qué**: Beneficio específico de la extracción
-- **Cómo**: Ejemplo de código del nuevo hook/componente
-- **Impacto**: Estimación de líneas que se reducirían
+What to extract: Clear description of the code to extract
+Why: Specific benefit of the extraction
+How: Code example of the new hook/component
+Impact: Estimation of lines that would be reduced
 
-### 5. Orden de Refactorización
-Prioriza las extracciones por:
-1. Mayor impacto en reducción de líneas
-2. Mayor potencial de reutilización
-3. Mejora en legibilidad y mantenimiento
+5. Refactoring Order
+Prioritize extractions by:
 
-## Formato de Respuesta Esperado
+Greatest impact on line reduction
+Greatest reusability potential
+Improvement in readability and maintenance
 
-```markdown
-## Análisis de Refactorización
+Expected Response Format
+markdown## Refactoring Analysis
 
-### 🎯 Resumen
-- Líneas actuales: ~600
-- Líneas estimadas después: ~X
-- Número de archivos sugeridos: X
+### 🎯 Summary
+- Current lines: ~600
+- Estimated lines after: ~X
+- Number of suggested files: X
 
-### 🔧 Custom Hooks Sugeridos
-1. **useFormLogic** (~50 líneas extraídas)
-   - Extrae: lógica de validación y manejo de estado del formulario
-   - Beneficio: reutilizable en otros formularios
+### 🔧 Suggested Custom Hooks
+1. **useFormLogic** (~50 lines extracted)
+   - Extracts: validation logic and form state handling
+   - Benefit: reusable in other forms
    
-2. **useApiData** (~40 líneas extraídas)
-   - Extrae: llamadas API y manejo de loading/error
-   - Beneficio: patrón estándar para todas las llamadas API
+2. **useApiData** (~40 lines extracted)
+   - Extracts: API calls and loading/error handling
+   - Benefit: standard pattern for all API calls
 
-### 🧩 Componentes UI Sugeridos
-1. **ActionButton** (~30 líneas extraídas)
-   - Extrae: botones con loading y variantes
-   - Beneficio: consistencia visual en toda la app
+### 🧩 Suggested UI Components
+1. **ActionButton** (~30 lines extracted)
+   - Extracts: buttons with loading and variants
+   - Benefit: visual consistency across the app
 
-### 🛠 Utilidades Sugeridas
+### 🛠 Suggested Utilities
 1. **validation.utils.js**
-   - Extrae: funciones de validación
-   - Beneficio: reutilizable y testeable independientemente
+   - Extracts: validation functions
+   - Benefit: reusable and independently testable
 
-### 📋 Plan de Refactorización
-1. Paso 1: Extraer [hook/componente más impactante]
-2. Paso 2: Extraer [siguiente prioridad]
+### 📋 Refactoring Plan
+1. Step 1: Extract [most impactful hook/component]
+2. Step 2: Extract [next priority]
 ...
-```
 
----
-
-**Ahora analiza mi componente y proporciona el análisis de refactorización siguiendo este formato.**
+Now analyze my component and provide the refactoring analysis following this format.
