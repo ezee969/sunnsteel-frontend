@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { ChevronRight, Loader2, Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { ChevronRight, Loader2, Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   useSupabaseSignIn,
@@ -30,6 +30,7 @@ export function SupabaseLoginForm() {
     useSupabaseGoogleSignIn();
   const searchParams = useSearchParams();
   const targetRedirect = searchParams.get('redirectTo') || '/dashboard';
+  const message = searchParams.get('message');
   const [showPassword, setShowPassword] = useState(false);
 
   // Initialize form with react-hook-form and zod resolver
@@ -55,6 +56,18 @@ export function SupabaseLoginForm() {
     <div className="relative w-full max-w-md">
       <div className="relative backdrop-blur-sm bg-white/70 dark:bg-black/40 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl border border-amber-500/20 dark:border-amber-300/20 transition-colors duration-700">
         <TopLoadingBar show={isPending || isGooglePending} />
+
+        {message === 'verify-email' && (
+          <div className="p-3 sm:p-4 text-sm bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-500/30 rounded-lg text-green-800 dark:text-green-200 mb-4 sm:mb-6 flex items-start gap-2 sm:gap-3">
+            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium mb-1">Account created successfully!</p>
+              <p className="text-xs opacity-90">
+                Please check your email and click the verification link to activate your account. Then you can log in here.
+              </p>
+            </div>
+          </div>
+        )}
 
         {isError && (
           <div className="p-3 sm:p-4 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg text-red-800 dark:text-red-200 mb-4 sm:mb-6 flex items-start gap-2 sm:gap-3">

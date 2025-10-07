@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import { httpClient } from './httpClient';
 import type { Session } from '@supabase/supabase-js';
+import { getFullErrorMessage } from '@/lib/utils/error-messages';
 
 export interface AuthResponse {
   user: {
@@ -11,6 +12,7 @@ export interface AuthResponse {
     weightUnit: string;
   };
   message?: string;
+  requiresEmailVerification?: boolean;
 }
 
 class SupabaseAuthService {
@@ -44,29 +46,48 @@ class SupabaseAuthService {
 
     if (error) {
       console.error('📝 Supabase signUp error:', error);
-      throw new Error(error.message);
+      const friendlyMessage = getFullErrorMessage(error.message);
+      throw new Error(friendlyMessage);
     }
 
     if (!data.user) {
       console.error('📝 No user returned from Supabase');
-      throw new Error('Failed to create user');
+      throw new Error('Unable to create account. Please try again or contact support if the problem persists.');
     }
 
     console.log('📝 Getting session after signup...');
     // Get the session token and verify with our backend
     const session = await supabase.auth.getSession();
-    console.log('📝 Session after signup:', { hasSession: !!session.data.session });
+    console.log('📝 Session after signup:', { 
+      hasSession: !!session.data.session,
+      emailConfirmed: data.user.email_confirmed_at ? 'confirmed' : 'pending'
+    });
 
-    if (session.data.session) {
-      console.log('📝 Verifying token with backend...');
-      const result = await this.verifyToken(session.data.session.access_token);
-      console.log('📝 Backend verification successful:', {
-        userId: result.user?.id,
-      });
-      return result;
+    // Check if email verification is required (no session means verification needed)
+    if (!session.data.session) {
+      console.log('📝 Email verification required - no session available yet');
+      
+      // Return a response indicating email verification is required
+      // We create a temporary user object with available data
+      return {
+        user: {
+          id: '', // Will be set after verification
+          email: data.user.email || email,
+          name: name,
+          supabaseUserId: data.user.id,
+          weightUnit: 'KG', // Default value
+        },
+        message: 'Please check your email to verify your account before logging in.',
+        requiresEmailVerification: true,
+      };
     }
 
-    throw new Error('Failed to get session after signup');
+    console.log('📝 Verifying token with backend...');
+    const result = await this.verifyToken(session.data.session.access_token);
+    console.log('📝 Backend verification successful:', {
+      userId: result.user?.id,
+    });
+    return result;
   }
 
   /**
@@ -89,12 +110,13 @@ class SupabaseAuthService {
 
     if (error) {
       console.error('🔐 Supabase signIn error:', error);
-      throw new Error(error.message);
+      const friendlyMessage = getFullErrorMessage(error.message);
+      throw new Error(friendlyMessage);
     }
 
     if (!data.session) {
       console.error('🔐 No session returned from Supabase');
-      throw new Error('Failed to sign in');
+      throw new Error('Unable to sign in. Please check your credentials and try again.');
     }
 
     console.log('🔐 Verifying token with backend...');

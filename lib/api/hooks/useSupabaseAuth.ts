@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Hook for signing up with email and password
+ * Redirects to login page after successful signup with appropriate message
  */
 export const useSupabaseSignUp = () => {
   const router = useRouter();
@@ -23,11 +24,19 @@ export const useSupabaseSignUp = () => {
     }) => {
       return await supabaseAuthService.signUp(email, password, name);
     },
-    onSuccess: () => {
-      // Add a small delay to ensure auth state updates before redirect
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 100);
+    onSuccess: (data) => {
+      // If email verification is required, redirect to login with message
+      // Otherwise, user can proceed to dashboard immediately
+      if (data.requiresEmailVerification) {
+        console.log('📝 Email verification required, redirecting to login');
+        router.push('/login?message=verify-email');
+      } else {
+        console.log('📝 Signup successful, redirecting to dashboard');
+        // Small delay to ensure auth state updates
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 100);
+      }
     },
   });
 };

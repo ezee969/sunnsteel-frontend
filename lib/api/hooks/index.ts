@@ -5,11 +5,6 @@ export * from './useExercises'
 export * from './use-tm-adjustments'
 export * from './useRtF'
 
-// Auth-specific hooks
+// Auth-specific hooks (Supabase-based)
 export * from './useSupabaseAuth'
 export * from './useSupabaseEmailAuth'
-export * from './useLogin'
-export * from './useLogout'
-export * from './useRegister'
-export * from './useRefreshToken'
-export * from './useGoogleLogin'

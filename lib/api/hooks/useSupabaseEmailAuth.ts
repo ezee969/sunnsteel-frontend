@@ -38,9 +38,14 @@ export function useSupabaseEmailAuth() {
     mutationFn: async ({ email, password, name }: { email: string; password: string; name: string }) => {
       return supabaseAuthService.signUp(email, password, name)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ['user'] })
-      router.push('/login')
+      // Redirect based on whether email verification is required
+      if (data.requiresEmailVerification) {
+        router.push('/login?message=verify-email')
+      } else {
+        router.push('/dashboard')
+      }
     },
   })
 
@@ -90,7 +95,7 @@ export function useSupabaseEmailLogin() {
 
 /**
  * useSupabaseEmailSignup
- * Creates a Supabase account, verifies with backend, then redirects to login (or dashboard in future).
+ * Creates a Supabase account, verifies with backend, then redirects appropriately.
  */
 export function useSupabaseEmailSignup() {
   const qc = useQueryClient()
@@ -99,9 +104,14 @@ export function useSupabaseEmailSignup() {
     mutationFn: async ({ email, password, name }: EmailSignupInput) => {
       return supabaseAuthService.signUp(email, password, name)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ['user'] })
-      router.push('/login')
+      // Redirect based on whether email verification is required
+      if (data.requiresEmailVerification) {
+        router.push('/login?message=verify-email')
+      } else {
+        router.push('/dashboard')
+      }
     },
   })
 }
