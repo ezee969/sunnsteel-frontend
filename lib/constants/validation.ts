@@ -3,7 +3,7 @@
  * These should match Supabase configuration and backend validation
  */
 
-export const VALIDATION_RULES = {
+export const VALIDATION_RULES = Object.freeze({
 	// Password validation
 	PASSWORD_MIN_LENGTH: 6,
 	PASSWORD_MAX_LENGTH: 128,
@@ -13,10 +13,10 @@ export const VALIDATION_RULES = {
 	NAME_MAX_LENGTH: 100,
 
 	// Email validation (using standard email regex)
-	EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-} as const
+ 	EMAIL_REGEX: /^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]+$/,
+} as const)
 
-export const VALIDATION_MESSAGES = {
+export const VALIDATION_MESSAGES = Object.freeze({
 	// Password messages
 	PASSWORD_TOO_SHORT: `Password must be at least ${VALIDATION_RULES.PASSWORD_MIN_LENGTH} characters`,
 	PASSWORD_TOO_LONG: `Password must not exceed ${VALIDATION_RULES.PASSWORD_MAX_LENGTH} characters`,
@@ -33,4 +33,4 @@ export const VALIDATION_MESSAGES = {
 
 	// Password confirmation
 	PASSWORDS_DONT_MATCH: "Passwords don't match",
-} as const
+} as const)
