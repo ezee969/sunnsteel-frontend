@@ -38,7 +38,7 @@ import { Viewport } from 'next';
 
 export const metadata: Metadata = {
   title: {
-    default: 'SUNSTEEL',
+    default: 'SUNNSTEEL',
     template: '%s | Sunnsteel',
   },
   description: 'More than a routine logbook.',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     'ejercicio en casa',
   ],
   authors: [{ name: 'Sunnsteel Team' }],
-  creator: 'SUNSTEEL',
+  creator: 'SUNNSTEEL',
   publisher: 'Sunnsteel',
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'
@@ -62,10 +62,10 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'SUNSTEEL',
+    title: 'SUNNSTEEL',
     description: 'More than a routine logbook.',
     url: '/',
-    siteName: 'SUNSTEEL',
+    siteName: 'SUNNSTEEL',
     images: [
       {
         url: '/logo.png',

@@ -123,93 +123,97 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
-  return (
-    <InitialLoadAnimation>
-      <div className="relative min-h-screen">
-        {/* Background */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <Image
-            src="/backgrounds/marble-light1536-x-1024.webp"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover dark:hidden"
-            priority={false}
+  const layoutContent = (
+    <div className="relative min-h-screen">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <Image
+          src="/backgrounds/marble-light1536-x-1024.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover dark:hidden"
+          priority={false}
+        />
+        <ParchmentOverlay opacity={0.06} />
+        <GoldVignetteOverlay intensity={0.06} />
+      </div>
+
+      <div className="flex min-h-screen">
+        {/* Mobile Menu Overlay */}
+        {isMobile && isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
+            onClick={() => setIsMobileMenuOpen(false)}
           />
-          <ParchmentOverlay opacity={0.06} />
-          <GoldVignetteOverlay intensity={0.06} />
-        </div>
+        )}
 
-        <div className="flex min-h-screen">
-          {/* Mobile Menu Overlay */}
-          {isMobile && isMobileMenuOpen && (
-            <div
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+        <Sidebar
+          isMobile={isMobile}
+          isSidebarOpen={isSidebarOpen}
+          isMobileMenuOpen={isMobileMenuOpen}
+          activeNav={activeNav}
+          setActiveNav={setActiveNav}
+          setIsSidebarOpen={setIsSidebarOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+
+        {/* Main Content */}
+        <div
+          className={cn(
+            'flex flex-col flex-1 transition-all duration-300',
+            isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
           )}
-
-          <Sidebar
+        >
+          <Header
+            title={getTitleFromPath(pathname)}
             isMobile={isMobile}
-            isSidebarOpen={isSidebarOpen}
-            isMobileMenuOpen={isMobileMenuOpen}
-            activeNav={activeNav}
-            setActiveNav={setActiveNav}
-            setIsSidebarOpen={setIsSidebarOpen}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
 
-          {/* Main Content */}
-          <div
-            className={cn(
-              'flex flex-col flex-1 transition-all duration-300',
-              isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
-            )}
-          >
-            <Header
-              title={getTitleFromPath(pathname)}
-              isMobile={isMobile}
-              setIsMobileMenuOpen={setIsMobileMenuOpen}
-            />
-
-            {/* Active Session Banner */}
-            {!isOnSessionPage && activeSession?.id && (
-              <div className="px-3 sm:px-6 mt-2">
-                <div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Dumbbell className="h-3 w-3" />
-                    <span>Active workout session in progress.</span>
-                  </div>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="classical"
-                    aria-label="Resume active session"
-                  >
-                    <Link href={`/workouts/sessions/${activeSession.id}`}>
-                      Resume
-                    </Link>
-                  </Button>
+          {/* Active Session Banner */}
+          {!isOnSessionPage && activeSession?.id && (
+            <div className="px-3 sm:px-6 mt-2">
+              <div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <Dumbbell className="h-3 w-3" />
+                  <span>Active workout session in progress.</span>
                 </div>
+                <Button
+                  asChild
+                  size="sm"
+                  variant="classical"
+                  aria-label="Resume active session"
+                >
+                  <Link href={`/workouts/sessions/${activeSession.id}`}>
+                    Resume
+                  </Link>
+                </Button>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Dashboard Content */}
-            <main className="flex-1 overflow-auto p-3 sm:p-6">
-              <div
-                className={cn(
-                  'min-h-full transition-all duration-300 ease-out',
-                  isTransitioning
-                    ? 'opacity-0 translate-y-2'
-                    : 'opacity-100 translate-y-0'
-                )}
-              >
-                {children}
-              </div>
-            </main>
-          </div>
+          {/* Dashboard Content */}
+          <main className="flex-1 overflow-auto p-3 sm:p-6">
+            <div
+              className={cn(
+                'min-h-full transition-all duration-300 ease-out',
+                isTransitioning
+                  ? 'opacity-0 translate-y-2'
+                  : 'opacity-100 translate-y-0'
+              )}
+            >
+              {children}
+            </div>
+          </main>
         </div>
       </div>
-    </InitialLoadAnimation>
+    </div>
   );
+
+  if (isMobile) {
+    return <InitialLoadAnimation>{layoutContent}</InitialLoadAnimation>;
+  }
+
+  return layoutContent;
 }
