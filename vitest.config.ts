@@ -23,6 +23,27 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      include: [
+        'components/**/*.{ts,tsx}',
+        'features/**/*.{ts,tsx}',
+        'hooks/**/*.{ts,tsx}',
+        'lib/utils/**/*.{ts,tsx}',
+        'lib/analytics/**/*.{ts,tsx}',
+      ],
+      exclude: [
+        '**/*.d.ts',
+        '**/index.ts',
+        'lib/api/types/**',
+        'lib/constants/**',
+        'lib/supabase/**',
+        'providers/**',
+        'public/**',
+        'schema/**',
+        'next.config.ts',
+        'postcss.config.mjs',
+        'tailwind.config.ts',
+        'vitest.config.ts',
+      ],
     },
   },
   resolve: {
