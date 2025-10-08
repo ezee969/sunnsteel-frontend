@@ -5,9 +5,9 @@ describe('time-format.utils', () => {
     it('should format ISO date string to time', () => {
       const isoString = '2024-01-15T14:30:00.000Z';
       const result = formatTime(isoString);
-      
-      // The result will depend on the local timezone, but should be in HH:MM format
-      expect(result).toMatch(/^\d{1,2}:\d{2}$/);
+
+      // Locale output may include AM/PM suffix, so allow both 24-hour and 12-hour formats
+      expect(result).toMatch(/^\d{1,2}:\d{2}(?:\s?[AP]M)?$/i);
     });
 
     it('should return "—" for null input', () => {
