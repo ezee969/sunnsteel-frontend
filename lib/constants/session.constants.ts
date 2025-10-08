@@ -14,7 +14,7 @@ export const SESSION_ACTIONS = {
 } as const;
 
 export const DEBOUNCE_DELAYS = {
-  SET_LOG_SAVE: 500,
+  SET_LOG_SAVE: 1500,
   SEARCH: 300,
 } as const;
 

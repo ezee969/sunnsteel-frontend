@@ -3,7 +3,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2 } from 'lucide-react';
 import { useSetLogForm } from '@/hooks/use-set-log-form';
 import type { LogRowProps } from '@/lib/utils/workout-session.types';
 
@@ -86,34 +85,16 @@ export const SetLogInput = ({
           )}
         </div>
         
-        {/* Save state indicator */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {saveState === 'saving' && (
-              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-            )}
-            {saveState === 'error' && (
-              <span className="text-xs text-red-600">Error</span>
-            )}
-            {saveState === 'saved' && (
-              <span className="text-xs text-green-600">Saved</span>
-            )}
-            {saveState === 'pending' && (
-              <span className="text-xs text-amber-600">Unsaved</span>
-            )}
-          </div>
-          
-          {/* Completion checkbox */}
-          <Checkbox
-            checked={isCompletedState}
-            onCheckedChange={(checked: boolean | 'indeterminate') =>
-              handleCompletionToggle(Boolean(checked))
-            }
-            aria-label="Mark set as complete"
-            disabled={saveState === 'saving'}
-            className="h-5 w-5"
-          />
-        </div>
+        {/* Completion checkbox */}
+        <Checkbox
+          checked={isCompletedState}
+          onCheckedChange={(checked: boolean | 'indeterminate') =>
+            handleCompletionToggle(Boolean(checked))
+          }
+          aria-label="Mark set as complete"
+          disabled={saveState === 'saving'}
+          className="h-5 w-5"
+        />
       </div>
 
       {/* Form inputs */}
@@ -135,14 +116,13 @@ export const SetLogInput = ({
             onChange={(e) => setReps(e.target.value)}
             disabled={saveState === 'saving'}
             className={`text-center text-lg font-semibold h-12 ${
-              !isValid && validationError?.includes('reps') 
-                ? 'border-red-500 focus:border-red-500' 
+              !isValid && validationError?.includes('reps')
+                ? 'border-red-500 focus:border-red-500'
                 : ''
             }`}
           />
         </div>
 
-        {/* Weight Section */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-muted-foreground">
@@ -162,8 +142,8 @@ export const SetLogInput = ({
             onChange={(e) => setWeight(e.target.value)}
             disabled={saveState === 'saving'}
             className={`text-center text-lg font-semibold h-12 ${
-              !isValid && validationError?.includes('weight') 
-                ? 'border-red-500 focus:border-red-500' 
+              !isValid && validationError?.includes('weight')
+                ? 'border-red-500 focus:border-red-500'
                 : ''
             }`}
           />
@@ -176,34 +156,14 @@ export const SetLogInput = ({
           {validationError}
         </div>
       )}
-
-      {/* Save state footer */}
-      {saveState !== 'idle' && (
-        <div className="flex items-center justify-center mt-3 text-xs">
-          {saveState === 'pending' && (
-            <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
-              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
-              Unsaved
-            </span>
-          )}
-          {saveState === 'saving' && (
-            <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full animate-pulse"></span>
-              Saving…
-            </span>
-          )}
-          {saveState === 'saved' && (
-            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
-              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
-              Saved
-            </span>
-          )}
-          {saveState === 'error' && (
-            <span className="flex items-center gap-1 text-red-600 dark:text-red-400">
-              <span className="inline-block w-1.5 h-1.5 bg-current rounded-full"></span>
-              Error
-            </span>
-          )}
+      {/* Save state footer (silent unless error) */}
+      {saveState === 'error' && (
+        <div
+          className="flex items-center justify-center mt-3 text-xs text-red-600 dark:text-red-400"
+          role="status"
+        >
+          <span className="inline-block w-1.5 h-1.5 bg-current rounded-full mr-2" />
+          <span>Error saving set. Please try again.</span>
         </div>
       )}
     </div>

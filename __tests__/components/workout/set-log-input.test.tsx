@@ -113,29 +113,7 @@ describe('SetLogInput', () => {
 		expect(checkbox).toBeChecked()
 	})
 
-	it('should show saving state indicator', () => {
-		mockUseSetLogForm.mockReturnValue({
-			...defaultHookReturn,
-			saveState: 'saving'
-		})
-
-		render(<SetLogInput {...defaultProps} />)
-
-		expect(screen.getByText('Saving…')).toBeInTheDocument()
-	})
-
-	it('should show saved state indicator', () => {
-		mockUseSetLogForm.mockReturnValue({
-			...defaultHookReturn,
-			saveState: 'saved'
-		})
-
-		render(<SetLogInput {...defaultProps} />)
-
-		expect(screen.getAllByText('Saved')).toHaveLength(2)
-	})
-
-	it('should show error state indicator', () => {
+	it('should render error feedback when save fails', () => {
 		mockUseSetLogForm.mockReturnValue({
 			...defaultHookReturn,
 			saveState: 'error'
@@ -143,18 +121,18 @@ describe('SetLogInput', () => {
 
 		render(<SetLogInput {...defaultProps} />)
 
-		expect(screen.getAllByText('Error')).toHaveLength(2)
+		expect(screen.getByText('Error saving set. Please try again.')).toBeInTheDocument()
 	})
 
-	it('should show pending state indicator', () => {
+	it('should hide save indicators for non-error states', () => {
 		mockUseSetLogForm.mockReturnValue({
 			...defaultHookReturn,
-			saveState: 'pending'
+			saveState: 'saved'
 		})
 
 		render(<SetLogInput {...defaultProps} />)
 
-		expect(screen.getAllByText('Unsaved')).toHaveLength(2)
+		expect(screen.queryByText('Error saving set. Please try again.')).not.toBeInTheDocument()
 	})
 
 	it('should disable inputs when saving', () => {
@@ -279,18 +257,6 @@ describe('SetLogInput', () => {
 
 		const weightInput = screen.getByDisplayValue('102.5')
 		expect(weightInput).toBeInTheDocument()
-	})
-
-	it('should show loading spinner when saving', () => {
-		mockUseSetLogForm.mockReturnValue({
-			...defaultHookReturn,
-			saveState: 'saving'
-		})
-
-		render(<SetLogInput {...defaultProps} />)
-
-		// Check for loading indicator (could be spinner or text)
-		expect(screen.getByText('Saving…')).toBeInTheDocument()
 	})
 
 	it('should handle keyboard navigation', () => {
