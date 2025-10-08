@@ -12,19 +12,41 @@ interface InitialLoadAnimationProps {
 export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const contentTimer = setTimeout(() => {
-      setShowContent(true);
-    }, 3200);
+    // Detect if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-    const exitTimer = setTimeout(() => {
+    // Only show animation on mobile
+    if (window.innerWidth >= 1024) {
+      // Desktop: skip animation entirely
+      setShowContent(true);
       setIsLoading(false);
-    }, 3500);
+    } else {
+      // Mobile: show animation
+      const contentTimer = setTimeout(() => {
+        setShowContent(true);
+      }, 3200);
+
+      const exitTimer = setTimeout(() => {
+        setIsLoading(false);
+      }, 3500);
+
+      return () => {
+        clearTimeout(contentTimer);
+        clearTimeout(exitTimer);
+        window.removeEventListener('resize', checkMobile);
+      };
+    }
 
     return () => {
-      clearTimeout(contentTimer);
-      clearTimeout(exitTimer);
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
@@ -41,29 +63,18 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
               transition: { duration: 0.8, ease: 'easeInOut' },
             }}
           >
-            {/* Multi-layered Background for Better Desktop/Mobile Support */}
+            {/* Mobile-only Background */}
             <motion.div
               className="absolute inset-0"
               initial={{ scale: 1.1, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.0, ease: 'easeOut' }}
             >
-              {/* Primary background - optimized for different screen sizes */}
+              {/* Primary background */}
               <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-black" />
 
-              {/* Desktop: Use larger background image */}
-              <div className="hidden lg:block absolute inset-0">
-                <Image
-                  src="/backgrounds/statue-inside-building.webp"
-                  alt="Classical Hero Background"
-                  fill
-                  className="object-cover object-center opacity-60"
-                  priority
-                />
-              </div>
-
-              {/* Mobile/Tablet: Use the angel image which works well */}
-              <div className="lg:hidden absolute inset-0">
+              {/* Mobile: Use the angel image */}
+              <div className="absolute inset-0">
                 <Image
                   src="/backgrounds/angel-david-w-sword.webp"
                   alt="Classical Angel Warrior"

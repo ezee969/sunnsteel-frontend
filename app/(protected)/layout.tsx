@@ -136,14 +136,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             className="object-cover dark:hidden"
             priority={false}
           />
-          {/* <Image
-            src="/backgrounds/marble-dark-1536-x-1024.webp"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover hidden dark:block"
-            priority={false}
-          /> */}
           <ParchmentOverlay opacity={0.06} />
           <GoldVignetteOverlay intensity={0.06} />
         </div>
