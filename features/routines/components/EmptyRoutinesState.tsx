@@ -6,7 +6,7 @@ import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 export function EmptyRoutinesState() {
   const { preloadOnHover } = useComponentPreloading()
   return (
-    <div className="flex h-[calc(100vh-300px)] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+    <div className="flex h-full flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
       <h3 className="text-2xl font-bold tracking-tight">You have no routines</h3>
       <p className="text-sm text-muted-foreground mb-4">
         Get started by creating a new routine.

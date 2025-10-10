@@ -23,28 +23,22 @@ export default function RoutinesPage() {
   }, [activeFilter]);
 
   const { data: routines, isLoading, error } = useRoutines(listFilters);
-
-  // Prefetch the create routine route to speed up navigation
   useEffect(() => {
     router.prefetch('/routines/new');
   }, [router]);
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
+    <div className="h-full min-h-0 flex flex-col gap-4 sm:gap-6">
       {/* Classical Hero */}
       <HeroSection
         imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
         title={<>Routines</>}
         subtitle={<>Plan, track, and refine your training.</>}
-      />
-      {/* Header Section */}
+     />
+        {/* Header Section */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground sm:text-base">
-              Plan, track, and manage your workout routines.
-            </p>
-          </div>
+          <div />
           <Button asChild className="hidden h-10 gap-2 sm:flex">
             <Link href="/routines/new" prefetch>
               <Plus className="h-4 w-4" />
@@ -54,22 +48,7 @@ export default function RoutinesPage() {
         </div>
       </div>
 
-      {/* Mobile Create Button - Sticky at bottom on mobile */}
-      <div className="sticky bottom-4 z-10 sm:hidden">
-        <Button asChild className="w-full shadow-lg" size="lg">
-          <Link
-            href="/routines/new"
-            prefetch
-            className="flex items-center justify-center gap-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Create Routine</span>
-          </Link>
-        </Button>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <WorkoutFilters
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}

@@ -1,5 +1,4 @@
 'use client';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +14,12 @@ import { Routine } from '@/lib/api/types/routine.type';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useRoutineListActions } from '@/features/routines/hooks/useRoutineListActions';
 import { RoutinesSkeletonList } from '@/features/routines/components/RoutinesSkeletonList';
-import { EmptyRoutinesState } from '@/features/routines/components/EmptyRoutinesState';
 import { RoutineCard } from '@/features/routines/components/RoutineCard';
+import { EmptyRoutinesState } from '@/features/routines/components/EmptyRoutinesState';
+import {
+  ROUTINE_MOCKS,
+  ROUTINE_MOCKS_ENABLED,
+} from '@/features/routines/mocks/mock-routines';
 import { Loader2 } from 'lucide-react';
 
 interface WorkoutsListProps {
@@ -59,15 +62,22 @@ export default function WorkoutsList({
     return <p className="text-destructive">Error: {error.message}</p>;
   }
 
-  if (!routines || routines.length === 0) {
-    return <EmptyRoutinesState />;
+  const shouldUseMocks = ROUTINE_MOCKS_ENABLED && (!routines || routines.length === 0);
+  const displayedRoutines = shouldUseMocks ? ROUTINE_MOCKS : routines ?? [];
+
+  if (!shouldUseMocks && displayedRoutines.length === 0) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <EmptyRoutinesState />
+      </div>
+    );
   }
 
   return (
-    <div className="h-full">
-      <ScrollArea className="h-[calc(100vh-300px)] sm:h-[calc(100vh-350px)] lg:h-[calc(100vh-300px)]">
-        <div className="grid gap-3 px-1 sm:gap-4 sm:pr-4 sm:pl-0">
-          {routines.map((routine) => {
+    <div className="flex min-h-0 flex-1 h-full flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+        <div className="grid gap-3 px-1 pb-4 sm:gap-4 sm:pr-4 sm:pl-0">
+          {displayedRoutines.map((routine) => {
             const isActiveRoutine =
               activeSession?.status === 'IN_PROGRESS' &&
               activeSession?.routineId === routine.id;
@@ -93,7 +103,7 @@ export default function WorkoutsList({
             );
           })}
         </div>
-      </ScrollArea>
+      </div>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>

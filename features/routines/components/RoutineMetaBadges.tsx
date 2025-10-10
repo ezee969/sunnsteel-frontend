@@ -1,14 +1,20 @@
 import { Badge } from '@/components/ui/badge'
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import { cn } from '@/lib/utils'
 
 interface RoutineMetaBadgesProps {
   daysPerWeek: number
   isPeriodized?: boolean
+  className?: string
 }
 
-export function RoutineMetaBadges({ daysPerWeek, isPeriodized }: RoutineMetaBadgesProps) {
+export function RoutineMetaBadges({
+  daysPerWeek,
+  isPeriodized,
+  className,
+}: RoutineMetaBadgesProps) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={cn('flex flex-wrap gap-2', className)}>
       <Badge
         variant="outline"
         className="flex items-center gap-1 text-xs sm:text-sm"

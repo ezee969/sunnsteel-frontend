@@ -138,16 +138,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <ParchmentOverlay opacity={0.06} />
         <GoldVignetteOverlay intensity={0.06} />
       </div>
-
-      <div className="flex min-h-screen">
-        {/* Mobile Menu Overlay */}
+      <div className="flex h-screen">
         {isMobile && isMobileMenuOpen && (
           <div
             className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
-
         <Sidebar
           isMobile={isMobile}
           isSidebarOpen={isSidebarOpen}
@@ -157,11 +154,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           setIsSidebarOpen={setIsSidebarOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
-
         {/* Main Content */}
         <div
           className={cn(
-            'flex flex-col flex-1 transition-all duration-300',
+            'flex min-h-0 flex-col flex-1 transition-all duration-300',
             isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
           )}
         >
@@ -170,8 +166,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             isMobile={isMobile}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
-
-          {/* Active Session Banner */}
           {!isOnSessionPage && activeSession?.id && (
             <div className="px-3 sm:px-6 mt-2">
               <div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
@@ -192,12 +186,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
           )}
-
+        
           {/* Dashboard Content */}
-          <main className="flex-1 overflow-auto p-3 sm:p-6">
+          <main className="flex-1 overflow-hidden p-3 sm:p-6">
             <div
               className={cn(
-                'min-h-full transition-all duration-300 ease-out',
+                'h-full transition-all duration-300 ease-out',
                 isTransitioning
                   ? 'opacity-0 translate-y-2'
                   : 'opacity-100 translate-y-0'
@@ -210,10 +204,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
     </div>
   );
-
+  
   if (isMobile) {
     return <InitialLoadAnimation>{layoutContent}</InitialLoadAnimation>;
   }
-
+  
   return layoutContent;
 }
