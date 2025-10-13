@@ -153,45 +153,63 @@ export const buildRoutineRequest = (
         programStartDate: data.programStartDate,
         programTimezone: tz,
         ...(programStyle && { programStyle }),
-        ...(!isEditing && data.programStartWeek && { programStartWeek: data.programStartWeek }),
+        ...(
+          // Include on create when provided; on edit only if user explicitly changed it
+          (data.programStartWeek && (!isEditing || data.programStartWeekExplicit))
+            ? { programStartWeek: data.programStartWeek }
+            : {}
+        ),
       }),
     days: data.days.map((day, dayIndex) => ({
       dayOfWeek: day.dayOfWeek,
       order: dayIndex,
-      exercises: day.exercises.map((exercise, exerciseIndex) => ({
-        exerciseId: exercise.exerciseId,
-        order: exerciseIndex,
-        restSeconds: exercise.restSeconds,
-        progressionScheme: exercise.progressionScheme,
-        minWeightIncrement: exercise.minWeightIncrement,
-        ...(isRtFExercise(exercise.progressionScheme) && {
-          ...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
-          ...(exercise.programRoundingKg !== undefined && { programRoundingKg: exercise.programRoundingKg }),
-        }),
-        sets: isRtFExercise(exercise.progressionScheme)
-          ? canonicalRtfSetsFor(exercise.progressionScheme)
-          : exercise.sets.map((set) => {
-              const baseSet = {
-                setNumber: set.setNumber,
-                ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
-              }
+      exercises: day.exercises.map((exercise, exerciseIndex) => {
+        const isRtF = isRtFExercise(exercise.progressionScheme)
+        const schemeUnified: ProgressionScheme = isRtF
+          ? 'PROGRAMMED_RTF'
+          : exercise.progressionScheme
+        const perExerciseStyle: 'STANDARD' | 'HYPERTROPHY' | undefined = isRtF
+          ? exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            ? 'HYPERTROPHY'
+            : 'STANDARD'
+          : undefined
 
-              if (set.repType === 'FIXED') {
+        return {
+          exerciseId: exercise.exerciseId,
+          order: exerciseIndex,
+          restSeconds: exercise.restSeconds,
+          progressionScheme: schemeUnified,
+          minWeightIncrement: exercise.minWeightIncrement,
+          ...(isRtF && {
+            ...(exercise.programTMKg !== undefined && { programTMKg: exercise.programTMKg }),
+            ...(exercise.programRoundingKg !== undefined && { programRoundingKg: exercise.programRoundingKg }),
+            ...(perExerciseStyle && { programStyle: perExerciseStyle }),
+          }),
+          sets: isRtF
+            ? canonicalRtfSetsFor(exercise.progressionScheme)
+            : exercise.sets.map((set) => {
+                const baseSet = {
+                  setNumber: set.setNumber,
+                  ...(set.weight !== undefined && set.weight !== null && { weight: set.weight }),
+                }
+
+                if (set.repType === 'FIXED') {
+                  return {
+                    ...baseSet,
+                    repType: 'FIXED' as const,
+                    reps: set.reps ?? 0,
+                  }
+                }
+
                 return {
                   ...baseSet,
-                  repType: 'FIXED' as const,
-                  reps: set.reps ?? 0,
+                  repType: 'RANGE' as const,
+                  minReps: set.minReps ?? 0,
+                  maxReps: set.maxReps ?? 0,
                 }
-              }
-
-              return {
-                ...baseSet,
-                repType: 'RANGE' as const,
-                minReps: set.minReps ?? 0,
-                maxReps: set.maxReps ?? 0,
-              }
-            }),
-      })),
+              }),
+        }
+      }),
     })),
   }
 }

@@ -36,4 +36,6 @@ export interface RoutineWizardData {
 	programStartDate?: string
 	programTimezone?: string
 	programStartWeek?: number
+	// Set true when user explicitly changes start week in the UI (used to include in PATCH)
+	programStartWeekExplicit?: boolean
 }

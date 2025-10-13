@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import { RoutineWizardData } from './types';
 import { ProgramScheduleSelector } from './components/ProgramScheduleSelector';
 import { ProgramStartDatePicker } from './components/ProgramStartDatePicker';
@@ -31,6 +32,14 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
   const scheduleMode = (data.programScheduleMode ?? 'NONE') as NonNullable<
     RoutineWizardData['programScheduleMode']
   >;
+
+  const usesRtf = data.days?.some((d) =>
+    d.exercises?.some(
+      (ex) =>
+        ex.progressionScheme === 'PROGRAMMED_RTF' ||
+        ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+    ),
+  )
 
   return (
     <TooltipProvider>
@@ -71,6 +80,46 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
             onSelectDate={handleDateSelect}
             onInputChange={handleDateInputChange}
           />
+
+          {scheduleMode === 'TIMEFRAME' && (
+            <div className="space-y-2">
+              <Label htmlFor="program-timezone">Timezone</Label>
+              <div className="flex items-center gap-2 w-full sm:w-96">
+                <Input
+                  id="program-timezone"
+                  placeholder="e.g., America/New_York"
+                  value={data.programTimezone ?? ''}
+                  onChange={(e) => onUpdate({ programTimezone: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="whitespace-nowrap"
+                  onClick={() =>
+                    onUpdate({
+                      programTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    })
+                  }
+                >
+                  Use system
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {scheduleMode === 'TIMEFRAME' && usesRtf && (
+            <div className="text-xs text-muted-foreground space-y-1">
+              {!data.programStartDate && (
+                <p className="text-destructive">Program start date is required for RtF schedules.</p>
+              )}
+              {!data.programTimezone && (
+                <p className="text-destructive">Timezone is required for RtF schedules.</p>
+              )}
+              {data.programTimezone && (
+                <p>Timezone: {data.programTimezone}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </TooltipProvider>

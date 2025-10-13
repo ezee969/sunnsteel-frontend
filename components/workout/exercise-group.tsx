@@ -29,6 +29,8 @@ interface ExerciseGroupProps {
   completedSets: number;
   totalSets: number;
   onSave: (payload: UpsertSetLogPayload) => void;
+  amrapSetNumber?: number;
+  hideAmrapLabel?: boolean;
 }
 
 /**
@@ -43,6 +45,8 @@ export const ExerciseGroup = ({
   completedSets,
   totalSets,
   onSave,
+  amrapSetNumber,
+  hideAmrapLabel,
 }: ExerciseGroupProps) => {
   const completionPercentage = totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
   const isComplete = completedSets === totalSets && totalSets > 0;
@@ -104,24 +108,33 @@ export const ExerciseGroup = ({
       {!isCollapsed && (
         <CardContent className="pt-0">
           <div className="space-y-4">
-            {sets.map((set) => (
-              <SetLogInput
-                key={`${set.routineExerciseId}-${set.setNumber}`}
-                sessionId={set.sessionId}
-                routineExerciseId={set.routineExerciseId}
-                exerciseId={exerciseId}
-                setNumber={set.setNumber}
-                reps={set.reps}
-                weight={set.weight}
-                isCompleted={set.isCompleted}
-                plannedReps={set.plannedReps}
-                plannedMinReps={set.plannedMinReps}
-                plannedMaxReps={set.plannedMaxReps}
-                plannedWeight={set.plannedWeight}
-                rpe={set.rpe}
-                onSave={onSave}
-              />
-            ))}
+            {sets.map((set) => {
+              const isAmrap = !!amrapSetNumber && set.setNumber === amrapSetNumber
+              return (
+                <div key={`${set.routineExerciseId}-${set.setNumber}`} className="space-y-1">
+                  {isAmrap && !hideAmrapLabel && (
+                    <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                      AMRAP
+                    </Badge>
+                  )}
+                  <SetLogInput
+                    sessionId={set.sessionId}
+                    routineExerciseId={set.routineExerciseId}
+                    exerciseId={exerciseId}
+                    setNumber={set.setNumber}
+                    reps={set.reps}
+                    weight={set.weight}
+                    isCompleted={set.isCompleted}
+                    plannedReps={set.plannedReps}
+                    plannedMinReps={set.plannedMinReps}
+                    plannedMaxReps={set.plannedMaxReps}
+                    plannedWeight={set.plannedWeight}
+                    rpe={set.rpe}
+                    onSave={onSave}
+                  />
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       )}

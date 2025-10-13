@@ -1,4 +1,5 @@
 import type { Routine } from '@/lib/api/types/routine.type';
+import type { ProgressionScheme } from '@/lib/api/types/routine.shared'
 import type { SetLog } from '@/lib/api/types/workout.type';
 
 export type UpsertSetLogPayload = {
@@ -59,3 +60,26 @@ export type ExerciseCompletionData = {
   percentage: number;
   isCompleted: boolean;
 };
+
+// Grouped exercise logs used by the Active Session page
+export type GroupedExerciseLogs = {
+  exerciseId: string
+  exerciseName: string
+  sets: Array<{
+    id: string
+    sessionId: string
+    routineExerciseId: string
+    exerciseId: string
+    setNumber: number
+    reps: number
+    weight?: number
+    rpe?: number
+    isCompleted: boolean
+    plannedReps?: number | null
+    plannedMinReps?: number | null
+    plannedMaxReps?: number | null
+    plannedWeight?: number | null
+  }>
+  progressionScheme: ProgressionScheme
+  programStyle?: 'STANDARD' | 'HYPERTROPHY'
+}

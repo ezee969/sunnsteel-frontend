@@ -96,3 +96,71 @@ export const httpClient = {
     });
   },
 };
+
+// Request variant that exposes status and headers without throwing on non-2xx
+export async function requestWithMeta<T>(
+  endpoint: string,
+  options: ApiRequestConfig = {},
+): Promise<{ data?: T; status: number; headers: Headers; ok: boolean }> {
+  const { secure = false, ...fetchOptions } = options
+  const url = `${API_BASE_URL}${endpoint}`
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(fetchOptions.headers as Record<string, string>),
+  }
+
+  if (secure) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session?.access_token) {
+      return { data: undefined, status: 401, headers: new Headers(), ok: false }
+    }
+    headers.Authorization = `Bearer ${session.access_token}`
+  }
+
+  const config: RequestInit = {
+    ...fetchOptions,
+    headers,
+    credentials: 'include',
+  }
+
+  const method = (config.method || 'GET').toUpperCase()
+  console.debug('[http-meta] →', method, url, { secure })
+  const response = await fetch(url, config)
+  const contentType = response.headers.get('content-type') || ''
+  const raw = await response.text()
+
+  if (!response.ok) {
+    // Return meta without throwing
+    let parsed: any = undefined
+    if (raw && contentType.includes('application/json')) {
+      try { parsed = JSON.parse(raw) } catch {}
+    }
+    return {
+      data: parsed as T | undefined,
+      status: response.status,
+      headers: response.headers,
+      ok: false,
+    }
+  }
+
+  if (response.status === 204 || !raw || raw.trim().length === 0) {
+    return { data: undefined, status: response.status, headers: response.headers, ok: true }
+  }
+
+  if (contentType.includes('application/json')) {
+    try {
+      const data = JSON.parse(raw) as T
+      return { data, status: response.status, headers: response.headers, ok: true }
+    } catch {}
+  }
+
+  return {
+    data: (raw as unknown as T),
+    status: response.status,
+    headers: response.headers,
+    ok: true,
+  }
+}

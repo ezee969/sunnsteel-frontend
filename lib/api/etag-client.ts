@@ -4,7 +4,7 @@
  * Handles conditional requests and cache validation for RTF data
  */
 
-import { httpClient } from './services/httpClient'
+import { requestWithMeta } from './services/httpClient'
 
 interface ETaggedResponse<T> {
   data: T
@@ -81,45 +81,53 @@ class ETaggedHttpClient {
       }
     }
 
-    try {
-      // Make the actual request
-      const data = await httpClient.request<T>(endpoint, {
-        method: 'GET',
-        secure: options.secure || false
-      })
+    // Prepare conditional headers when cached
+    const headers: Record<string, string> = {}
+    if (cached && !options.bypassCache && cached.etag) {
+      headers['If-None-Match'] = cached.etag
+    }
 
-      // For now, generate a simple cache key based on data content
-      // In production, this would use actual ETag headers from the backend
-      const etag = `"${JSON.stringify(data).length}-${now}"`
-      
-      // Cache the new data
-      const newCache: ETagCache = {
-        data,
-        etag,
-        lastModified: new Date(now).toISOString(),
-        timestamp: now,
-        maxAge: options.maxAge || this.defaultMaxAge
-      }
-      this.cache.set(cacheKey, newCache)
+    // Make the actual request with meta
+    const res = await requestWithMeta<T>(endpoint, {
+      method: 'GET',
+      secure: options.secure || false,
+      headers,
+    })
 
+    // 304: serve cached as HIT
+    if (res.status === 304 && cached) {
       return {
-        data,
-        etag,
-        lastModified: newCache.lastModified,
-        cacheStatus: cached ? 'stale' : 'miss'
+        data: cached.data as T,
+        etag: cached.etag,
+        lastModified: cached.lastModified,
+        cacheStatus: 'hit',
       }
-    } catch (error) {
-      // On network error, return stale cache if available
-      if (cached) {
-        console.warn('Network error, returning stale cache:', error)
-        return {
-          data: cached.data as T,
-          etag: cached.etag,
-          lastModified: cached.lastModified,
-          cacheStatus: 'stale'
-        }
-      }
-      throw error
+    }
+
+    // Non-ok and no cache -> bubble up minimal error
+    if (!res.ok && !cached) {
+      throw new Error(`Request failed with status: ${res.status}`)
+    }
+
+    // Ok path: store using real ETag if provided
+    const data = (res.data as T) as T
+    const headerEtag = res.headers.get('etag') || undefined
+    const etag = headerEtag ?? `"${JSON.stringify(data).length}-${now}"`
+
+    const newCache: ETagCache = {
+      data,
+      etag,
+      lastModified: new Date(now).toISOString(),
+      timestamp: now,
+      maxAge: options.maxAge || this.defaultMaxAge,
+    }
+    this.cache.set(cacheKey, newCache)
+
+    return {
+      data,
+      etag,
+      lastModified: newCache.lastModified,
+      cacheStatus: cached ? 'stale' : 'miss',
     }
   }
 
@@ -159,22 +167,36 @@ export const rtfApi = {
   /**
    * Fetch RTF timeline with ETag caching
    */
-  getTimeline: (routineId: string, options?: { maxAge?: number }) =>
-    etaggedHttpClient.conditionalGet(`/workouts/routines/${routineId}/rtf-timeline`, {
-      ...options,
-      secure: true
-    }),
+  getTimeline: (
+    routineId: string,
+    options?: { maxAge?: number; remaining?: boolean },
+  ) => {
+    const qs = options?.remaining ? '?remaining=1' : ''
+    return etaggedHttpClient.conditionalGet(
+      `/workouts/routines/${routineId}/rtf-timeline${qs}`,
+      {
+        maxAge: options?.maxAge,
+        secure: true,
+      },
+    )
+  },
 
   /**
    * Fetch RTF forecast with ETag caching
    */
-  getForecast: (routineId: string, targetWeek?: number, options?: { maxAge?: number }) => {
-    const endpoint = targetWeek 
-      ? `/workouts/routines/${routineId}/rtf-forecast?targetWeek=${targetWeek}`
-      : `/workouts/routines/${routineId}/rtf-forecast`
+  getForecast: (
+    routineId: string,
+    targetWeek?: number,
+    options?: { maxAge?: number; remaining?: boolean },
+  ) => {
+    const parts: string[] = []
+    if (typeof targetWeek === 'number') parts.push(`targetWeek=${targetWeek}`)
+    if (options?.remaining) parts.push('remaining=1')
+    const qs = parts.length ? `?${parts.join('&')}` : ''
+    const endpoint = `/workouts/routines/${routineId}/rtf-forecast${qs}`
     return etaggedHttpClient.conditionalGet(endpoint, {
-      ...options,
-      secure: true
+      maxAge: options?.maxAge,
+      secure: true,
     })
   },
 

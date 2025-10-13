@@ -5,38 +5,50 @@ import type { RtfTimeline, RtfForecast } from '../types/rtf.types';
 /**
  * RTF-F13: useRtFForecast hook - Abstraction for forecast endpoint with ETag caching
  */
-export const useRtFForecast = (routineId: string, targetWeeks?: number[]) => {
+export const useRtFForecast = (
+  routineId: string,
+  options?: { targetWeeks?: number[]; remaining?: boolean },
+) => {
+  const targetWeeks = options?.targetWeeks
+  const remaining = options?.remaining ?? false
   return usePerformanceQuery<RtfForecast, Error>({
-    queryKey: ['rtf', 'forecast', routineId, targetWeeks?.join(',') ?? 'default'],
+    queryKey: [
+      'rtf',
+      'forecast',
+      routineId,
+      targetWeeks?.join(',') ?? 'default',
+      remaining ? 'remaining' : 'all',
+    ],
     queryFn: async () => {
-      // Use ETag client for caching optimization
-      const targetWeek = targetWeeks?.[0] // Use first week for now
+      const targetWeek = targetWeeks?.[0]
       const response = await rtfApi.getForecast(routineId, targetWeek, {
-        maxAge: 10 * 60 * 1000 // 10 minutes cache
+        maxAge: 10 * 60 * 1000,
+        remaining,
       })
       return response.data as RtfForecast
     },
     enabled: !!routineId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
-  }, `RTF Forecast (${routineId})`);
-};
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  }, `RTF Forecast (${routineId})`)
+}
 
 /**
  * RTF-F14: useRtFTimeline hook - Abstraction for timeline endpoint with ETag caching
  */
-export const useRtFTimeline = (routineId: string) => {
+export const useRtFTimeline = (routineId: string, remaining?: boolean) => {
+  const rem = !!remaining
   return usePerformanceQuery<RtfTimeline, Error>({
-    queryKey: ['rtf', 'timeline', routineId],
+    queryKey: ['rtf', 'timeline', routineId, rem ? 'remaining' : 'all'],
     queryFn: async () => {
-      // Use ETag client for caching optimization
       const response = await rtfApi.getTimeline(routineId, {
-        maxAge: 15 * 60 * 1000 // 15 minutes cache (timelines change less frequently)
+        maxAge: 15 * 60 * 1000,
+        remaining: rem,
       })
       return response.data as RtfTimeline
     },
     enabled: !!routineId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour
-  }, `RTF Timeline (${routineId})`);
-};
+    staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  }, `RTF Timeline (${routineId})`)
+}

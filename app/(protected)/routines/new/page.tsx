@@ -20,6 +20,7 @@ import { TrainingDays } from '@/features/routines/wizard/TrainingDays';
 import { BuildDays } from '@/features/routines/wizard/BuildDays';
 import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate';
 import { RoutineWizardData } from '@/features/routines/wizard/types';
+import { getWeekdayFromIsoDate } from '@/features/routines/wizard/utils/date-helpers'
 
 // Use shared RoutineWizardData type
 
@@ -74,34 +75,58 @@ export default function CreateRoutinePage() {
         const hasName = routineData.name.trim() !== '';
         if (!hasName) return false;
 
-        // If Timeframe is selected, require program start date
+        // If Timeframe is selected and RtF is present, require program start date and timezone
         if (routineData.programScheduleMode === 'TIMEFRAME') {
-          return (
-            !!routineData.programStartDate &&
-            routineData.programStartDate.trim() !== ''
-          );
+          const usesRtf = routineData.days.some((d) =>
+            d.exercises.some(
+              (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+            ),
+          )
+          if (usesRtf) {
+            const hasDate = !!routineData.programStartDate && routineData.programStartDate.trim() !== ''
+            const hasTz = !!(routineData.programTimezone && routineData.programTimezone.trim() !== '')
+            return hasDate && hasTz
+          }
         }
 
         return true;
       case 2: // Training Days
-        return routineData.trainingDays.length > 0;
+        if (routineData.trainingDays.length === 0) return false
+        // If TIMEFRAME + RtF, enforce weekday alignment with earliest training day
+        if (routineData.programScheduleMode === 'TIMEFRAME') {
+          const usesRtf = routineData.days.some((d) =>
+            d.exercises.some(
+              (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+            ),
+          )
+          if (usesRtf && routineData.programStartDate) {
+            const startDow = getWeekdayFromIsoDate(routineData.programStartDate)
+            if (startDow === null) return false
+            const earliest = Math.min(...routineData.trainingDays)
+            return routineData.trainingDays.includes(startDow) && earliest === startDow
+          }
+        }
+        return true
       case 3: {
         // Build Days
         const daysComplete = routineData.days.every(
           (day) => day.exercises.length > 0
         );
         if (!daysComplete) return false;
-        // Only gate on start date when schedule is TIMEFRAME and time-based progression is used
+        // Gate on program fields when schedule is TIMEFRAME and RtF is used
         const usesRtf = routineData.days.some((d) =>
           d.exercises.some(
-            (ex) => ex.progressionScheme === 'PROGRAMMED_RTF'
-          )
+            (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+          ),
         )
         if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
-          return (
-            !!routineData.programStartDate &&
-            routineData.programStartDate.trim() !== ''
-          );
+          const hasDate = !!routineData.programStartDate && routineData.programStartDate.trim() !== ''
+          const hasTz = !!(routineData.programTimezone && routineData.programTimezone.trim() !== '')
+          if (!(hasDate && hasTz)) return false
+          // Validate start week range if provided
+          const totalWeeks = routineData.programWithDeloads ? 21 : 18
+          const sw = routineData.programStartWeek ?? 1
+          if (sw < 1 || sw > totalWeeks) return false
         }
         return true;
       }

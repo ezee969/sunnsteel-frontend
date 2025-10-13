@@ -148,6 +148,42 @@ export const useStartSession = () => {
           description: 'Continuing your in-progress workout.',
         })
       }
+      // Show RtF program info when available (new session or reused)
+      if (data.program) {
+        const wk = data.program.currentWeek
+        const total = data.program.durationWeeks
+        const deload = data.program.isDeloadWeek
+        push({
+          title: `Program Week ${wk} / ${total}`,
+          description: deload ? 'Deload week' : 'Standard week',
+        })
+      }
+    },
+    onError: (err: unknown) => {
+      // Map backend 4xx errors to friendly messages
+      const msg = err instanceof Error ? err.message : String(err)
+      // Expected format: STATUS:<code>:<message>
+      const m = msg.startsWith('STATUS:') ? msg.split(':') : []
+      const code = m.length >= 3 ? Number(m[1]) : NaN
+      const serverMessage = m.length >= 3 ? m.slice(2).join(':') : msg
+
+      if (!Number.isNaN(code) && code >= 400 && code < 500) {
+        let friendly = serverMessage
+        const lower = serverMessage.toLowerCase()
+        if (lower.includes('weekday') || lower.includes('day mismatch')) {
+          friendly = 'Program start date must match the first training weekday.'
+        } else if (lower.includes('missing') && (lower.includes('timezone') || lower.includes('program'))) {
+          friendly = 'Add start date and timezone for RtF programs.'
+        } else if (lower.includes('out of range') || lower.includes('week') && lower.includes('range')) {
+          friendly = 'Start week must be within the program’s valid range.'
+        } else if (code === 404) {
+          friendly = 'The routine or routine day was not found.'
+        }
+        push({ title: 'Cannot start session', description: friendly })
+        return
+      }
+      // Fallback
+      push({ title: 'Cannot start session', description: 'Unexpected error. Please try again.' })
     },
   });
 };

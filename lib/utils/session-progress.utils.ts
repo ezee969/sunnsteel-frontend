@@ -1,6 +1,6 @@
 import type { Routine, RoutineExercise } from '@/lib/api/types/routine.type';
 import type { SetLog } from '@/lib/api/types/workout.type';
-import type { SessionProgressData, ExerciseCompletionData } from './workout-session.types';
+import type { SessionProgressData, ExerciseCompletionData, GroupedExerciseLogs } from './workout-session.types';
 
 /**
  * Calculates overall session progress based on set logs and exercises
@@ -138,7 +138,7 @@ export function groupSetLogsByExercise(
   setLogs: SetLog[],
   exercises: RoutineExercise[],
   sessionId: string
-) {
+): GroupedExerciseLogs[] {
   const sortedExercises = [...exercises].sort((a, b) => a.order - b.order);
   
   return sortedExercises.map((re) => {
@@ -169,6 +169,8 @@ export function groupSetLogsByExercise(
       exerciseId: re.id,
       exerciseName: re.exercise.name,
       sets,
-    };
+      progressionScheme: re.progressionScheme,
+      programStyle: re.programStyle,
+    } as GroupedExerciseLogs;
   });
 }

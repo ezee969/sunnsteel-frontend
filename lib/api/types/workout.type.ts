@@ -29,6 +29,20 @@ export interface WorkoutSession {
   updatedAt: string;
   // When fetched with includeLogs=true on backend select
   setLogs?: SetLog[];
+  // Optional RtF program info returned by start endpoint (and may be present on detail views)
+  program?: {
+    currentWeek: number;
+    durationWeeks: number;
+    withDeloads: boolean;
+    isDeloadWeek: boolean;
+    startDate: string;
+    endDate: string;
+    timeZone: string;
+  };
+  // Optional day plans for RtF exercises
+  rtfPlans?: any[];
+  // Indicates whether backend reused an existing active session on start
+  reused?: boolean;
   // Detailed session data
   routine?: {
     id: string;

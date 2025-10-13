@@ -1,4 +1,4 @@
-import { httpClient } from './httpClient';
+import { httpClient, requestWithMeta } from './httpClient';
 import {
   FinishWorkoutRequest,
   SetLog,
@@ -14,11 +14,21 @@ const WORKOUTS_API_URL = '/workouts';
 
 export const workoutService = {
   startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
-    return httpClient.request<WorkoutSession>(`${WORKOUTS_API_URL}/sessions/start`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      secure: true,
-    });
+    const res = await requestWithMeta<WorkoutSession>(
+      `${WORKOUTS_API_URL}/sessions/start`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+        secure: true,
+      },
+    )
+    if (!res.ok) {
+      const serverMsg = (res.data as any)?.message as string | undefined
+      const msg = serverMsg || `Request failed with status: ${res.status}`
+      // Throw with status prefix so callers can branch on 4xx without parsing
+      throw new Error(`STATUS:${res.status}:${msg}`)
+    }
+    return (res.data as WorkoutSession)
   },
 
   getActiveSession: async (): Promise<WorkoutSession | null> => {

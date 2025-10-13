@@ -205,5 +205,57 @@ describe('session-progress.utils', () => {
       expect(result[1].sets[0].plannedReps).toBe(12);
       expect(result[1].sets[0].plannedWeight).toBe(50);
     });
+
+    it('should include progressionScheme and programStyle when provided', () => {
+      const logs: SetLog[] = [
+        { id: 'l1', routineExerciseId: 're1', exerciseId: 'e1', setNumber: 1, reps: 0, isCompleted: false },
+      ]
+      const exs: RoutineExercise[] = [
+        {
+          id: 're1',
+          order: 1,
+          restSeconds: 90,
+          progressionScheme: 'PROGRAMMED_RTF',
+          minWeightIncrement: 2.5,
+          programStyle: 'HYPERTROPHY',
+          exercise: { id: 'e1', name: 'Bench' },
+          sets: [ { setNumber: 1, reps: 8, weight: 60 } as any ],
+        } as any,
+      ]
+      const grouped = groupSetLogsByExercise(logs, exs, 's1')
+      expect(grouped[0].progressionScheme).toBe('PROGRAMMED_RTF')
+      expect(grouped[0].programStyle).toBe('HYPERTROPHY')
+    })
+
+    it('should derive AMRAP index by programStyle for RtF', () => {
+      const logs: SetLog[] = []
+      const exs: RoutineExercise[] = [
+        {
+          id: 'reA',
+          order: 1,
+          restSeconds: 120,
+          progressionScheme: 'PROGRAMMED_RTF',
+          minWeightIncrement: 2.5,
+          programStyle: 'STANDARD',
+          exercise: { id: 'eA', name: 'Squat' },
+          sets: [1,2,3,4,5].map((n) => ({ setNumber: n, reps: 5 })) as any,
+        } as any,
+        {
+          id: 'reB',
+          order: 2,
+          restSeconds: 120,
+          progressionScheme: 'PROGRAMMED_RTF',
+          minWeightIncrement: 2.5,
+          programStyle: 'HYPERTROPHY',
+          exercise: { id: 'eB', name: 'Bench' },
+          sets: [1,2,3,4].map((n) => ({ setNumber: n, reps: 10 })) as any,
+        } as any,
+      ]
+      const grouped = groupSetLogsByExercise(logs, exs, 's2')
+      const amrapA = grouped[0].programStyle === 'HYPERTROPHY' ? 4 : 5
+      const amrapB = grouped[1].programStyle === 'HYPERTROPHY' ? 4 : 5
+      expect(amrapA).toBe(5)
+      expect(amrapB).toBe(4)
+    })
   });
 });

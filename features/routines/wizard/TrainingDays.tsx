@@ -162,7 +162,7 @@ export function TrainingDays({
 								}}
 							/>
 						</div>
-						{!isEditing && (
+						{true && (
 							<div className="flex items-center justify-between gap-3">
 								<span className="text-sm text-muted-foreground">
 									Start program at week
@@ -175,7 +175,10 @@ export function TrainingDays({
 										),
 									)}
 									onValueChange={(value) =>
-										onUpdate({ programStartWeek: parseInt(value, 10) })
+										onUpdate({
+											programStartWeek: parseInt(value, 10),
+											programStartWeekExplicit: true,
+										})
 									}
 								>
 									<SelectTrigger

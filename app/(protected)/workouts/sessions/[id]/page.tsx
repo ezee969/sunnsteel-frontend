@@ -12,6 +12,7 @@ import { SessionConfirmationDialog } from '@/components/workout/session-confirma
 import { SessionLoadingSkeleton } from '@/components/workout/session-loading-skeleton';
 import { calculateSessionProgress } from '@/lib/utils/session-progress.utils';
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils';
+import type { GroupedExerciseLogs } from '@/lib/utils/workout-session.types'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types';
 import type { SetLog } from '@/lib/api/types/workout.type';
 import { useCallback, useMemo } from 'react';
@@ -58,11 +59,11 @@ export default function ActiveSessionPage() {
   }, [router]);
 
   // Group set logs by exercise for display
-  const groupedLogs = useMemo(() => {
-    if (!session?.setLogs || !routine) return [];
+  const groupedLogs = useMemo<GroupedExerciseLogs[]>(() => {
+    if (!session?.setLogs || !routine) return [] as GroupedExerciseLogs[];
 
     const day = routine.days.find((d) => d.id === session.routineDayId);
-    if (!day) return [];
+    if (!day) return [] as GroupedExerciseLogs[];
 
     return groupSetLogsByExercise(
       session.setLogs as SetLog[],
@@ -168,6 +169,20 @@ export default function ActiveSessionPage() {
       />
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Program info banner (RtF) */}
+        {session.program && (
+          <div className="rounded-md border bg-muted/30 p-3">
+            <div className="flex items-center justify-between text-sm">
+              <div className="font-medium">
+                Week {session.program.currentWeek} / {session.program.durationWeeks}
+              </div>
+              <div className="text-muted-foreground">
+                {session.program.isDeloadWeek ? 'Deload week' : 'Standard week'}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Action Card */}
         <SessionActionCard
           sessionId={session.id}
@@ -185,6 +200,11 @@ export default function ActiveSessionPage() {
           {groupedLogs.map((group) => {
             const completedSets = group.sets.filter((set) => set.isCompleted).length;
             const totalSets = group.sets.length;
+            // AMRAP highlighting: only for PROGRAMMED_RTF, derived from programStyle (fallback to total sets)
+            const amrapSetNumber = group.progressionScheme === 'PROGRAMMED_RTF'
+              ? (group.programStyle === 'HYPERTROPHY' ? 4 : 5)
+              : (totalSets === 5 ? 5 : totalSets === 4 ? 4 : undefined)
+            const hideAmrapLabel = !!session.program?.isDeloadWeek
 
             return (
               <ExerciseGroup
@@ -196,6 +216,8 @@ export default function ActiveSessionPage() {
                 onToggleCollapse={() => toggleExercise(group.exerciseId)}
                 completedSets={completedSets}
                 totalSets={totalSets}
+                amrapSetNumber={amrapSetNumber}
+                hideAmrapLabel={hideAmrapLabel}
                 onSave={handleSaveSetLog}
               />
             );

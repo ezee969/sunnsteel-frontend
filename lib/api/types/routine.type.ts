@@ -21,6 +21,8 @@ export interface RoutineExercise {
   // RtF-specific (present when progressionScheme = PROGRAMMED_RTF)
   programTMKg?: number;
   programRoundingKg?: number;
+  // Unified scheme variant persisted server-side
+  programStyle?: 'STANDARD' | 'HYPERTROPHY';
   exercise: {
     id: string;
     name: string;
@@ -80,6 +82,8 @@ export interface CreateRoutineRequest {
       // RtF-specific
       programTMKg?: number;
       programRoundingKg?: number;
+      // Unified PROGRAMMED_RTF variant indicator per exercise
+      programStyle?: 'STANDARD' | 'HYPERTROPHY';
       sets: Array<
         | {
             setNumber: number;
