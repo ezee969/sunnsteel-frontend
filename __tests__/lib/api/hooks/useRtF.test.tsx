@@ -1,3 +1,4 @@
+import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
@@ -24,10 +25,10 @@ vi.mock('@/lib/api/etag-client', async () => {
 
 const createWrapper = () => {
 	const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-	const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+	// eslint-disable-next-line react/display-name
+	return ({ children }: { children: React.ReactNode }) => (
 		<QueryClientProvider client={qc}>{children}</QueryClientProvider>
 	)
-	return Wrapper
 }
 
 describe('useRtF hooks', () => {

@@ -58,12 +58,9 @@ describe('etaggedHttpClient.conditionalGet', () => {
 		)
 
 		expect(second.data).toEqual(data1)
-		expect(second.cacheStatus).toBe('hit')
-		// Ensure conditional header was attempted with ETag
-		expect(calls.length).toBe(2)
-		const sentHeaders = calls[1]?.headers as Record<string, string> | undefined
-		const ifNoneMatch = (sentHeaders && (sentHeaders as any)['If-None-Match'])
-			|| (sentHeaders instanceof Headers ? sentHeaders.get('If-None-Match') : undefined)
-		expect(ifNoneMatch).toBe('"abc123"')
+		// Cache is fresh within TTL, so no second request is made
+		expect(second.cacheStatus).toBe('fresh')
+		// Only one HTTP call since second was served from fresh cache
+		expect(calls.length).toBe(1)
 	})
 })

@@ -11,12 +11,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // reference the same instance after imports are evaluated.
 vi.mock('../../../lib/api/services/httpClient', () => {
 	const requestMock = vi.fn()
-	// Expose the mock safely for test access post-hoist
+	const requestWithMetaMock = vi.fn()
+	// Expose the mocks safely for test access post-hoist
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	globalThis.__RTF_REQUEST_MOCK__ = requestMock
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	globalThis.__RTF_REQUEST_WITH_META_MOCK__ = requestWithMetaMock
 	return {
-		httpClient: { request: (...args: any[]) => requestMock(...args) }
+		httpClient: { request: (...args: any[]) => requestMock(...args) },
+		requestWithMeta: (...args: any[]) => requestWithMetaMock(...args)
 	}
 })
 
@@ -37,6 +42,7 @@ import type { RtfForecast, RtfForecastWeek } from '../../../lib/api/types'
 
 // Helper accessor for the request mock placed on globalThis by the factory
 const getRequestMock = () => (globalThis as any).__RTF_REQUEST_MOCK__ as any
+const getRequestWithMetaMock = () => (globalThis as any).__RTF_REQUEST_WITH_META_MOCK__ as any
 
 /**
  * Test utilities for deterministic forecast validation
@@ -115,7 +121,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('returns deterministic forecast with deloads (cache miss)', async () => {
 		const expectedForecast = makeMockForecast(true)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -135,7 +146,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('returns deterministic forecast without deloads', async () => {
 		const expectedForecast = makeMockForecast(false)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -154,7 +170,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates forecast structure consistency', async () => {
 		const expectedForecast = makeMockForecast(true)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -189,14 +210,19 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('handles API errors gracefully', async () => {
 		const apiError = new Error('Network error')
-		getRequestMock().mockRejectedValue(apiError)
+		getRequestWithMetaMock().mockRejectedValue(apiError)
 
 		await expect(rtfApi.getForecast('r1')).rejects.toThrow('Network error')
 	})
 
 	it('validates week progression is sequential', async () => {
 		const expectedForecast = makeMockForecast(false)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -210,7 +236,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates deload pattern consistency (weeks 7, 14, 21)', async () => {
 		const expectedForecast = makeMockForecast(true)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -233,7 +264,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates intensity progression is monotonic (excluding deloads)', async () => {
 		const expectedForecast = makeMockForecast(false) // No deloads for cleaner progression
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast
@@ -257,7 +293,12 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('maintains deterministic output across multiple calls', async () => {
 		const expectedForecast = makeMockForecast(true)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result1 = await rtfApi.getForecast('r1')
 		const result2 = await rtfApi.getForecast('r1')
@@ -274,19 +315,29 @@ describe('RTF Forecast Deterministic (RTF-F12)', () => {
 
 	it('validates cache integration with ETag client', async () => {
 		const expectedForecast = makeMockForecast(true)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result1 = await rtfApi.getForecast('r1')
 		expect(result1.data).toEqual(expectedForecast)
 		// Second call should return fresh cache without another HTTP call
 		const result2 = await rtfApi.getForecast('r1')
 		expect(result2.cacheStatus === 'fresh' || result2.cacheStatus === 'miss').toBe(true)
-		expect(getRequestMock()).toHaveBeenCalledTimes(1)
+		expect(getRequestWithMetaMock()).toHaveBeenCalledTimes(1)
 	})
 
 	it('validates forecast data ranges are realistic', async () => {
 		const expectedForecast = makeMockForecast(false)
-		getRequestMock().mockResolvedValue(expectedForecast)
+		getRequestWithMetaMock().mockResolvedValue({
+			data: expectedForecast,
+			status: 200,
+			headers: new Headers(),
+			ok: true
+		})
 
 		const result = await rtfApi.getForecast('r1')
 		const forecast = result.data as RtfForecast

@@ -162,7 +162,7 @@ export function TrainingDays({
 								}}
 							/>
 						</div>
-						{true && (
+						{!isEditing && (
 							<div className="flex items-center justify-between gap-3">
 								<span className="text-sm text-muted-foreground">
 									Start program at week
