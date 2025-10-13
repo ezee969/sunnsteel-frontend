@@ -30,6 +30,11 @@ export function useRoutineDaySelection({
 		})
 	}, [trainingDays])
 
+	const closePicker = () => {
+		setPickerOpen(false)
+		setSearchValue('')
+	}
+
 	// Close picker when clicking outside
 	useEffect(() => {
 		if (!isPickerOpen) return
@@ -39,7 +44,7 @@ export function useRoutineDaySelection({
 				dropdownRef.current &&
 				!dropdownRef.current.contains(event.target as Node)
 			) {
-				setPickerOpen(false)
+				closePicker()
 			}
 		}
 
@@ -67,7 +72,7 @@ export function useRoutineDaySelection({
 		picker: {
 			isOpen: isPickerOpen,
 			open: () => setPickerOpen(true),
-			close: () => setPickerOpen(false),
+			close: closePicker,
 			toggle: () => setPickerOpen((prev) => !prev),
 			searchValue,
 			setSearchValue,
