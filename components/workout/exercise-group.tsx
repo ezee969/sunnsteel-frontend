@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react';
 import { SetLogInput } from './set-log-input';
-import type { GroupedLogsProps, UpsertSetLogPayload } from '@/lib/utils/workout-session.types';
+import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types';
 
 interface ExerciseGroupProps {
   exerciseId: string;

@@ -1,6 +1,5 @@
 import type { Routine } from '@/lib/api/types/routine.type';
 import type { ProgressionScheme } from '@/lib/api/types/routine.shared'
-import type { SetLog } from '@/lib/api/types/workout.type';
 
 export type UpsertSetLogPayload = {
   routineExerciseId: string;

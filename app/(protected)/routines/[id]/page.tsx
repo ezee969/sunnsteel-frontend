@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Play, Calendar } from 'lucide-react'
 import { useRoutine } from '@/lib/api/hooks/useRoutines'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'

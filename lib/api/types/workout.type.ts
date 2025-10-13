@@ -40,7 +40,7 @@ export interface WorkoutSession {
     timeZone: string;
   };
   // Optional day plans for RtF exercises
-  rtfPlans?: any[];
+  rtfPlans?: unknown[];
   // Indicates whether backend reused an existing active session on start
   reused?: boolean;
   // Detailed session data

@@ -10,7 +10,6 @@ import { SessionActionCard } from '@/components/workout/session-action-card';
 import { ExerciseGroup } from '@/components/workout/exercise-group';
 import { SessionConfirmationDialog } from '@/components/workout/session-confirmation-dialog';
 import { SessionLoadingSkeleton } from '@/components/workout/session-loading-skeleton';
-import { calculateSessionProgress } from '@/lib/utils/session-progress.utils';
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils';
 import type { GroupedExerciseLogs } from '@/lib/utils/workout-session.types'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types';

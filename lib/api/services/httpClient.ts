@@ -134,12 +134,12 @@ export async function requestWithMeta<T>(
 
   if (!response.ok) {
     // Return meta without throwing
-    let parsed: any = undefined
+    let parsed: T | undefined = undefined
     if (raw && contentType.includes('application/json')) {
-      try { parsed = JSON.parse(raw) } catch {}
+      try { parsed = JSON.parse(raw) as T } catch {}
     }
     return {
-      data: parsed as T | undefined,
+      data: parsed,
       status: response.status,
       headers: response.headers,
       ok: false,

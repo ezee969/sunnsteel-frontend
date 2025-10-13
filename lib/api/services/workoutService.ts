@@ -23,7 +23,7 @@ export const workoutService = {
       },
     )
     if (!res.ok) {
-      const serverMsg = (res.data as any)?.message as string | undefined
+      const serverMsg = (res.data as { message?: string })?.message
       const msg = serverMsg || `Request failed with status: ${res.status}`
       // Throw with status prefix so callers can branch on 4xx without parsing
       throw new Error(`STATUS:${res.status}:${msg}`)

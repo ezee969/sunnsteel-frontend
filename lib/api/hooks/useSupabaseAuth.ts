@@ -51,7 +51,6 @@ export const useSupabaseSignIn = () => {
     mutationFn: async ({
       email,
       password,
-      redirectTo,
     }: {
       email: string;
       password: string;

@@ -203,7 +203,7 @@ function WeekGoalsOverview({ routineId, currentWeek }: WeekGoalsOverviewProps) {
 }
 
 function ForecastTab({ routineId, currentWeek }: { routineId: string; currentWeek?: number }) {
-  const { data: forecast, isLoading, error } = useRtFForecast(routineId, currentWeek ? [currentWeek] : undefined)
+  const { data: forecast, isLoading, error } = useRtFForecast(routineId, currentWeek ? { targetWeeks: [currentWeek] } : undefined)
   
   if (isLoading) {
     return (

@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(true);
+  const [, setIsProcessing] = useState(true);
 
   useEffect(() => {
     const sanitizePath = (p: string) => (p?.startsWith('/') ? p : '/dashboard');
