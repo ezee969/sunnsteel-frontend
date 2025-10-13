@@ -1,0 +1,342 @@
+{
+    "id": "6347a87b-4c84-47fe-99e5-4868076b4189",
+    "userId": "05de902f-b9a5-44d6-8a4f-90615af400ae",
+    "name": "ULPPL",
+    "description": "",
+    "isPeriodized": false,
+    "isFavorite": false,
+    "isCompleted": false,
+    "programWithDeloads": true,
+    "programDurationWeeks": 21,
+    "programStartWeek": 1,
+    "programStartDate": "2025-10-13T00:00:00.000Z",
+    "programEndDate": "2026-03-08T00:00:00.000Z",
+    "programTrainingDaysOfWeek": [
+        1
+    ],
+    "programTimezone": "America/Buenos_Aires",
+    "programStyle": "HYPERTROPHY",
+    "createdAt": "2025-10-13T18:06:59.327Z",
+    "updatedAt": "2025-10-13T18:06:59.327Z",
+    "days": [
+        {
+            "id": "1e5f9a6c-7ef7-4e30-96a0-46353060ffb8",
+            "dayOfWeek": 1,
+            "order": 0,
+            "exercises": [
+                {
+                    "id": "7f035dc8-b516-4916-9e12-baa7e0411da3",
+                    "order": 0,
+                    "restSeconds": 180,
+                    "progressionScheme": "PROGRAMMED_RTF",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": 114,
+                    "programRoundingKg": 2.5,
+                    "programStyle": "HYPERTROPHY",
+                    "exercise": {
+                        "id": "50bd2ce0-bb86-46ca-83fc-79b49a86e888",
+                        "name": "Bench Press"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "FIXED",
+                            "reps": 10,
+                            "minReps": null,
+                            "maxReps": null,
+                            "weight": null
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "FIXED",
+                            "reps": 10,
+                            "minReps": null,
+                            "maxReps": null,
+                            "weight": null
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "FIXED",
+                            "reps": 10,
+                            "minReps": null,
+                            "maxReps": null,
+                            "weight": null
+                        },
+                        {
+                            "setNumber": 4,
+                            "repType": "FIXED",
+                            "reps": 1,
+                            "minReps": null,
+                            "maxReps": null,
+                            "weight": null
+                        }
+                    ]
+                },
+                {
+                    "id": "991f37e6-cec3-47f2-b77f-db89ac33c2d8",
+                    "order": 1,
+                    "restSeconds": 180,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "8e807bf7-7b2b-4830-80c6-b34a8d5c35a4",
+                        "name": "Hammer Chest Press"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 8,
+                            "maxReps": 10,
+                            "weight": 95
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 8,
+                            "maxReps": 10,
+                            "weight": 90
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 8,
+                            "maxReps": 10,
+                            "weight": 90
+                        }
+                    ]
+                },
+                {
+                    "id": "3a739a54-e7b7-4687-83b2-45089c87d319",
+                    "order": 2,
+                    "restSeconds": 180,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "a5599ad6-1196-4bc0-b2a5-f5cd2a488101",
+                        "name": "Chest Supported T-Bar Row"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 70
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 65
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 65
+                        }
+                    ]
+                },
+                {
+                    "id": "20df0975-6dc9-439e-a8f1-e03c48ca0ddf",
+                    "order": 3,
+                    "restSeconds": 180,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "14451ad2-8227-4adf-8d9b-4597f1c785ba",
+                        "name": "Neutral Grip Lat Pulldown"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 85
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 85
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 6,
+                            "maxReps": 8,
+                            "weight": 80
+                        }
+                    ]
+                },
+                {
+                    "id": "9b721915-4e43-4684-941f-ec17a4a71a57",
+                    "order": 4,
+                    "restSeconds": 180,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "0ed5e58f-feca-445d-879f-46e816a2b823",
+                        "name": "Smith Machine JM Press"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 8,
+                            "maxReps": 10,
+                            "weight": 55
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 8,
+                            "maxReps": 10,
+                            "weight": 52.5
+                        }
+                    ]
+                },
+                {
+                    "id": "c5fe5cbd-fa55-4f4e-9df6-de4badf8b536",
+                    "order": 5,
+                    "restSeconds": 120,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "1f3d4a81-8954-4e62-9b3b-b55cb6f62c8f",
+                        "name": "One-Arm Overhead Triceps Extension"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 14
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 14
+                        }
+                    ]
+                },
+                {
+                    "id": "48f103ef-55a6-4ae3-a1b2-03461f78a372",
+                    "order": 6,
+                    "restSeconds": 120,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "f6b60401-dee3-4d02-be7c-d9d8c36e760d",
+                        "name": "Chest Supported Dumbbell Lateral Raises"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 17.5
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 15
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 15
+                        }
+                    ]
+                },
+                {
+                    "id": "8372f625-5ba2-4204-a1f9-535aaca65cf5",
+                    "order": 7,
+                    "restSeconds": 120,
+                    "progressionScheme": "DYNAMIC_DOUBLE_PROGRESSION",
+                    "minWeightIncrement": 2.5,
+                    "programTMKg": null,
+                    "programRoundingKg": 2.5,
+                    "programStyle": null,
+                    "exercise": {
+                        "id": "f6b60401-dee3-4d02-be7c-d9d8c36e760d",
+                        "name": "Chest Supported Dumbbell Lateral Raises"
+                    },
+                    "sets": [
+                        {
+                            "setNumber": 1,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 8
+                        },
+                        {
+                            "setNumber": 2,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 7.5
+                        },
+                        {
+                            "setNumber": 3,
+                            "repType": "RANGE",
+                            "reps": null,
+                            "minReps": 10,
+                            "maxReps": 12,
+                            "weight": 6
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

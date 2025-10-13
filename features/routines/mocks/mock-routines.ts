@@ -144,5 +144,4 @@ function createMockRoutine(index: number): Routine {
 export const ROUTINE_MOCKS = Array.from({ length: 10 }, (_, index) =>
 	createMockRoutine(index),
 )
-
 export const ROUTINE_MOCKS_ENABLED = false

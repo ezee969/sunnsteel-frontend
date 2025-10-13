@@ -188,7 +188,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           )}
         
           {/* Dashboard Content */}
-          <main className="flex-1 overflow-hidden p-3 sm:p-6">
+          <main className="flex-1 overflow-auto p-3 sm:p-6">
             <div
               className={cn(
                 'h-full transition-all duration-300 ease-out',
