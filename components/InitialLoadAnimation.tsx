@@ -14,6 +14,11 @@ const MOBILE_BACKGROUNDS = [
 	'/backgrounds/mobile-loader-bg-2.webp',
 	'/backgrounds/mobile-loader-bg-3.webp',
 	'/backgrounds/mobile-loader-bg-4.webp',
+	'/backgrounds/mobile-loader-bg-5.webp',
+	'/backgrounds/mobile-loader-bg-6.webp',
+	'/backgrounds/mobile-loader-bg-7.webp',
+	'/backgrounds/mobile-loader-bg-8.webp',
+	'/backgrounds/mobile-loader-bg-9.webp',
 ];
 
 const getRandomMobileBackground = () =>
