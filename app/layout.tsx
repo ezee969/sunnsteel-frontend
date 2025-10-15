@@ -5,6 +5,7 @@ import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PwaProvider } from '@/providers/pwa-provider';
 import { PerformanceDebugPanel } from '@/components/PerformanceDebugPanel';
+import { Eruda } from '@/components/Eruda';
 
 const oswald = Oswald({
   variable: '--font-oswald',
@@ -111,6 +112,7 @@ export default function RootLayout({
           <PwaProvider />
           <AppProvider>{children}</AppProvider>
           <PerformanceDebugPanel />
+          <Eruda />
         </ThemeProvider>
       </body>
     </html>
