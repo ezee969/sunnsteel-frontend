@@ -18,6 +18,7 @@ import HeroSection from '@/components/layout/HeroSection';
 import { RoutineBasicInfo } from '@/features/routines/wizard/RoutineBasicInfo';
 import { TrainingDays } from '@/features/routines/wizard/TrainingDays';
 import { BuildDays } from '@/features/routines/wizard/BuildDays';
+import { RtfConfiguration } from '@/features/routines/wizard/RtfConfiguration';
 import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate';
 import {
   RoutineWizardData,
@@ -32,12 +33,15 @@ import { RoutineDay, RoutineExercise } from '@/lib/api/types';
 
 // Use shared RoutineWizardData
 
-const STEPS = [
+const BASE_STEPS = [
   { id: 1, title: 'Basic Info', description: 'Name and description' },
   { id: 2, title: 'Training Days', description: 'Select workout days' },
   { id: 3, title: 'Build Days', description: 'Add exercises and sets' },
-  { id: 4, title: 'Review & Update', description: 'Review and save changes' },
 ];
+
+const RTF_STEP = { id: 4, title: 'RtF Configuration', description: 'Configure RtF program' };
+const REVIEW_STEP_WITHOUT_RTF = { id: 4, title: 'Review & Update', description: 'Review and save changes' };
+const REVIEW_STEP_WITH_RTF = { id: 5, title: 'Review & Update', description: 'Review and save changes' };
 
 // Normalize/compatibility mapping for legacy backend values
 // Backend may send 'DYNAMIC' | 'DYNAMIC_DOUBLE'; the wizard uses
@@ -78,6 +82,18 @@ export default function EditRoutinePage() {
   const { data: routine, isLoading, error } = useRoutine(routineId);
   const updateRoutineMutation = useUpdateRoutine();
   const createRoutineMutation = useCreateRoutine();
+
+  // Check if routine has RtF exercises
+  const hasRtfExercises = routineData.days.some((d) =>
+    d.exercises.some(
+      (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+    ),
+  );
+
+  // Compute dynamic steps based on RtF presence
+  const STEPS = hasRtfExercises 
+    ? [...BASE_STEPS, RTF_STEP, REVIEW_STEP_WITH_RTF]
+    : [...BASE_STEPS, REVIEW_STEP_WITHOUT_RTF];
 
   // Initialize form with routine data when loaded
   useEffect(() => {
@@ -135,6 +151,15 @@ export default function EditRoutinePage() {
   const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
     setRoutineData((prev) => ({ ...prev, ...updates }));
   };
+
+  // Handle step adjustment when RtF exercises are added/removed
+  useEffect(() => {
+    // If we're on step 5 (Review with RtF) and RtF exercises were removed
+    if (currentStep === 5 && !hasRtfExercises) {
+      // Step 5 no longer exists, move back to step 4 (which is now Review)
+      setCurrentStep(4);
+    }
+  }, [hasRtfExercises, currentStep]);
 
   const handleNext = () => {
     if (currentStep < STEPS.length) {
@@ -263,6 +288,22 @@ export default function EditRoutinePage() {
       case 3:
         return <BuildDays data={routineData} onUpdate={updateRoutineData} isEditing />;
       case 4:
+        // Step 4 is either RtF Configuration (if RtF exercises exist) or Review
+        if (hasRtfExercises) {
+          return <RtfConfiguration data={routineData} onUpdate={updateRoutineData} />;
+        }
+        return (
+          <ReviewAndCreate
+            data={routineData}
+            routineId={routineId}
+            isEditing={true}
+            onComplete={() => {
+              router.push('/routines');
+            }}
+          />
+        );
+      case 5:
+        // Step 5 is Review when RtF exercises exist
         return (
           <ReviewAndCreate
             data={routineData}

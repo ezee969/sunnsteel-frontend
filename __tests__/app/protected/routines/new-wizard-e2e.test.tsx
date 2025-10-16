@@ -98,7 +98,10 @@ describe('CreateRoutinePage wizard E2E', () => {
   expect(enabledRtf.getAttribute('aria-disabled')).not.toBe('true')
     fireEvent.click(enabledRtf)
 
-    // Advance to Review
+    // Advance to RtF Configuration step (new step 4)
+    fireEvent.click(screen.getByLabelText('Next'))
+
+    // Advance to Review (now step 5 when RtF exercises exist)
     fireEvent.click(screen.getByLabelText('Next'))
 
     // Submit
