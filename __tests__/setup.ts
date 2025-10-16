@@ -54,3 +54,12 @@ if (!('alert' in window)) {
   // override existing (noop in real browser env not needed, but safe here)
   window.alert = vi.fn();
 }
+
+// Mock ResizeObserver for cmdk (shadcn Command component)
+if (!('ResizeObserver' in global)) {
+  (global as any).ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
