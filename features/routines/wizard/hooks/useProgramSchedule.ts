@@ -20,10 +20,12 @@ export function useProgramSchedule({ data, onUpdate }: UseProgramScheduleParams)
 
 	const selectedDate = useMemo(() => parseWizardDate(data.programStartDate), [data.programStartDate])
 
+	// Auto-populate system timezone when TIMEFRAME mode is active and no timezone is set
 	useEffect(() => {
 		if (data.programScheduleMode !== 'TIMEFRAME') return
 		const tz = (data.programTimezone ?? '').trim()
 		if (tz.length > 0) return
+		
 		const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone
 		if (browserTz) {
 			onUpdate({ programTimezone: browserTz })
@@ -37,10 +39,19 @@ export function useProgramSchedule({ data, onUpdate }: UseProgramScheduleParams)
 			}
 			if (mode === 'NONE') {
 				next.programStartDate = undefined
+				next.programTimezone = undefined
+			} else if (mode === 'TIMEFRAME') {
+				// Auto-set system timezone when switching to TIMEFRAME mode
+				if (!data.programTimezone?.trim()) {
+					const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+					if (browserTz) {
+						next.programTimezone = browserTz
+					}
+				}
 			}
 			onUpdate(next)
 		},
-		[onUpdate],
+		[onUpdate, data.programTimezone],
 	)
 
 	const handleDateSelect = useCallback(

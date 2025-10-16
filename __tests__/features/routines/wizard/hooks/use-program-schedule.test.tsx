@@ -36,11 +36,40 @@ describe('useProgramSchedule', () => {
 		})
 	})
 
-	it('clears start date when switching to NONE', () => {
+	it('auto-sets system timezone when switching to TIMEFRAME mode', () => {
+		const onUpdate = vi.fn()
+		const timezone = 'America/Los_Angeles'
+		vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
+			timeZone: timezone,
+		} as Intl.ResolvedDateTimeFormatOptions)
+
+		const { result } = renderHook(() =>
+			useProgramSchedule({
+				data: { ...baseData, programScheduleMode: 'NONE' },
+				onUpdate,
+			}),
+		)
+
+		act(() => {
+			result.current.handleModeChange('TIMEFRAME')
+		})
+
+		expect(onUpdate).toHaveBeenCalledWith({
+			programScheduleMode: 'TIMEFRAME',
+			programTimezone: timezone,
+		})
+	})
+
+	it('clears start date and timezone when switching to NONE', () => {
 		const onUpdate = vi.fn()
 		const { result } = renderHook(() =>
 			useProgramSchedule({
-				data: { ...baseData, programScheduleMode: 'TIMEFRAME', programStartDate: '2025-10-01' },
+				data: { 
+					...baseData, 
+					programScheduleMode: 'TIMEFRAME', 
+					programStartDate: '2025-10-01',
+					programTimezone: 'America/New_York',
+				},
 				onUpdate,
 			}),
 		)
@@ -52,7 +81,35 @@ describe('useProgramSchedule', () => {
 		expect(onUpdate).toHaveBeenCalledWith({
 			programScheduleMode: 'NONE',
 			programStartDate: undefined,
+			programTimezone: undefined,
 		})
+	})
+
+	it('preserves existing timezone when switching to TIMEFRAME', () => {
+		const onUpdate = vi.fn()
+		const existingTimezone = 'Europe/London'
+		const { result } = renderHook(() =>
+			useProgramSchedule({
+				data: { 
+					...baseData, 
+					programScheduleMode: 'NONE',
+					programTimezone: existingTimezone,
+				},
+				onUpdate,
+			}),
+		)
+
+		act(() => {
+			result.current.handleModeChange('TIMEFRAME')
+		})
+
+		expect(onUpdate).toHaveBeenCalledWith({
+			programScheduleMode: 'TIMEFRAME',
+			// Should NOT include programTimezone since it already exists
+		})
+		expect(onUpdate).not.toHaveBeenCalledWith(
+			expect.objectContaining({ programTimezone: expect.anything() })
+		)
 	})
 
 	it('formats selected date via handleDateSelect', () => {

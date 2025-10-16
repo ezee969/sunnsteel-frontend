@@ -53,6 +53,8 @@ export function TrainingDays({
 		fullProgram,
 		tmTrend,
 	} = useRtfProgramPreview({ data, onUpdate })
+
+	
 	const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21
 
 	return (
@@ -161,7 +163,7 @@ export function TrainingDays({
 									})
 								}}
 							/>
-						</div>
+						</div> 
 						{!isEditing && (
 							<div className="flex items-center justify-between gap-3">
 								<span className="text-sm text-muted-foreground">

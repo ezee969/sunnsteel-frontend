@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 import { RoutineWizardData } from './types';
 import { ProgramScheduleSelector } from './components/ProgramScheduleSelector';
 import { ProgramStartDatePicker } from './components/ProgramStartDatePicker';
+import { TimezoneSelector } from './components/TimezoneSelector';
 import { useRoutineMetadataForm } from './hooks/useRoutineMetadataForm';
 import { useProgramSchedule } from './hooks/useProgramSchedule';
 
@@ -84,26 +84,12 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
           {scheduleMode === 'TIMEFRAME' && (
             <div className="space-y-2">
               <Label htmlFor="program-timezone">Timezone</Label>
-              <div className="flex items-center gap-2 w-full sm:w-96">
-                <Input
-                  id="program-timezone"
-                  placeholder="e.g., America/New_York"
-                  value={data.programTimezone ?? ''}
-                  onChange={(e) => onUpdate({ programTimezone: e.target.value })}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="whitespace-nowrap"
-                  onClick={() =>
-                    onUpdate({
-                      programTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    })
-                  }
-                >
-                  Use system
-                </Button>
-              </div>
+              <TimezoneSelector
+                value={data.programTimezone}
+                onChange={(timezone) => onUpdate({ programTimezone: timezone })}
+                placeholder="Select your timezone..."
+                className="w-full sm:w-96"
+              />
             </div>
           )}
 
