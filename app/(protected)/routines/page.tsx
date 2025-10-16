@@ -55,6 +55,17 @@ export default function RoutinesPage() {
         />
         <WorkoutsList routines={routines} isLoading={isLoading} error={error} />
       </div>
+
+      {/* Mobile FAB - Fixed position at bottom right */}
+      <Button
+        asChild
+        size="lg"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full p-0 shadow-lg sm:hidden"
+      >
+        <Link href="/routines/new" prefetch aria-label="Create Routine">
+          <Plus className="h-6 w-6" />
+        </Link>
+      </Button>
     </div>
   );
 }
