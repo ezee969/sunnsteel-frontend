@@ -1,7 +1,7 @@
 import { CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ChevronsUpDown, Clock, Trash2 } from 'lucide-react'
+import { ChevronsUpDown, Clock, Pencil, Trash2 } from 'lucide-react'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatTime } from '@/lib/utils/time'
 import type { Exercise } from '@/lib/api/types'
@@ -17,6 +17,7 @@ interface ExerciseHeaderProps {
 	onHeaderClick: () => void
 	onHeaderKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 	onToggleButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
+	onEditButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
 	onRemoveButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
@@ -28,6 +29,7 @@ export function ExerciseHeader({
 	onHeaderClick,
 	onHeaderKeyDown,
 	onToggleButtonClick,
+	onEditButtonClick,
 	onRemoveButtonClick,
 }: ExerciseHeaderProps) {
 	const plannedSets = getPresetSetCountForScheme(
@@ -104,6 +106,15 @@ export function ExerciseHeader({
 								expanded ? 'h-4 w-4 rotate-180' : 'h-3 w-3',
 							)}
 						/>
+					</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						aria-label="Edit exercise"
+						onClick={onEditButtonClick}
+						className={cn('p-0 text-muted-foreground hover:text-primary', expanded ? 'h-8 w-8' : 'h-6 w-6')}
+					>
+						<Pencil className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
 					</Button>
 					<Button
 						variant="ghost"

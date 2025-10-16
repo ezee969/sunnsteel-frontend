@@ -12,6 +12,7 @@ export interface ExerciseListProps {
 	expandedMap: Record<number, boolean>
 	onToggleExpand: (exerciseIndex: number) => void
 	onRemoveExercise: (exerciseIndex: number) => void
+	onUpdateExercise: ExerciseCardProps['onUpdateExercise']
 	onUpdateRestTime: ExerciseCardProps['onUpdateRestTime']
 	onUpdateProgressionScheme: ExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: ExerciseCardProps['onUpdateMinWeightIncrement']
@@ -27,6 +28,8 @@ export interface ExerciseListProps {
 	isRemovingSet: ExerciseCardProps['isRemovingSet']
 	disableTimeBasedProgressions?: boolean
 	registerRef: (key: string, node: HTMLDivElement | null) => void
+	exercises?: Exercise[]
+	isExercisesLoading?: boolean
 }
 
 export function ExerciseList({
@@ -36,6 +39,7 @@ export function ExerciseList({
 	expandedMap,
 	onToggleExpand,
 	onRemoveExercise,
+	onUpdateExercise,
 	onUpdateRestTime,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
@@ -51,6 +55,8 @@ export function ExerciseList({
 	isRemovingSet,
 	disableTimeBasedProgressions = false,
 	registerRef,
+	exercises,
+	isExercisesLoading,
 }: ExerciseListProps) {
 	if (!day || day.exercises.length === 0) {
 		return (
@@ -88,6 +94,7 @@ export function ExerciseList({
 								expanded={expanded}
 								onToggleExpand={onToggleExpand}
 								onRemoveExercise={onRemoveExercise}
+								onUpdateExercise={onUpdateExercise}
 								onUpdateRestTime={onUpdateRestTime}
 								onUpdateProgressionScheme={onUpdateProgressionScheme}
 								onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
@@ -102,6 +109,8 @@ export function ExerciseList({
 								onStepWeight={onStepWeight}
 								isRemovingSet={isRemovingSet}
 								disableTimeBasedProgressions={disableTimeBasedProgressions}
+								exercises={exercises}
+								isExercisesLoading={isExercisesLoading}
 							/>
 						</motion.div>
 					)

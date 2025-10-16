@@ -54,6 +54,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
   const {
     addExercise,
     removeExercise,
+    updateExercise,
     updateProgramTMKg,
     updateProgramRoundingKg,
     updateProgressionScheme,
@@ -208,6 +209,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                         }))
                       }
                       onRemoveExercise={removeExercise}
+                      onUpdateExercise={updateExercise}
                       onUpdateRestTime={(exerciseIndex, value) =>
                         setRestSeconds(exerciseIndex, parseTime(value))
                       }
@@ -241,6 +243,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
                       }
                       disableTimeBasedProgressions={!canUseTimeframe}
                       registerRef={registerExerciseRef}
+                      exercises={exercises}
+                      isExercisesLoading={exercisesLoading}
                     />
                   </CardContent>
                 </Card>

@@ -134,7 +134,6 @@ export function TrainingDays({
 				trainingDays={data.trainingDays}
 				dayInfos={DAYS_OF_WEEK}
 			/>
-
 			{usesRtf && (
 				<div className="bg-muted/30 p-3 md:p-4 rounded-lg space-y-3">
 					<h4 className="font-medium text-sm md:text-base">RtF Program Settings</h4>

@@ -94,6 +94,18 @@ export function useRoutineDayMutations({
 		[withDayMutation],
 	)
 
+	const updateExercise = useCallback(
+		(exerciseIndex: number, newExerciseId: string) => {
+			withDayMutation((day) => {
+				const exercise = day.exercises[exerciseIndex]
+				if (!exercise) return
+				// Only update the exerciseId, preserve all other configuration
+				exercise.exerciseId = newExerciseId
+			})
+		},
+		[withDayMutation],
+	)
+
 	const updateProgramTMKg = useCallback(
 		(exerciseIndex: number, tmKg: number) => {
 			withDayMutation((day) => {
@@ -372,6 +384,7 @@ export function useRoutineDayMutations({
 	return {
 		addExercise,
 		removeExercise,
+		updateExercise,
 		updateProgramTMKg,
 		updateProgramRoundingKg,
 		updateProgressionScheme,
