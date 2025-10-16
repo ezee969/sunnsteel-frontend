@@ -4,6 +4,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { useExercises } from '@/lib/api/hooks';
 import { parseTime } from '@/lib/utils/time';
 import { RoutineWizardData, ProgressionScheme } from './types';
@@ -15,6 +22,7 @@ import { useRoutineDayMutations } from './hooks/useRoutineDayMutations';
 interface BuildDaysProps {
   data: RoutineWizardData;
   onUpdate: (updates: Partial<RoutineWizardData>) => void;
+  isEditing?: boolean;
 }
 
 const DAYS_OF_WEEK = [
@@ -27,7 +35,7 @@ const DAYS_OF_WEEK = [
   'Saturday',
 ];
 
-export function BuildDays({ data, onUpdate }: BuildDaysProps) {
+export function BuildDays({ data, onUpdate, isEditing = false }: BuildDaysProps) {
   const [expandedMap, setExpandedMap] = useState<Record<number, boolean>>({});
   const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({});
   const exerciseRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -252,6 +260,62 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
             );
           })}
         </Tabs>
+
+        {/* RtF Program Start Week */}
+        {(() => {
+          const usesRtf = data.days.some((d) =>
+            d.exercises.some(
+              (ex) => ex.progressionScheme === 'PROGRAMMED_RTF' || ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+            ),
+          );
+          const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21;
+
+          if (!usesRtf || isEditing) return null;
+
+          return (
+            <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <span className="text-sm font-medium">Start program at week</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Choose which week to begin this {totalWeeks}-week program
+                  </p>
+                </div>
+                <Select
+                  value={String(
+                    Math.min(
+                      Math.max(data.programStartWeek ?? 1, 1),
+                      totalWeeks,
+                    ),
+                  )}
+                  onValueChange={(value) =>
+                    onUpdate({
+                      programStartWeek: parseInt(value, 10),
+                      programStartWeekExplicit: true,
+                    })
+                  }
+                >
+                  <SelectTrigger
+                    aria-label="Program start week"
+                    className="w-40 h-9 text-sm"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from(
+                      { length: totalWeeks },
+                      (_, index) => index + 1,
+                    ).map((week) => (
+                      <SelectItem key={week} value={String(week)}>
+                        Week {week} of {totalWeeks}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Overall Stats */}
         <div className="mt-6 pt-5 border-t">

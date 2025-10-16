@@ -59,33 +59,9 @@ describe('TrainingDays - RtF panel, weekday hint', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows Start Program Week select on create for RtF and hides it on edit', () => {
-    const data = makeData();
-    const { rerender } = render(
-      <TrainingDays data={data} onUpdate={onUpdate} />
-    );
-
-    expect(
-      screen.getByLabelText(/Program start week/i)
-    ).toBeInTheDocument();
-
-    rerender(<TrainingDays data={data} onUpdate={onUpdate} isEditing />);
-    expect(
-      screen.queryByLabelText(/Program start week/i)
-    ).not.toBeInTheDocument();
-  });
-
-  it('defaults programStartWeek to 1 when RtF is used and unset', async () => {
-    render(
-      <TrainingDays data={makeData({ programStartWeek: undefined })} onUpdate={onUpdate} />
-    );
-
-    await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ programStartWeek: 1 })
-      );
-    });
-  });
+  // Note: Start week selector was moved to BuildDays component (Step 3)
+  // where users choose exercise progressions. Tests for this feature
+  // should be in build-days tests instead.
 
   it('clamps programStartWeek when deloads toggled off (21 -> 18)', () => {
     const data = makeData({ programWithDeloads: true, programStartWeek: 21 });

@@ -2,13 +2,6 @@
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { useSidebar } from '@/hooks/use-sidebar'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import { format } from 'date-fns'
 import { CommonSplitCard } from './components/CommonSplitCard'
 import { TrainingDayButton } from './components/TrainingDayButton'
@@ -162,45 +155,7 @@ export function TrainingDays({
 									})
 								}}
 							/>
-						</div> 
-						{!isEditing && (
-							<div className="flex items-center justify-between gap-3">
-								<span className="text-sm text-muted-foreground">
-									Start program at week
-								</span>
-								<Select
-									value={String(
-										Math.min(
-											Math.max(data.programStartWeek ?? 1, 1),
-											totalWeeks,
-										),
-									)}
-									onValueChange={(value) =>
-										onUpdate({
-											programStartWeek: parseInt(value, 10),
-											programStartWeekExplicit: true,
-										})
-									}
-								>
-									<SelectTrigger
-										aria-label="Program start week"
-										className="w-40 h-8 text-sm"
-									>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{Array.from(
-											{ length: totalWeeks },
-											(_, index) => index + 1,
-										).map((week) => (
-											<SelectItem key={week} value={String(week)}>
-												Week {week} of {totalWeeks}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						)}
+						</div>
 					</div>
 					<WeekdayConsistencyHint
 						programStartDate={data.programStartDate}

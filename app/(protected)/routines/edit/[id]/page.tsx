@@ -261,7 +261,7 @@ export default function EditRoutinePage() {
           <TrainingDays data={routineData} onUpdate={updateRoutineData} isEditing />
         );
       case 3:
-        return <BuildDays data={routineData} onUpdate={updateRoutineData} />;
+        return <BuildDays data={routineData} onUpdate={updateRoutineData} isEditing />;
       case 4:
         return (
           <ReviewAndCreate
