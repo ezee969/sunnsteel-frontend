@@ -24,7 +24,12 @@ export default function ActiveSessionPage() {
   // Data fetching
   const { data: session, isLoading, error } = useSession(idParam);
   const { mutate: upsertSetLog } = useUpsertSetLog(idParam);
-  const { data: routine } = useRoutine(session?.routineId ?? '');
+  const routineId = session?.routineId ?? '';
+  const {
+    data: routine,
+    isFetched: isRoutineFetched,
+    error: routineError,
+  } = useRoutine(routineId);
 
   // Session management
   const {
@@ -61,7 +66,7 @@ export default function ActiveSessionPage() {
   const groupedLogs = useMemo<GroupedExerciseLogs[]>(() => {
     if (!session?.setLogs || !routine) return [] as GroupedExerciseLogs[];
 
-    const day = routine.days.find((d) => d.id === session.routineDayId);
+    const day = routine!.days.find((d) => d.id === session.routineDayId);
     if (!day) return [] as GroupedExerciseLogs[];
 
     return groupSetLogsByExercise(
@@ -71,8 +76,9 @@ export default function ActiveSessionPage() {
     );
   }, [session?.setLogs, session?.routineDayId, session?.id, routine]);
 
-  // Loading state
-  if (isLoading) {
+  // Loading state (session or routine). For routine, wait until first fetch completes when routineId exists
+  const routineFirstFetchPending = !!routineId && !isRoutineFetched;
+  if (isLoading || routineFirstFetchPending) {
     return <SessionLoadingSkeleton />;
   }
 
@@ -116,8 +122,28 @@ export default function ActiveSessionPage() {
     );
   }
 
-  // No routine found
-  if (!routine) {
+  // Routine error state
+  if (routineError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-red-600">Error Loading Routine</h1>
+          <p className="text-muted-foreground">
+            {routineError.message || 'Failed to load routine'}
+          </p>
+          <button
+            onClick={handleBack}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No routine found (only after routine finished first fetch and routineId exists)
+  if (!!routineId && isRoutineFetched && !routine) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center space-y-4">
@@ -136,7 +162,7 @@ export default function ActiveSessionPage() {
     );
   }
 
-  const day = routine.days.find((d) => d.id === session.routineDayId);
+  const day = routine!.days.find((d) => d.id === session.routineDayId);
   if (!day) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -160,7 +186,7 @@ export default function ActiveSessionPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <SessionHeader
-        routineName={routine.name}
+        routineName={routine!.name}
         dayName={`Day ${day.dayOfWeek}`}
         startedAt={session.startedAt}
         progressData={progressData}
@@ -185,7 +211,7 @@ export default function ActiveSessionPage() {
         {/* Action Card */}
         <SessionActionCard
           sessionId={session.id}
-          routineName={routine.name}
+          routineName={routine!.name}
           dayName={`Day ${day.dayOfWeek}`}
           startedAt={session.startedAt}
           progressData={progressData}
@@ -247,7 +273,7 @@ export default function ActiveSessionPage() {
         onClose={cancelFinish}
         onConfirm={() => executeFinish(finishStatus!)}
         progressData={progressData}
-        routineName={routine.name}
+        routineName={routine!.name}
         isFinishing={isFinishing}
       />
     </div>

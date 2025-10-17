@@ -87,6 +87,7 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
       ],
     },
     isLoading: false,
+    isFetched: true,
     error: undefined,
   }),
 }));
@@ -142,7 +143,7 @@ describe('ActiveSessionPage', () => {
     await waitFor(() => {
       expect(upsertMutate).toHaveBeenCalledWith({
         routineExerciseId: 're1',
-        exerciseId: 're1', // Component uses routineExerciseId as exerciseId
+        exerciseId: 'e1', // Now correctly uses the actual exercise ID
         setNumber: 1,
         reps: 12,
         weight: 100, // Weight comes from mock data

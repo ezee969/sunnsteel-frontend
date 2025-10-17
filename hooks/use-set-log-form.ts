@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useSaveState, setSaveState } from '@/lib/utils/save-status-store';
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
@@ -65,6 +65,24 @@ export const useSetLogForm = ({
   // Save state tracking
   const saveState = useSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`);
 
+  // Store latest onSave callback in ref to prevent infinite loop
+  const onSaveRef = useRef(onSave);
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
+
+  // Track last saved values to prevent redundant saves
+  const lastSavedRef = useRef({ reps: initialReps, weight: initialWeight, isCompleted: initialIsCompleted });
+
+  // Sync lastSavedRef when initial values change (from external updates/refetch)
+  useEffect(() => {
+    lastSavedRef.current = {
+      reps: initialReps,
+      weight: initialWeight,
+      isCompleted: initialIsCompleted,
+    };
+  }, [initialReps, initialWeight, initialIsCompleted, setNumber]);
+
   // Create payload for validation and saving
   const createPayload = useCallback((
     reps: string,
@@ -88,10 +106,19 @@ export const useSetLogForm = ({
     const currentReps = Number(debouncedReps) || 0;
     const currentWeight = debouncedWeight === '' ? undefined : Number(debouncedWeight);
 
-    const hasChanged = currentReps !== initialReps || currentWeight !== initialWeight;
+    // Normalize nullish weights for stable comparisons (null === undefined)
+    const norm = (w: number | undefined | null) => (w == null ? null : w);
+    const normCurrentWeight = norm(currentWeight);
+    const normSavedWeight = norm(lastSavedRef.current.weight);
+
+    // Check against last saved values (with normalized nullish weight)
+    const hasChanged = 
+      currentReps !== lastSavedRef.current.reps || 
+      normCurrentWeight !== normSavedWeight ||
+      isCompletedState !== lastSavedRef.current.isCompleted;
     
     if (!hasChanged) {
-      // Cancel pending state if values reverted to original
+      // Cancel pending state if values reverted to last saved
       if (saveState === 'pending') {
         setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'idle');
       }
@@ -101,28 +128,35 @@ export const useSetLogForm = ({
     // Only save if validation passes
     if (validation.isValid) {
       const payload = createPayload(debouncedReps, debouncedWeight, isCompletedState);
-      onSave(payload);
+      onSaveRef.current(payload);
+      // Update last saved values to prevent redundant saves
+      lastSavedRef.current = {
+        reps: currentReps,
+        weight: currentWeight,
+        isCompleted: isCompletedState,
+      };
     }
   }, [
     debouncedReps,
     debouncedWeight,
     isCompletedState,
-    initialReps,
-    initialWeight,
     saveState,
     sessionId,
     routineExerciseId,
     setNumber,
     validation.isValid,
     createPayload,
-    onSave,
   ]);
 
   // Immediate feedback effect for pending state
   useEffect(() => {
     const currentReps = Number(repsState) || 0;
     const currentWeight = weightState === '' ? undefined : Number(weightState);
-    const hasImmediateChange = currentReps !== initialReps || currentWeight !== initialWeight;
+    // Normalize nullish weights for stable comparisons (null === undefined)
+    const norm = (w: number | undefined | null) => (w == null ? null : w);
+    const hasImmediateChange = 
+      currentReps !== lastSavedRef.current.reps || 
+      norm(currentWeight) !== norm(lastSavedRef.current.weight);
     
     if (hasImmediateChange && saveState === 'idle') {
       // Only mark as pending if we're not already in a save flow
@@ -134,8 +168,6 @@ export const useSetLogForm = ({
   }, [
     repsState,
     weightState,
-    initialReps,
-    initialWeight,
     saveState,
     sessionId,
     routineExerciseId,
@@ -158,7 +190,14 @@ export const useSetLogForm = ({
     // Immediately save completion toggle
     const payload = createPayload(repsState, weightState, checked);
     if (validateSetLogPayload(payload).isValid) {
-      onSave(payload);
+      onSaveRef.current(payload);
+      // Update last saved values to prevent redundant saves
+      const w = weightState === '' ? undefined : Number(weightState);
+      lastSavedRef.current = {
+        reps: Number(repsState) || 0,
+        weight: w,
+        isCompleted: checked,
+      };
     }
   }, [
     sessionId,
@@ -167,7 +206,6 @@ export const useSetLogForm = ({
     repsState,
     weightState,
     createPayload,
-    onSave,
   ]);
 
   return {

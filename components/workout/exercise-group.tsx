@@ -14,6 +14,7 @@ interface ExerciseGroupProps {
     id: string;
     routineExerciseId: string;
     sessionId: string;
+    exerciseId: string;
     setNumber: number;
     reps: number;
     weight?: number;
@@ -120,7 +121,7 @@ export const ExerciseGroup = ({
                   <SetLogInput
                     sessionId={set.sessionId}
                     routineExerciseId={set.routineExerciseId}
-                    exerciseId={exerciseId}
+                    exerciseId={set.exerciseId}
                     setNumber={set.setNumber}
                     reps={set.reps}
                     weight={set.weight}

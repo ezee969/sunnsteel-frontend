@@ -15,6 +15,7 @@ const mockSets = [
 	{
 		id: 'set-1',
 		routineExerciseId: 'routine-exercise-1',
+		exerciseId: 'exercise-1',
 		sessionId: 'session-1',
 		setNumber: 1,
 		reps: 8,
@@ -26,6 +27,7 @@ const mockSets = [
 	{
 		id: 'set-2',
 		routineExerciseId: 'routine-exercise-1',
+		exerciseId: 'exercise-1',
 		sessionId: 'session-1',
 		setNumber: 2,
 		reps: 0,
@@ -37,6 +39,7 @@ const mockSets = [
 	{
 		id: 'set-3',
 		routineExerciseId: 'routine-exercise-1',
+		exerciseId: 'exercise-1',
 		sessionId: 'session-1',
 		setNumber: 3,
 		reps: 0,

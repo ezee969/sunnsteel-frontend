@@ -87,6 +87,9 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
         },
       ],
     },
+    isLoading: false,
+    isFetched: true,
+    error: undefined,
   }),
 }));
 
@@ -121,7 +124,7 @@ describe('ActiveSessionPage GroupedLogs', () => {
         expect(upsertMutate).toHaveBeenCalledWith(
           expect.objectContaining({
             routineExerciseId: 're1',
-            exerciseId: 're1',
+            exerciseId: 'e1', // Now correctly uses the actual exercise ID
             setNumber: 1,
             reps: 9,
             weight: 100,
