@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '../../../../utils';
 import userEvent from '@testing-library/user-event';
 
 // Mock debounce hook to return values immediately for testing
 vi.mock('@/hooks/use-debounce', () => ({
   useDebounce: vi.fn((value) => value) // Return value immediately for testing
+}));
+
+vi.mock('@/lib/api/hooks/useRtfWeekGoals', () => ({
+  useRtfWeekGoals: () => ({ data: undefined }),
 }));
 
 // Mocks

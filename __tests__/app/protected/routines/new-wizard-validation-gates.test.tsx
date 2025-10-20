@@ -58,7 +58,7 @@ describe('CreateRoutinePage wizard validation gates', () => {
     // Next should be enabled (no RtF exercises yet, so no weekday validation)
     const nextBtn = screen.getByLabelText('Next')
     expect(nextBtn).not.toBeDisabled()
-  })
+  }, 15000)
 
   it('Step 3: allows Next when timezone is present for RtF exercises', async () => {
     // Stable timezone

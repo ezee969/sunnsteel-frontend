@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession';
 import { useRoutine } from '@/lib/api/hooks/useRoutines';
+import { useRtfWeekGoals } from '@/lib/api/hooks/useRtfWeekGoals'
 import { useSessionManagement } from '@/hooks/use-session-management';
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises';
 import { SessionHeader } from '@/components/workout/session-header';
@@ -30,6 +31,7 @@ export default function ActiveSessionPage() {
     isFetched: isRoutineFetched,
     error: routineError,
   } = useRoutine(routineId);
+  const { data: weekGoals } = useRtfWeekGoals(routineId, session?.program?.currentWeek)
 
   // Session management
   const {
@@ -45,6 +47,7 @@ export default function ActiveSessionPage() {
     routine,
     routineDayId: session?.routineDayId,
     setLogs: session?.setLogs,
+    isDeloadWeek: session?.program?.isDeloadWeek,
   });
 
   // Collapsible exercises state
@@ -69,12 +72,28 @@ export default function ActiveSessionPage() {
     const day = routine!.days.find((d) => d.id === session.routineDayId);
     if (!day) return [] as GroupedExerciseLogs[];
 
+    const isDeloadWeek = !!session.program?.isDeloadWeek
+    const effectiveExercises = isDeloadWeek
+      ? day.exercises.map((re) =>
+          re.progressionScheme === 'PROGRAMMED_RTF' ||
+          re.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            ? { ...re, sets: re.sets.filter((s) => s.setNumber <= 3) }
+            : re,
+        )
+      : day.exercises
+
     return groupSetLogsByExercise(
       session.setLogs as SetLog[],
-      day.exercises,
+      effectiveExercises,
       session.id
     );
-  }, [session?.setLogs, session?.routineDayId, session?.id, routine]);
+  }, [
+    session?.setLogs,
+    session?.routineDayId,
+    session?.id,
+    session?.program?.isDeloadWeek,
+    routine,
+  ]);
 
   // Loading state (session or routine). For routine, wait until first fetch completes when routineId exists
   const routineFirstFetchPending = !!routineId && !isRoutineFetched;
@@ -225,18 +244,38 @@ export default function ActiveSessionPage() {
           {groupedLogs.map((group) => {
             const completedSets = group.sets.filter((set) => set.isCompleted).length;
             const totalSets = group.sets.length;
-            // AMRAP highlighting: only for PROGRAMMED_RTF, derived from programStyle (fallback to total sets)
-            const amrapSetNumber = group.progressionScheme === 'PROGRAMMED_RTF'
-              ? (group.programStyle === 'HYPERTROPHY' ? 4 : 5)
-              : (totalSets === 5 ? 5 : totalSets === 4 ? 4 : undefined)
-            const hideAmrapLabel = !!session.program?.isDeloadWeek
+            const isRtF =
+              group.progressionScheme === 'PROGRAMMED_RTF' ||
+              group.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            const goal = weekGoals?.goals?.find(g => g.routineExerciseId === group.exerciseId)
+            const isDeload = !!session.program?.isDeloadWeek
+            const amrapSetNumber = isRtF
+              ? (!isDeload
+                  ? (goal?.amrapSetNumber ?? (group.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY' ? 4 : 5))
+                  : undefined)
+              : undefined
+            const hideAmrapLabel = isDeload
+
+            const setsWithWeekTargets = isRtF && goal
+              ? group.sets.map((set) => {
+                  const isAmrapRow = !!amrapSetNumber && set.setNumber === amrapSetNumber
+                  return {
+                    ...set,
+                    plannedWeight: goal.workingWeightKg ?? set.plannedWeight,
+                    // For RtF, prefer fixedReps for non-AMRAP sets; clear range to show a single value
+                    plannedReps: !isAmrapRow ? (goal.fixedReps ?? set.plannedReps) : set.plannedReps,
+                    plannedMinReps: !isAmrapRow ? null : set.plannedMinReps,
+                    plannedMaxReps: !isAmrapRow ? null : set.plannedMaxReps,
+                  }
+                })
+              : group.sets
 
             return (
               <ExerciseGroup
                 key={group.exerciseId}
                 exerciseId={group.exerciseId}
                 exerciseName={group.exerciseName}
-                sets={group.sets}
+                sets={setsWithWeekTargets}
                 isCollapsed={isCollapsed(group.exerciseId)}
                 onToggleCollapse={() => toggleExercise(group.exerciseId)}
                 completedSets={completedSets}

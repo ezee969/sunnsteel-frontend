@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '../../../../utils';
 
 // spies
 const push = vi.fn();
@@ -12,6 +12,10 @@ const upsertMutate = vi.fn();
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: 'sess-1' }),
   useRouter: () => ({ push, back }),
+}));
+
+vi.mock('@/lib/api/hooks/useRtfWeekGoals', () => ({
+  useRtfWeekGoals: () => ({ data: undefined }),
 }));
 
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({

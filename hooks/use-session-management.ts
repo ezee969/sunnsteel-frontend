@@ -12,6 +12,7 @@ interface UseSessionManagementProps {
   routine?: Routine;
   routineDayId?: string;
   setLogs?: SetLog[];
+  isDeloadWeek?: boolean;
 }
 
 interface UseSessionManagementReturn {
@@ -39,6 +40,7 @@ export const useSessionManagement = ({
   routine,
   routineDayId,
   setLogs,
+  isDeloadWeek,
 }: UseSessionManagementProps): UseSessionManagementReturn => {
   const router = useRouter();
   const { mutate: finishSession, isPending: isFinishing } = useFinishSession(sessionId);
@@ -56,8 +58,16 @@ export const useSessionManagement = ({
     if (!day) {
       return { totalSets: 0, completedSets: 0, percentage: 0 };
     }
-    
-    return calculateSessionProgress(setLogs, day.exercises);
+    const effectiveExercises = isDeloadWeek
+      ? day.exercises.map((re) =>
+          re.progressionScheme === 'PROGRAMMED_RTF' ||
+          re.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+            ? { ...re, sets: re.sets.filter((s) => s.setNumber <= 3) }
+            : re,
+        )
+      : day.exercises
+
+    return calculateSessionProgress(setLogs, effectiveExercises);
   })();
 
   /**
@@ -76,7 +86,19 @@ export const useSessionManagement = ({
       return;
     }
 
-    const allSetsCompleted = areAllSetsCompleted(routine, routineDayId, setLogs);
+    const day = routine.days.find((d) => d.id === routineDayId)
+    const effectiveExercises = day
+      ? (isDeloadWeek
+          ? day.exercises.map((re) =>
+              re.progressionScheme === 'PROGRAMMED_RTF' ||
+              re.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+                ? { ...re, sets: re.sets.filter((s) => s.setNumber <= 3) }
+                : re,
+            )
+          : day.exercises)
+      : []
+
+    const allSetsCompleted = day ? areAllSetsCompleted(setLogs, effectiveExercises) : false;
 
     if (allSetsCompleted) {
       executeFinish(status);
@@ -84,7 +106,7 @@ export const useSessionManagement = ({
       setFinishStatus(status);
       setIsConfirmingFinish(true);
     }
-  }, [routine, routineDayId, setLogs]);
+  }, [routine, routineDayId, setLogs, isDeloadWeek]);
 
   /**
    * Executes the session finish operation

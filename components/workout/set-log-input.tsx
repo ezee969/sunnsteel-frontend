@@ -12,6 +12,7 @@ interface SetLogInputProps extends LogRowProps {
   plannedMaxReps?: number | null;
   plannedWeight?: number | null;
   rpe?: number;
+  isAmrap?: boolean;
 }
 
 /**
@@ -30,6 +31,7 @@ export const SetLogInput = ({
   plannedMaxReps,
   plannedWeight,
   onSave,
+  isAmrap,
 }: SetLogInputProps) => {
   const {
     repsState,
@@ -52,8 +54,9 @@ export const SetLogInput = ({
     onSave,
   });
 
-  const plannedRepsText =
-    plannedMinReps && plannedMaxReps
+  const plannedRepsText = isAmrap
+    ? 'AMRAP'
+    : plannedMinReps && plannedMaxReps
       ? `${plannedMinReps}-${plannedMaxReps}`
       : plannedReps ?? '—';
 

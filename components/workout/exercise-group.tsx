@@ -131,6 +131,7 @@ export const ExerciseGroup = ({
                     plannedMaxReps={set.plannedMaxReps}
                     plannedWeight={set.plannedWeight}
                     rpe={set.rpe}
+                    isAmrap={isAmrap}
                     onSave={onSave}
                   />
                 </div>
