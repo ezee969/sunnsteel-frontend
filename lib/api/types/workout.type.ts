@@ -1,3 +1,4 @@
+import type { ProgressionScheme } from './routine.shared';
 export interface SetLog {
   id: string;
   sessionId: string;
@@ -25,6 +26,7 @@ export interface WorkoutSession {
   endedAt?: string | null;
   durationSec?: number | null;
   notes?: string | null;
+  lastActivityAt?: string | null;
   createdAt: string;
   updatedAt: string;
   // When fetched with includeLogs=true on backend select
@@ -58,13 +60,13 @@ export interface WorkoutSession {
       id: string;
       order: number;
       restSeconds?: number | null;
-      progressionScheme: 'DYNAMIC' | 'DYNAMIC_DOUBLE';
+      progressionScheme: ProgressionScheme;
       minWeightIncrement: number;
       exercise: {
         id: string;
         name: string;
         primaryMuscles: string[];
-        secondaryMuscles: string[];
+        secondaryMuscles?: string[];
         equipment?: string | null;
       };
       sets: {

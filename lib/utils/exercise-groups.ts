@@ -6,7 +6,7 @@ export interface ExerciseGroup {
 		id: string
 		name: string
 		primaryMuscles: string[]
-		secondaryMuscles: string[]
+		secondaryMuscles?: string[]
 		equipment?: string | null
 	}
 	plannedSets: {

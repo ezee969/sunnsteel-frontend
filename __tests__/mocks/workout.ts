@@ -18,7 +18,7 @@ export const MOCK_SESSION_WITH_SETS: WorkoutSession = {
         id: 're-1',
         order: 1,
         restSeconds: 120,
-        progressionScheme: 'DYNAMIC',
+        progressionScheme: 'DOUBLE_PROGRESSION',
         minWeightIncrement: 2.5,
         exercise: {
           id: 'ex-1',
