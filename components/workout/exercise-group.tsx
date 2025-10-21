@@ -32,6 +32,7 @@ interface ExerciseGroupProps {
   onSave: (payload: UpsertSetLogPayload) => void;
   amrapSetNumber?: number;
   hideAmrapLabel?: boolean;
+  isRtF?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export const ExerciseGroup = ({
   onSave,
   amrapSetNumber,
   hideAmrapLabel,
+  isRtF,
 }: ExerciseGroupProps) => {
   const completionPercentage = totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
   const isComplete = completedSets === totalSets && totalSets > 0;
@@ -111,6 +113,13 @@ export const ExerciseGroup = ({
           <div className="space-y-4">
             {sets.map((set) => {
               const isAmrap = !!amrapSetNumber && set.setNumber === amrapSetNumber
+              const isDeload = !!hideAmrapLabel && !!isRtF && !amrapSetNumber
+              // Disable rules:
+              // - If RtF and deload: disable reps and weight for all sets
+              // - If RtF and non-deload: disable reps for non-AMRAP sets; allow only AMRAP reps
+              // - Weight is fixed for all RtF sets (including AMRAP)
+              const disableRepsInput = !!isRtF ? (isDeload ? true : !isAmrap) : false
+              const disableWeightInput = !!isRtF ? true : false
               return (
                 <div key={`${set.routineExerciseId}-${set.setNumber}`} className="space-y-1">
                   {isAmrap && !hideAmrapLabel && (
@@ -132,6 +141,8 @@ export const ExerciseGroup = ({
                     plannedWeight={set.plannedWeight}
                     rpe={set.rpe}
                     isAmrap={isAmrap}
+                    disableRepsInput={disableRepsInput}
+                    disableWeightInput={disableWeightInput}
                     onSave={onSave}
                   />
                 </div>

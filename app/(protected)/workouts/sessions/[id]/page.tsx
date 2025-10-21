@@ -200,7 +200,7 @@ export default function ActiveSessionPage() {
       </div>
     );
   }
-
+  console.log("Session ", session)
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -261,6 +261,8 @@ export default function ActiveSessionPage() {
                   const isAmrapRow = !!amrapSetNumber && set.setNumber === amrapSetNumber
                   return {
                     ...set,
+                    // Fix actual weight to workingWeight to ensure inputs (disabled) reflect correct value
+                    weight: goal.workingWeightKg ?? set.weight,
                     plannedWeight: goal.workingWeightKg ?? set.plannedWeight,
                     // For RtF, prefer fixedReps for non-AMRAP sets; clear range to show a single value
                     plannedReps: !isAmrapRow ? (goal.fixedReps ?? set.plannedReps) : set.plannedReps,
@@ -282,6 +284,7 @@ export default function ActiveSessionPage() {
                 totalSets={totalSets}
                 amrapSetNumber={amrapSetNumber}
                 hideAmrapLabel={hideAmrapLabel}
+                isRtF={isRtF}
                 onSave={handleSaveSetLog}
               />
             );

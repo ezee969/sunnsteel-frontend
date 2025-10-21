@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useSetLogForm } from '@/hooks/use-set-log-form';
+import { saveStateLabel } from '@/lib/utils/save-status-store'
 import type { LogRowProps } from '@/lib/utils/workout-session.types';
 
 interface SetLogInputProps extends LogRowProps {
@@ -13,6 +14,8 @@ interface SetLogInputProps extends LogRowProps {
   plannedWeight?: number | null;
   rpe?: number;
   isAmrap?: boolean;
+  disableRepsInput?: boolean;
+  disableWeightInput?: boolean;
 }
 
 /**
@@ -32,6 +35,8 @@ export const SetLogInput = ({
   plannedWeight,
   onSave,
   isAmrap,
+  disableRepsInput,
+  disableWeightInput,
 }: SetLogInputProps) => {
   const {
     repsState,
@@ -53,6 +58,17 @@ export const SetLogInput = ({
     initialIsCompleted: isCompleted,
     onSave,
   });
+
+  const showStatus = saveState !== 'idle'
+  const statusText = saveStateLabel(saveState)
+  const statusDotClass =
+    saveState === 'saving' || saveState === 'pending'
+      ? 'bg-amber-500 animate-pulse'
+      : saveState === 'saved'
+        ? 'bg-green-500'
+        : saveState === 'error'
+          ? 'bg-red-500'
+          : 'bg-transparent'
 
   const plannedRepsText = isAmrap
     ? 'AMRAP'
@@ -87,17 +103,24 @@ export const SetLogInput = ({
             </Badge>
           )}
         </div>
-        
-        {/* Completion checkbox */}
-        <Checkbox
-          checked={isCompletedState}
-          onCheckedChange={(checked: boolean | 'indeterminate') =>
-            handleCompletionToggle(Boolean(checked))
-          }
-          aria-label="Mark set as complete"
-          disabled={saveState === 'saving'}
-          className="h-5 w-5"
-        />
+        <div className="flex items-center gap-2">
+          {showStatus && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground" aria-live="polite">
+              <span className={`inline-block w-1.5 h-1.5 rounded-full ${statusDotClass}`} />
+              <span>{statusText}</span>
+            </div>
+          )}
+          {/* Completion checkbox */}
+          <Checkbox
+            checked={isCompletedState}
+            onCheckedChange={(checked: boolean | 'indeterminate') =>
+              handleCompletionToggle(Boolean(checked))
+            }
+            aria-label="Mark set as complete"
+            disabled={saveState === 'saving'}
+            className="h-5 w-5"
+          />
+        </div>
       </div>
 
       {/* Form inputs */}
@@ -110,20 +133,26 @@ export const SetLogInput = ({
               Target: {plannedRepsText}
             </span>
           </div>
-          <Input
-            type="number"
-            inputMode="numeric"
-            aria-label="Performed reps"
-            placeholder="Enter reps"
-            value={repsState}
-            onChange={(e) => setReps(e.target.value)}
-            disabled={saveState === 'saving'}
-            className={`text-center text-lg font-semibold h-12 ${
-              !isValid && validationError?.includes('reps')
-                ? 'border-red-500 focus:border-red-500'
-                : ''
-            }`}
-          />
+          {disableRepsInput ? (
+            <div className="text-sm text-muted-foreground">
+              Fixed by program
+            </div>
+          ) : (
+            <Input
+              type="number"
+              inputMode="numeric"
+              aria-label="Performed reps"
+              placeholder="Enter reps"
+              value={repsState}
+              onChange={(e) => setReps(e.target.value)}
+              disabled={saveState === 'saving'}
+              className={`text-center text-lg font-semibold h-12 ${
+                !isValid && validationError?.includes('reps')
+                  ? 'border-red-500 focus:border-red-500'
+                  : ''
+              }`}
+            />
+          )}
         </div>
 
         <div className="space-y-2">
@@ -135,21 +164,27 @@ export const SetLogInput = ({
               Target: {plannedWeight ? `${plannedWeight} kg` : '—'}
             </span>
           </div>
-          <Input
-            type="number"
-            inputMode="numeric"
-            step="0.5"
-            aria-label="Performed weight"
-            placeholder="Enter weight"
-            value={weightState}
-            onChange={(e) => setWeight(e.target.value)}
-            disabled={saveState === 'saving'}
-            className={`text-center text-lg font-semibold h-12 ${
-              !isValid && validationError?.includes('weight')
-                ? 'border-red-500 focus:border-red-500'
-                : ''
-            }`}
-          />
+          {disableWeightInput ? (
+            <div className="text-sm text-muted-foreground">
+              Fixed by program
+            </div>
+          ) : (
+            <Input
+              type="number"
+              inputMode="numeric"
+              step="0.5"
+              aria-label="Performed weight"
+              placeholder="Enter weight"
+              value={weightState}
+              onChange={(e) => setWeight(e.target.value)}
+              disabled={saveState === 'saving'}
+              className={`text-center text-lg font-semibold h-12 ${
+                !isValid && validationError?.includes('weight')
+                  ? 'border-red-500 focus:border-red-500'
+                  : ''
+              }`}
+            />
+          )}
         </div>
       </div>
 

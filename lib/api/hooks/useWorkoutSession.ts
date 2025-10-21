@@ -212,11 +212,63 @@ export const useUpsertSetLog = (id: string) => {
       const result = await workoutService.upsertSetLog(id, data)
       return result
     },
-    onMutate: (data: UpsertSetLogRequest) => {
+    onMutate: async (data: UpsertSetLogRequest) => {
+      // Mark as saving for immediate UI feedback
       setSaveState(
         `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
         'saving'
       )
+
+      // Optimistically update the session cache
+      await qc.cancelQueries({ queryKey: qk.session(id) })
+      const previous = qc.getQueryData<WorkoutSession>(qk.session(id))
+      if (previous) {
+        const now = new Date().toISOString()
+        const existing = (previous.setLogs ?? []).find(
+          (l: SetLog) =>
+            l.routineExerciseId === data.routineExerciseId &&
+            l.setNumber === data.setNumber,
+        )
+        const updatedSetLogs: SetLog[] = existing
+          ? (previous.setLogs ?? []).map((l: SetLog) =>
+              l.routineExerciseId === data.routineExerciseId &&
+              l.setNumber === data.setNumber
+                ? {
+                    ...l,
+                    reps: data.reps,
+                    weight: data.weight,
+                    isCompleted:
+                      typeof data.isCompleted === 'boolean'
+                        ? data.isCompleted
+                        : l.isCompleted,
+                    updatedAt: now,
+                  }
+                : l,
+            )
+          : [
+              ...(previous.setLogs ?? []),
+              {
+                id: `optimistic:${id}:${data.routineExerciseId}:${data.setNumber}`,
+                sessionId: id,
+                routineExerciseId: data.routineExerciseId,
+                exerciseId: data.exerciseId,
+                setNumber: data.setNumber,
+                reps: data.reps,
+                weight: data.weight,
+                isCompleted: !!data.isCompleted,
+                createdAt: now,
+                updatedAt: now,
+              } as SetLog,
+            ]
+
+        const next: WorkoutSession = {
+          ...previous,
+          setLogs: updatedSetLogs,
+        }
+        qc.setQueryData(qk.session(id), next)
+      }
+
+      return { previous } as { previous?: WorkoutSession }
     },
     onSuccess: (_res, data) => {
       setSaveState(
@@ -225,11 +277,18 @@ export const useUpsertSetLog = (id: string) => {
       )
       qc.invalidateQueries({ queryKey: qk.session(id) })
     },
-    onError: (_err, data) => {
+    onError: (_err, data, ctx) => {
       setSaveState(
         `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
         'error'
       )
+      if (ctx?.previous) {
+        qc.setQueryData(qk.session(id), ctx.previous)
+      }
+    },
+    onSettled: () => {
+      // Ensure we sync with server truth
+      qc.invalidateQueries({ queryKey: qk.session(id) })
     },
   })
 }
