@@ -55,8 +55,6 @@ import { HeroBackdrop } from '@/components/backgrounds/HeroBackdrop';
 export function ThemedHero() {
   return (
     <HeroBackdrop 
-      src="/backgrounds/light-marble.webp"
-      darkSrc="/backgrounds/dark-marble.webp"
       darkFilter="brightness(0.3) contrast(1.2)"
       className="h-96"
     >

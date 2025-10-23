@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
@@ -8,20 +7,6 @@ export default function Loading() {
     <div className="flex min-h-screen items-center justify-center">
       {/* Background during loading */}
       <div className="absolute inset-0 -z-10">
-        <Image
-          src="/backgrounds/marble-light1536-x-1024.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover dark:hidden"
-        />
-        <Image
-          src="/backgrounds/marble-dark-1536-x-1024.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover hidden dark:block"
-        />
         <ParchmentOverlay opacity={0.06} />
         <GoldVignetteOverlay intensity={0.06} />
       </div>

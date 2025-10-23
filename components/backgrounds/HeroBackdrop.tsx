@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 
 export type HeroBackdropProps = {
-  src: string; // /backgrounds/hero-desktop.webp
+  src?: string; // /backgrounds/hero-desktop.webp
   darkSrc?: string; // optional dark variant image
   blurPx?: number; // intensity of blur
   overlayColor?: string; // e.g., 'rgba(0,0,0,0.25)'
@@ -42,7 +42,7 @@ export const HeroBackdrop: React.FC<HeroBackdropProps> = ({
   }, []);
 
   // Prefer dark image when mounted and theme is dark
-  const activeSrc = mounted && isDark && darkSrc ? darkSrc : src;
+  const activeSrc = mounted && isDark && darkSrc ? darkSrc : src || '';
   const filter = [`blur(${blurPx}px)`, mounted && isDark ? darkFilter : undefined]
     .filter(Boolean)
     .join(' ');
