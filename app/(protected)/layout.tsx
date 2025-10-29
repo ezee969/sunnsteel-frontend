@@ -100,14 +100,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
       <div className="relative min-h-screen">
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <Image
-            src="/backgrounds/marble-light1536-x-1024.webp"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover dark:hidden"
-            priority={false}
-          />
           <ParchmentOverlay opacity={0.06} />
           <GoldVignetteOverlay intensity={0.06} />
         </div>
@@ -171,7 +163,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           )}
         
-          {/* Dashboard Content */}
+          {/* Content */}
           <main className="flex-1 overflow-auto p-3 sm:p-6">
             <div
               className={cn(
@@ -189,9 +181,5 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </div>
   );
   
-  if (isMobile) {
-    return <InitialLoadAnimation>{layoutContent}</InitialLoadAnimation>;
-  }
-  
-  return layoutContent;
+  return <InitialLoadAnimation>{layoutContent}</InitialLoadAnimation>;
 }

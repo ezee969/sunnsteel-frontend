@@ -9,6 +9,8 @@ import {
 	CORNER_ACCENTS,
 } from '@/components/initial-load-animation/corner-accent'
 
+let hasShownInitialLoader = false
+
 const MOBILE_BACKGROUNDS = [
 	'/backgrounds/mobile-loader-bg-1.webp',
 	'/backgrounds/mobile-loader-bg-2.webp',
@@ -30,7 +32,10 @@ interface InitialLoadAnimationProps {
 
 export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) => {
 	const [shouldAnimate] = useState(
-		() => typeof window !== 'undefined' && window.innerWidth < 1024
+		() =>
+			typeof window !== 'undefined' &&
+			window.innerWidth < 1024 &&
+			!hasShownInitialLoader
 	)
 	const [isLoading, setIsLoading] = useState(shouldAnimate)
 	const [showContent, setShowContent] = useState(!shouldAnimate)
@@ -43,6 +48,8 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
 		if (!shouldAnimate) {
 			return
 		}
+
+		hasShownInitialLoader = true
 
 		if (!hasRandomizedBackground.current) {
 			setBackgroundImage(getRandomMobileBackground())
