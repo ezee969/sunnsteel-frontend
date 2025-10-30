@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Sidebar from '@/features/shell/components/Sidebar';
@@ -16,6 +16,8 @@ import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 import { InitialLoadAnimation } from '@/components/InitialLoadAnimation';
 import { preloadAllCriticalComponents } from '@/lib/utils/dynamic-imports';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TopProgressBar } from '@/components/ui/top-progress-bar';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -59,7 +61,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const [activeNav, setActiveNav] = useState(() => getActiveNavFromPath(pathname));
   const { data: activeSession } = useActiveSession();
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isNavActive, setIsNavActive] = useState(false);
 
   const isOnSessionPage = pathname.startsWith('/workouts/sessions/');
 
@@ -70,13 +72,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Update activeNav when pathname changes
+  // Update activeNav when pathname changes and stop progress once the route resolves
   useEffect(() => {
     setActiveNav(getActiveNavFromPath(pathname));
-    // Trigger transition animation
-    setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 50);
-    return () => clearTimeout(timer);
+    // Finish navigation progress shortly after route resolves
+    const done = setTimeout(() => setIsNavActive(false), 300);
+    return () => clearTimeout(done);
   }, [pathname]);
 
   // Preload critical components after initial auth check
@@ -129,6 +130,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           setActiveNav={setActiveNav}
           setIsSidebarOpen={setIsSidebarOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
+          onNavigateStart={() => setIsNavActive(true)}
         />
         {/* Main Content */}
         <div
@@ -137,6 +139,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20'
           )}
         >
+          {/* Top progress bar for immediate feedback */}
+          <TopProgressBar active={isNavActive} />
           <Header
             title={getTitleFromPath(pathname)}
             isMobile={isMobile}
@@ -165,16 +169,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         
           {/* Content */}
           <main className="flex-1 overflow-auto p-3 sm:p-6">
-            <div
-              className={cn(
-                'h-full transition-all duration-300 ease-out',
-                isTransitioning
-                  ? 'opacity-0 translate-y-2'
-                  : 'opacity-100 translate-y-0'
-              )}
-            >
-              {children}
-            </div>
+            <Suspense
+              fallback={
+                <div className="w-full max-w-lg space-y-3 p-6">
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              }
+            > 
+              <div className={cn('h-full transition-all duration-300 ease-out')}>
+                {children}
+              </div>
+            </Suspense>
           </main>
         </div>
       </div>

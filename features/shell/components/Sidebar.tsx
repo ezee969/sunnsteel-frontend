@@ -101,6 +101,7 @@ interface SidebarProps {
   setActiveNav: (navItem: string) => void;
   setIsSidebarOpen: (isOpen: boolean) => void;
   setIsMobileMenuOpen: (isOpen: boolean) => void;
+  onNavigateStart?: () => void;
 }
 
 export default function Sidebar({
@@ -111,6 +112,7 @@ export default function Sidebar({
   setActiveNav,
   setIsSidebarOpen,
   setIsMobileMenuOpen,
+  onNavigateStart,
 }: SidebarProps) {
   const { user } = useUser();
   const { prefetchPage, prefetchMainNavigation, isReady } = useNavigationPrefetch();
@@ -218,6 +220,8 @@ export default function Sidebar({
                 if (isMobile) {
                   setIsMobileMenuOpen(false);
                 }
+                // Signal navigation start for global feedback
+                onNavigateStart && onNavigateStart();
               }}
             >
               <Button

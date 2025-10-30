@@ -74,6 +74,7 @@ A comprehensive, navigable index of all frontend documentation. Use the category
 - [RTF Implementation Completion](./history/RTF_IMPLEMENTATION_COMPLETION.md)
 - [RTF Frontend Completion (2025-01-23)](./history/RTF_FRONTEND_COMPLETION_2025-01-23.md)
 - [Test Fixes (2025-01-17)](./history/TEST_FIXES_2025-01-17.md)
+- [Loading UX Improvement (2025-10-29)](./history/2025-10-29-loading-ux-improvement.md)
 
 ## Templates
 - [Templates (Overview)](./templates/README.md)
