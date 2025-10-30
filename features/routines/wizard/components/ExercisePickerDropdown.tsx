@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, Plus, ChevronsUpDown } from 'lucide-react'
@@ -32,6 +32,17 @@ export const ExercisePickerDropdown = forwardRef<HTMLDivElement, ExercisePickerD
 		},
 		ref,
 	) {
+		const inputRef = useRef<HTMLInputElement>(null)
+
+		useEffect(() => {
+			if (isOpen) {
+				const id = requestAnimationFrame(() => {
+					inputRef.current?.focus()
+				})
+				return () => cancelAnimationFrame(id)
+			}
+		}, [isOpen])
+
 		return (
 			<div className="relative w-full sm:w-auto" ref={ref}>
 				<Button
@@ -57,6 +68,7 @@ export const ExercisePickerDropdown = forwardRef<HTMLDivElement, ExercisePickerD
 								value={searchValue}
 								onChange={(event) => onSearchChange(event.target.value)}
 								className="border-none focus:ring-0 focus-visible:ring-0"
+								ref={inputRef}
 							/>
 						</div>
 						<div className="max-h-[200px] overflow-y-auto p-2">
@@ -83,8 +95,8 @@ export const ExercisePickerDropdown = forwardRef<HTMLDivElement, ExercisePickerD
 												</span>
 												<span className="text-xs text-muted-foreground">
 													{exercise.primaryMuscles?.length
-															? formatMuscleGroups(exercise.primaryMuscles)
-															: 'Unknown'}{' '}
+														? formatMuscleGroups(exercise.primaryMuscles)
+														: 'Unknown'}{' '}
 														• {exercise.equipment}
 												</span>
 											</div>

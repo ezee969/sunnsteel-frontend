@@ -1,6 +1,7 @@
 import { Clock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useEffect, useState } from 'react'
 import {
 	Select,
 	SelectContent,
@@ -10,7 +11,7 @@ import {
 } from '@/components/ui/select'
 import { InfoTooltip } from '@/components/InfoTooltip'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { formatTime } from '@/lib/utils/time'
+import { formatTime, parseTime, isValidTimeFormat } from '@/lib/utils/time'
 import type { RoutineWizardExercise, ProgressionScheme } from '../types'
 import { isRtFExercise, requiresWeightIncrementField } from '../utils/progression.helpers'
 
@@ -52,6 +53,19 @@ export function ExerciseConfigSection({
 }: ExerciseConfigSectionProps) {
 	const isRtF = isRtFExercise(exercise.progressionScheme)
 
+	// Local state for rest time input: allow free typing (digits and ":")
+	const [restFocused, setRestFocused] = useState(false)
+	const [restInput, setRestInput] = useState<string>(
+		formatTime(exercise.restSeconds),
+	)
+
+	// Keep input in sync with prop when not focused/typing
+	useEffect(() => {
+		if (!restFocused) {
+			setRestInput(formatTime(exercise.restSeconds))
+		}
+	}, [exercise.restSeconds, restFocused])
+
 	return (
 		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-lg space-y-2 sm:space-y-3">
 			<div className="flex items-center justify-between gap-3">
@@ -63,9 +77,43 @@ export function ExerciseConfigSection({
 				</div>
 				<Input
 					aria-label="Rest time"
+					type="text"
+					inputMode="numeric"
+					pattern="[0-9:]*"
 					placeholder="0:00"
-					value={formatTime(exercise.restSeconds)}
-					onChange={(event) => onUpdateRestTime(exerciseIndex, event.target.value)}
+					value={restInput}
+					onFocus={() => setRestFocused(true)}
+					onChange={(event) => {
+						// allow only digits and a single ':'
+						const raw = event.target.value
+						let cleaned = raw.replace(/[^\d:]/g, '')
+						const firstColon = cleaned.indexOf(':')
+						if (firstColon !== -1) {
+							cleaned =
+								cleaned.slice(0, firstColon + 1) +
+								cleaned.slice(firstColon + 1).replace(/:/g, '')
+						}
+						setRestInput(cleaned)
+					}}
+					onBlur={() => {
+						const trimmed = restInput.trim()
+						if (trimmed === '') {
+							// revert to current value
+							setRestInput(formatTime(exercise.restSeconds))
+							setRestFocused(false)
+							return
+						}
+						if (isValidTimeFormat(trimmed)) {
+							// commit change upwards and format
+							onUpdateRestTime(exerciseIndex, trimmed)
+							const sec = parseTime(trimmed)
+							setRestInput(formatTime(sec))
+						} else {
+							// invalid format: revert to last valid
+							setRestInput(formatTime(exercise.restSeconds))
+						}
+						setRestFocused(false)
+					}}
 					className="w-32 sm:w-40 h-9 text-sm text-center"
 				/>
 			</div>
