@@ -4,8 +4,7 @@ import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PwaProvider } from '@/providers/pwa-provider';
-import { PerformanceDebugPanel } from '@/components/PerformanceDebugPanel';
-import { Eruda } from '@/components/Eruda';
+import dynamic from 'next/dynamic';
 
 const oswald = Oswald({
   variable: '--font-oswald',
@@ -36,6 +35,28 @@ const cinzel = Cinzel({
 });
 
 import { Viewport } from 'next';
+
+// Dev-only dynamic components (code-split, client-only)
+const DynamicPerformanceDebugPanel = dynamic(
+  () =>
+    import('@/components/PerformanceDebugPanel').then(
+      m => m.PerformanceDebugPanel
+    ),
+  { ssr: false }
+);
+
+const DynamicEruda = dynamic(
+  () => import('@/components/Eruda').then(m => m.Eruda),
+  { ssr: false }
+);
+
+const SHOW_PERF_PANEL =
+  process.env.NODE_ENV === 'development' &&
+  process.env.NEXT_PUBLIC_SHOW_PERFORMANCE_PANEL === 'true';
+
+const ENABLE_ERUDA =
+  process.env.NODE_ENV === 'development' ||
+  process.env.NEXT_PUBLIC_ENABLE_ERUDA === 'true';
 
 export const metadata: Metadata = {
   title: {
@@ -90,11 +111,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FFFFFF',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -103,16 +125,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaProvider />
           <AppProvider>{children}</AppProvider>
-          <PerformanceDebugPanel />
-          <Eruda />
+          {SHOW_PERF_PANEL ? <DynamicPerformanceDebugPanel /> : null}
+          {ENABLE_ERUDA ? <DynamicEruda /> : null}
         </ThemeProvider>
       </body>
     </html>

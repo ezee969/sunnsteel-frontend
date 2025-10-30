@@ -2,21 +2,11 @@
 trigger: always_on
 ---
 
-- After every change in the code follow the auto-documentation rules in the file:
-    - `.cursor/rules/auto-documentation.mdc`
-
-- For project architecture, check the following files:
-    - `.cursor/rules/sunsteel-project.mdc`
-    - `./README.md`
-
 - For testing:
     - `.windsurf/rules/sunsteel-project-testing.md`
 
 - For documentation conventions and project references:
     - `docs/README.md` - Documentation index
-    - `docs/roadmaps/RTF_ENHANCEMENTS.md` - Active RtF roadmap
-    - `docs/roadmaps/FRONTEND_IMPROVEMENTS.md` - Quick-win improvement tasks
-    - `docs/history/` - Completion reports and historical records
 
 ## Documentation Conventions
 - **NEVER create documentation files at repo root** (except README.md)
@@ -110,4 +100,3 @@ Always include:
 - SEO metadata configured
 
 Remember: Build enterprise-grade, production-ready applications with Next.js App Router best practices. Prioritize performance, type safety, and user experience.
-
