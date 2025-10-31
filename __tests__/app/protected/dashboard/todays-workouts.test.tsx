@@ -31,6 +31,7 @@ let routinesData: Routine[] | undefined;
 let routinesLoading = false;
 let routinesError: Error | undefined = undefined;
 let activeData: WorkoutSession | undefined = undefined;
+let sessionsMock: any = { data: { pages: [{ items: [] }] } };
 const startMutateAsync = vi.fn();
 
 vi.mock('@/lib/api/hooks/useRoutines', () => ({
@@ -40,6 +41,8 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
 vi.mock('@/lib/api/hooks/useWorkoutSession', () => ({
   useActiveSession: () => ({ data: activeData }),
   useStartSession: () => ({ mutateAsync: startMutateAsync, isPending: false }),
+  // New dependency in TodaysWorkouts
+  useSessions: () => sessionsMock,
 }));
 
 // Import after mocks
@@ -82,6 +85,7 @@ describe("Today's Workouts", () => {
     routinesError = undefined;
     activeData = undefined;
     startMutateAsync.mockReset();
+    sessionsMock = { data: { pages: [{ items: [] }] } };
   });
 
   it('shows loading state with weekday', () => {
@@ -135,6 +139,36 @@ describe("Today's Workouts", () => {
 
     expect(push).toHaveBeenCalledWith('/workouts/sessions/sess-2');
     expect(startMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("hides a routine if a COMPLETED session exists today", () => {
+    // One routine scheduled for today (Monday)
+    routinesData = [
+      makeRoutine({ id: 'r1', name: 'PPL', days: [{ id: 'd1', dayOfWeek: 1, order: 1, exercises: [] }] }),
+    ];
+    // Mock today's completed sessions to include this routine
+    sessionsMock = {
+      data: {
+        pages: [
+          {
+            items: [
+              {
+                id: 'sess-completed-1',
+                status: 'COMPLETED',
+                startedAt: new Date().toISOString(),
+                endedAt: new Date().toISOString(),
+                routine: { id: 'r1', name: 'PPL', dayName: 'Monday' },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    render(<TodaysWorkouts />);
+
+    // Since the only routine has a completed session today, it should be hidden
+    expect(screen.getByText(/No workouts scheduled today/i)).toBeInTheDocument();
   });
 
   it('shows conflict dialog when active session is for another day and navigates to it', async () => {

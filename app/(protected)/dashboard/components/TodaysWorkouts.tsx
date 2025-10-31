@@ -29,6 +29,7 @@ import { useRoutines } from '@/lib/api/hooks/useRoutines';
 import {
   useActiveSession,
   useStartSession,
+  useSessions,
 } from '@/lib/api/hooks/useWorkoutSession';
 import { getTodayDow, weekdayName, validateRoutineDayDate } from '@/lib/utils/date';
 import { Routine, RoutineDay } from '@/lib/api/types/routine.type';
@@ -59,6 +60,40 @@ export default function TodaysWorkouts() {
       })
       .filter((x): x is { routine: Routine; day: RoutineDay; canStartToday: boolean } => Boolean(x));
   }, [routines, todayDow]);
+
+  // Determine today's local ISO range
+  const fromISO = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }, []);
+  const toISO = useMemo(() => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d.toISOString();
+  }, []);
+
+  // Fetch today's completed sessions and build a set of routineIds completed today
+  const completedTodayQuery = useSessions({
+    status: 'COMPLETED',
+    from: fromISO,
+    to: toISO,
+    sort: 'finishedAt:desc',
+    limit: 50,
+  });
+
+  const completedRoutineIds = useMemo(() => {
+    const pages = completedTodayQuery.data?.pages ?? [];
+    const items = pages.flatMap(p => p.items ?? []);
+    return new Set(items.map(i => i.routine.id));
+  }, [completedTodayQuery.data]);
+
+  // Filter out routines that already have a completed session today
+  const visibleTodays = useMemo(() => {
+    if (!todays.length) return todays;
+    if (!completedRoutineIds.size) return todays;
+    return todays.filter(({ routine }) => !completedRoutineIds.has(routine.id));
+  }, [todays, completedRoutineIds]);
 
   const handleStart = async (routineId: string, routineDayId: string) => {
     if (!routineId || !routineDayId) return;
@@ -94,7 +129,7 @@ export default function TodaysWorkouts() {
     return <p className="text-destructive">Error: {error.message}</p>;
   }
 
-  if (!todays.length) {
+  if (!visibleTodays.length) {
     return (
       <Card>
         <CardHeader>
@@ -129,13 +164,13 @@ export default function TodaysWorkouts() {
         <CardHeader>
           <CardTitle>Today’s Workouts</CardTitle>
           <CardDescription>
-            {todays.length === 1
+            {visibleTodays.length === 1
               ? 'You have 1 workout planned.'
-              : `You have ${todays.length} workouts planned.`}
+              : `You have ${visibleTodays.length} workouts planned.`}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {todays.map(({ routine, day, canStartToday }) => {
+          {visibleTodays.map(({ routine, day, canStartToday }) => {
             const isActiveForThis =
               active?.status === 'IN_PROGRESS' && active?.routineDayId === day.id;
             return (
