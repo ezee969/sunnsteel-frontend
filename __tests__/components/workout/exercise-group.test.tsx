@@ -193,15 +193,16 @@ describe('ExerciseGroup', () => {
 	it('should show completion status styling', () => {
 		render(<ExerciseGroup {...defaultProps} />)
 
-		const completionBadge = screen.getByText('1/3 sets completed')
-		expect(completionBadge).toBeInTheDocument()
+		const completionText = screen.getByText('1/3 sets completed')
+		expect(completionText).toBeInTheDocument()
 
-		// Test with all completed - check the percentage badge instead
+		// With all sets completed, a ✓ Complete badge is shown
 		const completedSets = mockSets.map(set => ({ ...set, isCompleted: true }))
 
-		const { rerender } = render(<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />)
-		const percentageBadge = screen.getByText('100%')
-		expect(percentageBadge).toHaveClass('bg-green-100', 'text-green-800')
+		const { rerender } = render(
+			<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />
+		)
+		expect(screen.getByText('✓ Complete')).toBeInTheDocument()
 	})
 
 	it('should handle long exercise names', () => {
@@ -262,16 +263,15 @@ describe('ExerciseGroup', () => {
 	})
 
 	it('should show appropriate visual feedback for completion status', () => {
-		// Test incomplete exercise - check the percentage badge instead of the text
+		// Incomplete exercise shows progress text, not percent badge
 		render(<ExerciseGroup {...defaultProps} />)
-		let badge = screen.getByText('33%')
-		expect(badge).toHaveClass('bg-secondary')
+		expect(screen.getByText('1/3 sets completed')).toBeInTheDocument()
+		expect(screen.queryByText('✓ Complete')).not.toBeInTheDocument()
 
-		// Test completed exercise
+		// Completed exercise shows ✓ Complete badge
 		const completedSets = mockSets.map(set => ({ ...set, isCompleted: true }))
 
 		const { rerender } = render(<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />)
-		badge = screen.getByText('100%')
-		expect(badge).toHaveClass('bg-green-100')
+		expect(screen.getByText('✓ Complete')).toBeInTheDocument()
 	})
 })

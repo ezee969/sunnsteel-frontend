@@ -66,7 +66,7 @@ export const ExerciseGroup = ({
           onClick={onToggleCollapse}
           className="w-full justify-between p-0 h-auto hover:bg-transparent"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex flex-1 min-w-0 items-center gap-3">
             <div className="flex items-center gap-2">
               {isCollapsed ? (
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -75,7 +75,7 @@ export const ExerciseGroup = ({
               )}
               <Dumbbell className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-left">
+            <div className="text-left min-w-0">
               <h3 className="font-semibold text-base line-clamp-1">
                 {exerciseName}
               </h3>
@@ -85,17 +85,7 @@ export const ExerciseGroup = ({
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Badge 
-              variant={isComplete ? "default" : "secondary"}
-              className={`text-xs ${
-                isComplete 
-                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" 
-                  : ""
-              }`}
-            >
-              {Math.round(completionPercentage)}%
-            </Badge>
+          <div className="flex items-center gap-2 shrink-0">
             {isComplete && (
               <Badge 
                 variant="secondary"

@@ -118,10 +118,6 @@ export const useSetLogForm = ({
       isCompletedState !== lastSavedRef.current.isCompleted;
     
     if (!hasChanged) {
-      // Cancel pending state if values reverted to last saved
-      if (saveState === 'pending') {
-        setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'idle');
-      }
       return;
     }
 
@@ -163,7 +159,7 @@ export const useSetLogForm = ({
       markSetPending(sessionId, routineExerciseId, setNumber);
     } else if (!hasImmediateChange && saveState === 'pending') {
       // Cancel pending immediately if reverted before debounce
-      setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'idle');
+      void 0
     }
   }, [
     repsState,

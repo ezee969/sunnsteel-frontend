@@ -4,7 +4,7 @@ import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { PwaProvider } from '@/providers/pwa-provider';
-import dynamic from 'next/dynamic';
+import DevInjections from '@/components/dev-injections';
 
 const oswald = Oswald({
   variable: '--font-oswald',
@@ -36,19 +36,7 @@ const cinzel = Cinzel({
 
 import { Viewport } from 'next';
 
-// Dev-only dynamic components (code-split, client-only)
-const DynamicPerformanceDebugPanel = dynamic(
-  () =>
-    import('@/components/PerformanceDebugPanel').then(
-      m => m.PerformanceDebugPanel
-    ),
-  { ssr: false }
-);
-
-const DynamicEruda = dynamic(
-  () => import('@/components/Eruda').then(m => m.Eruda),
-  { ssr: false }
-);
+// Client-only dev helpers are rendered via DevInjections
 
 const SHOW_PERF_PANEL =
   process.env.NODE_ENV === 'development' &&
@@ -132,8 +120,10 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <PwaProvider />
           <AppProvider>{children}</AppProvider>
-          {SHOW_PERF_PANEL ? <DynamicPerformanceDebugPanel /> : null}
-          {ENABLE_ERUDA ? <DynamicEruda /> : null}
+          <DevInjections
+            showPerfPanel={SHOW_PERF_PANEL}
+            enableEruda={ENABLE_ERUDA}
+          />
         </ThemeProvider>
       </body>
     </html>
