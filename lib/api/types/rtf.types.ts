@@ -3,7 +3,8 @@
  * Mirrors backend RTF week goals structure
  */
 
-export type RtfVariant = 'STANDARD' | 'HYPERTROPHY';
+import type { RtfVariant } from '@sunsteel/contracts'
+export type { RtfVariant } from '@sunsteel/contracts'
 
 /**
  * Individual RTF exercise goal for a specific week

@@ -2,6 +2,7 @@
 import type { RepType, ProgressionScheme } from './routine.shared'
 export type { RepType, ProgressionScheme } from './routine.shared'
 import type { RtfWeekGoals } from './rtf.types'
+import type { ProgramStyle } from '@sunsteel/contracts'
 
 export interface RoutineSet {
   setNumber: number;
@@ -22,7 +23,7 @@ export interface RoutineExercise {
   programTMKg?: number;
   programRoundingKg?: number;
   // Unified scheme variant persisted server-side
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
+  programStyle?: ProgramStyle;
   exercise: {
     id: string;
     name: string;
@@ -43,7 +44,7 @@ export interface Routine {
   name: string;
   description?: string;
   isPeriodized: boolean;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
+  programStyle?: ProgramStyle;
   isFavorite: boolean;
   isCompleted: boolean;
   createdAt: string;
@@ -83,7 +84,7 @@ export interface CreateRoutineRequest {
       programTMKg?: number;
       programRoundingKg?: number;
       // Unified PROGRAMMED_RTF variant indicator per exercise
-      programStyle?: 'STANDARD' | 'HYPERTROPHY';
+      programStyle?: ProgramStyle;
       sets: Array<
         | {
             setNumber: number;
@@ -101,5 +102,5 @@ export interface CreateRoutineRequest {
       >;
     }>;
   }>;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
+  programStyle?: ProgramStyle;
 }

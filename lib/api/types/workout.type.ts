@@ -1,4 +1,5 @@
 import type { ProgressionScheme } from './routine.shared';
+import type { RepType, WorkoutSessionStatus } from '@sunsteel/contracts'
 export interface SetLog {
   id: string;
   sessionId: string;
@@ -13,8 +14,6 @@ export interface SetLog {
   createdAt: string;
   updatedAt: string;
 }
-
-export type WorkoutSessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABORTED';
 
 export interface WorkoutSession {
   id: string;
@@ -72,7 +71,7 @@ export interface WorkoutSession {
       sets: {
         id: string;
         setNumber: number;
-        repType: 'FIXED' | 'RANGE';
+        repType: RepType;
         reps?: number | null;
         minReps?: number | null;
         maxReps?: number | null;
@@ -82,35 +81,18 @@ export interface WorkoutSession {
   };
 }
 
-export interface StartWorkoutRequest {
-  routineId: string;
-  routineDayId: string;
-  notes?: string;
-}
-
-export type FinishStatus = 'COMPLETED' | 'ABORTED';
-
-export interface FinishWorkoutRequest {
-  status: FinishStatus;
-  notes?: string;
-}
-
-export interface UpsertSetLogRequest {
-  routineExerciseId: string;
-  exerciseId: string;
-  setNumber: number;
-  reps: number;
-  weight?: number;
-  rpe?: number;
-  isCompleted?: boolean;
-}
+export type {
+	FinishWorkoutRequest,
+	StartWorkoutRequest,
+	UpsertSetLogRequest,
+} from '@sunsteel/contracts'
 
 // History/List types
-export type WorkoutSessionListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABORTED';
+export type WorkoutSessionListStatus = WorkoutSessionStatus
 
 export interface WorkoutSessionSummary {
   id: string;
-  status: WorkoutSessionListStatus;
+  status: WorkoutSessionStatus;
   startedAt: string;
   endedAt?: string | null;
   durationSec?: number | null;
@@ -125,18 +107,4 @@ export interface WorkoutSessionSummary {
   };
 }
 
-export interface ListSessionsParams {
-  status?: WorkoutSessionListStatus;
-  routineId?: string;
-  from?: string; // ISO date
-  to?: string; // ISO date
-  q?: string;
-  cursor?: string;
-  limit?: number;
-  sort?: 'finishedAt:desc' | 'finishedAt:asc' | 'startedAt:desc' | 'startedAt:asc';
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  nextCursor?: string;
-}
+export type { ListSessionsParams, PaginatedResponse } from '@sunsteel/contracts'
