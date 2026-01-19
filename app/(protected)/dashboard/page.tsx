@@ -31,10 +31,10 @@ export default function Dashboard() {
       <TodaysWorkouts />
 
       {/* Stats Overview */}
-      <StatsOverview />
+      {/* <StatsOverview /> */}
 
       {/* Workout Programs */}
-      <WorkoutPrograms />
+      {/* <WorkoutPrograms /> */}
     </div>
   );
 }
