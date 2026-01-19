@@ -29,7 +29,6 @@ export const HeroBackdrop: React.FC<HeroBackdropProps> = ({
 	overlayColor = 'rgba(0,0,0,0.25)',
 	overlayGradient,
 	className,
-
 	style,
 	darkFilter = 'brightness(0.5) saturate(0.95)',
 	children,
