@@ -14,8 +14,14 @@ interface RtfConfigurationProps {
 }
 
 export function RtfConfiguration({ data, onUpdate }: RtfConfigurationProps) {
-	const { preview, fullProgram, tmTrend, rtfExercises, previewExerciseId, setPreviewExerciseId } =
-		useRtfProgramPreview({ data, onUpdate })
+	const {
+		preview,
+		fullProgram,
+		tmTrend,
+		rtfExercises,
+		previewExerciseId,
+		setPreviewExerciseId,
+	} = useRtfProgramPreview({ data, onUpdate })
 
 	return (
 		<div className="space-y-6">
@@ -23,21 +29,22 @@ export function RtfConfiguration({ data, onUpdate }: RtfConfigurationProps) {
 			<div className="space-y-2">
 				<h2 className="text-2xl font-bold">RtF Program Configuration</h2>
 				<p className="text-muted-foreground">
-					Your routine includes Reps to Failure (RtF) exercises. Configure your program settings and preview the progression timeline.
+					Your routine includes Reps to Failure (RtF) exercises. Configure your
+					program settings and preview the progression timeline.
 				</p>
 			</div>
 
 			{/* RtF Program Settings */}
 			<div className="bg-muted/30 p-4 md:p-6 rounded-lg space-y-4">
 				<h3 className="font-semibold text-lg">Program Settings</h3>
-				
+
 				<div className="space-y-4">
 					{/* Deload Weeks Toggle */}
 					<div className="flex items-center justify-between gap-3 p-3 bg-background rounded-md">
 						<div className="space-y-1">
 							<span className="text-sm font-medium">Include deload weeks</span>
 							<p className="text-xs text-muted-foreground">
-								{data.programWithDeloads 
+								{data.programWithDeloads
 									? '21-week program with deload weeks at W7, W14, W21'
 									: '18-week program without deload weeks'}
 							</p>
@@ -77,7 +84,8 @@ export function RtfConfiguration({ data, onUpdate }: RtfConfigurationProps) {
 			<div className="bg-muted/30 p-4 md:p-6 rounded-lg space-y-4">
 				<h3 className="font-semibold text-lg">Program Preview</h3>
 				<p className="text-sm text-muted-foreground">
-					View the progression timeline for your RtF exercises across the program duration.
+					View the progression timeline for your RtF exercises across the
+					program duration.
 				</p>
 				<RtfProgramPreviewPanel
 					preview={preview}

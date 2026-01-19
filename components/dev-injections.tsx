@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
 import dynamic from 'next/dynamic'
 
 const DynamicPerformanceDebugPanel = dynamic(
 	() =>
 		import('@/components/PerformanceDebugPanel').then(
-			m => m.PerformanceDebugPanel
+			m => m.PerformanceDebugPanel,
 		),
-	{ ssr: false }
+	{ ssr: false },
 )
 
 const DynamicEruda = dynamic(
 	() => import('@/components/Eruda').then(m => m.Eruda),
-	{ ssr: false }
+	{ ssr: false },
 )
 
 type Props = {
@@ -21,6 +21,8 @@ type Props = {
 }
 
 export default function DevInjections({ showPerfPanel, enableEruda }: Props) {
+	console.log('DevInjections - showPerfPanel:', showPerfPanel)
+	console.log('DevInjections - enableEruda:', enableEruda)
 	return (
 		<>
 			{showPerfPanel ? <DynamicPerformanceDebugPanel /> : null}
