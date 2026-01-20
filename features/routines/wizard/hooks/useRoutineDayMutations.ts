@@ -34,20 +34,22 @@ export function useRoutineDayMutations({
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
 		const targetDay = trainingDays[selectedDayIndex]
-		return data.days.findIndex((day) => day.dayOfWeek === targetDay)
+		return data.days.findIndex(day => day.dayOfWeek === targetDay)
 	}, [data.days, trainingDays, selectedDayIndex])
 
 	const withDayMutation = useCallback(
-		<Result = void>(mutator: (day: RoutineWizardData['days'][number]) => Result) => {
+		<Result = void>(
+			mutator: (day: RoutineWizardData['days'][number]) => Result,
+		) => {
 			const dayIndex = getDayIndex()
 			if (dayIndex === -1) return null
 
 			const originalDay = data.days[dayIndex]
 			const clonedDay = {
 				...originalDay,
-				exercises: originalDay.exercises.map((exercise) => ({
+				exercises: originalDay.exercises.map(exercise => ({
 					...exercise,
-					sets: exercise.sets.map((set) => ({ ...set })),
+					sets: exercise.sets.map(set => ({ ...set })),
 				})),
 			}
 
@@ -63,21 +65,22 @@ export function useRoutineDayMutations({
 
 	const addExercise = useCallback(
 		(exerciseId: string) =>
-			withDayMutation((day) => {
-				const newExercise: RoutineWizardData['days'][number]['exercises'][number] = {
-					exerciseId,
-					progressionScheme: 'NONE',
-					minWeightIncrement: 2.5,
-					restSeconds: 120,
-					sets: [
-						{
-							setNumber: 1,
-							repType: 'FIXED',
-							reps: 10,
-							weight: undefined,
-						},
-					],
-				}
+			withDayMutation(day => {
+				const newExercise: RoutineWizardData['days'][number]['exercises'][number] =
+					{
+						exerciseId,
+						progressionScheme: 'NONE',
+						minWeightIncrement: 2.5,
+						restSeconds: 180,
+						sets: [
+							{
+								setNumber: 1,
+								repType: 'FIXED',
+								reps: 10,
+								weight: undefined,
+							},
+						],
+					}
 
 				day.exercises.push(newExercise)
 				return day.exercises.length - 1
@@ -87,7 +90,7 @@ export function useRoutineDayMutations({
 
 	const removeExercise = useCallback(
 		(exerciseIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				day.exercises.splice(exerciseIndex, 1)
 			})
 		},
@@ -96,7 +99,7 @@ export function useRoutineDayMutations({
 
 	const updateExercise = useCallback(
 		(exerciseIndex: number, newExerciseId: string) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				// Only update the exerciseId, preserve all other configuration
@@ -108,10 +111,13 @@ export function useRoutineDayMutations({
 
 	const updateProgramTMKg = useCallback(
 		(exerciseIndex: number, tmKg: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				const rounded = roundToIncrement(clamp(tmKg, 0, MAX_WEIGHT), WEIGHT_STEP)
+				const rounded = roundToIncrement(
+					clamp(tmKg, 0, MAX_WEIGHT),
+					WEIGHT_STEP,
+				)
 				exercise.programTMKg = Number.isNaN(rounded) ? undefined : rounded
 			})
 		},
@@ -120,10 +126,12 @@ export function useRoutineDayMutations({
 
 	const updateProgramRoundingKg = useCallback(
 		(exerciseIndex: number, roundingKg: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				const valid = ALLOWED_ROUNDING.includes(roundingKg as typeof ALLOWED_ROUNDING[number])
+				const valid = ALLOWED_ROUNDING.includes(
+					roundingKg as (typeof ALLOWED_ROUNDING)[number],
+				)
 				exercise.programRoundingKg = valid ? roundingKg : 2.5
 			})
 		},
@@ -132,10 +140,14 @@ export function useRoutineDayMutations({
 
 	const updateMinWeightIncrement = useCallback(
 		(exerciseIndex: number, increment: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				exercise.minWeightIncrement = clamp(increment, MIN_WEIGHT_INCREMENT, MAX_WEIGHT)
+				exercise.minWeightIncrement = clamp(
+					increment,
+					MIN_WEIGHT_INCREMENT,
+					MAX_WEIGHT,
+				)
 			})
 		},
 		[withDayMutation],
@@ -155,17 +167,18 @@ export function useRoutineDayMutations({
 
 	const updateProgressionScheme = useCallback(
 		(exerciseIndex: number, scheme: ProgressionScheme) => {
-			const isTimeBased = scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+			const isTimeBased =
+				scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY'
 			if (isTimeBased && !canUseTimeframe) return
 
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 
 				exercise.progressionScheme = scheme
 
 				if (scheme !== 'NONE') {
-					exercise.sets.forEach((set) => {
+					exercise.sets.forEach(set => {
 						if (set.repType === 'FIXED') {
 							const base = set.reps ?? set.minReps ?? set.maxReps ?? 8
 							set.repType = 'RANGE'
@@ -191,7 +204,7 @@ export function useRoutineDayMutations({
 
 	const addSet = useCallback(
 		(exerciseIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				if (exercise.progressionScheme === 'PROGRAMMED_RTF') return
@@ -201,13 +214,18 @@ export function useRoutineDayMutations({
 				const newSet = {
 					setNumber: newSetNumber,
 					repType: lastSet?.repType ?? 'FIXED',
-					reps: lastSet?.repType === 'FIXED' ? lastSet?.reps ?? 10 : null,
-					minReps: lastSet?.repType === 'RANGE' ? lastSet?.minReps ?? 8 : null,
-					maxReps: lastSet?.repType === 'RANGE' ? lastSet?.maxReps ?? 12 : null,
+					reps: lastSet?.repType === 'FIXED' ? (lastSet?.reps ?? 10) : null,
+					minReps:
+						lastSet?.repType === 'RANGE' ? (lastSet?.minReps ?? 8) : null,
+					maxReps:
+						lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
 					weight: lastSet?.weight,
 				}
 
-				if (exercise.progressionScheme === 'DOUBLE_PROGRESSION' && exercise.sets.length > 0) {
+				if (
+					exercise.progressionScheme === 'DOUBLE_PROGRESSION' &&
+					exercise.sets.length > 0
+				) {
 					newSet.weight = exercise.sets[0].weight
 				}
 
@@ -219,7 +237,7 @@ export function useRoutineDayMutations({
 
 	const removeSet = useCallback(
 		(exerciseIndex: number, setIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				exercise.sets.splice(setIndex, 1)
@@ -233,7 +251,7 @@ export function useRoutineDayMutations({
 
 	const stepFixedReps = useCallback(
 		(exerciseIndex: number, setIndex: number, delta: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -251,7 +269,7 @@ export function useRoutineDayMutations({
 			field: 'minReps' | 'maxReps',
 			delta: number,
 		) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -278,15 +296,21 @@ export function useRoutineDayMutations({
 
 	const stepWeight = useCallback(
 		(exerciseIndex: number, setIndex: number, delta: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!exercise || !set) return
 
 				const current = set.weight ?? 0
-				const next = Math.max(0, roundToIncrement(current + delta * WEIGHT_STEP, WEIGHT_STEP))
+				const next = Math.max(
+					0,
+					roundToIncrement(current + delta * WEIGHT_STEP, WEIGHT_STEP),
+				)
 				set.weight = next
-				syncDoubleProgressionWeights(exercise, setIndex === 0 ? next : exercise.sets[0]?.weight)
+				syncDoubleProgressionWeights(
+					exercise,
+					setIndex === 0 ? next : exercise.sets[0]?.weight,
+				)
 			})
 		},
 		[withDayMutation],
@@ -294,7 +318,7 @@ export function useRoutineDayMutations({
 
 	const validateMinMaxReps = useCallback(
 		(exerciseIndex: number, setIndex: number, field: 'minReps' | 'maxReps') => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -328,7 +352,7 @@ export function useRoutineDayMutations({
 			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
 			value: string,
 		) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!exercise || !set) return
@@ -354,15 +378,21 @@ export function useRoutineDayMutations({
 						const parsed = parseFloat(value)
 						set.weight = Number.isNaN(parsed) ? undefined : Math.max(0, parsed)
 					}
-					syncDoubleProgressionWeights(exercise, value === '' ? undefined : set.weight)
+					syncDoubleProgressionWeights(
+						exercise,
+						value === '' ? undefined : set.weight,
+					)
 				} else {
 					const parsed = value === '' ? null : parseInt(value, 10)
 					if (field === 'reps') {
-						set.reps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.reps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					} else if (field === 'minReps') {
-						set.minReps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.minReps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					} else if (field === 'maxReps') {
-						set.maxReps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.maxReps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					}
 				}
 			})
@@ -372,7 +402,7 @@ export function useRoutineDayMutations({
 
 	const setRestSeconds = useCallback(
 		(exerciseIndex: number, restSeconds: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				exercise.restSeconds = restSeconds
