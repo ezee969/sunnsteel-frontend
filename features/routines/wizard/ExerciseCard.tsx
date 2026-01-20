@@ -21,7 +21,10 @@ export interface ExerciseCardProps {
 	onRemoveExercise: (exerciseIndex: number) => void
 	onUpdateExercise: (exerciseIndex: number, newExerciseId: string) => void
 	onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void
-	onUpdateProgressionScheme: (exerciseIndex: number, scheme: ProgressionScheme) => void
+	onUpdateProgressionScheme: (
+		exerciseIndex: number,
+		scheme: ProgressionScheme,
+	) => void
 	onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void
 	onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void
 	onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void
@@ -39,7 +42,11 @@ export interface ExerciseCardProps {
 		setIndex: number,
 		field: 'minReps' | 'maxReps',
 	) => void
-	onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void
+	onStepFixedReps: (
+		exerciseIndex: number,
+		setIndex: number,
+		delta: number,
+	) => void
 	onStepRangeReps: (
 		exerciseIndex: number,
 		setIndex: number,
@@ -122,9 +129,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 		if (!editSearchValue.trim()) return exercises
 		const search = editSearchValue.toLowerCase()
 		return exercises.filter(
-			(ex) =>
+			ex =>
 				ex.name.toLowerCase().includes(search) ||
-				ex.primaryMuscles?.some((m) => m.toLowerCase().includes(search)) ||
+				ex.primaryMuscles?.some(m => m.toLowerCase().includes(search)) ||
 				ex.equipment?.toLowerCase().includes(search),
 		)
 	}, [exercises, editSearchValue])
@@ -134,7 +141,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 		if (!isEditDropdownOpen) return
 
 		const handleClickOutside = (event: MouseEvent) => {
-			if (editDropdownRef.current && !editDropdownRef.current.contains(event.target as Node)) {
+			if (
+				editDropdownRef.current &&
+				!editDropdownRef.current.contains(event.target as Node)
+			) {
 				setIsEditDropdownOpen(false)
 				setEditSearchValue('')
 			}
@@ -144,10 +154,12 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 		return () => document.removeEventListener('mousedown', handleClickOutside)
 	}, [isEditDropdownOpen])
 
-	const handleEditButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleEditButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>,
+	) => {
 		event.stopPropagation()
 		event.preventDefault()
-		setIsEditDropdownOpen((prev) => !prev)
+		setIsEditDropdownOpen(prev => !prev)
 	}
 
 	const handleEditExercise = (newExerciseId: string) => {
@@ -174,7 +186,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 						onRemoveButtonClick={handleRemoveButtonClick}
 					/>
 					{isEditDropdownOpen && (
-						<div 
+						<div
 							ref={editDropdownRef}
 							className="absolute top-full right-2 z-[100] mt-1 w-[300px] bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200"
 							style={{ maxHeight: '400px' }}
@@ -185,7 +197,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 									aria-label="Search exercises"
 									placeholder="Search exercises..."
 									value={editSearchValue}
-									onChange={(e) => setEditSearchValue(e.target.value)}
+									onChange={e => setEditSearchValue(e.target.value)}
 									className="w-full px-3 py-2 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
 									autoFocus
 								/>
@@ -198,7 +210,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 									</div>
 								) : filteredExercises.length > 0 ? (
 									<div className="space-y-1">
-										{filteredExercises.map((ex) => (
+										{filteredExercises.map(ex => (
 											<button
 												key={ex.id}
 												onClick={() => handleEditExercise(ex.id)}
@@ -226,54 +238,54 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 					)}
 				</div>
 				<CardContent
-				className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-					expanded ? 'max-h-[3000px]' : 'max-h-0'
-				}`}
-				aria-hidden={!expanded}
-			>
-				<div
-					id={controlsId}
-					className={`p-0 sm:p-1 transition-opacity duration-300 ease-in-out ${
-						expanded ? 'opacity-100' : 'opacity-0'
+					className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+						expanded ? 'max-h-[3000px]' : 'max-h-0'
 					}`}
+					aria-hidden={!expanded}
 				>
-					<ExerciseConfigSection
-						exercise={exercise}
-						exerciseIndex={exerciseIndex}
-						disableTimeBasedProgressions={disableTimeBasedProgressions}
-						tmInput={tmInput}
-						tmMissing={tmMissing}
-						tmHelpId={helpId}
-						onTmInputChange={handleTmInputChange}
-						onTmBlur={handleTmBlur}
-						weightIncInput={weightIncInput}
-						onWeightIncChange={handleWeightIncChange}
-						onWeightIncBlur={handleWeightIncBlur}
-						onUpdateRestTime={onUpdateRestTime}
-						onUpdateProgressionScheme={onUpdateProgressionScheme}
-						onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
-					/>
-
-					{showSets && (
-						<SetListSection
+					<div
+						id={controlsId}
+						className={`p-0 sm:p-1 transition-opacity duration-300 ease-in-out ${
+							expanded ? 'opacity-100' : 'opacity-0'
+						}`}
+					>
+						<ExerciseConfigSection
 							exercise={exercise}
 							exerciseIndex={exerciseIndex}
-							tabIndex={tabIndex}
-							setsExpanded={setsExpanded}
-							onToggleSets={toggleSetsExpanded}
-							onAddSet={handleAddSet}
-							registerSetRowRef={registerSetRowRef}
-							onUpdateSet={onUpdateSet}
-							onValidateMinMaxReps={onValidateMinMaxReps}
-							onStepFixedReps={onStepFixedReps}
-							onStepRangeReps={onStepRangeReps}
-							onStepWeight={onStepWeight}
-							onRemoveSetAnimated={onRemoveSetAnimated}
-							isRemovingSet={isRemovingSet}
+							disableTimeBasedProgressions={disableTimeBasedProgressions}
+							tmInput={tmInput}
+							tmMissing={tmMissing}
+							tmHelpId={helpId}
+							onTmInputChange={handleTmInputChange}
+							onTmBlur={handleTmBlur}
+							weightIncInput={weightIncInput}
+							onWeightIncChange={handleWeightIncChange}
+							onWeightIncBlur={handleWeightIncBlur}
+							onUpdateRestTime={onUpdateRestTime}
+							onUpdateProgressionScheme={onUpdateProgressionScheme}
+							onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
 						/>
-					)}
-				</div>
-			</CardContent>
+
+						{showSets && (
+							<SetListSection
+								exercise={exercise}
+								exerciseIndex={exerciseIndex}
+								tabIndex={tabIndex}
+								setsExpanded={setsExpanded}
+								onToggleSets={toggleSetsExpanded}
+								onAddSet={handleAddSet}
+								registerSetRowRef={registerSetRowRef}
+								onUpdateSet={onUpdateSet}
+								onValidateMinMaxReps={onValidateMinMaxReps}
+								onStepFixedReps={onStepFixedReps}
+								onStepRangeReps={onStepRangeReps}
+								onStepWeight={onStepWeight}
+								onRemoveSetAnimated={onRemoveSetAnimated}
+								isRemovingSet={isRemovingSet}
+							/>
+						)}
+					</div>
+				</CardContent>
 			</Card>
 		</>
 	)

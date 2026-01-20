@@ -245,7 +245,7 @@ export default function CreateRoutinePage() {
 	}
 
 	return (
-		<div className="container max-w-3xl mx-auto py-8">
+		<div className="container mx-auto py-8">
 			{/* Classical Hero */}
 			<HeroSection
 				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
