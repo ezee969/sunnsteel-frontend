@@ -1,85 +1,43 @@
-## Rules & Guidelines
-The project is executed in Windows 11.
-Never try to mount the project by yourself, always ask the user to do it.
+## Sunnsteel Frontend (Next.js App Router)
 
-# GitHub Copilot Next.js Enterprise Developer Rule
-You are an expert senior Next.js developer specializing in Next.js App Router, React Server Components, TypeScript, Supabase, Shadcn/UI, Tailwind CSS, Framer Motion, Zod, and TanStack Query for enterprise applications.
+- The project is executed in Windows 11.
+- Never try to mount/run the project by yourself; ask the user to do it.
+- Keep documentation under `docs/` (avoid adding new root-level docs files).
 
-## Core Principles
-- Default to Server Components for performance and SEO
-- Implement type-safe, validated data flows from database to UI
-- Optimize for Core Web Vitals and accessibility
-- Write scalable, production-ready code
+### Developer workflows (from `package.json`)
 
-## Code Standards
-- Tabs for indentation, single quotes, no semicolons
-- PascalCase: Components, Types; kebab-case: files; camelCase: variables/functions
-- Prefix handlers with 'handle', booleans with verbs, hooks with 'use'
-- Line limit: 80 characters, strict equality (===), trailing commas
+- Run app: `npm run dev` (Next.js dev with Turbopack)
+- Run both apps: `npm run dev:all` (PowerShell launcher in `start-dev.ps1`)
+- Tests: `npm test` (Vitest), `npm run test:watch`, `npm run test:coverage`
 
-## Next.js App Router Patterns
-- Use Server Components by default
-- 'use client' only for: interactivity, browser APIs, state, client libraries
-- Implement proper loading.tsx and error.tsx boundaries
-- Use Server Actions for mutations and forms
-- Leverage streaming with Suspense boundaries
+### Auth + routing (cookie-based protection)
 
-## Technology-Specific Requirements
+- Route protection is implemented in [middleware.ts](../middleware.ts):
+	- Protected prefixes: `/dashboard`, `/workouts`, `/routines`.
+	- Session detection is via cookies: prefer HttpOnly `ss_session=1`, fallback `has_session=1`.
+	- Backend sets `ss_session` on `/auth/supabase/verify`.
+	- Unauthenticated users are redirected to `/login?redirectTo=...` (original path) by the middleware.
 
-### **Supabase Integration**
-- Create typed database interfaces with Supabase CLI
-- Implement RLS policies for security
-- Use appropriate server/client Supabase instances
-- Handle real-time subscriptions with proper cleanup
+### Supabase + backend verification flow
 
-### **Shadcn/UI + Tailwind**
-- Use Shadcn components as building blocks
-- Customize with Tailwind and CSS variables
-- Mobile-first responsive design
-- Implement dark mode support
-- Ensure WCAG 2.1 AA compliance
+- Supabase client lives in [lib/supabase/client.ts](../lib/supabase/client.ts) (uses a “dummy client” during build if env vars are missing).
+- Auth service calls:
+	- Supabase auth (email/password or Google OAuth)
+	- then verifies with backend using `/auth/supabase/verify` in [lib/api/services/supabaseAuthService.ts](../lib/api/services/supabaseAuthService.ts)
 
-### **Framer Motion**
-- Use transform properties for performance (x, y, scale, rotate)
-- Implement layout animations with layout prop
-- Use AnimatePresence for enter/exit animations
-- Create reusable animation variants
+### API layer conventions
 
-### **Zod Validation**
-- Create comprehensive schemas for all inputs
-- Use with react-hook-form for client validation
-- Implement server-side validation in Server Actions
-- Validate environment variables
+- Use the shared fetch wrapper in [lib/api/services/httpClient.ts](../lib/api/services/httpClient.ts):
+	- Base URL comes from `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:4000/api`).
+	- `secure: true` attaches `Authorization: Bearer <supabase access_token>`.
+	- Always uses `credentials: 'include'` so cookies flow as well.
+- Put endpoint calls in `lib/api/services/*` (example: [lib/api/services/routineService.ts](../lib/api/services/routineService.ts)) and React Query hooks in `lib/api/hooks/*`.
+	- Service methods typically build query strings via `URLSearchParams` (see `getUserRoutines` in `routineService`).
 
-### **TanStack Query**
-- Use only for client-side data fetching
-- Implement proper cache invalidation
-- Use optimistic updates for better UX
-- Create typed query hooks with error handling
+### Shared contracts (`@sunsteel/contracts`)
 
-## Performance & Security
-- Optimize images with Next.js Image component
-- Implement proper caching strategies
-- Use static generation where possible
-- Implement CSRF protection and input sanitization
-- Use Supabase RLS for data security
+- Prefer shared enums/types from `@sunsteel/contracts` via the wrappers in `lib/api/types/*` instead of redefining API shapes.
 
-## Code Generation Requirements
-Always include:
-1. TypeScript interfaces and Zod schemas first
-2. Server Components by default
-3. Proper error handling and loading states
-4. Accessibility attributes
-5. Responsive Tailwind classes
-6. Form validation with Zod
-7. Comprehensive JSDoc for complex functions
+### Code style
 
-## Quality Checklist
-- Server Components used where possible
-- Proper image optimization
-- Efficient database queries
-- Client bundle optimized
-- Accessibility standards met
-- SEO metadata configured
-
-Remember: Build enterprise-grade, production-ready applications with Next.js App Router best practices. Prioritize performance, type safety, and user experience.
+- Match the surrounding file’s formatting (tabs/spaces and semicolon usage vary). Imports typically use the `@/` alias.
