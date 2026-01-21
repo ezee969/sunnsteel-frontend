@@ -136,6 +136,7 @@ export default function EditRoutinePage() {
 							minReps: set.minReps ?? null,
 							maxReps: set.maxReps ?? null,
 							weight: set.weight,
+							rir: (set as unknown as { rir?: number | null }).rir ?? null,
 						})),
 						restSeconds: exercise.restSeconds,
 					})),

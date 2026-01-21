@@ -11,6 +11,8 @@ interface UseRoutineDayMutationsParams {
 
 const MIN_REPS = 1
 const MAX_REPS = 50
+const MIN_RIR = 0
+const MAX_RIR = 10
 const MIN_WEIGHT_INCREMENT = 0.25
 const MAX_WEIGHT = 500
 const WEIGHT_STEP = 0.5
@@ -83,6 +85,7 @@ export function useRoutineDayMutations({
 								repType: 'FIXED',
 								reps: 10,
 								weight: undefined,
+								rir: null,
 							},
 						],
 					}
@@ -225,6 +228,7 @@ export function useRoutineDayMutations({
 					maxReps:
 						lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
 					weight: lastSet?.weight,
+					rir: lastSet?.rir ?? null,
 				}
 
 				if (
@@ -354,8 +358,8 @@ export function useRoutineDayMutations({
 		(
 			exerciseIndex: number,
 			setIndex: number,
-			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-			value: string,
+			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+			value: string | number | null,
 		) => {
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
@@ -377,18 +381,28 @@ export function useRoutineDayMutations({
 						set.reps = null
 					}
 				} else if (field === 'weight') {
-					if (value === '') {
+					if (value === '' || value === null) {
 						set.weight = undefined
 					} else {
-						const parsed = parseFloat(value)
+						const parsed = parseFloat(String(value))
 						set.weight = Number.isNaN(parsed) ? undefined : Math.max(0, parsed)
 					}
 					syncDoubleProgressionWeights(
 						exercise,
 						value === '' ? undefined : set.weight,
 					)
+				} else if (field === 'rir') {
+					if (value === null || value === '') {
+						set.rir = null
+						return
+					}
+					const parsed = typeof value === 'number' ? value : parseInt(value, 10)
+					set.rir = Number.isNaN(parsed)
+						? null
+						: clamp(parsed, MIN_RIR, MAX_RIR)
 				} else {
-					const parsed = value === '' ? null : parseInt(value, 10)
+					const parsed =
+						value === '' || value === null ? null : parseInt(String(value), 10)
 					if (field === 'reps') {
 						set.reps =
 							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)

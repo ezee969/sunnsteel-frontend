@@ -34,8 +34,8 @@ export interface ExerciseCardProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-		value: string,
+		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (
 		exerciseIndex: number,

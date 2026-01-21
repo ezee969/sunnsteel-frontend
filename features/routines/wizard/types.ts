@@ -9,6 +9,7 @@ export interface RoutineSet {
 	minReps?: number | null
 	maxReps?: number | null
 	weight?: number | null
+	rir?: number | null
 }
 
 export interface RoutineWizardExercise {

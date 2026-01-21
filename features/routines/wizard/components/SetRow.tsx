@@ -21,15 +21,19 @@ interface SetRowProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-		value: string,
+		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (
 		exerciseIndex: number,
 		setIndex: number,
 		field: 'minReps' | 'maxReps',
 	) => void
-	onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void
+	onStepFixedReps: (
+		exerciseIndex: number,
+		setIndex: number,
+		delta: number,
+	) => void
 	onStepRangeReps: (
 		exerciseIndex: number,
 		setIndex: number,
@@ -67,6 +71,8 @@ export function SetRow({
 		handleMaxBlur,
 		handleWeightChange,
 		handleWeightBlur,
+		rirInput,
+		handleRirChange,
 	} = useSetRowInputs({
 		set,
 		exerciseIndex,
@@ -78,7 +84,9 @@ export function SetRow({
 	return (
 		<div
 			className={`bg-card border border-muted rounded-lg p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-all duration-200 ${
-				isRemoving ? 'animate-out fade-out-0 slide-out-to-top-2' : 'animate-in fade-in-0 slide-in-from-top-2'
+				isRemoving
+					? 'animate-out fade-out-0 slide-out-to-top-2'
+					: 'animate-in fade-in-0 slide-in-from-top-2'
 			}`}
 		>
 			<div className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-2 items-start sm:items-center">
@@ -107,7 +115,7 @@ export function SetRow({
 						</Label>
 						<Select
 							value={set.repType}
-							onValueChange={(value) =>
+							onValueChange={value =>
 								onUpdateSet(exerciseIndex, setIndex, 'repType', value)
 							}
 							disabled={progressionScheme !== 'NONE'}
@@ -148,7 +156,7 @@ export function SetRow({
 									aria-label="Reps"
 									placeholder="0"
 									value={set.reps ?? ''}
-									onChange={(event) => handleFixedRepsChange(event.target.value)}
+									onChange={event => handleFixedRepsChange(event.target.value)}
 									className="text-center h-8 flex-1 min-w-0"
 								/>
 								<Button
@@ -172,7 +180,9 @@ export function SetRow({
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
 											aria-label="Decrease minimum reps"
-											onClick={() => onStepRangeReps(exerciseIndex, setIndex, 'minReps', -1)}
+											onClick={() =>
+												onStepRangeReps(exerciseIndex, setIndex, 'minReps', -1)
+											}
 										>
 											<Minus className="h-3 w-3" />
 										</Button>
@@ -184,7 +194,7 @@ export function SetRow({
 											placeholder="Min"
 											autoComplete="off"
 											value={minInput}
-											onChange={(event) => handleMinChange(event.target.value)}
+											onChange={event => handleMinChange(event.target.value)}
 											onBlur={handleMinBlur}
 											className="text-center h-8 flex-1 min-w-0 sm:min-w-[64px]"
 										/>
@@ -194,12 +204,16 @@ export function SetRow({
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
 											aria-label="Increase minimum reps"
-											onClick={() => onStepRangeReps(exerciseIndex, setIndex, 'minReps', 1)}
+											onClick={() =>
+												onStepRangeReps(exerciseIndex, setIndex, 'minReps', 1)
+											}
 										>
 											<Plus className="h-3 w-3" />
 										</Button>
 									</div>
-									<span className="hidden sm:inline text-muted-foreground">-</span>
+									<span className="hidden sm:inline text-muted-foreground">
+										-
+									</span>
 									<div className="flex items-center gap-2 flex-1 min-w-0">
 										<Button
 											type="button"
@@ -207,7 +221,9 @@ export function SetRow({
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
 											aria-label="Decrease maximum reps"
-											onClick={() => onStepRangeReps(exerciseIndex, setIndex, 'maxReps', -1)}
+											onClick={() =>
+												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', -1)
+											}
 										>
 											<Minus className="h-3 w-3" />
 										</Button>
@@ -219,7 +235,7 @@ export function SetRow({
 											placeholder="Max"
 											autoComplete="off"
 											value={maxInput}
-											onChange={(event) => handleMaxChange(event.target.value)}
+											onChange={event => handleMaxChange(event.target.value)}
 											onBlur={handleMaxBlur}
 											className="text-center h-8 flex-1 min-w-0"
 										/>
@@ -229,7 +245,9 @@ export function SetRow({
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
 											aria-label="Increase maximum reps"
-											onClick={() => onStepRangeReps(exerciseIndex, setIndex, 'maxReps', 1)}
+											onClick={() =>
+												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', 1)
+											}
 										>
 											<Plus className="h-3 w-3" />
 										</Button>
@@ -252,7 +270,9 @@ export function SetRow({
 								size="icon"
 								className="h-9 w-9 p-0 shrink-0 sm:hidden"
 								aria-label="Decrease weight"
-								disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
+								disabled={
+									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+								}
 								onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
 							>
 								<Minus className="h-3 w-3" />
@@ -265,9 +285,11 @@ export function SetRow({
 								aria-label="Weight"
 								placeholder="0"
 								value={weightInput}
-								onChange={(event) => handleWeightChange(event.target.value)}
+								onChange={event => handleWeightChange(event.target.value)}
 								onBlur={handleWeightBlur}
-								disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
+								disabled={
+									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+								}
 								className={`text-center h-8 flex-1 min-w-0 ${
 									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
 										? 'cursor-not-allowed opacity-60'
@@ -280,7 +302,9 @@ export function SetRow({
 								size="icon"
 								className="h-9 w-9 p-0 shrink-0 sm:hidden"
 								aria-label="Increase weight"
-								disabled={progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0}
+								disabled={
+									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+								}
 								onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
 							>
 								<Plus className="h-3 w-3" />
@@ -289,7 +313,28 @@ export function SetRow({
 					</div>
 				</div>
 
-				<div className="hidden sm:flex sm:col-span-2 justify-end">
+				<div className="sm:col-span-1">
+					<div className="space-y-1">
+						<Label className="sm:hidden text-xs font-medium text-muted-foreground">
+							RIR
+						</Label>
+						<Input
+							type="number"
+							inputMode="numeric"
+							min={0}
+							max={10}
+							step={1}
+							autoComplete="off"
+							aria-label="RIR"
+							placeholder="0"
+							value={rirInput}
+							onChange={event => handleRirChange(event.target.value)}
+							className="text-center h-8 flex-1 min-w-0"
+						/>
+					</div>
+				</div>
+
+				<div className="hidden sm:flex sm:col-span-1 justify-end">
 					<Button
 						variant="ghost"
 						size="sm"
@@ -305,4 +350,3 @@ export function SetRow({
 		</div>
 	)
 }
-
