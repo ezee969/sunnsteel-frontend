@@ -12,6 +12,11 @@ export interface RoutineSet {
 }
 
 export interface RoutineWizardExercise {
+	/**
+	 * Client-only stable identifier used for UI concerns (e.g. drag-and-drop keys).
+	 * Not sent to the backend.
+	 */
+	clientId?: string
 	exerciseId: string
 	progressionScheme: ProgressionScheme
 	minWeightIncrement: number

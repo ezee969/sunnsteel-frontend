@@ -19,6 +19,7 @@ interface ExerciseHeaderProps {
 	onToggleButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
 	onEditButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
 	onRemoveButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
+	dragHandle?: React.ReactNode
 }
 
 export function ExerciseHeader({
@@ -31,6 +32,7 @@ export function ExerciseHeader({
 	onToggleButtonClick,
 	onEditButtonClick,
 	onRemoveButtonClick,
+	dragHandle,
 }: ExerciseHeaderProps) {
 	const plannedSets = getPresetSetCountForScheme(
 		exercise.progressionScheme,
@@ -54,7 +56,12 @@ export function ExerciseHeader({
 			onClick={onHeaderClick}
 			onKeyDown={onHeaderKeyDown}
 		>
-			<div className={cn('flex items-center justify-between', expanded ? 'gap-3' : 'gap-2')}>
+			<div
+				className={cn(
+					'flex items-center justify-between',
+					expanded ? 'gap-3' : 'gap-2',
+				)}
+			>
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2 min-w-0">
 						<div className="flex-1 min-w-0">
@@ -69,15 +76,18 @@ export function ExerciseHeader({
 							{expanded && (
 								<p className="text-xs sm:text-sm text-muted-foreground truncate">
 									{exerciseData?.primaryMuscles
-											? formatMuscleGroups(exerciseData.primaryMuscles)
-											: 'Unknown'}{' '}
+										? formatMuscleGroups(exerciseData.primaryMuscles)
+										: 'Unknown'}{' '}
 									• {exerciseData?.equipment}
 								</p>
 							)}
 						</div>
 						{!expanded && (
 							<div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
-								<Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 h-5">
+								<Badge
+									variant="secondary"
+									className="text-[10px] px-1.5 py-0.5 h-5"
+								>
 									{plannedSets}
 								</Badge>
 								<div className="flex items-center gap-0.5">
@@ -91,6 +101,7 @@ export function ExerciseHeader({
 					</div>
 				</div>
 				<div className="flex items-center gap-1 shrink-0">
+					{dragHandle}
 					<Button
 						variant="ghost"
 						size="sm"
@@ -112,7 +123,10 @@ export function ExerciseHeader({
 						size="sm"
 						aria-label="Edit exercise"
 						onClick={onEditButtonClick}
-						className={cn('p-0 text-muted-foreground hover:text-primary', expanded ? 'h-8 w-8' : 'h-6 w-6')}
+						className={cn(
+							'p-0 text-muted-foreground hover:text-primary',
+							expanded ? 'h-8 w-8' : 'h-6 w-6',
+						)}
 					>
 						<Pencil className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
 					</Button>
@@ -121,7 +135,10 @@ export function ExerciseHeader({
 						size="sm"
 						aria-label="Remove exercise"
 						onClick={onRemoveButtonClick}
-						className={cn('p-0 text-muted-foreground hover:text-destructive', expanded ? 'h-8 w-8' : 'h-6 w-6')}
+						className={cn(
+							'p-0 text-muted-foreground hover:text-destructive',
+							expanded ? 'h-8 w-8' : 'h-6 w-6',
+						)}
 					>
 						<Trash2 className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
 					</Button>

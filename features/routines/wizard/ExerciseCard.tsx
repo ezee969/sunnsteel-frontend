@@ -57,6 +57,7 @@ export interface ExerciseCardProps {
 	disableTimeBasedProgressions?: boolean
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
+	dragHandle?: React.ReactNode
 }
 
 export const ExerciseCard: FC<ExerciseCardProps> = ({
@@ -84,6 +85,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 	disableTimeBasedProgressions,
 	exercises = [],
 	isExercisesLoading = false,
+	dragHandle,
 }) => {
 	const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false)
 	const [editSearchValue, setEditSearchValue] = useState('')
@@ -184,6 +186,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 						onToggleButtonClick={handleToggleButtonClick}
 						onEditButtonClick={handleEditButtonClick}
 						onRemoveButtonClick={handleRemoveButtonClick}
+						dragHandle={dragHandle}
 					/>
 					{isEditDropdownOpen && (
 						<div

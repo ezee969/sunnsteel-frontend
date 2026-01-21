@@ -24,6 +24,10 @@ const clamp = (value: number, min: number, max: number) => {
 const roundToIncrement = (value: number, increment: number) =>
 	Math.round(value / increment) * increment
 
+const makeClientId = () =>
+	globalThis.crypto?.randomUUID?.() ??
+	`${Date.now()}-${Math.random().toString(16).slice(2)}`
+
 export function useRoutineDayMutations({
 	data,
 	onUpdate,
@@ -68,6 +72,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const newExercise: RoutineWizardData['days'][number]['exercises'][number] =
 					{
+						clientId: makeClientId(),
 						exerciseId,
 						progressionScheme: 'NONE',
 						minWeightIncrement: 2.5,
@@ -83,7 +88,7 @@ export function useRoutineDayMutations({
 					}
 
 				day.exercises.push(newExercise)
-				return day.exercises.length - 1
+				return newExercise.clientId ?? null
 			})?.result ?? null,
 		[withDayMutation],
 	)

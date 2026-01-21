@@ -41,13 +41,20 @@ export function BuildDays({
 	isEditing = false,
 }: BuildDaysProps) {
 	const [expandedMapByDay, setExpandedMapByDay] = useState<
-		Record<number, Record<number, boolean>>
+		Record<number, Record<string, boolean>>
 	>({})
 	const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({})
 	const exerciseRefs = useRef<Record<string, HTMLDivElement | null>>({})
 	const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null)
 	const { data: exercises, isLoading: exercisesLoading } = useExercises()
 	const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME'
+
+	const makeClientId = useCallback(
+		() =>
+			globalThis.crypto?.randomUUID?.() ??
+			`${Date.now()}-${Math.random().toString(16).slice(2)}`,
+		[],
+	)
 	const {
 		selectedDay,
 		setSelectedDay,
@@ -110,6 +117,22 @@ export function BuildDays({
 		onUpdate({ days: newDays })
 	}, [canUseTimeframe, data.days, onUpdate])
 
+	// Ensure each exercise has a stable clientId for UI (keys, drag-and-drop)
+	useEffect(() => {
+		const needsClientIds = data.days.some(day =>
+			day.exercises.some(ex => !ex.clientId),
+		)
+		if (!needsClientIds) return
+
+		const newDays = data.days.map(day => ({
+			...day,
+			exercises: day.exercises.map(ex =>
+				ex.clientId ? ex : { ...ex, clientId: makeClientId() },
+			),
+		}))
+		onUpdate({ days: newDays })
+	}, [data.days, makeClientId, onUpdate])
+
 	// Scroll after render to target exercise card if queued
 
 	// After days update, if we have a pending target, scroll to it (with small retries)
@@ -140,10 +163,10 @@ export function BuildDays({
 	}, [pendingScrollKey, data.days])
 
 	const handleAddExercise = (exerciseId: string) => {
-		const index = addExercise(exerciseId)
-		if (index === null) return
+		const clientId = addExercise(exerciseId)
+		if (!clientId) return
 		closePicker()
-		setPendingScrollKey(`${exerciseId}-${index}`)
+		setPendingScrollKey(clientId)
 	}
 
 	const registerExerciseRef = useCallback(
@@ -234,6 +257,42 @@ export function BuildDays({
 					{data.trainingDays.map((dayId, tabIndex) => {
 						const day = data.days.find(d => d.dayOfWeek === dayId)
 
+						const handleReorderExercises = (
+							newExercises: RoutineWizardData['days'][number]['exercises'],
+						) => {
+							// Persist reorder at the wizard-state level (array order)
+							const newDays = data.days.map(d =>
+								d.dayOfWeek === dayId ? { ...d, exercises: newExercises } : d,
+							)
+							onUpdate({ days: newDays })
+						}
+
+						const handleToggleExpandByKey = (exerciseKey: string) => {
+							setExpandedMapByDay(prev => {
+								const dayMap = prev[dayId] ?? {}
+								return {
+									...prev,
+									[dayId]: {
+										...dayMap,
+										[exerciseKey]: !(dayMap?.[exerciseKey] ?? true),
+									},
+								}
+							})
+						}
+
+						const handleRemoveExercise = (exerciseIndex: number) => {
+							const exerciseKey = day?.exercises?.[exerciseIndex]?.clientId
+							removeExercise(exerciseIndex)
+							if (!exerciseKey) return
+							setExpandedMapByDay(prev => {
+								const dayMap = prev[dayId]
+								if (!dayMap || !(exerciseKey in dayMap)) return prev
+								const nextDayMap = { ...dayMap }
+								delete nextDayMap[exerciseKey]
+								return { ...prev, [dayId]: nextDayMap }
+							})
+						}
+
 						return (
 							<TabsContent
 								key={dayId}
@@ -261,19 +320,9 @@ export function BuildDays({
 											day={day}
 											exercisesCatalog={exercises}
 											expandedMap={expandedMapByDay[dayId] ?? {}}
-											onToggleExpand={idx =>
-												setExpandedMapByDay(prev => {
-													const dayMap = prev[dayId] ?? {}
-													return {
-														...prev,
-														[dayId]: {
-															...dayMap,
-															[idx]: !(dayMap?.[idx] ?? true),
-														},
-													}
-												})
-											}
-											onRemoveExercise={removeExercise}
+											onToggleExpand={handleToggleExpandByKey}
+											onRemoveExercise={handleRemoveExercise}
+											onReorderExercises={handleReorderExercises}
 											onUpdateExercise={updateExercise}
 											onUpdateRestTime={(exerciseIndex, value) =>
 												setRestSeconds(exerciseIndex, parseTime(value))
