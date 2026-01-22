@@ -6,7 +6,11 @@ import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatTime } from '@/lib/utils/time'
 import type { Exercise } from '@/lib/api/types'
 import type { RoutineWizardData } from '../types'
-import { DAYS_OF_WEEK, getRtfSetSummary, isRtFExercise } from '../utils/routine-summary'
+import {
+	DAYS_OF_WEEK,
+	getRtfSetSummary,
+	isRtFExercise,
+} from '../utils/routine-summary'
 
 interface RoutineDayCardProps {
 	day: RoutineWizardData['days'][number]
@@ -36,12 +40,14 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 									<p className="text-xs text-muted-foreground">
 										{meta?.primaryMuscles
 											? formatMuscleGroups(meta.primaryMuscles)
-											: 'Unknown'} • {meta?.equipment ?? 'Unknown'}
+											: 'Unknown'}{' '}
+										• {meta?.equipment ?? 'Unknown'}
 									</p>
 									{isRtF && (
 										<div className="mt-1 flex flex-wrap gap-1">
 											<Badge variant="outline" className="text-[10px]">
-												{exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+												{exercise.progressionScheme ===
+												'PROGRAMMED_RTF_HYPERTROPHY'
 													? 'RtF Hypertrophy'
 													: 'RtF Standard'}
 											</Badge>
@@ -64,29 +70,31 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 							</div>
 
 							<div className="flex flex-wrap gap-1.5">
-								{isRtF
-									? (
-										<>
-											<Badge variant="outline" className="text-xs font-normal">
-												{summary.fixedSets} × {summary.repRange} reps (fixed)
+								{isRtF ? (
+									<>
+										<Badge variant="outline" className="text-xs font-normal">
+											{summary.fixedSets} × {summary.repRange} reps (fixed)
+										</Badge>
+										<Badge variant="outline" className="text-xs font-normal">
+											1 × AMRAP set
+										</Badge>
+									</>
+								) : (
+									<>
+										{exercise.sets.map(set => (
+											<Badge
+												key={set.setNumber}
+												variant="outline"
+												className="text-xs font-normal"
+											>
+												{set.repType === 'FIXED'
+													? `${set.reps ?? ''} reps`
+													: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
+												{set.weight ? ` @ ${set.weight}kg` : ''}
 											</Badge>
-											<Badge variant="outline" className="text-xs font-normal">
-												1 × AMRAP set
-											</Badge>
-										</>
-									)
-									: (
-										<>
-											{exercise.sets.map((set) => (
-												<Badge key={set.setNumber} variant="outline" className="text-xs font-normal">
-													{set.repType === 'FIXED'
-														? `${set.reps ?? ''} reps`
-														: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
-													{set.weight ? ` @ ${set.weight}kg` : ''}
-												</Badge>
-											))}
-										</>
-									)}
+										))}
+									</>
+								)}
 							</div>
 						</div>
 					)

@@ -13,7 +13,10 @@ import { InfoTooltip } from '@/components/InfoTooltip'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { formatTime, parseTime, isValidTimeFormat } from '@/lib/utils/time'
 import type { RoutineWizardExercise, ProgressionScheme } from '../types'
-import { isRtFExercise, requiresWeightIncrementField } from '../utils/progression.helpers'
+import {
+	isRtFExercise,
+	requiresWeightIncrementField,
+} from '../utils/progression.helpers'
 
 interface ExerciseConfigSectionProps {
 	exercise: RoutineWizardExercise
@@ -85,7 +88,7 @@ export function ExerciseConfigSection({
 					placeholder="0:00"
 					value={restInput}
 					onFocus={() => setRestFocused(true)}
-					onChange={(event) => {
+					onChange={event => {
 						// allow only digits and a single ':'
 						const raw = event.target.value
 						let cleaned = raw.replace(/[^\d:]/g, '')
@@ -132,7 +135,7 @@ export function ExerciseConfigSection({
 					type="text"
 					placeholder="Add a note..."
 					value={exercise.note || ''}
-					onChange={(event) => onUpdateNote(exerciseIndex, event.target.value)}
+					onChange={event => onUpdateNote(exerciseIndex, event.target.value)}
 					className="h-9 text-sm flex-1 min-w-0"
 				/>
 			</div>
@@ -153,7 +156,7 @@ export function ExerciseConfigSection({
 				</div>
 				<Select
 					value={exercise.progressionScheme}
-					onValueChange={(value) =>
+					onValueChange={value =>
 						onUpdateProgressionScheme(exerciseIndex, value as ProgressionScheme)
 					}
 				>
@@ -166,7 +169,9 @@ export function ExerciseConfigSection({
 					</SelectTrigger>
 					<SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
 						<SelectItem value="NONE">None</SelectItem>
-						<SelectItem value="DOUBLE_PROGRESSION">Double Progression</SelectItem>
+						<SelectItem value="DOUBLE_PROGRESSION">
+							Double Progression
+						</SelectItem>
 						<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
 							Dynamic Double Progression
 						</SelectItem>
@@ -214,10 +219,12 @@ export function ExerciseConfigSection({
 								pattern="[0-9]*[.]?[0-9]*"
 								placeholder="e.g. 110"
 								value={tmInput}
-								onChange={(event) => onTmInputChange(event.target.value)}
+								onChange={event => onTmInputChange(event.target.value)}
 								onBlur={onTmBlur}
 								className={`w-32 sm:w-40 h-8 text-sm text-center ${
-									tmMissing ? 'border-destructive focus-visible:ring-destructive' : ''
+									tmMissing
+										? 'border-destructive focus-visible:ring-destructive'
+										: ''
 								}`}
 							/>
 						</div>
@@ -230,7 +237,7 @@ export function ExerciseConfigSection({
 						</div>
 						<Select
 							value={(exercise.programRoundingKg ?? 2.5).toString()}
-							onValueChange={(value) =>
+							onValueChange={value =>
 								onUpdateProgramRoundingKg(exerciseIndex, parseFloat(value))
 							}
 						>
@@ -268,7 +275,7 @@ export function ExerciseConfigSection({
 							aria-label="Minimum weight increment"
 							placeholder="2.5"
 							value={weightIncInput}
-							onChange={(event) => onWeightIncChange(event.target.value)}
+							onChange={event => onWeightIncChange(event.target.value)}
 							onBlur={onWeightIncBlur}
 							className="w-32 sm:w-40 h-9 text-sm text-center"
 						/>

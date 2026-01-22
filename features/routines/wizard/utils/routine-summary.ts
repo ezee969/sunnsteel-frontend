@@ -5,7 +5,6 @@ import {
 	isRtFExercise,
 	isRtFHypertrophy,
 	isRtFStandard,
-	getRtfSetSummary,
 	RTF_HYPERTROPHY_SET_COUNT,
 	RTF_STANDARD_SET_COUNT,
 } from './progression.helpers'
