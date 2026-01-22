@@ -118,6 +118,7 @@ export default function EditRoutinePage() {
 					dayOfWeek: day.dayOfWeek,
 					exercises: day.exercises.map((exercise: RoutineExercise) => ({
 						exerciseId: exercise.exercise.id,
+						note: exercise.note ?? undefined,
 						progressionScheme: mapProgressionScheme(
 							(exercise as unknown as { progressionScheme?: string })
 								.progressionScheme,

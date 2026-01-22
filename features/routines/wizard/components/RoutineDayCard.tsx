@@ -52,6 +52,11 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 											)}
 										</div>
 									)}
+									{exercise.note && (
+										<p className="text-xs text-muted-foreground mt-1 italic">
+											Note: {exercise.note}
+										</p>
+									)}
 								</div>
 								<div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">
 									<span>{formatTime(exercise.restSeconds)} rest</span>

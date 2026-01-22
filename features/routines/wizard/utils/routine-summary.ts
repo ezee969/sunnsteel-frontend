@@ -85,7 +85,7 @@ export const resolveProgramTimezone = (data: RoutineWizardData) => {
 	const isValid = (tz: string) => {
 		try {
 			// Prefer modern API when available
-			const supported = (Intl as any).supportedValuesOf?.('timeZone') as
+			const supported = Intl.supportedValuesOf?.('timeZone') as
 				| string[]
 				| undefined
 			if (Array.isArray(supported)) {
@@ -187,6 +187,7 @@ export const buildRoutineRequest = (
 					exerciseId: exercise.exerciseId,
 					order: exerciseIndex,
 					restSeconds: exercise.restSeconds,
+					note: exercise.note,
 					progressionScheme: schemeUnified,
 					minWeightIncrement: exercise.minWeightIncrement,
 					...(isRtF && {

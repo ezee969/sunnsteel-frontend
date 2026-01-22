@@ -23,6 +23,7 @@ export interface RoutineWizardExercise {
 	minWeightIncrement: number
 	programTMKg?: number
 	programRoundingKg?: number
+	note?: string
 	sets: RoutineSet[]
 	restSeconds: number
 }

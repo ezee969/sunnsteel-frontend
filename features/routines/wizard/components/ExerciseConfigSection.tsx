@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react'
+import { Clock, StickyNote } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect, useState } from 'react'
@@ -28,6 +28,7 @@ interface ExerciseConfigSectionProps {
 	onWeightIncChange: (value: string) => void
 	onWeightIncBlur: () => void
 	onUpdateRestTime: (exerciseIndex: number, value: string) => void
+	onUpdateNote: (exerciseIndex: number, note: string) => void
 	onUpdateProgressionScheme: (
 		exerciseIndex: number,
 		scheme: ProgressionScheme,
@@ -48,6 +49,7 @@ export function ExerciseConfigSection({
 	onWeightIncChange,
 	onWeightIncBlur,
 	onUpdateRestTime,
+	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateProgramRoundingKg,
 }: ExerciseConfigSectionProps) {
@@ -115,6 +117,23 @@ export function ExerciseConfigSection({
 						setRestFocused(false)
 					}}
 					className="w-32 sm:w-40 h-9 text-sm text-center"
+				/>
+			</div>
+
+			<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2 shrink-0">
+					<StickyNote className="h-4 w-4 text-muted-foreground" />
+					<Label className="text-sm font-medium text-muted-foreground">
+						Note
+					</Label>
+				</div>
+				<Input
+					aria-label="Exercise note"
+					type="text"
+					placeholder="Add a note..."
+					value={exercise.note || ''}
+					onChange={(event) => onUpdateNote(exerciseIndex, event.target.value)}
+					className="h-9 text-sm flex-1 min-w-0"
 				/>
 			</div>
 

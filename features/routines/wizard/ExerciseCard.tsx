@@ -21,6 +21,7 @@ export interface ExerciseCardProps {
 	onRemoveExercise: (exerciseIndex: number) => void
 	onUpdateExercise: (exerciseIndex: number, newExerciseId: string) => void
 	onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void
+	onUpdateNote: (exerciseIndex: number, note: string) => void
 	onUpdateProgressionScheme: (
 		exerciseIndex: number,
 		scheme: ProgressionScheme,
@@ -70,6 +71,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 	onRemoveExercise,
 	onUpdateExercise,
 	onUpdateRestTime,
+	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onUpdateProgramTMKg,
@@ -265,6 +267,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
 							onWeightIncChange={handleWeightIncChange}
 							onWeightIncBlur={handleWeightIncBlur}
 							onUpdateRestTime={onUpdateRestTime}
+							onUpdateNote={onUpdateNote}
 							onUpdateProgressionScheme={onUpdateProgressionScheme}
 							onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
 						/>

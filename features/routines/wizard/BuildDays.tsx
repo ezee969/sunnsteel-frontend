@@ -76,6 +76,7 @@ export function BuildDays({
 		addExercise,
 		removeExercise,
 		updateExercise,
+		updateExerciseNote,
 		updateProgramTMKg,
 		updateProgramRoundingKg,
 		updateProgressionScheme,
@@ -327,6 +328,7 @@ export function BuildDays({
 											onUpdateRestTime={(exerciseIndex, value) =>
 												setRestSeconds(exerciseIndex, parseTime(value))
 											}
+											onUpdateNote={updateExerciseNote}
 											onUpdateProgressionScheme={updateProgressionScheme}
 											onUpdateMinWeightIncrement={updateMinWeightIncrement}
 											onUpdateProgramTMKg={updateProgramTMKg}

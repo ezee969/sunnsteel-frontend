@@ -18,6 +18,7 @@ export interface ExerciseListProps {
 	) => void
 	onUpdateExercise: ExerciseCardProps['onUpdateExercise']
 	onUpdateRestTime: ExerciseCardProps['onUpdateRestTime']
+	onUpdateNote: ExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: ExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: ExerciseCardProps['onUpdateMinWeightIncrement']
 	onUpdateProgramTMKg: ExerciseCardProps['onUpdateProgramTMKg']
@@ -46,6 +47,7 @@ export function ExerciseList({
 	onReorderExercises,
 	onUpdateExercise,
 	onUpdateRestTime,
+	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onUpdateProgramTMKg,
@@ -102,6 +104,7 @@ export function ExerciseList({
 								onRemoveExercise={onRemoveExercise}
 								onUpdateExercise={onUpdateExercise}
 								onUpdateRestTime={onUpdateRestTime}
+								onUpdateNote={onUpdateNote}
 								onUpdateProgressionScheme={onUpdateProgressionScheme}
 								onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
 								onUpdateProgramTMKg={onUpdateProgramTMKg}
@@ -138,6 +141,7 @@ interface ReorderableExerciseRowProps {
 	onRemoveExercise: ExerciseCardProps['onRemoveExercise']
 	onUpdateExercise: ExerciseCardProps['onUpdateExercise']
 	onUpdateRestTime: ExerciseCardProps['onUpdateRestTime']
+	onUpdateNote: ExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: ExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: ExerciseCardProps['onUpdateMinWeightIncrement']
 	onUpdateProgramTMKg: ExerciseCardProps['onUpdateProgramTMKg']
@@ -167,6 +171,7 @@ function ReorderableExerciseRow({
 	onRemoveExercise,
 	onUpdateExercise,
 	onUpdateRestTime,
+	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onUpdateProgramTMKg,
@@ -209,6 +214,7 @@ function ReorderableExerciseRow({
 				onRemoveExercise={onRemoveExercise}
 				onUpdateExercise={onUpdateExercise}
 				onUpdateRestTime={onUpdateRestTime}
+				onUpdateNote={onUpdateNote}
 				onUpdateProgressionScheme={onUpdateProgressionScheme}
 				onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
 				onUpdateProgramTMKg={onUpdateProgramTMKg}

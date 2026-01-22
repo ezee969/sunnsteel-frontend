@@ -18,6 +18,7 @@ export interface RoutineExercise {
 	id: string
 	order: number
 	restSeconds: number
+	note?: string | null
 	progressionScheme: ProgressionScheme
 	minWeightIncrement: number
 	// RtF-specific (present when progressionScheme = PROGRAMMED_RTF)
@@ -79,6 +80,7 @@ export interface CreateRoutineRequest {
 			exerciseId: string
 			order?: number
 			restSeconds: number
+			note?: string
 			progressionScheme: ProgressionScheme
 			minWeightIncrement: number
 			// RtF-specific
