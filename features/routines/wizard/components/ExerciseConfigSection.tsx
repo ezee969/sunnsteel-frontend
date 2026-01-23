@@ -1,4 +1,4 @@
-import { Clock, StickyNote } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ import {
 	isRtFExercise,
 	requiresWeightIncrementField,
 } from '../utils/progression.helpers'
+import { ExerciseNoteRow } from './ExerciseNoteRow'
 
 interface ExerciseConfigSectionProps {
 	exercise: RoutineWizardExercise
@@ -123,22 +124,10 @@ export function ExerciseConfigSection({
 				/>
 			</div>
 
-			<div className="flex items-center gap-3">
-				<div className="flex items-center gap-2 shrink-0">
-					<StickyNote className="h-4 w-4 text-muted-foreground" />
-					<Label className="text-sm font-medium text-muted-foreground">
-						Note
-					</Label>
-				</div>
-				<Input
-					aria-label="Exercise note"
-					type="text"
-					placeholder="Add a note..."
-					value={exercise.note || ''}
-					onChange={event => onUpdateNote(exerciseIndex, event.target.value)}
-					className="h-9 text-sm flex-1 min-w-0"
-				/>
-			</div>
+			<ExerciseNoteRow
+				note={exercise.note}
+				onSave={note => onUpdateNote(exerciseIndex, note)}
+			/>
 
 			<div className="flex items-center justify-between gap-3">
 				<div className="flex items-center gap-2">
