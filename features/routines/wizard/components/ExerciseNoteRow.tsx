@@ -20,9 +20,14 @@ import {
 interface ExerciseNoteRowProps {
 	note?: string | null
 	onSave: (note: string) => void
+	minimal?: boolean
 }
 
-export function ExerciseNoteRow({ note, onSave }: ExerciseNoteRowProps) {
+export function ExerciseNoteRow({
+	note,
+	onSave,
+	minimal = false,
+}: ExerciseNoteRowProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [draft, setDraft] = useState(note || '')
 
@@ -37,13 +42,19 @@ export function ExerciseNoteRow({ note, onSave }: ExerciseNoteRowProps) {
 	}
 
 	return (
-		<div className="flex items-center justify-between gap-3">
-			<div className="flex items-center gap-2 shrink-0">
-				<StickyNote className="h-4 w-4 text-muted-foreground" />
-				<Label className="text-sm font-medium text-muted-foreground">
-					Note
-				</Label>
-			</div>
+		<div
+			className={
+				minimal ? 'inline-flex' : 'flex items-center justify-between gap-3'
+			}
+		>
+			{!minimal && (
+				<div className="flex items-center gap-2 shrink-0">
+					<StickyNote className="h-4 w-4 text-muted-foreground" />
+					<Label className="text-sm font-medium text-muted-foreground">
+						Note
+					</Label>
+				</div>
+			)}
 
 			<TooltipProvider>
 				<Tooltip>

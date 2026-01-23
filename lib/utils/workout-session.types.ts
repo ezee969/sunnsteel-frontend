@@ -83,4 +83,5 @@ export type GroupedExerciseLogs = {
 	}>
 	progressionScheme: ProgressionScheme
 	programStyle?: 'STANDARD' | 'HYPERTROPHY'
+	note?: string | null
 }

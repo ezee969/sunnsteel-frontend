@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
 import { SetLogInput } from './set-log-input'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
+import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
 
 interface ExerciseGroupProps {
 	exerciseId: string
@@ -34,6 +35,8 @@ interface ExerciseGroupProps {
 	amrapSetNumber?: number
 	hideAmrapLabel?: boolean
 	isRtF?: boolean
+	note?: string | null
+	onSaveNote: (note: string) => void
 }
 
 /**
@@ -50,6 +53,8 @@ export const ExerciseGroup = ({
 	amrapSetNumber,
 	hideAmrapLabel,
 	isRtF,
+	note,
+	onSaveNote,
 }: ExerciseGroupProps) => {
 	const isComplete = completedSets === totalSets && totalSets > 0
 
@@ -61,11 +66,11 @@ export const ExerciseGroup = ({
 					: 'border-border'
 			}`}
 		>
-			<CardHeader className="pb-3">
+			<CardHeader className="pb-3 flex-row items-center justify-between space-y-0 gap-2">
 				<Button
 					variant="ghost"
 					onClick={onToggleCollapse}
-					className="w-full justify-between p-0 h-auto hover:bg-transparent"
+					className="flex-1 justify-between p-0 h-auto hover:bg-transparent"
 				>
 					<div className="flex flex-1 min-w-0 items-center gap-3">
 						<div className="flex items-center gap-2">
@@ -85,18 +90,23 @@ export const ExerciseGroup = ({
 							</p>
 						</div>
 					</div>
-
-					<div className="flex items-center gap-2 shrink-0">
-						{isComplete && (
-							<Badge
-								variant="secondary"
-								className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-							>
-								✓ Complete
-							</Badge>
-						)}
-					</div>
 				</Button>
+
+				<div className="flex items-center gap-2 shrink-0">
+					{/* Note button (stops propagation to prevent toggle) */}
+					<div onClick={e => e.stopPropagation()}>
+						<ExerciseNoteRow note={note} onSave={onSaveNote} minimal />
+					</div>
+
+					{isComplete && (
+						<Badge
+							variant="secondary"
+							className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+						>
+							✓ Complete
+						</Badge>
+					)}
+				</div>
 			</CardHeader>
 
 			{!isCollapsed && (

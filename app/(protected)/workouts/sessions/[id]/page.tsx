@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
-import { useRoutine } from '@/lib/api/hooks/useRoutines'
+import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
 import { useRtfWeekGoals } from '@/lib/api/hooks/useRtfWeekGoals'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
@@ -25,6 +25,7 @@ export default function ActiveSessionPage() {
 	// Data fetching
 	const { data: session, isLoading, error } = useSession(idParam)
 	const { mutate: upsertSetLog } = useUpsertSetLog(idParam)
+	const { mutate: updateNote } = useUpdateExerciseNote()
 	const routineId = session?.routineId ?? ''
 	const {
 		data: routine,
@@ -306,6 +307,16 @@ export default function ActiveSessionPage() {
 								hideAmrapLabel={hideAmrapLabel}
 								isRtF={isRtF}
 								onSave={handleSaveSetLog}
+								note={group.note}
+								onSaveNote={note => {
+									if (routineId) {
+										updateNote({
+											routineId,
+											routineExerciseId: group.exerciseId,
+											note,
+										})
+									}
+								}}
 							/>
 						)
 					})}
