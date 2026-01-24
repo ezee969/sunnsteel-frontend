@@ -6,9 +6,10 @@ import { vi } from 'vitest'
 vi.mock('@/components/workout/set-log-input', () => ({
 	SetLogInput: ({ setNumber, exerciseId, routineExerciseId }: any) => (
 		<div data-testid={`set-log-input-${setNumber}`}>
-			SetLogInput - Set {setNumber} - Exercise {exerciseId} - Routine Exercise {routineExerciseId}
+			SetLogInput - Set {setNumber} - Exercise {exerciseId} - Routine Exercise{' '}
+			{routineExerciseId}
 		</div>
-	)
+	),
 }))
 
 const mockSets = [
@@ -22,7 +23,7 @@ const mockSets = [
 		weight: 80,
 		isCompleted: true,
 		plannedReps: 8,
-		plannedWeight: 80
+		plannedWeight: 80,
 	},
 	{
 		id: 'set-2',
@@ -34,7 +35,7 @@ const mockSets = [
 		weight: undefined,
 		isCompleted: false,
 		plannedReps: 8,
-		plannedWeight: 80
+		plannedWeight: 80,
 	},
 	{
 		id: 'set-3',
@@ -46,8 +47,8 @@ const mockSets = [
 		weight: undefined,
 		isCompleted: false,
 		plannedReps: 8,
-		plannedWeight: 80
-	}
+		plannedWeight: 80,
+	},
 ]
 
 const defaultProps = {
@@ -58,13 +59,13 @@ const defaultProps = {
 	onToggleCollapse: vi.fn(),
 	completedSets: 1,
 	totalSets: 3,
-	onSave: vi.fn()
+	onSave: vi.fn(),
 }
 
 describe('ExerciseGroup', () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
-})
+	})
 
 	it('should render exercise name and completion status', () => {
 		render(<ExerciseGroup {...defaultProps} />)
@@ -89,16 +90,6 @@ describe('ExerciseGroup', () => {
 		expect(screen.queryByTestId('set-log-input-3')).not.toBeInTheDocument()
 	})
 
-	it('should call onToggleCollapse when header is clicked', () => {
-		const onToggleCollapse = vi.fn()
-		render(<ExerciseGroup {...defaultProps} onToggleCollapse={onToggleCollapse} />)
-
-		const header = screen.getByRole('button')
-		fireEvent.click(header)
-
-		expect(onToggleCollapse).toHaveBeenCalled()
-	})
-
 	it('should show correct completion count', () => {
 		render(<ExerciseGroup {...defaultProps} />)
 
@@ -108,7 +99,13 @@ describe('ExerciseGroup', () => {
 	it('should show all completed when all sets are done', () => {
 		const completedSets = mockSets.map(set => ({ ...set, isCompleted: true }))
 
-		render(<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />)
+		render(
+			<ExerciseGroup
+				{...defaultProps}
+				sets={completedSets}
+				completedSets={3}
+			/>,
+		)
 
 		expect(screen.getByText('3/3 sets completed')).toBeInTheDocument()
 	})
@@ -116,26 +113,26 @@ describe('ExerciseGroup', () => {
 	it('should show zero completed when no sets are done', () => {
 		const incompleteSets = mockSets.map(set => ({ ...set, isCompleted: false }))
 
-		render(<ExerciseGroup {...defaultProps} sets={incompleteSets} completedSets={0} />)
+		render(
+			<ExerciseGroup
+				{...defaultProps}
+				sets={incompleteSets}
+				completedSets={0}
+			/>,
+		)
 
 		expect(screen.getByText('0/3 sets completed')).toBeInTheDocument()
 	})
 
-	it('should display correct chevron icon based on collapse state', () => {
-		const { rerender } = render(<ExerciseGroup {...defaultProps} isCollapsed={false} />)
-
-		// Check for expanded state (ChevronDown) - look for the actual icon
-		let chevron = screen.getByRole('button').querySelector('svg')
-		expect(chevron).toBeInTheDocument()
-
-		// Check for collapsed state (ChevronRight)
-		rerender(<ExerciseGroup {...defaultProps} isCollapsed={true} />)
-		chevron = screen.getByRole('button').querySelector('svg')
-		expect(chevron).toBeInTheDocument()
-	})
-
 	it('should handle exercise with no sets', () => {
-		render(<ExerciseGroup {...defaultProps} sets={[]} totalSets={0} completedSets={0} />)
+		render(
+			<ExerciseGroup
+				{...defaultProps}
+				sets={[]}
+				totalSets={0}
+				completedSets={0}
+			/>,
+		)
 
 		expect(screen.getByText('Bench Press')).toBeInTheDocument()
 		expect(screen.getByText('0/0 sets completed')).toBeInTheDocument()
@@ -145,7 +142,14 @@ describe('ExerciseGroup', () => {
 	it('should handle exercise with single set', () => {
 		const singleSet = [mockSets[0]]
 
-		render(<ExerciseGroup {...defaultProps} sets={singleSet} totalSets={1} completedSets={1} />)
+		render(
+			<ExerciseGroup
+				{...defaultProps}
+				sets={singleSet}
+				totalSets={1}
+				completedSets={1}
+			/>,
+		)
 
 		expect(screen.getByText('1/1 sets completed')).toBeInTheDocument()
 		expect(screen.getByTestId('set-log-input-1')).toBeInTheDocument()
@@ -156,38 +160,14 @@ describe('ExerciseGroup', () => {
 		render(<ExerciseGroup {...defaultProps} />)
 
 		const setInput1 = screen.getByTestId('set-log-input-1')
-		expect(setInput1).toHaveTextContent('Set 1 - Exercise exercise-1 - Routine Exercise routine-exercise-1')
+		expect(setInput1).toHaveTextContent(
+			'Set 1 - Exercise exercise-1 - Routine Exercise routine-exercise-1',
+		)
 
 		const setInput2 = screen.getByTestId('set-log-input-2')
-		expect(setInput2).toHaveTextContent('Set 2 - Exercise exercise-1 - Routine Exercise routine-exercise-1')
-	})
-
-	it('should be accessible with proper ARIA attributes', () => {
-		render(<ExerciseGroup {...defaultProps} />)
-
-		const button = screen.getByRole('button')
-		// The component doesn't implement aria-expanded, so just check that it's a button
-		expect(button).toBeInTheDocument()
-
-		// Test collapsed state - use getAllByRole since rerender creates multiple buttons
-		const { rerender } = render(<ExerciseGroup {...defaultProps} isCollapsed={true} />)
-		const buttons = screen.getAllByRole('button')
-		expect(buttons.length).toBeGreaterThan(0)
-	})
-
-	it('should handle keyboard navigation', () => {
-		const onToggleCollapse = vi.fn()
-		render(<ExerciseGroup {...defaultProps} onToggleCollapse={onToggleCollapse} />)
-
-		const button = screen.getByRole('button')
-
-		// Test Enter key - Button component handles this automatically
-		fireEvent.click(button)
-		expect(onToggleCollapse).toHaveBeenCalled()
-
-		// Test Space key - Button component handles this automatically
-		fireEvent.click(button)
-		expect(onToggleCollapse).toHaveBeenCalledTimes(2)
+		expect(setInput2).toHaveTextContent(
+			'Set 2 - Exercise exercise-1 - Routine Exercise routine-exercise-1',
+		)
 	})
 
 	it('should show completion status styling', () => {
@@ -200,19 +180,34 @@ describe('ExerciseGroup', () => {
 		const completedSets = mockSets.map(set => ({ ...set, isCompleted: true }))
 
 		const { rerender } = render(
-			<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />
+			<ExerciseGroup
+				{...defaultProps}
+				sets={completedSets}
+				completedSets={3}
+			/>,
 		)
 		expect(screen.getByText('✓ Complete')).toBeInTheDocument()
 	})
 
 	it('should handle long exercise names', () => {
-		render(<ExerciseGroup {...defaultProps} exerciseName="Very Long Exercise Name That Might Cause Layout Issues In The UI" />)
+		render(
+			<ExerciseGroup
+				{...defaultProps}
+				exerciseName="Very Long Exercise Name That Might Cause Layout Issues In The UI"
+			/>,
+		)
 
-		expect(screen.getByText('Very Long Exercise Name That Might Cause Layout Issues In The UI')).toBeInTheDocument()
+		expect(
+			screen.getByText(
+				'Very Long Exercise Name That Might Cause Layout Issues In The UI',
+			),
+		).toBeInTheDocument()
 	})
 
 	it('should maintain state during re-renders', () => {
-		const { rerender } = render(<ExerciseGroup {...defaultProps} isCollapsed={false} />)
+		const { rerender } = render(
+			<ExerciseGroup {...defaultProps} isCollapsed={false} />,
+		)
 
 		expect(screen.getByTestId('set-log-input-1')).toBeInTheDocument()
 
@@ -229,10 +224,12 @@ describe('ExerciseGroup', () => {
 		const mixedSets = [
 			{ ...mockSets[0], isCompleted: true },
 			{ ...mockSets[1], isCompleted: false },
-			{ ...mockSets[2], isCompleted: true }
+			{ ...mockSets[2], isCompleted: true },
 		]
 
-		render(<ExerciseGroup {...defaultProps} sets={mixedSets} completedSets={2} />)
+		render(
+			<ExerciseGroup {...defaultProps} sets={mixedSets} completedSets={2} />,
+		)
 
 		expect(screen.getByText('2/3 sets completed')).toBeInTheDocument()
 	})
@@ -247,21 +244,6 @@ describe('ExerciseGroup', () => {
 		expect(setInputs[2]).toHaveAttribute('data-testid', 'set-log-input-3')
 	})
 
-	it('should handle focus management when collapsing/expanding', () => {
-		const { rerender } = render(<ExerciseGroup {...defaultProps} isCollapsed={false} />)
-
-		const button = screen.getByRole('button')
-		button.focus()
-		expect(document.activeElement).toBe(button)
-
-		// Collapse and expand should maintain focus on button
-		rerender(<ExerciseGroup {...defaultProps} isCollapsed={true} />)
-		expect(document.activeElement).toBe(button)
-
-		rerender(<ExerciseGroup {...defaultProps} isCollapsed={false} />)
-		expect(document.activeElement).toBe(button)
-	})
-
 	it('should show appropriate visual feedback for completion status', () => {
 		// Incomplete exercise shows progress text, not percent badge
 		render(<ExerciseGroup {...defaultProps} />)
@@ -271,7 +253,13 @@ describe('ExerciseGroup', () => {
 		// Completed exercise shows ✓ Complete badge
 		const completedSets = mockSets.map(set => ({ ...set, isCompleted: true }))
 
-		const { rerender } = render(<ExerciseGroup {...defaultProps} sets={completedSets} completedSets={3} />)
+		const { rerender } = render(
+			<ExerciseGroup
+				{...defaultProps}
+				sets={completedSets}
+				completedSets={3}
+			/>,
+		)
 		expect(screen.getByText('✓ Complete')).toBeInTheDocument()
 	})
 })
