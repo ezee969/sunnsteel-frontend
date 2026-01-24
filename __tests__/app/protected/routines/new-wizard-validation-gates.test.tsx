@@ -11,6 +11,26 @@ vi.mock('@/lib/api/hooks/useRoutines', () => ({
 	useUpdateRoutine: () => ({ isPending: false, mutateAsync: vi.fn() }),
 }))
 
+// Mock Schedule Selector to bypass disabled state
+vi.mock(
+	'@/features/routines/wizard/components/ProgramScheduleSelector',
+	() => ({
+		ProgramScheduleSelector: ({ value, onChange }: any) => (
+			<div>
+				<label htmlFor="mock-schedule">Program schedule</label>
+				<select
+					id="mock-schedule"
+					value={value}
+					onChange={e => onChange(e.target.value)}
+				>
+					<option value="NONE">None (indefinite)</option>
+					<option value="TIMEFRAME">Timeframe (date-driven)</option>
+				</select>
+			</div>
+		),
+	}),
+)
+
 vi.mock('@/lib/api/hooks/useExercises', () => ({
 	useExercises: () => ({
 		data: [
@@ -49,6 +69,14 @@ describe('CreateRoutinePage wizard validation gates', () => {
 			target: { value: 'Rtf Routine' },
 		})
 
+		// Switch to Timeframe (now possible via mock)
+		fireEvent.change(screen.getByLabelText('Program schedule'), {
+			target: { value: 'TIMEFRAME' },
+		})
+		fireEvent.change(screen.getByLabelText('Program start date'), {
+			target: { value: '2025-09-02' },
+		})
+
 		// Next → Step 2
 		fireEvent.click(screen.getByLabelText('Next'))
 
@@ -60,7 +88,7 @@ describe('CreateRoutinePage wizard validation gates', () => {
 		expect(nextBtn).not.toBeDisabled()
 	}, 15000)
 
-	it('Step 3: allows Next when RtF exercises present (no timeframe)', async () => {
+	it('Step 3: allows Next when timezone is present for RtF exercises', async () => {
 		// Stable timezone
 		vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockReturnValue({
 			timeZone: 'America/Los_Angeles',
@@ -74,6 +102,14 @@ describe('CreateRoutinePage wizard validation gates', () => {
 		// Step 1: name
 		fireEvent.change(screen.getByLabelText(/Routine Name/i), {
 			target: { value: 'Rtf Routine' },
+		})
+
+		// Switch to Timeframe (now possible via mock)
+		fireEvent.change(screen.getByLabelText('Program schedule'), {
+			target: { value: 'TIMEFRAME' },
+		})
+		fireEvent.change(screen.getByLabelText('Program start date'), {
+			target: { value: '2025-09-01' },
 		})
 
 		// Next → Step 2
