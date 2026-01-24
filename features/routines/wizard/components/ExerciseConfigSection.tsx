@@ -1,16 +1,6 @@
-import { Clock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect, useState } from 'react'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import { InfoTooltip } from '@/components/InfoTooltip'
-import { TooltipProvider } from '@/components/ui/tooltip'
 import { formatTime, parseTime, isValidTimeFormat } from '@/lib/utils/time'
 import type { RoutineWizardExercise, ProgressionScheme } from '../types'
 import {
@@ -18,6 +8,9 @@ import {
 	requiresWeightIncrementField,
 } from '../utils/progression.helpers'
 import { ExerciseNoteRow } from './ExerciseNoteRow'
+import { ProgressionSelect } from './ProgressionSelect'
+import { RtfExerciseConfig } from './RtfExerciseConfig'
+import { RestTimeExerciseConfig } from './RestTimeExerciseConfig'
 
 interface ExerciseConfigSectionProps {
 	exercise: RoutineWizardExercise
@@ -74,178 +67,41 @@ export function ExerciseConfigSection({
 
 	return (
 		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-lg space-y-2 sm:space-y-3">
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex items-center gap-2">
-					<Clock className="h-4 w-4 text-muted-foreground" />
-					<Label className="text-sm font-medium text-muted-foreground">
-						Rest
-					</Label>
-				</div>
-				<Input
-					aria-label="Rest time"
-					type="text"
-					inputMode="numeric"
-					pattern="[0-9:]*"
-					placeholder="0:00"
-					value={restInput}
-					onFocus={() => setRestFocused(true)}
-					onChange={event => {
-						// allow only digits and a single ':'
-						const raw = event.target.value
-						let cleaned = raw.replace(/[^\d:]/g, '')
-						const firstColon = cleaned.indexOf(':')
-						if (firstColon !== -1) {
-							cleaned =
-								cleaned.slice(0, firstColon + 1) +
-								cleaned.slice(firstColon + 1).replace(/:/g, '')
-						}
-						setRestInput(cleaned)
-					}}
-					onBlur={() => {
-						const trimmed = restInput.trim()
-						if (trimmed === '') {
-							// revert to current value
-							setRestInput(formatTime(exercise.restSeconds))
-							setRestFocused(false)
-							return
-						}
-						if (isValidTimeFormat(trimmed)) {
-							// commit change upwards and format
-							onUpdateRestTime(exerciseIndex, trimmed)
-							const sec = parseTime(trimmed)
-							setRestInput(formatTime(sec))
-						} else {
-							// invalid format: revert to last valid
-							setRestInput(formatTime(exercise.restSeconds))
-						}
-						setRestFocused(false)
-					}}
-					className="w-32 sm:w-40 h-9 text-sm text-center"
-				/>
-			</div>
+			<RestTimeExerciseConfig
+				restInput={restInput}
+				setRestInput={setRestInput}
+				exerciseIndex={exerciseIndex}
+				onUpdateRestTime={onUpdateRestTime}
+				formatTime={formatTime}
+				parseTime={parseTime}
+				isValidTimeFormat={isValidTimeFormat}
+				restSeconds={exercise.restSeconds}
+				setRestFocused={setRestFocused}
+			/>
 
 			<ExerciseNoteRow
 				note={exercise.note}
 				onSave={note => onUpdateNote(exerciseIndex, note)}
 			/>
 
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex items-center gap-2">
-					<Label className="text-sm font-medium text-muted-foreground">
-						Progression
-					</Label>
-					{disableTimeBasedProgressions && (
-						<TooltipProvider>
-							<InfoTooltip
-								content="Time-based progressions are disabled. Switch Program Schedule to Timeframe in Basic Info to enable."
-								side="right"
-							/>
-						</TooltipProvider>
-					)}
-				</div>
-				<Select
-					value={exercise.progressionScheme}
-					onValueChange={value =>
-						onUpdateProgressionScheme(exerciseIndex, value as ProgressionScheme)
-					}
-				>
-					<SelectTrigger
-						aria-label="Progression scheme"
-						size="sm"
-						className="w-32 sm:w-40 max-w-[60vw] h-9 truncate"
-					>
-						<SelectValue className="truncate" />
-					</SelectTrigger>
-					<SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
-						<SelectItem value="NONE">None</SelectItem>
-						<SelectItem value="DOUBLE_PROGRESSION">
-							Double Progression
-						</SelectItem>
-						<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
-							Dynamic Double Progression
-						</SelectItem>
-						<SelectItem
-							value="PROGRAMMED_RTF"
-							disabled={!!disableTimeBasedProgressions}
-							title={
-								disableTimeBasedProgressions
-									? 'Requires Timeframe schedule (set in Basic Info)'
-									: undefined
-							}
-						>
-							RtF Standard (5 sets: 4 + 1 AMRAP)
-						</SelectItem>
-						<SelectItem
-							value="PROGRAMMED_RTF_HYPERTROPHY"
-							disabled={!!disableTimeBasedProgressions}
-							title={
-								disableTimeBasedProgressions
-									? 'Requires Timeframe schedule (set in Basic Info)'
-									: undefined
-							}
-						>
-							RtF Hypertrophy (4 sets: 3 + 1 AMRAP)
-						</SelectItem>
-					</SelectContent>
-				</Select>
-			</div>
+			<ProgressionSelect
+				disableTimeBasedProgressions={disableTimeBasedProgressions}
+				progressionScheme={exercise.progressionScheme}
+				exerciseIndex={exerciseIndex}
+				onUpdateProgressionScheme={onUpdateProgressionScheme}
+			/>
 
 			{isRtF && (
-				<div className="grid grid-cols-1 gap-2 sm:gap-3">
-					<div className="flex flex-col gap-1">
-						<div className="flex items-center justify-between gap-3">
-							<div className="flex items-center gap-2">
-								<Label className="text-sm font-medium text-muted-foreground">
-									TM
-								</Label>
-							</div>
-							<Input
-								aria-label="Training Max"
-								aria-invalid={tmMissing}
-								aria-describedby={tmHelpId}
-								type="text"
-								inputMode="decimal"
-								pattern="[0-9]*[.]?[0-9]*"
-								placeholder="e.g. 110"
-								value={tmInput}
-								onChange={event => onTmInputChange(event.target.value)}
-								onBlur={onTmBlur}
-								className={`w-32 sm:w-40 h-8 text-sm text-center ${
-									tmMissing
-										? 'border-destructive focus-visible:ring-destructive'
-										: ''
-								}`}
-							/>
-						</div>
-					</div>
-					<div className="flex items-center justify-between gap-3">
-						<div className="flex items-center gap-2">
-							<Label className="text-sm font-medium text-muted-foreground">
-								Rounding
-							</Label>
-						</div>
-						<Select
-							value={(exercise.programRoundingKg ?? 2.5).toString()}
-							onValueChange={value =>
-								onUpdateProgramRoundingKg(exerciseIndex, parseFloat(value))
-							}
-						>
-							<SelectTrigger
-								aria-label="Rounding increment"
-								size="sm"
-								className="w-32 sm:w-40 truncate"
-							>
-								<SelectValue className="truncate" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="0.5">0.5</SelectItem>
-								<SelectItem value="1">1.0</SelectItem>
-								<SelectItem value="2.5">2.5</SelectItem>
-								<SelectItem value="5">5.0</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				</div>
+				<RtfExerciseConfig
+					tmInput={tmInput}
+					tmMissing={tmMissing}
+					tmHelpId={tmHelpId}
+					exerciseIndex={exerciseIndex}
+					onTmInputChange={onTmInputChange}
+					onTmBlur={onTmBlur}
+					programRoundingKg={exercise.programRoundingKg}
+					onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
+				/>
 			)}
 
 			{requiresWeightIncrementField(exercise.progressionScheme) && (
