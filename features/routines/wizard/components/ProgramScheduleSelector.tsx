@@ -32,15 +32,19 @@ export function ProgramScheduleSelector({
 	return (
 		<div className="space-y-3">
 			<div className="flex items-center gap-2">
-				<Label>Program Schedule</Label>
+				<Label className="text-muted-foreground">Program Schedule</Label>
 				<InfoTooltip content={tooltipContent} side="right" />
 			</div>
 			<div className="space-y-1">
 				<Select
 					value={value ?? 'NONE'}
-					onValueChange={(next) => onChange(next as ProgramScheduleMode)}
+					onValueChange={next => onChange(next as ProgramScheduleMode)}
+					disabled
 				>
-					<SelectTrigger aria-label="Program schedule" className="w-full sm:w-72">
+					<SelectTrigger
+						aria-label="Program schedule"
+						className="w-full sm:w-72"
+					>
 						<SelectValue placeholder="Choose schedule" />
 					</SelectTrigger>
 					<SelectContent className="max-w-[calc(100vw-2rem)]">
