@@ -95,8 +95,16 @@ describe('CreateRoutinePage wizard validation gates', () => {
 		})
 		fireEvent.click(rtfStandard)
 
+		await waitFor(() => {
+			expect(
+				screen.queryByRole('option', {
+					name: /RtF Standard \(5 sets: 4 \+ 1 AMRAP\)/i,
+				}),
+			).not.toBeInTheDocument()
+		})
+
 		// Next should be enabled (date+timezone present)
-		const nextBtn = screen.getByLabelText('Next')
+		const nextBtn = await screen.findByRole('button', { name: /Next/i })
 		expect(nextBtn).not.toBeDisabled()
 	})
 })
