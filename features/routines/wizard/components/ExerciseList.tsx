@@ -4,7 +4,10 @@ import { AnimatePresence, Reorder, useDragControls } from 'framer-motion'
 import { GripVertical } from 'lucide-react'
 import type { Exercise } from '@/lib/api/types'
 import type { RoutineWizardData } from '../types'
-import { ExerciseCard, type ExerciseCardProps } from '../ExerciseCard'
+import {
+	WizardExerciseCard,
+	type WizardExerciseCardProps,
+} from '../WizardExerciseCard'
 
 export interface ExerciseListProps {
 	tabIndex: number
@@ -16,21 +19,21 @@ export interface ExerciseListProps {
 	onReorderExercises: (
 		newExercises: RoutineWizardData['days'][number]['exercises'],
 	) => void
-	onUpdateExercise: ExerciseCardProps['onUpdateExercise']
-	onUpdateRestTime: ExerciseCardProps['onUpdateRestTime']
-	onUpdateNote: ExerciseCardProps['onUpdateNote']
-	onUpdateProgressionScheme: ExerciseCardProps['onUpdateProgressionScheme']
-	onUpdateMinWeightIncrement: ExerciseCardProps['onUpdateMinWeightIncrement']
-	onUpdateProgramTMKg: ExerciseCardProps['onUpdateProgramTMKg']
-	onUpdateProgramRoundingKg: ExerciseCardProps['onUpdateProgramRoundingKg']
-	onAddSet: ExerciseCardProps['onAddSet']
-	onRemoveSetAnimated: ExerciseCardProps['onRemoveSetAnimated']
-	onUpdateSet: ExerciseCardProps['onUpdateSet']
-	onValidateMinMaxReps: ExerciseCardProps['onValidateMinMaxReps']
-	onStepFixedReps: ExerciseCardProps['onStepFixedReps']
-	onStepRangeReps: ExerciseCardProps['onStepRangeReps']
-	onStepWeight: ExerciseCardProps['onStepWeight']
-	isRemovingSet: ExerciseCardProps['isRemovingSet']
+	onUpdateExercise: WizardExerciseCardProps['onUpdateExercise']
+	onUpdateRestTime: WizardExerciseCardProps['onUpdateRestTime']
+	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
+	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
+	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
+	onUpdateProgramTMKg: WizardExerciseCardProps['onUpdateProgramTMKg']
+	onUpdateProgramRoundingKg: WizardExerciseCardProps['onUpdateProgramRoundingKg']
+	onAddSet: WizardExerciseCardProps['onAddSet']
+	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
+	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
+	onValidateMinMaxReps: WizardExerciseCardProps['onValidateMinMaxReps']
+	onStepFixedReps: WizardExerciseCardProps['onStepFixedReps']
+	onStepRangeReps: WizardExerciseCardProps['onStepRangeReps']
+	onStepWeight: WizardExerciseCardProps['onStepWeight']
+	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
 	disableTimeBasedProgressions?: boolean
 	registerRef: (key: string, node: HTMLDivElement | null) => void
 	exercises?: Exercise[]
@@ -138,22 +141,22 @@ interface ReorderableExerciseRowProps {
 	exerciseData?: Exercise
 	expanded: boolean
 	onToggleExpand: () => void
-	onRemoveExercise: ExerciseCardProps['onRemoveExercise']
-	onUpdateExercise: ExerciseCardProps['onUpdateExercise']
-	onUpdateRestTime: ExerciseCardProps['onUpdateRestTime']
-	onUpdateNote: ExerciseCardProps['onUpdateNote']
-	onUpdateProgressionScheme: ExerciseCardProps['onUpdateProgressionScheme']
-	onUpdateMinWeightIncrement: ExerciseCardProps['onUpdateMinWeightIncrement']
-	onUpdateProgramTMKg: ExerciseCardProps['onUpdateProgramTMKg']
-	onUpdateProgramRoundingKg: ExerciseCardProps['onUpdateProgramRoundingKg']
-	onAddSet: ExerciseCardProps['onAddSet']
-	onRemoveSetAnimated: ExerciseCardProps['onRemoveSetAnimated']
-	onUpdateSet: ExerciseCardProps['onUpdateSet']
-	onValidateMinMaxReps: ExerciseCardProps['onValidateMinMaxReps']
-	onStepFixedReps: ExerciseCardProps['onStepFixedReps']
-	onStepRangeReps: ExerciseCardProps['onStepRangeReps']
-	onStepWeight: ExerciseCardProps['onStepWeight']
-	isRemovingSet: ExerciseCardProps['isRemovingSet']
+	onRemoveExercise: WizardExerciseCardProps['onRemoveExercise']
+	onUpdateExercise: WizardExerciseCardProps['onUpdateExercise']
+	onUpdateRestTime: WizardExerciseCardProps['onUpdateRestTime']
+	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
+	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
+	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
+	onUpdateProgramTMKg: WizardExerciseCardProps['onUpdateProgramTMKg']
+	onUpdateProgramRoundingKg: WizardExerciseCardProps['onUpdateProgramRoundingKg']
+	onAddSet: WizardExerciseCardProps['onAddSet']
+	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
+	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
+	onValidateMinMaxReps: WizardExerciseCardProps['onValidateMinMaxReps']
+	onStepFixedReps: WizardExerciseCardProps['onStepFixedReps']
+	onStepRangeReps: WizardExerciseCardProps['onStepRangeReps']
+	onStepWeight: WizardExerciseCardProps['onStepWeight']
+	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
 	disableTimeBasedProgressions?: boolean
 	registerRef: (key: string, node: HTMLDivElement | null) => void
 	exercises?: Exercise[]
@@ -204,7 +207,7 @@ function ReorderableExerciseRow({
 			whileDrag={{ zIndex: 60 }}
 			ref={node => registerRef(exerciseKey, node)}
 		>
-			<ExerciseCard
+			<WizardExerciseCard
 				tabIndex={tabIndex}
 				exerciseIndex={exerciseIndex}
 				exercise={exercise}

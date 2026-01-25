@@ -11,7 +11,7 @@ import { useExerciseCardState } from './hooks/useExerciseCardState'
 import { useExerciseAccessibility } from './hooks/useExerciseAccessibility'
 import { isRtFExercise } from './utils/progression.helpers'
 
-export interface ExerciseCardProps {
+export interface WizardExerciseCardProps {
 	tabIndex: number
 	exerciseIndex: number
 	exercise: RoutineWizardData['days'][number]['exercises'][number]
@@ -61,7 +61,7 @@ export interface ExerciseCardProps {
 	dragHandle?: React.ReactNode
 }
 
-export const ExerciseCard: FC<ExerciseCardProps> = ({
+export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	tabIndex,
 	exerciseIndex,
 	exercise,
