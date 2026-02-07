@@ -114,6 +114,7 @@ export default function RootLayout({
 		<html lang="es" suppressHydrationWarning>
 			<body
 				className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
+				suppressHydrationWarning
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<PwaProvider />

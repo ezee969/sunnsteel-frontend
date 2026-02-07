@@ -230,13 +230,15 @@ export default function Sidebar({
                 className={cn(
                   'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
                   isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
-                  activeNav === item.id && 'bg-primary text-primary-foreground'
+                  activeNav === item.id 
+                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400' 
+                    : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'
                 )}
                 asChild={false}
               >
                 <div
                   className={cn(
-                    'absolute inset-0 opacity-0 bg-gradient-to-r from-primary/10 to-primary/5 transition-opacity',
+                    'absolute inset-0 opacity-0 bg-gradient-to-r from-amber-600/5 dark:from-amber-400/5 to-transparent transition-opacity',
                     activeNav === item.id ? 'opacity-100' : 'group-hover:opacity-100'
                   )}
                 />
@@ -247,8 +249,8 @@ export default function Sidebar({
                     className={cn(
                       'h-5 w-5 transition-all',
                       activeNav === item.id
-                        ? 'text-primary-foreground'
-                        : 'text-muted-foreground group-hover:text-foreground'
+                        ? 'text-amber-500 dark:text-amber-400'
+                        : 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100'
                     )}
                   />
                 ) : (
@@ -256,22 +258,20 @@ export default function Sidebar({
                     className={cn(
                       'h-5 w-5 transition-all',
                       activeNav === item.id
-                        ? 'text-primary-foreground'
-                        : 'text-muted-foreground group-hover:text-foreground'
+                        ? 'text-amber-500 dark:text-amber-400'
+                        : 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100'
                     )}
                   />
                 )}
                 <span
                   className={cn(
-                    'transition-all duration-300',
-                    !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
+                    'transition-all duration-300 font-medium',
+                    !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
+                    activeNav === item.id ? 'translate-x-1' : 'group-hover:translate-x-1'
                   )}
                 >
                   {item.label}
                 </span>
-                {activeNav === item.id && (
-                  <div className="absolute right-0 top-0 h-full w-1 bg-primary-foreground/20" />
-                )}
               </Button>
             </Link>
           ))}

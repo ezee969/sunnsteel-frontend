@@ -24,7 +24,7 @@ export const HeroSection = ({
   innerClassName = '',
 }: HeroSectionProps) => {
   // Enforce consistent hero height across the app and reduce mobile height footprint
-  const computedHeightClass = 'h-[110px] sm:h-[150px]';
+  const computedHeightClass = 'h-[100px] sm:h-[130px]';
   return (
     <section
       className={`relative overflow-hidden rounded-xl border ${sectionClassName}`}

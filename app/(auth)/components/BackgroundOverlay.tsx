@@ -2,7 +2,6 @@
 
 import React from 'react'
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
 import { useTheme } from 'next-themes'
 
 export function BackgroundOverlay() {
@@ -15,7 +14,7 @@ export function BackgroundOverlay() {
 		<div className="absolute inset-0 z-0 overflow-hidden">
 			{/* Subtle parchment texture and gold vignette */}
 			<ParchmentOverlay opacity={isDark ? 0.12 : 0.08} />
-			<GoldVignetteOverlay intensity={isDark ? 0.2 : 0.1} />
+			<ParchmentOverlay opacity={isDark ? 0.12 : 0.08} />
 		</div>
 	)
 }

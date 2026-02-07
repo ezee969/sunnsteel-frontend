@@ -67,12 +67,12 @@ export const useSupabaseSignIn = () => {
       console.log('🚀 Login hook: onSuccess called with:', {
         userId: data.user?.id,
       });
-      // Add a small delay to ensure auth state updates before redirect
+      // Delay redirect slightly longer to ensure auth state updates and dev server compiles
       setTimeout(() => {
         console.log('🚀 Login hook: Redirecting to dashboard...');
         const target = variables?.redirectTo || '/dashboard';
         router.push(target);
-      }, 100);
+      }, 300);
     },
     onError: (error) => {
       console.error('🚀 Login hook: onError called:', error);

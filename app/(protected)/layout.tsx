@@ -112,8 +112,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="relative min-h-screen">
       {/* Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <ParchmentOverlay opacity={0.06} />
-        <GoldVignetteOverlay intensity={0.06} />
+        <div className="absolute inset-0 bg-white dark:bg-neutral-950 transition-colors duration-300" />
+        {/* Modern Brand Mesh Gradient */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]">
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#daa520,transparent_50%)]" />
+           <div className="absolute inset-0 bg-[grid_32px_32px_rgba(0,0,0,0.02)] dark:bg-[grid_32px_32px_rgba(255,255,255,0.02)]" />
+        </div>
+        <ParchmentOverlay opacity={0.04} />
       </div>
       <div className="flex h-screen">
         {isMobile && isMobileMenuOpen && (
