@@ -95,6 +95,15 @@ export const httpClient = {
       secure,
     });
   },
+
+  // PATCH request
+  patch<T, D = unknown>(endpoint: string, data?: D, secure = false): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+      secure,
+    });
+  },
 };
 
 // Request variant that exposes status and headers without throwing on non-2xx

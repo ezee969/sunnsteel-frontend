@@ -23,6 +23,7 @@ import { useSupabaseLogout } from '@/lib/api/hooks/useSupabaseEmailAuth';
 import { useUser } from '@/lib/api/hooks/useUser';
 import { ModeToggle } from '@/components/mode-toggle';
 import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+import Link from 'next/link';
 
 interface HeaderProps {
   title: string;
@@ -148,7 +149,7 @@ function UserDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="h-8 w-8 border-2 border-primary/20">
-            <AvatarImage src="/logo.png" alt="User" />
+            <AvatarImage src={user?.avatarUrl || ''} alt="User" className="object-cover" />
             <AvatarFallback className="bg-primary/10 text-primary">
               {user?.name?.charAt(0)}
             </AvatarFallback>
@@ -158,13 +159,17 @@ function UserDropdown() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          Profile
+        <DropdownMenuItem asChild>
+          <Link href="/profile" className="cursor-pointer">
+            <User className="mr-2 h-4 w-4" />
+            Profile
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
+        <DropdownMenuItem asChild>
+          <Link href="/settings" className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>

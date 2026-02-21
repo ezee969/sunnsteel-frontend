@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import type { Routine } from '@/lib/api/types/routine.type'
+import { Badge } from '@/components/ui/badge'
 import { ProgramStatusBadge } from './ProgramStatusBadge'
 import { RoutineProgress } from './RoutineProgress'
 import { RoutineMetaBadges } from './RoutineMetaBadges'
@@ -112,6 +113,20 @@ export function RoutineCard({
               <CardDescription className="line-clamp-1 text-xs leading-relaxed">
                 {routine.description}
               </CardDescription>
+            )}
+            {/* Day-of-week schedule badges */}
+            {routine.days && routine.days.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {routine.days.map((day) => (
+                  <Badge
+                    key={day.id}
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0 h-5 font-normal text-muted-foreground"
+                  >
+                    {weekdayName(day.dayOfWeek, 'short')}
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
           <DropdownMenu>

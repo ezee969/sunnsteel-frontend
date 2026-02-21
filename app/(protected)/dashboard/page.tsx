@@ -14,10 +14,14 @@ export default function Dashboard() {
 				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				title={<>Forge Your Path</>}
 				subtitle={<>Strength • Discipline • Craft</>}
+				innerClassName="max-[400px]:justify-center max-[400px]:text-center"
 			/>
 
 			<div className="flex flex-col gap-2">
-				<h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+				<h1
+					className="text-2xl sm:text-3xl font-bold tracking-tight"
+					style={{ fontFamily: 'var(--font-oswald), sans-serif', textTransform: 'none' }}
+				>
 					Welcome back, {user?.name}!
 				</h1>
 				<p className="text-muted-foreground text-sm sm:text-base">
@@ -26,7 +30,9 @@ export default function Dashboard() {
 			</div>
 
 			{/* Today's Workouts - dynamic based on device weekday and user routines */}
-			<TodaysWorkouts />
+			<div className="max-w-3xl">
+				<TodaysWorkouts />
+			</div>
 
 			{/* Stats Overview */}
 			{/* <StatsOverview /> */}
