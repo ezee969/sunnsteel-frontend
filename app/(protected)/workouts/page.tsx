@@ -5,12 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dumbbell, ChevronRight } from 'lucide-react';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';

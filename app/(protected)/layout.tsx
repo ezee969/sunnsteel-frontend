@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image';
+
 import Sidebar from '@/features/shell/components/Sidebar';
 import Header from '@/features/shell/components/Header';
 import { useSidebar } from '@/hooks/use-sidebar';

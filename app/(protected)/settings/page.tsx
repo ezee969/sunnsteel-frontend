@@ -95,11 +95,11 @@ export default function SettingsPage() {
         }
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading avatar:', error);
       push({
         title: 'Error',
-        description: error.message || 'Error uploading avatar. Are you sure the "avatars" bucket is public and created?',
+        description: (error as Error).message || 'Error uploading avatar. Are you sure the "avatars" bucket is public and created?',
         variant: 'destructive',
       });
     } finally {
@@ -234,7 +234,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-2">
-                  <Label htmlFor="weight">Weight ({/* @ts-ignore */} {user?.weightUnit || 'KG'})</Label>
+                  <Label htmlFor="weight">Weight ({user?.weightUnit || 'KG'})</Label>
                   <Input id="weight" name="weight" type="number" step="0.1" value={formData.weight} onChange={handleInputChange} className="bg-background/50" />
                 </div>
                 <div className="space-y-2">

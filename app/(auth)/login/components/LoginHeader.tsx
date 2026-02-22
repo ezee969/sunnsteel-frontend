@@ -1,4 +1,4 @@
-import OrnateCorners from '@/components/backgrounds/OrnateCorners';
+
 
 export function LoginHeader() {
   return (
