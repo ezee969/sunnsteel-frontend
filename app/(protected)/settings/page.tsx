@@ -219,7 +219,7 @@ export default function SettingsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="sex">Biological Sex</Label>
+                  <Label htmlFor="sex">Sex</Label>
                   <Select value={formData.sex} onValueChange={(val) => handleSelectChange(val, 'sex')}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select sex" />
