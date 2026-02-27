@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { ImageCropper } from '@/components/ui/image-cropper';
 
 export default function SettingsPage() {
   const { user, isLoading } = useUser();
@@ -29,6 +30,9 @@ export default function SettingsPage() {
 
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -52,25 +56,45 @@ export default function SettingsPage() {
     setFormData(prev => ({ ...prev, [name]: val }));
   };
 
-  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      setUploading(true);
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.');
+        return;
       }
       const file = event.target.files[0];
 
-      // Validation: Max 2MB
       if (file.size > 2 * 1024 * 1024) {
         throw new Error('Image size must be less than 2MB.');
       }
 
-      // Validation: Must be an image
       if (!file.type.startsWith('image/')) {
         throw new Error('Please upload a valid image file.');
       }
 
-      const fileExt = file.name.split('.').pop();
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setSelectedImageSrc(reader.result?.toString() || null);
+        setCropperOpen(true);
+      });
+      reader.readAsDataURL(file);
+
+      // Reset input value so selecting the same file again works
+      event.target.value = '';
+    } catch (error: unknown) {
+      console.error('Error selecting image:', error);
+      push({
+        title: 'Error',
+        description: (error as Error).message || 'Error selecting image.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleCroppedImageUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      
+      const fileExt = file.name.split('.').pop() || 'jpeg';
       const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
       
@@ -88,10 +112,13 @@ export default function SettingsPage() {
 
       setAvatarUrl(data.publicUrl);
       
-      // Immediately save URL to user profile
       updateUserMutation.mutate({ avatarUrl: data.publicUrl }, {
         onSuccess: () => {
-          // Could dispatch a toast notification
+          push({
+            title: 'Avatar Updated',
+            description: 'Your new profile picture has been saved.',
+            variant: 'success',
+          });
         }
       });
 
@@ -179,7 +206,7 @@ export default function SettingsPage() {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={uploadAvatar}
+                onChange={handleFileSelect}
                 disabled={uploading}
               />
             </div>
@@ -257,6 +284,13 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ImageCropper
+        open={cropperOpen}
+        onOpenChange={setCropperOpen}
+        imageSrc={selectedImageSrc}
+        onCropComplete={handleCroppedImageUpload}
+      />
     </div>
   );
 }

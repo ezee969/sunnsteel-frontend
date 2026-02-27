@@ -53,6 +53,7 @@
     "react-datepicker": "^4.25.0",
     "react-day-picker": "^9.9.0",
     "react-dom": "^18.3.1",
+    "react-easy-crop": "^5.5.6",
     "react-hook-form": "^7.55.0",
     "recharts": "^3.2.1",
     "tailwind-merge": "^3.0.2",
