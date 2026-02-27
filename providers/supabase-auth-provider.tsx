@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService';
 import { supabase } from '@/lib/supabase/client';
@@ -30,50 +30,13 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const pathname = usePathname();
+  // Track whether the INITIAL_SESSION event has been handled
+  const initialSessionHandled = useRef(false);
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        setSession(session);
-
-        if (session) {
-          // Verify with backend and get user profile
-          try {
-            const userProfile = await supabaseAuthService.verifyToken(
-              session.access_token
-            );
-            setUser(userProfile.user);
-            // Mark client-side session for middleware detection
-            try {
-              if (typeof document !== 'undefined') {
-                document.cookie = [
-                  'has_session=1',
-                  'Path=/',
-                  'Max-Age=604800', // 7 days
-                  'SameSite=Lax',
-                ].join('; ');
-              }
-            } catch {}
-          } catch (err) {
-            console.error('Failed to verify token with backend:', err);
-            setError(err as Error);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get initial session:', err);
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getInitialSession();
-
-    // Listen for auth changes
+    // Rely solely on onAuthStateChange to avoid race conditions.
+    // onAuthStateChange fires INITIAL_SESSION synchronously with the stored session,
+    // so there is no need for a separate getInitialSession call.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -85,7 +48,6 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       // Ignore TOKEN_REFRESHED events to prevent infinite loops
-      // Token refresh doesn't change user data, just refreshes the JWT
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed, skipping verification to prevent loop');
         setSession(session);
@@ -97,7 +59,6 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (session) {
         try {
-          // Verify with backend and get/create user
           const userProfile = await supabaseAuthService.verifyToken(
             session.access_token
           );
@@ -108,19 +69,17 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
               document.cookie = [
                 'has_session=1',
                 'Path=/',
-                'Max-Age=604800', // 7 days
+                'Max-Age=604800',
                 'SameSite=Lax',
               ].join('; ');
             }
           } catch {}
 
-          // Invalidate queries to refetch with new auth state
           queryClient.invalidateQueries({ queryKey: ['user'] });
         } catch (err) {
           console.error('Failed to verify token with backend:', err);
           setError(err as Error);
           setUser(null);
-          // Best-effort: clear marker on verification failure
           try {
             if (typeof document !== 'undefined') {
               document.cookie = 'has_session=; Max-Age=0; path=/';
@@ -129,14 +88,18 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } else {
         setUser(null);
-        // Clear all cached data on sign out
         queryClient.clear();
-        // Ensure any client-side session marker is cleared to avoid middleware/login loops
         try {
           if (typeof document !== 'undefined') {
             document.cookie = 'has_session=; Max-Age=0; path=/';
           }
         } catch {}
+      }
+
+      // Mark loading as done after the first INITIAL_SESSION event is processed
+      if (!initialSessionHandled.current) {
+        initialSessionHandled.current = true;
+        setIsLoading(false);
       }
     });
 
@@ -148,6 +111,7 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
   const contextIsLoading = isAuthPage ? false : isLoading;
 
   const value = {
+    // isAuthenticated requires both a Supabase session AND a verified backend user profile
     isAuthenticated: !!session && !!user,
     isLoading: contextIsLoading,
     session,

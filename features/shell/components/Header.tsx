@@ -24,6 +24,7 @@ import { useUser } from '@/lib/api/hooks/useUser';
 import { ModeToggle } from '@/components/mode-toggle';
 import OrnateCorners from '@/components/backgrounds/OrnateCorners';
 import Link from 'next/link';
+import { SearchBar } from '@/components/ui/search-bar';
 
 interface HeaderProps {
   title: string;
@@ -50,10 +51,13 @@ export default function Header({
           <span className="sr-only">Toggle Menu</span>
         </Button>
       )}
-      <div className="flex-1">
-        <h1 className="text-xl font-semibold truncate heading-classical">{title}</h1>
+      <div className="flex-1 min-w-0 mr-4 flex items-center justify-between">
+        <h1 className="text-xl font-semibold truncate heading-classical hidden sm:block mr-4 w-48">{title}</h1>
+        <div className="flex-1 max-w-sm ml-auto sm:ml-0">
+          <SearchBar />
+        </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <ModeToggle />
         <NotificationsDropdown />
         <UserDropdown />
