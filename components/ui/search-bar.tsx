@@ -44,11 +44,9 @@ export function SearchBar() {
     }
   };
 
-  const handleSelectUser = (_userId: string) => {
-    // Or navigate to their profile when that feature is ready!
-    // For now we can just route to the full search page or a specific user path.
-    // Assuming /profile/[id] isn't implemented yet, let's just go to the search view.
-    router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
+  const handleSelectUser = (userId: string) => {
+    // Navigate directly to the selected user's profile
+    router.push(`/profile/${userId}`);
     setIsFocused(false);
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useUserSearch } from '@/lib/api/hooks/useUserSearch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get('q') || '';
   
   const { data: results = [], isLoading } = useUserSearch(query, 50); // Get up to 50 results
@@ -52,6 +53,7 @@ export default function SearchPage() {
           {results.map((user, idx) => (
             <motion.div
               key={user.id}
+              onClick={() => router.push(`/profile/${user.id}`)}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05, duration: 0.3 }}
