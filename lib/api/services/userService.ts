@@ -1,24 +1,22 @@
 import { httpClient } from './httpClient';
-import { User } from '../types/auth.type';
-import { UpdateProfileRequest } from '@sunsteel/contracts';
+import {
+  PublicUserProfile,
+  UpdateProfileRequest,
+  UserProfile,
+  UserSearchResponse,
+} from '@sunsteel/contracts';
 
-export interface UserSearchResponse {
-  id: string
-  email: string
-  name: string
-  lastName?: string | null
-  avatarUrl?: string | null
-}
+export type { UserSearchResponse } from '@sunsteel/contracts';
 
 export const userService = {
   // Get current user profile
-  async getProfile(): Promise<User> {
-    return httpClient.get<User>('/users/profile', true);
+  async getProfile(): Promise<UserProfile> {
+    return httpClient.get<UserProfile>('/users/profile', true);
   },
 
   // Update user profile
-  async updateProfile(data: UpdateProfileRequest): Promise<User> {
-    return httpClient.patch<User>('/users/profile', data, true);
+  async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
+    return httpClient.patch<UserProfile>('/users/profile', data, true);
   },
 
   // Search users by name, email or username
@@ -28,5 +26,20 @@ export const userService = {
       limit: limit.toString()
     });
     return httpClient.get<UserSearchResponse[]>(`/users/search?${params.toString()}`, true);
-  }
+  },
+
+  // Get public profile by user id
+  async getUserById(userId: string): Promise<PublicUserProfile> {
+    return httpClient.get<PublicUserProfile>(`/users/${userId}`, true);
+  },
+
+  // Follow user
+  async followUser(userId: string): Promise<PublicUserProfile> {
+    return httpClient.post<PublicUserProfile>(`/users/${userId}/follow`, undefined, true);
+  },
+
+  // Unfollow user
+  async unfollowUser(userId: string): Promise<PublicUserProfile> {
+    return httpClient.delete<PublicUserProfile>(`/users/${userId}/follow`, true);
+  },
 };

@@ -104,6 +104,14 @@ export const httpClient = {
       secure,
     });
   },
+
+  // DELETE request
+  delete<T>(endpoint: string, secure = false): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'DELETE',
+      secure,
+    });
+  },
 };
 
 // Request variant that exposes status and headers without throwing on non-2xx

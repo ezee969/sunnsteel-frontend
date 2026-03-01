@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { userService } from '@/lib/api/services/userService';
-import { User } from '@/lib/api/types/auth.type';
+import { UserProfile } from '@sunsteel/contracts';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 
 export function useUser() {
@@ -11,7 +11,7 @@ export function useUser() {
     isLoading,
     error,
     refetch,
-  } = useQuery<User, Error>({
+  } = useQuery<UserProfile, Error>({
     queryKey: ['user'],
     queryFn: () => userService.getProfile(),
     enabled: !isLoadingSupabase && !!session,
