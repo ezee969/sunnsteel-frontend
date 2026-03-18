@@ -18,7 +18,7 @@ function AuthCallbackContent() {
 
     const handleAuthCallback = async () => {
       try {
-        console.log('🔄 Auth callback: Processing OAuth callback...');
+
 
         // Retrieve Supabase session created by OAuth provider
         const { data, error } = await supabase.auth.getSession();
@@ -34,10 +34,7 @@ function AuthCallbackContent() {
           return;
         }
 
-        console.log('🔄 Auth callback: Session retrieved:', {
-          hasSession: !!data.session,
-          userId: data.session?.user?.id,
-        });
+
 
         // Verify with backend immediately to set secure HttpOnly cookie (ss_session)
         try {

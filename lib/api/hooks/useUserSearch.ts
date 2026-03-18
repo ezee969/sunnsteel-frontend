@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { userService } from '../services/userService';
-import { useAuth } from '@/providers/use-auth-adapter';
+import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 
 export const useUserSearch = (query: string, limit: number = 5) => {
   const { isAuthenticated } = useAuth();

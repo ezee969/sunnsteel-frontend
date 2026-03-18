@@ -5,6 +5,7 @@ import {
 	TmEventResponse,
 	GetTmAdjustmentsParams,
 } from '../types/tm-adjustment.types'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * Query key factory for TM adjustments
@@ -81,7 +82,7 @@ export const useCreateTmAdjustment = () => {
 			)
 		},
 		onError: (error) => {
-			console.error('Failed to create TM adjustment:', error)
+			logger.error('Failed to create TM adjustment:', error)
 		},
 	})
 }

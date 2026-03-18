@@ -12,8 +12,7 @@ import WorkoutProgramCard from './WorkoutProgramCard';
 
 export default function WorkoutPrograms() {
   const handleStartProgram = () => {
-    // Handle starting a program
-    console.log('Starting program...');
+    // TODO: Implement program start logic
   };
 
   return (

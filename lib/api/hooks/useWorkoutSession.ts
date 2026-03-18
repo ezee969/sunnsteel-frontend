@@ -3,7 +3,7 @@ import { useToast } from '@/components/ui/toast'
 import { workoutService } from '../services/workoutService';
 import { setSaveState } from '@/lib/utils/save-status-store';
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
-import { useAuth } from '@/providers/use-auth-adapter';
+import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 import {
   FinishWorkoutRequest,
   StartWorkoutRequest,

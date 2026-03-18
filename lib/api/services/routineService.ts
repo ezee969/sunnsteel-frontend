@@ -1,52 +1,24 @@
 import { httpClient } from './httpClient'
 import { CreateRoutineRequest, Routine } from '../types/routine.type'
+import {
+	buildRoutineQueryString,
+	RoutineDetailOptions,
+	RoutineFilters,
+} from '../routines/routine-query'
 
 const ROUTINES_API_URL = '/routines'
 
 export const routineService = {
-	getUserRoutines: async (filters?: {
-		isFavorite?: boolean
-		isCompleted?: boolean
-		include?: string[] // e.g., ['rtfGoals']
-		week?: number // for RTF goals
-	}): Promise<Routine[]> => {
-		const qs = new URLSearchParams()
-		if (typeof filters?.isFavorite === 'boolean') {
-			qs.set('isFavorite', String(filters.isFavorite))
-		}
-		if (typeof filters?.isCompleted === 'boolean') {
-			qs.set('isCompleted', String(filters.isCompleted))
-		}
-		if (filters?.include?.length) {
-			qs.set('include', filters.include.join(','))
-		}
-		if (typeof filters?.week === 'number') {
-			qs.set('week', String(filters.week))
-		}
-
-		const url = `${ROUTINES_API_URL}${qs.toString() ? `?${qs.toString()}` : ''}`
+	getUserRoutines: async (filters?: RoutineFilters): Promise<Routine[]> => {
+		const url = `${ROUTINES_API_URL}${buildRoutineQueryString(filters)}`
 		return httpClient.request<Routine[]>(url, {
 			method: 'GET',
 			secure: true,
 		})
 	},
 
-	getById: async (
-		id: string,
-		options?: {
-			include?: string[] // e.g., ['rtfGoals']
-			week?: number // for RTF goals
-		},
-	): Promise<Routine> => {
-		const qs = new URLSearchParams()
-		if (options?.include?.length) {
-			qs.set('include', options.include.join(','))
-		}
-		if (typeof options?.week === 'number') {
-			qs.set('week', String(options.week))
-		}
-
-		const url = `${ROUTINES_API_URL}/${id}${qs.toString() ? `?${qs.toString()}` : ''}`
+	getById: async (id: string, options?: RoutineDetailOptions): Promise<Routine> => {
+		const url = `${ROUTINES_API_URL}/${id}${buildRoutineQueryString(options)}`
 		return httpClient.request<Routine>(url, {
 			method: 'GET',
 			secure: true,

@@ -6,11 +6,11 @@ import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
 import { useRtfWeekGoals } from '@/lib/api/hooks/useRtfWeekGoals'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
-import { SessionHeader } from '@/components/workout/session-header'
-import { SessionActionCard } from '@/components/workout/session-action-card'
-import { ExerciseGroup } from '@/components/workout/exercise-group'
-import { SessionConfirmationDialog } from '@/components/workout/session-confirmation-dialog'
-import { SessionLoadingSkeleton } from '@/components/workout/session-loading-skeleton'
+import { SessionHeader } from '@/features/workout/session-header'
+import { SessionActionCard } from '@/features/workout/session-action-card'
+import { ExerciseGroup } from '@/features/workout/exercise-group'
+import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
+import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
 import type { GroupedExerciseLogs } from '@/lib/utils/workout-session.types'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
@@ -209,7 +209,8 @@ export default function ActiveSessionPage() {
 			</div>
 		)
 	}
-	console.log('Session ', session)
+
+
 	return (
 		<div className="min-h-screen bg-background">
 			{/* Header */}

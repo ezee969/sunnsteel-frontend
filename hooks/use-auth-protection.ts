@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/auth-provider';
+import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 
 export function useAuthProtection() {
   const router = useRouter();

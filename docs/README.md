@@ -53,7 +53,6 @@ A comprehensive, navigable index of all frontend documentation. Use the category
 
 ## Development
 - [Development (Overview)](./development/README.md)
-- [Testing Patterns](./development/testing-patterns.md)
 
 ## Examples
 - [Examples (Overview)](./examples/README.md)

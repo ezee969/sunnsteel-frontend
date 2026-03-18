@@ -16,7 +16,6 @@ function LoginContent() {
   const { isAuthenticated, isLoading } = useSupabaseAuth();
 
   useEffect(() => {
-    console.log('🔄 Login page auth state:', { isAuthenticated, isLoading })
     // Redirect authenticated users away from /login
     if (!isLoading && isAuthenticated) {
       // sanitize redirect target: same-origin path only

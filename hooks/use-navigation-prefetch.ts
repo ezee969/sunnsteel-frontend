@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import { routineService } from '@/lib/api/services/routineService';
 import { workoutService } from '@/lib/api/services/workoutService';
-import { useAuth } from '@/providers/auth-provider';
+import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
 
 interface PrefetchOptions {
@@ -27,11 +27,11 @@ const DEFAULT_OPTIONS: PrefetchOptions = {
 export const useNavigationPrefetch = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { isAuthenticated, hasTriedRefresh } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const prefetchedRoutes = useRef(new Set<string>());
   const prefetchedData = useRef(new Set<string>());
 
-  const isReady = hasTriedRefresh && isAuthenticated;
+  const isReady = !isLoading && isAuthenticated;
 
   // Prefetch route with Next.js router
   const prefetchRoute = useCallback(

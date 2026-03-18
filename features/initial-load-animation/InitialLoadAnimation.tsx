@@ -7,7 +7,7 @@ import Image from 'next/image';
 import {
 	CornerAccent,
 	CORNER_ACCENTS,
-} from '@/components/initial-load-animation/corner-accent'
+} from './corner-accent'
 
 let hasShownInitialLoader = false
 

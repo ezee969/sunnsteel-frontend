@@ -9,6 +9,7 @@ import { AppToastProvider } from './toast-provider';
 import { useEffect } from 'react';
 import { assertClientEnv } from '@/schema/env.client';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
+import { logger } from '@/lib/utils/logger';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   // Run client-env validation once after mount (avoids SSR mismatch risk)
@@ -17,7 +18,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       assertClientEnv();
     } catch (e) {
       // Non-fatal; logged in assertClientEnv
-      console.warn('[env] validation threw', e);
+      logger.warn('[env] validation threw', e);
     }
   }, []);
 

@@ -3,8 +3,8 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useWorkoutSessionData } from '@/hooks/use-workout-session-data';
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups';
-import { HistorySessionHeader } from '@/components/workout/history-session-header';
-import { HistoryExerciseGroup } from '@/components/workout/history-exercise-group';
+import { HistorySessionHeader } from '@/features/workout/history-session-header';
+import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group';
 import { useCollapseMap } from '@/hooks/use-collapse-map';
 
 export default function WorkoutDetailPage() {

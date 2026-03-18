@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { PublicUserProfile } from '@sunsteel/contracts';
 import { userService } from '@/lib/api/services/userService';
-import { useAuth } from '@/providers/use-auth-adapter';
+import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 
 export function usePublicUser(userId: string) {
   const { isAuthenticated } = useAuth();

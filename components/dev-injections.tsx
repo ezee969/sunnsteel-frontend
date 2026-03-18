@@ -21,8 +21,6 @@ type Props = {
 }
 
 export default function DevInjections({ showPerfPanel, enableEruda }: Props) {
-	console.log('DevInjections - showPerfPanel:', showPerfPanel)
-	console.log('DevInjections - enableEruda:', enableEruda)
 	return (
 		<>
 			{showPerfPanel ? <DynamicPerformanceDebugPanel /> : null}

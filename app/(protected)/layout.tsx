@@ -14,7 +14,7 @@ import Link from 'next/link';
 import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
-import { InitialLoadAnimation } from '@/components/InitialLoadAnimation';
+import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialLoadAnimation';
 import { preloadAllCriticalComponents } from '@/lib/utils/dynamic-imports';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TopProgressBar } from '@/components/ui/top-progress-bar';

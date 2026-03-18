@@ -8,7 +8,7 @@
 
 - Run app: `npm run dev` (Next.js dev with Turbopack)
 - Run both apps: `npm run dev:all` (PowerShell launcher in `start-dev.ps1`)
-- Tests: `npm test` (Vitest), `npm run test:watch`, `npm run test:coverage`
+- Quality checks: `npm run typecheck`, `npm run lint`
 
 ### Auth + routing (cookie-based protection)
 
@@ -36,7 +36,7 @@
 
 ### Shared contracts (`@sunsteel/contracts`)
 
-- Prefer shared enums/types from `@sunsteel/contracts` via the wrappers in `lib/api/types/*` instead of redefining API shapes.
+- Prefer shared enums/types from the local `@sunsteel/contracts` package via the wrappers in `lib/api/types/*` instead of redefining API shapes.
 
 ### Code style
 
