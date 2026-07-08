@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Sunnsteel is a fitness/workout-tracking web app (Next.js 15 App Router, React 18, TypeScript, TailwindCSS v4, shadcn/ui). It is the frontend half of a two-repo system; the NestJS backend lives at `../sunnsteel-backend` and the shared types package at `../sunsteel-contracts` (imported as `@sunsteel/contracts`, a `file:` dependency). It has a classical/Renaissance visual theme.
+Sunnsteel is a fitness/workout-tracking web app (Next.js 15 App Router, React 18, TypeScript, TailwindCSS v4, shadcn/ui). It is the frontend half of a two-repo system; the NestJS backend lives at `../sunnsteel-backend` and the shared types package at `../sunsteel-contracts` (imported as `@sunsteel/contracts`). It has a classical/Renaissance visual theme.
+
+**`@sunsteel/contracts` is a published npm dependency (`^0.3.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here. (A proper monorepo/workspace setup would give both instant local edits and working deploys, but the repos are currently separate.)
 
 Runs on Windows 11. Do **not** start/run the app yourself — ask the user to run it.
 
