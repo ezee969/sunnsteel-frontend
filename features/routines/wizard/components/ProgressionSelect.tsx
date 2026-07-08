@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ProgressionScheme } from '@sunsteel/contracts'
+import { RTF_ENABLED } from '@/lib/config/env'
 
 interface Props {
 	disableTimeBasedProgressions?: boolean
@@ -60,9 +61,17 @@ export function ProgressionSelect({
 					<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
 						Dynamic Double Progression
 					</SelectItem>
-					{/* RtF (PROGRAMMED_RTF / PROGRAMMED_RTF_HYPERTROPHY) removed: the
-					    backend no longer supports Reps-to-Failure programming and
-					    rejects it on create. Deep RtF removal is pending. */}
+					{/* RtF (Reps-to-Failure) options are gated on RTF_ENABLED. The
+					    feature is dormant and the backend rejects these schemes, so
+					    they stay hidden until RtF is revived. */}
+					{RTF_ENABLED && (
+						<>
+							<SelectItem value="PROGRAMMED_RTF">Reps to Failure</SelectItem>
+							<SelectItem value="PROGRAMMED_RTF_HYPERTROPHY">
+								Reps to Failure (Hypertrophy)
+							</SelectItem>
+						</>
+					)}
 				</SelectContent>
 			</Select>
 		</div>

@@ -1,4 +1,5 @@
 import { usePerformanceQuery } from '@/hooks/use-performance-query';
+import { RTF_ENABLED } from '@/lib/config/env';
 import { rtfApi } from '../etag-client';
 import type { RtfTimeline, RtfForecast } from '../types/rtf.types';
 
@@ -27,7 +28,8 @@ export const useRtFForecast = (
       })
       return response.data as RtfForecast
     },
-    enabled: !!routineId,
+    // RtF disabled (see RTF_ENABLED): forecast endpoint removed from backend.
+    enabled: RTF_ENABLED && !!routineId,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   }, `RTF Forecast (${routineId})`)
@@ -47,7 +49,8 @@ export const useRtFTimeline = (routineId: string, remaining?: boolean) => {
       })
       return response.data as RtfTimeline
     },
-    enabled: !!routineId,
+    // RtF disabled (see RTF_ENABLED): timeline endpoint removed from backend.
+    enabled: RTF_ENABLED && !!routineId,
     staleTime: 10 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
   }, `RTF Timeline (${routineId})`)

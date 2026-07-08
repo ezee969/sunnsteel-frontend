@@ -21,6 +21,7 @@ import { BuildDays } from '@/features/routines/wizard/BuildDays'
 import { RtfConfiguration } from '@/features/routines/wizard/RtfConfiguration'
 import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate'
 import { RoutineWizardData } from '@/features/routines/wizard/types'
+import { RTF_ENABLED } from '@/lib/config/env'
 import { getWeekdayFromIsoDate } from '@/features/routines/wizard/utils/date-helpers'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 
@@ -61,14 +62,17 @@ export default function CreateRoutinePage() {
 		programWithDeloads: true,
 	})
 
-	// Check if routine has RtF exercises
-	const hasRtfExercises = routineData.days.some(d =>
-		d.exercises.some(
-			ex =>
-				ex.progressionScheme === 'PROGRAMMED_RTF' ||
-				ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
-		),
-	)
+	// Check if routine has RtF exercises. RtF is disabled (see RTF_ENABLED), so
+	// this is forced false to keep the RtF configuration step out of the wizard.
+	const hasRtfExercises =
+		RTF_ENABLED &&
+		routineData.days.some(d =>
+			d.exercises.some(
+				ex =>
+					ex.progressionScheme === 'PROGRAMMED_RTF' ||
+					ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+			),
+		)
 
 	// Compute dynamic steps based on RtF presence
 	const STEPS = hasRtfExercises

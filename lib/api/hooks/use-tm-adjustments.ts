@@ -6,6 +6,7 @@ import {
 	GetTmAdjustmentsParams,
 } from '../types/tm-adjustment.types'
 import { logger } from '@/lib/utils/logger'
+import { RTF_ENABLED } from '@/lib/config/env'
 
 /**
  * Query key factory for TM adjustments
@@ -33,7 +34,8 @@ export const useGetTmAdjustments = (
 	return useQuery({
 		queryKey: tmAdjustmentKeys.adjustments(routineId, params),
 		queryFn: () => TmAdjustmentService.getTmAdjustments(routineId, params),
-		enabled: options?.enabled ?? !!routineId,
+		// RtF/TM adjustments disabled (see RTF_ENABLED): backend endpoint removed.
+		enabled: RTF_ENABLED && (options?.enabled ?? !!routineId),
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	})
 }
@@ -50,7 +52,8 @@ export const useGetTmAdjustmentSummary = (
 	return useQuery({
 		queryKey: tmAdjustmentKeys.summary(routineId),
 		queryFn: () => TmAdjustmentService.getTmAdjustmentSummary(routineId),
-		enabled: options?.enabled ?? !!routineId,
+		// RtF/TM adjustments disabled (see RTF_ENABLED): backend endpoint removed.
+		enabled: RTF_ENABLED && (options?.enabled ?? !!routineId),
 		staleTime: 10 * 60 * 1000, // 10 minutes - summaries change less frequently
 	})
 }
@@ -94,6 +97,8 @@ export const useCanCreateTmAdjustment = (routine?: {
 	progressionScheme?: string 
 	days?: Array<{ exercises?: Array<{ progressionScheme?: string }> }> 
 }) => {
+	// RtF disabled (see RTF_ENABLED): never advertise TM adjustment support.
+	if (!RTF_ENABLED) return false
 	if (!routine) return false
 
 	// Check if any exercise uses PROGRAMMED_RTF

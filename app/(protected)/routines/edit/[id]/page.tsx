@@ -26,6 +26,7 @@ import {
 } from '@/features/routines/wizard/types'
 import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks'
 import { RoutineDay, RoutineExercise } from '@/lib/api/types'
+import { RTF_ENABLED } from '@/lib/config/env'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 
 // Use shared RoutineWizardData
@@ -92,14 +93,18 @@ export default function EditRoutinePage() {
 	const updateRoutineMutation = useUpdateRoutine()
 	const createRoutineMutation = useCreateRoutine()
 
-	// Check if routine has RtF exercises
-	const hasRtfExercises = routineData.days.some(d =>
-		d.exercises.some(
-			ex =>
-				ex.progressionScheme === 'PROGRAMMED_RTF' ||
-				ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
-		),
-	)
+	// Check if routine has RtF exercises. RtF is disabled (see RTF_ENABLED), so
+	// this is forced false to keep the RtF configuration step out of the wizard
+	// even when editing a legacy routine that still carries RtF schemes.
+	const hasRtfExercises =
+		RTF_ENABLED &&
+		routineData.days.some(d =>
+			d.exercises.some(
+				ex =>
+					ex.progressionScheme === 'PROGRAMMED_RTF' ||
+					ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
+			),
+		)
 
 	// Compute dynamic steps based on RtF presence
 	const STEPS = hasRtfExercises

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
 import { logger } from '@/lib/utils/logger'
+import { RTF_ENABLED } from '@/lib/config/env'
 import { rtfApi } from '../etag-client'
 import {
 	routineQueryKeys,
@@ -193,7 +194,9 @@ export const useRtFWeekGoals = (routineId: string, week?: number) => {
 				})
 				return response.data as Routine
 			},
-			enabled: !!routineId,
+			// RtF is disabled (see RTF_ENABLED): the backend week-goals endpoint was
+			// removed, so keep this query dormant to avoid doomed requests.
+			enabled: RTF_ENABLED && !!routineId,
 			staleTime: 2 * 60 * 1000,
 			gcTime: 10 * 60 * 1000,
 		},
