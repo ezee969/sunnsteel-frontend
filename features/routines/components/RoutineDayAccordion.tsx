@@ -21,7 +21,6 @@ interface RoutineDayAccordionProps {
 	activeSession?: { routineDayId: string } | null
 	isStarting: boolean
 	startActingDayId: string | null
-	programEnded: boolean
 	onStartWorkout: (dayId: string) => void
 }
 
@@ -40,7 +39,6 @@ export const RoutineDayAccordion = ({
 	activeSession,
 	isStarting,
 	startActingDayId,
-	programEnded,
 	onStartWorkout,
 }: RoutineDayAccordionProps) => {
 	const todayDow = getTodayDow()
@@ -93,7 +91,6 @@ export const RoutineDayAccordion = ({
 									size="sm"
 									variant={hasActiveSession ? 'default' : 'outline'}
 									disabled={
-										programEnded ||
 										isLoadingThisDay ||
 										(!hasActiveSession && !canStartToday)
 									}

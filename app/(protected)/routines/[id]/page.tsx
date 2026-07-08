@@ -94,7 +94,6 @@ export default function RoutineDetailsPage() {
 			<RoutineHeader
 				routine={routine}
 				daysPerWeek={routineData.daysPerWeek}
-				hasProgram={routineData.hasProgram}
 				onBack={() => router.push('/routines')}
 				onEdit={() => router.push(`/routines/edit/${routine.id}`)}
 				onToggleFavorite={handleToggleFavorite}
@@ -130,7 +129,6 @@ export default function RoutineDetailsPage() {
 									}
 									className="h-auto p-4 flex flex-col items-start gap-2"
 									disabled={
-										routineData.programEnded ||
 										isLoadingThisDay ||
 										(!hasActiveSession && !canStartToday)
 									}
@@ -180,7 +178,6 @@ export default function RoutineDetailsPage() {
 						activeSession={activeSession}
 						isStarting={sessionManager.isStarting}
 						startActingDayId={sessionManager.startActingDayId}
-						programEnded={routineData.programEnded}
 						onStartWorkout={dayId =>
 							sessionManager.handleStart(dayId, activeSession)
 						}

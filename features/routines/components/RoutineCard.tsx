@@ -22,28 +22,10 @@ import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import type { Routine } from '@/lib/api/types/routine.type'
 import { Badge } from '@/components/ui/badge'
-import { ProgramStatusBadge } from './ProgramStatusBadge'
 import { RoutineProgress } from './RoutineProgress'
 import { RoutineMetaBadges } from './RoutineMetaBadges'
 import { weekdayName, getTodayDow, validateWorkoutDate, validateRoutineDayDate } from '@/lib/utils/date'
 import { onPressEnterOrSpace } from '@/lib/utils/a11y'
-
-function isProgramEnded(routine: Routine | undefined): boolean {
-  if (!routine?.programEndDate) return false
-  const today = new Date()
-  const todayUTC = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  )
-  const end = new Date(routine.programEndDate)
-  const endUTC = Date.UTC(
-    end.getUTCFullYear(),
-    end.getUTCMonth(),
-    end.getUTCDate(),
-  )
-  return todayUTC > endUTC
-}
 
 export interface RoutineCardProps {
   routine: Routine
@@ -88,8 +70,7 @@ export function RoutineCard({
   const todayRoutineDay = routine.days?.find(day => day.dayOfWeek === todayDow)
   
   // Determine if the start button should be disabled based on validation and routine state
-  const isStartDisabled = (isStarting && startActingId === routine.id) || 
-                          isProgramEnded(routine) || 
+  const isStartDisabled = (isStarting && startActingId === routine.id) ||
                           (!isActiveRoutine && !canStartToday)
 
   return (
@@ -107,7 +88,6 @@ export function RoutineCard({
               <CardTitle className="text-sm font-semibold leading-tight sm:text-base truncate">
                 {routine.name}
               </CardTitle>
-              {routine.programEndDate && <ProgramStatusBadge routine={routine} />}
             </div>
             {routine.description && (
               <CardDescription className="line-clamp-1 text-xs leading-relaxed">
@@ -149,7 +129,7 @@ export function RoutineCard({
                       <DropdownMenuItem
                         key={d.id}
                         onSelect={() => onStartSession(routine, d.id)}
-                        disabled={(isStarting && startActingId === routine.id) || isProgramEnded(routine) || !canStartThisDay}
+                        disabled={(isStarting && startActingId === routine.id) || !canStartThisDay}
                         title={!canStartThisDay ? `This day is not scheduled for ${weekdayName(d.dayOfWeek, 'long')}` : undefined}
                       >
                         {weekdayName(d.dayOfWeek, 'short')}

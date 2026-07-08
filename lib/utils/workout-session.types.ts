@@ -82,6 +82,5 @@ export type GroupedExerciseLogs = {
 		plannedRir?: number | null
 	}>
 	progressionScheme: ProgressionScheme
-	programStyle?: 'STANDARD' | 'HYPERTROPHY'
 	note?: string | null
 }

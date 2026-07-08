@@ -119,24 +119,16 @@ function createMockRoutine(index: number): Routine {
 		}
 	})
 
-	const programEndDate =
-		index % 3 === 0
-			? new Date(baseMockDate + (index + 6) * 86400000).toISOString()
-			: undefined
-
 	return {
 		id: routineId,
 		userId: 'mock-user-id',
 		name: `Classical Strength Block ${index + 1}`,
 		description: `A balanced ${daysPerWeek}-day program focusing on strength and hypertrophy.`,
 		isPeriodized: index % 2 === 0,
-		programStyle: index % 2 === 0 ? 'STANDARD' : 'HYPERTROPHY',
 		isFavorite: index % 3 === 0,
 		isCompleted: index % 4 === 0,
 		createdAt,
 		updatedAt,
-		programDurationWeeks: daysPerWeek,
-		programEndDate,
 		days,
 	}
 }

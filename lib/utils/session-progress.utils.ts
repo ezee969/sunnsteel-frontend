@@ -180,7 +180,6 @@ export function groupSetLogsByExercise(
 			exerciseName: re.exercise.name,
 			sets,
 			progressionScheme: re.progressionScheme,
-			programStyle: re.programStyle,
 			note: re.note,
 		} as GroupedExerciseLogs
 	})

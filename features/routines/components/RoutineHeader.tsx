@@ -3,13 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Edit, Heart, Check } from 'lucide-react';
-import { ProgramStatusBadge } from './ProgramStatusBadge';
 import type { Routine } from '@/lib/api/types/routine.type';
 
 interface RoutineHeaderProps {
   routine: Routine;
   daysPerWeek: number;
-  hasProgram: boolean;
   onBack: () => void;
   onEdit: () => void;
   onToggleFavorite: () => void;
@@ -29,7 +27,6 @@ interface RoutineHeaderProps {
 export const RoutineHeader = ({
   routine,
   daysPerWeek,
-  hasProgram,
   onBack,
   onEdit,
   onToggleFavorite,
@@ -87,10 +84,6 @@ export const RoutineHeader = ({
 
       {/* Status Badges */}
       <div className="flex flex-wrap gap-2">
-        {hasProgram && routine.programEndDate && (
-          <ProgramStatusBadge routine={routine} />
-        )}
-        
         <Badge variant="secondary">
           {daysPerWeek} {daysPerWeek === 1 ? 'day' : 'days'} per week
         </Badge>
