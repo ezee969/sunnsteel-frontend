@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
 
         // Return cached first for speed, then update in background
         if (cached) {
-          fetchPromise; // Fire and forget background update
+          void fetchPromise; // Fire and forget background update
           return cached;
         }
         

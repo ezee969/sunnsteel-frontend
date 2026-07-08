@@ -79,7 +79,7 @@ export function useRoutineListActions() {
       if (session?.id) {
         router.push(`/workouts/sessions/${session.id}`)
       }
-    } catch (err) {
+    } catch {
       // handled by UI layer if needed
     } finally {
       setStartActingId(null)

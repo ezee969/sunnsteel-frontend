@@ -60,28 +60,9 @@ export function ProgressionSelect({
 					<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
 						Dynamic Double Progression
 					</SelectItem>
-					<SelectItem
-						value="PROGRAMMED_RTF"
-						disabled={!!disableTimeBasedProgressions}
-						title={
-							disableTimeBasedProgressions
-								? 'Requires Timeframe schedule (set in Basic Info)'
-								: undefined
-						}
-					>
-						RtF Standard (5 sets: 4 + 1 AMRAP)
-					</SelectItem>
-					<SelectItem
-						value="PROGRAMMED_RTF_HYPERTROPHY"
-						disabled={!!disableTimeBasedProgressions}
-						title={
-							disableTimeBasedProgressions
-								? 'Requires Timeframe schedule (set in Basic Info)'
-								: undefined
-						}
-					>
-						RtF Hypertrophy (4 sets: 3 + 1 AMRAP)
-					</SelectItem>
+					{/* RtF (PROGRAMMED_RTF / PROGRAMMED_RTF_HYPERTROPHY) removed: the
+					    backend no longer supports Reps-to-Failure programming and
+					    rejects it on create. Deep RtF removal is pending. */}
 				</SelectContent>
 			</Select>
 		</div>

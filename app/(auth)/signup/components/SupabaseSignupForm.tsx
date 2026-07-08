@@ -81,8 +81,8 @@ export function SupabaseSignupForm() {
   // Form submission handler
   function onSubmit(values: SignupFormValues) {
     // Remove confirmPassword before sending to API
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword, ...userData } = values;
+    const { confirmPassword: _confirmPassword, ...userData } = values;
+    void _confirmPassword;
 
     signUp(userData);
   }

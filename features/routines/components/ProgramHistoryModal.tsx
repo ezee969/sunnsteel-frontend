@@ -1,12 +1,12 @@
 /**
  * Program History Modal Component
  * RTF-F09: Program history modal - Training program snapshots and evolution tracking
- * Shows program changes, snapshots, and diffs over time
+ * Uses live timeline/forecast data to show weekly program evolution.
  */
 
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -20,53 +20,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
-  History,
-  GitBranch,
+  AlertCircle,
   Calendar,
-  User,
   ChevronRight,
-  Plus,
-  Minus,
-  Edit,
   Clock,
+  Edit,
+  GitBranch,
+  History,
+  Minus,
+  Plus,
   Target,
   TrendingUp,
-  AlertCircle
+  User,
 } from 'lucide-react'
+import { useRtFForecast, useRtFTimeline } from '@/lib/api/hooks'
+import type { ProgramChange, ProgramSnapshot } from './program-history.utils'
+import { buildSnapshots } from './program-history.utils'
 import { cn } from '@/lib/utils'
-import type { RtfExerciseGoal } from '@/lib/api/types' // eslint-disable-line @typescript-eslint/no-unused-vars
 
 interface ProgramHistoryModalProps {
   routineId: string
   routineName: string
   trigger?: React.ReactNode
-}
-
-interface ProgramSnapshot {
-  id: string
-  version: number
-  timestamp: string
-  author: string
-  changeType: 'creation' | 'modification' | 'deload_adjustment' | 'tm_adjustment' | 'exercise_change'
-  description: string
-  weekContext?: number
-  changes: ProgramChange[]
-  metadata: {
-    totalExercises: number
-    avgIntensity: number
-    totalVolume: number
-    hasRtfGoals: boolean
-  }
-}
-
-interface ProgramChange {
-  type: 'exercise_added' | 'exercise_removed' | 'exercise_modified' | 'intensity_changed' | 'reps_changed' | 'sets_changed'
-  exerciseName: string
-  field?: string
-  oldValue?: string | number
-  newValue?: string | number
-  impact: 'low' | 'medium' | 'high'
 }
 
 interface SnapshotCardProps {
@@ -83,22 +60,33 @@ interface ChangesDiffProps {
 
 function getChangeIcon(type: ProgramChange['type']) {
   switch (type) {
-    case 'exercise_added': return <Plus className="h-3 w-3 text-green-600" />
-    case 'exercise_removed': return <Minus className="h-3 w-3 text-red-600" />
-    case 'exercise_modified': return <Edit className="h-3 w-3 text-blue-600" />
-    case 'intensity_changed': return <TrendingUp className="h-3 w-3 text-orange-600" />
-    case 'reps_changed': return <Target className="h-3 w-3 text-purple-600" />
-    case 'sets_changed': return <Target className="h-3 w-3 text-cyan-600" />
-    default: return <Edit className="h-3 w-3 text-gray-600" />
+    case 'exercise_added':
+      return <Plus className="h-3 w-3 text-green-600" />
+    case 'exercise_removed':
+      return <Minus className="h-3 w-3 text-red-600" />
+    case 'exercise_modified':
+      return <Edit className="h-3 w-3 text-blue-600" />
+    case 'intensity_changed':
+      return <TrendingUp className="h-3 w-3 text-orange-600" />
+    case 'reps_changed':
+      return <Target className="h-3 w-3 text-purple-600" />
+    case 'sets_changed':
+      return <Target className="h-3 w-3 text-cyan-600" />
+    default:
+      return <Edit className="h-3 w-3 text-gray-600" />
   }
 }
 
 function getImpactColor(impact: ProgramChange['impact']): string {
   switch (impact) {
-    case 'high': return 'bg-red-100 text-red-800 border-red-200'
-    case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-    case 'low': return 'bg-green-100 text-green-800 border-green-200'
-    default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    case 'high':
+      return 'bg-red-100 text-red-800 border-red-200'
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+    case 'low':
+      return 'bg-green-100 text-green-800 border-green-200'
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200'
   }
 }
 
@@ -115,40 +103,43 @@ function ChangesDiff({ changes, compact = false }: ChangesDiffProps) {
   return (
     <div className="space-y-2">
       {changes.map((change) => (
-        <div key={`${change.exerciseName}-${change.type}`} className="flex items-start gap-3 p-3 border rounded-lg">
-          <div className="flex-shrink-0 mt-0.5">
-            {getChangeIcon(change.type)}
-          </div>
-          
+        <div
+          key={`${change.exerciseName}-${change.type}-${change.field ?? 'n/a'}`}
+          className="flex items-start gap-3 p-3 border rounded-lg"
+        >
+          <div className="flex-shrink-0 mt-0.5">{getChangeIcon(change.type)}</div>
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className={cn('font-medium', compact ? 'text-sm' : 'text-base')}>
                 {change.exerciseName}
               </span>
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={cn('text-xs px-2 py-0.5', getImpactColor(change.impact))}
               >
                 {change.impact} impact
               </Badge>
             </div>
-            
+
             <div className="text-sm text-muted-foreground">
-              {change.type === 'exercise_added' && 'Exercise added to program'}
-              {change.type === 'exercise_removed' && 'Exercise removed from program'}
+              {change.type === 'exercise_added' && 'Target block added'}
+              {change.type === 'exercise_removed' && 'Target block removed'}
               {change.type === 'exercise_modified' && change.field && (
                 <>
                   {change.field} changed from{' '}
                   <span className="line-through text-red-600">{change.oldValue}</span>
-                  {' → '}
+                  {' -> '}
                   <span className="text-green-600 font-medium">{change.newValue}</span>
                 </>
               )}
-              {(change.type === 'intensity_changed' || change.type === 'reps_changed' || change.type === 'sets_changed') && (
+              {(change.type === 'intensity_changed' ||
+                change.type === 'reps_changed' ||
+                change.type === 'sets_changed') && (
                 <>
                   {change.field || change.type.replace('_changed', '')} updated from{' '}
                   <span className="line-through text-red-600">{change.oldValue}</span>
-                  {' → '}
+                  {' -> '}
                   <span className="text-green-600 font-medium">{change.newValue}</span>
                 </>
               )}
@@ -160,15 +151,20 @@ function ChangesDiff({ changes, compact = false }: ChangesDiffProps) {
   )
 }
 
-function SnapshotCard({ snapshot, isLatest = false, onSelect, isSelected = false }: SnapshotCardProps) {
+function SnapshotCard({
+  snapshot,
+  isLatest = false,
+  onSelect,
+  isSelected = false,
+}: SnapshotCardProps) {
   const { version, timestamp, author, description, weekContext, changes, metadata } = snapshot
-  
+
   return (
-    <Card 
+    <Card
       className={cn(
         'cursor-pointer transition-all duration-200 hover:bg-muted/50',
         isSelected && 'ring-2 ring-primary',
-        isLatest && 'border-green-500'
+        isLatest && 'border-green-500',
       )}
       onClick={() => onSelect?.(snapshot)}
     >
@@ -176,41 +172,43 @@ function SnapshotCard({ snapshot, isLatest = false, onSelect, isSelected = false
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <CardTitle className="text-sm">
-                Version {version}
-              </CardTitle>
+              <CardTitle className="text-sm">Version {version}</CardTitle>
               {isLatest && (
-                <Badge variant="default" className="text-xs">Latest</Badge>
+                <Badge variant="default" className="text-xs">
+                  Latest
+                </Badge>
               )}
               {weekContext && (
-                <Badge variant="outline" className="text-xs">Week {weekContext}</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Week {weekContext}
+                </Badge>
               )}
             </div>
-            
+
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
               <span>{new Date(timestamp).toLocaleDateString()}</span>
-              <span>•</span>
+              <span>|</span>
               <User className="h-3 w-3" />
               <span>{author}</span>
             </div>
           </div>
-          
+
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <p className="text-sm text-muted-foreground mb-3">{description}</p>
-        
+
         <div className="grid grid-cols-2 gap-4 text-xs">
           <div>
             <div className="font-medium">{changes.length} changes</div>
             <div className="text-muted-foreground">Modifications</div>
           </div>
           <div>
-            <div className="font-medium">{metadata.totalExercises}</div>
-            <div className="text-muted-foreground">Exercises</div>
+            <div className="font-medium">{metadata.targetBlocks}</div>
+            <div className="text-muted-foreground">Target blocks</div>
           </div>
         </div>
       </CardContent>
@@ -218,158 +216,42 @@ function SnapshotCard({ snapshot, isLatest = false, onSelect, isSelected = false
   )
 }
 
-function generateMockSnapshots(): ProgramSnapshot[] {
-  const now = Date.now()
-  const dayMs = 24 * 60 * 60 * 1000
-  
-  return [
-    {
-      id: 'snap-1',
-      version: 1,
-      timestamp: new Date(now - 21 * dayMs).toISOString(),
-      author: 'System',
-      changeType: 'creation',
-      description: 'Initial RTF program creation with 4-day split',
-      changes: [
-        {
-          type: 'exercise_added',
-          exerciseName: 'Squat',
-          impact: 'high'
-        },
-        {
-          type: 'exercise_added', 
-          exerciseName: 'Bench Press',
-          impact: 'high'
-        },
-        {
-          type: 'exercise_added',
-          exerciseName: 'Deadlift', 
-          impact: 'high'
-        },
-        {
-          type: 'exercise_added',
-          exerciseName: 'Overhead Press',
-          impact: 'medium'
-        }
-      ],
-      metadata: {
-        totalExercises: 4,
-        avgIntensity: 80,
-        totalVolume: 100,
-        hasRtfGoals: true
-      }
-    },
-    {
-      id: 'snap-2',
-      version: 2,
-      timestamp: new Date(now - 14 * dayMs).toISOString(),
-      author: 'User',
-      changeType: 'modification',
-      description: 'Adjusted training maxes based on week 1 performance',
-      weekContext: 1,
-      changes: [
-        {
-          type: 'intensity_changed',
-          exerciseName: 'Squat',
-          field: 'Training Max',
-          oldValue: '315 lbs',
-          newValue: '325 lbs',
-          impact: 'medium'
-        },
-        {
-          type: 'intensity_changed',
-          exerciseName: 'Bench Press',
-          field: 'Training Max',
-          oldValue: '225 lbs', 
-          newValue: '235 lbs',
-          impact: 'medium'
-        }
-      ],
-      metadata: {
-        totalExercises: 4,
-        avgIntensity: 82,
-        totalVolume: 105,
-        hasRtfGoals: true
-      }
-    },
-    {
-      id: 'snap-3',
-      version: 3,
-      timestamp: new Date(now - 7 * dayMs).toISOString(),
-      author: 'System',
-      changeType: 'deload_adjustment',
-      description: 'Automatic deload week adjustments applied',
-      weekContext: 4,
-      changes: [
-        {
-          type: 'intensity_changed',
-          exerciseName: 'All Exercises',
-          field: 'Intensity',
-          oldValue: '80-85%',
-          newValue: '65-70%',
-          impact: 'high'
-        },
-        {
-          type: 'sets_changed',
-          exerciseName: 'All Exercises',
-          field: 'Sets',
-          oldValue: '3-4',
-          newValue: '2-3',
-          impact: 'medium'
-        }
-      ],
-      metadata: {
-        totalExercises: 4,
-        avgIntensity: 67,
-        totalVolume: 70,
-        hasRtfGoals: true
-      }
-    },
-    {
-      id: 'snap-4',
-      version: 4,
-      timestamp: new Date(now - 2 * dayMs).toISOString(),
-      author: 'User',
-      changeType: 'exercise_change',
-      description: 'Added accessory exercises and modified rep ranges',
-      weekContext: 5,
-      changes: [
-        {
-          type: 'exercise_added',
-          exerciseName: 'Barbell Row',
-          impact: 'medium'
-        },
-        {
-          type: 'exercise_added',
-          exerciseName: 'Incline Dumbbell Press',
-          impact: 'low'
-        },
-        {
-          type: 'reps_changed',
-          exerciseName: 'Squat',
-          field: 'AMRAP Target',
-          oldValue: '8+',
-          newValue: '10+',
-          impact: 'low'
-        }
-      ],
-      metadata: {
-        totalExercises: 6,
-        avgIntensity: 78,
-        totalVolume: 125,
-        hasRtfGoals: true
-      }
-    }
-  ]
-}
-
-export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModalProps) {
+export function ProgramHistoryModal({ routineId, routineName, trigger }: ProgramHistoryModalProps) {
   const [selectedSnapshot, setSelectedSnapshot] = useState<ProgramSnapshot | null>(null)
   const [activeTab, setActiveTab] = useState<'timeline' | 'changes' | 'stats'>('timeline')
-  
-  const snapshots = useMemo(() => generateMockSnapshots(), [])
-  const latestSnapshot = snapshots[snapshots.length - 1]
-  
+
+  const {
+    data: timeline,
+    isLoading: timelineLoading,
+    error: timelineError,
+  } = useRtFTimeline(routineId)
+  const {
+    data: forecast,
+    isLoading: forecastLoading,
+    error: forecastError,
+  } = useRtFForecast(routineId, { remaining: false })
+
+  const snapshots = useMemo(() => buildSnapshots(timeline, forecast), [timeline, forecast])
+  const latestSnapshot = snapshots[snapshots.length - 1] ?? null
+  const isLoading = timelineLoading || forecastLoading
+  const hasTimelineError = !!timelineError
+
+  useEffect(() => {
+    if (!latestSnapshot) {
+      setSelectedSnapshot(null)
+      return
+    }
+
+    if (!selectedSnapshot) {
+      setSelectedSnapshot(latestSnapshot)
+      return
+    }
+
+    if (!snapshots.some((snapshot) => snapshot.id === selectedSnapshot.id)) {
+      setSelectedSnapshot(latestSnapshot)
+    }
+  }, [latestSnapshot, selectedSnapshot, snapshots])
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -380,7 +262,7 @@ export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModa
           </Button>
         )}
       </DialogTrigger>
-      
+
       <DialogContent className="max-w-6xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -388,53 +270,78 @@ export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModa
             Program History - {routineName}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[70vh]">
-          {/* Snapshots List */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="h-4 w-4" />
               <h3 className="font-semibold">Program Versions</h3>
               <Badge variant="outline">{snapshots.length}</Badge>
             </div>
-            
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-3">
-                {snapshots.slice().reverse().map((snapshot) => (
-                  <SnapshotCard
-                    key={snapshot.id}
-                    snapshot={snapshot}
-                    isLatest={snapshot.id === latestSnapshot.id}
-                    onSelect={setSelectedSnapshot}
-                    isSelected={selectedSnapshot?.id === snapshot.id}
-                  />
-                ))}
+
+            {forecastError && !hasTimelineError && (
+              <div className="mb-3 rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+                Forecast details are partially unavailable; showing timeline-derived history.
               </div>
+            )}
+
+            <ScrollArea className="h-full pr-4">
+              {isLoading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Skeleton key={index} className="h-24 w-full" />
+                  ))}
+                </div>
+              ) : hasTimelineError ? (
+                <div className="rounded-md border border-red-300 bg-red-50 px-3 py-3 text-sm text-red-700">
+                  Unable to load program history.
+                </div>
+              ) : snapshots.length === 0 ? (
+                <div className="rounded-md border border-dashed px-3 py-3 text-sm text-muted-foreground">
+                  No program history available for this routine yet.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {snapshots
+                    .slice()
+                    .reverse()
+                    .map((snapshot) => (
+                      <SnapshotCard
+                        key={snapshot.id}
+                        snapshot={snapshot}
+                        isLatest={snapshot.id === latestSnapshot?.id}
+                        onSelect={setSelectedSnapshot}
+                        isSelected={selectedSnapshot?.id === snapshot.id}
+                      />
+                    ))}
+                </div>
+              )}
             </ScrollArea>
           </div>
-          
+
           <Separator orientation="vertical" className="hidden lg:block" />
-          
-          {/* Snapshot Details */}
+
           <div className="lg:col-span-3">
             {selectedSnapshot ? (
               <div className="h-full flex flex-col">
                 <div className="flex items-center gap-2 mb-4">
-                  <h3 className="font-semibold">
-                    Version {selectedSnapshot.version} Details
-                  </h3>
-                  {selectedSnapshot.id === latestSnapshot.id && (
-                    <Badge>Current</Badge>
-                  )}
+                  <h3 className="font-semibold">Version {selectedSnapshot.version} Details</h3>
+                  {selectedSnapshot.id === latestSnapshot?.id && <Badge>Current</Badge>}
                 </div>
-                
-                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'timeline' | 'changes' | 'stats')} className="flex-1">
+
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    setActiveTab(value as 'timeline' | 'changes' | 'stats')
+                  }
+                  className="flex-1"
+                >
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="timeline">Timeline</TabsTrigger>
                     <TabsTrigger value="changes">Changes</TabsTrigger>
                     <TabsTrigger value="stats">Statistics</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="timeline" className="flex-1">
                     <ScrollArea className="h-full">
                       <div className="space-y-4">
@@ -474,39 +381,45 @@ export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModa
                       </div>
                     </ScrollArea>
                   </TabsContent>
-                  
+
                   <TabsContent value="changes" className="flex-1">
                     <ScrollArea className="h-full">
                       <ChangesDiff changes={selectedSnapshot.changes} />
                     </ScrollArea>
                   </TabsContent>
-                  
+
                   <TabsContent value="stats" className="flex-1">
                     <div className="grid grid-cols-2 gap-4">
                       <Card>
                         <CardContent className="pt-6 text-center">
-                          <div className="text-2xl font-bold">{selectedSnapshot.metadata.totalExercises}</div>
-                          <div className="text-sm text-muted-foreground">Total Exercises</div>
+                          <div className="text-2xl font-bold">
+                            {selectedSnapshot.metadata.targetBlocks}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Target Blocks</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="pt-6 text-center">
-                          <div className="text-2xl font-bold">{selectedSnapshot.metadata.avgIntensity}%</div>
+                          <div className="text-2xl font-bold">
+                            {selectedSnapshot.metadata.avgIntensity}%
+                          </div>
                           <div className="text-sm text-muted-foreground">Avg Intensity</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="pt-6 text-center">
-                          <div className="text-2xl font-bold">{selectedSnapshot.metadata.totalVolume}</div>
+                          <div className="text-2xl font-bold">
+                            {selectedSnapshot.metadata.estimatedVolume}
+                          </div>
                           <div className="text-sm text-muted-foreground">Volume Index</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="pt-6 text-center">
                           <div className="text-2xl font-bold">
-                            {selectedSnapshot.metadata.hasRtfGoals ? 'Yes' : 'No'}
+                            {selectedSnapshot.metadata.hasForecastData ? 'Yes' : 'No'}
                           </div>
-                          <div className="text-sm text-muted-foreground">RTF Enabled</div>
+                          <div className="text-sm text-muted-foreground">Forecast Data</div>
                         </CardContent>
                       </Card>
                     </div>
@@ -528,3 +441,4 @@ export function ProgramHistoryModal({ routineName, trigger }: ProgramHistoryModa
     </Dialog>
   )
 }
+

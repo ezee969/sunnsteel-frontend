@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService';
+import { logger } from '@/lib/utils/logger';
 
 // Force this page to be client-side only to avoid prerendering issues
 export const dynamic = 'force-dynamic';
@@ -18,40 +19,25 @@ function AuthCallbackContent() {
 
     const handleAuthCallback = async () => {
       try {
-
-
-        // Retrieve Supabase session created by OAuth provider
         const { data, error } = await supabase.auth.getSession();
+
         if (error) {
-          console.error('🔄 Auth callback error (getSession):', error);
+          logger.error('[auth-callback] getSession failed', error);
           router.replace('/login?error=callback_error');
           return;
         }
 
         if (!data.session) {
-          console.warn('🔄 Auth callback: No session found, redirecting to login');
+          logger.warn('[auth-callback] missing session');
           router.replace('/login?error=no_session');
           return;
         }
 
-
-
-        // Verify with backend immediately to set secure HttpOnly cookie (ss_session)
         try {
+          // Verify with backend immediately to set secure HttpOnly cookie (ss_session)
           await supabaseAuthService.verifyToken(data.session.access_token);
-          // Best-effort client marker for middleware fallback
-          try {
-            if (typeof document !== 'undefined') {
-              document.cookie = [
-                'has_session=1',
-                'Path=/',
-                'Max-Age=604800', // 7 days
-                'SameSite=Lax',
-              ].join('; ');
-            }
-          } catch {}
         } catch (verifyErr) {
-          console.error('🔄 Auth callback: Backend verification failed:', verifyErr);
+          logger.error('[auth-callback] backend verification failed', verifyErr);
           router.replace('/login?error=verify_failed');
           return;
         }
@@ -61,14 +47,14 @@ function AuthCallbackContent() {
         const target = sanitizePath(raw);
         router.replace(target);
       } catch (err) {
-        console.error('🔄 Auth callback unexpected error:', err);
+        logger.error('[auth-callback] unexpected error', err);
         router.replace('/login?error=callback_error');
       } finally {
         setIsProcessing(false);
       }
     };
 
-    handleAuthCallback();
+    void handleAuthCallback();
   }, [router, searchParams]);
 
   return (

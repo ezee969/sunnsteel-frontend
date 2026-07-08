@@ -5,6 +5,11 @@ import { AppProvider } from '@/providers/app-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
 import DevInjections from '@/components/dev-injections'
+import {
+	PUBLIC_ENV,
+	SHOULD_ENABLE_ERUDA,
+	SHOULD_SHOW_PERFORMANCE_PANEL,
+} from '@/lib/config/env'
 
 const oswald = Oswald({
 	variable: '--font-oswald',
@@ -39,10 +44,9 @@ import { Viewport } from 'next'
 // Client-only dev helpers are rendered via DevInjections
 
 const SHOW_PERF_PANEL =
-	process.env.NODE_ENV === 'development' &&
-	process.env.NEXT_PUBLIC_SHOW_PERFORMANCE_PANEL === 'true'
+	SHOULD_SHOW_PERFORMANCE_PANEL
 
-const ENABLE_ERUDA = process.env.NEXT_PUBLIC_ENABLE_ERUDA === 'true'
+const ENABLE_ERUDA = SHOULD_ENABLE_ERUDA
 
 export const metadata: Metadata = {
 	title: {
@@ -64,7 +68,7 @@ export const metadata: Metadata = {
 	creator: 'SUNNSTEEL',
 	publisher: 'Sunnsteel',
 	metadataBase: new URL(
-		process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000',
+		PUBLIC_ENV.FRONTEND_URL,
 	),
 	alternates: {
 		canonical: '/',

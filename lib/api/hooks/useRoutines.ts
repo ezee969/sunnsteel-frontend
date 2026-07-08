@@ -8,7 +8,11 @@ import {
 	serializeRoutineFilters,
 } from '../routines/routine-query'
 import { routineService } from '../services/routineService'
-import { CreateRoutineRequest, Routine } from '../types/routine.type'
+import {
+	CreateRoutineRequest,
+	Routine,
+	UpdateRoutineRequest,
+} from '../types/routine.type'
 
 const ROUTINES_QUERY_KEY = routineQueryKeys.all()
 
@@ -214,9 +218,9 @@ export const useUpdateRoutine = () => {
 	return useMutation<
 		Routine,
 		Error,
-		{ id: string; data: CreateRoutineRequest }
+		{ id: string; data: UpdateRoutineRequest }
 	>({
-		mutationFn: ({ id, data }: { id: string; data: CreateRoutineRequest }) =>
+		mutationFn: ({ id, data }: { id: string; data: UpdateRoutineRequest }) =>
 			routineService.update(id, data),
 		onSuccess: (_: Routine, variables: { id: string }) => {
 			queryClient.invalidateQueries({ queryKey: ROUTINES_QUERY_KEY })

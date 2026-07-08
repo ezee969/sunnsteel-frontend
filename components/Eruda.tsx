@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { SHOULD_ENABLE_ERUDA } from '@/lib/config/env'
 
 /**
  * Eruda Mobile Developer Console
@@ -16,9 +17,7 @@ import { useEffect } from 'react'
 export function Eruda() {
 	useEffect(() => {
 		// Only load Eruda in development or when explicitly enabled
-		const shouldLoadEruda =
-			process.env.NODE_ENV === 'development' ||
-			process.env.NEXT_PUBLIC_ENABLE_ERUDA === 'true'
+		const shouldLoadEruda = SHOULD_ENABLE_ERUDA
 
 		if (!shouldLoadEruda) return
 

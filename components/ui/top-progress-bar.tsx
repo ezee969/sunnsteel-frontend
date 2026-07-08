@@ -10,8 +10,13 @@ interface TopProgressBarProps {
 
 export function TopProgressBar({ active, className }: TopProgressBarProps) {
   const [progress, setProgress] = useState(0)
+  const progressRef = useRef(0)
   const intervalRef = useRef<number | null>(null)
   const timeoutRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    progressRef.current = progress
+  }, [progress])
 
   useEffect(() => {
     // Clear timers helper
@@ -40,7 +45,7 @@ export function TopProgressBar({ active, className }: TopProgressBarProps) {
       // Complete and hide
       setProgress((p) => (p > 0 ? 100 : 0))
       clearTimers()
-      if (progress > 0) {
+      if (progressRef.current > 0) {
         timeoutRef.current = window.setTimeout(() => {
           setProgress(0)
         }, 250)
@@ -48,7 +53,6 @@ export function TopProgressBar({ active, className }: TopProgressBarProps) {
     }
 
     return () => clearTimers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active])
 
   const isVisible = progress > 0

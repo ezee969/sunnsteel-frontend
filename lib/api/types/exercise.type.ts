@@ -1,29 +1,19 @@
-export enum MuscleGroup {
-  PECTORAL = 'PECTORAL',
-  LATISSIMUS_DORSI = 'LATISSIMUS_DORSI',
-  TRAPEZIUS = 'TRAPEZIUS',
-  REAR_DELTOIDS = 'REAR_DELTOIDS',
-  ERECTOR_SPINAE = 'ERECTOR_SPINAE',
-  TERES_MAJOR = 'TERES_MAJOR',
-  TERES_MINOR = 'TERES_MINOR',
-  ANTERIOR_DELTOIDS = 'ANTERIOR_DELTOIDS',
-  MEDIAL_DELTOIDS = 'MEDIAL_DELTOIDS',
-  BICEPS = 'BICEPS',
-  FOREARMS = 'FOREARMS',
-  TRICEPS = 'TRICEPS',
-  QUADRICEPS = 'QUADRICEPS',
-  HAMSTRINGS = 'HAMSTRINGS',
-  GLUTES = 'GLUTES',
-  CALVES = 'CALVES',
-  CORE = 'CORE',
-}
+import { MUSCLE_GROUPS } from '@sunsteel/contracts';
+import type {
+  Exercise as ContractExercise,
+  MuscleGroup as ContractMuscleGroup,
+} from '@sunsteel/contracts';
 
-export interface Exercise {
-  id: string;
-  name: string;
-  primaryMuscles: MuscleGroup[];
-  secondaryMuscles: MuscleGroup[];
-  equipment: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type MuscleGroup = ContractMuscleGroup;
+
+// Backwards-compatible runtime map so existing Object.values(MuscleGroup) usage
+// keeps working while the canonical values come from shared contracts.
+export const MuscleGroup: Record<MuscleGroup, MuscleGroup> = MUSCLE_GROUPS.reduce(
+  (acc, muscle) => {
+    acc[muscle] = muscle;
+    return acc;
+  },
+  {} as Record<MuscleGroup, MuscleGroup>,
+);
+
+export type Exercise = ContractExercise

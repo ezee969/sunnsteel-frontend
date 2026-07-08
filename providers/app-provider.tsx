@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { assertClientEnv } from '@/schema/env.client';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
 import { logger } from '@/lib/utils/logger';
+import { SHOULD_LOG_PERFORMANCE } from '@/lib/config/env';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   // Run client-env validation once after mount (avoids SSR mismatch risk)
@@ -24,8 +25,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Record hydration timing (opt-in via environment or development mode)
   useEffect(() => {
-    const shouldLog = process.env.NODE_ENV === 'development' || 
-                     process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS === 'true';
+    const shouldLog = SHOULD_LOG_PERFORMANCE;
     
     if (shouldLog) {
       performanceMonitor.recordMetric('App Hydration Complete', performance.now(), 'component');

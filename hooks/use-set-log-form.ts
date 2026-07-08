@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
-import { useSaveState, setSaveState } from '@/lib/utils/save-status-store';
+import { useSaveState } from '@/lib/utils/save-status-store';
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession';
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types';
-import { validateSetLogPayload, isSetComplete } from '@/lib/utils/session-validation.utils';
+import { validateSetLogPayload } from '@/lib/utils/session-validation.utils';
 import { DEBOUNCE_DELAYS } from '@/lib/constants/session.constants';
 
 interface UseSetLogFormProps {

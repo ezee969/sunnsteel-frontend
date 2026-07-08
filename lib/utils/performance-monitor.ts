@@ -1,5 +1,7 @@
 'use client';
 
+import { IS_DEVELOPMENT } from '@/lib/config/env';
+
 interface PerformanceMetric {
   name: string;
   value: number;
@@ -102,7 +104,7 @@ class PerformanceMonitor {
     }
 
     // Log significant metrics in development
-    if (process.env.NODE_ENV === 'development') {
+    if (IS_DEVELOPMENT) {
       console.log(`🚀 [Performance] ${name}: ${value.toFixed(2)}ms`);
     }
   }

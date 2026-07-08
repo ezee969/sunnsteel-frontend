@@ -29,7 +29,6 @@ function WorkoutHistoryContent() {
     q, setQ,
     sort, setSort,
     isFiltersOpen, setIsFiltersOpen,
-    debouncedQ,
     isDateInvalid,
     params,
     applyUrl,

@@ -222,7 +222,7 @@ export default function Sidebar({
                   setIsMobileMenuOpen(false);
                 }
                 // Signal navigation start for global feedback
-                onNavigateStart && onNavigateStart();
+                onNavigateStart?.();
               }}
             >
               {(() => {

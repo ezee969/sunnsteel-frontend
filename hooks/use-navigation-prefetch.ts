@@ -35,7 +35,7 @@ export const useNavigationPrefetch = () => {
 
   // Prefetch route with Next.js router
   const prefetchRoute = useCallback(
-    async (href: string, options: PrefetchOptions = DEFAULT_OPTIONS) => {
+    async (href: string) => {
       if (prefetchedRoutes.current.has(href)) {
         performanceMonitor.recordCacheHit(`Route: ${href}`);
         return;
@@ -58,8 +58,7 @@ export const useNavigationPrefetch = () => {
   const prefetchData = useCallback(
     async (
       dataKey: string,
-      queryFn: () => Promise<any>,
-      options: PrefetchOptions = DEFAULT_OPTIONS
+      queryFn: () => Promise<any>
     ) => {
       if (!isReady) return;
 
@@ -92,7 +91,7 @@ export const useNavigationPrefetch = () => {
 
       await Promise.allSettled(
         [
-          prefetchRoute('/dashboard', opts),
+          prefetchRoute('/dashboard'),
           opts.includeData &&
             prefetchData(
               'dashboard-routines',
@@ -100,14 +99,12 @@ export const useNavigationPrefetch = () => {
                 routineService.getUserRoutines({
                   isFavorite: false,
                   isCompleted: false,
-                }),
-              opts
+                })
             ),
           opts.includeData &&
             prefetchData(
               'dashboard-active-session',
-              () => workoutService.getActiveSession(),
-              opts
+              () => workoutService.getActiveSession()
             ),
         ].filter(Boolean)
       );
@@ -122,18 +119,16 @@ export const useNavigationPrefetch = () => {
 
       await Promise.allSettled(
         [
-          prefetchRoute('/routines', opts),
+          prefetchRoute('/routines'),
           opts.includeData &&
             prefetchData(
               'routines-all',
-              () => routineService.getUserRoutines(),
-              opts
+              () => routineService.getUserRoutines()
             ),
           opts.includeData &&
             prefetchData(
               'routines-favorites',
-              () => routineService.getUserRoutines({ isFavorite: true }),
-              opts
+              () => routineService.getUserRoutines({ isFavorite: true })
             ),
         ].filter(Boolean)
       );
@@ -148,12 +143,11 @@ export const useNavigationPrefetch = () => {
 
       await Promise.allSettled(
         [
-          prefetchRoute('/workouts', opts),
+          prefetchRoute('/workouts'),
           opts.includeData &&
             prefetchData(
               'workouts-active-session',
-              () => workoutService.getActiveSession(),
-              opts
+              () => workoutService.getActiveSession()
             ),
         ].filter(Boolean)
       );
@@ -168,12 +162,11 @@ export const useNavigationPrefetch = () => {
 
       await Promise.allSettled(
         [
-          prefetchRoute('/workouts/history', opts),
+          prefetchRoute('/workouts/history'),
           opts.includeData &&
             prefetchData(
               'workouts-history',
-              () => workoutService.listSessions({ limit: 20 }),
-              opts
+              () => workoutService.listSessions({ limit: 20 })
             ),
         ].filter(Boolean)
       );
@@ -214,7 +207,7 @@ export const useNavigationPrefetch = () => {
         await prefetchWorkouts(opts);
       } else {
         // Fallback to just route prefetching
-        await prefetchRoute(href, opts);
+        await prefetchRoute(href);
       }
     },
     [

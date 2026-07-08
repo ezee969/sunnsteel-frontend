@@ -2,6 +2,9 @@
   "name": "frontend2",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.11"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:all": "powershell -ExecutionPolicy Bypass -File ./scripts/start-dev.ps1",
@@ -10,6 +13,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "verify": "npm run lint && npm run typecheck && npm run build",
+    "verify:security": "npm audit --omit=dev",
     "docs:check": "./scripts/update-docs.sh",
     "docs:update": "echo 'Run docs:check first, then update documentation manually'"
   },
@@ -44,7 +49,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.477.0",
-    "next": "15.4.10",
+    "next": "^15.5.14",
     "next-themes": "^0.4.6",
     "react": "^18.3.1",
     "react-day-picker": "^9.9.0",
@@ -65,7 +70,7 @@
     "concurrently": "^9.1.2",
     "eruda": "^3.4.3",
     "eslint": "^9.39.2",
-    "eslint-config-next": "^15.4.6",
+    "eslint-config-next": "^15.5.14",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",

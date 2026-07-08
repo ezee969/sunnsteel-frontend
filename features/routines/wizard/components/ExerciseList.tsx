@@ -35,7 +35,7 @@ export interface ExerciseListProps {
 	onStepWeight: WizardExerciseCardProps['onStepWeight']
 	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
 	disableTimeBasedProgressions?: boolean
-	registerRef: (key: string, node: HTMLDivElement | null) => void
+	registerRef: (key: string, node: HTMLElement | null) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
 }
@@ -158,7 +158,7 @@ interface ReorderableExerciseRowProps {
 	onStepWeight: WizardExerciseCardProps['onStepWeight']
 	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
 	disableTimeBasedProgressions?: boolean
-	registerRef: (key: string, node: HTMLDivElement | null) => void
+	registerRef: (key: string, node: HTMLElement | null) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
 }
@@ -205,7 +205,7 @@ function ReorderableExerciseRow({
 			dragListener={false}
 			dragControls={dragControls}
 			whileDrag={{ zIndex: 60 }}
-			ref={node => registerRef(exerciseKey, node)}
+			ref={(node: HTMLLIElement | null) => registerRef(exerciseKey, node)}
 		>
 			<WizardExerciseCard
 				tabIndex={tabIndex}

@@ -23,7 +23,6 @@ interface TrainingDaysProps {
 export function TrainingDays({
 	data,
 	onUpdate,
-	isEditing = false,
 }: TrainingDaysProps) {
 	const { isMobile } = useSidebar()
 	const programStartWeekday = useProgramStartDay({ data, onUpdate })
@@ -32,10 +31,6 @@ export function TrainingDays({
 		onUpdate,
 		programStartWeekday,
 	})
-
-	
-	const totalWeeks = (data.programWithDeloads ? 21 : 18) as 18 | 21
-
 	return (
 		<div className="space-y-4 md:space-y-6">
 			{data.programStartDate && programStartWeekday !== null && (

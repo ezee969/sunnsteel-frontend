@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { PUBLIC_ENV } from '@/lib/config/env'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+const API_BASE_URL = PUBLIC_ENV.API_URL
 
 interface ApiRequestConfig extends RequestInit {
 	secure?: boolean

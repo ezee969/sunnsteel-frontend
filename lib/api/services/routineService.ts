@@ -1,5 +1,9 @@
 import { httpClient } from './httpClient'
-import { CreateRoutineRequest, Routine } from '../types/routine.type'
+import {
+	CreateRoutineRequest,
+	Routine,
+	UpdateRoutineRequest,
+} from '../types/routine.type'
 import {
 	buildRoutineQueryString,
 	RoutineDetailOptions,
@@ -33,7 +37,7 @@ export const routineService = {
 		})
 	},
 
-	update: async (id: string, data: CreateRoutineRequest): Promise<Routine> => {
+	update: async (id: string, data: UpdateRoutineRequest): Promise<Routine> => {
 		return httpClient.request<Routine>(`${ROUTINES_API_URL}/${id}`, {
 			method: 'PATCH',
 			body: JSON.stringify(data),

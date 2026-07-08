@@ -1,6 +1,7 @@
+import { SHOULD_LOG_DEBUG } from '@/lib/config/env'
+
 const isDebugEnabled = () =>
-	process.env.NODE_ENV === 'development' ||
-	process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS === 'true'
+	SHOULD_LOG_DEBUG
 
 export const logger = {
 	debug: (...args: unknown[]) => {

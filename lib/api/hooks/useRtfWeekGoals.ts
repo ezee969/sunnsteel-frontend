@@ -16,7 +16,10 @@ export const useRtfWeekGoals = (
 			})
 			return res.data as RtfWeekGoals
 		},
-		enabled: !!routineId,
+		// RtF was removed from the backend; the rtf-week-goals endpoint now 404s.
+		// Only fire when an explicit program week is present, which no longer
+		// happens (sessions no longer carry a `program`), so this stays disabled.
+		enabled: !!routineId && typeof week === 'number',
 		staleTime: 2 * 60 * 1000,
 		gcTime: 30 * 60 * 1000,
 	}, `RTF Week Goals (${routineId}:${keyWeek})`)

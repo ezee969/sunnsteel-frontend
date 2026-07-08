@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQueryPerformance } from '@/hooks/use-performance-query';
+import { SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env';
 
 /**
  * Development-only performance debugging panel
@@ -12,8 +13,7 @@ export function PerformanceDebugPanel() {
   const [metrics, setMetrics] = useState<string>('');
   const { getMetrics, generateReport, getAverageFirstFetch } = useQueryPerformance();
 
-  const shouldShow = process.env.NODE_ENV === 'development' && 
-                    (process.env.NEXT_PUBLIC_SHOW_PERFORMANCE_PANEL === 'true');
+  const shouldShow = SHOULD_SHOW_PERFORMANCE_PANEL;
 
   useEffect(() => {
     if (shouldShow && isVisible) {

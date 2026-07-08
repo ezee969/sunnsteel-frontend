@@ -18,7 +18,6 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover'
 import {
-	COMMON_TIMEZONES,
 	getTimezonesByRegion,
 	findTimezoneOption,
 	getSystemTimezone,

@@ -20,7 +20,6 @@ interface UseExerciseAccessibilityResult {
 export function useExerciseAccessibility({
 	tabIndex,
 	exerciseIndex,
-	expanded,
 	onToggleExpand,
 	onRemoveExercise,
 }: UseExerciseAccessibilityOptions): UseExerciseAccessibilityResult {

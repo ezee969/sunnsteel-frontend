@@ -44,7 +44,7 @@ export function BuildDays({
 		Record<number, Record<string, boolean>>
 	>({})
 	const [removingSets, setRemovingSets] = useState<Record<string, boolean>>({})
-	const exerciseRefs = useRef<Record<string, HTMLDivElement | null>>({})
+	const exerciseRefs = useRef<Record<string, HTMLElement | null>>({})
 	const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null)
 	const { data: exercises, isLoading: exercisesLoading } = useExercises()
 	const canUseTimeframe = data.programScheduleMode === 'TIMEFRAME'
@@ -171,7 +171,7 @@ export function BuildDays({
 	}
 
 	const registerExerciseRef = useCallback(
-		(key: string, node: HTMLDivElement | null) => {
+		(key: string, node: HTMLElement | null) => {
 			exerciseRefs.current[key] = node
 		},
 		[],

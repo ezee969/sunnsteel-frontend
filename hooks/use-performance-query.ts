@@ -3,6 +3,7 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
 import { useEffect, useRef } from 'react';
+import { SHOULD_LOG_PERFORMANCE } from '@/lib/config/env';
 
 /**
  * Enhanced useQuery hook that adds performance monitoring for first data fetch timing
@@ -22,8 +23,7 @@ export function usePerformanceQuery<
   const firstFetchRef = useRef<boolean>(true);
   const fetchStartTimeRef = useRef<number | null>(null);
   
-  const shouldLog = process.env.NODE_ENV === 'development' || 
-                   process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS === 'true';
+  const shouldLog = SHOULD_LOG_PERFORMANCE;
 
   // Wrap the original queryFn to add performance monitoring
   const enhancedOptions: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
