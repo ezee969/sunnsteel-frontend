@@ -18,6 +18,7 @@ import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialL
 import { preloadAllCriticalComponents } from '@/lib/utils/dynamic-imports';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TopProgressBar } from '@/components/ui/top-progress-bar';
+import { logger } from '@/lib/utils/logger';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -88,7 +89,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       // Preload with delay to not interfere with initial render
       const timeoutId = setTimeout(() => {
         preloadAllCriticalComponents().catch(error => {
-          console.warn('Failed to preload critical components:', error);
+          logger.warn('Failed to preload critical components:', error);
         });
       }, 2000); // 2 second delay
       

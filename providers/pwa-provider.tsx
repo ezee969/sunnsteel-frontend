@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { logger } from '@/lib/utils/logger';
 
 export const PwaProvider = (): null => {
   const reloadedRef = useRef(false);
@@ -29,7 +30,7 @@ export const PwaProvider = (): null => {
               navigator.serviceWorker.controller
             ) {
               // There is an updated SW waiting
-              console.debug('[PWA] Update found, activating new service worker');
+              logger.debug('[PWA] Update found, activating new service worker');
               navigator.serviceWorker.controller?.postMessage({
                 type: 'SKIP_WAITING',
               });

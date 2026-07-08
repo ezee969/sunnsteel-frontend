@@ -7,6 +7,7 @@ import { routineService } from '@/lib/api/services/routineService';
 import { workoutService } from '@/lib/api/services/workoutService';
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 import { performanceMonitor } from '@/lib/utils/performance-monitor';
+import { logger } from '@/lib/utils/logger';
 
 interface PrefetchOptions {
   immediate?: boolean;
@@ -48,7 +49,7 @@ export const useNavigationPrefetch = () => {
         const duration = performance.now() - start;
         performanceMonitor.recordPrefetch(`Route: ${href}`, duration);
       } catch (error) {
-        console.warn(`Failed to prefetch route ${href}:`, error);
+        logger.warn(`Failed to prefetch route ${href}:`, error);
       }
     },
     [router]
@@ -78,7 +79,7 @@ export const useNavigationPrefetch = () => {
         const duration = performance.now() - start;
         performanceMonitor.recordPrefetch(`Data: ${dataKey}`, duration);
       } catch (error) {
-        console.warn(`Failed to prefetch data ${dataKey}:`, error);
+        logger.warn(`Failed to prefetch data ${dataKey}:`, error);
       }
     },
     [queryClient, isReady]

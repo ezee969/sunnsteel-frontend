@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { ImageCropper } from '@/components/ui/image-cropper';
+import { logger } from '@/lib/utils/logger';
 
 export default function SettingsPage() {
   const { user, isLoading } = useUser();
@@ -81,7 +82,7 @@ export default function SettingsPage() {
       // Reset input value so selecting the same file again works
       event.target.value = '';
     } catch (error: unknown) {
-      console.error('Error selecting image:', error);
+      logger.error('Error selecting image:', error);
       push({
         title: 'Error',
         description: (error as Error).message || 'Error selecting image.',
@@ -123,7 +124,7 @@ export default function SettingsPage() {
       });
 
     } catch (error: unknown) {
-      console.error('Error uploading avatar:', error);
+      logger.error('Error uploading avatar:', error);
       push({
         title: 'Error',
         description: (error as Error).message || 'Error uploading avatar. Are you sure the "avatars" bucket is public and created?',

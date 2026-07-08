@@ -4,6 +4,7 @@ import { Area } from 'react-easy-crop';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import getCroppedImg from '@/lib/utils/cropImage';
+import { logger } from '@/lib/utils/logger';
 import { Loader2 } from 'lucide-react';
 
 interface ImageCropperProps {
@@ -34,7 +35,7 @@ export function ImageCropper({ open, onOpenChange, imageSrc, onCropComplete }: I
         onOpenChange(false);
       }
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setIsProcessing(false);
     }

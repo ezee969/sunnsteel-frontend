@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { useToast } from '@/components/ui/toast'
 import { workoutService } from '../services/workoutService';
 import { setSaveState } from '@/lib/utils/save-status-store';
+import { logger } from '@/lib/utils/logger';
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 import {
@@ -92,17 +93,17 @@ export const useStartSession = () => {
   return useMutation({
   mutationFn: async (data: StartWorkoutRequest): Promise<(WorkoutSession & { _reused?: boolean }) | undefined> => {
       if (inFlightStart) {
-        console.debug('[start-session] prevented parallel start attempt');
+        logger.debug('[start-session] prevented parallel start attempt');
   const active = await workoutService.getActiveSession();
   return active ?? undefined;
       }
       inFlightStart = true;
       try {
         // 1) Reuse only an actually active session
-        console.debug('[start-session] checking existing active session');
+        logger.debug('[start-session] checking existing active session');
         const existing = await workoutService.getActiveSession();
         if (existing?.status === 'IN_PROGRESS' && existing.id) {
-          console.debug('[start-session] found existing active session (reuse)', existing.id);
+          logger.debug('[start-session] found existing active session (reuse)', existing.id);
           // Mark reuse via side channel property (non-persistent)
           return { ...existing, _reused: true } as WorkoutSession & { _reused?: boolean };
         }
@@ -110,26 +111,26 @@ export const useStartSession = () => {
         // 2) Start a new session (backend enforces uniqueness). Some backends may return 201 with empty body.
         let started: WorkoutSession | undefined;
         try {
-          console.debug('[start-session] POST /sessions/start', data);
+          logger.debug('[start-session] POST /sessions/start', data);
           started = await workoutService.startSession(data);
         } catch (e) {
-          console.debug('[start-session] start request threw, will poll active', e);
+          logger.debug('[start-session] start request threw, will poll active', e);
         }
         if (started?.id) {
-          console.debug('[start-session] start returned id', started.id);
+          logger.debug('[start-session] start returned id', started.id);
           return started;
         }
 
         // 3) Poll the active session briefly to obtain the new session id (handles async persistence / race fallback)
         for (let i = 0; i < 3; i++) {
-          console.debug('[start-session] polling active attempt', i + 1);
+          logger.debug('[start-session] polling active attempt', i + 1);
           const created = await workoutService.getActiveSession();
           if (created?.id) return created;
           await new Promise((r) => setTimeout(r, 250));
         }
 
         // Last attempt
-        console.debug('[start-session] last attempt to get active session');
+        logger.debug('[start-session] last attempt to get active session');
         const fallback = await workoutService.getActiveSession();
         return fallback ?? undefined;
       } finally {

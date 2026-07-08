@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { logger } from '@/lib/utils/logger';
 
 // Dynamic imports with preloading for heavy components
 // Using Next.js dynamic() for better SSR support and loading states
@@ -87,7 +88,7 @@ export const preloadAllCriticalComponents = async () => {
     try {
       return preload();
     } catch (error) {
-      console.warn('Failed to preload component:', error);
+      logger.warn('Failed to preload component:', error);
       return Promise.resolve();
     }
   });

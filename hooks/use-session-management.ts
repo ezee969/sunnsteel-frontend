@@ -12,6 +12,7 @@ import {
 	areAllSetsCompleted,
 } from '@/lib/utils/session-progress.utils'
 import { SESSION_STATUS } from '@/lib/constants/session.constants'
+import { logger } from '@/lib/utils/logger'
 
 interface UseSessionManagementProps {
 	sessionId: string
@@ -94,7 +95,7 @@ export const useSessionManagement = ({
 						router.push('/dashboard')
 					},
 					onError: error => {
-						console.error('Failed to finish session:', error)
+						logger.error('Failed to finish session:', error)
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)
 						setFinishStatus(null)

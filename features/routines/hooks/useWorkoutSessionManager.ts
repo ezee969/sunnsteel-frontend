@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession';
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date';
+import { logger } from '@/lib/utils/logger';
 import type { Routine } from '@/lib/api/types/routine.type';
 
 /**
@@ -43,7 +44,7 @@ export const useWorkoutSessionManager = (routineId: string, routine: Routine | u
         router.push(`/workouts/sessions/${session.id}`);
       }
     } catch (e) {
-      console.error('Failed to start session', e);
+      logger.error('Failed to start session', e);
     } finally {
       setStartActingDayId(null);
     }

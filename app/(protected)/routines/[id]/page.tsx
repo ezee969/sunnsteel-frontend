@@ -16,6 +16,7 @@ import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAc
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { getDayName } from '@/features/routines/utils/routine-detail.utils'
 import { validateRoutineDayDate } from '@/lib/utils/date'
+import { logger } from '@/lib/utils/logger'
 
 export default function RoutineDetailsPage() {
 	const params = useParams()
@@ -42,7 +43,7 @@ export default function RoutineDetailsPage() {
 		try {
 			await toggleFavorite({ id: routine.id, isFavorite: !routine.isFavorite })
 		} catch (error) {
-			console.error('Failed to toggle favorite:', error)
+			logger.error('Failed to toggle favorite:', error)
 		}
 	}
 
@@ -54,7 +55,7 @@ export default function RoutineDetailsPage() {
 				isCompleted: !routine.isCompleted,
 			})
 		} catch (error) {
-			console.error('Failed to toggle completed:', error)
+			logger.error('Failed to toggle completed:', error)
 		}
 	}
 

@@ -36,9 +36,6 @@ export default function Dashboard() {
 
 			{/* Stats Overview */}
 			{/* <StatsOverview /> */}
-
-			{/* Workout Programs */}
-			{/* <WorkoutPrograms /> */}
 		</div>
 	)
 }
