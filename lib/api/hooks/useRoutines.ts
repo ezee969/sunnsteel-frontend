@@ -1,8 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
 import { logger } from '@/lib/utils/logger'
-import { RTF_ENABLED } from '@/lib/config/env'
-import { rtfApi } from '../etag-client'
 import {
 	routineQueryKeys,
 	RoutineFilters,
@@ -184,26 +182,6 @@ export const useDeleteRoutine = () => {
 	})
 }
 
-export const useRtFWeekGoals = (routineId: string, week?: number) => {
-	return usePerformanceQuery<Routine, Error>(
-		{
-			queryKey: routineQueryKeys.weekGoals(routineId, week),
-			queryFn: async () => {
-				const response = await rtfApi.getWeekGoals(routineId, week, {
-					maxAge: 3 * 60 * 1000,
-				})
-				return response.data as Routine
-			},
-			// RtF is disabled (see RTF_ENABLED): the backend week-goals endpoint was
-			// removed, so keep this query dormant to avoid doomed requests.
-			enabled: RTF_ENABLED && !!routineId,
-			staleTime: 2 * 60 * 1000,
-			gcTime: 10 * 60 * 1000,
-		},
-		`RTF Week Goals (${routineId}, week: ${week ?? 'current'})`,
-	)
-}
-
 export const useCreateRoutine = () => {
 	const queryClient = useQueryClient()
 
@@ -247,9 +225,6 @@ export const useUpdateExerciseNote = () => {
 		onSuccess: (_, { routineId }) => {
 			queryClient.invalidateQueries({
 				queryKey: routineQueryKeys.detail(routineId),
-			})
-			queryClient.invalidateQueries({
-				queryKey: routineQueryKeys.weekGoals(routineId),
 			})
 			queryClient.invalidateQueries({ queryKey: ROUTINES_QUERY_KEY })
 		},

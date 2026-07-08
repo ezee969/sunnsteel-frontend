@@ -6,7 +6,6 @@ interface UseRoutineDayMutationsParams {
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 	selectedDayIndex: number
 	trainingDays: number[]
-	canUseTimeframe: boolean
 }
 
 const MIN_REPS = 1
@@ -16,7 +15,6 @@ const MAX_RIR = 10
 const MIN_WEIGHT_INCREMENT = 0.25
 const MAX_WEIGHT = 500
 const WEIGHT_STEP = 0.5
-const ALLOWED_ROUNDING = [0.5, 1, 2.5, 5] as const
 
 const clamp = (value: number, min: number, max: number) => {
 	if (Number.isNaN(value)) return min
@@ -35,7 +33,6 @@ export function useRoutineDayMutations({
 	onUpdate,
 	selectedDayIndex,
 	trainingDays,
-	canUseTimeframe,
 }: UseRoutineDayMutationsParams) {
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
@@ -128,35 +125,6 @@ export function useRoutineDayMutations({
 		[withDayMutation],
 	)
 
-	const updateProgramTMKg = useCallback(
-		(exerciseIndex: number, tmKg: number) => {
-			withDayMutation(day => {
-				const exercise = day.exercises[exerciseIndex]
-				if (!exercise) return
-				const rounded = roundToIncrement(
-					clamp(tmKg, 0, MAX_WEIGHT),
-					WEIGHT_STEP,
-				)
-				exercise.programTMKg = Number.isNaN(rounded) ? undefined : rounded
-			})
-		},
-		[withDayMutation],
-	)
-
-	const updateProgramRoundingKg = useCallback(
-		(exerciseIndex: number, roundingKg: number) => {
-			withDayMutation(day => {
-				const exercise = day.exercises[exerciseIndex]
-				if (!exercise) return
-				const valid = ALLOWED_ROUNDING.includes(
-					roundingKg as (typeof ALLOWED_ROUNDING)[number],
-				)
-				exercise.programRoundingKg = valid ? roundingKg : 2.5
-			})
-		},
-		[withDayMutation],
-	)
-
 	const updateMinWeightIncrement = useCallback(
 		(exerciseIndex: number, increment: number) => {
 			withDayMutation(day => {
@@ -186,10 +154,6 @@ export function useRoutineDayMutations({
 
 	const updateProgressionScheme = useCallback(
 		(exerciseIndex: number, scheme: ProgressionScheme) => {
-			const isTimeBased =
-				scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-			if (isTimeBased && !canUseTimeframe) return
-
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
@@ -212,13 +176,9 @@ export function useRoutineDayMutations({
 				if (scheme === 'DOUBLE_PROGRESSION' && exercise.sets.length > 0) {
 					syncDoubleProgressionWeights(exercise, exercise.sets[0].weight)
 				}
-
-				if (isTimeBased && typeof exercise.programRoundingKg === 'undefined') {
-					exercise.programRoundingKg = 2.5
-				}
 			})
 		},
-		[canUseTimeframe, withDayMutation],
+		[withDayMutation],
 	)
 
 	const addSet = useCallback(
@@ -226,7 +186,6 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				if (exercise.progressionScheme === 'PROGRAMMED_RTF') return
 
 				const lastSet = exercise.sets[exercise.sets.length - 1]
 				const newSetNumber = exercise.sets.length + 1
@@ -446,8 +405,6 @@ export function useRoutineDayMutations({
 		removeExercise,
 		updateExercise,
 		updateExerciseNote,
-		updateProgramTMKg,
-		updateProgramRoundingKg,
 		updateProgressionScheme,
 		updateMinWeightIncrement,
 		addSet,

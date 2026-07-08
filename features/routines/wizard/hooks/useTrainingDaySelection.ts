@@ -7,13 +7,11 @@ import { sortNumbersAscending } from '../utils/date-helpers'
 interface UseTrainingDaySelectionParams {
 	readonly data: RoutineWizardData
 	readonly onUpdate: (updates: Partial<RoutineWizardData>) => void
-	readonly programStartWeekday: number | null
 }
 
 export const useTrainingDaySelection = ({
 	data,
 	onUpdate,
-	programStartWeekday,
 }: UseTrainingDaySelectionParams) => {
 	const [hasInteracted, setHasInteracted] = useState(
 		data.trainingDays.length > 0,
@@ -36,10 +34,6 @@ export const useTrainingDaySelection = ({
 
 	const toggleDay = useCallback(
 		(dayId: number) => {
-			if (programStartWeekday !== null && dayId === programStartWeekday) {
-				return
-			}
-
 			setHasInteracted(true)
 
 			const isSelected = data.trainingDays.includes(dayId)
@@ -49,7 +43,7 @@ export const useTrainingDaySelection = ({
 
 			updateDays(next)
 		},
-		[data.trainingDays, programStartWeekday, updateDays],
+		[data.trainingDays, updateDays],
 	)
 
 	const selectSplit = useCallback(

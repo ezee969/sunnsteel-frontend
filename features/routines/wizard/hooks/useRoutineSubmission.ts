@@ -1,13 +1,9 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { useCreateRoutine, useUpdateRoutine } from '@/lib/api/hooks'
 import type { RoutineWizardData } from '../types'
-import {
-	buildRoutineRequest,
-	hasRtFExercises,
-	resolveProgramTimezone,
-} from '../utils/routine-summary'
+import { buildRoutineRequest } from '../utils/routine-summary'
 
 interface UseRoutineSubmissionParams {
 	data: RoutineWizardData
@@ -29,15 +25,8 @@ export function useRoutineSubmission({
 		? updateMutation.isPending
 		: createMutation.isPending
 
-	const usesRtf = useMemo(() => hasRtFExercises(data), [data])
-
 	const submit = useCallback(async () => {
-		const timezone = resolveProgramTimezone(data)
-		const payload = buildRoutineRequest(data, {
-			isEditing,
-			usesRtf,
-			timezone,
-		})
+		const payload = buildRoutineRequest(data)
 
 		if (isEditing && routineId) {
 			await updateMutation.mutateAsync({ id: routineId, data: payload })
@@ -46,11 +35,10 @@ export function useRoutineSubmission({
 		}
 
 		onComplete()
-	}, [createMutation, updateMutation, data, isEditing, onComplete, routineId, usesRtf])
+	}, [createMutation, updateMutation, data, isEditing, onComplete, routineId])
 
 	return {
 		submit,
 		isLoading,
-		usesRtf,
 	}
 }

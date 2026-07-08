@@ -95,7 +95,6 @@ export default function RoutineDetailsPage() {
 				routine={routine}
 				daysPerWeek={routineData.daysPerWeek}
 				hasProgram={routineData.hasProgram}
-				programStyleText={routineData.programStyleText}
 				onBack={() => router.push('/routines')}
 				onEdit={() => router.push(`/routines/edit/${routine.id}`)}
 				onToggleFavorite={handleToggleFavorite}
@@ -177,10 +176,6 @@ export default function RoutineDetailsPage() {
 						days={routine.days}
 						routine={{
 							id: routine.id,
-							programStartDate: routine.programStartDate,
-							programDurationWeeks: routine.programDurationWeeks,
-							programTimezone: routine.programTimezone,
-							programWithDeloads: routine.programWithDeloads,
 						}}
 						activeSession={activeSession}
 						isStarting={sessionManager.isStarting}

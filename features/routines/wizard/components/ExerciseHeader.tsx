@@ -5,7 +5,6 @@ import { ChevronsUpDown, Clock, Pencil, Trash2 } from 'lucide-react'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import type { Exercise } from '@/lib/api/types'
 import type { RoutineWizardExercise } from '../types'
-import { getPresetSetCountForScheme } from '../utils/progression.helpers'
 import { cn } from '@/lib/utils'
 
 interface ExerciseHeaderProps {
@@ -33,10 +32,7 @@ export function ExerciseHeader({
 	onRemoveButtonClick,
 	dragHandle,
 }: ExerciseHeaderProps) {
-	const plannedSets = getPresetSetCountForScheme(
-		exercise.progressionScheme,
-		exercise.sets.length,
-	)
+	const plannedSets = exercise.sets.length
 
 	const restMinutes = Math.floor(exercise.restSeconds / 60)
 	const restSeconds = (exercise.restSeconds % 60).toString().padStart(2, '0')

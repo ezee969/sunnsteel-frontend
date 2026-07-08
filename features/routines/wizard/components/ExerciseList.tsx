@@ -24,8 +24,6 @@ export interface ExerciseListProps {
 	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
-	onUpdateProgramTMKg: WizardExerciseCardProps['onUpdateProgramTMKg']
-	onUpdateProgramRoundingKg: WizardExerciseCardProps['onUpdateProgramRoundingKg']
 	onAddSet: WizardExerciseCardProps['onAddSet']
 	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
 	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
@@ -34,7 +32,6 @@ export interface ExerciseListProps {
 	onStepRangeReps: WizardExerciseCardProps['onStepRangeReps']
 	onStepWeight: WizardExerciseCardProps['onStepWeight']
 	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
-	disableTimeBasedProgressions?: boolean
 	registerRef: (key: string, node: HTMLElement | null) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
@@ -53,8 +50,6 @@ export function ExerciseList({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
-	onUpdateProgramTMKg,
-	onUpdateProgramRoundingKg,
 	onAddSet,
 	onRemoveSetAnimated,
 	onUpdateSet,
@@ -63,7 +58,6 @@ export function ExerciseList({
 	onStepRangeReps,
 	onStepWeight,
 	isRemovingSet,
-	disableTimeBasedProgressions = false,
 	registerRef,
 	exercises,
 	isExercisesLoading,
@@ -110,8 +104,6 @@ export function ExerciseList({
 								onUpdateNote={onUpdateNote}
 								onUpdateProgressionScheme={onUpdateProgressionScheme}
 								onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
-								onUpdateProgramTMKg={onUpdateProgramTMKg}
-								onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
 								onAddSet={onAddSet}
 								onRemoveSetAnimated={onRemoveSetAnimated}
 								onUpdateSet={onUpdateSet}
@@ -120,7 +112,6 @@ export function ExerciseList({
 								onStepRangeReps={onStepRangeReps}
 								onStepWeight={onStepWeight}
 								isRemovingSet={isRemovingSet}
-								disableTimeBasedProgressions={disableTimeBasedProgressions}
 								registerRef={registerRef}
 								exercises={exercises}
 								isExercisesLoading={isExercisesLoading}
@@ -147,8 +138,6 @@ interface ReorderableExerciseRowProps {
 	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
-	onUpdateProgramTMKg: WizardExerciseCardProps['onUpdateProgramTMKg']
-	onUpdateProgramRoundingKg: WizardExerciseCardProps['onUpdateProgramRoundingKg']
 	onAddSet: WizardExerciseCardProps['onAddSet']
 	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
 	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
@@ -157,7 +146,6 @@ interface ReorderableExerciseRowProps {
 	onStepRangeReps: WizardExerciseCardProps['onStepRangeReps']
 	onStepWeight: WizardExerciseCardProps['onStepWeight']
 	isRemovingSet: WizardExerciseCardProps['isRemovingSet']
-	disableTimeBasedProgressions?: boolean
 	registerRef: (key: string, node: HTMLElement | null) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
@@ -177,8 +165,6 @@ function ReorderableExerciseRow({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
-	onUpdateProgramTMKg,
-	onUpdateProgramRoundingKg,
 	onAddSet,
 	onRemoveSetAnimated,
 	onUpdateSet,
@@ -187,7 +173,6 @@ function ReorderableExerciseRow({
 	onStepRangeReps,
 	onStepWeight,
 	isRemovingSet,
-	disableTimeBasedProgressions = false,
 	registerRef,
 	exercises,
 	isExercisesLoading,
@@ -220,8 +205,6 @@ function ReorderableExerciseRow({
 				onUpdateNote={onUpdateNote}
 				onUpdateProgressionScheme={onUpdateProgressionScheme}
 				onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
-				onUpdateProgramTMKg={onUpdateProgramTMKg}
-				onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
 				onAddSet={onAddSet}
 				onRemoveSetAnimated={onRemoveSetAnimated}
 				onUpdateSet={onUpdateSet}
@@ -230,7 +213,6 @@ function ReorderableExerciseRow({
 				onStepRangeReps={onStepRangeReps}
 				onStepWeight={onStepWeight}
 				isRemovingSet={isRemovingSet}
-				disableTimeBasedProgressions={disableTimeBasedProgressions}
 				exercises={exercises}
 				isExercisesLoading={isExercisesLoading}
 				dragHandle={

@@ -4,5 +4,3 @@ export * from './workoutService'
 export * from './exercisesService'
 export * from './userService'
 export * from './supabaseAuthService'
-
-export * from './tm-adjustment.service'

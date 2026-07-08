@@ -1,6 +1,5 @@
 import type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
 export type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
-// If hypertrophy variant becomes supported backend-side, extend shared enum there.
 
 export interface RoutineSet {
 	setNumber: number
@@ -21,8 +20,6 @@ export interface RoutineWizardExercise {
 	exerciseId: string
 	progressionScheme: ProgressionScheme
 	minWeightIncrement: number
-	programTMKg?: number
-	programRoundingKg?: number
 	note?: string
 	sets: RoutineSet[]
 	restSeconds: number
@@ -38,11 +35,4 @@ export interface RoutineWizardData {
 	description?: string
 	trainingDays: number[]
 	days: RoutineWizardDay[]
-	programScheduleMode?: 'TIMEFRAME' | 'NONE'
-	programWithDeloads?: boolean
-	programStartDate?: string
-	programTimezone?: string
-	programStartWeek?: number
-	// Set true when user explicitly changes start week in the UI (used to include in PATCH)
-	programStartWeekExplicit?: boolean
 }

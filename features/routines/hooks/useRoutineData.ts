@@ -6,7 +6,7 @@ import type { Routine } from '@/lib/api/types/routine.type';
 
 /**
  * Custom hook for processing routine data and computing derived values
- * 
+ *
  * Handles:
  * - Program status calculations
  * - Days per week computation
@@ -30,26 +30,9 @@ export const useRoutineData = (routine: Routine | undefined) => {
     return Boolean(routine?.programEndDate);
   }, [routine?.programEndDate]);
 
-  // Get program style display text
-  const programStyleText = useMemo(() => {
-    if (!routine?.programStyle) return null;
-    return routine.programStyle === 'STANDARD' ? 'Standard' : 'Hypertrophy';
-  }, [routine?.programStyle]);
-
-  // Check if routine is RtF (Reps to Failure) program
-  const isRtfProgram = useMemo(() => {
-    return routine?.days?.some(day => 
-      day.exercises?.some(exercise => 
-        exercise.progressionScheme === 'PROGRAMMED_RTF'
-      )
-    ) ?? false;
-  }, [routine?.days]);
-
   return {
     programEnded,
     daysPerWeek,
     hasProgram,
-    programStyleText,
-    isRtfProgram,
   };
 };

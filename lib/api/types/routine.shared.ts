@@ -10,6 +10,3 @@ export type {
 	ProgressionScheme,
 	RepType,
 } from '@sunsteel/contracts'
-
-// Note: PROGRAMMED_RTF_HYPERTROPHY is now available as a separate progression scheme
-// This allows per-exercise choice between Standard RTF and Hypertrophy RTF variants

@@ -60,6 +60,4 @@ export const routineQueryKeys = {
 	list: (filters?: RoutineFilters) =>
 		[...routineQueryKeys.all(), serializeRoutineFilters(filters)] as const,
 	detail: (routineId: string) => [...routineQueryKeys.all(), routineId] as const,
-	weekGoals: (routineId: string, week?: number) =>
-		['routine', routineId, 'rtfGoals', week ?? 'current'] as const,
 }

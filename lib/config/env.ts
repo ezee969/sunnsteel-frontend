@@ -19,17 +19,6 @@ export const PUBLIC_ENV = {
   ENABLE_DEBUG_LOGS: asBoolean(process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS),
 } as const;
 
-/**
- * RtF (Reps-to-Failure) kill switch.
- *
- * RtF is dormant: the backend endpoints were removed and the feature is not
- * wired into the current app. Every RtF data hook and wizard UI entry point is
- * gated on this flag so the (still-present) RtF code never fires doomed requests
- * or exposes unreachable UI. Flip to `true` — and restore the backend — to
- * revive the feature. This is the single source of truth for RtF availability.
- */
-export const RTF_ENABLED = false;
-
 export const SHOULD_ENABLE_ERUDA =
   IS_DEVELOPMENT || PUBLIC_ENV.ENABLE_ERUDA;
 export const SHOULD_SHOW_PERFORMANCE_PANEL =

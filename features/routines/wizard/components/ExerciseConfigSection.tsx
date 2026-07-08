@@ -3,24 +3,14 @@ import { Label } from '@/components/ui/label'
 import { useEffect, useState } from 'react'
 import { formatTime, parseTime, isValidTimeFormat } from '@/lib/utils/time'
 import type { RoutineWizardExercise, ProgressionScheme } from '../types'
-import {
-	isRtFExercise,
-	requiresWeightIncrementField,
-} from '../utils/progression.helpers'
+import { requiresWeightIncrementField } from '../utils/progression.helpers'
 import { ExerciseNoteRow } from './ExerciseNoteRow'
 import { ProgressionSelect } from './ProgressionSelect'
-import { RtfExerciseConfig } from './RtfExerciseConfig'
 import { RestTimeExerciseConfig } from './RestTimeExerciseConfig'
 
 interface ExerciseConfigSectionProps {
 	exercise: RoutineWizardExercise
 	exerciseIndex: number
-	disableTimeBasedProgressions?: boolean
-	tmInput: string
-	tmMissing: boolean
-	tmHelpId: string
-	onTmInputChange: (value: string) => void
-	onTmBlur: () => void
 	weightIncInput: string
 	onWeightIncChange: (value: string) => void
 	onWeightIncBlur: () => void
@@ -30,28 +20,18 @@ interface ExerciseConfigSectionProps {
 		exerciseIndex: number,
 		scheme: ProgressionScheme,
 	) => void
-	onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void
 }
 
 export function ExerciseConfigSection({
 	exercise,
 	exerciseIndex,
-	disableTimeBasedProgressions,
-	tmInput,
-	tmMissing,
-	tmHelpId,
-	onTmInputChange,
-	onTmBlur,
 	weightIncInput,
 	onWeightIncChange,
 	onWeightIncBlur,
 	onUpdateRestTime,
 	onUpdateNote,
 	onUpdateProgressionScheme,
-	onUpdateProgramRoundingKg,
 }: ExerciseConfigSectionProps) {
-	const isRtF = isRtFExercise(exercise.progressionScheme)
-
 	// Local state for rest time input: allow free typing (digits and ":")
 	const [restFocused, setRestFocused] = useState(false)
 	const [restInput, setRestInput] = useState<string>(
@@ -85,24 +65,10 @@ export function ExerciseConfigSection({
 			/>
 
 			<ProgressionSelect
-				disableTimeBasedProgressions={disableTimeBasedProgressions}
 				progressionScheme={exercise.progressionScheme}
 				exerciseIndex={exerciseIndex}
 				onUpdateProgressionScheme={onUpdateProgressionScheme}
 			/>
-
-			{isRtF && (
-				<RtfExerciseConfig
-					tmInput={tmInput}
-					tmMissing={tmMissing}
-					tmHelpId={tmHelpId}
-					exerciseIndex={exerciseIndex}
-					onTmInputChange={onTmInputChange}
-					onTmBlur={onTmBlur}
-					programRoundingKg={exercise.programRoundingKg}
-					onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
-				/>
-			)}
 
 			{requiresWeightIncrementField(exercise.progressionScheme) && (
 				<div className="flex items-center justify-between gap-3">

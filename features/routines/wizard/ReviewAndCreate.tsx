@@ -14,7 +14,6 @@ import type { RoutineWizardData } from './types';
 import { useRoutineSubmission } from './hooks/useRoutineSubmission';
 import { useRoutineExercisesLookup } from './hooks/useRoutineExercisesLookup';
 import { RoutineDayCard } from './components/RoutineDayCard';
-import { ProgramSettingsCard } from './components/ProgramSettingsCard';
 import { RoutineSummaryStats } from './components/RoutineSummaryStats';
 import { DAYS_OF_WEEK } from './utils/routine-summary';
 import { useRoutineSummaryStats } from './hooks/useRoutineSummaryStats';
@@ -35,7 +34,7 @@ export function ReviewAndCreate({
 	const { data: exercises } = useExercises()
 	const exerciseMap = useRoutineExercisesLookup(exercises)
 
-	const { submit, isLoading, usesRtf } = useRoutineSubmission({
+	const { submit, isLoading } = useRoutineSubmission({
 		data,
 		routineId,
 		isEditing,
@@ -102,8 +101,6 @@ export function ReviewAndCreate({
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
-
-			<ProgramSettingsCard data={data} usesRtf={usesRtf} isEditing={isEditing} />
 
 			<RoutineSummaryStats totals={totals} />
 

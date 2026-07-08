@@ -18,7 +18,6 @@ import HeroSection from '@/components/layout/HeroSection'
 import { RoutineBasicInfo } from '@/features/routines/wizard/RoutineBasicInfo'
 import { TrainingDays } from '@/features/routines/wizard/TrainingDays'
 import { BuildDays } from '@/features/routines/wizard/BuildDays'
-import { RtfConfiguration } from '@/features/routines/wizard/RtfConfiguration'
 import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate'
 import {
 	RoutineWizardData,
@@ -26,32 +25,14 @@ import {
 } from '@/features/routines/wizard/types'
 import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks'
 import { RoutineDay, RoutineExercise } from '@/lib/api/types'
-import { RTF_ENABLED } from '@/lib/config/env'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 
-// Use shared RoutineWizardData
-
-const BASE_STEPS = [
+const STEPS = [
 	{ id: 1, title: 'Basic Info', description: 'Name and description' },
 	{ id: 2, title: 'Training Days', description: 'Select workout days' },
 	{ id: 3, title: 'Build Days', description: 'Add exercises and sets' },
+	{ id: 4, title: 'Review & Update', description: 'Review and save changes' },
 ]
-
-const RTF_STEP = {
-	id: 4,
-	title: 'RtF Configuration',
-	description: 'Configure RtF program',
-}
-const REVIEW_STEP_WITHOUT_RTF = {
-	id: 4,
-	title: 'Review & Update',
-	description: 'Review and save changes',
-}
-const REVIEW_STEP_WITH_RTF = {
-	id: 5,
-	title: 'Review & Update',
-	description: 'Review and save changes',
-}
 
 // Normalize/compatibility mapping for legacy backend values
 // Backend may send 'DYNAMIC' | 'DYNAMIC_DOUBLE'; the wizard uses
@@ -64,8 +45,6 @@ const mapProgressionScheme = (
 		case 'NONE':
 		case 'DOUBLE_PROGRESSION':
 		case 'DYNAMIC_DOUBLE_PROGRESSION':
-		case 'PROGRAMMED_RTF':
-		case 'PROGRAMMED_RTF_HYPERTROPHY':
 			return value as ProgressionScheme
 		case 'DYNAMIC':
 			return 'DOUBLE_PROGRESSION'
@@ -93,24 +72,6 @@ export default function EditRoutinePage() {
 	const updateRoutineMutation = useUpdateRoutine()
 	const createRoutineMutation = useCreateRoutine()
 
-	// Check if routine has RtF exercises. RtF is disabled (see RTF_ENABLED), so
-	// this is forced false to keep the RtF configuration step out of the wizard
-	// even when editing a legacy routine that still carries RtF schemes.
-	const hasRtfExercises =
-		RTF_ENABLED &&
-		routineData.days.some(d =>
-			d.exercises.some(
-				ex =>
-					ex.progressionScheme === 'PROGRAMMED_RTF' ||
-					ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
-			),
-		)
-
-	// Compute dynamic steps based on RtF presence
-	const STEPS = hasRtfExercises
-		? [...BASE_STEPS, RTF_STEP, REVIEW_STEP_WITH_RTF]
-		: [...BASE_STEPS, REVIEW_STEP_WITHOUT_RTF]
-
 	// Initialize form with routine data when loaded
 	useEffect(() => {
 		if (routine) {
@@ -129,12 +90,6 @@ export default function EditRoutinePage() {
 								.progressionScheme,
 						),
 						minWeightIncrement: exercise.minWeightIncrement || 2.5,
-						// RtF mapping (optional fields on backend response)
-						programTMKg: (exercise as unknown as { programTMKg?: number })
-							.programTMKg,
-						programRoundingKg: (
-							exercise as unknown as { programRoundingKg?: number }
-						).programRoundingKg,
 						sets: exercise.sets.map((set, index) => ({
 							setNumber: index + 1,
 							repType: set.repType,
@@ -147,21 +102,6 @@ export default function EditRoutinePage() {
 						restSeconds: exercise.restSeconds,
 					})),
 				})),
-				// Routine-level program fields (present only if routine uses RtF)
-				programWithDeloads: (
-					routine as unknown as { programWithDeloads?: boolean }
-				).programWithDeloads,
-				programStartDate: (routine as unknown as { programStartDate?: string })
-					.programStartDate,
-				programTimezone: (routine as unknown as { programTimezone?: string })
-					.programTimezone,
-				programScheduleMode: (
-					routine as unknown as { programStartDate?: string }
-				).programStartDate
-					? 'TIMEFRAME'
-					: 'NONE',
-				// Front-end only metadata (default STANDARD if absent)
-				// programStyle removed (per-exercise style now derived from progressionScheme)
 			}
 
 			setRoutineData(transformedData)
@@ -171,15 +111,6 @@ export default function EditRoutinePage() {
 	const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
 		setRoutineData(prev => ({ ...prev, ...updates }))
 	}
-
-	// Handle step adjustment when RtF exercises are added/removed
-	useEffect(() => {
-		// If we're on step 5 (Review with RtF) and RtF exercises were removed
-		if (currentStep === 5 && !hasRtfExercises) {
-			// Step 5 no longer exists, move back to step 4 (which is now Review)
-			setCurrentStep(4)
-		}
-	}, [hasRtfExercises, currentStep])
 
 	const handleNext = () => {
 		if (currentStep < STEPS.length) {
@@ -200,39 +131,14 @@ export default function EditRoutinePage() {
 		setCurrentStep(stepId)
 	}
 
-	const isStepValid = (stepId: number) => {
+	const isStepValid = (stepId: number): boolean => {
 		switch (stepId) {
 			case 1:
-				const hasName = routineData.name.trim() !== ''
-				if (!hasName) return false
-
-				// If Timeframe is selected, require program start date
-				if (routineData.programScheduleMode === 'TIMEFRAME') {
-					return (
-						!!routineData.programStartDate &&
-						routineData.programStartDate.trim() !== ''
-					)
-				}
-
-				return true
+				return routineData.name.trim() !== ''
 			case 2:
 				return routineData.trainingDays.length > 0
-			case 3: {
-				const daysComplete = routineData.days.every(
-					day => day.exercises.length > 0,
-				)
-				if (!daysComplete) return false
-				const usesRtf = routineData.days.some(d =>
-					d.exercises.some(ex => ex.progressionScheme === 'PROGRAMMED_RTF'),
-				)
-				if (routineData.programScheduleMode === 'TIMEFRAME' && usesRtf) {
-					return (
-						!!routineData.programStartDate &&
-						routineData.programStartDate.trim() !== ''
-					)
-				}
-				return true
-			}
+			case 3:
+				return routineData.days.every(day => day.exercises.length > 0)
 			case 4:
 				// Review step is considered valid if all previous steps are valid
 				return [1, 2, 3].every(isStepValid)
@@ -320,24 +226,6 @@ export default function EditRoutinePage() {
 					/>
 				)
 			case 4:
-				// Step 4 is either RtF Configuration (if RtF exercises exist) or Review
-				if (hasRtfExercises) {
-					return (
-						<RtfConfiguration data={routineData} onUpdate={updateRoutineData} />
-					)
-				}
-				return (
-					<ReviewAndCreate
-						data={routineData}
-						routineId={routineId}
-						isEditing={true}
-						onComplete={() => {
-							router.push('/routines')
-						}}
-					/>
-				)
-			case 5:
-				// Step 5 is Review when RtF exercises exist
 				return (
 					<ReviewAndCreate
 						data={routineData}

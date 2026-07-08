@@ -17,10 +17,6 @@ interface RoutineDayAccordionProps {
 	days: RoutineDay[]
 	routine: {
 		id: string
-		programStartDate?: string | null
-		programDurationWeeks?: number | null
-		programTimezone?: string | null
-		programWithDeloads?: boolean | null
 	}
 	activeSession?: { routineDayId: string } | null
 	isStarting: boolean
@@ -123,12 +119,6 @@ export const RoutineDayAccordion = ({
 											key={exercise.id}
 											exercise={exercise}
 											routineId={routine.id}
-											routine={{
-												programStartDate: routine.programStartDate,
-												programDurationWeeks: routine.programDurationWeeks,
-												programTimezone: routine.programTimezone,
-												programWithDeloads: routine.programWithDeloads,
-											}}
 										/>
 									))
 								) : (

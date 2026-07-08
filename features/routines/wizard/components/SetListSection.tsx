@@ -118,18 +118,7 @@ export function SetListSection({
 							onClick={onAddSet}
 							variant="outline"
 							className="w-full h-10 text-base mb-3"
-							disabled={
-								exercise.sets.length >= 10 ||
-								exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-								exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-							}
-							title={
-								exercise.progressionScheme === 'PROGRAMMED_RTF'
-									? 'Sets are handled by RtF Standard progression (5 sets: 4 + 1 AMRAP)'
-									: exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-										? 'Sets are handled by RtF Hypertrophy progression (4 sets: 3 + 1 AMRAP)'
-										: undefined
-							}
+							disabled={exercise.sets.length >= 10}
 						>
 							<Plus className="h-4 w-4 mr-2" />
 							Add Set

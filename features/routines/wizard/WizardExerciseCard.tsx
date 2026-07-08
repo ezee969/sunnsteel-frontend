@@ -9,7 +9,6 @@ import { ExerciseConfigSection } from './components/ExerciseConfigSection'
 import { SetListSection } from './components/SetListSection'
 import { useExerciseCardState } from './hooks/useExerciseCardState'
 import { useExerciseAccessibility } from './hooks/useExerciseAccessibility'
-import { isRtFExercise } from './utils/progression.helpers'
 
 export interface WizardExerciseCardProps {
 	tabIndex: number
@@ -27,8 +26,6 @@ export interface WizardExerciseCardProps {
 		scheme: ProgressionScheme,
 	) => void
 	onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void
-	onUpdateProgramTMKg: (exerciseIndex: number, tmKg: number) => void
-	onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void
 	onAddSet: (exerciseIndex: number) => void
 	isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean
 	onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void
@@ -55,7 +52,6 @@ export interface WizardExerciseCardProps {
 		delta: number,
 	) => void
 	onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void
-	disableTimeBasedProgressions?: boolean
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
 	dragHandle?: React.ReactNode
@@ -74,8 +70,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
-	onUpdateProgramTMKg,
-	onUpdateProgramRoundingKg,
 	onAddSet,
 	isRemovingSet,
 	onRemoveSetAnimated,
@@ -84,7 +78,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onStepFixedReps,
 	onStepRangeReps,
 	onStepWeight,
-	disableTimeBasedProgressions,
 	exercises = [],
 	isExercisesLoading = false,
 	dragHandle,
@@ -97,11 +90,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		setsExpanded,
 		toggleSetsExpanded,
 		handleAddSet,
-		tmInput,
-		tmMissing,
-		helpId,
-		handleTmInputChange,
-		handleTmBlur,
 		weightIncInput,
 		handleWeightIncChange,
 		handleWeightIncBlur,
@@ -110,7 +98,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		exerciseIndex,
 		tabIndex,
 		onAddSet,
-		onUpdateProgramTMKg,
 		onUpdateMinWeightIncrement,
 	})
 
@@ -171,8 +158,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		setIsEditDropdownOpen(false)
 		setEditSearchValue('')
 	}
-
-	const showSets = !isRtFExercise(exercise.progressionScheme)
 
 	return (
 		<>
@@ -257,39 +242,30 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 						<ExerciseConfigSection
 							exercise={exercise}
 							exerciseIndex={exerciseIndex}
-							disableTimeBasedProgressions={disableTimeBasedProgressions}
-							tmInput={tmInput}
-							tmMissing={tmMissing}
-							tmHelpId={helpId}
-							onTmInputChange={handleTmInputChange}
-							onTmBlur={handleTmBlur}
 							weightIncInput={weightIncInput}
 							onWeightIncChange={handleWeightIncChange}
 							onWeightIncBlur={handleWeightIncBlur}
 							onUpdateRestTime={onUpdateRestTime}
 							onUpdateNote={onUpdateNote}
 							onUpdateProgressionScheme={onUpdateProgressionScheme}
-							onUpdateProgramRoundingKg={onUpdateProgramRoundingKg}
 						/>
 
-						{showSets && (
-							<SetListSection
-								exercise={exercise}
-								exerciseIndex={exerciseIndex}
-								tabIndex={tabIndex}
-								setsExpanded={setsExpanded}
-								onToggleSets={toggleSetsExpanded}
-								onAddSet={handleAddSet}
-								registerSetRowRef={registerSetRowRef}
-								onUpdateSet={onUpdateSet}
-								onValidateMinMaxReps={onValidateMinMaxReps}
-								onStepFixedReps={onStepFixedReps}
-								onStepRangeReps={onStepRangeReps}
-								onStepWeight={onStepWeight}
-								onRemoveSetAnimated={onRemoveSetAnimated}
-								isRemovingSet={isRemovingSet}
-							/>
-						)}
+						<SetListSection
+							exercise={exercise}
+							exerciseIndex={exerciseIndex}
+							tabIndex={tabIndex}
+							setsExpanded={setsExpanded}
+							onToggleSets={toggleSetsExpanded}
+							onAddSet={handleAddSet}
+							registerSetRowRef={registerSetRowRef}
+							onUpdateSet={onUpdateSet}
+							onValidateMinMaxReps={onValidateMinMaxReps}
+							onStepFixedReps={onStepFixedReps}
+							onStepRangeReps={onStepRangeReps}
+							onStepWeight={onStepWeight}
+							onRemoveSetAnimated={onRemoveSetAnimated}
+							isRemovingSet={isRemovingSet}
+						/>
 					</div>
 				</CardContent>
 			</Card>

@@ -32,9 +32,6 @@ interface ExerciseGroupProps {
 	completedSets: number
 	totalSets: number
 	onSave: (payload: UpsertSetLogPayload) => void
-	amrapSetNumber?: number
-	hideAmrapLabel?: boolean
-	isRtF?: boolean
 	note?: string | null
 	onSaveNote: (note: string) => void
 }
@@ -50,9 +47,6 @@ export const ExerciseGroup = ({
 	completedSets,
 	totalSets,
 	onSave,
-	amrapSetNumber,
-	hideAmrapLabel,
-	isRtF,
 	note,
 	onSaveNote,
 }: ExerciseGroupProps) => {
@@ -112,55 +106,29 @@ export const ExerciseGroup = ({
 			{!isCollapsed && (
 				<CardContent className="pt-0">
 					<div className="space-y-4">
-						{sets.map(set => {
-							const isAmrap =
-								!!amrapSetNumber && set.setNumber === amrapSetNumber
-							const isDeload = !!hideAmrapLabel && !!isRtF && !amrapSetNumber
-							// Disable rules:
-							// - If RtF and deload: disable reps and weight for all sets
-							// - If RtF and non-deload: disable reps for non-AMRAP sets; allow only AMRAP reps
-							// - Weight is fixed for all RtF sets (including AMRAP)
-							const disableRepsInput = !!isRtF
-								? isDeload
-									? true
-									: !isAmrap
-								: false
-							const disableWeightInput = !!isRtF ? true : false
-							return (
-								<div
-									key={`${set.routineExerciseId}-${set.setNumber}`}
-									className="space-y-1"
-								>
-									{isAmrap && !hideAmrapLabel && (
-										<Badge
-											variant="secondary"
-											className="text-[10px] uppercase tracking-wide"
-										>
-											AMRAP
-										</Badge>
-									)}
-									<SetLogInput
-										sessionId={set.sessionId}
-										routineExerciseId={set.routineExerciseId}
-										exerciseId={set.exerciseId}
-										setNumber={set.setNumber}
-										reps={set.reps}
-										weight={set.weight}
-										isCompleted={set.isCompleted}
-										plannedReps={set.plannedReps}
-										plannedMinReps={set.plannedMinReps}
-										plannedMaxReps={set.plannedMaxReps}
-										plannedWeight={set.plannedWeight}
-										plannedRir={set.plannedRir}
-										rpe={set.rpe}
-										isAmrap={isAmrap}
-										disableRepsInput={disableRepsInput}
-										disableWeightInput={disableWeightInput}
-										onSave={onSave}
-									/>
-								</div>
-							)
-						})}
+						{sets.map(set => (
+							<div
+								key={`${set.routineExerciseId}-${set.setNumber}`}
+								className="space-y-1"
+							>
+								<SetLogInput
+									sessionId={set.sessionId}
+									routineExerciseId={set.routineExerciseId}
+									exerciseId={set.exerciseId}
+									setNumber={set.setNumber}
+									reps={set.reps}
+									weight={set.weight}
+									isCompleted={set.isCompleted}
+									plannedReps={set.plannedReps}
+									plannedMinReps={set.plannedMinReps}
+									plannedMaxReps={set.plannedMaxReps}
+									plannedWeight={set.plannedWeight}
+									plannedRir={set.plannedRir}
+									rpe={set.rpe}
+									onSave={onSave}
+								/>
+							</div>
+						))}
 					</div>
 				</CardContent>
 			)}

@@ -3,7 +3,6 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
 import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
-import { useRtfWeekGoals } from '@/lib/api/hooks/useRtfWeekGoals'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { SessionHeader } from '@/features/workout/session-header'
@@ -32,10 +31,6 @@ export default function ActiveSessionPage() {
 		isFetched: isRoutineFetched,
 		error: routineError,
 	} = useRoutine(routineId)
-	const { data: weekGoals } = useRtfWeekGoals(
-		routineId,
-		session?.program?.currentWeek,
-	)
 
 	// Session management
 	const {
@@ -51,7 +46,6 @@ export default function ActiveSessionPage() {
 		routine,
 		routineDayId: session?.routineDayId,
 		setLogs: session?.setLogs,
-		isDeloadWeek: session?.program?.isDeloadWeek,
 	})
 
 	// Collapsible exercises state
@@ -76,26 +70,15 @@ export default function ActiveSessionPage() {
 		const day = routine!.days.find(d => d.id === session.routineDayId)
 		if (!day) return [] as GroupedExerciseLogs[]
 
-		const isDeloadWeek = !!session.program?.isDeloadWeek
-		const effectiveExercises = isDeloadWeek
-			? day.exercises.map(re =>
-					re.progressionScheme === 'PROGRAMMED_RTF' ||
-					re.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-						? { ...re, sets: re.sets.filter(s => s.setNumber <= 3) }
-						: re,
-				)
-			: day.exercises
-
 		return groupSetLogsByExercise(
 			session.setLogs as SetLog[],
-			effectiveExercises,
+			day.exercises,
 			session.id,
 		)
 	}, [
 		session?.setLogs,
 		session?.routineDayId,
 		session?.id,
-		session?.program?.isDeloadWeek,
 		routine,
 	])
 
@@ -223,21 +206,6 @@ export default function ActiveSessionPage() {
 			/>
 
 			<div className="container mx-auto px-4 py-6 space-y-6">
-				{/* Program info banner (RtF) */}
-				{session.program && (
-					<div className="rounded-md border bg-muted/30 p-3">
-						<div className="flex items-center justify-between text-sm">
-							<div className="font-medium">
-								Week {session.program.currentWeek} /{' '}
-								{session.program.durationWeeks}
-							</div>
-							<div className="text-muted-foreground">
-								{session.program.isDeloadWeek ? 'Deload week' : 'Standard week'}
-							</div>
-						</div>
-					</div>
-				)}
-
 				{/* Action Card */}
 				<SessionActionCard
 					sessionId={session.id}
@@ -257,56 +225,17 @@ export default function ActiveSessionPage() {
 							set => set.isCompleted,
 						).length
 						const totalSets = group.sets.length
-						const isRtF =
-							group.progressionScheme === 'PROGRAMMED_RTF' ||
-							group.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-						const goal = weekGoals?.goals?.find(
-							g => g.routineExerciseId === group.exerciseId,
-						)
-						const isDeload = !!session.program?.isDeloadWeek
-						const amrapSetNumber = isRtF
-							? !isDeload
-								? (goal?.amrapSetNumber ??
-									(group.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-										? 4
-										: 5))
-								: undefined
-							: undefined
-						const hideAmrapLabel = isDeload
-
-						const setsWithWeekTargets =
-							isRtF && goal
-								? group.sets.map(set => {
-										const isAmrapRow =
-											!!amrapSetNumber && set.setNumber === amrapSetNumber
-										return {
-											...set,
-											// Fix actual weight to workingWeight to ensure inputs (disabled) reflect correct value
-											weight: goal.workingWeightKg ?? set.weight,
-											plannedWeight: goal.workingWeightKg ?? set.plannedWeight,
-											// For RtF, prefer fixedReps for non-AMRAP sets; clear range to show a single value
-											plannedReps: !isAmrapRow
-												? (goal.fixedReps ?? set.plannedReps)
-												: set.plannedReps,
-											plannedMinReps: !isAmrapRow ? null : set.plannedMinReps,
-											plannedMaxReps: !isAmrapRow ? null : set.plannedMaxReps,
-										}
-									})
-								: group.sets
 
 						return (
 							<ExerciseGroup
 								key={group.exerciseId}
 								exerciseId={group.exerciseId}
 								exerciseName={group.exerciseName}
-								sets={setsWithWeekTargets}
+								sets={group.sets}
 								isCollapsed={isCollapsed(group.exerciseId)}
 								onToggleCollapse={() => toggleExercise(group.exerciseId)}
 								completedSets={completedSets}
 								totalSets={totalSets}
-								amrapSetNumber={amrapSetNumber}
-								hideAmrapLabel={hideAmrapLabel}
-								isRtF={isRtF}
 								onSave={handleSaveSetLog}
 								note={group.note}
 								onSaveNote={note => {

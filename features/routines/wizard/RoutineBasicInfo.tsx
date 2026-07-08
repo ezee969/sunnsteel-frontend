@@ -5,11 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { RoutineWizardData } from './types'
-import { ProgramScheduleSelector } from './components/ProgramScheduleSelector'
-import { ProgramStartDatePicker } from './components/ProgramStartDatePicker'
-import { TimezoneSelector } from './components/TimezoneSelector'
 import { useRoutineMetadataForm } from './hooks/useRoutineMetadataForm'
-import { useProgramSchedule } from './hooks/useProgramSchedule'
 
 interface RoutineBasicInfoProps {
 	data: RoutineWizardData
@@ -19,27 +15,6 @@ interface RoutineBasicInfoProps {
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 	const { name, description, handleNameChange, handleDescriptionChange } =
 		useRoutineMetadataForm({ data, onUpdate })
-
-	const {
-		selectedDate,
-		isCalendarOpen,
-		setCalendarOpen,
-		handleModeChange,
-		handleDateSelect,
-		handleDateInputChange,
-	} = useProgramSchedule({ data, onUpdate })
-
-	const scheduleMode = (data.programScheduleMode ?? 'NONE') as NonNullable<
-		RoutineWizardData['programScheduleMode']
-	>
-
-	const usesRtf = data.days?.some(d =>
-		d.exercises?.some(
-			ex =>
-				ex.progressionScheme === 'PROGRAMMED_RTF' ||
-				ex.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY',
-		),
-	)
 
 	return (
 		<TooltipProvider>
@@ -66,51 +41,6 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 						onChange={e => handleDescriptionChange(e.target.value)}
 						rows={4}
 					/>
-				</div>
-
-				{/* Program Schedule */}
-				<div className="space-y-4">
-					<ProgramScheduleSelector
-						value={scheduleMode}
-						onChange={handleModeChange}
-					/>
-
-					<ProgramStartDatePicker
-						mode={scheduleMode}
-						selectedDate={selectedDate}
-						isOpen={isCalendarOpen}
-						onOpenChange={setCalendarOpen}
-						onSelectDate={handleDateSelect}
-						onInputChange={handleDateInputChange}
-					/>
-
-					{scheduleMode === 'TIMEFRAME' && (
-						<div className="space-y-2">
-							<Label htmlFor="program-timezone">Timezone</Label>
-							<TimezoneSelector
-								value={data.programTimezone}
-								onChange={timezone => onUpdate({ programTimezone: timezone })}
-								placeholder="Select your timezone..."
-								className="w-full sm:w-96"
-							/>
-						</div>
-					)}
-
-					{scheduleMode === 'TIMEFRAME' && usesRtf && (
-						<div className="text-xs text-muted-foreground space-y-1">
-							{!data.programStartDate && (
-								<p className="text-destructive">
-									Program start date is required for RtF schedules.
-								</p>
-							)}
-							{!data.programTimezone && (
-								<p className="text-destructive">
-									Timezone is required for RtF schedules.
-								</p>
-							)}
-							{data.programTimezone && <p>Timezone: {data.programTimezone}</p>}
-						</div>
-					)}
 				</div>
 			</div>
 		</TooltipProvider>

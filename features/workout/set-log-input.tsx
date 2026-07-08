@@ -13,9 +13,6 @@ interface SetLogInputProps extends LogRowProps {
 	plannedMaxReps?: number | null
 	plannedWeight?: number | null
 	rpe?: number
-	isAmrap?: boolean
-	disableRepsInput?: boolean
-	disableWeightInput?: boolean
 }
 
 /**
@@ -35,9 +32,6 @@ export const SetLogInput = ({
 	plannedWeight,
 	plannedRir,
 	onSave,
-	isAmrap,
-	disableRepsInput,
-	disableWeightInput,
 }: SetLogInputProps) => {
 	const {
 		repsState,
@@ -71,9 +65,8 @@ export const SetLogInput = ({
 					? 'bg-red-500'
 					: 'bg-transparent'
 
-	const plannedRepsText = isAmrap
-		? 'AMRAP'
-		: plannedMinReps && plannedMaxReps
+	const plannedRepsText =
+		plannedMinReps && plannedMaxReps
 			? `${plannedMinReps}-${plannedMaxReps}`
 			: (plannedReps ?? '—')
 
@@ -149,26 +142,20 @@ export const SetLogInput = ({
 							Target: {plannedRepsText}
 						</span>
 					</div>
-					{disableRepsInput ? (
-						<div className="text-sm text-muted-foreground">
-							Fixed by program
-						</div>
-					) : (
-						<Input
-							type="number"
-							inputMode="numeric"
-							aria-label="Performed reps"
-							placeholder="Enter reps"
-							value={repsState}
-							onChange={e => setReps(e.target.value)}
-							disabled={saveState === 'saving'}
-							className={`text-center text-lg font-semibold h-12 ${
-								!isValid && validationError?.includes('reps')
-									? 'border-red-500 focus:border-red-500'
-									: ''
-							}`}
-						/>
-					)}
+					<Input
+						type="number"
+						inputMode="numeric"
+						aria-label="Performed reps"
+						placeholder="Enter reps"
+						value={repsState}
+						onChange={e => setReps(e.target.value)}
+						disabled={saveState === 'saving'}
+						className={`text-center text-lg font-semibold h-12 ${
+							!isValid && validationError?.includes('reps')
+								? 'border-red-500 focus:border-red-500'
+								: ''
+						}`}
+					/>
 				</div>
 
 				<div className="space-y-2">
@@ -180,27 +167,21 @@ export const SetLogInput = ({
 							Target: {plannedWeight ? `${plannedWeight} kg` : '—'}
 						</span>
 					</div>
-					{disableWeightInput ? (
-						<div className="text-sm text-muted-foreground">
-							Fixed by program
-						</div>
-					) : (
-						<Input
-							type="number"
-							inputMode="numeric"
-							step="0.5"
-							aria-label="Performed weight"
-							placeholder="Enter weight"
-							value={weightState}
-							onChange={e => setWeight(e.target.value)}
-							disabled={saveState === 'saving'}
-							className={`text-center text-lg font-semibold h-12 ${
-								!isValid && validationError?.includes('weight')
-									? 'border-red-500 focus:border-red-500'
-									: ''
-							}`}
-						/>
-					)}
+					<Input
+						type="number"
+						inputMode="numeric"
+						step="0.5"
+						aria-label="Performed weight"
+						placeholder="Enter weight"
+						value={weightState}
+						onChange={e => setWeight(e.target.value)}
+						disabled={saveState === 'saving'}
+						className={`text-center text-lg font-semibold h-12 ${
+							!isValid && validationError?.includes('weight')
+								? 'border-red-500 focus:border-red-500'
+								: ''
+						}`}
+					/>
 				</div>
 			</div>
 
