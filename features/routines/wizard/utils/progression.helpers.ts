@@ -1,15 +1,20 @@
 import type { ProgressionScheme } from '../types'
+import {
+	isRtfProgressionScheme,
+	isRtfStandardScheme,
+	isRtfHypertrophyScheme,
+} from '@/lib/utils/rtf-week-calculator'
 
 export const RTF_STANDARD_SET_COUNT = 5
 export const RTF_HYPERTROPHY_SET_COUNT = 4
 
-export const isRtFStandard = (scheme: ProgressionScheme) => scheme === 'PROGRAMMED_RTF'
+// Delegate to the canonical RtF scheme checks in lib/utils/rtf-week-calculator
+// so the underlying string comparisons live in exactly one place.
+export const isRtFStandard = (scheme: ProgressionScheme) => isRtfStandardScheme(scheme)
 
-export const isRtFHypertrophy = (scheme: ProgressionScheme) =>
-	scheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+export const isRtFHypertrophy = (scheme: ProgressionScheme) => isRtfHypertrophyScheme(scheme)
 
-export const isRtFExercise = (scheme: ProgressionScheme) =>
-	isRtFStandard(scheme) || isRtFHypertrophy(scheme)
+export const isRtFExercise = (scheme: ProgressionScheme) => isRtfProgressionScheme(scheme)
 
 export interface RtfSetSummary {
 	totalSets: number

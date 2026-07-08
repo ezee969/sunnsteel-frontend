@@ -8,41 +8,58 @@ interface ApiRequestConfig extends RequestInit {
 	secure?: boolean
 }
 
+function buildBaseHeaders(fetchOptions: RequestInit): Record<string, string> {
+	return {
+		'Content-Type': 'application/json',
+		...(fetchOptions.headers as Record<string, string>),
+	}
+}
+
+/**
+ * Attaches a Supabase bearer token to `headers` in place. Returns false
+ * (without mutating `headers`) when there is no active session, letting
+ * callers decide how to handle an expired/missing session.
+ */
+async function attachAuthHeader(headers: Record<string, string>): Promise<boolean> {
+	const {
+		data: { session },
+	} = await supabase.auth.getSession()
+
+	if (!session?.access_token) {
+		return false
+	}
+
+	headers.Authorization = `Bearer ${session.access_token}`
+	return true
+}
+
+function prepareRequest(endpoint: string, fetchOptions: RequestInit, headers: Record<string, string>) {
+	const url = `${API_BASE_URL}${endpoint}`
+	const config: RequestInit = { ...fetchOptions, headers, credentials: 'include' }
+	const method = (config.method || 'GET').toUpperCase()
+	return { url, config, method }
+}
+
+async function readResponseBody(response: Response): Promise<{ raw: string; contentType: string }> {
+	const contentType = response.headers.get('content-type') || ''
+	const raw = await response.text()
+	return { raw, contentType }
+}
+
 export const httpClient = {
 	async request<T>(endpoint: string, options: ApiRequestConfig = {}): Promise<T> {
 		const { secure = false, ...fetchOptions } = options
-		const url = `${API_BASE_URL}${endpoint}`
+		const headers = buildBaseHeaders(fetchOptions)
 
-		const headers: Record<string, string> = {
-			'Content-Type': 'application/json',
-			...(fetchOptions.headers as Record<string, string>),
+		if (secure && !(await attachAuthHeader(headers))) {
+			throw new Error('Session expired')
 		}
 
-		if (secure) {
-			const {
-				data: { session },
-			} = await supabase.auth.getSession()
-
-			if (!session?.access_token) {
-				throw new Error('Session expired')
-			}
-
-			headers.Authorization = `Bearer ${session.access_token}`
-		}
-
-		const config: RequestInit = {
-			...fetchOptions,
-			headers,
-			credentials: 'include',
-		}
-
-		const method = (config.method || 'GET').toUpperCase()
+		const { url, config, method } = prepareRequest(endpoint, fetchOptions, headers)
 		logger.debug('[http] ->', method, url, { secure })
 
 		const response = await fetch(url, config)
-		const contentType = response.headers.get('content-type') || ''
-		const contentLength = response.headers.get('content-length')
-		const raw = await response.text()
+		const { raw, contentType } = await readResponseBody(response)
 
 		if (!response.ok) {
 			let errorMessage = `Request failed with status: ${response.status}`
@@ -56,7 +73,7 @@ export const httpClient = {
 
 			logger.error('[http] <-', response.status, method, url, {
 				contentType,
-				contentLength,
+				contentLength: response.headers.get('content-length'),
 				rawPreview: raw?.slice(0, 200),
 			})
 			throw new Error(errorMessage)
@@ -123,37 +140,17 @@ export async function requestWithMeta<T>(
 	options: ApiRequestConfig = {},
 ): Promise<{ data?: T; status: number; headers: Headers; ok: boolean }> {
 	const { secure = false, ...fetchOptions } = options
-	const url = `${API_BASE_URL}${endpoint}`
+	const headers = buildBaseHeaders(fetchOptions)
 
-	const headers: Record<string, string> = {
-		'Content-Type': 'application/json',
-		...(fetchOptions.headers as Record<string, string>),
+	if (secure && !(await attachAuthHeader(headers))) {
+		return { data: undefined, status: 401, headers: new Headers(), ok: false }
 	}
 
-	if (secure) {
-		const {
-			data: { session },
-		} = await supabase.auth.getSession()
-
-		if (!session?.access_token) {
-			return { data: undefined, status: 401, headers: new Headers(), ok: false }
-		}
-
-		headers.Authorization = `Bearer ${session.access_token}`
-	}
-
-	const config: RequestInit = {
-		...fetchOptions,
-		headers,
-		credentials: 'include',
-	}
-
-	const method = (config.method || 'GET').toUpperCase()
+	const { url, config, method } = prepareRequest(endpoint, fetchOptions, headers)
 	logger.debug('[http-meta] ->', method, url, { secure })
 
 	const response = await fetch(url, config)
-	const contentType = response.headers.get('content-type') || ''
-	const raw = await response.text()
+	const { raw, contentType } = await readResponseBody(response)
 
 	if (!response.ok) {
 		let parsed: T | undefined

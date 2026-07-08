@@ -77,28 +77,46 @@ export function isDeloadWeek(week: number, withDeloads: boolean): boolean {
 }
 
 /**
+ * Canonical RtF progression scheme identifiers. This is the single source of
+ * truth for the underlying string comparisons — other modules (e.g. the
+ * routine wizard's progression helpers) delegate to the functions below
+ * rather than re-declaring these literals.
+ */
+export const RTF_STANDARD_SCHEME = 'PROGRAMMED_RTF'
+export const RTF_HYPERTROPHY_SCHEME = 'PROGRAMMED_RTF_HYPERTROPHY'
+
+/**
+ * Check if a progression scheme is the standard RtF variant
+ */
+export function isRtfStandardScheme(progressionScheme: string): boolean {
+	return progressionScheme === RTF_STANDARD_SCHEME
+}
+
+/**
+ * Check if a progression scheme is the hypertrophy RtF variant
+ */
+export function isRtfHypertrophyScheme(progressionScheme: string): boolean {
+	return progressionScheme === RTF_HYPERTROPHY_SCHEME
+}
+
+/**
  * Get RtF variant from progression scheme
- * 
+ *
  * @param progressionScheme - The progression scheme string
  * @returns RtF variant ('STANDARD' | 'HYPERTROPHY') or null if not RtF
  */
 export function getRtfVariant(progressionScheme: string): 'STANDARD' | 'HYPERTROPHY' | null {
-	switch (progressionScheme) {
-		case 'PROGRAMMED_RTF':
-			return 'STANDARD'
-		case 'PROGRAMMED_RTF_HYPERTROPHY':
-			return 'HYPERTROPHY'
-		default:
-			return null
-	}
+	if (isRtfStandardScheme(progressionScheme)) return 'STANDARD'
+	if (isRtfHypertrophyScheme(progressionScheme)) return 'HYPERTROPHY'
+	return null
 }
 
 /**
- * Check if a progression scheme is RtF-based
- * 
+ * Check if a progression scheme is RtF-based (either variant)
+ *
  * @param progressionScheme - The progression scheme string
  * @returns True if the scheme is RtF-based
  */
 export function isRtfProgressionScheme(progressionScheme: string): boolean {
-	return progressionScheme === 'PROGRAMMED_RTF' || progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
+	return isRtfStandardScheme(progressionScheme) || isRtfHypertrophyScheme(progressionScheme)
 }
