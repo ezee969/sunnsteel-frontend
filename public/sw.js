@@ -1,5 +1,5 @@
 // public/sw.js
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const RUNTIME_CACHE = `ss-runtime-${CACHE_VERSION}`;
 const PRECACHE = `ss-precache-${CACHE_VERSION}`;
 const PAGE_CACHE = `ss-pages-${CACHE_VERSION}`;
@@ -102,27 +102,12 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         const pageCache = await caches.open(PAGE_CACHE);
         const runtimeCache = await caches.open(RUNTIME_CACHE);
-        
+
         // Check if it's a critical page
         const isCriticalPage = CRITICAL_PAGES.some(page => url.pathname === page || url.pathname.startsWith(page + '/'));
-        
-        if (isCriticalPage) {
-          // For critical pages: cache-first with background refresh
-          const cached = await pageCache.match(request);
-          if (cached) {
-            // Background refresh
-            fetch(request)
-              .then(response => {
-                if (response && response.ok) {
-                  pageCache.put(request, response.clone());
-                }
-              })
-              .catch(() => {});
-            return cached;
-          }
-        }
-        
-        // Network-first for other pages
+
+        // Network-first for all pages (auth/config-sensitive pages must never
+        // serve stale HTML pinned to a stale JS bundle - cache is fallback only)
         try {
           const networkResponse = await fetch(request);
           if (networkResponse.ok) {
