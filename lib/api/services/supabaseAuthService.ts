@@ -128,10 +128,36 @@ class SupabaseAuthService {
       throw new Error(error.message);
     }
 
+    await this.clearSessionMarker();
+
     try {
       await httpClient.post('/auth/supabase/logout');
     } catch (err) {
       logger.warn('[auth-service] backend logout cookie clear failed', err);
+    }
+  }
+
+  /**
+   * Set the same-origin `ss_session` marker cookie the middleware reads for
+   * route protection. Must be set by the frontend (not the backend): a cookie
+   * from the cross-site backend response is scoped to the backend domain and is
+   * never sent to this app's domain, so middleware could never see it.
+   */
+  private async setSessionMarker(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      await fetch('/api/session', { method: 'POST' });
+    } catch (err) {
+      logger.warn('[auth-service] failed to set session marker cookie', err);
+    }
+  }
+
+  private async clearSessionMarker(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      await fetch('/api/session', { method: 'DELETE' });
+    } catch (err) {
+      logger.warn('[auth-service] failed to clear session marker cookie', err);
     }
   }
 
@@ -154,6 +180,7 @@ class SupabaseAuthService {
       const response = await httpClient.post<AuthResponse>('/auth/supabase/verify', {
         token,
       });
+      await this.setSessionMarker();
       logger.debug('[auth-service] backend verify succeeded', {
         userId: response.user?.id,
       });

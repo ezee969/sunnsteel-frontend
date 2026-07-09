@@ -15,6 +15,20 @@ const EnvSchema = z.object({
 
 export type ClientEnv = z.infer<typeof EnvSchema>
 
+// Next.js only inlines *static* accesses like `process.env.NEXT_PUBLIC_X` in
+// browser bundles; the `process.env` object itself is not populated client-side.
+// So we must build the object from explicit static accesses before validating —
+// passing `process.env` directly makes every var read as undefined in the browser.
+const rawClientEnv = {
+	NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+	NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL,
+	NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+	NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+	NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+	NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS,
+	NEXT_PUBLIC_ENABLE_RTF_DEBUG: process.env.NEXT_PUBLIC_ENABLE_RTF_DEBUG,
+}
+
 let cached: ClientEnv | null = null
 
 export function getClientEnv(): ClientEnv {
@@ -34,7 +48,7 @@ export function getClientEnv(): ClientEnv {
 		return cached
 	}
 	
-	const parsed = EnvSchema.safeParse(process.env)
+	const parsed = EnvSchema.safeParse(rawClientEnv)
 	if (!parsed.success) {
 		console.warn('[env] Client env validation failed', parsed.error.flatten())
 		console.warn('[env] Environment variables being validated:', {
