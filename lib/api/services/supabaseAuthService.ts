@@ -18,6 +18,11 @@ class SupabaseAuthService {
   async signUp(email: string, password: string, name: string): Promise<AuthResponse> {
     logger.debug('[auth-service] signUp start', { email });
 
+    const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL;
+    const siteUrl =
+      configuredBaseUrl ||
+      (typeof window !== 'undefined' ? window.location.origin : '');
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -25,6 +30,7 @@ class SupabaseAuthService {
         data: {
           name,
         },
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     });
 
