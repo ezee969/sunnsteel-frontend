@@ -204,28 +204,8 @@ export default function Sidebar({
       </div>
       <ScrollArea className="flex-1 py-4">
         <nav className="grid gap-2 px-2">
-          {SIDEBAR_NAV_ITEMS.map((item) => (
-          <Link
-              key={item.id}
-              href={item.disabled ? '#' : item.href}
-              prefetch={!item.disabled}
-              onMouseEnter={() => !item.disabled && handleNavHover(item.href)}
-              onClick={(e) => {
-                if (item.disabled) {
-                  e.preventDefault();
-                  return;
-                }
-                // Set active nav immediately for consistent visual state
-                setActiveNav(item.id);
-                // Close mobile sidebar after navigation
-                if (isMobile) {
-                  setIsMobileMenuOpen(false);
-                }
-                // Signal navigation start for global feedback
-                onNavigateStart?.();
-              }}
-            >
-              {(() => {
+          {SIDEBAR_NAV_ITEMS.map((item) => {
+            const content = (() => {
                 const showTooltip = !isSidebarOpen && !isMobile;
                 const buttonContent = (
                   <Button
@@ -292,9 +272,38 @@ export default function Sidebar({
                   );
                 }
                 return buttonContent;
-              })()}
-            </Link>
-          ))}
+            })();
+
+            // Disabled items are not links: an anchor would stay focusable and be
+            // announced as a link even though it goes nowhere.
+            if (item.disabled) {
+              return (
+                <div key={item.id} aria-disabled="true">
+                  {content}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                onMouseEnter={() => handleNavHover(item.href)}
+                onClick={() => {
+                  // Set active nav immediately for consistent visual state
+                  setActiveNav(item.id);
+                  // Close mobile sidebar after navigation
+                  if (isMobile) {
+                    setIsMobileMenuOpen(false);
+                  }
+                  // Signal navigation start for global feedback
+                  onNavigateStart?.();
+                }}
+              >
+                {content}
+              </Link>
+            );
+          })}
           <Separator className="my-4" />
           <Button
             asChild
@@ -358,7 +367,7 @@ export default function Sidebar({
               )}
             >
               <span className="text-sm font-medium">{user?.name} {user?.lastName}</span>
-              <span className="text-xs text-muted-foreground">Premium Member</span>
+              <span className="text-xs text-muted-foreground truncate max-w-[10rem]">{user?.email}</span>
             </div>
           </div>
         </Link>

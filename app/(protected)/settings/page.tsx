@@ -212,7 +212,7 @@ export default function SettingsPage() {
               />
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Click the image to upload a new avatar. Next.js & Supabase edge optimized.
+              Click the image to upload a new avatar.
             </p>
           </CardContent>
         </Card>

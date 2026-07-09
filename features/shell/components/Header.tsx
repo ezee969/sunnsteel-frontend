@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  Bell,
-  Menu,
-  User,
-  Settings,
-  Medal,
-  Activity,
-  TrendingUp,
-} from 'lucide-react';
+import { Menu, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -59,86 +51,9 @@ export default function Header({
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <ModeToggle />
-        <NotificationsDropdown />
         <UserDropdown />
       </div>
     </header>
-  );
-}
-
-function NotificationsDropdown() {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="relative rounded-full h-9 w-9"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-            3
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] sm:w-80">
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <div className="grid gap-2 p-2">
-          <NotificationItem
-            icon={Medal}
-            title="New Achievement Unlocked!"
-            description="You've completed 10 workouts this month."
-            time="2 hours ago"
-          />
-          <NotificationItem
-            icon={Activity}
-            title="Workout Reminder"
-            description="Your scheduled chest workout is in 30 minutes."
-            time="30 minutes ago"
-          />
-          <NotificationItem
-            icon={TrendingUp}
-            title="New Personal Record!"
-            description="You've set a new PR on Bench Press: 225 lbs."
-            time="Yesterday"
-          />
-        </div>
-        <DropdownMenuSeparator />
-        <div className="p-2">
-          <Button variant="outline" size="sm" className="w-full">
-            View All Notifications
-          </Button>
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-interface NotificationItemProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  time: string;
-}
-
-function NotificationItem({
-  icon: Icon,
-  title,
-  description,
-  time,
-}: NotificationItemProps) {
-  return (
-    <div className="flex items-start gap-3 rounded-lg p-2 hover:bg-muted">
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-      <div className="grid gap-1">
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-        <p className="text-xs text-muted-foreground">{time}</p>
-      </div>
-    </div>
   );
 }
 

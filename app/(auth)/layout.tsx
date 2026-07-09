@@ -12,15 +12,14 @@ export default function AuthLayout({
 	children: React.ReactNode
 }) {
 	const [mounted, setMounted] = useState(false)
-	const [isAnimating, setIsAnimating] = useState(true)
 
 	useEffect(() => {
 		setMounted(true)
 	}, [])
 	return (
-		<div className="min-h-screen w-full flex bg-white dark:bg-neutral-950 transition-colors duration-300">
+		<div className="h-screen w-full flex bg-white dark:bg-neutral-950 transition-colors duration-300">
 			{/* Left Side - Form Container */}
-			<div className="w-full lg:w-[45%] flex flex-col relative border-r border-neutral-200 dark:border-neutral-800">
+			<div className="w-full lg:w-[45%] min-h-0 flex flex-col relative border-r border-neutral-200 dark:border-neutral-800">
 				{mounted ? (
 					<div className="relative z-20 flex justify-center lg:justify-start px-8 py-8 lg:py-12 lg:px-12">
 						<motion.div
@@ -48,7 +47,7 @@ export default function AuthLayout({
 					{mounted && <ModernBackground />}
 				</div>
 
-				<div className={`flex-1 flex flex-col relative z-10 ${isAnimating ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+				<div className="flex-1 min-h-0 flex flex-col relative z-10 overflow-y-auto">
 					<AnimatePresence mode="wait">
 						{mounted && (
 							<motion.div
@@ -56,7 +55,6 @@ export default function AuthLayout({
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.8, ease: 'easeOut', delay: 0.15 }}
-								onAnimationComplete={() => setIsAnimating(false)}
 								className="w-full max-w-sm sm:max-w-md mx-auto my-auto p-6 sm:p-10"
 							>
 								{children}
