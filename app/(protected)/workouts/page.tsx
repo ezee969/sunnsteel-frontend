@@ -1,18 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useActiveSession, useStartSession } from '@/lib/api/hooks/useWorkoutSession';
+import { useRoutines, useCreateRoutine } from '@/lib/api/hooks/useRoutines';
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, ChevronRight } from 'lucide-react';
+import { Dumbbell, ChevronRight, Loader2 } from 'lucide-react';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+import { useToast } from '@/components/ui/toast';
 
 export default function WorkoutsIndexPage() {
   const router = useRouter();
   const { preloadOnHover } = useComponentPreloading();
   const { data: active, isLoading } = useActiveSession();
+  const { data: routines } = useRoutines();
+  const { mutate: createRoutine } = useCreateRoutine();
+  const { mutate: startSession } = useStartSession();
+  const { push } = useToast();
+  const [isStartingEmpty, setIsStartingEmpty] = useState(false);
 
   useEffect(() => {
     if (active?.id) {
@@ -20,12 +27,77 @@ export default function WorkoutsIndexPage() {
     }
   }, [active?.id, router]);
 
-  if (isLoading) {
+  const handleStartEmptyWorkout = () => {
+    setIsStartingEmpty(true);
+
+    // 1. Check if "Quick Workout" routine already exists
+    const existing = routines?.find(r => r.name === 'Quick Workout');
+    if (existing && existing.days.length > 0) {
+      startSession({
+        routineId: existing.id,
+        routineDayId: existing.days[0].id
+      }, {
+        onSuccess: (session) => {
+          if (session?.id) {
+            router.push(`/workouts/sessions/${session.id}`);
+          } else {
+            setIsStartingEmpty(false);
+          }
+        },
+        onError: () => {
+          setIsStartingEmpty(false);
+        }
+      });
+      return;
+    }
+
+    // 2. Create the "Quick Workout" routine first
+    const today = new Date().getDay();
+    createRoutine({
+      name: 'Quick Workout',
+      description: 'Quick training session started without a pre-made routine',
+      isPeriodized: false,
+      days: [{
+        dayOfWeek: today,
+        order: 1,
+        exercises: []
+      }]
+    }, {
+      onSuccess: (newRoutine) => {
+        if (newRoutine && newRoutine.days.length > 0) {
+          startSession({
+            routineId: newRoutine.id,
+            routineDayId: newRoutine.days[0].id
+          }, {
+            onSuccess: (session) => {
+              if (session?.id) {
+                router.push(`/workouts/sessions/${session.id}`);
+              } else {
+                setIsStartingEmpty(false);
+              }
+            },
+            onError: () => {
+              setIsStartingEmpty(false);
+            }
+          });
+        } else {
+          setIsStartingEmpty(false);
+          push({ title: 'Error', description: 'Failed to initialize routine day.' });
+        }
+      },
+      onError: (err) => {
+        setIsStartingEmpty(false);
+        push({ title: 'Error starting workout', description: err.message });
+      }
+    });
+  };
+
+  if (isLoading || isStartingEmpty) {
     return (
       <div className="flex h-[calc(100vh-300px)] items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground">
-          <Dumbbell className="h-5 w-5 animate-pulse" />
-          <span>Loading your workouts...</span>
+          <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+          <span>{isStartingEmpty ? 'Initializing quick workout...' : 'Loading your workouts...'}</span>
         </div>
       </div>
     );
@@ -54,16 +126,22 @@ export default function WorkoutsIndexPage() {
         <div className="space-y-2">
           <h2 className="text-xl font-semibold tracking-tight">No Active Workout</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            You don&apos;t have a workout in progress right now. Pick a routine
-            to start a new session, or check your history to see past workouts.
+            You don&apos;t have a workout in progress right now. Start an empty session to log on the fly, pick a routine, or view your history.
           </p>
         </div>
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-3">
-          <Button asChild variant="classical">
+          <Button 
+            variant="classical" 
+            onClick={handleStartEmptyWorkout}
+            disabled={isStartingEmpty}
+          >
+            <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
+            Start Empty Workout
+          </Button>
+          <Button asChild variant="outline">
             <Link href="/routines">
-              <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
               Go to Routines
             </Link>
           </Button>

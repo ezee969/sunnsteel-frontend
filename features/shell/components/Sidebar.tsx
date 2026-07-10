@@ -25,6 +25,8 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import Link from 'next/link';
 import { useEffect, useCallback } from 'react';
 import { useNavigationPrefetch } from '@/hooks/use-navigation-prefetch';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/toast';
 
 type NavItem = {
   id: string;
@@ -117,6 +119,14 @@ export default function Sidebar({
 }: SidebarProps) {
   const { user } = useUser();
   const { prefetchPage, prefetchMainNavigation, isReady } = useNavigationPrefetch();
+  const { push } = useToast();
+
+  const handleDisabledClick = (label: string) => {
+    push({
+      title: `${label} - Coming Soon`,
+      description: 'We are working hard on bringing this feature to Sunnsteel. Stay tuned!',
+    });
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -210,13 +220,13 @@ export default function Sidebar({
                 const buttonContent = (
                   <Button
                     variant={activeNav === item.id ? 'default' : 'ghost'}
-                    disabled={item.disabled}
                     className={cn(
                       'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
                       isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
                       activeNav === item.id 
                         ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400' 
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700'
+                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700',
+                      item.disabled && 'opacity-50 hover:bg-transparent dark:hover:bg-transparent cursor-not-allowed'
                     )}
                     asChild={false}
                   >
@@ -256,6 +266,14 @@ export default function Sidebar({
                     >
                       {item.label}
                     </span>
+                    {item.disabled && (isSidebarOpen || isMobile) && (
+                      <Badge
+                        variant="outline"
+                        className="ml-auto text-[9px] h-4 px-1 border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider font-sans shrink-0"
+                      >
+                        Soon
+                      </Badge>
+                    )}
                   </Button>
                 );
 
@@ -278,7 +296,11 @@ export default function Sidebar({
             // announced as a link even though it goes nowhere.
             if (item.disabled) {
               return (
-                <div key={item.id} aria-disabled="true">
+                <div
+                  key={item.id}
+                  onClick={() => handleDisabledClick(item.label)}
+                  className="cursor-pointer"
+                >
                   {content}
                 </div>
               );

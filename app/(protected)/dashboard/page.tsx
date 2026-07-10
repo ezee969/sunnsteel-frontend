@@ -3,6 +3,7 @@
 import { useUser } from '@/lib/api/hooks/useUser'
 import TodaysWorkouts from './components/TodaysWorkouts'
 import HeroSection from '@/components/layout/HeroSection'
+import StatsOverview from './components/StatsOverview'
 
 export default function Dashboard() {
 	const { user } = useUser()
@@ -35,7 +36,7 @@ export default function Dashboard() {
 			</div>
 
 			{/* Stats Overview */}
-			{/* <StatsOverview /> */}
+			<StatsOverview />
 		</div>
 	)
 }

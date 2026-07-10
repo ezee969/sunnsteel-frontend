@@ -89,30 +89,16 @@ export function SetRow({
 					: 'animate-in fade-in-0 slide-in-from-top-2'
 			}`}
 		>
-			<div className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-2 items-start sm:items-center">
-				<div className="sm:col-span-2">
-					<div className="flex items-center justify-between sm:justify-start">
+			<div className="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-2 items-stretch sm:items-center">
+				{/* Top line on mobile: Set Badge, Rep Type Select, Delete button */}
+				<div className="flex items-center justify-between sm:col-span-5 gap-2">
+					<div className="flex items-center gap-2">
 						<Badge variant="outline" className="text-xs px-2 py-1">
 							Set {set.setNumber}
 						</Badge>
-						<Button
-							variant="ghost"
-							size="sm"
-							onClick={onRemoveSet}
-							aria-label="Remove set"
-							disabled={disableRemove}
-							className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-						>
-							<Trash2 className="h-3 w-3" />
-						</Button>
 					</div>
-				</div>
 
-				<div className="sm:col-span-3">
-					<div className="space-y-1">
-						<Label className="sm:hidden text-xs font-medium text-muted-foreground">
-							Rep Type
-						</Label>
+					<div className="flex-1 max-w-[140px] sm:max-w-none">
 						<Select
 							value={set.repType}
 							onValueChange={value =>
@@ -120,21 +106,34 @@ export function SetRow({
 							}
 							disabled={progressionScheme !== 'NONE'}
 						>
-							<SelectTrigger aria-label="Rep type" className="w-full">
+							<SelectTrigger aria-label="Rep type" className="w-full h-9 sm:h-8">
 								<SelectValue className="truncate" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="FIXED">Fixed Reps</SelectItem>
-								<SelectItem value="RANGE">Rep Range</SelectItem>
+								<SelectItem value="FIXED">Fixed</SelectItem>
+								<SelectItem value="RANGE">Range</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
+
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={onRemoveSet}
+						aria-label="Remove set"
+						disabled={disableRemove}
+						className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
+					>
+						<Trash2 className="h-4 w-4" />
+					</Button>
 				</div>
 
-				<div className="sm:col-span-3">
-					<div className="space-y-1">
-						<Label className="sm:hidden text-xs font-medium text-muted-foreground">
-							{set.repType === 'FIXED' ? 'Reps' : 'Rep Range'}
+				{/* Inputs Row on mobile, contents on desktop */}
+				<div className="grid grid-cols-3 sm:contents gap-2">
+					{/* Reps Column */}
+					<div className="sm:col-span-3 space-y-1">
+						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
+							{set.repType === 'FIXED' ? 'Reps' : 'Reps Range'}
 						</Label>
 						{set.repType === 'FIXED' ? (
 							<div className="flex items-center gap-2 w-full">
@@ -157,7 +156,7 @@ export function SetRow({
 									placeholder="0"
 									value={set.reps ?? ''}
 									onChange={event => handleFixedRepsChange(event.target.value)}
-									className="text-center h-8 flex-1 min-w-0"
+									className="text-center h-9 sm:h-8 flex-1 min-w-0"
 								/>
 								<Button
 									type="button"
@@ -196,7 +195,7 @@ export function SetRow({
 											value={minInput}
 											onChange={event => handleMinChange(event.target.value)}
 											onBlur={handleMinBlur}
-											className="text-center h-8 flex-1 min-w-0 sm:min-w-[64px]"
+											className="text-center h-9 sm:h-8 flex-1 min-w-0 sm:min-w-[64px]"
 										/>
 										<Button
 											type="button"
@@ -237,7 +236,7 @@ export function SetRow({
 											value={maxInput}
 											onChange={event => handleMaxChange(event.target.value)}
 											onBlur={handleMaxBlur}
-											className="text-center h-8 flex-1 min-w-0"
+											className="text-center h-9 sm:h-8 flex-1 min-w-0"
 										/>
 										<Button
 											type="button"
@@ -256,11 +255,10 @@ export function SetRow({
 							</div>
 						)}
 					</div>
-				</div>
 
-				<div className="sm:col-span-2">
-					<div className="space-y-1">
-						<Label className="sm:hidden text-xs font-medium text-muted-foreground">
+					{/* Weight Column */}
+					<div className="sm:col-span-2 space-y-1">
+						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
 							Weight
 						</Label>
 						<div className="flex items-center gap-2 w-full">
@@ -290,7 +288,7 @@ export function SetRow({
 								disabled={
 									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
 								}
-								className={`text-center h-8 flex-1 min-w-0 ${
+								className={`text-center h-9 sm:h-8 flex-1 min-w-0 ${
 									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
 										? 'cursor-not-allowed opacity-60'
 										: ''
@@ -311,11 +309,10 @@ export function SetRow({
 							</Button>
 						</div>
 					</div>
-				</div>
 
-				<div className="sm:col-span-1">
-					<div className="space-y-1">
-						<Label className="sm:hidden text-xs font-medium text-muted-foreground">
+					{/* RIR Column */}
+					<div className="sm:col-span-1 space-y-1">
+						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
 							RIR
 						</Label>
 						<Input
@@ -329,11 +326,12 @@ export function SetRow({
 							placeholder="0"
 							value={rirInput}
 							onChange={event => handleRirChange(event.target.value)}
-							className="text-center h-8 flex-1 min-w-0"
+							className="text-center h-9 sm:h-8 flex-1 min-w-0"
 						/>
 					</div>
 				</div>
 
+				{/* Desktop-only delete button */}
 				<div className="hidden sm:flex sm:col-span-1 justify-end">
 					<Button
 						variant="ghost"
