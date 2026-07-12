@@ -95,7 +95,7 @@ export function ExerciseHeader({
 						)}
 					</div>
 				</div>
-				<div className="flex items-center gap-1 shrink-0">
+				<div className="flex items-center gap-1.5 sm:gap-1 shrink-0">
 					{dragHandle}
 					<Button
 						variant="ghost"
@@ -104,7 +104,7 @@ export function ExerciseHeader({
 						aria-expanded={expanded}
 						aria-controls={controlsId}
 						onClick={onToggleButtonClick}
-						className={cn('p-0', expanded ? 'h-8 w-8' : 'h-6 w-6')}
+						className={cn('p-0', expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6')}
 					>
 						<ChevronsUpDown
 							className={cn(
@@ -120,7 +120,7 @@ export function ExerciseHeader({
 						onClick={onEditButtonClick}
 						className={cn(
 							'p-0 text-muted-foreground hover:text-primary',
-							expanded ? 'h-8 w-8' : 'h-6 w-6',
+							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>
 						<Pencil className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
@@ -132,7 +132,7 @@ export function ExerciseHeader({
 						onClick={onRemoveButtonClick}
 						className={cn(
 							'p-0 text-muted-foreground hover:text-destructive',
-							expanded ? 'h-8 w-8' : 'h-6 w-6',
+							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>
 						<Trash2 className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />

@@ -40,6 +40,38 @@ export function BuildDays({
 	const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null)
 	const { data: exercises, isLoading: exercisesLoading } = useExercises()
 
+	// Fade hints on the day-tabs scroll container so it's clear there are
+	// more tabs off-screen when the list overflows (e.g. 4+ training days).
+	const dayTabsRef = useRef<HTMLDivElement>(null)
+	const [dayTabsOverflow, setDayTabsOverflow] = useState({
+		left: false,
+		right: false,
+	})
+
+	const updateDayTabsOverflow = useCallback(() => {
+		const el = dayTabsRef.current
+		if (!el) return
+		setDayTabsOverflow({
+			left: el.scrollLeft > 4,
+			right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+		})
+	}, [])
+
+	useEffect(() => {
+		updateDayTabsOverflow()
+		const el = dayTabsRef.current
+		if (!el) return
+
+		el.addEventListener('scroll', updateDayTabsOverflow, { passive: true })
+		const resizeObserver = new ResizeObserver(updateDayTabsOverflow)
+		resizeObserver.observe(el)
+
+		return () => {
+			el.removeEventListener('scroll', updateDayTabsOverflow)
+			resizeObserver.disconnect()
+		}
+	}, [updateDayTabsOverflow, data.trainingDays.length])
+
 	const makeClientId = useCallback(
 		() =>
 			globalThis.crypto?.randomUUID?.() ??
@@ -205,24 +237,35 @@ export function BuildDays({
 					value={selectedDay.toString()}
 					onValueChange={(value: string) => setSelectedDay(parseInt(value))}
 				>
-					<TabsList className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 mb-2">
-						{data.trainingDays.map((dayId, index) => (
-							<TabsTrigger
-								key={dayId}
-								value={index.toString()}
-								className="flex-shrink-0 whitespace-nowrap h-10 px-4"
-							>
-								{DAYS_OF_WEEK[dayId]}
-								<Badge
-									variant="secondary"
-									className="ml-2 h-5 min-w-[1.25rem] px-1 text-[10px] leading-none flex items-center justify-center"
+					<div className="relative mb-2">
+						<TabsList
+							ref={dayTabsRef}
+							className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1"
+						>
+							{data.trainingDays.map((dayId, index) => (
+								<TabsTrigger
+									key={dayId}
+									value={index.toString()}
+									className="flex-shrink-0 whitespace-nowrap h-10 px-4"
 								>
-									{data.days.find(d => d.dayOfWeek === dayId)?.exercises
-										?.length ?? 0}
-								</Badge>
-							</TabsTrigger>
-						))}
-					</TabsList>
+									{DAYS_OF_WEEK[dayId]}
+									<Badge
+										variant="secondary"
+										className="ml-2 h-5 min-w-[1.25rem] px-1 text-[10px] leading-none flex items-center justify-center"
+									>
+										{data.days.find(d => d.dayOfWeek === dayId)?.exercises
+											?.length ?? 0}
+									</Badge>
+								</TabsTrigger>
+							))}
+						</TabsList>
+						{dayTabsOverflow.left && (
+							<div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-muted to-transparent" />
+						)}
+						{dayTabsOverflow.right && (
+							<div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-muted to-transparent" />
+						)}
+					</div>
 
 					{data.trainingDays.map((dayId, tabIndex) => {
 						const day = data.days.find(d => d.dayOfWeek === dayId)

@@ -225,7 +225,7 @@ function ReorderableExerciseRow({
 							e.stopPropagation()
 							dragControls.start(e)
 						}}
-						className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground/50 hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none transition-colors"
+						className="inline-flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-md text-muted-foreground/50 hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none transition-colors"
 					>
 						<GripVertical className="h-4 w-4" />
 					</button>

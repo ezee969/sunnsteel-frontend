@@ -128,8 +128,10 @@ export function SetRow({
 					</Button>
 				</div>
 
-				{/* Inputs Row on mobile, contents on desktop */}
-				<div className="grid grid-cols-3 sm:contents gap-2">
+				{/* Inputs: Reps gets its own row on mobile so its steppers/input aren't
+				    squeezed by Weight/RIR sharing the same row; contents on desktop
+				    (unchanged 12-col grid via col-span) */}
+				<div className="flex flex-col gap-2 sm:contents">
 					{/* Reps Column */}
 					<div className="sm:col-span-3 space-y-1">
 						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
@@ -141,7 +143,7 @@ export function SetRow({
 									type="button"
 									variant="outline"
 									size="icon"
-									className="h-9 w-9 p-0 shrink-0 sm:hidden"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
 									aria-label="Decrease reps"
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, -1)}
 								>
@@ -156,13 +158,13 @@ export function SetRow({
 									placeholder="0"
 									value={set.reps ?? ''}
 									onChange={event => handleFixedRepsChange(event.target.value)}
-									className="text-center h-9 sm:h-8 flex-1 min-w-0"
+									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0"
 								/>
 								<Button
 									type="button"
 									variant="outline"
 									size="icon"
-									className="h-9 w-9 p-0 shrink-0 sm:hidden"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
 									aria-label="Increase reps"
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, 1)}
 								>
@@ -256,78 +258,120 @@ export function SetRow({
 						)}
 					</div>
 
-					{/* Weight Column */}
-					<div className="sm:col-span-2 space-y-1">
-						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
-							Weight
-						</Label>
-						<div className="flex items-center gap-2 w-full">
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="h-9 w-9 p-0 shrink-0 sm:hidden"
-								aria-label="Decrease weight"
-								disabled={
-									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-								}
-								onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
-							>
-								<Minus className="h-3 w-3" />
-							</Button>
-							<Input
-								type="text"
-								inputMode="decimal"
-								pattern="[0-9]*[.]?[0-9]*"
-								autoComplete="off"
-								aria-label="Weight"
-								placeholder="0"
-								value={weightInput}
-								onChange={event => handleWeightChange(event.target.value)}
-								onBlur={handleWeightBlur}
-								disabled={
-									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-								}
-								className={`text-center h-9 sm:h-8 flex-1 min-w-0 ${
-									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-										? 'cursor-not-allowed opacity-60'
-										: ''
-								}`}
-							/>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="h-9 w-9 p-0 shrink-0 sm:hidden"
-								aria-label="Increase weight"
-								disabled={
-									progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-								}
-								onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
-							>
-								<Plus className="h-3 w-3" />
-							</Button>
+					{/* Weight and RIR each get their own full-width row on mobile —
+					    two stepper groups (minus + input + plus) can't fit side by
+					    side in a narrow card without the buttons overlapping; contents
+					    on desktop (unchanged 12-col grid) */}
+					<div className="flex flex-col gap-2 sm:contents">
+						{/* Weight Column */}
+						<div className="sm:col-span-2 space-y-1">
+							<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
+								Weight
+							</Label>
+							<div className="flex items-center gap-2 w-full">
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
+									aria-label="Decrease weight"
+									disabled={
+										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+									}
+									onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
+								>
+									<Minus className="h-3 w-3" />
+								</Button>
+								<Input
+									type="text"
+									inputMode="decimal"
+									pattern="[0-9]*[.]?[0-9]*"
+									autoComplete="off"
+									aria-label="Weight"
+									placeholder="0"
+									value={weightInput}
+									onChange={event => handleWeightChange(event.target.value)}
+									onBlur={handleWeightBlur}
+									disabled={
+										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+									}
+									className={`text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 ${
+										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+											? 'cursor-not-allowed opacity-60'
+											: ''
+									}`}
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
+									aria-label="Increase weight"
+									disabled={
+										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
+									}
+									onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
+								>
+									<Plus className="h-3 w-3" />
+								</Button>
+							</div>
 						</div>
-					</div>
 
-					{/* RIR Column */}
-					<div className="sm:col-span-1 space-y-1">
-						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
-							RIR
-						</Label>
-						<Input
-							type="number"
-							inputMode="numeric"
-							min={0}
-							max={10}
-							step={1}
-							autoComplete="off"
-							aria-label="RIR"
-							placeholder="0"
-							value={rirInput}
-							onChange={event => handleRirChange(event.target.value)}
-							className="text-center h-9 sm:h-8 flex-1 min-w-0"
-						/>
+						{/* RIR Column */}
+						<div className="sm:col-span-1 space-y-1">
+							<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
+								RIR
+							</Label>
+							<div className="flex items-center gap-2 w-full">
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
+									aria-label="Decrease RIR"
+									onClick={() =>
+										onUpdateSet(
+											exerciseIndex,
+											setIndex,
+											'rir',
+											Math.max(0, (set.rir ?? 0) - 1),
+										)
+									}
+								>
+									<Minus className="h-3 w-3" />
+								</Button>
+								<Input
+									type="number"
+									inputMode="numeric"
+									min={0}
+									max={10}
+									step={1}
+									autoComplete="off"
+									aria-label="RIR"
+									placeholder="0"
+									value={rirInput}
+									onChange={event => handleRirChange(event.target.value)}
+									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0"
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									className="h-10 w-10 p-0 shrink-0 sm:hidden"
+									aria-label="Increase RIR"
+									onClick={() =>
+										onUpdateSet(
+											exerciseIndex,
+											setIndex,
+											'rir',
+											Math.min(10, (set.rir ?? 0) + 1),
+										)
+									}
+								>
+									<Plus className="h-3 w-3" />
+								</Button>
+							</div>
+						</div>
 					</div>
 				</div>
 

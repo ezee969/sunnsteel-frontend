@@ -25,7 +25,7 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 					</Label>
 					<Input
 						id="routine-name"
-						placeholder="e.g., Push Pull Legs, Upper Lower, Full Body..."
+						placeholder="e.g., Push Pull Legs"
 						value={name}
 						onChange={e => handleNameChange(e.target.value)}
 						className="text-lg"

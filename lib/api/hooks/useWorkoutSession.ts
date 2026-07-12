@@ -187,6 +187,13 @@ export const useFinishSession = (id: string) => {
 export const useUpsertSetLog = (id: string) => {
   const qc = useQueryClient();
   return useMutation({
+    // Serialize all set-log writes for this session. Editing reps/weight fires a
+    // debounced upsert (carrying the current isCompleted), and the completion
+    // checkbox fires an immediate upsert — without a shared scope these are
+    // independent writes to the same row and can race, so a reps/weight save
+    // (isCompleted:false) can land after the completion save (isCompleted:true)
+    // and clobber it on the server, leaving the set showing as not completed.
+    scope: { id: `set-log:${id}` },
     mutationFn: async (data: UpsertSetLogRequest): Promise<SetLog> => {
       // Mark as pending (user modified fields) right before network
       setSaveState(
@@ -280,6 +287,9 @@ export const useUpsertSetLog = (id: string) => {
 export const useDeleteSetLog = (id: string) => {
   const qc = useQueryClient();
   return useMutation({
+    // Share the upsert scope so deletes and upserts for the same session can't
+    // race each other either.
+    scope: { id: `set-log:${id}` },
     mutationFn: ({
       routineExerciseId,
       setNumber,
