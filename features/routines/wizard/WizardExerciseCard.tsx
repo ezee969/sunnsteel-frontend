@@ -1,14 +1,16 @@
 'use client'
 
-import { FC, useState, useRef, useEffect, useMemo } from 'react'
+import { FC, useEffect, useMemo, useRef, useState } from 'react'
+
 import { Card, CardContent } from '@/components/ui/card'
 import type { Exercise } from '@/lib/api/types'
-import type { RoutineWizardData, ProgressionScheme } from './types'
-import { ExerciseHeader } from './components/ExerciseHeader'
+
 import { ExerciseConfigSection } from './components/ExerciseConfigSection'
+import { ExerciseHeader } from './components/ExerciseHeader'
 import { SetListSection } from './components/SetListSection'
-import { useExerciseCardState } from './hooks/useExerciseCardState'
 import { useExerciseAccessibility } from './hooks/useExerciseAccessibility'
+import { useExerciseCardState } from './hooks/useExerciseCardState'
+import type { ProgressionScheme, RoutineWizardData } from './types'
 
 export interface WizardExerciseCardProps {
 	tabIndex: number

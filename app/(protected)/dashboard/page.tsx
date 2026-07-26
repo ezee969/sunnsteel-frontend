@@ -1,9 +1,10 @@
 'use client'
 
-import { useUser } from '@/lib/api/hooks/useUser'
-import TodaysWorkouts from './components/TodaysWorkouts'
 import HeroSection from '@/components/layout/HeroSection'
+import { useUser } from '@/lib/api/hooks/useUser'
+
 import StatsOverview from './components/StatsOverview'
+import TodaysWorkouts from './components/TodaysWorkouts'
 
 export default function Dashboard() {
 	const { user } = useUser()
@@ -21,7 +22,10 @@ export default function Dashboard() {
 			<div className="flex flex-col gap-2">
 				<h1
 					className="text-2xl sm:text-3xl font-bold tracking-tight"
-					style={{ fontFamily: 'var(--font-oswald), sans-serif', textTransform: 'none' }}
+					style={{
+						fontFamily: 'var(--font-oswald), sans-serif',
+						textTransform: 'none',
+					}}
 				>
 					Welcome back, {user?.name}!
 				</h1>

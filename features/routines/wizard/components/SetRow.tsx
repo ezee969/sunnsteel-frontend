@@ -1,3 +1,5 @@
+import { Minus, Plus, Trash2 } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,9 +11,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { Minus, Plus, Trash2 } from 'lucide-react'
-import type { ProgressionScheme, RoutineSet } from '../types'
+
 import { useSetRowInputs } from '../hooks/useSetRowInputs'
+import type { ProgressionScheme, RoutineSet } from '../types'
 
 interface SetRowProps {
 	exerciseIndex: number
@@ -106,7 +108,10 @@ export function SetRow({
 							}
 							disabled={progressionScheme !== 'NONE'}
 						>
-							<SelectTrigger aria-label="Rep type" className="w-full h-9 sm:h-8">
+							<SelectTrigger
+								aria-label="Rep type"
+								className="w-full h-9 sm:h-8"
+							>
 								<SelectValue className="truncate" />
 							</SelectTrigger>
 							<SelectContent>

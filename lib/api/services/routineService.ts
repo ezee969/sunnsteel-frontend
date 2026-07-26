@@ -1,14 +1,14 @@
-import { httpClient } from './httpClient'
-import {
-	CreateRoutineRequest,
-	Routine,
-	UpdateRoutineRequest,
-} from '../types/routine.type'
 import {
 	buildRoutineQueryString,
 	RoutineDetailOptions,
 	RoutineFilters,
 } from '../routines/routine-query'
+import {
+	CreateRoutineRequest,
+	Routine,
+	UpdateRoutineRequest,
+} from '../types/routine.type'
+import { httpClient } from './httpClient'
 
 const ROUTINES_API_URL = '/routines'
 
@@ -21,7 +21,10 @@ export const routineService = {
 		})
 	},
 
-	getById: async (id: string, options?: RoutineDetailOptions): Promise<Routine> => {
+	getById: async (
+		id: string,
+		options?: RoutineDetailOptions,
+	): Promise<Routine> => {
 		const url = `${ROUTINES_API_URL}/${id}${buildRoutineQueryString(options)}`
 		return httpClient.request<Routine>(url, {
 			method: 'GET',

@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowLeft, Clock, Target, Weight } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,7 +21,12 @@ export function HistorySessionHeader({
 	return (
 		<div className="mb-6">
 			<div className="flex items-center gap-3 mb-4">
-				<Button variant="ghost" size="sm" onClick={onBack} className="h-8 w-8 p-0">
+				<Button
+					variant="ghost"
+					size="sm"
+					onClick={onBack}
+					className="h-8 w-8 p-0"
+				>
 					<ArrowLeft className="h-4 w-4" />
 				</Button>
 				<div>

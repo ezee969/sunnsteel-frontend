@@ -1,12 +1,14 @@
 'use client'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
-import { SetLogInput } from './set-log-input'
-import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
+import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
+
+import { SetLogInput } from './set-log-input'
 
 interface ExerciseGroupProps {
 	exerciseId: string

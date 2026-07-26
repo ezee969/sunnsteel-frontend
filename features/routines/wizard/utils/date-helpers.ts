@@ -1,4 +1,6 @@
-export const getWeekdayFromIsoDate = (isoDate: string | undefined | null): number | null => {
+export const getWeekdayFromIsoDate = (
+	isoDate: string | undefined | null,
+): number | null => {
 	if (!isoDate) {
 		return null
 	}
@@ -19,4 +21,5 @@ export const getWeekdayFromIsoDate = (isoDate: string | undefined | null): numbe
 	return new Date(year, month - 1, day).getDay()
 }
 
-export const sortNumbersAscending = (values: number[]): number[] => [...values].sort((a, b) => a - b)
+export const sortNumbersAscending = (values: number[]): number[] =>
+	[...values].sort((a, b) => a - b)

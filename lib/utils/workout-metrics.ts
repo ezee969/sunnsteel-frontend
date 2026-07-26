@@ -17,7 +17,7 @@ export function getDayName(dayOfWeek?: number): string {
 		' Thursday',
 		' Friday',
 		' Saturday',
-	].map((day) => day.trim())
+	].map(day => day.trim())
 
 	return days[dayOfWeek] ?? 'Unknown Day'
 }
@@ -52,7 +52,10 @@ export function getCompletedSetsCount(setLogs?: SetLog[]): number {
 		return 0
 	}
 
-	return setLogs.reduce((count, log) => (log.isCompleted ? count + 1 : count), 0)
+	return setLogs.reduce(
+		(count, log) => (log.isCompleted ? count + 1 : count),
+		0,
+	)
 }
 
 /**

@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useExercises } from '@/lib/api/hooks'
 import { parseTime } from '@/lib/utils/time'
-import { RoutineWizardData } from './types'
+
 import { ExerciseList } from './components/ExerciseList'
 import { ExercisePickerDropdown } from './components/ExercisePickerDropdown'
-import { useRoutineDaySelection } from './hooks/useRoutineDaySelection'
 import { useRoutineDayMutations } from './hooks/useRoutineDayMutations'
+import { useRoutineDaySelection } from './hooks/useRoutineDaySelection'
+import { RoutineWizardData } from './types'
 
 interface BuildDaysProps {
 	data: RoutineWizardData
@@ -28,10 +30,7 @@ const DAYS_OF_WEEK = [
 	'Saturday',
 ]
 
-export function BuildDays({
-	data,
-	onUpdate,
-}: BuildDaysProps) {
+export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	const [expandedMapByDay, setExpandedMapByDay] = useState<
 		Record<number, Record<string, boolean>>
 	>({})

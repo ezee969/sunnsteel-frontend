@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { RoutineWizardData } from './types'
+
 import { useRoutineMetadataForm } from './hooks/useRoutineMetadataForm'
+import { RoutineWizardData } from './types'
 
 interface RoutineBasicInfoProps {
 	data: RoutineWizardData

@@ -1,20 +1,21 @@
 'use client'
 
+import { Calendar, Play } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
+
 import { Button } from '@/components/ui/button'
-import { Play, Calendar } from 'lucide-react'
-import { useRoutine } from '@/lib/api/hooks/useRoutines'
-import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
-import {
-	useToggleRoutineFavorite,
-	useToggleRoutineCompleted,
-} from '@/lib/api/hooks/useRoutines'
-import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
-import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
-import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
+import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
+import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
+import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
 import { getDayName } from '@/features/routines/utils/routine-detail.utils'
+import {
+	useRoutine,
+	useToggleRoutineCompleted,
+	useToggleRoutineFavorite,
+} from '@/lib/api/hooks/useRoutines'
+import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { validateRoutineDayDate } from '@/lib/utils/date'
 import { logger } from '@/lib/utils/logger'
 
@@ -129,8 +130,7 @@ export default function RoutineDetailsPage() {
 									}
 									className="h-auto p-4 flex flex-col items-start gap-2"
 									disabled={
-										isLoadingThisDay ||
-										(!hasActiveSession && !canStartToday)
+										isLoadingThisDay || (!hasActiveSession && !canStartToday)
 									}
 									onClick={() =>
 										sessionManager.handleStart(day.id, activeSession)

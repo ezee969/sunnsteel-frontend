@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
+
 import type { RoutineWizardData } from '../types'
 
 interface UseRoutineMetadataFormParams {
@@ -8,7 +9,10 @@ interface UseRoutineMetadataFormParams {
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 }
 
-export function useRoutineMetadataForm({ data, onUpdate }: UseRoutineMetadataFormParams) {
+export function useRoutineMetadataForm({
+	data,
+	onUpdate,
+}: UseRoutineMetadataFormParams) {
 	const handleNameChange = useCallback(
 		(value: string) => {
 			onUpdate({ name: value })

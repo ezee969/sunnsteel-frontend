@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
 import { useTheme } from 'next-themes'
+import React from 'react'
+
+import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
 
 export function BackgroundOverlay() {
 	const { resolvedTheme } = useTheme()

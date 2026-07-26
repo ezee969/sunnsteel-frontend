@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import type { RoutineWizardData, ProgressionScheme } from '../types'
+
+import type { ProgressionScheme, RoutineWizardData } from '../types'
 
 interface UseRoutineDayMutationsParams {
 	data: RoutineWizardData

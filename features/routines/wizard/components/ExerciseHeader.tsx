@@ -1,11 +1,13 @@
-import { CardHeader } from '@/components/ui/card'
+import { ChevronsUpDown, Clock, Pencil, Trash2 } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ChevronsUpDown, Clock, Pencil, Trash2 } from 'lucide-react'
-import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
+import { CardHeader } from '@/components/ui/card'
 import type { Exercise } from '@/lib/api/types'
-import type { RoutineWizardExercise } from '../types'
 import { cn } from '@/lib/utils'
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
+
+import type { RoutineWizardExercise } from '../types'
 
 interface ExerciseHeaderProps {
 	exercise: RoutineWizardExercise
@@ -104,7 +106,10 @@ export function ExerciseHeader({
 						aria-expanded={expanded}
 						aria-controls={controlsId}
 						onClick={onToggleButtonClick}
-						className={cn('p-0', expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6')}
+						className={cn(
+							'p-0',
+							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
+						)}
 					>
 						<ChevronsUpDown
 							className={cn(

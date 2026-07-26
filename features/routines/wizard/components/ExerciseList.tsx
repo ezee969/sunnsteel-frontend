@@ -2,7 +2,9 @@
 
 import { AnimatePresence, Reorder, useDragControls } from 'framer-motion'
 import { GripVertical } from 'lucide-react'
+
 import type { Exercise } from '@/lib/api/types'
+
 import type { RoutineWizardData } from '../types'
 import {
 	WizardExerciseCard,

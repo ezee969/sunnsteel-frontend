@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
+
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useEffect, useState } from 'react'
-import { formatTime, parseTime, isValidTimeFormat } from '@/lib/utils/time'
-import type { RoutineWizardExercise, ProgressionScheme } from '../types'
+import { formatTime, isValidTimeFormat, parseTime } from '@/lib/utils/time'
+
+import type { ProgressionScheme, RoutineWizardExercise } from '../types'
 import { requiresWeightIncrementField } from '../utils/progression.helpers'
 import { ExerciseNoteRow } from './ExerciseNoteRow'
 import { ProgressionSelect } from './ProgressionSelect'

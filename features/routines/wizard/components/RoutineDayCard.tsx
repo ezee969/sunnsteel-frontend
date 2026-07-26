@@ -2,9 +2,10 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatTime } from '@/lib/utils/time'
-import type { Exercise } from '@/lib/api/types'
+
 import type { RoutineWizardData } from '../types'
 import { DAYS_OF_WEEK } from '../utils/routine-summary'
 

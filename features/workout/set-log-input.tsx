@@ -1,8 +1,8 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
 import { useSetLogForm } from '@/hooks/use-set-log-form'
 import { saveStateLabel } from '@/lib/utils/save-status-store'
 import type { LogRowProps } from '@/lib/utils/workout-session.types'

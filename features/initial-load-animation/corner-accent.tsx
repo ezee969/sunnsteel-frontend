@@ -1,5 +1,5 @@
-import React from 'react'
 import { motion } from 'framer-motion'
+import React from 'react'
 
 type CornerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
@@ -8,7 +8,10 @@ export interface CornerAccentProps {
 	delay: number
 }
 
-const cornerAccentStyles: Record<CornerPosition, { className: string; initial: { x: number; y: number } }> = {
+const cornerAccentStyles: Record<
+	CornerPosition,
+	{ className: string; initial: { x: number; y: number } }
+> = {
 	'top-left': {
 		className: 'top-4 left-4 border-l-2 border-t-2',
 		initial: { x: -20, y: -20 },

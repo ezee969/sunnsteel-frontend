@@ -1,5 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { ChevronsUpDown, Plus } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+
 import type { RoutineWizardExercise } from '../types'
 import { SetRow } from './SetRow'
 

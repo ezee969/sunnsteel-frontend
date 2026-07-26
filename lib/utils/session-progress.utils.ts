@@ -1,9 +1,10 @@
 import type { Routine, RoutineExercise } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
+
 import type {
-	SessionProgressData,
 	ExerciseCompletionData,
 	GroupedExerciseLogs,
+	SessionProgressData,
 } from './workout-session.types'
 
 /**

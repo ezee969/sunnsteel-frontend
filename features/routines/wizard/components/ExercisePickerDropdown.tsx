@@ -1,11 +1,12 @@
 'use client'
 
+import { ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Loader2, Plus, ChevronsUpDown } from 'lucide-react'
-import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import type { Exercise } from '@/lib/api/types'
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 
 export interface ExercisePickerDropdownProps {
 	isOpen: boolean

@@ -1,6 +1,7 @@
+import { Clock } from 'lucide-react'
+
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Clock } from 'lucide-react'
 
 interface Props {
 	restInput: string

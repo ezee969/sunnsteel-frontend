@@ -1,3 +1,5 @@
+import { ProgressionScheme } from '@sunsteel/contracts'
+
 import { Label } from '@/components/ui/label'
 import {
 	Select,
@@ -6,7 +8,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { ProgressionScheme } from '@sunsteel/contracts'
 
 interface Props {
 	progressionScheme: ProgressionScheme

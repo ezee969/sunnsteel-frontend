@@ -1,5 +1,5 @@
-import type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
-export type { RepType, ProgressionScheme } from '@/lib/api/types/routine.shared'
+import type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
+export type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
 
 export interface RoutineSet {
 	setNumber: number

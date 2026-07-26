@@ -1,11 +1,13 @@
-import type { Metadata } from 'next'
-import { Oswald, Space_Mono, Bebas_Neue, Cinzel } from 'next/font/google'
 import './globals.css'
-import { AppProvider } from '@/providers/app-provider'
-import { ThemeProvider } from '@/providers/theme-provider'
-import { PwaProvider } from '@/providers/pwa-provider'
+
+import type { Metadata } from 'next'
+import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
+
 import DevInjections from '@/components/dev-injections'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
+import { AppProvider } from '@/providers/app-provider'
+import { PwaProvider } from '@/providers/pwa-provider'
+import { ThemeProvider } from '@/providers/theme-provider'
 
 const oswald = Oswald({
 	variable: '--font-oswald',
@@ -66,9 +68,7 @@ export const metadata: Metadata = {
 	authors: [{ name: 'Sunnsteel Team' }],
 	creator: 'SUNNSTEEL',
 	publisher: 'Sunnsteel',
-	metadataBase: new URL(
-		PUBLIC_ENV.FRONTEND_URL,
-	),
+	metadataBase: new URL(PUBLIC_ENV.FRONTEND_URL),
 	alternates: {
 		canonical: '/',
 	},
@@ -94,7 +94,9 @@ export const metadata: Metadata = {
 			{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
 			{ url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
 		],
-		apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+		apple: [
+			{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+		],
 	},
 	// iOS-installed PWA is the declared target platform, so the title and status
 	// bar style are set explicitly rather than left to Safari's defaults.

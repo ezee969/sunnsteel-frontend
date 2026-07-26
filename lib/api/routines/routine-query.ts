@@ -12,7 +12,9 @@ const NO_FILTERS_KEY = 'nofilters'
 export function serializeRoutineFilters(filters?: RoutineFilters) {
 	if (!filters) return NO_FILTERS_KEY
 
-	const entries = Object.entries(filters).filter(([, value]) => value !== undefined)
+	const entries = Object.entries(filters).filter(
+		([, value]) => value !== undefined,
+	)
 	if (!entries.length) return NO_FILTERS_KEY
 
 	entries.sort(([left], [right]) => left.localeCompare(right))
@@ -27,14 +29,24 @@ export function serializeRoutineFilters(filters?: RoutineFilters) {
 		.join('|')
 }
 
-export function buildRoutineQueryParams(filters?: RoutineFilters | RoutineDetailOptions) {
+export function buildRoutineQueryParams(
+	filters?: RoutineFilters | RoutineDetailOptions,
+) {
 	const params = new URLSearchParams()
 
-	if (filters && 'isFavorite' in filters && typeof filters.isFavorite === 'boolean') {
+	if (
+		filters &&
+		'isFavorite' in filters &&
+		typeof filters.isFavorite === 'boolean'
+	) {
 		params.set('isFavorite', String(filters.isFavorite))
 	}
 
-	if (filters && 'isCompleted' in filters && typeof filters.isCompleted === 'boolean') {
+	if (
+		filters &&
+		'isCompleted' in filters &&
+		typeof filters.isCompleted === 'boolean'
+	) {
 		params.set('isCompleted', String(filters.isCompleted))
 	}
 
@@ -49,7 +61,9 @@ export function buildRoutineQueryParams(filters?: RoutineFilters | RoutineDetail
 	return params
 }
 
-export function buildRoutineQueryString(filters?: RoutineFilters | RoutineDetailOptions) {
+export function buildRoutineQueryString(
+	filters?: RoutineFilters | RoutineDetailOptions,
+) {
 	const params = buildRoutineQueryParams(filters)
 	const query = params.toString()
 	return query ? `?${query}` : ''
@@ -59,5 +73,6 @@ export const routineQueryKeys = {
 	all: () => ['routines'] as const,
 	list: (filters?: RoutineFilters) =>
 		[...routineQueryKeys.all(), serializeRoutineFilters(filters)] as const,
-	detail: (routineId: string) => [...routineQueryKeys.all(), routineId] as const,
+	detail: (routineId: string) =>
+		[...routineQueryKeys.all(), routineId] as const,
 }

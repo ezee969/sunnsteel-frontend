@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
 	isSetComplete,
 	validateSessionFinish,
@@ -25,9 +26,9 @@ describe('validateSetLogPayload', () => {
 	})
 
 	it('accepts a missing weight (bodyweight exercises)', () => {
-		expect(
-			validateSetLogPayload({ ...valid, weight: undefined }).isValid,
-		).toBe(true)
+		expect(validateSetLogPayload({ ...valid, weight: undefined }).isValid).toBe(
+			true,
+		)
 	})
 
 	it('accepts weight 0 but rejects negative weight', () => {
@@ -36,7 +37,9 @@ describe('validateSetLogPayload', () => {
 	})
 
 	it('rejects a set number below 1', () => {
-		expect(validateSetLogPayload({ ...valid, setNumber: 0 }).isValid).toBe(false)
+		expect(validateSetLogPayload({ ...valid, setNumber: 0 }).isValid).toBe(
+			false,
+		)
 	})
 
 	it('reports every problem at once rather than stopping at the first', () => {

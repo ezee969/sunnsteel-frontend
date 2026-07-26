@@ -58,5 +58,5 @@ export const isSameTrainingSplit = (
 		return false
 	}
 
-	return currentDays.every((day) => candidateDays.includes(day))
+	return currentDays.every(day => candidateDays.includes(day))
 }

@@ -1,8 +1,15 @@
 import { useMemo } from 'react'
+
 import { useSession } from '@/lib/api/hooks/useWorkoutSession'
 import type { WorkoutSession } from '@/lib/api/types/workout.type'
-import { buildExerciseGroups, type ExerciseGroup } from '@/lib/utils/exercise-groups'
-import { buildSessionMetrics, type SessionMetrics } from '@/lib/utils/workout-metrics'
+import {
+	buildExerciseGroups,
+	type ExerciseGroup,
+} from '@/lib/utils/exercise-groups'
+import {
+	buildSessionMetrics,
+	type SessionMetrics,
+} from '@/lib/utils/workout-metrics'
 
 interface UseWorkoutSessionDataResult {
 	session?: WorkoutSession
@@ -13,7 +20,9 @@ interface UseWorkoutSessionDataResult {
 	error: unknown
 }
 
-export function useWorkoutSessionData(sessionId: string | undefined): UseWorkoutSessionDataResult {
+export function useWorkoutSessionData(
+	sessionId: string | undefined,
+): UseWorkoutSessionDataResult {
 	const { data, isLoading, isError, error } = useSession(sessionId ?? '')
 
 	const exerciseGroups = useMemo(() => buildExerciseGroups(data), [data])

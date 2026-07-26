@@ -1,17 +1,19 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Calendar, Play } from 'lucide-react'
+
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Play, Calendar } from 'lucide-react'
-import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
-import { ExerciseCard } from './ExerciseCard'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import type { RoutineDay } from '@/lib/api/types/routine.type'
+import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
+
+import { ExerciseCard } from './ExerciseCard'
 
 interface RoutineDayAccordionProps {
 	days: RoutineDay[]
@@ -91,8 +93,7 @@ export const RoutineDayAccordion = ({
 									size="sm"
 									variant={hasActiveSession ? 'default' : 'outline'}
 									disabled={
-										isLoadingThisDay ||
-										(!hasActiveSession && !canStartToday)
+										isLoadingThisDay || (!hasActiveSession && !canStartToday)
 									}
 									onClick={() => onStartWorkout(day.id)}
 								>

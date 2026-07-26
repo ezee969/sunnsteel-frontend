@@ -1,20 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardDescription,
 } from '@/components/ui/card'
-import { ArrowLeft } from 'lucide-react'
 import { Stepper } from '@/components/ui/stepper'
-import HeroSection from '@/components/layout/HeroSection'
-
 // Step components. Steps 1-2 are static: the user always sees step 1 first and
 // step 2 immediately after. Steps 3-4 are the heavy ones and are loaded on
 // demand — there is no reason to ship them before the user has even named the

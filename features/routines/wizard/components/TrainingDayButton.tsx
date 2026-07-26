@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
 import type { TrainingDayInfo } from '../constants/training-days'
 
 interface TrainingDayButtonProps {
@@ -26,13 +27,12 @@ export const TrainingDayButton = ({
 		className={cn(
 			'flex flex-col h-auto p-1.5 md:p-3 text-xs md:text-sm relative',
 			isMobile && 'h-10 w-10 p-0 flex items-center justify-center',
-			isLocked && 'bg-primary text-primary-foreground cursor-not-allowed opacity-90',
+			isLocked &&
+				'bg-primary text-primary-foreground cursor-not-allowed opacity-90',
 		)}
 		size={isMobile ? 'icon' : 'sm'}
 		title={
-			isLocked
-				? 'This day is locked as your program start date'
-				: undefined
+			isLocked ? 'This day is locked as your program start date' : undefined
 		}
 	>
 		{isMobile ? (

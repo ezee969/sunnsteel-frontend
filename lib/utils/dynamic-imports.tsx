@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * Route modules worth warming up on user intent (hover/focus), because the
@@ -10,38 +10,38 @@
  * calls `preloadOnHover` with it.
  */
 export const preloadComponents = {
-  // Active workout session - heavy real-time component
-  activeWorkoutSession: () => {
-    import('@/app/(protected)/workouts/sessions/[id]/page');
-  },
+	// Active workout session - heavy real-time component
+	activeWorkoutSession: () => {
+		import('@/app/(protected)/workouts/sessions/[id]/page')
+	},
 
-  // Wizard entry point - heavy routine creation flow
-  newRoutinePage: () => {
-    import('@/app/(protected)/routines/new/page');
-  },
+	// Wizard entry point - heavy routine creation flow
+	newRoutinePage: () => {
+		import('@/app/(protected)/routines/new/page')
+	},
 
-  workoutHistoryPage: () => {
-    import('@/app/(protected)/workouts/history/page');
-  },
-};
+	workoutHistoryPage: () => {
+		import('@/app/(protected)/workouts/history/page')
+	},
+}
 
 /**
  * Hook for preloading a route module when the user signals intent.
  * Spread the result onto the element that triggers the navigation.
  */
 export const useComponentPreloading = () => {
-  const preloadOnHover = (componentName: keyof typeof preloadComponents) => {
-    return {
-      onMouseEnter: () => {
-        preloadComponents[componentName]?.();
-      },
-      onFocus: () => {
-        preloadComponents[componentName]?.();
-      },
-    };
-  };
+	const preloadOnHover = (componentName: keyof typeof preloadComponents) => {
+		return {
+			onMouseEnter: () => {
+				preloadComponents[componentName]?.()
+			},
+			onFocus: () => {
+				preloadComponents[componentName]?.()
+			},
+		}
+	}
 
-  return {
-    preloadOnHover,
-  };
-};
+	return {
+		preloadOnHover,
+	}
+}

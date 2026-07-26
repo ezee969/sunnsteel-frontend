@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_SESSIONS_LIMIT, buildSessionsQueryString } from './workoutService'
+
+import { buildSessionsQueryString, MAX_SESSIONS_LIMIT } from './workoutService'
 
 /**
  * Contract tests against the backend's `ListSessionsDto`.

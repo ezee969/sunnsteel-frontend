@@ -43,7 +43,7 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 
 	const setLogsByExercise = groupSetLogsByExercise(session.setLogs)
 
-	return session.routineDay.exercises.map((routineExercise) => ({
+	return session.routineDay.exercises.map(routineExercise => ({
 		routineExerciseId: routineExercise.id,
 		exercise: routineExercise.exercise,
 		plannedSets: routineExercise.sets,

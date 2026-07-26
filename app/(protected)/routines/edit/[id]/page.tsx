@@ -1,29 +1,29 @@
 'use client'
 
+import { ArrowLeft } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
+
+import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardDescription,
 } from '@/components/ui/card'
-import { ArrowLeft } from 'lucide-react'
 import { Stepper } from '@/components/ui/stepper'
-import HeroSection from '@/components/layout/HeroSection'
-
 // Step components — steps 3 and 4 are loaded on demand, see TD-09 and the
 // matching comment in routines/new/page.tsx.
 import { RoutineBasicInfo } from '@/features/routines/wizard/RoutineBasicInfo'
 import { TrainingDays } from '@/features/routines/wizard/TrainingDays'
-import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
 import {
-	RoutineWizardData,
 	ProgressionScheme,
+	RoutineWizardData,
 } from '@/features/routines/wizard/types'
+import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
 
 const BuildDays = dynamic(
 	() => import('@/features/routines/wizard/BuildDays').then(m => m.BuildDays),
@@ -37,9 +37,9 @@ const ReviewAndCreate = dynamic(
 		),
 	{ loading: () => <WizardStepSkeleton />, ssr: false },
 )
-import { useRoutine, useUpdateRoutine, useCreateRoutine } from '@/lib/api/hooks'
-import { RoutineDay, RoutineExercise } from '@/lib/api/types'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
+import { useCreateRoutine, useRoutine, useUpdateRoutine } from '@/lib/api/hooks'
+import { RoutineDay, RoutineExercise } from '@/lib/api/types'
 
 const STEPS = [
 	{ id: 1, title: 'Basic Info', description: 'Name and description' },
