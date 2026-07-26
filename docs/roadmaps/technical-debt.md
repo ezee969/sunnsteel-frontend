@@ -674,13 +674,36 @@ Funciona en Vercel porque las devDeps se instalan durante el build, pero es frá
 
 ---
 
-### CL-06 · Herramientas de formato instaladas pero no conectadas ✅
+### CL-06 · Herramientas de formato instaladas pero no conectadas — ✔ **HECHO (2026-07-26)**
+
+**Medido antes de tocar nada:** de 233 archivos `.ts`/`.tsx`, **93 seguían `.prettierrc`** (tabs, sin punto y coma) y **135 lo contradecían** (2 espacios, con punto y coma). Un 40/60, sin nada que arbitrara.
+
+**Ejecutado:** los tres plugins conectados en `eslint.config.mjs` y un `eslint --fix` de una sola pasada — **224 archivos, 19 564 correcciones**, todas automáticas.
+
+- `prettier/prettier` como error, con `eslint-config-prettier` **después** de los `extends` para apagar las reglas estilísticas heredadas que pelearían con él.
+- `simple-import-sort/imports` y `/exports`. Los imports de efecto (`import './globals.css'`) **no se reordenan**: el plugin los trata como barreras, así que el orden de efectos de módulo se conserva. Ese era el riesgo que justificó aplazarlo, y está acotado por diseño del plugin.
+- `import/no-duplicates`, la única regla de `eslint-plugin-import` útil sin resolver de TypeScript. Sus reglas de resolución de rutas (`no-unresolved`, `no-cycle`) se dejan **apagadas** a propósito: necesitan `eslint-import-resolver-typescript`, que no está instalado, y sólo recomprobarían lo que `tsc` ya comprueba.
+
+**Un ajuste que no estaba previsto:** `.prettierrc` tenía `endOfLine: "lf"` y el repo usa `core.autocrlf=true`, o sea árbol en CRLF y repositorio en LF. Con `"lf"` fijo, Prettier marcaba **todos** los archivos como mal formados en cada checkout limpio. Cambiado a `"auto"`: git sigue normalizando a LF al commitear, y Prettier deja de pelearse con el checkout.
+
+**Verificado:** `npm run verify` en verde (lint, typecheck, 33 tests, build) **y** prueba en navegador contra el backend real — `/dashboard` con 7 peticiones y **cero fallos**.
+
+**Commit aislado**, sin ningún cambio funcional dentro, más un `.git-blame-ignore-revs` que lo apunta para que `git blame` siga atribuyendo las líneas a quien las escribió de verdad. Se dejó configurado en el repo local con `git config blame.ignoreRevsFile .git-blame-ignore-revs`; GitHub lo respeta solo.
+
+*Diagnóstico original abajo.*
+
+---
+
+<details>
+<summary>Diagnóstico original</summary>
 
 **Evidencia:** `eslint-plugin-prettier`, `eslint-plugin-import` y `eslint-plugin-simple-import-sort` están en `devDependencies` pero **no aparecen en [eslint.config.mjs](../../eslint.config.mjs)**, que sólo extiende `next/core-web-vitals` + `next/typescript`.
 
 Resultado: el repo tiene dos estilos de formato conviviendo (tabs+sin-semi en `lib/api/services/*`, 2-espacios+semi en `middleware.ts`, `providers/*`, `lib/config/env.ts`) y nada lo arbitra.
 
 **Acción:** decidir (ver Q-03). O se conectan los plugins y se hace un reformateo único en un commit aislado, o se desinstalan y se acepta la convención "imita el archivo vecino".
+
+</details>
 
 ---
 
@@ -728,16 +751,9 @@ Lo que sí queda claro y guía el trabajo de aquí en adelante: **la app es una 
 
 Descartadas: subir el `@Max` del backend a 100 exige desplegar el otro repo y consagra el patrón de traerse 100 sesiones al cliente para calcular 4 números; agregar en el servidor es lo correcto pero es trabajo de TD-11 y no debía bloquear una función rota en producción.
 
-### Q-03 · ¿Se unifica el formato del código? — **APLAZADA con criterio (2026-07-25)**
+### Q-03 · ¿Se unifica el formato del código? — **RESUELTA Y EJECUTADA (2026-07-26)**
 
-**Sí, pero no todavía.** La recomendación previa era "hacerlo ahora"; se revisa por dos motivos concretos que no existían cuando se escribió:
-
-1. **El árbol tiene un diff sin commitear de cinco bloques.** Un reformateo repo-wide enterraría ese trabajo en ruido y haría irrevisable lo que realmente cambió.
-2. **`simple-import-sort` reordena imports**, lo que en casos raros altera el orden de efectos de módulo. Hacerlo sin red de seguridad era imprudente; ahora T-01 existe, pero cubre 3 archivos, no el repo.
-
-**Condiciones para ejecutarlo**, en este orden: árbol limpio (todo lo de hoy commiteado) → conectar los tres plugins en `eslint.config.mjs` → `npm run lint:fix` → **commit aislado, sin ningún cambio funcional dentro**.
-
-**No se desinstalaron los plugins**, porque eso cerraría la puerta a la opción buena. Siguen declarados y sin configurar, que es exactamente el estado que describe CL-06.
+**Sí.** Se aplazó primero por dos motivos concretos —había un diff sin commitear de cinco bloques, y no había tests— y se ejecutó en cuanto ambos desaparecieron. Ver CL-06.
 
 ### Q-04 · ¿Se introduce testing? — **RESUELTA parcialmente (2026-07-25)**
 

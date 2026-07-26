@@ -109,7 +109,8 @@ Two coexisting styles — match whichever domain you are in:
 
 ## Conventions
 
-- **Formatting is inconsistent across the repo — match the surrounding file.** [.prettierrc](.prettierrc) says tabs, single quotes, no semicolons, `printWidth` 80, `arrowParens: avoid`, but Prettier is **not** wired into ESLint or CI. `lib/api/services/*` follow it; `middleware.ts`, `providers/*` and `lib/config/env.ts` use 2-space + semicolons. Do not reformat existing code.
+- **Formatting is enforced, not a matter of taste (CL-06).** [.prettierrc](.prettierrc) is the single source of truth — tabs, single quotes, no semicolons, `printWidth` 80, `arrowParens: avoid`, `endOfLine: auto` — and `prettier/prettier` runs as an ESLint **error**, so `npm run lint` and CI fail on drift. Imports are sorted by `simple-import-sort`; run `npm run lint:fix` rather than arranging them by hand. Side-effect imports are not reordered. The repo used to have two coexisting styles with nothing arbitrating; don't reintroduce that by "matching the surrounding file".
+- **`endOfLine` is `auto` on purpose.** `core.autocrlf=true` means the working tree is CRLF while the repo stores LF; a hard `"lf"` made Prettier flag every file on a fresh checkout.
 - Imports use the `@/` alias (maps to repo root).
 - Naming: PascalCase components/types, `use*` hooks, `*Service.ts` services, `*.type.ts` types, kebab-case multi-word filenames, `UPPER_SNAKE_CASE` constants.
 - `@typescript-eslint/no-explicit-any` is turned **off** — `any` is permitted.
