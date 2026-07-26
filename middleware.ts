@@ -36,7 +36,10 @@ export const config = {
   matcher: [
     '/login',
     '/signup',
-    '/auth/:path*',
+    // '/auth/:path*' used to be here. The function does nothing with those
+    // paths (they are in neither PROTECTED_PREFIXES nor AUTH_PAGES), so every
+    // visit to /auth/callback paid a middleware invocation to fall through to
+    // NextResponse.next(). Removed in TD-16.
     '/dashboard/:path*',
     '/workouts/:path*',
     '/routines/:path*',

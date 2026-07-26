@@ -1,6 +1,6 @@
 'use client';
 
-import { IS_DEVELOPMENT } from '@/lib/config/env';
+import { IS_DEVELOPMENT, SHOULD_LOG_PERFORMANCE } from '@/lib/config/env';
 
 interface PerformanceMetric {
   name: string;
@@ -20,7 +20,10 @@ class PerformanceMonitor {
   private navigationStart: number = 0;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    // Opt-in, like every other flag in lib/config/env.ts. This used to register
+    // three PerformanceObservers (LCP, FID, CLS) unconditionally at module
+    // load, accumulating metrics nobody read whenever the flag was off. TD-14.
+    if (typeof window !== 'undefined' && SHOULD_LOG_PERFORMANCE) {
       this.initializeWebVitals();
     }
   }

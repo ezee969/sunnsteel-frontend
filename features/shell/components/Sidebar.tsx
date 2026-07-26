@@ -23,8 +23,6 @@ import { useUser } from '@/lib/api/hooks/useUser';
 import { ClassicalIcon, ClassicalIconName } from '@/components/icons/ClassicalIcon';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import Link from 'next/link';
-import { useEffect, useCallback } from 'react';
-import { useNavigationPrefetch } from '@/hooks/use-navigation-prefetch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 
@@ -118,7 +116,6 @@ export default function Sidebar({
   onNavigateStart,
 }: SidebarProps) {
   const { user } = useUser();
-  const { prefetchPage, prefetchMainNavigation, isReady } = useNavigationPrefetch();
   const { push } = useToast();
 
   const handleDisabledClick = (label: string) => {
@@ -132,24 +129,8 @@ export default function Sidebar({
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Prefetch main navigation on component mount
-  useEffect(() => {
-    if (isReady) {
-      // Prefetch with a slight delay to not interfere with initial render
-      const timeoutId = setTimeout(() => {
-        prefetchMainNavigation({ immediate: true, priority: 'high' });
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isReady, prefetchMainNavigation]);
-
-  // Handle hover prefetching for individual routes
-  const handleNavHover = useCallback(
-    (href: string) => {
-      prefetchPage(href, { immediate: true, priority: 'high' });
-    },
-    [prefetchPage]
-  );
+  // Route prefetching is handled by next/link, which prefetches these nav
+  // targets automatically (they are all statically prerendered).
 
   return (
     <div
@@ -310,7 +291,6 @@ export default function Sidebar({
               <Link
                 key={item.id}
                 href={item.href}
-                onMouseEnter={() => handleNavHover(item.href)}
                 onClick={() => {
                   // Set active nav immediately for consistent visual state
                   setActiveNav(item.id);

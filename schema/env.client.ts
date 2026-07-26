@@ -1,4 +1,4 @@
-// Runtime validation for public environment variables.
+﻿// Runtime validation for public environment variables.
 // Executed client-side once (import in AppProvider) to surface misconfiguration early.
 
 import { z } from 'zod'
@@ -10,14 +10,13 @@ const EnvSchema = z.object({
 	NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(10),
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().min(10).optional(),
 	NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: z.string().optional().transform(val => val === 'true'),
-	NEXT_PUBLIC_ENABLE_RTF_DEBUG: z.string().optional().transform(val => val === 'true'),
 })
 
 export type ClientEnv = z.infer<typeof EnvSchema>
 
 // Next.js only inlines *static* accesses like `process.env.NEXT_PUBLIC_X` in
 // browser bundles; the `process.env` object itself is not populated client-side.
-// So we must build the object from explicit static accesses before validating —
+// So we must build the object from explicit static accesses before validating â€”
 // passing `process.env` directly makes every var read as undefined in the browser.
 const rawClientEnv = {
 	NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
@@ -26,7 +25,6 @@ const rawClientEnv = {
 	NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 	NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 	NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS,
-	NEXT_PUBLIC_ENABLE_RTF_DEBUG: process.env.NEXT_PUBLIC_ENABLE_RTF_DEBUG,
 }
 
 let cached: ClientEnv | null = null
@@ -43,7 +41,6 @@ export function getClientEnv(): ClientEnv {
 			NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL,
 			NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 			NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS === 'true',
-			NEXT_PUBLIC_ENABLE_RTF_DEBUG: process.env.NEXT_PUBLIC_ENABLE_RTF_DEBUG === 'true',
 		} as ClientEnv
 		return cached
 	}
@@ -58,7 +55,6 @@ export function getClientEnv(): ClientEnv {
 			NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '[PRESENT]' : '[MISSING]',
 			NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? '[PRESENT]' : '[MISSING]',
 			NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS,
-			NEXT_PUBLIC_ENABLE_RTF_DEBUG: process.env.NEXT_PUBLIC_ENABLE_RTF_DEBUG,
 		})
 		// Create a fallback env with defaults for development
 		cached = {
@@ -68,7 +64,6 @@ export function getClientEnv(): ClientEnv {
 			NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL,
 			NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 			NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS: process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_LOGS === 'true',
-			NEXT_PUBLIC_ENABLE_RTF_DEBUG: process.env.NEXT_PUBLIC_ENABLE_RTF_DEBUG === 'true',
 		} as ClientEnv
 		return cached
 	}

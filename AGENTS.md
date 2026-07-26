@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents (Codex and others) when working with code in this repository.
 
 Last verified against the tree on 2026-07-25 (audit + a real `next build`). If something here contradicts the code, the code wins — and fix this file.
 
@@ -14,7 +14,7 @@ Stack: **Next.js 15.5 (App Router) · React 18.3 · TypeScript 5 (strict) · Tai
 
 **`@sunsteel/contracts` is a published npm dependency (`^0.5.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
 
-Runs on Windows 11.
+Runs on Windows 11. Do **not** start/run the app yourself — ask the user to run it.
 
 ## Commands
 
@@ -60,7 +60,7 @@ Two-step: Supabase auth (email/password or Google OAuth) → backend verificatio
 
 [providers/supabase-auth-provider.tsx](providers/supabase-auth-provider.tsx) relies solely on `onAuthStateChange` (no parallel `getInitialSession`, to avoid a race). It re-runs `verifyToken` on every non-`TOKEN_REFRESHED` event, so a full page load costs `POST /auth/supabase/verify` + `POST /api/session`.
 
-**That verification is deliberately not a gate — do not turn it back into one.** `isLoading` flips to `false` as soon as the provider knows _whether_ there is a session, **before** the `await verifyToken`, and data hooks are enabled on `!!session`. This is safe because the backend's `SupabaseJwtGuard` re-verifies the token and get-or-creates the user on **every** protected request (`../sunnsteel-backend/src/auth/strategies/supabase-jwt.strategy.ts`), so `/auth/supabase/verify` duplicates that work rather than being a prerequisite for it. `isAuthenticated` is still `!!session && !!user`, but it now means "the verified profile has arrived" — use it only for UI that genuinely needs the profile, never to gate queries or rendering. Full reasoning in TD-18.
+**That verification is deliberately not a gate — do not turn it back into one.** `isLoading` flips to `false` as soon as the provider knows *whether* there is a session, **before** the `await verifyToken`, and data hooks are enabled on `!!session`. This is safe because the backend's `SupabaseJwtGuard` re-verifies the token and get-or-creates the user on **every** protected request (`../sunnsteel-backend/src/auth/strategies/supabase-jwt.strategy.ts`), so `/auth/supabase/verify` duplicates that work rather than being a prerequisite for it. `isAuthenticated` is still `!!session && !!user`, but it now means "the verified profile has arrived" — use it only for UI that genuinely needs the profile, never to gate queries or rendering. Full reasoning in TD-18.
 
 Route protection is in [middleware.ts](middleware.ts) and checks **only** `ss_session === '1'`. Protected prefixes: `/dashboard`, `/workouts`, `/routines`, `/profile`, `/settings`, `/search`. Unauthenticated hits redirect to `/login?redirectTo=<original>`; authenticated hits on `/login`/`/signup` redirect to `/dashboard`. [app/(protected)/layout.tsx](<app/(protected)/layout.tsx>) adds a second, client-side redirect: it bounces to `/login` when there is no Supabase session, or when the backend verification actually **failed** (`error && !user`) — not merely when the profile has yet to arrive.
 
@@ -123,8 +123,8 @@ These are verified and will bite you if you assume otherwise:
 - **RtF (Reps-to-Failure) is gone.** Earlier versions of this file described a large dormant RtF codebase (`etag-client.ts`, `rtf-offline-cache.ts`, `useRtF.ts`, `Rtf*` components, `tm-trend.ts`). **None of it exists anymore.** The only residue is the unused `NEXT_PUBLIC_ENABLE_RTF_DEBUG` var in [schema/env.client.ts](schema/env.client.ts). Do not go looking for it; do not reintroduce it.
 - **`refetchOnMount` is `true`, not `'always'`** (changed in TD-02), so `staleTime` is now load-bearing: a fresh query is served from cache on navigation and does not hit the network. If a hook must never serve stale data, give it its own `staleTime: 0` — `useSession` does, because it backs the live training session.
 - **`next/dynamic` is used only for the two heavy wizard steps** (`BuildDays`, `ReviewAndCreate`, in both `routines/new` and `routines/edit/[id]`) and the perf debug panel. There is no `React.lazy` and **no `React.memo` anywhere** — and adding memo to the session screen would not help, because `groupSetLogsByExercise` rebuilds every object on each call, so every prop is a fresh reference (see TD-07).
-- **[lib/utils/dynamic-imports.tsx](lib/utils/dynamic-imports.tsx) is preload-on-_hover_ only.** `preloadAllCriticalComponents`, which eagerly `import()`ed ~11 page modules 2 s after auth, was removed (TD-06); `preloadComponents` now holds only the 3 entries `preloadOnHover` actually uses. Don't reintroduce eager preloading. `DashboardStats` in that file is a dead export (CL-03).
-- **The mobile splash mounts `children` immediately.** [InitialLoadAnimation.tsx](features/initial-load-animation/InitialLoadAnimation.tsx) is an overlay _on top of_ the app, not a gate _in front of_ it. It used to withhold `children` for 3.4 s, which meant no page query started until it finished (TD-03). If you touch it, keep `children` mounted from the first frame and animate only opacity.
+- **[lib/utils/dynamic-imports.tsx](lib/utils/dynamic-imports.tsx) is preload-on-*hover* only.** `preloadAllCriticalComponents`, which eagerly `import()`ed ~11 page modules 2 s after auth, was removed (TD-06); `preloadComponents` now holds only the 3 entries `preloadOnHover` actually uses. Don't reintroduce eager preloading. `DashboardStats` in that file is a dead export (CL-03).
+- **The mobile splash mounts `children` immediately.** [InitialLoadAnimation.tsx](features/initial-load-animation/InitialLoadAnimation.tsx) is an overlay *on top of* the app, not a gate *in front of* it. It used to withhold `children` for 3.4 s, which meant no page query started until it finished (TD-03). If you touch it, keep `children` mounted from the first frame and animate only opacity.
 - **Eruda is gone** (TD-05). It used to be a devDependency imported from app code that shipped a 488 KB chunk. `NEXT_PUBLIC_ENABLE_ERUDA` may still exist in the Vercel env; nothing reads it.
 - **Icons/assets are generated, not hand-made.** `icon-192/512/512-maskable.png`, `apple-touch-icon.png` and `og-image.jpg` were produced from the original 1024px `logo.png` with `sharp` (a transitive dep of `next`, so no install needed). The 1.76 MB `logo.png` and the 5.23 MB hero original were **deleted from the tree but remain in git history** — `git show HEAD~1:public/logo.png` to recover. If you need another size, regenerate from there rather than resizing a derivative.
 - **There are no routine mocks and no `next/dynamic` component exports left.** `features/routines/mocks/`, `components/ui/command.tsx`, `DashboardStats` and four dead `lib/utils` modules were deleted in block 5 (CL-03/CL-04), along with eight unused dependencies (`@dnd-kit/*`, `recharts`, `@supabase/ssr`, `@tanstack/react-query-devtools`, `cmdk`, `concurrently`). Don't reintroduce them looking for something that "used to be there".
@@ -134,6 +134,6 @@ Known issues, with evidence and file:line references, are tracked in [docs/roadm
 
 ## Documentation rule
 
-**Never create doc files at repo root** (except this file, `AGENTS.md` and `README`). All project docs live under `docs/` (`docs/roadmaps/`, `docs/history/`, `docs/reference/`). The `docs/` tree was fully deleted at some point and is being rebuilt — check what exists before assuming a path.
+**Never create doc files at repo root** (except this file, `CLAUDE.md` and `README`). All project docs live under `docs/` (`docs/roadmaps/`, `docs/history/`, `docs/reference/`). The `docs/` tree was fully deleted at some point and is being rebuilt — check what exists before assuming a path.
 
-`AGENTS.md` is the Codex-facing twin of this file. **Keep the two in sync**: if you change one, mirror the change in the other.
+`CLAUDE.md` is the Claude Code-facing twin of this file. **Keep the two in sync**: if you change one, mirror the change in the other.

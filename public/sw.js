@@ -1,17 +1,24 @@
 // public/sw.js
-const CACHE_VERSION = 'v4';
+// Bumped to v5 in TD-04: PRECACHE_URLS changed (the 1.76 MB /logo.png is gone,
+// replaced by the 10 KB /icon-192.png), so old caches must be discarded.
+const CACHE_VERSION = 'v5';
 const RUNTIME_CACHE = `ss-runtime-${CACHE_VERSION}`;
 const PRECACHE = `ss-precache-${CACHE_VERSION}`;
 const PAGE_CACHE = `ss-pages-${CACHE_VERSION}`;
-const API_CACHE = `ss-api-${CACHE_VERSION}`;
 
 // Core assets to precache (kept minimal)
-const PRECACHE_URLS = ['/', '/site.webmanifest', '/favicon.ico', '/logo.png'];
+// Only the 192px icon is precached. The 512/maskable variants are fetched by
+// the platform at install-to-homescreen time, not on every visit.
+const PRECACHE_URLS = ['/', '/site.webmanifest', '/favicon.ico', '/icon-192.png'];
 
-// Critical pages to prefetch for PWA navigation
+// Pages whose HTML is kept in the longer-lived PAGE_CACHE rather than the
+// runtime cache, so they stay available offline. They are cached as the user
+// visits them - activation does NOT prefetch them (that cost 5 extra network
+// requests per deploy, including /login and /signup which an authenticated
+// user never sees).
 const CRITICAL_PAGES = [
   '/dashboard',
-  '/routines', 
+  '/routines',
   '/workouts',
   '/login',
   '/signup'
@@ -30,24 +37,10 @@ self.addEventListener('activate', (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => key !== PRECACHE && key !== RUNTIME_CACHE && key !== PAGE_CACHE && key !== API_CACHE)
+          .filter((key) => key !== PRECACHE && key !== RUNTIME_CACHE && key !== PAGE_CACHE)
           .map((key) => caches.delete(key))
       );
       await self.clients.claim();
-      
-      // Prefetch critical pages in background
-      const pageCache = await caches.open(PAGE_CACHE);
-      const prefetchPromises = CRITICAL_PAGES.map(async (page) => {
-        try {
-          const response = await fetch(page, { credentials: 'same-origin' });
-          if (response.ok) {
-            await pageCache.put(page, response);
-          }
-        } catch (error) {
-          console.warn(`Failed to prefetch ${page}:`, error);
-        }
-      });
-      await Promise.allSettled(prefetchPromises);
     })()
   );
 });
@@ -66,35 +59,13 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   const isSameOrigin = url.origin === self.location.origin;
 
-  // API calls: cache-first with background refresh for better performance
-  if (isSameOrigin && url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      (async () => {
-        const cache = await caches.open(API_CACHE);
-        const cached = await cache.match(request);
-        
-        // Background refresh for critical data
-        const fetchPromise = fetch(request)
-          .then((response) => {
-            if (response && response.status === 200) {
-              cache.put(request, response.clone());
-            }
-            return response;
-          })
-          .catch(() => undefined);
-
-        // Return cached first for speed, then update in background
-        if (cached) {
-          void fetchPromise; // Fire and forget background update
-          return cached;
-        }
-        
-        // No cache, wait for network
-        return fetchPromise || fetch(request);
-      })()
-    );
-    return;
-  }
+  // NOTE: there is deliberately no same-origin `/api/*` branch here. One used
+  // to exist (cache-first with background refresh) and was unreachable: the
+  // backend lives on another origin, and the only same-origin `/api/*` route is
+  // `/api/session`, which accepts POST/DELETE only — while this handler returns
+  // early on anything that is not a GET. It gave a false impression of offline
+  // API caching. Removed in TD-13. If a same-origin `/api` proxy is ever added,
+  // this is where its strategy would go.
 
   // HTML/navigation: Enhanced caching strategy
   if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {

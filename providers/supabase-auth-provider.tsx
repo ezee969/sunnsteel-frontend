@@ -54,10 +54,41 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // Drop the routing marker BEFORE publishing a null session.
+      //
+      // The protected layout redirects to /login the instant it observes
+      // `session === null`. If `ss_session` is still set at that moment,
+      // middleware bounces the redirect straight back to /dashboard, the layout
+      // renders its empty shell, and the app parks there — a black screen.
+      //
+      // Clearing it after `setSession(null)` is NOT enough: on the initial load
+      // `isLoading` happens to gate the layout's redirect effect, but on logout
+      // loading is already resolved, so nothing holds the redirect back. Doing
+      // it here makes the invariant hold on every path. See TD-21.
+      if (!session) {
+        await supabaseAuthService.clearSessionMarker();
+      }
+
       setSession(session);
       setError(null);
 
+      const resolveInitialLoad = () => {
+        if (!initialSessionHandled.current) {
+          initialSessionHandled.current = true;
+          setIsLoading(false);
+        }
+      };
+
       if (session) {
+        // Auth is resolved as soon as we know THERE IS a session — the backend
+        // verification below is deliberately not a gate. Every protected
+        // endpoint re-verifies the token and get-or-creates the user through
+        // SupabaseJwtGuard (backend `supabase-jwt.strategy.ts`), so `/verify`
+        // duplicates that work rather than being a prerequisite for it.
+        // Resolving here lets data queries run against `session` in parallel
+        // with the verification instead of behind it. See TD-18.
+        resolveInitialLoad();
+
         try {
           const userProfile = await supabaseAuthService.verifyToken(
             session.access_token
@@ -66,18 +97,21 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
           queryClient.invalidateQueries({ queryKey: ['user'] });
         } catch (err) {
           logger.error('[auth] backend verification failed', err);
-          setError(err as Error);
           setUser(null);
+          // Order matters: drop the routing marker BEFORE publishing the error,
+          // because the error is what makes the protected layout bounce to
+          // /login. With a stale `ss_session` still set, the middleware would
+          // bounce us straight back — see the `else` branch below.
+          await supabaseAuthService.clearSessionMarker();
+          setError(err as Error);
         }
       } else {
+        // The marker was already cleared above, before this null session was
+        // published — that ordering is what keeps middleware from bouncing the
+        // redirect back to /dashboard.
         setUser(null);
         queryClient.clear();
-      }
-
-      // Mark loading as done after the first INITIAL_SESSION event is processed
-      if (!initialSessionHandled.current) {
-        initialSessionHandled.current = true;
-        setIsLoading(false);
+        resolveInitialLoad();
       }
     });
 

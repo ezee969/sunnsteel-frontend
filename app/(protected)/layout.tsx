@@ -15,10 +15,8 @@ import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay';
 import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay';
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
 import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialLoadAnimation';
-import { preloadAllCriticalComponents } from '@/lib/utils/dynamic-imports';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TopProgressBar } from '@/components/ui/top-progress-bar';
-import { logger } from '@/lib/utils/logger';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -27,7 +25,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useSupabaseAuth();
+  const { session, user, error: authError, isLoading } = useSupabaseAuth();
   const {
     isSidebarOpen,
     setIsSidebarOpen,
@@ -68,12 +66,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const isOnSessionPage = pathname.startsWith('/workouts/sessions/');
 
-  // Client-side protection for all routes under (protected)
+  // Client-side protection for all routes under (protected).
+  // The Supabase session alone decides whether we stay: it is what authorizes
+  // every API request. The backend verification is only allowed to kick us out
+  // when it has actually failed (expired token, account conflict) — waiting for
+  // it to succeed would put a round trip in front of the first render (TD-18).
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isLoading) return;
+    if (!session || (authError && !user)) {
       router.replace('/login');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [session, user, authError, isLoading, router]);
 
   // Update activeNav when pathname changes and stop progress once the route resolves
   useEffect(() => {
@@ -83,24 +86,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return () => clearTimeout(done);
   }, [pathname]);
 
-  // Preload critical components after initial auth check
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      // Preload with delay to not interfere with initial render
-      const timeoutId = setTimeout(() => {
-        preloadAllCriticalComponents().catch(error => {
-          logger.warn('Failed to preload critical components:', error);
-        });
-      }, 2000); // 2 second delay
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isAuthenticated, isLoading]);
+  // Route chunks are pulled in by next/link prefetch and by the per-component
+  // `preloadOnHover` helpers. Eagerly importing every page module here cost
+  // bandwidth on cold start for routes the user may never visit.
 
   // Remove loading state handling - use loading.tsx files instead
 
-  // While determining/redirecting auth state, render a stable empty shell
-  if (isLoading || !isAuthenticated) {
+  // While determining/redirecting auth state, render a stable empty shell.
+  // Gated on `session`, not on the verified profile: children mount (and their
+  // queries fire) as soon as we have a token to send.
+  if (isLoading || !session) {
     return (
       <div className="relative min-h-screen">
         <div className="absolute inset-0 -z-10 overflow-hidden">

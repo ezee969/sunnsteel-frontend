@@ -12,6 +12,36 @@ import {
 
 const WORKOUTS_API_URL = '/workouts';
 
+/**
+ * Hard ceiling the backend enforces on `limit` for the sessions list
+ * (`@Max(50)` on `ListSessionsDto`, see `../sunnsteel-backend`).
+ *
+ * Asking for more does not degrade gracefully — the DTO validation rejects the
+ * **whole request** with a 400. The dashboard asked for 100 and its four stat
+ * cards silently rendered 0 for everyone until it was caught. See TD-22.
+ */
+export const MAX_SESSIONS_LIMIT = 50;
+
+/**
+ * Pure query-string builder for the sessions list. Extracted so the limit cap
+ * is enforced in one place and can be tested without touching the network.
+ */
+export function buildSessionsQueryString(params: ListSessionsParams): string {
+  const usp = new URLSearchParams();
+  if (params.status) usp.set('status', params.status);
+  if (params.routineId) usp.set('routineId', params.routineId);
+  if (params.from) usp.set('from', params.from);
+  if (params.to) usp.set('to', params.to);
+  if (params.q) usp.set('q', params.q);
+  if (params.cursor) usp.set('cursor', params.cursor);
+  if (params.limit != null) {
+    usp.set('limit', String(Math.min(params.limit, MAX_SESSIONS_LIMIT)));
+  }
+  if (params.sort) usp.set('sort', params.sort);
+  const qs = usp.toString();
+  return qs ? `?${qs}` : '';
+}
+
 export const workoutService = {
   startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
     const res = await requestWithMeta<WorkoutSession>(
@@ -86,18 +116,9 @@ export const workoutService = {
   listSessions: async (
     params: ListSessionsParams,
   ): Promise<PaginatedResponse<WorkoutSessionSummary>> => {
-    const usp = new URLSearchParams();
-    if (params.status) usp.set('status', params.status);
-    if (params.routineId) usp.set('routineId', params.routineId);
-    if (params.from) usp.set('from', params.from);
-    if (params.to) usp.set('to', params.to);
-    if (params.q) usp.set('q', params.q);
-    if (params.cursor) usp.set('cursor', params.cursor);
-    if (params.limit != null) usp.set('limit', String(params.limit));
-    if (params.sort) usp.set('sort', params.sort);
-    const qs = usp.toString();
+    const qs = buildSessionsQueryString(params);
     return httpClient.request<PaginatedResponse<WorkoutSessionSummary>>(
-      `${WORKOUTS_API_URL}/sessions${qs ? `?${qs}` : ''}`,
+      `${WORKOUTS_API_URL}/sessions${qs}`,
       { method: 'GET', secure: true },
     );
   },

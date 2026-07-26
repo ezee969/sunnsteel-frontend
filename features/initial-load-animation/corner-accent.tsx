@@ -28,10 +28,10 @@ const cornerAccentStyles: Record<CornerPosition, { className: string; initial: {
 }
 
 export const CORNER_ACCENTS: CornerAccentProps[] = [
-	{ position: 'top-left', delay: 0.3 },
-	{ position: 'top-right', delay: 0.3 },
-	{ position: 'bottom-left', delay: 0.3 },
-	{ position: 'bottom-right', delay: 0.3 },
+	{ position: 'top-left', delay: 0.15 },
+	{ position: 'top-right', delay: 0.15 },
+	{ position: 'bottom-left', delay: 0.15 },
+	{ position: 'bottom-right', delay: 0.15 },
 ]
 
 export const CornerAccent = ({ position, delay }: CornerAccentProps) => {
@@ -42,7 +42,7 @@ export const CornerAccent = ({ position, delay }: CornerAccentProps) => {
 			className={`absolute w-16 h-16 sm:w-20 sm:h-20 border-amber-500/60 ${className}`}
 			initial={{ opacity: 0, ...initial }}
 			animate={{ opacity: 1, x: 0, y: 0 }}
-			transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+			transition={{ duration: 0.5, delay, ease: 'easeOut' }}
 		/>
 	)
 }

@@ -3,7 +3,7 @@ import { userService } from '../services/userService';
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider';
 
 export const useUserSearch = (query: string, limit: number = 5) => {
-  const { isAuthenticated } = useAuth();
+  const { session } = useAuth();
 
   return useQuery({
     queryKey: ['users', 'search', query, limit],
@@ -11,7 +11,8 @@ export const useUserSearch = (query: string, limit: number = 5) => {
       if (!query || query.trim().length < 2) return [];
       return userService.searchUsers(query, limit);
     },
-    enabled: isAuthenticated && !!query && query.trim().length >= 2,
+    // Gated on the session, not on the backend verification — see TD-18.
+    enabled: !!session && !!query && query.trim().length >= 2,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 1
   });

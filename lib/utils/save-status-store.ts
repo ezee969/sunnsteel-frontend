@@ -27,7 +27,6 @@ export function getSaveState(key: string): Entry | undefined {
 
 // Auto-transition from 'saved' back to 'idle' after a short dwell to keep UI calm
 const SAVED_DWELL_MS = 2000
-let ticking = false
 const timers = new Map<string, number>()
 
 function scheduleAutoIdle(key: string) {
@@ -52,30 +51,12 @@ function scheduleAutoIdle(key: string) {
   }, remain)
   timers.set(key, tid)
 }
-function tick() {
-  if (ticking) return
-  ticking = true
-  requestAnimationFrame(() => {
-    const now = Date.now()
-    let changed = false
-    for (const [k, v] of store.entries()) {
-      if (v.state === 'saved' && now - v.updatedAt > SAVED_DWELL_MS) {
-        store.set(k, { state: 'idle', updatedAt: now })
-        changed = true
-      }
-    }
-    if (changed) emit()
-    ticking = false
-  })
-}
-
 // Public hook for components
 export function useSaveState(key: string) {
   const [entry, setEntry] = useState<Entry | undefined>(() => getSaveState(key))
   useEffect(() => {
     const listener = () => {
       setEntry(getSaveState(key))
-      tick()
     }
     listeners.add(listener)
     return () => {

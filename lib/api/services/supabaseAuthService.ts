@@ -152,7 +152,14 @@ class SupabaseAuthService {
     }
   }
 
-  private async clearSessionMarker(): Promise<void> {
+  /**
+   * Clear the marker cookie. Public because it must run on EVERY path that
+   * leaves the client unauthenticated, not just an explicit `signOut()`: the
+   * cookie lives 7 days independently of the Supabase session, so if it
+   * outlives it the middleware keeps waving `/dashboard` through while the app
+   * bounces to `/login` and back. See TD-21.
+   */
+  async clearSessionMarker(): Promise<void> {
     if (typeof window === 'undefined') return;
     try {
       await fetch('/api/session', { method: 'DELETE' });

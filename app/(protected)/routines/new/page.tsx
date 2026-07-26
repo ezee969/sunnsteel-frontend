@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,13 +15,28 @@ import { ArrowLeft } from 'lucide-react'
 import { Stepper } from '@/components/ui/stepper'
 import HeroSection from '@/components/layout/HeroSection'
 
-// Step components
+// Step components. Steps 1-2 are static: the user always sees step 1 first and
+// step 2 immediately after. Steps 3-4 are the heavy ones and are loaded on
+// demand — there is no reason to ship them before the user has even named the
+// routine. See TD-09.
 import { RoutineBasicInfo } from '@/features/routines/wizard/RoutineBasicInfo'
 import { TrainingDays } from '@/features/routines/wizard/TrainingDays'
-import { BuildDays } from '@/features/routines/wizard/BuildDays'
-import { ReviewAndCreate } from '@/features/routines/wizard/ReviewAndCreate'
 import { RoutineWizardData } from '@/features/routines/wizard/types'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
+import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
+
+const BuildDays = dynamic(
+	() => import('@/features/routines/wizard/BuildDays').then(m => m.BuildDays),
+	{ loading: () => <WizardStepSkeleton />, ssr: false },
+)
+
+const ReviewAndCreate = dynamic(
+	() =>
+		import('@/features/routines/wizard/ReviewAndCreate').then(
+			m => m.ReviewAndCreate,
+		),
+	{ loading: () => <WizardStepSkeleton />, ssr: false },
+)
 
 const STEPS = [
 	{ id: 1, title: 'Basic Info', description: 'Name and description' },

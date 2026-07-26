@@ -97,22 +97,25 @@ function WorkoutHistoryContent() {
     refetch();
   };
 
+  // None of these call refetch(). Changing a filter changes `params`, which
+  // changes the query key, which makes TanStack Query fetch the new key on its
+  // own. The refetch() that used to be here ran against the query object of the
+  // *current* render — i.e. the OLD key — so every filter change fired two
+  // requests: one with the previous filters whose result was thrown away, and
+  // then the real one. Verified in the browser. See TD-10.
   const handleChangeStatus = (val: WorkoutSessionListStatus | undefined) => {
     setStatus(val);
     applyUrl(buildParams({ status: val }));
-    refetch();
   };
 
   const handleChangeRoutine = (val: string) => {
     setRoutineId(val);
     applyUrl(buildParams({ routineId: val }));
-    refetch();
   };
 
   const handleChangeSort = (val: NonNullable<ListSessionsParams['sort']>) => {
     setSort(val);
     applyUrl(buildParams({ sort: val }));
-    refetch();
   };
 
   const handleClearFilter = (key: string) => {
@@ -139,7 +142,7 @@ function WorkoutHistoryContent() {
         applyUrl(buildParams({ sort: 'finishedAt:desc' }));
         break;
     }
-    refetch();
+    // Same reason as the handlers above: clearing a filter changes the key.
   };
 
   return (

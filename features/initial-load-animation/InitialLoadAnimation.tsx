@@ -11,6 +11,17 @@ import {
 
 let hasShownInitialLoader = false
 
+/**
+ * How long the splash stays up. Long enough for the entrance choreography to
+ * complete as one beat, short enough that it never reads as waiting.
+ *
+ * The important part is not this number but that `children` mount on the first
+ * frame (see the render below): the splash is an overlay *on top of* the app
+ * loading, not a gate *in front of* it. Page queries fire during the animation
+ * instead of after it, so this time overlaps real work rather than adding to it.
+ */
+const SPLASH_DURATION_MS = 1200
+
 const MOBILE_BACKGROUNDS = [
 	'/backgrounds/mobile-loader-bg-1.webp',
 	'/backgrounds/mobile-loader-bg-2.webp',
@@ -56,18 +67,12 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
 			hasRandomizedBackground.current = true
 		}
 
-		const contentTimer = setTimeout(() => {
-			setShowContent(true)
-		}, 3400)
-
 		const exitTimer = setTimeout(() => {
+			setShowContent(true)
 			setIsLoading(false)
-		}, 3800)
+		}, SPLASH_DURATION_MS)
 
-		return () => {
-			clearTimeout(contentTimer)
-			clearTimeout(exitTimer)
-		}
+		return () => clearTimeout(exitTimer)
 	}, [shouldAnimate])
 
   return (
@@ -80,20 +85,20 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
             initial={{ opacity: 1 }}
             exit={{
               opacity: 0,
-              transition: { duration: 1, ease: [0.4, 0, 0.2, 1] },
+              transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
             }}
           >
             {/* Dynamic Background with Ken Burns Effect */}
             <motion.div
               className="absolute inset-0"
-              initial={{ scale: 1.15, opacity: 0 }}
-              animate={{ 
-                scale: 1.05, 
+              initial={{ scale: 1.08, opacity: 0 }}
+              animate={{
+                scale: 1,
                 opacity: 1,
               }}
-              transition={{ 
-                scale: { duration: 3.5, ease: 'easeOut' },
-                opacity: { duration: 0.8, ease: 'easeIn' }
+              transition={{
+                scale: { duration: 1.7, ease: 'easeOut' },
+                opacity: { duration: 0.35, ease: 'easeIn' }
               }}
             >
               <div className="absolute inset-0">
@@ -131,7 +136,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
               className="absolute inset-6 sm:inset-8 border border-amber-400/20 rounded-sm"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
+              transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
             />
 
             {/* Main Content Container */}
@@ -139,24 +144,24 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
               className="relative z-10 text-center max-w-5xl mx-auto px-6 sm:px-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.3, delay: 0.05 }}
             >
               {/* Powerful Brand Section */}
               <motion.div
                 className="mb-10 sm:mb-14"
-                initial={{ opacity: 0, y: 60, scale: 0.85 }}
+                initial={{ opacity: 0, y: 40, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
-                  duration: 1,
-                  delay: 0.6,
+                  duration: 0.5,
+                  delay: 0.15,
                   ease: [0.25, 0.1, 0.25, 1],
                 }}
               >
                 {/* Main Logo/Title */}
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
+                  transition={{ duration: 0.4, delay: 0.25 }}
                 >
                   <h1
                     className="text-5xl sm:text-7xl lg:text-9xl font-black tracking-tight mb-3 sm:mb-5"
@@ -181,24 +186,24 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                   className="flex items-center justify-center mb-5 sm:mb-7"
                   initial={{ scaleX: 0, opacity: 0 }}
                   animate={{ scaleX: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 1.1, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: 0.4, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <motion.div 
                     className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-500/60"
                     style={{ width: 'clamp(2rem, 8vw, 5rem)' }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 0.6 }}
+                    transition={{ delay: 0.45, duration: 0.3 }}
                   />
                   <motion.div
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
-                    transition={{ 
-                      delay: 1.3, 
-                      duration: 0.6,
+                    transition={{
+                      delay: 0.5,
+                      duration: 0.4,
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 15
+                      stiffness: 260,
+                      damping: 18
                     }}
                   >
                     <ClassicalIcon
@@ -215,7 +220,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                     style={{ width: 'clamp(2rem, 8vw, 5rem)' }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 0.6 }}
+                    transition={{ delay: 0.45, duration: 0.3 }}
                   />
                 </motion.div>
 
@@ -231,7 +236,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.5, duration: 0.7, ease: 'easeOut' }}
+                  transition={{ delay: 0.55, duration: 0.35, ease: 'easeOut' }}
                 >
                   Forge Your Legacy
                 </motion.p>
@@ -242,14 +247,14 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                 className="flex flex-col items-center space-y-5 sm:space-y-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 2, duration: 0.6 }}
+                transition={{ delay: 0.65, duration: 0.3 }}
               >
                 {/* Loading Text */}
                 <motion.div
                   className="flex items-center space-x-3"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 2.2, duration: 0.5 }}
+                  transition={{ delay: 0.7, duration: 0.25 }}
                 >
                   <motion.p
                     className="text-base sm:text-lg lg:text-xl font-semibold tracking-wider uppercase"
@@ -274,9 +279,9 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                           scale: [0.8, 1.2, 0.8],
                         }}
                         transition={{
-                          duration: 1.2,
+                          duration: 0.9,
                           repeat: Infinity,
-                          delay: i * 0.2,
+                          delay: i * 0.15,
                           ease: 'easeInOut',
                         }}
                       />
@@ -289,7 +294,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                   className="w-full max-w-xs sm:max-w-sm"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 2.3, duration: 0.5 }}
+                  transition={{ delay: 0.75, duration: 0.25 }}
                 >
                   <div className="relative h-2 bg-gradient-to-r from-amber-950/40 via-amber-900/30 to-amber-950/40 rounded-full overflow-hidden border border-amber-700/30 shadow-inner">
                     {/* Shimmer Effect Background */}
@@ -299,7 +304,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                         x: ['-100%', '200%'],
                       }}
                       transition={{
-                        duration: 2,
+                        duration: 1.1,
                         repeat: Infinity,
                         ease: 'linear',
                       }}
@@ -314,8 +319,8 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
                       transition={{
-                        duration: 1.2,
-                        delay: 2.5,
+                        duration: 0.35,
+                        delay: 0.85,
                         ease: [0.4, 0, 0.2, 1],
                       }}
                     >
@@ -326,7 +331,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                           opacity: [0.6, 1, 0.6],
                         }}
                         transition={{
-                          duration: 1,
+                          duration: 0.8,
                           repeat: Infinity,
                           ease: 'easeInOut',
                         }}
@@ -342,7 +347,7 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
               className="absolute inset-0 pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
-              transition={{ delay: 1, duration: 1 }}
+              transition={{ delay: 0.35, duration: 0.5 }}
             >
               {[...Array(8)].map((_, i) => (
                 <motion.div
@@ -358,9 +363,9 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
                     scale: [0, 1, 0],
                   }}
                   transition={{
-                    duration: 3 + Math.random() * 2,
+                    duration: 1.5 + Math.random(),
                     repeat: Infinity,
-                    delay: Math.random() * 2,
+                    delay: Math.random() * 0.6,
                     ease: 'easeInOut',
                   }}
                 />
@@ -370,26 +375,17 @@ export const InitialLoadAnimation = ({ children }: InitialLoadAnimationProps) =>
         )}
       </AnimatePresence>
 
-      {/* Smooth Content Entrance */}
-      <AnimatePresence>
-        {showContent && (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              transition: { 
-                duration: 0.8, 
-                ease: [0.25, 0.1, 0.25, 1]
-              },
-            }}
-            className="min-h-screen"
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Content is mounted from the first frame, hidden underneath the splash.
+          Mounting is what starts the page's queries, so the app loads *during*
+          the animation. Only its opacity is animated as the overlay clears. */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.98 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        className="min-h-screen"
+      >
+        {children}
+      </motion.div>
     </>
   );
 };

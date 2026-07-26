@@ -157,9 +157,6 @@ export const useSetLogForm = ({
     if (hasImmediateChange && saveState === 'idle') {
       // Only mark as pending if we're not already in a save flow
       markSetPending(sessionId, routineExerciseId, setNumber);
-    } else if (!hasImmediateChange && saveState === 'pending') {
-      // Cancel pending immediately if reverted before debounce
-      void 0
     }
   }, [
     repsState,

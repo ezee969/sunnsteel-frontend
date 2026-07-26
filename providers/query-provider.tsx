@@ -11,9 +11,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 			new QueryClient({
 				defaultOptions: {
 					queries: {
-						staleTime: 5 * 60 * 1000, // 5 minutes - longer cache for better navigation performance
+						staleTime: 5 * 60 * 1000,
 						refetchOnWindowFocus: false,
-						refetchOnMount: 'always', // Always refetch on mount for fresh data
+						// `true`, not `'always'`. Every protected page is a client
+						// component that remounts on navigation, so `'always'` refetched
+						// every query on every navigation and made `staleTime` above
+						// purely decorative. With `true`, a query that is still fresh is
+						// served from cache and navigation stops touching the network.
+						// Queries that must not serve stale data opt out with their own
+						// `staleTime: 0` — see `useSession` in useWorkoutSession.ts.
+						// TD-02.
+						refetchOnMount: true,
 						refetchOnReconnect: true,
 						retry: (failureCount, error: unknown) => {
 							const status =

@@ -11,10 +11,15 @@ export function useWorkoutHistoryFilters(initialIsMobile: boolean) {
   const pathname = usePathname();
   const search = useSearchParams();
 
-  const [status, setStatus] = useState<WorkoutSessionListStatus | undefined>(() => {
-    const v = search.get('status') as WorkoutSessionListStatus | null;
-    return v ?? 'COMPLETED';
-  });
+  // Defaults to undefined ("All"), matching both the URL-sync effect below
+  // (`setStatus(s ?? undefined)`) and what the Status select renders on a bare
+  // URL. It used to default to 'COMPLETED', so the first render queried
+  // status=COMPLETED, the sync effect immediately reset it to undefined, and
+  // the page fired two requests with two different keys before showing
+  // anything. See TD-10.
+  const [status, setStatus] = useState<WorkoutSessionListStatus | undefined>(
+    () => (search.get('status') as WorkoutSessionListStatus | null) ?? undefined
+  );
   const [routineId, setRoutineId] = useState<string>(() => search.get('routineId') ?? '');
   const [from, setFrom] = useState<string>(() => search.get('from') ?? '');
   const [to, setTo] = useState<string>(() => search.get('to') ?? '');

@@ -8,6 +8,24 @@ interface ApiRequestConfig extends RequestInit {
 	secure?: boolean
 }
 
+/**
+ * Error carrying the HTTP status, so callers can branch on it.
+ *
+ * This exists because `query-provider.tsx` decides whether to retry by reading
+ * `error.status`: throwing a bare `Error` made that check silently unreachable
+ * and every 4xx got retried 3 times with backoff. Extends `Error`, so existing
+ * `instanceof Error` / `.message` handling is unaffected. See TD-23.
+ */
+export class HttpError extends Error {
+	readonly status: number
+
+	constructor(message: string, status: number) {
+		super(message)
+		this.name = 'HttpError'
+		this.status = status
+	}
+}
+
 function buildBaseHeaders(fetchOptions: RequestInit): Record<string, string> {
 	return {
 		'Content-Type': 'application/json',
@@ -52,7 +70,8 @@ export const httpClient = {
 		const headers = buildBaseHeaders(fetchOptions)
 
 		if (secure && !(await attachAuthHeader(headers))) {
-			throw new Error('Session expired')
+			// 401-equivalent: there is no token to send, so retrying cannot help.
+			throw new HttpError('Session expired', 401)
 		}
 
 		const { url, config, method } = prepareRequest(endpoint, fetchOptions, headers)
@@ -76,7 +95,7 @@ export const httpClient = {
 				contentLength: response.headers.get('content-length'),
 				rawPreview: raw?.slice(0, 200),
 			})
-			throw new Error(errorMessage)
+			throw new HttpError(errorMessage, response.status)
 		}
 
 		if (response.status === 204 || !raw || raw.trim().length === 0) {

@@ -41,12 +41,15 @@ const qk = {
 };
 
 export const useActiveSession = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { session, isLoading } = useAuth();
   return useQuery({
     queryKey: qk.active,
     queryFn: () => workoutService.getActiveSession(),
-    // Only run once auth is resolved and user is authenticated
-    enabled: !isLoading && isAuthenticated,
+    // Gated on the Supabase session, NOT on the backend verification: the
+    // request already carries the bearer token, and the backend guard verifies
+    // it (and get-or-creates the user) on its own. Waiting for `isAuthenticated`
+    // put two serial round trips in front of the first data request. See TD-18.
+    enabled: !isLoading && !!session,
   });
 };
 
@@ -55,13 +58,17 @@ export const useSession = (id: string) => {
     queryKey: qk.session(id),
     queryFn: () => workoutService.getSessionById(id),
     enabled: !!id,
+    // Deliberate opt-out of the global 5-minute staleTime (TD-02): this is the
+    // live training session, and showing set logs that are minutes out of date
+    // would be a correctness bug, not a slow page. Always refetch on mount.
+    staleTime: 0,
   });
 };
 
 export const useSessions = (
   params: Omit<ListSessionsParams, 'cursor' | 'limit'> & { limit?: number },
 ) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { session, isLoading } = useAuth();
   const { limit = 20, ...rest } = params;
   return useInfiniteQuery<{
     items: WorkoutSessionSummary[]
@@ -76,7 +83,8 @@ export const useSessions = (
       }),
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    enabled: !isLoading && isAuthenticated,
+    // See useActiveSession above.
+    enabled: !isLoading && !!session,
   })
 };
 // Exposed utility to mark a set as locally dirty (pending) before debounce/autosave
@@ -261,12 +269,36 @@ export const useUpsertSetLog = (id: string) => {
 
       return { previous } as { previous?: WorkoutSession }
     },
-    onSuccess: (_res, data) => {
+    onSuccess: (res, data) => {
       setSaveState(
         `set:${id}:${data.routineExerciseId}:${data.setNumber}`,
         'saved'
       )
-      qc.invalidateQueries({ queryKey: qk.session(id) })
+      // Reconcile in place with the row the server just returned, instead of
+      // invalidating and refetching the whole session.
+      //
+      // This used to invalidate TWICE (here and in onSettled), so every
+      // autosave keystroke triggered a full `GET /workouts/sessions/{id}`,
+      // which produced a new `setLogs` array, which recomputed `groupedLogs`,
+      // which re-rendered every ExerciseGroup and SetLogInput on screen — on
+      // the app's most interactive page, while the user is typing.
+      //
+      // Safe because the backend's upsertSetLog returns the complete SetLog
+      // row and does not modify the session itself; it only reads it to
+      // validate ownership and status. It also replaces the synthetic
+      // `optimistic:` id that onMutate inserted with the real one. See TD-07.
+      qc.setQueryData<WorkoutSession>(qk.session(id), prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          setLogs: (prev.setLogs ?? []).map((l: SetLog) =>
+            l.routineExerciseId === data.routineExerciseId &&
+            l.setNumber === data.setNumber
+              ? res
+              : l,
+          ),
+        }
+      })
     },
     onError: (_err, data, ctx) => {
       setSaveState(
@@ -276,9 +308,9 @@ export const useUpsertSetLog = (id: string) => {
       if (ctx?.previous) {
         qc.setQueryData(qk.session(id), ctx.previous)
       }
-    },
-    onSettled: () => {
-      // Ensure we sync with server truth
+      // Resync with the server only when the write failed. On success the
+      // cache already holds the server's own row (see onSuccess), so the
+      // refetch that used to live in onSettled had nothing to correct.
       qc.invalidateQueries({ queryKey: qk.session(id) })
     },
   })

@@ -1,10 +1,58 @@
+import { useMemo } from 'react';
 import StatCard from './StatCard';
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
 import { useSessions } from '@/lib/api/hooks/useWorkoutSession';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const WEEKLY_GOAL = 4;
+
 export default function StatsOverview() {
-  const { data, isLoading } = useSessions({ limit: 100 });
+  // 50 is the backend's hard ceiling (`@Max(50)` on ListSessionsDto.limit).
+  // Asking for 100 made this endpoint return 400 on every dashboard load, so
+  // these four cards silently rendered 0 for everyone. See TD-22.
+  const { data, isLoading } = useSessions({ limit: 50 });
+
+  // Derived in a single pass and memoised. This used to run on every render of
+  // the dashboard: a flatMap, four filters and a Set over the whole session
+  // list. It has to sit ABOVE the early return below — moving it down would
+  // break the rules of hooks. See TD-11.
+  const stats = useMemo(() => {
+    const sessions = data?.pages?.flatMap(page => page.items) || [];
+
+    // Week starts on Monday; getDay() is 0 for Sunday, so shift it back 6 days.
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const day = now.getDay();
+    startOfWeek.setDate(now.getDate() - day + (day === 0 ? -6 : 1));
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const completed = sessions.filter(s => s.status === 'COMPLETED');
+
+    const completedThisWeek = completed.filter(s => {
+      if (!s.endedAt) return false;
+      return new Date(s.endedAt) >= startOfWeek;
+    });
+
+    const activeDaysThisWeek = new Set(
+      completedThisWeek.map(s => new Date(s.endedAt || s.startedAt).toDateString()),
+    ).size;
+
+    const weeklyWorkoutsCount = completedThisWeek.length;
+
+    return {
+      weeklyWorkoutsCount,
+      weeklyWorkoutsProgress: Math.min(
+        100,
+        Math.round((weeklyWorkoutsCount / WEEKLY_GOAL) * 100),
+      ),
+      activeDaysThisWeek,
+      activeDaysProgress: Math.min(100, Math.round((activeDaysThisWeek / 7) * 100)),
+      totalCompleted: completed.length,
+      completionRate: sessions.length
+        ? Math.round((completed.length / sessions.length) * 100)
+        : 0,
+    };
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -20,42 +68,14 @@ export default function StatsOverview() {
     );
   }
 
-  const sessions = data?.pages?.flatMap(page => page.items) || [];
-
-  // 1. Weekly Workouts
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  const day = now.getDay(); // 0 is Sunday, 1 is Monday, etc.
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday (make Monday start)
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const completedThisWeek = sessions.filter(s => {
-    if (s.status !== 'COMPLETED' || !s.endedAt) return false;
-    const finishedDate = new Date(s.endedAt);
-    return finishedDate >= startOfWeek;
-  });
-
-  const weeklyWorkoutsCount = completedThisWeek.length;
-  const weeklyGoal = 4; // default target
-  const weeklyWorkoutsProgress = Math.min(100, Math.round((weeklyWorkoutsCount / weeklyGoal) * 100));
-
-  // 2. Weekly Consistency (Active Days)
-  const activeDaysThisWeek = new Set(
-    completedThisWeek.map(s => {
-      const date = new Date(s.endedAt || s.startedAt);
-      return date.toDateString();
-    })
-  ).size;
-  const activeDaysProgress = Math.min(100, Math.round((activeDaysThisWeek / 7) * 100));
-
-  // 3. Total Workouts Completed
-  const totalCompleted = sessions.filter(s => s.status === 'COMPLETED').length;
-
-  // 4. Workout Completion Rate (Completed vs Total Started)
-  const totalSessionsCount = sessions.length;
-  const completedSessionsCount = sessions.filter(s => s.status === 'COMPLETED').length;
-  const completionRate = totalSessionsCount > 0 ? Math.round((completedSessionsCount / totalSessionsCount) * 100) : 0;
+  const {
+    weeklyWorkoutsCount,
+    weeklyWorkoutsProgress,
+    activeDaysThisWeek,
+    activeDaysProgress,
+    totalCompleted,
+    completionRate,
+  } = stats;
 
   return (
     <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -69,11 +89,11 @@ export default function StatsOverview() {
         }
         title="Weekly Workouts"
         value={String(weeklyWorkoutsCount)}
-        unit={`/ ${weeklyGoal}`}
+        unit={`/ ${WEEKLY_GOAL}`}
         subtitle="Workouts completed this week"
         progress={weeklyWorkoutsProgress}
         progressText={`${weeklyWorkoutsProgress}% of target`}
-        additionalText={weeklyWorkoutsCount >= weeklyGoal ? 'Goal Met!' : 'Active'}
+        additionalText={weeklyWorkoutsCount >= WEEKLY_GOAL ? 'Goal Met!' : 'Active'}
       />
       <StatCard
         icon={

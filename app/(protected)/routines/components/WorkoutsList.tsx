@@ -16,10 +16,6 @@ import { useRoutineListActions } from '@/features/routines/hooks/useRoutineListA
 import { RoutinesSkeletonList } from '@/features/routines/components/RoutinesSkeletonList';
 import { RoutineCard } from '@/features/routines/components/RoutineCard';
 import { EmptyRoutinesState } from '@/features/routines/components/EmptyRoutinesState';
-import {
-  ROUTINE_MOCKS,
-  ROUTINE_MOCKS_ENABLED,
-} from '@/features/routines/mocks/mock-routines';
 import { Loader2 } from 'lucide-react';
 
 interface WorkoutsListProps {
@@ -62,10 +58,9 @@ export default function WorkoutsList({
     return <p className="text-destructive">Error: {error.message}</p>;
   }
 
-  const shouldUseMocks = ROUTINE_MOCKS_ENABLED && (!routines || routines.length === 0);
-  const displayedRoutines = shouldUseMocks ? ROUTINE_MOCKS : routines ?? [];
+  const displayedRoutines = routines ?? [];
 
-  if (!shouldUseMocks && displayedRoutines.length === 0) {
+  if (displayedRoutines.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 flex-col">
         <EmptyRoutinesState />

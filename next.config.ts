@@ -20,6 +20,20 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Client-side Router Cache lifetimes, in seconds. Next 15 defaults `dynamic`
+  // to 0, so the five `ƒ` routes (/routines/[id], /routines/edit/[id],
+  // /workouts/history/[id], /workouts/sessions/[id], /profile/[[...userId]])
+  // refetch their RSC payload on every navigation. Those pages are 100%
+  // 'use client', so the payload is a small shell — but it is still a round
+  // trip, and it is the only navigation cost attributable to the framework.
+  // Data freshness is unaffected: it comes from TanStack Query, not the RSC
+  // payload. See TD-19.
+  experimental: {
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
   async headers() {
     return [
       {
