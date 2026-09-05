@@ -2,7 +2,7 @@
 
 This file provides guidance to coding agents (Codex and others) when working with code in this repository.
 
-Last verified against the tree on 2026-07-25 (audit + a real `next build`). If something here contradicts the code, the code wins — and fix this file.
+Last verified against the tree on 2026-09-05 (audit + a real `next build`). If something here contradicts the code, the code wins — and fix this file.
 
 ## Project
 
@@ -30,9 +30,11 @@ npm run verify         # lint + typecheck + build (run this before considering w
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 20.
 
-Coverage is deliberately narrow: **pure logic and API-contract only**, 33 tests across `lib/api/routines/routine-query.test.ts`, `lib/utils/session-validation.utils.test.ts` and `lib/api/services/workout-query.test.ts`. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be tested** without first deciding to add them. Don't write a component test and wonder why it fails.
+Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 75 tests across seven files: `lib/api/routines/routine-query.test.ts`, `lib/utils/internal-redirect.test.ts`, `lib/utils/session-validation.utils.test.ts`, `lib/api/services/workout-query.test.ts`, `lib/auth/auth-session-controller.test.ts`, `lib/api/services/supabaseAuthService.test.ts` and `lib/pwa/service-worker-policy.test.ts`. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
 
 **Never run `npm run verify` (or `npm run build`) while `npm run dev` is running.** Both write to the same `.next/` directory, so the production build overwrites the dev server's manifests and the running server starts answering **500 on every route**. In this app that surfaces as a **black screen**, because the layout never mounts — it looks exactly like an auth bug and will send you chasing the wrong thing (`localStorage` throwing `SecurityError` and the tab title falling back to the URL are the tells that it's a dead server, not client code). This has already burned an hour once. Stop the dev server first, or verify only when you are done poking at the app.
+
+This build/dev restriction applies to **this checkout's `.next/` directory**, not to port 3000 globally. A different project running on that port does not conflict. Check the Node process command line/project path before asking the user to stop a server.
 
 There is no `docs:check` / `docs:update` script — both were broken (one pointed at a `.sh` that does not exist, the other was an `echo`) and were removed in CL-05.
 
@@ -58,7 +60,11 @@ Two-step: Supabase auth (email/password or Google OAuth) → backend verificatio
 2. `verifyToken()` posts the access token to the backend at `/auth/supabase/verify`.
 3. On success it calls `POST /api/session` — **the frontend's own Route Handler** ([app/api/session/route.ts](app/api/session/route.ts)) — which sets the HttpOnly `ss_session=1` cookie (7-day maxAge). The cookie **cannot** be set by the backend: a cookie in the backend's response is scoped to the backend's domain and is never sent to this app's domain, so middleware would never see it.
 
-[providers/supabase-auth-provider.tsx](providers/supabase-auth-provider.tsx) relies solely on `onAuthStateChange` (no parallel `getInitialSession`, to avoid a race). It re-runs `verifyToken` on every non-`TOKEN_REFRESHED` event, so a full page load costs `POST /auth/supabase/verify` + `POST /api/session`.
+[providers/supabase-auth-provider.tsx](providers/supabase-auth-provider.tsx) relies solely on a **synchronous** `onAuthStateChange` callback (no parallel `getInitialSession`). [lib/auth/auth-session-controller.ts](lib/auth/auth-session-controller.ts) defers verification outside the Supabase auth callback, discards stale completions after logout/account changes/unmount, and cancels scheduled work on cleanup. Repeated `SIGNED_IN` and established-profile `TOKEN_REFRESHED` events do not re-verify or invalidate `['user']`. `USER_UPDATED` explicitly refreshes both. Account switches clear the old query cache before publishing the new session.
+
+`verifyToken` shares its pending/completed result for the current token in memory, so email login and the provider do not duplicate the backend request. Logout, account changes and explicit user updates invalidate that result; failed requests are not cached. A cold page load still costs `POST /auth/supabase/verify` + `POST /api/session`. The OAuth callback consumes the provider's verified profile instead of making its own request. Auth pages now observe the real initial `isLoading` state, so the callback cannot redirect before the initial session is known.
+
+Marker POST/DELETE requests are serialized. A stale verification cannot enqueue a new POST after invalidation; a DELETE waits for any already-started POST. A failed POST rejects verification rather than caching a false login success. DELETE remains best-effort (errors are logged); network failures during cookie cleanup still require a separate recovery UX.
 
 **That verification is deliberately not a gate — do not turn it back into one.** `isLoading` flips to `false` as soon as the provider knows *whether* there is a session, **before** the `await verifyToken`, and data hooks are enabled on `!!session`. This is safe because the backend's `SupabaseJwtGuard` re-verifies the token and get-or-creates the user on **every** protected request (`../sunnsteel-backend/src/auth/strategies/supabase-jwt.strategy.ts`), so `/auth/supabase/verify` duplicates that work rather than being a prerequisite for it. `isAuthenticated` is still `!!session && !!user`, but it now means "the verified profile has arrived" — use it only for UI that genuinely needs the profile, never to gate queries or rendering. Full reasoning in TD-18.
 
@@ -70,7 +76,7 @@ Route protection is in [middleware.ts](middleware.ts) and checks **only** `ss_se
 
 "Clear it before redirecting" is **not** a strong enough rule: it's the render that triggers the redirect. A first attempt cleared the cookie after `setSession(null)` and appeared to work only because `isLoading` happened to gate the layout's effect on first load — logout, where loading is already resolved, still broke. See TD-21. The ordering *is* the fix; preserve it when refactoring.
 
-**Debugging trap, and it will get you more than once: the service worker masks the real state in dev.** It re-registers on every page load, so it comes back right after you clear it. Three distinct ways it lied during one session: (1) `fetch('/dashboard')` **from the page** returns cached HTML without ever reaching middleware, so it cannot tell you whether route protection works — use a real navigation; (2) `fetch('/site.webmanifest')` returned the *previous* manifest from `ss-precache-*` after the file had changed; (3) stale-while-revalidate on `/_next/static/*` served an **old JS bundle**, so a source fix appeared not to work at all. When a change "doesn't take effect", unregister the SW and delete all `ss-*` caches before believing the result.
+**Service-worker state must not participate in development debugging.** [providers/pwa-provider.tsx](providers/pwa-provider.tsx) registers `/sw.js` only in production. In development it removes an existing Sunnsteel `/sw.js` registration, deletes only `ss-*` caches and reloads once if that worker controlled the page, preventing the old controller from immediately recreating those caches. That reload is deferred on `/workouts/sessions/*`. Do not remove the cleanup or broaden it to caches the app does not own.
 
 The Supabase client ([lib/supabase/client.ts](lib/supabase/client.ts)) falls back to a dummy client when env vars are missing during build, and only throws at runtime on the client side.
 
@@ -87,8 +93,8 @@ Two coexisting styles — match whichever domain you are in:
 ### Caching
 
 - **TanStack Query** ([providers/query-provider.tsx](providers/query-provider.tsx)): `staleTime` 5 min, `gcTime` 10 min, `refetchOnMount: true`, `refetchOnWindowFocus: false`, `refetchOnReconnect: true`, no retry on 4xx (the predicate reads `error.status`, which `httpClient` supplies via `HttpError`).
-- **Next.js Router Cache** ([next.config.ts](next.config.ts)): `experimental.staleTimes` = `{ dynamic: 30, static: 180 }` seconds. Without it Next 15 defaults `dynamic` to 0 and the five `ƒ` routes refetch their RSC payload on every navigation (TD-19). It does not affect data freshness — data comes from TanStack Query, not the RSC payload. **`refetchOnMount: 'always'`** is set, which in practice cancels the `staleTime` for navigations, since every page is a client component that remounts.
-- **Service worker** ([public/sw.js](public/sw.js)): hand-written, no Workbox/next-pwa. Network-first for HTML, stale-while-revalidate for same-origin static assets, cache-first for same-origin `/api/*`. `CACHE_VERSION` is bumped **manually**. Registered by [providers/pwa-provider.tsx](providers/pwa-provider.tsx), which does skipWaiting + a one-time reload on `controllerchange`.
+- **Next.js Router Cache** ([next.config.ts](next.config.ts)): `experimental.staleTimes` = `{ dynamic: 30, static: 180 }` seconds. Without it Next 15 defaults `dynamic` to 0 and the five `ƒ` routes refetch their RSC payload on every navigation (TD-19). It does not affect data freshness — data comes from TanStack Query, not the RSC payload. TanStack Query uses `refetchOnMount: true`, so fresh data survives page remounts within its `staleTime`.
+- **Service worker** ([public/sw.js](public/sw.js)): hand-written, no Workbox/next-pwa. Network-first for HTML, stale-while-revalidate for same-origin static assets, no API cache, and cross-origin requests bypass it. `CACHE_VERSION` is bumped **manually**. [providers/pwa-provider.tsx](providers/pwa-provider.tsx) registers it only in production. Updates activate through the waiting worker and reload once; both activation and reload are deferred while the user is on `/workouts/sessions/*`.
 - **No persisted query cache** — no IndexedDB, no `persistQueryClient`.
 
 ### State
@@ -106,6 +112,7 @@ Two coexisting styles — match whichever domain you are in:
 - `providers/` — nested in [providers/app-provider.tsx](providers/app-provider.tsx): `QueryProvider` → `SupabaseAuthProvider` → `AppToastProvider`. `ThemeProvider` and `PwaProvider` sit above it in [app/layout.tsx](app/layout.tsx).
 - `lib/config/env.ts` — `PUBLIC_ENV` and the `SHOULD_*` flags (performance panel/logs, debug logs). `schema/env.client.ts` validates client env at mount (never throws; warns).
 - `hooks/` — standalone (non-API) React hooks.
+- `lib/auth/` — framework-independent auth event controller and cancellation error; exercised with mocked dependencies in Node tests.
 
 ## Conventions
 
@@ -130,6 +137,7 @@ These are verified and will bite you if you assume otherwise:
 - **Icons/assets are generated, not hand-made.** `icon-192/512/512-maskable.png`, `apple-touch-icon.png` and `og-image.jpg` were produced from the original 1024px `logo.png` with `sharp` (a transitive dep of `next`, so no install needed). The 1.76 MB `logo.png` and the 5.23 MB hero original were **deleted from the tree but remain in git history** — `git show HEAD~1:public/logo.png` to recover. If you need another size, regenerate from there rather than resizing a derivative.
 - **There are no routine mocks and no `next/dynamic` component exports left.** `features/routines/mocks/`, `components/ui/command.tsx`, `DashboardStats` and four dead `lib/utils` modules were deleted in block 5 (CL-03/CL-04), along with eight unused dependencies (`@dnd-kit/*`, `recharts`, `@supabase/ssr`, `@tanstack/react-query-devtools`, `cmdk`, `concurrently`). Don't reintroduce them looking for something that "used to be there".
 - **The service worker has no `/api/*` branch, on purpose.** One existed and was unreachable — the backend is cross-origin and the only same-origin `/api` route accepts POST/DELETE only, while the handler returns early on non-GET. Verified in the browser: `ss-api-*` never got created. See TD-13.
+- **Service-worker activation only deletes obsolete `ss-*` caches.** Never restore the previous "delete every cache except the current three" filter: Cache Storage is origin-wide, so that could erase unrelated application caches. Updates do not call `skipWaiting()` from `install`; the page sends `SKIP_WAITING` to the waiting worker when it is safe to reload. See TD-25.
 
 Known issues, with evidence and file:line references, are tracked in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md). Read it before "optimizing" anything performance-related — several existing optimizations are net negative.
 

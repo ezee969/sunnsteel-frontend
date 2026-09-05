@@ -2,8 +2,8 @@ import path from 'node:path'
 
 import { defineConfig } from 'vitest/config'
 
-// Node environment only: the agreed scope for T-01 is pure logic — no DOM, no
-// network, no component rendering. Adding jsdom + React Testing Library is a
+// Node environment: pure logic, auth event orchestration and mocked API calls.
+// No DOM, live network or component rendering. Adding React Testing Library is a
 // deliberate later decision, not an oversight.
 export default defineConfig({
 	test: {

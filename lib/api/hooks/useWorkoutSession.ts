@@ -4,6 +4,7 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
 import { logger } from '@/lib/utils/logger'
@@ -21,6 +22,7 @@ import {
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
+import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 
 // Serialize params object to ensure stable query keys
 function serializeSessionParams(
@@ -45,10 +47,26 @@ function serializeSessionParams(
 }
 
 const qk = {
+	stats: ['workout', 'stats'] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
 	sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
 		['workout', 'sessions', serializeSessionParams(params)] as const,
+}
+
+export const useWorkoutStats = () => {
+	const { session, isLoading } = useAuth()
+	const [, setClock] = useState(0)
+	useEffect(() => {
+		const timer = setInterval(() => setClock(value => value + 1), 60_000)
+		return () => clearInterval(timer)
+	}, [])
+	const params = getWorkoutStatsQuery()
+	return useQuery({
+		queryKey: [...qk.stats, params],
+		queryFn: () => workoutService.getStats(params),
+		enabled: !isLoading && !!session,
+	})
 }
 
 export const useActiveSession = () => {
@@ -173,6 +191,7 @@ export const useStartSession = () => {
 		onSuccess: (data: (WorkoutSession & { _reused?: boolean }) | undefined) => {
 			if (!data) return
 			qc.setQueryData(qk.active, data)
+			qc.invalidateQueries({ queryKey: qk.stats })
 			if (data.id) {
 				qc.setQueryData(qk.session(data.id), data)
 			}
@@ -216,6 +235,7 @@ export const useFinishSession = (id: string) => {
 		onSuccess: (session: WorkoutSession) => {
 			qc.setQueryData(qk.session(id), session)
 			qc.invalidateQueries({ queryKey: qk.active })
+			qc.invalidateQueries({ queryKey: qk.stats })
 		},
 	})
 }

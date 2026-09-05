@@ -5,6 +5,7 @@ const CACHE_VERSION = 'v5'
 const RUNTIME_CACHE = `ss-runtime-${CACHE_VERSION}`
 const PRECACHE = `ss-precache-${CACHE_VERSION}`
 const PAGE_CACHE = `ss-pages-${CACHE_VERSION}`
+const CURRENT_CACHES = new Set([RUNTIME_CACHE, PRECACHE, PAGE_CACHE])
 
 // Core assets to precache (kept minimal)
 // Only the 192px icon is precached. The 512/maskable variants are fetched by
@@ -33,7 +34,6 @@ self.addEventListener('install', event => {
 	event.waitUntil(
 		caches.open(PRECACHE).then(cache => cache.addAll(PRECACHE_URLS)),
 	)
-	self.skipWaiting()
 })
 
 self.addEventListener('activate', event => {
@@ -42,10 +42,7 @@ self.addEventListener('activate', event => {
 			const keys = await caches.keys()
 			await Promise.all(
 				keys
-					.filter(
-						key =>
-							key !== PRECACHE && key !== RUNTIME_CACHE && key !== PAGE_CACHE,
-					)
+					.filter(key => key.startsWith('ss-') && !CURRENT_CACHES.has(key))
 					.map(key => caches.delete(key)),
 			)
 			await self.clients.claim()
@@ -56,7 +53,7 @@ self.addEventListener('activate', event => {
 // Allow page to ask SW to skip waiting immediately
 self.addEventListener('message', event => {
 	if (event.data && event.data.type === 'SKIP_WAITING') {
-		self.skipWaiting()
+		event.waitUntil(self.skipWaiting())
 	}
 })
 
@@ -74,6 +71,7 @@ self.addEventListener('fetch', event => {
 	// early on anything that is not a GET. It gave a false impression of offline
 	// API caching. Removed in TD-13. If a same-origin `/api` proxy is ever added,
 	// this is where its strategy would go.
+	if (!isSameOrigin) return
 
 	// HTML/navigation: Enhanced caching strategy
 	if (
@@ -96,7 +94,7 @@ self.addEventListener('fetch', event => {
 					const networkResponse = await fetch(request)
 					if (networkResponse.ok) {
 						const cache = isCriticalPage ? pageCache : runtimeCache
-						cache.put(request, networkResponse.clone())
+						await cache.put(request, networkResponse.clone())
 					}
 					return networkResponse
 				} catch (err) {
@@ -118,7 +116,6 @@ self.addEventListener('fetch', event => {
 
 	// Static assets (same-origin .js, .css, images, fonts): stale-while-revalidate
 	const ASSET_PATTERN =
-		isSameOrigin &&
 		/\.(?:js|css|png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|otf)$/i.test(
 			url.pathname,
 		)
@@ -128,13 +125,13 @@ self.addEventListener('fetch', event => {
 				const cache = await caches.open(RUNTIME_CACHE)
 				const cached = await cache.match(request)
 				const networkPromise = fetch(request)
-					.then(response => {
+					.then(async response => {
 						// Only cache successful, basic/opaque responses
 						if (
 							response &&
 							(response.status === 200 || response.type === 'opaque')
 						) {
-							cache.put(request, response.clone())
+							await cache.put(request, response.clone())
 						}
 						return response
 					})

@@ -1,11 +1,10 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect } from 'react'
 
-import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService'
-import { supabase } from '@/lib/supabase/client'
-import { logger } from '@/lib/utils/logger'
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
+import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 // Force this page to be client-side only to avoid prerendering issues
 export const dynamic = 'force-dynamic'
@@ -13,50 +12,24 @@ export const dynamic = 'force-dynamic'
 function AuthCallbackContent() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
-	const [, setIsProcessing] = useState(true)
+	const { session, user, error, isLoading } = useSupabaseAuth()
 
 	useEffect(() => {
-		const sanitizePath = (p: string) => (p?.startsWith('/') ? p : '/dashboard')
-
-		const handleAuthCallback = async () => {
-			try {
-				const { data, error } = await supabase.auth.getSession()
-
-				if (error) {
-					logger.error('[auth-callback] getSession failed', error)
-					router.replace('/login?error=callback_error')
-					return
-				}
-
-				if (!data.session) {
-					logger.warn('[auth-callback] missing session')
-					router.replace('/login?error=no_session')
-					return
-				}
-
-				try {
-					// Verify with backend immediately to set secure HttpOnly cookie (ss_session)
-					await supabaseAuthService.verifyToken(data.session.access_token)
-				} catch (verifyErr) {
-					logger.error('[auth-callback] backend verification failed', verifyErr)
-					router.replace('/login?error=verify_failed')
-					return
-				}
-
-				// Redirect to intended destination (or dashboard) without adding to history
-				const raw = searchParams.get('callbackUrl') || '/dashboard'
-				const target = sanitizePath(raw)
-				router.replace(target)
-			} catch (err) {
-				logger.error('[auth-callback] unexpected error', err)
-				router.replace('/login?error=callback_error')
-			} finally {
-				setIsProcessing(false)
-			}
+		if (isLoading) return
+		if (error) {
+			router.replace('/login?error=verify_failed')
+			return
 		}
-
-		void handleAuthCallback()
-	}, [router, searchParams])
+		if (!session) {
+			router.replace('/login?error=no_session')
+			return
+		}
+		// The provider publishes this profile only after the marker is settled.
+		// Do not start a second verification request from the callback page.
+		if (user) {
+			router.replace(sanitizeInternalRedirect(searchParams.get('callbackUrl')))
+		}
+	}, [error, isLoading, router, searchParams, session, user])
 
 	return (
 		<div className="flex min-h-screen items-center justify-center">

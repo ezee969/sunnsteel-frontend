@@ -31,6 +31,7 @@ import {
 	useSupabaseGoogleSignIn,
 	useSupabaseSignIn,
 } from '@/lib/api/hooks/useSupabaseAuth'
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { LoginFormValues, loginSchema } from '@/schema/login-schema'
 
 import { TopLoadingBar } from '../../../../components/ui/top-loading-bar'
@@ -41,7 +42,9 @@ export function SupabaseLoginForm() {
 		useSupabaseGoogleSignIn()
 	const searchParams = useSearchParams()
 	const router = useRouter()
-	const targetRedirect = searchParams.get('redirectTo') || '/dashboard'
+	const targetRedirect = sanitizeInternalRedirect(
+		searchParams.get('redirectTo'),
+	)
 	const message = searchParams.get('message')
 	const [showPassword, setShowPassword] = useState(false)
 

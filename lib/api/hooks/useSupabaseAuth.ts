@@ -5,6 +5,7 @@ import {
 	type AuthResponse,
 	supabaseAuthService,
 } from '@/lib/api/services/supabaseAuthService'
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -64,7 +65,7 @@ export const useSupabaseSignIn = () => {
 		onSuccess: (data, variables) => {
 			logger.debug('[auth] login onSuccess', { userId: data.user?.id })
 			setTimeout(() => {
-				const target = variables?.redirectTo || '/dashboard'
+				const target = sanitizeInternalRedirect(variables?.redirectTo)
 				router.push(target)
 			}, 300)
 		},

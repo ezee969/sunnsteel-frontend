@@ -8,6 +8,7 @@ import {
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
+import { WorkoutStats, WorkoutStatsQuery } from '../types/workout-stats.type'
 import { httpClient, requestWithMeta } from './httpClient'
 
 const WORKOUTS_API_URL = '/workouts'
@@ -43,6 +44,11 @@ export function buildSessionsQueryString(params: ListSessionsParams): string {
 }
 
 export const workoutService = {
+	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
+		httpClient.get<WorkoutStats>(
+			`${WORKOUTS_API_URL}/stats?${new URLSearchParams({ ...params })}`,
+			true,
+		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
 		const res = await requestWithMeta<WorkoutSession>(
 			`${WORKOUTS_API_URL}/sessions/start`,

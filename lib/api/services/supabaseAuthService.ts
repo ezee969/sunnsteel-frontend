@@ -4,16 +4,58 @@ import type {
 } from '@sunsteel/contracts'
 import type { Session } from '@supabase/supabase-js'
 
+import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
 import { PUBLIC_ENV } from '@/lib/config/env'
 import { supabase } from '@/lib/supabase/client'
 import { getFullErrorMessage } from '@/lib/utils/error-messages'
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { logger } from '@/lib/utils/logger'
 
 import { httpClient } from './httpClient'
 
 export type AuthResponse = SupabaseAuthResponse
 
-class SupabaseAuthService {
+export class SupabaseAuthService {
+	private verificationVersion = 0
+	private verification: {
+		token: string
+		promise: Promise<AuthResponse>
+	} | null = null
+	private markerQueue: Promise<void> = Promise.resolve()
+
+	/** Forget both pending and successful verification when auth identity changes. */
+	invalidateVerification(): void {
+		this.verificationVersion++
+		this.verification = null
+	}
+
+	private queueSessionMarker(
+		method: 'POST' | 'DELETE',
+		version?: number,
+	): Promise<void> {
+		const operation = this.markerQueue.then(async () => {
+			if (version !== undefined && version !== this.verificationVersion) {
+				throw new AuthVerificationCancelledError()
+			}
+			if (typeof window === 'undefined') return
+			try {
+				const response = await fetch('/api/session', { method })
+				if (!response.ok)
+					throw new Error(`Session marker returned ${response.status}`)
+			} catch (error) {
+				logger.warn('[auth-service] session marker update failed', {
+					method,
+					error,
+				})
+				// Do not cache a successful login when routing still lacks its marker.
+				if (method === 'POST') throw error
+			}
+		})
+		// A DELETE waits for an already-started POST, so logout wins that race.
+		this.markerQueue = operation.catch(() => {})
+		return operation
+	}
+
 	/**
 	 * Sign up with email and password.
 	 */
@@ -110,9 +152,10 @@ class SupabaseAuthService {
 
 		const callbackPath = '/auth/callback'
 		const redirectBase = `${siteUrl}${callbackPath}`
-		const redirectTo = callbackUrl
-			? `${redirectBase}?callbackUrl=${encodeURIComponent(callbackUrl)}`
-			: redirectBase
+		const safeCallbackUrl = sanitizeInternalRedirect(callbackUrl)
+		const redirectTo = `${redirectBase}?callbackUrl=${encodeURIComponent(
+			safeCallbackUrl,
+		)}`
 
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
@@ -152,13 +195,8 @@ class SupabaseAuthService {
 	 * from the cross-site backend response is scoped to the backend domain and is
 	 * never sent to this app's domain, so middleware could never see it.
 	 */
-	private async setSessionMarker(): Promise<void> {
-		if (typeof window === 'undefined') return
-		try {
-			await fetch('/api/session', { method: 'POST' })
-		} catch (err) {
-			logger.warn('[auth-service] failed to set session marker cookie', err)
-		}
+	private setSessionMarker(version: number): Promise<void> {
+		return this.queueSessionMarker('POST', version)
 	}
 
 	/**
@@ -168,13 +206,9 @@ class SupabaseAuthService {
 	 * outlives it the middleware keeps waving `/dashboard` through while the app
 	 * bounces to `/login` and back. See TD-21.
 	 */
-	async clearSessionMarker(): Promise<void> {
-		if (typeof window === 'undefined') return
-		try {
-			await fetch('/api/session', { method: 'DELETE' })
-		} catch (err) {
-			logger.warn('[auth-service] failed to clear session marker cookie', err)
-		}
+	clearSessionMarker(): Promise<void> {
+		this.invalidateVerification()
+		return this.queueSessionMarker('DELETE')
 	}
 
 	/**
@@ -191,7 +225,24 @@ class SupabaseAuthService {
 	/**
 	 * Verify Supabase token with backend.
 	 */
-	async verifyToken(token: string): Promise<AuthResponse> {
+	verifyToken(token: string): Promise<AuthResponse> {
+		// Login and the provider share this promise, including a completed result
+		// for the current token. Nothing is persisted or used for API authorization.
+		if (this.verification?.token === token) return this.verification.promise
+
+		const version = this.verificationVersion
+		const promise = this.performVerification(token, version).catch(error => {
+			if (this.verification?.promise === promise) this.verification = null
+			throw error
+		})
+		this.verification = { token, promise }
+		return promise
+	}
+
+	private async performVerification(
+		token: string,
+		version: number,
+	): Promise<AuthResponse> {
 		try {
 			const response = await httpClient.post<AuthResponse>(
 				'/auth/supabase/verify',
@@ -199,13 +250,18 @@ class SupabaseAuthService {
 					token,
 				},
 			)
-			await this.setSessionMarker()
+			await this.setSessionMarker(version)
+			if (version !== this.verificationVersion) {
+				throw new AuthVerificationCancelledError()
+			}
 			logger.debug('[auth-service] backend verify succeeded', {
 				userId: response.user?.id,
 			})
 			return response
 		} catch (error) {
-			logger.error('[auth-service] backend verify failed', error)
+			if (!(error instanceof AuthVerificationCancelledError)) {
+				logger.error('[auth-service] backend verify failed', error)
+			}
 			throw error
 		}
 	}

@@ -40,6 +40,32 @@ Si algún día se migra, el destino no es "Vite" a secas sino **Vite + TanStack 
 
 ## P0 — Impacto directo en usuarios
 
+### TD-24 · Verificación de auth duplicada y respuestas obsoletas — **IMPLEMENTADO; smoke tests principales confirmados por el usuario (2026-09-05)**
+
+**Evidencia:** el login por email y el provider llamaban a `verifyToken` para el mismo token; el callback OAuth repetía la lectura de sesión y la verificación. El provider invalidaba `['user']` después de cada verificación y no descartaba respuestas de una sesión anterior. Un `/verify` tardío podía volver a escribir el marcador después del logout.
+
+**Cambios:** [auth-session-controller.ts](../../lib/auth/auth-session-controller.ts) separa la coordinación de eventos de React, mantiene síncrono el callback de Supabase y descarta resultados tras logout, cambio de cuenta o desmontaje. Los eventos `SIGNED_IN` repetidos y los refresh de una sesión ya verificada no repiten la verificación. `USER_UPDATED` sí refresca el perfil. El callback OAuth consume el estado del provider. La sesión habilita las queries antes de la verificación, preservando TD-18; la limpieza del marcador sigue precediendo a la sesión nula y al error, preservando TD-21.
+
+[supabaseAuthService.ts](../../lib/api/services/supabaseAuthService.ts) comparte la verificación pendiente/completada del token actual en memoria, sin usar esa caché como autorización. Invalida resultados al cambiar de identidad y serializa los POST/DELETE del marcador: una respuesta antigua no puede encolar un nuevo POST, y un DELETE espera al POST que ya haya comenzado. Los POST fallidos no se cachean como login exitoso. Los DELETE siguen siendo best-effort; una UX de recuperación ante fallos de red al cerrar sesión queda pendiente.
+
+**Verificación:** `npm run verify` exit 0: lint, TypeScript, **61 tests en 6 archivos** y build de producción con Next.js 15.5.25. Los 22 tests nuevos cubren deduplicación login/provider, token refresh, cambio de cuenta, logout con respuestas tardías, orden POST/DELETE y cleanup. No se añadieron jsdom ni Testing Library: las llamadas externas están mockeadas. Se comprobó por la ruta del proceso que el servidor de desarrollo en puerto 3000 pertenecía a otro proyecto; no compartía el `.next/` de Sunnsteel y no fue necesario detenerlo.
+
+**Smoke tests confirmados por el usuario (2026-09-05):** Google login local, recarga autenticada conservando la sesión, logout seguido de acceso directo a `/dashboard` con retorno al login sin pantalla negra, y flujo completo de Google login en el sitio desplegado. Esta confirmación es una prueba manual del usuario, no una nueva ejecución automatizada del agente.
+
+**Configuración de Google resuelta:** el error `Unsupported provider: missing OAuth secret` se corrigió creando el cliente OAuth web en Google Cloud, guardando sus credenciales en el proveedor Google de Supabase y configurando Site URL/Redirect URLs. No fue necesario cambiar código para resolver ese error. No se almacenan las credenciales en esta documentación.
+
+**Verificación adicional aún pendiente:** login por email tras el refactor y comprobación de red al volver a enfocar la pestaña para confirmar que no se repite `/verify`. Los tres smoke tests confirmados no prueban esos dos casos.
+
+### TD-25 · Service Worker interfería con desarrollo y actualizaba en momentos inseguros — **IMPLEMENTADO Y VERIFICADO (2026-09-05)**
+
+**Evidencia:** [pwa-provider.tsx](../../providers/pwa-provider.tsx) registraba el worker también en desarrollo, por lo que HTML, manifest y bundles de `/_next/static/*` obsoletos podían ocultar el código actual. Cuando encontraba una actualización enviaba `SKIP_WAITING` a `navigator.serviceWorker.controller` — el worker activo anterior — en lugar de al worker nuevo. A la vez, [sw.js](../../public/sw.js) ejecutaba `skipWaiting()` incondicionalmente en `install`, por lo que no existía ninguna oportunidad real de aplazar el cambio. `activate` borraba además toda caché del origen cuyo nombre no coincidiera con las tres actuales, aunque no perteneciera a Sunnsteel, y el handler `fetch` interceptaba innecesariamente los GET al backend cross-origin.
+
+**Cambios:** el worker se registra sólo en producción. En desarrollo se elimina una inscripción Sunnsteel `/sw.js` previa y exclusivamente las cachés con prefijo `ss-*`; si ese worker todavía controla la página, se recarga una vez para impedir que recree las cachés. Las actualizaciones se activan enviando el mensaje al worker `waiting`/`installing`; si el usuario está en `/workouts/sessions/*`, tanto la activación como cualquier recarga se aplazan hasta abandonar la sesión. La primera instalación ya no provoca una recarga innecesaria. `activate` conserva cachés ajenas, los GET cross-origin pasan directo a red y las escrituras en Cache Storage se esperan antes de resolver la respuesta.
+
+**Cobertura y verificación:** [service-worker-policy.test.ts](../../lib/pwa/service-worker-policy.test.ts) cubre propiedad de cachés y la ruta protegida contra recargas. `npm run verify` finalizó con exit 0: lint, TypeScript, **75 tests en 7 archivos** y build de producción con Next.js 15.5.25. `node --check public/sw.js` también pasa.
+
+**`CACHE_VERSION` deliberadamente NO se bumpeó:** no cambió el contenido de `PRECACHE_URLS`; el propio cambio de bytes de `sw.js` dispara el ciclo de actualización. Forzar un namespace nuevo sólo redescargaría contenido idéntico.
+
 ### TD-01 · El prefetch de datos nunca acierta la caché — ✔ **HECHO (2026-07-25)**
 
 **Resuelto:** eliminado `hooks/use-navigation-prefetch.ts` (253 líneas) y su consumo en `Sidebar.tsx` (import, `useEffect` de `prefetchMainNavigation`, `handleNavHover`, `onMouseEnter`). El prefetch de rutas lo cubre `next/link`, que ya prefetchea automáticamente esos destinos (todos `○` estáticos). `npm run verify` en verde.
@@ -137,7 +163,7 @@ Es lazy (sólo se descarga si `SHOULD_ENABLE_ERUDA`), pero se publica en el outp
 
 **Lo que NO se hizo, y por qué:** estaba previsto sacar `await this.setSessionMarker()` (`POST /api/session`) del camino crítico en `supabaseAuthService.verifyToken`. Se descartó: con los cambios de arriba, `verify` + el marker ya no bloquean nada — nadie los espera. Hacerlo fire-and-forget no ganaría tiempo y sí arriesga el flujo de login, donde la cookie **no** existe todavía y el middleware la necesita en la navegación inmediata a `/dashboard`.
 
-**Verificación manual pendiente en dispositivo** (no se puede cubrir con `npm run verify`): arranque en frío logueado, arranque con sesión de Supabase expirada (debe redirigir a `/login`, no quedarse en blanco ni en bucle), logout y login limpio.
+**Verificación manual actualizada (2026-09-05):** el usuario confirmó recarga autenticada, logout con acceso directo posterior a `/dashboard` y Google login local y desplegado (ver TD-24). Sigue sin verificarse explícitamente el arranque con sesión de Supabase expirada; estas pruebas tampoco constituyen una medición en iPhone.
 
 `npm run verify` exit 0. Sin cambios en el bundle.
 
@@ -594,7 +620,11 @@ Es una base más pobre que la planeada, pero es reproducible y ya ha demostrado 
 
 ---
 
-### T-01 · Tests sobre la lógica pura de la sesión de entrenamiento ❗
+### T-01 · Tests sobre la lógica pura de la sesión de entrenamiento — ✔ **HECHO (2026-07-25), ampliado con auth y PWA**
+
+**Estado actual:** Vitest está integrado en `verify` y CI. La última verificación registrada (TD-25) pasó **75 tests en 7 archivos**. El bloque 7 detalla el alcance inicial y sus exclusiones; TD-24 y TD-25 documentan las ampliaciones. La propuesta original siguiente se conserva como contexto y no implica que todas las unidades propuestas estén cubiertas.
+
+**Propuesta original:**
 
 **Evidencia:** cero archivos de test en el repo; CI sólo hace typecheck → lint → build.
 
@@ -757,9 +787,9 @@ Descartadas: subir el `@Max` del backend a 100 exige desplegar el otro repo y co
 
 ### Q-04 · ¿Se introduce testing? — **RESUELTA parcialmente (2026-07-25)**
 
-**Sí, con alcance mínimo: ver T-01.** No hay ni un test en el repo, y CI sólo hace typecheck + lint + build. Con `no-explicit-any` desactivado y castings defensivos frecuentes (`as WorkoutSession`, `(options.queryFn as any)`), la red de seguridad real es más fina de lo que sugiere `strict: true`.
+**Sí, implementado: ver T-01.** Vitest corre en `verify` y CI; la última verificación registrada pasó 75 tests en 7 archivos (TD-25).
 
-Alcance acordado: **sólo lógica pura** (bloque 7). Nada de tests de componentes ni E2E por ahora — el coste no se justifica para un proyecto de una persona.
+Alcance actual: lógica pura, contratos de API, coordinación de auth y políticas de PWA en Node, con llamadas externas mockeadas (bloque 7, TD-24 y TD-25). No se añadieron tests de componentes ni E2E.
 
 Queda abierto si el alcance debe crecer, y eso depende de si se reabre Q-02: una migración de plataforma exigiría bastante más cobertura que T-01.
 
@@ -776,8 +806,8 @@ Marcas:
 
 ---
 
-### Bloque 0 · Línea base
-`M-01` **[plan]** — acordar qué se mide y cómo. Cuatro números, en un iPhone real. Sin esto no se puede demostrar nada ni reevaluar Q-02.
+### Bloque 0 · Línea base — **REPLANTEADO (2026-07-25)**
+`M-01` — por decisión del usuario no se hará la medición en iPhone. Se conservan las mediciones de red de escritorio y del build como referencia; no demuestran tiempos percibidos en móvil.
 
 ### ~~Bloque 1 · Borrar desperdicio de red~~ — ✔ **COMPLETADO (2026-07-25)**
 `TD-01` ✔ · `TD-06` ✔ · `TD-08` ✔ — `npm run verify` exit 0
@@ -834,7 +864,7 @@ Compuestos, el arranque en frío pasaba de `verify + /api/session + 3.4 s + dato
 
 **Dos hallazgos colaterales de esta medición, ajenos al bloque 2:** ver **TD-22** (el dashboard pide `limit=100`, el backend responde 400, las 4 tarjetas llevan mostrando 0) y **TD-23** (el "no reintentar en 4xx" no funciona).
 
-**Sigue pendiente en dispositivo:** los números de M-01 en un iPhone real. Lo de arriba es Chrome de escritorio contra `localhost`; sirve para probar el **orden**, no para estimar tiempos.
+**Medición en dispositivo descartada por decisión del usuario (M-01):** lo de arriba es Chrome de escritorio contra `localhost`; sirve para probar el **orden**, no para estimar tiempos en iPhone.
 
 ### ~~Bloque 3 · Navegación instantánea~~ — ✔ **COMPLETADO (2026-07-25)**
 `TD-02` ✔ · `TD-07` ✔ · `TD-11` ✔ · `TD-19` ✔ — `npm run verify` exit 0
@@ -936,7 +966,7 @@ Ya no queda **ningún chunk por encima de 300 KB** en el build.
 **Nota:** `node_modules` sigue pesando 477 MB y el lockfile declara 497 paquetes. Las 8 desinstaladas apenas mueven esa aguja — el peso está en `next`, `typescript` y las herramientas de build. No es un problema de producción: nada de eso se despliega.
 
 ### ~~Bloque 6 · Config y PWA~~ — ✔ **COMPLETADO (2026-07-25)**
-`TD-12` ✔ · `TD-14` ✔ · `TD-15` ✔ (en bloque 4) · `TD-20` ✔ (en bloque 4) · `CL-07` ✔ · `CL-06` **aplazado, ver Q-03**
+`TD-12` ✔ · `TD-14` ✔ · `TD-15` ✔ (en bloque 4) · `TD-20` ✔ (en bloque 4) · `CL-07` ✔ · `CL-06` ✔ **completado el 2026-07-26, ver Q-03**
 
 **TD-12 — `tailwind.config.ts` borrado.** La verificación pendiente (¿anima el acordeón o da un salto seco?) se resolvió **sin necesidad de mirarlo en pantalla, y con más certeza que mirándolo**: `accordion-down` y `accordion-up` no aparecen en ningún archivo del repo salvo el propio config muerto. Ningún código puede usarlas.
 
@@ -948,7 +978,7 @@ Y hay una razón concreta: `AccordionContent` ([components/ui/accordion.tsx:59](
 
 **TD-14 — observers condicionados.** `PerformanceMonitor` registraba sus tres `PerformanceObserver` (LCP, FID, CLS) en el constructor a nivel de módulo, con el flag apagado o encendido. Ahora exige `SHOULD_LOG_PERFORMANCE`, como el resto de flags de `lib/config/env.ts`.
 
-### Bloque 7 · Red de seguridad — **T-01 ✔ HECHO (2026-07-25)** · `TD-10` pendiente
+### Bloque 7 · Red de seguridad — **T-01 ✔ HECHO (2026-07-25)** · **TD-10 ✔ HECHO (2026-07-26)**
 
 **T-01 resuelto con alcance ampliado.** Vitest instalado, **33 tests en 3 archivos**, `npm test` conectado a `verify` y al CI (paso `Test` entre Lint y Build).
 
@@ -966,7 +996,7 @@ Ese cambio es la protección real; los tests sólo evitan que alguien lo suba si
 
 **Lo que NO cubre, deliberadamente:** `hooks/use-set-log-form.ts` estaba en la lista original de T-01, pero es un hook de React y testearlo exige `jsdom` + Testing Library. Eso es un salto de alcance real (dos dependencias más y un entorno de test distinto), no una omisión. `vitest.config.ts` usa `environment: 'node'` a propósito y lo dice en un comentario.
 
-**TD-10 sigue pendiente** y necesita el navegador: confirmar si cambiar filtros del historial dispara doble fetch. No se pudo comprobar porque la sesión del panel de pruebas caducó.
+**TD-10 completado y verificado en navegador (2026-07-26):** la carga del historial y cada cambio de filtro pasaron de dos peticiones a una. La causa y la corrección están documentadas en TD-10; ya no queda pendiente esta comprobación.
 
 ---
 

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 import { LoginHeader } from './components/LoginHeader'
@@ -20,9 +21,9 @@ function LoginContent() {
 	useEffect(() => {
 		// Redirect authenticated users away from /login
 		if (!isLoading && isAuthenticated) {
-			// sanitize redirect target: same-origin path only
-			const raw = searchParams.get('redirectTo') || '/dashboard'
-			const redirectTo = raw.startsWith('/') ? raw : '/dashboard'
+			const redirectTo = sanitizeInternalRedirect(
+				searchParams.get('redirectTo'),
+			)
 			// Replace to avoid adding /login to history stack
 			router.replace(redirectTo)
 			// hard-navigation fallback in case client routing is blocked

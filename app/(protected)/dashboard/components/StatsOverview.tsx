@@ -1,65 +1,14 @@
-import { useMemo } from 'react'
-
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSessions } from '@/lib/api/hooks/useWorkoutSession'
+import { useWorkoutStats } from '@/lib/api/hooks/useWorkoutSession'
 
 import StatCard from './StatCard'
 
 const WEEKLY_GOAL = 4
 
 export default function StatsOverview() {
-	// 50 is the backend's hard ceiling (`@Max(50)` on ListSessionsDto.limit).
-	// Asking for 100 made this endpoint return 400 on every dashboard load, so
-	// these four cards silently rendered 0 for everyone. See TD-22.
-	const { data, isLoading } = useSessions({ limit: 50 })
-
-	// Derived in a single pass and memoised. This used to run on every render of
-	// the dashboard: a flatMap, four filters and a Set over the whole session
-	// list. It has to sit ABOVE the early return below — moving it down would
-	// break the rules of hooks. See TD-11.
-	const stats = useMemo(() => {
-		const sessions = data?.pages?.flatMap(page => page.items) || []
-
-		// Week starts on Monday; getDay() is 0 for Sunday, so shift it back 6 days.
-		const now = new Date()
-		const startOfWeek = new Date(now)
-		const day = now.getDay()
-		startOfWeek.setDate(now.getDate() - day + (day === 0 ? -6 : 1))
-		startOfWeek.setHours(0, 0, 0, 0)
-
-		const completed = sessions.filter(s => s.status === 'COMPLETED')
-
-		const completedThisWeek = completed.filter(s => {
-			if (!s.endedAt) return false
-			return new Date(s.endedAt) >= startOfWeek
-		})
-
-		const activeDaysThisWeek = new Set(
-			completedThisWeek.map(s =>
-				new Date(s.endedAt || s.startedAt).toDateString(),
-			),
-		).size
-
-		const weeklyWorkoutsCount = completedThisWeek.length
-
-		return {
-			weeklyWorkoutsCount,
-			weeklyWorkoutsProgress: Math.min(
-				100,
-				Math.round((weeklyWorkoutsCount / WEEKLY_GOAL) * 100),
-			),
-			activeDaysThisWeek,
-			activeDaysProgress: Math.min(
-				100,
-				Math.round((activeDaysThisWeek / 7) * 100),
-			),
-			totalCompleted: completed.length,
-			completionRate: sessions.length
-				? Math.round((completed.length / sessions.length) * 100)
-				: 0,
-		}
-	}, [data])
+	const { data, isLoading, isError, refetch, isFetching } = useWorkoutStats()
 
 	if (isLoading) {
 		return (
@@ -75,14 +24,31 @@ export default function StatsOverview() {
 		)
 	}
 
+	if (isError || !data) {
+		return (
+			<div role="alert" className="rounded-lg border p-4 space-y-3">
+				<p>Workout statistics could not be loaded.</p>
+				<Button onClick={() => refetch()} disabled={isFetching}>
+					Try again
+				</Button>
+			</div>
+		)
+	}
+
 	const {
 		weeklyWorkoutsCount,
-		weeklyWorkoutsProgress,
 		activeDaysThisWeek,
-		activeDaysProgress,
 		totalCompleted,
 		completionRate,
-	} = stats
+	} = data
+	const weeklyWorkoutsProgress = Math.min(
+		100,
+		Math.round((weeklyWorkoutsCount / WEEKLY_GOAL) * 100),
+	)
+	const activeDaysProgress = Math.min(
+		100,
+		Math.round((activeDaysThisWeek / 7) * 100),
+	)
 
 	return (
 		<div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -146,9 +112,9 @@ export default function StatsOverview() {
 				}
 				title="Completion Rate"
 				value={`${completionRate}%`}
-				subtitle="Percentage of completed sets"
+				subtitle="Percentage of completed workouts"
 				progress={completionRate}
-				progressText="Set completion efficiency"
+				progressText="Across all training sessions"
 				additionalText={completionRate >= 90 ? 'Excellent' : 'On Track'}
 			/>
 		</div>
