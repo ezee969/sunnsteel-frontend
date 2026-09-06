@@ -72,9 +72,9 @@ Route protection is in [middleware.ts](middleware.ts) and checks **only** `ss_se
 
 **The middleware is a UX gate, not a security boundary.** The cookie's 7-day lifetime is independent of the Supabase session, so the two can drift in both directions. Real authorization is the bearer token on each backend request.
 
-**Invariant: the marker cookie must be cleared *before any render can observe a null session*** — `await supabaseAuthService.clearSessionMarker()` (`DELETE /api/session`) runs before `setSession(null)`, and before `setError(...)` on the failed-verification path. If the marker outlives the Supabase session, middleware waves `/dashboard` through, the layout bounces to `/login`, middleware bounces back, and the app parks on `/dashboard` rendering its empty shell — **a black screen, not a visible loop**.
+**Invariant: the marker cookie must be cleared _before any render can observe a null session_** — `await supabaseAuthService.clearSessionMarker()` (`DELETE /api/session`) runs before `setSession(null)`, and before `setError(...)` on the failed-verification path. If the marker outlives the Supabase session, middleware waves `/dashboard` through, the layout bounces to `/login`, middleware bounces back, and the app parks on `/dashboard` rendering its empty shell — **a black screen, not a visible loop**.
 
-"Clear it before redirecting" is **not** a strong enough rule: it's the render that triggers the redirect. A first attempt cleared the cookie after `setSession(null)` and appeared to work only because `isLoading` happened to gate the layout's effect on first load — logout, where loading is already resolved, still broke. See TD-21. The ordering *is* the fix; preserve it when refactoring.
+"Clear it before redirecting" is **not** a strong enough rule: it's the render that triggers the redirect. A first attempt cleared the cookie after `setSession(null)` and appeared to work only because `isLoading` happened to gate the layout's effect on first load — logout, where loading is already resolved, still broke. See TD-21. The ordering _is_ the fix; preserve it when refactoring.
 
 **Service-worker state must not participate in development debugging.** [providers/pwa-provider.tsx](providers/pwa-provider.tsx) registers `/sw.js` only in production. In development it removes an existing Sunnsteel `/sw.js` registration, deletes only `ss-*` caches and reloads once if that worker controlled the page, preventing the old controller from immediately recreating those caches. That reload is deferred on `/workouts/sessions/*`. Do not remove the cleanup or broaden it to caches the app does not own.
 
@@ -88,7 +88,7 @@ Two coexisting styles — match whichever domain you are in:
 - **Workouts**: a local `qk` object inside [lib/api/hooks/useWorkoutSession.ts](lib/api/hooks/useWorkoutSession.ts) → `['workout','session','active']`, `['workout','session',id]`, `['workout','sessions',<serialized params>]`.
 - Everything else is an inline literal: `['user']`, `['exercises']`, `['users','search',q,limit]`.
 
-**If you add a prefetch, it must use the exact key the consuming hook reads.** A hand-rolled data-prefetch layer that wrote to keys nobody read (`hooks/use-navigation-prefetch.ts`) was deleted for exactly this reason — see TD-01 in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md). Route prefetching is `next/link`'s job; don't reimplement it.
+**If you add a prefetch, it must use the exact key the consuming hook reads.** A hand-rolled data-prefetch layer that wrote to keys nobody read (`hooks/use-navigation-prefetch.ts`) was deleted for exactly this reason. Treat that as historical evidence: start from the [active technical-debt register](docs/roadmaps/technical-debt.md), which links the closed audit when older decision context is needed. Route prefetching is `next/link`'s job; don't reimplement it.
 
 ### Caching
 
@@ -141,7 +141,7 @@ These are verified and will bite you if you assume otherwise:
 - **The service worker has no `/api/*` branch, on purpose.** One existed and was unreachable — the backend is cross-origin and the only same-origin `/api` route accepts POST/DELETE only, while the handler returns early on non-GET. Verified in the browser: `ss-api-*` never got created. See TD-13.
 - **Service-worker activation only deletes obsolete `ss-*` caches.** Never restore the previous "delete every cache except the current three" filter: Cache Storage is origin-wide, so that could erase unrelated application caches. Updates do not call `skipWaiting()` from `install`; the page sends `SKIP_WAITING` to the waiting worker when it is safe to reload. See TD-25.
 
-Known issues, with evidence and file:line references, are tracked in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md). Read it before "optimizing" anything performance-related — several existing optimizations are net negative.
+Active technical debt, with evidence and closure criteria, is tracked in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md). Read it before optimizing anything performance-related. Use the closed audit linked from that register only when older decision evidence is needed.
 
 ## Documentation rule
 

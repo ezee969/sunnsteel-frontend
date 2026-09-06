@@ -123,6 +123,12 @@ This records dependency order, not an estimate or a detailed implementation plan
 | DATA-04 | `QUEUED` | Routine snapshot per session | Preserve the routine/day/exercise prescription used at training time so future edits cannot rewrite history.              | BE/CT schema                 |
 | DATA-05 | `QUEUED` | Historical backfill          | Generate initial records, events, rollups, and snapshots from existing sessions with repeatable migration logic.          | DATA-01 through DATA-04      |
 
+Together, `DATA-01` through `DATA-05` provide the durable data model and
+backfill needed to close
+[`TD-27`](technical-debt.md#td-27-workoutprogressservicegetprogress-recorre-todo-el-historial).
+The technical-debt entry owns the query-cost evidence and closure criteria;
+this roadmap owns the product and cross-repository delivery sequence.
+
 ### Progress
 
 | ID      | Status      | Feature                         | User-facing behavior                                                                                                      | Dependencies            |

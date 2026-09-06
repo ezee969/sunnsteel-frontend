@@ -22,8 +22,8 @@ import {
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
-import { getWorkoutProgressQuery } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
+import { useWorkoutAnalytics } from './useWorkoutAnalytics'
 
 // Serialize params object to ensure stable query keys
 function serializeSessionParams(
@@ -71,18 +71,25 @@ export const useWorkoutStats = () => {
 	})
 }
 
-/**
- * Lifetime totals, streaks and personal records, all derived server-side from
- * the logged sets rather than stored separately.
- */
+/** Progress is enabled only once an account generation is active. */
 export const useWorkoutProgress = () => {
 	const { session, isLoading } = useAuth()
-	const params = getWorkoutProgressQuery()
-	return useQuery({
-		queryKey: [...qk.progress, params.timeZone],
-		queryFn: () => workoutService.getProgress(params),
-		enabled: !isLoading && !!session,
+	const analytics = useWorkoutAnalytics()
+	const timeZone = analytics.data?.timeZone
+	const query = useQuery({
+		queryKey: [...qk.progress, timeZone],
+		queryFn: () => workoutService.getProgress({ timeZone: timeZone! }),
+		enabled: !isLoading && !!session && !!timeZone,
 	})
+	return {
+		...query,
+		bootstrapError:
+			analytics.error ??
+			(analytics.data?.state === 'FAILED'
+				? new Error('Analytics setup failed')
+				: null),
+		retryBootstrap: analytics.retry,
+	}
 }
 
 export const useActiveSession = () => {
@@ -252,6 +259,7 @@ export const useFinishSession = (id: string) => {
 			qc.setQueryData(qk.session(id), session)
 			qc.invalidateQueries({ queryKey: qk.active })
 			qc.invalidateQueries({ queryKey: qk.stats })
+			qc.invalidateQueries({ queryKey: qk.progress })
 		},
 	})
 }

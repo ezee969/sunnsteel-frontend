@@ -1,6 +1,7 @@
 'use client'
 
 import HeroSection from '@/components/layout/HeroSection'
+import { Button } from '@/components/ui/button'
 
 import DashboardLoading from './components/DashboardLoading'
 import PersonalRecords from './components/PersonalRecords'
@@ -10,7 +11,7 @@ import TodaysWorkouts from './components/TodaysWorkouts'
 import { useDashboardData } from './hooks/useDashboardData'
 
 export default function Dashboard() {
-	const { isLoading, user } = useDashboardData()
+	const { isLoading, user, progress } = useDashboardData()
 
 	const name = user?.name?.trim()
 
@@ -29,7 +30,18 @@ export default function Dashboard() {
 			 * arrives as a single composed view instead of assembling itself
 			 * section by section.
 			 */}
-			{isLoading ? (
+			{progress.bootstrapError ? (
+				<div role="alert" className="flex flex-col items-start gap-3">
+					<p>Unable to prepare your workout progress. Please try again.</p>
+					<Button
+						onClick={() => {
+							void progress.retryBootstrap().catch(() => undefined)
+						}}
+					>
+						Retry
+					</Button>
+				</div>
+			) : isLoading ? (
 				<DashboardLoading />
 			) : (
 				<div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-4 duration-500 sm:gap-6">

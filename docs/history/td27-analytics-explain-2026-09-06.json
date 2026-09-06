@@ -1,0 +1,323 @@
+[
+  {
+    "query": {
+      "timestamp": "2026-09-06T18:56:49.622Z",
+      "query": "\n          SELECT * FROM \"WorkoutAnalyticsProjection\"\n          WHERE \"userId\" = $1 AND \"active\" AND \"state\" = 'READY' AND \"timeZone\" = $2 LIMIT 1",
+      "params": "[\"53e7efed-ab77-4ebb-9af2-40fe8689c20f\",\"America/New_York\"]",
+      "duration": 3,
+      "target": "quaint::connector::metrics"
+    },
+    "plan": [
+      {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.28,
+              "Total Cost": 8.3,
+              "Plan Rows": 1,
+              "Plan Width": 93,
+              "Actual Startup Time": 0.017,
+              "Actual Total Time": 0.018,
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "Shared Hit Blocks": 3,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Index Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "analytics_one_active_user",
+                  "Relation Name": "WorkoutAnalyticsProjection",
+                  "Alias": "WorkoutAnalyticsProjection",
+                  "Startup Cost": 0.28,
+                  "Total Cost": 8.3,
+                  "Plan Rows": 1,
+                  "Plan Width": 93,
+                  "Actual Startup Time": 0.017,
+                  "Actual Total Time": 0.017,
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Index Cond": "(\"userId\" = '53e7efed-ab77-4ebb-9af2-40fe8689c20f'::text)",
+                  "Rows Removed by Index Recheck": 0,
+                  "Filter": "((state = 'READY'::text) AND (\"timeZone\" = 'America/New_York'::text))",
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 3,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0
+                }
+              ]
+            },
+            "Planning": {
+              "Shared Hit Blocks": 0,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+            },
+            "Planning Time": 0.104,
+            "Triggers": [],
+            "Execution Time": 0.03
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": {
+      "timestamp": "2026-09-06T18:56:49.627Z",
+      "query": "SELECT \"public\".\"PersonalRecord\".\"id\", \"public\".\"PersonalRecord\".\"exerciseId\", \"public\".\"PersonalRecord\".\"exerciseName\", \"public\".\"PersonalRecord\".\"weight\", \"public\".\"PersonalRecord\".\"reps\", \"public\".\"PersonalRecord\".\"estimated1rm\", \"public\".\"PersonalRecord\".\"achievedAt\" FROM \"public\".\"PersonalRecord\" WHERE \"public\".\"PersonalRecord\".\"userId\" = $1 ORDER BY \"public\".\"PersonalRecord\".\"achievedAt\" DESC LIMIT $2 OFFSET $3",
+      "params": "[\"53e7efed-ab77-4ebb-9af2-40fe8689c20f\",5,0]",
+      "duration": 3,
+      "target": "quaint::connector::metrics"
+    },
+    "plan": [
+      {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.28,
+              "Total Cost": 0.9,
+              "Plan Rows": 5,
+              "Plan Width": 60,
+              "Actual Startup Time": 0.02,
+              "Actual Total Time": 0.023,
+              "Actual Rows": 5,
+              "Actual Loops": 1,
+              "Shared Hit Blocks": 4,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Index Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "PersonalRecord_userId_achievedAt_idx",
+                  "Relation Name": "PersonalRecord",
+                  "Alias": "PersonalRecord",
+                  "Startup Cost": 0.28,
+                  "Total Cost": 250.54,
+                  "Plan Rows": 2001,
+                  "Plan Width": 60,
+                  "Actual Startup Time": 0.019,
+                  "Actual Total Time": 0.021,
+                  "Actual Rows": 5,
+                  "Actual Loops": 1,
+                  "Index Cond": "(\"userId\" = '53e7efed-ab77-4ebb-9af2-40fe8689c20f'::text)",
+                  "Rows Removed by Index Recheck": 0,
+                  "Shared Hit Blocks": 4,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0
+                }
+              ]
+            },
+            "Planning": {
+              "Shared Hit Blocks": 0,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+            },
+            "Planning Time": 0.081,
+            "Triggers": [],
+            "Execution Time": 0.036
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "query": {
+      "timestamp": "2026-09-06T18:56:49.634Z",
+      "query": "SELECT s.\"id\", s.\"startedAt\", s.\"endedAt\", s.\"durationSec\", s.\"totalVolumeKg\", s.\"completedSets\", sn.\"payload\"\n          FROM \"WorkoutSession\" s LEFT JOIN \"WorkoutSessionSnapshot\" sn ON sn.\"sessionId\" = s.\"id\"\n          WHERE s.\"userId\" = $1 AND s.\"status\" = 'COMPLETED' AND s.\"completedSets\" > 0\n          ORDER BY s.\"endedAt\" DESC, s.\"id\" DESC LIMIT 5",
+      "params": "[\"53e7efed-ab77-4ebb-9af2-40fe8689c20f\"]",
+      "duration": 6,
+      "target": "quaint::connector::metrics"
+    },
+    "plan": [
+      {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.56,
+              "Total Cost": 2.12,
+              "Plan Rows": 5,
+              "Plan Width": 75,
+              "Actual Startup Time": 0.026,
+              "Actual Total Time": 0.039,
+              "Actual Rows": 5,
+              "Actual Loops": 1,
+              "Shared Hit Blocks": 14,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Nested Loop",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Join Type": "Left",
+                  "Startup Cost": 0.56,
+                  "Total Cost": 6236.45,
+                  "Plan Rows": 20003,
+                  "Plan Width": 75,
+                  "Actual Startup Time": 0.026,
+                  "Actual Total Time": 0.038,
+                  "Actual Rows": 5,
+                  "Actual Loops": 1,
+                  "Inner Unique": true,
+                  "Shared Hit Blocks": 14,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Plans": [
+                    {
+                      "Node Type": "Index Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Scan Direction": "Forward",
+                      "Index Name": "workout_recent_completed_sets",
+                      "Relation Name": "WorkoutSession",
+                      "Alias": "s",
+                      "Startup Cost": 0.41,
+                      "Total Cost": 2837.97,
+                      "Plan Rows": 20003,
+                      "Plan Width": 43,
+                      "Actual Startup Time": 0.016,
+                      "Actual Total Time": 0.017,
+                      "Actual Rows": 5,
+                      "Actual Loops": 1,
+                      "Index Cond": "(\"userId\" = '53e7efed-ab77-4ebb-9af2-40fe8689c20f'::text)",
+                      "Rows Removed by Index Recheck": 0,
+                      "Shared Hit Blocks": 4,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    },
+                    {
+                      "Node Type": "Index Scan",
+                      "Parent Relationship": "Inner",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Scan Direction": "Forward",
+                      "Index Name": "WorkoutSessionSnapshot_pkey",
+                      "Relation Name": "WorkoutSessionSnapshot",
+                      "Alias": "sn",
+                      "Startup Cost": 0.15,
+                      "Total Cost": 0.17,
+                      "Plan Rows": 1,
+                      "Plan Width": 64,
+                      "Actual Startup Time": 0.003,
+                      "Actual Total Time": 0.003,
+                      "Actual Rows": 1,
+                      "Actual Loops": 5,
+                      "Index Cond": "(\"sessionId\" = s.id)",
+                      "Rows Removed by Index Recheck": 0,
+                      "Shared Hit Blocks": 10,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning": {
+              "Shared Hit Blocks": 0,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+            },
+            "Planning Time": 0.234,
+            "Triggers": [],
+            "Execution Time": 0.058
+          }
+        ]
+      }
+    ]
+  }
+]
