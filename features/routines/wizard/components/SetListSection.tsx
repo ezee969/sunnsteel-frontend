@@ -34,6 +34,25 @@ interface SetListSectionProps {
 	isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean
 }
 
+/**
+ * Render the collapsible "Sets" section for an exercise, including per-set rows and controls to add, update, and remove sets.
+ *
+ * @param exercise - The exercise data including its sets and progression scheme
+ * @param exerciseIndex - Index of the exercise within the parent routine
+ * @param tabIndex - Index used to scope ARIA ids and test ids for this section
+ * @param setsExpanded - Whether the sets list is currently expanded
+ * @param onToggleSets - Toggle handler for expanding/collapsing the sets list
+ * @param onAddSet - Handler invoked when the "Add Set" button is clicked
+ * @param registerSetRowRef - Callback to register a DOM ref for a set row: (setIndex, node) => void
+ * @param onUpdateSet - Handler to update a set field for a given exercise and set index
+ * @param onValidateMinMaxReps - Handler to validate min/max reps for a specific set
+ * @param onStepFixedReps - Handler to increment/decrement fixed reps for a set
+ * @param onStepRangeReps - Handler to increment/decrement min/max reps for a set
+ * @param onStepWeight - Handler to increment/decrement weight for a set
+ * @param onRemoveSetAnimated - Handler to request removal of a set with animation
+ * @param isRemovingSet - Predicate that returns `true` if a given set is currently in a removing state
+ * @returns The JSX element rendering the sets section and its controls
+ */
 export function SetListSection({
 	exercise,
 	exerciseIndex,

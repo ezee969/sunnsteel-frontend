@@ -16,6 +16,22 @@ interface UseRoutineSubmissionParams {
 	onComplete: () => void
 }
 
+/**
+ * Hook that prepares and sends a routine create or update request, and exposes submission state.
+ *
+ * Prepares a request payload from the provided wizard data, chooses create or update behavior
+ * based on `isEditing`/`routineId`, executes the corresponding mutation, and invokes `onComplete`
+ * after the mutation succeeds.
+ *
+ * @param data - RoutineWizardData used to build the request payload
+ * @param routineId - Optional identifier of the routine to update when editing
+ * @param isEditing - When true, the hook will perform an update when `routineId` is present; otherwise it will create a new routine
+ * @param onComplete - Callback invoked after a successful create or update operation
+ * @returns An object containing:
+ *  - `submit`: a function that triggers the create or update operation and invokes `onComplete` on success
+ *  - `isLoading`: `true` while the active mutation is pending, `false` otherwise
+ *  - `usesRtf`: `true` if the provided data contains RtF exercises, `false` otherwise
+ */
 export function useRoutineSubmission({
 	data,
 	routineId,

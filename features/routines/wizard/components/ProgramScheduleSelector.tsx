@@ -24,6 +24,14 @@ interface ProgramScheduleSelectorProps {
 	tooltipContent?: string
 }
 
+/**
+ * Renders a labeled program schedule selector with an info tooltip and a dropdown of options.
+ *
+ * @param value - The currently selected program schedule mode; the control displays `'NONE'` when `value` is undefined.
+ * @param onChange - Callback invoked with the newly selected `ProgramScheduleMode` when the user picks an option.
+ * @param tooltipContent - Optional tooltip text shown by the info icon; defaults to `PROGRAM_SCHEDULE_TOOLTIP`.
+ * @returns The rendered Program Schedule selector React element.
+ */
 export function ProgramScheduleSelector({
 	value,
 	onChange,

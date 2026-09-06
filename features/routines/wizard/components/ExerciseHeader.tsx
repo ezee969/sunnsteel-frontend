@@ -20,6 +20,19 @@ interface ExerciseHeaderProps {
 	onRemoveButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
+/**
+ * Render the header for a routine-wizard exercise, showing the exercise name, summary (planned sets and rest) when collapsed, detailed muscles and equipment when expanded, and action buttons to toggle sets or remove the exercise.
+ *
+ * @param exercise - RoutineWizardExercise used to compute planned sets and rest time
+ * @param exerciseData - Optional exercise metadata (name, primary muscles, equipment) used for display; falls back to placeholders when absent
+ * @param expanded - Whether the header is in its expanded state (affects layout and visible details)
+ * @param controlsId - ID of the collapsible sets region referenced by ARIA attributes
+ * @param onHeaderClick - Click handler for the header element
+ * @param onHeaderKeyDown - Keyboard event handler for header interactions
+ * @param onToggleButtonClick - Click handler for the toggle-sets button
+ * @param onRemoveButtonClick - Click handler for the remove-exercise button
+ * @returns The header element for an exercise with accessible attributes and interactive controls
+ */
 export function ExerciseHeader({
 	exercise,
 	exerciseData,

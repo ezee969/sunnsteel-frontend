@@ -8,6 +8,27 @@ interface UseRoutineDaySelectionParams {
 	trainingDays: number[]
 }
 
+/**
+ * Manages state for selecting a routine day and filtering exercises for a day picker UI.
+ *
+ * Keeps a selected day index clamped to the provided trainingDays array, controls a dropdown picker (open/close/toggle),
+ * closes the picker when clicks occur outside its container, and provides a searchable, memoized list of exercises.
+ *
+ * @param exercises - Optional list of exercises to filter; each exercise's `name`, `equipment`, and `primaryMuscles` are used for search matches.
+ * @param trainingDays - Array representing available training days; `selectedDay` is clamped to the valid indices of this array.
+ * @returns An object containing:
+ *  - `selectedDay`: the current selected day index.
+ *  - `setSelectedDay`: setter for the selected day index.
+ *  - `dropdownRef`: ref to attach to the dropdown container for outside-click detection.
+ *  - `picker`: an object with:
+ *      - `isOpen`: whether the picker dropdown is open.
+ *      - `open`: opens the picker.
+ *      - `close`: closes the picker.
+ *      - `toggle`: toggles the picker's open state.
+ *      - `searchValue`: the current search string.
+ *      - `setSearchValue`: setter for the search string.
+ *      - `filteredExercises`: exercises filtered by `searchValue` (matches `name`, `equipment`, or any `primaryMuscles`, case-insensitive).
+ */
 export function useRoutineDaySelection({
 	exercises = [],
 	trainingDays,

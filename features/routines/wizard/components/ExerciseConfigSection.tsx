@@ -34,6 +34,29 @@ interface ExerciseConfigSectionProps {
 	onUpdateProgramRoundingKg: (exerciseIndex: number, roundingKg: number) => void
 }
 
+/**
+ * Render configuration controls for a single exercise in the routine wizard.
+ *
+ * Renders inputs for rest time and progression scheme, conditionally shows RtF-specific
+ * controls (Training Max and rounding) and an optional minimum weight increment field
+ * based on the exercise's progression scheme and provided flags.
+ *
+ * @param exercise - The exercise being configured.
+ * @param exerciseIndex - Index of the exercise within the routine (used in update callbacks).
+ * @param disableTimeBasedProgressions - When true, disables time-based (RtF) progression options and shows explanatory tooltip.
+ * @param tmInput - Current text value for the Training Max input.
+ * @param tmMissing - When true, marks the Training Max input as invalid (used for validation UI).
+ * @param tmHelpId - ID of an element that provides additional help for the Training Max input (used for aria-describedby).
+ * @param onTmInputChange - Called with the new TM text when the Training Max input changes.
+ * @param onTmBlur - Called when the Training Max input loses focus.
+ * @param weightIncInput - Current text value for the minimum weight increment input.
+ * @param onWeightIncChange - Called with the new weight increment text when that input changes.
+ * @param onWeightIncBlur - Called when the weight increment input loses focus.
+ * @param onUpdateRestTime - Called with (exerciseIndex, value) when the rest time input changes.
+ * @param onUpdateProgressionScheme - Called with (exerciseIndex, scheme) when the progression scheme changes.
+ * @param onUpdateProgramRoundingKg - Called with (exerciseIndex, roundingKg) when the program rounding value changes.
+ * @returns The React element tree for the exercise configuration section.
+ */
 export function ExerciseConfigSection({
 	exercise,
 	exerciseIndex,

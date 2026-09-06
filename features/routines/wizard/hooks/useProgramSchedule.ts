@@ -15,6 +15,21 @@ interface UseProgramScheduleParams {
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 }
 
+/**
+ * Manage program schedule state and provide handlers used by the routine wizard.
+ *
+ * This hook derives the currently selected start date from `data.programStartDate`, tracks calendar visibility, and exposes handlers to change the schedule mode, select or parse a start date, and toggle the calendar. When the schedule mode is `TIMEFRAME` and `programTimezone` is empty, it will populate `programTimezone` with the browser time zone.
+ *
+ * @param data - Routine wizard data containing schedule-related fields
+ * @param onUpdate - Callback to apply partial updates to the wizard data
+ * @returns An object with:
+ *  - `selectedDate`: the parsed start `Date` or `undefined` if not set
+ *  - `isCalendarOpen`: whether the calendar UI is open
+ *  - `setCalendarOpen`: setter to open or close the calendar
+ *  - `handleModeChange`: updates `programScheduleMode` (clears `programStartDate` when set to `'NONE'`)
+ *  - `handleDateSelect`: sets `programStartDate` to the chosen date (formatted) or clears it when no date is provided, and closes the calendar
+ *  - `handleDateInputChange`: parses a date string and updates `programStartDate` with a formatted date or clears it if parsing fails
+ */
 export function useProgramSchedule({ data, onUpdate }: UseProgramScheduleParams) {
 	const [isCalendarOpen, setCalendarOpen] = useState(false)
 

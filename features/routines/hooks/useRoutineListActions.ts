@@ -9,6 +9,22 @@ import {
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import type { Routine } from '@/lib/api/types/routine.type'
 
+/**
+ * Manages UI state and action handlers for routine list operations.
+ *
+ * Provides state flags and callback functions for deleting routines, toggling favorite/completed status, and starting sessions.
+ *
+ * @returns An object containing:
+ * - isDeleteDialogOpen: whether the delete confirmation dialog is open
+ * - setIsDeleteDialogOpen: setter for the delete dialog state
+ * - selectedRoutineId: id of the routine selected for deletion or `null`
+ * - favoriteActingId: id of the routine currently performing a favorite toggle or `null`
+ * - completedActingId: id of the routine currently performing a completed toggle or `null`
+ * - startActingId: id of the routine currently starting a session or `null`
+ * - lastStartReused: whether the last started session was reused
+ * - isDeleting, isTogglingFavorite, isTogglingCompleted, isStarting: flags for ongoing async operations
+ * - handleDeleteClick, handleConfirmDelete, handleToggleFavorite, handleToggleCompleted, handleStartSessionForRoutine: action handler functions
+ */
 export function useRoutineListActions() {
   const router = useRouter()
 

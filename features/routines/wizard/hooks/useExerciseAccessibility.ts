@@ -17,6 +17,21 @@ interface UseExerciseAccessibilityResult {
 	handleRemoveButtonClick: (event: MouseEvent<HTMLButtonElement>) => void
 }
 
+/**
+ * Provides stable IDs and event handlers to manage keyboard and mouse accessibility for an exercise row.
+ *
+ * @param tabIndex - Numerical index used to derive a deterministic `controlsId` for ARIA relationships
+ * @param exerciseIndex - Index of the exercise this hook manages; passed to callbacks when actions occur
+ * @param expanded - Whether the exercise row is currently expanded
+ * @param onToggleExpand - Callback invoked with `exerciseIndex` to toggle the row's expanded state
+ * @param onRemoveExercise - Callback invoked with `exerciseIndex` to remove the exercise
+ * @returns An object with:
+ *  - `controlsId`: ID string for ARIA `aria-controls` (formed as `sets-{tabIndex}-{exerciseIndex}`)
+ *  - `handleHeaderClick`: click handler that toggles expansion for this exercise
+ *  - `handleHeaderKeyDown`: keydown handler that toggles expansion when Enter or Space is pressed
+ *  - `handleToggleButtonClick`: button click handler that stops propagation and toggles expansion
+ *  - `handleRemoveButtonClick`: button click handler that stops propagation and removes the exercise
+ */
 export function useExerciseAccessibility({
 	tabIndex,
 	exerciseIndex,

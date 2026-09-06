@@ -27,6 +27,12 @@ import { RoutineMetaBadges } from './RoutineMetaBadges'
 import { weekdayName } from '@/lib/utils/date'
 import { onPressEnterOrSpace } from '@/lib/utils/a11y'
 
+/**
+ * Determine whether a routine's program has ended by comparing today's UTC date to the routine's programEndDate.
+ *
+ * @param routine - Routine to check; may be undefined or lack a programEndDate
+ * @returns `true` if today's UTC date is after the routine's `programEndDate`, `false` otherwise
+ */
 function isProgramEnded(routine: Routine | undefined): boolean {
   if (!routine?.programEndDate) return false
   const today = new Date()
@@ -61,6 +67,26 @@ export interface RoutineCardProps {
   favoriteActingId: string | null
 }
 
+/**
+ * Renders a card UI for a routine, including name/description, program status, start/resume controls,
+ * completion and favorite toggles, per-day start options, progress, and metadata badges.
+ *
+ * @param routine - The routine to display
+ * @param isActiveRoutine - Whether this routine is the currently active routine
+ * @param activeSessionId - ID of the active workout session, used when resuming
+ * @param onStartSession - Callback to start a session for the routine; optionally accepts a routineDayId
+ * @param onToggleCompleted - Callback to toggle the routine's completed state
+ * @param onToggleFavorite - Callback to toggle the routine's favorite state
+ * @param onDelete - Callback to delete the routine by id
+ * @param isStarting - Whether a start action is currently in progress
+ * @param startActingId - ID of the routine currently performing a start action
+ * @param lastStartReused - Whether the last start action reused an existing session (affects label)
+ * @param isTogglingCompleted - Whether a completed-toggle action is currently in progress
+ * @param completedActingId - ID of the routine currently performing a completed-toggle action
+ * @param isTogglingFavorite - Whether a favorite-toggle action is currently in progress
+ * @param favoriteActingId - ID of the routine currently performing a favorite-toggle action
+ * @returns The JSX element for the routine card
+ */
 export function RoutineCard({
   routine,
   isActiveRoutine,
