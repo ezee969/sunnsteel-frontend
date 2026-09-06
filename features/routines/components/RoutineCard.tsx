@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils'
 import { onPressEnterOrSpace } from '@/lib/utils/a11y'
 import {
 	getTodayDow,
+	nextScheduledDay,
 	validateRoutineDayDate,
 	validateWorkoutDate,
 	weekdayName,
@@ -32,7 +33,7 @@ import {
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
 import { RoutineMetaBadges } from './RoutineMetaBadges'
-import { RoutineProgress } from './RoutineProgress'
+import { RoutineScheduleNote } from './RoutineScheduleNote'
 
 export interface RoutineCardProps {
 	routine: Routine
@@ -75,6 +76,7 @@ export function RoutineCard({
 	const workoutValidation = validateWorkoutDate(routine.days)
 	const canStartToday = workoutValidation.isValid
 	const todayRoutineDay = routine.days?.find(day => day.dayOfWeek === todayDow)
+	const nextDay = nextScheduledDay(routine.days, todayDow)
 
 	// Determine if the start button should be disabled based on validation and routine state
 	const isStartDisabled =
@@ -183,7 +185,10 @@ export function RoutineCard({
 					/>
 				</div>
 
-				<RoutineProgress completed={routine.isCompleted} />
+				<RoutineScheduleNote
+					isCompleted={routine.isCompleted}
+					nextDay={nextDay}
+				/>
 
 				<div className="flex items-center gap-1.5 pt-1">
 					{isActiveRoutine ? (

@@ -117,3 +117,38 @@ export const formatTimeAgo = (
 	}
 	return formatter.format(0, 'minute')
 }
+
+/**
+ * Soonest upcoming occurrence of a routine's scheduled days.
+ *
+ * Returns the matching `dayOfWeek` and how many days away it is (`0` when the
+ * routine trains today), or `null` when the routine has no days configured.
+ */
+export const nextScheduledDay = (
+	routineDays: Array<{ dayOfWeek: number }> | undefined,
+	todayDow: number = getTodayDow(),
+): { dayOfWeek: number; daysAway: number } | null => {
+	if (!routineDays || routineDays.length === 0) return null
+
+	let best: { dayOfWeek: number; daysAway: number } | null = null
+	for (const day of routineDays) {
+		const daysAway = (((day.dayOfWeek - todayDow) % 7) + 7) % 7
+		if (!best || daysAway < best.daysAway) {
+			best = { dayOfWeek: day.dayOfWeek, daysAway }
+		}
+	}
+	return best
+}
+
+/**
+ * Human label for a `nextScheduledDay` result: "Today", "Tomorrow" or the
+ * weekday name.
+ */
+export const describeDaysAway = (
+	dayOfWeek: number,
+	daysAway: number,
+): string => {
+	if (daysAway === 0) return 'Today'
+	if (daysAway === 1) return 'Tomorrow'
+	return weekdayName(dayOfWeek, 'long')
+}

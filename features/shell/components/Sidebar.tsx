@@ -6,6 +6,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Dumbbell,
+	History,
 	Home,
 	LucideIcon,
 	Medal,
@@ -67,6 +68,16 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		icon: Activity,
 		classicalName: 'scroll-unfurled',
 		href: '/routines',
+		disabled: false,
+	},
+	// History needs its own entry: `/workouts` redirects into the live session
+	// whenever one is running, so the "View History" link on that page is
+	// unreachable for exactly as long as the user has something to review.
+	{
+		id: 'history',
+		label: 'History',
+		icon: History,
+		href: '/workouts/history',
 		disabled: false,
 	},
 	{

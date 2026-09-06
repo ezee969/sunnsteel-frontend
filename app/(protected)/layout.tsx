@@ -45,6 +45,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	// Determine active nav based on current pathname
 	const getActiveNavFromPath = (path: string) => {
 		if (path.startsWith('/dashboard')) return 'dashboard'
+		if (path.startsWith('/workouts/history')) return 'history'
 		if (path.startsWith('/workouts')) return 'workouts'
 		if (path.startsWith('/routines')) return 'routines'
 		if (path.startsWith('/settings')) return 'settings'
