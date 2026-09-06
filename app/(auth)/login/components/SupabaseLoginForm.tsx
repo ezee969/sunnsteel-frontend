@@ -123,7 +123,7 @@ export function SupabaseLoginForm() {
 												autoCapitalize="none"
 												autoComplete="email"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -156,7 +156,7 @@ export function SupabaseLoginForm() {
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
 												autoComplete="current-password"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>

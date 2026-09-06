@@ -10,6 +10,7 @@ export function useUser() {
 	const {
 		data: user,
 		isLoading,
+		isPending,
 		error,
 		refetch,
 	} = useQuery<UserProfile, Error>({
@@ -25,6 +26,11 @@ export function useUser() {
 	return {
 		user,
 		isLoading: safeIsLoading,
+		// Unlike `isLoading`, this stays true while the query is still disabled
+		// (auth not resolved yet), so callers can use it as a "profile has not
+		// settled" gate. It is identical on server and client, so it is safe to
+		// branch rendering on it.
+		isPending,
 		error,
 		refetch,
 	}

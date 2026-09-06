@@ -1,6 +1,6 @@
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { useWorkoutStats } from '@/lib/api/hooks/useWorkoutSession'
 
 import StatCard from './StatCard'
@@ -8,18 +8,15 @@ import StatCard from './StatCard'
 const WEEKLY_GOAL = 4
 
 export default function StatsOverview() {
-	const { data, isLoading, isError, refetch, isFetching } = useWorkoutStats()
+	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
 
-	if (isLoading) {
+	// The dashboard page gates the first paint, so this only shows when the stats
+	// query restarts later — the week-bounded query key rolls over at midnight
+	// on the week boundary. Matches the initial skeleton so nothing reflows.
+	if (isPending) {
 		return (
-			<div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-				{[1, 2, 3, 4].map(i => (
-					<div key={i} className="rounded-lg border p-4 space-y-3 bg-card/50">
-						<Skeleton className="h-6 w-24" />
-						<Skeleton className="h-8 w-16" />
-						<Skeleton className="h-3.5 w-32" />
-					</div>
-				))}
+			<div className="flex min-h-40 items-center justify-center">
+				<ClassicalLoader label="Loading workout statistics" />
 			</div>
 		)
 	}

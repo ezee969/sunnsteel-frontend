@@ -6,7 +6,7 @@ Last verified against the tree on 2026-09-06 (audit + a real `next build`). If s
 
 ## Project
 
-Sunnsteel is a fitness/workout-tracking web app with a classical/Renaissance visual theme. It is the frontend half of a two-repo system: the NestJS backend lives at `../sunnsteel-backend` and the shared types package at `../sunsteel-contracts` (imported as `@sunsteel/contracts`).
+Sunnsteel is a fitness/workout-tracking web app with a classical/Renaissance visual theme. It is the frontend half of a two-repo system: the NestJS backend lives at `../sunnsteel-backend` and the shared types package at `../sunnsteel-contracts` (imported as `@sunsteel/contracts`).
 
 Stack: **Next.js 15.5 (App Router) · React 18.3 · TypeScript 5 (strict) · TailwindCSS 4.3 · shadcn/ui + Radix · TanStack Query 5 · Supabase JS 2**.
 
@@ -64,7 +64,7 @@ Two-step: Supabase auth (email/password or Google OAuth) → backend verificatio
 
 `verifyToken` shares its pending/completed result for the current token in memory, so email login and the provider do not duplicate the backend request. Logout, account changes and explicit user updates invalidate that result; failed requests are not cached. A cold page load still costs `POST /auth/supabase/verify` + `POST /api/session`. The OAuth callback consumes the provider's verified profile instead of making its own request. Auth pages now observe the real initial `isLoading` state, so the callback cannot redirect before the initial session is known.
 
-Marker POST/DELETE requests are serialized. A stale verification cannot enqueue a new POST after invalidation; a DELETE waits for any already-started POST. A failed POST rejects verification rather than caching a false login success. DELETE remains best-effort (errors are logged); network failures during cookie cleanup still require a separate recovery UX.
+Marker POST/DELETE requests are serialized. A stale verification cannot enqueue a new POST after invalidation; a DELETE waits for any already-started POST. A failed POST rejects verification rather than caching a false login success. Concurrent DELETE cleanup shares one pending request; failures surface in the protected layout without exposing cached data, and the user can retry until the routing marker is cleared.
 
 **That verification is deliberately not a gate — do not turn it back into one.** `isLoading` flips to `false` as soon as the provider knows *whether* there is a session, **before** the `await verifyToken`, and data hooks are enabled on `!!session`. This is safe because the backend's `SupabaseJwtGuard` re-verifies the token and get-or-creates the user on **every** protected request (`../sunnsteel-backend/src/auth/strategies/supabase-jwt.strategy.ts`), so `/auth/supabase/verify` duplicates that work rather than being a prerequisite for it. `isAuthenticated` is still `!!session && !!user`, but it now means "the verified profile has arrived" — use it only for UI that genuinely needs the profile, never to gate queries or rendering. Full reasoning in TD-18.
 

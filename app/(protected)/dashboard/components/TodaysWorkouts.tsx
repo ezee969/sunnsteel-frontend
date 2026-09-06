@@ -3,7 +3,7 @@
 import { Calendar, CalendarDays, ChevronRight, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import ClassicalIcon from '@/components/icons/ClassicalIcon'
 import {
@@ -25,89 +25,28 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useRoutines } from '@/lib/api/hooks/useRoutines'
-import {
-	useActiveSession,
-	useSessions,
-	useStartSession,
-} from '@/lib/api/hooks/useWorkoutSession'
-import { Routine, RoutineDay } from '@/lib/api/types/routine.type'
+import { ClassicalLoader } from '@/components/ui/classical-loader'
+import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { cn } from '@/lib/utils'
-import {
-	getTodayDow,
-	validateRoutineDayDate,
-	weekdayName,
-} from '@/lib/utils/date'
+import { weekdayName } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
+
+import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
 
 export default function TodaysWorkouts() {
 	const router = useRouter()
 	const { preloadOnHover } = useComponentPreloading()
-	const { data: routines, isLoading, error } = useRoutines()
-	const { data: active } = useActiveSession()
 	const { mutateAsync: startSession, isPending } = useStartSession()
 
-	const todayDow = getTodayDow()
+	const {
+		todayDow,
+		entries: visibleTodays,
+		active,
+		error,
+		isPending: isDataPending,
+	} = useTodaysWorkouts()
+
 	const [activeConflictOpen, setActiveConflictOpen] = useState(false)
-
-	const todays = useMemo(() => {
-		return (routines ?? [])
-			.map((r: Routine) => {
-				const day = r.days?.find((d: RoutineDay) => d.dayOfWeek === todayDow)
-				if (!day) return null
-
-				// Validate if this routine day can be started today based on scheduling rules
-				const validation = validateRoutineDayDate(day)
-				const canStartToday = validation.isValid
-
-				return { routine: r, day, canStartToday } as {
-					routine: Routine
-					day: RoutineDay
-					canStartToday: boolean
-				}
-			})
-			.filter(
-				(
-					x,
-				): x is { routine: Routine; day: RoutineDay; canStartToday: boolean } =>
-					Boolean(x),
-			)
-	}, [routines, todayDow])
-
-	// Determine today's local ISO range
-	const fromISO = useMemo(() => {
-		const d = new Date()
-		d.setHours(0, 0, 0, 0)
-		return d.toISOString()
-	}, [])
-	const toISO = useMemo(() => {
-		const d = new Date()
-		d.setHours(23, 59, 59, 999)
-		return d.toISOString()
-	}, [])
-
-	// Fetch today's completed sessions and build a set of routineIds completed today
-	const completedTodayQuery = useSessions({
-		status: 'COMPLETED',
-		from: fromISO,
-		to: toISO,
-		sort: 'finishedAt:desc',
-		limit: 50,
-	})
-
-	const completedRoutineIds = useMemo(() => {
-		const pages = completedTodayQuery.data?.pages ?? []
-		const items = pages.flatMap(p => p.items ?? [])
-		return new Set(items.map(i => i.routine.id))
-	}, [completedTodayQuery.data])
-
-	// Filter out routines that already have a completed session today
-	const visibleTodays = useMemo(() => {
-		if (!todays.length) return todays
-		if (!completedRoutineIds.size) return todays
-		return todays.filter(({ routine }) => !completedRoutineIds.has(routine.id))
-	}, [todays, completedRoutineIds])
 
 	const handleStart = async (routineId: string, routineDayId: string) => {
 		if (!routineId || !routineDayId) return
@@ -121,19 +60,14 @@ export default function TodaysWorkouts() {
 		if (session?.id) router.push(`/workouts/sessions/${session.id}`)
 	}
 
-	if (isLoading) {
+	// Reachable only after the first reveal (the page gates the initial load) —
+	// e.g. a background refetch that invalidates the list. Keep it wordless so it
+	// reads as the same surface still settling, not as new copy appearing.
+	if (isDataPending) {
 		return (
 			<Card>
-				<CardHeader>
-					<CardTitle>Today’s Workouts</CardTitle>
-					<CardDescription>
-						Fetching your plan for {weekdayName(todayDow, 'long')}…
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<Skeleton className="h-6 w-2/3" />
-					<Skeleton className="h-10 w-full" />
-					<Skeleton className="h-10 w-2/3" />
+				<CardContent className="flex min-h-32 items-center justify-center">
+					<ClassicalLoader size="md" label="Loading today’s workouts" />
 				</CardContent>
 			</Card>
 		)

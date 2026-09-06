@@ -161,7 +161,7 @@ export function SupabaseSignupForm() {
 												autoCapitalize="words"
 												autoComplete="name"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -187,7 +187,7 @@ export function SupabaseSignupForm() {
 												autoCapitalize="none"
 												autoComplete="email"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -210,7 +210,7 @@ export function SupabaseSignupForm() {
 											<Input
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -262,7 +262,7 @@ export function SupabaseSignupForm() {
 											<Input
 												type={showConfirmPassword ? 'text' : 'password'}
 												placeholder="••••••••"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-transparent focus:border-neutral-400 dark:focus:border-neutral-700 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
