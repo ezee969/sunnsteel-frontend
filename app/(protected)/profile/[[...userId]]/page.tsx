@@ -24,6 +24,11 @@ import { useFollowUser } from '@/lib/api/hooks/useFollowUser'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
 import { useUnfollowUser } from '@/lib/api/hooks/useUnfollowUser'
 import { useUser } from '@/lib/api/hooks/useUser'
+import {
+	useWorkoutProgress,
+	useWorkoutStats,
+} from '@/lib/api/hooks/useWorkoutSession'
+import { formatTimeAgo } from '@/lib/utils/date'
 
 export default function ProfilePage() {
 	const params = useParams<{ userId?: string[] }>()
@@ -36,6 +41,10 @@ export default function ProfilePage() {
 	const { data: publicUser, isLoading: isPublicLoading } = usePublicUser(
 		isOwnByRoute ? '' : routeUserId || '',
 	)
+	// Both are viewer-scoped endpoints, so the numbers they return only ever
+	// describe the signed-in user -- they are rendered on your own profile only.
+	const { data: progress } = useWorkoutProgress()
+	const { data: stats } = useWorkoutStats()
 	const followMutation = useFollowUser(routeUserId || '')
 	const unfollowMutation = useUnfollowUser(routeUserId || '')
 
@@ -78,6 +87,20 @@ export default function ProfilePage() {
 	const joinDateText = formatDistanceToNow(new Date(profileCreatedAt), {
 		addSuffix: true,
 	})
+
+	const showOwnStats = isOwnProfile
+	const totalWorkouts = stats?.totalCompleted ?? 0
+	const weeklyWorkouts = stats?.weeklyWorkoutsCount ?? 0
+	const currentStreak = progress?.currentStreakDays ?? 0
+	const bestStreak = progress?.bestStreakDays ?? 0
+	const totalVolumeKg = progress?.totalVolumeKg ?? 0
+	const personalRecords = progress?.personalRecords ?? []
+	const volumeLabel =
+		totalVolumeKg >= 1_000_000
+			? `${(totalVolumeKg / 1_000_000).toFixed(1)}M`
+			: totalVolumeKg >= 1_000
+				? `${(totalVolumeKg / 1_000).toFixed(1)}k`
+				: String(totalVolumeKg)
 	const isMutating = followMutation.isPending || unfollowMutation.isPending
 
 	const onFollowToggle = () => {
@@ -218,9 +241,11 @@ export default function ProfilePage() {
 									</span>
 									<Dumbbell className="h-4 w-4 text-primary" />
 								</div>
-								<div className="text-3xl font-bold heading-classical">142</div>
+								<div className="text-3xl font-bold heading-classical">
+									{showOwnStats ? totalWorkouts : '—'}
+								</div>
 								<div className="text-xs text-emerald-500 mt-1 font-medium">
-									+12 this month
+									{showOwnStats ? `+${weeklyWorkouts} this week` : ' '}
 								</div>
 							</CardContent>
 						</Card>
@@ -237,13 +262,13 @@ export default function ProfilePage() {
 									<Flame className="h-4 w-4 text-orange-500" />
 								</div>
 								<div className="text-3xl font-bold heading-classical">
-									14{' '}
+									{showOwnStats ? currentStreak : '—'}{' '}
 									<span className="text-lg text-muted-foreground font-normal">
 										days
 									</span>
 								</div>
 								<div className="text-xs text-muted-foreground mt-1 font-medium">
-									Personal Best: 32
+									{showOwnStats ? `Personal Best: ${bestStreak}` : ' '}
 								</div>
 							</CardContent>
 						</Card>
@@ -261,7 +286,7 @@ export default function ProfilePage() {
 								</div>
 								<div className="flex items-end gap-2">
 									<div className="text-3xl font-bold heading-classical">
-										1.2M
+										{showOwnStats ? volumeLabel : '—'}
 									</div>
 									<div className="text-sm text-muted-foreground mb-1 font-medium">
 										{(viewer.weightUnit || 'KG') === 'KG' ? 'kg' : 'lbs'}
@@ -274,50 +299,40 @@ export default function ProfilePage() {
 					<Card className="border-border/40 bg-card/30 backdrop-blur-sm shadow-sm p-6 overflow-hidden relative">
 						<div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/[0.01] to-transparent pointer-events-none"></div>
 						<h3 className="text-lg font-semibold heading-classical mb-6 flex items-center gap-2">
-							<Trophy className="h-5 w-5 text-primary" /> Recent Achievements
+							<Trophy className="h-5 w-5 text-primary" /> Personal Records
 						</h3>
 
 						<div className="space-y-4">
-							{[
-								{
-									title: 'Century Club',
-									desc: 'Logged 100 workouts total',
-									date: '2 days ago',
-									icon: <Medal className="h-5 w-5 text-yellow-500" />,
-								},
-								{
-									title: 'Consistency King',
-									desc: 'Workout out 4 times a week for a month',
-									date: 'Last week',
-									icon: <Flame className="h-5 w-5 text-orange-500" />,
-								},
-								{
-									title: 'Heavy Lifter',
-									desc: 'Squat 1RM reached 315 lbs',
-									date: '2 weeks ago',
-									icon: <Target className="h-5 w-5 text-blue-500" />,
-								},
-							].map((achievement, i) => (
-								<div
-									key={i}
-									className="flex gap-4 items-start p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50 group"
-								>
-									<div className="h-10 w-10 rounded-full bg-background flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
-										{achievement.icon}
+							{!showOwnStats || personalRecords.length === 0 ? (
+								<p className="text-muted-foreground text-sm">
+									{showOwnStats
+										? 'Log a few sets and your records will show up here.'
+										: 'Records are only visible on your own profile.'}
+								</p>
+							) : (
+								personalRecords.map(record => (
+									<div
+										key={record.exerciseId}
+										className="flex gap-4 items-start p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50 group"
+									>
+										<div className="h-10 w-10 rounded-full bg-background flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
+											<Medal className="h-5 w-5 text-yellow-500" />
+										</div>
+										<div className="flex-1">
+											<h4 className="font-semibold text-sm">
+												{record.exerciseName}
+											</h4>
+											<p className="text-xs text-muted-foreground">
+												{record.weight} kg for {record.reps} reps · est. 1RM{' '}
+												{record.estimated1rm} kg
+											</p>
+										</div>
+										<span className="text-xs text-muted-foreground whitespace-nowrap">
+											{formatTimeAgo(record.achievedAt)}
+										</span>
 									</div>
-									<div className="flex-1">
-										<h4 className="font-semibold text-sm">
-											{achievement.title}
-										</h4>
-										<p className="text-xs text-muted-foreground">
-											{achievement.desc}
-										</p>
-									</div>
-									<span className="text-xs text-muted-foreground whitespace-nowrap">
-										{achievement.date}
-									</span>
-								</div>
-							))}
+								))
+							)}
 						</div>
 					</Card>
 				</div>
@@ -362,25 +377,6 @@ function Medal(props: React.SVGProps<SVGSVGElement>) {
 			<path d="M8 7h8" />
 			<circle cx="12" cy="17" r="5" />
 			<path d="M12 18v-2h-.5" />
-		</svg>
-	)
-}
-
-function Target(props: React.SVGProps<SVGSVGElement>) {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			{...props}
-		>
-			<circle cx="12" cy="12" r="10" />
-			<circle cx="12" cy="12" r="6" />
-			<circle cx="12" cy="12" r="2" />
 		</svg>
 	)
 }

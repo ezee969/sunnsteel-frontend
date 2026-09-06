@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 
 import { useUser } from '@/lib/api/hooks/useUser'
-import { useWorkoutStats } from '@/lib/api/hooks/useWorkoutSession'
+import {
+	useWorkoutProgress,
+	useWorkoutStats,
+} from '@/lib/api/hooks/useWorkoutSession'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 import { useTodaysWorkouts } from './useTodaysWorkouts'
@@ -24,6 +27,7 @@ export function useDashboardData() {
 
 	const { user, isPending: isUserPending } = useUser()
 	const stats = useWorkoutStats()
+	const progress = useWorkoutProgress()
 	const todaysWorkouts = useTodaysWorkouts()
 
 	// No session means the protected layout / middleware is about to redirect.
@@ -34,6 +38,7 @@ export function useDashboardData() {
 		isBootstrapping ||
 		isUserPending ||
 		stats.isPending ||
+		progress.isPending ||
 		todaysWorkouts.isPending
 
 	// The gate is first-paint only. Once the dashboard has been revealed, a later
@@ -49,6 +54,7 @@ export function useDashboardData() {
 		isLoading: isSettling && !hasRevealed,
 		user,
 		stats,
+		progress,
 		todaysWorkouts,
 	}
 }

@@ -3,6 +3,8 @@
 import HeroSection from '@/components/layout/HeroSection'
 
 import DashboardLoading from './components/DashboardLoading'
+import PersonalRecords from './components/PersonalRecords'
+import RecentActivity from './components/RecentActivity'
 import StatsOverview from './components/StatsOverview'
 import TodaysWorkouts from './components/TodaysWorkouts'
 import { useDashboardData } from './hooks/useDashboardData'
@@ -53,6 +55,12 @@ export default function Dashboard() {
 
 					{/* Stats Overview */}
 					<StatsOverview />
+
+					{/* Recent sessions and records, both derived from the logged sets */}
+					<div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+						<RecentActivity />
+						<PersonalRecords />
+					</div>
 				</div>
 			)}
 		</div>

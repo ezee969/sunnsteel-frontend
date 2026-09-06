@@ -8,6 +8,10 @@ import {
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
+import {
+	WorkoutProgress,
+	WorkoutProgressQuery,
+} from '../types/workout-progress.type'
 import { WorkoutStats, WorkoutStatsQuery } from '../types/workout-stats.type'
 import { httpClient, requestWithMeta } from './httpClient'
 
@@ -47,6 +51,11 @@ export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
 			`${WORKOUTS_API_URL}/stats?${new URLSearchParams({ ...params })}`,
+			true,
+		),
+	getProgress: (params: WorkoutProgressQuery): Promise<WorkoutProgress> =>
+		httpClient.get<WorkoutProgress>(
+			`${WORKOUTS_API_URL}/progress?${new URLSearchParams({ ...params })}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
