@@ -2,11 +2,12 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatTime } from '@/lib/utils/time'
-import type { Exercise } from '@/lib/api/types'
+
 import type { RoutineWizardData } from '../types'
-import { DAYS_OF_WEEK, getRtfSetSummary, isRtFExercise } from '../utils/routine-summary'
+import { DAYS_OF_WEEK } from '../utils/routine-summary'
 
 interface RoutineDayCardProps {
 	day: RoutineWizardData['days'][number]
@@ -34,8 +35,6 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 			<div className="space-y-3">
 				{day.exercises.map((exercise, exerciseIndex) => {
 					const meta = exerciseMap[exercise.exerciseId]
-					const isRtF = isRtFExercise(exercise.progressionScheme)
-					const summary = getRtfSetSummary(exercise.progressionScheme)
 
 					return (
 						<div key={exerciseIndex} className="border rounded-md p-3">
@@ -45,21 +44,13 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 									<p className="text-xs text-muted-foreground">
 										{meta?.primaryMuscles
 											? formatMuscleGroups(meta.primaryMuscles)
-											: 'Unknown'} • {meta?.equipment ?? 'Unknown'}
+											: 'Unknown'}{' '}
+										• {meta?.equipment ?? 'Unknown'}
 									</p>
-									{isRtF && (
-										<div className="mt-1 flex flex-wrap gap-1">
-											<Badge variant="outline" className="text-[10px]">
-												{exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-													? 'RtF Hypertrophy'
-													: 'RtF Standard'}
-											</Badge>
-											{exercise.programTMKg && (
-												<Badge variant="secondary" className="text-[10px]">
-													TM: {exercise.programTMKg}kg
-												</Badge>
-											)}
-										</div>
+									{exercise.note && (
+										<p className="text-xs text-muted-foreground mt-1 italic">
+											Note: {exercise.note}
+										</p>
 									)}
 								</div>
 								<div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">
@@ -68,29 +59,18 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 							</div>
 
 							<div className="flex flex-wrap gap-1.5">
-								{isRtF
-									? (
-										<>
-											<Badge variant="outline" className="text-xs font-normal">
-												{summary.fixedSets} × {summary.repRange} reps (fixed)
-											</Badge>
-											<Badge variant="outline" className="text-xs font-normal">
-												1 × AMRAP set
-											</Badge>
-										</>
-									)
-									: (
-										<>
-											{exercise.sets.map((set) => (
-												<Badge key={set.setNumber} variant="outline" className="text-xs font-normal">
-													{set.repType === 'FIXED'
-														? `${set.reps ?? ''} reps`
-														: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
-													{set.weight ? ` @ ${set.weight}kg` : ''}
-												</Badge>
-											))}
-										</>
-									)}
+								{exercise.sets.map(set => (
+									<Badge
+										key={set.setNumber}
+										variant="outline"
+										className="text-xs font-normal"
+									>
+										{set.repType === 'FIXED'
+											? `${set.reps ?? ''} reps`
+											: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
+										{set.weight ? ` @ ${set.weight}kg` : ''}
+									</Badge>
+								))}
 							</div>
 						</div>
 					)

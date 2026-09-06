@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
+import { useCallback, useMemo } from 'react'
 
 interface UseExerciseAccessibilityOptions {
 	tabIndex: number
@@ -35,7 +35,6 @@ interface UseExerciseAccessibilityResult {
 export function useExerciseAccessibility({
 	tabIndex,
 	exerciseIndex,
-	expanded,
 	onToggleExpand,
 	onRemoveExercise,
 }: UseExerciseAccessibilityOptions): UseExerciseAccessibilityResult {

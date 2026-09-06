@@ -1,0 +1,139 @@
+'use client'
+
+import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
+import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
+
+import { SetLogInput } from './set-log-input'
+
+interface ExerciseGroupProps {
+	exerciseId: string
+	exerciseName: string
+	sets: Array<{
+		id: string
+		routineExerciseId: string
+		sessionId: string
+		exerciseId: string
+		setNumber: number
+		reps: number
+		weight?: number
+		rpe?: number
+		isCompleted: boolean
+		plannedReps?: number | null
+		plannedMinReps?: number | null
+		plannedMaxReps?: number | null
+		plannedWeight?: number | null
+		plannedRir?: number | null
+	}>
+	isCollapsed: boolean
+	onToggleCollapse: () => void
+	completedSets: number
+	totalSets: number
+	onSave: (payload: UpsertSetLogPayload) => void
+	note?: string | null
+	onSaveNote: (note: string) => void
+}
+
+/**
+ * Reusable component for displaying collapsible exercise groups with set logs
+ */
+export const ExerciseGroup = ({
+	exerciseName,
+	sets,
+	isCollapsed,
+	onToggleCollapse,
+	completedSets,
+	totalSets,
+	onSave,
+	note,
+	onSaveNote,
+}: ExerciseGroupProps) => {
+	const isComplete = completedSets === totalSets && totalSets > 0
+
+	return (
+		<Card
+			className={`transition-all duration-200 ${
+				isComplete
+					? 'border-green-200 bg-green-50/30 dark:border-green-800 dark:bg-green-950/10'
+					: 'border-border'
+			}`}
+		>
+			<CardHeader className="pb-3 flex-row items-center justify-between space-y-0 gap-2">
+				<Button
+					variant="ghost"
+					onClick={onToggleCollapse}
+					className="flex-1 justify-between p-0 h-auto hover:bg-transparent"
+				>
+					<div className="flex flex-1 min-w-0 items-center gap-3">
+						<div className="flex items-center gap-2">
+							{isCollapsed ? (
+								<ChevronRight className="h-4 w-4 text-muted-foreground" />
+							) : (
+								<ChevronDown className="h-4 w-4 text-muted-foreground" />
+							)}
+							<Dumbbell className="h-4 w-4 text-muted-foreground" />
+						</div>
+						<div className="text-left min-w-0">
+							<h3 className="font-semibold text-base line-clamp-1">
+								{exerciseName}
+							</h3>
+							<p className="text-sm text-muted-foreground">
+								{completedSets}/{totalSets} sets completed
+							</p>
+						</div>
+					</div>
+				</Button>
+
+				<div className="flex items-center gap-2 shrink-0">
+					{/* Note button (stops propagation to prevent toggle) */}
+					<div onClick={e => e.stopPropagation()}>
+						<ExerciseNoteRow note={note} onSave={onSaveNote} minimal />
+					</div>
+
+					{isComplete && (
+						<Badge
+							variant="secondary"
+							className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+						>
+							✓ Complete
+						</Badge>
+					)}
+				</div>
+			</CardHeader>
+
+			{!isCollapsed && (
+				<CardContent className="pt-0">
+					<div className="space-y-4">
+						{sets.map(set => (
+							<div
+								key={`${set.routineExerciseId}-${set.setNumber}`}
+								className="space-y-1"
+							>
+								<SetLogInput
+									sessionId={set.sessionId}
+									routineExerciseId={set.routineExerciseId}
+									exerciseId={set.exerciseId}
+									setNumber={set.setNumber}
+									reps={set.reps}
+									weight={set.weight}
+									isCompleted={set.isCompleted}
+									plannedReps={set.plannedReps}
+									plannedMinReps={set.plannedMinReps}
+									plannedMaxReps={set.plannedMaxReps}
+									plannedWeight={set.plannedWeight}
+									plannedRir={set.plannedRir}
+									rpe={set.rpe}
+									onSave={onSave}
+								/>
+							</div>
+						))}
+					</div>
+				</CardContent>
+			)}
+		</Card>
+	)
+}

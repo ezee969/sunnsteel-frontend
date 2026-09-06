@@ -1,163 +1,123 @@
-'use client';
+'use client'
 
-import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService';
-import { supabase } from '@/lib/supabase/client';
-import { usePathname } from 'next/navigation';
-import type { Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+	createContext,
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
+
+import type { AuthResponse } from '@/lib/api/services/supabaseAuthService'
+import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService'
+import { createAuthSessionController } from '@/lib/auth/auth-session-controller'
+import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface SupabaseAuthContextType {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  session: Session | null;
-  user: any | null;
-  error: Error | null;
+	isAuthenticated: boolean
+	isLoading: boolean
+	session: Session | null
+	user: AuthResponse['user'] | null
+	error: Error | null
+	isSessionCleanupPending: boolean
+	sessionCleanupError: Error | null
+	retrySessionCleanup: () => void
 }
 
 const SupabaseAuthContext = createContext<SupabaseAuthContextType>({
-  isAuthenticated: false,
-  isLoading: true,
-  session: null,
-  user: null,
-  error: null,
-});
+	isAuthenticated: false,
+	isLoading: true,
+	session: null,
+	user: null,
+	error: null,
+	isSessionCleanupPending: false,
+	sessionCleanupError: null,
+	retrySessionCleanup: () => {},
+})
 
 export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
-  const queryClient = useQueryClient();
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const pathname = usePathname();
+	const queryClient = useQueryClient()
+	const [session, setSession] = useState<Session | null>(null)
+	const [user, setUser] = useState<AuthResponse['user'] | null>(null)
+	const [isLoading, setIsLoading] = useState(true)
+	const [error, setError] = useState<Error | null>(null)
+	const [isSessionCleanupPending, setIsSessionCleanupPending] = useState(false)
+	const [sessionCleanupError, setSessionCleanupError] = useState<Error | null>(
+		null,
+	)
+	const controllerRef = useRef<ReturnType<
+		typeof createAuthSessionController
+	> | null>(null)
+	const retrySessionCleanup = useCallback(() => {
+		controllerRef.current?.retrySessionCleanup()
+	}, [])
 
-  useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        setSession(session);
+	useEffect(() => {
+		const controller = createAuthSessionController({
+			verifyToken: token => supabaseAuthService.verifyToken(token),
+			invalidateVerification: () =>
+				supabaseAuthService.invalidateVerification(),
+			clearSessionMarker: () => supabaseAuthService.clearSessionMarker(),
+			setSession,
+			setUser,
+			setError,
+			setIsLoading,
+			setSessionCleanupError,
+			setIsSessionCleanupPending,
+			clearQueries: () => queryClient.clear(),
+			invalidateUser: () => {
+				void queryClient.invalidateQueries({ queryKey: ['user'] })
+			},
+		})
+		controllerRef.current = controller
+		// INITIAL_SESSION remains the sole source of startup session state.
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange((event, session) => {
+			logger.debug('[auth] state change', event, {
+				hasSession: !!session,
+				userId: session?.user?.id,
+			})
+			controller.handleAuthStateChange(event, session)
+		})
 
-        if (session) {
-          // Verify with backend and get user profile
-          try {
-            const userProfile = await supabaseAuthService.verifyToken(
-              session.access_token
-            );
-            setUser(userProfile.user);
-            // Mark client-side session for middleware detection
-            try {
-              if (typeof document !== 'undefined') {
-                document.cookie = [
-                  'has_session=1',
-                  'Path=/',
-                  'Max-Age=604800', // 7 days
-                  'SameSite=Lax',
-                ].join('; ');
-              }
-            } catch {}
-          } catch (err) {
-            console.error('Failed to verify token with backend:', err);
-            setError(err as Error);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to get initial session:', err);
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+		return () => {
+			controllerRef.current = null
+			controller.dispose()
+			subscription.unsubscribe()
+		}
+	}, [queryClient])
 
-    getInitialSession();
+	const value = {
+		// isAuthenticated requires both a Supabase session AND a verified backend user profile
+		isAuthenticated: !!session && !!user,
+		isLoading,
+		session,
+		user,
+		error,
+		isSessionCleanupPending,
+		sessionCleanupError,
+		retrySessionCleanup,
+	}
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
-      console.log('Session details:', {
-        hasSession: !!session,
-        accessToken: session?.access_token ? 'present' : 'missing',
-        userId: session?.user?.id,
-      });
-
-      setSession(session);
-      setError(null);
-
-      if (session) {
-        try {
-          // Verify with backend and get/create user
-          const userProfile = await supabaseAuthService.verifyToken(
-            session.access_token
-          );
-          setUser(userProfile.user);
-          // Mark client-side session for middleware detection
-          try {
-            if (typeof document !== 'undefined') {
-              document.cookie = [
-                'has_session=1',
-                'Path=/',
-                'Max-Age=604800', // 7 days
-                'SameSite=Lax',
-              ].join('; ');
-            }
-          } catch {}
-
-          // Invalidate queries to refetch with new auth state
-          queryClient.invalidateQueries({ queryKey: ['user'] });
-        } catch (err) {
-          console.error('Failed to verify token with backend:', err);
-          setError(err as Error);
-          setUser(null);
-          // Best-effort: clear marker on verification failure
-          try {
-            if (typeof document !== 'undefined') {
-              document.cookie = 'has_session=; Max-Age=0; path=/';
-            }
-          } catch {}
-        }
-      } else {
-        setUser(null);
-        // Clear all cached data on sign out
-        queryClient.clear();
-        // Ensure any client-side session marker is cleared to avoid middleware/login loops
-        try {
-          if (typeof document !== 'undefined') {
-            document.cookie = 'has_session=; Max-Age=0; path=/';
-          }
-        } catch {}
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [queryClient]);
-
-  // Skip loading on auth pages to avoid redirect loops
-  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/auth/callback';
-  const contextIsLoading = isAuthPage ? false : isLoading;
-
-  const value = {
-    isAuthenticated: !!session && !!user,
-    isLoading: contextIsLoading,
-    session,
-    user,
-    error,
-  };
-
-  return (
-    <SupabaseAuthContext.Provider value={value}>
-      {children}
-    </SupabaseAuthContext.Provider>
-  );
-};
+	return (
+		<SupabaseAuthContext.Provider value={value}>
+			{children}
+		</SupabaseAuthContext.Provider>
+	)
+}
 
 export const useSupabaseAuth = () => {
-  const context = useContext(SupabaseAuthContext);
-  if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within a SupabaseAuthProvider');
-  }
-  return context;
-};
+	const context = useContext(SupabaseAuthContext)
+	if (context === undefined) {
+		throw new Error(
+			'useSupabaseAuth must be used within a SupabaseAuthProvider',
+		)
+	}
+	return context
+}

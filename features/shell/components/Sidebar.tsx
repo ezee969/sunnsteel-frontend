@@ -1,328 +1,412 @@
-'use client';
+'use client'
 
 import {
-  Activity,
-  Calendar,
-  Dumbbell,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  LucideIcon,
-  Medal,
-  Settings,
-  TrendingUp,
-  Weight,
-  X,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { useUser } from '@/lib/api/hooks/useUser';
-import { ClassicalIcon, ClassicalIconName } from '@/components/icons/ClassicalIcon';
-import Link from 'next/link';
-import { useEffect, useCallback } from 'react';
-import { useNavigationPrefetch } from '@/hooks/use-navigation-prefetch';
+	Activity,
+	Calendar,
+	ChevronLeft,
+	ChevronRight,
+	Dumbbell,
+	Home,
+	LucideIcon,
+	Medal,
+	Settings,
+	TrendingUp,
+	Weight,
+	X,
+} from 'lucide-react'
+import Link from 'next/link'
 
-type NavItem = {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  classicalName?: ClassicalIconName;
-  href: string;
-  disabled: boolean;
-};
+import {
+	ClassicalIcon,
+	ClassicalIconName,
+} from '@/components/icons/ClassicalIcon'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { useToast } from '@/components/ui/toast'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { useUser } from '@/lib/api/hooks/useUser'
+import { cn } from '@/lib/utils'
+
+type NavItemBase = {
+	id: string
+	label: string
+	icon: LucideIcon
+	classicalName?: ClassicalIconName
+}
+
+type NavItem = NavItemBase &
+	({ disabled: true; href?: never } | { disabled: false; href: string })
 
 const SIDEBAR_NAV_ITEMS: NavItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: Home,
-    classicalName: 'pillar-icon',
-    href: '/dashboard',
-    disabled: false,
-  },
-  {
-    id: 'workouts',
-    label: 'Workouts',
-    icon: Dumbbell,
-    classicalName: 'dumbbell',
-    href: '/workouts',
-    disabled: false,
-  },
-  {
-    id: 'routines',
-    label: 'Routines',
-    icon: Activity,
-    classicalName: 'scroll-unfurled',
-    href: '/routines',
-    disabled: false,
-  },
-  {
-    id: 'progress',
-    label: 'Progress',
-    icon: TrendingUp,
-    classicalName: 'compass',
-    href: '/progress',
-    disabled: true,
-  },
-  {
-    id: 'exercises',
-    label: 'Exercises',
-    icon: Weight,
-    classicalName: 'two-dumbbells',
-    href: '/exercises',
-    disabled: true,
-  },
-  {
-    id: 'schedule',
-    label: 'Schedule',
-    icon: Calendar,
-    classicalName: 'hourglass',
-    href: '/schedule',
-    disabled: true,
-  },
-  {
-    id: 'achievements',
-    label: 'Achievements',
-    icon: Medal,
-    classicalName: 'laurel-crown',
-    href: '/achievements',
-    disabled: true,
-  },
-] as const;
+	{
+		id: 'dashboard',
+		label: 'Dashboard',
+		icon: Home,
+		classicalName: 'pillar-icon',
+		href: '/dashboard',
+		disabled: false,
+	},
+	{
+		id: 'workouts',
+		label: 'Workouts',
+		icon: Dumbbell,
+		classicalName: 'dumbbell',
+		href: '/workouts',
+		disabled: false,
+	},
+	{
+		id: 'routines',
+		label: 'Routines',
+		icon: Activity,
+		classicalName: 'scroll-unfurled',
+		href: '/routines',
+		disabled: false,
+	},
+	{
+		id: 'progress',
+		label: 'Progress',
+		icon: TrendingUp,
+		classicalName: 'compass',
+		disabled: true,
+	},
+	{
+		id: 'exercises',
+		label: 'Exercises',
+		icon: Weight,
+		classicalName: 'two-dumbbells',
+		disabled: true,
+	},
+	{
+		id: 'schedule',
+		label: 'Schedule',
+		icon: Calendar,
+		classicalName: 'hourglass',
+		disabled: true,
+	},
+	{
+		id: 'achievements',
+		label: 'Achievements',
+		icon: Medal,
+		classicalName: 'laurel-crown',
+		disabled: true,
+	},
+] satisfies NavItem[]
 
 interface SidebarProps {
-  isMobile: boolean;
-  isSidebarOpen: boolean;
-  isMobileMenuOpen: boolean;
-  activeNav: string;
-  setActiveNav: (navItem: string) => void;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-  setIsMobileMenuOpen: (isOpen: boolean) => void;
+	isMobile: boolean
+	isSidebarOpen: boolean
+	isMobileMenuOpen: boolean
+	activeNav: string
+	setActiveNav: (navItem: string) => void
+	setIsSidebarOpen: (isOpen: boolean) => void
+	setIsMobileMenuOpen: (isOpen: boolean) => void
+	onNavigateStart?: () => void
 }
 
 export default function Sidebar({
-  isMobile,
-  isSidebarOpen,
-  isMobileMenuOpen,
-  activeNav,
-  setActiveNav,
-  setIsSidebarOpen,
-  setIsMobileMenuOpen,
+	isMobile,
+	isSidebarOpen,
+	isMobileMenuOpen,
+	activeNav,
+	setActiveNav,
+	setIsSidebarOpen,
+	setIsMobileMenuOpen,
+	onNavigateStart,
 }: SidebarProps) {
-  const { user } = useUser();
-  const { prefetchPage, prefetchMainNavigation, isReady } = useNavigationPrefetch();
+	const { user } = useUser()
+	const { push } = useToast()
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+	const handleDisabledClick = (label: string) => {
+		push({
+			title: `${label} - Coming Soon`,
+			description:
+				'We are working hard on bringing this feature to Sunnsteel. Stay tuned!',
+		})
+	}
 
-  // Prefetch main navigation on component mount
-  useEffect(() => {
-    if (isReady) {
-      // Prefetch with a slight delay to not interfere with initial render
-      const timeoutId = setTimeout(() => {
-        prefetchMainNavigation({ immediate: true, priority: 'high' });
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isReady, prefetchMainNavigation]);
+	const toggleSidebar = () => {
+		setIsSidebarOpen(!isSidebarOpen)
+	}
 
-  // Handle hover prefetching for individual routes
-  const handleNavHover = useCallback(
-    (href: string) => {
-      prefetchPage(href, { immediate: true, priority: 'high' });
-    },
-    [prefetchPage]
-  );
+	// Route prefetching is handled by next/link, which prefetches these nav
+	// targets automatically (they are all statically prerendered).
 
-  return (
-    <div
-      className={cn(
-        'fixed inset-y-0 z-50 flex flex-col backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
-        // Classical marble background + subtle border in gold tones
-        'bg-marble-light dark:bg-marble-light border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)]',
-        // Ensure consistent background across mobile and desktop
-        'bg-sidebar/95 dark:bg-sidebar/95',
-        isMobile
-          ? isMobileMenuOpen
-            ? 'left-0 w-[85%] max-w-[300px]'
-            : '-left-full'
-          : isSidebarOpen
-          ? 'left-0 w-64'
-          : 'left-0 w-20'
-      )}
-    >
-      {/* Golden vertical accent line */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[rgba(255,215,0,0.2)] via-[rgba(218,165,32,0.35)] to-[rgba(255,215,0,0.2)]" />
-      <div className="flex h-16 items-center justify-between border-b px-4">
-        <div
-          className={cn(
-            'flex items-center gap-2 font-semibold transition-all duration-300',
-            !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
-          )}
-        >
-          <span
-            className="text-xl font-black tracking-wider text-black dark:text-white"
-            style={{
-              fontFamily: '"Cinzel", "Times New Roman", serif',
-              letterSpacing: '0.05em',
-              fontWeight: '900',
-            }}
-          >
-            SUNNSTEEL
-          </span>
-        </div>
-        {isSidebarOpen && isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        )}
-        {!isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className={cn('rounded-full', !isSidebarOpen && 'ml-auto')}
-          >
-            {isSidebarOpen ? (
-              <ChevronLeft className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
-          </Button>
-        )}
-      </div>
-      <ScrollArea className="flex-1 py-4">
-        <nav className="grid gap-2 px-2">
-          {SIDEBAR_NAV_ITEMS.map((item) => (
-            <Link
-              key={item.id}
-              href={item.disabled ? '#' : item.href}
-              prefetch={!item.disabled}
-              onMouseEnter={() => !item.disabled && handleNavHover(item.href)}
-              onClick={(e) => {
-                if (item.disabled) {
-                  e.preventDefault();
-                  return;
-                }
-                // Set active nav immediately for consistent visual state
-                setActiveNav(item.id);
-                // Close mobile sidebar after navigation
-                if (isMobile) {
-                  setIsMobileMenuOpen(false);
-                }
-              }}
-            >
-              <Button
-                variant={activeNav === item.id ? 'default' : 'ghost'}
-                disabled={item.disabled}
-                className={cn(
-                  'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
-                  isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
-                  activeNav === item.id && 'bg-primary text-primary-foreground'
-                )}
-                asChild={false}
-              >
-                <div
-                  className={cn(
-                    'absolute inset-0 opacity-0 bg-gradient-to-r from-primary/10 to-primary/5 transition-opacity',
-                    activeNav === item.id ? 'opacity-100' : 'group-hover:opacity-100'
-                  )}
-                />
-                {item.classicalName ? (
-                  <ClassicalIcon
-                    name={item.classicalName}
-                    aria-hidden
-                    className={cn(
-                      'h-5 w-5 transition-all',
-                      activeNav === item.id
-                        ? 'text-primary-foreground'
-                        : 'text-muted-foreground group-hover:text-foreground'
-                    )}
-                  />
-                ) : (
-                  <item.icon
-                    className={cn(
-                      'h-5 w-5 transition-all',
-                      activeNav === item.id
-                        ? 'text-primary-foreground'
-                        : 'text-muted-foreground group-hover:text-foreground'
-                    )}
-                  />
-                )}
-                <span
-                  className={cn(
-                    'transition-all duration-300',
-                    !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
-                  )}
-                >
-                  {item.label}
-                </span>
-                {activeNav === item.id && (
-                  <div className="absolute right-0 top-0 h-full w-1 bg-primary-foreground/20" />
-                )}
-              </Button>
-            </Link>
-          ))}
-          <Separator className="my-4" />
-          <Button
-            disabled={true}
-            variant="ghost"
-            className={cn(
-              'justify-start gap-3 h-12 transition-all duration-300',
-              !isSidebarOpen && !isMobile && 'justify-center'
-            )}
-            onClick={() => {
-              const button = document.activeElement as HTMLElement;
-              if (button) button.classList.add('scale-95');
-              setTimeout(() => {
-                if (button) button.classList.remove('scale-95');
-              }, 100);
-            }}
-          >
-            <Settings className="h-5 w-5 text-muted-foreground" />
-            <span
-              className={cn(
-                'transition-all duration-300',
-                !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
-              )}
-            >
-              Settings
-            </span>
-          </Button>
-        </nav>
-      </ScrollArea>
-      <div className="border-t p-4">
-        <div
-          className={cn(
-            'flex items-center gap-3',
-            !isSidebarOpen && !isMobile && 'justify-center'
-          )}
-        >
-          <Avatar className="h-10 w-10 border-2 border-primary/20">
-            <AvatarImage src="/logo.png" alt="User" />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {user?.name?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div
-            className={cn(
-              'flex flex-col transition-all duration-300',
-              !isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden'
-            )}
-          >
-            <span className="text-sm font-medium">{user?.name}</span>
-            <span className="text-xs text-muted-foreground">Premium Member</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div
+			className={cn(
+				'fixed inset-y-0 z-50 flex flex-col backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
+				// Classical marble background + subtle border in gold tones
+				'bg-marble-light dark:bg-marble-light border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)]',
+				// Ensure consistent background across mobile and desktop
+				'bg-sidebar/95 dark:bg-sidebar/95',
+				isMobile
+					? isMobileMenuOpen
+						? 'left-0 w-[85%] max-w-[300px]'
+						: '-left-full'
+					: isSidebarOpen
+						? 'left-0 w-64'
+						: 'left-0 w-20',
+			)}
+		>
+			{/* Golden vertical accent line */}
+			<div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[rgba(255,215,0,0.2)] via-[rgba(218,165,32,0.35)] to-[rgba(255,215,0,0.2)]" />
+			<div className="flex h-16 items-center justify-between border-b px-4">
+				<div
+					className={cn(
+						'flex items-center gap-2 font-semibold transition-all duration-300',
+						!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
+					)}
+				>
+					<span
+						className="text-xl font-black tracking-wider text-black dark:text-white"
+						style={{
+							fontFamily: '"Cinzel", "Times New Roman", serif',
+							letterSpacing: '0.05em',
+							fontWeight: '900',
+						}}
+					>
+						SUNNSTEEL
+					</span>
+				</div>
+				{isSidebarOpen && isMobile && (
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => setIsMobileMenuOpen(false)}
+					>
+						<X className="h-5 w-5" />
+					</Button>
+				)}
+				{!isMobile && (
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={toggleSidebar}
+						className={cn('rounded-full', !isSidebarOpen && 'ml-auto')}
+					>
+						{isSidebarOpen ? (
+							<ChevronLeft className="h-5 w-5" />
+						) : (
+							<ChevronRight className="h-5 w-5" />
+						)}
+					</Button>
+				)}
+			</div>
+			<ScrollArea className="flex-1 py-4">
+				<nav className="grid gap-2 px-2">
+					{SIDEBAR_NAV_ITEMS.map(item => {
+						const content = (() => {
+							const showTooltip = !isSidebarOpen && !isMobile
+							const buttonContent = (
+								<Button
+									aria-disabled={item.disabled}
+									variant={activeNav === item.id ? 'default' : 'ghost'}
+									className={cn(
+										'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
+										isSidebarOpen || isMobile
+											? 'justify-start'
+											: 'justify-center',
+										activeNav === item.id
+											? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400'
+											: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700',
+										item.disabled &&
+											'opacity-50 hover:bg-transparent dark:hover:bg-transparent cursor-not-allowed',
+									)}
+									asChild={false}
+								>
+									<div
+										className={cn(
+											'absolute inset-0 opacity-0 bg-gradient-to-r from-amber-600/5 dark:from-amber-400/5 to-transparent transition-opacity',
+											activeNav === item.id
+												? 'opacity-100'
+												: 'group-hover:opacity-100',
+										)}
+									/>
+									{item.classicalName ? (
+										<ClassicalIcon
+											name={item.classicalName}
+											aria-hidden
+											className={cn(
+												'h-5 w-5 transition-all',
+												activeNav === item.id
+													? 'text-amber-500 dark:text-amber-400'
+													: 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+											)}
+										/>
+									) : (
+										<item.icon
+											className={cn(
+												'h-5 w-5 transition-all',
+												activeNav === item.id
+													? 'text-amber-500 dark:text-amber-400'
+													: 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+											)}
+										/>
+									)}
+									<span
+										className={cn(
+											'transition-all duration-300 font-medium',
+											!isSidebarOpen &&
+												!isMobile &&
+												'opacity-0 w-0 overflow-hidden',
+											activeNav === item.id
+												? 'translate-x-1'
+												: 'group-hover:translate-x-1',
+										)}
+									>
+										{item.label}
+									</span>
+									{item.disabled && (isSidebarOpen || isMobile) && (
+										<Badge
+											variant="outline"
+											className="ml-auto text-[9px] h-4 px-1 border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider font-sans shrink-0"
+										>
+											Soon
+										</Badge>
+									)}
+								</Button>
+							)
+
+							if (showTooltip) {
+								return (
+									<Tooltip>
+										<TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+										<TooltipContent side="right" sideOffset={8}>
+											{item.label}
+										</TooltipContent>
+									</Tooltip>
+								)
+							}
+							return buttonContent
+						})()
+
+						// Disabled items are not links: an anchor would stay focusable and be
+						// announced as a link even though it goes nowhere.
+						if (item.disabled) {
+							return (
+								<div
+									key={item.id}
+									onClick={() => handleDisabledClick(item.label)}
+									className="cursor-pointer"
+								>
+									{content}
+								</div>
+							)
+						}
+
+						return (
+							<Link
+								key={item.id}
+								href={item.href}
+								onClick={() => {
+									// Set active nav immediately for consistent visual state
+									setActiveNav(item.id)
+									// Close mobile sidebar after navigation
+									if (isMobile) {
+										setIsMobileMenuOpen(false)
+									}
+									// Signal navigation start for global feedback
+									onNavigateStart?.()
+								}}
+							>
+								{content}
+							</Link>
+						)
+					})}
+					<Separator className="my-4" />
+					<Button
+						asChild
+						variant={activeNav === 'settings' ? 'default' : 'ghost'}
+						className={cn(
+							'justify-start gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
+							!isSidebarOpen && !isMobile ? 'justify-center' : '',
+							activeNav === 'settings'
+								? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400'
+								: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700',
+						)}
+						onClick={() => {
+							if (isMobile) {
+								setIsMobileMenuOpen(false)
+							}
+						}}
+					>
+						<Link href="/settings" onClick={() => setActiveNav('settings')}>
+							<div
+								className={cn(
+									'absolute inset-0 opacity-0 bg-gradient-to-r from-amber-600/5 dark:from-amber-400/5 to-transparent transition-opacity',
+									activeNav === 'settings'
+										? 'opacity-100'
+										: 'group-hover:opacity-100',
+								)}
+							/>
+							<Settings
+								className={cn(
+									'h-5 w-5 transition-all text-muted-foreground',
+									activeNav === 'settings'
+										? 'text-amber-500 dark:text-amber-400'
+										: 'group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+								)}
+							/>
+							<span
+								className={cn(
+									'transition-all duration-300',
+									!isSidebarOpen &&
+										!isMobile &&
+										'opacity-0 w-0 overflow-hidden',
+								)}
+							>
+								Settings
+							</span>
+						</Link>
+					</Button>
+				</nav>
+			</ScrollArea>
+			<div className="border-t p-4">
+				<Link href="/settings">
+					<div
+						className={cn(
+							'flex items-center gap-3 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 p-2 rounded-md transition-colors',
+							!isSidebarOpen && !isMobile && 'justify-center',
+						)}
+					>
+						<Avatar className="h-10 w-10 border-2 border-primary/20">
+							<AvatarImage
+								src={user?.avatarUrl || ''}
+								alt="User avatar"
+								className="object-cover"
+							/>
+							<AvatarFallback className="bg-primary/10 text-primary">
+								{user?.name
+									?.split(' ')
+									.map(n => n.charAt(0))
+									.join('')
+									.slice(0, 2)
+									.toUpperCase()}
+							</AvatarFallback>
+						</Avatar>
+						<div
+							className={cn(
+								'flex flex-col transition-all duration-300',
+								!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
+							)}
+						>
+							<span className="text-sm font-medium">
+								{user?.name} {user?.lastName}
+							</span>
+							<span className="text-xs text-muted-foreground truncate max-w-[10rem]">
+								{user?.email}
+							</span>
+						</div>
+					</div>
+				</Link>
+			</div>
+		</div>
+	)
 }

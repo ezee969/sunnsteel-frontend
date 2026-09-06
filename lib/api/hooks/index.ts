@@ -1,15 +1,11 @@
-export * from './useRoutines'
-export * from './useWorkoutSession'
-export * from './useUser'
 export * from './useExercises'
-export * from './use-tm-adjustments'
-export * from './useRtF'
+export * from './useFollowUser'
+export * from './usePublicUser'
+export * from './useRoutines'
+export * from './useUnfollowUser'
+export * from './useUser'
+export * from './useWorkoutSession'
 
-// Auth-specific hooks
+// Auth-specific hooks (Supabase-based)
 export * from './useSupabaseAuth'
 export * from './useSupabaseEmailAuth'
-export * from './useLogin'
-export * from './useLogout'
-export * from './useRegister'
-export * from './useRefreshToken'
-export * from './useGoogleLogin'

@@ -1,101 +1,22 @@
 // Re-export shared primitive enums to maintain backwards compatible imports.
-import type { RepType, ProgressionScheme } from './routine.shared'
-export type { RepType, ProgressionScheme } from './routine.shared'
-import type { RtfWeekGoals } from './rtf.types'
+export type { ProgressionScheme, RepType } from './routine.shared'
+import type {
+	CreateRoutineRequest as ContractCreateRoutineRequest,
+	Routine as ContractRoutine,
+	RoutineDay as ContractRoutineDay,
+	RoutineExercise as ContractRoutineExercise,
+	RoutineSet as ContractRoutineSet,
+	UpdateRoutineRequest as ContractUpdateRoutineRequest,
+} from '@sunsteel/contracts'
 
-export interface RoutineSet {
-  setNumber: number;
-  repType: RepType;
-  reps?: number | null;
-  minReps?: number | null;
-  maxReps?: number | null;
-  weight?: number;
-}
+export type RoutineSet = ContractRoutineSet
 
-export interface RoutineExercise {
-  id: string;
-  order: number;
-  restSeconds: number;
-  progressionScheme: ProgressionScheme;
-  minWeightIncrement: number;
-  // RtF-specific (present when progressionScheme = PROGRAMMED_RTF)
-  programTMKg?: number;
-  programRoundingKg?: number;
-  exercise: {
-    id: string;
-    name: string;
-  };
-  sets: RoutineSet[];
-}
+export type RoutineExercise = ContractRoutineExercise
 
-export interface RoutineDay {
-  id: string;
-  dayOfWeek: number;
-  order: number;
-  exercises: RoutineExercise[];
-}
+export type RoutineDay = ContractRoutineDay
 
-export interface Routine {
-  id: string;
-  userId: string;
-  name: string;
-  description?: string;
-  isPeriodized: boolean;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
-  isFavorite: boolean;
-  isCompleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-  // Optional program schedule fields (present for RtF routines when backend returns them)
-  programWithDeloads?: boolean;
-  programDurationWeeks?: number;
-  programStartWeek?: number;
-  programStartDate?: string; // ISO date string
-  programEndDate?: string;   // ISO date string
-  programTimezone?: string;  // IANA tz
-  // RTF week goals (populated when ?include=rtfGoals is used)
-  rtfGoals?: RtfWeekGoals;
-  days: RoutineDay[];
-}
+export type Routine = ContractRoutine
 
 // Request types
-export interface CreateRoutineRequest {
-  name: string;
-  description?: string;
-  isPeriodized: boolean;
-  // Routine-level program fields (only when any exercise uses PROGRAMMED_RTF)
-  programWithDeloads?: boolean; // true=21; false=18
-  programStartDate?: string; // yyyy-mm-dd
-  programTimezone?: string; // IANA TZ
-  programStartWeek?: number; // 1..(18|21) only used on create
-  days: Array<{
-    dayOfWeek: number;
-    order?: number;
-    exercises: Array<{
-      exerciseId: string;
-      order?: number;
-      restSeconds: number;
-      progressionScheme: ProgressionScheme;
-      minWeightIncrement: number;
-      // RtF-specific
-      programTMKg?: number;
-      programRoundingKg?: number;
-      sets: Array<
-        | {
-            setNumber: number;
-            repType: 'FIXED';
-            reps: number;
-            weight?: number;
-          }
-        | {
-            setNumber: number;
-            repType: 'RANGE';
-            minReps: number;
-            maxReps: number;
-            weight?: number;
-          }
-      >;
-    }>;
-  }>;
-  programStyle?: 'STANDARD' | 'HYPERTROPHY';
-}
+export type CreateRoutineRequest = ContractCreateRoutineRequest
+export type UpdateRoutineRequest = ContractUpdateRoutineRequest

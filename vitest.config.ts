@@ -1,33 +1,19 @@
+import path from 'node:path'
+
 import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
+// Node environment: pure logic, auth event orchestration and mocked API calls.
+// No DOM, live network or component rendering. Adding React Testing Library is a
+// deliberate later decision, not an oversight.
 export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./test/setup.ts'],
-    globals: true,
-    css: true,
-    include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
-    // Exclude removed legacy auth hook test (Supabase migration)
-    exclude: [
-      'test/lib/api/hooks/useAuth.test.tsx',
-      'test/lib/api/hooks/useAuth.test.skip.ts',
-      'node_modules',
-    ],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov'],
-    },
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './'),
-    },
-  },
+	test: {
+		environment: 'node',
+		include: ['**/*.test.ts'],
+		exclude: ['node_modules/**', '.next/**'],
+	},
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, '.'),
+		},
+	},
 })

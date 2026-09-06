@@ -1,83 +1,194 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession';
-import { useComponentPreloading } from '@/lib/utils/dynamic-imports';
+import { ChevronRight, Dumbbell, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
+import { useCreateRoutine, useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Dumbbell, ChevronRight } from 'lucide-react';
-import { ClassicalIcon } from '@/components/icons/ClassicalIcon';
+	useActiveSession,
+	useStartSession,
+} from '@/lib/api/hooks/useWorkoutSession'
+import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
 export default function WorkoutsIndexPage() {
-  const router = useRouter();
-  const { preloadOnHover } = useComponentPreloading();
-  const { data: active, isLoading } = useActiveSession();
+	const router = useRouter()
+	const { preloadOnHover } = useComponentPreloading()
+	const { data: active, isLoading } = useActiveSession()
+	const { data: routines } = useRoutines()
+	const { mutate: createRoutine } = useCreateRoutine()
+	const { mutate: startSession } = useStartSession()
+	const { push } = useToast()
+	const [isStartingEmpty, setIsStartingEmpty] = useState(false)
 
-  useEffect(() => {
-    if (active?.id) {
-      router.replace(`/workouts/sessions/${active.id}`);
-    }
-  }, [active?.id, router]);
+	useEffect(() => {
+		if (active?.id) {
+			router.replace(`/workouts/sessions/${active.id}`)
+		}
+	}, [active?.id, router])
 
-  if (isLoading) {
-    return (
-      <div className="flex h-[calc(100vh-300px)] items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Dumbbell className="h-5 w-5 animate-pulse" />
-          <span>Loading your workouts...</span>
-        </div>
-      </div>
-    );
-  }
+	const handleStartEmptyWorkout = () => {
+		setIsStartingEmpty(true)
 
-  // If there is an active session, we'll navigate away; render a lightweight fallback meanwhile
-  if (active?.id) {
-    return (
-      <div className="flex h-[calc(100vh-300px)] items-center justify-center">
-        <div className="text-sm text-muted-foreground">
-          Redirecting to your active session…
-        </div>
-      </div>
-    );
-  }
+		// 1. Check if "Quick Workout" routine already exists
+		const existing = routines?.find(r => r.name === 'Quick Workout')
+		if (existing && existing.days.length > 0) {
+			startSession(
+				{
+					routineId: existing.id,
+					routineDayId: existing.days[0].id,
+				},
+				{
+					onSuccess: session => {
+						if (session?.id) {
+							router.push(`/workouts/sessions/${session.id}`)
+						} else {
+							setIsStartingEmpty(false)
+						}
+					},
+					onError: () => {
+						setIsStartingEmpty(false)
+					},
+				},
+			)
+			return
+		}
 
-  return (
-    <div className="mx-auto max-w-2xl p-4">
-      <Card>
-        <CardHeader>
-          <CardDescription>No active workout session found.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Start a new workout from one of your routines. You can begin with the
-            first day or pick a specific day from the routine dropdown.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="classical">
-              <Link href="/routines">
-                <ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
-                Go to Routines
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/workouts/history" {...preloadOnHover('workoutHistoryPage')}>View History</Link>
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href="/dashboard">
-                Dashboard
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+		// 2. Create the "Quick Workout" routine first
+		const today = new Date().getDay()
+		createRoutine(
+			{
+				name: 'Quick Workout',
+				description:
+					'Quick training session started without a pre-made routine',
+				isPeriodized: false,
+				days: [
+					{
+						dayOfWeek: today,
+						order: 1,
+						exercises: [],
+					},
+				],
+			},
+			{
+				onSuccess: newRoutine => {
+					if (newRoutine && newRoutine.days.length > 0) {
+						startSession(
+							{
+								routineId: newRoutine.id,
+								routineDayId: newRoutine.days[0].id,
+							},
+							{
+								onSuccess: session => {
+									if (session?.id) {
+										router.push(`/workouts/sessions/${session.id}`)
+									} else {
+										setIsStartingEmpty(false)
+									}
+								},
+								onError: () => {
+									setIsStartingEmpty(false)
+								},
+							},
+						)
+					} else {
+						setIsStartingEmpty(false)
+						push({
+							title: 'Error',
+							description: 'Failed to initialize routine day.',
+						})
+					}
+				},
+				onError: err => {
+					setIsStartingEmpty(false)
+					push({ title: 'Error starting workout', description: err.message })
+				},
+			},
+		)
+	}
+
+	if (isLoading || isStartingEmpty) {
+		return (
+			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
+				<div className="flex items-center gap-2 text-muted-foreground">
+					<Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+					<span>
+						{isStartingEmpty
+							? 'Initializing quick workout...'
+							: 'Loading your workouts...'}
+					</span>
+				</div>
+			</div>
+		)
+	}
+
+	// If there is an active session, we'll navigate away; render a lightweight fallback meanwhile
+	if (active?.id) {
+		return (
+			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
+				<div className="text-sm text-muted-foreground">
+					Redirecting to your active session…
+				</div>
+			</div>
+		)
+	}
+
+	return (
+		<div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+			<div className="mx-auto max-w-md text-center space-y-6">
+				{/* Visual icon */}
+				<div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted/60">
+					<Dumbbell className="h-10 w-10 text-muted-foreground/60" />
+				</div>
+
+				{/* Heading & copy */}
+				<div className="space-y-2">
+					<h2 className="text-xl font-semibold tracking-tight">
+						No Active Workout
+					</h2>
+					<p className="text-sm text-muted-foreground leading-relaxed">
+						You don&apos;t have a workout in progress right now. Start an empty
+						session to log on the fly, pick a routine, or view your history.
+					</p>
+				</div>
+
+				{/* Actions */}
+				<div className="flex flex-wrap justify-center gap-3">
+					<Button
+						variant="classical"
+						onClick={handleStartEmptyWorkout}
+						disabled={isStartingEmpty}
+					>
+						<ClassicalIcon
+							name="dumbbell"
+							className="mr-2 h-4 w-4"
+							aria-hidden
+						/>
+						Start Empty Workout
+					</Button>
+					<Button asChild variant="outline">
+						<Link href="/routines">Go to Routines</Link>
+					</Button>
+					<Button asChild variant="outline">
+						<Link
+							href="/workouts/history"
+							{...preloadOnHover('workoutHistoryPage')}
+						>
+							View History
+						</Link>
+					</Button>
+					<Button asChild variant="secondary">
+						<Link href="/dashboard">
+							Dashboard
+							<ChevronRight className="ml-2 h-4 w-4" />
+						</Link>
+					</Button>
+				</div>
+			</div>
+		</div>
+	)
 }

@@ -1,20 +1,21 @@
 import { useCallback } from 'react'
-import type { RoutineWizardData, ProgressionScheme } from '../types'
+
+import type { ProgressionScheme, RoutineWizardData } from '../types'
 
 interface UseRoutineDayMutationsParams {
 	data: RoutineWizardData
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 	selectedDayIndex: number
 	trainingDays: number[]
-	canUseTimeframe: boolean
 }
 
 const MIN_REPS = 1
 const MAX_REPS = 50
+const MIN_RIR = 0
+const MAX_RIR = 10
 const MIN_WEIGHT_INCREMENT = 0.25
 const MAX_WEIGHT = 500
 const WEIGHT_STEP = 0.5
-const ALLOWED_ROUNDING = [0.5, 1, 2.5, 5] as const
 
 const clamp = (value: number, min: number, max: number) => {
 	if (Number.isNaN(value)) return min
@@ -24,59 +25,35 @@ const clamp = (value: number, min: number, max: number) => {
 const roundToIncrement = (value: number, increment: number) =>
 	Math.round(value / increment) * increment
 
-/**
- * Provide mutation helpers to modify the selected day's routine data.
- *
- * The hook locates the currently selected training day in `data.days` and exposes functions
- * to add/remove exercises and sets, update progression, reps, weights, rest, and related program
- * fields. When a mutation is applied the hook calls `onUpdate` with an updated `days` array.
- * If the selected day is not present, mutations are no-ops and no update is emitted.
- *
- * @param data - The routine wizard state containing `days` to mutate
- * @param onUpdate - Callback invoked with partial updates to the routine data (e.g., `{ days: [...] }`)
- * @param selectedDayIndex - Index into `trainingDays` indicating the currently selected target day
- * @param trainingDays - Array of day-of-week identifiers used to find the corresponding entry in `data.days`
- * @param canUseTimeframe - Whether time-based progression schemes are allowed
- * @returns An object of mutation helpers:
- * - addExercise(exerciseId): adds an exercise to the selected day and returns the new exercise index or null
- * - removeExercise(exerciseIndex): removes an exercise from the selected day
- * - updateProgramTMKg(exerciseIndex, tmKg): sets an exercise's program TM (rounded and clamped)
- * - updateProgramRoundingKg(exerciseIndex, roundingKg): sets program rounding (validated against allowed values)
- * - updateProgressionScheme(exerciseIndex, scheme): updates an exercise's progression scheme (respects timeframe)
- * - updateMinWeightIncrement(exerciseIndex, increment): updates an exercise's minimum weight increment (clamped)
- * - addSet(exerciseIndex): appends a set to an exercise
- * - removeSet(exerciseIndex, setIndex): removes a set and renumbers remaining sets
- * - stepFixedReps(exerciseIndex, setIndex, delta): adjusts fixed reps by `delta` (clamped)
- * - stepRangeReps(exerciseIndex, setIndex, field, delta): adjusts min/max reps by `delta` (keeps min/max consistent)
- * - stepWeight(exerciseIndex, setIndex, delta): adjusts a set's weight by `delta * WEIGHT_STEP` (rounded, >= 0)
- * - updateSet(exerciseIndex, setIndex, field, value): updates a specific set field (`repType`, `reps`, `minReps`, `maxReps`, `weight`)
- * - validateMinMaxReps(exerciseIndex, setIndex, field): ensures min/max reps are not inverted
- * - setRestSeconds(exerciseIndex, restSeconds): sets rest seconds for an exercise
- */
+const makeClientId = () =>
+	globalThis.crypto?.randomUUID?.() ??
+	`${Date.now()}-${Math.random().toString(16).slice(2)}`
+
 export function useRoutineDayMutations({
 	data,
 	onUpdate,
 	selectedDayIndex,
 	trainingDays,
-	canUseTimeframe,
 }: UseRoutineDayMutationsParams) {
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
 		const targetDay = trainingDays[selectedDayIndex]
-		return data.days.findIndex((day) => day.dayOfWeek === targetDay)
+		return data.days.findIndex(day => day.dayOfWeek === targetDay)
 	}, [data.days, trainingDays, selectedDayIndex])
 
 	const withDayMutation = useCallback(
-		<Result = void>(mutator: (day: RoutineWizardData['days'][number]) => Result) => {
+		<Result = void>(
+			mutator: (day: RoutineWizardData['days'][number]) => Result,
+		) => {
 			const dayIndex = getDayIndex()
 			if (dayIndex === -1) return null
 
 			const originalDay = data.days[dayIndex]
 			const clonedDay = {
 				...originalDay,
-				exercises: originalDay.exercises.map((exercise) => ({
+				exercises: originalDay.exercises.map(exercise => ({
 					...exercise,
-					sets: exercise.sets.map((set) => ({ ...set })),
+					sets: exercise.sets.map(set => ({ ...set })),
 				})),
 			}
 
@@ -92,56 +69,58 @@ export function useRoutineDayMutations({
 
 	const addExercise = useCallback(
 		(exerciseId: string) =>
-			withDayMutation((day) => {
-				const newExercise: RoutineWizardData['days'][number]['exercises'][number] = {
-					exerciseId,
-					progressionScheme: 'NONE',
-					minWeightIncrement: 2.5,
-					restSeconds: 120,
-					sets: [
-						{
-							setNumber: 1,
-							repType: 'FIXED',
-							reps: 10,
-							weight: undefined,
-						},
-					],
-				}
+			withDayMutation(day => {
+				const newExercise: RoutineWizardData['days'][number]['exercises'][number] =
+					{
+						clientId: makeClientId(),
+						exerciseId,
+						progressionScheme: 'NONE',
+						minWeightIncrement: 2.5,
+						restSeconds: 180,
+						sets: [
+							{
+								setNumber: 1,
+								repType: 'FIXED',
+								reps: 10,
+								weight: undefined,
+								rir: null,
+							},
+						],
+					}
 
 				day.exercises.push(newExercise)
-				return day.exercises.length - 1
+				return newExercise.clientId ?? null
 			})?.result ?? null,
 		[withDayMutation],
 	)
 
 	const removeExercise = useCallback(
 		(exerciseIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				day.exercises.splice(exerciseIndex, 1)
 			})
 		},
 		[withDayMutation],
 	)
 
-	const updateProgramTMKg = useCallback(
-		(exerciseIndex: number, tmKg: number) => {
-			withDayMutation((day) => {
+	const updateExercise = useCallback(
+		(exerciseIndex: number, newExerciseId: string) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				const rounded = roundToIncrement(clamp(tmKg, 0, MAX_WEIGHT), WEIGHT_STEP)
-				exercise.programTMKg = Number.isNaN(rounded) ? undefined : rounded
+				// Only update the exerciseId, preserve all other configuration
+				exercise.exerciseId = newExerciseId
 			})
 		},
 		[withDayMutation],
 	)
 
-	const updateProgramRoundingKg = useCallback(
-		(exerciseIndex: number, roundingKg: number) => {
-			withDayMutation((day) => {
+	const updateExerciseNote = useCallback(
+		(exerciseIndex: number, note: string) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				const valid = ALLOWED_ROUNDING.includes(roundingKg as typeof ALLOWED_ROUNDING[number])
-				exercise.programRoundingKg = valid ? roundingKg : 2.5
+				exercise.note = note
 			})
 		},
 		[withDayMutation],
@@ -149,10 +128,14 @@ export function useRoutineDayMutations({
 
 	const updateMinWeightIncrement = useCallback(
 		(exerciseIndex: number, increment: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				exercise.minWeightIncrement = clamp(increment, MIN_WEIGHT_INCREMENT, MAX_WEIGHT)
+				exercise.minWeightIncrement = clamp(
+					increment,
+					MIN_WEIGHT_INCREMENT,
+					MAX_WEIGHT,
+				)
 			})
 		},
 		[withDayMutation],
@@ -172,17 +155,14 @@ export function useRoutineDayMutations({
 
 	const updateProgressionScheme = useCallback(
 		(exerciseIndex: number, scheme: ProgressionScheme) => {
-			const isTimeBased = scheme === 'PROGRAMMED_RTF' || scheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-			if (isTimeBased && !canUseTimeframe) return
-
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 
 				exercise.progressionScheme = scheme
 
 				if (scheme !== 'NONE') {
-					exercise.sets.forEach((set) => {
+					exercise.sets.forEach(set => {
 						if (set.repType === 'FIXED') {
 							const base = set.reps ?? set.minReps ?? set.maxReps ?? 8
 							set.repType = 'RANGE'
@@ -197,34 +177,35 @@ export function useRoutineDayMutations({
 				if (scheme === 'DOUBLE_PROGRESSION' && exercise.sets.length > 0) {
 					syncDoubleProgressionWeights(exercise, exercise.sets[0].weight)
 				}
-
-				if (isTimeBased && typeof exercise.programRoundingKg === 'undefined') {
-					exercise.programRoundingKg = 2.5
-				}
 			})
 		},
-		[canUseTimeframe, withDayMutation],
+		[withDayMutation],
 	)
 
 	const addSet = useCallback(
 		(exerciseIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
-				if (exercise.progressionScheme === 'PROGRAMMED_RTF') return
 
 				const lastSet = exercise.sets[exercise.sets.length - 1]
 				const newSetNumber = exercise.sets.length + 1
 				const newSet = {
 					setNumber: newSetNumber,
 					repType: lastSet?.repType ?? 'FIXED',
-					reps: lastSet?.repType === 'FIXED' ? lastSet?.reps ?? 10 : null,
-					minReps: lastSet?.repType === 'RANGE' ? lastSet?.minReps ?? 8 : null,
-					maxReps: lastSet?.repType === 'RANGE' ? lastSet?.maxReps ?? 12 : null,
+					reps: lastSet?.repType === 'FIXED' ? (lastSet?.reps ?? 10) : null,
+					minReps:
+						lastSet?.repType === 'RANGE' ? (lastSet?.minReps ?? 8) : null,
+					maxReps:
+						lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
 					weight: lastSet?.weight,
+					rir: lastSet?.rir ?? null,
 				}
 
-				if (exercise.progressionScheme === 'DOUBLE_PROGRESSION' && exercise.sets.length > 0) {
+				if (
+					exercise.progressionScheme === 'DOUBLE_PROGRESSION' &&
+					exercise.sets.length > 0
+				) {
 					newSet.weight = exercise.sets[0].weight
 				}
 
@@ -236,7 +217,7 @@ export function useRoutineDayMutations({
 
 	const removeSet = useCallback(
 		(exerciseIndex: number, setIndex: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				exercise.sets.splice(setIndex, 1)
@@ -250,7 +231,7 @@ export function useRoutineDayMutations({
 
 	const stepFixedReps = useCallback(
 		(exerciseIndex: number, setIndex: number, delta: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -268,7 +249,7 @@ export function useRoutineDayMutations({
 			field: 'minReps' | 'maxReps',
 			delta: number,
 		) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -295,15 +276,21 @@ export function useRoutineDayMutations({
 
 	const stepWeight = useCallback(
 		(exerciseIndex: number, setIndex: number, delta: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!exercise || !set) return
 
 				const current = set.weight ?? 0
-				const next = Math.max(0, roundToIncrement(current + delta * WEIGHT_STEP, WEIGHT_STEP))
+				const next = Math.max(
+					0,
+					roundToIncrement(current + delta * WEIGHT_STEP, WEIGHT_STEP),
+				)
 				set.weight = next
-				syncDoubleProgressionWeights(exercise, setIndex === 0 ? next : exercise.sets[0]?.weight)
+				syncDoubleProgressionWeights(
+					exercise,
+					setIndex === 0 ? next : exercise.sets[0]?.weight,
+				)
 			})
 		},
 		[withDayMutation],
@@ -311,7 +298,7 @@ export function useRoutineDayMutations({
 
 	const validateMinMaxReps = useCallback(
 		(exerciseIndex: number, setIndex: number, field: 'minReps' | 'maxReps') => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!set) return
@@ -342,10 +329,10 @@ export function useRoutineDayMutations({
 		(
 			exerciseIndex: number,
 			setIndex: number,
-			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-			value: string,
+			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+			value: string | number | null,
 		) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
 				if (!exercise || !set) return
@@ -365,21 +352,37 @@ export function useRoutineDayMutations({
 						set.reps = null
 					}
 				} else if (field === 'weight') {
-					if (value === '') {
+					if (value === '' || value === null) {
 						set.weight = undefined
 					} else {
-						const parsed = parseFloat(value)
+						const parsed = parseFloat(String(value))
 						set.weight = Number.isNaN(parsed) ? undefined : Math.max(0, parsed)
 					}
-					syncDoubleProgressionWeights(exercise, value === '' ? undefined : set.weight)
+					syncDoubleProgressionWeights(
+						exercise,
+						value === '' ? undefined : set.weight,
+					)
+				} else if (field === 'rir') {
+					if (value === null || value === '') {
+						set.rir = null
+						return
+					}
+					const parsed = typeof value === 'number' ? value : parseInt(value, 10)
+					set.rir = Number.isNaN(parsed)
+						? null
+						: clamp(parsed, MIN_RIR, MAX_RIR)
 				} else {
-					const parsed = value === '' ? null : parseInt(value, 10)
+					const parsed =
+						value === '' || value === null ? null : parseInt(String(value), 10)
 					if (field === 'reps') {
-						set.reps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.reps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					} else if (field === 'minReps') {
-						set.minReps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.minReps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					} else if (field === 'maxReps') {
-						set.maxReps = parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
+						set.maxReps =
+							parsed === null ? null : clamp(parsed, MIN_REPS, MAX_REPS)
 					}
 				}
 			})
@@ -389,7 +392,7 @@ export function useRoutineDayMutations({
 
 	const setRestSeconds = useCallback(
 		(exerciseIndex: number, restSeconds: number) => {
-			withDayMutation((day) => {
+			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
 				exercise.restSeconds = restSeconds
@@ -401,8 +404,8 @@ export function useRoutineDayMutations({
 	return {
 		addExercise,
 		removeExercise,
-		updateProgramTMKg,
-		updateProgramRoundingKg,
+		updateExercise,
+		updateExerciseNote,
 		updateProgressionScheme,
 		updateMinWeightIncrement,
 		addSet,

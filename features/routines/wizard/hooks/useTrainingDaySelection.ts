@@ -1,19 +1,18 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+
 import type { RoutineWizardData } from '../types'
 import { sortNumbersAscending } from '../utils/date-helpers'
 
 interface UseTrainingDaySelectionParams {
 	readonly data: RoutineWizardData
 	readonly onUpdate: (updates: Partial<RoutineWizardData>) => void
-	readonly programStartWeekday: number | null
 }
 
 export const useTrainingDaySelection = ({
 	data,
 	onUpdate,
-	programStartWeekday,
 }: UseTrainingDaySelectionParams) => {
 	const [hasInteracted, setHasInteracted] = useState(
 		data.trainingDays.length > 0,
@@ -24,10 +23,10 @@ export const useTrainingDaySelection = ({
 			const sorted = sortNumbersAscending(nextTrainingDays)
 			onUpdate({
 				trainingDays: sorted,
-				days: sorted.map((dayOfWeek) => ({
+				days: sorted.map(dayOfWeek => ({
 					dayOfWeek,
 					exercises:
-						data.days.find((day) => day.dayOfWeek === dayOfWeek)?.exercises ?? [],
+						data.days.find(day => day.dayOfWeek === dayOfWeek)?.exercises ?? [],
 				})),
 			})
 		},
@@ -36,20 +35,16 @@ export const useTrainingDaySelection = ({
 
 	const toggleDay = useCallback(
 		(dayId: number) => {
-			if (programStartWeekday !== null && dayId === programStartWeekday) {
-				return
-			}
-
 			setHasInteracted(true)
 
 			const isSelected = data.trainingDays.includes(dayId)
 			const next = isSelected
-				? data.trainingDays.filter((id) => id !== dayId)
+				? data.trainingDays.filter(id => id !== dayId)
 				: [...data.trainingDays, dayId]
 
 			updateDays(next)
 		},
-		[data.trainingDays, programStartWeekday, updateDays],
+		[data.trainingDays, updateDays],
 	)
 
 	const selectSplit = useCallback(
@@ -58,7 +53,7 @@ export const useTrainingDaySelection = ({
 
 			const sameSelection =
 				data.trainingDays.length === splitDays.length &&
-				data.trainingDays.every((day) => splitDays.includes(day))
+				data.trainingDays.every(day => splitDays.includes(day))
 
 			if (sameSelection) {
 				onUpdate({ trainingDays: [], days: [] })

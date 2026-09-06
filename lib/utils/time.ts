@@ -4,10 +4,10 @@
  * @returns Formatted time string (e.g., "2:30")
  */
 export const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+	const mins = Math.floor(seconds / 60)
+	const secs = seconds % 60
+	return `${mins}:${secs.toString().padStart(2, '0')}`
+}
 
 /**
  * Parse MM:SS format to total seconds
@@ -15,14 +15,14 @@ export const formatTime = (seconds: number): string => {
  * @returns Total seconds
  */
 export const parseTime = (timeStr: string): number => {
-  const parts = timeStr.split(':');
-  if (parts.length !== 2) return 0;
+	const parts = timeStr.split(':')
+	if (parts.length !== 2) return 0
 
-  const mins = parseInt(parts[0]) || 0;
-  const secs = parseInt(parts[1]) || 0;
+	const mins = parseInt(parts[0]) || 0
+	const secs = parseInt(parts[1]) || 0
 
-  return mins * 60 + secs;
-};
+	return mins * 60 + secs
+}
 
 /**
  * Validate time string format
@@ -30,12 +30,12 @@ export const parseTime = (timeStr: string): number => {
  * @returns True if valid MM:SS format
  */
 export const isValidTimeFormat = (timeStr: string): boolean => {
-  const timeRegex = /^\d{1,2}:\d{2}$/;
-  if (!timeRegex.test(timeStr)) return false;
+	const timeRegex = /^\d{1,2}:\d{2}$/
+	if (!timeRegex.test(timeStr)) return false
 
-  const [mins, secs] = timeStr.split(':').map(Number);
-  return mins >= 0 && secs >= 0 && secs < 60;
-};
+	const [mins, secs] = timeStr.split(':').map(Number)
+	return mins >= 0 && secs >= 0 && secs < 60
+}
 
 /**
  * Format seconds to human readable format
@@ -43,16 +43,16 @@ export const isValidTimeFormat = (timeStr: string): boolean => {
  * @returns Human readable string (e.g., "2 min 30 sec")
  */
 export const formatTimeReadable = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+	const mins = Math.floor(seconds / 60)
+	const secs = seconds % 60
 
-  if (mins === 0) {
-    return `${secs} sec`;
-  }
+	if (mins === 0) {
+		return `${secs} sec`
+	}
 
-  if (secs === 0) {
-    return `${mins} min`;
-  }
+	if (secs === 0) {
+		return `${mins} min`
+	}
 
-  return `${mins} min ${secs} sec`;
-};
+	return `${mins} min ${secs} sec`
+}

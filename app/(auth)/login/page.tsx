@@ -1,91 +1,81 @@
-'use client';
+'use client'
 
-import { useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { LoginHeader } from './components/LoginHeader';
-import { SupabaseLoginForm } from './components/SupabaseLoginForm';
-import { useSupabaseAuth } from '@/providers/supabase-auth-provider';
+import { motion } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect } from 'react'
+
+import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
+import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
+
+import { LoginHeader } from './components/LoginHeader'
+import { SupabaseLoginForm } from './components/SupabaseLoginForm'
 
 // Force dynamic rendering to avoid SSG issues with useSearchParams
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
 function LoginContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading } = useSupabaseAuth();
+	const router = useRouter()
+	const searchParams = useSearchParams()
+	const { isAuthenticated, isLoading } = useSupabaseAuth()
 
-  useEffect(() => {
-    console.log('🔄 Login page auth state:', { isAuthenticated, isLoading })
-    // Redirect authenticated users away from /login
-    if (!isLoading && isAuthenticated) {
-      // sanitize redirect target: same-origin path only
-      const raw = searchParams.get('redirectTo') || '/dashboard'
-      const redirectTo = raw.startsWith('/') ? raw : '/dashboard'
-      // Replace to avoid adding /login to history stack
-      router.replace(redirectTo)
-      // hard-navigation fallback in case client routing is blocked
-      const t = setTimeout(() => {
-        if (typeof window !== 'undefined' && window.location.pathname === '/login') {
-          window.location.replace(redirectTo)
-        }
-      }, 300)
-      return () => clearTimeout(t)
-    }
-  }, [isAuthenticated, isLoading, router, searchParams]);
+	useEffect(() => {
+		// Redirect authenticated users away from /login
+		if (!isLoading && isAuthenticated) {
+			const redirectTo = sanitizeInternalRedirect(
+				searchParams.get('redirectTo'),
+			)
+			// Replace to avoid adding /login to history stack
+			router.replace(redirectTo)
+			// hard-navigation fallback in case client routing is blocked
+			const t = setTimeout(() => {
+				if (
+					typeof window !== 'undefined' &&
+					window.location.pathname === '/login'
+				) {
+					window.location.replace(redirectTo)
+				}
+			}, 300)
+			return () => clearTimeout(t)
+		}
+	}, [isAuthenticated, isLoading, router, searchParams])
 
-  // Show loading while checking auth state
-  if (isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <div className="text-center">
-          <div className="rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto animate-spin" />
-          <p className="mt-2 text-gray-600">Checking authentication...</p>
-        </div>
-      </motion.div>
-    );
-  }
+	// Show loading while checking auth state
+	if (isLoading) {
+		return (
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				className="flex items-center justify-center min-h-[400px]"
+			>
+				<div className="text-center">
+					<div className="rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto animate-spin" />
+					<p className="mt-2 text-gray-600">Checking authentication...</p>
+				</div>
+			</motion.div>
+		)
+	}
 
-  // If authenticated, show loading state while redirecting
-  if (isAuthenticated) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <div className="text-center">
-          <div className="rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto animate-spin" />
-          <p className="mt-2 text-gray-600">Redirecting to dashboard...</p>
-          <p className="mt-1 text-sm text-gray-500">
-            If nothing happens, <a href="/dashboard" className="underline">click here</a>.
-          </p>
-        </div>
-      </motion.div>
-    );
-  }
+	// When already authenticated, avoid rendering an extra loader to reduce flicker.
+	// The effect above will immediately replace to the target route.
+	if (isAuthenticated) return null
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <LoginHeader />
-      <SupabaseLoginForm />
-    </motion.div>
-  );
+	return (
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: -20 }}
+			transition={{ duration: 0.5, ease: 'easeOut' }}
+		>
+			<LoginHeader />
+			<SupabaseLoginForm />
+		</motion.div>
+	)
 }
 
 export default function LoginPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginContent />
-    </Suspense>
-  );
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<LoginContent />
+		</Suspense>
+	)
 }

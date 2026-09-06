@@ -1,5 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { ChevronsUpDown, Plus } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+
 import type { RoutineWizardExercise } from '../types'
 import { SetRow } from './SetRow'
 
@@ -14,15 +16,19 @@ interface SetListSectionProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight',
-		value: string,
+		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (
 		exerciseIndex: number,
 		setIndex: number,
 		field: 'minReps' | 'maxReps',
 	) => void
-	onStepFixedReps: (exerciseIndex: number, setIndex: number, delta: number) => void
+	onStepFixedReps: (
+		exerciseIndex: number,
+		setIndex: number,
+		delta: number,
+	) => void
 	onStepRangeReps: (
 		exerciseIndex: number,
 		setIndex: number,
@@ -97,14 +103,15 @@ export function SetListSection({
 						<div className="col-span-3">Type</div>
 						<div className="col-span-3">Reps</div>
 						<div className="col-span-2">Weight</div>
-						<div className="col-span-2" />
+						<div className="col-span-1">RIR</div>
+						<div className="col-span-1" />
 					</div>
 
 					<div className="space-y-1.5 px-2 sm:px-0">
 						{exercise.sets.map((set, setIndex) => (
 							<div
 								key={setIndex}
-								ref={(node) => registerSetRowRef(setIndex, node)}
+								ref={node => registerSetRowRef(setIndex, node)}
 							>
 								<SetRow
 									exerciseIndex={exerciseIndex}
@@ -116,7 +123,9 @@ export function SetListSection({
 									onStepFixedReps={onStepFixedReps}
 									onStepRangeReps={onStepRangeReps}
 									onStepWeight={onStepWeight}
-									onRemoveSet={() => onRemoveSetAnimated(exerciseIndex, setIndex)}
+									onRemoveSet={() =>
+										onRemoveSetAnimated(exerciseIndex, setIndex)
+									}
 									isRemoving={isRemovingSet(exerciseIndex, setIndex)}
 									disableRemove={exercise.sets.length === 1}
 								/>
@@ -130,18 +139,7 @@ export function SetListSection({
 							onClick={onAddSet}
 							variant="outline"
 							className="w-full h-10 text-base mb-3"
-							disabled={
-								exercise.sets.length >= 10 ||
-								exercise.progressionScheme === 'PROGRAMMED_RTF' ||
-								exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-							}
-							title={
-								exercise.progressionScheme === 'PROGRAMMED_RTF'
-									? 'Sets are handled by RtF Standard progression (5 sets: 4 + 1 AMRAP)'
-								: exercise.progressionScheme === 'PROGRAMMED_RTF_HYPERTROPHY'
-								? 'Sets are handled by RtF Hypertrophy progression (4 sets: 3 + 1 AMRAP)'
-								: undefined
-							}
+							disabled={exercise.sets.length >= 10}
 						>
 							<Plus className="h-4 w-4 mr-2" />
 							Add Set

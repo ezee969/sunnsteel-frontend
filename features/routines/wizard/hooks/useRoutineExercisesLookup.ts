@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+
 import type { Exercise } from '@/lib/api/types'
 
 type ExerciseMap = Record<string, Exercise>

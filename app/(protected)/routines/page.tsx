@@ -1,81 +1,74 @@
-'use client';
+'use client'
 
-import WorkoutFilters from './components/WorkoutFilters';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { WorkoutFilter } from './types';
-import WorkoutsList from './components/WorkoutsList';
-import Link from 'next/link';
-import { useRoutines } from '@/lib/api/hooks/useRoutines';
-import { useRouter } from 'next/navigation';
-import HeroSection from '@/components/layout/HeroSection';
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+
+import HeroSection from '@/components/layout/HeroSection'
+import { Button } from '@/components/ui/button'
+import { useRoutines } from '@/lib/api/hooks/useRoutines'
+
+import WorkoutFilters from './components/WorkoutFilters'
+import WorkoutsList from './components/WorkoutsList'
+import { WorkoutFilter } from './types'
 
 export default function RoutinesPage() {
-  const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all');
+	const router = useRouter()
+	const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all')
 
-  const listFilters = useMemo(() => {
-    if (activeFilter === 'favorites') return { isFavorite: true } as const;
-    if (activeFilter === 'completed') return { isCompleted: true } as const;
-    // 'all' and 'recent' currently map to no backend filters
-    return {} as const;
-  }, [activeFilter]);
+	const listFilters = useMemo(() => {
+		if (activeFilter === 'favorites') return { isFavorite: true } as const
+		if (activeFilter === 'completed') return { isCompleted: true } as const
+		// 'all' and 'recent' currently map to no backend filters
+		return {} as const
+	}, [activeFilter])
 
-  const { data: routines, isLoading, error } = useRoutines(listFilters);
+	const { data: routines, isLoading, error } = useRoutines(listFilters)
+	useEffect(() => {
+		router.prefetch('/routines/new')
+	}, [router])
 
-  // Prefetch the create routine route to speed up navigation
-  useEffect(() => {
-    router.prefetch('/routines/new');
-  }, [router]);
+	return (
+		<div className="h-full min-h-0 flex flex-col gap-4 sm:gap-6">
+			{/* Classical Hero */}
+			<HeroSection
+				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
+				title={<>Routines</>}
+				subtitle={<>Plan, track, and refine your training.</>}
+			/>
+			{/* Header Section */}
+			<div className="flex flex-col gap-2">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+					<div />
+					<Button asChild className="hidden h-10 gap-2 sm:flex">
+						<Link href="/routines/new" prefetch>
+							<Plus className="h-4 w-4" />
+							<span>Create Routine</span>
+						</Link>
+					</Button>
+				</div>
+			</div>
 
-  return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      {/* Classical Hero */}
-      <HeroSection
-        imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        title={<>Routines</>}
-        subtitle={<>Plan, track, and refine your training.</>}
-      />
-      {/* Header Section */}
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground sm:text-base">
-              Plan, track, and manage your workout routines.
-            </p>
-          </div>
-          <Button asChild className="hidden h-10 gap-2 sm:flex">
-            <Link href="/routines/new" prefetch>
-              <Plus className="h-4 w-4" />
-              <span>Create Routine</span>
-            </Link>
-          </Button>
-        </div>
-      </div>
+			<div className="flex min-h-0 flex-1 flex-col gap-4">
+				<WorkoutFilters
+					activeFilter={activeFilter}
+					onFilterChange={setActiveFilter}
+				/>
+				<WorkoutsList routines={routines} isLoading={isLoading} error={error} />
+			</div>
 
-      {/* Mobile Create Button - Sticky at bottom on mobile */}
-      <div className="sticky bottom-4 z-10 sm:hidden">
-        <Button asChild className="w-full shadow-lg" size="lg">
-          <Link
-            href="/routines/new"
-            prefetch
-            className="flex items-center justify-center gap-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Create Routine</span>
-          </Link>
-        </Button>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col gap-4">
-        <WorkoutFilters
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
-        <WorkoutsList routines={routines} isLoading={isLoading} error={error} />
-      </div>
-    </div>
-  );
+			{/* Mobile FAB - Fixed position at bottom right */}
+			<Button
+				asChild
+				size="lg"
+				className="fixed bottom-6 right-6 h-12 gap-1.5 rounded-full px-5 shadow-lg sm:hidden"
+			>
+				<Link href="/routines/new" prefetch aria-label="Create Routine">
+					<Plus className="h-5 w-5" />
+					<span className="text-sm font-semibold">New</span>
+				</Link>
+			</Button>
+		</div>
+	)
 }

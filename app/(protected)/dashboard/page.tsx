@@ -1,40 +1,60 @@
-'use client';
+'use client'
 
-import StatsOverview from './components/StatsOverview';
-import WorkoutPrograms from './components/WorkoutPrograms';
-import { useUser } from '@/lib/api/hooks/useUser';
-import TodaysWorkouts from './components/TodaysWorkouts';
-import HeroSection from '@/components/layout/HeroSection';
+import HeroSection from '@/components/layout/HeroSection'
+
+import DashboardLoading from './components/DashboardLoading'
+import StatsOverview from './components/StatsOverview'
+import TodaysWorkouts from './components/TodaysWorkouts'
+import { useDashboardData } from './hooks/useDashboardData'
 
 export default function Dashboard() {
-  const { user } = useUser();
+	const { isLoading, user } = useDashboardData()
 
-  return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      {/* Classical Hero */}
-      <HeroSection
-        imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
-        title={<>Forge Your Path</>}
-        subtitle={<>Strength • Discipline • Craft</>}
-      />
+	const name = user?.name?.trim()
 
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Welcome back, {user?.name}!
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Track your fitness journey and achieve your goals.
-        </p>
-      </div>
+	return (
+		<div className="flex flex-col gap-4 sm:gap-6">
+			{/* Classical Hero — static, so it paints immediately */}
+			<HeroSection
+				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
+				title={<>Forge Your Path</>}
+				subtitle={<>Strength • Discipline • Craft</>}
+				innerClassName="max-[400px]:justify-center max-[400px]:text-center"
+			/>
 
-      {/* Today's Workouts - dynamic based on device weekday and user routines */}
-      <TodaysWorkouts />
+			{/*
+			 * Everything below is gated on one readiness flag so the dashboard
+			 * arrives as a single composed view instead of assembling itself
+			 * section by section.
+			 */}
+			{isLoading ? (
+				<DashboardLoading />
+			) : (
+				<div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-4 duration-500 sm:gap-6">
+					<div className="flex flex-col gap-2">
+						<h1
+							className="text-2xl sm:text-3xl font-bold tracking-tight"
+							style={{
+								fontFamily: 'var(--font-oswald), sans-serif',
+								textTransform: 'none',
+							}}
+						>
+							{name ? `Welcome back, ${name}!` : 'Welcome back!'}
+						</h1>
+						<p className="text-muted-foreground text-sm sm:text-base">
+							Track your fitness journey and achieve your goals.
+						</p>
+					</div>
 
-      {/* Stats Overview */}
-      <StatsOverview />
+					{/* Today's Workouts - dynamic based on device weekday and user routines */}
+					<div className="max-w-3xl">
+						<TodaysWorkouts />
+					</div>
 
-      {/* Workout Programs */}
-      <WorkoutPrograms />
-    </div>
-  );
+					{/* Stats Overview */}
+					<StatsOverview />
+				</div>
+			)}
+		</div>
+	)
 }
