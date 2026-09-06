@@ -1,74 +1,90 @@
-# Registro activo de deuda técnica
+# Active technical-debt register
 
-Este documento registra únicamente deuda técnica activa y accionable. Los
-problemas funcionales y las capacidades pendientes pertenecen al
-[roadmap de producto](product-roadmap.md); en particular, los problemas de
-perfiles, unidades y Quick Workout no se trasladan aquí.
+This document records only active, actionable technical debt. Functional
+problems and missing capabilities belong to the
+[product roadmap](product-roadmap.md); in particular, the profile, unit and
+Quick Workout problems are not duplicated here.
 
-## Reglas de mantenimiento
+## Maintenance rules
 
-- Cada entrada debe describir impacto, evidencia verificable, dirección de
-  solución y criterios de cierre.
-- La deuda se elimina de este registro cuando se cierra. La evidencia extensa
-  de auditorías cerradas se conserva en `docs/history/`.
-- Las decisiones de producto se enlazan, pero no se duplican aquí.
-- Una limitación aceptada se documenta como contexto y no se convierte en deuda
-  activa sin evidencia nueva que justifique priorizarla.
+- Every entry must state impact, verifiable evidence, a solution direction and
+  closure criteria.
+- Debt is removed from this register when it is closed. Extensive evidence from
+  closed audits is preserved in `docs/history/`.
+- Product decisions are linked, never duplicated here.
+- An accepted limitation is documented as context. It does not become active
+  debt without new evidence that justifies prioritising it.
 
-## Deuda activa
+## Active debt
 
-### TD-27 · `WorkoutProgressService.getProgress` recorre todo el historial
+<a id="td-27"></a>
 
-**Estado:** activo. Relacionado con `DATA-01`–`DATA-05` del
-[roadmap de producto](product-roadmap.md#analytics-and-historical-data-foundation).
+### TD-27 · `WorkoutProgressService.getProgress` scans the entire history
 
-**Impacto:** el coste de `GET /workouts/progress` crece con todo el historial de
-entrenamiento del usuario. Cada petición transfiere y procesa todos los sets
-completados necesarios para volumen y récords, además de todas las fechas de
-sesiones completadas para calcular rachas. Esto aumenta trabajo de base de
-datos, memoria y CPU del backend, y puede degradar la latencia del dashboard a
-medida que crece el historial.
+**Status:** active. Related to `DATA-01`-`DATA-05` in the
+[product roadmap](product-roadmap.md#analytics-and-historical-data-foundation),
+which are `IN_PROGRESS`: the implementation exists and is awaiting staged
+rollout, so this entry stays open until the production gates pass.
 
-**Evidencia:** en
+**Impact:** the cost of `GET /workouts/progress` grows with the user's entire
+training history. Every request transfers and processes all completed sets
+needed for volume and records, plus every completed session date needed to
+compute streaks. This increases database work, backend memory and CPU, and can
+degrade dashboard latency as history grows.
+
+**Evidence:** in
 `../sunnsteel-backend/src/workouts/workout-progress.service.ts`, `getProgress`
-ejecuta en cada llamada un `setLog.findMany` sin ventana temporal ni límite y un
-`workoutSession.findMany` separado, también sin límite, para todas las fechas
-históricas. Después calcula volumen, récords personales y rachas en memoria. El
-frontend consume esa petición mediante `useWorkoutProgress` en el dashboard.
+runs, on every call, a `setLog.findMany` with no time window and no limit, plus a
+separate unbounded `workoutSession.findMany` for all historical dates. It then
+computes volume, personal records and streaks in memory. The frontend consumes
+that request through `useWorkoutProgress` on the dashboard.
 
-**Dirección de solución:** sustituir los recorridos de por vida por datos
-persistidos y consultas acotadas. `DATA-01` aporta récords personales
-persistentes; `DATA-02` y `DATA-03`, eventos y acumulados para volumen y rachas;
-`DATA-04`, snapshots que preservan el significado histórico; y `DATA-05`, un
-backfill repetible para los usuarios existentes. La respuesta pública de
-progreso debe conservar su contrato mientras cambia la fuente de los cálculos.
+**Solution direction:** replace the lifetime scans with persisted data and
+bounded queries. `DATA-01` supplies persistent personal records; `DATA-02` and
+`DATA-03`, events and aggregates for volume and streaks; `DATA-04`, snapshots
+that preserve historical meaning; and `DATA-05`, a repeatable backfill for
+existing users. The public progress response must keep its contract while the
+source of the calculations changes.
 
-**Criterios de cierre:**
+**Closure criteria:**
 
-- `getProgress` deja de consultar todos los sets completados y todas las fechas
-  históricas en cada petición.
-- Los récords, acumulados y eventos se actualizan de forma consistente e
-  idempotente, con backfill repetible para el historial existente.
-- Los tests de lógica y contrato demuestran que la respuesta mantiene los
-  resultados actuales, incluidos volumen, récords, actividad reciente y
-  rachas.
-- Una inspección de consultas o medición con un historial representativo
-  confirma que el trabajo de lectura queda acotado y no crece linealmente con
-  toda la vida del usuario.
+- `getProgress` no longer queries every completed set and every historical date
+  on each request.
+- Records, aggregates and events are updated consistently and idempotently, with
+  a repeatable backfill for existing history.
+- Logic and contract tests demonstrate that the response preserves current
+  results, including volume, records, recent activity and streaks.
+- A query inspection or measurement against a representative history confirms
+  that read work stays bounded and does not grow with the user's whole lifetime.
 
-## Limitaciones aceptadas
+**Remaining work is deployment, not construction.** The staged sequence, its
+gates and the two flags (`WORKOUT_ANALYTICS_JOBS`,
+`WORKOUT_PROGRESS_PROJECTION_READS`) live in the
+[TD-27 rollout runbook](../reference/td27-analytics-rollout.md); local evidence
+is in
+[`td27-analytics-local-validation-2026-09-06.md`](../history/td27-analytics-local-validation-2026-09-06.md).
 
-- No se dispone de mediciones reales en iPhone. Las comprobaciones de escritorio
-  pueden validar orden y comportamiento, pero no cuantifican el rendimiento de
-  la PWA en ese dispositivo.
-- La suite deliberadamente no incluye tests de componentes ni E2E: Vitest se
-  mantiene en entorno Node para lógica pura, orquestación de auth y contratos de
-  API. Esta frontera de cobertura se acepta hasta que una necesidad concreta
-  justifique ampliar herramientas y mantenimiento.
+## Accepted limitations
 
-## Auditoría anterior
+- There are no real measurements on iPhone. Desktop checks can validate ordering
+  and behaviour, but they do not quantify the PWA's performance on that device.
+- The suite deliberately excludes component and E2E tests: Vitest stays in a Node
+  environment for pure logic, auth orchestration and API contracts. This coverage
+  boundary is accepted until a concrete need justifies expanding the tooling and
+  its maintenance.
 
-Los 27 elementos de la auditoría anterior fueron cerrados o replanteados. Su
-contenido completo permanece como evidencia en la
-[auditoría técnica de julio de 2026](../history/technical-debt-audit-2026-07.md);
-no debe usarse como lista de deuda activa.
+## Previous audit
+
+All 27 items from the previous audit were closed or reframed. Their full content
+remains as evidence in the
+[July 2026 technical audit](../history/technical-debt-audit-2026-07.md), which is
+written in Spanish and kept frozen as a historical record. It must not be used as
+a list of active debt.
+
+## Document history
+
+- **2026-09-06:** Translated from Spanish to English so both active registers and
+  the four `CLAUDE.md`/`AGENTS.md` files share one language. Content is
+  unchanged apart from the `DATA-01`-`DATA-05` status note and the pointer to the
+  rollout runbook. A stable `td-27` anchor was added so cross-document links no
+  longer depend on the heading text.
