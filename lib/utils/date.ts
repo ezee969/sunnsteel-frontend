@@ -85,3 +85,35 @@ export const validateRoutineDayDate = (
 		message: `Today is ${weekdayName(todayDow, 'long')}, but this workout is scheduled for ${weekdayName(routineDay.dayOfWeek, 'long')}`,
 	}
 }
+
+/**
+ * Compact relative time ("3 days ago") for activity and record lists.
+ *
+ * Uses `Intl.RelativeTimeFormat` so it follows the viewer's locale rather than
+ * hand-rolled English strings.
+ */
+export const formatTimeAgo = (
+	value: string | Date,
+	now: Date = new Date(),
+): string => {
+	const date = typeof value === 'string' ? new Date(value) : value
+	if (Number.isNaN(date.getTime())) return ''
+
+	const seconds = Math.round((date.getTime() - now.getTime()) / 1000)
+	const units: [Intl.RelativeTimeFormatUnit, number][] = [
+		['year', 31_536_000],
+		['month', 2_592_000],
+		['week', 604_800],
+		['day', 86_400],
+		['hour', 3_600],
+		['minute', 60],
+	]
+
+	const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+	for (const [unit, secondsPerUnit] of units) {
+		if (Math.abs(seconds) >= secondsPerUnit) {
+			return formatter.format(Math.round(seconds / secondsPerUnit), unit)
+		}
+	}
+	return formatter.format(0, 'minute')
+}

@@ -22,6 +22,7 @@ import {
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
+import { getWorkoutProgressQuery } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 
 // Serialize params object to ensure stable query keys
@@ -48,6 +49,7 @@ function serializeSessionParams(
 
 const qk = {
 	stats: ['workout', 'stats'] as const,
+	progress: ['workout', 'progress'] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
 	sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
@@ -65,6 +67,20 @@ export const useWorkoutStats = () => {
 	return useQuery({
 		queryKey: [...qk.stats, params],
 		queryFn: () => workoutService.getStats(params),
+		enabled: !isLoading && !!session,
+	})
+}
+
+/**
+ * Lifetime totals, streaks and personal records, all derived server-side from
+ * the logged sets rather than stored separately.
+ */
+export const useWorkoutProgress = () => {
+	const { session, isLoading } = useAuth()
+	const params = getWorkoutProgressQuery()
+	return useQuery({
+		queryKey: [...qk.progress, params.timeZone],
+		queryFn: () => workoutService.getProgress(params),
 		enabled: !isLoading && !!session,
 	})
 }
