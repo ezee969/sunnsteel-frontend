@@ -39,6 +39,16 @@ export interface ExerciseListProps {
 	isExercisesLoading?: boolean
 }
 
+/**
+ * Render the reorderable exercise cards for a routine day.
+ *
+ * The component resolves catalog metadata, forwards editing callbacks and
+ * displays an empty state when the day has no exercises.
+ *
+ * @param day - Routine day whose exercises should be rendered
+ * @param registerRef - Register an exercise row for scrolling and measurement
+ * @returns The exercise list or its empty state
+ */
 export function ExerciseList({
 	tabIndex,
 	day,

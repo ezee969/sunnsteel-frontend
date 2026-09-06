@@ -36,6 +36,13 @@ import { LoginFormValues, loginSchema } from '@/schema/login-schema'
 
 import { TopLoadingBar } from '../../../../components/ui/top-loading-bar'
 
+/**
+ * Renders a login UI that supports email/password and Google sign-in via Supabase.
+ *
+ * Displays a Google sign-in button, an email/password form with schema validation, a top loading bar while authentication is pending, and an error message when sign-in fails. Disables inputs and actions while any authentication request is in progress.
+ *
+ * @returns The login form React element.
+ */
 export function SupabaseLoginForm() {
 	const { mutate: signIn, isPending, isError, error } = useSupabaseSignIn()
 	const { mutate: googleSignIn, isPending: isGooglePending } =

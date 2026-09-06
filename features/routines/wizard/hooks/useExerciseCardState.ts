@@ -21,6 +21,22 @@ interface UseExerciseCardStateResult {
 	handleWeightIncBlur: () => void
 }
 
+/**
+ * Manage local UI state and interaction handlers for a single exercise card in the wizard.
+ *
+ * Keeps the minimum weight increment synchronized with the exercise, tracks
+ * expansion of the sets list, manages row refs and scrolls a newly added set
+ * into view.
+ *
+ * @returns An object containing state and handlers for the exercise card:
+ * - `registerSetRowRef`: register a DOM ref for a set row by index
+ * - `setsExpanded`: whether the sets list is expanded
+ * - `toggleSetsExpanded`: toggle the sets expanded state
+ * - `handleAddSet`: request adding a new set (and scroll to it)
+ * - `weightIncInput`: current minimum weight increment input string
+ * - `handleWeightIncChange`: update weight increment input text
+ * - `handleWeightIncBlur`: validate and commit weight increment input to parent
+ */
 export function useExerciseCardState({
 	exercise,
 	exerciseIndex,

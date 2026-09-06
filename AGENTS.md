@@ -28,7 +28,7 @@ npm run build          # next build
 npm run verify         # lint + typecheck + build (run this before considering work done)
 ```
 
-**Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 20.
+**Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 22 (required by the current Supabase client).
 
 Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 81 tests across eight files, including `lib/api/types/workout-stats.test.ts` for local week boundaries and logout marker recovery in the auth suites. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
 

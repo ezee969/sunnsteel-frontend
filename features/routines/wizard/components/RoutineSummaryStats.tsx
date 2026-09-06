@@ -4,6 +4,12 @@ interface RoutineSummaryStatsProps {
 	totals: RoutineTotals
 }
 
+/**
+ * Renders a compact summary card showing routine totals: training days, exercises, and sets.
+ *
+ * @param totals - Object with numeric totals to display; expects `trainingDays`, `totalExercises`, and `totalSets`.
+ * @returns A JSX element containing the styled routine summary card.
+ */
 export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 	return (
 		<div className="rounded-lg border bg-card text-card-foreground p-4">

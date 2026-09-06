@@ -24,6 +24,22 @@ interface ExerciseConfigSectionProps {
 	) => void
 }
 
+/**
+ * Render configuration controls for one routine exercise.
+ *
+ * Includes rest time, notes and progression. A minimum weight increment field
+ * is shown when the selected progression scheme requires it.
+ *
+ * @param exercise - Exercise configuration being edited
+ * @param exerciseIndex - Exercise index passed to update callbacks
+ * @param weightIncInput - Current minimum weight increment input
+ * @param onWeightIncChange - Update the local weight increment input
+ * @param onWeightIncBlur - Validate and save the weight increment
+ * @param onUpdateRestTime - Save a rest-time change
+ * @param onUpdateNote - Save an exercise note
+ * @param onUpdateProgressionScheme - Save a progression-scheme change
+ * @returns The exercise configuration controls
+ */
 export function ExerciseConfigSection({
 	exercise,
 	exerciseIndex,

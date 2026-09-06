@@ -19,6 +19,13 @@ import type {
 	UpsertSetLogPayload,
 } from '@/lib/utils/workout-session.types'
 
+/**
+ * Render the active workout session page with session metadata, progress, finish/abort controls, and editable set logs.
+ *
+ * Renders a hero, session header (status and start time), a card showing routine name and progress, finish/abort actions with confirmation dialog, and a list of set logs that will be grouped by routine structure when routine metadata is available. Handles saving individual set logs and finishing or aborting the session.
+ *
+ * @returns The React element tree for the active session UI.
+ */
 export default function ActiveSessionPage() {
 	const params = useParams<{ id: string | string[] }>()
 	const router = useRouter()

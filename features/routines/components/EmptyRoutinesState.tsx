@@ -4,6 +4,13 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
+/**
+ * Renders a centered empty-state UI prompting the user to create a new routine.
+ *
+ * The call-to-action button links to "/routines/new" and triggers component preloading for the new-routine page on hover.
+ *
+ * @returns A React element containing a titled empty state, supporting subtitle text and a button-styled link to create a routine.
+ */
 export function EmptyRoutinesState() {
 	const { preloadOnHover } = useComponentPreloading()
 	return (
