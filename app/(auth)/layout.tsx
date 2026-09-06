@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+
 import { ModeToggle } from '@/components/mode-toggle'
-import { ModernBrandHero } from './components/ModernBrandHero'
+
 import { ModernBackground } from './components/ModernBackground'
+import { ModernBrandHero } from './components/ModernBrandHero'
 
 export default function AuthLayout({
 	children,
@@ -25,7 +27,7 @@ export default function AuthLayout({
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.8, ease: "easeOut" }}
+							transition={{ duration: 0.8, ease: 'easeOut' }}
 							className="flex flex-col items-center lg:items-start"
 						>
 							<h1 className="text-3xl lg:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 dark:from-white dark:via-neutral-200 dark:to-neutral-500 mb-1 drop-shadow-xl">
@@ -64,12 +66,12 @@ export default function AuthLayout({
 				</div>
 			</div>
 
-            {/* Right Side (Desktop) - Branding & Hero */}
+			{/* Right Side (Desktop) - Branding & Hero */}
 			<div className="hidden lg:flex flex-1 relative flex-col items-center justify-center bg-neutral-950 overflow-hidden">
-                <div className="absolute right-8 top-8 z-50">
+				<div className="absolute right-8 top-8 z-50">
 					{mounted && <ModeToggle />}
 				</div>
-                {mounted && <ModernBrandHero />}
+				{mounted && <ModernBrandHero />}
 			</div>
 		</div>
 	)

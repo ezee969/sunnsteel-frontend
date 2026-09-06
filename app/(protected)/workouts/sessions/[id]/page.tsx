@@ -1,20 +1,23 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
-import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
-import { useSessionManagement } from '@/hooks/use-session-management'
-import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
-import { SessionHeader } from '@/features/workout/session-header'
-import { SessionActionCard } from '@/features/workout/session-action-card'
-import { ExerciseGroup } from '@/features/workout/exercise-group'
-import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
-import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
-import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
-import type { GroupedExerciseLogs } from '@/lib/utils/workout-session.types'
-import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
-import type { SetLog } from '@/lib/api/types/workout.type'
 import { useCallback, useMemo } from 'react'
+
+import { ExerciseGroup } from '@/features/workout/exercise-group'
+import { SessionActionCard } from '@/features/workout/session-action-card'
+import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
+import { SessionHeader } from '@/features/workout/session-header'
+import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
+import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
+import { useSessionManagement } from '@/hooks/use-session-management'
+import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
+import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
+import type { SetLog } from '@/lib/api/types/workout.type'
+import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
+import type {
+	GroupedExerciseLogs,
+	UpsertSetLogPayload,
+} from '@/lib/utils/workout-session.types'
 
 export default function ActiveSessionPage() {
 	const params = useParams<{ id: string | string[] }>()
@@ -75,12 +78,7 @@ export default function ActiveSessionPage() {
 			day.exercises,
 			session.id,
 		)
-	}, [
-		session?.setLogs,
-		session?.routineDayId,
-		session?.id,
-		routine,
-	])
+	}, [session?.setLogs, session?.routineDayId, session?.id, routine])
 
 	// Loading state (session or routine). For routine, wait until first fetch completes when routineId exists
 	const routineFirstFetchPending = !!routineId && !isRoutineFetched
@@ -192,7 +190,6 @@ export default function ActiveSessionPage() {
 			</div>
 		)
 	}
-
 
 	return (
 		<div className="min-h-screen bg-background">

@@ -1,11 +1,29 @@
+import { PUBLIC_ENV } from '@/lib/config/env'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { PUBLIC_ENV } from '@/lib/config/env'
 
 const API_BASE_URL = PUBLIC_ENV.API_URL
 
 interface ApiRequestConfig extends RequestInit {
 	secure?: boolean
+}
+
+/**
+ * Error carrying the HTTP status, so callers can branch on it.
+ *
+ * This exists because `query-provider.tsx` decides whether to retry by reading
+ * `error.status`: throwing a bare `Error` made that check silently unreachable
+ * and every 4xx got retried 3 times with backoff. Extends `Error`, so existing
+ * `instanceof Error` / `.message` handling is unaffected. See TD-23.
+ */
+export class HttpError extends Error {
+	readonly status: number
+
+	constructor(message: string, status: number) {
+		super(message)
+		this.name = 'HttpError'
+		this.status = status
+	}
 }
 
 function buildBaseHeaders(fetchOptions: RequestInit): Record<string, string> {
@@ -20,7 +38,9 @@ function buildBaseHeaders(fetchOptions: RequestInit): Record<string, string> {
  * (without mutating `headers`) when there is no active session, letting
  * callers decide how to handle an expired/missing session.
  */
-async function attachAuthHeader(headers: Record<string, string>): Promise<boolean> {
+async function attachAuthHeader(
+	headers: Record<string, string>,
+): Promise<boolean> {
 	const {
 		data: { session },
 	} = await supabase.auth.getSession()
@@ -33,29 +53,47 @@ async function attachAuthHeader(headers: Record<string, string>): Promise<boolea
 	return true
 }
 
-function prepareRequest(endpoint: string, fetchOptions: RequestInit, headers: Record<string, string>) {
+function prepareRequest(
+	endpoint: string,
+	fetchOptions: RequestInit,
+	headers: Record<string, string>,
+) {
 	const url = `${API_BASE_URL}${endpoint}`
-	const config: RequestInit = { ...fetchOptions, headers, credentials: 'include' }
+	const config: RequestInit = {
+		...fetchOptions,
+		headers,
+		credentials: 'include',
+	}
 	const method = (config.method || 'GET').toUpperCase()
 	return { url, config, method }
 }
 
-async function readResponseBody(response: Response): Promise<{ raw: string; contentType: string }> {
+async function readResponseBody(
+	response: Response,
+): Promise<{ raw: string; contentType: string }> {
 	const contentType = response.headers.get('content-type') || ''
 	const raw = await response.text()
 	return { raw, contentType }
 }
 
 export const httpClient = {
-	async request<T>(endpoint: string, options: ApiRequestConfig = {}): Promise<T> {
+	async request<T>(
+		endpoint: string,
+		options: ApiRequestConfig = {},
+	): Promise<T> {
 		const { secure = false, ...fetchOptions } = options
 		const headers = buildBaseHeaders(fetchOptions)
 
 		if (secure && !(await attachAuthHeader(headers))) {
-			throw new Error('Session expired')
+			// 401-equivalent: there is no token to send, so retrying cannot help.
+			throw new HttpError('Session expired', 401)
 		}
 
-		const { url, config, method } = prepareRequest(endpoint, fetchOptions, headers)
+		const { url, config, method } = prepareRequest(
+			endpoint,
+			fetchOptions,
+			headers,
+		)
 		logger.debug('[http] ->', method, url, { secure })
 
 		const response = await fetch(url, config)
@@ -76,7 +114,7 @@ export const httpClient = {
 				contentLength: response.headers.get('content-length'),
 				rawPreview: raw?.slice(0, 200),
 			})
-			throw new Error(errorMessage)
+			throw new HttpError(errorMessage, response.status)
 		}
 
 		if (response.status === 204 || !raw || raw.trim().length === 0) {
@@ -119,7 +157,11 @@ export const httpClient = {
 		})
 	},
 
-	patch<T, D = unknown>(endpoint: string, data?: D, secure = false): Promise<T> {
+	patch<T, D = unknown>(
+		endpoint: string,
+		data?: D,
+		secure = false,
+	): Promise<T> {
 		return this.request<T>(endpoint, {
 			method: 'PATCH',
 			body: data ? JSON.stringify(data) : undefined,
@@ -146,7 +188,11 @@ export async function requestWithMeta<T>(
 		return { data: undefined, status: 401, headers: new Headers(), ok: false }
 	}
 
-	const { url, config, method } = prepareRequest(endpoint, fetchOptions, headers)
+	const { url, config, method } = prepareRequest(
+		endpoint,
+		fetchOptions,
+		headers,
+	)
 	logger.debug('[http-meta] ->', method, url, { secure })
 
 	const response = await fetch(url, config)
@@ -181,7 +227,12 @@ export async function requestWithMeta<T>(
 	if (contentType.includes('application/json')) {
 		try {
 			const data = JSON.parse(raw) as T
-			return { data, status: response.status, headers: response.headers, ok: true }
+			return {
+				data,
+				status: response.status,
+				headers: response.headers,
+				ok: true,
+			}
 		} catch {}
 	}
 

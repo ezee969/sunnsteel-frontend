@@ -1,14 +1,14 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export default async function HomePage() {
-  // This will redirect to /dashboard if authenticated, or /login if not
-  const cookieStore = await cookies();
-  const hasValidSession = cookieStore.get('ss_session')?.value === '1';
+	// This will redirect to /dashboard if authenticated, or /login if not
+	const cookieStore = await cookies()
+	const hasValidSession = cookieStore.get('ss_session')?.value === '1'
 
-  if (hasValidSession) {
-    redirect('/dashboard');
-  }
+	if (hasValidSession) {
+		redirect('/dashboard')
+	}
 
-  redirect('/login');
+	redirect('/login')
 }

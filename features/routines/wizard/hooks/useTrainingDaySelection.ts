@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+
 import type { RoutineWizardData } from '../types'
 import { sortNumbersAscending } from '../utils/date-helpers'
 
@@ -22,10 +23,10 @@ export const useTrainingDaySelection = ({
 			const sorted = sortNumbersAscending(nextTrainingDays)
 			onUpdate({
 				trainingDays: sorted,
-				days: sorted.map((dayOfWeek) => ({
+				days: sorted.map(dayOfWeek => ({
 					dayOfWeek,
 					exercises:
-						data.days.find((day) => day.dayOfWeek === dayOfWeek)?.exercises ?? [],
+						data.days.find(day => day.dayOfWeek === dayOfWeek)?.exercises ?? [],
 				})),
 			})
 		},
@@ -38,7 +39,7 @@ export const useTrainingDaySelection = ({
 
 			const isSelected = data.trainingDays.includes(dayId)
 			const next = isSelected
-				? data.trainingDays.filter((id) => id !== dayId)
+				? data.trainingDays.filter(id => id !== dayId)
 				: [...data.trainingDays, dayId]
 
 			updateDays(next)
@@ -52,7 +53,7 @@ export const useTrainingDaySelection = ({
 
 			const sameSelection =
 				data.trainingDays.length === splitDays.length &&
-				data.trainingDays.every((day) => splitDays.includes(day))
+				data.trainingDays.every(day => splitDays.includes(day))
 
 			if (sameSelection) {
 				onUpdate({ trainingDays: [], days: [] })

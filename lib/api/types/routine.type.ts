@@ -1,5 +1,5 @@
 // Re-export shared primitive enums to maintain backwards compatible imports.
-export type { RepType, ProgressionScheme } from './routine.shared'
+export type { ProgressionScheme, RepType } from './routine.shared'
 import type {
 	CreateRoutineRequest as ContractCreateRoutineRequest,
 	Routine as ContractRoutine,

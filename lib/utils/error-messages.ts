@@ -12,7 +12,8 @@ export interface ErrorMessageMapping {
 const errorMappings: ErrorMessageMapping[] = [
 	// Email already in use
 	{
-		pattern: /user already registered|email.*already.*registered|duplicate.*email/i,
+		pattern:
+			/user already registered|email.*already.*registered|duplicate.*email/i,
 		friendlyMessage: 'This email is already registered',
 		actionableGuidance:
 			'If this is your account, try logging in instead. Forgot your password? Use the password reset option.',
@@ -107,7 +108,10 @@ export function getFriendlyErrorMessage(
 	// If no mapping found, return a sanitized version of the original message
 	// Remove technical details like stack traces, UUIDs, etc.
 	const sanitized = errorMessage
-		.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '') // Remove UUIDs
+		.replace(
+			/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+			'',
+		) // Remove UUIDs
 		.replace(/at\s+[\w.<>]+\s*\([^)]+\)/g, '') // Remove stack traces
 		.replace(/\s{2,}/g, ' ') // Remove extra spaces
 		.trim()

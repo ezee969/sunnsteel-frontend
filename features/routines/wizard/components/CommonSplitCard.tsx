@@ -1,8 +1,9 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+
 import type { TrainingSplit } from '../constants/training-days'
 
 interface CommonSplitCardProps {
@@ -30,7 +31,7 @@ export const CommonSplitCard = ({
 		tabIndex={0}
 		aria-label={`Select ${split.name} training split (${split.days.length} days)`}
 		onClick={onSelect}
-		onKeyDown={(event) => {
+		onKeyDown={event => {
 			if (event.key === 'Enter' || event.key === ' ') {
 				event.preventDefault()
 				onSelect()
@@ -43,7 +44,10 @@ export const CommonSplitCard = ({
 					<h4 className="font-medium text-xs md:text-sm leading-tight line-clamp-2 break-words">
 						{split.name}
 					</h4>
-					<Badge variant="outline" className="shrink-0 text-[10px] md:text-xs h-5 px-1.5">
+					<Badge
+						variant="outline"
+						className="shrink-0 text-[10px] md:text-xs h-5 px-1.5"
+					>
 						{split.days.length}d
 					</Badge>
 				</div>

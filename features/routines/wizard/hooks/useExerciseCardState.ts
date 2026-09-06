@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import type { RoutineWizardData } from '../types'
 import { sanitizeDecimalInput } from '../utils/validation.helpers'
 
@@ -30,7 +31,8 @@ export function useExerciseCardState({
 	const [setsExpanded, setSetsExpanded] = useState(true)
 	const [shouldScrollToLast, setShouldScrollToLast] = useState(false)
 	const [weightIncInput, setWeightIncInput] = useState<string>(
-		exercise.minWeightIncrement !== undefined && exercise.minWeightIncrement !== null
+		exercise.minWeightIncrement !== undefined &&
+			exercise.minWeightIncrement !== null
 			? String(exercise.minWeightIncrement)
 			: '',
 	)
@@ -38,7 +40,9 @@ export function useExerciseCardState({
 	useEffect(() => {
 		const parentValue = exercise.minWeightIncrement
 		setWeightIncInput(
-			parentValue !== undefined && parentValue !== null ? String(parentValue) : '',
+			parentValue !== undefined && parentValue !== null
+				? String(parentValue)
+				: '',
 		)
 	}, [exercise.minWeightIncrement])
 
@@ -51,12 +55,15 @@ export function useExerciseCardState({
 		setShouldScrollToLast(false)
 	}, [exercise.sets.length, shouldScrollToLast])
 
-	const registerSetRowRef = useCallback((index: number, node: HTMLDivElement | null) => {
-		setRowRefs.current[index] = node
-	}, [])
+	const registerSetRowRef = useCallback(
+		(index: number, node: HTMLDivElement | null) => {
+			setRowRefs.current[index] = node
+		},
+		[],
+	)
 
 	const toggleSetsExpanded = useCallback(() => {
-		setSetsExpanded((previous) => !previous)
+		setSetsExpanded(previous => !previous)
 	}, [])
 
 	const handleAddSet = useCallback(() => {
@@ -83,9 +90,16 @@ export function useExerciseCardState({
 
 		const parentValue = exercise.minWeightIncrement
 		setWeightIncInput(
-			parentValue !== undefined && parentValue !== null ? String(parentValue) : '',
+			parentValue !== undefined && parentValue !== null
+				? String(parentValue)
+				: '',
 		)
-	}, [exercise.minWeightIncrement, exerciseIndex, onUpdateMinWeightIncrement, weightIncInput])
+	}, [
+		exercise.minWeightIncrement,
+		exerciseIndex,
+		onUpdateMinWeightIncrement,
+		weightIncInput,
+	])
 
 	return {
 		registerSetRowRef,

@@ -1,4 +1,5 @@
-export const sanitizeIntegerInput = (value: string) => value.replace(/[^0-9]/g, '')
+export const sanitizeIntegerInput = (value: string) =>
+	value.replace(/[^0-9]/g, '')
 
 export const sanitizeDecimalInput = (value: string) =>
 	value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')

@@ -12,11 +12,15 @@ export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 			</h3>
 			<div className="flex justify-around text-center">
 				<div>
-					<p className="text-xl font-bold text-primary">{totals.trainingDays}</p>
+					<p className="text-xl font-bold text-primary">
+						{totals.trainingDays}
+					</p>
 					<p className="text-xs text-muted-foreground">Days</p>
 				</div>
 				<div>
-					<p className="text-xl font-bold text-primary">{totals.totalExercises}</p>
+					<p className="text-xl font-bold text-primary">
+						{totals.totalExercises}
+					</p>
 					<p className="text-xs text-muted-foreground">Exercises</p>
 				</div>
 				<div>

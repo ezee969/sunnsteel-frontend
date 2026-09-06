@@ -1,18 +1,19 @@
-import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useCallback, useState } from 'react'
+
 import { useFinishSession } from '@/lib/api/hooks'
 import type { Routine } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
-import type {
-	SessionStatus,
-	SessionProgressData,
-} from '@/lib/utils/workout-session.types'
-import {
-	calculateSessionProgress,
-	areAllSetsCompleted,
-} from '@/lib/utils/session-progress.utils'
 import { SESSION_STATUS } from '@/lib/constants/session.constants'
 import { logger } from '@/lib/utils/logger'
+import {
+	areAllSetsCompleted,
+	calculateSessionProgress,
+} from '@/lib/utils/session-progress.utils'
+import type {
+	SessionProgressData,
+	SessionStatus,
+} from '@/lib/utils/workout-session.types'
 
 interface UseSessionManagementProps {
 	sessionId: string

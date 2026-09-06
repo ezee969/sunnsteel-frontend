@@ -1,5 +1,7 @@
 'use client'
 
+import { Clock, FileText } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +12,6 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { formatTime } from '@/lib/utils/time'
-import { FileText, Clock } from 'lucide-react'
 
 interface ExerciseCardProps {
 	exercise: {

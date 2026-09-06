@@ -1,24 +1,28 @@
 export const getTodayDow = (): number => {
-  // Local device weekday (0=Sun..6=Sat)
-  return new Date().getDay();
-};
+	// Local device weekday (0=Sun..6=Sat)
+	return new Date().getDay()
+}
 
-export const weekdayName = (dayOfWeek: number, style: 'short' | 'long' = 'short'): string => {
-  const short = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
-  const long = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ] as const;
-  const src = style === 'long' ? long : short;
-  return src[dayOfWeek] ?? `Day ${dayOfWeek}`;
-};
+export const weekdayName = (
+	dayOfWeek: number,
+	style: 'short' | 'long' = 'short',
+): string => {
+	const short = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+	const long = [
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	] as const
+	const src = style === 'long' ? long : short
+	return src[dayOfWeek] ?? `Day ${dayOfWeek}`
+}
 
-export const isTodayDow = (dayOfWeek: number): boolean => dayOfWeek === getTodayDow();
+export const isTodayDow = (dayOfWeek: number): boolean =>
+	dayOfWeek === getTodayDow()
 
 /**
  * Validates if a workout can be started today based on routine's scheduled days
@@ -27,33 +31,33 @@ export const isTodayDow = (dayOfWeek: number): boolean => dayOfWeek === getToday
  * @returns Object with validation result and message
  */
 export const validateWorkoutDate = (
-  routineDays: Array<{ dayOfWeek: number }> | undefined,
-  todayDow: number = getTodayDow()
+	routineDays: Array<{ dayOfWeek: number }> | undefined,
+	todayDow: number = getTodayDow(),
 ): { isValid: boolean; message?: string; availableDays?: string[] } => {
-  if (!routineDays || routineDays.length === 0) {
-    return {
-      isValid: false,
-      message: 'No training days configured for this routine'
-    };
-  }
+	if (!routineDays || routineDays.length === 0) {
+		return {
+			isValid: false,
+			message: 'No training days configured for this routine',
+		}
+	}
 
-  const scheduledDays = routineDays.map(day => day.dayOfWeek);
-  const isScheduledToday = scheduledDays.includes(todayDow);
+	const scheduledDays = routineDays.map(day => day.dayOfWeek)
+	const isScheduledToday = scheduledDays.includes(todayDow)
 
-  if (isScheduledToday) {
-    return { isValid: true };
-  }
+	if (isScheduledToday) {
+		return { isValid: true }
+	}
 
-  const availableDayNames = scheduledDays
-    .sort()
-    .map(dow => weekdayName(dow, 'long'));
+	const availableDayNames = scheduledDays
+		.sort()
+		.map(dow => weekdayName(dow, 'long'))
 
-  return {
-    isValid: false,
-    message: `Today is ${weekdayName(todayDow, 'long')}, but this routine is scheduled for ${availableDayNames.join(', ')}`,
-    availableDays: availableDayNames
-  };
-};
+	return {
+		isValid: false,
+		message: `Today is ${weekdayName(todayDow, 'long')}, but this routine is scheduled for ${availableDayNames.join(', ')}`,
+		availableDays: availableDayNames,
+	}
+}
 
 /**
  * Checks if a specific routine day can be started today
@@ -62,22 +66,22 @@ export const validateWorkoutDate = (
  * @returns Object with validation result and message
  */
 export const validateRoutineDayDate = (
-  routineDay: { dayOfWeek: number } | undefined,
-  todayDow: number = getTodayDow()
+	routineDay: { dayOfWeek: number } | undefined,
+	todayDow: number = getTodayDow(),
 ): { isValid: boolean; message?: string } => {
-  if (!routineDay) {
-    return {
-      isValid: false,
-      message: 'Invalid routine day'
-    };
-  }
+	if (!routineDay) {
+		return {
+			isValid: false,
+			message: 'Invalid routine day',
+		}
+	}
 
-  if (routineDay.dayOfWeek === todayDow) {
-    return { isValid: true };
-  }
+	if (routineDay.dayOfWeek === todayDow) {
+		return { isValid: true }
+	}
 
-  return {
-    isValid: false,
-    message: `Today is ${weekdayName(todayDow, 'long')}, but this workout is scheduled for ${weekdayName(routineDay.dayOfWeek, 'long')}`
-  };
-};
+	return {
+		isValid: false,
+		message: `Today is ${weekdayName(todayDow, 'long')}, but this workout is scheduled for ${weekdayName(routineDay.dayOfWeek, 'long')}`,
+	}
+}

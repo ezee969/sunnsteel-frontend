@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+
 import type { RoutineSet } from '../types'
 import {
+	parseOptionalPositiveFloat,
 	sanitizeDecimalInput,
 	sanitizeIntegerInput,
-	parseOptionalPositiveFloat,
 } from '../utils/validation.helpers'
 
 interface UseSetRowInputsOptions {

@@ -1,11 +1,13 @@
 'use client'
 
 import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
-import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { createEnterSpaceHandler } from '@/lib/utils/keyboard'
+import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
+
 import { SetComparisonRow } from './set-comparison-row'
 
 interface HistoryExerciseGroupProps {
@@ -34,7 +36,8 @@ export function HistoryExerciseGroup({
 						<CardTitle className="text-lg">{group.exercise.name}</CardTitle>
 					</div>
 					<Badge variant="outline" className="text-xs">
-						{formatMuscleGroups(group.exercise.primaryMuscles)} • {group.exercise.equipment}
+						{formatMuscleGroups(group.exercise.primaryMuscles)} •{' '}
+						{group.exercise.equipment}
 					</Badge>
 					{collapsed ? (
 						<ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -55,9 +58,9 @@ export function HistoryExerciseGroup({
 					</div>
 
 					<div className="space-y-2">
-						{group.plannedSets.map((plannedSet) => {
+						{group.plannedSets.map(plannedSet => {
 							const performedSet = group.performedSets.find(
-								(set) => set.setNumber === plannedSet.setNumber,
+								set => set.setNumber === plannedSet.setNumber,
 							)
 							return (
 								<SetComparisonRow

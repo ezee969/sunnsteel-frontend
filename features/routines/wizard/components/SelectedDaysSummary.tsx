@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+
 import type { TrainingDayInfo } from '../constants/training-days'
 
 interface SelectedDaysSummaryProps {
@@ -31,15 +32,13 @@ export const SelectedDaysSummary = ({
 				</p>
 			</div>
 			<div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 md:gap-2">
-				{dayInfos.map((day) => (
+				{dayInfos.map(day => (
 					<Badge
 						key={day.id}
 						variant="secondary"
 						className={cn(
 							'w-full text-center text-xs md:text-sm px-1 py-1 transition-opacity duration-300',
-							trainingDays.includes(day.id)
-								? 'opacity-100'
-								: 'opacity-0',
+							trainingDays.includes(day.id) ? 'opacity-100' : 'opacity-0',
 						)}
 					>
 						{day.name}

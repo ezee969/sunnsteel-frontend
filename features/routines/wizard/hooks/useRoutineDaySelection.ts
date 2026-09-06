@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+
 import type { Exercise } from '@/lib/api/types'
 
 interface UseRoutineDaySelectionParams {
@@ -24,7 +25,7 @@ export function useRoutineDaySelection({
 			return
 		}
 
-		setSelectedDay((prev) => {
+		setSelectedDay(prev => {
 			if (prev < trainingDays.length) return prev
 			return Math.max(0, trainingDays.length - 1)
 		})
@@ -56,10 +57,10 @@ export function useRoutineDaySelection({
 		const searchLower = searchValue.trim().toLowerCase()
 		if (!searchLower) return exercises
 
-		return exercises.filter((exercise) => {
+		return exercises.filter(exercise => {
 			if (exercise.name.toLowerCase().includes(searchLower)) return true
 			if (exercise.equipment.toLowerCase().includes(searchLower)) return true
-			return exercise.primaryMuscles.some((muscle) =>
+			return exercise.primaryMuscles.some(muscle =>
 				muscle.toLowerCase().includes(searchLower),
 			)
 		})
@@ -73,7 +74,7 @@ export function useRoutineDaySelection({
 			isOpen: isPickerOpen,
 			open: () => setPickerOpen(true),
 			close: closePicker,
-			toggle: () => setPickerOpen((prev) => !prev),
+			toggle: () => setPickerOpen(prev => !prev),
 			searchValue,
 			setSearchValue,
 			filteredExercises,

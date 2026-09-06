@@ -1,23 +1,24 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Edit, Heart, Check } from 'lucide-react';
-import type { Routine } from '@/lib/api/types/routine.type';
+import { ArrowLeft, Check, Edit, Heart } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import type { Routine } from '@/lib/api/types/routine.type'
 
 interface RoutineHeaderProps {
-  routine: Routine;
-  daysPerWeek: number;
-  onBack: () => void;
-  onEdit: () => void;
-  onToggleFavorite: () => void;
-  onToggleCompleted: () => void;
-  isToggling: boolean;
+	routine: Routine
+	daysPerWeek: number
+	onBack: () => void
+	onEdit: () => void
+	onToggleFavorite: () => void
+	onToggleCompleted: () => void
+	isToggling: boolean
 }
 
 /**
  * Header component for routine detail page
- * 
+ *
  * Features:
  * - Back navigation and edit buttons
  * - Routine title and description
@@ -25,69 +26,69 @@ interface RoutineHeaderProps {
  * - Favorite and completion toggle buttons
  */
 export const RoutineHeader = ({
-  routine,
-  daysPerWeek,
-  onBack,
-  onEdit,
-  onToggleFavorite,
-  onToggleCompleted,
-  isToggling,
+	routine,
+	daysPerWeek,
+	onBack,
+	onEdit,
+	onToggleFavorite,
+	onToggleCompleted,
+	isToggling,
 }: RoutineHeaderProps) => {
-  return (
-    <div className="space-y-6">
-      {/* Navigation and Actions */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Routines
-        </Button>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleFavorite}
-            disabled={isToggling}
-          >
-            <Heart 
-              className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-red-500' : ''}`} 
-            />
-            {routine.isFavorite ? 'Unfavorite' : 'Favorite'}
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleCompleted}
-            disabled={isToggling}
-          >
-            <Check 
-              className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-green-500' : ''}`} 
-            />
-            {routine.isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
-          </Button>
-          
-          <Button variant="outline" size="sm" onClick={onEdit}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-        </div>
-      </div>
+	return (
+		<div className="space-y-6">
+			{/* Navigation and Actions */}
+			<div className="flex items-center justify-between">
+				<Button variant="ghost" size="sm" onClick={onBack}>
+					<ArrowLeft className="h-4 w-4 mr-2" />
+					Back to Routines
+				</Button>
 
-      {/* Title and Description */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">{routine.name}</h1>
-        {routine.description && (
-          <p className="text-muted-foreground">{routine.description}</p>
-        )}
-      </div>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onToggleFavorite}
+						disabled={isToggling}
+					>
+						<Heart
+							className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-red-500' : ''}`}
+						/>
+						{routine.isFavorite ? 'Unfavorite' : 'Favorite'}
+					</Button>
 
-      {/* Status Badges */}
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="secondary">
-          {daysPerWeek} {daysPerWeek === 1 ? 'day' : 'days'} per week
-        </Badge>
-      </div>
-    </div>
-  );
-};
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onToggleCompleted}
+						disabled={isToggling}
+					>
+						<Check
+							className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-green-500' : ''}`}
+						/>
+						{routine.isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
+					</Button>
+
+					<Button variant="outline" size="sm" onClick={onEdit}>
+						<Edit className="h-4 w-4 mr-2" />
+						Edit
+					</Button>
+				</div>
+			</div>
+
+			{/* Title and Description */}
+			<div>
+				<h1 className="text-3xl font-bold mb-2">{routine.name}</h1>
+				{routine.description && (
+					<p className="text-muted-foreground">{routine.description}</p>
+				)}
+			</div>
+
+			{/* Status Badges */}
+			<div className="flex flex-wrap gap-2">
+				<Badge variant="secondary">
+					{daysPerWeek} {daysPerWeek === 1 ? 'day' : 'days'} per week
+				</Badge>
+			</div>
+		</div>
+	)
+}

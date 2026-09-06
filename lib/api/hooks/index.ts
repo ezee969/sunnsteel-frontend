@@ -1,10 +1,10 @@
-export * from './useRoutines'
-export * from './useWorkoutSession'
-export * from './useUser'
-export * from './usePublicUser'
-export * from './useFollowUser'
-export * from './useUnfollowUser'
 export * from './useExercises'
+export * from './useFollowUser'
+export * from './usePublicUser'
+export * from './useRoutines'
+export * from './useUnfollowUser'
+export * from './useUser'
+export * from './useWorkoutSession'
 
 // Auth-specific hooks (Supabase-based)
 export * from './useSupabaseAuth'

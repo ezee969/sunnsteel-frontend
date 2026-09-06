@@ -1,9 +1,10 @@
 'use client'
 
 import { useSidebar } from '@/hooks/use-sidebar'
+
 import { CommonSplitCard } from './components/CommonSplitCard'
-import { TrainingDayButton } from './components/TrainingDayButton'
 import { SelectedDaysSummary } from './components/SelectedDaysSummary'
+import { TrainingDayButton } from './components/TrainingDayButton'
 import {
 	COMMON_SPLITS,
 	DAYS_OF_WEEK,
@@ -18,10 +19,7 @@ interface TrainingDaysProps {
 	readonly isEditing?: boolean
 }
 
-export function TrainingDays({
-	data,
-	onUpdate,
-}: TrainingDaysProps) {
+export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
 	const { isMobile } = useSidebar()
 	const { toggleDay, selectSplit } = useTrainingDaySelection({
 		data,
@@ -39,7 +37,7 @@ export function TrainingDays({
 						Quick select common splits:
 					</p>
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2">
-						{COMMON_SPLITS.map((split) => (
+						{COMMON_SPLITS.map(split => (
 							<CommonSplitCard
 								key={split.name}
 								split={split}
@@ -55,7 +53,7 @@ export function TrainingDays({
 						Or select days manually:
 					</p>
 					<div className="grid grid-cols-7 gap-1 md:gap-2">
-						{DAYS_OF_WEEK.map((day) => (
+						{DAYS_OF_WEEK.map(day => (
 							<TrainingDayButton
 								key={day.id}
 								day={day}

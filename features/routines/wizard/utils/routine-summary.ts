@@ -1,4 +1,5 @@
 import { CreateRoutineRequest } from '@/lib/api/types'
+
 import type { RoutineWizardData } from '../types'
 
 export const DAYS_OF_WEEK = [
@@ -58,8 +59,7 @@ export const buildRoutineRequest = (
 						setNumber: set.setNumber,
 						...(set.weight !== undefined &&
 							set.weight !== null && { weight: set.weight }),
-						...(set.rir !== undefined &&
-							set.rir !== null && { rir: set.rir }),
+						...(set.rir !== undefined && set.rir !== null && { rir: set.rir }),
 					}
 
 					if (set.repType === 'FIXED') {

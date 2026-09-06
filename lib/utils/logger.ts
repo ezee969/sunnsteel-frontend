@@ -1,7 +1,6 @@
 import { SHOULD_LOG_DEBUG } from '@/lib/config/env'
 
-const isDebugEnabled = () =>
-	SHOULD_LOG_DEBUG
+const isDebugEnabled = () => SHOULD_LOG_DEBUG
 
 export const logger = {
 	debug: (...args: unknown[]) => {

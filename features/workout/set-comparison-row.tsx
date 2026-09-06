@@ -1,8 +1,8 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
-import { Badge } from '@/components/ui/badge'
 import { formatReps, formatWeight } from '@/lib/utils/workout-metrics'
 
 interface SetComparisonRowProps {
@@ -10,7 +10,10 @@ interface SetComparisonRowProps {
 	performedSet?: SetLog
 }
 
-export function SetComparisonRow({ plannedSet, performedSet }: SetComparisonRowProps) {
+export function SetComparisonRow({
+	plannedSet,
+	performedSet,
+}: SetComparisonRowProps) {
 	return (
 		<div className="bg-card border border-muted rounded-lg p-3 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none">
 			<div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-2 items-start sm:items-center">
@@ -35,7 +38,9 @@ export function SetComparisonRow({ plannedSet, performedSet }: SetComparisonRowP
 
 				<div className="sm:col-span-3">
 					<div className="space-y-1">
-						<div className="sm:hidden text-xs font-medium text-muted-foreground">Planned</div>
+						<div className="sm:hidden text-xs font-medium text-muted-foreground">
+							Planned
+						</div>
 						<div className="text-sm">
 							{plannedSet.repType === 'FIXED'
 								? `${plannedSet.reps} reps`
@@ -47,22 +52,34 @@ export function SetComparisonRow({ plannedSet, performedSet }: SetComparisonRowP
 
 				<div className="sm:col-span-2">
 					<div className="space-y-1">
-						<div className="sm:hidden text-xs font-medium text-muted-foreground">Reps</div>
-						<div className="text-sm font-medium">{formatReps(performedSet?.reps)}</div>
+						<div className="sm:hidden text-xs font-medium text-muted-foreground">
+							Reps
+						</div>
+						<div className="text-sm font-medium">
+							{formatReps(performedSet?.reps)}
+						</div>
 					</div>
 				</div>
 
 				<div className="sm:col-span-2">
 					<div className="space-y-1">
-						<div className="sm:hidden text-xs font-medium text-muted-foreground">Weight</div>
-						<div className="text-sm font-medium">{formatWeight(performedSet?.weight)}</div>
+						<div className="sm:hidden text-xs font-medium text-muted-foreground">
+							Weight
+						</div>
+						<div className="text-sm font-medium">
+							{formatWeight(performedSet?.weight)}
+						</div>
 					</div>
 				</div>
 
 				<div className="sm:col-span-2">
 					<div className="space-y-1">
-						<div className="sm:hidden text-xs font-medium text-muted-foreground">RPE</div>
-						<div className="text-sm">{performedSet?.rpe ? `${performedSet.rpe}/10` : '—'}</div>
+						<div className="sm:hidden text-xs font-medium text-muted-foreground">
+							RPE
+						</div>
+						<div className="text-sm">
+							{performedSet?.rpe ? `${performedSet.rpe}/10` : '—'}
+						</div>
 					</div>
 				</div>
 

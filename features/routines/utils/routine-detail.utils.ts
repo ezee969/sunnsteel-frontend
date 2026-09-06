@@ -8,9 +8,17 @@
  * @returns The display name of the day
  */
 export const getDayName = (dayOfWeek: number): string => {
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return dayNames[dayOfWeek] || 'Unknown';
-};
+	const dayNames = [
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+	]
+	return dayNames[dayOfWeek] || 'Unknown'
+}
 
 /**
  * Formats progression scheme for display
@@ -18,23 +26,23 @@ export const getDayName = (dayOfWeek: number): string => {
  * @returns Formatted display text
  */
 export const formatProgressionScheme = (progressionScheme: string): string => {
-  return progressionScheme.replace('_', ' ');
-};
+	return progressionScheme.replace('_', ' ')
+}
 
 /**
  * Constants for routine detail page
  */
 export const ROUTINE_DETAIL_CONSTANTS = {
-  LOADING_SPINNER_SIZE: 'h-4 w-4',
-  BADGE_VARIANTS: {
-    SECONDARY: 'secondary' as const,
-    OUTLINE: 'outline' as const,
-  },
-  BUTTON_SIZES: {
-    SM: 'sm' as const,
-  },
-  ICON_SIZES: {
-    SM: 'h-4 w-4',
-    MD: 'h-6 w-6',
-  },
-} as const;
+	LOADING_SPINNER_SIZE: 'h-4 w-4',
+	BADGE_VARIANTS: {
+		SECONDARY: 'secondary' as const,
+		OUTLINE: 'outline' as const,
+	},
+	BUTTON_SIZES: {
+		SM: 'sm' as const,
+	},
+	ICON_SIZES: {
+		SM: 'h-4 w-4',
+		MD: 'h-6 w-6',
+	},
+} as const

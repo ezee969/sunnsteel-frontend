@@ -1,0 +1,9 @@
+# Revisions to skip when running `git blame`.
+#
+# Enable locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub honours this file automatically.
+
+# style: enforce Prettier and import sorting repo-wide (CL-06)
+# Mechanical `eslint --fix` across 224 files. No functional change.
+5a73843094d751a1e218cb4ba09d4212cb8349ac

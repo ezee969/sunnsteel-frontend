@@ -1,22 +1,24 @@
-"use client";
+'use client'
 
-import { Button } from '@/components/ui/button';
+import { CheckCircle, Loader2, Save } from 'lucide-react'
+
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Loader2, Save } from 'lucide-react';
-import { useExercises } from '@/lib/api/hooks';
-import type { RoutineWizardData } from './types';
-import { useRoutineSubmission } from './hooks/useRoutineSubmission';
-import { useRoutineExercisesLookup } from './hooks/useRoutineExercisesLookup';
-import { RoutineDayCard } from './components/RoutineDayCard';
-import { RoutineSummaryStats } from './components/RoutineSummaryStats';
-import { DAYS_OF_WEEK } from './utils/routine-summary';
-import { useRoutineSummaryStats } from './hooks/useRoutineSummaryStats';
+} from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useExercises } from '@/lib/api/hooks'
+
+import { RoutineDayCard } from './components/RoutineDayCard'
+import { RoutineSummaryStats } from './components/RoutineSummaryStats'
+import { useRoutineExercisesLookup } from './hooks/useRoutineExercisesLookup'
+import { useRoutineSubmission } from './hooks/useRoutineSubmission'
+import { useRoutineSummaryStats } from './hooks/useRoutineSummaryStats'
+import type { RoutineWizardData } from './types'
+import { DAYS_OF_WEEK } from './utils/routine-summary'
 
 interface ReviewAndCreateProps {
 	data: RoutineWizardData
@@ -44,7 +46,12 @@ export function ReviewAndCreate({
 
 	return (
 		<div className="space-y-6">
-			<Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+			<Accordion
+				type="single"
+				collapsible
+				defaultValue="item-1"
+				className="w-full"
+			>
 				<AccordionItem value="item-1">
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
@@ -59,8 +66,12 @@ export function ReviewAndCreate({
 						</div>
 						{data.description && (
 							<div>
-								<p className="text-sm font-medium text-muted-foreground">Description</p>
-								<p className="text-sm text-muted-foreground">{data.description}</p>
+								<p className="text-sm font-medium text-muted-foreground">
+									Description
+								</p>
+								<p className="text-sm text-muted-foreground">
+									{data.description}
+								</p>
 							</div>
 						)}
 					</AccordionContent>
@@ -75,7 +86,7 @@ export function ReviewAndCreate({
 					</AccordionTrigger>
 					<AccordionContent className="pl-1">
 						<div className="flex flex-wrap gap-2 mb-2">
-							{data.trainingDays.map((dayId) => (
+							{data.trainingDays.map(dayId => (
 								<Badge key={dayId} variant="secondary">
 									{DAYS_OF_WEEK[dayId]}
 								</Badge>
@@ -95,8 +106,12 @@ export function ReviewAndCreate({
 						</span>
 					</AccordionTrigger>
 					<AccordionContent className="space-y-4 pl-1">
-						{data.days.map((day) => (
-							<RoutineDayCard key={day.dayOfWeek} day={day} exerciseMap={exerciseMap} />
+						{data.days.map(day => (
+							<RoutineDayCard
+								key={day.dayOfWeek}
+								day={day}
+								exerciseMap={exerciseMap}
+							/>
 						))}
 					</AccordionContent>
 				</AccordionItem>
@@ -132,7 +147,9 @@ export function ReviewAndCreate({
 			<div className="bg-muted/50 p-4 rounded-lg">
 				<h4 className="font-medium mb-2">What happens next?</h4>
 				<ul className="text-sm text-muted-foreground space-y-1">
-					<li>• Your routine will be saved and available in your routines list</li>
+					<li>
+						• Your routine will be saved and available in your routines list
+					</li>
 					<li>• You can start workouts from this routine anytime</li>
 					<li>• You can edit or duplicate this routine later</li>
 					<li>• Track your progress as you complete workouts</li>

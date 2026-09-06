@@ -13,7 +13,7 @@ export const VALIDATION_RULES = Object.freeze({
 	NAME_MAX_LENGTH: 100,
 
 	// Email validation (using standard email regex)
- 	EMAIL_REGEX: /^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]+$/,
+	EMAIL_REGEX: /^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]+$/,
 } as const)
 
 export const VALIDATION_MESSAGES = Object.freeze({
