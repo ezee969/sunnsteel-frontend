@@ -147,4 +147,6 @@ Known issues, with evidence and file:line references, are tracked in [docs/roadm
 
 **Never create doc files at repo root** (except this file, `CLAUDE.md` and `README`). All project docs live under `docs/` (`docs/roadmaps/`, `docs/history/`, `docs/reference/`). The `docs/` tree was fully deleted at some point and is being rebuilt — check what exists before assuming a path.
 
+Before proposing or implementing product features, read [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md). It is the canonical cross-repository registry for shipped capabilities, the active queue, dependencies, deferred work and retained product decisions. Verify the code before changing a feature to `SHIPPED`; performance defects and cleanup remain in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md).
+
 `CLAUDE.md` is the Claude Code-facing twin of this file. **Keep the two in sync**: if you change one, mirror the change in the other.
