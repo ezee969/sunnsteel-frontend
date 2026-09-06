@@ -22,6 +22,7 @@ export class SupabaseAuthService {
 		promise: Promise<AuthResponse>
 	} | null = null
 	private markerQueue: Promise<void> = Promise.resolve()
+	private markerCleanup: Promise<void> | null = null
 
 	/** Forget both pending and successful verification when auth identity changes. */
 	invalidateVerification(): void {
@@ -47,8 +48,7 @@ export class SupabaseAuthService {
 					method,
 					error,
 				})
-				// Do not cache a successful login when routing still lacks its marker.
-				if (method === 'POST') throw error
+				throw error
 			}
 		})
 		// A DELETE waits for an already-started POST, so logout wins that race.
@@ -180,13 +180,20 @@ export class SupabaseAuthService {
 			throw new Error(error.message)
 		}
 
-		await this.clearSessionMarker()
+		let markerError: unknown
+		try {
+			await this.clearSessionMarker()
+		} catch (error) {
+			markerError = error
+		}
 
 		try {
 			await httpClient.post('/auth/supabase/logout')
 		} catch (err) {
 			logger.warn('[auth-service] backend logout cookie clear failed', err)
 		}
+
+		if (markerError) throw markerError
 	}
 
 	/**
@@ -208,7 +215,14 @@ export class SupabaseAuthService {
 	 */
 	clearSessionMarker(): Promise<void> {
 		this.invalidateVerification()
-		return this.queueSessionMarker('DELETE')
+		if (this.markerCleanup) return this.markerCleanup
+
+		const operation = this.queueSessionMarker('DELETE')
+		const cleanup = operation.finally(() => {
+			if (this.markerCleanup === cleanup) this.markerCleanup = null
+		})
+		this.markerCleanup = cleanup
+		return cleanup
 	}
 
 	/**

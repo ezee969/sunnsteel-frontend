@@ -5,8 +5,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
 	createContext,
 	ReactNode,
+	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from 'react'
 
@@ -22,6 +24,9 @@ interface SupabaseAuthContextType {
 	session: Session | null
 	user: AuthResponse['user'] | null
 	error: Error | null
+	isSessionCleanupPending: boolean
+	sessionCleanupError: Error | null
+	retrySessionCleanup: () => void
 }
 
 const SupabaseAuthContext = createContext<SupabaseAuthContextType>({
@@ -30,6 +35,9 @@ const SupabaseAuthContext = createContext<SupabaseAuthContextType>({
 	session: null,
 	user: null,
 	error: null,
+	isSessionCleanupPending: false,
+	sessionCleanupError: null,
+	retrySessionCleanup: () => {},
 })
 
 export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
@@ -38,6 +46,16 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<AuthResponse['user'] | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<Error | null>(null)
+	const [isSessionCleanupPending, setIsSessionCleanupPending] = useState(false)
+	const [sessionCleanupError, setSessionCleanupError] = useState<Error | null>(
+		null,
+	)
+	const controllerRef = useRef<ReturnType<
+		typeof createAuthSessionController
+	> | null>(null)
+	const retrySessionCleanup = useCallback(() => {
+		controllerRef.current?.retrySessionCleanup()
+	}, [])
 
 	useEffect(() => {
 		const controller = createAuthSessionController({
@@ -49,11 +67,14 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 			setUser,
 			setError,
 			setIsLoading,
+			setSessionCleanupError,
+			setIsSessionCleanupPending,
 			clearQueries: () => queryClient.clear(),
 			invalidateUser: () => {
 				void queryClient.invalidateQueries({ queryKey: ['user'] })
 			},
 		})
+		controllerRef.current = controller
 		// INITIAL_SESSION remains the sole source of startup session state.
 		const {
 			data: { subscription },
@@ -66,6 +87,7 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 		})
 
 		return () => {
+			controllerRef.current = null
 			controller.dispose()
 			subscription.unsubscribe()
 		}
@@ -78,6 +100,9 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 		session,
 		user,
 		error,
+		isSessionCleanupPending,
+		sessionCleanupError,
+		retrySessionCleanup,
 	}
 
 	return (

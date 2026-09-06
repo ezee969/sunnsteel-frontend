@@ -54,7 +54,7 @@ Si algún día se migra, el destino no es "Vite" a secas sino **Vite + TanStack 
 
 **Configuración de Google resuelta:** el error `Unsupported provider: missing OAuth secret` se corrigió creando el cliente OAuth web en Google Cloud, guardando sus credenciales en el proveedor Google de Supabase y configurando Site URL/Redirect URLs. No fue necesario cambiar código para resolver ese error. No se almacenan las credenciales en esta documentación.
 
-**Verificación adicional aún pendiente:** login por email tras el refactor y comprobación de red al volver a enfocar la pestaña para confirmar que no se repite `/verify`. Los tres smoke tests confirmados no prueban esos dos casos.
+**Verificación manual completada por el usuario (2026-09-06):** el usuario confirmó también el login por email, el arranque con sesión expirada y el comportamiento al volver a enfocar la pestaña. Con esto quedan cerrados los smoke tests de auth enumerados en este ítem. La comprobación de refocus es una confirmación manual del usuario, no una captura de red conservada en el repo.
 
 ### TD-25 · Service Worker interfería con desarrollo y actualizaba en momentos inseguros — **IMPLEMENTADO Y VERIFICADO (2026-09-05)**
 
@@ -65,6 +65,14 @@ Si algún día se migra, el destino no es "Vite" a secas sino **Vite + TanStack 
 **Cobertura y verificación:** [service-worker-policy.test.ts](../../lib/pwa/service-worker-policy.test.ts) cubre propiedad de cachés y la ruta protegida contra recargas. `npm run verify` finalizó con exit 0: lint, TypeScript, **75 tests en 7 archivos** y build de producción con Next.js 15.5.25. `node --check public/sw.js` también pasa.
 
 **`CACHE_VERSION` deliberadamente NO se bumpeó:** no cambió el contenido de `PRECACHE_URLS`; el propio cambio de bytes de `sw.js` dispara el ciclo de actualización. Forzar un namespace nuevo sólo redescargaría contenido idéntico.
+
+### TD-26 · Fallo de red al limpiar el marcador de sesión dejaba el logout sin recuperación — **IMPLEMENTADO (2026-09-06)**
+
+**Evidencia:** `queueSessionMarker('DELETE')` registraba cualquier fallo de `/api/session` y lo convertía en éxito. El controlador publicaba después la sesión nula aunque la cookie `ss_session` siguiera viva, recreando el estado peligroso de TD-21 sin ofrecer al usuario ninguna salida visible.
+
+**Cambios:** los DELETE fallidos vuelven a su llamador y las limpiezas concurrentes comparten una sola promesa. Al recibir una sesión nula, el controlador borra inmediatamente perfil y caché de queries para ocultar datos protegidos, pero conserva el valor anterior de `session` hasta que desaparezca el marcador. Mientras tanto el layout muestra una pantalla de limpieza. Si falla, muestra un mensaje con `Try again`; al reintentar correctamente publica la sesión nula y continúa hacia `/login`. El mismo mecanismo cubre un fallo de limpieza posterior a un error de verificación. Un login nuevo cancela visualmente cualquier recuperación obsoleta. El menú deshabilita logout mientras está en curso y muestra un toast si la operación falla antes de que aparezca la pantalla de recuperación.
+
+**Verificación:** `npm run verify` terminó con exit 0: lint, typecheck, **81 tests en 8 archivos** y build de producción con Next.js 15.5.25. Los tres casos nuevos cubren deduplicación y reintento del DELETE, recuperación tras logout y recuperación después de un error de verificación. En navegador se confirmó que las opciones futuras del sidebar permanecen en `/dashboard`; al probar el logout, la navegación alcanzó `/login`, pero el servidor de desarrollo dejó de escuchar antes de entregar la página. La recuperación ante un DELETE fallido queda verificada de forma automatizada, no mediante una falla de red manual.
 
 ### TD-01 · El prefetch de datos nunca acierta la caché — ✔ **HECHO (2026-07-25)**
 
@@ -163,7 +171,7 @@ Es lazy (sólo se descarga si `SHOULD_ENABLE_ERUDA`), pero se publica en el outp
 
 **Lo que NO se hizo, y por qué:** estaba previsto sacar `await this.setSessionMarker()` (`POST /api/session`) del camino crítico en `supabaseAuthService.verifyToken`. Se descartó: con los cambios de arriba, `verify` + el marker ya no bloquean nada — nadie los espera. Hacerlo fire-and-forget no ganaría tiempo y sí arriesga el flujo de login, donde la cookie **no** existe todavía y el middleware la necesita en la navegación inmediata a `/dashboard`.
 
-**Verificación manual actualizada (2026-09-05):** el usuario confirmó recarga autenticada, logout con acceso directo posterior a `/dashboard` y Google login local y desplegado (ver TD-24). Sigue sin verificarse explícitamente el arranque con sesión de Supabase expirada; estas pruebas tampoco constituyen una medición en iPhone.
+**Verificación manual completada (2026-09-06):** el usuario confirmó recarga autenticada, logout con acceso directo posterior a `/dashboard`, Google login local y desplegado, login por email, arranque con sesión expirada y refocus de pestaña (ver TD-24). Estas pruebas no constituyen una medición en iPhone.
 
 `npm run verify` exit 0. Sin cambios en el bundle.
 
@@ -492,7 +500,13 @@ De paso se eliminó un doble filtrado real: `totalCompleted` y `completedSession
 
 **Cambio de comportamiento menor y aceptado:** el "inicio de semana" se calculaba en cada render, así que cruzar la medianoche con la app abierta lo actualizaba. Ahora se recalcula cuando cambian los datos. Irrelevante en la práctica: la página se remonta en cada navegación.
 
-**Sigue abierto:** el dashboard hace **dos** consultas de sesiones distintas — `StatsOverview` (`limit:50`) y `TodaysWorkouts` (`status:COMPLETED, from, to, limit:50`). A medio plazo estas 4 métricas deberían venir agregadas del backend en vez de traerse 50 sesiones al cliente (ver Q-05).
+**Agregación implementada y smoke test en navegador verificado (2026-09-06):** `StatsOverview` consume `GET /workouts/stats` mediante servicio y hook. El backend cuenta todas las sesiones del usuario y todas las completadas en una transacción consistente; sólo lee timestamps de finalización del intervalo semanal para contar días activos en la zona horaria del navegador. La respuesta contiene cuatro números, sin el límite de 50 del historial. `TodaysWorkouts` conserva su consulta de sesiones para mostrar los entrenamientos del día.
+
+La semana comienza el lunes local y usa un límite superior exclusivo; el hook revisa el intervalo cada minuto para cambiar de clave al pasar de semana. Inicio y finalización de sesión invalidan las estadísticas. La tasa conserva su definición (sesiones completadas / todas las sesiones), pero sus textos ya no dicen que mide sets. Los errores muestran un mensaje con reintento en lugar de ceros.
+
+**Contrato compartido publicado (2026-09-06):** `@sunsteel/contracts@0.6.0` exporta `WorkoutStatsQuery` y `WorkoutStatsResponse`. Backend y frontend consumen `^0.6.0` desde npm; no usan enlaces `file:`. El DTO del backend conserva sólo los decoradores de validación e implementa el contrato compartido, mientras el helper frontend conserva el cálculo de la semana local y usa el tipo compartido. Desplegar el backend con `/workouts/stats` antes del frontend. No requiere migración de base de datos.
+
+**Verificación completada (2026-09-06):** `npm run verify` frontend terminó con exit 0: lint, typecheck, 78 tests en 8 archivos y build de producción con Next.js 15.5.25, ejecutado tras confirmar que el dev server de este checkout estaba detenido. Backend: lint, typecheck, build y cuatro tests con base de datos mockeada (historial de más de 50 sesiones, pertenencia al usuario, fechas locales, historial vacío y validación de parámetros). Smoke test autenticado en `localhost:3000`, con backend en `4000`: las cuatro tarjetas muestran 0 entrenamientos semanales, 0 días activos, 1 entrenamiento total y 50% de finalización, también después de una recarga completa, sin mensaje de error de estadísticas. Esto verifica carga y persistencia visual, no una comparación independiente contra la base de datos ni una mutación de entrenamiento real.
 
 ---
 
@@ -548,13 +562,13 @@ Invocación de middleware (34.1 kB) sin efecto en cada visita a `/auth/callback`
 
 ---
 
-### TD-17 · Rutas de navegación que no existen ✅
+### TD-17 · Rutas de navegación que no existen — ✔ **HECHO (2026-09-06)**
 
 **Evidencia:** [app/(protected)/layout.tsx:44-47](<../../app/(protected)/layout.tsx>) mapea `/progress`, `/exercises`, `/schedule` y `/achievements` en `getActiveNavFromPath`; el Sidebar los lista con `disabled: true` y un toast "Coming Soon" ([Sidebar.tsx:65-96](../../features/shell/components/Sidebar.tsx)).
 
 No es un bug, pero el mapeo del layout sugiere rutas que no existen y confundirá a quien lea el código.
 
-**Acción:** ninguna urgente. Anotarlo o simplificar el mapeo cuando se decida el roadmap de esas secciones.
+**Resuelto:** el layout ya no reconoce como rutas activas `/progress`, `/exercises`, `/schedule` ni `/achievements`. Los cuatro elementos siguen visibles como funciones futuras y conservan su toast, pero el tipo de navegación ya no permite asignarles un `href`; sólo los elementos habilitados pueden declarar una ruta real.
 
 ---
 
@@ -622,7 +636,7 @@ Es una base más pobre que la planeada, pero es reproducible y ya ha demostrado 
 
 ### T-01 · Tests sobre la lógica pura de la sesión de entrenamiento — ✔ **HECHO (2026-07-25), ampliado con auth y PWA**
 
-**Estado actual:** Vitest está integrado en `verify` y CI. La última verificación registrada (TD-25) pasó **75 tests en 7 archivos**. El bloque 7 detalla el alcance inicial y sus exclusiones; TD-24 y TD-25 documentan las ampliaciones. La propuesta original siguiente se conserva como contexto y no implica que todas las unidades propuestas estén cubiertas.
+**Estado actual:** Vitest está integrado en `verify` y CI. La última ejecución pasó **81 tests en 8 archivos**. El bloque 7 detalla el alcance inicial y sus exclusiones; TD-24, TD-25 y TD-26 documentan las ampliaciones. La propuesta original siguiente se conserva como contexto y no implica que todas las unidades propuestas estén cubiertas.
 
 **Propuesta original:**
 
@@ -787,7 +801,7 @@ Descartadas: subir el `@Max` del backend a 100 exige desplegar el otro repo y co
 
 ### Q-04 · ¿Se introduce testing? — **RESUELTA parcialmente (2026-07-25)**
 
-**Sí, implementado: ver T-01.** Vitest corre en `verify` y CI; la última verificación registrada pasó 75 tests en 7 archivos (TD-25).
+**Sí, implementado: ver T-01.** Vitest corre en `verify` y CI; la última ejecución pasó 81 tests en 8 archivos (TD-26).
 
 Alcance actual: lógica pura, contratos de API, coordinación de auth y políticas de PWA en Node, con llamadas externas mockeadas (bloque 7, TD-24 y TD-25). No se añadieron tests de componentes ni E2E.
 

@@ -62,6 +62,8 @@ describe('auth verification and marker ordering', () => {
 			},
 			setError: vi.fn(),
 			setIsLoading: vi.fn(),
+			setSessionCleanupError: vi.fn(),
+			setIsSessionCleanupPending: vi.fn(),
 			clearQueries: vi.fn(),
 			invalidateUser: vi.fn(),
 		})
@@ -159,6 +161,28 @@ describe('auth verification and marker ordering', () => {
 		await rejected
 		expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
 			'POST',
+			'DELETE',
+		])
+	})
+
+	it('shares concurrent marker cleanup and allows retry after failure', async () => {
+		const service = new SupabaseAuthService()
+		const firstResponse = deferred<Response>()
+		fetchMock
+			.mockReturnValueOnce(firstResponse.promise)
+			.mockResolvedValueOnce(new Response(null, { status: 204 }))
+
+		const first = service.clearSessionMarker()
+		const concurrent = service.clearSessionMarker()
+		expect(concurrent).toBe(first)
+		firstResponse.resolve(new Response(null, { status: 503 }))
+		await expect(first).rejects.toThrow('Session marker returned 503')
+		expect(fetchMock).toHaveBeenCalledTimes(1)
+
+		await expect(service.clearSessionMarker()).resolves.toBeUndefined()
+		expect(fetchMock).toHaveBeenCalledTimes(2)
+		expect(fetchMock.mock.calls.map(([, options]) => options?.method)).toEqual([
+			'DELETE',
 			'DELETE',
 		])
 	})

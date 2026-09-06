@@ -25,7 +25,15 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	const pathname = usePathname()
 	const router = useRouter()
-	const { session, user, error: authError, isLoading } = useSupabaseAuth()
+	const {
+		session,
+		user,
+		error: authError,
+		isLoading,
+		isSessionCleanupPending,
+		sessionCleanupError,
+		retrySessionCleanup,
+	} = useSupabaseAuth()
 	const {
 		isSidebarOpen,
 		setIsSidebarOpen,
@@ -39,10 +47,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/dashboard')) return 'dashboard'
 		if (path.startsWith('/workouts')) return 'workouts'
 		if (path.startsWith('/routines')) return 'routines'
-		if (path.startsWith('/progress')) return 'progress'
-		if (path.startsWith('/exercises')) return 'exercises'
-		if (path.startsWith('/schedule')) return 'schedule'
-		if (path.startsWith('/achievements')) return 'achievements'
 		if (path.startsWith('/settings')) return 'settings'
 		return 'dashboard' // fallback
 	}
@@ -97,6 +101,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	// While determining/redirecting auth state, render a stable empty shell.
 	// Gated on `session`, not on the verified profile: children mount (and their
 	// queries fire) as soon as we have a token to send.
+	if (isSessionCleanupPending || sessionCleanupError) {
+		return (
+			<div className="relative flex min-h-screen items-center justify-center p-6">
+				<div className="absolute inset-0 -z-10 overflow-hidden">
+					<ParchmentOverlay opacity={0.06} />
+					<GoldVignetteOverlay intensity={0.06} />
+				</div>
+				<div
+					role={sessionCleanupError ? 'alert' : 'status'}
+					className="w-full max-w-md space-y-4 rounded-lg border bg-card p-6 text-center shadow-lg"
+				>
+					<h1 className="heading-classical text-xl font-semibold">
+						{sessionCleanupError
+							? 'Session cleanup needs one more step'
+							: 'Finishing session cleanup…'}
+					</h1>
+					<p className="text-sm text-muted-foreground">
+						{sessionCleanupError
+							? 'This browser could not clear its routing session. Check your connection and try again.'
+							: 'Clearing this browser session securely.'}
+					</p>
+					{sessionCleanupError && (
+						<Button onClick={retrySessionCleanup}>Try again</Button>
+					)}
+				</div>
+			</div>
+		)
+	}
+
 	if (isLoading || !session) {
 		return (
 			<div className="relative min-h-screen">

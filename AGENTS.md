@@ -2,7 +2,7 @@
 
 This file provides guidance to coding agents (Codex and others) when working with code in this repository.
 
-Last verified against the tree on 2026-09-05 (audit + a real `next build`). If something here contradicts the code, the code wins — and fix this file.
+Last verified against the tree on 2026-09-06 (audit + a real `next build`). If something here contradicts the code, the code wins — and fix this file.
 
 ## Project
 
@@ -12,7 +12,7 @@ Stack: **Next.js 15.5 (App Router) · React 18.3 · TypeScript 5 (strict) · Tai
 
 **It is effectively an SPA hosted on Next.js.** Only `app/page.tsx` (a redirect based on a cookie), `app/api/session/route.ts` and the six `loading.tsx` files are Server Components. **Every other `page.tsx` and both group layouts are `'use client'`.** There is no RSC data fetching, no Server Actions, no `fetch` caching/`revalidate`, no streaming. All data is fetched client-side via TanStack Query against the external backend. Keep this in mind before reaching for a Next.js server feature — nothing else in the app uses one.
 
-**`@sunsteel/contracts` is a published npm dependency (`^0.5.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
+**`@sunsteel/contracts` is a published npm dependency (`^0.6.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunnsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunnsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
 
 Runs on Windows 11. Do **not** start/run the app yourself — ask the user to run it.
 
@@ -30,7 +30,7 @@ npm run verify         # lint + typecheck + build (run this before considering w
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 20.
 
-Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 75 tests across seven files: `lib/api/routines/routine-query.test.ts`, `lib/utils/internal-redirect.test.ts`, `lib/utils/session-validation.utils.test.ts`, `lib/api/services/workout-query.test.ts`, `lib/auth/auth-session-controller.test.ts`, `lib/api/services/supabaseAuthService.test.ts` and `lib/pwa/service-worker-policy.test.ts`. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
+Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 81 tests across eight files, including `lib/api/types/workout-stats.test.ts` for local week boundaries and logout marker recovery in the auth suites. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
 
 **Never run `npm run verify` (or `npm run build`) while `npm run dev` is running.** Both write to the same `.next/` directory, so the production build overwrites the dev server's manifests and the running server starts answering **500 on every route**. In this app that surfaces as a **black screen**, because the layout never mounts — it looks exactly like an auth bug and will send you chasing the wrong thing (`localStorage` throwing `SecurityError` and the tab title falling back to the URL are the tells that it's a dead server, not client code). This has already burned an hour once. Stop the dev server first, or verify only when you are done poking at the app.
 

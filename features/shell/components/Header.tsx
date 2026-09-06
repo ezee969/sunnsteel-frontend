@@ -16,6 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SearchBar } from '@/components/ui/search-bar'
+import { useToast } from '@/components/ui/toast'
 import { useSupabaseLogout } from '@/lib/api/hooks/useSupabaseEmailAuth'
 import { useUser } from '@/lib/api/hooks/useUser'
 
@@ -62,9 +63,18 @@ export default function Header({
 
 function UserDropdown() {
 	const { user } = useUser()
-	const { mutate: logout } = useSupabaseLogout()
+	const { push } = useToast()
+	const { mutate: logout, isPending } = useSupabaseLogout()
 	const handleLogout = () => {
-		logout()
+		logout(undefined, {
+			onError: () => {
+				push({
+					title: 'Could not sign out',
+					description: 'Check your connection and try again.',
+					variant: 'destructive',
+				})
+			},
+		})
 	}
 	return (
 		<DropdownMenu>
@@ -98,7 +108,9 @@ function UserDropdown() {
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+				<DropdownMenuItem onClick={handleLogout} disabled={isPending}>
+					{isPending ? 'Signing out…' : 'Log out'}
+				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)

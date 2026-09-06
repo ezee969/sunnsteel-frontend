@@ -50,6 +50,8 @@ function setup() {
 		setUser: vi.fn(),
 		setError: vi.fn(),
 		setIsLoading: vi.fn(),
+		setSessionCleanupError: vi.fn(),
+		setIsSessionCleanupPending: vi.fn(),
 		clearQueries: vi.fn(),
 		invalidateUser: vi.fn(),
 	}
@@ -99,6 +101,34 @@ describe('auth session events', () => {
 		await vi.runAllTimersAsync()
 		expect(deps.setSession).toHaveBeenCalledWith(null)
 		expect(deps.setIsLoading).toHaveBeenCalledWith(false)
+	})
+
+	it('keeps the old session hidden and offers a retry when cleanup fails', async () => {
+		const { deps, handleAuthStateChange, retrySessionCleanup } = setup()
+		const failure = new Error('Network unavailable')
+		deps.clearSessionMarker
+			.mockRejectedValueOnce(failure)
+			.mockResolvedValueOnce(undefined)
+
+		handleAuthStateChange('SIGNED_OUT', null)
+		expect(deps.clearQueries).toHaveBeenCalledTimes(1)
+		expect(deps.setUser).toHaveBeenCalledWith(null)
+		expect(deps.setIsSessionCleanupPending).toHaveBeenCalledWith(true)
+		await vi.runAllTimersAsync()
+
+		expect(deps.setSession).not.toHaveBeenCalledWith(null)
+		expect(deps.setSessionCleanupError).toHaveBeenCalledWith(failure)
+		expect(deps.setIsSessionCleanupPending).toHaveBeenLastCalledWith(false)
+
+		retrySessionCleanup()
+		expect(deps.setSessionCleanupError).toHaveBeenLastCalledWith(null)
+		expect(deps.setIsSessionCleanupPending).toHaveBeenLastCalledWith(true)
+		await vi.runAllTimersAsync()
+
+		expect(deps.clearSessionMarker).toHaveBeenCalledTimes(2)
+		expect(deps.setSession).toHaveBeenCalledWith(null)
+		expect(deps.setSessionCleanupError).toHaveBeenLastCalledWith(null)
+		expect(deps.setIsSessionCleanupPending).toHaveBeenLastCalledWith(false)
 	})
 
 	it('ignores repeated sign-in notifications while pending and after success', async () => {
@@ -198,6 +228,26 @@ describe('auth session events', () => {
 		cleanup.resolve()
 		await vi.runAllTimersAsync()
 		expect(deps.setError).toHaveBeenLastCalledWith(failure)
+	})
+
+	it('can retry marker cleanup after token verification fails', async () => {
+		const { deps, handleAuthStateChange, retrySessionCleanup } = setup()
+		const verificationFailure = new Error('Verification failed')
+		const cleanupFailure = new Error('Network unavailable')
+		deps.verifyToken.mockRejectedValue(verificationFailure)
+		deps.clearSessionMarker
+			.mockRejectedValueOnce(cleanupFailure)
+			.mockResolvedValueOnce(undefined)
+
+		handleAuthStateChange('INITIAL_SESSION', session())
+		await vi.runAllTimersAsync()
+		expect(deps.setSessionCleanupError).toHaveBeenCalledWith(cleanupFailure)
+		expect(deps.setError).not.toHaveBeenCalledWith(verificationFailure)
+
+		retrySessionCleanup()
+		await vi.runAllTimersAsync()
+		expect(deps.setError).toHaveBeenCalledWith(verificationFailure)
+		expect(deps.setSessionCleanupError).toHaveBeenLastCalledWith(null)
 	})
 
 	it('does not let an older logout cleanup erase a new sign-in', async () => {

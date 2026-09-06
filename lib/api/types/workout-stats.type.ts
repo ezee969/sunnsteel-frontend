@@ -1,16 +1,7 @@
-// Mirrors the backend endpoint DTO until a published contracts release includes it.
-export interface WorkoutStats {
-	totalCompleted: number
-	completionRate: number
-	weeklyWorkoutsCount: number
-	activeDaysThisWeek: number
-}
+import type { WorkoutStatsQuery as ContractWorkoutStatsQuery } from '@sunsteel/contracts'
 
-export interface WorkoutStatsQuery {
-	weekStart: string
-	weekEnd: string
-	timeZone: string
-}
+export type { WorkoutStatsResponse as WorkoutStats } from '@sunsteel/contracts'
+export type WorkoutStatsQuery = ContractWorkoutStatsQuery
 
 export function getWorkoutStatsQuery(now = new Date()): WorkoutStatsQuery {
 	const start = new Date(now)

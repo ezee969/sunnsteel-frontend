@@ -12,6 +12,8 @@ interface AuthSessionDependencies {
 	setUser: (user: AuthResponse['user'] | null) => void
 	setError: (error: Error | null) => void
 	setIsLoading: (loading: boolean) => void
+	setSessionCleanupError: (error: Error | null) => void
+	setIsSessionCleanupPending: (pending: boolean) => void
 	clearQueries: () => void
 	invalidateUser: () => void
 }
@@ -23,9 +25,38 @@ export function createAuthSessionController(deps: AuthSessionDependencies) {
 	let disposed = false
 	let verified = false
 	let pendingToken: string | null = null
+	let cleanupSuccess: (() => void) | null = null
 	const timers = new Set<ReturnType<typeof setTimeout>>()
 
 	const isCurrent = (version: number) => !disposed && generation === version
+
+	async function clearSessionMarker(version: number, onSuccess: () => void) {
+		try {
+			await deps.clearSessionMarker()
+			if (!isCurrent(version)) return
+			cleanupSuccess = null
+			deps.setSessionCleanupError(null)
+			deps.setIsSessionCleanupPending(false)
+			onSuccess()
+		} catch (error) {
+			if (!isCurrent(version)) return
+			cleanupSuccess = onSuccess
+			deps.setSessionCleanupError(
+				error instanceof Error ? error : new Error(String(error)),
+			)
+			deps.setIsSessionCleanupPending(false)
+			deps.setIsLoading(false)
+		}
+	}
+
+	function startSessionMarkerCleanup(version: number, onSuccess: () => void) {
+		cleanupSuccess = onSuccess
+		deps.clearQueries()
+		deps.setUser(null)
+		deps.setSessionCleanupError(null)
+		deps.setIsSessionCleanupPending(true)
+		schedule(version, () => clearSessionMarker(version, onSuccess))
+	}
 
 	function schedule(version: number, work: () => Promise<void>) {
 		// Never return an async callback to Supabase or run refresh-triggering
@@ -54,18 +85,18 @@ export function createAuthSessionController(deps: AuthSessionDependencies) {
 			pendingToken = null
 			// Invalidate synchronously: an older /verify must not restore the cookie.
 			deps.invalidateVerification()
-			schedule(version, async () => {
-				await deps.clearSessionMarker()
-				if (!isCurrent(version)) return
+			startSessionMarkerCleanup(version, () => {
 				// TD-21: clear the marker BEFORE exposing a null session to any render.
-				deps.clearQueries()
-				deps.setUser(null)
 				deps.setError(null)
 				deps.setSession(null)
 				deps.setIsLoading(false)
 			})
 			return
 		}
+
+		cleanupSuccess = null
+		deps.setSessionCleanupError(null)
+		deps.setIsSessionCleanupPending(false)
 
 		if (accountChanged) {
 			verified = false
@@ -106,16 +137,24 @@ export function createAuthSessionController(deps: AuthSessionDependencies) {
 				verified = false
 				pendingToken = null
 				if (error instanceof AuthVerificationCancelledError) return
-				await deps.clearSessionMarker()
-				if (!isCurrent(version)) return
-				deps.setUser(null)
-				deps.setError(error instanceof Error ? error : new Error(String(error)))
+				const verificationError =
+					error instanceof Error ? error : new Error(String(error))
+				startSessionMarkerCleanup(version, () => {
+					deps.setError(verificationError)
+					deps.setIsLoading(false)
+				})
 			}
 		})
 	}
 
 	return {
 		handleAuthStateChange,
+		retrySessionCleanup() {
+			if (disposed || !cleanupSuccess) return
+			const onSuccess = cleanupSuccess
+			const version = ++generation
+			startSessionMarkerCleanup(version, onSuccess)
+		},
 		dispose() {
 			disposed = true
 			generation++

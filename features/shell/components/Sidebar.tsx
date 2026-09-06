@@ -34,14 +34,15 @@ import {
 import { useUser } from '@/lib/api/hooks/useUser'
 import { cn } from '@/lib/utils'
 
-type NavItem = {
+type NavItemBase = {
 	id: string
 	label: string
 	icon: LucideIcon
 	classicalName?: ClassicalIconName
-	href: string
-	disabled: boolean
 }
+
+type NavItem = NavItemBase &
+	({ disabled: true; href?: never } | { disabled: false; href: string })
 
 const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	{
@@ -73,7 +74,6 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Progress',
 		icon: TrendingUp,
 		classicalName: 'compass',
-		href: '/progress',
 		disabled: true,
 	},
 	{
@@ -81,7 +81,6 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Exercises',
 		icon: Weight,
 		classicalName: 'two-dumbbells',
-		href: '/exercises',
 		disabled: true,
 	},
 	{
@@ -89,7 +88,6 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Schedule',
 		icon: Calendar,
 		classicalName: 'hourglass',
-		href: '/schedule',
 		disabled: true,
 	},
 	{
@@ -97,10 +95,9 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Achievements',
 		icon: Medal,
 		classicalName: 'laurel-crown',
-		href: '/achievements',
 		disabled: true,
 	},
-] as const
+] satisfies NavItem[]
 
 interface SidebarProps {
 	isMobile: boolean
@@ -209,6 +206,7 @@ export default function Sidebar({
 							const showTooltip = !isSidebarOpen && !isMobile
 							const buttonContent = (
 								<Button
+									aria-disabled={item.disabled}
 									variant={activeNav === item.id ? 'default' : 'ghost'}
 									className={cn(
 										'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
