@@ -187,8 +187,15 @@ export const useStartSession = () => {
 						'[start-session] found existing active session (reuse)',
 						existing.id,
 					)
+					// Re-enter through the idempotent start endpoint so the backend records
+					// that the owner explicitly resumed a recoverable stale session.
+					await workoutService.startSession(data)
 					// Mark reuse via side channel property (non-persistent)
-					return { ...existing, _reused: true } as WorkoutSession & {
+					return {
+						...existing,
+						lastActivityAt: new Date().toISOString(),
+						_reused: true,
+					} as WorkoutSession & {
 						_reused?: boolean
 					}
 				}
@@ -230,7 +237,13 @@ export const useStartSession = () => {
 			qc.setQueryData(qk.active, data)
 			qc.invalidateQueries({ queryKey: qk.stats })
 			if (data.id) {
-				qc.setQueryData(qk.session(data.id), data)
+				if (data._reused) {
+					// The active/start response is compact and omits set logs. Preserve the
+					// detailed live-session cache and refresh it instead of replacing it.
+					qc.invalidateQueries({ queryKey: qk.session(data.id) })
+				} else {
+					qc.setQueryData(qk.session(data.id), data)
+				}
 			}
 			if (data._reused) {
 				push({
@@ -356,6 +369,7 @@ export const useUpsertSetLog = (id: string) => {
 			return { previous } as { previous?: WorkoutSession }
 		},
 		onSuccess: (res, data) => {
+			const activityAt = new Date().toISOString()
 			setSaveState(
 				`set:${id}:${data.routineExerciseId}:${data.setNumber}`,
 				'saved',
@@ -369,14 +383,15 @@ export const useUpsertSetLog = (id: string) => {
 			// which re-rendered every ExerciseGroup and SetLogInput on screen — on
 			// the app's most interactive page, while the user is typing.
 			//
-			// Safe because the backend's upsertSetLog returns the complete SetLog
-			// row and does not modify the session itself; it only reads it to
-			// validate ownership and status. It also replaces the synthetic
-			// `optimistic:` id that onMutate inserted with the real one. See TD-07.
+			// The backend returns the complete SetLog and commits a session heartbeat
+			// in the same transaction. Mirror that timestamp locally so a long-open
+			// page cannot trigger stale recovery after successful activity. This also
+			// replaces the synthetic `optimistic:` id with the real one. See TD-07.
 			qc.setQueryData<WorkoutSession>(qk.session(id), prev => {
 				if (!prev) return prev
 				return {
 					...prev,
+					lastActivityAt: activityAt,
 					setLogs: (prev.setLogs ?? []).map((l: SetLog) =>
 						l.routineExerciseId === data.routineExerciseId &&
 						l.setNumber === data.setNumber
@@ -385,6 +400,9 @@ export const useUpsertSetLog = (id: string) => {
 					),
 				}
 			})
+			qc.setQueryData<WorkoutSession | null>(qk.active, prev =>
+				prev?.id === id ? { ...prev, lastActivityAt: activityAt } : prev,
+			)
 		},
 		onError: (_err, data, ctx) => {
 			setSaveState(
@@ -444,6 +462,15 @@ export const useDeleteSetLog = (id: string) => {
 			if (ctx?.previous) {
 				qc.setQueryData(qk.session(id), ctx.previous)
 			}
+		},
+		onSuccess: () => {
+			const activityAt = new Date().toISOString()
+			qc.setQueryData<WorkoutSession>(qk.session(id), prev =>
+				prev ? { ...prev, lastActivityAt: activityAt } : prev,
+			)
+			qc.setQueryData<WorkoutSession | null>(qk.active, prev =>
+				prev?.id === id ? { ...prev, lastActivityAt: activityAt } : prev,
+			)
 		},
 		onSettled: () => {
 			qc.invalidateQueries({ queryKey: qk.session(id) })

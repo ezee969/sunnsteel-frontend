@@ -13,6 +13,7 @@ import { TopProgressBar } from '@/components/ui/top-progress-bar'
 import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialLoadAnimation'
 import Header from '@/features/shell/components/Header'
 import Sidebar from '@/features/shell/components/Sidebar'
+import { StaleSessionRecoveryDialog } from '@/features/workout/stale-session-recovery-dialog'
 import { useSidebar } from '@/hooks/use-sidebar'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { cn } from '@/lib/utils'
@@ -144,6 +145,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
 	const layoutContent = (
 		<div className="relative min-h-screen">
+			<StaleSessionRecoveryDialog session={activeSession} />
 			{/* Background */}
 			<div className="absolute inset-0 -z-10 overflow-hidden">
 				<div className="absolute inset-0 bg-white dark:bg-neutral-950 transition-colors duration-300" />
