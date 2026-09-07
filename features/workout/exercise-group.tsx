@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
+import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
 import { SetLogInput } from './set-log-input'
@@ -34,6 +35,7 @@ interface ExerciseGroupProps {
 	completedSets: number
 	totalSets: number
 	onSave: (payload: UpsertSetLogPayload) => void
+	previousSets?: ReadonlyMap<string, PreviousSetPerformance>
 	/** Fired when any set in this group is ticked complete (LIVE-01). */
 	onSetCompleted?: () => void
 	note?: string | null
@@ -51,6 +53,7 @@ export const ExerciseGroup = ({
 	completedSets,
 	totalSets,
 	onSave,
+	previousSets,
 	onSetCompleted,
 	note,
 	onSaveNote,
@@ -129,6 +132,9 @@ export const ExerciseGroup = ({
 									plannedMaxReps={set.plannedMaxReps}
 									plannedWeight={set.plannedWeight}
 									plannedRir={set.plannedRir}
+									previousPerformance={previousSets?.get(
+										`${set.routineExerciseId}:${set.setNumber}`,
+									)}
 									rpe={set.rpe}
 									onSave={onSave}
 									onSetCompleted={onSetCompleted}

@@ -4,6 +4,11 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { useSetLogForm } from '@/hooks/use-set-log-form'
+import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
+import {
+	formatPreviousPerformance,
+	isSetPerformanceImproved,
+} from '@/lib/utils/previous-performance.utils'
 import { saveStateLabel } from '@/lib/utils/save-status-store'
 import type { LogRowProps } from '@/lib/utils/workout-session.types'
 
@@ -13,6 +18,7 @@ interface SetLogInputProps extends LogRowProps {
 	plannedMaxReps?: number | null
 	plannedWeight?: number | null
 	rpe?: number
+	previousPerformance?: PreviousSetPerformance
 }
 
 /**
@@ -32,6 +38,7 @@ export const SetLogInput = ({
 	plannedWeight,
 	plannedRir,
 	rpe,
+	previousPerformance,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -78,6 +85,15 @@ export const SetLogInput = ({
 		plannedMinReps && plannedMaxReps
 			? `${plannedMinReps}-${plannedMaxReps}`
 			: (plannedReps ?? '—')
+	const hasImproved = previousPerformance
+		? isSetPerformanceImproved(
+				{
+					reps: Number(repsState) || 0,
+					weight: weightState === '' ? undefined : Number(weightState),
+				},
+				previousPerformance,
+			)
+		: false
 
 	return (
 		<div
@@ -191,6 +207,26 @@ export const SetLogInput = ({
 					/>
 				</div>
 			</div>
+
+			{previousPerformance ? (
+				<div
+					className={`mt-2 flex items-center justify-between rounded-md px-2 py-1 text-[11px] ${
+						hasImproved
+							? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
+							: 'bg-muted/60 text-muted-foreground'
+					}`}
+				>
+					<span>
+						Last time:{' '}
+						<span className="font-medium">
+							{formatPreviousPerformance(previousPerformance)}
+						</span>
+					</span>
+					{hasImproved ? (
+						<span className="font-semibold">↑ Improvement</span>
+					) : null}
+				</div>
+			) : null}
 
 			{/* Validation error */}
 			{!isValid && validationError && (

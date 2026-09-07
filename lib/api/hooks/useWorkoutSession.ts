@@ -16,6 +16,7 @@ import { workoutService } from '../services/workoutService'
 import {
 	FinishWorkoutRequest,
 	ListSessionsParams,
+	PreviousPerformanceResponse,
 	SetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
@@ -52,6 +53,8 @@ const qk = {
 	progress: ['workout', 'progress'] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
+	previousPerformance: (id: string) =>
+		['workout', 'session', id, 'previous-performance'] as const,
 	sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
 		['workout', 'sessions', serializeSessionParams(params)] as const,
 }
@@ -114,6 +117,17 @@ export const useSession = (id: string) => {
 		// live training session, and showing set logs that are minutes out of date
 		// would be a correctness bug, not a slow page. Always refetch on mount.
 		staleTime: 0,
+	})
+}
+
+export const usePreviousPerformance = (id: string) => {
+	return useQuery<PreviousPerformanceResponse | null>({
+		queryKey: qk.previousPerformance(id),
+		queryFn: () => workoutService.getPreviousPerformance(id),
+		enabled: !!id,
+		// The comparison is against a completed session, so its result cannot
+		// change while the current session is open.
+		staleTime: Number.POSITIVE_INFINITY,
 	})
 }
 

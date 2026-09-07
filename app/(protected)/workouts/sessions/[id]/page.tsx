@@ -14,7 +14,11 @@ import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
-import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
+import {
+	usePreviousPerformance,
+	useSession,
+	useUpsertSetLog,
+} from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
 import type {
@@ -36,6 +40,8 @@ export default function ActiveSessionPage() {
 
 	// Data fetching
 	const { data: session, isLoading, error } = useSession(idParam)
+	const { data: previousPerformance, error: previousPerformanceError } =
+		usePreviousPerformance(idParam)
 	const { mutate: upsertSetLog } = useUpsertSetLog(idParam)
 	const { mutate: updateNote } = useUpdateExerciseNote()
 	const routineId = session?.routineId ?? ''
@@ -98,6 +104,16 @@ export default function ActiveSessionPage() {
 			session.id,
 		)
 	}, [session?.setLogs, session?.routineDayId, session?.id, routine])
+	const previousSets = useMemo(
+		() =>
+			new Map(
+				(previousPerformance?.sets ?? []).map(set => [
+					`${set.routineExerciseId}:${set.setNumber}`,
+					set,
+				]),
+			),
+		[previousPerformance?.sets],
+	)
 
 	// Loading state (session or routine). For routine, wait until first fetch completes when routineId exists
 	const routineFirstFetchPending = !!routineId && !isRoutineFetched
@@ -242,6 +258,14 @@ export default function ActiveSessionPage() {
 
 				{/* Exercise Groups */}
 				<div className="space-y-4">
+					{previousPerformanceError ? (
+						<p
+							className="text-center text-xs text-amber-700 dark:text-amber-300"
+							role="status"
+						>
+							Previous performance is temporarily unavailable.
+						</p>
+					) : null}
 					{groupedLogs.map(group => {
 						const completedSets = group.sets.filter(
 							set => set.isCompleted,
@@ -259,6 +283,7 @@ export default function ActiveSessionPage() {
 								completedSets={completedSets}
 								totalSets={totalSets}
 								onSave={handleSaveSetLog}
+								previousSets={previousSets}
 								onSetCompleted={() => restTimer.start(group.restSeconds)}
 								note={group.note}
 								onSaveNote={note => {

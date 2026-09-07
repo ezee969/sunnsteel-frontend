@@ -2,6 +2,7 @@ import {
 	FinishWorkoutRequest,
 	ListSessionsParams,
 	PaginatedResponse,
+	PreviousPerformanceResponse,
 	SetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
@@ -94,6 +95,18 @@ export const workoutService = {
 	getSessionById: async (id: string): Promise<WorkoutSession> => {
 		return httpClient.request<WorkoutSession>(
 			`${WORKOUTS_API_URL}/sessions/${id}`,
+			{
+				method: 'GET',
+				secure: true,
+			},
+		)
+	},
+
+	getPreviousPerformance: async (
+		id: string,
+	): Promise<PreviousPerformanceResponse | null> => {
+		return httpClient.request<PreviousPerformanceResponse | null>(
+			`${WORKOUTS_API_URL}/sessions/${id}/previous-performance`,
 			{
 				method: 'GET',
 				secure: true,
