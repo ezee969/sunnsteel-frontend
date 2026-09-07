@@ -26,6 +26,8 @@ export type LogRowProps = {
 	plannedWeight?: number | null
 	plannedRir?: number | null
 	onSave: (payload: UpsertSetLogPayload) => void
+	/** Fired only when a set is ticked complete, never when it is unticked. */
+	onSetCompleted?: () => void
 }
 
 export type GroupedLogsProps = {
@@ -83,5 +85,7 @@ export type GroupedExerciseLogs = {
 		plannedRir?: number | null
 	}>
 	progressionScheme: ProgressionScheme
+	// LIVE-01 reads this to start the rest countdown.
+	restSeconds: number
 	note?: string | null
 }

@@ -17,6 +17,7 @@ interface UseSetLogFormProps {
 	initialRpe?: number
 	initialIsCompleted: boolean
 	onSave: (payload: UpsertSetLogPayload) => void
+	onSetCompleted?: () => void
 }
 
 interface UseSetLogFormReturn {
@@ -53,6 +54,7 @@ export const useSetLogForm = ({
 	initialRpe,
 	initialIsCompleted,
 	onSave,
+	onSetCompleted,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
 	// Form state
 	const [repsState, setRepsState] = useState<string>(
@@ -85,6 +87,11 @@ export const useSetLogForm = ({
 	useEffect(() => {
 		onSaveRef.current = onSave
 	}, [onSave])
+
+	const onSetCompletedRef = useRef(onSetCompleted)
+	useEffect(() => {
+		onSetCompletedRef.current = onSetCompleted
+	}, [onSetCompleted])
 
 	// Track last saved values to prevent redundant saves
 	const lastSavedRef = useRef({
@@ -229,6 +236,10 @@ export const useSetLogForm = ({
 		(checked: boolean) => {
 			setIsCompletedState(checked)
 			markSetPending(sessionId, routineExerciseId, setNumber)
+
+			// Ticking a set is what starts rest (LIVE-01). Unticking is a
+			// correction and must not restart the countdown.
+			if (checked) onSetCompletedRef.current?.()
 
 			// Immediately save completion toggle
 			const payload = createPayload(repsState, weightState, rpeState, checked)

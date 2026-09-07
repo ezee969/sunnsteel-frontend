@@ -184,6 +184,7 @@ export function groupSetLogsByExercise(
 			exerciseName: re.exercise.name,
 			sets,
 			progressionScheme: re.progressionScheme,
+			restSeconds: re.restSeconds,
 			note: re.note,
 		} as GroupedExerciseLogs
 	})

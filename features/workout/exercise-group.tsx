@@ -34,6 +34,8 @@ interface ExerciseGroupProps {
 	completedSets: number
 	totalSets: number
 	onSave: (payload: UpsertSetLogPayload) => void
+	/** Fired when any set in this group is ticked complete (LIVE-01). */
+	onSetCompleted?: () => void
 	note?: string | null
 	onSaveNote: (note: string) => void
 }
@@ -49,6 +51,7 @@ export const ExerciseGroup = ({
 	completedSets,
 	totalSets,
 	onSave,
+	onSetCompleted,
 	note,
 	onSaveNote,
 }: ExerciseGroupProps) => {
@@ -128,6 +131,7 @@ export const ExerciseGroup = ({
 									plannedRir={set.plannedRir}
 									rpe={set.rpe}
 									onSave={onSave}
+									onSetCompleted={onSetCompleted}
 								/>
 							</div>
 						))}

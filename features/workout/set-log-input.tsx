@@ -33,6 +33,7 @@ export const SetLogInput = ({
 	plannedRir,
 	rpe,
 	onSave,
+	onSetCompleted,
 }: SetLogInputProps) => {
 	const {
 		repsState,
@@ -56,6 +57,7 @@ export const SetLogInput = ({
 		initialRpe: rpe,
 		initialIsCompleted: isCompleted,
 		onSave,
+		onSetCompleted,
 	})
 
 	const showStatus = saveState !== 'idle'

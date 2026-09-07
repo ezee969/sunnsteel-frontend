@@ -4,11 +4,13 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 
 import { ExerciseGroup } from '@/features/workout/exercise-group'
+import { RestTimerBar } from '@/features/workout/rest-timer-bar'
 import { SessionActionCard } from '@/features/workout/session-action-card'
 import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
 import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
+import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
@@ -47,6 +49,10 @@ export default function ActiveSessionPage() {
 	// progress. Gating on the status rather than the route means finishing or
 	// aborting drops the lock immediately, without waiting for the redirect.
 	useScreenWakeLock(session?.status === 'IN_PROGRESS')
+
+	// LIVE-01: rest runs off the exercise's own restSeconds, started by the
+	// tap that ticks a set complete.
+	const restTimer = useRestTimer()
 
 	// Session management
 	const {
@@ -215,7 +221,13 @@ export default function ActiveSessionPage() {
 				onNavigateBack={handleBack}
 			/>
 
-			<div className="container mx-auto px-4 py-6 space-y-6">
+			{/* The rest bar is fixed, so it would sit on top of the last set and
+			    the finish action. Reserve room for it only while it is shown. */}
+			<div
+				className={`container mx-auto px-4 py-6 space-y-6 ${
+					restTimer.remaining !== null ? 'pb-28' : ''
+				}`}
+			>
 				{/* Action Card */}
 				<SessionActionCard
 					sessionId={session.id}
@@ -247,6 +259,7 @@ export default function ActiveSessionPage() {
 								completedSets={completedSets}
 								totalSets={totalSets}
 								onSave={handleSaveSetLog}
+								onSetCompleted={() => restTimer.start(group.restSeconds)}
 								note={group.note}
 								onSaveNote={note => {
 									if (routineId) {
@@ -279,6 +292,16 @@ export default function ActiveSessionPage() {
 					</div>
 				)}
 			</div>
+
+			{/* Rest timer (LIVE-01). Fixed to the bottom, so it is rendered last
+			    and outside the scrolling content. */}
+			<RestTimerBar
+				remaining={restTimer.remaining}
+				total={restTimer.total}
+				isOver={restTimer.isOver}
+				onExtend={restTimer.extend}
+				onDismiss={restTimer.dismiss}
+			/>
 
 			{/* Confirmation Dialog */}
 			<SessionConfirmationDialog
