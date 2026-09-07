@@ -1,5 +1,10 @@
 # TD-27: implementation and staged rollout
 
+> Closed 2026-09-07: [closure record](../history/td27-closure-2026-09-07.md).
+> The rollout sequence below is historical. The projection reader is now unconditional;
+> WORKOUT_PROGRESS_PROJECTION_READS is obsolete. Keep WORKOUT_ANALYTICS_JOBS=true.
+> The comparison CLI uses an offline fixture, never a production API fallback.
+
 The implementation is ready for staged deployment. TD-27 remains open until
 production comparison, backfill coverage and query evidence pass. DATA-02 still
 excludes progression, achievements and the other future event types. Existing
@@ -51,10 +56,9 @@ versioned prescription snapshots and account time-zone registration/status.
 7. Observe the rollout and retain the snapshot-aware legacy reader during the
    rollback window. Reverting the flag is the read-path rollback. Do not roll
    back to code that predates snapshots or atomic finish.
-8. After the production gates and rollback observation, promote
-   `prisma/deferred/analytics-fk-cutover.sql` into its own ordered Prisma
-   migration in the deployment commit and run `prisma migrate deploy`. It is
-   deliberately outside the automatic migration directory until that gate. It checks snapshot/source-ID
+8. After the production gates and rollback observation, apply
+   `prisma/migrations/20260907090000_analytics_fk_cutover/migration.sql`
+   with `prisma migrate deploy`. Promoted on 2026-09-07, it checks snapshot/source-ID
    coverage and READY projections, takes bounded locks and changes the three
    live relations to `ON DELETE SET NULL`. Before this step, structural edits or
    deletion of routines with history return 409 rather than destroying history.
@@ -148,10 +152,21 @@ active or requested generation when introducing retention later.
   94 before and after (2026-09-07T07:59:21Z).
 - Legacy/projected dashboard comparisons passed for all seven accounts at
   2026-09-07T08:00:19Z (7/7 exact matches).
-- Worker adjustment published as `c21f0cd`; GitHub CI passed. Railway deployment
-  was still in progress at the last check.
-- Projection-read flag activation, the rollback observation window and FK
-  cutover remain pending.
+- Worker adjustment published as `c21f0cd`; startup fix `75dff50` passed CI and
+  Railway deployment. Compiled module loading is now checked in CI and builds.
+- The owner confirmed both analytics flags enabled on 2026-09-07. Independent
+  post-activation checks at 08:29 UTC returned health `ok`, zero unregistered or
+  pending accounts and eight COMPLETED jobs. Runtime flag values and an
+  authenticated dashboard request were not independently inspected.
+- The owner confirmed the post-activation workout check. The guarded FK cutover
+  was applied and published as `47a9acf`: all three constraints report SET NULL,
+  with 39 sessions and 39 snapshots after migration. Local backend verification
+  and the isolated PostgreSQL integration suite passed before applying it.
+- Pooled migration access hit a stale session advisory lock. The idle holder
+  (no open transaction) was released and migration succeeded over the direct
+  connection to the same Neon database. Use direct connections for migrations.
+- The owner confirmed post-cutover functionality. The API legacy reader and
+  projection-read flag were removed to close TD-27.
 
 ## Historical limitations
 

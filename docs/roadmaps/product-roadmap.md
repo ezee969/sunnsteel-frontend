@@ -110,7 +110,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 
 | Order | Queue group              | Size | Included feature IDs                                           | Why it precedes later work                                                                            |
 | ----- | ------------------------ | ---- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| 1     | Analytics foundation     | L    | DATA-01 through DATA-05                                        | Implemented in code and awaiting staged rollout. Groups 4, 6, 7, and 8 all read what it produces.     |
+| 1     | Analytics foundation     | L    | DATA-01 through DATA-05                                        | TD-27 foundation shipped; DATA-02 retains future event types. Groups 4, 6, 7, and 8 all read what it produces.     |
 | 2     | Product integrity        | S    | FIX-03 (FIX-01, FIX-02, FIX-04, FIX-06 through FIX-08 shipped) | Existing screens and flows must be truthful and usable first.                                         |
 | 3     | Daily session essentials | M    | LIVE-01 through LIVE-06                                        | High-frequency improvements that reuse data already collected and wait on no deployment.              |
 | 4     | Visible workout payoff   | M    | LIVE-07 through LIVE-10                                        | Buildable now against the analytics code; ships once projection reads are enabled in production.      |
@@ -158,11 +158,11 @@ users until projection reads are enabled.
 
 | ID      | Status        | Size | Feature                      | User-facing or architectural outcome                                                                                      | Dependencies                 |
 | ------- | ------------- | ---- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| DATA-01 | `IN_PROGRESS` | L    | Persistent personal records  | Store record events when they occur instead of deriving all records from the user's lifetime set-log table on every read. | BE/CT migration and backfill |
+| DATA-01 | `SHIPPED` | L    | Persistent personal records  | Store record events when they occur instead of deriving all records from the user's lifetime set-log table on every read. | BE/CT migration and backfill |
 | DATA-02 | `IN_PROGRESS` | L    | Training-event stream        | Persist session completions, PRs, streak milestones, progression changes, and achievements as addressable events.         | BE/CT schema                 |
-| DATA-03 | `IN_PROGRESS` | L    | Daily and weekly rollups     | Store volume, completed sets, active days, and muscle-group totals for fast progress views.                               | BE schema and backfill       |
-| DATA-04 | `IN_PROGRESS` | L    | Routine snapshot per session | Preserve the routine/day/exercise prescription used at training time so future edits cannot rewrite history.              | BE/CT schema                 |
-| DATA-05 | `IN_PROGRESS` | L    | Historical backfill          | Generate initial records, events, rollups, and snapshots from existing sessions with repeatable migration logic.          | DATA-01 through DATA-04      |
+| DATA-03 | `SHIPPED` | L    | Daily and weekly rollups     | Store volume, completed sets, active days, and muscle-group totals for fast progress views.                               | BE schema and backfill       |
+| DATA-04 | `SHIPPED` | L    | Routine snapshot per session | Preserve the routine/day/exercise prescription used at training time so future edits cannot rewrite history.              | BE/CT schema                 |
+| DATA-05 | `SHIPPED` | L    | Historical backfill          | Generate initial records, events, rollups, and snapshots from existing sessions with repeatable migration logic.          | DATA-01 through DATA-04      |
 
 Together, `DATA-01` through `DATA-05` provide the durable data model and
 backfill needed to close
@@ -170,19 +170,7 @@ backfill needed to close
 The technical-debt entry owns the query-cost evidence and closure criteria;
 this roadmap owns the product and cross-repository delivery sequence.
 
-**Implementation state, verified 2026-09-06.** These are `IN_PROGRESS`, not
-pending. The backend carries the expansion migration
-(`prisma/migrations/20260906180000_analytics_expand`), the analytics module
-(`src/workouts/analytics/`) and six new Prisma models; `@sunsteel/contracts@0.7.0`
-is published and consumed by both repositories. What remains is deployment, not
-construction: staging rehearsal, backfill, legacy-versus-projection comparison,
-and then the two flags `WORKOUT_ANALYTICS_JOBS` and
-`WORKOUT_PROGRESS_PROJECTION_READS`. The staged sequence and its gates live in
-the [TD-27 rollout runbook](../reference/td27-analytics-rollout.md); local
-evidence is in
-[`td27-analytics-local-validation-2026-09-06.md`](../history/td27-analytics-local-validation-2026-09-06.md).
-Do not re-plan this work from scratch. Move these to `SHIPPED` only after the
-production comparison passes.
+**Delivery verified 2026-09-07.** DATA-01, DATA-03, DATA-04 and DATA-05 shipped. Production comparison passed for all seven accounts; repeated backfill was idempotent, snapshot-safe relations were migrated and the API legacy fallback was removed. See the [TD-27 closure record](../history/td27-closure-2026-09-07.md). DATA-02 retains its partial status below.
 
 **`DATA-02` is deliberately partial.** `TrainingEventType` currently emits only
 `SESSION_COMPLETED` and `PERSONAL_RECORD`. Progression changes, streak

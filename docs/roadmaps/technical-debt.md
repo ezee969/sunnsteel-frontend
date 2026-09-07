@@ -17,52 +17,11 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
+No active technical debt is currently recorded.
+
 <a id="td-27"></a>
 
-### TD-27 · `WorkoutProgressService.getProgress` scans the entire history
-
-**Status:** active. Related to `DATA-01`-`DATA-05` in the
-[product roadmap](product-roadmap.md#analytics-and-historical-data-foundation),
-which are `IN_PROGRESS`: the implementation exists and is awaiting staged
-rollout, so this entry stays open until the production gates pass.
-
-**Impact:** the cost of `GET /workouts/progress` grows with the user's entire
-training history. Every request transfers and processes all completed sets
-needed for volume and records, plus every completed session date needed to
-compute streaks. This increases database work, backend memory and CPU, and can
-degrade dashboard latency as history grows.
-
-**Evidence:** in
-`../sunnsteel-backend/src/workouts/workout-progress.service.ts`, `getProgress`
-runs, on every call, a `setLog.findMany` with no time window and no limit, plus a
-separate unbounded `workoutSession.findMany` for all historical dates. It then
-computes volume, personal records and streaks in memory. The frontend consumes
-that request through `useWorkoutProgress` on the dashboard.
-
-**Solution direction:** replace the lifetime scans with persisted data and
-bounded queries. `DATA-01` supplies persistent personal records; `DATA-02` and
-`DATA-03`, events and aggregates for volume and streaks; `DATA-04`, snapshots
-that preserve historical meaning; and `DATA-05`, a repeatable backfill for
-existing users. The public progress response must keep its contract while the
-source of the calculations changes.
-
-**Closure criteria:**
-
-- `getProgress` no longer queries every completed set and every historical date
-  on each request.
-- Records, aggregates and events are updated consistently and idempotently, with
-  a repeatable backfill for existing history.
-- Logic and contract tests demonstrate that the response preserves current
-  results, including volume, records, recent activity and streaks.
-- A query inspection or measurement against a representative history confirms
-  that read work stays bounded and does not grow with the user's whole lifetime.
-
-**Remaining work is deployment, not construction.** The staged sequence, its
-gates and the two flags (`WORKOUT_ANALYTICS_JOBS`,
-`WORKOUT_PROGRESS_PROJECTION_READS`) live in the
-[TD-27 rollout runbook](../reference/td27-analytics-rollout.md); local evidence
-is in
-[`td27-analytics-local-validation-2026-09-06.md`](../history/td27-analytics-local-validation-2026-09-06.md).
+TD-27 closed on 2026-09-07. See the [closure record](../history/td27-closure-2026-09-07.md) for implementation and production evidence.
 
 ## Accepted limitations
 
