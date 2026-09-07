@@ -144,7 +144,8 @@ active or requested generation when introducing retention later.
   five personal records and five recent activities).
 - A batch of 25 exceeded the 30-second transaction timeout over the remote
   connection. Batches of two completed successfully; the worker default was
-  reduced to two and passed backend `npm run verify`. Deploy this adjustment.
+  reduced to two and passed backend `npm run verify`. Its deployment is
+  recorded below.
 - The owner explicitly authorized Europe/Berlin for the six empty test accounts;
   all seven accounts are READY with no pending jobs.
 - A second production rebuild matched the original totals, daily/weekly and
@@ -167,6 +168,13 @@ active or requested generation when introducing retention later.
   connection to the same Neon database. Use direct connections for migrations.
 - The owner confirmed post-cutover functionality. The API legacy reader and
   projection-read flag were removed to close TD-27.
+- **TD-27 closed on 2026-09-07.** The staged sequence above ran to completion;
+  no step in `Deployment order` is outstanding. Evidence and the delivered/
+  partial split are in
+  [`../history/td27-closure-2026-09-07.md`](../history/td27-closure-2026-09-07.md).
+  `WORKOUT_ANALYTICS_JOBS` is not a rollout flag and stays enabled: new accounts
+  and rebuilds still need it. Steps 1-9 are retained as the record of how this
+  shipped, not as pending work.
 
 ## Historical limitations
 
