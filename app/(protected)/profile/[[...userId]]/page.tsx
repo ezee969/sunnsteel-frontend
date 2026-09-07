@@ -6,7 +6,6 @@ import {
 	CalendarDays,
 	Dumbbell,
 	Flame,
-	MapPin,
 	Share2,
 	Trophy,
 	UserMinus,
@@ -16,7 +15,6 @@ import { useParams } from 'next/navigation'
 import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -138,25 +136,23 @@ export default function ProfilePage() {
 						</div>
 
 						<div className="flex-1 text-center md:text-left space-y-2 mt-4 md:mt-0">
-							<div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 justify-center md:justify-start">
-								<h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground heading-classical">
-									{profileName} {profileLastName}
-								</h1>
-								<div className="flex gap-2 justify-center">
-									<Badge
-										variant="secondary"
-										className="bg-primary/10 text-primary border-primary/20 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-primary/20"
-									>
-										Pro Member
-									</Badge>
-								</div>
-							</div>
+							{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
+							membership, plan or tier, so no badge rendered here can be backed by
+							real account state. Titles and ranks are owned by ACH-02/ACH-03; do
+							not re-add one ad hoc. */}
+							<h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground heading-classical">
+								{profileName} {profileLastName}
+							</h1>
 							<p className="text-muted-foreground font-medium flex items-center justify-center md:justify-start gap-1.5 text-sm md:text-base">
 								<CalendarDays className="h-4 w-4" /> Joined {joinDateText}
 							</p>
 
+							{/* FIX-06: these counts are text, not controls. They used to carry
+							cursor-pointer and a hover state while leading nowhere. The browsable
+							follower/following lists, and the paginated endpoint they need, belong
+							to SOC-02. */}
 							<div className="flex gap-4 justify-center md:justify-start pt-2">
-								<div className="cursor-pointer hover:opacity-80 transition-opacity flex items-baseline gap-1.5">
+								<div className="flex items-baseline gap-1.5">
 									<span className="text-lg font-bold heading-classical">
 										{followerCount}
 									</span>
@@ -164,7 +160,7 @@ export default function ProfilePage() {
 										Followers
 									</span>
 								</div>
-								<div className="cursor-pointer hover:opacity-80 transition-opacity flex items-baseline gap-1.5">
+								<div className="flex items-baseline gap-1.5">
 									<span className="text-lg font-bold heading-classical">
 										{followingCount}
 									</span>
@@ -214,17 +210,14 @@ export default function ProfilePage() {
 						<h2 className="text-xl font-semibold heading-classical flex items-center gap-2">
 							<User className="h-5 w-5 text-primary" /> About
 						</h2>
+						{/* FIX-01: this block used to state the same invented biography and
+						location ("San Francisco, CA") for every user, on other people's
+						profiles too. Neither UserProfile nor PublicUserProfile carries a bio
+						or location field, so there is nothing real to render yet. PROF-04
+						adds the editable fields and their per-field visibility. */}
 						<p className="text-muted-foreground text-sm leading-relaxed">
-							Fitness enthusiast on a journey to become stronger every day.
-							Currently running a Push/Pull/Legs split and focusing on
-							progressive overload.
-							<br />
-							<br />
-							&quot;The iron never lies to you.&quot;
+							No bio yet.
 						</p>
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<MapPin className="h-4 w-4" /> San Francisco, CA
-						</div>
 					</div>
 				</div>
 

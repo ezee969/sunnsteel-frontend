@@ -25,9 +25,12 @@ export default function SearchPage() {
 				<h2 className="text-2xl font-bold heading-classical mb-2">
 					Search Users
 				</h2>
+				{/* FIX-07: this used to offer search by username and by email.
+				Unique handles do not exist yet -- PROF-03 owns them -- and an email
+				address is not a public identity, so it is not offered as a way to
+				look someone up. */}
 				<p className="text-muted-foreground max-w-md">
-					Type a name, username, or email in the top search bar to find
-					profiles.
+					Type a name in the top search bar to find profiles.
 				</p>
 			</div>
 		)
@@ -82,7 +85,7 @@ export default function SearchPage() {
 							<h3 className="text-lg font-semibold text-center mb-1 group-hover:text-primary transition-colors">
 								{user.name} {user.lastName || ''}
 							</h3>
-							{/* Could add a `@username` here if username logic is integrated, for now just relying on name */}
+							{/* A `@handle` belongs here once PROF-03 introduces unique usernames. */}
 							<p className="text-xs text-muted-foreground/80 mt-2 font-medium tracking-wide">
 								VIEW PROFILE
 							</p>
@@ -97,7 +100,7 @@ export default function SearchPage() {
 					<h3 className="text-xl font-semibold mb-2">No users found</h3>
 					<p className="text-muted-foreground max-w-sm">
 						We couldn&apos;t find any profiles matching &quot;{query}&quot;. Try
-						trying a different spelling or name.
+						a different spelling or name.
 					</p>
 				</div>
 			)}

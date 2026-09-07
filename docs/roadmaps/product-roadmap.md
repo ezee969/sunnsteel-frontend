@@ -82,22 +82,26 @@ as with `FIX-05` -- there is no honest short version and the surface stays
 unfinished until the real capability lands. Do not let the first table wait for
 the second.
 
+The first table shipped on 2026-09-07 and is retained as a record of what was
+corrected and where. `FIX-03` is the only integrity item still open; `FIX-05`
+remains deliberately deferred to `PROF-12`.
+
 ### Honesty fixes — frontend only
 
-| ID     | Status | Size | Work item                          | Expected behavior                                                                                                                                                             | Repositories |
-| ------ | ------ | ---- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FIX-01 | `NEXT` | S    | Remove fabricated profile content  | Profiles must not claim that every user has the same biography or lives in San Francisco. Show real optional data or an honest empty state.                                   | FE           |
-| FIX-02 | `NEXT` | S    | Remove the unconditional Pro badge | Display a membership/title badge only when backed by a real account state.                                                                                                    | FE           |
-| FIX-06 | `NEXT` | S    | Stop implying interactive counts   | Follower and Following counts must not render as interactive while they lead nowhere. Browsable relationship lists, and the paginated endpoint they need, belong to `SOC-02`. | FE           |
-| FIX-07 | `NEXT` | S    | Align search copy with behavior    | Do not claim username search until unique usernames exist; avoid presenting email as a public identity.                                                                       | FE           |
-| FIX-08 | `NEXT` | S    | Replace fixed dashboard goals      | Label weekly and lifetime targets as generic milestones until `PROG-08` supplies real user goals.                                                                             | FE           |
+| ID     | Status    | Size | Work item                          | Expected behavior                                                                                                                                                             | Repositories |
+| ------ | --------- | ---- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| FIX-01 | `SHIPPED` | S    | Remove fabricated profile content  | Profiles must not claim that every user has the same biography or lives in San Francisco. Show real optional data or an honest empty state.                                   | FE           |
+| FIX-02 | `SHIPPED` | S    | Remove the unconditional Pro badge | Display a membership/title badge only when backed by a real account state.                                                                                                    | FE           |
+| FIX-06 | `SHIPPED` | S    | Stop implying interactive counts   | Follower and Following counts must not render as interactive while they lead nowhere. Browsable relationship lists, and the paginated endpoint they need, belong to `SOC-02`. | FE           |
+| FIX-07 | `SHIPPED` | S    | Align search copy with behavior    | Do not claim username search until unique usernames exist; avoid presenting email as a public identity.                                                                       | FE           |
+| FIX-08 | `SHIPPED` | S    | Replace fixed dashboard goals      | Label weekly and lifetime targets as generic milestones until `PROG-08` supplies real user goals.                                                                             | FE           |
 
 ### Integrity gaps owned by a feature
 
 | ID     | Status     | Size | Work item                          | Expected behavior                                                                                                                                                                                                                                                                                                                                                                            | Repositories                                      |
 | ------ | ---------- | ---- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | FIX-03 | `NEXT`     | M    | Correct kg/lb handling             | Canonical storage is already kilograms (`SetLog.weight`, `PersonalRecord.weight`, `WorkoutAnalyticsProjection.totalVolumeKg`), so this is presentation and input conversion, not a storage migration. Convert at the display and entry boundary, and never label a kilogram value as pounds. Revisit only if a future field stores a non-canonical unit.                                     | FE; BE/CT only if a new preference field is added |
-| FIX-04 | `NEXT`     | S    | Hide the Quick Workout entry point | Decided 2026-09-07: hide the button rather than seed it with a starting exercise. It currently creates a routine with an empty `exercises` array, so the session it opens has nothing loggable and no way to add anything. Hiding is reversible and costs nothing; the replacement flow is `LIVE-06`, whose design is still open.                                                            | FE                                                |
+| FIX-04 | `SHIPPED`  | S    | Hide the Quick Workout entry point | Decided 2026-09-07: hide the button rather than seed it with a starting exercise. It currently creates a routine with an empty `exercises` array, so the session it opens has nothing loggable and no way to add anything. Hiding is reversible and costs nothing; the replacement flow is `LIVE-06`, whose design is still open.                                                            | FE                                                |
 | FIX-05 | `DEFERRED` | -    | Make Share Profile functional      | Decided 2026-09-06: no interim fix. `/profile` is inside `PROTECTED_PREFIXES` in `middleware.ts`, so any link shared today sends a signed-out visitor to `/login`. A copy-link stopgap would replace a dead button with a link the recipient cannot open, which is a new false promise rather than a repaired one. The button stays visibly inert until `PROF-12` ships real public sharing. | FE, once `PROF-12` lands                          |
 
 ## Active queue
@@ -107,7 +111,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | Order | Queue group              | Size | Included feature IDs                                           | Why it precedes later work                                                                            |
 | ----- | ------------------------ | ---- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | 1     | Analytics foundation     | L    | DATA-01 through DATA-05                                        | Implemented in code and awaiting staged rollout. Groups 4, 6, 7, and 8 all read what it produces.     |
-| 2     | Product integrity        | S    | FIX-01 through FIX-04, FIX-06 through FIX-08                   | Existing screens and flows must be truthful and usable first.                                         |
+| 2     | Product integrity        | S    | FIX-03 (FIX-01, FIX-02, FIX-04, FIX-06 through FIX-08 shipped) | Existing screens and flows must be truthful and usable first.                                         |
 | 3     | Daily session essentials | M    | LIVE-01 through LIVE-06                                        | High-frequency improvements that reuse data already collected and wait on no deployment.              |
 | 4     | Visible workout payoff   | M    | LIVE-07 through LIVE-10                                        | Buildable now against the analytics code; ships once projection reads are enabled in production.      |
 | 5     | Identity and privacy     | XL   | PROF-03 through PROF-10, PROF-12                               | Public identity and visibility rules are prerequisites for social expansion.                          |
@@ -119,10 +123,11 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 11    | Complex infrastructure   | XL   | OFFLINE-01, MSG-01 through MSG-05                              | Offline conflict resolution, realtime delivery, moderation, and unread state are substantial systems. |
 
 Order is dependency order, not priority: group 1 leads because it is already in
-flight, not because it outranks the honesty fixes in group 2, which are a day of
-frontend work and can proceed in parallel. Group 3 sits ahead of group 4 because
-nothing in it waits on a production rollout, while group 4 cannot reach users
-until projection reads are enabled.
+flight, not because it outranks the honesty fixes in group 2, which were a day of
+frontend work and proceeded in parallel -- the six frontend-only ones shipped on
+2026-09-07, leaving `FIX-03` (kg/lb presentation). Group 3 sits ahead of group 4
+because nothing in it waits on a production rollout, while group 4 cannot reach
+users until projection reads are enabled.
 
 ## Feature catalog
 
@@ -417,6 +422,7 @@ it again without addressing the original decision.
 | Date       | Feature IDs                                                                                                  | Evidence                                      | Notes                                         |
 | ---------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------- | --------------------------------------------- |
 | 2026-09-06 | CORE-01 through CORE-03, PROF-01 through PROF-02, SOC-01, ROUT-01 through ROUT-02, LIVE-00, HIST-01, DASH-01 | Verified against the three local repositories | Initial product snapshot and roadmap created. |
+| 2026-09-07 | FIX-01, FIX-02, FIX-04, FIX-06, FIX-07, FIX-08 | FE `app/(protected)/profile/[[...userId]]/page.tsx`, `app/(protected)/workouts/page.tsx`, `app/(protected)/search/page.tsx`, `app/(protected)/dashboard/components/StatsOverview.tsx`; `npm run verify` clean | The frontend-only honesty group, shipped as one change with no contract publish, no backend and no migration. `FIX-01` leaves an honest `No bio yet.` empty state and drops the invented location; `PROF-04` still owns the real editable fields. `FIX-04` hides the entry point behind `SHOW_QUICK_WORKOUT_ENTRY` and leaves `handleStartEmptyWorkout` wired for `LIVE-06`. `FIX-08` also corrects a defect: the lifetime card showed `0 left` forever past 50 sessions. |
 
 ## Document history
 
@@ -452,3 +458,15 @@ it again without addressing the original decision.
   replacement flow is not designed yet. Noted the template-selection direction
   and its overlap with `ROUT-03`, whose `Curated templates` dependency still has
   no owning ID.
+- **2026-09-07 (revision 2):** Shipped the six frontend-only honesty fixes as a
+  single change -- `FIX-01`, `FIX-02`, `FIX-04`, `FIX-06`, `FIX-07`, `FIX-08` --
+  and moved them to `SHIPPED`. Queue group 2 now holds only `FIX-03`. Three
+  decisions are worth carrying forward. `FIX-01` removed the invented biography
+  and location but kept the About block with a one-line honest empty state,
+  because the capability is wanted and `PROF-04` owns the real editable fields;
+  it did not build an empty state elaborate enough for `PROF-04` to discard.
+  `FIX-02` deleted the badge outright rather than conditioning it, because
+  neither `UserProfile` nor `PublicUserProfile` carries a membership, plan or
+  tier field to condition it on. `FIX-04` hid the entry point behind a
+  `SHOW_QUICK_WORKOUT_ENTRY` flag instead of deleting the flow, so `LIVE-06`
+  resumes from working code once its product decision is made.

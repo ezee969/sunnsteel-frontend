@@ -15,6 +15,16 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
+// FIX-04 (decided 2026-09-07): the Quick Workout entry point is hidden, not
+// removed. `handleStartEmptyWorkout` below creates a routine whose only day has
+// `exercises: []`, so the session it opens has nothing loggable and no way to add
+// anything. The replacement flow is LIVE-06, which is BLOCKED on a product
+// decision that has not been made, so the handler stays wired behind this flag
+// rather than being deleted: flipping this constant is the whole revert.
+//
+// The code it guards is deliberately unreachable. Do not remove it as dead code.
+const SHOW_QUICK_WORKOUT_ENTRY: boolean = false
+
 export default function WorkoutsIndexPage() {
 	const router = useRouter()
 	const { preloadOnHover } = useComponentPreloading()
@@ -151,25 +161,27 @@ export default function WorkoutsIndexPage() {
 						No Active Workout
 					</h2>
 					<p className="text-sm text-muted-foreground leading-relaxed">
-						You don&apos;t have a workout in progress right now. Start an empty
-						session to log on the fly, pick a routine, or view your history.
+						You don&apos;t have a workout in progress right now. Pick a routine
+						to start training, or review your history.
 					</p>
 				</div>
 
 				{/* Actions */}
 				<div className="flex flex-wrap justify-center gap-3">
-					<Button
-						variant="classical"
-						onClick={handleStartEmptyWorkout}
-						disabled={isStartingEmpty}
-					>
-						<ClassicalIcon
-							name="dumbbell"
-							className="mr-2 h-4 w-4"
-							aria-hidden
-						/>
-						Start Empty Workout
-					</Button>
+					{SHOW_QUICK_WORKOUT_ENTRY && (
+						<Button
+							variant="classical"
+							onClick={handleStartEmptyWorkout}
+							disabled={isStartingEmpty}
+						>
+							<ClassicalIcon
+								name="dumbbell"
+								className="mr-2 h-4 w-4"
+								aria-hidden
+							/>
+							Start Empty Workout
+						</Button>
+					)}
 					<Button asChild variant="outline">
 						<Link href="/routines">Go to Routines</Link>
 					</Button>

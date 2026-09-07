@@ -8,7 +8,12 @@ import {
 
 import StatCard from './StatCard'
 
-const WEEKLY_GOAL = 4
+// FIX-08: these are shared app milestones, not the user's goals. Nothing in
+// WorkoutStatsResponse or WorkoutProgressResponse carries a personal target, so
+// the copy below must not call them one. PROG-08 (personal goals) supplies real
+// per-user values; replace these constants when it lands.
+const WEEKLY_MILESTONE = 4
+const TOTAL_SESSIONS_MILESTONE = 50
 
 export default function StatsOverview() {
 	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
@@ -49,11 +54,15 @@ export default function StatsOverview() {
 
 	const weeklyWorkoutsProgress = Math.min(
 		100,
-		Math.round((weeklyWorkoutsCount / WEEKLY_GOAL) * 100),
+		Math.round((weeklyWorkoutsCount / WEEKLY_MILESTONE) * 100),
 	)
 	const activeDaysProgress = Math.min(
 		100,
 		Math.round((activeDaysThisWeek / 7) * 100),
+	)
+	const sessionsToMilestone = Math.max(
+		0,
+		TOTAL_SESSIONS_MILESTONE - totalCompleted,
 	)
 
 	return (
@@ -68,12 +77,12 @@ export default function StatsOverview() {
 				}
 				title="Weekly Workouts"
 				value={String(weeklyWorkoutsCount)}
-				unit={`/ ${WEEKLY_GOAL}`}
+				unit={`/ ${WEEKLY_MILESTONE}`}
 				subtitle="Workouts completed this week"
 				progress={weeklyWorkoutsProgress}
-				progressText={`${weeklyWorkoutsProgress}% of target`}
+				progressText={`${weeklyWorkoutsProgress}% of milestone`}
 				additionalText={
-					weeklyWorkoutsCount >= WEEKLY_GOAL ? 'Goal Met!' : 'Active'
+					weeklyWorkoutsCount >= WEEKLY_MILESTONE ? 'Milestone met' : 'Active'
 				}
 			/>
 			<StatCard
@@ -104,9 +113,13 @@ export default function StatsOverview() {
 				value={String(totalCompleted)}
 				subtitle="Total completed training sessions"
 				progress={totalCompleted}
-				progressMax={Math.max(50, totalCompleted)}
-				progressText="Target: 50 Sessions"
-				additionalText={`${Math.max(0, 50 - totalCompleted)} left`}
+				progressMax={Math.max(TOTAL_SESSIONS_MILESTONE, totalCompleted)}
+				progressText={`Milestone: ${TOTAL_SESSIONS_MILESTONE} sessions`}
+				additionalText={
+					sessionsToMilestone > 0
+						? `${sessionsToMilestone} to go`
+						: 'Milestone met'
+				}
 			/>
 			<StatCard
 				icon={
