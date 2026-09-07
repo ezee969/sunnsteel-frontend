@@ -17,6 +17,53 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
+### TD-29 - Focusing a set input zooms the page on iOS and does not zoom back
+
+**Impact.** Reported from a real device on 2026-09-07: tapping an input during a
+session zooms the page in, and iOS does not restore the previous scale on blur,
+so the user has to pinch out by hand mid-workout. It breaks the installed PWA's
+illusion of being an app, on the one screen that is used while training and
+one-handed.
+
+**Cause, verified 2026-09-07.** iOS Safari auto-zooms any focused form control
+whose computed `font-size` is below 16px. The design system already handles
+this: [`components/ui/input.tsx`](../../components/ui/input.tsx) sets
+`text-base` with `md:text-sm`, which is 16px on phones and 14px only from the
+`md` breakpoint up. That mitigation is deliberate and correct.
+
+Three call sites defeat it.
+[`features/workout/set-log-input.tsx`](../../features/workout/set-log-input.tsx)
+passes an unconditional `text-sm` on lines 114 (reps), 136 (weight) and 162
+(RPE), which overrides the base and lands every set input at 14px on exactly the
+screen where this hurts. No other input in the app overrides the base size, so
+the defect is contained to this component. The RPE input is new in `LIVE-04`, so
+that change added a third trigger to an existing two rather than causing the
+problem.
+
+**Solution direction.** Drop the unconditional `text-sm` so the base
+`text-base md:text-sm` applies, or restate that pair explicitly at the three call
+sites.
+
+**Do not fix this in the viewport.** Adding `maximum-scale=1` or
+`user-scalable=no` to the `viewport` export in
+[`app/layout.tsx`](../../app/layout.tsx) also stops the zoom, and is the first
+result any search returns, but it disables pinch-zoom for every user on every
+screen -- a real accessibility regression traded for a cosmetic fix. The viewport
+currently sets only `width` and `initialScale`; keep it that way.
+
+**Resolve together with [`TD-28`](#td-28).** 16px inputs are wider than 14px
+ones, in a row that already carries three inputs plus the badge and the
+checkbox, and whose save-state indicator is currently invisible for an unrelated
+reason. Fixing either one alone risks a layout that the other then breaks, so
+both closure checks want the same narrow-viewport pass.
+
+**Closure criteria.** No input in the session row computes below 16px on a
+phone-width viewport; focusing reps, weight and RPE on a real iOS device causes
+no zoom; the row still fits at 320px and 360px; and the viewport export still
+permits user scaling.
+
+<a id="td-28"></a>
+
 ### TD-28 - `xs:` is not a defined breakpoint, so three responsive classes emit no CSS
 
 **Impact.** Two components silently lose their responsive behaviour, in different
@@ -80,6 +127,11 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-07 (revision 2):** Recorded `TD-29` from a device report: focusing a
+  set input zooms the page on iOS. The cause is three call sites overriding the
+  16px mobile font size that `components/ui/input.tsx` already sets for exactly
+  this reason, not a missing mitigation. Cross-linked to `TD-28` because both
+  closure checks need the same narrow-viewport pass on the same row.
 - **2026-09-07:** Recorded `TD-28` after a production-build check of the compiled
   stylesheet showed the `xs:` variant generating no CSS. Found while adding the
   RPE column for `LIVE-04`, which shares the affected row; the two are related
