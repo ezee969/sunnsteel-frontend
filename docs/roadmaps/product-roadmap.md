@@ -324,7 +324,7 @@ Instructions and media make this a content project as well as an engineering one
 | -------- | ----------- | ---- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
 | NOTIF-01 | `QUEUED`    | L    | In-app notification center | Collect actionable training, schedule, achievement, and social notifications with read state.                                       | DATA-02, PROF-06                       |
 | NOTIF-02 | `QUEUED`    | M    | Web Push foundation        | Request permission, register the subscription and render authorized notifications on supported installed PWAs.                      | NOTIF-08; service-worker push handlers |
-| NOTIF-03 | `QUEUED`    | S    | Rest-timer alert           | Notify when rest ends while the app is backgrounded or the screen is locked.                                                        | LIVE-01, NOTIF-02                      |
+| NOTIF-03 | `QUEUED`    | S    | Rest-timer alert           | Notify when rest ends while the app is backgrounded or the screen is locked. **The alert is a notification, not the in-app tone.** `LIVE-01` synthesises its tone with WebAudio inside the page, and a backgrounded or locked PWA has its timers throttled or suspended and its audio context suspended, so that tone cannot fire -- this is the execution model, not a defect to repair in `LIVE-01`. The OS must play the sound, which means a notification, which on iOS means Web Push. **Scope limit recorded 2026-09-07: a live countdown on the lock screen is not achievable and must not be promised.** iOS Live Activities are native-only with no web equivalent, and the Web Notifications API has no chronometer or countdown field, so the most either platform can show is a static line such as `Rest ends at 14:32`, never a number that ticks down. Two further conditions: on iOS, Web Push requires the PWA installed to the Home Screen (16.4+) and does nothing in a browser tab; and a rest alert means scheduling one push per completed set at second-level precision, which is heavier than a training reminder and is what the `S` size assumes `NOTIF-08` already provides. The Chromium Notification Triggers experiment would allow a local scheduled notification with no server, but it is unverified, Chromium-only at best and absent on iOS; confirm its status before any plan depends on it.                                                        | LIVE-01, NOTIF-02                      |
 | NOTIF-04 | `QUEUED`    | M    | Training reminders         | Remind users before scheduled sessions using their time zone and quiet hours.                                                       | SCHED-01, PREF-04, NOTIF-02            |
 | NOTIF-05 | `QUEUED`    | M    | Notification controls      | Configure categories, channels, quiet hours, and optional digests.                                                                  | NOTIF-01, NOTIF-02                     |
 | NOTIF-06 | `CANDIDATE` | M    | Streak-at-risk reminder    | Offer an optional nudge based on the real training schedule rather than generic daily pressure.                                     | SCHED-01, DATA-02                      |
@@ -462,6 +462,14 @@ it again without addressing the original decision.
   tier field to condition it on. `FIX-04` hid the entry point behind a
   `SHOW_QUICK_WORKOUT_ENTRY` flag instead of deleting the flow, so `LIVE-06`
   resumes from working code once its product decision is made.
+- **2026-09-07 (revision 5):** Recorded the scope limit on `NOTIF-03` after the
+  capability was asked for directly: the end-of-rest **alert** is reachable
+  through `NOTIF-08` and `NOTIF-02`, but a **visible countdown on a locked**
+  **screen** is not a web capability and no amount of work in this stack
+  delivers it. The row previously said only "notify when rest ends", which was
+  correct but left the impossible half unaddressed and available to be promised
+  by mistake. Also noted that `LIVE-01`'s in-app tone cannot be made to fire
+  while backgrounded, so it must not be filed as a bug against `LIVE-01`.
 - **2026-09-07 (revision 4):** Closed the analytics foundation against verified
   production evidence. `DATA-01`, `DATA-03`, `DATA-04` and `DATA-05` moved to
   `SHIPPED` and queue group 1 is done; `TD-27` is closed in
