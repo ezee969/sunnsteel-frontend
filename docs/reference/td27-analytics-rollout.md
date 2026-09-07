@@ -141,10 +141,17 @@ active or requested generation when introducing retention later.
 - A batch of 25 exceeded the 30-second transaction timeout over the remote
   connection. Batches of two completed successfully; the worker default was
   reduced to two and passed backend `npm run verify`. Deploy this adjustment.
-- Six accounts remain unregistered and have no workout sessions. Their zones
-  must still be registered by their owners before the global rollout gates pass.
-- Projection-read flag activation, repeat-rebuild production evidence, the
-  rollback observation window and FK cutover remain pending.
+- The owner explicitly authorized Europe/Berlin for the six empty test accounts;
+  all seven accounts are READY with no pending jobs.
+- A second production rebuild matched the original totals, daily/weekly and
+  muscle rollups, record frontiers and checksum exactly. Event count remained
+  94 before and after (2026-09-07T07:59:21Z).
+- Legacy/projected dashboard comparisons passed for all seven accounts at
+  2026-09-07T08:00:19Z (7/7 exact matches).
+- Worker adjustment published as `c21f0cd`; GitHub CI passed. Railway deployment
+  was still in progress at the last check.
+- Projection-read flag activation, the rollback observation window and FK
+  cutover remain pending.
 
 ## Historical limitations
 
