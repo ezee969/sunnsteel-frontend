@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
@@ -59,6 +60,7 @@ export const ExerciseGroup = ({
 	onSaveNote,
 }: ExerciseGroupProps) => {
 	const isComplete = completedSets === totalSets && totalSets > 0
+	const weightUnit = useWeightUnit()
 
 	return (
 		<Card
@@ -132,6 +134,7 @@ export const ExerciseGroup = ({
 									plannedMaxReps={set.plannedMaxReps}
 									plannedWeight={set.plannedWeight}
 									plannedRir={set.plannedRir}
+									weightUnit={weightUnit}
 									previousPerformance={previousSets?.get(
 										`${set.routineExerciseId}:${set.setNumber}`,
 									)}

@@ -1,5 +1,6 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
 import { AnimatePresence, Reorder, useDragControls } from 'framer-motion'
 import { GripVertical } from 'lucide-react'
 
@@ -12,6 +13,7 @@ import {
 } from '../WizardExerciseCard'
 
 export interface ExerciseListProps {
+	weightUnit: WeightUnit
 	tabIndex: number
 	day?: RoutineWizardData['days'][number]
 	exercisesCatalog?: Exercise[]
@@ -50,6 +52,7 @@ export interface ExerciseListProps {
  * @returns The exercise list or its empty state
  */
 export function ExerciseList({
+	weightUnit,
 	tabIndex,
 	day,
 	exercisesCatalog,
@@ -102,6 +105,7 @@ export function ExerciseList({
 
 						return (
 							<ReorderableExerciseRow
+								weightUnit={weightUnit}
 								key={exerciseKey}
 								exerciseKey={exerciseKey}
 								tabIndex={tabIndex}
@@ -137,6 +141,7 @@ export function ExerciseList({
 }
 
 interface ReorderableExerciseRowProps {
+	weightUnit: WeightUnit
 	exerciseKey: string
 	tabIndex: number
 	exerciseIndex: number
@@ -164,6 +169,7 @@ interface ReorderableExerciseRowProps {
 }
 
 function ReorderableExerciseRow({
+	weightUnit,
 	exerciseKey,
 	tabIndex,
 	exerciseIndex,
@@ -205,6 +211,7 @@ function ReorderableExerciseRow({
 			ref={(node: HTMLLIElement | null) => registerRef(exerciseKey, node)}
 		>
 			<WizardExerciseCard
+				weightUnit={weightUnit}
 				tabIndex={tabIndex}
 				exerciseIndex={exerciseIndex}
 				exercise={exercise}

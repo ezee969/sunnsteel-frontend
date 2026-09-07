@@ -32,6 +32,12 @@ describe('isSetPerformanceImproved', () => {
 		)
 	})
 
+	it('ignores display-rounding noise when comparing equal weights', () => {
+		expect(
+			isSetPerformanceImproved({ reps: 9, weight: 79.998 }, previous),
+		).toBe(true)
+	})
+
 	it('compares reps for bodyweight sets and ignores incomplete input', () => {
 		const bodyweight = { ...previous, weight: null }
 		expect(
@@ -44,16 +50,17 @@ describe('isSetPerformanceImproved', () => {
 })
 
 describe('formatPreviousPerformance', () => {
-	it('includes a canonical kilogram value when one was logged', () => {
-		expect(formatPreviousPerformance(previous)).toBe('8 reps · 80 kg')
+	it('displays a logged weight in the selected unit', () => {
+		expect(formatPreviousPerformance(previous, 'KG')).toBe('8 reps · 80 kg')
+		expect(formatPreviousPerformance(previous, 'LB')).toBe('8 reps · 176.37 lb')
 	})
 
 	it('does not invent a weight for bodyweight sets', () => {
-		expect(formatPreviousPerformance({ ...previous, weight: null })).toBe(
+		expect(formatPreviousPerformance({ ...previous, weight: null }, 'LB')).toBe(
 			'8 reps',
 		)
-		expect(formatPreviousPerformance({ ...previous, reps: 1, weight: 0 })).toBe(
-			'1 rep',
-		)
+		expect(
+			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG'),
+		).toBe('1 rep')
 	})
 })

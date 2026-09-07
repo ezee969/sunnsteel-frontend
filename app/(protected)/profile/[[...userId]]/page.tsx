@@ -27,6 +27,12 @@ import {
 	useWorkoutStats,
 } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import {
+	formatWeight,
+	formatWeightAmount,
+	getWeightUnitLabel,
+	kilogramsToDisplayWeight,
+} from '@/lib/utils/weight-unit'
 
 export default function ProfilePage() {
 	const params = useParams<{ userId?: string[] }>()
@@ -92,13 +98,15 @@ export default function ProfilePage() {
 	const currentStreak = progress?.currentStreakDays ?? 0
 	const bestStreak = progress?.bestStreakDays ?? 0
 	const totalVolumeKg = progress?.totalVolumeKg ?? 0
+	const weightUnit = viewer.weightUnit ?? 'KG'
+	const totalVolume = kilogramsToDisplayWeight(totalVolumeKg, weightUnit)
 	const personalRecords = progress?.personalRecords ?? []
 	const volumeLabel =
-		totalVolumeKg >= 1_000_000
-			? `${(totalVolumeKg / 1_000_000).toFixed(1)}M`
-			: totalVolumeKg >= 1_000
-				? `${(totalVolumeKg / 1_000).toFixed(1)}k`
-				: String(totalVolumeKg)
+		totalVolume >= 1_000_000
+			? `${(totalVolume / 1_000_000).toFixed(1)}M`
+			: totalVolume >= 1_000
+				? `${(totalVolume / 1_000).toFixed(1)}k`
+				: formatWeightAmount(totalVolumeKg, weightUnit, 1)
 	const isMutating = followMutation.isPending || unfollowMutation.isPending
 
 	const onFollowToggle = () => {
@@ -282,7 +290,7 @@ export default function ProfilePage() {
 										{showOwnStats ? volumeLabel : '—'}
 									</div>
 									<div className="text-sm text-muted-foreground mb-1 font-medium">
-										{(viewer.weightUnit || 'KG') === 'KG' ? 'kg' : 'lbs'}
+										{getWeightUnitLabel(weightUnit)}
 									</div>
 								</div>
 							</CardContent>
@@ -316,8 +324,9 @@ export default function ProfilePage() {
 												{record.exerciseName}
 											</h4>
 											<p className="text-xs text-muted-foreground">
-												{record.weight} kg for {record.reps} reps · est. 1RM{' '}
-												{record.estimated1rm} kg
+												{formatWeight(record.weight, weightUnit)} for{' '}
+												{record.reps} reps · est. 1RM{' '}
+												{formatWeight(record.estimated1rm, weightUnit)}
 											</p>
 										</div>
 										<span className="text-xs text-muted-foreground whitespace-nowrap">

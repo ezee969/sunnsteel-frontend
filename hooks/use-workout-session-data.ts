@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useSession } from '@/lib/api/hooks/useWorkoutSession'
 import type { WorkoutSession } from '@/lib/api/types/workout.type'
 import {
@@ -24,9 +25,13 @@ export function useWorkoutSessionData(
 	sessionId: string | undefined,
 ): UseWorkoutSessionDataResult {
 	const { data, isLoading, isError, error } = useSession(sessionId ?? '')
+	const weightUnit = useWeightUnit()
 
 	const exerciseGroups = useMemo(() => buildExerciseGroups(data), [data])
-	const metrics = useMemo(() => buildSessionMetrics(data), [data])
+	const metrics = useMemo(
+		() => buildSessionMetrics(data, weightUnit),
+		[data, weightUnit],
+	)
 
 	return {
 		session: data,

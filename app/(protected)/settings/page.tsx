@@ -1,5 +1,6 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
@@ -27,19 +28,31 @@ import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
+
+interface SettingsFormData {
+	name: string
+	lastName: string
+	age: string
+	sex: string
+	weight: string
+	height: string
+	weightUnit: WeightUnit
+}
 
 export default function SettingsPage() {
 	const { user, isLoading } = useUser()
 	const updateUserMutation = useUpdateUser()
 	const { push } = useToast()
 
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<SettingsFormData>({
 		name: '',
 		lastName: '',
 		age: '',
 		sex: '',
 		weight: '',
 		height: '',
+		weightUnit: 'KG',
 	})
 
 	const [avatarUrl, setAvatarUrl] = useState('')
@@ -55,8 +68,9 @@ export default function SettingsPage() {
 				lastName: user.lastName || '',
 				age: user.age ? String(user.age) : '',
 				sex: user.sex || '',
-				weight: user.weight ? String(user.weight) : '',
+				weight: formatWeightInput(user.weight, user.weightUnit),
 				height: user.height ? String(user.height) : '',
+				weightUnit: user.weightUnit,
 			})
 			setAvatarUrl(user.avatarUrl || '')
 		}
@@ -68,6 +82,20 @@ export default function SettingsPage() {
 
 	const handleSelectChange = (val: string, name: string) => {
 		setFormData(prev => ({ ...prev, [name]: val }))
+	}
+
+	const handleWeightUnitChange = (weightUnit: WeightUnit) => {
+		setFormData(previous => {
+			const currentWeightKg = parseWeightInput(
+				previous.weight,
+				previous.weightUnit,
+			)
+			return {
+				...previous,
+				weightUnit,
+				weight: formatWeightInput(currentWeightKg, weightUnit),
+			}
+		})
 	}
 
 	const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,14 +180,20 @@ export default function SettingsPage() {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
+		const originalWeight = formatWeightInput(user?.weight, formData.weightUnit)
+		const weightKg =
+			formData.weight === originalWeight
+				? (user?.weight ?? null)
+				: (parseWeightInput(formData.weight, formData.weightUnit) ?? null)
 		updateUserMutation.mutate(
 			{
 				name: formData.name,
 				lastName: formData.lastName || null,
 				age: formData.age ? parseInt(formData.age, 10) : null,
 				sex: formData.sex ? (formData.sex as 'MALE' | 'FEMALE') : null,
-				weight: formData.weight ? parseFloat(formData.weight) : null,
+				weight: weightKg,
 				height: formData.height ? parseFloat(formData.height) : null,
+				weightUnit: formData.weightUnit,
 				avatarUrl: avatarUrl || null,
 			},
 			{
@@ -315,10 +349,10 @@ export default function SettingsPage() {
 								</div>
 							</div>
 
-							<div className="grid grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 								<div className="space-y-2">
 									<Label htmlFor="weight">
-										Weight ({user?.weightUnit || 'KG'})
+										Weight ({formData.weightUnit === 'LB' ? 'lb' : 'kg'})
 									</Label>
 									<Input
 										id="weight"
@@ -329,6 +363,23 @@ export default function SettingsPage() {
 										onChange={handleInputChange}
 										className="bg-background/50"
 									/>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor="weightUnit">Weight Unit</Label>
+									<Select
+										value={formData.weightUnit}
+										onValueChange={value =>
+											handleWeightUnitChange(value as WeightUnit)
+										}
+									>
+										<SelectTrigger id="weightUnit" className="bg-background/50">
+											<SelectValue aria-label="Weight unit" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="KG">Kilograms (kg)</SelectItem>
+											<SelectItem value="LB">Pounds (lb)</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor="height">Height (cm)</Label>

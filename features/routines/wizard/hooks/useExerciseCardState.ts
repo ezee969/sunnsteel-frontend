@@ -1,4 +1,7 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
 
 import type { RoutineWizardData } from '../types'
 import { sanitizeDecimalInput } from '../utils/validation.helpers'
@@ -9,6 +12,7 @@ interface UseExerciseCardStateOptions {
 	tabIndex: number
 	onAddSet: (exerciseIndex: number) => void
 	onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void
+	weightUnit: WeightUnit
 }
 
 interface UseExerciseCardStateResult {
@@ -42,6 +46,7 @@ export function useExerciseCardState({
 	exerciseIndex,
 	onAddSet,
 	onUpdateMinWeightIncrement,
+	weightUnit,
 }: UseExerciseCardStateOptions): UseExerciseCardStateResult {
 	const setRowRefs = useRef<(HTMLDivElement | null)[]>([])
 	const [setsExpanded, setSetsExpanded] = useState(true)
@@ -49,7 +54,7 @@ export function useExerciseCardState({
 	const [weightIncInput, setWeightIncInput] = useState<string>(
 		exercise.minWeightIncrement !== undefined &&
 			exercise.minWeightIncrement !== null
-			? String(exercise.minWeightIncrement)
+			? formatWeightInput(exercise.minWeightIncrement, weightUnit)
 			: '',
 	)
 
@@ -57,10 +62,10 @@ export function useExerciseCardState({
 		const parentValue = exercise.minWeightIncrement
 		setWeightIncInput(
 			parentValue !== undefined && parentValue !== null
-				? String(parentValue)
+				? formatWeightInput(parentValue, weightUnit)
 				: '',
 		)
-	}, [exercise.minWeightIncrement])
+	}, [exercise.minWeightIncrement, weightUnit])
 
 	useEffect(() => {
 		if (!shouldScrollToLast) return
@@ -97,17 +102,23 @@ export function useExerciseCardState({
 			return
 		}
 
-		const parsed = Number.parseFloat(trimmed)
-		if (!Number.isNaN(parsed) && parsed > 0) {
-			onUpdateMinWeightIncrement(exerciseIndex, parsed)
-			setWeightIncInput(String(parsed))
+		const currentDisplay = formatWeightInput(
+			exercise.minWeightIncrement,
+			weightUnit,
+		)
+		if (trimmed === currentDisplay) return
+
+		const parsedKg = parseWeightInput(trimmed, weightUnit)
+		if (parsedKg !== undefined && parsedKg > 0) {
+			onUpdateMinWeightIncrement(exerciseIndex, parsedKg)
+			setWeightIncInput(formatWeightInput(parsedKg, weightUnit))
 			return
 		}
 
 		const parentValue = exercise.minWeightIncrement
 		setWeightIncInput(
 			parentValue !== undefined && parentValue !== null
-				? String(parentValue)
+				? formatWeightInput(parentValue, weightUnit)
 				: '',
 		)
 	}, [
@@ -115,6 +126,7 @@ export function useExerciseCardState({
 		exerciseIndex,
 		onUpdateMinWeightIncrement,
 		weightIncInput,
+		weightUnit,
 	])
 
 	return {

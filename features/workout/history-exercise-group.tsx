@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import { createEnterSpaceHandler } from '@/lib/utils/keyboard'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
@@ -21,6 +22,8 @@ export function HistoryExerciseGroup({
 	collapsed,
 	onToggle,
 }: HistoryExerciseGroupProps) {
+	const weightUnit = useWeightUnit()
+
 	return (
 		<Card>
 			<CardHeader
@@ -67,6 +70,7 @@ export function HistoryExerciseGroup({
 									key={`${group.routineExerciseId}-${plannedSet.id ?? plannedSet.setNumber}`}
 									plannedSet={plannedSet}
 									performedSet={performedSet}
+									weightUnit={weightUnit}
 								/>
 							)
 						})}

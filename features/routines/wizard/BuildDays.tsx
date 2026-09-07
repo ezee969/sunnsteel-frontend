@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
 import { parseTime } from '@/lib/utils/time'
 
@@ -49,6 +50,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	const exerciseRefs = useRef<Record<string, HTMLElement | null>>({})
 	const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null)
 	const { data: exercises, isLoading: exercisesLoading } = useExercises()
+	const weightUnit = useWeightUnit()
 
 	// Fade hints on the day-tabs scroll container so it's clear there are
 	// more tabs off-screen when the list overflows (e.g. 4+ training days).
@@ -125,6 +127,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		onUpdate,
 		selectedDayIndex: selectedDay,
 		trainingDays: data.trainingDays,
+		weightUnit,
 	})
 
 	// Note: we compute day-specific data on-demand below to avoid stale references
@@ -339,6 +342,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 									</CardHeader>
 									<CardContent className="p-4 sm:p-6">
 										<ExerciseList
+											weightUnit={weightUnit}
 											tabIndex={tabIndex}
 											day={day}
 											exercisesCatalog={exercises}

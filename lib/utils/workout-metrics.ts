@@ -1,5 +1,12 @@
+import type { WeightUnit } from '@sunsteel/contracts'
+
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 import { formatTimeReadable } from '@/lib/utils/time'
+import {
+	formatWeight as formatWeightForUnit,
+	formatWeightAmount,
+	getWeightUnitLabel,
+} from '@/lib/utils/weight-unit'
 
 /**
  * Returns the day name for a given ISO day of week (0 = Sunday).
@@ -23,14 +30,13 @@ export function getDayName(dayOfWeek?: number): string {
 }
 
 /**
- * Formats a numeric weight value in kilograms with units.
+ * Formats a canonical kilogram value in the user's preferred unit.
  */
-export function formatWeight(weight?: number | null): string {
-	if (!weight) {
-		return '—'
-	}
-
-	return `${weight} kg`
+export function formatWeight(
+	weight: number | null | undefined,
+	weightUnit: WeightUnit,
+): string {
+	return formatWeightForUnit(weight, weightUnit)
 }
 
 /**
@@ -75,13 +81,6 @@ export function calculateTotalVolume(setLogs?: SetLog[]): number {
 	}, 0)
 }
 
-/**
- * Formats a numeric kilogram value with one decimal place and unit suffix.
- */
-export function formatKg(value: number): string {
-	return `${value.toFixed(1)} kg`
-}
-
 export interface SessionMetrics {
 	statusLabel: string
 	dayLabel: string
@@ -95,7 +94,10 @@ export interface SessionMetrics {
 /**
  * Builds common session metrics for UI presentation.
  */
-export function buildSessionMetrics(session?: WorkoutSession): SessionMetrics {
+export function buildSessionMetrics(
+	session: WorkoutSession | undefined,
+	weightUnit: WeightUnit,
+): SessionMetrics {
 	const completedSets = getCompletedSetsCount(session?.setLogs)
 	const totalVolume = calculateTotalVolume(session?.setLogs)
 
@@ -109,7 +111,7 @@ export function buildSessionMetrics(session?: WorkoutSession): SessionMetrics {
 			? formatTimeReadable(session.durationSec)
 			: '—',
 		completedSets,
-		totalVolumeLabel: formatKg(totalVolume),
+		totalVolumeLabel: `${formatWeightAmount(totalVolume, weightUnit, 1)} ${getWeightUnitLabel(weightUnit)}`,
 		notes: session?.notes ?? null,
 	}
 }

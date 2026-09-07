@@ -3,8 +3,10 @@
 import { Trophy } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { formatWeight } from '@/lib/utils/weight-unit'
 
 import PersonalRecordItem from './PersonalRecordItem'
 
@@ -17,6 +19,7 @@ import PersonalRecordItem from './PersonalRecordItem'
  */
 export default function PersonalRecords() {
 	const { data } = useWorkoutProgress()
+	const weightUnit = useWeightUnit()
 	const records = data?.personalRecords ?? []
 
 	return (
@@ -38,7 +41,7 @@ export default function PersonalRecords() {
 							key={record.exerciseId}
 							exercise={record.exerciseName}
 							timeAgo={formatTimeAgo(record.achievedAt)}
-							weight={`${record.weight} kg × ${record.reps}`}
+							weight={`${formatWeight(record.weight, weightUnit)} × ${record.reps}`}
 							showSeparator={index < records.length - 1}
 						/>
 					))

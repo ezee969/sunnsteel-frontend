@@ -1,10 +1,13 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
+
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatTime } from '@/lib/utils/time'
+import { formatWeight } from '@/lib/utils/weight-unit'
 
 import type { RoutineWizardData } from '../types'
 import { DAYS_OF_WEEK } from '../utils/routine-summary'
@@ -12,6 +15,7 @@ import { DAYS_OF_WEEK } from '../utils/routine-summary'
 interface RoutineDayCardProps {
 	day: RoutineWizardData['days'][number]
 	exerciseMap: Record<string, Exercise>
+	weightUnit: WeightUnit
 }
 
 /**
@@ -23,7 +27,11 @@ interface RoutineDayCardProps {
  * @param exerciseMap - A lookup map of Exercise objects keyed by exercise ID used to resolve exercise metadata.
  * @returns The JSX element for the day's routine card.
  */
-export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
+export function RoutineDayCard({
+	day,
+	exerciseMap,
+	weightUnit,
+}: RoutineDayCardProps) {
 	const displayName = DAYS_OF_WEEK[day.dayOfWeek]
 
 	return (
@@ -68,7 +76,9 @@ export function RoutineDayCard({ day, exerciseMap }: RoutineDayCardProps) {
 										{set.repType === 'FIXED'
 											? `${set.reps ?? ''} reps`
 											: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
-										{set.weight ? ` @ ${set.weight}kg` : ''}
+										{set.weight
+											? ` @ ${formatWeight(set.weight, weightUnit)}`
+											: ''}
 									</Badge>
 								))}
 							</div>

@@ -1,5 +1,7 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
+
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -10,6 +12,7 @@ import {
 	isSetPerformanceImproved,
 } from '@/lib/utils/previous-performance.utils'
 import { saveStateLabel } from '@/lib/utils/save-status-store'
+import { formatWeight, parseWeightInput } from '@/lib/utils/weight-unit'
 import type { LogRowProps } from '@/lib/utils/workout-session.types'
 
 interface SetLogInputProps extends LogRowProps {
@@ -19,6 +22,7 @@ interface SetLogInputProps extends LogRowProps {
 	plannedWeight?: number | null
 	rpe?: number
 	previousPerformance?: PreviousSetPerformance
+	weightUnit: WeightUnit
 }
 
 /**
@@ -39,6 +43,7 @@ export const SetLogInput = ({
 	plannedRir,
 	rpe,
 	previousPerformance,
+	weightUnit,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -65,6 +70,7 @@ export const SetLogInput = ({
 		initialIsCompleted: isCompleted,
 		onSave,
 		onSetCompleted,
+		weightUnit,
 	})
 
 	const statusText = saveStateLabel(saveState)
@@ -89,7 +95,7 @@ export const SetLogInput = ({
 		? isSetPerformanceImproved(
 				{
 					reps: Number(repsState) || 0,
-					weight: weightState === '' ? undefined : Number(weightState),
+					weight: parseWeightInput(weightState, weightUnit),
 				},
 				previousPerformance,
 			)
@@ -145,9 +151,9 @@ export const SetLogInput = ({
 				<div className="flex-1 flex flex-col items-center gap-1 min-w-[80px]">
 					<Input
 						type="number"
-						inputMode="numeric"
-						step="0.5"
-						aria-label="Performed weight"
+						inputMode="decimal"
+						step={weightUnit === 'LB' ? 1 : 0.5}
+						aria-label={`Performed weight in ${weightUnit === 'LB' ? 'pounds' : 'kilograms'}`}
 						placeholder="Weight"
 						value={weightState}
 						onChange={e => setWeight(e.target.value)}
@@ -159,7 +165,7 @@ export const SetLogInput = ({
 						}`}
 					/>
 					<span className="text-[10px] text-muted-foreground whitespace-nowrap">
-						Target: {plannedWeight ? `${plannedWeight}kg` : '—'}
+						Target: {formatWeight(plannedWeight, weightUnit)}
 					</span>
 				</div>
 
@@ -219,7 +225,7 @@ export const SetLogInput = ({
 					<span>
 						Last time:{' '}
 						<span className="font-medium">
-							{formatPreviousPerformance(previousPerformance)}
+							{formatPreviousPerformance(previousPerformance, weightUnit)}
 						</span>
 					</span>
 					{hasImproved ? (

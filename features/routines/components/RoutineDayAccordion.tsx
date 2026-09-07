@@ -1,5 +1,6 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
 import { Calendar, Play } from 'lucide-react'
 
 import {
@@ -16,6 +17,7 @@ import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
 import { ExerciseCard } from './ExerciseCard'
 
 interface RoutineDayAccordionProps {
+	weightUnit: WeightUnit
 	days: RoutineDay[]
 	routine: {
 		id: string
@@ -36,6 +38,7 @@ interface RoutineDayAccordionProps {
  * - Program end state handling
  */
 export const RoutineDayAccordion = ({
+	weightUnit,
 	days,
 	routine,
 	activeSession,
@@ -117,6 +120,7 @@ export const RoutineDayAccordion = ({
 											key={exercise.id}
 											exercise={exercise}
 											routineId={routine.id}
+											weightUnit={weightUnit}
 										/>
 									))
 								) : (

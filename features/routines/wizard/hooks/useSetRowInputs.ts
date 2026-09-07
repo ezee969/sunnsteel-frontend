@@ -1,4 +1,7 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { useCallback, useEffect, useState } from 'react'
+
+import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
 
 import type { RoutineSet } from '../types'
 import {
@@ -22,6 +25,7 @@ interface UseSetRowInputsOptions {
 		setIndex: number,
 		field: 'minReps' | 'maxReps',
 	) => void
+	weightUnit: WeightUnit
 }
 
 export const useSetRowInputs = ({
@@ -30,6 +34,7 @@ export const useSetRowInputs = ({
 	setIndex,
 	onUpdateSet,
 	onValidateMinMaxReps,
+	weightUnit,
 }: UseSetRowInputsOptions) => {
 	const [minInput, setMinInput] = useState<string>(
 		set.minReps !== null && set.minReps !== undefined
@@ -42,7 +47,7 @@ export const useSetRowInputs = ({
 			: '',
 	)
 	const [weightInput, setWeightInput] = useState<string>(
-		set.weight !== undefined && set.weight !== null ? String(set.weight) : '',
+		formatWeightInput(set.weight, weightUnit),
 	)
 	const [rirInput, setRirInput] = useState<string>(
 		set.rir !== undefined && set.rir !== null ? String(set.rir) : '',
@@ -65,10 +70,8 @@ export const useSetRowInputs = ({
 	}, [set.maxReps])
 
 	useEffect(() => {
-		setWeightInput(
-			set.weight !== undefined && set.weight !== null ? String(set.weight) : '',
-		)
-	}, [set.weight])
+		setWeightInput(formatWeightInput(set.weight, weightUnit))
+	}, [set.weight, weightUnit])
 
 	useEffect(() => {
 		setRirInput(
@@ -133,17 +136,29 @@ export const useSetRowInputs = ({
 			return
 		}
 
+		const currentDisplay = formatWeightInput(set.weight, weightUnit)
+		if (trimmed === currentDisplay) return
+
 		const parsed = parseOptionalPositiveFloat(trimmed)
-		if (parsed !== undefined) {
-			onUpdateSet(exerciseIndex, setIndex, 'weight', String(parsed))
-			setWeightInput(String(parsed))
+		const parsedKg =
+			parsed === undefined
+				? undefined
+				: parseWeightInput(String(parsed), weightUnit)
+		if (parsedKg !== undefined) {
+			onUpdateSet(exerciseIndex, setIndex, 'weight', String(parsedKg))
+			setWeightInput(formatWeightInput(parsedKg, weightUnit))
 			return
 		}
 
-		setWeightInput(
-			set.weight !== undefined && set.weight !== null ? String(set.weight) : '',
-		)
-	}, [exerciseIndex, set.weight, setIndex, weightInput, onUpdateSet])
+		setWeightInput(formatWeightInput(set.weight, weightUnit))
+	}, [
+		exerciseIndex,
+		set.weight,
+		setIndex,
+		weightInput,
+		onUpdateSet,
+		weightUnit,
+	])
 
 	const handleRirChange = useCallback(
 		(value: string) => {

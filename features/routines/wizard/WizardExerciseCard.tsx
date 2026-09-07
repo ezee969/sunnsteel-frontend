@@ -1,5 +1,6 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,6 +14,7 @@ import { useExerciseCardState } from './hooks/useExerciseCardState'
 import type { ProgressionScheme, RoutineWizardData } from './types'
 
 export interface WizardExerciseCardProps {
+	weightUnit: WeightUnit
 	tabIndex: number
 	exerciseIndex: number
 	exercise: RoutineWizardData['days'][number]['exercises'][number]
@@ -60,6 +62,7 @@ export interface WizardExerciseCardProps {
 }
 
 export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
+	weightUnit,
 	tabIndex,
 	exerciseIndex,
 	exercise,
@@ -101,6 +104,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		tabIndex,
 		onAddSet,
 		onUpdateMinWeightIncrement,
+		weightUnit,
 	})
 
 	const {
@@ -245,6 +249,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							exercise={exercise}
 							exerciseIndex={exerciseIndex}
 							weightIncInput={weightIncInput}
+							weightUnit={weightUnit}
 							onWeightIncChange={handleWeightIncChange}
 							onWeightIncBlur={handleWeightIncBlur}
 							onUpdateRestTime={onUpdateRestTime}
@@ -253,6 +258,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 						/>
 
 						<SetListSection
+							weightUnit={weightUnit}
 							exercise={exercise}
 							exerciseIndex={exerciseIndex}
 							tabIndex={tabIndex}

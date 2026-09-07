@@ -1,3 +1,4 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -6,6 +7,7 @@ import type { RoutineWizardExercise } from '../types'
 import { SetRow } from './SetRow'
 
 interface SetListSectionProps {
+	weightUnit: WeightUnit
 	exercise: RoutineWizardExercise
 	exerciseIndex: number
 	tabIndex: number
@@ -60,6 +62,7 @@ interface SetListSectionProps {
  * @returns The JSX element rendering the sets section and its controls
  */
 export function SetListSection({
+	weightUnit,
 	exercise,
 	exerciseIndex,
 	tabIndex,
@@ -102,7 +105,9 @@ export function SetListSection({
 						<div className="col-span-2">Set</div>
 						<div className="col-span-3">Type</div>
 						<div className="col-span-3">Reps</div>
-						<div className="col-span-2">Weight</div>
+						<div className="col-span-2">
+							Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
+						</div>
 						<div className="col-span-1">RIR</div>
 						<div className="col-span-1" />
 					</div>
@@ -114,6 +119,7 @@ export function SetListSection({
 								ref={node => registerSetRowRef(setIndex, node)}
 							>
 								<SetRow
+									weightUnit={weightUnit}
 									exerciseIndex={exerciseIndex}
 									setIndex={setIndex}
 									set={set}

@@ -10,6 +10,7 @@ import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
 import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
 import { getDayName } from '@/features/routines/utils/routine-detail.utils'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useRoutine,
 	useToggleRoutineCompleted,
@@ -23,6 +24,7 @@ export default function RoutineDetailsPage() {
 	const params = useParams()
 	const router = useRouter()
 	const routineId = params.id as string
+	const weightUnit = useWeightUnit()
 
 	// Data fetching
 	const { data: routine, isLoading } = useRoutine(routineId)
@@ -171,6 +173,7 @@ export default function RoutineDetailsPage() {
 				<div className="space-y-4">
 					<h2 className="text-xl font-semibold">Routine Days</h2>
 					<RoutineDayAccordion
+						weightUnit={weightUnit}
 						days={routine.days}
 						routine={{
 							id: routine.id,

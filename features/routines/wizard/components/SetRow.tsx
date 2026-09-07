@@ -1,3 +1,4 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,7 @@ import { useSetRowInputs } from '../hooks/useSetRowInputs'
 import type { ProgressionScheme, RoutineSet } from '../types'
 
 interface SetRowProps {
+	weightUnit: WeightUnit
 	exerciseIndex: number
 	setIndex: number
 	set: RoutineSet
@@ -67,6 +69,7 @@ interface SetRowProps {
  * @returns The rendered set row element
  */
 export function SetRow({
+	weightUnit,
 	exerciseIndex,
 	setIndex,
 	set,
@@ -99,6 +102,7 @@ export function SetRow({
 		setIndex,
 		onUpdateSet,
 		onValidateMinMaxReps,
+		weightUnit,
 	})
 
 	return (
@@ -289,7 +293,7 @@ export function SetRow({
 						{/* Weight Column */}
 						<div className="sm:col-span-2 space-y-1">
 							<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
-								Weight
+								Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
 							</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button

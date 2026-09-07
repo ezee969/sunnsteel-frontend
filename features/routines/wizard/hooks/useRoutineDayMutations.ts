@@ -1,4 +1,7 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { useCallback } from 'react'
+
+import { stepCanonicalWeight } from '@/lib/utils/weight-unit'
 
 import type { ProgressionScheme, RoutineWizardData } from '../types'
 
@@ -7,6 +10,7 @@ interface UseRoutineDayMutationsParams {
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 	selectedDayIndex: number
 	trainingDays: number[]
+	weightUnit: WeightUnit
 }
 
 const MIN_REPS = 1
@@ -15,15 +19,11 @@ const MIN_RIR = 0
 const MAX_RIR = 10
 const MIN_WEIGHT_INCREMENT = 0.25
 const MAX_WEIGHT = 500
-const WEIGHT_STEP = 0.5
 
 const clamp = (value: number, min: number, max: number) => {
 	if (Number.isNaN(value)) return min
 	return Math.min(max, Math.max(min, value))
 }
-
-const roundToIncrement = (value: number, increment: number) =>
-	Math.round(value / increment) * increment
 
 const makeClientId = () =>
 	globalThis.crypto?.randomUUID?.() ??
@@ -34,6 +34,7 @@ export function useRoutineDayMutations({
 	onUpdate,
 	selectedDayIndex,
 	trainingDays,
+	weightUnit,
 }: UseRoutineDayMutationsParams) {
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
@@ -282,10 +283,7 @@ export function useRoutineDayMutations({
 				if (!exercise || !set) return
 
 				const current = set.weight ?? 0
-				const next = Math.max(
-					0,
-					roundToIncrement(current + delta * WEIGHT_STEP, WEIGHT_STEP),
-				)
+				const next = stepCanonicalWeight(current, weightUnit, delta)
 				set.weight = next
 				syncDoubleProgressionWeights(
 					exercise,
@@ -293,7 +291,7 @@ export function useRoutineDayMutations({
 				)
 			})
 		},
-		[withDayMutation],
+		[weightUnit, withDayMutation],
 	)
 
 	const validateMinMaxReps = useCallback(

@@ -1,3 +1,4 @@
+import type { WeightUnit } from '@sunsteel/contracts'
 import { useEffect, useState } from 'react'
 
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,7 @@ interface ExerciseConfigSectionProps {
 	exercise: RoutineWizardExercise
 	exerciseIndex: number
 	weightIncInput: string
+	weightUnit: WeightUnit
 	onWeightIncChange: (value: string) => void
 	onWeightIncBlur: () => void
 	onUpdateRestTime: (exerciseIndex: number, value: string) => void
@@ -44,6 +46,7 @@ export function ExerciseConfigSection({
 	exercise,
 	exerciseIndex,
 	weightIncInput,
+	weightUnit,
 	onWeightIncChange,
 	onWeightIncBlur,
 	onUpdateRestTime,
@@ -92,7 +95,7 @@ export function ExerciseConfigSection({
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Label className="text-sm font-medium text-muted-foreground">
-							Weight Inc.
+							Weight Inc. ({weightUnit === 'LB' ? 'lb' : 'kg'})
 						</Label>
 					</div>
 					<div className="flex items-center gap-2 sm:gap-2">

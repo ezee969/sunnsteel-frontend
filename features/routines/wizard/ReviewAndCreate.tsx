@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
 
 import { RoutineDayCard } from './components/RoutineDayCard'
@@ -46,6 +47,7 @@ export function ReviewAndCreate({
 	onComplete,
 }: ReviewAndCreateProps) {
 	const { data: exercises } = useExercises()
+	const weightUnit = useWeightUnit()
 	const exerciseMap = useRoutineExercisesLookup(exercises)
 
 	const { submit, isLoading } = useRoutineSubmission({
@@ -123,6 +125,7 @@ export function ReviewAndCreate({
 								key={day.dayOfWeek}
 								day={day}
 								exerciseMap={exerciseMap}
+								weightUnit={weightUnit}
 							/>
 						))}
 					</AccordionContent>

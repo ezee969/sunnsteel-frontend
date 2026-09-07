@@ -1,18 +1,23 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
+
 import { Badge } from '@/components/ui/badge'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
+import { formatWeight as formatPlannedWeight } from '@/lib/utils/weight-unit'
 import { formatReps, formatWeight } from '@/lib/utils/workout-metrics'
 
 interface SetComparisonRowProps {
 	plannedSet: ExerciseGroup['plannedSets'][number]
 	performedSet?: SetLog
+	weightUnit: WeightUnit
 }
 
 export function SetComparisonRow({
 	plannedSet,
 	performedSet,
+	weightUnit,
 }: SetComparisonRowProps) {
 	return (
 		<div className="bg-card border border-muted rounded-lg p-3 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none">
@@ -45,7 +50,9 @@ export function SetComparisonRow({
 							{plannedSet.repType === 'FIXED'
 								? `${plannedSet.reps} reps`
 								: `${plannedSet.minReps}-${plannedSet.maxReps} reps`}
-							{plannedSet.weight && ` @ ${plannedSet.weight} kg`}
+							{plannedSet.weight
+								? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit)}`
+								: null}
 						</div>
 					</div>
 				</div>
@@ -67,7 +74,7 @@ export function SetComparisonRow({
 							Weight
 						</div>
 						<div className="text-sm font-medium">
-							{formatWeight(performedSet?.weight)}
+							{formatWeight(performedSet?.weight, weightUnit)}
 						</div>
 					</div>
 				</div>

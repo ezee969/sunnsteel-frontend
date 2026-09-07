@@ -1,5 +1,6 @@
 'use client'
 
+import type { WeightUnit } from '@sunsteel/contracts'
 import { Clock, FileText } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +13,7 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { formatTime } from '@/lib/utils/time'
+import { formatWeight } from '@/lib/utils/weight-unit'
 
 interface ExerciseCardProps {
 	exercise: {
@@ -34,6 +36,7 @@ interface ExerciseCardProps {
 		}[]
 	}
 	routineId?: string
+	weightUnit: WeightUnit
 }
 
 /**
@@ -44,7 +47,7 @@ interface ExerciseCardProps {
  * - Set details with reps, weight, and RPE/RIR
  * - Numbered set indicators
  */
-export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
+export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 	return (
 		<div className="border rounded-lg p-4 bg-card">
 			<div className="flex items-center justify-between mb-2">
@@ -127,8 +130,6 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 								? `${set.minReps}-${set.maxReps}`
 								: String(set.reps || set.minReps || 0)
 
-						const displayWeight = set.weight || 0
-
 						return (
 							<div
 								key={set.id || index}
@@ -138,7 +139,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
 									{index + 1}
 								</span>
 								<span>
-									{repDisplay} @ {displayWeight}kg
+									{repDisplay}
+									{set.weight
+										? ` @ ${formatWeight(set.weight, weightUnit)}`
+										: ''}
 									{set.rpe && ` (RPE ${set.rpe})`}
 									{set.rir !== null &&
 										set.rir !== undefined &&

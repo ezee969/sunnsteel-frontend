@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { formatTimeReadable } from '@/lib/utils/time'
+import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
 import ActivityItem from './ActivityItem'
 
@@ -16,6 +18,7 @@ import ActivityItem from './ActivityItem'
  */
 export default function RecentActivity() {
 	const router = useRouter()
+	const weightUnit = useWeightUnit()
 	const { data } = useWorkoutProgress()
 	const entries = data?.recentActivity ?? []
 
@@ -54,7 +57,7 @@ export default function RecentActivity() {
 								time={formatTimeAgo(entry.endedAt ?? entry.startedAt)}
 								badges={[
 									`${entry.completedSets} sets`,
-									`${entry.totalVolumeKg.toLocaleString()} kg`,
+									`${formatWeightAmount(entry.totalVolumeKg, weightUnit)} ${getWeightUnitLabel(weightUnit)}`,
 									...(entry.durationSec
 										? [formatTimeReadable(entry.durationSec)]
 										: []),

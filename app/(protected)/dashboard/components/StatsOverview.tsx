@@ -1,10 +1,16 @@
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useWorkoutProgress,
 	useWorkoutStats,
 } from '@/lib/api/hooks/useWorkoutSession'
+import {
+	formatWeightAmount,
+	getWeightUnitLabel,
+	kilogramsToDisplayWeight,
+} from '@/lib/utils/weight-unit'
 
 import StatCard from './StatCard'
 
@@ -16,6 +22,7 @@ const WEEKLY_MILESTONE = 4
 const TOTAL_SESSIONS_MILESTONE = 50
 
 export default function StatsOverview() {
+	const weightUnit = useWeightUnit()
 	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
 	const { data: progress } = useWorkoutProgress()
 
@@ -50,7 +57,9 @@ export default function StatsOverview() {
 	const currentStreak = progress?.currentStreakDays ?? 0
 	const bestStreak = progress?.bestStreakDays ?? 0
 	const totalVolumeKg = progress?.totalVolumeKg ?? 0
-	const totalTonnes = totalVolumeKg / 1000
+	const displayVolume = kilogramsToDisplayWeight(totalVolumeKg, weightUnit)
+	const compactVolume = displayVolume / 1000
+	const compactVolumeUnit = weightUnit === 'KG' ? 't' : 'k lb'
 
 	const weeklyWorkoutsProgress = Math.min(
 		100,
@@ -162,13 +171,13 @@ export default function StatsOverview() {
 					/>
 				}
 				title="Total Volume"
-				value={totalTonnes.toFixed(1)}
-				unit="t"
+				value={compactVolume.toFixed(1)}
+				unit={compactVolumeUnit}
 				subtitle="Lifetime weight moved"
-				progress={totalTonnes}
-				progressMax={Math.max(100, Math.ceil(totalTonnes / 50) * 50)}
-				progressText={`${totalVolumeKg.toLocaleString()} kg lifted`}
-				additionalText={totalTonnes >= 100 ? 'Heavy' : 'Building'}
+				progress={compactVolume}
+				progressMax={Math.max(100, Math.ceil(compactVolume / 50) * 50)}
+				progressText={`${formatWeightAmount(totalVolumeKg, weightUnit)} ${getWeightUnitLabel(weightUnit)} lifted`}
+				additionalText={compactVolume >= 100 ? 'Heavy' : 'Building'}
 			/>
 		</div>
 	)
