@@ -17,7 +17,45 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-No active technical debt is currently recorded.
+### TD-28 - `xs:` is not a defined breakpoint, so three responsive classes emit no CSS
+
+**Impact.** Two components silently lose their responsive behaviour, in different
+ways.
+
+- [`features/workout/set-log-input.tsx`](../../features/workout/set-log-input.tsx)
+  line 175: `hidden xs:flex` collapses to plain `hidden`, so the per-set
+  save-state indicator (`pending` / `saving` / `saved`) never renders at any
+  viewport width. Save **errors** are unaffected -- they surface through a
+  separate footer block that carries no `xs:` class -- so what is lost is the
+  transient confirmation that a set was written, not the failure report.
+- [`ExercisePickerDropdown.tsx`](../../features/routines/wizard/components/ExercisePickerDropdown.tsx)
+  lines 59-60: the pair `hidden xs:inline` / `xs:hidden` collapses so the button
+  always reads `Add` and never `Add Exercise`. Degraded rather than broken; the
+  short label is always visible.
+
+**Evidence, verified 2026-09-07.** `xs` is not defined anywhere in
+[`app/globals.css`](../../app/globals.css). Tailwind is v4 CSS-first with no
+`tailwind.config.ts`, and one must not be added (a config file is only loaded via
+`@config`, so it would be silently ignored -- see `CLAUDE.md`), which leaves the
+default `sm`-`2xl` set. The compiled stylesheet from a production build contains
+no `xs:` variant rule at all; the only `xs` strings in it are theme tokens
+(`--text-xs`, `--container-xs`, `--radius-xs`). An undefined Tailwind variant
+produces no rule and no build error, which is why this survived unnoticed.
+
+**Solution direction.** Either define an `xs` breakpoint in the `@theme` block of
+`globals.css`, which is the CSS-first way to add one and makes all three call
+sites behave as written, or rewrite the three sites against an existing
+breakpoint and keep the breakpoint set small. Prefer whichever is decided
+deliberately: the current state is neither.
+
+Re-enabling the save-state indicator is **not** a pure class change. It competes
+for horizontal space in a set row that gained an RPE column in `LIVE-04`, so it
+needs a narrow-viewport layout check rather than only removing the dead variant.
+
+**Closure criteria.** No `xs:` variant remains in the source without a matching
+definition; the save-state indicator is observed rendering during a real set
+save; and the set row is checked at 320px and 360px with both that indicator and
+the RPE column present.
 
 <a id="td-27"></a>
 
@@ -42,6 +80,11 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-07:** Recorded `TD-28` after a production-build check of the compiled
+  stylesheet showed the `xs:` variant generating no CSS. Found while adding the
+  RPE column for `LIVE-04`, which shares the affected row; the two are related
+  only by that layout, so the breakpoint defect was left out of that change
+  rather than folded into it.
 - **2026-09-06:** Translated from Spanish to English so both active registers and
   the four `CLAUDE.md`/`AGENTS.md` files share one language. Content is
   unchanged apart from the `DATA-01`-`DATA-05` status note and the pointer to the
