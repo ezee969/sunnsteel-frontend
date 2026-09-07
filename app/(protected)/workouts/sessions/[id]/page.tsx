@@ -9,6 +9,7 @@ import { SessionConfirmationDialog } from '@/features/workout/session-confirmati
 import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
+import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
 import { useSession, useUpsertSetLog } from '@/lib/api/hooks/useWorkoutSession'
@@ -41,6 +42,11 @@ export default function ActiveSessionPage() {
 		isFetched: isRoutineFetched,
 		error: routineError,
 	} = useRoutine(routineId)
+
+	// LIVE-02: hold the screen awake only while the session is genuinely in
+	// progress. Gating on the status rather than the route means finishing or
+	// aborting drops the lock immediately, without waiting for the redirect.
+	useScreenWakeLock(session?.status === 'IN_PROGRESS')
 
 	// Session management
 	const {
