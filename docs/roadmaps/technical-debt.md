@@ -19,7 +19,9 @@ Quick Workout problems are not duplicated here.
 
 ### TD-29 - Focusing a set input zooms the page on iOS and does not zoom back
 
-**Impact.** Reported from a real device on 2026-09-07: tapping an input during a
+**Impact.** Reported from an iPhone on 2026-09-07 (platform confirmed with the
+reporter, since the auto-zoom below is iOS-specific -- Android Chrome does not
+zoom on focus, so an Android report would have needed a different diagnosis): tapping an input during a
 session zooms the page in, and iOS does not restore the previous scale on blur,
 so the user has to pinch out by hand mid-workout. It breaks the installed PWA's
 illusion of being an app, on the one screen that is used while training and
