@@ -53,16 +53,22 @@ result any search returns, but it disables pinch-zoom for every user on every
 screen -- a real accessibility regression traded for a cosmetic fix. The viewport
 currently sets only `width` and `initialScale`; keep it that way.
 
-**Resolve together with [`TD-28`](#td-28).** 16px inputs are wider than 14px
-ones, in a row that already carries three inputs plus the badge and the
-checkbox, and whose save-state indicator is currently invisible for an unrelated
-reason. Fixing either one alone risks a layout that the other then breaks, so
-both closure checks want the same narrow-viewport pass.
+**This fix does not resize the row.** An earlier revision of this entry claimed
+16px inputs would be wider than 14px ones and that the fix therefore needed a
+layout redesign. That was wrong, and is corrected here so nobody plans around
+it. Each column is `flex-1 ... min-w-[70px]` and `Input` carries
+`w-full min-w-0`, so the box width comes from the flex distribution, not from
+its content: raising the font size enlarges the digits inside a box of unchanged
+width. The only real question is whether the longest value still fits, and a
+device screenshot on 2026-09-07 shows `67.5` rendering with room to spare at
+14px, so a five-character `102.5` fits at 16px. The fix is the three-class
+change and nothing more. [`TD-28`](#td-28) is the half of this pair that still
+needs a decision.
 
 **Closure criteria.** No input in the session row computes below 16px on a
-phone-width viewport; focusing reps, weight and RPE on a real iOS device causes
-no zoom; the row still fits at 320px and 360px; and the viewport export still
-permits user scaling.
+phone-width viewport; focusing reps, weight and RPE on a real iPhone causes no
+zoom; a five-character weight such as `102.5` is still fully legible; and the
+viewport export still permits user scaling.
 
 <a id="td-28"></a>
 
@@ -97,14 +103,21 @@ sites behave as written, or rewrite the three sites against an existing
 breakpoint and keep the breakpoint set small. Prefer whichever is decided
 deliberately: the current state is neither.
 
-Re-enabling the save-state indicator is **not** a pure class change. It competes
-for horizontal space in a set row that gained an RPE column in `LIVE-04`, so it
-needs a narrow-viewport layout check rather than only removing the dead variant.
+Re-enabling the save-state indicator is **not** a pure class change, and a
+device screenshot on 2026-09-07 settles why: after the RPE column added in
+`LIVE-04` there is no meaningful gap left between that input and the completion
+checkbox, so defining an `xs` breakpoint would restore an indicator with nowhere
+to go. Decide where the state belongs before reviving it -- as colour on the
+completion checkbox, or in the small caption line that currently reads
+`Optional`, rather than as a fourth column. This is the harder half of the pair:
+`TD-29` turned out to be a three-class change that resizes nothing, while this
+one needs a design decision.
 
 **Closure criteria.** No `xs:` variant remains in the source without a matching
 definition; the save-state indicator is observed rendering during a real set
-save; and the set row is checked at 320px and 360px with both that indicator and
-the RPE column present.
+save; and the set row is checked on a phone with that indicator and the RPE
+column present. The `ExercisePickerDropdown` label pair is fixed or removed in
+the same pass, since it is the same root cause.
 
 <a id="td-27"></a>
 
@@ -129,6 +142,13 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-07 (revision 3):** Corrected `TD-29` against a device screenshot.
+  The entry had claimed the 16px fix would widen the inputs and force a
+  redesign; it does not, because the columns are `flex-1` and the input is
+  `w-full`, so font size changes the digits and not the box. That inverts the
+  pair: `TD-29` is a three-class change, and `TD-28` is the one needing a
+  design decision, because the same screenshot shows no room left for a fourth
+  element in that row.
 - **2026-09-07 (revision 2):** Recorded `TD-29` from a device report: focusing a
   set input zooms the page on iOS. The cause is three call sites overriding the
   16px mobile font size that `components/ui/input.tsx` already sets for exactly
