@@ -60,16 +60,19 @@ export const SetLogInput = ({
 		onSetCompleted,
 	})
 
-	const showStatus = saveState !== 'idle'
 	const statusText = saveStateLabel(saveState)
-	const statusDotClass =
+	// TD-28: the save state is drawn on the completion checkbox instead of in
+	// its own column -- after the RPE input there is no width left for one. A
+	// Tailwind ring is a box-shadow, so it costs no layout space. The focus
+	// ring still wins while focused, because that rule is variant-scoped.
+	const saveRingClass =
 		saveState === 'saving' || saveState === 'pending'
-			? 'bg-amber-500 animate-pulse'
+			? 'ring-2 ring-amber-500'
 			: saveState === 'saved'
-				? 'bg-green-500'
+				? 'ring-2 ring-green-500'
 				: saveState === 'error'
-					? 'bg-red-500'
-					: 'bg-transparent'
+					? 'ring-2 ring-red-500'
+					: ''
 
 	const plannedRepsText =
 		plannedMinReps && plannedMaxReps
@@ -111,7 +114,7 @@ export const SetLogInput = ({
 						value={repsState}
 						onChange={e => setReps(e.target.value)}
 						disabled={saveState === 'saving'}
-						className={`text-center text-sm font-semibold h-9 px-1 ${
+						className={`text-center font-semibold h-9 px-1 ${
 							!isValid && validationError?.includes('reps')
 								? 'border-red-500 focus:border-red-500'
 								: ''
@@ -133,7 +136,7 @@ export const SetLogInput = ({
 						value={weightState}
 						onChange={e => setWeight(e.target.value)}
 						disabled={saveState === 'saving'}
-						className={`text-center text-sm font-semibold h-9 px-1 ${
+						className={`text-center font-semibold h-9 px-1 ${
 							!isValid && validationError?.includes('weight')
 								? 'border-red-500 focus:border-red-500'
 								: ''
@@ -159,7 +162,7 @@ export const SetLogInput = ({
 						value={rpeState}
 						onChange={e => setRpe(e.target.value)}
 						disabled={saveState === 'saving'}
-						className={`text-center text-sm font-semibold h-9 px-1 ${
+						className={`text-center font-semibold h-9 px-1 ${
 							!isValid && validationError?.includes('RPE')
 								? 'border-red-500 focus:border-red-500'
 								: ''
@@ -170,19 +173,13 @@ export const SetLogInput = ({
 					</span>
 				</div>
 
-				{/* Save Status & Completion Checkbox */}
+				{/* Completion checkbox, doubling as the save-state indicator */}
 				<div className="flex items-center gap-2 shrink-0">
-					{showStatus && (
-						<div
-							className="hidden xs:flex items-center gap-1 text-[10px] text-muted-foreground"
-							aria-live="polite"
-						>
-							<span
-								className={`inline-block w-1 h-1 rounded-full ${statusDotClass}`}
-							/>
-							<span className="max-w-[40px] truncate">{statusText}</span>
-						</div>
-					)}
+					{/* Colour alone must not carry this, so the same state is announced
+					    to screen readers. The visible error footer below is unaffected. */}
+					<span className="sr-only" role="status" aria-live="polite">
+						{statusText}
+					</span>
 					<Checkbox
 						checked={isCompletedState}
 						onCheckedChange={(checked: boolean | 'indeterminate') =>
@@ -190,7 +187,7 @@ export const SetLogInput = ({
 						}
 						aria-label="Mark set as complete"
 						disabled={saveState === 'saving'}
-						className="h-5 w-5"
+						className={`h-5 w-5 ${saveRingClass}`}
 					/>
 				</div>
 			</div>

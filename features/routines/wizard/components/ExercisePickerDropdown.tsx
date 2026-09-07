@@ -56,8 +56,7 @@ export const ExercisePickerDropdown = forwardRef<
 			>
 				<div className="flex items-center gap-2">
 					<Plus className="h-4 w-4" />
-					<span className="hidden xs:inline">Add Exercise</span>
-					<span className="xs:hidden">Add</span>
+					<span>Add Exercise</span>
 				</div>
 				<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 			</Button>

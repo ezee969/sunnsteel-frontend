@@ -65,10 +65,16 @@ device screenshot on 2026-09-07 shows `67.5` rendering with room to spare at
 change and nothing more. [`TD-28`](#td-28) is the half of this pair that still
 needs a decision.
 
-**Closure criteria.** No input in the session row computes below 16px on a
-phone-width viewport; focusing reps, weight and RPE on a real iPhone causes no
-zoom; a five-character weight such as `102.5` is still fully legible; and the
-viewport export still permits user scaling.
+**Fix applied 2026-09-07, awaiting device confirmation.** The unconditional
+`text-sm` was removed from all three inputs, so the base `text-base md:text-sm`
+now governs. Confirmed against the compiled stylesheet: the rule survives with
+`md` at `min-width:48rem`, so the inputs compute 16px below 768px and 14px above.
+The viewport export was not touched and still permits user scaling.
+
+**Closure criteria.** Two of four are met by the above. Still open, and only
+answerable on the device: focusing reps, weight and RPE on a real iPhone causes
+no zoom, and a five-character weight such as `102.5` remains fully legible at
+the larger size.
 
 <a id="td-28"></a>
 
@@ -113,11 +119,22 @@ completion checkbox, or in the small caption line that currently reads
 `TD-29` turned out to be a three-class change that resizes nothing, while this
 one needs a design decision.
 
-**Closure criteria.** No `xs:` variant remains in the source without a matching
-definition; the save-state indicator is observed rendering during a real set
-save; and the set row is checked on a phone with that indicator and the RPE
-column present. The `ExercisePickerDropdown` label pair is fixed or removed in
-the same pass, since it is the same root cause.
+**Fix applied 2026-09-07, awaiting device confirmation.** The state moved onto
+the completion checkbox as a coloured ring -- amber while pending or saving,
+green when saved, red on error. A Tailwind ring is a box-shadow, so it consumes
+no layout width, which is what made this viable in a row with no space left. The
+focus ring is unaffected because its rule is variant-scoped and therefore does
+not collide. Colour cannot carry state on its own, so the same text is now in an
+`sr-only` live region; the visible error footer was already separate and still
+renders. `ExercisePickerDropdown` dropped its label pair entirely rather than
+switching breakpoint, because the button is `w-full` on mobile and the short
+label solved nothing. No `xs:` variant remains anywhere in the source, and the
+compiled stylesheet carries the new `ring-*` and `sr-only` rules.
+
+**Closure criteria.** The source and stylesheet halves are met. Still open, and
+only answerable on the device: the ring is observed changing colour during a
+real set save, and the row is checked on a phone with the ring and the RPE
+column both present.
 
 <a id="td-27"></a>
 
@@ -142,6 +159,12 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-07 (revision 4):** Applied the fixes for both entries. `TD-29`
+  dropped the `text-sm` override at the three set inputs; `TD-28` moved the
+  save state onto the completion checkbox as a ring, on the owner's decision,
+  and removed the last `xs:` usages. Both remain open on purpose: their
+  remaining criteria are device observations, and neither can be verified from
+  a build. Vitest is Node-only, so no test covers either change.
 - **2026-09-07 (revision 3):** Corrected `TD-29` against a device screenshot.
   The entry had claimed the 16px fix would widen the inputs and force a
   redesign; it does not, because the columns are `flex-1` and the input is
