@@ -31,15 +31,18 @@ export const SetLogInput = ({
 	plannedMaxReps,
 	plannedWeight,
 	plannedRir,
+	rpe,
 	onSave,
 }: SetLogInputProps) => {
 	const {
 		repsState,
 		weightState,
+		rpeState,
 		isCompletedState,
 		saveState,
 		setReps,
 		setWeight,
+		setRpe,
 		handleCompletionToggle,
 		isValid,
 		validationError,
@@ -50,6 +53,7 @@ export const SetLogInput = ({
 		setNumber,
 		initialReps: reps,
 		initialWeight: weight,
+		initialRpe: rpe,
 		initialIsCompleted: isCompleted,
 		onSave,
 	})
@@ -135,6 +139,32 @@ export const SetLogInput = ({
 					/>
 					<span className="text-[10px] text-muted-foreground whitespace-nowrap">
 						Target: {plannedWeight ? `${plannedWeight}kg` : '—'}
+					</span>
+				</div>
+
+				{/* RPE Column (LIVE-04). Optional: the set log and the history view
+				    have always carried RPE, but nothing could enter it, so the
+				    history column was permanently empty. */}
+				<div className="flex-1 flex flex-col items-center gap-1 min-w-[52px]">
+					<Input
+						type="number"
+						inputMode="decimal"
+						step="0.5"
+						min="0"
+						max="10"
+						aria-label="Rate of perceived exertion, 0 to 10"
+						placeholder="RPE"
+						value={rpeState}
+						onChange={e => setRpe(e.target.value)}
+						disabled={saveState === 'saving'}
+						className={`text-center text-sm font-semibold h-9 px-1 ${
+							!isValid && validationError?.includes('RPE')
+								? 'border-red-500 focus:border-red-500'
+								: ''
+						}`}
+					/>
+					<span className="text-[10px] text-muted-foreground whitespace-nowrap">
+						Optional
 					</span>
 				</div>
 

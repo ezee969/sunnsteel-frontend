@@ -14,6 +14,7 @@ interface UseSetLogFormProps {
 	setNumber: number
 	initialReps: number
 	initialWeight?: number
+	initialRpe?: number
 	initialIsCompleted: boolean
 	onSave: (payload: UpsertSetLogPayload) => void
 }
@@ -22,6 +23,7 @@ interface UseSetLogFormReturn {
 	// Form state
 	repsState: string
 	weightState: string
+	rpeState: string
 	isCompletedState: boolean
 
 	// Save state
@@ -30,6 +32,7 @@ interface UseSetLogFormReturn {
 	// Form handlers
 	setReps: (value: string) => void
 	setWeight: (value: string) => void
+	setRpe: (value: string) => void
 	handleCompletionToggle: (checked: boolean) => void
 
 	// Validation
@@ -47,6 +50,7 @@ export const useSetLogForm = ({
 	setNumber,
 	initialReps,
 	initialWeight,
+	initialRpe,
 	initialIsCompleted,
 	onSave,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
@@ -59,6 +63,9 @@ export const useSetLogForm = ({
 			? String(initialWeight)
 			: '',
 	)
+	const [rpeState, setRpeState] = useState<string>(
+		initialRpe !== undefined && initialRpe !== null ? String(initialRpe) : '',
+	)
 	const [isCompletedState, setIsCompletedState] = useState<boolean>(
 		initialIsCompleted ?? false,
 	)
@@ -66,6 +73,7 @@ export const useSetLogForm = ({
 	// Debounced values for auto-save
 	const debouncedReps = useDebounce(repsState, DEBOUNCE_DELAYS.SET_LOG_SAVE)
 	const debouncedWeight = useDebounce(weightState, DEBOUNCE_DELAYS.SET_LOG_SAVE)
+	const debouncedRpe = useDebounce(rpeState, DEBOUNCE_DELAYS.SET_LOG_SAVE)
 
 	// Save state tracking
 	const saveState = useSaveState(
@@ -82,6 +90,7 @@ export const useSetLogForm = ({
 	const lastSavedRef = useRef({
 		reps: initialReps,
 		weight: initialWeight,
+		rpe: initialRpe,
 		isCompleted: initialIsCompleted,
 	})
 
@@ -90,15 +99,17 @@ export const useSetLogForm = ({
 		lastSavedRef.current = {
 			reps: initialReps,
 			weight: initialWeight,
+			rpe: initialRpe,
 			isCompleted: initialIsCompleted,
 		}
-	}, [initialReps, initialWeight, initialIsCompleted, setNumber])
+	}, [initialReps, initialWeight, initialRpe, initialIsCompleted, setNumber])
 
 	// Create payload for validation and saving
 	const createPayload = useCallback(
 		(
 			reps: string,
 			weight: string,
+			rpe: string,
 			isCompleted: boolean,
 		): UpsertSetLogPayload => ({
 			routineExerciseId,
@@ -106,13 +117,20 @@ export const useSetLogForm = ({
 			setNumber,
 			reps: Number(reps) || 0,
 			weight: weight === '' ? undefined : Number(weight),
+			// An empty box means "not recorded", never RPE 0.
+			rpe: rpe === '' ? undefined : Number(rpe),
 			isCompleted,
 		}),
 		[routineExerciseId, exerciseId, setNumber],
 	)
 
 	// Validate current form state
-	const currentPayload = createPayload(repsState, weightState, isCompletedState)
+	const currentPayload = createPayload(
+		repsState,
+		weightState,
+		rpeState,
+		isCompletedState,
+	)
 	const validation = validateSetLogPayload(currentPayload)
 
 	// Auto-save effect for debounced values
@@ -120,6 +138,7 @@ export const useSetLogForm = ({
 		const currentReps = Number(debouncedReps) || 0
 		const currentWeight =
 			debouncedWeight === '' ? undefined : Number(debouncedWeight)
+		const currentRpe = debouncedRpe === '' ? undefined : Number(debouncedRpe)
 
 		// Normalize nullish weights for stable comparisons (null === undefined)
 		const norm = (w: number | undefined | null) => (w == null ? null : w)
@@ -130,6 +149,7 @@ export const useSetLogForm = ({
 		const hasChanged =
 			currentReps !== lastSavedRef.current.reps ||
 			normCurrentWeight !== normSavedWeight ||
+			norm(currentRpe) !== norm(lastSavedRef.current.rpe) ||
 			isCompletedState !== lastSavedRef.current.isCompleted
 
 		if (!hasChanged) {
@@ -141,6 +161,7 @@ export const useSetLogForm = ({
 			const payload = createPayload(
 				debouncedReps,
 				debouncedWeight,
+				debouncedRpe,
 				isCompletedState,
 			)
 			onSaveRef.current(payload)
@@ -148,12 +169,14 @@ export const useSetLogForm = ({
 			lastSavedRef.current = {
 				reps: currentReps,
 				weight: currentWeight,
+				rpe: currentRpe,
 				isCompleted: isCompletedState,
 			}
 		}
 	}, [
 		debouncedReps,
 		debouncedWeight,
+		debouncedRpe,
 		isCompletedState,
 		saveState,
 		sessionId,
@@ -167,11 +190,13 @@ export const useSetLogForm = ({
 	useEffect(() => {
 		const currentReps = Number(repsState) || 0
 		const currentWeight = weightState === '' ? undefined : Number(weightState)
+		const currentRpe = rpeState === '' ? undefined : Number(rpeState)
 		// Normalize nullish weights for stable comparisons (null === undefined)
 		const norm = (w: number | undefined | null) => (w == null ? null : w)
 		const hasImmediateChange =
 			currentReps !== lastSavedRef.current.reps ||
-			norm(currentWeight) !== norm(lastSavedRef.current.weight)
+			norm(currentWeight) !== norm(lastSavedRef.current.weight) ||
+			norm(currentRpe) !== norm(lastSavedRef.current.rpe)
 
 		if (hasImmediateChange && saveState === 'idle') {
 			// Only mark as pending if we're not already in a save flow
@@ -180,6 +205,7 @@ export const useSetLogForm = ({
 	}, [
 		repsState,
 		weightState,
+		rpeState,
 		saveState,
 		sessionId,
 		routineExerciseId,
@@ -195,20 +221,26 @@ export const useSetLogForm = ({
 		setWeightState(value)
 	}, [])
 
+	const setRpe = useCallback((value: string) => {
+		setRpeState(value)
+	}, [])
+
 	const handleCompletionToggle = useCallback(
 		(checked: boolean) => {
 			setIsCompletedState(checked)
 			markSetPending(sessionId, routineExerciseId, setNumber)
 
 			// Immediately save completion toggle
-			const payload = createPayload(repsState, weightState, checked)
+			const payload = createPayload(repsState, weightState, rpeState, checked)
 			if (validateSetLogPayload(payload).isValid) {
 				onSaveRef.current(payload)
 				// Update last saved values to prevent redundant saves
 				const w = weightState === '' ? undefined : Number(weightState)
+				const r = rpeState === '' ? undefined : Number(rpeState)
 				lastSavedRef.current = {
 					reps: Number(repsState) || 0,
 					weight: w,
+					rpe: r,
 					isCompleted: checked,
 				}
 			}
@@ -219,6 +251,7 @@ export const useSetLogForm = ({
 			setNumber,
 			repsState,
 			weightState,
+			rpeState,
 			createPayload,
 		],
 	)
@@ -227,6 +260,7 @@ export const useSetLogForm = ({
 		// Form state
 		repsState,
 		weightState,
+		rpeState,
 		isCompletedState,
 
 		// Save state
@@ -235,6 +269,7 @@ export const useSetLogForm = ({
 		// Form handlers
 		setReps,
 		setWeight,
+		setRpe,
 		handleCompletionToggle,
 
 		// Validation

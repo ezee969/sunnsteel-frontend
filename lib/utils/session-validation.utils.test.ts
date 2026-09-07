@@ -36,6 +36,24 @@ describe('validateSetLogPayload', () => {
 		expect(validateSetLogPayload({ ...valid, weight: -1 }).isValid).toBe(false)
 	})
 
+	it('accepts a missing RPE — it is optional and was never enterable before', () => {
+		expect(validateSetLogPayload({ ...valid, rpe: undefined }).isValid).toBe(
+			true,
+		)
+	})
+
+	it('accepts the ends of the 0-10 scale the history view renders against', () => {
+		expect(validateSetLogPayload({ ...valid, rpe: 0 }).isValid).toBe(true)
+		expect(validateSetLogPayload({ ...valid, rpe: 7.5 }).isValid).toBe(true)
+		expect(validateSetLogPayload({ ...valid, rpe: 10 }).isValid).toBe(true)
+	})
+
+	it('rejects an RPE outside 0-10, which would render as a bogus n/10', () => {
+		expect(validateSetLogPayload({ ...valid, rpe: -1 }).isValid).toBe(false)
+		expect(validateSetLogPayload({ ...valid, rpe: 11 }).isValid).toBe(false)
+		expect(validateSetLogPayload({ ...valid, rpe: NaN }).isValid).toBe(false)
+	})
+
 	it('rejects a set number below 1', () => {
 		expect(validateSetLogPayload({ ...valid, setNumber: 0 }).isValid).toBe(
 			false,

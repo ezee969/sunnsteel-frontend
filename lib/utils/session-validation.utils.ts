@@ -30,6 +30,15 @@ export const validateSetLogPayload = (
 		errors.push('Weight must be 0 or greater')
 	}
 
+	// RPE is optional. History renders it as `n/10`, so anything outside that
+	// scale would be displayed as a fraction of a bound it does not share.
+	if (
+		payload.rpe !== undefined &&
+		(payload.rpe < 0 || payload.rpe > 10 || Number.isNaN(payload.rpe))
+	) {
+		errors.push('RPE must be between 0 and 10')
+	}
+
 	return {
 		isValid: errors.length === 0,
 		errors,

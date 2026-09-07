@@ -7,6 +7,7 @@ export type UpsertSetLogPayload = {
 	setNumber: number
 	reps: number
 	weight?: number
+	rpe?: number
 	isCompleted?: boolean
 }
 

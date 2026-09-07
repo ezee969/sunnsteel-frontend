@@ -167,6 +167,9 @@ export function groupSetLogsByExercise(
 				setNumber: tpl.setNumber,
 				reps: log?.reps ?? 0,
 				weight: log?.weight ?? tpl.weight,
+				// Carried through so a logged RPE survives a refetch. The contract
+				// types this as `number | null`; the grouped set uses `undefined`.
+				rpe: log?.rpe ?? undefined,
 				isCompleted: log?.isCompleted ?? false,
 				plannedReps: tpl.reps,
 				plannedMinReps: tpl.minReps,
