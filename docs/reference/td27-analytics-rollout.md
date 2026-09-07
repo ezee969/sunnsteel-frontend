@@ -31,7 +31,7 @@ versioned prescription snapshots and account time-zone registration/status.
    registration uses `onlyIfUnset` to protect simultaneous devices. It polls the
    status while BUILDING and does not request progress before an active zone
    exists. An old active generation remains readable during a zone change.
-4. Backfill runs on the existing Nest scheduler (five-second tick, 25 sessions
+4. Backfill runs on the existing Nest scheduler (five-second tick, two sessions
    per batch). Each worker claims account/job rows with `SKIP LOCKED`. A first
    cursor snapshots all available sessions, including aborted/active ones; the
    second cursor folds completed sessions in `(endedAt, id)` order. A failed
@@ -65,6 +65,48 @@ versioned prescription snapshots and account time-zone registration/status.
    branch. Only then update the roadmap with production evidence; this local
    implementation does not claim that cleanup or deployment has happened.
 
+## Lock profile of the expansion migration
+
+Read out of
+`prisma/migrations/20260906180000_analytics_expand/migration.sql` on 2026-09-07.
+The expansion has since been applied in production, so this is kept as a record
+of what step 1 exercised and as a constraint on future edits to that file -- not
+as a pending instruction. It is a read of the SQL, never a measurement; no
+duration stated here was observed.
+
+**Free.** The eight new tables and their indexes are built empty. Every
+`ADD COLUMN` against an already-populated table is nullable with no default --
+`User.timeZone`, `User.analyticsProjectionId`, the four on `WorkoutSession`
+(`completedSets`, `sourceRoutineDayId`, `sourceRoutineId`, `totalVolumeKg`) and
+`SetLog.sourceRoutineExerciseId` -- so each is metadata-only on PostgreSQL 11+.
+They still take `ACCESS EXCLUSIVE` briefly, which means they queue behind any
+long-running open transaction; a stuck transaction, not the rewrite, is what
+stalls this migration.
+
+**What to time.** The file contains no `CONCURRENTLY`, so every index build takes
+`SHARE` on its table and blocks writes for its whole duration. Five builds run
+against populated tables:
+
+| Table            | Index                                                 |
+| ---------------- | ----------------------------------------------------- |
+| `WorkoutSession` | `WorkoutSession_userId_id_idx`                        |
+| `WorkoutSession` | `workout_recent_completed_sets` (partial)             |
+| `WorkoutSession` | `workout_analytics_backfill_cursor` (partial)         |
+| `WorkoutSession` | `workout_analytics_cursor_status`                     |
+| `SetLog`         | `SetLog_sessionId_sourceRoutineExerciseId_setNumber_key` (UNIQUE) |
+
+Expect `SetLog` to dominate: it holds one row per logged set, so it is the
+largest table the migration touches.
+
+**Why the unique index is safe on existing data, and how that breaks.**
+`SetLog_sessionId_sourceRoutineExerciseId_setNumber_key` covers
+`sourceRoutineExerciseId`, which this same migration has just added as `NULL` for
+every pre-existing row. The index is not declared `NULLS NOT DISTINCT`, and
+PostgreSQL treats NULLs as distinct from one another in a unique index, so no
+historical row can collide no matter how much history the database holds. Adding
+`NULLS NOT DISTINCT` to that statement would make the migration fail against any
+database with existing set logs. Do not add it.
+
 ## Operations (backend working directory)
 
 Use the explicitly selected environment's connection configuration:
@@ -89,6 +131,20 @@ completion produces one completion event and at most one PR event per exercise;
 daily/weekly muscle rows and record frontiers add storage per generation. Old
 inactive generations are retained for audit in this delivery. Do not delete the
 active or requested generation when introducing retention later.
+
+## Production checkpoint — 2026-09-07
+
+- Expansion migration applied; backend deployment `6b27aff` succeeded.
+- The registered Europe/Berlin account reached READY: 38 sessions snapshotted
+  and processed. The legacy/projected comparison matched exactly (including
+  five personal records and five recent activities).
+- A batch of 25 exceeded the 30-second transaction timeout over the remote
+  connection. Batches of two completed successfully; the worker default was
+  reduced to two and passed backend `npm run verify`. Deploy this adjustment.
+- Six accounts remain unregistered and have no workout sessions. Their zones
+  must still be registered by their owners before the global rollout gates pass.
+- Projection-read flag activation, repeat-rebuild production evidence, the
+  rollback observation window and FK cutover remain pending.
 
 ## Historical limitations
 
