@@ -12,7 +12,7 @@ Stack: **Next.js 15.5 (App Router) · React 18.3 · TypeScript 5 (strict) · Tai
 
 **It is effectively an SPA hosted on Next.js.** Only `app/page.tsx` (a redirect based on a cookie), `app/api/session/route.ts` and the six `loading.tsx` files are Server Components. **Every other `page.tsx` and both group layouts are `'use client'`.** There is no RSC data fetching, no Server Actions, no `fetch` caching/`revalidate`, no streaming. All data is fetched client-side via TanStack Query against the external backend. Keep this in mind before reaching for a Next.js server feature — nothing else in the app uses one.
 
-**`@sunsteel/contracts` is a published npm dependency (`^0.7.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunnsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunnsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
+**`@sunsteel/contracts` is a published npm dependency (`^0.8.1` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunnsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunnsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
 
 Runs on Windows 11. Do **not** start/run the app yourself — ask the user to run it.
 
@@ -30,11 +30,13 @@ npm run verify         # lint + typecheck + test + build (run before considering
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 22 (required by the current Supabase client).
 
-Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 104 tests across eleven files, including `lib/api/types/workout-stats.test.ts` for local week boundaries and logout marker recovery in the auth suites. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
+Coverage stays in Node: **pure logic, auth event orchestration and API-contract tests**, 109 tests across twelve files, including `lib/api/types/workout-stats.test.ts` for local week boundaries, previous-performance comparison logic and logout marker recovery in the auth suites. Network calls are mocked. [vitest.config.ts](vitest.config.ts) uses `environment: 'node'` on purpose — there is no jsdom and no React Testing Library, so **hooks and components cannot be rendered in tests** without first deciding to add them.
 
 **Never run `npm run verify` (or `npm run build`) while `npm run dev` is running.** Both write to the same `.next/` directory, so the production build overwrites the dev server's manifests and the running server starts answering **500 on every route**. In this app that surfaces as a **black screen**, because the layout never mounts — it looks exactly like an auth bug and will send you chasing the wrong thing (`localStorage` throwing `SecurityError` and the tab title falling back to the URL are the tells that it's a dead server, not client code). This has already burned an hour once. Stop the dev server first, or verify only when you are done poking at the app.
 
 This build/dev restriction applies to **this checkout's `.next/` directory**, not to port 3000 globally. A different project running on that port does not conflict. Check the Node process command line/project path before asking the user to stop a server.
+
+When the owner keeps the dev servers running, do not ask them to stop just to close routine work. Run `npm run lint`, `npm run typecheck` and `npm test` locally, push the coherent change, and require the clean CI build to pass before closure. Ask for a stop only if CI is unavailable or a local production-build diagnosis is specifically necessary. For authenticated browser checks, use the running app and ask the owner only to sign in if the current browser session is unauthenticated.
 
 There is no `docs:check` / `docs:update` script — both were broken (one pointed at a `.sh` that does not exist, the other was an `echo`) and were removed in CL-05.
 
@@ -85,7 +87,7 @@ The Supabase client ([lib/supabase/client.ts](lib/supabase/client.ts)) falls bac
 Two coexisting styles — match whichever domain you are in:
 
 - **Routines**: `routineQueryKeys` in [lib/api/routines/routine-query.ts](lib/api/routines/routine-query.ts) → `['routines']`, `['routines', <serialized filters>]`, `['routines', <id>]`. The same file holds `RoutineFilters`, filter serialization and the `URLSearchParams` builders — build query strings via those helpers, not ad hoc. Note lists and details share the `['routines']` prefix, so invalidating it hits both.
-- **Workouts**: a local `qk` object inside [lib/api/hooks/useWorkoutSession.ts](lib/api/hooks/useWorkoutSession.ts) → `['workout','session','active']`, `['workout','session',id]`, `['workout','sessions',<serialized params>]`.
+- **Workouts**: a local `qk` object inside [lib/api/hooks/useWorkoutSession.ts](lib/api/hooks/useWorkoutSession.ts) → `['workout','session','active']`, `['workout','session',id]`, `['workout','session',id,'previous-performance']`, `['workout','sessions',<serialized params>]`.
 - Everything else is an inline literal: `['user']`, `['exercises']`, `['users','search',q,limit]`.
 
 **If you add a prefetch, it must use the exact key the consuming hook reads.** A hand-rolled data-prefetch layer that wrote to keys nobody read (`hooks/use-navigation-prefetch.ts`) was deleted for exactly this reason. Treat that as historical evidence: start from the [active technical-debt register](docs/roadmaps/technical-debt.md), which links the closed audit when older decision context is needed. Route prefetching is `next/link`'s job; don't reimplement it.
