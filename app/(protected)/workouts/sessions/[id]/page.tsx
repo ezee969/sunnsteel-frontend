@@ -253,6 +253,7 @@ export default function ActiveSessionPage() {
 					progressData={progressData}
 					isFinishing={isFinishing}
 					onFinishAttempt={() => handleFinishAttempt('COMPLETED')}
+					onDiscardAttempt={() => handleFinishAttempt('ABORTED')}
 					onNavigateBack={handleBack}
 				/>
 
@@ -332,10 +333,13 @@ export default function ActiveSessionPage() {
 			<SessionConfirmationDialog
 				isOpen={isConfirmingFinish}
 				onClose={cancelFinish}
-				onConfirm={() => executeFinish(finishStatus!)}
+				onConfirm={() => {
+					if (finishStatus) executeFinish(finishStatus)
+				}}
 				progressData={progressData}
 				routineName={routine!.name}
 				isFinishing={isFinishing}
+				status={finishStatus}
 			/>
 		</div>
 	)

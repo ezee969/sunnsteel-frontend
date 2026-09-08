@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, CheckCircle, Target } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Target, Trash2 } from 'lucide-react'
 
 import {
 	AlertDialog,
@@ -13,7 +13,11 @@ import {
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import type { SessionProgressData } from '@/lib/utils/workout-session.types'
+import { getSessionResolutionCopy } from '@/lib/utils/session-resolution'
+import type {
+	SessionProgressData,
+	SessionStatus,
+} from '@/lib/utils/workout-session.types'
 
 interface SessionConfirmationDialogProps {
 	isOpen: boolean
@@ -22,6 +26,7 @@ interface SessionConfirmationDialogProps {
 	progressData: SessionProgressData
 	routineName: string
 	isFinishing: boolean
+	status: SessionStatus | null
 }
 
 /**
@@ -34,28 +39,33 @@ export const SessionConfirmationDialog = ({
 	progressData,
 	routineName,
 	isFinishing,
+	status,
 }: SessionConfirmationDialogProps) => {
 	const { completedSets, totalSets, percentage } = progressData
 	const isComplete = percentage === 100
+	const isDiscarding = status === 'ABORTED'
 	const incompleteSets = totalSets - completedSets
+	const copy = getSessionResolutionCopy(status)
 
 	return (
 		<AlertDialog open={isOpen} onOpenChange={onClose}>
 			<AlertDialogContent className="max-w-md">
 				<AlertDialogHeader>
 					<AlertDialogTitle className="flex items-center gap-2">
-						{isComplete ? (
+						{isDiscarding ? (
+							<Trash2 className="h-5 w-5 text-destructive" />
+						) : isComplete ? (
 							<CheckCircle className="h-5 w-5 text-green-600" />
 						) : (
 							<AlertTriangle className="h-5 w-5 text-amber-600" />
 						)}
-						Finish Session
+						{copy.title}
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>
 						<div className="space-y-3">
 							<p>
-								Are you sure you want to finish your workout session for{' '}
-								<span className="font-medium">{routineName}</span>?
+								{copy.prompt} <span className="font-medium">{routineName}</span>
+								?
 							</p>
 
 							{/* Progress Summary */}
@@ -85,8 +95,15 @@ export const SessionConfirmationDialog = ({
 								)}
 							</div>
 
-							{/* Warning for incomplete sessions */}
-							{!isComplete && (
+							{/* Resolution warning */}
+							{isDiscarding ? (
+								<div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3">
+									<p className="text-sm text-destructive">
+										<strong>Discarding is permanent.</strong> This session and
+										its saved sets will not appear in workout history.
+									</p>
+								</div>
+							) : !isComplete ? (
 								<div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
 									<p className="text-sm text-amber-800 dark:text-amber-200">
 										<strong>Note:</strong> Finishing with incomplete sets will
@@ -94,10 +111,10 @@ export const SessionConfirmationDialog = ({
 										benefit of the workout.
 									</p>
 								</div>
-							)}
+							) : null}
 
 							{/* Success message for complete sessions */}
-							{isComplete && (
+							{!isDiscarding && isComplete && (
 								<div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
 									<p className="text-sm text-green-800 dark:text-green-200">
 										<strong>Great job!</strong> You&apos;ve completed all sets.
@@ -115,12 +132,14 @@ export const SessionConfirmationDialog = ({
 						onClick={onConfirm}
 						disabled={isFinishing}
 						className={
-							isComplete
-								? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
-								: 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
+							isDiscarding
+								? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+								: isComplete
+									? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
+									: 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
 						}
 					>
-						{isFinishing ? 'Finishing...' : 'Finish Session'}
+						{isFinishing ? copy.pendingLabel : copy.confirmLabel}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

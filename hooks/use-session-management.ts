@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
+import { useToast } from '@/components/ui/toast'
 import { useFinishSession } from '@/lib/api/hooks'
 import type { Routine } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
@@ -10,6 +11,7 @@ import {
 	areAllSetsCompleted,
 	calculateSessionProgress,
 } from '@/lib/utils/session-progress.utils'
+import { getSessionResolutionCopy } from '@/lib/utils/session-resolution'
 import type {
 	SessionProgressData,
 	SessionStatus,
@@ -49,6 +51,7 @@ export const useSessionManagement = ({
 	setLogs,
 }: UseSessionManagementProps): UseSessionManagementReturn => {
 	const router = useRouter()
+	const { push } = useToast()
 	const { mutate: finishSession, isPending: isFinishing } =
 		useFinishSession(sessionId)
 
@@ -75,11 +78,18 @@ export const useSessionManagement = ({
 	const executeFinish = useCallback(
 		(status: SessionStatus) => {
 			if (!status) return
+			const copy = getSessionResolutionCopy(status)
 
 			finishSession(
 				{ status },
 				{
 					onSuccess: () => {
+						if (status === SESSION_STATUS.ABORTED) {
+							push({
+								title: copy.successTitle,
+								description: copy.successDescription,
+							})
+						}
 						// Reset confirmation state on success and navigate away
 						setIsConfirmingFinish(false)
 						setFinishStatus(null)
@@ -87,6 +97,13 @@ export const useSessionManagement = ({
 					},
 					onError: error => {
 						logger.error('Failed to finish session:', error)
+						push({
+							title: copy.errorTitle,
+							description:
+								error instanceof Error
+									? error.message
+									: 'Please check your connection and try again.',
+						})
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)
 						setFinishStatus(null)
@@ -94,7 +111,7 @@ export const useSessionManagement = ({
 				},
 			)
 		},
-		[finishSession, router],
+		[finishSession, push, router],
 	)
 
 	/**

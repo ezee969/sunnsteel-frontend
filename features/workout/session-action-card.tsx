@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,6 +15,7 @@ interface SessionActionCardProps {
 	progressData: SessionProgressData
 	isFinishing: boolean
 	onFinishAttempt: () => void
+	onDiscardAttempt: () => void
 	onNavigateBack: () => void
 }
 
@@ -25,6 +26,7 @@ export const SessionActionCard = ({
 	progressData,
 	isFinishing,
 	onFinishAttempt,
+	onDiscardAttempt,
 }: SessionActionCardProps) => {
 	const { percentage } = progressData
 	const isComplete = percentage === 100
@@ -42,8 +44,20 @@ export const SessionActionCard = ({
 				</div>
 
 				{/* Action Buttons */}
-				<div className="flex pt-2">
+				<div className="flex gap-2 pt-2">
 					<Button
+						type="button"
+						variant="outline"
+						onClick={onDiscardAttempt}
+						disabled={isFinishing}
+						size="sm"
+						className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+					>
+						<Trash2 className="mr-1 h-4 w-4" aria-hidden />
+						Discard
+					</Button>
+					<Button
+						type="button"
 						onClick={onFinishAttempt}
 						disabled={isFinishing}
 						size="sm"
