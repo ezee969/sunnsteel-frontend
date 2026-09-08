@@ -43,3 +43,13 @@ next-env.d.ts
 
 # Local Claude Code settings (personal, not shared)
 .claude/settings.local.json
+
+# UI restyle: baseline in docs/ui-restyle/screenshots/before is committed on
+# purpose (a frozen baseline that is not versioned is not frozen). The "after"
+# set is regenerated after every batch and must not be committed.
+docs/ui-restyle/screenshots/after/
+
+# Playwright: saved sign-in state for UI capture runs. Never commit.
+.auth/
+test-results/
+playwright-report/

@@ -16,6 +16,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "ui:login": "node e2e/save-auth.mjs",
+    "ui:capture:before": "playwright test --project=before",
+    "ui:capture:after": "playwright test --project=after",
     "verify:security": "npm audit --omit=dev"
   },
   "dependencies": {
@@ -56,6 +59,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^18",
