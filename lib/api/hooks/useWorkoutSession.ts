@@ -7,7 +7,9 @@ import {
 import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { logger } from '@/lib/utils/logger'
+import { buildPersonalRecordCelebration } from '@/lib/utils/personal-record-celebration'
 import { setSaveState } from '@/lib/utils/save-status-store'
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider'
@@ -20,6 +22,7 @@ import {
 	SetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
+	UpsertSetLogResponse,
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
@@ -293,6 +296,8 @@ export const useFinishSession = (id: string) => {
 
 export const useUpsertSetLog = (id: string) => {
 	const qc = useQueryClient()
+	const { push } = useToast()
+	const weightUnit = useWeightUnit()
 	return useMutation({
 		// Serialize all set-log writes for this session. Editing reps/weight fires a
 		// debounced upsert (carrying the current isCompleted), and the completion
@@ -301,7 +306,9 @@ export const useUpsertSetLog = (id: string) => {
 		// (isCompleted:false) can land after the completion save (isCompleted:true)
 		// and clobber it on the server, leaving the set showing as not completed.
 		scope: { id: `set-log:${id}` },
-		mutationFn: async (data: UpsertSetLogRequest): Promise<SetLog> => {
+		mutationFn: async (
+			data: UpsertSetLogRequest,
+		): Promise<UpsertSetLogResponse> => {
 			// Mark as pending (user modified fields) right before network
 			setSaveState(
 				`set:${id}:${data.routineExerciseId}:${data.setNumber}`,
@@ -369,6 +376,7 @@ export const useUpsertSetLog = (id: string) => {
 			return { previous } as { previous?: WorkoutSession }
 		},
 		onSuccess: (res, data) => {
+			const savedSet = res.setLog
 			const activityAt = new Date().toISOString()
 			setSaveState(
 				`set:${id}:${data.routineExerciseId}:${data.setNumber}`,
@@ -383,8 +391,8 @@ export const useUpsertSetLog = (id: string) => {
 			// which re-rendered every ExerciseGroup and SetLogInput on screen — on
 			// the app's most interactive page, while the user is typing.
 			//
-			// The backend returns the complete SetLog and commits a session heartbeat
-			// in the same transaction. Mirror that timestamp locally so a long-open
+			// The mutation response includes the complete SetLog and commits a session
+			// heartbeat in the same transaction. Mirror that timestamp locally so a long-open
 			// page cannot trigger stale recovery after successful activity. This also
 			// replaces the synthetic `optimistic:` id with the real one. See TD-07.
 			qc.setQueryData<WorkoutSession>(qk.session(id), prev => {
@@ -395,7 +403,7 @@ export const useUpsertSetLog = (id: string) => {
 					setLogs: (prev.setLogs ?? []).map((l: SetLog) =>
 						l.routineExerciseId === data.routineExerciseId &&
 						l.setNumber === data.setNumber
-							? res
+							? savedSet
 							: l,
 					),
 				}
@@ -403,6 +411,14 @@ export const useUpsertSetLog = (id: string) => {
 			qc.setQueryData<WorkoutSession | null>(qk.active, prev =>
 				prev?.id === id ? { ...prev, lastActivityAt: activityAt } : prev,
 			)
+
+			const celebration = buildPersonalRecordCelebration(
+				res.earnedRecords,
+				weightUnit,
+			)
+			if (celebration) {
+				push({ ...celebration, variant: 'success', duration: 6000 })
+			}
 		},
 		onError: (_err, data, ctx) => {
 			setSaveState(

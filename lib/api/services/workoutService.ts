@@ -3,9 +3,9 @@ import {
 	ListSessionsParams,
 	PaginatedResponse,
 	PreviousPerformanceResponse,
-	SetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
+	UpsertSetLogResponse,
 	WorkoutSession,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
@@ -131,8 +131,8 @@ export const workoutService = {
 	upsertSetLog: async (
 		id: string,
 		data: UpsertSetLogRequest,
-	): Promise<SetLog> => {
-		return httpClient.request<SetLog>(
+	): Promise<UpsertSetLogResponse> => {
+		return httpClient.request<UpsertSetLogResponse>(
 			`${WORKOUTS_API_URL}/sessions/${id}/set-logs`,
 			{
 				method: 'PUT',

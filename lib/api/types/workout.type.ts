@@ -7,6 +7,7 @@ import type {
 	SetLog as ContractSetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
+	UpsertSetLogResponse,
 	WorkoutSession as ContractWorkoutSession,
 	WorkoutSessionStatus,
 	WorkoutSessionSummary as ContractWorkoutSessionSummary,
@@ -38,6 +39,7 @@ export type {
 	PreviousSetPerformance,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
+	UpsertSetLogResponse,
 }
 
 // History/List types
