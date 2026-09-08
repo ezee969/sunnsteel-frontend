@@ -1,6 +1,7 @@
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { formatDaysPerWeek } from '@/lib/utils/routine-format'
 
 interface RoutineMetaBadgesProps {
 	daysPerWeek: number
@@ -24,7 +25,7 @@ export function RoutineMetaBadges({
 					className="h-3 w-3 flex-shrink-0"
 					aria-hidden
 				/>
-				<span>{daysPerWeek} days/week</span>
+				<span>{formatDaysPerWeek(daysPerWeek)}</span>
 			</Badge>
 			{isPeriodized && (
 				<Badge variant="outline" className="text-xs sm:text-sm">

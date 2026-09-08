@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { formatDaysPerWeek } from '@/lib/utils/routine-format'
 
 import type { TrainingDayInfo } from '../constants/training-days'
 
@@ -16,7 +17,7 @@ export const SelectedDaysSummary = ({
 }: SelectedDaysSummaryProps) => (
 	<div className="bg-muted/50 p-3 md:p-4 rounded-lg">
 		<h4 className="font-medium text-sm md:text-base mb-2 md:mb-3">
-			Selected Training Days ({trainingDays.length} days/week)
+			Selected Training Days ({formatDaysPerWeek(trainingDays.length)})
 		</h4>
 		<div className="relative min-h-[56px] md:min-h-[28px]">
 			<div
