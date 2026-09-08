@@ -1,5 +1,7 @@
 import {
 	PublicUserProfile,
+	ReplaceTrainingLocationsRequest,
+	TrainingLocationPreference,
 	UpdateProfileRequest,
 	UserProfile,
 	UserSearchResponse,
@@ -18,6 +20,26 @@ export const userService = {
 	// Update user profile
 	async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
 		return httpClient.patch<UserProfile>('/users/profile', data, true)
+	},
+
+	async getTrainingLocations(): Promise<TrainingLocationPreference[]> {
+		return httpClient.get<TrainingLocationPreference[]>(
+			'/users/training-locations',
+			true,
+		)
+	},
+
+	async replaceTrainingLocations(
+		data: ReplaceTrainingLocationsRequest,
+	): Promise<TrainingLocationPreference[]> {
+		return httpClient.request<TrainingLocationPreference[]>(
+			'/users/training-locations',
+			{
+				method: 'PUT',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		)
 	},
 
 	// Search users by name, email or username

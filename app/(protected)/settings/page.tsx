@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { supabase } from '@/lib/supabase/client'
@@ -411,6 +412,8 @@ export default function SettingsPage() {
 					</CardContent>
 				</Card>
 			</div>
+
+			<TrainingLocationPreferencesCard weightUnit={formData.weightUnit} />
 
 			<ImageCropper
 				open={cropperOpen}
