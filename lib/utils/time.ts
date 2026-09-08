@@ -36,23 +36,3 @@ export const isValidTimeFormat = (timeStr: string): boolean => {
 	const [mins, secs] = timeStr.split(':').map(Number)
 	return mins >= 0 && secs >= 0 && secs < 60
 }
-
-/**
- * Format seconds to human readable format
- * @param seconds - Total seconds
- * @returns Human readable string (e.g., "2 min 30 sec")
- */
-export const formatTimeReadable = (seconds: number): string => {
-	const mins = Math.floor(seconds / 60)
-	const secs = seconds % 60
-
-	if (mins === 0) {
-		return `${secs} sec`
-	}
-
-	if (secs === 0) {
-		return `${mins} min`
-	}
-
-	return `${mins} min ${secs} sec`
-}

@@ -1,7 +1,7 @@
 import type { WeightUnit } from '@sunsteel/contracts'
 
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
-import { formatTimeReadable } from '@/lib/utils/time'
+import { formatDuration } from '@/lib/utils/time-format.utils'
 import {
 	formatWeight as formatWeightForUnit,
 	formatWeightAmount,
@@ -108,7 +108,7 @@ export function buildSessionMetrics(
 			? new Date(session.startedAt).toLocaleDateString()
 			: 'Unknown Date',
 		durationLabel: session?.durationSec
-			? formatTimeReadable(session.durationSec)
+			? formatDuration(session.durationSec)
 			: '—',
 		completedSets,
 		totalVolumeLabel: `${formatWeightAmount(totalVolume, weightUnit, 1)} ${getWeightUnitLabel(weightUnit)}`,

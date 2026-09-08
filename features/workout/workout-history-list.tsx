@@ -3,7 +3,7 @@ import type { Ref } from 'react'
 
 import { Button } from '@/components/ui/button'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
-import { formatTimeReadable } from '@/lib/utils/time'
+import { formatDuration } from '@/lib/utils/time-format.utils'
 
 const getErrorMessage = (err: unknown): string => {
 	if (err instanceof Error) return err.message
@@ -99,9 +99,7 @@ export function WorkoutHistoryList({
 						</div>
 						<div>
 							<div className="text-muted-foreground">Duration</div>
-							<div>
-								{s.durationSec ? formatTimeReadable(s.durationSec) : '—'}
-							</div>
+							<div>{s.durationSec ? formatDuration(s.durationSec) : '—'}</div>
 						</div>
 						<div>
 							<div className="text-muted-foreground">Volume / Sets</div>

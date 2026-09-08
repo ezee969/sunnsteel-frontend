@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
-import { formatTimeReadable } from '@/lib/utils/time'
+import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
 import ActivityItem from './ActivityItem'
@@ -59,7 +59,7 @@ export default function RecentActivity() {
 									`${entry.completedSets} sets`,
 									`${formatWeightAmount(entry.totalVolumeKg, weightUnit)} ${getWeightUnitLabel(weightUnit)}`,
 									...(entry.durationSec
-										? [formatTimeReadable(entry.durationSec)]
+										? [formatDuration(entry.durationSec)]
 										: []),
 								]}
 								showSeparator={index < entries.length - 1}
