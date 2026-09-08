@@ -10,6 +10,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
+import { PlateCalculatorDialog } from './plate-calculator-dialog'
 import { SetLogInput } from './set-log-input'
 
 interface ExerciseGroupProps {
@@ -61,6 +62,13 @@ export const ExerciseGroup = ({
 }: ExerciseGroupProps) => {
 	const isComplete = completedSets === totalSets && totalSets > 0
 	const weightUnit = useWeightUnit()
+	const nextWeightedSet =
+		sets.find(
+			set => !set.isCompleted && (set.plannedWeight ?? set.weight ?? 0) > 0,
+		) ?? sets.find(set => (set.plannedWeight ?? set.weight ?? 0) > 0)
+	const calculatorTarget = nextWeightedSet
+		? (nextWeightedSet.plannedWeight ?? nextWeightedSet.weight)
+		: undefined
 
 	return (
 		<Card
@@ -97,6 +105,13 @@ export const ExerciseGroup = ({
 				</Button>
 
 				<div className="flex items-center gap-2 shrink-0">
+					{calculatorTarget ? (
+						<PlateCalculatorDialog
+							exerciseName={exerciseName}
+							initialTargetWeightKg={calculatorTarget}
+						/>
+					) : null}
+
 					{/* Note button (stops propagation to prevent toggle) */}
 					<div onClick={e => e.stopPropagation()}>
 						<ExerciseNoteRow note={note} onSave={onSaveNote} minimal />
