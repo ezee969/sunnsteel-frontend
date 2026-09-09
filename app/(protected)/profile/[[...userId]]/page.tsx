@@ -119,7 +119,7 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="w-full max-w-5xl mx-auto space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+		<div className="w-full max-w-5xl mx-auto space-y-6 pb-20">
 			<Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm relative shadow-sm">
 				<div className="h-32 md:h-48 w-full bg-gradient-to-r from-primary/20 via-primary/10 to-transparent relative">
 					<div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay"></div>
@@ -316,7 +316,7 @@ export default function ProfilePage() {
 										key={record.exerciseId}
 										className="flex gap-4 items-start p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50 group"
 									>
-										<div className="h-10 w-10 rounded-full bg-background flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
+										<div className="h-10 w-10 rounded-full bg-background flex items-center justify-center border shadow-sm transition-colors duration-[var(--motion-fast)] ease-standard">
 											<Medal className="h-5 w-5 text-yellow-500" />
 										</div>
 										<div className="flex-1">

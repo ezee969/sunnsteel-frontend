@@ -99,7 +99,7 @@ export default function TodaysWorkouts() {
 								name={'scroll-unfurled'}
 								aria-hidden
 								className={cn(
-									'h-4 w-4 transition-all',
+									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
 									'text-primary-foreground',
 								)}
 							/>

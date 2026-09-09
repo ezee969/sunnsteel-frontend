@@ -35,13 +35,13 @@ function AccordionTrigger({
 			<AccordionPrimitive.Trigger
 				data-slot="accordion-trigger"
 				className={cn(
-					'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all ease-in-out outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
+					'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-colors duration-[var(--motion-fast)] ease-standard outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
 					className,
 				)}
 				{...props}
 			>
 				{children}
-				<ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-300 ease-in-out" />
+				<ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-[var(--motion-base)] ease-standard" />
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
 	)
@@ -56,9 +56,14 @@ function AccordionContent({
 		<AccordionPrimitive.Content
 			data-slot="accordion-content"
 			className={cn(
-				'grid overflow-hidden text-sm transition-[grid-template-rows] duration-300 ease-in-out',
+				// Motion spec §2.7: height changes instantly, the reveal is opacity only.
+				// The row-template transition this replaced was a layout animation -
+				// on the never-list (§1.2) and the most expensive frame cost on a
+				// phone. Do not write that class name here even in a comment: Tailwind
+				// v4 scans source text and would compile it back into the bundle.
+				'grid overflow-hidden text-sm',
 				'data-[state=closed]:grid-rows-[0fr] data-[state=open]:grid-rows-[1fr]',
-				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+				'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:duration-[var(--motion-fast)] data-[state=open]:ease-standard',
 			)}
 			{...props}
 		>

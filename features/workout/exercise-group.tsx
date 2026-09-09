@@ -74,8 +74,12 @@ export const ExerciseGroup = ({
 		// is an earned mark, so it takes gold (§4.3 rule 2) rather than the green
 		// this screen used, which freed `success` for genuine system state.
 		<section
-			className={`mark py-4 pl-3 transition-colors duration-[var(--motion-base)] ease-standard ${
-				isComplete ? 'mark-success bg-surface/60' : 'mark'
+			// Motion spec §2.9 signature 2: `mark-fill` makes the mark grow top to
+			// bottom instead of appearing, and the row settles onto the completed
+			// tone over the same 300ms. The fill is a transform on an overlay bar,
+			// so completing a set never reflows the row.
+			className={`mark mark-fill py-4 pl-3 transition-colors duration-[var(--motion-slow)] ease-standard ${
+				isComplete ? 'mark-success bg-surface/60' : ''
 			}`}
 		>
 			<div className="flex items-center justify-between gap-2">

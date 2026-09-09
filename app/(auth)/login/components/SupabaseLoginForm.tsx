@@ -130,7 +130,7 @@ export function SupabaseLoginForm() {
 												autoCapitalize="none"
 												autoComplete="email"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -163,7 +163,7 @@ export function SupabaseLoginForm() {
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
 												autoComplete="current-password"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-all font-medium"
+												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -187,7 +187,7 @@ export function SupabaseLoginForm() {
 						/>
 
 						<Button
-							className="w-full h-11 font-medium text-base bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-200 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+							className="w-full h-11 font-medium text-base bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors duration-[var(--motion-fast)] ease-standard"
 							type="submit"
 							disabled={isPending || isGooglePending}
 						>
@@ -232,7 +232,7 @@ export function SupabaseLoginForm() {
 							alt="Google"
 							width={16}
 							height={16}
-							className="mr-2 h-4 w-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all"
+							className="mr-2 h-4 w-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-[opacity,filter] duration-[var(--motion-fast)] ease-standard"
 						/>
 					)}
 					Continue with Google

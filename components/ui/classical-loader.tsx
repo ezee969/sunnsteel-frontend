@@ -58,14 +58,14 @@ export function ClassicalLoader({
 			<span
 				aria-hidden
 				className={cn(
-					'absolute inset-0 animate-spin rounded-full border-transparent border-t-foreground',
+					'absolute inset-0 animate-spin-slow rounded-full border-transparent border-t-ink-2',
 					ring,
 				)}
 			/>
 			<ClassicalIcon
 				name="laurel-wreath"
 				aria-hidden
-				className={cn('animate-pulse text-ink-3', icon)}
+				className={cn('animate-pulse-opacity text-ink-3', icon)}
 			/>
 		</span>
 	)

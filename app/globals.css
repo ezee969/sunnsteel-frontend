@@ -325,8 +325,24 @@
 
   /* Structure (§11.2). The double rule appears once per page, under the page
      inscription. */
+  /* Motion spec §2.9 signature 1: the rule draws in from the left, once per
+     region per visit. The border stays in the box but transparent, so the
+     drawn rule is an overlay and the heading's height never changes. A
+     mount-time animation, not a transition - a re-render keeps the same class
+     string and therefore cannot replay it (§1.3 rule 1). */
   .rule-heading {
+    position: relative;
+    border-bottom: 3px double transparent;
+  }
+  .rule-heading::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
     border-bottom: 3px double var(--rule);
+    transform-origin: left;
+    animation: rule-draw 240ms var(--ease-standard) backwards;
   }
   .rule-row {
     border-bottom: 1px solid var(--rule-faint);
@@ -349,6 +365,32 @@
   .mark-warning {
     border-left-color: var(--warning-strong);
   }
+
+  /* Motion spec §2.9 signature 2. The mark fills top to bottom rather than
+     appearing. The 3px border stays transparent and holds the space; the fill
+     is an overlay bar, so nothing reflows when a set completes. Applied only on
+     the session set row - every other `.mark` consumer keeps the static border.
+     A React re-render does not restart this: the class string is unchanged, and
+     `groupSetLogsByExercise` rebuilding its objects cannot retrigger a CSS
+     animation (§1.3 rule 1). */
+  .mark-fill {
+    position: relative;
+  }
+  .mark-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -3px;
+    width: 3px;
+    background: var(--success-strong);
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  .mark-fill.mark-success::before {
+    animation: mark-fill var(--motion-slow) var(--ease-standard) forwards;
+  }
+
 
   /* The one classical device the direction keeps: gold brackets, one pair per
      screen, on the page inscription rather than around a photograph. */
@@ -413,14 +455,83 @@
   display: none;
 }
 
-/* §9.3 - both signature motions collapse to an instant change; everything else
-   is opacity only. */
+/* Motion spec §2.8 / §4. The four keyframes are the closed inventory; a fifth
+   needs a defect report against the spec, not a silent addition. */
+@keyframes pulse-opacity {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mark-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* The only two infinite animations in the app (§2.8). Both are single-property
+   and neither carries information - the LOADING label and the skeleton's
+   position do. */
+.animate-pulse-opacity {
+  animation: pulse-opacity 1600ms ease-in-out infinite;
+}
+.animate-spin-slow {
+  animation: spin 800ms linear infinite;
+}
+
+/* Motion spec §2.2. On a touch PWA neither hover nor focus-visible fires, so an
+   affordance revealed by hover does not exist there at all. */
+@media (pointer: coarse) {
+  .hover-reveal {
+    opacity: 1;
+  }
+}
+
+/* Motion spec §3. Not a blanket 1ms override: colour and opacity survive at
+   `--motion-fast`, because colour at 120ms is not vestibular load and killing
+   it removes feedback rather than motion. What goes is transform and the
+   keyframe animations. */
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 120ms;
+    --motion-base: 120ms;
+    --motion-slow: 120ms;
+  }
+  .animate-pulse-opacity,
+  .animate-spin-slow,
+  .rule-heading::after,
+  .mark-fill.mark-success::before {
+    animation: none !important;
+  }
+  /* The mark is simply there, at its final state. */
+  .mark-fill::before {
+    transform: scaleY(1);
+  }
+  /* Overlays become opacity-only: no scale, no side translate (§3). */
   *,
   *::before,
   *::after {
-    transition-duration: 1ms !important;
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
+    --tw-enter-scale: 1 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke, opacity !important;
   }
 }

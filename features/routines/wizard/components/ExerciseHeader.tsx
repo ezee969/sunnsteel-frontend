@@ -55,7 +55,7 @@ export function ExerciseHeader({
 	return (
 		<CardHeader
 			className={cn(
-				'cursor-pointer transition-all duration-200 hover:bg-muted/30',
+				'cursor-pointer transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted/30',
 				expanded ? 'p-3 sm:p-4' : 'p-2 sm:p-3',
 			)}
 			role="button"

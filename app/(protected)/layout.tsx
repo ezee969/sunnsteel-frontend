@@ -163,7 +163,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 						// full-viewport basis and the margin pushes the document 122px
 						// past the viewport at 768-1023. Pre-existing; measured on a
 						// clean tree at 890px against a 768px viewport.
-						'flex min-h-0 w-full min-w-0 flex-1 flex-col transition-all duration-300',
+						'flex min-h-0 w-full min-w-0 flex-1 flex-col',
 						isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20',
 					)}
 				>
@@ -207,11 +207,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 								</div>
 							}
 						>
-							<div
-								className={cn('h-full transition-all duration-300 ease-out')}
-							>
-								{children}
-							</div>
+							<div className={cn('h-full')}>{children}</div>
 						</Suspense>
 					</main>
 				</div>

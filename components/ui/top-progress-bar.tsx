@@ -63,20 +63,24 @@ export function TopProgressBar({ active, className }: TopProgressBarProps) {
 			className={cn(
 				'pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5',
 				isVisible ? 'opacity-100' : 'opacity-0',
-				'transition-opacity duration-200',
+				'transition-opacity duration-[var(--motion-fast)] ease-standard',
+				isVisible ? '' : 'duration-[140ms] ease-exit',
 				className,
 			)}
 			aria-hidden
 		>
 			<div className="relative h-full w-full bg-transparent">
+				{/* Motion spec §2.8: the fill is `scaleX`, not `width`. Animating
+				    width relayouts the document on every progress tick; a
+				    transform runs on the compositor. */}
 				<div
-					className="absolute left-0 top-0 h-full rounded-r"
+					className="absolute left-0 top-0 h-full w-full origin-left rounded-r"
 					style={{
-						width: `${progress}%`,
+						transform: `scaleX(${progress / 100})`,
 						background:
 							'linear-gradient(90deg, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.8) 50%, rgba(255,215,0,0.6) 100%)',
 						boxShadow: '0 0 8px rgba(255, 215, 0, 0.5)',
-						transition: 'width 200ms ease-out',
+						transition: 'transform var(--motion-slow) var(--ease-standard)',
 					}}
 				/>
 			</div>

@@ -107,10 +107,8 @@ export function SetRow({
 
 	return (
 		<div
-			className={`bg-card border border-muted rounded-lg p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-all duration-200 ${
-				isRemoving
-					? 'animate-out fade-out-0 slide-out-to-top-2'
-					: 'animate-in fade-in-0 slide-in-from-top-2'
+			className={`bg-card border border-muted rounded-lg p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
+				isRemoving ? 'animate-out fade-out-0 duration-[140ms] ease-exit' : ''
 			}`}
 		>
 			<div className="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-2 items-stretch sm:items-center">

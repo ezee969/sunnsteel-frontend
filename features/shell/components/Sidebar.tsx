@@ -16,6 +16,7 @@ import {
 	X,
 } from 'lucide-react'
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
 import {
 	ClassicalIcon,
@@ -133,6 +134,10 @@ export default function Sidebar({
 	const { user } = useUser()
 	const { push } = useToast()
 
+	// -1 when the active route is not in this list (Settings), which hides the
+	// marker rather than parking it on the wrong row.
+	const activeIndex = SIDEBAR_NAV_ITEMS.findIndex(item => item.id === activeNav)
+
 	const handleDisabledClick = (label: string) => {
 		push({
 			title: `${label} - Coming Soon`,
@@ -154,7 +159,7 @@ export default function Sidebar({
 				// v1.0 §11.10: an index column, not a panel. Ground-coloured with a
 				// single rule on its right edge - no marble wash, no gold hex border,
 				// no blur, no shadow. Elevation in this system is tonal (§8).
-				'fixed inset-y-0 z-50 flex flex-col border-r border-rule bg-background transition-all duration-300 ease-in-out',
+				'fixed inset-y-0 z-50 flex flex-col border-r border-rule bg-background',
 				isMobile
 					? isMobileMenuOpen
 						? 'left-0 w-[85%] max-w-[300px]'
@@ -167,7 +172,7 @@ export default function Sidebar({
 			<div className="flex h-14 items-center justify-between border-b border-rule px-4 md:h-16">
 				<div
 					className={cn(
-						'flex items-center gap-2 font-semibold transition-all duration-300',
+						'flex items-center gap-2 font-semibold',
 						!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
 					)}
 				>
@@ -200,7 +205,33 @@ export default function Sidebar({
 				)}
 			</div>
 			<ScrollArea className="flex-1 py-4">
-				<nav className="grid gap-2 px-2">
+				<nav
+					className="relative grid gap-2 px-2"
+					style={
+						{
+							'--nav-pitch': isMobile ? '3.25rem' : '2.75rem',
+						} as CSSProperties
+					}
+				>
+					{/* Motion spec §2.3: ONE marker, translated. Rows are a uniform
+					    pitch (item height + the 8px grid gap), so the offset is exact
+					    and needs no measurement. Hidden when the active route is not
+					    in this list - Settings lives in the footer and keeps its own
+					    mark. `aria-hidden`: the active item is already conveyed by
+					    `aria-current` on the link. */}
+					{activeIndex >= 0 && (
+						<span
+							aria-hidden
+							className={cn(
+								'pointer-events-none absolute left-2 z-10 w-[3px] bg-honour-strong',
+								'transition-transform duration-[var(--motion-base)] ease-standard',
+								isMobile ? 'h-11' : 'h-9',
+							)}
+							style={{
+								transform: `translateY(calc(${activeIndex} * var(--nav-pitch)))`,
+							}}
+						/>
+					)}
 					{SIDEBAR_NAV_ITEMS.map(item => {
 						const content = (() => {
 							const showTooltip = !isSidebarOpen && !isMobile
@@ -219,7 +250,7 @@ export default function Sidebar({
 											? 'justify-start'
 											: 'justify-center',
 										activeNav === item.id
-											? 'mark-honour bg-surface font-semibold text-foreground'
+											? 'bg-surface font-semibold text-foreground'
 											: 'text-ink-2 hover:bg-surface hover:text-foreground',
 										item.disabled &&
 											'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
@@ -377,7 +408,7 @@ export default function Sidebar({
 						</Avatar>
 						<div
 							className={cn(
-								'flex flex-col transition-all duration-300',
+								'flex flex-col',
 								!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
 							)}
 						>

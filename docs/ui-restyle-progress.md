@@ -5,27 +5,71 @@ phase or implementation batch, per the plan's handoff protocol.
 
 ## Current Phase
 
-**Phase 9 (responsive QA) complete.** Phase 10 (motion) is next.
+**Phase 10 (motion) implemented.** The full gate is green with the dev server
+stopped: `npm run verify` passes lint, typecheck, 152 tests and a production
+build.
 
-144 checks — 9 routes x 8 widths x 2 themes — measured in the browser, not
-reviewed by eye: **zero horizontal overflow, zero clipped content, zero
-unreachable content.** Four defects found and corrected; two more investigated
-and shown to be measurement artefacts.
+Every row of the motion spec's §6 delta table is applied, both signature motions
+exist, and the compiled stylesheet confirms each new rule emits. Beyond the
+delta table, **eight files carried motion the spec prohibits** and were corrected
+in the same pass — including two genuine layout animations on the session
+screen's critical path.
 
-**Both audit predictions answered with data.** Prediction 1 **confirmed**:
-320/375/390/430 are byte-identical in layout signature on all eight routes, in
-both themes — nothing changes until 640. Prediction 2 **refuted in exactly one
-place**: 1024/1280/1440 are identical on seven of eight routes, and the exception
-is the `xl:text-right` Batch 2 added to the history ledger for §10.1's open
-ledger. The audit was right about the pre-restyle app; the restyle changed it
-where v1.0 asked and nowhere else.
-
-**The merge with `origin/main` is resolved and the full gate is green** —
-`npm run verify` passes end to end (lint, typecheck, 152 tests, production
-build), and `package-lock.json` carries a two-entry fix for the `npm ci` failure
-CI hit (Findings 51). Nothing is committed.
+Nothing is committed.
 
 ## Completed
+
+### Phase 10 — Motion implementation
+
+Read `AGENTS.md`, the plan, this file, `docs/ui-motion-spec.md` and
+`docs/ui-design-system.md` §9 first. No new dependency: `tailwindcss-animate`
+remains the only animation utility source, per spec §4.
+
+**The two signatures now exist.** Neither did before this phase.
+
+- *Rule draw* (§2.9.1) is folded into `.rule-heading` itself, so all eleven
+  consumers get it without touching a call site. The border stays in the box but
+  transparent and the drawn rule is a `::after` overlay, so the heading's height
+  is unchanged — a scaled border would have shifted every one of those layouts by
+  3px. It is a mount-time animation, not a transition, so a re-render cannot
+  replay it (§1.3 rule 1).
+- *Set completion* (§2.9.2) is `.mark-fill` on the session exercise row. The 3px
+  border holds the space and stays transparent; the fill is an overlay bar
+  scaling on Y from the top. Completing a set therefore never reflows the row,
+  which was the explicit reason the spec chose a transform over a growing border.
+
+**§6 delta table, all applied:**
+
+| File | Change |
+| --- | --- |
+| `accordion.tsx` | Row-template transition deleted — height is instant, reveal is opacity at 120ms; trigger `transition-all` → `transition-colors`; chevron 200ms standard |
+| `dialog.tsx`, `alert-dialog.tsx` | Scale 0.98 not 0.95; enter 300ms standard, exit `data-[state=closed]:duration-[180ms] ease-exit`; scrim 200/180 |
+| `dropdown-menu.tsx`, `select.tsx`, `popover.tsx` | Scale 0.98; enter 200ms standard, exit 140ms exit |
+| `tooltip.tsx` | Scale 0.98; 120ms standard / 80ms exit |
+| `tabs.tsx` | `transition-[color,box-shadow]` → `transition-colors` at 200ms standard; active `shadow-sm` removed |
+| `toast.tsx` | Close button gains `hover-reveal`; opacity 1 at rest under `pointer: coarse` |
+| `skeleton.tsx`, `classical-loader.tsx` | `pulse-opacity` 1600ms and `spin-slow` 800ms; spinner recoloured to `--ink-2` |
+| `top-progress-bar.tsx` | Fill `width` → `scaleX`; opacity 120ms enter / 140ms exit |
+| profile page | The last page-level `animate-in fade-in slide-in-from-bottom` deleted |
+
+**Nav marker (§2.3).** The sidebar previously coloured each item's own 3px
+border, which cross-fades rather than slides — the spec is explicit that per-item
+borders cannot slide. There is now one marker element translated between rows.
+The grid pitch is uniform (item height plus the 8px gap), so the offset is exact
+and needs no measurement JS: a CSS variable and `translateY`. It hides when the
+active route is not in the list, so Settings — which lives in the footer — keeps
+its own mark rather than parking the marker on a wrong row.
+
+**`prefers-reduced-motion` rewritten.** The previous block was a blanket
+`transition-duration: 1ms` on every element. That is not what §3 asks for and it
+is worse than it looks: it kills colour and opacity feedback along with motion.
+The new block sets the three duration tokens to 120ms, disables the four
+keyframes by name, forces the mark to its final state, and zeroes the enter/exit
+scale and translate variables so overlays become opacity-only. Colour survives,
+because colour at 120ms is not vestibular load.
+
+**Keyframe inventory closed at four**, as §4 requires: `spin` (Tailwind's, driven
+at 800ms), `pulse-opacity`, `rule-draw`, `mark-fill`.
 
 ### Phase 0 — Baseline
 
@@ -1851,6 +1895,46 @@ The four that shaped Phase 2 and 3:
    for a restyle; recorded because it was found while restoring the account
    state, and it belongs in the product roadmap rather than here.
 
+**Findings 52 — two layout animations were live on the session screen's hot
+path, and both are the exact defect §4 exists to prevent.**
+
+- `rest-timer-bar.tsx` animated `width`. That bar ticks once a second for the
+  length of every rest interval, on the screen that re-renders most broadly
+  (TD-07), so it was relaying out the document on every tick for the duration of
+  a workout. Now `scaleX` on a composited layer.
+- `top-progress-bar.tsx` animated `width` on every route change.
+
+Neither was in the §6 delta table; both were found by grepping the compiled
+stylesheet for `transition-property:width` rather than by reading the source.
+
+**Findings 53 — the auth pages never went through a Phase 8 batch.** `/login`
+and `/signup` sit outside the protected shell, and the batches were scoped to
+shell surfaces. They still carried `transition-all`, `hover:scale-[1.01]` and
+`active:scale-[0.99]` — three things §5 prohibits outright — plus a password
+strength meter animating width. All corrected here. Worth checking whether they
+were skipped for the *visual* work too; that is a Phase 12 question, not a
+Phase 10 one.
+
+**Findings 54 — Tailwind v4 compiles class names out of prose.** Content
+detection scans every non-ignored file, so a class name written in a code comment
+or in `docs/` is emitted into the bundle even when nothing uses it. A comment I
+wrote in `accordion.tsx` naming the deleted row-template transition put that
+utility straight back into the stylesheet.
+
+The comment is reworded, but the docs still do it: `docs/ui-motion-spec.md` and
+the archived July audit mention `transition-all` and friends, so those utilities
+appear in the compiled CSS with no consumer. Consequences worth carrying forward:
+
+1. It is dead weight, though small.
+2. **It defeats §7 gate 1 as written.** Grepping the bundle for a class name no
+   longer proves anything about usage — presence can come from prose. The gate
+   should assert on the emitted *declaration* (`transition-property:width`) and
+   cross-check the source, which is how Findings 52 was actually caught.
+
+Constraining scanning with `@source` would fix it, but narrowing content
+detection late in a restyle risks silently dropping a class that is genuinely
+used — the TD-28 failure class — so it is left alone deliberately.
+
 ## Known Risks
 
 - **`npm run typecheck` is red on unrelated in-flight work** (Findings 32).
@@ -2043,63 +2127,28 @@ The four that shaped Phase 2 and 3:
 
 ## Next Task
 
-**Phase 10 — Motion.** Two halves per the plan: a proposal (Qwen 3.8 Max) over
-the finished static UI, then implementation.
+**Phase 11 — Accessibility visual QA (GPT-5.6 Sol High).** Per the handoff
+protocol this is a separate session; do not continue into it automatically. The
+ready prompt is entry 14 in
+[ui-restyle/session-prompts.md](ui-restyle/session-prompts.md).
 
-Most of the groundwork is already in place and should not be re-decided:
+Before it runs, `npm run ui:capture:after` should be re-run so the reviewer sees
+the motion work's resting states rather than the Phase 9 captures.
 
-- **The tokens exist and are verified working**: `--motion-fast` 120ms,
-  `--motion-base` 200ms, `--motion-slow` 300ms as plain custom properties
-  consumed via `duration-[var(--motion-*)]`, and `--ease-standard` /
-  `--ease-exit` as real Tailwind v4 namespace entries (§9.5). Phase 4 measured
-  them on rendered nodes.
-- **§9.2's prohibitions have been applied through all four batches**: no
-  page-level entrance animation, no scale on hover or press, no fade-up per
-  section, no animated gradients. Phase 10 must not reintroduce any of them.
-- **§9.1 names the two signature motions and neither is built yet**: the rule
-  draw (a region's heading rule scaling in on X over 240ms) and set completion
-  (the left mark filling top to bottom over 300ms). These are the actual work.
-- **§9.3** requires both signatures to collapse to an instant colour change under
-  `prefers-reduced-motion`; the global reduced-motion block in `globals.css`
-  already clamps durations, so verify rather than re-add.
-- **§9.4**: the session screen re-renders broadly (no `React.memo`,
-  `groupSetLogsByExercise` rebuilds every object per call), so animate it with
-  CSS, not JS.
+Carried forward, none blocking:
 
-**Known open items:**
-
-- **Nothing is committed.** The `origin/main` merge, all four Phase 8 batches,
-  Phase 9's corrections, the `session-recap` restyle and the lock fix are all
-  staged/working-tree changes.
-- **CI has not been re-run since the lock fix** (Findings 51). It cannot be
-  validated from Windows; the next push is the confirmation.
-- Commit `docs/ui-restyle/screenshots/before/` (17 MB + 6 `session-full` images).
-- **Build the component/state captures** from `ui-restyle/capture-manifest.md`,
-  and give the harness a precondition check for an active session (Findings 46).
-  Phase 12 will need all of them; Batches 3 and 4 each had to script their own.
-- **Not covered by any batch, still off-palette**: the two auth screens (§12.4
-  calls them a self-contained batch), the profile page, `InitialLoadAnimation`,
-  `PerformanceDebugPanel`.
-- `session-action-card.tsx` still references `honour-bright`, which is not a
-  token (Findings 36). The session screen is §14 work.
-- `.ledger-page` still has zero consumers; §10's container widths are unapplied.
-- Deletion candidates for Phase 15, six: `popover`, `alert`, `OrnateCorners`,
-  `HeroBackdrop`, `HeroCard`, `WorkoutItem`.
-- The session screen's composition gaps (v1.0 §14) are still open.
-- **Reported, not fixed** (Phase 9 scope): the mobile FAB overlaps list content
-  mid-scroll. Content is reachable — the list reserves space at the end — but
-  removing the overlap entirely means relocating the action, which is a layout
-  change (Findings 50).
-
-**Gates, every phase:**
-
-1. **Check the served stylesheet right after any git operation on
-   `globals.css`** — not at the end (Findings 33).
-2. Contrast re-measured in the browser; both themes. Rasterise the computed
-   `oklch()` through a canvas (Findings 37).
-3. No horizontal overflow at 320/375/390/430/768/1024/1280/1440. Budget
-   `viewport - 256` inside the shell and check at the breakpoint itself
-   (Findings 47).
-4. `npm run ui:capture:after`, compared against `before/`, with no active
-   session (Findings 46). The sweep cannot see §10.2 violations.
-5. `npm run verify` only with the dev server stopped.
+- **Motion spec §7 gates 2–6 are unrun.** This session verified gate 1 (compiled
+  stylesheet) and gate 7 (`npm run verify` with the dev server stopped). Still
+  owed, all requiring a browser: measured durations on rendered nodes in both
+  themes; a Performance trace showing zero Layout events while opening the delete
+  dialog, opening the kebab menu, expanding the history filters and completing a
+  set; reduced motion emulated against every row of §3; `pointer: coarse`
+  emulated for the toast close button; and a forced re-render confirming neither
+  signature replays.
+- **The nav marker needs a real look at 390 and in the mobile drawer.** The pitch
+  is derived from uniform row heights, which is correct in the markup but unproven
+  on screen.
+- The theme crossfade stays on `body` rather than the temporary shell class §2.9
+  describes. Body is a single node, so the concern that rule raises — a paint
+  transition on every node of a broadly re-rendering screen — does not apply. A
+  deliberate deviation, not an omission.

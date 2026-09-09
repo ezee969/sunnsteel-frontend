@@ -46,11 +46,15 @@ export const RestTimerBar = ({
 			    at a glance from arm's length. Rest ending is a system state, not
 			    an earned mark, so it takes `success` and never gold. */}
 			<div className="h-1 w-full bg-surface-sunk">
+				{/* Motion spec §1.2/§2.8: `scaleX`, never `width`. This ticks once a
+				    second for the length of a rest interval, on the screen that
+				    re-renders most broadly (TD-07) - animating width would relayout
+				    the document on every tick. */}
 				<div
-					className={`h-full transition-[width] duration-200 ease-linear ${
+					className={`h-full w-full origin-left transition-transform duration-[var(--motion-base)] ease-linear ${
 						isOver ? 'bg-success' : 'bg-ink-3'
 					}`}
-					style={{ width: `${Math.round(progress * 100)}%` }}
+					style={{ transform: `scaleX(${progress})` }}
 				/>
 			</div>
 

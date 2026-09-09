@@ -21,7 +21,7 @@ export const CommonSplitCard = ({
 }: CommonSplitCardProps) => (
 	<Card
 		className={cn(
-			'cursor-pointer transition-all hover:bg-muted/50 active:scale-[0.98]',
+			'cursor-pointer transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted/50',
 			'border-border/50',
 			'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
 			isSelected && 'ring-1 ring-primary bg-muted/30',
