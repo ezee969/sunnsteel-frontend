@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { useToast } from '@/components/ui/toast'
 import { useFinishSession } from '@/lib/api/hooks'
 import type { Routine } from '@/lib/api/types/routine.type'
-import type { SetLog } from '@/lib/api/types/workout.type'
+import type { ProgressionChange, SetLog } from '@/lib/api/types/workout.type'
 import { SESSION_STATUS } from '@/lib/constants/session.constants'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -28,6 +28,7 @@ interface UseSessionManagementReturn {
 	// State
 	isConfirmingFinish: boolean
 	finishStatus: SessionStatus | null
+	progressionChanges: ProgressionChange[]
 
 	// Progress data
 	progressData: SessionProgressData
@@ -36,6 +37,7 @@ interface UseSessionManagementReturn {
 	handleFinishAttempt: (status: SessionStatus) => void
 	executeFinish: (status: SessionStatus) => void
 	cancelFinish: () => void
+	completeProgressionReview: () => void
 
 	// Status
 	isFinishing: boolean
@@ -57,6 +59,9 @@ export const useSessionManagement = ({
 
 	const [isConfirmingFinish, setIsConfirmingFinish] = useState(false)
 	const [finishStatus, setFinishStatus] = useState<SessionStatus | null>(null)
+	const [progressionChanges, setProgressionChanges] = useState<
+		ProgressionChange[]
+	>([])
 
 	// Calculate progress data
 	const progressData = (() => {
@@ -83,16 +88,25 @@ export const useSessionManagement = ({
 			finishSession(
 				{ status },
 				{
-					onSuccess: () => {
+					onSuccess: result => {
 						if (status === SESSION_STATUS.ABORTED) {
 							push({
 								title: copy.successTitle,
 								description: copy.successDescription,
 							})
 						}
-						// Reset confirmation state on success and navigate away
+						// Reset confirmation state on success. A completed session with
+						// automatic progression stays on this route until the owner has
+						// seen exactly what changed.
 						setIsConfirmingFinish(false)
 						setFinishStatus(null)
+						if (
+							status === SESSION_STATUS.COMPLETED &&
+							result.progressionChanges.length > 0
+						) {
+							setProgressionChanges(result.progressionChanges)
+							return
+						}
 						router.push('/dashboard')
 					},
 					onError: error => {
@@ -155,10 +169,16 @@ export const useSessionManagement = ({
 		setFinishStatus(null)
 	}, [])
 
+	const completeProgressionReview = useCallback(() => {
+		setProgressionChanges([])
+		router.push('/dashboard')
+	}, [router])
+
 	return {
 		// State
 		isConfirmingFinish,
 		finishStatus,
+		progressionChanges,
 
 		// Progress data
 		progressData,
@@ -167,6 +187,7 @@ export const useSessionManagement = ({
 		handleFinishAttempt,
 		executeFinish,
 		cancelFinish,
+		completeProgressionReview,
 
 		// Status
 		isFinishing,

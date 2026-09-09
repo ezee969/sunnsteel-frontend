@@ -1,5 +1,6 @@
 import {
 	FinishWorkoutRequest,
+	FinishWorkoutResponse,
 	ListSessionsParams,
 	PaginatedResponse,
 	PreviousPerformanceResponse,
@@ -117,8 +118,8 @@ export const workoutService = {
 	finishSession: async (
 		id: string,
 		data: FinishWorkoutRequest,
-	): Promise<WorkoutSession> => {
-		return httpClient.request<WorkoutSession>(
+	): Promise<FinishWorkoutResponse> => {
+		return httpClient.request<FinishWorkoutResponse>(
 			`${WORKOUTS_API_URL}/sessions/${id}/finish`,
 			{
 				method: 'PATCH',

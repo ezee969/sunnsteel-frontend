@@ -17,6 +17,7 @@ import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider'
 import { workoutService } from '../services/workoutService'
 import {
 	FinishWorkoutRequest,
+	FinishWorkoutResponse,
 	ListSessionsParams,
 	PreviousPerformanceResponse,
 	SetLog,
@@ -285,8 +286,8 @@ export const useFinishSession = (id: string) => {
 	return useMutation({
 		mutationFn: (data: FinishWorkoutRequest) =>
 			workoutService.finishSession(id, data),
-		onSuccess: (session: WorkoutSession) => {
-			qc.setQueryData(qk.session(id), session)
+		onSuccess: (result: FinishWorkoutResponse) => {
+			qc.setQueryData(qk.session(id), result.session)
 			qc.invalidateQueries({ queryKey: qk.active })
 			qc.invalidateQueries({ queryKey: qk.stats })
 			qc.invalidateQueries({ queryKey: qk.progress })

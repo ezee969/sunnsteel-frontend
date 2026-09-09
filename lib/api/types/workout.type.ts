@@ -1,9 +1,11 @@
 import type {
 	FinishWorkoutRequest,
+	FinishWorkoutResponse,
 	ListSessionsParams,
 	PaginatedResponse,
 	PreviousPerformanceResponse,
 	PreviousSetPerformance,
+	ProgressionChange,
 	SetLog as ContractSetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
@@ -35,8 +37,10 @@ export interface WorkoutSession extends Omit<
 
 export type {
 	FinishWorkoutRequest,
+	FinishWorkoutResponse,
 	PreviousPerformanceResponse,
 	PreviousSetPerformance,
+	ProgressionChange,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
 	UpsertSetLogResponse,
