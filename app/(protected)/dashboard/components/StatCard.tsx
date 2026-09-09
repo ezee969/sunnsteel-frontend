@@ -43,7 +43,7 @@ export default function StatCard({
 		<div className="flex min-w-0 flex-col gap-2 bg-background px-3 py-4 sm:px-4 sm:py-5">
 			<div className="flex min-w-0 items-center gap-2 text-ink-3">
 				{icon}
-				<span className="type-label truncate">{title}</span>
+				<span className="type-label">{title}</span>
 			</div>
 
 			{/* Wraps: the unit drops below the value rather than pushing it past

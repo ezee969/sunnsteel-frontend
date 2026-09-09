@@ -5,26 +5,25 @@ phase or implementation batch, per the plan's handoff protocol.
 
 ## Current Phase
 
-**Phase 8 Batch 4 (menus, dropdowns, modals) complete and verified.** Phase 8 is
-finished; **Phase 9 (responsive QA)** is next.
+**Phase 9 (responsive QA) complete.** Phase 10 (motion) is next.
 
-Verified, not assumed: `npm run ui:capture:after` (54 captures) plus eight
-interaction captures of the open menu and open dialog at 390/1440 in both
-themes; an overflow sweep run **with the overlays open** — 32 checks, no
-horizontal overflow; contrast measured on the real rendered dialog rather than a
-probe element; the served-stylesheet gate; `npm run lint` clean; `npm test` 150
-passing / 21 files.
+144 checks — 9 routes x 8 widths x 2 themes — measured in the browser, not
+reviewed by eye: **zero horizontal overflow, zero clipped content, zero
+unreachable content.** Four defects found and corrected; two more investigated
+and shown to be measurement artefacts.
 
-`npm run typecheck` is still red on the same nine `@sunsteel/contracts` export
-errors from `aaaace9` (Findings 32), in files no restyle batch has touched. A
-production build remains outstanding: the owner's dev server is up and the two
-share `.next/`.
+**Both audit predictions answered with data.** Prediction 1 **confirmed**:
+320/375/390/430 are byte-identical in layout signature on all eight routes, in
+both themes — nothing changes until 640. Prediction 2 **refuted in exactly one
+place**: 1024/1280/1440 are identical on seven of eight routes, and the exception
+is the `xl:text-right` Batch 2 added to the history ledger for §10.1's open
+ledger. The audit was right about the pre-restyle app; the restyle changed it
+where v1.0 asked and nowhere else.
 
-**What Phase 8 leaves off-palette**, all of it outside the four batches' scope:
-the two auth screens (§12.4 calls them a self-contained batch), the profile page,
-`InitialLoadAnimation`, `PerformanceDebugPanel`, and one live `honour-bright`
-reference in `session-action-card.tsx` — the session screen belongs to §14, not
-to a Phase 8 batch.
+**The merge with `origin/main` is resolved and the full gate is green** —
+`npm run verify` passes end to end (lint, typecheck, 152 tests, production
+build), and `package-lock.json` carries a two-entry fix for the `npm ci` failure
+CI hit (Findings 51). Nothing is committed.
 
 ## Completed
 
@@ -785,6 +784,99 @@ present in the served stylesheet and their markup reviewed against §11.9. They
 remain the strongest argument for building the component/state captures in
 `ui-restyle/capture-manifest.md`.
 
+### Phase 9 — Responsive QA
+
+**144 checks** — 9 routes x 8 widths x 2 themes — measured in the browser rather
+than reviewed by eye, plus a separate layout-signature pass to answer the two
+audit predictions with data.
+
+**Result: zero horizontal overflow, zero clipped content, zero unreachable
+content.** Four defects were found and corrected; two more were investigated and
+proved to be measurement artefacts rather than defects.
+
+#### How it was measured
+
+A scripted probe per route/width/theme, reporting: elements extending past the
+viewport (measured on the shell's real scroll container, not the document, which
+never grows); text clipped by `overflow:hidden`/`ellipsis` where `scrollWidth`
+exceeds `clientWidth`; interactive elements under 24px below `md`; and geometric
+intersection between `position:fixed` elements and page text.
+
+Separately, a **layout signature** per width — every visible element's tag,
+class, `display`, `flex-direction`, column count, `font-size`, `position` and
+`text-align`, sorted, with pixel widths deliberately excluded so a fluid resize
+does not register as a change. Comparing signatures answers "does any breakpoint
+rule actually fire between these two widths" exactly, which is what both
+predictions are really asking.
+
+#### Prediction 1 — CONFIRMED
+
+**320, 375, 390 and 430 are byte-identical in layout signature on all eight
+routes, in both themes.** Nothing changes until **640** (`sm`), and even then two
+routes — `search` and `workouts` — do not change at all, because neither has an
+`sm:` rule that alters layout.
+
+This is §10.3's `sm`/`md` cliff, measured rather than assumed: 290 `sm:` sites
+against 51 `md:` and 26 `lg:`. Per the Do Not Revisit list it is **recorded, not
+fixed** — redistributing those sites is a layout rewrite, not a restyle.
+
+#### Prediction 2 — REFUTED, in exactly one place, on purpose
+
+1024, 1280 and 1440 are identical on **seven of eight** routes. The exception is
+`/workouts/history`, which differs at both 1280 and 1440 — the `xl:text-right`
+Batch 2 added so the ledger's duration and volume become right-aligned mono
+columns (§10.1's "open ledger").
+
+So the audit was right about the pre-restyle app, and the restyle changed it in
+precisely the one place v1.0 asked for and nowhere else. **`xl:` still fires on
+one route only**; §10.1's other promises — the stat row as a single band, type
+stepping at `xl` — were deliberately not implemented, because both were measured
+to overflow (Findings 34).
+
+#### Defects found and corrected
+
+**1. The settings form collapsed to unreadable field widths at 768.** The
+two-column split (`md:grid-cols-[1fr_2fr]`) and the field rows (`sm:grid-cols-3`,
+`md:grid-cols-2`) all fired while the shell's main column was only **512px**, so
+the form ended up ~212px wide with three ~60px cells. The Weight Unit select
+rendered as **"Ki ⌄"** — its value box was 10px holding 89px of text.
+
+All four grids now step at `lg`, and the three-across weight row at `xl`:
+measured, that row needs ~179px per cell and gets 127px at 1024 but 166px at
+1280. Verified `lost: 0` at all seven widths afterwards.
+
+**This is the third instance of the same root cause** (Findings 34, 39): a
+breakpoint firing at a viewport width where the shell has not given the main
+column comparable room. `md:` means 768 viewport, which is a **512px** content
+column here.
+
+**2. `/routines` list content was unreachable behind the mobile FAB.** The
+scrolling list reserved no space for the `fixed` "+ NEW" button, so at the bottom
+of the scroll the last card sat under it at every width below `sm`. The list
+reserves 96px below `sm` now; overlap at the end of the scroll went 3 → 0.
+
+**3. The dashboard stat label was truncated at 320.** "Weekly Workouts" needed
+102px in a 100px box, so `truncate` — added in Batch 2 to prevent overflow — cost
+a letter to save 2px. It wraps instead; a caption that loses a word is worse than
+one that takes two lines.
+
+**4. `settings` first/last name row was a hard `grid-cols-2` at every width**,
+including 320. Now `grid-cols-1 sm:grid-cols-2`.
+
+#### Investigated, and NOT defects
+
+- **The "Default" radio measured 13x13px.** The probe measures the `<input>`, but
+  the input is wrapped by its `<label>`, which is **81x44px** — the real hit
+  target, and exactly the §11.6 mobile height. Confirmed the label contains the
+  input, so clicking anywhere in it toggles. No change made.
+- **The FAB overlaps list text mid-scroll.** It still does, and that is what a
+  floating action button is. The defect was content being *unreachable* at the
+  end of the list, which is fixed. Moving the action out of the viewport
+  altogether would be a layout/behavioural change, so it is reported, not fixed.
+- **171 "clipped" hits on `.sr-only`.** Screen-reader-only text is clipped to 1px
+  by design. Excluded from the analysis, noted so the next sweep does not
+  re-investigate it.
+
 ## UI Inventory
 
 ### 1. Shared primitives
@@ -1010,6 +1102,25 @@ Phase 15 with the other dead code. `progress`, `classical-loader`, `stepper`,
 through the `--ss-*` aliases, and the last three carry ~44 raw palette classes
 that v1.0 §12.4 schedules for their own pass.
 
+**Phase 9 — responsive QA.** 3 files, all corrections rather than restyling:
+
+- `app/(protected)/settings/page.tsx` — four grids stepped from `md`/`sm` to
+  `lg`/`xl`, and the name row from a hard `grid-cols-2` to `grid-cols-1
+  sm:grid-cols-2`
+- `app/(protected)/dashboard/components/StatCard.tsx` — the caption wraps
+  instead of truncating
+- `app/(protected)/routines/components/WorkoutsList.tsx` — the list reserves
+  96px below `sm` for the fixed FAB
+
+**Also in the tree, from resolving the `origin/main` merge:**
+
+- `features/workout/progression-result-dialog.tsx` — deleted, superseded
+  upstream by `session-recap.tsx`
+- `features/workout/session-recap.tsx` — new upstream component, restyled to
+  v1.0 (it was written outside the restyle and arrived fully off-palette)
+- `package-lock.json` — two optional-dependency entries added (+23/−0) to fix
+  the `npm ci` failure on CI
+
 **Phase 8 Batch 4 — menus, dropdowns, modals.** 10 files:
 
 - Primitives: `components/ui/alert-dialog.tsx` (untouched since project start),
@@ -1223,6 +1334,69 @@ One tooling decision, which the plan requires before the baseline is frozen:
   screenshots, not for functional or component testing.
 
 ## Findings
+
+### New in Phase 9
+
+**47. `md:` does not mean "a medium content column" in this shell.** Three
+separate defects now share one root cause (Findings 34, 39, and the settings form
+here): a breakpoint fires at a viewport width, but the protected layout hands its
+main column **viewport minus 256px**. At a 768 viewport that is **512px**, and at
+1024 it is 768. Every `md:`/`lg:` multi-column rule inside the shell is therefore
+one step more optimistic than it looks.
+
+The settings form was the worst case: a two-column page split *and* a
+three-column field row both firing inside 512px produced ~60px cells, and the
+Weight Unit select rendered as **"Ki"** — a 10px box holding 89px of text.
+
+**Rule for the rest of the project: when adding a multi-column rule inside the
+protected shell, budget `viewport - 256`, and verify at the breakpoint itself,
+not above it.**
+
+**48. A layout-signature diff answers "do these widths render the same" exactly.**
+Comparing per-element `display`/`flex-direction`/column-count/`font-size`/
+`position`/`text-align`, sorted, with pixel widths excluded, isolates "did a
+breakpoint rule fire" from "did the page reflow fluidly". That is what made both
+predictions answerable as facts rather than impressions.
+
+**The first attempt was wrong and looked right.** Including `<head>` and
+Next.js's dev-injected `SCRIPT`/`LINK`/`META`/`NEXTJS-PORTAL` nodes made every
+width differ, "refuting" prediction 1 in 10 route/theme pairs. The diffs were all
+injected-node churn shifting array indices. Filtering to visible content in the
+scroll container flipped the answer to a clean confirmation. **A diff over an
+unstable node set produces confident nonsense.**
+
+**49. Two of the sweep's hits were artefacts of how it measures, not defects.**
+The "Default" radio reports 13x13px, but the probe measures the `<input>` while
+the real hit target is the `<label>` wrapping it — 81x44px, exactly §11.6's
+mobile height. And `.sr-only` text reports as clipped 171 times because it is
+clipped to 1px by design.
+
+**An automated sweep needs its false-positive classes written down**, or the next
+run re-investigates them. Both are now recorded here.
+
+**50. A floating action button overlaps content; that is what it is.** The real
+defect was different and worth separating: the scrolling list reserved no space
+for it, so at the *end* of the scroll the last card was unreachable behind it.
+That is fixed. Mid-scroll overlap remains and is intrinsic — removing it means
+moving the action out of the viewport, which is a layout change, not a style one.
+Reported, not fixed, per Phase 9's scope.
+
+**51. `npm ci` failed on CI for a lock-file defect that predates the restyle.**
+`@img/sharp-wasm32` (an optional platform variant of `sharp`, pulled in by
+`next`) declares `@emnapi/runtime@^1.11.3`, and npm on Windows resolves the
+native win32 binary and never writes the wasm32 branch's dependencies into the
+lock. `npm ci` on Linux validates every platform and fails with EUSAGE.
+
+`HEAD`, `origin/main` and the merged index all lacked the entries, so this would
+have failed for anyone on any push. Fixed by adding the two entries with
+integrity hashes taken verbatim from the registry (+23/−0, insert-only).
+
+Two approaches that did **not** work, recorded so they are not retried:
+`npm install --package-lock-only` reproduces the same platform-blind resolution;
+deleting and regenerating the lock drifted the tree (`npm ci --dry-run` then
+reported "added 2, removed 4"). **`npm ci --dry-run` on Windows cannot reproduce
+the failure** — it does not validate the Linux-only branch — so CI is the only
+real confirmation.
 
 ### New in Phase 8 Batch 4
 
@@ -1734,6 +1908,15 @@ The four that shaped Phase 2 and 3:
   Same `.next/`; the running server then 500s on every route and the app goes
   black in a way that looks like an auth bug.
 
+- **Budget `viewport - 256` for any multi-column rule inside the protected
+  shell** (Findings 47). `md:` fires at a 768 viewport, where the main column is
+  512px. This has now caused three separate defects.
+- **The sweep has two known false-positive classes** (Findings 49): `.sr-only`
+  text always reports as clipped, and a bare `<input type=radio>` reports a small
+  target when its wrapping `<label>` is the real one. Do not re-investigate them.
+- **`npm ci` cannot be validated from Windows** (Findings 51). `npm ci --dry-run`
+  does not check the Linux-only optional-dependency branch, so a green local run
+  proves nothing about CI.
 - **Five silent-failure instances found so far** — `xs:`, `honour-bright` x2,
   `slide-in-bottom`, and a `group-hover:` with no `group` ancestor (Findings 43).
   Four emitted nothing; the fifth emitted valid CSS that could never match. Check
@@ -1811,6 +1994,13 @@ The four that shaped Phase 2 and 3:
   Five files still read them. An undefined custom property is invalid at
   computed-value time and fails silently. They are aliased to v1.0 roles until
   Phase 8 clears the last consumer.
+- **The `sm`/`md` cliff, now measured.** 320/375/390/430 are byte-identical on
+  all eight routes, both themes; nothing changes until 640 (Phase 9). §10.3 says
+  record it, not fix it — it is recorded.
+- **`truncate` on the dashboard stat caption.** It cost a letter to save 2px at
+  320. It wraps.
+- **Settings grids at `md`/`sm`.** They produced ~60px field cells at a 768
+  viewport (Findings 47). They step at `lg`, and the weight row at `xl`.
 - **Tinting an overlay by variant.** The toast's five coloured cards were five
   surfaces for one component (Findings 45). Variants change a `.mark`, not the
   surface.
@@ -1853,64 +2043,63 @@ The four that shaped Phase 2 and 3:
 
 ## Next Task
 
-**Phase 9 — Responsive QA.** Phase 8 is complete: all four batches are landed and
-verified. Phase 9 is a verification phase, not an implementation one — correct UI
-issues only, and do not open new design decisions.
+**Phase 10 — Motion.** Two halves per the plan: a proposal (Qwen 3.8 Max) over
+the finished static UI, then implementation.
 
-Verify at **320 / 375 / 390 / 430 / 768 / 1024 / 1280 / 1440**, both themes,
-across every route plus the overlay states, checking: horizontal overflow,
-element overlap, clipped content, text wrapping, grid behaviour, navigation,
-touch targets, section spacing, modal sizing, dropdown positioning, image
-scaling, and breakpoint transitions.
+Most of the groundwork is already in place and should not be re-decided:
 
-**What the four batches already measured**, so Phase 9 starts from evidence
-rather than from zero:
+- **The tokens exist and are verified working**: `--motion-fast` 120ms,
+  `--motion-base` 200ms, `--motion-slow` 300ms as plain custom properties
+  consumed via `duration-[var(--motion-*)]`, and `--ease-standard` /
+  `--ease-exit` as real Tailwind v4 namespace entries (§9.5). Phase 4 measured
+  them on rendered nodes.
+- **§9.2's prohibitions have been applied through all four batches**: no
+  page-level entrance animation, no scale on hover or press, no fade-up per
+  section, no animated gradients. Phase 10 must not reintroduce any of them.
+- **§9.1 names the two signature motions and neither is built yet**: the rule
+  draw (a region's heading rule scaling in on X over 240ms) and set completion
+  (the left mark filling top to bottom over 300ms). These are the actual work.
+- **§9.3** requires both signatures to collapse to an instant colour change under
+  `prefers-reduced-motion`; the global reduced-motion block in `globals.css`
+  already clamps durations, so verify rather than re-add.
+- **§9.4**: the session screen re-renders broadly (no `React.memo`,
+  `groupSetLogsByExercise` rebuilds every object per call), so animate it with
+  CSS, not JS.
 
-- No horizontal overflow at all eight widths, both themes, on the dashboard,
-  routines, history, workouts, search, settings, `/routines/new`, the open filter
-  panel, the open dropdown and the open dialog.
-- Two overflow defects were found and fixed at **768 specifically** (Findings 34,
-  39), both caused by a column count or a layout switch sharing a breakpoint with
-  a type step. **768 is this app's worst case**, because the shell gives its main
-  column only 512px there.
+**Known open items:**
 
-**Expect Phase 9 to find 320–639 rendering identically.** That is the §10.3
-`sm`/`md` cliff — 290 `sm:` sites against 51 `md:`. **Record it, do not fix it**;
-redistributing those sites is a layout rewrite, not a restyle.
-
-**Known open items to carry into Phase 9 and beyond:**
-
-- `npm run typecheck` is red on nine `@sunsteel/contracts` export errors from
-  `aaaace9` (Findings 32). Publish and bump the package; `npm run verify` cannot
-  pass until then.
-- **No production build has run against any of the four batches.** The owner's
-  dev server is up and the two share `.next/`. Either stop it once for
-  `npm run verify`, or require a clean CI build — the compiled-stylesheet check
-  at `.next/static/css/*.css` has been outstanding since Phase 7.
+- **Nothing is committed.** The `origin/main` merge, all four Phase 8 batches,
+  Phase 9's corrections, the `session-recap` restyle and the lock fix are all
+  staged/working-tree changes.
+- **CI has not been re-run since the lock fix** (Findings 51). It cannot be
+  validated from Windows; the next push is the confirmation.
 - Commit `docs/ui-restyle/screenshots/before/` (17 MB + 6 `session-full` images).
 - **Build the component/state captures** from `ui-restyle/capture-manifest.md`,
   and give the harness a precondition check for an active session (Findings 46).
-  Batch 3 and Batch 4 each had to script their own; Phase 12 will need all of
-  them.
-- **Not covered by any Phase 8 batch**, and still off-palette: the two auth
-  screens (§12.4 calls them a self-contained batch), the profile page,
-  `InitialLoadAnimation`, `PerformanceDebugPanel`.
+  Phase 12 will need all of them; Batches 3 and 4 each had to script their own.
+- **Not covered by any batch, still off-palette**: the two auth screens (§12.4
+  calls them a self-contained batch), the profile page, `InitialLoadAnimation`,
+  `PerformanceDebugPanel`.
 - `session-action-card.tsx` still references `honour-bright`, which is not a
   token (Findings 36). The session screen is §14 work.
 - `.ledger-page` still has zero consumers; §10's container widths are unapplied.
 - Deletion candidates for Phase 15, six: `popover`, `alert`, `OrnateCorners`,
   `HeroBackdrop`, `HeroCard`, `WorkoutItem`.
 - The session screen's composition gaps (v1.0 §14) are still open.
+- **Reported, not fixed** (Phase 9 scope): the mobile FAB overlaps list content
+  mid-scroll. Content is reachable — the list reserves space at the end — but
+  removing the overlap entirely means relocating the action, which is a layout
+  change (Findings 50).
 
 **Gates, every phase:**
 
 1. **Check the served stylesheet right after any git operation on
    `globals.css`** — not at the end (Findings 33).
 2. Contrast re-measured in the browser; both themes. Rasterise the computed
-   `oklch()` through a canvas — parsing `getComputedStyle().color` as RGB
-   silently produces nonsense (Findings 37).
-3. No horizontal overflow at the eight widths. Check just *above* a shared
-   breakpoint, not only the extremes (Findings 34, 39).
+   `oklch()` through a canvas (Findings 37).
+3. No horizontal overflow at 320/375/390/430/768/1024/1280/1440. Budget
+   `viewport - 256` inside the shell and check at the breakpoint itself
+   (Findings 47).
 4. `npm run ui:capture:after`, compared against `before/`, with no active
    session (Findings 46). The sweep cannot see §10.2 violations.
 5. `npm run verify` only with the dev server stopped.

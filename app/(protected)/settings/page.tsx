@@ -235,7 +235,7 @@ export default function SettingsPage() {
 				</p>
 			</div>
 
-			<div className="grid items-start gap-6 md:grid-cols-[1fr_2fr]">
+			<div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
 				<Card>
 					<CardHeader>
 						<CardTitle>Profile Picture</CardTitle>
@@ -283,7 +283,7 @@ export default function SettingsPage() {
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleSubmit} className="space-y-4">
-							<div className="grid grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div className="space-y-2">
 									<Label htmlFor="name">First Name</Label>
 									<Input
@@ -316,7 +316,7 @@ export default function SettingsPage() {
 								/>
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 								<div className="space-y-2">
 									<Label htmlFor="age">Age</Label>
 									<Input
@@ -348,7 +348,7 @@ export default function SettingsPage() {
 								</div>
 							</div>
 
-							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
 								<div className="space-y-2">
 									<Label htmlFor="weight">
 										Weight ({formData.weightUnit === 'LB' ? 'lb' : 'kg'})
