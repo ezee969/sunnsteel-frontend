@@ -34,6 +34,16 @@ interface PrivacyField {
 
 const PRIVACY_FIELDS: PrivacyField[] = [
 	{
+		key: 'biography',
+		label: 'Biography',
+		description: 'Controls the biography shown in the About section.',
+	},
+	{
+		key: 'location',
+		label: 'Location',
+		description: 'Controls the location shown in the About section.',
+	},
+	{
 		key: 'workoutHistory',
 		label: 'Workout history',
 		description:

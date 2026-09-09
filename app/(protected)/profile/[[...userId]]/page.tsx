@@ -6,6 +6,7 @@ import {
 	CalendarDays,
 	Dumbbell,
 	Flame,
+	MapPin,
 	Share2,
 	Trophy,
 	UserMinus,
@@ -133,6 +134,10 @@ export default function ProfilePage() {
 		: (publicUser!.personalRecords ?? [])
 	const canViewBodyMetrics =
 		isOwnProfile || publicUser!.viewerAccess.bodyMetrics
+	const canViewBiography = isOwnProfile || publicUser!.viewerAccess.biography
+	const biography = isOwnProfile ? viewer.bio : publicUser!.bio
+	const canViewLocation = isOwnProfile || publicUser!.viewerAccess.location
+	const location = isOwnProfile ? viewer.location : publicUser!.location
 	const bodyMetrics = isOwnProfile
 		? {
 				age: viewer.age,
@@ -266,14 +271,22 @@ export default function ProfilePage() {
 						<h2 className="text-xl font-semibold heading-classical flex items-center gap-2">
 							<User className="h-5 w-5 text-primary" /> About
 						</h2>
-						{/* FIX-01: this block used to state the same invented biography and
-						location ("San Francisco, CA") for every user, on other people's
-						profiles too. Neither UserProfile nor PublicUserProfile carries a bio
-						or location field, so there is nothing real to render yet. PROF-04
-						adds the editable fields and their per-field visibility. */}
-						<p className="text-muted-foreground text-sm leading-relaxed">
-							No bio yet.
+						<p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+							{!canViewBiography
+								? 'Biography is private.'
+								: biography || 'No bio yet.'}
 						</p>
+						<div className="flex items-start gap-2 text-sm text-muted-foreground">
+							<MapPin
+								className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+								aria-hidden
+							/>
+							<span>
+								{!canViewLocation
+									? 'Location is private.'
+									: location || 'No location added yet.'}
+							</span>
+						</div>
 					</div>
 
 					<div className="space-y-4">

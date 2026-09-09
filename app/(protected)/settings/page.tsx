@@ -1,6 +1,10 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
+import {
+	PROFILE_BIO_MAX_LENGTH,
+	PROFILE_LOCATION_MAX_LENGTH,
+	type WeightUnit,
+} from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
@@ -23,6 +27,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
@@ -40,6 +45,8 @@ interface SettingsFormData {
 	username: string
 	name: string
 	lastName: string
+	bio: string
+	location: string
 	age: string
 	sex: string
 	weight: string
@@ -56,6 +63,8 @@ export default function SettingsPage() {
 		username: '',
 		name: '',
 		lastName: '',
+		bio: '',
+		location: '',
 		age: '',
 		sex: '',
 		weight: '',
@@ -75,6 +84,8 @@ export default function SettingsPage() {
 				username: user.username || '',
 				name: user.name || '',
 				lastName: user.lastName || '',
+				bio: user.bio || '',
+				location: user.location || '',
 				age: user.age ? String(user.age) : '',
 				sex: user.sex || '',
 				weight: formatWeightInput(user.weight, user.weightUnit),
@@ -85,7 +96,9 @@ export default function SettingsPage() {
 		}
 	}, [user])
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+	) => {
 		const value =
 			e.target.name === 'username'
 				? e.target.value.replace(/^@/, '').toLowerCase()
@@ -212,6 +225,8 @@ export default function SettingsPage() {
 				username: normalizeUsername(formData.username),
 				name: formData.name,
 				lastName: formData.lastName || null,
+				bio: formData.bio || null,
+				location: formData.location || null,
 				age: formData.age ? parseInt(formData.age, 10) : null,
 				sex: formData.sex ? (formData.sex as 'MALE' | 'FEMALE') : null,
 				weight: weightKg,
@@ -373,6 +388,48 @@ export default function SettingsPage() {
 									disabled
 									className="cursor-not-allowed"
 								/>
+							</div>
+
+							<div className="space-y-2">
+								<div className="flex items-baseline justify-between gap-3">
+									<Label htmlFor="location">Location</Label>
+									<span className="type-data text-xs text-ink-3">
+										{formData.location.length}/{PROFILE_LOCATION_MAX_LENGTH}
+									</span>
+								</div>
+								<Input
+									id="location"
+									name="location"
+									value={formData.location}
+									onChange={handleInputChange}
+									maxLength={PROFILE_LOCATION_MAX_LENGTH}
+									placeholder="City, country"
+									autoComplete="address-level2"
+								/>
+								<p className="type-body-sm text-ink-3">
+									Optional. Control who sees it under Profile Privacy.
+								</p>
+							</div>
+
+							<div className="space-y-2">
+								<div className="flex items-baseline justify-between gap-3">
+									<Label htmlFor="bio">Biography</Label>
+									<span className="type-data text-xs text-ink-3">
+										{formData.bio.length}/{PROFILE_BIO_MAX_LENGTH}
+									</span>
+								</div>
+								<Textarea
+									id="bio"
+									name="bio"
+									value={formData.bio}
+									onChange={handleInputChange}
+									maxLength={PROFILE_BIO_MAX_LENGTH}
+									placeholder="Tell people about your training."
+									className="min-h-28 resize-y"
+								/>
+								<p className="type-body-sm text-ink-3">
+									Optional. Line breaks are preserved on your profile.
+								</p>
 							</div>
 
 							<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
