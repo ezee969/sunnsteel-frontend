@@ -67,9 +67,7 @@ export function ExerciseNoteRow({
 							onClick={handleOpen}
 						>
 							<FileText
-								className={`h-4 w-4 ${
-									note ? 'text-yellow-500' : 'text-muted-foreground'
-								}`}
+								className={`h-4 w-4 ${note ? 'text-foreground' : 'text-ink-3'}`}
 							/>
 							{note && (
 								<span className="absolute top-0 right-0">

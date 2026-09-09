@@ -5,31 +5,33 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-type ProgressProps = React.ComponentProps<typeof ProgressPrimitive.Root> & {
-	variant?: 'gold'
-}
+type ProgressProps = React.ComponentProps<typeof ProgressPrimitive.Root>
 
-function Progress({ className, value, variant, ...props }: ProgressProps) {
+/**
+ * A square progress track.
+ *
+ * The `gold` variant is retired with the last of the `--ss-*` aliases (v1.0
+ * §11.3): its gradient fill broke §4.3 rule 6, and gold marked ordinary
+ * progress rather than something earned (rule 3). Its only consumer was the
+ * dashboard stat tile, converted in the same batch.
+ *
+ * The track is a well and the bar is square — nothing in this direction is a
+ * pill (§7). Call sites re-colour the indicator through the
+ * `[&_[data-slot=progress-indicator]]` hook.
+ */
+function Progress({ className, value, ...props }: ProgressProps) {
 	return (
 		<ProgressPrimitive.Root
 			data-slot="progress"
 			className={cn(
-				'relative h-2 w-full overflow-hidden rounded-full',
-				variant === 'gold'
-					? 'bg-[rgba(218,165,32,0.18)] dark:bg-[rgba(255,215,0,0.2)]'
-					: 'bg-primary/20',
+				'relative h-2 w-full overflow-hidden rounded-none bg-surface-sunk',
 				className,
 			)}
 			{...props}
 		>
 			<ProgressPrimitive.Indicator
 				data-slot="progress-indicator"
-				className={cn(
-					'h-full w-full flex-1 transition-all',
-					variant === 'gold'
-						? 'bg-[linear-gradient(to_right,var(--ss-gold),var(--ss-gold-2))]'
-						: 'bg-primary',
-				)}
+				className="h-full w-full flex-1 bg-primary transition-transform duration-[var(--motion-slow)] ease-standard"
 				style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
 			/>
 		</ProgressPrimitive.Root>

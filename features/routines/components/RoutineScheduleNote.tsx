@@ -32,13 +32,18 @@ export function RoutineScheduleNote({
 	nextDay,
 	className,
 }: RoutineScheduleNoteProps) {
-	const { Icon, label, value, tone } = (() => {
+	// v1.0 §4.3: completion is `--success` and nothing else; "today" is neither
+	// completion nor honour, so it is emphasised with ink rather than gold. A
+	// routine with no training days is a risk, and warning has no text grade
+	// (rule 4) — the glyph carries `--warning-strong`, the words stay in ink.
+	const { Icon, label, value, iconTone, valueTone } = (() => {
 		if (isCompleted) {
 			return {
 				Icon: ListChecks,
 				label: 'Status',
 				value: 'Completed',
-				tone: 'text-emerald-600 dark:text-emerald-500',
+				iconTone: 'text-success',
+				valueTone: 'text-success',
 			}
 		}
 		if (!nextDay) {
@@ -46,32 +51,34 @@ export function RoutineScheduleNote({
 				Icon: CircleAlert,
 				label: 'Schedule',
 				value: 'No training days',
-				tone: 'text-muted-foreground',
+				iconTone: 'text-warning-strong',
+				valueTone: 'text-ink-2',
 			}
 		}
 		return {
 			Icon: CalendarDays,
 			label: 'Next session',
 			value: describeDaysAway(nextDay.dayOfWeek, nextDay.daysAway),
-			tone:
-				nextDay.daysAway === 0
-					? 'text-amber-600 dark:text-amber-400'
-					: 'text-foreground/80',
+			iconTone: 'text-ink-3',
+			valueTone: nextDay.daysAway === 0 ? 'text-foreground' : 'text-ink-2',
 		}
 	})()
 
 	return (
 		<div
 			className={cn(
-				'flex items-center justify-between gap-2 text-xs text-muted-foreground',
+				'flex items-center justify-between gap-2 text-ink-3',
 				className,
 			)}
 		>
-			<span className="flex items-center gap-1.5">
-				<Icon className={cn('h-3.5 w-3.5 flex-shrink-0', tone)} aria-hidden />
+			<span className="type-body-sm flex items-center gap-1.5">
+				<Icon
+					className={cn('h-3.5 w-3.5 flex-shrink-0', iconTone)}
+					aria-hidden
+				/>
 				<span>{label}</span>
 			</span>
-			<span className={cn('font-medium', tone)}>{value}</span>
+			<span className={cn('type-data', valueTone)}>{value}</span>
 		</div>
 	)
 }

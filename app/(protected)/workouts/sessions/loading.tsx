@@ -1,6 +1,5 @@
 import { Play, Square } from 'lucide-react'
 
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -9,15 +8,10 @@ export default function WorkoutSessionLoading() {
 	return (
 		<div className="space-y-6">
 			{/* Hero Section */}
-			<HeroBackdrop
-				src="/backgrounds/vertical-hero-greek-columns.webp"
-				className="h-20 mb-6"
-			>
-				<div className="flex flex-col items-center justify-center h-full text-center">
-					<Skeleton className="h-6 w-40 mb-1" />
-					<Skeleton className="h-4 w-32" />
-				</div>
-			</HeroBackdrop>
+			<div className="rule-heading pb-4">
+				<Skeleton className="mb-2 h-8 w-48" />
+				<Skeleton className="h-4 w-64" />
+			</div>
 
 			{/* Session Header */}
 			<div className="text-center space-y-2">

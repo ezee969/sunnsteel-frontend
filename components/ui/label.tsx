@@ -13,7 +13,9 @@ function Label({
 		<LabelPrimitive.Root
 			data-slot="label"
 			className={cn(
-				'flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+				// §11.6: field labels sit above the field in the body-small rank,
+				// not as tracked micro-caps - those are region captions only (§5.3).
+				'type-body-sm flex items-center gap-2 leading-none text-ink-3 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:text-ink-3 peer-disabled:cursor-not-allowed peer-disabled:text-ink-3',
 				className,
 			)}
 			{...props}

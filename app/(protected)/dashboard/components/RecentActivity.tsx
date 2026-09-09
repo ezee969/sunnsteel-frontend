@@ -4,7 +4,6 @@ import { Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -23,16 +22,17 @@ export default function RecentActivity() {
 	const entries = data?.recentActivity ?? []
 
 	return (
-		<Card className="border-border/40">
-			<CardHeader className="pb-3">
-				<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-					<Activity className="h-4 w-4 text-primary" aria-hidden />
-					Recent Activity
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
+		// §11.5 — `ruled` is the default for a list: no fill, no box, a section
+		// heading over a rule with `.rule-row` between items. This was a card
+		// containing cards.
+		<section>
+			<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+				<Activity className="h-4 w-4 text-ink-3" aria-hidden />
+				Recent Activity
+			</h2>
+			<div className="pt-1">
 				{entries.length === 0 ? (
-					<p className="text-muted-foreground text-sm">
+					<p className="type-body-sm py-3 text-ink-3">
 						Finished workouts will appear here.
 					</p>
 				) : (
@@ -40,7 +40,7 @@ export default function RecentActivity() {
 						<button
 							key={entry.sessionId}
 							type="button"
-							className="w-full text-left"
+							className="block w-full text-left transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface"
 							onClick={() =>
 								router.push(`/workouts/sessions/${entry.sessionId}`)
 							}
@@ -49,7 +49,7 @@ export default function RecentActivity() {
 								icon={
 									<ClassicalIcon
 										name="two-dumbbells"
-										className="h-5 w-5"
+										className="h-4 w-4"
 										aria-hidden
 									/>
 								}
@@ -67,7 +67,7 @@ export default function RecentActivity() {
 						</button>
 					))
 				)}
-			</CardContent>
-		</Card>
+			</div>
+		</section>
 	)
 }

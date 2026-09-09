@@ -42,7 +42,7 @@ export function ProgressionResultDialog({
 				showCloseButton={false}
 			>
 				<DialogHeader>
-					<div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 sm:mx-0">
+					<div className="flex size-10 items-center justify-center rounded-sm bg-surface-sunk text-success">
 						<TrendingUp className="size-6" aria-hidden="true" />
 					</div>
 					<DialogTitle>Progression applied</DialogTitle>
@@ -56,11 +56,13 @@ export function ProgressionResultDialog({
 					{changes.map(change => (
 						<section
 							key={change.routineExerciseId}
-							className="space-y-3 rounded-lg border bg-muted/30 p-4"
+							className="space-y-3 rounded-none border border-rule-faint bg-surface-sunk p-4"
 						>
 							<div>
-								<h3 className="font-semibold">{change.exerciseName}</h3>
-								<p className="mt-1 text-sm text-muted-foreground">
+								<h3 className="type-panel text-foreground">
+									{change.exerciseName}
+								</h3>
+								<p className="type-body-sm mt-1 text-ink-3">
 									{getProgressionRuleExplanation(change, weightUnit)}
 								</p>
 							</div>
@@ -73,15 +75,17 @@ export function ProgressionResultDialog({
 									return (
 										<li
 											key={set.setNumber}
-											className="flex items-center justify-between gap-4 rounded-md bg-background px-3 py-2 text-sm"
+											className="flex items-center justify-between gap-4 rounded-none bg-background px-3 py-2"
 										>
 											<div>
-												<p className="font-medium">{presentation.setLabel}</p>
-												<p className="text-xs text-muted-foreground">
+												<p className="type-body-sm text-foreground">
+													{presentation.setLabel}
+												</p>
+												<p className="type-body-sm text-ink-3">
 													{presentation.repsLabel}
 												</p>
 											</div>
-											<span className="font-semibold text-emerald-700 dark:text-emerald-300">
+											<span className="type-data type-data-strong text-honour">
 												{presentation.weightLabel}
 											</span>
 										</li>

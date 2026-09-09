@@ -1,72 +1,46 @@
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function WorkoutHistoryLoading() {
 	return (
-		<div className="space-y-6">
-			{/* Hero Section */}
-			<HeroBackdrop
-				src="/backgrounds/vertical-hero-greek-columns.webp"
-				className="h-24 mb-8"
-			>
-				<div className="flex flex-col items-center justify-center h-full text-center">
-					<Skeleton className="h-8 w-56 mb-2" />
-					<Skeleton className="h-4 w-72" />
-				</div>
-			</HeroBackdrop>
-
-			{/* Filters */}
-			<div className="flex flex-wrap gap-2 mb-6">
-				<Skeleton className="h-10 w-32" />
-				<Skeleton className="h-10 w-28" />
-				<Skeleton className="h-10 w-24" />
-				<Skeleton className="h-10 w-36" />
+		<div className="mx-auto max-w-3xl space-y-6 p-4">
+			{/* Masthead */}
+			<div className="rule-heading pb-4">
+				<Skeleton className="mb-2 h-8 w-48" />
+				<Skeleton className="h-4 w-64" />
 			</div>
 
-			{/* Session History List */}
-			<div className="space-y-4">
+			{/* Section heading + filter control */}
+			<div className="rule-heading flex items-end justify-between gap-2 pb-2">
+				<div className="space-y-2">
+					<Skeleton className="h-5 w-40" />
+					<Skeleton className="h-3 w-56" />
+				</div>
+				<Skeleton className="h-9 w-20" />
+			</div>
+
+			{/* The session ledger: ruled rows, matching what loads (§11.5) */}
+			<div className="border-t border-rule">
 				{Array.from({ length: 8 }).map((_, i) => (
-					<Card key={i}>
-						<CardHeader className="pb-3">
-							<div className="flex items-start justify-between">
-								<div className="flex-1">
-									<Skeleton className="h-5 w-48 mb-2" />
-									<div className="flex gap-4 text-sm text-muted-foreground">
-										<Skeleton className="h-4 w-20" />
-										<Skeleton className="h-4 w-16" />
-										<Skeleton className="h-4 w-24" />
-									</div>
+					<div key={i} className="rule-row py-3 pl-3 pr-1">
+						<div className="flex items-baseline justify-between gap-4">
+							<Skeleton className="h-4 w-56 max-w-full" />
+							<Skeleton className="h-3 w-20 shrink-0" />
+						</div>
+						<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
+							{Array.from({ length: 4 }).map((__, j) => (
+								<div key={j} className="space-y-1">
+									<Skeleton className="h-3 w-16" />
+									<Skeleton className="h-3 w-24 max-w-full" />
 								</div>
-								<Skeleton className="h-6 w-20" />
-							</div>
-						</CardHeader>
-						<CardContent className="pt-0">
-							<div className="flex items-center justify-between">
-								<div className="flex gap-6">
-									<div className="text-center">
-										<Skeleton className="h-6 w-8 mb-1" />
-										<Skeleton className="h-3 w-12" />
-									</div>
-									<div className="text-center">
-										<Skeleton className="h-6 w-12 mb-1" />
-										<Skeleton className="h-3 w-16" />
-									</div>
-									<div className="text-center">
-										<Skeleton className="h-6 w-10 mb-1" />
-										<Skeleton className="h-3 w-14" />
-									</div>
-								</div>
-								<Skeleton className="h-8 w-20" />
-							</div>
-						</CardContent>
-					</Card>
+							))}
+						</div>
+					</div>
 				))}
 			</div>
 
-			{/* Load More */}
-			<div className="text-center pt-4">
-				<Skeleton className="h-10 w-32 mx-auto" />
+			{/* Load more */}
+			<div className="pt-4 text-center">
+				<Skeleton className="mx-auto h-10 w-32" />
 			</div>
 		</div>
 	)

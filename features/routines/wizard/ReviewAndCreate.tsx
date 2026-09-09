@@ -69,7 +69,7 @@ export function ReviewAndCreate({
 				<AccordionItem value="item-1">
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
-							<CheckCircle className="h-5 w-5 text-green-500" />
+							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
 							Basic Information
 						</span>
 					</AccordionTrigger>
@@ -94,7 +94,7 @@ export function ReviewAndCreate({
 				<AccordionItem value="item-2">
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
-							<CheckCircle className="h-5 w-5 text-green-500" />
+							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
 							Training Schedule
 						</span>
 					</AccordionTrigger>
@@ -115,7 +115,7 @@ export function ReviewAndCreate({
 				<AccordionItem value="item-3">
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
-							<CheckCircle className="h-5 w-5 text-green-500" />
+							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
 							Workout Details
 						</span>
 					</AccordionTrigger>
@@ -139,7 +139,7 @@ export function ReviewAndCreate({
 					onClick={submit}
 					disabled={isLoading}
 					className="w-full sm:w-auto"
-					variant="classical"
+					variant="default"
 				>
 					{isLoading ? (
 						<>

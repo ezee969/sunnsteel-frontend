@@ -1,20 +1,13 @@
-import HeroBackdrop from '@/components/backgrounds/HeroBackdrop'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function RoutinesLoading() {
 	return (
-		<div className="space-y-6">
-			{/* Hero Section */}
-			<HeroBackdrop
-				src="/backgrounds/vertical-hero-greek-columns.webp"
-				className="h-24 mb-8"
-			>
-				<div className="flex flex-col items-center justify-center h-full text-center">
-					<Skeleton className="h-8 w-48 mb-2" />
-					<Skeleton className="h-4 w-64" />
-				</div>
-			</HeroBackdrop>
+		<div className="flex flex-col gap-6 sm:gap-8">
+			{/* Masthead */}
+			<div className="rule-heading pb-4">
+				<Skeleton className="mb-2 h-8 w-48" />
+				<Skeleton className="h-4 w-64" />
+			</div>
 
 			{/* Filters */}
 			<div className="flex flex-wrap gap-2">
@@ -24,33 +17,28 @@ export default function RoutinesLoading() {
 				<Skeleton className="h-10 w-32" />
 			</div>
 
-			{/* Routines Grid */}
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{/* The routines ledger: ruled rows, matching what loads (§11.5) */}
+			<div className="border-t border-rule">
 				{Array.from({ length: 6 }).map((_, i) => (
-					<Card key={i} className="h-48">
-						<CardHeader className="pb-2">
-							<div className="flex items-start justify-between">
-								<div className="flex-1">
-									<Skeleton className="h-5 w-3/4 mb-2" />
-									<Skeleton className="h-4 w-full mb-1" />
-									<Skeleton className="h-4 w-2/3" />
-								</div>
-								<div className="flex gap-2">
-									<Skeleton className="h-8 w-8 rounded" />
-									<Skeleton className="h-8 w-8 rounded" />
-								</div>
+					<div key={i} className="rule-row py-3 pl-3 pr-1 sm:pl-4">
+						<div className="flex items-start justify-between gap-2">
+							<div className="min-w-0 flex-1 space-y-2">
+								<Skeleton className="h-4 w-40" />
+								<Skeleton className="h-3 w-60 max-w-full" />
+								<Skeleton className="h-3 w-28" />
 							</div>
-						</CardHeader>
-						<CardContent className="pt-2">
-							<div className="flex items-center justify-between">
-								<div className="flex gap-2">
-									<Skeleton className="h-6 w-16" />
-									<Skeleton className="h-6 w-20" />
-								</div>
-								<Skeleton className="h-8 w-20" />
+							<Skeleton className="size-9 shrink-0" />
+						</div>
+						<div className="mt-2 space-y-2">
+							<Skeleton className="h-3 w-32" />
+							<Skeleton className="h-3 w-full" />
+							<div className="flex items-center gap-1.5 pt-1">
+								<Skeleton className="h-9 w-[120px]" />
+								<Skeleton className="size-9" />
+								<Skeleton className="size-9" />
 							</div>
-						</CardContent>
-					</Card>
+						</div>
+					</div>
 				))}
 			</div>
 		</div>

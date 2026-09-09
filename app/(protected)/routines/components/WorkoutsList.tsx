@@ -61,7 +61,9 @@ export default function WorkoutsList({
 	}
 
 	if (error) {
-		return <p className="text-destructive">Error: {error.message}</p>
+		return (
+			<p className="type-body-sm text-destructive">Error: {error.message}</p>
+		)
 	}
 
 	const displayedRoutines = routines ?? []
@@ -77,7 +79,10 @@ export default function WorkoutsList({
 	return (
 		<div className="flex min-h-0 flex-1 h-full flex-col">
 			<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-				<div className="grid gap-3 px-1 pb-4 sm:gap-4 sm:pr-4 sm:pl-0">
+				{/* §11.5 — one ruled ledger, not a stack of boxes. The rules come
+				    from each row's `.rule-row`, so the gap that used to separate
+				    the cards is gone. */}
+				<div className="border-t border-rule pb-4 sm:pr-4">
 					{displayedRoutines.map(routine => {
 						const isActiveRoutine =
 							activeSession?.status === 'IN_PROGRESS' &&
@@ -123,7 +128,7 @@ export default function WorkoutsList({
 						<AlertDialogAction
 							onClick={handleConfirmDelete}
 							disabled={isDeleting}
-							className="bg-destructive  hover:bg-destructive/90"
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
 							{isDeleting ? (
 								<>

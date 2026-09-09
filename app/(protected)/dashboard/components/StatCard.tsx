@@ -1,6 +1,5 @@
 import { ReactNode } from 'react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 
 interface StatCardProps {
@@ -15,6 +14,20 @@ interface StatCardProps {
 	additionalText?: string
 }
 
+/**
+ * One cell of the dashboard's ruled stat band.
+ *
+ * v1.0 §4.3 rule 3 caps honour at two marks per viewport and reserves it for
+ * "better than planned". This tile used to carry a gold header pill and a gold
+ * progress bar, so six ordinary numbers were marked as achievements — the
+ * clearest remaining QA 4 violation. A milestone bar is progress, not honour,
+ * so the bar is a hairline in `--ink-2` on a `--surface-sunk` track and nothing
+ * on this row is gold.
+ *
+ * The card box is gone with it: §11.5 makes `ruled` the default and §10.1 turns
+ * the stat row into one ruled band. The cell paints its own ground so the 1px
+ * grid lines come from the container's gap.
+ */
 export default function StatCard({
 	icon,
 	title,
@@ -27,49 +40,43 @@ export default function StatCard({
 	additionalText,
 }: StatCardProps) {
 	return (
-		<Card className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all">
-			<CardHeader className="pb-1 sm:pb-2 p-3 sm:p-6">
-				<CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-					<div className="rounded-full flex items-center gap-2 p-1.5 sm:p-2 text-[color:var(--ss-gold)] dark:text-[color:var(--ss-gold-2)] bg-gradient-to-br from-[rgba(218,165,32,0.15)] to-transparent ring-1 ring-[rgba(218,165,32,0.35)] dark:ring-[rgba(255,215,0,0.35)]">
-						{icon} {title}
+		<div className="flex min-w-0 flex-col gap-2 bg-background px-3 py-4 sm:px-4 sm:py-5">
+			<div className="flex min-w-0 items-center gap-2 text-ink-3">
+				{icon}
+				<span className="type-label truncate">{title}</span>
+			</div>
+
+			{/* Wraps: the unit drops below the value rather than pushing it past
+			    the cell when a figure runs long. */}
+			<div className="flex flex-wrap items-baseline gap-x-1.5">
+				<span className="type-numeral text-foreground">{value}</span>
+				{unit && <span className="type-data text-ink-3">{unit}</span>}
+			</div>
+
+			{subtitle && (
+				<p className="type-body-sm hidden text-ink-3 sm:block">{subtitle}</p>
+			)}
+
+			{progress !== undefined && (
+				<div className="mt-auto flex flex-col gap-1 pt-1">
+					{/* The Radix primitive stays: it carries the progressbar role and
+					    value, which a plain div would drop. */}
+					{/* The track is `--rule-faint`, not the primitive's `--surface-sunk`:
+					    a sunken well is nearly invisible against `--background`, which
+					    is the ground this cell paints, so a full bar read as a rule. */}
+					<Progress
+						value={progress}
+						max={progressMax}
+						className="h-1 bg-rule-faint [&_[data-slot=progress-indicator]]:bg-ink-2"
+					/>
+					<div className="flex flex-wrap items-baseline justify-between gap-x-2">
+						<span className="type-body-sm text-ink-3">{progressText}</span>
+						{additionalText && (
+							<span className="type-body-sm text-ink-3">{additionalText}</span>
+						)}
 					</div>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-				<div className="flex items-baseline gap-1">
-					<div className="text-xl sm:text-3xl font-bold heading-classical">
-						{value}
-					</div>
-					{unit && (
-						<div className="text-xs sm:text-sm text-muted-foreground">
-							{unit}
-						</div>
-					)}
 				</div>
-				{subtitle && (
-					<p className="text-xs text-muted-foreground mt-1 hidden sm:block">
-						{subtitle}
-					</p>
-				)}
-				{progress !== undefined && (
-					<div className="mt-2 sm:mt-3">
-						<Progress
-							value={progress}
-							max={progressMax}
-							variant="gold"
-							className="h-1.5 sm:h-2"
-						/>
-						<div className="mt-1 flex justify-between text-[10px] sm:text-xs">
-							<span className="text-muted-foreground">{progressText}</span>
-							{additionalText && (
-								<span className="text-[color:var(--ss-gold)] dark:text-[color:var(--ss-gold-2)] font-medium">
-									{additionalText}
-								</span>
-							)}
-						</div>
-					</div>
-				)}
-			</CardContent>
-		</Card>
+			)}
+		</div>
 	)
 }

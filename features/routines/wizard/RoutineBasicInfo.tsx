@@ -32,14 +32,14 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 			<div className="space-y-6">
 				<div className="space-y-2">
 					<Label htmlFor="routine-name">
-						Routine Name <span className="text-destructive">*</span>
+						Routine Name <span className="text-ink-3">*</span>
 					</Label>
 					<Input
 						id="routine-name"
+						className="max-w-[var(--cluster-max)]"
 						placeholder="e.g., Push Pull Legs"
 						value={name}
 						onChange={e => handleNameChange(e.target.value)}
-						className="text-lg"
 					/>
 				</div>
 

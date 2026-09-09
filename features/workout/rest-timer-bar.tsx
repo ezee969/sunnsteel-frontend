@@ -36,31 +36,36 @@ export const RestTimerBar = ({
 	const progress = restProgress(remaining, total)
 
 	return (
+		// Fixed chrome, not an overlay, so it separates by a rule rather than a
+		// shadow (§8) and is opaque rather than blurred.
 		<div
-			className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm shadow-lg"
+			className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-surface"
 			style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
 		>
 			{/* Elapsed fraction, drawn as a hairline so the bar stays readable
-			    at a glance from arm's length. */}
-			<div className="h-1 w-full bg-muted">
+			    at a glance from arm's length. Rest ending is a system state, not
+			    an earned mark, so it takes `success` and never gold. */}
+			<div className="h-1 w-full bg-surface-sunk">
 				<div
 					className={`h-full transition-[width] duration-200 ease-linear ${
-						isOver ? 'bg-green-500' : 'bg-amber-500'
+						isOver ? 'bg-success' : 'bg-ink-3'
 					}`}
 					style={{ width: `${Math.round(progress * 100)}%` }}
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+			<div className="ledger-page flex items-center gap-3 py-3">
 				<div className="flex flex-col">
-					<span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+					<span className="type-label text-ink-3">
 						{isOver ? 'Rest over' : 'Resting'}
 					</span>
 					<span
 						// Announce the end once, rather than reading every tick aloud.
 						aria-live={isOver ? 'polite' : 'off'}
-						className={`text-2xl font-bold tabular-nums heading-classical ${
-							isOver ? 'text-green-600 dark:text-green-400' : ''
+						// A countdown must be tabular or the digits shuffle every
+						// second; Space Mono is monospaced, so it is by construction.
+						className={`type-data-strong text-2xl leading-tight ${
+							isOver ? 'text-success' : 'text-foreground'
 						}`}
 					>
 						{formatRestTime(remaining)}
@@ -73,15 +78,24 @@ export const RestTimerBar = ({
 						size="sm"
 						onClick={onExtend}
 						aria-label={`Add ${REST_TIMER_EXTEND_SECONDS} seconds to the rest timer`}
+						className="type-button h-9 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
 					>
 						<Plus className="mr-1 h-4 w-4" aria-hidden />
 						{REST_TIMER_EXTEND_SECONDS}s
 					</Button>
+					{/* The `classical` gold-gradient variant is retired in v0.1 — gold
+					    never fills a control. This is not the region's primary action
+					    either, so it stays quiet rather than becoming a second crimson. */}
 					<Button
-						variant={isOver ? 'classical' : 'secondary'}
+						variant="outline"
 						size="sm"
 						onClick={onDismiss}
 						aria-label={isOver ? 'Dismiss the rest timer' : 'Skip the rest'}
+						className={`type-button h-9 rounded-sm shadow-none ${
+							isOver
+								? 'border-success bg-transparent text-success hover:bg-success/10'
+								: 'border-rule bg-transparent text-foreground hover:bg-muted'
+						}`}
 					>
 						<X className="mr-1 h-4 w-4" aria-hidden />
 						{isOver ? 'Done' : 'Skip'}

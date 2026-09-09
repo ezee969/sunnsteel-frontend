@@ -17,11 +17,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,100 +34,149 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Design System v1.0 §11.1 - roles shadcn has no equivalent for. Each
+     semantic role has a text grade cleared to 4.5:1 and, where it is also drawn
+     as a mark, a `-strong` grade cleared to 3:1. `--warning-strong` has no text
+     grade on purpose: gold and amber cannot be separated by hue under
+     colour-vision deficiency, so warning is a mark only (§4.3 rule 4). */
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-rule: var(--rule);
+  --color-rule-faint: var(--rule-faint);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-primary-hover: var(--primary-hover);
+  --color-success: var(--success);
+  --color-success-strong: var(--success-strong);
+  --color-honour: var(--honour);
+  --color-honour-strong: var(--honour-strong);
+  --color-warning-strong: var(--warning-strong);
+  --color-scrim: var(--scrim);
+
+  /* §7. Explicit rather than derived from `--radius`, which is retired. `lg`
+     and `xl` collapse onto 4px rather than being deleted, so the 36 existing
+     `rounded-lg`/`rounded-xl` sites re-point instead of breaking; Phase 15
+     normalises them to `rounded-md` with no visual effect. */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+
+  /* `--ease-*` IS a Tailwind v4 theme namespace, so these emit `ease-standard`
+     and `ease-exit`. `--duration-*` is NOT - motion durations are plain custom
+     properties below, consumed as `duration-[var(--motion-*)]`. See §9.5; this
+     is the TD-28/TD-29 silent-failure class. */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --shadow-overlay: 0 16px 40px -12px oklch(0.235 0.014 62 / 0.32);
 }
 
+/* Design System v1.0 - LOCKED. docs/ui-design-system.md
+   Light: "Stone" (§4.1). Every text role clears WCAG AA 4.5:1 against
+   --background, --surface and --surface-sunk; every mark clears 3:1. Figures
+   in §4.4, computed from the oklch->sRGB transform. */
 :root {
-  /* SUNNSTEEL Classical Palette */
-  --ss-crimson: #8b0000;
-  --ss-crimson-2: #dc143c;
-  --ss-gold: #daa520;
-  --ss-gold-2: #ffd700;
-  --ss-bronze: #cd7f32;
-  --ss-bronze-2: #b87333;
-  --ss-charcoal: #1a1a1a;
-  --ss-charcoal-2: #2f2f2f;
-  --ss-ivory: #f5f5dc;
-  --ss-cream: #fffdd0;
-  --ss-forest: #355e3b;
-  --ss-purple: #663399;
+  --background: oklch(0.935 0.012 88);
+  --foreground: oklch(0.235 0.014 62);
+  --surface: oklch(0.975 0.008 88);
+  --surface-sunk: oklch(0.893 0.014 86);
+  --card: oklch(0.975 0.008 88);
+  --card-foreground: oklch(0.235 0.014 62);
+  --popover: oklch(0.975 0.008 88);
+  --popover-foreground: oklch(0.235 0.014 62);
+  --primary: oklch(0.235 0.014 62);
+  --primary-hover: oklch(0.17 0.014 62);
+  --primary-foreground: oklch(0.975 0.008 88);
+  --secondary: oklch(0.912 0.01 87);
+  --secondary-foreground: oklch(0.235 0.014 62);
+  --muted: oklch(0.912 0.01 87);
+  --muted-foreground: oklch(0.4 0.013 62);
+  --accent: oklch(0.912 0.01 87);
+  --accent-foreground: oklch(0.235 0.014 62);
+  --ink-2: oklch(0.4 0.013 62);
+  --ink-3: oklch(0.48 0.012 70);
+  --rule: oklch(0.75 0.014 84);
+  --rule-faint: oklch(0.84 0.01 86);
+  --border: oklch(0.75 0.014 84);
+  --input: oklch(0.75 0.014 84);
+  --ring: oklch(0.235 0.014 62);
+  --success: oklch(0.48 0.1 152);
+  --success-strong: oklch(0.56 0.11 152);
+  --honour: oklch(0.455 0.09 90);
+  --honour-strong: oklch(0.575 0.115 90);
+  --warning-strong: oklch(0.56 0.13 52);
+  --destructive: oklch(0.495 0.17 28);
+  /* §2.1 - this equalled --destructive, so destructive-on-destructive was
+     invisible in light mode only. Verified 6.22:1. */
+  --destructive-foreground: oklch(0.975 0.008 88);
+  --scrim: oklch(0.235 0.014 62 / 0.42);
 
-  /* Gradients */
-  --ss-grad-gold: linear-gradient(to right, var(--ss-gold), var(--ss-gold-2));
-  --ss-grad-crimson: linear-gradient(
-    to right,
-    var(--ss-crimson),
-    var(--ss-crimson-2)
-  );
-  --ss-grad-bronze: linear-gradient(to right, var(--ss-bronze), var(--ss-bronze-2));
+  --sidebar: oklch(0.935 0.012 88);
+  --sidebar-foreground: oklch(0.235 0.014 62);
+  --sidebar-primary: oklch(0.235 0.014 62);
+  --sidebar-primary-foreground: oklch(0.975 0.008 88);
+  --sidebar-accent: oklch(0.975 0.008 88);
+  --sidebar-accent-foreground: oklch(0.235 0.014 62);
+  --sidebar-border: oklch(0.75 0.014 84);
+  --sidebar-ring: oklch(0.235 0.014 62);
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0 0);
-  --primary: oklch(0.129 0 0);
-  --primary-foreground: oklch(0.984 0 0);
-  --secondary: oklch(0.968 0 0);
-  --secondary-foreground: oklch(0.129 0 0);
-  --muted: oklch(0.968 0 0);
-  --muted-foreground: oklch(0.554 0 0);
-  --accent: oklch(0.968 0 0);
-  --accent-foreground: oklch(0.129 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.929 0 0);
-  --ring: oklch(0.704 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.984 0 0);
-  --sidebar-foreground: oklch(0.129 0 0);
-  --sidebar-primary: oklch(0.129 0 0);
-  --sidebar-primary-foreground: oklch(0.984 0 0);
-  --sidebar-accent: oklch(0.968 0 0);
-  --sidebar-accent-foreground: oklch(0.129 0 0);
-  --sidebar-border: oklch(0.929 0 0);
-  --sidebar-ring: oklch(0.704 0 0);
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --content-max: 1200px;
+  --field-max: 96px;
+  --cluster-max: 480px;
 }
 
+/* Dark: "Night" (§4.2). A remap of the same roles, not an inversion. Gold and
+   crimson both lift, because the light values vanish on a dark ground, and the
+   focus ring becomes the honour mark because ink does not read as a ring
+   against near-black. */
 .dark {
-  /* Palette is neutral across modes; gradients remain the same. */
-  --background: oklch(0.129 0 0);
-  --foreground: oklch(0.984 0 0);
-  --card: oklch(0.129 0 0);
-  --card-foreground: oklch(0.984 0 0);
-  --popover: oklch(0.129 0 0);
-  --popover-foreground: oklch(0.984 0 0);
-  --primary: oklch(0.984 0 0);
-  --primary-foreground: oklch(0.129 0 0);
-  --secondary: oklch(0.208 0 0);
-  --secondary-foreground: oklch(0.984 0 0);
-  --muted: oklch(0.208 0 0);
-  --muted-foreground: oklch(0.704 0 0);
-  --accent: oklch(0.208 0 0);
-  --accent-foreground: oklch(0.984 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.208 0 0);
-  --input: oklch(0.208 0 0);
-  --ring: oklch(0.446 0 0);
-  --sidebar: oklch(0.129 0 0);
-  --sidebar-foreground: oklch(0.984 0 0);
-  --sidebar-primary: oklch(0.984 0 0);
-  --sidebar-primary-foreground: oklch(0.129 0 0);
-  --sidebar-accent: oklch(0.208 0 0);
-  --sidebar-accent-foreground: oklch(0.984 0 0);
-  --sidebar-border: oklch(0.208 0 0);
-  --sidebar-ring: oklch(0.446 0 0);
+  --background: oklch(0.155 0.01 70);
+  --foreground: oklch(0.94 0.01 88);
+  --surface: oklch(0.205 0.011 70);
+  --surface-sunk: oklch(0.118 0.009 70);
+  --card: oklch(0.205 0.011 70);
+  --card-foreground: oklch(0.94 0.01 88);
+  --popover: oklch(0.205 0.011 70);
+  --popover-foreground: oklch(0.94 0.01 88);
+  --primary: oklch(0.94 0.01 88);
+  --primary-hover: oklch(0.87 0.01 88);
+  --primary-foreground: oklch(0.155 0.01 70);
+  --secondary: oklch(0.248 0.011 70);
+  --secondary-foreground: oklch(0.94 0.01 88);
+  --muted: oklch(0.248 0.011 70);
+  --muted-foreground: oklch(0.79 0.01 84);
+  --accent: oklch(0.248 0.011 70);
+  --accent-foreground: oklch(0.94 0.01 88);
+  --ink-2: oklch(0.79 0.01 84);
+  --ink-3: oklch(0.64 0.01 80);
+  --rule: oklch(0.37 0.012 72);
+  --rule-faint: oklch(0.295 0.01 72);
+  --border: oklch(0.37 0.012 72);
+  --input: oklch(0.37 0.012 72);
+  --ring: oklch(0.84 0.11 90);
+  --success: oklch(0.775 0.095 152);
+  --success-strong: oklch(0.74 0.105 152);
+  --honour: oklch(0.8 0.1 90);
+  --honour-strong: oklch(0.84 0.11 90);
+  --warning-strong: oklch(0.76 0.125 52);
+  --destructive: oklch(0.66 0.15 28);
+  --destructive-foreground: oklch(0.155 0.01 70);
+  --scrim: oklch(0.075 0.006 70 / 0.62);
+
+  --sidebar: oklch(0.155 0.01 70);
+  --sidebar-foreground: oklch(0.94 0.01 88);
+  --sidebar-primary: oklch(0.94 0.01 88);
+  --sidebar-primary-foreground: oklch(0.155 0.01 70);
+  --sidebar-accent: oklch(0.205 0.011 70);
+  --sidebar-accent-foreground: oklch(0.94 0.01 88);
+  --sidebar-border: oklch(0.37 0.012 72);
+  --sidebar-ring: oklch(0.84 0.11 90);
 }
 
 @layer base {
@@ -140,9 +184,16 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground transition-colors;
+    transition-duration: var(--motion-slow);
   }
-  /* Strong heading style using Bebas Neue */
+  /* Strong heading style using Bebas Neue.
+     v1.0 §5.5: this flattens four ranks into one texture and is replaced by the
+     `.type-*` classes below. It cannot be re-pointed in one edit without
+     changing every heading in the app at once, so it stays until the LAST
+     Phase 8 batch - a class beats an element selector, so a migrated heading
+     wins while an unmigrated one keeps working. This is the only deliberate
+     transitional overlap in the system. */
   h1,
   h2,
   h3,
@@ -152,38 +203,6 @@
     letter-spacing: 0.05em;
     font-weight: 400;
     text-transform: uppercase;
-  }
-  /* Gold text utility */
-  .text-gold {
-    color: var(--ss-gold);
-  }
-  .dark .text-gold {
-    color: var(--ss-gold-2);
-  }
-
-  /* Gold border utility */
-  .border-gold {
-    border-color: var(--ss-gold);
-  }
-  .dark .border-gold {
-    border-color: var(--ss-gold-2);
-  }
-  /* Marble subtle background utility */
-  .bg-marble-light {
-    background-image: radial-gradient(
-        ellipse at 30% 20%,
-        rgba(0, 0, 0, 0.03),
-        transparent 60%
-      ),
-      radial-gradient(ellipse at 70% 80%, rgba(0, 0, 0, 0.03), transparent 60%);
-  }
-  .dark .bg-marble-light {
-    background-image: radial-gradient(
-        ellipse at 30% 20%,
-        rgba(255, 255, 255, 0.05),
-        transparent 60%
-      ),
-      radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.05), transparent 60%);
   }
   /* Make interactive elements clearly clickable */
   button,
@@ -203,6 +222,188 @@
   }
 }
 
+@layer components {
+  /* Type ranks (v1.0 §5.2). Classes, not element selectors, so a migrated
+     heading beats the global `h1`-`h4` Bebas rule on specificity while an
+     unmigrated one keeps working. Only loaded weights are used: Cinzel ships
+     600 and 900, Bebas Neue 400, Space Mono 400 and 700. Asking for an absent
+     weight synthesises silently. */
+  .type-page {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+  .type-section {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .type-panel {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  /* §5.3: region-level captions only, never inside a repeated row - that is
+     what produced the micro-cap chatter Phase 5 flagged. */
+  .type-label {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  /* The caption rank inside a repeated row: sentence case, untracked. */
+  .type-body-sm {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .type-data {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-data-strong {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-numeral {
+    font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 2.5rem;
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+  }
+  /* v1.0 §5.2 names a Wordmark rank (Cinzel 900) but §11.2 listed no class for
+     it, so the sidebar carried it as an inline style with a literal family name.
+     Cinzel ships 900, so this is the spec's own rank, not a new decision. */
+  .type-wordmark {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .type-button {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 768px) {
+    .type-page {
+      font-size: 2rem;
+    }
+    .type-section {
+      font-size: 1.125rem;
+    }
+    .type-panel {
+      font-size: 1rem;
+    }
+    .type-numeral {
+      font-size: 3.25rem;
+    }
+  }
+
+  /* Structure (§11.2). The double rule appears once per page, under the page
+     inscription. */
+  .rule-heading {
+    border-bottom: 3px double var(--rule);
+  }
+  .rule-row {
+    border-bottom: 1px solid var(--rule-faint);
+  }
+  .rule-row:last-child {
+    border-bottom: 0;
+  }
+  /* Status marks. `success` = done as planned; `honour` = better than planned,
+     at most two per viewport; `warning` = risk, and the only form warning takes
+     because it has no text grade (§4.3). */
+  .mark {
+    border-left: 3px solid transparent;
+  }
+  .mark-success {
+    border-left-color: var(--success-strong);
+  }
+  .mark-honour {
+    border-left-color: var(--honour-strong);
+  }
+  .mark-warning {
+    border-left-color: var(--warning-strong);
+  }
+
+  /* The one classical device the direction keeps: gold brackets, one pair per
+     screen, on the page inscription rather than around a photograph. */
+  .corner-brackets {
+    position: relative;
+  }
+  .corner-brackets::before,
+  .corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-color: var(--honour-strong);
+    border-style: solid;
+    pointer-events: none;
+  }
+  .corner-brackets::before {
+    top: -0.25rem;
+    left: -0.5rem;
+    border-width: 1px 0 0 1px;
+  }
+  .corner-brackets::after {
+    right: -0.5rem;
+    bottom: -0.25rem;
+    border-width: 0 1px 1px 0;
+  }
+
+  /* §5.4: a live duration's string length changes as it ticks, which shifts its
+     neighbours. Reserve the slot. */
+  .duration-slot {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    min-width: 9ch;
+    display: inline-block;
+  }
+
+  /* Layout (§10). */
+  .ledger-page {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .ledger-page {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .ledger-page {
+      padding-inline: 3rem;
+    }
+  }
+}
+
 /* Scrollbar-hidden utility for mobile horizontal scroll containers */
 .hide-scrollbar {
   -ms-overflow-style: none;
@@ -210,4 +411,16 @@
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* §9.3 - both signature motions collapse to an instant change; everything else
+   is opacity only. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

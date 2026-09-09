@@ -3,6 +3,7 @@ import type { Ref } from 'react'
 
 import { Button } from '@/components/ui/button'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
+import { cn } from '@/lib/utils'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 
 const getErrorMessage = (err: unknown): string => {
@@ -38,7 +39,7 @@ export function WorkoutHistoryList({
 
 	if (isLoading) {
 		return (
-			<div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+			<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
 				Loading sessions…
 			</div>
 		)
@@ -46,7 +47,11 @@ export function WorkoutHistoryList({
 
 	if (isError) {
 		return (
-			<div className="text-sm text-destructive" role="alert" aria-live="polite">
+			<div
+				className="type-body-sm text-destructive"
+				role="alert"
+				aria-live="polite"
+			>
 				{getErrorMessage(error)}
 			</div>
 		)
@@ -54,18 +59,36 @@ export function WorkoutHistoryList({
 
 	if (items.length === 0) {
 		return (
-			<div className="text-sm text-muted-foreground">
+			<div className="type-body-sm py-6 text-ink-3">
 				No sessions found with the current filters.
 			</div>
 		)
 	}
 
 	return (
-		<div className="space-y-3">
+		// §11.5 — history is the archetypal ruled list: no fill, no box, a rule
+		// between rows. Each row was a bordered card inside a card inside a card.
+		<div className="border-t border-rule">
 			{items.map(s => (
 				<div
 					key={s.id}
-					className="rounded-md border p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+					// §11.12 — status is a mark, and the status word beside it is what
+					// carries the meaning (§4.3 rule 8). A finished session is "done,
+					// as planned"; an aborted one is the row worth noticing.
+					//
+					// `IN_PROGRESS` is deliberately unmarked, not overlooked. All three
+					// mark colours describe an outcome — `--success` is completion,
+					// `--honour` is better than planned and capped at two per viewport,
+					// and `--warning-strong` already means "aborted" in this very list,
+					// so reusing it would collapse two different states into one colour.
+					// A session still running has no outcome yet, and `.mark`'s
+					// transparent 3px keeps the row on the same left axis as its
+					// neighbours while saying so.
+					className={cn(
+						'rule-row mark cursor-pointer py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
+						s.status === 'COMPLETED' && 'mark-success',
+						s.status === 'ABORTED' && 'mark-warning',
+					)}
 					onClick={() => router.push(`/workouts/history/${s.id}`)}
 					role="button"
 					tabIndex={0}
@@ -79,55 +102,65 @@ export function WorkoutHistoryList({
 						}
 					}}
 				>
-					<div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-						<div className="font-medium">
+					<div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+						<div className="type-panel min-w-0 text-foreground">
 							{s.routine.name}
 							{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
 						</div>
-						<div className="text-xs text-muted-foreground">{s.status}</div>
-					</div>
-					<div className="mt-1 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-						<div>
-							<div className="text-muted-foreground">Started</div>
-							<div>{new Date(s.startedAt).toLocaleString()}</div>
+						<div className="type-body-sm shrink-0 text-ink-3 sm:text-right">
+							{s.status}
 						</div>
+					</div>
+
+					{/* §10.1 — at `xl` the ledger opens: duration and volume become
+					    right-aligned mono columns rather than left-aligned pairs. */}
+					<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
 						<div>
-							<div className="text-muted-foreground">Ended</div>
-							<div>
-								{s.endedAt ? new Date(s.endedAt).toLocaleString() : '—'}
+							<div className="type-body-sm text-ink-3">Started</div>
+							<div className="type-data text-ink-2">
+								{new Date(s.startedAt).toLocaleString()}
 							</div>
 						</div>
 						<div>
-							<div className="text-muted-foreground">Duration</div>
-							<div>{s.durationSec ? formatDuration(s.durationSec) : '—'}</div>
+							<div className="type-body-sm text-ink-3">Ended</div>
+							<div className="type-data text-ink-2">
+								{s.endedAt ? new Date(s.endedAt).toLocaleString() : '—'}
+							</div>
 						</div>
-						<div>
-							<div className="text-muted-foreground">Volume / Sets</div>
-							<div>
+						<div className="xl:text-right">
+							<div className="type-body-sm text-ink-3">Duration</div>
+							<div className="type-data text-ink-2">
+								{s.durationSec ? formatDuration(s.durationSec) : '—'}
+							</div>
+						</div>
+						<div className="xl:text-right">
+							<div className="type-body-sm text-ink-3">Volume / Sets</div>
+							<div className="type-data text-ink-2">
 								{s.totalVolume ?? '—'} / {s.totalSets ?? '—'}
 							</div>
 						</div>
 					</div>
+
 					{s.notes && (
-						<div className="mt-2 text-sm text-muted-foreground">{s.notes}</div>
+						<div className="type-body-sm mt-2 text-ink-3">{s.notes}</div>
 					)}
 				</div>
 			))}
 
 			{/* Load more controls */}
 			{hasNextPage ? (
-				<div className="flex items-center justify-center">
+				<div className="flex items-center justify-center pt-4">
 					<Button
 						onClick={() => fetchNextPage()}
 						disabled={isFetchingNextPage}
-						variant="classical"
+						variant="outline"
 						aria-label="Load more"
 					>
 						{isFetchingNextPage ? 'Loading…' : 'Load more'}
 					</Button>
 				</div>
 			) : (
-				<div className="text-center text-xs text-muted-foreground">
+				<div className="type-body-sm pt-4 text-center text-ink-3">
 					No more sessions
 				</div>
 			)}

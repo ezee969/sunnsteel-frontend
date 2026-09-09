@@ -12,7 +12,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { getSessionResolutionCopy } from '@/lib/utils/session-resolution'
 import type {
 	SessionProgressData,
@@ -49,44 +48,54 @@ export const SessionConfirmationDialog = ({
 
 	return (
 		<AlertDialog open={isOpen} onOpenChange={onClose}>
+			{/* Radix portals this to <body>, outside the section wrapper, so the
+			    scope class has to travel with it or the dialog renders on the old
+			    greyscale palette. */}
 			<AlertDialogContent className="max-w-md">
 				<AlertDialogHeader>
-					<AlertDialogTitle className="flex items-center gap-2">
+					<AlertDialogTitle className="type-section flex items-center gap-2 text-foreground">
 						{isDiscarding ? (
 							<Trash2 className="h-5 w-5 text-destructive" />
 						) : isComplete ? (
-							<CheckCircle className="h-5 w-5 text-green-600" />
+							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
 						) : (
-							<AlertTriangle className="h-5 w-5 text-amber-600" />
+							<AlertTriangle className="h-5 w-5 text-ink-2" />
 						)}
 						{copy.title}
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>
 						<div className="space-y-3">
-							<p>
-								{copy.prompt} <span className="font-medium">{routineName}</span>
-								?
+							<p className="text-ink-2">
+								{copy.prompt}{' '}
+								<span className="text-foreground">{routineName}</span>?
 							</p>
 
 							{/* Progress Summary */}
-							<div className="bg-muted/50 rounded-lg p-3 space-y-2">
-								<div className="flex items-center justify-between">
-									<span className="text-sm font-medium">Progress</span>
-									<Badge variant={isComplete ? 'default' : 'secondary'}>
+							<div className="space-y-2 bg-surface-sunk p-3">
+								<div className="flex items-baseline justify-between">
+									<span className="type-label text-ink-3">Progress</span>
+									<span
+										className={`type-data type-data-strong ${
+											isComplete ? 'text-success' : 'text-foreground'
+										}`}
+									>
 										{Math.round(percentage)}%
-									</Badge>
+									</span>
 								</div>
 
-								<div className="flex items-center gap-2 text-sm">
-									<Target className="h-4 w-4 text-muted-foreground" />
+								<div className="flex items-center gap-2 text-sm text-ink-2">
+									<Target className="h-4 w-4 shrink-0 text-ink-3" />
 									<span>
 										{completedSets} of {totalSets} sets completed
 									</span>
 								</div>
 
 								{!isComplete && (
-									<div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
-										<AlertTriangle className="h-4 w-4" />
+									<div className="flex items-center gap-2 text-sm text-ink-2">
+										<AlertTriangle
+											className="h-4 w-4 shrink-0 text-warning-strong"
+											aria-hidden
+										/>
 										<span>
 											{incompleteSets} set{incompleteSets !== 1 ? 's' : ''}{' '}
 											remaining
@@ -97,28 +106,32 @@ export const SessionConfirmationDialog = ({
 
 							{/* Resolution warning */}
 							{isDiscarding ? (
-								<div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3">
-									<p className="text-sm text-destructive">
-										<strong>Discarding is permanent.</strong> This session and
-										its saved sets will not appear in workout history.
+								<div className="mark border-l-destructive bg-surface-sunk p-3">
+									<p className="text-sm text-ink-2">
+										<strong className="text-destructive">
+											Discarding is permanent.
+										</strong>{' '}
+										This session and its saved sets will not appear in workout
+										history.
 									</p>
 								</div>
 							) : !isComplete ? (
-								<div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-									<p className="text-sm text-amber-800 dark:text-amber-200">
-										<strong>Note:</strong> Finishing with incomplete sets will
-										still save your progress, but you won&apos;t get the full
-										benefit of the workout.
+								<div className="mark mark-warning bg-surface-sunk p-3">
+									<p className="text-sm text-ink-2">
+										<strong className="text-ink-2">Note:</strong> Finishing with
+										incomplete sets will still save your progress, but you
+										won&apos;t get the full benefit of the workout.
 									</p>
 								</div>
 							) : null}
 
 							{/* Success message for complete sessions */}
 							{!isDiscarding && isComplete && (
-								<div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-									<p className="text-sm text-green-800 dark:text-green-200">
-										<strong>Great job!</strong> You&apos;ve completed all sets.
-										Your progress will be saved and applied to future workouts.
+								<div className="mark mark-success bg-surface-sunk p-3">
+									<p className="text-sm text-ink-2">
+										<strong className="text-success">Great job!</strong>{' '}
+										You&apos;ve completed all sets. Your progress will be saved
+										and applied to future workouts.
 									</p>
 								</div>
 							)}
@@ -127,6 +140,8 @@ export const SessionConfirmationDialog = ({
 				</AlertDialogHeader>
 
 				<AlertDialogFooter>
+					{/* Cancel is quiet, so the one crimson fill in the dialog is
+					    unambiguously the thing that proceeds (§4.3 rule 1). */}
 					<AlertDialogCancel disabled={isFinishing}>Cancel</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={onConfirm}
@@ -134,9 +149,7 @@ export const SessionConfirmationDialog = ({
 						className={
 							isDiscarding
 								? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-								: isComplete
-									? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
-									: 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
+								: ''
 						}
 					>
 						{isFinishing ? copy.pendingLabel : copy.confirmLabel}

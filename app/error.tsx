@@ -23,7 +23,7 @@ export default function RootError({
 				{error.message || 'An unexpected error occurred.'}
 			</p>
 			<div className="flex gap-2">
-				<Button variant="classical" onClick={() => reset()}>
+				<Button variant="default" onClick={() => reset()}>
 					Try again
 				</Button>
 				<Button variant="outline" onClick={() => window.location.assign('/')}>

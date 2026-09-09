@@ -48,18 +48,14 @@ export default function WorkoutFilters({
 	onFilterChange,
 }: WorkoutFiltersProps) {
 	return (
-		<div className="relative w-full">
+		<div className="w-full">
 			<div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
 				{filters.map(filter => (
 					<Button
 						key={filter.id}
 						variant={activeFilter === filter.id ? 'default' : 'outline'}
-						className={cn(
-							'flex-shrink-0 gap-2',
-							'h-9 px-3 text-sm sm:h-10 sm:px-4 sm:text-base',
-							activeFilter === filter.id &&
-								'bg-primary text-primary-foreground',
-						)}
+						size={'sm'}
+						className={cn('flex-shrink-0 gap-2', 'sm:h-10 sm:px-4')}
 						onClick={() => onFilterChange(filter.id as WorkoutFilter)}
 						disabled={filter.disabled}
 					>
@@ -76,8 +72,6 @@ export default function WorkoutFilters({
 					</Button>
 				))}
 			</div>
-			{/* Gradient fade effect for mobile */}
-			<div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent sm:hidden" />
 		</div>
 	)
 }

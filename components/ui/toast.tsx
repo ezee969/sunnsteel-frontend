@@ -31,38 +31,41 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
+/**
+ * A toast is an overlay, so every variant sits on the same `--popover` surface
+ * (§8 — one shadow, light only; dark separates by a 1px `--rule`). The variant
+ * is carried by a `.mark` left rule plus a glyph, never by a tinted card:
+ * §11.12 says status is a mark plus a glyph with no fill, and the five tinted
+ * cards this replaced were five different surfaces for one component.
+ *
+ * `info` and `default` take no mark colour on purpose. The palette has no role
+ * for "neutral information" — inventing one would be a sixth accent — so they
+ * keep `.mark`'s transparent rule and are distinguished by their glyph, which
+ * §4.3 rule 8 already requires of every state.
+ */
 const variantStyles: Record<
 	ToastVariant,
-	{ container: string; icon: React.ReactNode }
+	{ mark: string; icon: React.ReactNode }
 > = {
 	default: {
-		container:
-			'border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80',
-		icon: <Info className="h-5 w-5 text-neutral-500" />,
+		mark: '',
+		icon: <Info className="h-5 w-5 text-ink-3" aria-hidden />,
 	},
 	success: {
-		container:
-			'border-emerald-500/20 bg-emerald-50/90 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-100',
-		icon: (
-			<CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-		),
+		mark: 'mark-success',
+		icon: <CheckCircle2 className="h-5 w-5 text-success" aria-hidden />,
 	},
 	destructive: {
-		container:
-			'border-red-500/20 bg-red-50/90 dark:bg-red-950/30 text-red-900 dark:text-red-100',
-		icon: <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />,
+		mark: 'border-l-destructive',
+		icon: <XCircle className="h-5 w-5 text-destructive" aria-hidden />,
 	},
 	warning: {
-		container:
-			'border-amber-500/20 bg-amber-50/90 dark:bg-amber-950/30 text-amber-900 dark:text-amber-100',
-		icon: (
-			<AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-		),
+		mark: 'mark-warning',
+		icon: <AlertCircle className="h-5 w-5 text-warning-strong" aria-hidden />,
 	},
 	info: {
-		container:
-			'border-sky-500/20 bg-sky-50/90 dark:bg-sky-950/30 text-sky-900 dark:text-sky-100',
-		icon: <Info className="h-5 w-5 text-sky-600 dark:text-sky-400" />,
+		mark: '',
+		icon: <Info className="h-5 w-5 text-ink-3" aria-hidden />,
 	},
 }
 
@@ -101,67 +104,54 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 				>
 					<AnimatePresence mode="popLayout">
 						{toasts.map(t => (
+							// §9.2 — no scale on enter or exit. Enter is
+							// `--motion-base`; exit runs at 70% of it (§9).
 							<motion.div
 								key={t.id}
 								layout
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+								initial={{ opacity: 0, y: 12 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, transition: { duration: 0.14 } }}
+								transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
 								className={cn(
-									'relative overflow-hidden rounded-xl border p-4 shadow-lg backdrop-blur-md transition-all pl-5',
-									variantStyles[t.variant || 'default'].container,
+									'group mark relative overflow-hidden rounded-md border border-rule bg-popover p-4 pl-4 text-popover-foreground shadow-overlay dark:shadow-none',
+									variantStyles[t.variant || 'default'].mark,
 								)}
 							>
-								{/* Side Accent bar */}
-								<div
-									className={cn(
-										'absolute left-0 top-0 bottom-0 w-1',
-										t.variant === 'success' && 'bg-emerald-500',
-										t.variant === 'destructive' && 'bg-red-500',
-										t.variant === 'warning' && 'bg-amber-500',
-										t.variant === 'info' && 'bg-sky-500',
-										(!t.variant || t.variant === 'default') && 'bg-neutral-400',
-									)}
-								/>
-
 								<div className="flex gap-3">
 									<div className="shrink-0 pt-0.5">
 										{variantStyles[t.variant || 'default'].icon}
 									</div>
 									<div className="flex-1 min-w-0 pr-4">
 										{t.title && (
-											<p className="font-semibold text-[15px] leading-tight mb-1">
+											<p className="type-panel mb-1 text-foreground">
 												{t.title}
 											</p>
 										)}
 										{t.description && (
-											<p className="text-sm opacity-90 leading-relaxed">
-												{t.description}
-											</p>
+											<p className="type-body-sm text-ink-2">{t.description}</p>
 										)}
 									</div>
+									{/* The `group` class this depends on was missing from the
+									    container, so the dismiss control was permanently
+									    `opacity-0` — invisible, but still clickable. */}
 									<button
 										onClick={() => remove(t.id)}
-										className="absolute top-3 right-3 p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-neutral-400"
+										aria-label="Dismiss notification"
+										className="absolute top-3 right-3 rounded-sm p-1 text-ink-3 opacity-0 transition-opacity duration-[var(--motion-fast)] ease-standard group-hover:opacity-100 focus-visible:opacity-100 hover:text-foreground"
 									>
-										<X className="h-3.5 w-3.5" />
+										<X className="h-3.5 w-3.5" aria-hidden />
 									</button>
 								</div>
 
-								{/* Bottom progress bar for auto-dismiss */}
+								{/* Auto-dismiss timer. It measures time, not status, so it
+								    takes no semantic colour (§4.3 rule 8's converse). */}
 								{t.duration && t.duration > 0 && (
 									<motion.div
 										initial={{ width: '100%' }}
 										animate={{ width: '0%' }}
 										transition={{ duration: t.duration / 1000, ease: 'linear' }}
-										className={cn(
-											'absolute bottom-0 left-0 h-[2px] opacity-30',
-											t.variant === 'destructive'
-												? 'bg-red-500'
-												: t.variant === 'success'
-													? 'bg-emerald-500'
-													: 'bg-amber-500',
-										)}
+										className="absolute bottom-0 left-0 h-[2px] bg-rule"
 									/>
 								)}
 							</motion.div>

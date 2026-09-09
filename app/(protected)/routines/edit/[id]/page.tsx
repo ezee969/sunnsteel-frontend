@@ -179,8 +179,8 @@ export default function EditRoutinePage() {
 		if (isLoading) {
 			return (
 				<div className="flex flex-col items-center justify-center h-64 space-y-4">
-					<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-					<p className="text-muted-foreground">Loading routine data...</p>
+					<div className="h-12 w-12 animate-spin rounded-full border-2 border-rule-faint border-t-foreground"></div>
+					<p className="type-body-sm text-ink-3">Loading routine data...</p>
 				</div>
 			)
 		}
@@ -188,9 +188,9 @@ export default function EditRoutinePage() {
 		if (error) {
 			return (
 				<div className="text-center py-12 space-y-4">
-					<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+					<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-sm border border-destructive bg-surface">
 						<svg
-							className="h-6 w-6 text-red-600"
+							className="h-6 w-6 text-destructive"
 							fill="none"
 							viewBox="0 0 24 24"
 							strokeWidth={1.5}
@@ -263,7 +263,6 @@ export default function EditRoutinePage() {
 		<div className="container max-w-3xl mx-auto py-8">
 			{/* Classical Hero */}
 			<HeroSection
-				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				sectionClassName="mb-4 sm:mb-6"
 				title={<>Refine Your Program</>}
 				subtitle={<>Adjust days, progressions, and details.</>}
@@ -281,14 +280,14 @@ export default function EditRoutinePage() {
 						Back to Routines
 					</Button>
 				</div>
-				<h1 className="text-3xl font-bold">Edit Routine</h1>
-				<p className="text-muted-foreground mt-2">
+				<h1 className="type-section text-foreground">Edit Routine</h1>
+				<p className="type-body-sm mt-1 text-ink-3">
 					Update your workout routine step by step
 				</p>
 			</div>
 
 			{/* Stepper: sticky on top for easier navigation on mobile */}
-			<div className="sticky top-0 z-20 mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="sticky top-0 z-20 mb-4 border-b border-rule bg-background sm:mb-8">
 				<div className="py-2">
 					<Stepper
 						steps={STEPS}
@@ -311,8 +310,8 @@ export default function EditRoutinePage() {
 
 			{/* Main Content */}
 			<Card className="overflow-hidden">
-				<CardHeader className="border-b">
-					<CardTitle className="text-lg sm:text-xl">
+				<CardHeader className="border-b border-rule-faint pb-4">
+					<CardTitle className="type-section text-foreground">
 						{STEPS[currentStep - 1].title}
 					</CardTitle>
 					<CardDescription className="hidden sm:block">

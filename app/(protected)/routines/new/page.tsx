@@ -126,7 +126,6 @@ export default function CreateRoutinePage() {
 		<div className="container mx-auto py-8">
 			{/* Classical Hero */}
 			<HeroSection
-				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				sectionClassName="mb-4 sm:mb-6"
 				title={<>Design Your Program</>}
 				subtitle={<>Build days, choose progression, set your path.</>}
@@ -144,13 +143,13 @@ export default function CreateRoutinePage() {
 						<span className="hidden sm:inline">Back to Routines</span>
 					</Button>
 				</div>
-				<h1 className="text-2xl sm:text-3xl font-bold">Create New Routine</h1>
-				<p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
+				<h1 className="type-section text-foreground">Create New Routine</h1>
+				<p className="type-body-sm mt-1 text-ink-3">
 					Build your custom workout routine step by step
 				</p>
 			</div>
 
-			<div className=" mb-4 sm:mb-8 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="mb-4 border-b border-rule bg-background sm:mb-8">
 				<div className="py-2">
 					<Stepper
 						steps={STEPS}
@@ -163,8 +162,8 @@ export default function CreateRoutinePage() {
 
 			{/* Main Content */}
 			<Card className="overflow-hidden">
-				<CardHeader className="border-b">
-					<CardTitle className="text-lg sm:text-xl">
+				<CardHeader className="border-b border-rule-faint pb-4">
+					<CardTitle className="type-section text-foreground">
 						{STEPS[currentStep - 1].title}
 					</CardTitle>
 					<CardDescription className="hidden sm:block">

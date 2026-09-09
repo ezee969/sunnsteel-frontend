@@ -17,7 +17,13 @@ export interface ClassicalLoaderProps {
 }
 
 /**
- * A gold arc orbiting a breathing laurel wreath.
+ * An ink arc orbiting a breathing laurel wreath.
+ *
+ * It was gold, on the last two `rgba(218,165,32,…)` literals and the last
+ * `--ss-gold` alias in the app. v1.0 §4.3 rule 3 reserves honour for "better
+ * than planned" and says explicitly that it is never decoration, so a spinner
+ * cannot wear it — the arc is `--foreground` and the wreath `--ink-3`, which
+ * inverts correctly in both themes where the hardcoded rgba pair did not.
  *
  * Built only from Tailwind's stock `animate-spin` / `animate-pulse`. Custom
  * `@keyframes` in globals.css are not worth the risk here: Turbopack silently
@@ -46,26 +52,20 @@ export function ClassicalLoader({
 			{/* Track */}
 			<span
 				aria-hidden
-				className={cn(
-					'absolute inset-0 rounded-full border-[color:rgba(218,165,32,0.2)] dark:border-[color:rgba(255,215,0,0.18)]',
-					ring,
-				)}
+				className={cn('absolute inset-0 rounded-full border-rule-faint', ring)}
 			/>
 			{/* Orbiting arc */}
 			<span
 				aria-hidden
 				className={cn(
-					'absolute inset-0 animate-spin rounded-full border-transparent border-t-[color:var(--ss-gold)] dark:border-t-[color:var(--ss-gold-2)]',
+					'absolute inset-0 animate-spin rounded-full border-transparent border-t-foreground',
 					ring,
 				)}
 			/>
 			<ClassicalIcon
 				name="laurel-wreath"
 				aria-hidden
-				className={cn(
-					'animate-pulse text-[color:var(--ss-gold)] dark:text-[color:var(--ss-gold-2)]',
-					icon,
-				)}
+				className={cn('animate-pulse text-ink-3', icon)}
 			/>
 		</span>
 	)

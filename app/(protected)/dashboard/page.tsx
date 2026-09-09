@@ -16,13 +16,11 @@ export default function Dashboard() {
 	const name = user?.name?.trim()
 
 	return (
-		<div className="flex flex-col gap-4 sm:gap-6">
+		<div className="flex flex-col gap-6 sm:gap-8">
 			{/* Classical Hero — static, so it paints immediately */}
 			<HeroSection
-				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				title={<>Forge Your Path</>}
 				subtitle={<>Strength • Discipline • Craft</>}
-				innerClassName="max-[400px]:justify-center max-[400px]:text-center"
 			/>
 
 			{/*
@@ -32,7 +30,9 @@ export default function Dashboard() {
 			 */}
 			{progress.bootstrapError ? (
 				<div role="alert" className="flex flex-col items-start gap-3">
-					<p>Unable to prepare your workout progress. Please try again.</p>
+					<p className="type-body-sm text-foreground">
+						Unable to prepare your workout progress. Please try again.
+					</p>
 					<Button
 						onClick={() => {
 							void progress.retryBootstrap().catch(() => undefined)
@@ -44,18 +44,19 @@ export default function Dashboard() {
 			) : isLoading ? (
 				<DashboardLoading />
 			) : (
-				<div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-4 duration-500 sm:gap-6">
-					<div className="flex flex-col gap-2">
-						<h1
-							className="text-2xl sm:text-3xl font-bold tracking-tight"
-							style={{
-								fontFamily: 'var(--font-oswald), sans-serif',
-								textTransform: 'none',
-							}}
-						>
+				// §9.2 — no page-level entrance animation. The whole dashboard used
+				// to fade and rise on every visit, which delays perceived load and is
+				// the exact trope the plan forbids.
+				<div className="flex flex-col gap-8 sm:gap-12">
+					<div className="flex flex-col gap-1">
+						{/* The masthead above already carries the page rank, so the
+						    greeting is a panel title rather than a second inscription
+						    competing with it (§5.3 — Cinzel appears at most twice, and
+						    the inline font-family override went with the old rank). */}
+						<h1 className="type-panel text-foreground">
 							{name ? `Welcome back, ${name}!` : 'Welcome back!'}
 						</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
+						<p className="type-body-sm text-ink-3">
 							Track your fitness journey and achieve your goals.
 						</p>
 					</div>
@@ -69,7 +70,7 @@ export default function Dashboard() {
 					<StatsOverview />
 
 					{/* Recent sessions and records, both derived from the logged sets */}
-					<div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+					<div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
 						<RecentActivity />
 						<PersonalRecords />
 					</div>

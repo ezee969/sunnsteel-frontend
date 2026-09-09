@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface ActivityItemProps {
 	icon: ReactNode
@@ -11,6 +10,19 @@ interface ActivityItemProps {
 	showSeparator?: boolean
 }
 
+/**
+ * One ruled row of the recent-activity ledger.
+ *
+ * v1.0 §11.5 makes `ruled` the default for a list, and §11.12 says read-only
+ * data carries no border and no fill — so the three metric badges are now one
+ * Space Mono run separated by middots, which is also what §10 asks a ledger row
+ * to collapse to below 640. That removes the wrap problem the badges had at
+ * 320px rather than working around it.
+ *
+ * The gradient medallion is gone (§4.3 rule 6): the glyph sits inline in
+ * `--ink-3`. `showSeparator` keeps its meaning and now draws the row rule
+ * itself, so the list needs no `Separator` elements between children.
+ */
 export default function ActivityItem({
 	icon,
 	title,
@@ -19,30 +31,26 @@ export default function ActivityItem({
 	showSeparator = true,
 }: ActivityItemProps) {
 	return (
-		<>
-			<div className="flex items-start gap-4">
-				<div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
-					{icon}
+		<div
+			className={cn(
+				'flex items-start gap-3 py-3',
+				showSeparator && 'border-b border-rule-faint',
+			)}
+		>
+			<span className="mt-0.5 shrink-0 text-ink-3" aria-hidden>
+				{icon}
+			</span>
+			<div className="min-w-0 flex-1 sm:flex sm:items-baseline sm:justify-between sm:gap-4">
+				<div className="min-w-0">
+					<p className="type-panel text-foreground">{title}</p>
+					<p className="type-body-sm text-ink-3">{time}</p>
 				</div>
-				<div className="flex-1">
-					<p className="font-medium">{title}</p>
-					<p className="text-sm text-muted-foreground">{time}</p>
-					{badges.length > 0 && (
-						<div className="mt-2 flex gap-2">
-							{badges.map((badge, index) => (
-								<Badge
-									key={index}
-									variant="secondary"
-									className="bg-primary/5 hover:bg-primary/10 text-foreground"
-								>
-									{badge}
-								</Badge>
-							))}
-						</div>
-					)}
-				</div>
+				{badges.length > 0 && (
+					<p className="type-data mt-1 text-ink-3 sm:mt-0 sm:shrink-0 sm:text-right">
+						{badges.join(' · ')}
+					</p>
+				)}
 			</div>
-			{showSeparator && <Separator />}
-		</>
+		</div>
 	)
 }

@@ -14,7 +14,15 @@ function Checkbox({
 		<CheckboxPrimitive.Root
 			data-slot="checkbox"
 			className={cn(
-				'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+				// Checked is `success`, not the primary control colour: a repeated
+				// list control is never the region's action (v1.0 §4.3 rule 1), and
+				// a ticked box means "done, as planned" (rule 2). Phase 4 made these
+				// crimson and Phase 5 read fifteen of them as a column of errors.
+				'peer size-4 shrink-0 rounded-none border border-rule bg-surface outline-none transition-colors duration-[var(--motion-fast)] ease-standard',
+				'data-[state=checked]:border-success-strong data-[state=checked]:bg-success-strong data-[state=checked]:text-primary-foreground',
+				'focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40',
+				'aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/40',
+				'disabled:cursor-not-allowed disabled:bg-surface-sunk disabled:text-ink-3',
 				className,
 			)}
 			{...props}

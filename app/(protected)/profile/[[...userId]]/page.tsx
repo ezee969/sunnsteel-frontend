@@ -189,7 +189,7 @@ export default function ProfilePage() {
 							</Button>
 							{!isOwnProfile && (
 								<Button
-									variant={isFollowedByMe ? 'outline' : 'classical'}
+									variant={isFollowedByMe ? 'outline' : 'default'}
 									size="sm"
 									onClick={onFollowToggle}
 									disabled={isMutating}

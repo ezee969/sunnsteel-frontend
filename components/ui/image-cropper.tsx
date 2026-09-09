@@ -66,7 +66,7 @@ export function ImageCropper({
 					<DialogTitle>Crop Profile Picture</DialogTitle>
 				</DialogHeader>
 
-				<div className="relative w-full h-64 sm:h-80 bg-neutral-100 rounded-md overflow-hidden">
+				<div className="relative h-64 w-full overflow-hidden rounded-none bg-surface-sunk sm:h-80">
 					{imageSrc ? (
 						<Cropper
 							image={imageSrc}
@@ -83,9 +83,7 @@ export function ImageCropper({
 				</div>
 
 				<div className="flex items-center space-x-4 mt-4">
-					<span className="text-sm font-medium text-muted-foreground w-12">
-						Zoom
-					</span>
+					<span className="type-body-sm w-12 text-ink-3">Zoom</span>
 					<input
 						type="range"
 						value={zoom}
@@ -94,7 +92,7 @@ export function ImageCropper({
 						step={0.1}
 						aria-labelledby="Zoom"
 						onChange={e => setZoom(Number(e.target.value))}
-						className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+						className="h-2 w-full cursor-pointer appearance-none rounded-none bg-surface-sunk accent-[color:var(--primary)]"
 					/>
 				</div>
 
@@ -106,11 +104,7 @@ export function ImageCropper({
 					>
 						Cancel
 					</Button>
-					<Button
-						onClick={handleSave}
-						disabled={isProcessing}
-						className="bg-amber-500 hover:bg-amber-600 text-white transition-colors"
-					>
+					<Button onClick={handleSave} disabled={isProcessing}>
 						{isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 						Save
 					</Button>

@@ -74,15 +74,17 @@ export default function TodaysWorkouts() {
 	}
 
 	if (error) {
-		return <p className="text-destructive">Error: {error.message}</p>
+		return (
+			<p className="type-body-sm text-destructive">Error: {error.message}</p>
+		)
 	}
 
 	if (!visibleTodays.length) {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<CalendarDays className="h-4 w-4" />
+					<CardTitle className="type-section flex items-center gap-2 text-foreground">
+						<CalendarDays className="h-4 w-4 text-ink-3" aria-hidden />
 						No workouts scheduled today
 					</CardTitle>
 					<CardDescription>
@@ -111,9 +113,13 @@ export default function TodaysWorkouts() {
 
 	return (
 		<>
+			{/* One of the three things §11.5 keeps boxed: the screen's single
+			    primary call to action. Everything else on this page is ruled. */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Today’s Workouts</CardTitle>
+					<CardTitle className="type-section text-foreground">
+						Today’s Workouts
+					</CardTitle>
 					<CardDescription>
 						{visibleTodays.length === 1
 							? 'You have 1 workout planned.'
@@ -128,13 +134,17 @@ export default function TodaysWorkouts() {
 						return (
 							<div
 								key={`${routine.id}:${day.id}`}
-								className="rounded-md border p-3 sm:flex sm:items-center sm:justify-between"
+								className="rounded-none border border-rule-faint p-3 sm:flex sm:items-center sm:justify-between"
 							>
 								<div className="min-w-0 flex-1">
-									<div className="flex items-center gap-2">
-										<span className="font-medium truncate">{routine.name}</span>
-										<Badge variant="classical">
-											<Calendar className="h-4 w-4" />
+									<div className="flex flex-wrap items-center gap-2">
+										<span className="type-panel min-w-0 truncate text-foreground">
+											{routine.name}
+										</span>
+										{/* §4.3 rule 3 — a scheduled weekday is not an achievement,
+										    so it is not an honour mark. */}
+										<Badge variant="outline">
+											<Calendar className="h-3 w-3" aria-hidden />
 											{weekdayName(day.dayOfWeek)}
 										</Badge>
 									</div>
@@ -143,7 +153,7 @@ export default function TodaysWorkouts() {
 									<Button
 										type="button"
 										className="w-full sm:w-auto"
-										variant="classical"
+										variant="default"
 										aria-label={
 											isActiveForThis ? 'Resume workout' : 'Start workout'
 										}

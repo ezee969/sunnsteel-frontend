@@ -39,8 +39,13 @@ export default function StatsOverview() {
 
 	if (isError || !data) {
 		return (
-			<div role="alert" className="rounded-lg border p-4 space-y-3">
-				<p>Workout statistics could not be loaded.</p>
+			<div
+				role="alert"
+				className="space-y-3 rounded-sm border border-rule bg-surface p-4"
+			>
+				<p className="type-body-sm text-foreground">
+					Workout statistics could not be loaded.
+				</p>
 				<Button onClick={() => refetch()} disabled={isFetching}>
 					Try again
 				</Button>
@@ -75,12 +80,23 @@ export default function StatsOverview() {
 	)
 
 	return (
-		<div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3">
+		// §10.1 — the stat row is one ruled band, not a card grid. The 1px lines
+		// are the container's own ground showing through a `gap-px`, so they run
+		// unbroken in both directions and need no per-cell border bookkeeping.
+		//
+		// The third column arrives at `lg`, not `sm`, and the band never opens to
+		// six. Both are the same measured constraint: the numeral rank steps to
+		// 52px at 768, where the shell's main column is only 512px wide, so three
+		// columns there gave a 170px cell for a value that can need ~196px — the
+		// first sweep caught 16px of overflow at exactly that width. Six across at
+		// 1440 fails the same way (§10.2 — a value is never clipped to fit a
+		// column count).
+		<div className="grid grid-cols-2 gap-px border-y border-rule bg-rule-faint lg:grid-cols-3">
 			<StatCard
 				icon={
 					<ClassicalIcon
 						name="two-dumbbells"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}
@@ -98,7 +114,7 @@ export default function StatsOverview() {
 				icon={
 					<ClassicalIcon
 						name="compass"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}
@@ -114,7 +130,7 @@ export default function StatsOverview() {
 				icon={
 					<ClassicalIcon
 						name="laurel-wreath"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}
@@ -134,7 +150,7 @@ export default function StatsOverview() {
 				icon={
 					<ClassicalIcon
 						name="shield"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}
@@ -149,7 +165,7 @@ export default function StatsOverview() {
 				icon={
 					<ClassicalIcon
 						name="torch"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}
@@ -166,7 +182,7 @@ export default function StatsOverview() {
 				icon={
 					<ClassicalIcon
 						name="bicep-flexing"
-						className="h-4 w-4 sm:h-5 sm:w-5 text-primary"
+						className="h-4 w-4 shrink-0"
 						aria-hidden
 					/>
 				}

@@ -15,7 +15,7 @@ export type Target = {
 	slug: string
 	path: string
 	/** Skipped unless the matching env var supplies an id. */
-	requiresId?: 'session'
+	requiresId?: 'session' | 'sessionFull'
 	note?: string
 }
 
@@ -36,6 +36,17 @@ export const ROUTES: Target[] = [
 		requiresId: 'session',
 		note: 'highest-density screen in the app; set UI_SESSION_ID',
 	},
+	{
+		slug: 'session-full',
+		path: '/workouts/sessions/__ID__',
+		requiresId: 'sessionFull',
+		note:
+			'the same screen carrying real data — logged sets, previous-performance ' +
+			'rows, a full progress bar. The `session` slug shows a freshly started ' +
+			'session with nothing in it, which hides most of what this screen is. ' +
+			'Any finished session id works, since the route renders by id; set ' +
+			'UI_SESSION_FULL_ID.',
+	},
 	{ slug: 'profile', path: '/profile' },
 	{ slug: 'search', path: '/search?q=press' },
 	{ slug: 'settings', path: '/settings' },
@@ -44,6 +55,11 @@ export const ROUTES: Target[] = [
 export function resolvePath(target: Target): string | null {
 	if (target.requiresId === 'session') {
 		const id = process.env.UI_SESSION_ID
+		if (!id) return null
+		return target.path.replace('__ID__', id)
+	}
+	if (target.requiresId === 'sessionFull') {
+		const id = process.env.UI_SESSION_FULL_ID
 		if (!id) return null
 		return target.path.replace('__ID__', id)
 	}

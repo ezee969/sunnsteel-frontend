@@ -28,6 +28,18 @@ import type {
 } from '@/lib/utils/workout-session.types'
 
 /**
+ * The Phase 4 scope class and shell bleed are gone: Phase 7 landed the palette
+ * globally, so this section no longer needs its own copy of it. The screen's
+ * remaining v1.0 gaps - the action panel composition, the masthead wrap, field
+ * width caps and the micro-caps inside set rows - are Phase 8's batch, listed
+ * in docs/ui-design-system.md §14.
+ */
+const SHELL_CLASS = 'min-h-screen bg-background'
+
+const BACK_BUTTON_CLASS =
+	'type-button inline-flex h-10 items-center rounded-sm bg-primary px-6 text-primary-foreground transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover'
+
+/**
  * Render the active workout session page with session metadata, progress, finish/abort controls, and editable set logs.
  *
  * Renders a hero, session header (status and start time), a card showing routine name and progress, finish/abort actions with confirmation dialog, and a list of set logs that will be grouped by routine structure when routine metadata is available. Handles saving individual set logs and finishing or aborting the session.
@@ -127,18 +139,13 @@ export default function ActiveSessionPage() {
 	// Error state
 	if (error) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center space-y-4">
-					<h1 className="text-2xl font-bold text-red-600">
-						Error Loading Session
-					</h1>
-					<p className="text-muted-foreground">
+			<div className={SHELL_CLASS}>
+				<div className="ledger-page space-y-4 py-16 text-center">
+					<h1 className="type-page text-destructive">Error Loading Session</h1>
+					<p className="text-ink-2">
 						{error.message || 'Failed to load workout session'}
 					</p>
-					<button
-						onClick={handleBack}
-						className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-					>
+					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						Go Back
 					</button>
 				</div>
@@ -149,17 +156,14 @@ export default function ActiveSessionPage() {
 	// No session found
 	if (!session) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center space-y-4">
-					<h1 className="text-2xl font-bold">Session Not Found</h1>
-					<p className="text-muted-foreground">
+			<div className={SHELL_CLASS}>
+				<div className="ledger-page space-y-4 py-16 text-center">
+					<h1 className="type-page">Session Not Found</h1>
+					<p className="text-ink-2">
 						The workout session you&apos;re looking for doesn&apos;t exist or
 						has been deleted.
 					</p>
-					<button
-						onClick={handleBack}
-						className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-					>
+					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						Go Back
 					</button>
 				</div>
@@ -170,18 +174,13 @@ export default function ActiveSessionPage() {
 	// Routine error state
 	if (routineError) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center space-y-4">
-					<h1 className="text-2xl font-bold text-red-600">
-						Error Loading Routine
-					</h1>
-					<p className="text-muted-foreground">
+			<div className={SHELL_CLASS}>
+				<div className="ledger-page space-y-4 py-16 text-center">
+					<h1 className="type-page text-destructive">Error Loading Routine</h1>
+					<p className="text-ink-2">
 						{routineError.message || 'Failed to load routine'}
 					</p>
-					<button
-						onClick={handleBack}
-						className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-					>
+					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						Go Back
 					</button>
 				</div>
@@ -192,16 +191,13 @@ export default function ActiveSessionPage() {
 	// No routine found (only after routine finished first fetch and routineId exists)
 	if (!!routineId && isRoutineFetched && !routine) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center space-y-4">
-					<h1 className="text-2xl font-bold">Routine Not Found</h1>
-					<p className="text-muted-foreground">
+			<div className={SHELL_CLASS}>
+				<div className="ledger-page space-y-4 py-16 text-center">
+					<h1 className="type-page">Routine Not Found</h1>
+					<p className="text-ink-2">
 						The routine associated with this session could not be loaded.
 					</p>
-					<button
-						onClick={handleBack}
-						className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-					>
+					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						Go Back
 					</button>
 				</div>
@@ -212,16 +208,13 @@ export default function ActiveSessionPage() {
 	const day = routine!.days.find(d => d.id === session.routineDayId)
 	if (!day) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center space-y-4">
-					<h1 className="text-2xl font-bold">Day Not Found</h1>
-					<p className="text-muted-foreground">
+			<div className={SHELL_CLASS}>
+				<div className="ledger-page space-y-4 py-16 text-center">
+					<h1 className="type-page">Day Not Found</h1>
+					<p className="text-ink-2">
 						The routine day associated with this session could not be found.
 					</p>
-					<button
-						onClick={handleBack}
-						className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-					>
+					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						Go Back
 					</button>
 				</div>
@@ -230,7 +223,7 @@ export default function ActiveSessionPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-background">
+		<div className={SHELL_CLASS}>
 			{/* Header */}
 			<SessionHeader
 				routineName={routine!.name}
@@ -243,7 +236,7 @@ export default function ActiveSessionPage() {
 			{/* The rest bar is fixed, so it would sit on top of the last set and
 			    the finish action. Reserve room for it only while it is shown. */}
 			<div
-				className={`container mx-auto px-4 py-6 space-y-6 ${
+				className={`ledger-page space-y-8 py-6 md:py-8 ${
 					restTimer.remaining !== null ? 'pb-28' : ''
 				}`}
 			>
@@ -261,15 +254,16 @@ export default function ActiveSessionPage() {
 				/>
 
 				{/* Exercise Groups */}
-				<div className="space-y-4">
-					{previousPerformanceError ? (
-						<p
-							className="text-center text-xs text-amber-700 dark:text-amber-300"
-							role="status"
-						>
-							Previous performance is temporarily unavailable.
-						</p>
-					) : null}
+				{previousPerformanceError ? (
+					<p
+						className="type-label border-l-2 border-warning-strong bg-surface-sunk px-3 py-2 text-ink-2"
+						role="status"
+					>
+						Previous performance is temporarily unavailable.
+					</p>
+				) : null}
+
+				<div className="divide-y divide-rule-faint border-y border-rule">
 					{groupedLogs.map(group => {
 						const completedSets = group.sets.filter(
 							set => set.isCompleted,
@@ -306,18 +300,11 @@ export default function ActiveSessionPage() {
 
 				{/* Empty state */}
 				{groupedLogs.length === 0 && (
-					<div className="text-center py-12">
-						<div className="space-y-4">
-							<div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-								<span className="text-2xl">🏋️</span>
-							</div>
-							<div>
-								<h3 className="text-lg font-semibold">No Exercises Found</h3>
-								<p className="text-muted-foreground">
-									This workout session doesn&apos;t have any exercises to log.
-								</p>
-							</div>
-						</div>
+					<div className="border-t border-rule py-16 text-center">
+						<h3 className="type-section text-foreground">No Exercises Found</h3>
+						<p className="mt-4 text-sm text-ink-2">
+							This workout session doesn&apos;t have any exercises to log.
+						</p>
 					</div>
 				)}
 			</div>

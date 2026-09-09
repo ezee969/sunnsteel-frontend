@@ -135,8 +135,11 @@ export function StaleSessionRecoveryDialog({
 		<AlertDialog open={isOpen}>
 			<AlertDialogContent className="max-w-lg">
 				<AlertDialogHeader>
-					<AlertDialogTitle className="flex items-center gap-2">
-						<AlertTriangle className="h-5 w-5 text-amber-600" />
+					<AlertDialogTitle className="flex items-center gap-2 text-foreground">
+						<AlertTriangle
+							className="h-5 w-5 text-warning-strong"
+							aria-hidden
+						/>
 						Recover your workout
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>
@@ -148,7 +151,7 @@ export function StaleSessionRecoveryDialog({
 								has not had saved activity since {lastActivity}. Choose what to
 								do before starting another workout.
 							</p>
-							<div className="rounded-lg border bg-muted/40 p-3 text-sm">
+							<div className="type-body-sm bg-surface-sunk p-3">
 								{hasDetailedSetLogs ? (
 									<span className="font-medium text-foreground">
 										{recovery.completedSets} of {recovery.totalSets} sets saved
@@ -175,7 +178,7 @@ export function StaleSessionRecoveryDialog({
 						</div>
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				<AlertDialogFooter className="sm:grid sm:grid-cols-3">
+				<AlertDialogFooter>
 					<Button
 						variant="destructive"
 						onClick={() => resolveSession('ABORTED')}
@@ -192,11 +195,7 @@ export function StaleSessionRecoveryDialog({
 						<CheckCircle2 className="h-4 w-4" />
 						Finish saved work
 					</Button>
-					<Button
-						variant="classical"
-						onClick={handleResume}
-						disabled={isPending}
-					>
+					<Button variant="default" onClick={handleResume} disabled={isPending}>
 						<Play className="h-4 w-4" />
 						{resumeSession.isPending ? 'Resuming…' : 'Resume'}
 					</Button>

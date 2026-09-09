@@ -22,7 +22,7 @@ export const SessionLoadingSkeleton = ({
 	return (
 		<div
 			data-testid="session-loading-skeleton"
-			className="space-y-6"
+			className="min-h-screen space-y-6 bg-background pb-6"
 			aria-label="Loading session data"
 			role="status"
 		>
@@ -30,9 +30,9 @@ export const SessionLoadingSkeleton = ({
 			{showHeader && (
 				<div
 					data-testid="header-skeleton"
-					className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b"
+					className="rule-heading sticky top-0 z-20 bg-background"
 				>
-					<div className="container mx-auto px-4 py-3">
+					<div className="ledger-page py-3">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
 								<Skeleton className="h-8 w-8 rounded" />
@@ -44,19 +44,19 @@ export const SessionLoadingSkeleton = ({
 							<div className="flex items-center gap-3">
 								<Skeleton className="h-4 w-16" />
 								<Skeleton className="h-4 w-12" />
-								<Skeleton className="h-6 w-16 rounded-full" />
+								<Skeleton className="h-6 w-16 rounded-none" />
 							</div>
 						</div>
 					</div>
 				</div>
 			)}
 
-			<div className="container mx-auto px-4 space-y-6">
+			<div className="ledger-page space-y-8 pt-6">
 				{/* Action Card Skeleton */}
 				{showActionCard && (
 					<Card
 						data-testid="action-card-skeleton"
-						className="sticky top-4 z-10"
+						className="sticky top-4 z-10 rounded-sm border-rule bg-surface bg-none shadow-none"
 					>
 						<CardHeader className="pb-3">
 							<div className="flex items-start justify-between">
@@ -64,7 +64,7 @@ export const SessionLoadingSkeleton = ({
 									<Skeleton className="h-6 w-40" />
 									<Skeleton className="h-4 w-24" />
 								</div>
-								<Skeleton className="h-6 w-20 rounded-full" />
+								<Skeleton className="h-6 w-20 rounded-none" />
 							</div>
 						</CardHeader>
 						<CardContent className="space-y-4">
@@ -116,6 +116,7 @@ export const SessionLoadingSkeleton = ({
 						<Card
 							key={exerciseIndex}
 							data-testid={`exercise-skeleton-${exerciseIndex}`}
+							className="rounded-none border-x-0 border-b-0 border-t border-rule-faint bg-transparent bg-none py-4 shadow-none"
 						>
 							<CardHeader className="pb-3">
 								<div className="flex items-center justify-between">
@@ -130,8 +131,8 @@ export const SessionLoadingSkeleton = ({
 										</div>
 									</div>
 									<div className="flex items-center gap-2">
-										<Skeleton className="h-5 w-12 rounded-full" />
-										<Skeleton className="h-5 w-16 rounded-full" />
+										<Skeleton className="h-5 w-12 rounded-none" />
+										<Skeleton className="h-5 w-16 rounded-none" />
 									</div>
 								</div>
 							</CardHeader>
@@ -143,13 +144,13 @@ export const SessionLoadingSkeleton = ({
 											<div
 												key={setIndex}
 												data-testid={`set-skeleton-${exerciseIndex}-${setIndex}`}
-												className="rounded-lg border-2 p-4 space-y-3"
+												className="space-y-3 bg-surface-sunk p-4"
 											>
 												{/* Set header */}
 												<div className="flex items-center justify-between">
 													<div className="flex items-center gap-2">
-														<Skeleton className="h-5 w-12 rounded-full" />
-														<Skeleton className="h-5 w-16 rounded-full" />
+														<Skeleton className="h-5 w-12 rounded-none" />
+														<Skeleton className="h-5 w-16 rounded-none" />
 													</div>
 													<div className="flex items-center gap-2">
 														<Skeleton className="h-3 w-8" />

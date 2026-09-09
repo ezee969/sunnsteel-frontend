@@ -33,21 +33,18 @@ export default function RoutinesPage() {
 		<div className="h-full min-h-0 flex flex-col gap-4 sm:gap-6">
 			{/* Classical Hero */}
 			<HeroSection
-				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				title={<>Routines</>}
 				subtitle={<>Plan, track, and refine your training.</>}
 			/>
-			{/* Header Section */}
-			<div className="flex flex-col gap-2">
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-					<div />
-					<Button asChild className="hidden h-10 gap-2 sm:flex">
-						<Link href="/routines/new" prefetch>
-							<Plus className="h-4 w-4" />
-							<span>Create Routine</span>
-						</Link>
-					</Button>
-				</div>
+			{/* Header Section — the empty spacer div that used to sit opposite this
+			    button left a band of dead space under the masthead. */}
+			<div className="flex justify-end">
+				<Button asChild className="hidden gap-2 sm:flex">
+					<Link href="/routines/new" prefetch>
+						<Plus className="h-4 w-4" />
+						<span>Create Routine</span>
+					</Link>
+				</Button>
 			</div>
 
 			<div className="flex min-h-0 flex-1 flex-col gap-4">

@@ -46,8 +46,8 @@ export const TrainingDayButton = ({
 			</>
 		)}
 		{isLocked && (
-			<div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
-				<span className="text-white text-[8px] font-bold">🔒</span>
+			<div className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-none bg-warning-strong">
+				<span className="text-[8px] leading-none">🔒</span>
 			</div>
 		)}
 	</Button>

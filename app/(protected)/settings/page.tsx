@@ -219,39 +219,39 @@ export default function SettingsPage() {
 	if (isLoading) {
 		return (
 			<div className="flex justify-center p-8">
-				<Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+				<Loader2 className="h-8 w-8 animate-spin text-ink-3" />
 			</div>
 		)
 	}
 
 	return (
-		<div className="max-w-4xl mx-auto space-y-6 slide-in-bottom">
-			<div>
-				<h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 heading-classical">
+		<div className="mx-auto max-w-4xl space-y-8">
+			<div className="rule-heading pb-4">
+				<h2 className="type-page corner-brackets inline-block text-foreground">
 					Profile Settings
 				</h2>
-				<p className="text-muted-foreground">
+				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
 					Manage your account settings and set your preferences.
 				</p>
 			</div>
 
-			<div className="grid gap-6 md:grid-cols-[1fr_2fr]">
-				<Card className="border-amber-500/20 bg-card/50 backdrop-blur-sm">
+			<div className="grid items-start gap-6 md:grid-cols-[1fr_2fr]">
+				<Card>
 					<CardHeader>
 						<CardTitle>Profile Picture</CardTitle>
 						<CardDescription>Update your avatar</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-col items-center gap-4">
 						<div className="relative group">
-							<Avatar className="h-32 w-32 border-4 border-amber-500/20 shadow-lg transition-transform group-hover:scale-105">
+							<Avatar className="h-32 w-32 border border-rule">
 								<AvatarImage src={avatarUrl || ''} className="object-cover" />
-								<AvatarFallback className="text-3xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+								<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
 									{user?.name?.charAt(0)}
 								</AvatarFallback>
 							</Avatar>
 							<label
 								htmlFor="avatar-upload"
-								className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 group-hover:opacity-100 rounded-full cursor-pointer backdrop-blur-[2px] transition-all"
+								className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-foreground/70 text-background opacity-0 transition-opacity duration-[var(--motion-fast)] ease-standard group-hover:opacity-100"
 							>
 								{uploading ? (
 									<Loader2 className="h-6 w-6 animate-spin" />
@@ -268,13 +268,13 @@ export default function SettingsPage() {
 								disabled={uploading}
 							/>
 						</div>
-						<p className="text-xs text-muted-foreground text-center">
+						<p className="type-body-sm text-center text-ink-3">
 							Click the image to upload a new avatar.
 						</p>
 					</CardContent>
 				</Card>
 
-				<Card className="border-amber-500/20 bg-card/50 backdrop-blur-sm shadow-xl shadow-amber-900/5">
+				<Card>
 					<CardHeader>
 						<CardTitle>Personal Information</CardTitle>
 						<CardDescription>
@@ -292,7 +292,6 @@ export default function SettingsPage() {
 										value={formData.name}
 										onChange={handleInputChange}
 										required
-										className="bg-background/50"
 									/>
 								</div>
 								<div className="space-y-2">
@@ -302,7 +301,6 @@ export default function SettingsPage() {
 										name="lastName"
 										value={formData.lastName}
 										onChange={handleInputChange}
-										className="bg-background/50"
 									/>
 								</div>
 							</div>
@@ -314,7 +312,7 @@ export default function SettingsPage() {
 									type="email"
 									value={user?.email || ''}
 									disabled
-									className="bg-muted cursor-not-allowed text-muted-foreground border-transparent"
+									className="cursor-not-allowed"
 								/>
 							</div>
 
@@ -324,12 +322,12 @@ export default function SettingsPage() {
 									<Input
 										id="age"
 										name="age"
+										className="max-w-[var(--field-max)]"
 										type="number"
 										min="10"
 										max="120"
 										value={formData.age}
 										onChange={handleInputChange}
-										className="bg-background/50"
 									/>
 								</div>
 
@@ -339,7 +337,7 @@ export default function SettingsPage() {
 										value={formData.sex}
 										onValueChange={val => handleSelectChange(val, 'sex')}
 									>
-										<SelectTrigger className="bg-background/50">
+										<SelectTrigger className="w-full">
 											<SelectValue placeholder="Select sex" />
 										</SelectTrigger>
 										<SelectContent>
@@ -358,11 +356,11 @@ export default function SettingsPage() {
 									<Input
 										id="weight"
 										name="weight"
+										className="max-w-[var(--field-max)]"
 										type="number"
 										step="0.1"
 										value={formData.weight}
 										onChange={handleInputChange}
-										className="bg-background/50"
 									/>
 								</div>
 								<div className="space-y-2">
@@ -373,7 +371,7 @@ export default function SettingsPage() {
 											handleWeightUnitChange(value as WeightUnit)
 										}
 									>
-										<SelectTrigger id="weightUnit" className="bg-background/50">
+										<SelectTrigger id="weightUnit" className="w-full">
 											<SelectValue aria-label="Weight unit" />
 										</SelectTrigger>
 										<SelectContent>
@@ -387,11 +385,11 @@ export default function SettingsPage() {
 									<Input
 										id="height"
 										name="height"
+										className="max-w-[var(--field-max)]"
 										type="number"
 										step="0.1"
 										value={formData.height}
 										onChange={handleInputChange}
-										className="bg-background/50"
 									/>
 								</div>
 							</div>
@@ -400,7 +398,7 @@ export default function SettingsPage() {
 								<Button
 									type="submit"
 									disabled={updateUserMutation.isPending}
-									className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white min-w-[120px] shadow-md transition-all hover:scale-[1.02]"
+									className="min-w-[120px]"
 								>
 									{updateUserMutation.isPending ? (
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />

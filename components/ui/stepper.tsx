@@ -24,6 +24,20 @@ interface StepperProps {
 	canStepClick?: (stepId: number) => boolean
 }
 
+/**
+ * The routine wizard's step indicator.
+ *
+ * This carried the largest raw-palette cluster left in the app — 22 classes
+ * across `blue-*`, `green-*` and `gray-*`. v1.0 §12.1 maps them by meaning, not
+ * by name: **completed is `--success`** (§4.3 rule 2 — done, as planned), the
+ * **current step is an ink outline, not an ink fill** (rule 1 reserves the
+ * filled `--primary` for the region's one real control, which is the wizard's
+ * Next button), a **visited step is a plain bounded marker**, and an unreached
+ * step takes the §4.3 rule 7 disabled treatment — `--ink-3` on `--surface-sunk`,
+ * never a global opacity drop.
+ *
+ * The markers are square. §7 keeps `rounded-full` for avatars only.
+ */
 export function Stepper({
 	steps,
 	currentStep,
@@ -35,8 +49,12 @@ export function Stepper({
 }: StepperProps) {
 	return (
 		<div className={cn('w-full', className)}>
-			{/* Mobile Version - Vertical Layout */}
-			<div className="block sm:hidden">
+			{/* Stacked layout. It runs to `lg`, not `sm`: the horizontal stepper
+			    needs ~700px and the shell only gives its main column 512px at a 768
+			    viewport, so four steps ran 88px past the edge there. The `before`
+			    baseline shows the same overflow with step 4 already cut off —
+			    pre-existing, but this batch's type ranks widened it. */}
+			<div className="block lg:hidden">
 				<div className="space-y-4">
 					{steps.map(step => {
 						const isCompleted = completedSteps
@@ -50,26 +68,24 @@ export function Stepper({
 
 						return (
 							<div key={step.id} className="flex items-start gap-4">
-								{/* Step Circle */}
+								{/* Step Marker */}
 								<div
 									className={cn(
-										'flex shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold cursor-pointer transition-all duration-200',
+										'type-data flex shrink-0 cursor-pointer items-center justify-center rounded-sm border transition-colors duration-[var(--motion-fast)] ease-standard',
 										isCompleted
-											? 'border-green-500 bg-green-500 text-white hover:bg-green-600 hover:border-green-600 h-8 w-8'
+											? 'h-8 w-8 border-success bg-success text-background'
 											: isActive
-												? 'border-blue-500 bg-blue-50 text-blue-600  h-10 w-10'
+												? 'h-10 w-10 border-2 border-primary bg-surface text-foreground'
 												: isClickable
-													? 'border-blue-400 bg-blue-100 text-blue-700 hover:bg-blue-200 hover:border-blue-500 h-8 w-8'
-													: 'border-gray-300 bg-gray-50 text-gray-400 h-8 w-8',
+													? 'h-8 w-8 border-rule bg-surface text-ink-2 hover:bg-muted'
+													: 'h-8 w-8 border-rule-faint bg-surface-sunk text-ink-3',
 									)}
 									onClick={() => isClickable && onStepClick?.(step.id)}
 								>
 									{isCompleted ? (
 										<Check className="h-4 w-4" />
 									) : (
-										<span className={cn(isActive ? 'text-sm' : 'text-xs')}>
-											{step.id}
-										</span>
+										<span>{step.id}</span>
 									)}
 								</div>
 
@@ -83,14 +99,14 @@ export function Stepper({
 								>
 									<div
 										className={cn(
-											'font-medium transition-colors',
+											'type-panel transition-colors duration-[var(--motion-fast)] ease-standard',
 											isCompleted
-												? 'text-green-700 hover:text-green-800 text-sm'
+												? 'text-ink-2'
 												: isActive
-													? 'text-blue-600 text-base font-semibold'
+													? 'text-foreground'
 													: isClickable
-														? 'text-blue-600 hover:text-blue-700 text-sm'
-														: 'text-gray-500 text-sm',
+														? 'text-ink-2 hover:text-foreground'
+														: 'text-ink-3',
 										)}
 									>
 										{step.title}
@@ -98,7 +114,7 @@ export function Stepper({
 
 									{/* Description - Only show for active step */}
 									{isActive && (
-										<div className="text-sm mt-2 text-gray-600 leading-relaxed">
+										<div className="type-body-sm mt-1 text-ink-3">
 											{step.description}
 										</div>
 									)}
@@ -107,7 +123,7 @@ export function Stepper({
 								{/* Active Indicator */}
 								{isActive && (
 									<div className="mt-1">
-										<ChevronRight className="h-4 w-4 text-blue-500" />
+										<ChevronRight className="h-4 w-4 text-ink-3" aria-hidden />
 									</div>
 								)}
 							</div>
@@ -116,8 +132,8 @@ export function Stepper({
 				</div>
 			</div>
 
-			{/* Desktop Version - Horizontal Layout */}
-			<div className="hidden sm:block">
+			{/* Horizontal Layout */}
+			<div className="hidden lg:block">
 				<div className="flex items-start justify-between w-full">
 					{steps.map((step, index) => {
 						const isCompleted = completedSteps
@@ -136,22 +152,22 @@ export function Stepper({
 								<div
 									className={cn(
 										'flex flex-col items-center relative shrink-0 px-2',
-										isClickable && 'cursor-pointer hover:opacity-80',
+										isClickable && 'cursor-pointer',
 									)}
 									onClick={() => isClickable && onStepClick?.(step.id)}
 								>
-									{/* Step Circle Wrapper - Fixed Height for Alignment */}
-									<div className="flex items-center justify-center h-12 mb-2">
+									{/* Step Marker Wrapper - Fixed Height for Alignment */}
+									<div className="mb-2 flex h-12 items-center justify-center">
 										<div
 											className={cn(
-												'flex items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-200',
+												'type-data flex items-center justify-center rounded-sm border transition-colors duration-[var(--motion-fast)] ease-standard',
 												isCompleted
-													? 'border-green-500 bg-green-500 text-white h-10 w-10'
+													? 'h-10 w-10 border-success bg-success text-background'
 													: isActive
-														? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm shadow-blue-100 h-12 w-12'
+														? 'h-12 w-12 border-2 border-primary bg-surface text-foreground'
 														: isClickable
-															? 'border-blue-400 bg-blue-100 text-blue-700 hover:bg-blue-200 hover:border-blue-500 h-10 w-10'
-															: 'border-gray-300 bg-gray-50 text-gray-400 h-10 w-10',
+															? 'h-10 w-10 border-rule bg-surface text-ink-2 hover:bg-muted'
+															: 'h-10 w-10 border-rule-faint bg-surface-sunk text-ink-3',
 											)}
 										>
 											{isCompleted ? (
@@ -165,14 +181,14 @@ export function Stepper({
 									{/* Step Title */}
 									<div
 										className={cn(
-											'text-center font-medium transition-colors',
+											'type-panel text-center transition-colors duration-[var(--motion-fast)] ease-standard',
 											isCompleted
-												? 'text-green-700 text-sm'
+												? 'text-ink-2'
 												: isActive
-													? 'text-blue-600 text-sm font-semibold'
+													? 'text-foreground'
 													: isClickable
-														? 'text-blue-600 hover:text-blue-700 text-xs'
-														: 'text-gray-500 text-xs',
+														? 'text-ink-2 hover:text-foreground'
+														: 'text-ink-3',
 										)}
 									>
 										{step.title}
@@ -181,8 +197,8 @@ export function Stepper({
 									{/* Step Description */}
 									<div
 										className={cn(
-											'text-center text-xs mt-1 transition-colors max-w-[150px]',
-											isActive ? 'text-gray-600' : 'text-gray-400',
+											'type-body-sm mt-1 max-w-[150px] text-center transition-colors duration-[var(--motion-fast)] ease-standard',
+											isActive ? 'text-ink-2' : 'text-ink-3',
 										)}
 									>
 										{step.description}
@@ -193,12 +209,12 @@ export function Stepper({
 								{!isLast && (
 									<div
 										className={cn(
-											'flex-1 h-0.5 mx-4 transition-colors duration-300 mt-6',
+											'mx-4 mt-6 h-px flex-1 transition-colors duration-[var(--motion-base)] ease-standard',
 											isCompleted
-												? 'bg-green-500'
+												? 'bg-success'
 												: isActive
-													? 'bg-blue-500'
-													: 'bg-gray-300',
+													? 'bg-rule'
+													: 'bg-rule-faint',
 										)}
 									/>
 								)}

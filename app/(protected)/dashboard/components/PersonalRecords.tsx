@@ -2,7 +2,6 @@
 
 import { Trophy } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -23,16 +22,15 @@ export default function PersonalRecords() {
 	const records = data?.personalRecords ?? []
 
 	return (
-		<Card className="border-border/40">
-			<CardHeader className="pb-3">
-				<CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-					<Trophy className="h-4 w-4 text-primary" aria-hidden />
-					Personal Records
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
+		// §11.5 — ruled, like every other list on this page.
+		<section>
+			<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+				<Trophy className="h-4 w-4 text-ink-3" aria-hidden />
+				Personal Records
+			</h2>
+			<div className="pt-1">
 				{records.length === 0 ? (
-					<p className="text-muted-foreground text-sm">
+					<p className="type-body-sm py-3 text-ink-3">
 						Log a few sets and your records will show up here.
 					</p>
 				) : (
@@ -46,7 +44,7 @@ export default function PersonalRecords() {
 						/>
 					))
 				)}
-			</CardContent>
-		</Card>
+			</div>
+		</section>
 	)
 }

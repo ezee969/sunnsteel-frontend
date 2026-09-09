@@ -22,7 +22,6 @@ import {
 	ClassicalIconName,
 } from '@/components/icons/ClassicalIcon'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -152,11 +151,10 @@ export default function Sidebar({
 	return (
 		<div
 			className={cn(
-				'fixed inset-y-0 z-50 flex flex-col backdrop-blur-sm border-r shadow-lg transition-all duration-300 ease-in-out',
-				// Classical marble background + subtle border in gold tones
-				'bg-marble-light dark:bg-marble-light border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)]',
-				// Ensure consistent background across mobile and desktop
-				'bg-sidebar/95 dark:bg-sidebar/95',
+				// v1.0 §11.10: an index column, not a panel. Ground-coloured with a
+				// single rule on its right edge - no marble wash, no gold hex border,
+				// no blur, no shadow. Elevation in this system is tonal (§8).
+				'fixed inset-y-0 z-50 flex flex-col border-r border-rule bg-background transition-all duration-300 ease-in-out',
 				isMobile
 					? isMobileMenuOpen
 						? 'left-0 w-[85%] max-w-[300px]'
@@ -166,23 +164,14 @@ export default function Sidebar({
 						: 'left-0 w-20',
 			)}
 		>
-			{/* Golden vertical accent line */}
-			<div className="pointer-events-none absolute right-0 top-0 h-full w-[2px] bg-gradient-to-b from-[rgba(255,215,0,0.2)] via-[rgba(218,165,32,0.35)] to-[rgba(255,215,0,0.2)]" />
-			<div className="flex h-16 items-center justify-between border-b px-4">
+			<div className="flex h-14 items-center justify-between border-b border-rule px-4 md:h-16">
 				<div
 					className={cn(
 						'flex items-center gap-2 font-semibold transition-all duration-300',
 						!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
 					)}
 				>
-					<span
-						className="text-xl font-black tracking-wider text-black dark:text-white"
-						style={{
-							fontFamily: '"Cinzel", "Times New Roman", serif',
-							letterSpacing: '0.05em',
-							fontWeight: '900',
-						}}
-					>
+					<span className="type-wordmark text-xl text-foreground">
 						SUNNSTEEL
 					</span>
 				</div>
@@ -218,69 +207,60 @@ export default function Sidebar({
 							const buttonContent = (
 								<Button
 									aria-disabled={item.disabled}
-									variant={activeNav === item.id ? 'default' : 'ghost'}
+									variant="ghost"
 									className={cn(
-										'gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
+										// §11.10: active is a 3px honour mark plus ink text, never
+										// a filled slab - that inversion was the heaviest object
+										// on every screen. Hover and active differ by colour, not
+										// geometry, so both carry the same 3px left border.
+										'mark group w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
+										isMobile ? 'h-11' : 'h-9',
 										isSidebarOpen || isMobile
 											? 'justify-start'
 											: 'justify-center',
 										activeNav === item.id
-											? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400'
-											: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700',
+											? 'mark-honour bg-surface font-semibold text-foreground'
+											: 'text-ink-2 hover:bg-surface hover:text-foreground',
 										item.disabled &&
-											'opacity-50 hover:bg-transparent dark:hover:bg-transparent cursor-not-allowed',
+											'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
 									)}
 									asChild={false}
 								>
-									<div
-										className={cn(
-											'absolute inset-0 opacity-0 bg-gradient-to-r from-amber-600/5 dark:from-amber-400/5 to-transparent transition-opacity',
-											activeNav === item.id
-												? 'opacity-100'
-												: 'group-hover:opacity-100',
-										)}
-									/>
 									{item.classicalName ? (
 										<ClassicalIcon
 											name={item.classicalName}
 											aria-hidden
 											className={cn(
-												'h-5 w-5 transition-all',
+												'h-5 w-5 shrink-0 transition-colors',
 												activeNav === item.id
-													? 'text-amber-500 dark:text-amber-400'
-													: 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+													? 'text-honour-strong'
+													: 'text-ink-3 group-hover:text-foreground',
 											)}
 										/>
 									) : (
 										<item.icon
 											className={cn(
-												'h-5 w-5 transition-all',
+												'h-5 w-5 shrink-0 transition-colors',
 												activeNav === item.id
-													? 'text-amber-500 dark:text-amber-400'
-													: 'text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+													? 'text-honour-strong'
+													: 'text-ink-3 group-hover:text-foreground',
 											)}
 										/>
 									)}
 									<span
 										className={cn(
-											'transition-all duration-300 font-medium',
+											'truncate',
 											!isSidebarOpen &&
 												!isMobile &&
-												'opacity-0 w-0 overflow-hidden',
-											activeNav === item.id
-												? 'translate-x-1'
-												: 'group-hover:translate-x-1',
+												'w-0 overflow-hidden opacity-0',
 										)}
 									>
 										{item.label}
 									</span>
 									{item.disabled && (isSidebarOpen || isMobile) && (
-										<Badge
-											variant="outline"
-											className="ml-auto text-[9px] h-4 px-1 border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider font-sans shrink-0"
-										>
+										<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
 											Soon
-										</Badge>
+										</span>
 									)}
 								</Button>
 							)
@@ -334,13 +314,14 @@ export default function Sidebar({
 					<Separator className="my-4" />
 					<Button
 						asChild
-						variant={activeNav === 'settings' ? 'default' : 'ghost'}
+						variant="ghost"
 						className={cn(
-							'justify-start gap-3 h-12 relative overflow-hidden group transition-all duration-300 w-full',
+							'mark group w-full justify-start gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
+							isMobile ? 'h-11' : 'h-9',
 							!isSidebarOpen && !isMobile ? 'justify-center' : '',
 							activeNav === 'settings'
-								? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 border-l-2 border-amber-600 dark:border-amber-400'
-								: 'hover:bg-neutral-100 dark:hover:bg-neutral-800 border-l-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-700',
+								? 'mark-honour bg-surface font-semibold text-foreground'
+								: 'text-ink-2 hover:bg-surface hover:text-foreground',
 						)}
 						onClick={() => {
 							if (isMobile) {
@@ -349,28 +330,20 @@ export default function Sidebar({
 						}}
 					>
 						<Link href="/settings" onClick={() => setActiveNav('settings')}>
-							<div
-								className={cn(
-									'absolute inset-0 opacity-0 bg-gradient-to-r from-amber-600/5 dark:from-amber-400/5 to-transparent transition-opacity',
-									activeNav === 'settings'
-										? 'opacity-100'
-										: 'group-hover:opacity-100',
-								)}
-							/>
 							<Settings
 								className={cn(
-									'h-5 w-5 transition-all text-muted-foreground',
+									'h-5 w-5 shrink-0 transition-colors',
 									activeNav === 'settings'
-										? 'text-amber-500 dark:text-amber-400'
-										: 'group-hover:text-neutral-900 dark:group-hover:text-neutral-100',
+										? 'text-honour-strong'
+										: 'text-ink-3 group-hover:text-foreground',
 								)}
 							/>
 							<span
 								className={cn(
-									'transition-all duration-300',
+									'truncate',
 									!isSidebarOpen &&
 										!isMobile &&
-										'opacity-0 w-0 overflow-hidden',
+										'w-0 overflow-hidden opacity-0',
 								)}
 							>
 								Settings
@@ -379,21 +352,21 @@ export default function Sidebar({
 					</Button>
 				</nav>
 			</ScrollArea>
-			<div className="border-t p-4">
+			<div className="border-t border-rule p-4">
 				<Link href="/settings">
 					<div
 						className={cn(
-							'flex items-center gap-3 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 p-2 rounded-md transition-colors',
+							'flex cursor-pointer items-center gap-3 rounded-sm p-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
 							!isSidebarOpen && !isMobile && 'justify-center',
 						)}
 					>
-						<Avatar className="h-10 w-10 border-2 border-primary/20">
+						<Avatar className="h-10 w-10 border border-rule">
 							<AvatarImage
 								src={user?.avatarUrl || ''}
 								alt="User avatar"
 								className="object-cover"
 							/>
-							<AvatarFallback className="bg-primary/10 text-primary">
+							<AvatarFallback>
 								{user?.name
 									?.split(' ')
 									.map(n => n.charAt(0))
@@ -408,10 +381,10 @@ export default function Sidebar({
 								!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
 							)}
 						>
-							<span className="text-sm font-medium">
+							<span className="truncate text-sm font-medium text-foreground">
 								{user?.name} {user?.lastName}
 							</span>
-							<span className="text-xs text-muted-foreground truncate max-w-[10rem]">
+							<span className="max-w-[10rem] truncate text-xs text-ink-3">
 								{user?.email}
 							</span>
 						</div>

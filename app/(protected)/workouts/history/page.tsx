@@ -5,12 +5,6 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-} from '@/components/ui/card'
 import { useWorkoutHistoryFilters } from '@/features/workout/use-workout-history-filters'
 import { WorkoutHistoryFilters } from '@/features/workout/workout-history-filters'
 import { WorkoutHistoryList } from '@/features/workout/workout-history-list'
@@ -159,39 +153,39 @@ function WorkoutHistoryContent() {
 	return (
 		<div className="mx-auto max-w-3xl p-4">
 			<HeroSection
-				imageSrc="/backgrounds/vertical-hero-greek-columns.webp"
 				sectionClassName="mb-4 sm:mb-6"
 				title={<>Training Archive</>}
 				subtitle={<>Browse and filter your sessions.</>}
 			/>
-			<Card>
-				<CardHeader>
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-						<div>
-							<h1 className="text-xl font-semibold">Workout History</h1>
-							<CardDescription>
-								Browse your past workout sessions with filters.
-							</CardDescription>
-						</div>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={handleToggleFilters}
-							aria-expanded={isFiltersOpen}
-							aria-controls="workout-history-filters"
-							className="inline-flex items-center gap-1 sm:self-start"
-						>
-							<span>Filter</span>
-							<ChevronDown
-								className={`h-4 w-4 transition-transform duration-300 ${
-									isFiltersOpen ? 'rotate-180' : ''
-								}`}
-								aria-hidden="true"
-							/>
-						</Button>
+			{/* §11.5 — the archive is a ruled ledger, so the panel that used to box
+			    the whole list is gone. The section heading and its rule carry the
+			    region instead. */}
+			<section>
+				<div className="rule-heading flex flex-col gap-2 pb-2 sm:flex-row sm:items-end sm:justify-between">
+					<div>
+						<h1 className="type-section text-foreground">Workout History</h1>
+						<p className="type-body-sm text-ink-3">
+							Browse your past workout sessions with filters.
+						</p>
 					</div>
-				</CardHeader>
-				<CardContent>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={handleToggleFilters}
+						aria-expanded={isFiltersOpen}
+						aria-controls="workout-history-filters"
+						className="inline-flex items-center gap-1 self-start sm:self-auto"
+					>
+						<span>Filter</span>
+						<ChevronDown
+							className={`h-4 w-4 transition-transform duration-[var(--motion-base)] ease-standard ${
+								isFiltersOpen ? 'rotate-180' : ''
+							}`}
+							aria-hidden="true"
+						/>
+					</Button>
+				</div>
+				<div className="pt-4">
 					<WorkoutHistoryFilters
 						filters={{
 							status,
@@ -227,8 +221,8 @@ function WorkoutHistoryContent() {
 							sentinelRef,
 						}}
 					/>
-				</CardContent>
-			</Card>
+				</div>
+			</section>
 		</div>
 	)
 }
@@ -238,7 +232,7 @@ export default function WorkoutHistoryPage() {
 		<Suspense
 			fallback={
 				<div className="mx-auto max-w-3xl p-4">
-					<div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+					<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
 						Loading workout history…
 					</div>
 				</div>

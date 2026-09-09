@@ -132,11 +132,11 @@ export const TrainingLocationPreferencesCard = ({
 	}
 
 	return (
-		<Card className="border-amber-500/20 bg-card/50 backdrop-blur-sm">
+		<Card>
 			<CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div className="space-y-1.5">
 					<CardTitle className="flex items-center gap-2">
-						<MapPin className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+						<MapPin className="h-4 w-4 text-ink-3" aria-hidden />
 						Training Locations
 					</CardTitle>
 					<CardDescription>
@@ -156,13 +156,13 @@ export const TrainingLocationPreferencesCard = ({
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{isLoading ? (
-					<div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="h-4 w-4 animate-spin" />
 						Loading equipment preferences…
 					</div>
 				) : error ? (
-					<div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm">
-						<p className="text-destructive">{error.message}</p>
+					<div className="rounded-sm border border-destructive bg-surface p-4">
+						<p className="type-body-sm text-destructive">{error.message}</p>
 						<Button
 							type="button"
 							variant="outline"
@@ -176,9 +176,11 @@ export const TrainingLocationPreferencesCard = ({
 				) : (
 					<>
 						{drafts.length === 0 ? (
-							<div className="rounded-md border border-dashed p-6 text-center">
-								<p className="font-medium">No training locations saved</p>
-								<p className="mt-1 text-sm text-muted-foreground">
+							<div className="rounded-sm border border-dashed border-rule p-6 text-center">
+								<p className="type-panel text-foreground">
+									No training locations saved
+								</p>
+								<p className="type-body-sm mt-1 text-ink-3">
 									Add the gym or home setup you train with most often.
 								</p>
 							</div>
@@ -187,7 +189,7 @@ export const TrainingLocationPreferencesCard = ({
 						{drafts.map((location, locationIndex) => (
 							<section
 								key={location.key}
-								className="space-y-4 rounded-md border bg-background/40 p-4"
+								className="space-y-4 rounded-none border border-rule-faint bg-surface-sunk p-4"
 							>
 								<div className="flex flex-wrap items-end gap-3">
 									<div className="min-w-48 flex-1 space-y-2">
@@ -212,6 +214,7 @@ export const TrainingLocationPreferencesCard = ({
 										</Label>
 										<Input
 											id={`bar-${location.key}`}
+											className="max-w-[var(--field-max)]"
 											type="number"
 											min="0.5"
 											max={weightUnit === 'KG' ? '100' : '220.46'}
@@ -225,9 +228,10 @@ export const TrainingLocationPreferencesCard = ({
 											}
 										/>
 									</div>
-									<label className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm">
+									<label className="type-body-sm flex h-11 items-center gap-2 rounded-sm border border-rule bg-surface px-3 text-foreground md:h-10">
 										<input
 											type="radio"
+											className="accent-[color:var(--primary)]"
 											name="default-training-location"
 											checked={location.isDefault}
 											onChange={() => makeDefault(location.key)}
@@ -260,7 +264,7 @@ export const TrainingLocationPreferencesCard = ({
 											}))
 										}
 									/>
-									<p className="text-xs text-muted-foreground">
+									<p className="type-body-sm text-ink-3">
 										Separate equipment with commas.
 									</p>
 								</div>
@@ -268,10 +272,10 @@ export const TrainingLocationPreferencesCard = ({
 								<div className="space-y-3">
 									<div className="flex items-center justify-between gap-3">
 										<div>
-											<p className="text-sm font-medium">
+											<p className="type-panel text-foreground">
 												Available Plate Pairs
 											</p>
-											<p className="text-xs text-muted-foreground">
+											<p className="type-body-sm text-ink-3">
 												Enter the weight of one plate and how many pairs exist.
 											</p>
 										</div>
@@ -298,7 +302,7 @@ export const TrainingLocationPreferencesCard = ({
 									{location.availablePlatePairs.map(plate => (
 										<div
 											key={plate.key}
-											className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3"
+											className="flex flex-wrap items-end gap-3"
 										>
 											<div className="space-y-2">
 												<Label htmlFor={`plate-weight-${plate.key}`}>
@@ -306,6 +310,7 @@ export const TrainingLocationPreferencesCard = ({
 												</Label>
 												<Input
 													id={`plate-weight-${plate.key}`}
+													className="max-w-[var(--field-max)]"
 													type="number"
 													min="0.05"
 													step="0.01"
@@ -332,6 +337,7 @@ export const TrainingLocationPreferencesCard = ({
 												</Label>
 												<Input
 													id={`plate-count-${plate.key}`}
+													className="max-w-[var(--field-max)]"
 													type="number"
 													min="1"
 													max="20"
@@ -377,7 +383,7 @@ export const TrainingLocationPreferencesCard = ({
 						))}
 
 						{formError ? (
-							<p className="text-sm text-destructive" role="alert">
+							<p className="type-body-sm text-destructive" role="alert">
 								{formError}
 							</p>
 						) : null}

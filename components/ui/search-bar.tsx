@@ -60,32 +60,41 @@ export function SearchBar() {
 	return (
 		<div className="relative w-full max-w-sm" ref={containerRef}>
 			<form onSubmit={handleSearchSubmit} className="relative group">
-				<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+				<Search
+					className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard group-focus-within:text-foreground"
+					aria-hidden
+				/>
+				{/* The field takes the primitive's own boundary (§11.6). It was a
+				    translucent pill with a `--primary`-tinted border and ring, which
+				    made the one search field in the app the only control that did not
+				    look like the rest of them. */}
 				<Input
 					type="text"
 					placeholder="Search users..."
-					className="pl-9 pr-10 w-full bg-background/50 border-primary/20 focus-visible:ring-primary/30 transition-all rounded-full"
+					className="w-full pl-9 pr-10"
 					value={query}
 					onChange={e => setQuery(e.target.value)}
 					onFocus={() => setIsFocused(true)}
 				/>
 				{isLoading && (
-					<Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+					<Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-ink-3" />
 				)}
 			</form>
 
 			<AnimatePresence>
 				{showDropdown && (
+					// §11.9/§8 — an overlay separates by shadow in light, by scrim and
+					// a 1px rule in dark. Nothing here is translucent or blurred.
 					<motion.div
-						initial={{ opacity: 0, y: -10 }}
+						initial={{ opacity: 0, y: -4 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.15 }}
-						className="absolute top-full mt-2 w-full bg-background/95 backdrop-blur-md border border-primary/20 rounded-xl shadow-lg shadow-black/5 overflow-hidden z-50"
+						exit={{ opacity: 0, y: -4 }}
+						transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+						className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-md border border-rule bg-popover text-popover-foreground shadow-overlay dark:shadow-none"
 					>
 						{results.length > 0 ? (
-							<div className="py-2 flex flex-col max-h-[300px] overflow-y-auto">
-								<span className="text-xs font-semibold text-muted-foreground px-3 mb-1 uppercase tracking-wider">
+							<div className="flex max-h-[300px] flex-col overflow-y-auto py-2">
+								<span className="type-label mb-1 px-3 text-ink-3">
 									Top Results
 								</span>
 								{results.map(
@@ -95,16 +104,16 @@ export function SearchBar() {
 										<button
 											key={user.id}
 											onClick={() => handleSelectUser(user.id)}
-											className="flex items-center gap-3 w-full px-3 py-2 hover:bg-primary/10 transition-colors text-left"
+											className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted"
 										>
-											<Avatar className="h-8 w-8 border border-primary/20">
+											<Avatar className="h-8 w-8 border border-rule">
 												<AvatarImage src={user.avatarUrl || ''} />
-												<AvatarFallback className="text-xs bg-primary/10 text-primary">
+												<AvatarFallback className="type-body-sm bg-surface-sunk text-ink-2">
 													{user.name.charAt(0)}
 												</AvatarFallback>
 											</Avatar>
 											<div className="flex flex-col overflow-hidden">
-												<span className="text-sm font-medium truncate">
+												<span className="type-panel truncate text-foreground">
 													{user.name} {user.lastName || ''}
 												</span>
 											</div>
@@ -112,7 +121,7 @@ export function SearchBar() {
 									),
 								)}
 								<div
-									className="px-3 py-2 mt-1 border-t border-primary/10 text-xs text-center text-primary cursor-pointer hover:bg-primary/5 transition-colors"
+									className="type-body-sm mt-1 cursor-pointer border-t border-rule-faint px-3 py-2 text-center text-ink-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground"
 									onClick={e => {
 										e.preventDefault()
 										handleSearchSubmit(e as unknown as React.FormEvent)
@@ -123,7 +132,7 @@ export function SearchBar() {
 							</div>
 						) : (
 							!isLoading && (
-								<div className="p-4 text-center text-sm text-muted-foreground">
+								<div className="type-body-sm p-4 text-center text-ink-3">
 									No users found for &quot;{debouncedQuery}&quot;
 								</div>
 							)

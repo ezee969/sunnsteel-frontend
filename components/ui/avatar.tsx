@@ -42,7 +42,8 @@ function AvatarFallback({
 		<AvatarPrimitive.Fallback
 			data-slot="avatar-fallback"
 			className={cn(
-				'bg-muted flex size-full items-center justify-center rounded-full',
+				// Avatars are the one place `rounded-full` survives (§7).
+				'type-label flex size-full items-center justify-center rounded-full bg-surface-sunk text-ink-2',
 				className,
 			)}
 			{...props}

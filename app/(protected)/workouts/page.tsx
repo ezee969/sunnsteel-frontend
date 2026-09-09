@@ -124,8 +124,8 @@ export default function WorkoutsIndexPage() {
 	if (isLoading || isStartingEmpty) {
 		return (
 			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
-				<div className="flex items-center gap-2 text-muted-foreground">
-					<Loader2 className="h-5 w-5 animate-spin text-amber-500" />
+				<div className="type-body-sm flex items-center gap-2 text-ink-3">
+					<Loader2 className="h-5 w-5 animate-spin" />
 					<span>
 						{isStartingEmpty
 							? 'Initializing quick workout...'
@@ -140,7 +140,7 @@ export default function WorkoutsIndexPage() {
 	if (active?.id) {
 		return (
 			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
-				<div className="text-sm text-muted-foreground">
+				<div className="type-body-sm text-ink-3">
 					Redirecting to your active session…
 				</div>
 			</div>
@@ -151,16 +151,14 @@ export default function WorkoutsIndexPage() {
 		<div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
 			<div className="mx-auto max-w-md text-center space-y-6">
 				{/* Visual icon */}
-				<div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted/60">
-					<Dumbbell className="h-10 w-10 text-muted-foreground/60" />
+				<div className="mx-auto flex h-20 w-20 items-center justify-center rounded-sm bg-surface-sunk">
+					<Dumbbell className="h-10 w-10 text-ink-3" aria-hidden />
 				</div>
 
 				{/* Heading & copy */}
 				<div className="space-y-2">
-					<h2 className="text-xl font-semibold tracking-tight">
-						No Active Workout
-					</h2>
-					<p className="text-sm text-muted-foreground leading-relaxed">
+					<h2 className="type-section text-foreground">No Active Workout</h2>
+					<p className="type-body-sm text-ink-3">
 						You don&apos;t have a workout in progress right now. Pick a routine
 						to start training, or review your history.
 					</p>
@@ -170,7 +168,7 @@ export default function WorkoutsIndexPage() {
 				<div className="flex flex-wrap justify-center gap-3">
 					{SHOW_QUICK_WORKOUT_ENTRY && (
 						<Button
-							variant="classical"
+							variant="default"
 							onClick={handleStartEmptyWorkout}
 							disabled={isStartingEmpty}
 						>

@@ -1,10 +1,8 @@
 'use client'
 
-import { ChevronDown, ChevronRight, Dumbbell } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
@@ -71,40 +69,39 @@ export const ExerciseGroup = ({
 		: undefined
 
 	return (
-		<Card
-			className={`transition-all duration-200 ${
-				isComplete
-					? 'border-green-200 bg-green-50/30 dark:border-green-800 dark:bg-green-950/10'
-					: 'border-border'
+		// De-boxed: a ruled entry on the page, not a card. The mark on the left
+		// is what a completed exercise reads as at a glance — a finished exercise
+		// is an earned mark, so it takes gold (§4.3 rule 2) rather than the green
+		// this screen used, which freed `success` for genuine system state.
+		<section
+			className={`mark py-4 pl-3 transition-colors duration-[var(--motion-base)] ease-standard ${
+				isComplete ? 'mark-success bg-surface/60' : 'mark'
 			}`}
 		>
-			<CardHeader className="pb-3 flex-row items-center justify-between space-y-0 gap-2">
+			<div className="flex items-center justify-between gap-2">
 				<Button
 					variant="ghost"
 					onClick={onToggleCollapse}
-					className="flex-1 justify-between p-0 h-auto hover:bg-transparent"
+					className="h-auto flex-1 justify-between rounded-none p-0 hover:bg-transparent"
 				>
-					<div className="flex flex-1 min-w-0 items-center gap-3">
-						<div className="flex items-center gap-2">
-							{isCollapsed ? (
-								<ChevronRight className="h-4 w-4 text-muted-foreground" />
-							) : (
-								<ChevronDown className="h-4 w-4 text-muted-foreground" />
-							)}
-							<Dumbbell className="h-4 w-4 text-muted-foreground" />
-						</div>
-						<div className="text-left min-w-0">
-							<h3 className="font-semibold text-base line-clamp-1">
+					<div className="flex min-w-0 flex-1 items-center gap-3">
+						{isCollapsed ? (
+							<ChevronRight className="h-4 w-4 shrink-0 text-ink-3" />
+						) : (
+							<ChevronDown className="h-4 w-4 shrink-0 text-ink-3" />
+						)}
+						<div className="min-w-0 text-left">
+							<h3 className="type-panel line-clamp-1 text-foreground">
 								{exerciseName}
 							</h3>
-							<p className="text-sm text-muted-foreground">
-								{completedSets}/{totalSets} sets completed
+							<p className="type-data mt-0.5 text-ink-3">
+								{completedSets}/{totalSets} sets
 							</p>
 						</div>
 					</div>
 				</Button>
 
-				<div className="flex items-center gap-2 shrink-0">
+				<div className="flex shrink-0 items-center gap-3">
 					{calculatorTarget ? (
 						<PlateCalculatorDialog
 							exerciseName={exerciseName}
@@ -118,50 +115,39 @@ export const ExerciseGroup = ({
 					</div>
 
 					{isComplete && (
-						<Badge
-							variant="secondary"
-							className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-						>
-							✓ Complete
-						</Badge>
+						<span className="type-label text-honour">Complete</span>
 					)}
 				</div>
-			</CardHeader>
+			</div>
 
 			{!isCollapsed && (
-				<CardContent className="pt-0">
-					<div className="space-y-4">
-						{sets.map(set => (
-							<div
-								key={`${set.routineExerciseId}-${set.setNumber}`}
-								className="space-y-1"
-							>
-								<SetLogInput
-									sessionId={set.sessionId}
-									routineExerciseId={set.routineExerciseId}
-									exerciseId={set.exerciseId}
-									setNumber={set.setNumber}
-									reps={set.reps}
-									weight={set.weight}
-									isCompleted={set.isCompleted}
-									plannedReps={set.plannedReps}
-									plannedMinReps={set.plannedMinReps}
-									plannedMaxReps={set.plannedMaxReps}
-									plannedWeight={set.plannedWeight}
-									plannedRir={set.plannedRir}
-									weightUnit={weightUnit}
-									previousPerformance={previousSets?.get(
-										`${set.routineExerciseId}:${set.setNumber}`,
-									)}
-									rpe={set.rpe}
-									onSave={onSave}
-									onSetCompleted={onSetCompleted}
-								/>
-							</div>
-						))}
-					</div>
-				</CardContent>
+				<div className="mt-3 space-y-2">
+					{sets.map(set => (
+						<SetLogInput
+							key={`${set.routineExerciseId}-${set.setNumber}`}
+							sessionId={set.sessionId}
+							routineExerciseId={set.routineExerciseId}
+							exerciseId={set.exerciseId}
+							setNumber={set.setNumber}
+							reps={set.reps}
+							weight={set.weight}
+							isCompleted={set.isCompleted}
+							plannedReps={set.plannedReps}
+							plannedMinReps={set.plannedMinReps}
+							plannedMaxReps={set.plannedMaxReps}
+							plannedWeight={set.plannedWeight}
+							plannedRir={set.plannedRir}
+							weightUnit={weightUnit}
+							previousPerformance={previousSets?.get(
+								`${set.routineExerciseId}:${set.setNumber}`,
+							)}
+							rpe={set.rpe}
+							onSave={onSave}
+							onSetCompleted={onSetCompleted}
+						/>
+					))}
+				</div>
 			)}
-		</Card>
+		</section>
 	)
 }

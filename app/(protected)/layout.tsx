@@ -5,8 +5,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { ReactNode, Suspense, useEffect, useState } from 'react'
 
-import GoldVignetteOverlay from '@/components/backgrounds/GoldVignetteOverlay'
-import ParchmentOverlay from '@/components/backgrounds/ParchmentOverlay'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TopProgressBar } from '@/components/ui/top-progress-bar'
@@ -105,21 +103,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	// queries fire) as soon as we have a token to send.
 	if (isSessionCleanupPending || sessionCleanupError) {
 		return (
-			<div className="relative flex min-h-screen items-center justify-center p-6">
-				<div className="absolute inset-0 -z-10 overflow-hidden">
-					<ParchmentOverlay opacity={0.06} />
-					<GoldVignetteOverlay intensity={0.06} />
-				</div>
+			<div className="relative flex min-h-screen items-center justify-center bg-background p-6">
 				<div
 					role={sessionCleanupError ? 'alert' : 'status'}
-					className="w-full max-w-md space-y-4 rounded-lg border bg-card p-6 text-center shadow-lg"
+					className="w-full max-w-md space-y-4 rounded-sm border border-rule bg-surface p-6 text-center"
 				>
-					<h1 className="heading-classical text-xl font-semibold">
+					<h1 className="type-section text-foreground">
 						{sessionCleanupError
 							? 'Session cleanup needs one more step'
 							: 'Finishing session cleanup…'}
 					</h1>
-					<p className="text-sm text-muted-foreground">
+					<p className="text-sm text-ink-2">
 						{sessionCleanupError
 							? 'This browser could not clear its routing session. Check your connection and try again.'
 							: 'Clearing this browser session securely.'}
@@ -133,33 +127,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	}
 
 	if (isLoading || !session) {
-		return (
-			<div className="relative min-h-screen">
-				<div className="absolute inset-0 -z-10 overflow-hidden">
-					<ParchmentOverlay opacity={0.06} />
-					<GoldVignetteOverlay intensity={0.06} />
-				</div>
-			</div>
-		)
+		return <div className="relative min-h-screen bg-background" />
 	}
 
 	const layoutContent = (
 		<div className="relative min-h-screen">
 			<StaleSessionRecoveryDialog session={activeSession} />
-			{/* Background */}
-			<div className="absolute inset-0 -z-10 overflow-hidden">
-				<div className="absolute inset-0 bg-white dark:bg-neutral-950 transition-colors duration-300" />
-				{/* Modern Brand Mesh Gradient */}
-				<div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]">
-					<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#daa520,transparent_50%)]" />
-					<div className="absolute inset-0 bg-[grid_32px_32px_rgba(0,0,0,0.02)] dark:bg-[grid_32px_32px_rgba(255,255,255,0.02)]" />
-				</div>
-				<ParchmentOverlay opacity={0.04} />
-			</div>
+			{/* Ground. v1.0 §1.4 retires the gold mesh gradient and the parchment
+			    wash: the identity is carried by structure, not by texture behind
+			    the content. One flat surface, both themes. */}
+			<div className="absolute inset-0 -z-10 bg-background" />
 			<div className="flex h-screen">
 				{isMobile && isMobileMenuOpen && (
 					<div
-						className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm touch-none"
+						className="fixed inset-0 z-50 touch-none bg-scrim"
 						onClick={() => setIsMobileMenuOpen(false)}
 					/>
 				)}
@@ -176,7 +157,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 				{/* Main Content */}
 				<div
 					className={cn(
-						'flex min-h-0 flex-col flex-1 transition-all duration-300',
+						// `min-w-0` is load-bearing: the sidebar is `fixed`, so it takes no
+						// flow width, yet this column is `flex-1` inside a viewport-wide
+						// flex row AND carries `ml-64`. Without it the column keeps its
+						// full-viewport basis and the margin pushes the document 122px
+						// past the viewport at 768-1023. Pre-existing; measured on a
+						// clean tree at 890px against a 768px viewport.
+						'flex min-h-0 w-full min-w-0 flex-1 flex-col transition-all duration-300',
 						isMobile ? 'ml-0 w-full' : isSidebarOpen ? 'ml-64' : 'ml-20',
 					)}
 				>
@@ -197,7 +184,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 								<Button
 									asChild
 									size="sm"
-									variant="classical"
+									variant="default"
 									aria-label="Resume active session"
 								>
 									<Link href={`/workouts/sessions/${activeSession.id}`}>

@@ -1,7 +1,4 @@
-import { Dumbbell } from 'lucide-react'
-
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface PersonalRecordItemProps {
 	exercise: string
@@ -10,6 +7,16 @@ interface PersonalRecordItemProps {
 	showSeparator?: boolean
 }
 
+/**
+ * One ruled row of the personal-records ledger.
+ *
+ * The record itself is the point of the row, so the figure is emphatic Space
+ * Mono rather than a badge (§11.12: read-only data has no border and no fill).
+ *
+ * No honour mark: §4.3 rule 3 allows at most two per viewport, and a list of
+ * five records would spend them all on a section whose heading already says
+ * these are records.
+ */
 export default function PersonalRecordItem({
 	exercise,
 	timeAgo,
@@ -17,25 +24,19 @@ export default function PersonalRecordItem({
 	showSeparator = true,
 }: PersonalRecordItemProps) {
 	return (
-		<>
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-3">
-					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
-						<Dumbbell className="h-5 w-5 text-primary" />
-					</div>
-					<div>
-						<p className="font-medium">{exercise}</p>
-						<p className="text-xs text-muted-foreground">{timeAgo}</p>
-					</div>
-				</div>
-				<Badge
-					variant="outline"
-					className="font-bold bg-primary/5 hover:bg-primary/10"
-				>
-					{weight}
-				</Badge>
+		<div
+			className={cn(
+				'flex items-baseline justify-between gap-4 py-3',
+				showSeparator && 'border-b border-rule-faint',
+			)}
+		>
+			<div className="min-w-0">
+				<p className="type-panel text-foreground">{exercise}</p>
+				<p className="type-body-sm text-ink-3">{timeAgo}</p>
 			</div>
-			{showSeparator && <Separator />}
-		</>
+			<span className="type-data type-data-strong shrink-0 text-foreground">
+				{weight}
+			</span>
+		</div>
 	)
 }

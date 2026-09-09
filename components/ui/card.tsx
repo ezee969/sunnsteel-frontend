@@ -7,11 +7,14 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
 		<div
 			data-slot="card"
 			className={cn(
-				'text-card-foreground flex flex-col gap-6 rounded-2xl border py-6',
-				// Subtle classical gradient + marble texture
-				'bg-gradient-to-b from-[rgba(255,255,255,0.92)] to-[rgba(255,255,255,0.78)] dark:from-[rgba(0,0,0,0.6)] dark:to-[rgba(0,0,0,0.45)] bg-marble-light',
-				// Ornamental border & soft depth
-				'border-[rgba(218,165,32,0.2)] dark:border-[rgba(255,215,0,0.18)] shadow-[0_10px_28px_rgba(0,0,0,0.12)]',
+				// v1.0 §11.5 `panel`: surface, 2px radius, 1px rule, no shadow.
+				// The gold-tinted gradient, marble wash and drop shadow are all
+				// retired - elevation is tonal (§8), and nothing in this system is
+				// translucent. Two further variants, `ruled` (no fill, no box) and
+				// `sunk` (well), are applied per call site in Phase 8 rather than
+				// added here, since Card has no cva and 26 files pass their own
+				// className.
+				'flex flex-col gap-6 rounded-sm border border-rule bg-surface py-6 text-card-foreground',
 				className,
 			)}
 			{...props}
@@ -33,10 +36,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="card-title"
-			className={cn(
-				'leading-tight font-semibold text-xl heading-classical',
-				className,
-			)}
+			className={cn('type-panel leading-tight', className)}
 			{...props}
 		/>
 	)
@@ -46,7 +46,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="card-description"
-			className={cn('text-muted-foreground text-sm', className)}
+			className={cn('type-body-sm text-ink-2', className)}
 			{...props}
 		/>
 	)

@@ -61,7 +61,7 @@ export function WizardNavigation({
 	const showNextButton = currentStep < totalSteps
 
 	return (
-		<div className="sticky bottom-0 z-20 mt-6 border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<div className="sticky bottom-0 z-20 mt-6 border-t border-rule bg-background">
 			<div className="py-3 flex items-center justify-between px-4 sm:px-6 lg:px-8">
 				<Button
 					variant="outline"
@@ -80,7 +80,7 @@ export function WizardNavigation({
 						disabled={isNextDisabled || isSubmitting}
 						className="gap-2"
 						aria-label={label}
-						variant="classical"
+						variant="default"
 					>
 						{isSubmitting ? (
 							<>

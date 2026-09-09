@@ -5,15 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -84,106 +76,99 @@ export function RoutineCard({
 		(!isActiveRoutine && !canStartToday)
 
 	return (
-		<Card
+		// §11.5 — routine cards are a `ruled` list: no fill, no box, a rule
+		// between rows. The active routine is marked by a 3px left rule rather
+		// than a yellow tint (§11.12 — status is a mark plus a glyph, no fill;
+		// the pulsing dot and the "Resume" label are the glyph and the words).
+		<div
 			className={cn(
-				'transition-all duration-200 hover:shadow-md',
-				isActiveRoutine &&
-					'border-l-4 border-l-yellow-500 bg-yellow-50/30 dark:bg-yellow-950/20',
+				'rule-row mark py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface sm:pl-4',
+				isActiveRoutine && 'border-l-primary',
 			)}
 		>
-			<CardHeader className="p-3 sm:p-4 pb-2 sm:pb-2">
-				<div className="flex items-start justify-between gap-2">
-					<div className="flex-1 min-w-0">
-						<div className="flex items-center gap-2 mb-1">
-							<CardTitle className="text-sm font-semibold leading-tight sm:text-base truncate">
-								{routine.name}
-							</CardTitle>
-						</div>
-						{routine.description && (
-							<CardDescription className="line-clamp-1 text-xs leading-relaxed">
-								{routine.description}
-							</CardDescription>
-						)}
-						{/* Day-of-week schedule badges */}
-						{routine.days && routine.days.length > 0 && (
-							<div className="flex flex-wrap gap-1 mt-1.5">
-								{routine.days.map(day => (
-									<Badge
-										key={day.id}
-										variant="outline"
-										className="text-[10px] px-1.5 py-0 h-5 font-normal text-muted-foreground"
-									>
-										{weekdayName(day.dayOfWeek, 'short')}
-									</Badge>
-								))}
-							</div>
-						)}
-					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-8 w-8 -mr-2 flex-shrink-0 touch-manipulation"
-							>
-								<MoreVertical className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{routine.days.length > 0 && (
-								<>
-									<DropdownMenuItem className="pointer-events-none opacity-60">
-										Start session with day
-									</DropdownMenuItem>
-									{routine.days.map(d => {
-										const dayValidation = validateRoutineDayDate(d)
-										const canStartThisDay = dayValidation.isValid
-
-										return (
-											<DropdownMenuItem
-												key={d.id}
-												onSelect={() => onStartSession(routine, d.id)}
-												disabled={
-													(isStarting && startActingId === routine.id) ||
-													!canStartThisDay
-												}
-												title={
-													!canStartThisDay
-														? `This day is not scheduled for ${weekdayName(d.dayOfWeek, 'long')}`
-														: undefined
-												}
-											>
-												{weekdayName(d.dayOfWeek, 'short')}
-											</DropdownMenuItem>
-										)
-									})}
-									<div className="my-1 h-px bg-border" />
-								</>
-							)}
-							<DropdownMenuItem asChild>
-								<Link href={`/routines/${routine.id}`}>Open</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem asChild>
-								<Link href={`/routines/edit/${routine.id}`}>Edit</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								className="text-destructive"
-								onSelect={() => onDelete(routine.id)}
-							>
-								Delete
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+			<div className="flex items-start justify-between gap-2">
+				<div className="flex-1 min-w-0">
+					<p className="type-panel truncate text-foreground">{routine.name}</p>
+					{routine.description && (
+						<p className="type-body-sm line-clamp-1 text-ink-3">
+							{routine.description}
+						</p>
+					)}
+					{/* Day-of-week schedule: read-only data, so mono on the row
+					    ground rather than a strip of outlined boxes (§11.12). */}
+					{routine.days && routine.days.length > 0 && (
+						<p className="type-data mt-1 text-ink-3">
+							{routine.days
+								.map(day => weekdayName(day.dayOfWeek, 'short'))
+								.join(' · ')}
+						</p>
+					)}
 				</div>
-			</CardHeader>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="-mr-1 size-9 flex-shrink-0 touch-manipulation"
+						>
+							<MoreVertical className="h-4 w-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						{routine.days.length > 0 && (
+							<>
+								<DropdownMenuItem className="pointer-events-none opacity-60">
+									Start session with day
+								</DropdownMenuItem>
+								{routine.days.map(d => {
+									const dayValidation = validateRoutineDayDate(d)
+									const canStartThisDay = dayValidation.isValid
 
-			<CardContent className="p-3 pt-1 sm:p-4 sm:pt-2 space-y-2">
-				<div className="flex items-center gap-1.5">
-					<RoutineMetaBadges
-						daysPerWeek={routine.days.length}
-						isPeriodized={routine.isPeriodized}
-					/>
-				</div>
+									return (
+										<DropdownMenuItem
+											key={d.id}
+											onSelect={() => onStartSession(routine, d.id)}
+											disabled={
+												(isStarting && startActingId === routine.id) ||
+												!canStartThisDay
+											}
+											title={
+												!canStartThisDay
+													? `This day is not scheduled for ${weekdayName(d.dayOfWeek, 'long')}`
+													: undefined
+											}
+										>
+											{weekdayName(d.dayOfWeek, 'short')}
+										</DropdownMenuItem>
+									)
+								})}
+								<div className="my-1 h-px bg-rule-faint" />
+							</>
+						)}
+						<DropdownMenuItem asChild>
+							<Link href={`/routines/${routine.id}`}>Open</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href={`/routines/edit/${routine.id}`}>Edit</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="text-destructive"
+							onSelect={() => onDelete(routine.id)}
+						>
+							Delete
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+
+			{/* §10.2 — the data cluster caps at `--cluster-max`. Unbounded, the
+			    schedule note put its label at the far left of a 1120px row and its
+			    value at the far right, which is QA 7's exact failure. */}
+			<div className="mt-2 max-w-[var(--cluster-max)] space-y-2">
+				<RoutineMetaBadges
+					daysPerWeek={routine.days.length}
+					isPeriodized={routine.isPeriodized}
+				/>
 
 				<RoutineScheduleNote
 					isCompleted={routine.isCompleted}
@@ -194,9 +179,9 @@ export function RoutineCard({
 					{isActiveRoutine ? (
 						<Button
 							type="button"
-							variant="classical"
+							variant="default"
 							size="sm"
-							className="h-8 flex-1 sm:flex-initial sm:min-w-[120px] relative pl-6 text-xs font-medium touch-manipulation"
+							className="relative flex-1 touch-manipulation pl-6 sm:flex-initial sm:min-w-[120px]"
 							aria-label="Resume active workout session"
 							onClick={e => {
 								e.preventDefault()
@@ -219,9 +204,9 @@ export function RoutineCard({
 					) : (
 						<Button
 							type="button"
-							variant="classical"
+							variant="default"
 							size="sm"
-							className="h-8 flex-1 sm:flex-initial sm:min-w-[120px] text-xs font-medium touch-manipulation"
+							className="flex-1 touch-manipulation sm:flex-initial sm:min-w-[120px]"
 							aria-label="Start session"
 							onClick={e => {
 								e.preventDefault()
@@ -260,7 +245,7 @@ export function RoutineCard({
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="h-8 w-8 flex-shrink-0 touch-manipulation active:scale-95 transition-transform"
+						className="size-9 flex-shrink-0 touch-manipulation"
 						aria-label={
 							routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
 						}
@@ -272,10 +257,13 @@ export function RoutineCard({
 						}}
 					>
 						{isTogglingCompleted && completedActingId === routine.id ? (
-							<Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+							<Loader2 className="h-4 w-4 animate-spin text-success" />
 						) : (
 							<ListChecks
-								className="h-4 w-4 text-emerald-600 transition-colors"
+								className={cn(
+									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
+									routine.isCompleted ? 'text-success' : 'text-ink-3',
+								)}
 								fill={routine.isCompleted ? 'currentColor' : 'none'}
 							/>
 						)}
@@ -284,7 +272,7 @@ export function RoutineCard({
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="h-8 w-8 flex-shrink-0 touch-manipulation active:scale-95 transition-transform"
+						className="size-9 flex-shrink-0 touch-manipulation"
 						aria-label={
 							routine.isFavorite ? 'Unmark favorite' : 'Mark as favorite'
 						}
@@ -296,16 +284,19 @@ export function RoutineCard({
 						disabled={isTogglingFavorite && favoriteActingId === routine.id}
 					>
 						{isTogglingFavorite && favoriteActingId === routine.id ? (
-							<Loader2 className="h-4 w-4 animate-spin text-rose-500" />
+							<Loader2 className="h-4 w-4 animate-spin text-ink-3" />
 						) : (
 							<Heart
-								className="h-4 w-4 text-rose-500 transition-all"
+								className={cn(
+									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
+									routine.isFavorite ? 'text-foreground' : 'text-ink-3',
+								)}
 								fill={routine.isFavorite ? 'currentColor' : 'none'}
 							/>
 						)}
 					</Button>
 				</div>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	)
 }

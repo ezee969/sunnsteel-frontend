@@ -106,7 +106,7 @@ export const PlateCalculatorDialog = ({
 						Loading equipment…
 					</div>
 				) : error ? (
-					<div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm">
+					<div className="type-body-sm mark border-l-destructive bg-surface-sunk p-4">
 						<p className="text-destructive">{error.message}</p>
 						<Button
 							type="button"
@@ -176,7 +176,7 @@ export const PlateCalculatorDialog = ({
 
 						{selectedLocation ? (
 							<div
-								className="rounded-md border bg-muted/30 p-4"
+								className="rounded-none border border-rule-faint bg-surface-sunk p-4"
 								aria-live="polite"
 							>
 								<div className="flex items-center justify-between gap-3 text-sm">
@@ -197,7 +197,7 @@ export const PlateCalculatorDialog = ({
 														: `Bar alone loads ${formatWeight(loading.loadedWeightKg)}`}
 											</p>
 											{loading.status === 'short' ? (
-												<p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
+												<p className="type-body-sm mt-1 text-ink-2">
 													{formatWeight(loading.differenceKg)} below target
 												</p>
 											) : loading.status === 'over' ? (

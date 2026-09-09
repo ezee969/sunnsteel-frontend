@@ -62,7 +62,7 @@ export const ExercisePickerDropdown = forwardRef<
 			</Button>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[400px] mt-2 bg-popover border rounded-md shadow-lg animate-in fade-in-0 zoom-in-95 duration-200 max-h-[400px] overflow-hidden">
+				<div className="absolute top-full left-0 z-50 mt-2 max-h-[400px] w-full overflow-hidden rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 sm:right-0 sm:left-auto sm:w-[400px] dark:shadow-none">
 					<div className="p-3 border-b">
 						<Input
 							aria-label="Search exercises"
