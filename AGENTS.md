@@ -12,7 +12,7 @@ Stack: **Next.js 15.5 (App Router) · React 18.3 · TypeScript 5 (strict) · Tai
 
 **It is effectively an SPA hosted on Next.js.** Only `app/page.tsx` (a redirect based on a cookie), `app/api/session/route.ts` and the six `loading.tsx` files are Server Components. **Every other `page.tsx` and both group layouts are `'use client'`.** There is no RSC data fetching, no Server Actions, no `fetch` caching/`revalidate`, no streaming. All data is fetched client-side via TanStack Query against the external backend. Keep this in mind before reaching for a Next.js server feature — nothing else in the app uses one.
 
-**`@sunsteel/contracts` is a published npm dependency (`^0.11.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunnsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunnsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
+**`@sunsteel/contracts` is a published npm dependency (`^0.12.0` in [package.json](package.json)), not a `file:` link.** It must resolve from the registry because Vercel only clones this repo — pointing it at the local sibling (`file:../sunnsteel-contracts`) breaks the deploy (the shared types silently degrade to `any`). Trade-off: local edits to `../sunnsteel-contracts` are **not** picked up until you `npm publish` a new version and bump it here.
 
 Runs on Windows 11. Do **not** start/run the app yourself — ask the user to run it.
 
