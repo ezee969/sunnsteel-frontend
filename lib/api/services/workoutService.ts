@@ -8,6 +8,7 @@ import {
 	UpsertSetLogRequest,
 	UpsertSetLogResponse,
 	WorkoutSession,
+	WorkoutSessionRecap,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
 import {
@@ -108,6 +109,16 @@ export const workoutService = {
 	): Promise<PreviousPerformanceResponse | null> => {
 		return httpClient.request<PreviousPerformanceResponse | null>(
 			`${WORKOUTS_API_URL}/sessions/${id}/previous-performance`,
+			{
+				method: 'GET',
+				secure: true,
+			},
+		)
+	},
+
+	getSessionRecap: async (id: string): Promise<WorkoutSessionRecap> => {
+		return httpClient.request<WorkoutSessionRecap>(
+			`${WORKOUTS_API_URL}/sessions/${id}/recap`,
 			{
 				method: 'GET',
 				secure: true,

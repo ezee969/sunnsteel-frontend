@@ -104,7 +104,11 @@ export function StaleSessionRecoveryDialog({
 								? 'Your completed sets were kept in your history.'
 								: 'The abandoned session will no longer block a new workout.',
 					})
-					router.replace('/dashboard')
+					router.replace(
+						status === 'COMPLETED' && session?.id
+							? `/workouts/history/${session.id}`
+							: '/dashboard',
+					)
 				},
 				onError: error => {
 					push({

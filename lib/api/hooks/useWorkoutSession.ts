@@ -25,6 +25,7 @@ import {
 	UpsertSetLogRequest,
 	UpsertSetLogResponse,
 	WorkoutSession,
+	WorkoutSessionRecap,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
@@ -59,6 +60,7 @@ const qk = {
 	session: (id: string) => ['workout', 'session', id] as const,
 	previousPerformance: (id: string) =>
 		['workout', 'session', id, 'previous-performance'] as const,
+	recap: (id: string) => ['workout', 'session', id, 'recap'] as const,
 	sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
 		['workout', 'sessions', serializeSessionParams(params)] as const,
 }
@@ -131,6 +133,15 @@ export const usePreviousPerformance = (id: string) => {
 		enabled: !!id,
 		// The comparison is against a completed session, so its result cannot
 		// change while the current session is open.
+		staleTime: Number.POSITIVE_INFINITY,
+	})
+}
+
+export const useSessionRecap = (id: string, enabled = true) => {
+	return useQuery<WorkoutSessionRecap>({
+		queryKey: qk.recap(id),
+		queryFn: () => workoutService.getSessionRecap(id),
+		enabled: enabled && !!id,
 		staleTime: Number.POSITIVE_INFINITY,
 	})
 }
@@ -288,6 +299,7 @@ export const useFinishSession = (id: string) => {
 			workoutService.finishSession(id, data),
 		onSuccess: (result: FinishWorkoutResponse) => {
 			qc.setQueryData(qk.session(id), result.session)
+			if (result.recap) qc.setQueryData(qk.recap(id), result.recap)
 			qc.invalidateQueries({ queryKey: qk.active })
 			qc.invalidateQueries({ queryKey: qk.stats })
 			qc.invalidateQueries({ queryKey: qk.progress })

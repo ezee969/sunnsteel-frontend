@@ -4,8 +4,10 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
+import { SessionRecapPanel } from '@/features/workout/session-recap'
 import { useCollapseMap } from '@/hooks/use-collapse-map'
 import { useWorkoutSessionData } from '@/hooks/use-workout-session-data'
+import { useSessionRecap } from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 
 export default function WorkoutDetailPage() {
@@ -15,6 +17,11 @@ export default function WorkoutDetailPage() {
 
 	const { session, exerciseGroups, metrics, isLoading, isError, error } =
 		useWorkoutSessionData(id)
+	const {
+		data: recap,
+		isLoading: isRecapLoading,
+		isError: isRecapError,
+	} = useSessionRecap(id, session?.status === 'COMPLETED')
 
 	// UI state: collapsed exercises
 	const { toggle, isCollapsed } = useCollapseMap<string>()
@@ -46,7 +53,23 @@ export default function WorkoutDetailPage() {
 				title={session?.routine?.name}
 				metrics={metrics}
 				onBack={() => router.back()}
+				showSummary={!recap}
 			/>
+
+			{session.status === 'COMPLETED' ? (
+				recap ? (
+					<SessionRecapPanel recap={recap} />
+				) : (
+					<div
+						className="mb-6 rounded-lg border p-4 text-sm text-muted-foreground"
+						role={isRecapError ? 'alert' : 'status'}
+					>
+						{isRecapLoading
+							? 'Loading session recap...'
+							: 'The session recap is temporarily unavailable.'}
+					</div>
+				)
+			) : null}
 
 			{/* Exercises */}
 			<div className="space-y-4">

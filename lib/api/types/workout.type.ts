@@ -6,11 +6,13 @@ import type {
 	PreviousPerformanceResponse,
 	PreviousSetPerformance,
 	ProgressionChange,
+	SessionRecapRecord,
 	SetLog as ContractSetLog,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
 	UpsertSetLogResponse,
 	WorkoutSession as ContractWorkoutSession,
+	WorkoutSessionRecap,
 	WorkoutSessionStatus,
 	WorkoutSessionSummary as ContractWorkoutSessionSummary,
 } from '@sunsteel/contracts'
@@ -41,9 +43,11 @@ export type {
 	PreviousPerformanceResponse,
 	PreviousSetPerformance,
 	ProgressionChange,
+	SessionRecapRecord,
 	StartWorkoutRequest,
 	UpsertSetLogRequest,
 	UpsertSetLogResponse,
+	WorkoutSessionRecap,
 }
 
 // History/List types
