@@ -1,6 +1,6 @@
 # Sunnsteel Product Roadmap
 
-Last verified against the frontend, backend, and shared contracts: **2026-09-06**.
+Last verified against the frontend, backend, and shared contracts: **2026-09-09**.
 
 This is the canonical product feature registry for Sunnsteel. It tells humans and
 coding agents what the product already does, what is next, which ideas are only
@@ -115,7 +115,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 1     | Analytics foundation     | L    | DATA-01 through DATA-05                                                        | TD-27 foundation shipped; DATA-02 retains future event types. Groups 4, 6, 7, and 8 all read what it produces. |
 | 2     | Product integrity        | S    | Complete — FIX-01 through FIX-04 and FIX-06 through FIX-10 shipped             | Existing screens and flows must be truthful and usable first.                                                  |
 | 3     | Daily session essentials | M    | LIVE-01 through LIVE-06, LIVE-19 (LIVE-01 through LIVE-05 and LIVE-19 shipped) | `LIVE-05` is shipped; LIVE-06 remains product-blocked.                                                         |
-| 4     | Visible workout payoff   | M    | LIVE-07 through LIVE-10 (LIVE-07 and LIVE-10 shipped)                          | LIVE-08 still needs a progression writer/event contract; LIVE-09 depends on LIVE-07 and LIVE-08.               |
+| 4     | Visible workout payoff   | M    | LIVE-07 through LIVE-10 (LIVE-07, LIVE-08 and LIVE-10 shipped)                 | LIVE-09 is next; its live record and progression inputs now exist.                                             |
 | 5     | Identity and privacy     | XL   | PROF-03 through PROF-10, PROF-12                                               | Public identity and visibility rules are prerequisites for social expansion.                                   |
 | 6     | Progress destination     | L    | PROG-01 through PROG-08                                                        | Activates the disabled Progress navigation on efficient data reads.                                            |
 | 7     | Achievements and ranks   | L    | ACH-01 through ACH-05                                                          | Uses the events layer and turns the visual theme into a product mechanic.                                      |
@@ -144,7 +144,7 @@ projection reads are enabled.
 | LIVE-05 | `SHIPPED`   | M    | Plate calculator               | The active session exposes one calculator per weighted exercise. It starts from the next incomplete set's target and the default training location, allows both to change, and returns the exact bar-plus-plates load or the closest inventory-bounded load without exceeding the target. The result is expressed per side in the account's kg/lb unit, handles a bare bar and warns when the bar itself exceeds the target. Shipped 2026-09-08 as a frontend-only consumer of PREF-01.    | PREF-01                                                   |
 | LIVE-06 | `BLOCKED`   | L    | Ad-hoc workout replacement     | Blocked on a product decision, not on code: what replaces Quick Workout has not been designed. The direction under consideration is letting the user pick a template (full body, upper/lower, filtered by session duration and experience level) instead of starting from an empty session, which overlaps `ROUT-03` and needs those templates authored. Resolve the design before scheduling.                                                                                             | FIX-04; design decision pending; likely `ROUT-03`         |
 | LIVE-07 | `SHIPPED`   | M    | Live PR detection              | Completing a set now celebrates every weight, rep, volume and estimated-1RM frontier it crosses. The result is calculated against completed history plus other completed sets in the active session; identical autosaves do not repeat it, bodyweight work can earn only the truthful rep category, and weight-derived values display in the account's kg/lb preference. Shipped 2026-09-08 through `@sunsteel/contracts@0.9.0` and the BE/FE set-log mutation path.                       | DATA-01; `@sunsteel/contracts@0.9.0`; BE/FE mutation path |
-| LIVE-08 | `QUEUED`    | M    | Progression transparency       | Explain which exercises advanced, the old/new prescription, and the rule that fired.                                                                                                                                                                                                                                                                                                                                                                                                       | DATA-02                                                   |
+| LIVE-08 | `SHIPPED`   | M    | Progression transparency       | Finishing a workout now pauses before Dashboard when prescriptions advanced and names each exercise, the all-sets or per-set rule, performed/target reps, and old → new load in the account's kg/lb unit. Only completed sets can satisfy a progression rule. The finish response is retry-stable because each change is stored as an idempotent `PROGRESSION_CHANGED` event. Shipped 2026-09-09 through `@sunsteel/contracts@0.11.0`, BE migration/event writer and FE result dialog.     | DATA-02 progression slice; `@sunsteel/contracts@0.11.0`   |
 | LIVE-09 | `QUEUED`    | M    | Session recap                  | Show duration, volume, completed sets, records, progression changes, notes, and comparison with the previous session.                                                                                                                                                                                                                                                                                                                                                                      | DATA-01, DATA-02                                          |
 | LIVE-10 | `SHIPPED`   | M    | Abandoned-session recovery     | After 48 hours without activity, require the owner to Resume, finish using completed sets, or discard the session. Sessions are no longer auto-aborted in the background; Resume refreshes `lastActivityAt`, and the detailed set log is fetched only when the recovery prompt is needed. Shipped 2026-09-07 across FE/BE without a contract publish.                                                                                                                                      | Existing `lastActivityAt`; FE/BE behavior change          |
 | LIVE-11 | `CANDIDATE` | L    | Exercise substitution          | Recommend alternatives by muscles and equipment and apply them to this session or optionally to the routine.                                                                                                                                                                                                                                                                                                                                                                               | EXER-05, DATA-04                                          |
@@ -175,11 +175,12 @@ this roadmap owns the product and cross-repository delivery sequence.
 
 **Delivery verified 2026-09-07.** DATA-01, DATA-03, DATA-04 and DATA-05 shipped. Production comparison passed for all seven accounts; repeated backfill was idempotent, snapshot-safe relations were migrated and the API legacy fallback was removed. See the [TD-27 closure record](../history/td27-closure-2026-09-07.md). DATA-02 retains its partial status below.
 
-**`DATA-02` is deliberately partial.** `TrainingEventType` currently emits only
-`SESSION_COMPLETED` and `PERSONAL_RECORD`. Progression changes, streak
-milestones and achievements are not yet events, so `LIVE-08`, `ACH-01` and
-`ACH-05` each require extending the enum and its writers before they can read
-what they need.
+**`DATA-02` is deliberately partial.** `TrainingEventType` now emits
+`SESSION_COMPLETED`, `PERSONAL_RECORD` and `PROGRESSION_CHANGED`.
+Progression changes are addressable and retry-stable, which closes `LIVE-08`
+and supplies that part of `LIVE-09`. Streak milestones and achievements are
+not yet events, so `ACH-01` and `ACH-05` still require extending the enum and
+their writers before they can read what they need.
 
 ### Progress
 
@@ -428,6 +429,7 @@ it again without addressing the original decision.
 
 | 2026-09-08 | PREF-01 | CT `@sunsteel/contracts@0.10.0`; BE `TrainingLocationPreference`, `GET/PUT /users/training-locations`, migration and three focused tests; FE Settings editor, query/mutation hooks and `training-location-preferences.ts` (+ three tests); all repository gates and CI green | Equipment preferences now have stable per-location identities, exactly one default when any exist, canonical kilogram storage, bounded plate-pair quantities and normalized equipment. Replacement is transactional, rejects foreign IDs before writing and supports rename swaps without uniqueness collisions. The migration is applied in Neon. **Authenticated-browser verified 2026-09-08 using the gitignored state produced by `npm run ui:login`:** saved and reloaded Home Gym with a 20 kg bar, one 20 kg plate pair and barbell/bench/rack; GET and PUT returned 200, changing the unsaved account unit rendered both weights as 44.09 lb, and no console errors occurred. Components and hooks remain outside Vitest's Node-only rendering boundary. |
 | 2026-09-08 | LIVE-05 | FE `plate-calculator-dialog.tsx`, finite-inventory `plate-calculator.ts` (+ five tests) and the weighted-exercise entry point; isolated `npm run verify` clean with 147 tests | Uses the published PREF-01 read path without a backend or contract change. The bounded calculator preserves pair quantities and finds the best valid combination rather than assuming a greedy plate order; the UI defaults to the next incomplete target and default location while keeping both editable. **Authenticated-browser verified 2026-09-08 using `ui:login` state at a 390 × 844 viewport:** Home Gym's 20 kg bar plus its single 20 kg plate pair resolved 60 kg exactly; a 150001 kg target stopped truthfully at the 60 kg inventory maximum, a 15 kg target warned that the bar was 5 kg too heavy, and no console errors or Next.js overlay occurred. The temporary 0/1-set session was discarded after the pass. The dialog remains outside Vitest's Node-only rendering boundary. |
+| 2026-09-09 | LIVE-08 | CT `@sunsteel/contracts@0.11.0`; BE `PROGRESSION_CHANGED` migration, pure progression outcome (+ four tests), idempotent event writer and typed finish response; FE result dialog and unit-aware presentation (+ three tests); all repository gates, integration CI and deployments green | Session finish now returns the completed session plus every prescription change and stores one stable event per session/exercise. Double progression requires every prescribed set to be completed at target; dynamic progression reports only the completed sets that individually reached target. Typed-but-incomplete sets can no longer advance load. Repeating the same finish reads the original event instead of returning an empty or duplicated result. **Authenticated-browser verified 2026-09-09 on the test account:** one completed Incline Dumbbell Press set at 10/10 and 40 kg produced `SET_REACHED_TARGET`, displayed `40 → 42 kg`, and the Continue action returned to Dashboard with no console errors. A repeated finish against the deployed Railway API returned the same change with HTTP 200, and the deployed routine read confirmed the next prescription is 42 kg. The frontend hook/dialog remains outside Vitest's Node-only rendering boundary. |
 
 ## Document history
 
@@ -593,3 +595,13 @@ it again without addressing the original decision.
   combination tests, completed an authenticated narrow-viewport pass and
   discarded its temporary session. Queue group 3 now has only `LIVE-06`, which
   remains blocked on the owner's product decision.
+- **2026-09-09 (revision 20):** Shipped `LIVE-08` across contracts, backend and
+  frontend. Published `@sunsteel/contracts@0.11.0`, added the
+  `PROGRESSION_CHANGED` event and made finish responses retry-stable. The
+  active-session result now explains the exercise, rule, achieved reps and old
+  to new load before returning to Dashboard. Pure tests also close the latent
+  case where entered reps on an incomplete set advanced its prescription. The
+  authenticated browser and deployed-API pass confirmed 40 to 42 kg dynamic
+  progression without console errors. `DATA-02` remains partial only for its
+  missing milestone and achievement event families; `LIVE-09` is now the next
+  visible-workout-payoff item.
