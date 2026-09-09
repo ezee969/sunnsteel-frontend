@@ -8,6 +8,7 @@ import {
 	Flame,
 	MapPin,
 	Share2,
+	Target,
 	Trophy,
 	UserMinus,
 	UserPlus,
@@ -16,6 +17,7 @@ import { useParams } from 'next/navigation'
 import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,6 +30,13 @@ import {
 	useWorkoutStats,
 } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import {
+	getPreferredTrainingStyleLabel,
+	getTrainingDisciplineLabel,
+	getTrainingExperienceLabel,
+	getTrainingGoalLabel,
+	hasTrainingIdentity,
+} from '@/lib/utils/training-identity'
 import { normalizeUsername } from '@/lib/utils/username'
 import {
 	formatWeight,
@@ -138,6 +147,12 @@ export default function ProfilePage() {
 	const biography = isOwnProfile ? viewer.bio : publicUser!.bio
 	const canViewLocation = isOwnProfile || publicUser!.viewerAccess.location
 	const location = isOwnProfile ? viewer.location : publicUser!.location
+	const canViewTrainingIdentity =
+		isOwnProfile || publicUser!.viewerAccess.trainingIdentity
+	const trainingIdentity = isOwnProfile
+		? viewer.trainingIdentity
+		: publicUser!.trainingIdentity
+	const hasTrainingIdentityContent = hasTrainingIdentity(trainingIdentity)
 	const bodyMetrics = isOwnProfile
 		? {
 				age: viewer.age,
@@ -287,6 +302,83 @@ export default function ProfilePage() {
 									: location || 'No location added yet.'}
 							</span>
 						</div>
+					</div>
+
+					<div className="space-y-4">
+						<h2 className="flex items-center gap-2 text-xl font-semibold heading-classical">
+							<Target className="h-5 w-5 text-primary" aria-hidden />
+							Training Identity
+						</h2>
+						{!canViewTrainingIdentity ? (
+							<p className="text-sm text-muted-foreground">
+								Training identity is private.
+							</p>
+						) : !hasTrainingIdentityContent || !trainingIdentity ? (
+							<p className="text-sm text-muted-foreground">
+								No training identity added yet.
+							</p>
+						) : (
+							<dl className="space-y-4 text-sm">
+								{trainingIdentity.goals.length > 0 ? (
+									<div className="space-y-2">
+										<dt className="type-label text-ink-3">Goals</dt>
+										<dd className="flex flex-wrap gap-2">
+											{trainingIdentity.goals.map(goal => (
+												<Badge key={goal} variant="secondary">
+													{getTrainingGoalLabel(goal)}
+												</Badge>
+											))}
+										</dd>
+									</div>
+								) : null}
+								{trainingIdentity.experienceLevel ? (
+									<div className="space-y-1">
+										<dt className="type-label text-ink-3">Experience</dt>
+										<dd>
+											{getTrainingExperienceLabel(
+												trainingIdentity.experienceLevel,
+											)}
+										</dd>
+									</div>
+								) : null}
+								{trainingIdentity.disciplines.length > 0 ? (
+									<div className="space-y-2">
+										<dt className="type-label text-ink-3">Disciplines</dt>
+										<dd className="flex flex-wrap gap-2">
+											{trainingIdentity.disciplines.map(discipline => (
+												<Badge key={discipline} variant="outline">
+													{getTrainingDisciplineLabel(discipline)}
+												</Badge>
+											))}
+										</dd>
+									</div>
+								) : null}
+								{trainingIdentity.preferredStyle ? (
+									<div className="space-y-1">
+										<dt className="type-label text-ink-3">Preferred style</dt>
+										<dd>
+											{getPreferredTrainingStyleLabel(
+												trainingIdentity.preferredStyle,
+											)}
+										</dd>
+									</div>
+								) : null}
+								{trainingIdentity.favoriteExercises.length > 0 ? (
+									<div className="space-y-2">
+										<dt className="type-label text-ink-3">
+											Favorite exercises
+										</dt>
+										<dd>
+											<ul className="space-y-1 text-muted-foreground">
+												{trainingIdentity.favoriteExercises.map(exercise => (
+													<li key={exercise.id}>{exercise.name}</li>
+												))}
+											</ul>
+										</dd>
+									</div>
+								) : null}
+							</dl>
+						)}
 					</div>
 
 					<div className="space-y-4">

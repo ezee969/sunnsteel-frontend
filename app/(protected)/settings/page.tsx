@@ -30,6 +30,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
+import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
@@ -530,6 +531,10 @@ export default function SettingsPage() {
 			</div>
 
 			<TrainingLocationPreferencesCard weightUnit={formData.weightUnit} />
+
+			{user ? (
+				<TrainingIdentitySettingsCard identity={user.trainingIdentity} />
+			) : null}
 
 			{user ? (
 				<ProfilePrivacySettingsCard settings={user.privacySettings} />

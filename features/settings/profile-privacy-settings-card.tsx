@@ -44,6 +44,12 @@ const PRIVACY_FIELDS: PrivacyField[] = [
 		description: 'Controls the location shown in the About section.',
 	},
 	{
+		key: 'trainingIdentity',
+		label: 'Training identity',
+		description:
+			'Controls your goals, experience, disciplines, preferred style, and favorite exercises.',
+	},
+	{
 		key: 'workoutHistory',
 		label: 'Workout history',
 		description:
