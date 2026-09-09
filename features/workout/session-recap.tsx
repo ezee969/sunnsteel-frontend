@@ -61,13 +61,16 @@ function ComparisonMetric({
 	change,
 }: ComparisonMetricProps) {
 	return (
-		<div className="rounded-lg border bg-background/70 p-3">
-			<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-				{label}
+		// §5.3 — captions inside a repeated item are Body small in sentence case.
+		// The tracked uppercase micro-cap this had is the region-caption rank, and
+		// three of them in a row is the "visual chatter" QA 10 flagged.
+		<div className="bg-surface-sunk p-3">
+			<p className="type-body-sm text-ink-3">{label}</p>
+			<p className="type-data type-data-strong mt-2 text-foreground">
+				{current}
 			</p>
-			<p className="mt-2 font-semibold">{current}</p>
-			<p className="text-xs text-muted-foreground">Previous {previous}</p>
-			<p className="mt-1 text-sm font-medium">{change}</p>
+			<p className="type-body-sm text-ink-3">Previous {previous}</p>
+			<p className="type-data mt-1 text-ink-2">{change}</p>
 		</div>
 	)
 }
@@ -79,45 +82,53 @@ export function SessionRecapContent({ recap }: SessionRecapContentProps) {
 
 	return (
 		<div className="space-y-6">
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-				<div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
-					<Clock3 className="size-5 text-muted-foreground" aria-hidden />
-					<div>
-						<p className="text-xs text-muted-foreground">Duration</p>
-						<p className="font-semibold">{formatDuration(recap.durationSec)}</p>
+			{/* Headline figures: wells, square, on the tonal step below the surface
+			    they sit on (§8). They were translucent `bg-muted/30` boxes. */}
+			<div className="grid grid-cols-1 gap-px bg-rule-faint sm:grid-cols-3">
+				<div className="flex items-center gap-3 bg-surface-sunk p-3">
+					<Clock3 className="size-5 shrink-0 text-ink-3" aria-hidden />
+					<div className="min-w-0">
+						<p className="type-body-sm text-ink-3">Duration</p>
+						<p className="type-data type-data-strong text-foreground">
+							{formatDuration(recap.durationSec)}
+						</p>
 					</div>
 				</div>
-				<div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
-					<Weight className="size-5 text-muted-foreground" aria-hidden />
-					<div>
-						<p className="text-xs text-muted-foreground">Volume</p>
-						<p className="font-semibold">
+				<div className="flex items-center gap-3 bg-surface-sunk p-3">
+					<Weight className="size-5 shrink-0 text-ink-3" aria-hidden />
+					<div className="min-w-0">
+						<p className="type-body-sm text-ink-3">Volume</p>
+						<p className="type-data type-data-strong text-foreground">
 							{formatWeightAmount(recap.totalVolumeKg, weightUnit, 1)}{' '}
 							{unitLabel}
 						</p>
 					</div>
 				</div>
-				<div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
-					<CheckCheck className="size-5 text-muted-foreground" aria-hidden />
-					<div>
-						<p className="text-xs text-muted-foreground">Completed sets</p>
-						<p className="font-semibold">{recap.completedSets}</p>
+				<div className="flex items-center gap-3 bg-surface-sunk p-3">
+					<CheckCheck className="size-5 shrink-0 text-ink-3" aria-hidden />
+					<div className="min-w-0">
+						<p className="type-body-sm text-ink-3">Completed sets</p>
+						<p className="type-data type-data-strong text-foreground">
+							{recap.completedSets}
+						</p>
 					</div>
 				</div>
 			</div>
 
 			<section className="space-y-3">
-				<div className="flex items-center gap-2">
-					<GitCompareArrows className="size-5 text-primary" aria-hidden />
-					<h3 className="font-semibold">Compared with last time</h3>
+				<div className="rule-row flex items-center gap-2 pb-2">
+					<GitCompareArrows className="size-4 text-ink-3" aria-hidden />
+					<h3 className="type-panel text-foreground">
+						Compared with last time
+					</h3>
 				</div>
 				{previous ? (
 					<>
-						<p className="text-sm text-muted-foreground">
+						<p className="type-body-sm text-ink-3">
 							Previous session finished{' '}
 							{new Date(previous.endedAt).toLocaleDateString()}.
 						</p>
-						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+						<div className="grid grid-cols-1 gap-px bg-rule-faint sm:grid-cols-3">
 							<ComparisonMetric
 								label="Duration"
 								current={formatDuration(recap.durationSec)}
@@ -142,58 +153,69 @@ export function SessionRecapContent({ recap }: SessionRecapContentProps) {
 						</div>
 					</>
 				) : (
-					<p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
+					<p className="type-body-sm border border-dashed border-rule p-3 text-ink-3">
 						This is the first completed session for this routine day.
 					</p>
 				)}
 			</section>
 
 			<section className="space-y-3">
-				<div className="flex items-center gap-2">
-					<Trophy className="size-5 text-amber-600" aria-hidden />
-					<h3 className="font-semibold">Personal records</h3>
+				{/* §4.3 rule 3 — records are exactly what `--honour` means, but at most
+				    two marks per viewport. The heading glyph is this section's one
+				    mark; the rows below stay neutral, as the dashboard's Personal
+				    Records ledger does. Gold on every record would spend the whole
+				    budget on one list. */}
+				<div className="rule-row flex items-center gap-2 pb-2">
+					<Trophy className="size-4 text-honour" aria-hidden />
+					<h3 className="type-panel text-foreground">Personal records</h3>
 				</div>
 				{recap.records.length > 0 ? (
-					<ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+					<ul className="grid grid-cols-1 gap-px bg-rule-faint sm:grid-cols-2">
 						{recap.records.map(record => (
 							<li
 								key={`${record.exerciseId}:${record.kind}`}
-								className="rounded-lg border bg-amber-500/5 p-3"
+								className="bg-surface-sunk p-3"
 							>
-								<p className="font-medium">{record.exerciseName}</p>
-								<p className="text-sm text-muted-foreground">
+								<p className="type-panel text-foreground">
+									{record.exerciseName}
+								</p>
+								<p className="type-body-sm text-ink-3">
 									{RECAP_RECORD_LABELS[record.kind]} · Set {record.setNumber}
 								</p>
-								<p className="mt-1 font-semibold text-amber-700 dark:text-amber-300">
+								<p className="type-data type-data-strong mt-1 text-foreground">
 									{formatRecapRecordValue(record, weightUnit)}
 								</p>
 							</li>
 						))}
 					</ul>
 				) : (
-					<p className="text-sm text-muted-foreground">
+					<p className="type-body-sm text-ink-3">
 						No new personal records in this session.
 					</p>
 				)}
 			</section>
 
 			<section className="space-y-3">
-				<div className="flex items-center gap-2">
-					<TrendingUp className="size-5 text-emerald-600" aria-hidden />
-					<h3 className="font-semibold">Progression changes</h3>
+				{/* The second and last honour mark: a raised prescription is the
+				    definition of "better than planned". */}
+				<div className="rule-row flex items-center gap-2 pb-2">
+					<TrendingUp className="size-4 text-honour" aria-hidden />
+					<h3 className="type-panel text-foreground">Progression changes</h3>
 				</div>
 				{recap.progressionChanges.length > 0 ? (
-					<div className="space-y-3">
+					<div className="space-y-px bg-rule-faint">
 						{recap.progressionChanges.map(change => (
 							<div
 								key={change.routineExerciseId}
-								className="rounded-lg border bg-emerald-500/5 p-3"
+								className="bg-surface-sunk p-3"
 							>
-								<p className="font-medium">{change.exerciseName}</p>
-								<p className="mt-1 text-sm text-muted-foreground">
+								<p className="type-panel text-foreground">
+									{change.exerciseName}
+								</p>
+								<p className="type-body-sm mt-1 text-ink-3">
 									{getProgressionRuleExplanation(change, weightUnit)}
 								</p>
-								<ul className="mt-2 space-y-1 text-sm">
+								<ul className="mt-2 space-y-1">
 									{change.sets.map(set => {
 										const presentation = getProgressionSetPresentation(
 											set,
@@ -202,12 +224,12 @@ export function SessionRecapContent({ recap }: SessionRecapContentProps) {
 										return (
 											<li
 												key={set.setNumber}
-												className="flex flex-wrap justify-between gap-2"
+												className="type-data flex flex-wrap justify-between gap-2 text-ink-2"
 											>
 												<span>
 													{presentation.setLabel} · {presentation.repsLabel}
 												</span>
-												<span className="font-medium">
+												<span className="type-data-strong text-foreground">
 													{presentation.weightLabel}
 												</span>
 											</li>
@@ -218,18 +240,18 @@ export function SessionRecapContent({ recap }: SessionRecapContentProps) {
 						))}
 					</div>
 				) : (
-					<p className="text-sm text-muted-foreground">
+					<p className="type-body-sm text-ink-3">
 						No prescriptions changed after this session.
 					</p>
 				)}
 			</section>
 
 			<section className="space-y-3">
-				<div className="flex items-center gap-2">
-					<NotebookPen className="size-5 text-primary" aria-hidden />
-					<h3 className="font-semibold">Session notes</h3>
+				<div className="rule-row flex items-center gap-2 pb-2">
+					<NotebookPen className="size-4 text-ink-3" aria-hidden />
+					<h3 className="type-panel text-foreground">Session notes</h3>
 				</div>
-				<p className="rounded-lg border bg-muted/20 p-3 text-sm text-muted-foreground">
+				<p className="type-body-sm bg-surface-sunk p-3 text-ink-2">
 					{recap.notes?.trim() || 'No notes were added to this session.'}
 				</p>
 			</section>
@@ -260,8 +282,11 @@ export function SessionRecapDialog({
 				{recap ? (
 					<>
 						<DialogHeader>
-							<div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary sm:mx-0">
-								<Sparkles className="size-6" aria-hidden />
+							{/* §11.9 — one reading axis. This medallion was centred below
+							    `sm` while the title and body stayed left. §7 also keeps
+							    `rounded-full` for avatars. */}
+							<div className="flex size-10 items-center justify-center rounded-sm bg-surface-sunk text-ink-2">
+								<Sparkles className="size-5" aria-hidden />
 							</div>
 							<DialogTitle>Session complete</DialogTitle>
 							<DialogDescription>
@@ -286,7 +311,9 @@ export function SessionRecapPanel({ recap }: SessionRecapContentProps) {
 	return (
 		<Card className="mb-6">
 			<CardHeader>
-				<CardTitle>Session recap</CardTitle>
+				<CardTitle className="type-section text-foreground">
+					Session recap
+				</CardTitle>
 				<CardDescription>
 					{recap.routineName}
 					{recap.dayName ? ` · ${recap.dayName}` : ''}
