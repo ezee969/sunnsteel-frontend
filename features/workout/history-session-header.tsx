@@ -11,12 +11,14 @@ interface HistorySessionHeaderProps {
 	title?: string
 	metrics: SessionMetrics
 	onBack: () => void
+	showSummary?: boolean
 }
 
 export function HistorySessionHeader({
 	title = 'Workout Session',
 	metrics,
 	onBack,
+	showSummary = true,
 }: HistorySessionHeaderProps) {
 	return (
 		<div className="mb-6">
@@ -37,43 +39,45 @@ export function HistorySessionHeader({
 				</div>
 			</div>
 
-			<Card>
-				<CardContent className="p-4">
-					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-						<div className="flex items-center gap-2">
-							<Badge
-								variant={
-									metrics.statusLabel === 'COMPLETED'
-										? 'default'
-										: metrics.statusLabel === 'IN_PROGRESS'
-											? 'secondary'
-											: 'destructive'
-								}
-							>
-								{metrics.statusLabel}
-							</Badge>
+			{showSummary ? (
+				<Card>
+					<CardContent className="p-4">
+						<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+							<div className="flex items-center gap-2">
+								<Badge
+									variant={
+										metrics.statusLabel === 'COMPLETED'
+											? 'default'
+											: metrics.statusLabel === 'IN_PROGRESS'
+												? 'secondary'
+												: 'destructive'
+									}
+								>
+									{metrics.statusLabel}
+								</Badge>
+							</div>
+							<div className="flex items-center gap-2">
+								<Clock className="h-4 w-4 text-muted-foreground" />
+								<span>{metrics.durationLabel}</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<Target className="h-4 w-4 text-muted-foreground" />
+								<span>{metrics.completedSets} sets</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<Weight className="h-4 w-4 text-muted-foreground" />
+								<span>{metrics.totalVolumeLabel}</span>
+							</div>
 						</div>
-						<div className="flex items-center gap-2">
-							<Clock className="h-4 w-4 text-muted-foreground" />
-							<span>{metrics.durationLabel}</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Target className="h-4 w-4 text-muted-foreground" />
-							<span>{metrics.completedSets} sets</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<Weight className="h-4 w-4 text-muted-foreground" />
-							<span>{metrics.totalVolumeLabel}</span>
-						</div>
-					</div>
 
-					{metrics.notes && (
-						<div className="mt-4 pt-4 border-t">
-							<p className="text-sm text-muted-foreground">{metrics.notes}</p>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+						{metrics.notes && (
+							<div className="mt-4 pt-4 border-t">
+								<p className="text-sm text-muted-foreground">{metrics.notes}</p>
+							</div>
+						)}
+					</CardContent>
+				</Card>
+			) : null}
 		</div>
 	)
 }

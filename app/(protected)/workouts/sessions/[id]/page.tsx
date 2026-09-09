@@ -4,12 +4,12 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 
 import { ExerciseGroup } from '@/features/workout/exercise-group'
-import { ProgressionResultDialog } from '@/features/workout/progression-result-dialog'
 import { RestTimerBar } from '@/features/workout/rest-timer-bar'
 import { SessionActionCard } from '@/features/workout/session-action-card'
 import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
 import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
+import { SessionRecapDialog } from '@/features/workout/session-recap'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
@@ -82,8 +82,8 @@ export default function ActiveSessionPage() {
 		cancelFinish,
 		isFinishing,
 		finishStatus,
-		progressionChanges,
-		completeProgressionReview,
+		recap,
+		completeRecap,
 	} = useSessionManagement({
 		sessionId: idParam,
 		routine,
@@ -331,10 +331,7 @@ export default function ActiveSessionPage() {
 				isFinishing={isFinishing}
 				status={finishStatus}
 			/>
-			<ProgressionResultDialog
-				changes={progressionChanges}
-				onContinue={completeProgressionReview}
-			/>
+			<SessionRecapDialog recap={recap} onContinue={completeRecap} />
 		</div>
 	)
 }
