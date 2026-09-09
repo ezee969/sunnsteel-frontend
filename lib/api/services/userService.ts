@@ -42,7 +42,7 @@ export const userService = {
 		)
 	},
 
-	// Search users by name, email or username
+	// Search users by name or username
 	async searchUsers(
 		query: string,
 		limit: number = 5,
@@ -57,9 +57,9 @@ export const userService = {
 		)
 	},
 
-	// Get public profile by user id
-	async getUserById(userId: string): Promise<PublicUserProfile> {
-		return httpClient.get<PublicUserProfile>(`/users/${userId}`, true)
+	// Get public profile by username, retaining UUID compatibility for old links.
+	async getPublicProfile(identifier: string): Promise<PublicUserProfile> {
+		return httpClient.get<PublicUserProfile>(`/users/${identifier}`, true)
 	},
 
 	// Follow user

@@ -22,12 +22,8 @@ export default function SearchPage() {
 					<Search className="h-8 w-8 text-ink-3" aria-hidden />
 				</div>
 				<h2 className="type-section mb-2 text-foreground">Search Users</h2>
-				{/* FIX-07: this used to offer search by username and by email.
-				Unique handles do not exist yet -- PROF-03 owns them -- and an email
-				address is not a public identity, so it is not offered as a way to
-				look someone up. */}
 				<p className="type-body-sm max-w-md text-ink-3">
-					Type a name in the top search bar to find profiles.
+					Type a name or @username in the top search bar to find profiles.
 				</p>
 			</div>
 		)
@@ -68,7 +64,9 @@ export default function SearchPage() {
 						// `panel` (§11.5) and hover changes colour only.
 						<div
 							key={user.id}
-							onClick={() => router.push(`/profile/${user.id}`)}
+							onClick={() =>
+								router.push(`/profile/${encodeURIComponent(user.username)}`)
+							}
 							className="group flex cursor-pointer flex-col items-center rounded-sm border border-rule bg-surface p-6 transition-colors duration-[var(--motion-fast)] ease-standard hover:border-ink-3"
 						>
 							<Avatar className="mb-4 h-20 w-20 border border-rule">
@@ -83,8 +81,7 @@ export default function SearchPage() {
 							<h3 className="type-panel text-center text-foreground">
 								{user.name} {user.lastName || ''}
 							</h3>
-							{/* A `@handle` belongs here once PROF-03 introduces unique usernames. */}
-							<p className="type-body-sm mt-2 text-ink-3">View profile</p>
+							<p className="type-body-sm mt-1 text-ink-3">@{user.username}</p>
 						</div>
 					))}
 				</div>
@@ -96,7 +93,7 @@ export default function SearchPage() {
 					<h3 className="type-section mb-2 text-foreground">No users found</h3>
 					<p className="type-body-sm max-w-sm text-ink-3">
 						We couldn&apos;t find any profiles matching &quot;{query}&quot;. Try
-						a different spelling or name.
+						a different spelling, name or @username.
 					</p>
 				</div>
 			)}

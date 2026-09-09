@@ -416,7 +416,7 @@ export default function Sidebar({
 								{user?.name} {user?.lastName}
 							</span>
 							<span className="max-w-[10rem] truncate text-xs text-ink-3">
-								{user?.email}
+								{user?.username ? `@${user.username}` : ''}
 							</span>
 						</div>
 					</div>

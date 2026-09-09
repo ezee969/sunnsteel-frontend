@@ -49,9 +49,9 @@ export function SearchBar() {
 		}
 	}
 
-	const handleSelectUser = (userId: string) => {
+	const handleSelectUser = (username: string) => {
 		// Navigate directly to the selected user's profile
-		router.push(`/profile/${userId}`)
+		router.push(`/profile/${encodeURIComponent(username)}`)
 		setIsFocused(false)
 	}
 
@@ -70,7 +70,7 @@ export function SearchBar() {
 				    look like the rest of them. */}
 				<Input
 					type="text"
-					placeholder="Search users..."
+					placeholder="Search by name or @username..."
 					className="w-full pl-9 pr-10"
 					value={query}
 					onChange={e => setQuery(e.target.value)}
@@ -103,7 +103,8 @@ export function SearchBar() {
 									) => (
 										<button
 											key={user.id}
-											onClick={() => handleSelectUser(user.id)}
+											type="button"
+											onClick={() => handleSelectUser(user.username)}
 											className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted"
 										>
 											<Avatar className="h-8 w-8 border border-rule">
@@ -115,6 +116,9 @@ export function SearchBar() {
 											<div className="flex flex-col overflow-hidden">
 												<span className="type-panel truncate text-foreground">
 													{user.name} {user.lastName || ''}
+												</span>
+												<span className="type-body-sm truncate text-ink-3">
+													@{user.username}
 												</span>
 											</div>
 										</button>

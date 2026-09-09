@@ -29,9 +29,14 @@ import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import {
+	getUsernameValidationError,
+	normalizeUsername,
+} from '@/lib/utils/username'
 import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
 
 interface SettingsFormData {
+	username: string
 	name: string
 	lastName: string
 	age: string
@@ -47,6 +52,7 @@ export default function SettingsPage() {
 	const { push } = useToast()
 
 	const [formData, setFormData] = useState<SettingsFormData>({
+		username: '',
 		name: '',
 		lastName: '',
 		age: '',
@@ -65,6 +71,7 @@ export default function SettingsPage() {
 	useEffect(() => {
 		if (user) {
 			setFormData({
+				username: user.username || '',
 				name: user.name || '',
 				lastName: user.lastName || '',
 				age: user.age ? String(user.age) : '',
@@ -78,7 +85,11 @@ export default function SettingsPage() {
 	}, [user])
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+		const value =
+			e.target.name === 'username'
+				? e.target.value.replace(/^@/, '').toLowerCase()
+				: e.target.value
+		setFormData(prev => ({ ...prev, [e.target.name]: value }))
 	}
 
 	const handleSelectChange = (val: string, name: string) => {
@@ -181,6 +192,15 @@ export default function SettingsPage() {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
+		const usernameError = getUsernameValidationError(formData.username)
+		if (usernameError) {
+			push({
+				title: 'Choose another username',
+				description: usernameError,
+				variant: 'destructive',
+			})
+			return
+		}
 		const originalWeight = formatWeightInput(user?.weight, formData.weightUnit)
 		const weightKg =
 			formData.weight === originalWeight
@@ -188,6 +208,7 @@ export default function SettingsPage() {
 				: (parseWeightInput(formData.weight, formData.weightUnit) ?? null)
 		updateUserMutation.mutate(
 			{
+				username: normalizeUsername(formData.username),
 				name: formData.name,
 				lastName: formData.lastName || null,
 				age: formData.age ? parseInt(formData.age, 10) : null,
@@ -223,6 +244,8 @@ export default function SettingsPage() {
 			</div>
 		)
 	}
+
+	const usernameError = getUsernameValidationError(formData.username)
 
 	return (
 		<div className="mx-auto max-w-4xl space-y-8">
@@ -283,6 +306,41 @@ export default function SettingsPage() {
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleSubmit} className="space-y-4">
+							<div className="space-y-2">
+								<Label htmlFor="username">Username</Label>
+								<div className="relative max-w-[var(--field-max)]">
+									<span
+										className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
+										aria-hidden
+									>
+										@
+									</span>
+									<Input
+										id="username"
+										name="username"
+										value={formData.username}
+										onChange={handleInputChange}
+										className="pl-8"
+										autoCapitalize="none"
+										autoCorrect="off"
+										spellCheck={false}
+										maxLength={30}
+										aria-invalid={Boolean(usernameError)}
+										aria-describedby="username-help"
+										required
+									/>
+								</div>
+								<p
+									id="username-help"
+									className={`type-body-sm ${
+										usernameError ? 'text-destructive' : 'text-ink-3'
+									}`}
+								>
+									{usernameError ||
+										'Your public handle. Letters are saved in lowercase.'}
+								</p>
+							</div>
+
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div className="space-y-2">
 									<Label htmlFor="name">First Name</Label>
@@ -397,7 +455,9 @@ export default function SettingsPage() {
 							<div className="pt-4 flex justify-end">
 								<Button
 									type="submit"
-									disabled={updateUserMutation.isPending}
+									disabled={
+										updateUserMutation.isPending || Boolean(usernameError)
+									}
 									className="min-w-[120px]"
 								>
 									{updateUserMutation.isPending ? (

@@ -27,6 +27,7 @@ import {
 	useWorkoutStats,
 } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { normalizeUsername } from '@/lib/utils/username'
 import {
 	formatWeight,
 	formatWeightAmount,
@@ -36,21 +37,28 @@ import {
 
 export default function ProfilePage() {
 	const params = useParams<{ userId?: string[] }>()
-	const routeUserId = Array.isArray(params?.userId)
+	const routeIdentifier = Array.isArray(params?.userId)
 		? params.userId[0]
 		: undefined
 
 	const { user: viewer, isLoading: isViewerLoading } = useUser()
-	const isOwnByRoute = !routeUserId || (viewer?.id && routeUserId === viewer.id)
+	const isOwnByRoute =
+		!routeIdentifier ||
+		Boolean(
+			viewer &&
+			(routeIdentifier === viewer.id ||
+				normalizeUsername(routeIdentifier) === viewer.username),
+		)
 	const { data: publicUser, isLoading: isPublicLoading } = usePublicUser(
-		isOwnByRoute ? '' : routeUserId || '',
+		isOwnByRoute ? '' : routeIdentifier || '',
 	)
 	// Both are viewer-scoped endpoints, so the numbers they return only ever
 	// describe the signed-in user -- they are rendered on your own profile only.
 	const { data: progress } = useWorkoutProgress()
 	const { data: stats } = useWorkoutStats()
-	const followMutation = useFollowUser(routeUserId || '')
-	const unfollowMutation = useUnfollowUser(routeUserId || '')
+	const targetUserId = publicUser?.id || ''
+	const followMutation = useFollowUser(targetUserId, routeIdentifier || '')
+	const unfollowMutation = useUnfollowUser(targetUserId, routeIdentifier || '')
 
 	if (isViewerLoading || (!isOwnByRoute && isPublicLoading)) {
 		return (
@@ -74,20 +82,27 @@ export default function ProfilePage() {
 		)
 	}
 
-	const isOwnProfile = isOwnByRoute || !publicUser
-	const profileName = isOwnProfile ? viewer.name : publicUser.name
-	const profileLastName = isOwnProfile ? viewer.lastName : publicUser.lastName
-	const profileAvatar = isOwnProfile ? viewer.avatarUrl : publicUser.avatarUrl
-	const profileCreatedAt = isOwnProfile
-		? viewer.createdAt
-		: publicUser.createdAt
-	const followerCount = isOwnProfile
-		? viewer.followerCount
-		: publicUser.followerCount
-	const followingCount = isOwnProfile
-		? viewer.followingCount
-		: publicUser.followingCount
-	const isFollowedByMe = isOwnProfile ? false : publicUser.isFollowedByMe
+	if (!isOwnByRoute && !publicUser) {
+		return (
+			<div className="flex h-[60vh] flex-col items-center justify-center gap-2 px-4 text-center">
+				<h1 className="type-section text-foreground">User not found</h1>
+				<p className="type-body-sm text-ink-3">
+					Check the username and try again.
+				</p>
+			</div>
+		)
+	}
+
+	const isOwnProfile = isOwnByRoute
+	const profile = isOwnProfile ? viewer : publicUser!
+	const profileName = profile.name
+	const profileUsername = profile.username
+	const profileLastName = profile.lastName
+	const profileAvatar = profile.avatarUrl
+	const profileCreatedAt = profile.createdAt
+	const followerCount = profile.followerCount
+	const followingCount = profile.followingCount
+	const isFollowedByMe = isOwnProfile ? false : publicUser!.isFollowedByMe
 	const joinDateText = formatDistanceToNow(new Date(profileCreatedAt), {
 		addSuffix: true,
 	})
@@ -110,7 +125,7 @@ export default function ProfilePage() {
 	const isMutating = followMutation.isPending || unfollowMutation.isPending
 
 	const onFollowToggle = () => {
-		if (!routeUserId || isOwnProfile) return
+		if (!targetUserId || isOwnProfile) return
 		if (isFollowedByMe) {
 			unfollowMutation.mutate()
 			return
@@ -151,6 +166,7 @@ export default function ProfilePage() {
 							<h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground heading-classical">
 								{profileName} {profileLastName}
 							</h1>
+							<p className="type-data text-ink-3">@{profileUsername}</p>
 							<p className="text-muted-foreground font-medium flex items-center justify-center md:justify-start gap-1.5 text-sm md:text-base">
 								<CalendarDays className="h-4 w-4" /> Joined {joinDateText}
 							</p>
