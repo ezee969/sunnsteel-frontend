@@ -154,8 +154,14 @@ Active technical debt, with evidence and closure criteria, is tracked in [docs/r
 
 ## Documentation rule
 
-**Never create doc files at repo root** (except this file, `AGENTS.md` and `README`). All project docs live under `docs/` (`docs/roadmaps/`, `docs/history/`, `docs/reference/`). The `docs/` tree was fully deleted at some point and is being rebuilt — check what exists before assuming a path.
+**Never create doc files at repo root** (except this file, `AGENTS.md` and `README`). All project docs live under `docs/` (`docs/roadmaps/`, `docs/history/`, `docs/reference/`). The `docs/` tree was fully deleted at some point and is being rebuilt — check what exists before assuming a path. This ban covers **this repository's root only** — the portfolio docs in the parent workspace folder are a deliberate exception documented below, and must never be moved into this repo.
 
 Before proposing or implementing product features, read [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md). It is the canonical cross-repository registry for shipped capabilities, the active queue, dependencies, deferred work and retained product decisions. Verify the code before changing a feature to `SHIPPED`; performance defects and cleanup remain in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md).
+
+## Portfolio docs (monorepo parent folder)
+
+`../FEATURES.md` (product-facing) and `../TECH_STACK.md` (technical/portfolio-facing) live in the parent workspace folder (`sunsteel/`), **outside this repository**. They are derived documents: the code and [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md) are the sources of truth.
+
+Update them in the same change when: a feature moves to `SHIPPED` in the roadmap, an active user-facing feature is removed or hidden, a dependency/CI/build script changes, or an architecture decision recorded in this file changes. Keep `FEATURES.md` free of technical details and `TECH_STACK.md` free of unverified claims; update its "Last verified" date only when actually verified against code. Do not sync them for refactors, fixes, or in-progress work with no user-visible or stack-visible effect.
 
 `AGENTS.md` is the Codex-facing twin of this file. **Keep the two in sync**: if you change one, mirror the change in the other.
