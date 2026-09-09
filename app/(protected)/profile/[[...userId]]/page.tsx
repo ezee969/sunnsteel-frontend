@@ -107,15 +107,47 @@ export default function ProfilePage() {
 		addSuffix: true,
 	})
 
-	const showOwnStats = isOwnProfile
-	const totalWorkouts = stats?.totalCompleted ?? 0
+	const canViewWorkoutHistory =
+		isOwnProfile || publicUser!.viewerAccess.workoutHistory
+	const publicTrainingSummary = isOwnProfile
+		? undefined
+		: publicUser!.trainingSummary
+	const totalWorkouts = isOwnProfile
+		? (stats?.totalCompleted ?? 0)
+		: (publicTrainingSummary?.completedWorkouts ?? 0)
 	const weeklyWorkouts = stats?.weeklyWorkoutsCount ?? 0
-	const currentStreak = progress?.currentStreakDays ?? 0
-	const bestStreak = progress?.bestStreakDays ?? 0
-	const totalVolumeKg = progress?.totalVolumeKg ?? 0
+	const currentStreak = isOwnProfile
+		? (progress?.currentStreakDays ?? 0)
+		: (publicTrainingSummary?.currentStreakDays ?? 0)
+	const bestStreak = isOwnProfile
+		? (progress?.bestStreakDays ?? 0)
+		: (publicTrainingSummary?.bestStreakDays ?? 0)
+	const totalVolumeKg = isOwnProfile
+		? (progress?.totalVolumeKg ?? 0)
+		: (publicTrainingSummary?.totalVolumeKg ?? 0)
 	const weightUnit = viewer.weightUnit ?? 'KG'
 	const totalVolume = kilogramsToDisplayWeight(totalVolumeKg, weightUnit)
-	const personalRecords = progress?.personalRecords ?? []
+	const canViewRecords = isOwnProfile || publicUser!.viewerAccess.records
+	const personalRecords = isOwnProfile
+		? (progress?.personalRecords ?? [])
+		: (publicUser!.personalRecords ?? [])
+	const canViewBodyMetrics =
+		isOwnProfile || publicUser!.viewerAccess.bodyMetrics
+	const bodyMetrics = isOwnProfile
+		? {
+				age: viewer.age,
+				sex: viewer.sex,
+				weightKg: viewer.weight,
+				heightCm: viewer.height,
+			}
+		: publicUser!.bodyMetrics
+	const hasBodyMetrics = Boolean(
+		bodyMetrics &&
+		(bodyMetrics.age != null ||
+			bodyMetrics.sex != null ||
+			bodyMetrics.weightKg != null ||
+			bodyMetrics.heightCm != null),
+	)
 	const volumeLabel =
 		totalVolume >= 1_000_000
 			? `${(totalVolume / 1_000_000).toFixed(1)}M`
@@ -243,6 +275,48 @@ export default function ProfilePage() {
 							No bio yet.
 						</p>
 					</div>
+
+					<div className="space-y-4">
+						<h2 className="text-xl font-semibold heading-classical">
+							Body Metrics
+						</h2>
+						{!canViewBodyMetrics ? (
+							<p className="text-muted-foreground text-sm">
+								Body metrics are private.
+							</p>
+						) : !hasBodyMetrics ? (
+							<p className="text-muted-foreground text-sm">
+								No body metrics added yet.
+							</p>
+						) : (
+							<dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+								<BodyMetric label="Age" value={bodyMetrics?.age} />
+								<BodyMetric
+									label="Sex"
+									value={
+										bodyMetrics?.sex ? bodyMetrics.sex.toLowerCase() : null
+									}
+									capitalize
+								/>
+								<BodyMetric
+									label="Weight"
+									value={
+										bodyMetrics?.weightKg == null
+											? null
+											: formatWeight(bodyMetrics.weightKg, weightUnit)
+									}
+								/>
+								<BodyMetric
+									label="Height"
+									value={
+										bodyMetrics?.heightCm == null
+											? null
+											: `${bodyMetrics.heightCm} cm`
+									}
+								/>
+							</dl>
+						)}
+					</div>
 				</div>
 
 				<div className="lg:col-span-2 space-y-6">
@@ -259,10 +333,14 @@ export default function ProfilePage() {
 									<Dumbbell className="h-4 w-4 text-primary" />
 								</div>
 								<div className="text-3xl font-bold heading-classical">
-									{showOwnStats ? totalWorkouts : '—'}
+									{canViewWorkoutHistory ? totalWorkouts : '—'}
 								</div>
 								<div className="text-xs text-emerald-500 mt-1 font-medium">
-									{showOwnStats ? `+${weeklyWorkouts} this week` : ' '}
+									{canViewWorkoutHistory
+										? isOwnProfile
+											? `+${weeklyWorkouts} this week`
+											: 'Lifetime completed'
+										: ' '}
 								</div>
 							</CardContent>
 						</Card>
@@ -279,13 +357,15 @@ export default function ProfilePage() {
 									<Flame className="h-4 w-4 text-orange-500" />
 								</div>
 								<div className="text-3xl font-bold heading-classical">
-									{showOwnStats ? currentStreak : '—'}{' '}
-									<span className="text-lg text-muted-foreground font-normal">
-										days
-									</span>
+									{canViewWorkoutHistory ? currentStreak : '—'}{' '}
+									{canViewWorkoutHistory ? (
+										<span className="text-lg text-muted-foreground font-normal">
+											days
+										</span>
+									) : null}
 								</div>
 								<div className="text-xs text-muted-foreground mt-1 font-medium">
-									{showOwnStats ? `Personal Best: ${bestStreak}` : ' '}
+									{canViewWorkoutHistory ? `Personal Best: ${bestStreak}` : ' '}
 								</div>
 							</CardContent>
 						</Card>
@@ -303,11 +383,13 @@ export default function ProfilePage() {
 								</div>
 								<div className="flex items-end gap-2">
 									<div className="text-3xl font-bold heading-classical">
-										{showOwnStats ? volumeLabel : '—'}
+										{canViewWorkoutHistory ? volumeLabel : '—'}
 									</div>
-									<div className="text-sm text-muted-foreground mb-1 font-medium">
-										{getWeightUnitLabel(weightUnit)}
-									</div>
+									{canViewWorkoutHistory ? (
+										<div className="text-sm text-muted-foreground mb-1 font-medium">
+											{getWeightUnitLabel(weightUnit)}
+										</div>
+									) : null}
 								</div>
 							</CardContent>
 						</Card>
@@ -320,11 +402,13 @@ export default function ProfilePage() {
 						</h3>
 
 						<div className="space-y-4">
-							{!showOwnStats || personalRecords.length === 0 ? (
+							{!canViewRecords || personalRecords.length === 0 ? (
 								<p className="text-muted-foreground text-sm">
-									{showOwnStats
-										? 'Log a few sets and your records will show up here.'
-										: 'Records are only visible on your own profile.'}
+									{!canViewRecords
+										? 'Personal records are private.'
+										: isOwnProfile
+											? 'Log a few sets and your records will show up here.'
+											: 'No personal records yet.'}
 								</p>
 							) : (
 								personalRecords.map(record => (
@@ -355,6 +439,29 @@ export default function ProfilePage() {
 					</Card>
 				</div>
 			</div>
+		</div>
+	)
+}
+
+function BodyMetric({
+	label,
+	value,
+	capitalize = false,
+}: {
+	label: string
+	value: string | number | null | undefined
+	capitalize?: boolean
+}) {
+	return (
+		<div>
+			<dt className="text-xs uppercase tracking-wider text-ink-3">{label}</dt>
+			<dd
+				className={
+					capitalize ? 'capitalize text-foreground' : 'text-foreground'
+				}
+			>
+				{value ?? '—'}
+			</dd>
 		</div>
 	)
 }

@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
@@ -472,6 +473,10 @@ export default function SettingsPage() {
 			</div>
 
 			<TrainingLocationPreferencesCard weightUnit={formData.weightUnit} />
+
+			{user ? (
+				<ProfilePrivacySettingsCard settings={user.privacySettings} />
+			) : null}
 
 			<ImageCropper
 				open={cropperOpen}

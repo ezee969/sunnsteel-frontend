@@ -3,6 +3,7 @@ export * from './useFollowUser'
 export * from './usePublicUser'
 export * from './useRoutines'
 export * from './useUnfollowUser'
+export * from './useUpdateProfilePrivacy'
 export * from './useUser'
 export * from './useWorkoutSession'
 
