@@ -28,7 +28,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { formatTimeAgo } from '@/lib/utils/date'
-import { getSharedProfileUrl } from '@/lib/utils/profile-sharing'
+import {
+	copyTextToClipboard,
+	getSharedProfileUrl,
+} from '@/lib/utils/profile-sharing'
 import {
 	getPreferredTrainingStyleLabel,
 	getTrainingDisciplineLabel,
@@ -147,7 +150,7 @@ export function ProfileView(props: ProfileViewProps) {
 	const onShareProfile = async () => {
 		try {
 			const url = getSharedProfileUrl(profileUsername, window.location.origin)
-			await navigator.clipboard.writeText(url)
+			await copyTextToClipboard(url)
 			push({
 				title: 'Profile link copied',
 				description: 'Anyone with the link can view this public profile.',
