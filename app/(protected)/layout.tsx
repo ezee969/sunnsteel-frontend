@@ -47,6 +47,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/workouts/history')) return 'history'
 		if (path.startsWith('/workouts')) return 'workouts'
 		if (path.startsWith('/routines')) return 'routines'
+		if (path.startsWith('/progress')) return 'progress'
 		if (path.startsWith('/settings')) return 'settings'
 		return 'dashboard' // fallback
 	}
@@ -59,6 +60,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/routines/new')) return 'New Routine'
 		if (path.startsWith('/routines/edit')) return 'Edit Routine'
 		if (path.startsWith('/routines')) return 'Routines'
+		if (path.startsWith('/progress')) return 'Progress'
 		if (path.startsWith('/settings')) return 'Profile Settings'
 		if (path.startsWith('/dashboard')) return 'Dashboard'
 		return 'Dashboard'

@@ -28,6 +28,7 @@ import {
 	WorkoutSessionRecap,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
+import type { ExerciseStrengthTrendQuery } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 import { useWorkoutAnalytics } from './useWorkoutAnalytics'
 
@@ -56,6 +57,15 @@ function serializeSessionParams(
 const qk = {
 	stats: ['workout', 'stats'] as const,
 	progress: ['workout', 'progress'] as const,
+	strengthTrend: (params: ExerciseStrengthTrendQuery) =>
+		[
+			'workout',
+			'progress',
+			'strength',
+			params.exerciseId ?? null,
+			params.from ?? null,
+			params.to ?? null,
+		] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
 	previousPerformance: (id: string) =>
@@ -99,6 +109,17 @@ export const useWorkoutProgress = () => {
 				: null),
 		retryBootstrap: analytics.retry,
 	}
+}
+
+export const useExerciseStrengthTrend = (
+	params: ExerciseStrengthTrendQuery,
+) => {
+	const { session, isLoading } = useAuth()
+	return useQuery({
+		queryKey: qk.strengthTrend(params),
+		queryFn: () => workoutService.getStrengthTrend(params),
+		enabled: !isLoading && !!session,
+	})
 }
 
 export const useActiveSession = () => {

@@ -5,6 +5,7 @@ const PROTECTED_PREFIXES = [
 	'/workouts',
 	'/routines',
 	'/profile',
+	'/progress',
 	'/settings',
 	'/search',
 ] as const
@@ -44,6 +45,7 @@ export const config = {
 		'/workouts/:path*',
 		'/routines/:path*',
 		'/profile/:path*',
+		'/progress/:path*',
 		'/settings/:path*',
 		'/search/:path*',
 	],
