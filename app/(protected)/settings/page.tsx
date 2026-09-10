@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
@@ -534,6 +535,10 @@ export default function SettingsPage() {
 
 			{user ? (
 				<TrainingIdentitySettingsCard identity={user.trainingIdentity} />
+			) : null}
+
+			{user ? (
+				<ProfileDiscoverySettingsCard settings={user.discoverySettings} />
 			) : null}
 
 			{user ? (
