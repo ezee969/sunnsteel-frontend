@@ -84,6 +84,11 @@ export const userService = {
 		return httpClient.get<PublicUserProfile>(`/users/${identifier}`, true)
 	},
 
+	// Read the exact public view a signed-out recipient sees.
+	async getSharedProfile(identifier: string): Promise<PublicUserProfile> {
+		return httpClient.get<PublicUserProfile>(`/profiles/${identifier}`)
+	},
+
 	// Follow user
 	async followUser(userId: string): Promise<PublicUserProfile> {
 		return httpClient.post<PublicUserProfile>(
