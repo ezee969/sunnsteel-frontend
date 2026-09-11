@@ -19,6 +19,7 @@
     "ui:login": "node e2e/save-auth.mjs",
     "ui:capture:before": "playwright test --project=before",
     "ui:capture:after": "playwright test --project=after",
+    "ui:regression": "playwright test --project=regression",
     "verify:security": "npm audit --omit=dev"
   },
   "dependencies": {

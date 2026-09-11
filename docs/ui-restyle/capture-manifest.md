@@ -16,6 +16,12 @@ File naming: `<slug>-<width>-<theme>.png` — e.g. `dashboard-390-dark.png`.
 4. Theme is switched via the app's own control so `next-themes` writes the `.dark`
    class; emulating `prefers-color-scheme` alone is not equivalent here, because
    `@custom-variant dark (&:is(.dark *))` keys off the class, not the media query.
+5. **No active workout session.** `/workouts` redirects into a live session and
+   every other protected page grows a "Resume" banner. Since Phase 14 this is
+   enforced, not just listed (TD-34): `e2e/preconditions.ts` fails the run with
+   the session's id. The one exception is capturing the session screen itself,
+   declared with `UI_SESSION_ID` — then only that screen and `/login` may be
+   captured in the run.
 
 ## Routes
 
@@ -27,6 +33,7 @@ File naming: `<slug>-<width>-<theme>.png` — e.g. `dashboard-390-dark.png`.
 | `routines-new` | `/routines/new` | Wizard; capture each step separately if they differ structurally |
 | `workouts` | `/workouts` | Redirects into the live session when one exists — capture both states |
 | `history` | `/workouts/history` | List plus filter bar |
+| `history-detail` | `/workouts/history/<id>` | Added in Phase 14; set `UI_HISTORY_ID`. Restyled after the baseline froze, so it has no `before/` image |
 | `session` | `/workouts/sessions/<id>` | The highest-density screen in the app |
 | `profile` | `/profile` | Own profile; also capture another user's profile |
 | `search` | `/search?q=<term>` | Results grid and the no-query state |

@@ -10,12 +10,22 @@ export const THEMES = ['light', 'dark'] as const
 /** The Phase 9 responsive sweep. Not part of the frozen baseline. */
 export const SWEEP_WIDTHS = [320, 375, 390, 430, 768, 1024, 1280, 1440] as const
 
+/** The Phase 14 regression sweep (e2e/regression.spec.ts), per the plan. */
+export const REGRESSION_WIDTHS = [320, 390, 430, 768, 1024, 1280, 1440] as const
+
+/** Which environment variable supplies the id for a `requiresId` target. */
+export const ID_ENV = {
+	session: 'UI_SESSION_ID',
+	sessionFull: 'UI_SESSION_FULL_ID',
+	historyDetail: 'UI_HISTORY_ID',
+} as const
+
 export type Target = {
 	/** File-name slug: `<slug>-<width>-<theme>.png`. */
 	slug: string
 	path: string
-	/** Skipped unless the matching env var supplies an id. */
-	requiresId?: 'session' | 'sessionFull'
+	/** Skipped unless the matching env var (ID_ENV) supplies an id. */
+	requiresId?: keyof typeof ID_ENV
 	note?: string
 }
 
@@ -30,6 +40,15 @@ export const ROUTES: Target[] = [
 		note: 'redirects into the live session when one exists',
 	},
 	{ slug: 'history', path: '/workouts/history' },
+	{
+		slug: 'history-detail',
+		path: '/workouts/history/__ID__',
+		requiresId: 'historyDetail',
+		note:
+			'restyled in the Phase 13 follow-up, after the baseline was frozen, so ' +
+			'it has no `before/` counterpart. Any finished session id; set ' +
+			'UI_HISTORY_ID.',
+	},
 	{
 		slug: 'session',
 		path: '/workouts/sessions/__ID__',
@@ -53,15 +72,8 @@ export const ROUTES: Target[] = [
 ]
 
 export function resolvePath(target: Target): string | null {
-	if (target.requiresId === 'session') {
-		const id = process.env.UI_SESSION_ID
-		if (!id) return null
-		return target.path.replace('__ID__', id)
-	}
-	if (target.requiresId === 'sessionFull') {
-		const id = process.env.UI_SESSION_FULL_ID
-		if (!id) return null
-		return target.path.replace('__ID__', id)
-	}
-	return target.path
+	if (!target.requiresId) return target.path
+	const id = process.env[ID_ENV[target.requiresId]]
+	if (!id) return null
+	return target.path.replace('__ID__', id)
 }

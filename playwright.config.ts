@@ -3,10 +3,13 @@ import { defineConfig } from '@playwright/test'
 import type { CaptureOptions } from './e2e/fixtures'
 
 /**
- * Playwright exists in this repo for one purpose: reproducible UI screenshots
- * for the restyle (see docs/ui-restyle-plan.md). It is not a functional test
- * suite. Vitest stays Node-only for logic, auth orchestration and contracts —
- * that boundary is deliberate and documented in docs/roadmaps/technical-debt.md.
+ * Playwright exists in this repo for the UI restyle (see
+ * docs/ui-restyle-plan.md): reproducible screenshots (`before` / `after`) and,
+ * since Phase 14, a regression sweep of layout and interaction states
+ * (`regression`). It runs against the local dev server and is not part of
+ * `npm run verify` or CI. Vitest stays Node-only for logic, auth orchestration
+ * and contracts — that boundary is deliberate and documented in
+ * docs/roadmaps/technical-debt.md.
  *
  * Specs are named `*.spec.ts` on purpose: vitest includes `**\/*.test.ts`, so the
  * two runners cannot pick up each other's files.
@@ -29,9 +32,25 @@ export default defineConfig<CaptureOptions>({
 		trace: 'off',
 		video: 'off',
 	},
+	// Each project names its spec: without `testMatch`, `--project=after` would
+	// also run the regression sweep, and the sweep would write screenshots.
 	projects: [
-		{ name: 'before', use: { captureDir: 'before' } },
-		{ name: 'after', use: { captureDir: 'after' } },
+		{
+			name: 'before',
+			testMatch: 'baseline.spec.ts',
+			use: { captureDir: 'before' },
+		},
+		{
+			name: 'after',
+			testMatch: 'baseline.spec.ts',
+			use: { captureDir: 'after' },
+		},
+		{
+			name: 'regression',
+			testMatch: 'regression.spec.ts',
+			// The first request to each route compiles it under Turbopack.
+			use: { navigationTimeout: 90_000 },
+		},
 	],
 	webServer: {
 		command: 'npm run dev',

@@ -2,10 +2,9 @@ import { existsSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
-import { resolvePath, ROUTES, THEMES, WIDTHS } from './capture-targets'
+import { ID_ENV, resolvePath, ROUTES, THEMES, WIDTHS } from './capture-targets'
 import { expect, test } from './fixtures'
-
-const STATE_PATH = '.auth/state.json'
+import { findActiveSessionId, STATE_PATH } from './preconditions'
 
 /**
  * `/login` must be captured signed OUT. `middleware.ts` redirects an
@@ -20,12 +19,25 @@ const MAX_CAPTURE_HEIGHT = 8000
 
 test.use({ storageState: existsSync(STATE_PATH) ? STATE_PATH : undefined })
 
-test.beforeAll(() => {
-	if (!existsSync(STATE_PATH)) {
+/**
+ * TD-34: a live workout session changes what most captures show — `/workouts`
+ * redirects into it and every other protected page grows a "Resume" banner —
+ * so a run under one produces plausible images that match nothing in
+ * `before/`. The only deliberate exception is capturing the session screen
+ * itself, declared by pointing UI_SESSION_ID at the live session.
+ */
+let activeSessionId: string | null = null
+
+test.beforeAll(async ({ browser }) => {
+	// Also throws when the saved sign-in is missing or expired — without one
+	// every protected route redirects to /login and the run would silently
+	// capture sixty copies of the login page.
+	activeSessionId = await findActiveSessionId(browser)
+	if (activeSessionId && activeSessionId !== process.env.UI_SESSION_ID) {
 		throw new Error(
-			`No saved session at ${STATE_PATH}. Run "npm run ui:login" first — ` +
-				'without it every protected route redirects to /login and the run ' +
-				'would silently capture sixty copies of the login page.',
+			`A workout session (${activeSessionId}) is active. Finish or discard ` +
+				'it before capturing, or set UI_SESSION_ID to it to capture the ' +
+				'session screen on purpose.',
 		)
 	}
 })
@@ -111,7 +123,8 @@ for (const target of ROUTES) {
 	// not use `test.skip()`: called at module scope it skips the whole file, not
 	// this route.
 	if (path === null) {
-		console.warn(`skipping ${target.slug}: set UI_SESSION_ID to capture it`)
+		const env = target.requiresId ? ID_ENV[target.requiresId] : 'an id'
+		console.warn(`skipping ${target.slug}: set ${env} to capture it`)
 		continue
 	}
 
@@ -124,6 +137,21 @@ for (const target of ROUTES) {
 				page,
 				captureDir,
 			}) => {
+				// Only the session screen (which hides the banner) and signed-out
+				// routes are valid while the declared session is live.
+				if (
+					activeSessionId &&
+					!signedOut &&
+					!path.startsWith('/workouts/sessions/')
+				) {
+					throw new Error(
+						`${target.slug} cannot be captured while session ` +
+							`${activeSessionId} is active: /workouts redirects into it and ` +
+							'every other page shows its Resume banner. Capture the session ' +
+							'screen alone (--grep session), then finish the session.',
+					)
+				}
+
 				const shared = {
 					path,
 					slug: target.slug,
