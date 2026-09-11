@@ -186,7 +186,10 @@ function PerformanceSessionCard({
 				</div>
 
 				<Button variant="link" className="h-auto p-0" asChild>
-					<Link href={'/workouts/sessions/' + session.sessionId}>
+					<Link
+						href={'/workouts/sessions/' + session.sessionId}
+						prefetch={false}
+					>
 						Open session recap
 					</Link>
 				</Button>
