@@ -268,9 +268,9 @@ export default function SettingsPage() {
 	return (
 		<div className="mx-auto max-w-4xl space-y-8">
 			<div className="rule-heading pb-4">
-				<h2 className="type-page corner-brackets inline-block text-foreground">
+				<h1 className="type-page corner-brackets inline-block text-foreground">
 					Profile Settings
-				</h2>
+				</h1>
 				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
 					Manage your account settings and set your preferences.
 				</p>

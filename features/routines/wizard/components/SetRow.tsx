@@ -159,7 +159,7 @@ export function SetRow({
 				<div className="flex flex-col gap-2 sm:contents">
 					{/* Reps Column */}
 					<div className="sm:col-span-3 space-y-1">
-						<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
+						<Label className="sm:hidden">
 							{set.repType === 'FIXED' ? 'Reps' : 'Reps Range'}
 						</Label>
 						{set.repType === 'FIXED' ? (
@@ -290,7 +290,7 @@ export function SetRow({
 					<div className="flex flex-col gap-2 sm:contents">
 						{/* Weight Column */}
 						<div className="sm:col-span-2 space-y-1">
-							<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
+							<Label className="sm:hidden">
 								Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
 							</Label>
 							<div className="flex items-center gap-2 w-full">
@@ -322,7 +322,7 @@ export function SetRow({
 									}
 									className={`text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 ${
 										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-											? 'cursor-not-allowed opacity-60'
+											? 'cursor-not-allowed'
 											: ''
 									}`}
 								/>
@@ -344,9 +344,7 @@ export function SetRow({
 
 						{/* RIR Column */}
 						<div className="sm:col-span-1 space-y-1">
-							<Label className="sm:hidden text-[10px] font-medium text-muted-foreground">
-								RIR
-							</Label>
+							<Label className="sm:hidden">RIR</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button
 									type="button"

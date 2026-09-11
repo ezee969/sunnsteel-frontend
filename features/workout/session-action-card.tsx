@@ -3,7 +3,6 @@
 import { AlertCircle, CheckCircle, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import type { SessionProgressData } from '@/lib/utils/workout-session.types'
 
 interface SessionActionCardProps {
@@ -31,37 +30,39 @@ export const SessionActionCard = ({
 	const isComplete = percentage === 100
 
 	return (
-		// One of the three things v0.1 keeps boxed: the single genuine call to
-		// action on the screen (§11.5). `panel` = surface, 2px radius, 1px rule,
-		// no shadow.
-		<section className="rounded-sm border border-rule bg-surface p-4 md:p-6">
-			{/* Progress */}
-			<div className="space-y-2">
-				<div className="flex items-baseline justify-between">
-					<span className="type-label text-ink-3">Progress</span>
-					<span className="type-data type-data-strong text-foreground">
-						{Math.round(percentage)}%
-					</span>
+		// Final review 4 / §11.8: an inline control row directly under the
+		// masthead, not a boxed "metric card plus giant button". The progress bar
+		// and percentage it used to carry restated what the masthead already
+		// shows, so overall progress is now stated exactly once on this screen.
+		<section
+			aria-label="Session actions"
+			className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+		>
+			{/* Completion Status */}
+			{!isComplete ? (
+				<div className="mark mark-warning flex items-center gap-2 bg-surface-sunk py-2 pl-3 pr-3">
+					<AlertCircle
+						className="h-4 w-4 shrink-0 text-warning-strong"
+						aria-hidden
+					/>
+					<p className="type-body-sm text-ink-2">
+						Complete all sets to finish the session
+					</p>
 				</div>
-				{/* Completion is earned, so the fill is gold. Track is a well and the
-				    bar is square — nothing in this direction is a pill. The Radix
-				    primitive stays: it carries the progressbar role and value, which
-				    a plain div would drop. */}
-				<Progress
-					value={percentage}
-					className="h-1.5 rounded-none bg-surface-sunk [&_[data-slot=progress-indicator]]:bg-honour-bright [&_[data-slot=progress-indicator]]:transition-[transform] [&_[data-slot=progress-indicator]]:duration-[var(--motion-slow)] [&_[data-slot=progress-indicator]]:ease-standard"
-				/>
-			</div>
+			) : (
+				<span className="hidden sm:block" />
+			)}
 
-			{/* The one action on this region, so it is the one crimson fill
-			    (§4.3 rule 1). Gold never fills a control (rule 6). */}
-			<div className="mt-5 flex gap-2">
+			{/* Finish is the region's one filled control, in ink (§4.3 rule 1);
+			    Discard destroys data, so it is the destructive outline (rule 5).
+			    Sized to their labels rather than stretched across the column. */}
+			<div className="flex gap-2">
 				<Button
 					type="button"
 					variant="outline"
 					onClick={onDiscardAttempt}
 					disabled={isFinishing}
-					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive disabled:opacity-60"
+					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10"
 				>
 					<Trash2 className="mr-2 h-4 w-4" aria-hidden />
 					Discard
@@ -70,16 +71,16 @@ export const SessionActionCard = ({
 					type="button"
 					onClick={onFinishAttempt}
 					disabled={isFinishing}
-					className="type-button h-11 flex-1 rounded-sm bg-primary text-primary-foreground shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover disabled:opacity-60"
+					className="type-button h-11 flex-1 rounded-sm bg-primary text-primary-foreground shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover sm:flex-none md:h-10"
 				>
 					{isFinishing ? (
 						<>
-							<AlertCircle className="mr-2 h-4 w-4 animate-spin" />
+							<AlertCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden />
 							Finishing...
 						</>
 					) : isComplete ? (
 						<>
-							<CheckCircle className="mr-2 h-4 w-4" />
+							<CheckCircle className="mr-2 h-4 w-4" aria-hidden />
 							Finish Session
 						</>
 					) : (
@@ -87,16 +88,6 @@ export const SessionActionCard = ({
 					)}
 				</Button>
 			</div>
-
-			{/* Completion Status */}
-			{!isComplete && (
-				<div className="mt-4 flex items-center gap-2 border-l-2 border-warning-strong bg-surface-sunk py-2 pl-3">
-					<AlertCircle className="h-4 w-4 shrink-0 text-ink-2" />
-					<p className="text-xs text-ink-2">
-						Complete all sets to finish the session
-					</p>
-				</div>
-			)}
 		</section>
 	)
 }

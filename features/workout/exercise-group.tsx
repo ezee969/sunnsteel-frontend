@@ -70,9 +70,8 @@ export const ExerciseGroup = ({
 
 	return (
 		// De-boxed: a ruled entry on the page, not a card. The mark on the left
-		// is what a completed exercise reads as at a glance — a finished exercise
-		// is an earned mark, so it takes gold (§4.3 rule 2) rather than the green
-		// this screen used, which freed `success` for genuine system state.
+		// is what a completed exercise reads as at a glance — "done, as planned",
+		// so it is `--success` (§4.3 rule 2), not gold.
 		<section
 			// Motion spec §2.9 signature 2: `mark-fill` makes the mark grow top to
 			// bottom instead of appearing, and the row settles onto the completed
@@ -119,7 +118,7 @@ export const ExerciseGroup = ({
 					</div>
 
 					{isComplete && (
-						<span className="type-label text-honour">Complete</span>
+						<span className="type-label text-success">Complete</span>
 					)}
 				</div>
 			</div>

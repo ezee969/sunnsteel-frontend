@@ -56,17 +56,17 @@ function calculatePasswordStrength(password: string): {
 	if (/[^a-zA-Z0-9]/.test(password)) strength += 25
 
 	let label = 'Weak'
-	let color = 'bg-red-500'
+	let color = 'bg-destructive'
 
 	if (strength >= 80) {
 		label = 'Strong'
-		color = 'bg-green-500'
+		color = 'bg-success-strong'
 	} else if (strength >= 60) {
 		label = 'Good'
-		color = 'bg-amber-500'
+		color = 'bg-ink-2'
 	} else if (strength >= 40) {
 		label = 'Fair'
-		color = 'bg-yellow-500'
+		color = 'bg-warning-strong'
 	}
 
 	return { strength, label, color }
@@ -116,15 +116,15 @@ export function SupabaseSignupForm() {
 	)
 
 	return (
-		<div className="w-full max-w-sm mx-auto">
+		<div className="w-full rounded-sm border border-rule bg-surface p-5 sm:p-6">
 			<TopLoadingBar show={isPending || isGooglePending} />
 
 			{isSuccess && (
-				<div className="p-3 mb-6 text-sm text-green-800 dark:text-green-200 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-500/30 rounded-lg flex items-center gap-3">
-					<CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+				<div className="type-body-sm mark mark-success mb-6 flex items-center gap-3 bg-surface-sunk p-3 text-foreground">
+					<CheckCircle2 className="h-5 w-5 shrink-0 text-success" aria-hidden />
 					<div className="flex-1">
-						<p className="font-medium">Account created!</p>
-						<p className="text-xs opacity-90">
+						<p className="type-panel">Account created!</p>
+						<p className="text-ink-2">
 							Check your email to verify your account.
 						</p>
 					</div>
@@ -132,11 +132,17 @@ export function SupabaseSignupForm() {
 			)}
 
 			{isError && (
-				<div className="p-3 mb-6 text-sm text-red-800 dark:text-red-200 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg flex items-center gap-3">
-					<AlertCircle className="w-5 h-5 flex-shrink-0" />
+				<div
+					role="alert"
+					className="type-body-sm mark mb-6 flex items-center gap-3 border-l-destructive bg-surface-sunk p-3 text-foreground"
+				>
+					<AlertCircle
+						className="h-5 w-5 shrink-0 text-destructive"
+						aria-hidden
+					/>
 					<div className="flex-1">
-						<p className="font-medium">Sign up failed</p>
-						<p className="text-xs opacity-90">
+						<p className="type-panel">Sign up failed</p>
+						<p className="text-ink-2">
 							{error?.message || 'An error occurred during signup'}
 						</p>
 					</div>
@@ -154,14 +160,17 @@ export function SupabaseSignupForm() {
 									<FormLabel>Full Name</FormLabel>
 									<FormControl>
 										<div className="relative">
-											<User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<User
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												placeholder="John Doe"
 												type="text"
 												autoCapitalize="words"
 												autoComplete="name"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -180,14 +189,17 @@ export function SupabaseSignupForm() {
 									<FormLabel>Email</FormLabel>
 									<FormControl>
 										<div className="relative">
-											<Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<Mail
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												placeholder="name@example.com"
 												type="email"
 												autoCapitalize="none"
 												autoComplete="email"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -206,18 +218,24 @@ export function SupabaseSignupForm() {
 									<FormLabel>Password</FormLabel>
 									<FormControl>
 										<div className="relative">
-											<Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<Lock
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10 pr-11"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
 											<button
 												type="button"
 												onClick={() => setShowPassword(!showPassword)}
-												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors p-1"
+												aria-label={
+													showPassword ? 'Hide password' : 'Show password'
+												}
+												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 												tabIndex={-1}
 											>
 												{showPassword ? (
@@ -230,14 +248,14 @@ export function SupabaseSignupForm() {
 									</FormControl>
 
 									{/* Password Strength Indicator */}
-									<div className="h-1 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden mt-2">
+									<div className="mt-2 h-1 overflow-hidden rounded-none bg-rule-faint">
 										<div
 											className={`h-full origin-left transition-transform duration-[var(--motion-slow)] ease-standard ${passwordStrength.color}`}
 											style={{ width: `${passwordStrength.strength}%` }}
 										/>
 									</div>
 									{field.value && (
-										<p className="text-xs text-neutral-500 mt-1">
+										<p className="type-body-sm mt-1 text-ink-3">
 											Strength:{' '}
 											<span className="font-medium">
 												{passwordStrength.label}
@@ -258,11 +276,14 @@ export function SupabaseSignupForm() {
 									<FormLabel>Confirm Password</FormLabel>
 									<FormControl>
 										<div className="relative">
-											<Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<Lock
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												type={showConfirmPassword ? 'text' : 'password'}
 												placeholder="••••••••"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10 pr-11"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -271,7 +292,12 @@ export function SupabaseSignupForm() {
 												onClick={() =>
 													setShowConfirmPassword(!showConfirmPassword)
 												}
-												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors p-1"
+												aria-label={
+													showConfirmPassword
+														? 'Hide password'
+														: 'Show password'
+												}
+												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 												tabIndex={-1}
 											>
 												{showConfirmPassword ? (
@@ -288,7 +314,8 @@ export function SupabaseSignupForm() {
 						/>
 
 						<Button
-							className="w-full h-11 font-medium text-base bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors duration-[var(--motion-fast)] ease-standard"
+							size="lg"
+							className="w-full"
 							type="submit"
 							disabled={isPending || isGooglePending}
 						>
@@ -300,7 +327,7 @@ export function SupabaseSignupForm() {
 							) : (
 								<>
 									Create Account
-									<ChevronRight className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+									<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 								</>
 							)}
 						</Button>
@@ -309,18 +336,17 @@ export function SupabaseSignupForm() {
 
 				<div className="relative py-2">
 					<div className="absolute inset-0 flex items-center">
-						<span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+						<span className="w-full border-t border-rule" />
 					</div>
-					<div className="relative flex justify-center text-xs uppercase tracking-widest">
-						<span className="px-4 text-neutral-400 dark:text-neutral-500">
-							Or
-						</span>
+					<div className="relative flex justify-center">
+						<span className="type-label bg-surface px-4 text-ink-3">Or</span>
 					</div>
 				</div>
 
 				<Button
 					variant="outline"
-					className="w-full h-11 border-neutral-200 dark:border-neutral-800 bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors text-neutral-600 dark:text-neutral-300 font-medium"
+					size="lg"
+					className="w-full"
 					onClick={handleGoogleSignUp}
 					disabled={isPending || isGooglePending}
 					type="button"
@@ -333,18 +359,18 @@ export function SupabaseSignupForm() {
 							alt="Google"
 							width={16}
 							height={16}
-							className="mr-2 h-4 w-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-[opacity,filter] duration-[var(--motion-fast)] ease-standard"
+							className="mr-2 h-4 w-4"
 						/>
 					)}
 					Continue with Google
 				</Button>
 			</div>
 
-			<div className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+			<div className="type-body-sm mt-6 text-center text-ink-2">
 				Already have an account?{' '}
 				<Link
 					href="/login"
-					className="font-semibold text-neutral-900 dark:text-neutral-100 hover:underline underline-offset-4 pointer-cursor p-2"
+					className="p-2 font-semibold text-foreground underline-offset-4 hover:underline"
 				>
 					Log in
 				</Link>

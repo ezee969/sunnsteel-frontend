@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Dumbbell, Loader2 } from 'lucide-react'
+import { ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -148,56 +148,53 @@ export default function WorkoutsIndexPage() {
 	}
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-			<div className="mx-auto max-w-md text-center space-y-6">
-				{/* Visual icon */}
-				<div className="mx-auto flex h-20 w-20 items-center justify-center rounded-sm bg-surface-sunk">
-					<Dumbbell className="h-10 w-10 text-ink-3" aria-hidden />
-				</div>
+		// Final review 8: a page-specific composition on the page grid, not a
+		// centred placeholder. The message is the page inscription (§11.11) and
+		// the actions share its left axis, capped to a readable measure.
+		<div className="flex flex-col gap-6">
+			<div className="rule-heading pb-4">
+				<h1 className="type-page corner-brackets inline-block text-foreground">
+					No Active Workout
+				</h1>
+				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
+					You don&apos;t have a workout in progress right now. Pick a routine to
+					start training, or review your history.
+				</p>
+			</div>
 
-				{/* Heading & copy */}
-				<div className="space-y-2">
-					<h2 className="type-section text-foreground">No Active Workout</h2>
-					<p className="type-body-sm text-ink-3">
-						You don&apos;t have a workout in progress right now. Pick a routine
-						to start training, or review your history.
-					</p>
-				</div>
-
-				{/* Actions */}
-				<div className="flex flex-wrap justify-center gap-3">
-					{SHOW_QUICK_WORKOUT_ENTRY && (
-						<Button
-							variant="default"
-							onClick={handleStartEmptyWorkout}
-							disabled={isStartingEmpty}
-						>
-							<ClassicalIcon
-								name="dumbbell"
-								className="mr-2 h-4 w-4"
-								aria-hidden
-							/>
-							Start Empty Workout
-						</Button>
-					)}
-					<Button asChild variant="outline">
-						<Link href="/routines">Go to Routines</Link>
+			{/* Actions */}
+			<div className="flex flex-wrap gap-3">
+				{SHOW_QUICK_WORKOUT_ENTRY && (
+					<Button
+						variant="default"
+						onClick={handleStartEmptyWorkout}
+						disabled={isStartingEmpty}
+					>
+						<ClassicalIcon
+							name="dumbbell"
+							className="mr-2 h-4 w-4"
+							aria-hidden
+						/>
+						Start Empty Workout
 					</Button>
-					<Button asChild variant="outline">
-						<Link
-							href="/workouts/history"
-							{...preloadOnHover('workoutHistoryPage')}
-						>
-							View History
-						</Link>
-					</Button>
-					<Button asChild variant="secondary">
-						<Link href="/dashboard">
-							Dashboard
-							<ChevronRight className="ml-2 h-4 w-4" />
-						</Link>
-					</Button>
-				</div>
+				)}
+				<Button asChild variant="outline">
+					<Link href="/routines">Go to Routines</Link>
+				</Button>
+				<Button asChild variant="outline">
+					<Link
+						href="/workouts/history"
+						{...preloadOnHover('workoutHistoryPage')}
+					>
+						View History
+					</Link>
+				</Button>
+				<Button asChild variant="secondary">
+					<Link href="/dashboard">
+						Dashboard
+						<ChevronRight className="ml-2 h-4 w-4" />
+					</Link>
+				</Button>
 			</div>
 		</div>
 	)

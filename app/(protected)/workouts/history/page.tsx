@@ -151,7 +151,7 @@ function WorkoutHistoryContent() {
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl p-4">
+		<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
 				title={<>Training Archive</>}
@@ -163,7 +163,7 @@ function WorkoutHistoryContent() {
 			<section>
 				<div className="rule-heading flex flex-col gap-2 pb-2 sm:flex-row sm:items-end sm:justify-between">
 					<div>
-						<h1 className="type-section text-foreground">Workout History</h1>
+						<h2 className="type-section text-foreground">Workout History</h2>
 						<p className="type-body-sm text-ink-3">
 							Browse your past workout sessions with filters.
 						</p>
@@ -231,7 +231,7 @@ export default function WorkoutHistoryPage() {
 	return (
 		<Suspense
 			fallback={
-				<div className="mx-auto max-w-3xl p-4">
+				<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
 					<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
 						Loading workout history…
 					</div>

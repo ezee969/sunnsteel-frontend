@@ -28,8 +28,8 @@ export default function WorkoutDetailPage() {
 
 	if (isLoading) {
 		return (
-			<div className="container mx-auto p-4">
-				<div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+			<div className="ledger-page py-6 md:py-8">
+				<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
 					Loading workout details...
 				</div>
 			</div>
@@ -38,8 +38,8 @@ export default function WorkoutDetailPage() {
 
 	if (isError || !session) {
 		return (
-			<div className="container mx-auto p-4">
-				<div className="text-sm text-destructive" role="alert">
+			<div className="ledger-page py-6 md:py-8">
+				<div className="type-body-sm text-destructive" role="alert">
 					{String(error) || 'Failed to load workout details'}
 				</div>
 			</div>
@@ -47,7 +47,9 @@ export default function WorkoutDetailPage() {
 	}
 
 	return (
-		<div className="container mx-auto p-4 max-w-4xl">
+		// The session screen's page grid, so a session reads the same during and
+		// after it (TD-31).
+		<div className="ledger-page space-y-8 py-6 md:py-8">
 			{/* Header */}
 			<HistorySessionHeader
 				title={session?.routine?.name}
@@ -61,7 +63,11 @@ export default function WorkoutDetailPage() {
 					<SessionRecapPanel recap={recap} />
 				) : (
 					<div
-						className="mb-6 rounded-lg border p-4 text-sm text-muted-foreground"
+						className={
+							isRecapError
+								? 'type-body-sm mark mark-warning bg-surface-sunk py-2 pl-3 pr-3 text-ink-2'
+								: 'type-body-sm text-ink-3'
+						}
 						role={isRecapError ? 'alert' : 'status'}
 					>
 						{isRecapLoading
@@ -71,17 +77,24 @@ export default function WorkoutDetailPage() {
 				)
 			) : null}
 
-			{/* Exercises */}
-			<div className="space-y-4">
-				{exerciseGroups.map((group: ExerciseGroup) => (
-					<HistoryExerciseGroup
-						key={group.routineExerciseId}
-						group={group}
-						collapsed={isCollapsed(group.routineExerciseId)}
-						onToggle={() => toggle(group.routineExerciseId)}
-					/>
-				))}
-			</div>
+			{/* Exercises: a ruled list, as on the session screen (§11.5). The
+			    heading is for the outline only — without it the exercise `h3`s
+			    sat under the recap's `h2`, or under no `h2` at all. */}
+			<section aria-labelledby="history-exercises-heading">
+				<h2 id="history-exercises-heading" className="sr-only">
+					Exercises
+				</h2>
+				<div className="divide-y divide-rule-faint border-y border-rule">
+					{exerciseGroups.map((group: ExerciseGroup) => (
+						<HistoryExerciseGroup
+							key={group.routineExerciseId}
+							group={group}
+							collapsed={isCollapsed(group.routineExerciseId)}
+							onToggle={() => toggle(group.routineExerciseId)}
+						/>
+					))}
+				</div>
+			</section>
 		</div>
 	)
 }

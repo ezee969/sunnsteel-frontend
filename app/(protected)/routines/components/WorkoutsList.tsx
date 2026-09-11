@@ -82,7 +82,7 @@ export default function WorkoutsList({
 				{/* §11.5 — one ruled ledger, not a stack of boxes. The rules come
 				    from each row's `.rule-row`, so the gap that used to separate
 				    the cards is gone. */}
-				<div className="border-t border-rule pb-24 sm:pb-4 sm:pr-4">
+				<div className="border-t border-rule pb-4 sm:pr-4">
 					{displayedRoutines.map(routine => {
 						const isActiveRoutine =
 							activeSession?.status === 'IN_PROGRESS' &&

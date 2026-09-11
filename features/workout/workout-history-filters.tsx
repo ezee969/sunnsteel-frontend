@@ -193,6 +193,10 @@ export function WorkoutHistoryFilters({
 							</label>
 							<Input
 								id="from"
+								aria-invalid={f.isDateInvalid || undefined}
+								aria-describedby={
+									f.isDateInvalid ? 'history-date-error' : undefined
+								}
 								className="max-w-[var(--cluster-max)]"
 								type="date"
 								value={f.from}
@@ -207,13 +211,21 @@ export function WorkoutHistoryFilters({
 							</label>
 							<Input
 								id="to"
+								aria-invalid={f.isDateInvalid || undefined}
+								aria-describedby={
+									f.isDateInvalid ? 'history-date-error' : undefined
+								}
 								className="max-w-[var(--cluster-max)]"
 								type="date"
 								value={f.to}
 								onChange={e => f.setTo(e.target.value)}
 							/>
 							{f.isDateInvalid ? (
-								<span className="type-body-sm text-destructive">
+								<span
+									id="history-date-error"
+									role="alert"
+									className="type-body-sm text-destructive"
+								>
 									From date must be before or equal to To date.
 								</span>
 							) : null}

@@ -1,13 +1,22 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import { ModeToggle } from '@/components/mode-toggle'
 
-import { ModernBackground } from './components/ModernBackground'
-import { ModernBrandHero } from './components/ModernBrandHero'
-
+/**
+ * The signed-out shell.
+ *
+ * Final review 3 / TD-31: this was visually a separate product — a glowing
+ * grid, amber blur blobs, a vignette, a gradient-clipped wordmark and a
+ * split-screen panel holding an inspirational quote, with the actual task
+ * underweighted beside it. It is rebuilt on the protected product's grammar:
+ * the same ground, the same topbar (wordmark left, theme control right, one
+ * rule below, §11.10), and the form as the page's single subject.
+ *
+ * The page-level fade-and-rise is gone (§9.2). The `mounted` gate is kept
+ * exactly as it was: children and the theme control render only after mount.
+ */
 export default function AuthLayout({
 	children,
 }: {
@@ -18,61 +27,22 @@ export default function AuthLayout({
 	useEffect(() => {
 		setMounted(true)
 	}, [])
+
 	return (
-		<div className="h-screen w-full flex bg-white dark:bg-neutral-950 transition-colors duration-300">
-			{/* Left Side - Form Container */}
-			<div className="w-full lg:w-[45%] min-h-0 flex flex-col relative border-r border-neutral-200 dark:border-neutral-800">
+		<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+			<header className="flex h-14 shrink-0 items-center justify-between border-b border-rule px-4 md:h-16 md:px-8">
+				<span className="type-wordmark text-xl text-foreground">SUNNSTEEL</span>
 				{mounted ? (
-					<div className="relative z-20 flex justify-center lg:justify-start px-8 py-8 lg:py-12 lg:px-12">
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.8, ease: 'easeOut' }}
-							className="flex flex-col items-center lg:items-start"
-						>
-							<h1 className="text-3xl lg:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 dark:from-white dark:via-neutral-200 dark:to-neutral-500 mb-1 drop-shadow-xl">
-								sunnsteel
-							</h1>
-							<div className="flex items-center gap-2 opacity-80">
-								<div className="h-px w-8 bg-gradient-to-l from-amber-600 dark:from-amber-400 to-transparent" />
-								<div className="h-2 w-2 rotate-45 border border-amber-600/60 dark:border-amber-400/60 bg-amber-600/20 dark:bg-amber-500/20" />
-								<div className="h-px w-8 bg-gradient-to-r from-amber-600 dark:from-amber-400 to-transparent" />
-							</div>
-						</motion.div>
-					</div>
+					<ModeToggle />
 				) : (
-					<div className="h-32" /> // Stable placeholder while hydrating
+					<span className="size-11 md:size-10" aria-hidden />
 				)}
-
-				<div className="hidden lg:block absolute inset-0 z-0 bg-white dark:bg-neutral-950" />
-				<div className="lg:hidden absolute inset-0 z-0">
-					{mounted && <ModernBackground />}
+			</header>
+			<main className="flex-1">
+				<div className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
+					{mounted ? children : null}
 				</div>
-
-				<div className="flex-1 min-h-0 flex flex-col relative z-10 overflow-y-auto">
-					<AnimatePresence mode="wait">
-						{mounted && (
-							<motion.div
-								key="auth-content"
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, ease: 'easeOut', delay: 0.15 }}
-								className="w-full max-w-sm sm:max-w-md mx-auto my-auto p-6 sm:p-10"
-							>
-								{children}
-							</motion.div>
-						)}
-					</AnimatePresence>
-				</div>
-			</div>
-
-			{/* Right Side (Desktop) - Branding & Hero */}
-			<div className="hidden lg:flex flex-1 relative flex-col items-center justify-center bg-neutral-950 overflow-hidden">
-				<div className="absolute right-8 top-8 z-50">
-					{mounted && <ModeToggle />}
-				</div>
-				{mounted && <ModernBrandHero />}
-			</div>
+			</main>
 		</div>
 	)
 }

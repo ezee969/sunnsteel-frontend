@@ -17,82 +17,57 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Five entries recorded on 2026-09-09 from the Phase 8/9 UI restyle. All five are
-frontend-only and none affects stored data. Phase-by-phase narrative and the
+Four entries remain from the Phase 8/9 UI restyle; `TD-30` closed in Phase 13
+(see the document history). All are frontend-only and none affects stored
+data. Phase-by-phase narrative and the
 full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
 
-<a id="td-30"></a>
-
-### TD-30 — `honour-bright` is not a token, and one live reference remains
-
-**Impact.** `features/workout/session-action-card.tsx:52` sets
-`[&_[data-slot=progress-indicator]]:bg-honour-bright`. `honour-bright` is a name
-from the Qwen direction document that never entered `@theme inline`, so it emits
-no CSS and no error. The session's progress bar falls back to the `Progress`
-primitive's `bg-primary` and renders ink where gold was intended — plausible, and
-wrong.
-
-**Evidence.** Absent from the served stylesheet and from the production bundle:
-`grep -c honour-bright .next/static/css/*.css` returns 0 while the class is still
-in the source. A second reference in `session-confirmation-dialog.tsx` was closed
-in Phase 8 Batch 4 by replacing it with `.mark mark-success`.
-
-**Solution direction.** Decide what that bar should be under v1.0 §4.3 — rule 2
-makes completion `--success`, rule 3 keeps gold for what is earned — and use the
-token. Do not add `honour-bright` to the theme; the name does not exist in the
-locked system.
-
-**Closure.** No occurrence of `honour-bright` in the tree, and the session
-screen's progress bar verified against §4.3 in both themes.
-
 <a id="td-31"></a>
 
-### TD-31 — Four surfaces never went through the restyle and are off-palette
+### TD-31 — Two surfaces are still off the design system
 
-**Impact.** The app is visually inconsistent on routes a user reaches early. The
-two auth screens are the first thing a signed-out visitor sees, and they still
-carry blurred amber blobs (`ModernBackground`), a gradient-clipped wordmark
-(`(auth)/layout.tsx`) and raw `neutral-*` classes — all retired by v1.0 §4.3
-rule 6.
+**Impact.** Visible inconsistency, now limited to a first-paint overlay and a
+dev-only panel. The auth screens and the profile were rebuilt in Phase 13 of
+the UI restyle, and the history detail page in its follow-up.
 
-**Evidence.** `app/(auth)/**`, `app/(protected)/profile/[[...userId]]/page.tsx`,
-`features/initial-load-animation/InitialLoadAnimation.tsx` and
-`components/PerformanceDebugPanel.tsx` still match
-`grep -E '(amber|neutral|blue|emerald)-[0-9]{2,3}|backdrop-blur|bg-card/[0-9]'`.
-Phase 8's four batches covered the protected shell only; v1.0 §12.4 explicitly
-scopes the auth screens as a separate batch because they share no components
-with it.
+**Evidence.**
 
-**Solution direction.** One batch for the two auth screens, one pass for the
-profile page. `InitialLoadAnimation` and `PerformanceDebugPanel` are lower value:
-the first is a splash overlay, the second is dev-only behind `SHOULD_*` flags.
+- `features/initial-load-animation/InitialLoadAnimation.tsx` still carries
+  `amber-*` gradients and a `rounded-full` progress track.
+- `components/PerformanceDebugPanel.tsx` still uses raw `blue`/`green`/`black`
+  classes. Dev-only, behind the `SHOULD_*` flags.
 
-**Closure.** No raw palette classes on those routes, and captures at
-390/768/1440 in both themes compared against `before/`.
+**Solution direction.** The splash is a first-paint overlay whose `children`
+must stay mounted (see the gotcha in `AGENTS.md`), so change only colour and
+shape there. The debug panel is lowest value.
+
+**Closure.** No raw palette classes on those two surfaces, and captures at
+390/768/1440 in both themes.
 
 <a id="td-32"></a>
 
-### TD-32 — Six components have zero importers
+### TD-32 — Components with zero importers
 
 **Impact.** Dead code that still type-checks, lints and ships in the module
-graph. Two of them (`HeroCard`, `WorkoutItem`) were restyled in Phase 8 Batch 2
-purely so they would not sit on a retired pattern — work spent on code nothing
-renders.
+graph.
 
-**Evidence.** `popover`, `alert`, `OrnateCorners`, `HeroBackdrop`, `HeroCard`,
-`WorkoutItem` each return only self-references from a tree-wide grep.
-`OrnateCorners` and `HeroBackdrop` lost their last consumers during the restyle
-(Batch 1 retired the photographic hero, Batch 2 retired `HeroCard`'s frame).
+**Evidence.** Each of these returns only self-references from a tree-wide
+search: `components/ui/popover.tsx`, `components/ui/alert.tsx`,
+`components/ui/calendar.tsx`, `HeroBackdrop`, `HeroCard`, `WorkoutItem`,
+`app/(auth)/components/BackgroundOverlay.tsx`, and — since the Phase 13 auth
+rebuild — `ModernBrandHero` and `ModernBackground` (the latter imported only by
+the former). `OrnateCorners`, `ParchmentOverlay` and `GoldVignetteOverlay` are
+reachable only from files on this list.
 
-**Solution direction.** Delete in Phase 15, together. Confirm zero importers at
+**Solution direction.** Delete together in Phase 15. Confirm zero importers at
 that moment rather than trusting this entry — `SHOW_QUICK_WORKOUT_ENTRY` is the
 standing reminder that "unused" and "deliberately unreachable" are different
 things, and that flag, its handler and its `isStartingEmpty` branch must not be
 touched.
 
-**Closure.** The six files removed, `npm run verify` green.
+**Closure.** The files removed, `npm run verify` green.
 
 <a id="td-33"></a>
 
@@ -185,6 +160,19 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-11 (revision 8):** Narrowed `TD-31` to the splash and the debug
+  panel: `/workouts/history/[id]` is restyled onto the session screen's
+  patterns, verified with no raw-palette classes in its rendered `main` and 12
+  captures (completed and aborted sessions, 390/768/1440, both themes).
+- **2026-09-11 (revision 7):** Closed and removed `TD-30`: `honour-bright`
+  no longer appears anywhere in the tree, and the session progress bar it
+  coloured is `--success-strong`, verified in fresh session captures in both
+  themes. Narrowed `TD-31` after the Phase 13 restyle rebuilt the auth screens
+  and the profile, and added the history detail page, which no phase had
+  covered. Widened `TD-32` with the auth components the rebuild orphaned and
+  `calendar`. Retained for future sessions: `TD-30`'s closure took one class;
+  finding it took a compiled-stylesheet grep, because the fallback it produced
+  rendered plausibly.
 - **2026-09-09 (revision 6):** Recorded `TD-30` to `TD-34` from the Phase 8/9 UI
   restyle. The register had been empty since revision 5; these are the durable
   residue of that work, not its narrative — the phase log and the full

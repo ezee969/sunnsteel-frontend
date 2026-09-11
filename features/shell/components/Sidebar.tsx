@@ -184,6 +184,8 @@ export default function Sidebar({
 					<Button
 						variant="ghost"
 						size="icon"
+						aria-label="Close navigation"
+						className="size-11"
 						onClick={() => setIsMobileMenuOpen(false)}
 					>
 						<X className="h-5 w-5" />
@@ -194,7 +196,8 @@ export default function Sidebar({
 						variant="ghost"
 						size="icon"
 						onClick={toggleSidebar}
-						className={cn('rounded-full', !isSidebarOpen && 'ml-auto')}
+						aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+						className={cn(!isSidebarOpen && 'ml-auto')}
 					>
 						{isSidebarOpen ? (
 							<ChevronLeft className="h-5 w-5" />
@@ -233,113 +236,107 @@ export default function Sidebar({
 						/>
 					)}
 					{SIDEBAR_NAV_ITEMS.map(item => {
-						const content = (() => {
-							const showTooltip = !isSidebarOpen && !isMobile
-							const buttonContent = (
-								<Button
-									aria-disabled={item.disabled}
-									variant="ghost"
+						const showTooltip = !isSidebarOpen && !isMobile
+						const isActive = activeNav === item.id
+						const itemClassName = cn(
+							// §11.10: active is a 3px honour mark plus ink text, never
+							// a filled slab - that inversion was the heaviest object
+							// on every screen. Hover and active differ by colour, not
+							// geometry, so both carry the same 3px left border.
+							'mark group w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
+							isMobile ? 'h-11' : 'h-9',
+							isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
+							isActive
+								? 'bg-surface font-semibold text-foreground'
+								: 'text-ink-2 hover:bg-surface hover:text-foreground',
+							item.disabled &&
+								'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
+						)
+						const iconClassName = cn(
+							'h-5 w-5 shrink-0 transition-colors',
+							isActive
+								? 'text-honour-strong'
+								: 'text-ink-3 group-hover:text-foreground',
+						)
+						const inner = (
+							<>
+								{item.classicalName ? (
+									<ClassicalIcon
+										name={item.classicalName}
+										aria-hidden
+										className={iconClassName}
+									/>
+								) : (
+									<item.icon className={iconClassName} aria-hidden />
+								)}
+								<span
 									className={cn(
-										// §11.10: active is a 3px honour mark plus ink text, never
-										// a filled slab - that inversion was the heaviest object
-										// on every screen. Hover and active differ by colour, not
-										// geometry, so both carry the same 3px left border.
-										'mark group w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
-										isMobile ? 'h-11' : 'h-9',
-										isSidebarOpen || isMobile
-											? 'justify-start'
-											: 'justify-center',
-										activeNav === item.id
-											? 'bg-surface font-semibold text-foreground'
-											: 'text-ink-2 hover:bg-surface hover:text-foreground',
-										item.disabled &&
-											'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
+										'truncate',
+										!isSidebarOpen &&
+											!isMobile &&
+											'w-0 overflow-hidden opacity-0',
 									)}
-									asChild={false}
 								>
-									{item.classicalName ? (
-										<ClassicalIcon
-											name={item.classicalName}
-											aria-hidden
-											className={cn(
-												'h-5 w-5 shrink-0 transition-colors',
-												activeNav === item.id
-													? 'text-honour-strong'
-													: 'text-ink-3 group-hover:text-foreground',
-											)}
-										/>
-									) : (
-										<item.icon
-											className={cn(
-												'h-5 w-5 shrink-0 transition-colors',
-												activeNav === item.id
-													? 'text-honour-strong'
-													: 'text-ink-3 group-hover:text-foreground',
-											)}
-										/>
-									)}
-									<span
-										className={cn(
-											'truncate',
-											!isSidebarOpen &&
-												!isMobile &&
-												'w-0 overflow-hidden opacity-0',
-										)}
-									>
-										{item.label}
+									{item.label}
+								</span>
+								{item.disabled && (isSidebarOpen || isMobile) && (
+									<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
+										Soon
 									</span>
-									{item.disabled && (isSidebarOpen || isMobile) && (
-										<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
-											Soon
-										</span>
-									)}
-								</Button>
-							)
+								)}
+							</>
+						)
 
-							if (showTooltip) {
-								return (
+						// a11y review 2: an enabled item is ONE anchor (Button asChild ->
+						// Link) with `aria-current` on the active one. It used to be a
+						// real <button> nested inside the <a>, two tab stops for one
+						// destination. Disabled items stay a button that explains itself
+						// with a toast - same handler, now on the control rather than on a
+						// wrapping div.
+						const control = item.disabled ? (
+							<Button
+								type="button"
+								variant="ghost"
+								aria-disabled
+								className={itemClassName}
+								onClick={() => handleDisabledClick(item.label)}
+							>
+								{inner}
+							</Button>
+						) : (
+							<Button asChild variant="ghost" className={itemClassName}>
+								<Link
+									href={item.href}
+									aria-current={isActive ? 'page' : undefined}
+									onClick={() => {
+										// Set active nav immediately for consistent visual state
+										setActiveNav(item.id)
+										// Close mobile sidebar after navigation
+										if (isMobile) {
+											setIsMobileMenuOpen(false)
+										}
+										// Signal navigation start for global feedback
+										onNavigateStart?.()
+									}}
+								>
+									{inner}
+								</Link>
+							</Button>
+						)
+
+						return (
+							<div key={item.id}>
+								{showTooltip ? (
 									<Tooltip>
-										<TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+										<TooltipTrigger asChild>{control}</TooltipTrigger>
 										<TooltipContent side="right" sideOffset={8}>
 											{item.label}
 										</TooltipContent>
 									</Tooltip>
-								)
-							}
-							return buttonContent
-						})()
-
-						// Disabled items are not links: an anchor would stay focusable and be
-						// announced as a link even though it goes nowhere.
-						if (item.disabled) {
-							return (
-								<div
-									key={item.id}
-									onClick={() => handleDisabledClick(item.label)}
-									className="cursor-pointer"
-								>
-									{content}
-								</div>
-							)
-						}
-
-						return (
-							<Link
-								key={item.id}
-								href={item.href}
-								onClick={() => {
-									// Set active nav immediately for consistent visual state
-									setActiveNav(item.id)
-									// Close mobile sidebar after navigation
-									if (isMobile) {
-										setIsMobileMenuOpen(false)
-									}
-									// Signal navigation start for global feedback
-									onNavigateStart?.()
-								}}
-							>
-								{content}
-							</Link>
+								) : (
+									control
+								)}
+							</div>
 						)
 					})}
 					<Separator className="my-4" />
@@ -360,7 +357,11 @@ export default function Sidebar({
 							}
 						}}
 					>
-						<Link href="/settings" onClick={() => setActiveNav('settings')}>
+						<Link
+							href="/settings"
+							aria-current={activeNav === 'settings' ? 'page' : undefined}
+							onClick={() => setActiveNav('settings')}
+						>
 							<Settings
 								className={cn(
 									'h-5 w-5 shrink-0 transition-colors',

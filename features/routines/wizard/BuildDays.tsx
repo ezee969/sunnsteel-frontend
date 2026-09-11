@@ -222,26 +222,20 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{selectedDayExercisesCount}
 						</div>
-						<div className="mt-1 text-[10px] font-medium uppercase text-muted-foreground">
-							Exercises
-						</div>
+						<div className="type-label mt-1 text-ink-3">Exercises</div>
 					</div>
 					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{selectedDaySetsCount}
 						</div>
-						<div className="mt-1 text-[10px] font-medium uppercase text-muted-foreground">
-							Sets
-						</div>
+						<div className="type-label mt-1 text-ink-3">Sets</div>
 					</div>
 					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{data.days.filter(day => day.exercises.length > 0).length}/
 							{data.days.length}
 						</div>
-						<div className="mt-1 text-[10px] font-medium uppercase text-muted-foreground">
-							Days Ready
-						</div>
+						<div className="type-label mt-1 text-ink-3">Days Ready</div>
 					</div>
 				</div>
 
@@ -264,7 +258,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 									{DAYS_OF_WEEK[dayId]}
 									<Badge
 										variant="secondary"
-										className="ml-2 h-5 min-w-[1.25rem] px-1 text-[10px] leading-none flex items-center justify-center"
+										className="ml-2 flex h-5 min-w-[1.25rem] items-center justify-center px-1 leading-none"
 									>
 										{data.days.find(d => d.dayOfWeek === dayId)?.exercises
 											?.length ?? 0}

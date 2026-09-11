@@ -28,9 +28,13 @@ interface SetLogInputProps extends LogRowProps {
  * A numeric field keeps its own size classes so the 16px-below-`md` rule
  * survives: that is an iOS zoom-on-focus mitigation (TD-29), not a type choice,
  * so `font-mono` sets only the family and never the size.
+ *
+ * a11y review 1: 44px tall below `md`, where this row is touched mid-workout.
+ * Final review 5 / v1.0 §10.2: capped at `--field-max` above it, so a two-digit
+ * number is never stretched across a third of the screen at 1440.
  */
 const FIELD_CLASS =
-	'h-9 rounded-none border-0 bg-transparent px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40'
+	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40'
 
 const FIELD_INVALID_CLASS = 'text-destructive ring-2 ring-destructive/50'
 
@@ -83,13 +87,20 @@ export const SetLogInput = ({
 	})
 
 	const statusText = saveStateLabel(saveState)
+	// a11y review 7: the invalid field and its message are linked, so a screen
+	// reader user editing one of several repeated rows hears which one failed.
+	const errorId = `set-${routineExerciseId}-${setNumber}-error`
+	const repsInvalid = !isValid && Boolean(validationError?.includes('reps'))
+	const weightInvalid = !isValid && Boolean(validationError?.includes('weight'))
+	const rpeInvalid = !isValid && Boolean(validationError?.includes('RPE'))
 	// TD-28: the save state is drawn on the completion checkbox instead of in
 	// its own column -- after the RPE input there is no width left for one. A
 	// Tailwind ring is a box-shadow, so it costs no layout space. The focus
 	// ring still wins while focused, because that rule is variant-scoped.
 	//
 	// These are genuine system states rather than earned marks, which is what
-	// `success` and `warning` are for; completion takes gold elsewhere.
+	// `success` and `warning` are for. Completion is `--success` too (§4.3
+	// rule 2); gold is reserved for the improvement line below.
 	const saveRingClass =
 		saveState === 'saving' || saveState === 'pending'
 			? 'ring-2 ring-warning-strong'
@@ -128,13 +139,13 @@ export const SetLogInput = ({
 				<div className="flex min-w-[46px] shrink-0 flex-col justify-center gap-0.5">
 					<span
 						className={`type-label ${
-							isCompletedState ? 'text-honour' : 'text-ink-3'
+							isCompletedState ? 'text-success' : 'text-ink-3'
 						}`}
 					>
 						Set {setNumber}
 					</span>
 					{plannedRir !== undefined && plannedRir !== null && (
-						<span className="type-data text-[11px] leading-none text-ink-3">
+						<span className="type-data leading-none text-ink-3">
 							RIR {plannedRir}
 						</span>
 					)}
@@ -147,16 +158,16 @@ export const SetLogInput = ({
 						inputMode="numeric"
 						aria-label="Performed reps"
 						placeholder="Reps"
+						aria-invalid={repsInvalid || undefined}
+						aria-describedby={repsInvalid ? errorId : undefined}
 						value={repsState}
 						onChange={e => setReps(e.target.value)}
 						disabled={saveState === 'saving'}
 						className={`${FIELD_CLASS} ${
-							!isValid && validationError?.includes('reps')
-								? FIELD_INVALID_CLASS
-								: ''
+							repsInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span className="type-label whitespace-nowrap text-[10px] text-ink-3">
+					<span className="type-body-sm text-center text-ink-3">
 						Target: {plannedRepsText}
 					</span>
 				</div>
@@ -169,16 +180,16 @@ export const SetLogInput = ({
 						step={weightUnit === 'LB' ? 1 : 0.5}
 						aria-label={`Performed weight in ${weightUnit === 'LB' ? 'pounds' : 'kilograms'}`}
 						placeholder="Weight"
+						aria-invalid={weightInvalid || undefined}
+						aria-describedby={weightInvalid ? errorId : undefined}
 						value={weightState}
 						onChange={e => setWeight(e.target.value)}
 						disabled={saveState === 'saving'}
 						className={`${FIELD_CLASS} ${
-							!isValid && validationError?.includes('weight')
-								? FIELD_INVALID_CLASS
-								: ''
+							weightInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span className="type-label whitespace-nowrap text-[10px] text-ink-3">
+					<span className="type-body-sm text-center text-ink-3">
 						Target: {formatWeight(plannedWeight, weightUnit)}
 					</span>
 				</div>
@@ -195,18 +206,16 @@ export const SetLogInput = ({
 						max="10"
 						aria-label="Rate of perceived exertion, 0 to 10"
 						placeholder="RPE"
+						aria-invalid={rpeInvalid || undefined}
+						aria-describedby={rpeInvalid ? errorId : undefined}
 						value={rpeState}
 						onChange={e => setRpe(e.target.value)}
 						disabled={saveState === 'saving'}
 						className={`${FIELD_CLASS} ${
-							!isValid && validationError?.includes('RPE')
-								? FIELD_INVALID_CLASS
-								: ''
+							rpeInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span className="type-label whitespace-nowrap text-[10px] text-ink-3">
-						Optional
-					</span>
+					<span className="type-body-sm text-center text-ink-3">Optional</span>
 				</div>
 
 				{/* Completion checkbox, doubling as the save-state indicator */}
@@ -226,24 +235,24 @@ export const SetLogInput = ({
 						// Checked colour comes from the primitive (`--success-strong`,
 						// v1.0 §4.3 rule 2). This call site only sizes the box and draws
 						// the save-state ring; it must not re-specify the fill.
-						className={`size-5 ${saveRingClass}`}
+						className={`relative size-5 after:absolute after:-inset-3 after:content-[''] ${saveRingClass}`}
 					/>
 				</div>
 			</div>
 
 			{previousPerformance ? (
 				<div
-					className={`mt-2 flex items-center justify-between border-t border-rule-faint pt-1.5 text-[11px] ${
+					className={`type-body-sm mt-2 flex items-center justify-between border-t border-rule-faint pt-1.5 ${
 						hasImproved ? 'text-honour' : 'text-ink-3'
 					}`}
 				>
-					<span className="type-label">Last time</span>
-					<span className="type-data flex items-center gap-2 text-[11px]">
+					<span>Last time</span>
+					<span className="type-data flex items-center gap-2">
 						{formatPreviousPerformance(previousPerformance, weightUnit)}
 						{/* An improvement is earned, so it is one of the few places
 						    gold belongs. */}
 						{hasImproved ? (
-							<span className="type-label text-honour">↑ Improvement</span>
+							<span className="type-body-sm text-honour">↑ Improvement</span>
 						) : null}
 					</span>
 				</div>
@@ -251,7 +260,11 @@ export const SetLogInput = ({
 
 			{/* Validation error */}
 			{!isValid && validationError && (
-				<div className="mt-2 text-center text-xs text-destructive">
+				<div
+					id={errorId}
+					role="alert"
+					className="type-body-sm mt-2 text-center text-destructive"
+				>
 					{validationError}
 				</div>
 			)}
@@ -259,8 +272,8 @@ export const SetLogInput = ({
 			{/* Save state error footer (silent unless error) */}
 			{saveState === 'error' && (
 				<div
-					className="mt-2 flex items-center justify-center text-xs text-destructive"
-					role="status"
+					className="type-body-sm mt-2 flex items-center justify-center text-destructive"
+					role="alert"
 				>
 					<span className="mr-2 inline-block h-1.5 w-1.5 bg-current" />
 					<span>Error saving set. Please try again.</span>

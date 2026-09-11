@@ -102,41 +102,43 @@ export function WorkoutHistoryList({
 						}
 					}}
 				>
-					<div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-						<div className="type-panel min-w-0 text-foreground">
-							{s.routine.name}
-							{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
+					<div className="xl:grid xl:grid-cols-[minmax(0,2fr)_minmax(0,5fr)] xl:items-center xl:gap-8">
+						<div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 xl:flex-col xl:items-start xl:gap-0.5">
+							<div className="type-panel min-w-0 text-foreground">
+								{s.routine.name}
+								{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
+							</div>
+							<div className="type-body-sm shrink-0 text-ink-3 sm:text-right xl:text-left">
+								{s.status}
+							</div>
 						</div>
-						<div className="type-body-sm shrink-0 text-ink-3 sm:text-right">
-							{s.status}
-						</div>
-					</div>
 
-					{/* §10.1 — at `xl` the ledger opens: duration and volume become
+						{/* §10.1 — at `xl` the ledger opens: duration and volume become
 					    right-aligned mono columns rather than left-aligned pairs. */}
-					<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
-						<div>
-							<div className="type-body-sm text-ink-3">Started</div>
-							<div className="type-data text-ink-2">
-								{new Date(s.startedAt).toLocaleString()}
+						<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4 xl:mt-0">
+							<div>
+								<div className="type-body-sm text-ink-3">Started</div>
+								<div className="type-data text-ink-2">
+									{new Date(s.startedAt).toLocaleString()}
+								</div>
 							</div>
-						</div>
-						<div>
-							<div className="type-body-sm text-ink-3">Ended</div>
-							<div className="type-data text-ink-2">
-								{s.endedAt ? new Date(s.endedAt).toLocaleString() : '—'}
+							<div>
+								<div className="type-body-sm text-ink-3">Ended</div>
+								<div className="type-data text-ink-2">
+									{s.endedAt ? new Date(s.endedAt).toLocaleString() : '—'}
+								</div>
 							</div>
-						</div>
-						<div className="xl:text-right">
-							<div className="type-body-sm text-ink-3">Duration</div>
-							<div className="type-data text-ink-2">
-								{s.durationSec ? formatDuration(s.durationSec) : '—'}
+							<div className="xl:text-right">
+								<div className="type-body-sm text-ink-3">Duration</div>
+								<div className="type-data text-ink-2">
+									{s.durationSec ? formatDuration(s.durationSec) : '—'}
+								</div>
 							</div>
-						</div>
-						<div className="xl:text-right">
-							<div className="type-body-sm text-ink-3">Volume / Sets</div>
-							<div className="type-data text-ink-2">
-								{s.totalVolume ?? '—'} / {s.totalSets ?? '—'}
+							<div className="xl:text-right">
+								<div className="type-body-sm text-ink-3">Volume / Sets</div>
+								<div className="type-data text-ink-2">
+									{s.totalVolume ?? '—'} / {s.totalSets ?? '—'}
+								</div>
 							</div>
 						</div>
 					</div>

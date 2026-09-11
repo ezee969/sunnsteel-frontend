@@ -49,13 +49,14 @@ export default function WorkoutFilters({
 }: WorkoutFiltersProps) {
 	return (
 		<div className="w-full">
-			<div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+			<div className="flex flex-wrap gap-2">
 				{filters.map(filter => (
 					<Button
 						key={filter.id}
 						variant={activeFilter === filter.id ? 'default' : 'outline'}
 						size={'sm'}
-						className={cn('flex-shrink-0 gap-2', 'sm:h-10 sm:px-4')}
+						aria-pressed={activeFilter === filter.id}
+						className={cn('flex-shrink-0 gap-2', 'h-11 sm:h-10 sm:px-4')}
 						onClick={() => onFilterChange(filter.id as WorkoutFilter)}
 						disabled={filter.disabled}
 					>

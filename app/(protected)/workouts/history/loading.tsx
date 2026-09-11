@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function WorkoutHistoryLoading() {
 	return (
-		<div className="mx-auto max-w-3xl space-y-6 p-4">
+		<div className="mx-auto max-w-3xl space-y-6 p-4 xl:max-w-[var(--content-max)]">
 			{/* Masthead */}
 			<div className="rule-heading pb-4">
 				<Skeleton className="mb-2 h-8 w-48" />

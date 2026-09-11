@@ -143,7 +143,7 @@ export default function CreateRoutinePage() {
 						<span className="hidden sm:inline">Back to Routines</span>
 					</Button>
 				</div>
-				<h1 className="type-section text-foreground">Create New Routine</h1>
+				<h2 className="type-section text-foreground">Create New Routine</h2>
 				<p className="type-body-sm mt-1 text-ink-3">
 					Build your custom workout routine step by step
 				</p>

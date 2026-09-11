@@ -43,9 +43,10 @@ export const SessionHeader = ({
 							variant="ghost"
 							size="sm"
 							onClick={onNavigateBack}
-							className="-ml-2 rounded-sm p-2 text-ink-2 hover:bg-muted hover:text-foreground"
+							aria-label="Back"
+							className="-ml-2 size-11 rounded-sm p-2 text-ink-2 hover:bg-muted hover:text-foreground md:size-9"
 						>
-							<ArrowLeft className="h-4 w-4" />
+							<ArrowLeft className="h-4 w-4" aria-hidden />
 						</Button>
 						<div className="min-w-0">
 							{/* The one classical device the direction keeps: gold brackets,
@@ -72,15 +73,16 @@ export const SessionHeader = ({
 							</p>
 						</div>
 
-						{/* Completion is an earned mark, so it is the one thing here that
-						    may take gold (§4.3 rule 2). */}
+						{/* The screen's one statement of overall progress (§11.8).
+						    Completion is "done, as planned", so it is --success, not
+						    gold (§4.3 rule 2). */}
 						<div className="text-right">
 							<p className="type-label text-ink-3">
 								{isComplete ? 'Complete' : 'Progress'}
 							</p>
 							<p
 								className={`type-data type-data-strong ${
-									isComplete ? 'text-honour' : 'text-foreground'
+									isComplete ? 'text-success' : 'text-foreground'
 								}`}
 							>
 								{Math.round(percentage)}%

@@ -14,13 +14,6 @@ import {
 
 import { Button } from '@/components/ui/button'
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
-import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -153,7 +146,7 @@ export function SessionRecapContent({ recap }: SessionRecapContentProps) {
 						</div>
 					</>
 				) : (
-					<p className="type-body-sm border border-dashed border-rule p-3 text-ink-3">
+					<p className="type-body-sm text-ink-3">
 						This is the first completed session for this routine day.
 					</p>
 				)}
@@ -307,21 +300,24 @@ export function SessionRecapDialog({
 	)
 }
 
+/**
+ * The recap on the history detail page. A record region, so it is ruled rather
+ * than boxed (§11.5): a section heading over a single rule — the page's one
+ * double rule belongs to its masthead (§11.2).
+ */
 export function SessionRecapPanel({ recap }: SessionRecapContentProps) {
 	return (
-		<Card className="mb-6">
-			<CardHeader>
-				<CardTitle className="type-section text-foreground">
+		<section aria-labelledby="session-recap-heading" className="space-y-4">
+			<div className="border-b border-rule pb-2">
+				<h2 id="session-recap-heading" className="type-section text-foreground">
 					Session recap
-				</CardTitle>
-				<CardDescription>
+				</h2>
+				<p className="type-body-sm mt-1 text-ink-3">
 					{recap.routineName}
 					{recap.dayName ? ` · ${recap.dayName}` : ''}
-				</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<SessionRecapContent recap={recap} />
-			</CardContent>
-		</Card>
+				</p>
+			</div>
+			<SessionRecapContent recap={recap} />
+		</section>
 	)
 }

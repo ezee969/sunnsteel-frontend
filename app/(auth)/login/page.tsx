@@ -1,9 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
+import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
@@ -42,16 +42,10 @@ function LoginContent() {
 	// Show loading while checking auth state
 	if (isLoading) {
 		return (
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				className="flex items-center justify-center min-h-[400px]"
-			>
-				<div className="text-center">
-					<div className="rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto animate-spin" />
-					<p className="mt-2 text-gray-600">Checking authentication...</p>
-				</div>
-			</motion.div>
+			<div className="flex min-h-[400px] flex-col items-center justify-center gap-3">
+				<ClassicalLoader size="md" label="Checking authentication" />
+				<p className="type-body-sm text-ink-3">Checking authentication...</p>
+			</div>
 		)
 	}
 
@@ -59,16 +53,12 @@ function LoginContent() {
 	// The effect above will immediately replace to the target route.
 	if (isAuthenticated) return null
 
+	// §9.2: no page-level entrance animation.
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: -20 }}
-			transition={{ duration: 0.5, ease: 'easeOut' }}
-		>
+		<div>
 			<LoginHeader />
 			<SupabaseLoginForm />
-		</motion.div>
+		</div>
 	)
 }
 

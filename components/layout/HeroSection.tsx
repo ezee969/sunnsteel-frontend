@@ -32,9 +32,9 @@ export const HeroSection = ({
 	return (
 		<section className={`rule-heading pb-4 ${sectionClassName}`}>
 			<div className={innerClassName}>
-				<h2 className="type-page corner-brackets inline-block text-foreground">
+				<h1 className="type-page corner-brackets inline-block text-foreground">
 					{title}
-				</h2>
+				</h1>
 				{subtitle ? (
 					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
 						{subtitle}

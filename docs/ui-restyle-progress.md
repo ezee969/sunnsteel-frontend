@@ -5,19 +5,172 @@ phase or implementation batch, per the plan's handoff protocol.
 
 ## Current Phase
 
-**Phase 10 (motion) implemented.** The full gate is green with the dev server
-stopped: `npm run verify` passes lint, typecheck, 152 tests and a production
-build.
+**Phase 13 (final corrections) complete.** Phase 14 (automated regression
+sweep) is next.
 
-Every row of the motion spec's §6 delta table is applied, both signature motions
-exist, and the compiled stylesheet confirms each new rule emits. Beyond the
-delta table, **eight files carried motion the spec prohibits** and were corrected
-in the same pass — including two genuine layout animations on the session
-screen's critical path.
+All 30 points from the Phase 11 accessibility review and the Phase 12 final
+review have a recorded decision (see the Phase 13 section). **21 accepted in
+full, 6 accepted in part, 3 already fixed by earlier phases.** The partial ones
+reject seven specific asks, each with its reason in the log: the search
+combobox's keyboard contract, inert "Soon" sidebar items, their 10px label
+(written into §11.10), the six-column stat band (measured to overflow), removing
+the Today's Workouts panel (§11.5 keeps it), regrouping the set row's inputs,
+and moving the shell's active-session notice.
+
+Gates green with the dev server up: `npm run lint`, `npm run typecheck`,
+`npm test` (158 / 25 files). **No production build has been run against this
+phase** — the owner's dev server is up and they share `.next/`; CI is the
+confirmation, or `npm run verify` once the server is stopped.
+
+**Follow-up, same day:** `/workouts/history/[id]` — the one protected route no
+phase or review had covered (Findings 57) — is restyled onto the session
+screen's patterns. See the end of the Phase 13 section. TD-31 now holds only
+the splash and the dev-only debug panel.
 
 Nothing is committed.
 
 ## Completed
+
+### Phase 13 — Final corrections
+
+Applied the approved points from
+[ui-accessibility-review-sol.md](ui-accessibility-review-sol.md) (Phase 11) and
+[ui-final-review-sol.md](ui-final-review-sol.md) (Phase 12). Those two phases
+ran in separate sessions and are recorded in their own documents rather than
+here. Every point was checked against the **current** code before it was
+accepted, because both reviews worked from captures that predated several
+commits — three of the final review's points were already fixed.
+
+**No new visual direction, no logic change, no token added or changed.**
+`app/globals.css` changed only in its reduced-motion block. Every data hook,
+service, query key, route and handler is untouched; where a clickable `<div>`
+became a `<button>` or `<a>`, it calls the same handler. `SHOW_QUICK_WORKOUT_ENTRY`,
+`handleStartEmptyWorkout` and the `isStartingEmpty` branch are intact — checked
+explicitly after the Workouts empty state was recomposed.
+
+**Verified, not assumed:**
+
+- `npm run lint` clean, `npm run typecheck` clean, `npm test` **158 passing / 25
+  files**.
+- `npm run ui:capture:after` — 54 route captures — plus interaction captures:
+  the keyboard-focused menu, the finish dialog (390/1440, both themes), the
+  session screen fresh and with a completed set (390/768/1440, both themes,
+  through the harness's own `UI_SESSION_ID` / `UI_SESSION_FULL_ID` targets), the
+  recap dialog and the history recap panel.
+- An overflow sweep of **11 routes x 8 widths x 2 themes = 176 checks, no
+  horizontal overflow**, including signed-out `/login` and `/signup`.
+- **Exactly one visible `h1` on every route** at 390 and 1440.
+- Sidebar: **0** interactive elements nested in another, `aria-current="page"`
+  on the active item, **0** unnamed buttons in the header, nav and sidebar.
+- Stepper: 4 step buttons in each layout, `aria-current="step"` on the current
+  one; at 390 the first form field now sits at 544px, inside the first viewport.
+- Menu keyboard focus: a 2px ring on the focused item, seen on screen rather
+  than inferred from a computed style.
+- Touch targets at 390: header controls, routine row actions and filters all
+  **44x44**; the floating action button count is **0**.
+- Set-row checkbox: the visible box is 20x20; a click **10px outside it**
+  completed the set. Reps field **44px** tall at 390.
+- Login "Or": **6.09:1** light, **5.36:1** dark, rendered.
+
+**The session screen was captured from a live test session**, started with the
+owner's permission on a test account. Order mattered: the finish dialog only
+appears while sets are outstanding — with everything complete, Finish finishes
+immediately (Findings 22) — so the dialog was captured first, then the fresh
+session, then a set was completed and the full-session captures taken, then
+the session was finished to capture the recap. It leaves one COMPLETED session
+in that account's history and **no active session** (confirmed: `/workouts` no
+longer redirects).
+
+#### Decision log — every review point
+
+The rule applied throughout: **accept** anything that is styling, layout,
+typography, tokens, or markup semantics that exposes state already on screen
+(`aria-current`, `aria-pressed`, `aria-invalid`/`aria-describedby`, a native
+`<button>`/`<a>` in place of a clickable `<div>` calling the *same* handler).
+**Reject or report** anything that needs new behaviour, new keyboard logic, new
+content, or a decision the locked system has already measured and closed.
+
+**Accessibility review (`ui-accessibility-review-sol.md`)**
+
+| # | Pri | Point | Decision | Why / what was done |
+| --- | --- | --- | --- | --- |
+| 1 | P0 | Set controls too small | **Accepted** | Numeric fields `h-11` below `md` (44px), `md:h-9` above. The 20px checkbox keeps its visible size and gains a 44px hit area through an `::after` inset on the Radix button — no layout width, the same trick the save ring already uses. Verified by clicking 10px *outside* the visible box and confirming the set completed. |
+| 2 | P0 | Sidebar nests a `<button>` in each `<a>` | **Accepted** | One anchor per destination (`Button asChild` → `Link`), `aria-current="page"` on the active item and on Settings. The collapse and close icon buttons had no accessible name; they have one now. Verified: 0 nested controls, `aria-current` on Dashboard. |
+| 3 | P0 | Stepper is pointer-only | **Accepted** | Every step is a real `<button>` calling the same guarded handler; `aria-current="step"`, `aria-disabled` on unreachable steps, and a label naming each state ("Step 2 of 4: Training Days, available"). Mouse behaviour is identical. |
+| 4 | P0 | Menu/select keyboard focus invisible | **Accepted** | `focus-visible:ring-2 ring-inset ring-ring` on every menu item type and `SelectItem` — ink in light, honour mark in dark, both well over 3:1 against `--popover`. `focus-visible` rather than `focus`, so it appears on keyboard navigation, not on hover. Verified on screen. |
+| 5 | P1 | Reduced motion misses Framer and stock animations | **Accepted** | `MotionConfig reducedMotion="user"` at the app root covers every framer-motion component in one place (transforms and layout off, opacity kept — motion spec §3). `animate-spin`/`pulse`/`ping`/`bounce` added to the reduced-motion block, where §3 says spinners are static. The auth screens' 20px slide-ins are gone entirely (see final 3). |
+| 6 | P1 | Search suggestions not a keyboard composite | **Partly accepted** | "View all results" was a clickable `<div>`; it is a `<button>` with the same handler. The search-results cards on `/search` were the same defect and are now links. **Rejected:** the full combobox/listbox with Arrow/Escape handling and active-descendant state — that is new keyboard behaviour, outside a UI-only phase. Reported. |
+| 7 | P1 | Validation errors not associated | **Accepted** | History date range: both fields get `aria-invalid` and `aria-describedby` to the message, which is now `role="alert"`. Set rows: each invalid field is linked to a per-row error id; a failed save is announced as `role="alert"` instead of a polite status. |
+| 8 | P1 | Heading hierarchy changes with the viewport | **Accepted** | The top bar title is no longer a heading; the visible page inscription (`HeroSection` and the pages that stand in for it) is the single `h1`; secondary page headings are `h2`. Classes carry the styling, so no visual change. Verified: exactly one visible `h1` on every route at 390 and 1440. |
+| 9 | P1 | Selected states not exposed | **Accepted** | `aria-pressed` on the routine filters and `CommonSplitCard`; the theme toggle names the theme it switches to. |
+| 10 | P1 | Login "Or" fails contrast | **Accepted** | `--ink-3` on the panel surface: **6.09:1 light, 5.36:1 dark**, measured rendered. |
+| 11 | P1 | Sub-12px text in set rows and the wizard | **Accepted, with one exception** | Set-row captions, RIR, previous-performance and improvement text move to 13px body-small sentence case (§11.7); wizard split cards, stat captions, set labels, badges and day labels to 12–13px. **Rejected for the sidebar's "Soon":** 10px bare uppercase is written into §11.10 of the locked system. |
+| 12 | P2 | Mobile targets under 44px | **Accepted** | Header icon controls, theme toggle, routine row actions, filter buttons, menu rows (`min-h-11` below `md`), the toast's dismiss (hit area), the password show/hide control and the session back button. Verified 44x44 at 390. |
+| 13 | P2 | Disabled semantics and visuals disagree | **Partly accepted** | "Start session with day" is a `DropdownMenuLabel`, not a live item made mouse-inert. Opacity-based disabled styling removed from the session actions, tabs, accordion and a wizard field — the primitives' `--ink-3` on `--surface-sunk` applies (§4.3 rule 7). **Rejected:** making the sidebar's "Soon" items inert — they deliberately explain themselves with a toast; changing that is behaviour. |
+| 14 | P2 | Session captures stale | **Accepted** | Re-captured from a live test session (with the owner's permission) at 390/768/1440 in both themes, fresh and with a completed set, plus the finish dialog and the recap. |
+
+**Final review (`ui-final-review-sol.md`)**
+
+| # | Pri | Point | Decision | Why / what was done |
+| --- | --- | --- | --- | --- |
+| 1 | P0 | Session uses superseded colour semantics | **Accepted — most was already fixed** | Finish was already primary ink and checked boxes already `--success-strong` (Phase 7, Batch 4); the captures predated that. What remained, and is fixed: the progress bar named `honour-bright`, a token that does not exist (TD-30); the masthead painted 100% in gold; each completed exercise's "Complete" label and the completed set number were gold. All `--success` now (§4.3 rule 2). |
+| 2 | P0 | Settings breaks at 768 ("Ki") | **Already fixed** | Phase 9 (Findings 47). Re-verified: no field value clipped at any width. |
+| 3 | P0 | Login is a separate product | **Accepted** | The auth shell is rebuilt on the product's grammar: ground, top bar with wordmark and theme control, the inscription over the double rule, the form as a `panel` with the Input primitive's boundaries, status blocks as marks on wells. The glow grid, amber blur blobs, gradient wordmark, split-screen quote and all Framer entrance motion are gone. Closes the auth half of TD-31. |
+| 4 | P1 | Session repeats its state | **Accepted** | §11.8 says exactly this. The standalone panel with its own progress bar is now an inline control row under the masthead; overall progress is stated once, in the masthead; per-exercise and per-set completion stay. The component keeps its responsibility — it still renders Discard, Finish and the outstanding-sets note. |
+| 5 | P1 | Set row cramped on mobile, stretched on desktop | **Partly accepted** | Numeric fields cap at `--field-max` from `md` (§10.2), captions are readable 13px, and fields are 44px on touch. **Not done:** regrouping the row's inputs into a new desktop composition — a new layout for the densest control in the app, which §11.7 has not specified. Reported for a design decision. |
+| 6 | P1 | History doesn't become desktop at 1440 | **Accepted** | From `xl` the archive uses `--content-max` and each row becomes a ledger line: title and status in one column, the four figures on stable axes beside it. |
+| 7 | P1 | Profile is a card dashboard | **Accepted** | Masthead over the double rule instead of a gradient band; the third-party "stardust" texture (a request to transparenttextures.com on every view) removed; the blurred avatar halo gone; the three watermark stat cards are one ruled band; records are a ruled ledger; emerald/orange/blue trend colours removed. Closes the profile half of TD-31. |
+| 8 | P1 | Empty states are generic placeholders | **Accepted** | Search (no query, no results) and Workouts are compositions on the page grid: the inscription over the rule and a message at a readable measure; the dashed box and centred icon medallions are gone. `SHOW_QUICK_WORKOUT_ENTRY`, its handler and the `isStartingEmpty` branch are untouched. |
+| 9 | P1 | Dashboard desktop isn't an open ledger | **Partly rejected** | The six-column stat band is measured to overflow (Findings 34) and is on the Do Not Revisit list. Today's Workouts stays a panel — §11.5 keeps a screen's single primary call to action boxed. **Accepted:** the bordered row inside that panel was the card-in-card effect; rows are ruled now. |
+| 10 | P1 | Routine filters clip; floating pill | **Accepted** | The strip wraps instead of hiding options off the edge. The floating "+ New" pill is gone; the rectangular Create Routine action shows at every width. That also removes Findings 50's mid-scroll overlap. |
+| 11 | P1 | Wizard spends the mobile viewport on navigation | **Accepted** | Below `lg` the tracker is one compact row of markers plus the current step, so the first field sits in the first viewport at 390. **Rejected:** moving the active-session notice — it is the shell's banner, shown on every page. |
+| 12 | P2 | Surface/radius drift | **Accepted** | Covered by 3, 7, 8 and 10. |
+| 13 | P2 | Finish uses destructive emphasis | **Already fixed** | Batch 4 made Finish primary ink; crimson stays reserved for Discard and Delete. The review's screenshots predated it. |
+| 14 | P2 | Finish dialog has competing axes | **Already fixed** | Batch 4 put `alert-dialog` on one left axis with the prescribed stacked/row actions. Verified in the new finish-dialog captures. |
+| 15 | P2 | Small condensed metadata | **Accepted** | Same work as a11y 11. |
+| 16 | P2 | AI-template tropes | **Accepted** | The split auth page with quote and glow, the profile gradient hero with stat-card trio, the dashed empty state and the floating pill — all four are gone (3, 7, 8, 10). |
+
+#### Follow-up — the history detail page (TD-31)
+
+Requested by the owner after Phase 13 closed. Same rules: UI only, v1.0 as
+written, the session screen's existing patterns reused rather than a new
+composition. `useWorkoutSessionData`, `useSessionRecap`, `useCollapseMap`, the
+`SessionMetrics` shape and every prop contract are untouched.
+
+- **Page**: `ledger-page` with the session screen's rhythm (`space-y-8 py-6
+  md:py-8`), replacing `container max-w-4xl`. Loading and error states moved to
+  `type-body-sm` on the ink tokens; an unavailable recap is a `mark-warning`
+  note on a well, as the session screen's previous-performance notice is.
+- **Masthead** (`history-session-header`): the inscription at page rank with
+  its one pair of corner brackets over the page's one double rule (§11.11). It
+  was an unclassed `h1` through the global Bebas rule. The summary card became
+  a `dl` of captions over mono values; status is a mark plus its word
+  (`mark-success` completed, `mark-warning` aborted, transparent in progress —
+  the archive list's rule), not a filled or crimson badge. Back control named
+  and 44px below `md`.
+- **Recap** (`SessionRecapPanel`): ruled rather than boxed (§11.5) — an `h2`
+  over a single rule, so the recap's `h3` subsections now nest correctly.
+- **Exercises** (`history-exercise-group`): ruled entries in a `divide-y` list,
+  the live `ExerciseGroup`'s shape, with a `mark-success` rule when every set
+  was completed and an "n/m sets" count. The toggle is a native `<button>` with
+  `aria-expanded`/`aria-controls` calling the same `onToggle`; it was a
+  `role="button"` card header with a hand-rolled key handler. The
+  muscles/equipment line is body-small instead of a bordered badge.
+- **Set rows** (`set-comparison-row`): ruled ledger lines, not bordered mobile
+  cards; values in Space Mono; captions sentence-case body-small (§5.3).
+  Completion is a check glyph in `--success-strong` plus an `sr-only` name, or
+  a dash with "Not completed" — it was a filled-ink badge (§4.3 rules 2, 8).
+- An `sr-only` "Exercises" `h2` closes the outline gap: without it an aborted
+  session (no recap) went `h1` → `h3`.
+
+**Verified:** lint, typecheck, 158 tests; 12 captures (a completed session with
+a recap, an aborted one without, 390/768/1440, both themes) compared against
+captures of the old page taken first; no horizontal overflow in any; one `h1`
+each; collapse toggles by click, Enter and Space with `aria-expanded`
+following; back control 44x44 at 390; **zero** raw-palette, `rounded-lg`,
+`bg-card` or `text-muted-foreground` classes inside `main`. The stale "takes
+gold" comment on the live `ExerciseGroup` — contradicting its own
+`mark-success` — was corrected in passing.
 
 ### Phase 10 — Motion implementation
 
@@ -1146,6 +1299,36 @@ Phase 15 with the other dead code. `progress`, `classical-loader`, `stepper`,
 through the `--ss-*` aliases, and the last three carry ~44 raw palette classes
 that v1.0 §12.4 schedules for their own pass.
 
+**Phase 13 follow-up — history detail page.** 6 files:
+`app/(protected)/workouts/history/[id]/page.tsx`,
+`features/workout/history-session-header.tsx`,
+`history-exercise-group.tsx`, `set-comparison-row.tsx`, `session-recap.tsx`
+(`SessionRecapPanel` only; the `Card` import went with it), `exercise-group.tsx`
+(a comment). No token, hook or prop contract changed.
+
+**Phase 13 — final corrections.** 48 files:
+
+- Primitives: `dropdown-menu`, `select`, `tabs`, `accordion`, `toast`,
+  `search-bar`, `stepper` (rewritten: real buttons + compact mobile tracker)
+- Shell: `Sidebar`, `Header`, `mode-toggle`, `HeroSection`,
+  `providers/app-provider.tsx` (`MotionConfig`), `app/globals.css` (reduced-motion
+  block only)
+- Auth (rebuilt): `app/(auth)/layout.tsx`, `login/page.tsx`, `signup/page.tsx`,
+  `LoginHeader`, `SignupHeader`, `SupabaseLoginForm`, `SupabaseSignupForm`;
+  `app/(public)/layout.tsx` (wordmark)
+- Profile: `features/profile/profile-view.tsx`, `profile-loading.tsx`
+- Session: `set-log-input`, `session-action-card`, `session-header`,
+  `exercise-group`, `session-recap`
+- Pages: dashboard (`page`, `TodaysWorkouts`), routines (`page`, `WorkoutFilters`,
+  `WorkoutsList`, `RoutineCard`, `new/page`, `edit/[id]/page`), history (`page`,
+  `loading`, `workout-history-list`, `workout-history-filters`), `search/page`,
+  `settings/page`, `workouts/page`
+- Wizard: `CommonSplitCard`, `BuildDays`, `SetRow`, `ExerciseHeader`,
+  `TrainingDayButton`
+
+No file was deleted. `ModernBackground` and `ModernBrandHero` lost their last
+consumers with the auth rebuild and join the Phase 15 deletion list (TD-32).
+
 **Phase 9 — responsive QA.** 3 files, all corrections rather than restyling:
 
 - `app/(protected)/settings/page.tsx` — four grids stepped from `md`/`sm` to
@@ -1378,6 +1561,63 @@ One tooling decision, which the plan requires before the baseline is frozen:
   screenshots, not for functional or component testing.
 
 ## Findings
+
+### New in Phase 13
+
+**52. Three of the final review's points were already fixed, and the review
+could not know.** "Settings breaks at 768" (Phase 9), "Finish uses destructive
+emphasis" and "the finish dialog has competing axes" (both Batch 4) were all
+closed before Phase 12 ran; its captures predated the fixes. The session-screen
+P0 was only partly stale — the `honour-bright` bar and gold completion labels
+were real. **A review against stale captures produces confident, specific,
+wrong findings.** Capture immediately before any QA phase, and check each point
+against the code before acting on it.
+
+**53. Two more `group-hover:` rules with no `group` ancestor**, in both auth
+forms: the Log in chevron's `opacity-50 group-hover:opacity-100` and the Google
+logo's `grayscale group-hover:grayscale-0`. Same class as the toast's dismiss
+button (Findings 43): valid CSS that can never match. That makes **seven**
+silent-failure instances in this restyle. Both were removed with the rebuild.
+
+**54. Moving heading levels cost nothing visually, because type is a class.**
+Every heading whose level changed (`h2`→`h1`, `h1`→`h2`, `h3`→`h2`, or out of
+the outline to `p`) already carried a `.type-*` class, which beats the global
+`h1`–`h4` Bebas rule on specificity (§5.5), so no pixel moved. The migration
+strategy chosen in Phase 4 is what made document semantics independent of
+appearance. An unclassed heading would not have been free: changing its level
+would have changed its look.
+
+**55. One `MotionConfig` covers every framer-motion component.** None of the
+files using framer-motion honoured reduced motion, and it writes transforms
+inline, so the reduced-motion CSS block could not reach it. `reducedMotion="user"` at the root makes every framer component drop
+transform and layout motion under the OS setting while keeping opacity — which
+is motion spec §3's rule, applied once. It changes how state arrives, never what
+renders, so it stays inside §3's "no JS decides what to render" constraint.
+
+**56. The profile made a third-party request on every view.** The hero band's
+texture was `url('https://www.transparenttextures.com/patterns/stardust.png')`,
+loaded from an external host on every profile render, including the public
+`/members/<username>` page. Removed with the band. Not a styling finding, but a
+privacy and CSP one that only a visual review of this page would surface.
+
+**57. `/workouts/history/[id]` is off-system and no phase has covered it.** Its
+title renders through the global Bebas rule, the exercise block is a boxed
+card, the set badge is a bordered box and the checked box is filled ink rather
+than `--success`. Neither review listed it — it was only seen because the
+restyled recap panel sits on that page. Added to TD-31, then **closed the same
+day** in the Phase 13 follow-up.
+
+**59. A per-state outline check caught what the captures could not.** The
+restyled detail page looked right in all 12 captures, and an aborted session
+still went `h1` → `h3`, because only a completed session renders the recap's
+`h2`. A heading list per state, not per route, is what surfaced it — add state
+variants to the Phase 14 heading check.
+
+**58. A pseudo-element can be verified as a hit area.** `elementFromPoint` 10px
+outside the visible 20px checkbox returns the checkbox, and a real click there
+completed the set. This is the check for any `::after`-expanded target — its
+`getBoundingClientRect` still reports the visible box, so a size probe alone
+reports a failure that isn't one.
 
 ### New in Phase 9
 
@@ -1992,6 +2232,16 @@ used — the TD-28 failure class — so it is left alone deliberately.
   Same `.next/`; the running server then 500s on every route and the app goes
   black in a way that looks like an auth bug.
 
+- **No production build has run against Phase 13.** Lint, typecheck and tests
+  are green; the compiled-stylesheet check and `next build` need the dev server
+  stopped, or a clean CI run.
+- **Reported, not fixed** in Phase 13: the search suggestions' full combobox
+  keyboard contract (a11y 6), making the sidebar's "Soon" items inert (a11y 13),
+  and regrouping the session set row's inputs for desktop (final 5). Each needs
+  behaviour or a design decision the locked system has not made.
+- **Seven silent-failure instances** so far (Findings 53): undefined classes,
+  and `group-hover:` with no `group`. Any class not obviously Tailwind's own must
+  be traced to the element it is meant to reach.
 - **Budget `viewport - 256` for any multi-column rule inside the protected
   shell** (Findings 47). `md:` fires at a 768 viewport, where the main column is
   512px. This has now caused three separate defects.
@@ -2078,6 +2328,19 @@ used — the TD-28 failure class — so it is left alone deliberately.
   Five files still read them. An undefined custom property is invalid at
   computed-value time and fails silently. They are aliased to v1.0 roles until
   Phase 8 clears the last consumer.
+- **Gold on completion anywhere.** The masthead percentage, each exercise's
+  "Complete" label, the completed set number and the progress bar are all
+  `--success` (§4.3 rule 2). Gold is for records and improvements only.
+- **Floating pill actions.** The routines "+ New" pill is gone; §7 keeps
+  `rounded-full` for avatars. The rectangular action shows at every width.
+- **Dashed placeholder boxes for empty states.** Search, Workouts and the
+  session recap put the message on the page grid.
+- **A standalone session action panel with its own progress bar.** §11.8: the
+  actions are an inline row and progress is stated once, in the masthead.
+- **Nesting a `<button>` inside a nav `<a>`.** One anchor per destination
+  (`Button asChild` → `Link`) with `aria-current`.
+- **Whole-control opacity for disabled.** `--ink-3` on `--surface-sunk`
+  (§4.3 rule 7); tabs, accordion and the session actions no longer fade.
 - **The `sm`/`md` cliff, now measured.** 320/375/390/430 are byte-identical on
   all eight routes, both themes; nothing changes until 640 (Phase 9). §10.3 says
   record it, not fix it — it is recorded.
@@ -2127,28 +2390,28 @@ used — the TD-28 failure class — so it is left alone deliberately.
 
 ## Next Task
 
-**Phase 11 — Accessibility visual QA (GPT-5.6 Sol High).** Per the handoff
-protocol this is a separate session; do not continue into it automatically. The
-ready prompt is entry 14 in
-[ui-restyle/session-prompts.md](ui-restyle/session-prompts.md).
+**Phase 14 — Automated regression sweep.** Playwright was adopted in Phase 0
+(decision A), so this is scripted rather than manual.
 
-Before it runs, `npm run ui:capture:after` should be re-run so the reviewer sees
-the motion work's resting states rather than the Phase 9 captures.
+Per the plan: 320/390/430/768/1024/1280/1440; no horizontal overflow, no new
+console errors, no broken components; navigation, modals, dropdowns, hover and
+focus states and the mobile drawer all working; screenshots rendering; and
+**`npm run verify` with the dev server stopped** — which also closes this
+phase's outstanding production build and the compiled-stylesheet check. Do not
+change tests to hide regressions.
 
-Carried forward, none blocking:
+Carry-forward:
 
-- **Motion spec §7 gates 2–6 are unrun.** This session verified gate 1 (compiled
-  stylesheet) and gate 7 (`npm run verify` with the dev server stopped). Still
-  owed, all requiring a browser: measured durations on rendered nodes in both
-  themes; a Performance trace showing zero Layout events while opening the delete
-  dialog, opening the kebab menu, expanding the history filters and completing a
-  set; reduced motion emulated against every row of §3; `pointer: coarse`
-  emulated for the toast close button; and a forced re-render confirming neither
-  signature replays.
-- **The nav marker needs a real look at 390 and in the mobile drawer.** The pitch
-  is derived from uniform row heights, which is correct in the markup but unproven
-  on screen.
-- The theme crossfade stays on `body` rather than the temporary shell class §2.9
-  describes. Body is a single node, so the concern that rule raises — a paint
-  transition on every node of a broadly re-rendering screen — does not apply. A
-  deliberate deviation, not an omission.
+- **TD-34 first**: give the capture harness an active-session precondition, so
+  Phase 14's comparisons cannot be silently invalidated (Findings 46).
+- The component/state captures in `ui-restyle/capture-manifest.md` are now
+  mostly scripted in ad-hoc files that were deleted after use; Phase 14 is the
+  place to make them permanent specs.
+- Still off-palette (TD-31): `InitialLoadAnimation`, `PerformanceDebugPanel`.
+  (`/workouts/history/[id]` was restyled in the Phase 13 follow-up; add it to
+  the capture manifest, which has no target for it.)
+- Phase 15 deletion list (TD-32) grew: `ModernBackground`, `ModernBrandHero`,
+  `BackgroundOverlay`, `calendar` join `popover`, `alert`, `OrnateCorners`,
+  `HeroBackdrop`, `HeroCard`, `WorkoutItem`.
+- Reported, not fixed: search combobox keyboard contract, inert "Soon" items,
+  set-row desktop regrouping.

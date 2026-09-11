@@ -53,9 +53,9 @@ export default function Dashboard() {
 						    greeting is a panel title rather than a second inscription
 						    competing with it (§5.3 — Cinzel appears at most twice, and
 						    the inline font-family override went with the old rank). */}
-						<h1 className="type-panel text-foreground">
+						<p className="type-panel text-foreground">
 							{name ? `Welcome back, ${name}!` : 'Welcome back!'}
-						</h1>
+						</p>
 						<p className="type-body-sm text-ink-3">
 							Track your fitness journey and achieve your goals.
 						</p>

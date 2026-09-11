@@ -513,6 +513,10 @@
   }
   .animate-pulse-opacity,
   .animate-spin-slow,
+  .animate-spin,
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
   .rule-heading::after,
   .mark-fill.mark-success::before {
     animation: none !important;

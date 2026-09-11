@@ -81,15 +81,18 @@ export function SupabaseLoginForm() {
 	}
 
 	return (
-		<div className="w-full max-w-sm mx-auto">
+		<div className="w-full rounded-sm border border-rule bg-surface p-5 sm:p-6">
 			<TopLoadingBar show={isPending || isGooglePending} />
 
 			{message === 'verify-email' && (
-				<div className="p-3 sm:p-4 text-sm bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-500/30 rounded-lg text-green-800 dark:text-green-200 mb-6 flex items-start gap-3">
-					<CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+				<div className="type-body-sm mark mark-success mb-6 flex items-start gap-3 bg-surface-sunk p-3 text-foreground">
+					<CheckCircle2
+						className="mt-0.5 h-5 w-5 shrink-0 text-success"
+						aria-hidden
+					/>
 					<div className="flex-1">
-						<p className="font-medium mb-1">Account created!</p>
-						<p className="text-xs opacity-90">
+						<p className="type-panel mb-1">Account created!</p>
+						<p className="text-ink-2">
 							Check your email to verify your account.
 						</p>
 					</div>
@@ -97,11 +100,17 @@ export function SupabaseLoginForm() {
 			)}
 
 			{isError && (
-				<div className="p-3 sm:p-4 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-lg text-red-800 dark:text-red-200 mb-6 flex items-start gap-3">
-					<AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+				<div
+					role="alert"
+					className="type-body-sm mark mb-6 flex items-start gap-3 border-l-destructive bg-surface-sunk p-3 text-foreground"
+				>
+					<AlertCircle
+						className="mt-0.5 h-5 w-5 shrink-0 text-destructive"
+						aria-hidden
+					/>
 					<div className="flex-1">
-						<p className="font-medium mb-1">Unable to sign in</p>
-						<p className="text-xs opacity-90">
+						<p className="type-panel mb-1">Unable to sign in</p>
+						<p className="text-ink-2">
 							{error?.message || 'Please check your credentials.'}
 						</p>
 					</div>
@@ -123,14 +132,17 @@ export function SupabaseLoginForm() {
 									<FormLabel>Email</FormLabel>
 									<FormControl>
 										<div className="relative">
-											<Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<Mail
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												placeholder="name@example.com"
 												type="email"
 												autoCapitalize="none"
 												autoComplete="email"
 												autoCorrect="off"
-												className="pl-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
@@ -150,7 +162,7 @@ export function SupabaseLoginForm() {
 										<FormLabel>Password</FormLabel>
 										<Link
 											href="/forgot-password"
-											className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors p-2 -mr-2"
+											className="type-body-sm -mr-2 p-2 text-ink-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 											tabIndex={-1}
 										>
 											Forgot password?
@@ -158,19 +170,25 @@ export function SupabaseLoginForm() {
 									</div>
 									<FormControl>
 										<div className="relative">
-											<Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+											<Lock
+												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+												aria-hidden
+											/>
 											<Input
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
 												autoComplete="current-password"
-												className="pl-10 pr-10 h-11 bg-neutral-100/50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 focus:border-neutral-400 dark:focus:border-neutral-600 focus:ring-0 focus:bg-white dark:focus:bg-neutral-900 transition-colors duration-[var(--motion-fast)] ease-standard font-medium"
+												className="pl-10 pr-11"
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
 											<button
 												type="button"
 												onClick={() => setShowPassword(!showPassword)}
-												className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors p-1"
+												aria-label={
+													showPassword ? 'Hide password' : 'Show password'
+												}
+												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 												disabled={isPending || isGooglePending}
 											>
 												{showPassword ? (
@@ -187,7 +205,8 @@ export function SupabaseLoginForm() {
 						/>
 
 						<Button
-							className="w-full h-11 font-medium text-base bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors duration-[var(--motion-fast)] ease-standard"
+							size="lg"
+							className="w-full"
 							type="submit"
 							disabled={isPending || isGooglePending}
 						>
@@ -199,7 +218,7 @@ export function SupabaseLoginForm() {
 							) : (
 								<>
 									Log in
-									<ChevronRight className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+									<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 								</>
 							)}
 						</Button>
@@ -208,18 +227,17 @@ export function SupabaseLoginForm() {
 
 				<div className="relative py-2">
 					<div className="absolute inset-0 flex items-center">
-						<span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+						<span className="w-full border-t border-rule" />
 					</div>
-					<div className="relative flex justify-center text-xs uppercase tracking-widest">
-						<span className="px-4 text-neutral-400 dark:text-neutral-500">
-							Or
-						</span>
+					<div className="relative flex justify-center">
+						<span className="type-label bg-surface px-4 text-ink-3">Or</span>
 					</div>
 				</div>
 
 				<Button
 					variant="outline"
-					className="w-full h-11 border-neutral-200 dark:border-neutral-800 bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors text-neutral-600 dark:text-neutral-300 font-medium"
+					size="lg"
+					className="w-full"
 					onClick={handleGoogleSignIn}
 					disabled={isPending || isGooglePending}
 					type="button"
@@ -232,18 +250,18 @@ export function SupabaseLoginForm() {
 							alt="Google"
 							width={16}
 							height={16}
-							className="mr-2 h-4 w-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-[opacity,filter] duration-[var(--motion-fast)] ease-standard"
+							className="mr-2 h-4 w-4"
 						/>
 					)}
 					Continue with Google
 				</Button>
 			</div>
 
-			<div className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+			<div className="type-body-sm mt-6 text-center text-ink-2">
 				Don&apos;t have an account?{' '}
 				<Link
 					href="/signup"
-					className="font-semibold text-neutral-900 dark:text-neutral-100 hover:underline underline-offset-4 pointer-cursor p-2"
+					className="p-2 font-semibold text-foreground underline-offset-4 hover:underline"
 				>
 					Sign up
 				</Link>

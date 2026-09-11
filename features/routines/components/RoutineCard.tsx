@@ -10,6 +10,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuLabel,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Routine } from '@/lib/api/types/routine.type'
@@ -109,7 +110,8 @@ export function RoutineCard({
 						<Button
 							variant="ghost"
 							size="icon"
-							className="-mr-1 size-9 flex-shrink-0 touch-manipulation"
+							aria-label="Routine actions"
+							className="-mr-1 size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						>
 							<MoreVertical className="h-4 w-4" />
 						</Button>
@@ -117,9 +119,7 @@ export function RoutineCard({
 					<DropdownMenuContent align="end">
 						{routine.days.length > 0 && (
 							<>
-								<DropdownMenuItem className="pointer-events-none opacity-60">
-									Start session with day
-								</DropdownMenuItem>
+								<DropdownMenuLabel>Start session with day</DropdownMenuLabel>
 								{routine.days.map(d => {
 									const dayValidation = validateRoutineDayDate(d)
 									const canStartThisDay = dayValidation.isValid
@@ -245,7 +245,7 @@ export function RoutineCard({
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="size-9 flex-shrink-0 touch-manipulation"
+						className="size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						aria-label={
 							routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
 						}
@@ -272,7 +272,7 @@ export function RoutineCard({
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="size-9 flex-shrink-0 touch-manipulation"
+						className="size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						aria-label={
 							routine.isFavorite ? 'Unmark favorite' : 'Mark as favorite'
 						}

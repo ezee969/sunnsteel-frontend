@@ -126,7 +126,7 @@ export default function TodaysWorkouts() {
 							: `You have ${visibleTodays.length} workouts planned.`}
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="space-y-4">
+				<CardContent>
 					{visibleTodays.map(({ routine, day, canStartToday }) => {
 						const isActiveForThis =
 							active?.status === 'IN_PROGRESS' &&
@@ -134,7 +134,7 @@ export default function TodaysWorkouts() {
 						return (
 							<div
 								key={`${routine.id}:${day.id}`}
-								className="rounded-none border border-rule-faint p-3 sm:flex sm:items-center sm:justify-between"
+								className="rule-row py-3 first:pt-0 last:pb-0 sm:flex sm:items-center sm:justify-between"
 							>
 								<div className="min-w-0 flex-1">
 									<div className="flex flex-wrap items-center gap-2">

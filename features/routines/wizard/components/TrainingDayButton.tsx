@@ -40,7 +40,7 @@ export const TrainingDayButton = ({
 		) : (
 			<>
 				<span className="font-medium">{day.short}</span>
-				<span className="hidden sm:block text-[10px] md:text-xs opacity-80">
+				<span className="hidden text-xs sm:block">
 					{day.name.substring(0, 3)}
 				</span>
 			</>

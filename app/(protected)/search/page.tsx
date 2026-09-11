@@ -1,6 +1,5 @@
 'use client'
 
-import { Search } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
@@ -17,14 +16,17 @@ export default function SearchPage() {
 
 	if (!query) {
 		return (
-			<div className="flex h-[60vh] flex-col items-center justify-center px-4 text-center">
-				<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-surface-sunk">
-					<Search className="h-8 w-8 text-ink-3" aria-hidden />
+			// Final review 8: the page inscription on the page grid (§11.11), not
+			// a centred icon placeholder.
+			<div className="mx-auto max-w-6xl">
+				<div className="rule-heading pb-4">
+					<h1 className="type-page corner-brackets inline-block text-foreground">
+						Search Users
+					</h1>
+					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
+						Type a name or @username in the top search bar to find profiles.
+					</p>
 				</div>
-				<h2 className="type-section mb-2 text-foreground">Search Users</h2>
-				<p className="type-body-sm max-w-md text-ink-3">
-					Type a name or @username in the top search bar to find profiles.
-				</p>
 			</div>
 		)
 	}
@@ -78,20 +80,19 @@ export default function SearchPage() {
 									{user.name.charAt(0)}
 								</AvatarFallback>
 							</Avatar>
-							<h3 className="type-panel text-center text-foreground">
+							<h2 className="type-panel text-center text-foreground">
 								{user.name} {user.lastName || ''}
-							</h3>
+							</h2>
 							<p className="type-body-sm mt-1 text-ink-3">@{user.username}</p>
 						</div>
 					))}
 				</div>
 			) : (
-				<div className="flex h-[40vh] flex-col items-center justify-center rounded-sm border border-dashed border-rule p-8 text-center">
-					<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-sm bg-surface-sunk">
-						<Search className="h-8 w-8 text-ink-3" aria-hidden />
-					</div>
-					<h3 className="type-section mb-2 text-foreground">No users found</h3>
-					<p className="type-body-sm max-w-sm text-ink-3">
+				// Final review 8: no dashed placeholder box. The message sits on the
+				// page grid under the inscription, at a readable measure.
+				<div className="max-w-[68ch] space-y-1">
+					<h2 className="type-panel text-foreground">No users found</h2>
+					<p className="type-body-sm text-ink-3">
 						We couldn&apos;t find any profiles matching &quot;{query}&quot;. Try
 						a different spelling, name or @username.
 					</p>

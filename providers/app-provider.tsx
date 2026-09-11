@@ -1,5 +1,6 @@
 'use client'
 
+import { MotionConfig } from 'framer-motion'
 import { ReactNode, useEffect } from 'react'
 
 import { SHOULD_LOG_PERFORMANCE } from '@/lib/config/env'
@@ -40,10 +41,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	return (
 		// <Provider store={store}>
 		// {/* </Provider> */}
-		<QueryProvider>
-			<SupabaseAuthProvider>
-				<AppToastProvider>{children}</AppToastProvider>
-			</SupabaseAuthProvider>
-		</QueryProvider>
+		// Motion spec §3 / a11y review 5: framer-motion writes transforms
+		// inline, beyond the reach of the reduced-motion CSS block. "user" drops
+		// transform and layout animation under the OS setting and keeps opacity.
+		<MotionConfig reducedMotion="user">
+			<QueryProvider>
+				<SupabaseAuthProvider>
+					<AppToastProvider>{children}</AppToastProvider>
+				</SupabaseAuthProvider>
+			</QueryProvider>
+		</MotionConfig>
 	)
 }

@@ -124,15 +124,18 @@ export function SearchBar() {
 										</button>
 									),
 								)}
-								<div
-									className="type-body-sm mt-1 cursor-pointer border-t border-rule-faint px-3 py-2 text-center text-ink-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground"
+								{/* a11y review 6: this was a clickable <div> - no role, no tab stop,
+								    unreachable from the keyboard. Same handler, real button. */}
+								<button
+									type="button"
+									className="type-body-sm mt-1 w-full border-t border-rule-faint px-3 py-2 text-center text-ink-2 outline-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
 									onClick={e => {
 										e.preventDefault()
 										handleSearchSubmit(e as unknown as React.FormEvent)
 									}}
 								>
 									View all results for &quot;{debouncedQuery}&quot;
-								</div>
+								</button>
 							</div>
 						) : (
 							!isLoading && (

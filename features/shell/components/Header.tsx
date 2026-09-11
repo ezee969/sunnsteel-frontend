@@ -41,7 +41,7 @@ export default function Header({
 					variant="ghost"
 					size="icon"
 					onClick={() => setIsMobileMenuOpen(true)}
-					className="mr-1"
+					className="mr-1 size-11 md:size-10"
 				>
 					<Menu className="h-5 w-5" />
 					<span className="sr-only">Toggle Menu</span>
@@ -57,9 +57,9 @@ export default function Header({
 				    clips the pseudo-elements, so they rendered as nothing at all -
 				    and §11.11 allows one pair per screen, which the page masthead
 				    already carries. */}
-				<h1 className="type-section mr-4 hidden min-w-0 max-w-[18rem] truncate text-foreground sm:block">
+				<p className="type-section mr-4 hidden min-w-0 max-w-[18rem] truncate text-foreground sm:block">
 					{title}
-				</h1>
+				</p>
 				<div className="flex-1 max-w-sm ml-auto sm:ml-0">
 					<SearchBar />
 				</div>
@@ -90,7 +90,12 @@ function UserDropdown() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="ghost" size="icon" className="rounded-full">
+				<Button
+					variant="ghost"
+					size="icon"
+					aria-label="Account menu"
+					className="size-11 rounded-full md:size-10"
+				>
 					<Avatar className="h-8 w-8 border border-rule">
 						<AvatarImage
 							src={user?.avatarUrl || ''}

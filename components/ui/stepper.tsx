@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, ChevronRight } from 'lucide-react'
+import { Check } from 'lucide-react'
 import React from 'react'
 
 import { cn } from '@/lib/utils'
@@ -24,19 +24,61 @@ interface StepperProps {
 	canStepClick?: (stepId: number) => boolean
 }
 
+type StepState = {
+	isCompleted: boolean
+	isActive: boolean
+	isClickable: boolean
+}
+
+const MARKER_BASE =
+	'type-data flex shrink-0 items-center justify-center rounded-sm border transition-colors duration-[var(--motion-fast)] ease-standard'
+
+/**
+ * Marker tone by state — v1.0 §12.1: completed is `--success` (§4.3 rule 2),
+ * the current step an ink outline rather than a fill (rule 1 reserves the fill
+ * for the wizard's Next button), a visited step a plain bounded marker, and an
+ * unreached step the rule 7 disabled treatment. Square: §7 keeps
+ * `rounded-full` for avatars.
+ */
+function markerTone({ isCompleted, isActive, isClickable }: StepState) {
+	if (isCompleted) return 'border-success bg-success text-background'
+	if (isActive) return 'border-2 border-primary bg-surface text-foreground'
+	if (isClickable)
+		return 'border-rule bg-surface text-ink-2 group-hover:bg-muted'
+	return 'border-rule-faint bg-surface-sunk text-ink-3'
+}
+
+function titleTone({ isCompleted, isActive, isClickable }: StepState) {
+	if (isActive) return 'text-foreground'
+	if (isCompleted) return 'text-ink-2'
+	if (isClickable) return 'text-ink-2 group-hover:text-foreground'
+	return 'text-ink-3'
+}
+
+function stateLabel({ isCompleted, isActive, isClickable }: StepState) {
+	if (isActive) return 'current step'
+	if (isCompleted) return 'completed'
+	if (isClickable) return 'available'
+	return 'not available yet'
+}
+
+const FOCUS_RING =
+	'outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+
 /**
  * The routine wizard's step indicator.
  *
- * This carried the largest raw-palette cluster left in the app — 22 classes
- * across `blue-*`, `green-*` and `gray-*`. v1.0 §12.1 maps them by meaning, not
- * by name: **completed is `--success`** (§4.3 rule 2 — done, as planned), the
- * **current step is an ink outline, not an ink fill** (rule 1 reserves the
- * filled `--primary` for the region's one real control, which is the wizard's
- * Next button), a **visited step is a plain bounded marker**, and an unreached
- * step takes the §4.3 rule 7 disabled treatment — `--ink-3` on `--surface-sunk`,
- * never a global opacity drop.
+ * a11y review 3: every step is a real `<button>`. It used to put `onClick` on
+ * plain `<div>`s — no tab stop, no key handling, no role — so a keyboard user
+ * could not return to a visited step the UI presented as clickable. The current
+ * step carries `aria-current="step"`, unreachable steps `aria-disabled`, and
+ * each label names its state. The click guard is unchanged: a step is only
+ * acted on when `canStepClick`/`visitedSteps` allows it, exactly as before.
  *
- * The markers are square. §7 keeps `rounded-full` for avatars only.
+ * Final review 11: below `lg` the tracker is one compact row of markers plus
+ * the current step's title, instead of a four-row vertical list that pushed the
+ * form below the first viewport. The horizontal layout still needs `lg` — at a
+ * 768 viewport the shell's main column is only 512px (Findings 39).
  */
 export function Stepper({
 	steps,
@@ -47,182 +89,161 @@ export function Stepper({
 	completedSteps,
 	canStepClick,
 }: StepperProps) {
+	const total = steps.length
+
+	const stateOf = (step: Step): StepState => {
+		const isCompleted = completedSteps
+			? completedSteps.has(step.id)
+			: currentStep > step.id
+		const isActive = currentStep === step.id
+		const canClick = canStepClick
+			? canStepClick(step.id)
+			: visitedSteps?.has(step.id)
+		return { isCompleted, isActive, isClickable: !!canClick && !isActive }
+	}
+
+	const buttonProps = (step: Step, state: StepState) => ({
+		type: 'button' as const,
+		onClick: () => state.isClickable && onStepClick?.(step.id),
+		'aria-current': state.isActive ? ('step' as const) : undefined,
+		'aria-disabled': !state.isClickable && !state.isActive ? true : undefined,
+		'aria-label': `Step ${step.id} of ${total}: ${step.title}, ${stateLabel(state)}`,
+	})
+
+	const current = steps.find(step => step.id === currentStep)
+
 	return (
 		<div className={cn('w-full', className)}>
-			{/* Stacked layout. It runs to `lg`, not `sm`: the horizontal stepper
-			    needs ~700px and the shell only gives its main column 512px at a 768
-			    viewport, so four steps ran 88px past the edge there. The `before`
-			    baseline shows the same overflow with step 4 already cut off —
-			    pre-existing, but this batch's type ranks widened it. */}
-			<div className="block lg:hidden">
-				<div className="space-y-4">
-					{steps.map(step => {
-						const isCompleted = completedSteps
-							? completedSteps.has(step.id)
-							: currentStep > step.id
-						const isActive = currentStep === step.id
-						const canClick = canStepClick
-							? canStepClick(step.id)
-							: visitedSteps?.has(step.id)
-						const isClickable = !!canClick && !isActive
-
-						return (
-							<div key={step.id} className="flex items-start gap-4">
-								{/* Step Marker */}
-								<div
-									className={cn(
-										'type-data flex shrink-0 cursor-pointer items-center justify-center rounded-sm border transition-colors duration-[var(--motion-fast)] ease-standard',
-										isCompleted
-											? 'h-8 w-8 border-success bg-success text-background'
-											: isActive
-												? 'h-10 w-10 border-2 border-primary bg-surface text-foreground'
-												: isClickable
-													? 'h-8 w-8 border-rule bg-surface text-ink-2 hover:bg-muted'
-													: 'h-8 w-8 border-rule-faint bg-surface-sunk text-ink-3',
-									)}
-									onClick={() => isClickable && onStepClick?.(step.id)}
-								>
-									{isCompleted ? (
-										<Check className="h-4 w-4" />
-									) : (
-										<span>{step.id}</span>
-									)}
-								</div>
-
-								{/* Step Content */}
-								<div
-									className={cn(
-										'flex-1 min-w-0',
-										isClickable && 'cursor-pointer',
-									)}
-									onClick={() => isClickable && onStepClick?.(step.id)}
-								>
-									<div
-										className={cn(
-											'type-panel transition-colors duration-[var(--motion-fast)] ease-standard',
-											isCompleted
-												? 'text-ink-2'
-												: isActive
-													? 'text-foreground'
-													: isClickable
-														? 'text-ink-2 hover:text-foreground'
-														: 'text-ink-3',
-										)}
-									>
-										{step.title}
-									</div>
-
-									{/* Description - Only show for active step */}
-									{isActive && (
-										<div className="type-body-sm mt-1 text-ink-3">
-											{step.description}
-										</div>
-									)}
-								</div>
-
-								{/* Active Indicator */}
-								{isActive && (
-									<div className="mt-1">
-										<ChevronRight className="h-4 w-4 text-ink-3" aria-hidden />
-									</div>
-								)}
-							</div>
-						)
-					})}
-				</div>
-			</div>
-
-			{/* Horizontal Layout */}
-			<div className="hidden lg:block">
-				<div className="flex items-start justify-between w-full">
+			{/* Compact tracker, below `lg` */}
+			<div className="lg:hidden">
+				<ol className="flex items-center gap-2" aria-label="Routine steps">
 					{steps.map((step, index) => {
-						const isCompleted = completedSteps
-							? completedSteps.has(step.id)
-							: currentStep > step.id
-						const isActive = currentStep === step.id
-						const canClick = canStepClick
-							? canStepClick(step.id)
-							: visitedSteps?.has(step.id)
-						const isClickable = !!canClick && !isActive
-						const isLast = index === steps.length - 1
-
+						const state = stateOf(step)
+						const isLast = index === total - 1
 						return (
-							<React.Fragment key={step.id}>
-								{/* Step Container */}
-								<div
+							<li
+								key={step.id}
+								className={cn('flex items-center gap-2', !isLast && 'flex-1')}
+							>
+								<button
+									{...buttonProps(step, state)}
 									className={cn(
-										'flex flex-col items-center relative shrink-0 px-2',
-										isClickable && 'cursor-pointer',
+										'group relative rounded-sm',
+										FOCUS_RING,
+										state.isActive && 'cursor-default',
+										// 32px marker, 44px hit area (a11y review 12)
+										"after:absolute after:-inset-1.5 after:content-['']",
 									)}
-									onClick={() => isClickable && onStepClick?.(step.id)}
 								>
-									{/* Step Marker Wrapper - Fixed Height for Alignment */}
-									<div className="mb-2 flex h-12 items-center justify-center">
-										<div
-											className={cn(
-												'type-data flex items-center justify-center rounded-sm border transition-colors duration-[var(--motion-fast)] ease-standard',
-												isCompleted
-													? 'h-10 w-10 border-success bg-success text-background'
-													: isActive
-														? 'h-12 w-12 border-2 border-primary bg-surface text-foreground'
-														: isClickable
-															? 'h-10 w-10 border-rule bg-surface text-ink-2 hover:bg-muted'
-															: 'h-10 w-10 border-rule-faint bg-surface-sunk text-ink-3',
-											)}
-										>
-											{isCompleted ? (
-												<Check className="h-5 w-5" />
-											) : (
-												<span>{step.id}</span>
-											)}
-										</div>
-									</div>
-
-									{/* Step Title */}
-									<div
-										className={cn(
-											'type-panel text-center transition-colors duration-[var(--motion-fast)] ease-standard',
-											isCompleted
-												? 'text-ink-2'
-												: isActive
-													? 'text-foreground'
-													: isClickable
-														? 'text-ink-2 hover:text-foreground'
-														: 'text-ink-3',
-										)}
+									<span
+										className={cn(MARKER_BASE, 'size-8', markerTone(state))}
 									>
-										{step.title}
-									</div>
-
-									{/* Step Description */}
-									<div
-										className={cn(
-											'type-body-sm mt-1 max-w-[150px] text-center transition-colors duration-[var(--motion-fast)] ease-standard',
-											isActive ? 'text-ink-2' : 'text-ink-3',
+										{state.isCompleted ? (
+											<Check className="h-4 w-4" aria-hidden />
+										) : (
+											<span aria-hidden>{step.id}</span>
 										)}
-									>
-										{step.description}
-									</div>
-								</div>
-
-								{/* Connector Line */}
+									</span>
+								</button>
 								{!isLast && (
-									<div
+									<span
+										aria-hidden
 										className={cn(
-											'mx-4 mt-6 h-px flex-1 transition-colors duration-[var(--motion-base)] ease-standard',
-											isCompleted
-												? 'bg-success'
-												: isActive
-													? 'bg-rule'
-													: 'bg-rule-faint',
+											'h-px flex-1 transition-colors duration-[var(--motion-base)] ease-standard',
+											state.isCompleted ? 'bg-success' : 'bg-rule-faint',
 										)}
 									/>
 								)}
-							</React.Fragment>
+							</li>
 						)
 					})}
-				</div>
+				</ol>
+				{current && (
+					<div className="mt-3">
+						<p className="type-panel text-foreground">
+							<span className="type-data mr-2 text-ink-3">
+								{current.id}/{total}
+							</span>
+							{current.title}
+						</p>
+						<p className="type-body-sm mt-0.5 text-ink-3">
+							{current.description}
+						</p>
+					</div>
+				)}
 			</div>
+
+			{/* Horizontal layout, from `lg` */}
+			<ol
+				className="hidden w-full items-start lg:flex"
+				aria-label="Routine steps"
+			>
+				{steps.map((step, index) => {
+					const state = stateOf(step)
+					const isLast = index === total - 1
+					return (
+						<li
+							key={step.id}
+							className={cn('flex items-start', !isLast && 'flex-1')}
+						>
+							<button
+								{...buttonProps(step, state)}
+								className={cn(
+									'group flex shrink-0 flex-col items-center rounded-sm px-2 text-center',
+									FOCUS_RING,
+									state.isActive && 'cursor-default',
+								)}
+							>
+								{/* Marker wrapper - fixed height for alignment */}
+								<span className="mb-2 flex h-12 items-center justify-center">
+									<span
+										className={cn(
+											MARKER_BASE,
+											state.isActive ? 'size-12' : 'size-10',
+											markerTone(state),
+										)}
+									>
+										{state.isCompleted ? (
+											<Check className="h-5 w-5" aria-hidden />
+										) : (
+											<span aria-hidden>{step.id}</span>
+										)}
+									</span>
+								</span>
+								<span
+									className={cn(
+										'type-panel transition-colors duration-[var(--motion-fast)] ease-standard',
+										titleTone(state),
+									)}
+								>
+									{step.title}
+								</span>
+								<span
+									className={cn(
+										'type-body-sm mt-1 max-w-[150px] transition-colors duration-[var(--motion-fast)] ease-standard',
+										state.isActive ? 'text-ink-2' : 'text-ink-3',
+									)}
+								>
+									{step.description}
+								</span>
+							</button>
+							{!isLast && (
+								<span
+									aria-hidden
+									className={cn(
+										'mx-4 mt-6 h-px flex-1 transition-colors duration-[var(--motion-base)] ease-standard',
+										state.isCompleted
+											? 'bg-success'
+											: state.isActive
+												? 'bg-rule'
+												: 'bg-rule-faint',
+									)}
+								/>
+							)}
+						</li>
+					)
+				})}
+			</ol>
 		</div>
 	)
 }

@@ -39,7 +39,7 @@ export default function RoutinesPage() {
 			{/* Header Section — the empty spacer div that used to sit opposite this
 			    button left a band of dead space under the masthead. */}
 			<div className="flex justify-end">
-				<Button asChild className="hidden gap-2 sm:flex">
+				<Button asChild className="gap-2">
 					<Link href="/routines/new" prefetch>
 						<Plus className="h-4 w-4" />
 						<span>Create Routine</span>
@@ -54,18 +54,6 @@ export default function RoutinesPage() {
 				/>
 				<WorkoutsList routines={routines} isLoading={isLoading} error={error} />
 			</div>
-
-			{/* Mobile FAB - Fixed position at bottom right */}
-			<Button
-				asChild
-				size="lg"
-				className="fixed bottom-6 right-6 h-12 gap-1.5 rounded-full px-5 shadow-lg sm:hidden"
-			>
-				<Link href="/routines/new" prefetch aria-label="Create Routine">
-					<Plus className="h-5 w-5" />
-					<span className="text-sm font-semibold">New</span>
-				</Link>
-			</Button>
 		</div>
 	)
 }

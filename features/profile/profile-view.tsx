@@ -25,7 +25,6 @@ import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
@@ -166,115 +165,103 @@ export function ProfileView(props: ProfileViewProps) {
 	}
 
 	return (
-		<div className="w-full max-w-5xl mx-auto space-y-6 pb-20">
-			<Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm relative shadow-sm">
-				<div className="h-32 md:h-48 w-full bg-gradient-to-r from-primary/20 via-primary/10 to-transparent relative">
-					<div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay"></div>
-					<div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-card/80 to-transparent backdrop-blur-[2px]"></div>
-				</div>
+		<div className="mx-auto w-full max-w-5xl space-y-8 pb-20 sm:space-y-12">
+			{/* Final review 7: the gradient band, the third-party "stardust"
+			    texture (a request to transparenttextures.com on every view), the
+			    blurred halo and the card around the whole masthead are gone. The
+			    profile opens like every other page - an inscription over the double
+			    rule (§11.11) - with the portrait at a measured size, which also
+			    gives the first 390px viewport back to content. */}
+			<section className="rule-heading pb-6">
+				<div className="flex flex-col gap-5 sm:flex-row sm:items-end">
+					<Avatar className="h-20 w-20 shrink-0 border border-rule sm:h-24 sm:w-24">
+						<AvatarImage
+							src={profileAvatar || ''}
+							alt={profileName}
+							className="object-cover"
+						/>
+						<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
+							{profileName.charAt(0)}
+							{profileLastName?.charAt(0)}
+						</AvatarFallback>
+					</Avatar>
 
-				<div className="px-6 md:px-10 pb-8 relative">
-					<div className="flex flex-col md:flex-row gap-6 md:items-end -mt-16 md:-mt-20">
-						<div className="relative group self-center md:self-start">
-							<div className="absolute -inset-0.5 bg-gradient-to-br from-primary via-primary/50 to-transparent rounded-full blur opacity-70 group-hover:opacity-100 transition duration-500"></div>
-							<Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-card relative z-10 shadow-xl bg-card">
-								<AvatarImage
-									src={profileAvatar || ''}
-									alt={profileName}
-									className="object-cover"
-								/>
-								<AvatarFallback className="text-4xl bg-primary/10 text-primary font-serif">
-									{profileName.charAt(0)}
-									{profileLastName?.charAt(0)}
-								</AvatarFallback>
-							</Avatar>
-						</div>
-
-						<div className="flex-1 text-center md:text-left space-y-2 mt-4 md:mt-0">
-							{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
+					<div className="min-w-0 flex-1 space-y-1">
+						{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
 							membership, plan or tier, so no badge rendered here can be backed by
 							real account state. Titles and ranks are owned by ACH-02/ACH-03; do
 							not re-add one ad hoc. */}
-							<h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground heading-classical">
-								{profileName} {profileLastName}
-							</h1>
-							<p className="type-data text-ink-3">@{profileUsername}</p>
-							<p className="text-muted-foreground font-medium flex items-center justify-center md:justify-start gap-1.5 text-sm md:text-base">
-								<CalendarDays className="h-4 w-4" /> Joined {joinDateText}
-							</p>
+						<h1 className="type-page corner-brackets inline-block text-foreground">
+							{profileName} {profileLastName}
+						</h1>
+						<p className="type-data text-ink-3">@{profileUsername}</p>
+						<p className="type-body-sm flex items-center gap-1.5 text-ink-3">
+							<CalendarDays className="h-4 w-4" aria-hidden /> Joined{' '}
+							{joinDateText}
+						</p>
 
-							{/* FIX-06: these counts are text, not controls. They used to carry
+						{/* FIX-06: these counts are text, not controls. They used to carry
 							cursor-pointer and a hover state while leading nowhere. The browsable
 							follower/following lists, and the paginated endpoint they need, belong
 							to SOC-02. */}
-							<div className="flex gap-4 justify-center md:justify-start pt-2">
-								<div className="flex items-baseline gap-1.5">
-									<span className="text-lg font-bold heading-classical">
-										{followerCount}
-									</span>
-									<span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-										Followers
-									</span>
-								</div>
-								<div className="flex items-baseline gap-1.5">
-									<span className="text-lg font-bold heading-classical">
-										{followingCount}
-									</span>
-									<span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-										Following
-									</span>
-								</div>
-							</div>
-						</div>
-
-						<div className="flex items-center justify-center md:justify-end gap-3 mt-4 md:mt-0 w-full md:w-auto">
-							<Button
-								variant="outline"
-								size="sm"
-								className="border-primary/20 hover:bg-primary/10 transition-colors"
-								onClick={onShareProfile}
-							>
-								<Share2 className="h-4 w-4 mr-2" /> Share Profile
-							</Button>
-							{!isOwnProfile && followAction && (
-								<Button
-									variant={isFollowedByMe ? 'outline' : 'default'}
-									size="sm"
-									onClick={onFollowToggle}
-									disabled={isMutating}
-								>
-									{isFollowedByMe ? (
-										<>
-											<UserMinus className="h-4 w-4 mr-2" />
-											{isMutating ? 'Unfollowing...' : 'Unfollow'}
-										</>
-									) : (
-										<>
-											<UserPlus className="h-4 w-4 mr-2" />
-											{isMutating ? 'Following...' : 'Follow'}
-										</>
-									)}
-								</Button>
-							)}
+						<div className="flex gap-5 pt-2">
+							<p className="flex items-baseline gap-1.5">
+								<span className="type-data type-data-strong text-foreground">
+									{followerCount}
+								</span>
+								<span className="type-body-sm text-ink-3">Followers</span>
+							</p>
+							<p className="flex items-baseline gap-1.5">
+								<span className="type-data type-data-strong text-foreground">
+									{followingCount}
+								</span>
+								<span className="type-body-sm text-ink-3">Following</span>
+							</p>
 						</div>
 					</div>
-				</div>
-			</Card>
 
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				<div className="space-y-6 lg:col-span-1 border-r-0 lg:border-r border-border/40 pr-0 lg:pr-6">
-					<div className="space-y-4">
-						<h2 className="text-xl font-semibold heading-classical flex items-center gap-2">
-							<User className="h-5 w-5 text-primary" /> About
+					<div className="flex flex-wrap gap-3">
+						<Button variant="outline" size="sm" onClick={onShareProfile}>
+							<Share2 className="mr-2 h-4 w-4" aria-hidden /> Share Profile
+						</Button>
+						{!isOwnProfile && followAction && (
+							<Button
+								variant={isFollowedByMe ? 'outline' : 'default'}
+								size="sm"
+								onClick={onFollowToggle}
+								disabled={isMutating}
+							>
+								{isFollowedByMe ? (
+									<>
+										<UserMinus className="mr-2 h-4 w-4" aria-hidden />
+										{isMutating ? 'Unfollowing...' : 'Unfollow'}
+									</>
+								) : (
+									<>
+										<UserPlus className="mr-2 h-4 w-4" aria-hidden />
+										{isMutating ? 'Following...' : 'Follow'}
+									</>
+								)}
+							</Button>
+						)}
+					</div>
+				</div>
+			</section>
+
+			<div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-10">
+				<div className="space-y-8 lg:col-span-1 lg:border-r lg:border-rule-faint lg:pr-8">
+					<section className="space-y-3">
+						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+							<User className="h-4 w-4 text-ink-3" aria-hidden /> About
 						</h2>
-						<p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+						<p className="type-body-sm whitespace-pre-line text-ink-2">
 							{!canViewBiography
 								? 'Biography is private.'
 								: biography || 'No bio yet.'}
 						</p>
-						<div className="flex items-start gap-2 text-sm text-muted-foreground">
+						<div className="type-body-sm flex items-start gap-2 text-ink-2">
 							<MapPin
-								className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+								className="mt-0.5 h-4 w-4 shrink-0 text-ink-3"
 								aria-hidden
 							/>
 							<span>
@@ -283,23 +270,23 @@ export function ProfileView(props: ProfileViewProps) {
 									: location || 'No location added yet.'}
 							</span>
 						</div>
-					</div>
+					</section>
 
-					<div className="space-y-4">
-						<h2 className="flex items-center gap-2 text-xl font-semibold heading-classical">
-							<Target className="h-5 w-5 text-primary" aria-hidden />
+					<section className="space-y-3">
+						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+							<Target className="h-4 w-4 text-ink-3" aria-hidden />
 							Training Identity
 						</h2>
 						{!canViewTrainingIdentity ? (
-							<p className="text-sm text-muted-foreground">
+							<p className="type-body-sm text-ink-3">
 								Training identity is private.
 							</p>
 						) : !hasTrainingIdentityContent || !trainingIdentity ? (
-							<p className="text-sm text-muted-foreground">
+							<p className="type-body-sm text-ink-3">
 								No training identity added yet.
 							</p>
 						) : (
-							<dl className="space-y-4 text-sm">
+							<dl className="type-body-sm space-y-4 text-foreground">
 								{trainingIdentity.goals.length > 0 ? (
 									<div className="space-y-2">
 										<dt className="type-label text-ink-3">Goals</dt>
@@ -350,7 +337,7 @@ export function ProfileView(props: ProfileViewProps) {
 											Favorite exercises
 										</dt>
 										<dd>
-											<ul className="space-y-1 text-muted-foreground">
+											<ul className="space-y-1 text-ink-2">
 												{trainingIdentity.favoriteExercises.map(exercise => (
 													<li key={exercise.id}>{exercise.name}</li>
 												))}
@@ -360,22 +347,22 @@ export function ProfileView(props: ProfileViewProps) {
 								) : null}
 							</dl>
 						)}
-					</div>
+					</section>
 
-					<div className="space-y-4">
-						<h2 className="text-xl font-semibold heading-classical">
+					<section className="space-y-3">
+						<h2 className="type-section rule-heading pb-2 text-foreground">
 							Body Metrics
 						</h2>
 						{!canViewBodyMetrics ? (
-							<p className="text-muted-foreground text-sm">
+							<p className="type-body-sm text-ink-3">
 								Body metrics are private.
 							</p>
 						) : !hasBodyMetrics ? (
-							<p className="text-muted-foreground text-sm">
+							<p className="type-body-sm text-ink-3">
 								No body metrics added yet.
 							</p>
 						) : (
-							<dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+							<dl className="grid grid-cols-2 gap-x-4 gap-y-3">
 								<BodyMetric label="Age" value={bodyMetrics?.age} />
 								<BodyMetric
 									label="Sex"
@@ -402,127 +389,114 @@ export function ProfileView(props: ProfileViewProps) {
 								/>
 							</dl>
 						)}
-					</div>
+					</section>
 				</div>
 
-				<div className="lg:col-span-2 space-y-6">
-					<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-						<Card className="bg-gradient-to-br from-card to-card/50 border-border/40 shadow-sm relative overflow-hidden group">
-							<div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity duration-300">
-								<Dumbbell className="h-24 w-24 text-primary" />
+				<div className="space-y-8 lg:col-span-2">
+					{/* Final review 7: the three boxed stat cards with oversized
+					    watermark icons and emerald/orange/blue trend colours become one
+					    ruled band, the dashboard's pattern (§10.1). None of those
+					    colours meant anything the palette defines. */}
+					<div className="grid grid-cols-2 gap-px border-y border-rule bg-rule-faint sm:grid-cols-4">
+						<div className="flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
+							<div className="flex items-center gap-2 text-ink-3">
+								<Dumbbell className="h-4 w-4 shrink-0" aria-hidden />
+								<span className="type-label">Workouts</span>
 							</div>
-							<CardContent className="p-4 sm:p-5">
-								<div className="flex items-center justify-between mb-2">
-									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-										Workouts
-									</span>
-									<Dumbbell className="h-4 w-4 text-primary" />
-								</div>
-								<div className="text-3xl font-bold heading-classical">
-									{canViewWorkoutHistory ? totalWorkouts : '—'}
-								</div>
-								<div className="text-xs text-emerald-500 mt-1 font-medium">
-									{canViewWorkoutHistory
-										? isOwnProfile
-											? `+${weeklyWorkouts} this week`
-											: 'Lifetime completed'
-										: ' '}
-								</div>
-							</CardContent>
-						</Card>
+							<span className="type-numeral text-foreground">
+								{canViewWorkoutHistory ? totalWorkouts : '—'}
+							</span>
+							<span className="type-body-sm text-ink-3">
+								{canViewWorkoutHistory
+									? isOwnProfile
+										? `+${weeklyWorkouts} this week`
+										: 'Lifetime completed'
+									: ' '}
+							</span>
+						</div>
 
-						<Card className="bg-gradient-to-br from-card to-card/50 border-border/40 shadow-sm relative overflow-hidden group">
-							<div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity duration-300">
-								<Flame className="h-24 w-24 text-orange-500" />
+						<div className="flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
+							<div className="flex items-center gap-2 text-ink-3">
+								<Flame className="h-4 w-4 shrink-0" aria-hidden />
+								<span className="type-label">Streak</span>
 							</div>
-							<CardContent className="p-4 sm:p-5">
-								<div className="flex items-center justify-between mb-2">
-									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-										Streak
-									</span>
-									<Flame className="h-4 w-4 text-orange-500" />
-								</div>
-								<div className="text-3xl font-bold heading-classical">
-									{canViewWorkoutHistory ? currentStreak : '—'}{' '}
-									{canViewWorkoutHistory ? (
-										<span className="text-lg text-muted-foreground font-normal">
-											days
-										</span>
-									) : null}
-								</div>
-								<div className="text-xs text-muted-foreground mt-1 font-medium">
-									{canViewWorkoutHistory ? `Personal Best: ${bestStreak}` : ' '}
-								</div>
-							</CardContent>
-						</Card>
+							<div className="flex flex-wrap items-baseline gap-x-1.5">
+								<span className="type-numeral text-foreground">
+									{canViewWorkoutHistory ? currentStreak : '—'}
+								</span>
+								{canViewWorkoutHistory ? (
+									<span className="type-data text-ink-3">days</span>
+								) : null}
+							</div>
+							<span className="type-body-sm text-ink-3">
+								{canViewWorkoutHistory ? `Personal Best: ${bestStreak}` : ' '}
+							</span>
+						</div>
 
-						<Card className="bg-gradient-to-br from-card to-card/50 border-border/40 shadow-sm relative overflow-hidden group sm:col-span-2">
-							<div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-10 transition-opacity duration-300">
-								<Activity className="h-24 w-24 text-blue-500" />
+						<div className="col-span-2 flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
+							<div className="flex items-center gap-2 text-ink-3">
+								<Activity className="h-4 w-4 shrink-0" aria-hidden />
+								<span className="type-label">Volume Lifted Total</span>
 							</div>
-							<CardContent className="p-4 sm:p-5 flex flex-col justify-between h-full">
-								<div className="flex items-center justify-between mb-2">
-									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-										Volume Lifted Total
+							<div className="flex flex-wrap items-baseline gap-x-1.5">
+								<span className="type-numeral text-foreground">
+									{canViewWorkoutHistory ? volumeLabel : '—'}
+								</span>
+								{canViewWorkoutHistory ? (
+									<span className="type-data text-ink-3">
+										{getWeightUnitLabel(weightUnit)}
 									</span>
-									<Activity className="h-4 w-4 text-blue-500" />
-								</div>
-								<div className="flex items-end gap-2">
-									<div className="text-3xl font-bold heading-classical">
-										{canViewWorkoutHistory ? volumeLabel : '—'}
-									</div>
-									{canViewWorkoutHistory ? (
-										<div className="text-sm text-muted-foreground mb-1 font-medium">
-											{getWeightUnitLabel(weightUnit)}
-										</div>
-									) : null}
-								</div>
-							</CardContent>
-						</Card>
+								) : null}
+							</div>
+						</div>
 					</div>
 
-					<Card className="border-border/40 bg-card/30 backdrop-blur-sm shadow-sm p-6 overflow-hidden relative">
-						<div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/[0.01] to-transparent pointer-events-none"></div>
-						<h3 className="text-lg font-semibold heading-classical mb-6 flex items-center gap-2">
-							<Trophy className="h-5 w-5 text-primary" /> Personal Records
-						</h3>
-
-						<div className="space-y-4">
-							{!canViewRecords || personalRecords.length === 0 ? (
-								<p className="text-muted-foreground text-sm">
-									{!canViewRecords
-										? 'Personal records are private.'
-										: isOwnProfile
-											? 'Log a few sets and your records will show up here.'
-											: 'No personal records yet.'}
-								</p>
-							) : (
-								personalRecords.map(record => (
+					{/* §11.5: records are a ruled list, not a translucent panel of
+					    hover-boxed rows. One honour mark for the section - records are
+					    exactly what gold means, but at most two per viewport (§4.3
+					    rule 3), matching the dashboard and the session recap. */}
+					<section>
+						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+							<Trophy className="h-4 w-4 text-honour" aria-hidden /> Personal
+							Records
+						</h2>
+						{!canViewRecords || personalRecords.length === 0 ? (
+							<p className="type-body-sm py-3 text-ink-3">
+								{!canViewRecords
+									? 'Personal records are private.'
+									: isOwnProfile
+										? 'Log a few sets and your records will show up here.'
+										: 'No personal records yet.'}
+							</p>
+						) : (
+							<div className="pt-1">
+								{personalRecords.map(record => (
 									<div
 										key={record.exerciseId}
-										className="flex gap-4 items-start p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50 group"
+										className="rule-row flex items-baseline justify-between gap-4 py-3"
 									>
-										<div className="h-10 w-10 rounded-full bg-background flex items-center justify-center border shadow-sm transition-colors duration-[var(--motion-fast)] ease-standard">
-											<Medal className="h-5 w-5 text-yellow-500" />
-										</div>
-										<div className="flex-1">
-											<h4 className="font-semibold text-sm">
+										<div className="min-w-0">
+											<h3 className="type-panel text-foreground">
 												{record.exerciseName}
-											</h4>
-											<p className="text-xs text-muted-foreground">
-												{formatWeight(record.weight, weightUnit)} for{' '}
-												{record.reps} reps · est. 1RM{' '}
-												{formatWeight(record.estimated1rm, weightUnit)}
+											</h3>
+											<p className="type-body-sm text-ink-3">
+												<span className="type-data text-ink-2">
+													{formatWeight(record.weight, weightUnit)}
+												</span>{' '}
+												for {record.reps} reps · est. 1RM{' '}
+												<span className="type-data text-ink-2">
+													{formatWeight(record.estimated1rm, weightUnit)}
+												</span>
 											</p>
 										</div>
-										<span className="text-xs text-muted-foreground whitespace-nowrap">
+										<span className="type-body-sm shrink-0 whitespace-nowrap text-ink-3">
 											{formatTimeAgo(record.achievedAt)}
 										</span>
 									</div>
-								))
-							)}
-						</div>
-					</Card>
+								))}
+							</div>
+						)}
+					</section>
 				</div>
 			</div>
 		</div>
@@ -540,10 +514,12 @@ function BodyMetric({
 }) {
 	return (
 		<div>
-			<dt className="text-xs uppercase tracking-wider text-ink-3">{label}</dt>
+			<dt className="type-label text-ink-3">{label}</dt>
 			<dd
 				className={
-					capitalize ? 'capitalize text-foreground' : 'text-foreground'
+					capitalize
+						? 'type-data capitalize text-foreground'
+						: 'type-data text-foreground'
 				}
 			>
 				{value ?? '—'}
@@ -566,28 +542,6 @@ function User(props: React.SVGProps<SVGSVGElement>) {
 		>
 			<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
 			<circle cx="12" cy="7" r="4" />
-		</svg>
-	)
-}
-
-function Medal(props: React.SVGProps<SVGSVGElement>) {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			{...props}
-		>
-			<path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15" />
-			<path d="M11 12 5.12 2.2" />
-			<path d="m13 12 5.88-9.8" />
-			<path d="M8 7h8" />
-			<circle cx="12" cy="17" r="5" />
-			<path d="M12 18v-2h-.5" />
 		</svg>
 	)
 }

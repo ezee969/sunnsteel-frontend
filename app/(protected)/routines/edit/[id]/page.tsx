@@ -280,7 +280,7 @@ export default function EditRoutinePage() {
 						Back to Routines
 					</Button>
 				</div>
-				<h1 className="type-section text-foreground">Edit Routine</h1>
+				<h2 className="type-section text-foreground">Edit Routine</h2>
 				<p className="type-body-sm mt-1 text-ink-3">
 					Update your workout routine step by step
 				</p>
