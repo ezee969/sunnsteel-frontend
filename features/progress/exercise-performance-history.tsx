@@ -12,7 +12,6 @@ import {
 	RefreshCw,
 	TrendingUp,
 } from 'lucide-react'
-import Link from 'next/link'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -186,12 +185,9 @@ function PerformanceSessionCard({
 				</div>
 
 				<Button variant="link" className="h-auto p-0" asChild>
-					<Link
-						href={'/workouts/sessions/' + session.sessionId}
-						prefetch={false}
-					>
+					<a href={'/workouts/sessions/' + session.sessionId}>
 						Open session recap
-					</Link>
+					</a>
 				</Button>
 			</div>
 		</article>
