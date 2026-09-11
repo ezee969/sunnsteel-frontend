@@ -1,4 +1,10 @@
 export type {
+	ExercisePerformanceHistoryQuery,
+	ExercisePerformanceHistoryResponse,
+	ExercisePerformancePrescription,
+	ExercisePerformanceSession,
+	ExercisePerformanceSet,
+	ExercisePerformanceSummary,
 	ExerciseStrengthSummary,
 	ExerciseStrengthTrendPoint,
 	ExerciseStrengthTrendQuery,

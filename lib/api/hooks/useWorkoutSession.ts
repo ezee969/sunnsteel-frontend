@@ -28,7 +28,11 @@ import {
 	WorkoutSessionRecap,
 	WorkoutSessionSummary,
 } from '../types/workout.type'
-import type { ExerciseStrengthTrendQuery } from '../types/workout-progress.type'
+import type {
+	ExercisePerformanceHistoryQuery,
+	ExercisePerformanceHistoryResponse,
+	ExerciseStrengthTrendQuery,
+} from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 import { useWorkoutAnalytics } from './useWorkoutAnalytics'
 
@@ -62,6 +66,17 @@ const qk = {
 			'workout',
 			'progress',
 			'strength',
+			params.exerciseId ?? null,
+			params.from ?? null,
+			params.to ?? null,
+		] as const,
+	exercisePerformance: (
+		params: Omit<ExercisePerformanceHistoryQuery, 'cursor' | 'limit'>,
+	) =>
+		[
+			'workout',
+			'progress',
+			'performance',
 			params.exerciseId ?? null,
 			params.from ?? null,
 			params.to ?? null,
@@ -113,11 +128,31 @@ export const useWorkoutProgress = () => {
 
 export const useExerciseStrengthTrend = (
 	params: ExerciseStrengthTrendQuery,
+	enabled = true,
 ) => {
 	const { session, isLoading } = useAuth()
 	return useQuery({
 		queryKey: qk.strengthTrend(params),
 		queryFn: () => workoutService.getStrengthTrend(params),
+		enabled: enabled && !isLoading && !!session,
+	})
+}
+
+export const useExercisePerformanceHistory = (
+	params: Omit<ExercisePerformanceHistoryQuery, 'cursor' | 'limit'>,
+	limit = 10,
+) => {
+	const { session, isLoading } = useAuth()
+	return useInfiniteQuery<ExercisePerformanceHistoryResponse>({
+		queryKey: qk.exercisePerformance(params),
+		queryFn: ({ pageParam }) =>
+			workoutService.getExercisePerformance({
+				...params,
+				cursor: (pageParam as string | undefined) ?? undefined,
+				limit,
+			}),
+		initialPageParam: undefined,
+		getNextPageParam: lastPage => lastPage.nextCursor,
 		enabled: !isLoading && !!session,
 	})
 }

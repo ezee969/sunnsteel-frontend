@@ -12,6 +12,8 @@ import {
 	WorkoutSessionSummary,
 } from '../types/workout.type'
 import {
+	ExercisePerformanceHistoryQuery,
+	ExercisePerformanceHistoryResponse,
 	ExerciseStrengthTrendQuery,
 	ExerciseStrengthTrendResponse,
 	WorkoutProgress,
@@ -63,6 +65,21 @@ export function buildStrengthTrendQueryString(
 	return query ? `?${query}` : ''
 }
 
+export function buildExercisePerformanceQueryString(
+	params: ExercisePerformanceHistoryQuery,
+): string {
+	const search = new URLSearchParams()
+	if (params.exerciseId) search.set('exerciseId', params.exerciseId)
+	if (params.from) search.set('from', params.from)
+	if (params.to) search.set('to', params.to)
+	if (params.cursor) search.set('cursor', params.cursor)
+	if (params.limit != null) {
+		search.set('limit', String(Math.min(params.limit, 30)))
+	}
+	const query = search.toString()
+	return query ? `?${query}` : ''
+}
+
 export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
@@ -79,6 +96,13 @@ export const workoutService = {
 	): Promise<ExerciseStrengthTrendResponse> =>
 		httpClient.get<ExerciseStrengthTrendResponse>(
 			`${WORKOUTS_API_URL}/progress/strength${buildStrengthTrendQueryString(params)}`,
+			true,
+		),
+	getExercisePerformance: (
+		params: ExercisePerformanceHistoryQuery,
+	): Promise<ExercisePerformanceHistoryResponse> =>
+		httpClient.get<ExercisePerformanceHistoryResponse>(
+			`${WORKOUTS_API_URL}/progress/performance${buildExercisePerformanceQueryString(params)}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
