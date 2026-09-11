@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildSessionsQueryString, MAX_SESSIONS_LIMIT } from './workoutService'
+import {
+	buildExercisePerformanceQueryString,
+	buildSessionsQueryString,
+	MAX_SESSIONS_LIMIT,
+} from './workoutService'
 
 /**
  * Contract tests against the backend's `ListSessionsDto`.
@@ -64,5 +68,33 @@ describe('buildSessionsQueryString', () => {
 		expect(params.get('cursor')).toBe('c1')
 		expect(params.get('limit')).toBe('5')
 		expect(params.get('sort')).toBe('finishedAt:desc')
+	})
+})
+
+describe('exercise performance history contract', () => {
+	it('serialises the exercise, range and cursor used by pagination', () => {
+		const query = buildExercisePerformanceQueryString({
+			exerciseId: 'exercise-1',
+			from: '2026-01-01T00:00:00.000Z',
+			to: '2026-03-01T00:00:00.000Z',
+			cursor: 'session-1',
+			limit: 10,
+		})
+		const params = new URLSearchParams(query)
+		expect(params.get('exerciseId')).toBe('exercise-1')
+		expect(params.get('from')).toBe('2026-01-01T00:00:00.000Z')
+		expect(params.get('to')).toBe('2026-03-01T00:00:00.000Z')
+		expect(params.get('cursor')).toBe('session-1')
+		expect(params.get('limit')).toBe('10')
+	})
+
+	it('caps the page size at the backend DTO maximum', () => {
+		expect(buildExercisePerformanceQueryString({ limit: 100 })).toBe(
+			'?limit=30',
+		)
+	})
+
+	it('omits a bare question mark for the initial default exercise read', () => {
+		expect(buildExercisePerformanceQueryString({})).toBe('')
 	})
 })

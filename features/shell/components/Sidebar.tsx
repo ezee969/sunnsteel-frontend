@@ -85,7 +85,8 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Progress',
 		icon: TrendingUp,
 		classicalName: 'compass',
-		disabled: true,
+		href: '/progress',
+		disabled: false,
 	},
 	{
 		id: 'exercises',
