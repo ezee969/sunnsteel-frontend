@@ -14,12 +14,15 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
+import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
+	useMuscleGroupHeatmap,
 } from '@/lib/api/hooks/useWorkoutSession'
+import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
 import {
 	getStrengthDisplayPoints,
 	getStrengthTrendRange,
@@ -49,6 +52,7 @@ function ProgressLoading() {
 
 export default function ProgressPage() {
 	const [range, setRange] = useState<StrengthRange>('90D')
+	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
 	const [exerciseId, setExerciseId] = useState<string>()
 	const [rangeAnchor] = useState(() => new Date())
 	const historyParams = useMemo(
@@ -56,6 +60,7 @@ export default function ProgressPage() {
 		[exerciseId, range, rangeAnchor],
 	)
 	const history = useExercisePerformanceHistory(historyParams)
+	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
 	const historyPage = history.data?.pages[0]
 	const selectedExerciseId =
 		exerciseId ?? historyPage?.selectedExercise?.exerciseId
@@ -93,10 +98,22 @@ export default function ProgressPage() {
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
 			<HeroSection
-				title={<>Strength Progress</>}
+				title={<>Training Progress</>}
 				subtitle={
-					<>Follow record trends and review every performance behind them.</>
+					<>
+						See how your training is distributed, follow record trends, and
+						review every performance behind them.
+					</>
 				}
+			/>
+
+			<MuscleGroupHeatmap
+				data={muscleHeatmap.data}
+				weeks={heatmapWeeks}
+				isPending={muscleHeatmap.isPending}
+				isError={Boolean(muscleHeatmap.error)}
+				onWeeksChange={setHeatmapWeeks}
+				onRetry={() => void muscleHeatmap.retry()}
 			/>
 
 			<section className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">

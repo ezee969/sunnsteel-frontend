@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
 	buildExercisePerformanceQueryString,
+	buildMuscleGroupHeatmapQueryString,
 	buildSessionsQueryString,
 	MAX_SESSIONS_LIMIT,
 } from './workoutService'
@@ -96,5 +97,24 @@ describe('exercise performance history contract', () => {
 
 	it('omits a bare question mark for the initial default exercise read', () => {
 		expect(buildExercisePerformanceQueryString({})).toBe('')
+	})
+})
+
+describe('muscle-group heatmap contract', () => {
+	it('serialises the account time zone and bounded week count', () => {
+		const params = new URLSearchParams(
+			buildMuscleGroupHeatmapQueryString({
+				timeZone: 'Europe/Berlin',
+				weeks: 8,
+			}),
+		)
+		expect(params.get('timeZone')).toBe('Europe/Berlin')
+		expect(params.get('weeks')).toBe('8')
+	})
+
+	it('omits the optional week count without dropping the required zone', () => {
+		expect(
+			buildMuscleGroupHeatmapQueryString({ timeZone: 'America/New_York' }),
+		).toBe('?timeZone=America%2FNew_York')
 	})
 })

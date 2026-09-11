@@ -16,6 +16,8 @@ import {
 	ExercisePerformanceHistoryResponse,
 	ExerciseStrengthTrendQuery,
 	ExerciseStrengthTrendResponse,
+	MuscleGroupHeatmapQuery,
+	MuscleGroupHeatmapResponse,
 	WorkoutProgress,
 	WorkoutProgressQuery,
 } from '../types/workout-progress.type'
@@ -80,6 +82,14 @@ export function buildExercisePerformanceQueryString(
 	return query ? `?${query}` : ''
 }
 
+export function buildMuscleGroupHeatmapQueryString(
+	params: MuscleGroupHeatmapQuery,
+): string {
+	const search = new URLSearchParams({ timeZone: params.timeZone })
+	if (params.weeks != null) search.set('weeks', String(params.weeks))
+	return `?${search}`
+}
+
 export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
@@ -103,6 +113,13 @@ export const workoutService = {
 	): Promise<ExercisePerformanceHistoryResponse> =>
 		httpClient.get<ExercisePerformanceHistoryResponse>(
 			`${WORKOUTS_API_URL}/progress/performance${buildExercisePerformanceQueryString(params)}`,
+			true,
+		),
+	getMuscleGroupHeatmap: (
+		params: MuscleGroupHeatmapQuery,
+	): Promise<MuscleGroupHeatmapResponse> =>
+		httpClient.get<MuscleGroupHeatmapResponse>(
+			`${WORKOUTS_API_URL}/progress/muscles${buildMuscleGroupHeatmapQueryString(params)}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
