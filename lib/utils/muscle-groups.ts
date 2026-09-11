@@ -28,6 +28,7 @@ export const MUSCLE_GROUP_LABELS: Record<string, string> = {
 
 	// Core
 	CORE: 'Core',
+	ADDUCTOR: 'Adductors',
 }
 
 /**

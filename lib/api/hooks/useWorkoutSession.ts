@@ -32,6 +32,8 @@ import type {
 	ExercisePerformanceHistoryQuery,
 	ExercisePerformanceHistoryResponse,
 	ExerciseStrengthTrendQuery,
+	MuscleGroupHeatmapQuery,
+	MuscleGroupHeatmapResponse,
 } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 import { useWorkoutAnalytics } from './useWorkoutAnalytics'
@@ -80,6 +82,14 @@ const qk = {
 			params.exerciseId ?? null,
 			params.from ?? null,
 			params.to ?? null,
+		] as const,
+	muscleHeatmap: (params: MuscleGroupHeatmapQuery) =>
+		[
+			'workout',
+			'progress',
+			'muscles',
+			params.timeZone,
+			params.weeks ?? null,
 		] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
@@ -155,6 +165,34 @@ export const useExercisePerformanceHistory = (
 		getNextPageParam: lastPage => lastPage.nextCursor,
 		enabled: !isLoading && !!session,
 	})
+}
+
+export const useMuscleGroupHeatmap = (weeks = 8) => {
+	const { session, isLoading } = useAuth()
+	const analytics = useWorkoutAnalytics()
+	const timeZone =
+		analytics.data?.state === 'READY' ? analytics.data.timeZone : null
+	const params = { timeZone: timeZone ?? '', weeks }
+	const query = useQuery<MuscleGroupHeatmapResponse>({
+		queryKey: qk.muscleHeatmap(params),
+		queryFn: () => workoutService.getMuscleGroupHeatmap(params),
+		enabled: !isLoading && !!session && !!timeZone,
+	})
+	const bootstrapError =
+		analytics.error ??
+		(analytics.data?.state === 'FAILED'
+			? new Error('Analytics setup failed')
+			: null)
+	return {
+		...query,
+		isPending:
+			!bootstrapError &&
+			(analytics.isPending ||
+				analytics.data?.state === 'BUILDING' ||
+				query.isPending),
+		error: bootstrapError ?? query.error,
+		retry: bootstrapError ? analytics.retry : query.refetch,
+	}
 }
 
 export const useActiveSession = () => {
