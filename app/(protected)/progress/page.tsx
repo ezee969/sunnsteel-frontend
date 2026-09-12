@@ -136,7 +136,7 @@ export default function ProgressPage() {
 						Exercise
 					</label>
 					<Select
-						value={selectedExerciseId}
+						value={selectedExerciseId ?? ''}
 						onValueChange={setExerciseId}
 						disabled={!historyPage?.exercises.length}
 					>
