@@ -16,11 +16,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
+import { VolumeTrends } from '@/features/progress/volume-trends'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
+	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
 import {
@@ -29,6 +31,7 @@ import {
 	STRENGTH_RANGE_OPTIONS,
 	type StrengthRange,
 } from '@/lib/utils/strength-trend'
+import type { VolumeTrendWeeks } from '@/lib/utils/volume-trend'
 import {
 	formatWeightInput,
 	getWeightUnitLabel,
@@ -53,6 +56,7 @@ function ProgressLoading() {
 export default function ProgressPage() {
 	const [range, setRange] = useState<StrengthRange>('90D')
 	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
+	const [volumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>(8)
 	const [exerciseId, setExerciseId] = useState<string>()
 	const [rangeAnchor] = useState(() => new Date())
 	const historyParams = useMemo(
@@ -61,6 +65,7 @@ export default function ProgressPage() {
 	)
 	const history = useExercisePerformanceHistory(historyParams)
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
+	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const historyPage = history.data?.pages[0]
 	const selectedExerciseId =
 		exerciseId ?? historyPage?.selectedExercise?.exerciseId
@@ -114,6 +119,15 @@ export default function ProgressPage() {
 				isError={Boolean(muscleHeatmap.error)}
 				onWeeksChange={setHeatmapWeeks}
 				onRetry={() => void muscleHeatmap.retry()}
+			/>
+
+			<VolumeTrends
+				data={volumeTrend.data}
+				weeks={volumeWeeks}
+				isPending={volumeTrend.isPending}
+				isError={Boolean(volumeTrend.error)}
+				onWeeksChange={setVolumeWeeks}
+				onRetry={() => void volumeTrend.retry()}
 			/>
 
 			<section className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">

@@ -4,6 +4,7 @@ import {
 	buildExercisePerformanceQueryString,
 	buildMuscleGroupHeatmapQueryString,
 	buildSessionsQueryString,
+	buildVolumeTrendQueryString,
 	MAX_SESSIONS_LIMIT,
 } from './workoutService'
 
@@ -116,5 +117,16 @@ describe('muscle-group heatmap contract', () => {
 		expect(
 			buildMuscleGroupHeatmapQueryString({ timeZone: 'America/New_York' }),
 		).toBe('?timeZone=America%2FNew_York')
+	})
+})
+
+describe('volume trend contract', () => {
+	it('serialises the account time zone and bounded week count', () => {
+		expect(
+			buildVolumeTrendQueryString({
+				timeZone: 'Europe/Berlin',
+				weeks: 12,
+			}),
+		).toBe('?timeZone=Europe%2FBerlin&weeks=12')
 	})
 })

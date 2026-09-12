@@ -13,8 +13,13 @@ export type {
 	MuscleGroupHeatmapResponse,
 	MuscleGroupHeatmapValue,
 	MuscleGroupHeatmapWeek,
+	MuscleVolumeTrendSeries,
 	PersonalRecordEntry,
 	RecentActivityEntry,
+	VolumeTrendPoint,
+	VolumeTrendQuery,
+	VolumeTrendResponse,
+	VolumeTrendSeries,
 	WorkoutProgressResponse as WorkoutProgress,
 	WorkoutProgressQuery,
 } from '@sunsteel/contracts'

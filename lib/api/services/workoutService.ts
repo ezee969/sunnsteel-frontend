@@ -18,6 +18,8 @@ import {
 	ExerciseStrengthTrendResponse,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	VolumeTrendQuery,
+	VolumeTrendResponse,
 	WorkoutProgress,
 	WorkoutProgressQuery,
 } from '../types/workout-progress.type'
@@ -90,6 +92,12 @@ export function buildMuscleGroupHeatmapQueryString(
 	return `?${search}`
 }
 
+export function buildVolumeTrendQueryString(params: VolumeTrendQuery): string {
+	const search = new URLSearchParams({ timeZone: params.timeZone })
+	if (params.weeks != null) search.set('weeks', String(params.weeks))
+	return `?${search}`
+}
+
 export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
@@ -120,6 +128,11 @@ export const workoutService = {
 	): Promise<MuscleGroupHeatmapResponse> =>
 		httpClient.get<MuscleGroupHeatmapResponse>(
 			`${WORKOUTS_API_URL}/progress/muscles${buildMuscleGroupHeatmapQueryString(params)}`,
+			true,
+		),
+	getVolumeTrend: (params: VolumeTrendQuery): Promise<VolumeTrendResponse> =>
+		httpClient.get<VolumeTrendResponse>(
+			`${WORKOUTS_API_URL}/progress/volume${buildVolumeTrendQueryString(params)}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
