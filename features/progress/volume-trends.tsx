@@ -186,7 +186,7 @@ export function VolumeTrends({
 									{SCOPE_OPTIONS.find(option => option.value === scope)?.label}
 								</label>
 								<Select
-									value={selection?.id || undefined}
+									value={selection?.id ?? ''}
 									onValueChange={setSelectedId}
 									disabled={series.length === 0}
 								>
