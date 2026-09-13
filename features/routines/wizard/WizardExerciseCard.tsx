@@ -211,7 +211,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 					{isEditDropdownOpen && (
 						<div
 							ref={editDropdownRef}
-							className="absolute top-full right-2 z-[100] mt-1 w-[300px] rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 dark:shadow-none max-h-[400px]"
+							className="absolute top-full right-2 left-2 z-[100] mt-1 rounded-md sm:left-auto sm:w-[300px] border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 dark:shadow-none max-h-[400px]"
 						>
 							<div className="p-3 border-b">
 								<input
