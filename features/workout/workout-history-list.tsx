@@ -1,9 +1,11 @@
 import { useRouter } from 'next/navigation'
 import type { Ref } from 'react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
 import { cn } from '@/lib/utils'
+import { getHistoryEmptyState } from '@/lib/utils/empty-states'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 
 const getErrorMessage = (err: unknown): string => {
@@ -29,11 +31,16 @@ export interface WorkoutHistoryListProps {
 		fetchNextPage: () => void
 		sentinelRef: Ref<HTMLDivElement>
 	}
+	emptyState: {
+		hasActiveFilters: boolean
+		onClearFilters: () => void
+	}
 }
 
 export function WorkoutHistoryList({
 	data: { items, isLoading, isError, error },
 	pagination: { hasNextPage, isFetchingNextPage, fetchNextPage, sentinelRef },
+	emptyState: { hasActiveFilters, onClearFilters },
 }: WorkoutHistoryListProps) {
 	const router = useRouter()
 
@@ -59,9 +66,10 @@ export function WorkoutHistoryList({
 
 	if (items.length === 0) {
 		return (
-			<div className="type-body-sm py-6 text-ink-3">
-				No sessions found with the current filters.
-			</div>
+			<EmptyModule
+				{...getHistoryEmptyState(hasActiveFilters)}
+				onClearFilters={onClearFilters}
+			/>
 		)
 	}
 

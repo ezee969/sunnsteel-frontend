@@ -4,9 +4,12 @@ import { Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { getRecentActivityEmptyState } from '@/lib/utils/empty-states'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -19,7 +22,10 @@ export default function RecentActivity() {
 	const router = useRouter()
 	const weightUnit = useWeightUnit()
 	const { data } = useWorkoutProgress()
+	// Same key the dashboard gate already waits on, so this adds no request.
+	const { data: routines } = useRoutines()
 	const entries = data?.recentActivity ?? []
+	const hasRoutines = (routines?.length ?? 0) > 0
 
 	return (
 		// §11.5 — `ruled` is the default for a list: no fill, no box, a section
@@ -32,9 +38,7 @@ export default function RecentActivity() {
 			</h2>
 			<div className="pt-1">
 				{entries.length === 0 ? (
-					<p className="type-body-sm py-3 text-ink-3">
-						Finished workouts will appear here.
-					</p>
+					<EmptyModule {...getRecentActivityEmptyState(hasRoutines)} />
 				) : (
 					entries.map((entry, index) => (
 						<button

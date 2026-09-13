@@ -145,15 +145,18 @@ export function useWorkoutHistoryFilters(initialIsMobile: boolean) {
 		[status, routineId, from, to, debouncedQ, sort],
 	)
 
+	// Clearing returns to the same "All" default as a bare URL (TD-10). It used
+	// to reset status to COMPLETED, which left a status chip behind and could
+	// keep an empty result empty after "Clear filters" (DASH-10).
 	const handleClearAll = useCallback(() => {
-		setStatus('COMPLETED')
+		setStatus(undefined)
 		setRoutineId('')
 		setFrom('')
 		setTo('')
 		setQ('')
 		setSort('finishedAt:desc')
 		const next = buildParams({
-			status: 'COMPLETED',
+			status: undefined,
 			routineId: '',
 			from: '',
 			to: '',
