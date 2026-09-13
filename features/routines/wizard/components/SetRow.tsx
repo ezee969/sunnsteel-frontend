@@ -107,7 +107,7 @@ export function SetRow({
 
 	return (
 		<div
-			className={`bg-card border border-muted rounded-lg p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
+			className={`bg-card border border-muted rounded-md p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
 				isRemoving ? 'animate-out fade-out-0 duration-[140ms] ease-exit' : ''
 			}`}
 		>

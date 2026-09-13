@@ -49,10 +49,10 @@ interface ExerciseCardProps {
  */
 export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 	return (
-		<div className="border rounded-lg p-4 bg-card">
+		<div className="rounded-md border p-4 bg-card">
 			<div className="flex items-center justify-between mb-2">
 				<div className="flex items-center gap-2">
-					<h4 className="font-medium">
+					<h4 className="type-panel text-foreground">
 						{exercise.exercise?.name || 'Unknown Exercise'}
 					</h4>
 					{exercise.note && (
@@ -63,7 +63,7 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 									size="icon"
 									className="h-8 w-8 relative"
 								>
-									<FileText className="h-4 w-4 text-yellow-500" />
+									<FileText className="h-4 w-4 text-foreground" />
 									<span className="absolute top-0 right-0">
 										<svg
 											width="6"
@@ -72,20 +72,13 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 											fill="none"
 											xmlns="http://www.w3.org/2000/svg"
 										>
-											<circle
-												cx="4"
-												cy="4"
-												r="4"
-												fill="#FACC15"
-												stroke="#FFF"
-												strokeWidth="0"
-											/>
+											<circle cx="4" cy="4" r="4" className="fill-foreground" />
 											<text
 												x="4"
 												y="6"
 												textAnchor="middle"
 												fontSize="5"
-												fill="#FFF"
+												className="fill-background"
 												fontWeight="bold"
 											>
 												!
@@ -135,7 +128,7 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 								key={set.id || index}
 								className="text-sm flex items-center gap-2"
 							>
-								<span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs">
+								<span className="w-6 h-6 bg-muted flex items-center justify-center text-xs">
 									{index + 1}
 								</span>
 								<span>

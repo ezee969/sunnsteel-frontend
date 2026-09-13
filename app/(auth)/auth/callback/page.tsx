@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
+import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
@@ -34,7 +35,7 @@ function AuthCallbackContent() {
 	return (
 		<div className="flex min-h-screen items-center justify-center">
 			<div className="flex flex-col items-center space-y-4">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+				<ClassicalLoader size="lg" label="Completing authentication" />
 				<div className="text-center space-y-2">
 					<p className="text-lg font-medium">Completing authentication...</p>
 					<p className="text-sm text-muted-foreground">
@@ -52,7 +53,7 @@ export default function AuthCallback() {
 			fallback={
 				<div className="flex min-h-screen items-center justify-center">
 					<div className="flex flex-col items-center space-y-4">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+						<ClassicalLoader size="lg" label="Preparing authentication" />
 						<div className="text-center space-y-2">
 							<p className="text-lg font-medium">Loading...</p>
 							<p className="text-sm text-muted-foreground">

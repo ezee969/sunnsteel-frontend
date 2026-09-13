@@ -77,7 +77,7 @@ export function ExerciseHeader({
 						<div className="flex-1 min-w-0">
 							<h4
 								className={cn(
-									'font-medium truncate',
+									'type-panel truncate',
 									expanded ? 'text-base sm:text-base' : 'text-sm sm:text-base',
 								)}
 							>
@@ -123,7 +123,7 @@ export function ExerciseHeader({
 					>
 						<ChevronsUpDown
 							className={cn(
-								'transition-transform duration-300 ease-in-out',
+								'transition-transform duration-[var(--motion-slow)] ease-standard',
 								expanded ? 'h-4 w-4 rotate-180' : 'h-3 w-3',
 							)}
 						/>

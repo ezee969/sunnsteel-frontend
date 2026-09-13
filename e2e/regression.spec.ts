@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 
 import type { Browser, Locator, Page, TestInfo } from '@playwright/test'
+import { USERNAME_PATTERN_SOURCE } from '@sunsteel/contracts'
 
 import { REGRESSION_WIDTHS, THEMES } from './capture-targets'
 import { expect, test as base } from './fixtures'
@@ -131,9 +132,13 @@ async function discoverIds(browser: Browser): Promise<Ids> {
 			await page.keyboard.press('Escape')
 		}
 
+		// Built from the contract's own pattern: a hand-written `[a-z0-9_]` stopped
+		// at the first hyphen of "codex-prof03-0909" and sent the members check to
+		// a profile that does not exist.
 		await page.goto('/profile', { waitUntil: 'networkidle' })
 		const text = await page.locator('main').innerText()
-		found.username = text.match(/@([a-z0-9_]{3,30})/)?.[1]
+		const username = new RegExp(`@(${USERNAME_PATTERN_SOURCE.slice(1, -1)})`)
+		found.username = text.match(username)?.[1]
 	} finally {
 		await context.close()
 	}
@@ -286,7 +291,11 @@ async function tabTo(
 				name: `${active.tagName.toLowerCase()} "${name}"`,
 			}
 		}, selector)
-		if (state && !state.inView) offscreen.push(state.name)
+		// `nextjs-portal` is Next's development indicator, injected by `next dev`
+		// and absent from a production build; it is tooling, not the app.
+		if (state && !state.inView && !state.name.startsWith('nextjs-portal')) {
+			offscreen.push(state.name)
+		}
 		if (state?.done) return { reached: true, offscreen }
 	}
 	return { reached: false, offscreen }
@@ -333,12 +342,15 @@ async function expectDrawerClosed(page: Page) {
  * `align="end"`), inside the viewport; Escape closes it and returns focus.
  */
 async function checkMenu(page: Page, trigger: Locator, label: string) {
+	// Measured before opening: an open Radix menu marks everything outside it
+	// `aria-hidden`, so a role-based locator for the trigger finds nothing until
+	// the menu closes. Opening a menu does not move its trigger.
+	const t = await box(trigger, `${label} trigger`)
 	await trigger.click()
 	const menu = page.getByRole('menu')
 	await expect(menu, `${label} did not open`).toBeVisible()
 	await expectWithinViewport(page, menu, label)
 
-	const t = await box(trigger, `${label} trigger`)
 	const m = await box(menu, label)
 	const below = m.y - (t.y + t.height)
 	const above = t.y - (m.y + m.height)
@@ -803,11 +815,12 @@ for (const width of REGRESSION_WIDTHS) {
 			await page.keyboard.press('ArrowDown')
 			const item = page.locator('[role="menuitem"]:focus')
 			await expect(item).toHaveCount(1)
-			expect
-				.soft(
-					paintsShadow((await focusStyle(item)).shadow),
-					'the focused menu item has no ring',
-				)
+			// Polled: Radix moves the highlight on the keydown, and the computed
+			// style is read a frame later on a slow dev server.
+			await expect.soft
+				.poll(async () => paintsShadow((await focusStyle(item)).shadow), {
+					message: 'the focused menu item has no ring',
+				})
 				.toBe(true)
 			await page.keyboard.press('Escape')
 			await expect(trigger).toBeFocused()

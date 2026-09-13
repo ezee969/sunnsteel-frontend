@@ -187,23 +187,6 @@
     @apply bg-background text-foreground transition-colors;
     transition-duration: var(--motion-slow);
   }
-  /* Strong heading style using Bebas Neue.
-     v1.0 §5.5: this flattens four ranks into one texture and is replaced by the
-     `.type-*` classes below. It cannot be re-pointed in one edit without
-     changing every heading in the app at once, so it stays until the LAST
-     Phase 8 batch - a class beats an element selector, so a migrated heading
-     wins while an unmigrated one keeps working. This is the only deliberate
-     transitional overlap in the system. */
-  h1,
-  h2,
-  h3,
-  h4,
-  .heading-classical {
-    font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: 0.05em;
-    font-weight: 400;
-    text-transform: uppercase;
-  }
   /* Make interactive elements clearly clickable */
   button,
   [role='button'],
@@ -223,11 +206,13 @@
 }
 
 @layer components {
-  /* Type ranks (v1.0 §5.2). Classes, not element selectors, so a migrated
-     heading beats the global `h1`-`h4` Bebas rule on specificity while an
-     unmigrated one keeps working. Only loaded weights are used: Cinzel ships
-     600 and 900, Bebas Neue 400, Space Mono 400 and 700. Asking for an absent
-     weight synthesises silently. */
+  /* Type ranks (v1.0 §5.2). Classes, not element selectors: heading level is
+     document structure and rank is appearance, so the two stay independent.
+     The global `h1`-`h4` Bebas rule these replaced was deleted in Phase 15
+     (§5.5), once every heading carried a rank — a heading without one now
+     falls back to the body face, not to Bebas. Only loaded weights are used:
+     Cinzel ships 600 and 900, Bebas Neue 400, Space Mono 400 and 700. Asking
+     for an absent weight synthesises silently. */
   .type-page {
     font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
     font-weight: 600;

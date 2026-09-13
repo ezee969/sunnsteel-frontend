@@ -211,7 +211,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h3 className="text-lg font-medium mb-4">
+				<h3 className="type-section mb-4 text-foreground">
 					Build Your Training Days
 					<span className="text-destructive ml-1">*</span>
 				</h3>

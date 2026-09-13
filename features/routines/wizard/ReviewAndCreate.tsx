@@ -159,8 +159,8 @@ export function ReviewAndCreate({
 				</Button>
 			</div>
 
-			<div className="bg-muted/50 p-4 rounded-lg">
-				<h4 className="font-medium mb-2">What happens next?</h4>
+			<div className="bg-muted/50 p-4 rounded-md">
+				<h4 className="type-panel mb-2 text-foreground">What happens next?</h4>
 				<ul className="text-sm text-muted-foreground space-y-1">
 					<li>
 						• Your routine will be saved and available in your routines list

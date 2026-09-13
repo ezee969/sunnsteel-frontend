@@ -25,7 +25,7 @@ export default function WorkoutSessionLoading() {
 					<Skeleton className="h-4 w-20" />
 					<Skeleton className="h-4 w-16" />
 				</div>
-				<Skeleton className="h-2 w-full rounded-full" />
+				<Skeleton className="h-2 w-full" />
 			</div>
 
 			{/* Session Controls */}
@@ -62,7 +62,7 @@ export default function WorkoutSessionLoading() {
 							{Array.from({ length: 3 }).map((_, j) => (
 								<div
 									key={j}
-									className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg"
+									className="flex items-center gap-4 p-3 bg-muted/50 rounded-md"
 								>
 									<div className="flex-1 grid grid-cols-3 gap-4">
 										<div>
@@ -78,7 +78,7 @@ export default function WorkoutSessionLoading() {
 											<Skeleton className="h-8 w-12" />
 										</div>
 									</div>
-									<Skeleton className="h-8 w-8 rounded" />
+									<Skeleton className="h-8 w-8 rounded-md" />
 								</div>
 							))}
 						</CardContent>

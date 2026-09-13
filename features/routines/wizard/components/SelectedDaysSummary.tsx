@@ -15,8 +15,8 @@ export const SelectedDaysSummary = ({
 	trainingDays,
 	dayInfos,
 }: SelectedDaysSummaryProps) => (
-	<div className="bg-muted/50 p-3 md:p-4 rounded-lg">
-		<h4 className="font-medium text-sm md:text-base mb-2 md:mb-3">
+	<div className="bg-muted/50 p-3 md:p-4 rounded-md">
+		<h4 className="type-panel mb-2 text-foreground md:mb-3">
 			Selected Training Days ({formatDaysPerWeek(trainingDays.length)})
 		</h4>
 		<div className="relative min-h-[56px] md:min-h-[28px]">
@@ -38,7 +38,7 @@ export const SelectedDaysSummary = ({
 						key={day.id}
 						variant="secondary"
 						className={cn(
-							'w-full text-center text-xs md:text-sm px-1 py-1 transition-opacity duration-300',
+							'w-full text-center text-xs md:text-sm px-1 py-1 transition-opacity duration-[var(--motion-slow)] ease-standard',
 							trainingDays.includes(day.id) ? 'opacity-100' : 'opacity-0',
 						)}
 					>

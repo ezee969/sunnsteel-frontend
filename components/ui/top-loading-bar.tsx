@@ -9,6 +9,11 @@ interface TopLoadingBarProps {
 	className?: string
 }
 
+/**
+ * An indeterminate loading bar. Ink on a square track, pulsing with the motion
+ * spec's `pulse-opacity` (§4: its keyframe inventory is closed). It used to be
+ * a gold hex gradient sliding on a keyframe of its own.
+ */
 export const TopLoadingBar: React.FC<TopLoadingBarProps> = ({
 	show,
 	className,
@@ -24,32 +29,7 @@ export const TopLoadingBar: React.FC<TopLoadingBarProps> = ({
 			role="status"
 			aria-live="polite"
 		>
-			<div className="relative w-full h-full bg-transparent">
-				<div
-					className={cn(
-						'absolute left-0 top-0 h-0.5',
-						'bg-gradient-to-r from-[#FFD700] via-[#B8860B] to-[#FFD700]',
-						'animate-[loadingBar_1.1s_ease-in-out_infinite]',
-					)}
-					style={{ width: '35%' }}
-				/>
-			</div>
-			<style jsx>{`
-				@keyframes loadingBar {
-					0% {
-						transform: translateX(-50%);
-						opacity: 0.7;
-					}
-					50% {
-						transform: translateX(90%);
-						opacity: 1;
-					}
-					100% {
-						transform: translateX(150%);
-						opacity: 0.7;
-					}
-				}
-			`}</style>
+			<div className="animate-pulse-opacity h-full w-full bg-primary" />
 		</div>
 	)
 }

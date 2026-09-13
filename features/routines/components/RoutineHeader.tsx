@@ -36,14 +36,16 @@ export const RoutineHeader = ({
 }: RoutineHeaderProps) => {
 	return (
 		<div className="space-y-6">
-			{/* Navigation and Actions */}
-			<div className="flex items-center justify-between">
+			{/* Navigation and Actions. TD-35: both rows wrap. Unwrapped, the three
+			    labelled actions pushed <main> to 551px at 320 and 563px at 768,
+			    where the shell leaves this column 512px (viewport - 256). */}
+			<div className="flex flex-wrap items-center justify-between gap-2">
 				<Button variant="ghost" size="sm" onClick={onBack}>
 					<ArrowLeft className="h-4 w-4 mr-2" />
 					Back to Routines
 				</Button>
 
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<Button
 						variant="outline"
 						size="sm"
@@ -51,7 +53,7 @@ export const RoutineHeader = ({
 						disabled={isToggling}
 					>
 						<Heart
-							className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-red-500' : ''}`}
+							className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-foreground' : ''}`}
 						/>
 						{routine.isFavorite ? 'Unfavorite' : 'Favorite'}
 					</Button>
@@ -63,7 +65,7 @@ export const RoutineHeader = ({
 						disabled={isToggling}
 					>
 						<Check
-							className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-green-500' : ''}`}
+							className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-success' : ''}`}
 						/>
 						{routine.isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
 					</Button>
@@ -77,7 +79,7 @@ export const RoutineHeader = ({
 
 			{/* Title and Description */}
 			<div>
-				<h1 className="text-3xl font-bold mb-2">{routine.name}</h1>
+				<h1 className="type-page mb-2 text-foreground">{routine.name}</h1>
 				{routine.description && (
 					<p className="text-muted-foreground">{routine.description}</p>
 				)}

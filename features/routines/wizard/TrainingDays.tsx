@@ -28,7 +28,7 @@ export function TrainingDays({ data, onUpdate }: TrainingDaysProps) {
 	return (
 		<div className="space-y-4 md:space-y-6">
 			<div>
-				<h3 className="text-base md:text-lg font-medium mb-3 md:mb-4">
+				<h3 className="type-section mb-3 text-foreground md:mb-4">
 					Which days will you train?
 					<span className="text-destructive ml-1">*</span>
 				</h3>

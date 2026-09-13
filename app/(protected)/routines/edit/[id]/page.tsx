@@ -14,6 +14,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
+import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { Stepper } from '@/components/ui/stepper'
 // Step components — steps 3 and 4 are loaded on demand, see TD-09 and the
 // matching comment in routines/new/page.tsx.
@@ -179,7 +180,7 @@ export default function EditRoutinePage() {
 		if (isLoading) {
 			return (
 				<div className="flex flex-col items-center justify-center h-64 space-y-4">
-					<div className="h-12 w-12 animate-spin rounded-full border-2 border-rule-faint border-t-foreground"></div>
+					<ClassicalLoader size="lg" label="Loading routine data" />
 					<p className="type-body-sm text-ink-3">Loading routine data...</p>
 				</div>
 			)
@@ -203,7 +204,9 @@ export default function EditRoutinePage() {
 							/>
 						</svg>
 					</div>
-					<h3 className="text-lg font-medium">Error loading routine</h3>
+					<h3 className="type-section text-foreground">
+						Error loading routine
+					</h3>
 					<p className="text-muted-foreground max-w-md mx-auto">
 						{error.message ||
 							"We couldn't load the routine data. Please check your connection and try again."}

@@ -34,8 +34,13 @@ function AccordionTrigger({
 		<AccordionPrimitive.Header className="flex">
 			<AccordionPrimitive.Trigger
 				data-slot="accordion-trigger"
+				// The trigger is the text inside Radix's `<h3>` header, so it carries
+				// the heading's rank itself (§5.3, panel). Before Phase 15 the global
+				// `h1`-`h4` rule styled it Bebas; with that rule gone it fell back to
+				// the system face. No `text-*`/`font-*` beside the rank: utilities
+				// would override it.
 				className={cn(
-					'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-colors duration-[var(--motion-fast)] ease-standard outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:text-ink-3 [&[data-state=open]>svg]:rotate-180',
+					'type-panel focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-foreground transition-colors duration-[var(--motion-fast)] ease-standard outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:text-ink-3 [&[data-state=open]>svg]:rotate-180',
 					className,
 				)}
 				{...props}

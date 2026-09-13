@@ -17,14 +17,11 @@ export default function Error({
 	}, [error])
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center p-6 bg-black text-white">
-			<h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-			<Button
-				onClick={reset}
-				className="bg-gradient-to-r from-[#8B0000] to-[#B8860B]"
-			>
-				Try again
-			</Button>
+		<div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-foreground">
+			<h2 className="type-section mb-4 text-foreground">
+				Something went wrong!
+			</h2>
+			<Button onClick={reset}>Try again</Button>
 		</div>
 	)
 }

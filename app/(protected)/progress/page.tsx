@@ -170,9 +170,9 @@ export default function ProgressPage() {
 				<ProgressLoading />
 			) : history.isError && !history.data ? (
 				<div role="alert" className="border border-rule bg-surface p-6">
-					<h1 className="type-section text-foreground">
+					<h2 className="type-section text-foreground">
 						Progress is unavailable
-					</h1>
+					</h2>
 					<p className="type-body-sm mt-2 text-ink-3">
 						We could not load your exercise history. Try again.
 					</p>
@@ -188,9 +188,9 @@ export default function ProgressPage() {
 			) : !selectedPerformance ? (
 				<div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-rule bg-surface p-8 text-center">
 					<Dumbbell className="size-8 text-ink-3" aria-hidden />
-					<h1 className="type-section mt-4 text-foreground">
+					<h2 className="type-section mt-4 text-foreground">
 						No exercise history yet
-					</h1>
+					</h2>
 					<p className="type-body-sm mt-2 max-w-md text-ink-3">
 						Finish a session with at least one completed set to start building
 						your progress history.
@@ -201,12 +201,12 @@ export default function ProgressPage() {
 					<section aria-labelledby="current-strength" className="space-y-3">
 						<div className="rule-row flex items-center gap-2 pb-2">
 							<TrendingUp className="size-4 text-honour" aria-hidden />
-							<h1
+							<h2
 								id="current-strength"
 								className="type-section text-foreground"
 							>
 								{selectedPerformance.exerciseName}
-							</h1>
+							</h2>
 						</div>
 					</section>
 

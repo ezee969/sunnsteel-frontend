@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { buttonVariants } from '@/components/ui/button'
+
 export default function GlobalError({
 	error,
 	reset,
@@ -17,15 +19,12 @@ export default function GlobalError({
 
 	return (
 		<html lang="es">
-			<body className="min-h-screen flex flex-col items-center justify-center p-6 text-center gap-4 bg-black text-white">
-				<h2 className="text-2xl font-bold">Something went wrong</h2>
-				<p className="text-sm text-white/70 max-w-md break-words">
+			<body className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6 text-center text-foreground">
+				<h2 className="type-section text-foreground">Something went wrong</h2>
+				<p className="type-body-sm max-w-md break-words text-ink-2">
 					{error.message || 'A critical error occurred.'}
 				</p>
-				<button
-					onClick={() => reset()}
-					className="px-4 py-2 rounded-md bg-[linear-gradient(to_right,#B8860B,#8B0000)] text-white"
-				>
+				<button onClick={() => reset()} className={buttonVariants()}>
 					Try again
 				</button>
 			</body>

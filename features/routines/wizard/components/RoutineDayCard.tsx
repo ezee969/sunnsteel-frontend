@@ -36,7 +36,7 @@ export function RoutineDayCard({
 
 	return (
 		<Card key={day.dayOfWeek} className="border rounded-md p-3">
-			<h4 className="font-medium mb-2 flex items-center justify-between">
+			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
 				{displayName}
 				<Badge variant="outline">{day.exercises.length} exercises</Badge>
 			</h4>

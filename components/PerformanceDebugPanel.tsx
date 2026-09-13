@@ -31,22 +31,27 @@ export function PerformanceDebugPanel() {
 	if (!shouldShow) return null
 
 	return (
+		// TD-31: dev-only, but on the system's tokens rather than a raw blue
+		// button over a black terminal. A `panel` (§11.5) in Space Mono, square
+		// to 2px, separated by its rule rather than a shadow (§8). Capped to the
+		// viewport, so at 320 it no longer runs off the left edge.
 		<div className="fixed bottom-4 right-4 z-50">
 			<button
+				type="button"
 				onClick={() => setIsVisible(!isVisible)}
-				className="bg-blue-500 text-white px-3 py-2 rounded-lg shadow-lg text-xs font-mono hover:bg-blue-600 transition-colors"
+				className="type-data rounded-sm border border-rule bg-surface px-3 py-2 text-foreground transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 			>
 				{isVisible ? 'Hide' : 'Show'} Perf ({getMetrics().length})
 			</button>
 
 			{isVisible && (
-				<div className="mt-2 bg-black/90 text-green-400 p-4 rounded-lg shadow-lg max-w-md max-h-96 overflow-auto text-xs font-mono">
-					<div className="mb-2 border-b border-gray-600 pb-2">
-						<div>📊 Performance Metrics</div>
+				<div className="type-data mt-2 max-h-96 max-w-[calc(100vw-2rem)] overflow-auto rounded-sm border border-rule bg-surface p-4 text-foreground sm:max-w-md">
+					<div className="mb-2 border-b border-rule-faint pb-2">
+						<div className="type-label text-ink-3">📊 Performance Metrics</div>
 						<div>Avg First Fetch: {getAverageFirstFetch().toFixed(2)}ms</div>
 						<div>Total Metrics: {getMetrics().length}</div>
 					</div>
-					<pre className="whitespace-pre-wrap text-xs">
+					<pre className="type-data whitespace-pre-wrap text-ink-2">
 						{metrics || 'No metrics yet...'}
 					</pre>
 				</div>

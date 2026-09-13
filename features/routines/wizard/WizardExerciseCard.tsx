@@ -1,6 +1,7 @@
 'use client'
 
 import type { WeightUnit } from '@sunsteel/contracts'
+import { Loader2 } from 'lucide-react'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -184,8 +185,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 					{isEditDropdownOpen && (
 						<div
 							ref={editDropdownRef}
-							className="absolute top-full right-2 z-[100] mt-1 w-[300px] rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 dark:shadow-none"
-							style={{ maxHeight: '400px' }}
+							className="absolute top-full right-2 z-[100] mt-1 w-[300px] rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 dark:shadow-none max-h-[400px]"
 						>
 							<div className="p-3 border-b">
 								<input
@@ -201,7 +201,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							<div className="max-h-[200px] overflow-y-auto p-2">
 								{isExercisesLoading ? (
 									<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-										<span className="animate-spin">⏳</span>
+										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />
 										Loading...
 									</div>
 								) : filteredExercises.length > 0 ? (
@@ -234,14 +234,14 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 					)}
 				</div>
 				<CardContent
-					className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+					className={`overflow-hidden transition-[max-height] duration-[var(--motion-slow)] ease-standard ${
 						expanded ? 'max-h-[3000px]' : 'max-h-0'
 					}`}
 					aria-hidden={!expanded}
 				>
 					<div
 						id={controlsId}
-						className={`p-0 sm:p-1 transition-opacity duration-300 ease-in-out ${
+						className={`p-0 sm:p-1 transition-opacity duration-[var(--motion-slow)] ease-standard ${
 							expanded ? 'opacity-100' : 'opacity-0'
 						}`}
 					>

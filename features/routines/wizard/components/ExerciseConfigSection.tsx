@@ -67,7 +67,7 @@ export function ExerciseConfigSection({
 	}, [exercise.restSeconds, restFocused])
 
 	return (
-		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-lg space-y-2 sm:space-y-3">
+		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-md space-y-2 sm:space-y-3">
 			<RestTimeExerciseConfig
 				restInput={restInput}
 				setRestInput={setRestInput}

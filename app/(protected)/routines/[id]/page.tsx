@@ -1,9 +1,10 @@
 'use client'
 
-import { Calendar, Play } from 'lucide-react'
+import { Calendar, Loader2, Play } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
@@ -65,12 +66,12 @@ export default function RoutineDetailsPage() {
 	if (isLoading) {
 		return (
 			<div className="container mx-auto px-4 py-8">
-				<div className="animate-pulse space-y-6">
-					<div className="h-8 bg-muted rounded w-1/3"></div>
-					<div className="h-4 bg-muted rounded w-2/3"></div>
+				<div className="space-y-6">
+					<Skeleton className="h-8 w-1/3" />
+					<Skeleton className="h-4 w-2/3" />
 					<div className="space-y-4">
 						{[1, 2, 3].map(i => (
-							<div key={i} className="h-20 bg-muted rounded"></div>
+							<Skeleton key={i} className="h-20" />
 						))}
 					</div>
 				</div>
@@ -82,7 +83,7 @@ export default function RoutineDetailsPage() {
 		return (
 			<div className="container mx-auto px-4 py-8">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Routine not found</h1>
+					<h1 className="type-page mb-4 text-foreground">Routine not found</h1>
 					<Button onClick={() => router.push('/routines')}>
 						Back to Routines
 					</Button>
@@ -107,7 +108,7 @@ export default function RoutineDetailsPage() {
 			{/* Quick Start Section */}
 			{routine.days && routine.days.length > 0 && (
 				<div className="space-y-4">
-					<h2 className="text-xl font-semibold">Quick Start</h2>
+					<h2 className="type-section text-foreground">Quick Start</h2>
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 						{routine.days.map(day => {
 							const isToday = day.dayOfWeek === sessionManager.todayDow
@@ -144,7 +145,10 @@ export default function RoutineDetailsPage() {
 											{getDayName(day.dayOfWeek)}
 										</span>
 										{isLoadingThisDay && (
-											<div className="ml-auto h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+											<Loader2
+												className="ml-auto h-4 w-4 animate-spin"
+												aria-hidden
+											/>
 										)}
 										{!isLoadingThisDay && <Play className="h-4 w-4 ml-auto" />}
 									</div>
@@ -171,7 +175,7 @@ export default function RoutineDetailsPage() {
 			{/* Routine Days */}
 			{routine.days && routine.days.length > 0 && (
 				<div className="space-y-4">
-					<h2 className="text-xl font-semibold">Routine Days</h2>
+					<h2 className="type-section text-foreground">Routine Days</h2>
 					<RoutineDayAccordion
 						weightUnit={weightUnit}
 						days={routine.days}

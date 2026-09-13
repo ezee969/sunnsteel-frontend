@@ -198,7 +198,7 @@ export function RoutineCard({
 							}}
 							{...preloadOnHover('activeWorkoutSession')}
 						>
-							<span className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-current opacity-70 animate-pulse" />
+							<span className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-current opacity-70 animate-pulse-opacity" />
 							Resume
 						</Button>
 					) : (

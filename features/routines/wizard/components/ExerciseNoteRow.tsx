@@ -78,20 +78,13 @@ export function ExerciseNoteRow({
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
 									>
-										<circle
-											cx="4"
-											cy="4"
-											r="4"
-											fill="#FACC15"
-											stroke="#FFF"
-											strokeWidth="0"
-										/>
+										<circle cx="4" cy="4" r="4" className="fill-foreground" />
 										<text
 											x="4"
 											y="6"
 											textAnchor="middle"
 											fontSize="5"
-											fill="#FFF"
+											className="fill-background"
 											fontWeight="bold"
 										>
 											!

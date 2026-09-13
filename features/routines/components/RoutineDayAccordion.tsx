@@ -1,7 +1,7 @@
 'use client'
 
 import type { WeightUnit } from '@sunsteel/contracts'
-import { Calendar, Play } from 'lucide-react'
+import { Calendar, Loader2, Play } from 'lucide-react'
 
 import {
 	Accordion,
@@ -101,7 +101,7 @@ export const RoutineDayAccordion = ({
 									onClick={() => onStartWorkout(day.id)}
 								>
 									{isLoadingThisDay ? (
-										<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />
 									) : (
 										<>
 											<Play className="h-4 w-4 mr-1" />

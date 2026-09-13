@@ -92,7 +92,7 @@ export function SetListSection({
 					className="h-8 w-8 p-0"
 				>
 					<ChevronsUpDown
-						className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
+						className={`h-4 w-4 transition-transform duration-[var(--motion-slow)] ease-standard ${
 							setsExpanded ? 'rotate-180' : ''
 						}`}
 					/>

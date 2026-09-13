@@ -15,7 +15,17 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
 	{
-		ignores: ['.next/**', 'coverage/**', 'node_modules/**', 'next-env.d.ts'],
+		// Playwright's output folders are gitignored artifacts. Unignored, a lint
+		// run during `npm run ui:regression` crashed while globbing a folder the
+		// run was deleting.
+		ignores: [
+			'.next/**',
+			'coverage/**',
+			'node_modules/**',
+			'next-env.d.ts',
+			'test-results/**',
+			'playwright-report/**',
+		],
 	},
 	...compat.extends('next/core-web-vitals', 'next/typescript'),
 	// Turns off every stylistic rule inherited above that would fight Prettier.

@@ -12,8 +12,8 @@ interface RoutineSummaryStatsProps {
  */
 export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 	return (
-		<div className="rounded-lg border bg-card text-card-foreground p-4">
-			<h3 className="text-base font-semibold leading-none tracking-tight mb-3 text-center">
+		<div className="rounded-md border bg-card text-card-foreground p-4">
+			<h3 className="type-panel mb-3 text-center text-foreground">
 				Routine Summary
 			</h3>
 			<div className="flex justify-around text-center">

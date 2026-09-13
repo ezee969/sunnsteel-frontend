@@ -32,9 +32,13 @@ interface SetLogInputProps extends LogRowProps {
  * a11y review 1: 44px tall below `md`, where this row is touched mid-workout.
  * Final review 5 / v1.0 §10.2: capped at `--field-max` above it, so a two-digit
  * number is never stretched across a third of the screen at 1440.
+ *
+ * TD-35: below `sm` the field drops its side padding — it has no border and
+ * centres its value — which is what lets a five-character weight ("102.5") fit
+ * the weight column at 320.
  */
 const FIELD_CLASS =
-	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40'
+	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40'
 
 const FIELD_INVALID_CLASS = 'text-destructive ring-2 ring-destructive/50'
 
@@ -134,9 +138,16 @@ export const SetLogInput = ({
 				isCompletedState ? 'mark-success' : 'mark'
 			}`}
 		>
+			{/* TD-35: the fixed column minimums (46 + 62 + 72 + 48px) plus the
+			    checkbox column needed 273px, and at 320 this row has 228. Below `sm`
+			    the three field columns drop their minimums and size to their
+			    captions instead, and the weight column takes the larger share
+			    because it carries the longest value. The gap and the checkbox
+			    column's padding stay: together they keep the checkbox's 44px hit
+			    area clear of the RPE field. From `sm` nothing changes. */}
 			<div className="flex items-stretch justify-between gap-1 sm:gap-2">
 				{/* Set number & RIR */}
-				<div className="flex min-w-[46px] shrink-0 flex-col justify-center gap-0.5">
+				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px]">
 					<span
 						className={`type-label ${
 							isCompletedState ? 'text-success' : 'text-ink-3'
@@ -152,7 +163,7 @@ export const SetLogInput = ({
 				</div>
 
 				{/* Reps */}
-				<div className="flex min-w-[62px] flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1">
+				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[62px]">
 					<Input
 						type="number"
 						inputMode="numeric"
@@ -173,7 +184,7 @@ export const SetLogInput = ({
 				</div>
 
 				{/* Weight */}
-				<div className="flex min-w-[72px] flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1">
+				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[72px] sm:flex-1">
 					<Input
 						type="number"
 						inputMode="decimal"
@@ -197,7 +208,7 @@ export const SetLogInput = ({
 				{/* RPE (LIVE-04). Optional: the set log and the history view have
 				    always carried RPE, but nothing could enter it, so the history
 				    column was permanently empty. */}
-				<div className="flex min-w-[48px] flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1">
+				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[48px]">
 					<Input
 						type="number"
 						inputMode="decimal"

@@ -5,31 +5,293 @@ phase or implementation batch, per the plan's handoff protocol.
 
 ## Current Phase
 
-**Phase 13 (final corrections) complete.** Phase 14 (automated regression
-sweep) is next.
+**Phase 15 (styling cleanup) complete. The restyle plan's last phase is
+done;** what remains is listed under Next Task and needs the owner.
 
-All 30 points from the Phase 11 accessibility review and the Phase 12 final
-review have a recorded decision (see the Phase 13 section). **21 accepted in
-full, 6 accepted in part, 3 already fixed by earlier phases.** The partial ones
-reject seven specific asks, each with its reason in the log: the search
-combobox's keyboard contract, inert "Soon" sidebar items, their 10px label
-(written into §11.10), the six-column stat band (measured to overflow), removing
-the Today's Workouts panel (§11.5 keeps it), regrouping the set row's inputs,
-and moving the shell's active-session notice.
+The consistency pass found and removed the last off-system styling in live
+code, and deleted the one deprecated rule the system had kept on purpose. Counted
+over the Phase 1 audit's scope (`.tsx` under `app`, `components`, `features`,
+`hooks`, `lib`):
 
-Gates green with the dev server up: `npm run lint`, `npm run typecheck`,
-`npm test` (158 / 25 files). **No production build has been run against this
-phase** — the owner's dev server is up and they share `.next/`; CI is the
-confirmation, or `npm run verify` once the server is stopped.
+| Measure | Phase 1 | Before Phase 15 | Now, all files | Now, live code |
+| --- | --- | --- | --- | --- |
+| Hardcoded hex values | 22 | 22 | 9 | **2** |
+| `rgba()` literals | 26 | 20 | 16 | **0** |
+| Raw palette classes | 436 | 16 (+7 `black`/`white`) | 13 (+1) | **0** |
+| Distinct radius values | 9 | 11 | 8 | **5** |
+| Shadow values | the whole ladder, `xs`–`xl` + `inner` + 3 coloured | `overlay`, `none`, `xs` | same | **`overlay`, `none`** |
+| Files with inline `style={{ }}` | 14 | 13 | 11 | **7** |
 
-**Follow-up, same day:** `/workouts/history/[id]` — the one protected route no
-phase or review had covered (Findings 57) — is restyled onto the session
-screen's patterns. See the end of the Phase 13 section. TD-31 now holds only
-the splash and the dev-only debug panel.
+"Live code" excludes comment text and the thirteen files nothing imports
+(TD-32), which now hold every remaining `rgba()`, raw palette class, blur and
+non-token shadow in the source. They are **flagged, not deleted**, pending the
+owner's confirmation. The two live hex values are the theme's grounds in the
+browser `themeColor`, which metadata can only take as hex. The five radius
+values are `none`, `sm`, `md`, `full` and `[inherit]`. The seven inline styles
+all carry runtime values. The before and now columns come from one script and
+compare exactly; Phase 1 counted with its own scan, so that column compares in
+kind, not to the unit.
 
-Nothing is committed.
+`npm run ui:regression` on the routes Phase 15 changed passes: 43 of 43 (routine detail, routine edit, the wizard, dashboard, login and signup at 390/768/1440 in both themes, and navigation at every width), then routine detail again at all seven widths in both themes after the accordion fix, 14 of 14. `npm run verify` passes end to end on the final tree — lint, typecheck, 169 tests / 27 files and the production build — run in a throwaway worktree because the owner's dev server was up on this checkout; the compiled CSS no longer contains the heading rule, and every class Phase 15 introduced is present.
+
+**TD-32 is closed** (2026-09-13, on the owner's confirmation): the thirteen
+zero-importer files are deleted, with the two folders they left empty and the
+two dependencies only they imported — `react-day-picker` and
+`@radix-ui/react-popover`. Counted again over the Phase 1 scope, every file now matches live code: 2 hex values (the theme grounds in `themeColor`), 0 `rgba()`, 0 raw palette classes, 5 radius values, only `shadow-overlay` and `shadow-none`, and 7 files whose inline styles carry runtime values. The uninstall dropped the `@emnapi` lock
+entries TD-33 guards; the lock was rebuilt from the pre-uninstall one minus the
+removed packages, so those entries are unchanged. `npm run verify` passes end to end on the final tree, after a clean `npm ci` from the rebuilt lock (549 packages, five fewer).
+
+Committed state: nothing since `dc13b1f` is committed — the Phase 14 fixes and
+follow-ups, Phase 15 and every document change are in the working tree.
 
 ## Completed
+
+### Phase 15 — Styling cleanup
+
+A consistency pass over what the restyle touched, applying decisions v1.0 had
+already made — no new ones. Counted by a census script
+(`p15_count.mjs`, scratch) before and after, over every source `.tsx`, `.ts` and
+`.css`; the table in Current Phase holds the numbers.
+
+**Leftover colour, hex and gradients** — all in surfaces no batch had reached:
+
+- `app/(protected)/loading.tsx`, the protected route fallback, rendered the
+  parchment texture and the gold vignette on every navigation. Both removed; it
+  is skeletons on the ground.
+- The error boundaries: `login/error.tsx` was `bg-black` with a hex gradient
+  over the `Button`; `global-error.tsx` the same with a hand-rolled button. Both
+  are on the ground and ink, and use the Button's own variants.
+- Both loading bars: `top-progress-bar` (the shell's navigation bar) drew a gold
+  `rgba()` gradient with a glow, `top-loading-bar` a gold hex gradient sliding
+  on a keyframe outside the motion spec's closed inventory. Both are ink
+  (`bg-primary`, as `Progress` fills); the second pulses with the spec's own
+  `pulse-opacity`.
+- The note indicators in `ExerciseCard` and `ExerciseNoteRow` were a yellow hex
+  dot with a white "!"; they are ink on the ground, matching the note icon's own
+  ink.
+- `RoutineHeader`'s favourite and completion icons were `red-500` and
+  `green-500`; they are `foreground` and `success`, as on `RoutineCard`.
+- The browser `themeColor` and the web manifest said pure white and black; they
+  now carry the grounds from §4.1 and §4.2 (`#ede9e1`, `#0f0c08`).
+
+**The deprecated heading rule.** §5.5 scheduled the global `h1`–`h4` Bebas rule
+for deletion in the last Phase 8 batch; it survived six phases because 22
+headings still depended on it — the error boundaries, `not-found`, routine
+detail and the wizard's steps. Each now carries its §5.3 rank (`type-page`,
+`type-section`, `type-panel`, and `type-numeral` for the 404), with the size
+and weight utilities that would have overridden the rank removed, and the rule
+and its unused `.heading-classical` selector are deleted. A multi-line scan
+finds **no heading without a rank**. One heading the scan could not see was
+caught in the browser: Radix's accordion renders its own `<h3>`, and
+`AccordionTrigger` had no rank, so the routine detail's day headers fell back to
+the system face the moment the rule went. The primitive's trigger now carries
+`type-panel` (Findings 74).
+
+**Radii.** `rounded-lg` (8 sites) and bare `rounded` (3) compile to 4px, the
+same as `rounded-md` (§7.1 said Phase 15 would normalise them); `rounded-[2px]`
+is `rounded-sm`. No pixel moved. A progress skeleton lost its pill, a badge its
+circle, and three decorative medallions their circle and action-colour tint
+(§7, §4.3 rule 1).
+
+**One-off styles.** Four hand-rolled spinners became the loaders the app
+already uses (`Loader2` in controls, `ClassicalLoader` at page level); an
+emoji spinner went the same way; a hand-rolled `animate-pulse` skeleton became
+the `Skeleton` primitive; the four remaining error-page buttons became `Button`
+variants; four `duration-300` became `--motion-slow` (the same 300ms); one
+static inline `maxHeight` became a class; the stock `animate-pulse` on the
+active routine's dot became the spec's `pulse-opacity`.
+
+**Left on purpose:**
+
+- Three `rounded-full` uses that are not avatars, each an earlier phase's
+  decision: the `ClassicalLoader` ring, the scroll-area thumb, and
+  `RoutineCard`'s pulsing status dot.
+- Two gradients: the wizard's horizontal-scroll edge fades, `muted` to
+  transparent — an affordance, not an accent (§4.3 rule 6 governs accents).
+- Seven files with inline styles, all runtime values: widths and transforms
+  that track progress, the rest timer's `env(safe-area-inset-bottom)`, a
+  measured `maxHeight`, the sidebar's `--nav-pitch`, and an icon's size prop.
+- `rest-timer-bar`'s `ease-linear`: a countdown should move at constant speed.
+- `SHOW_QUICK_WORKOUT_ENTRY`, `handleStartEmptyWorkout` and the
+  `isStartingEmpty` branch — untouched.
+- The thirteen zero-importer files (TD-32) and `react-day-picker`, which only
+  `calendar.tsx` imports: flagged for the owner, not deleted.
+- The composition of four surfaces that are now token-clean but were never in
+  a batch — routine detail, the error boundaries and `not-found`, and two
+  loading skeletons that still sketch removed layouts. Recomposing them would
+  be a restyle batch, not cleanup: recorded as TD-38.
+- **The body face.** Unranked text computes to the system UI font, not the
+  Oswald §5.2 specifies (Findings 75). The fix is one class on `body`, but it
+  changes every unranked line on every screen, and every review so far approved
+  the current face — so it needs a capture review, not a cleanup commit.
+  Recorded as TD-39.
+
+**Verified:** `npm run ui:regression` on the routes Phase 15 changed passes: 43 of 43 (routine detail, routine edit, the wizard, dashboard, login and signup at 390/768/1440 in both themes, and navigation at every width), then routine detail again at all seven widths in both themes after the accordion fix, 14 of 14. Captures of the surfaces the sweep does not reach — `not-found`, routine detail, the wizard's first step and the auth callback, at 390 and 1440 in both themes — show no heading in Bebas except the 404 numeral, and no horizontal overflow. `npm run verify` passes end to end on the final tree — lint, typecheck, 169 tests / 27 files and the production build — run in a throwaway worktree because the owner's dev server was up on this checkout; the compiled CSS no longer contains the heading rule, and every class Phase 15 introduced is present.
+
+### Phase 14 — Automated regression sweep
+
+Extends the Phase 0 Playwright harness; no application file changed. Run with
+`npm run ui:regression` against a running dev server and backend, signed in
+(`npm run ui:login`).
+
+**What the sweep asserts** (`e2e/regression.spec.ts`, project `regression`):
+
+- **Layout — 16 routes x 7 widths x 2 themes = 224 checks.** No sideways
+  scroll on the document or on the shell's inner `<main>`, which is the real
+  scroll container, with the widest offenders named in the failure; no console
+  error or uncaught exception; content rendered; exactly one visible `h1`.
+  Routes: `/login`, `/signup` and `/members/<username>` signed out; dashboard,
+  routines, the wizard, routine detail and edit, workouts, history, a history
+  detail, the session screen (a finished session, rendered by id), progress,
+  profile, search and settings. Ids come from the seeded data at run time.
+- **Interactions, per width — 59 checks.** Navigation (five sidebar or drawer
+  destinations with `aria-current`, plus one through the account menu); the
+  mobile drawer (44px toggle, width, scrim, dismissal) and its close control;
+  the desktop sidebar's collapse and expand, including the content column's
+  offset; an alert dialog (the routine delete confirmation, dismissed by Escape
+  and by Cancel — Delete is never pressed) and a dialog (the plate calculator,
+  dismissed by Escape and by an outside click), each inside the 16px inset
+  (§11.9) with focus moved in; the account and routine menus (inside the
+  viewport, attached to and end-aligned with the trigger, Escape closes and
+  returns focus) and the header search suggestions; hover on a ruled row and a
+  sidebar item; keyboard focus in both themes — every Tab stop on screen, and
+  `:focus-visible` with a painted ring on the account trigger, the search field
+  and the highlighted menu item.
+- **Console, everywhere.** An automatic fixture watches every test's page,
+  interactions included: errors fail the test; warnings are recorded as
+  annotations.
+
+**Preconditions** (`e2e/preconditions.ts`, shared with the capture spec): a
+saved sign-in, a backend answering `/health`, an app that keeps the session — a
+bounce to `/login` is reported with the auth requests that caused it — and no
+live workout session (TD-34). The capture spec keeps one declared exception:
+`UI_SESSION_ID` set to the live session captures the session screen, and only
+that screen and `/login` may be captured in that run. The check writes the
+refreshed tokens back to `.auth/state.json`.
+
+**Results** — run 5, the full suite (57 minutes against the owner's dev
+server), plus a re-run of the two families whose harness defects were fixed
+after it:
+
+| Family | Checks | Pass | Fail | Cause |
+| --- | --- | --- | --- | --- |
+| Layout | 224 | 198 | 26 | TD-35 (12), TD-37 (14) |
+| Navigation | 7 | 7 | 0 | |
+| Mobile drawer | 3 | 3 | 0 | |
+| Drawer close control | 3 | 0 | 3 | TD-36 |
+| Desktop sidebar | 4 | 4 | 0 | |
+| Alert dialog | 7 | 7 | 0 | |
+| Dialog | 7 | 7 | 0 | |
+| Dropdowns | 7 | 7 | 0 | |
+| Hover | 7 | 7 | 0 | |
+| Keyboard focus | 14 | 8 | 6 | TD-36 (320–430, both themes) |
+| **Total** | **283** | **248** | **35** | |
+
+**Harness defects found and fixed during the phase.** Five, each a wrong
+measurement of the app rather than a wrong expectation of it — no assertion was
+loosened:
+
+1. The username pattern stopped at the first hyphen (`codex` for
+   `codex-prof03-0909`) and sent the members check to a profile that does not
+   exist. It is now built from the contract's `USERNAME_PATTERN_SOURCE`.
+2. A backend restart surfaced as "the saved session has expired", which cost
+   two runs. The precondition checks `/health` first and names the failing auth
+   request on a bounce (Findings 60).
+3. An open Radix menu marks the rest of the page `aria-hidden`, so the trigger's
+   role-based locator timed out — all seven dropdown checks (Findings 61). The
+   trigger is measured before the menu opens.
+4. `nextjs-portal`, `next dev`'s development indicator, was counted as an
+   off-screen Tab stop at every width (Findings 64). It is excluded as tooling a
+   production build does not have; the drawer's off-screen links still count.
+5. The highlighted menu item's ring was read once, a frame early on a slow dev
+   server. It is polled now.
+
+**The runs were taken against a moving tree.** The owner committed and merged
+mid-phase — `dc13b1f` took the first draft of this harness (and
+`.p14-probe.mjs`), `d345e72` bumped `@sunsteel/contracts` to 0.20.0 — which left
+`node_modules` stale twice (`npm ci` both times, the lock unchanged), and the
+owner's backend restarted under its file watcher several times. Runs 1, 2 and 4
+and one targeted re-run were stopped by that environment, not by the app.
+
+**Not done:** `npm run ui:capture:after` was not re-run — no UI changed.
+
+#### Follow-up — TD-35, TD-37 and the stray probe
+
+Requested by the owner after the phase closed. Every cause was **measured
+before anything was changed**, and two of the three recorded in TD-35 turned
+out to be wrong (Findings 66).
+
+- **`/routines/[id]`** — `RoutineHeader`'s navigation row ("Back to Routines"
+  plus Favorite, Mark Complete and Edit) could not wrap, pushing `<main>` to
+  551px at 320 and 563px against 512 at 768. Both of its rows wrap now. The
+  Quick Start day buttons, first blamed, were never involved.
+- **The session screen at 320** — the set row's fixed column minimums (46 + 62
+  + 72 + 48px, plus the 29px checkbox column and the gaps) needed 273px where
+  the row has 228. The 13px captions, first blamed, fit their columns. Below
+  `sm` the three field columns now size to their captions, the weight column
+  takes the larger share (`flex-[1.4]`), the set column needs 40px rather than
+  46, and the fields drop their side padding. Measured at 320: a five-character
+  weight needs 49px and the weight field has 53, still at 16px (TD-29); the
+  checkbox still catches a click 10px either side; the RPE field's edge hits
+  the field, not the checkbox's hit area. From `sm` the row is unchanged.
+- **The public members header at 320** — 353px for a 320 viewport. Below `sm`
+  the wordmark steps to 16px and the gaps and button padding tighten; the 44px
+  theme toggle keeps its target. It now ends at 304 with its padding intact.
+- **`/progress`** — three secondary `h1`s, not one: the selected exercise, and
+  the error and empty states the sweep had not reached. All three are `h2`,
+  with their classes unchanged, so nothing moved (Findings 54).
+- **`.p14-probe.mjs`** — deleted. It was a one-off console probe committed at
+  the repo root; its two checks (per-route console output, active-session
+  detection) are what `e2e/regression.spec.ts` and `e2e/preconditions.ts` now
+  do properly, and it was the only file failing lint.
+- **ESLint ignores** — `test-results/` and `playwright-report/` added. A lint
+  run during a regression run crashed while globbing a folder Playwright was
+  deleting (Findings 67).
+
+**Verified:** the targeted regression runs — members, routine detail, session
+and progress layouts at seven widths in both themes, plus both dialog checks on
+the session screen — 70 of 70; the measurements above; `npm run verify` as in
+Current Phase.
+
+#### Follow-up — TD-31: the splash and the debug panel
+
+Requested by the owner. The design system never mentions the splash, so it was
+brought onto the rules that are written down rather than onto a new direction.
+
+- **The splash** (`InitialLoadAnimation`) kept its photograph, its timing
+  (1200ms, 500ms exit) and its copy. Its ground is the theme's ground instead
+  of black. The type sits on an opaque `panel` (§11.5) instead of three
+  gradient scrims and a vignette (§4.3 rule 6, §11.5). The gold gradient
+  wordmark and laurel with their glows are ink (§4.3 rule 3, §8, §9.2), and the
+  screen's one pair of corner brackets replaces four amber corner frames and an
+  inner frame (§11.11). The progress track is square with an ink fill (§7), and
+  every entrance is an opacity fade: the rise, scale, spin, shimmer sweep and
+  floating particles are on the motion spec's prohibited list. The wordmark is
+  a `p`, not a second `h1`. `children` still mount on the first frame, and the
+  content wrapper's 0.98 scale is gone, so it animates opacity only, as the
+  `AGENTS.md` gotcha requires. `corner-accent.tsx` lost its only importer and
+  was deleted.
+- **The performance panel** is a `panel` in Space Mono with no shadow (§8)
+  instead of a blue button over a black terminal. It gained a visible keyboard
+  focus ring — before, the button's only shadow was the decorative
+  `shadow-lg` — and caps its width to the viewport below `sm`.
+
+**Verified**, by auditing each surface's rendered DOM:
+
+| Surface | Widths x themes | Raw classes before | After |
+| --- | --- | --- | --- |
+| Splash | 390, 768 x 2 (it renders only below 1024) | 27, plus 6 inline colour styles | 0, and 0 |
+| Performance panel | 390, 768, 1440 x 2 | 8 | 0 |
+
+At 320 the wordmark sits inside its panel and nothing scrolls sideways. The
+panel's focus ring is ink in light and the honour mark in dark, like the Button
+primitive's. The regression checks that load the splash — the dashboard, routines and workouts layouts at 320–768 in both themes, navigation at every width and the mobile drawer — pass, 34 of 34: one navigation check at 768 failed while a production build was loading the machine, and passed on an idle re-run. Lint, typecheck and 169 tests are green.
+
+The panel renders only when `NEXT_PUBLIC_SHOW_PERFORMANCE_PANEL=true` at
+dev-server start, so it was checked on a second dev server (port 3001) run from
+a throwaway worktree with that flag — the owner's server and `.env.local` were
+not touched. Turbopack could not build that worktree from the scratchpad
+(Findings 69).
 
 ### Phase 13 — Final corrections
 
@@ -1299,6 +1561,72 @@ Phase 15 with the other dead code. `progress`, `classical-loader`, `stepper`,
 through the `--ss-*` aliases, and the last three carry ~44 raw palette classes
 that v1.0 §12.4 schedules for their own pass.
 
+**TD-32 closure (after Phase 15).** 13 files and 2 folders deleted:
+`components/ui/popover.tsx`, `alert.tsx`, `calendar.tsx`,
+`components/InfoTooltip.tsx`, `components/backgrounds/` (`HeroBackdrop`,
+`OrnateCorners`, `ParchmentOverlay`, `GoldVignetteOverlay`),
+`app/(auth)/components/` (`BackgroundOverlay`, `ModernBrandHero`,
+`ModernBackground`), `dashboard/components/HeroCard.tsx` and `WorkoutItem.tsx`.
+`package.json` and `package-lock.json` lose `react-day-picker` and
+`@radix-ui/react-popover`; `../TECH_STACK.md` drops `react-day-picker` from its
+utilities line.
+
+**Phase 15 — styling cleanup.** 39 files, plus the docs:
+
+- `components/ui/accordion.tsx` — the trigger carries `type-panel`
+
+- Route surfaces: `app/(protected)/loading.tsx`, `app/(auth)/login/error.tsx`,
+  `app/global-error.tsx`, `app/error.tsx`, `app/not-found.tsx`, the four
+  segment `error.tsx` files, `app/(protected)/workouts/loading.tsx`,
+  `workouts/sessions/loading.tsx`, `app/(auth)/auth/callback/page.tsx`
+- Routine detail: `routines/[id]/page.tsx`, `RoutineHeader`,
+  `RoutineDayAccordion`, `ExerciseCard`; `RoutineCard` (one animation)
+- Primitives: `top-progress-bar`, `top-loading-bar`, `tabs`, `tooltip`
+- The wizard: `BuildDays`, `TrainingDays`, `ReviewAndCreate`,
+  `WizardExerciseCard`, `ExerciseConfigSection`, `ExerciseHeader`,
+  `ExerciseNoteRow`, `RoutineDayCard`, `RoutineSummaryStats`,
+  `SelectedDaysSummary`, `SetListSection`, `SetRow`;
+  `routines/edit/[id]/page.tsx`
+- `features/workout/session-loading-skeleton.tsx`
+- `app/globals.css` — the `h1`–`h4` Bebas rule and `.heading-classical`
+  deleted, and the comment above the type ranks corrected
+- `app/layout.tsx` (`themeColor`), `public/site.webmanifest`
+- `docs/roadmaps/technical-debt.md` — revision 12: TD-32 corrected, TD-38
+  recorded
+
+**Phase 14 follow-up — TD-31.** 4 files:
+
+- `features/initial-load-animation/InitialLoadAnimation.tsx` — the splash
+- `features/initial-load-animation/corner-accent.tsx` — deleted (no importer)
+- `components/PerformanceDebugPanel.tsx` — the panel
+- `docs/roadmaps/technical-debt.md` — revision 11: TD-31 closed
+
+**Phase 14 follow-up — TD-35, TD-37, the stray probe.** 7 files:
+
+- `features/workout/set-log-input.tsx` — the set row below `sm` (TD-35)
+- `features/routines/components/RoutineHeader.tsx` — rows wrap (TD-35)
+- `app/(public)/layout.tsx` — the public header below `sm` (TD-35)
+- `app/(protected)/progress/page.tsx` — three `h1`s to `h2` (TD-37)
+- `eslint.config.mjs` — Playwright's output folders ignored
+- `.p14-probe.mjs` — deleted
+- `docs/roadmaps/technical-debt.md` — revision 10: TD-35 and TD-37 closed
+
+**Phase 14 — automated regression sweep.** Test harness and documentation
+only; no application file changed.
+
+- `e2e/regression.spec.ts` (new) — the sweep
+- `e2e/preconditions.ts` (new) — shared run preconditions (TD-34)
+- `e2e/baseline.spec.ts` — uses the preconditions; the `UI_SESSION_ID` exception
+- `e2e/capture-targets.ts` — `REGRESSION_WIDTHS`, `ID_ENV`, the
+  `history-detail` target (`UI_HISTORY_ID`)
+- `playwright.config.ts` — per-project `testMatch`, the `regression` project
+- `package.json` — the `ui:regression` script
+- `docs/ui-restyle/capture-manifest.md` — precondition 5, the `history-detail`
+  row
+- `docs/roadmaps/technical-debt.md` — revision 9: TD-34 closed, TD-35 to TD-37
+  recorded
+- `../TECH_STACK.md` (outside the repository) — the Playwright line
+
 **Phase 13 follow-up — history detail page.** 6 files:
 `app/(protected)/workouts/history/[id]/page.tsx`,
 `features/workout/history-session-header.tsx`,
@@ -1561,6 +1889,105 @@ One tooling decision, which the plan requires before the baseline is frozen:
   screenshots, not for functional or component testing.
 
 ## Findings
+
+### New in Phase 15
+
+**70. A debt entry's "reachable only from dead files" was wrong, and only a
+count showed it.** TD-32 said the parchment and gold-vignette overlays were
+reachable only from other dead files. `app/(protected)/loading.tsx` — the
+protected shell's live route fallback — rendered both on every navigation. The
+census script flagged the hex and `rgba()` values; tracing them found the live
+importer. Lists assert, counts check.
+
+**71. The one deliberate transitional rule outlived its deletion date by six
+phases.** §5.5 kept the `h1`–`h4` Bebas rule alive so unmigrated headings would
+keep working, to be deleted in the last Phase 8 batch. Twenty-two headings still
+leaned on it — error boundaries, `not-found`, routine detail and the wizard's
+steps, none of which a batch had covered. A class-beats-element migration never
+forces its own last step; something has to count the stragglers.
+
+**72. Adding a rank to a heading is not enough when a size utility sits beside
+it.** `.type-*` lives in `@layer components` and Tailwind's `text-lg` in the
+utilities layer, which wins. Each ranked heading therefore had its old
+`text-*`/`font-*` classes removed, not just a rank added — otherwise the rank
+would have applied only its family.
+
+**73. Error boundaries are the surfaces no capture reaches.** They render only
+on failure, so every batch, review and sweep in this restyle passed them by; two
+of them still drew black grounds and hex gradients. Recorded with the other
+never-batched surfaces as TD-38.
+
+**74. A source scan cannot see headings a primitive renders.** The multi-line
+heading scan found zero unranked `<h1>`–`<h4>` in the source, and the browser
+still found one: Radix's `AccordionPrimitive.Header` emits an `<h3>` around the
+trigger. Checking computed fonts on rendered pages is what caught it. Dialog and
+alert-dialog titles were already ranked; the accordion was the only gap.
+
+**75. The body face has never reached the page.** `html`, `body` and every
+unranked paragraph compute to Tailwind's fallback stack — `--font-oswald` lives
+on `<body>` (where `next/font` puts it), preflight reads `--default-font-family`
+on `<html>`, and `@theme inline` does not emit that variable. Text with a
+`.type-*` class was always right, which is why sixteen phases of captures and
+two independent reviews did not notice. TD-39.
+
+### New in Phase 14
+
+**60. "The session expired" was never the cause.** Three runs stopped on a
+bounce to `/login`, and every one traced to the backend: a watcher restart makes
+`/auth/supabase/verify` fail, and the protected layout treats a failed
+verification as a sign-out (`error && !user`, TD-18). A context seeded from an
+access token five hours stale still refreshed with a 200. The redirect looks the
+same either way, which is why the precondition now names the request.
+
+**61. An open Radix menu hides everything else from role queries.**
+`DropdownMenu` is modal by default and marks the rest of the document
+`aria-hidden`; Playwright's `getByRole` honours that, so a locator for the
+trigger waits out the test while the menu is open. It cost seven checks and
+looked like a layout hang.
+
+**62. A pseudo-element hit area counts toward scroll width.** Phase 13 verified
+that the checkbox's `::after` catches a click 10px outside the box (Findings
+58); it did not check that the same 12px extension widens the scrollable area.
+At 320 the set row already ends 7px past the edge, and the hit area takes
+`<main>` to 338px (TD-35).
+
+**63. The mobile drawer's close button is unreachable by construction.**
+`Sidebar` renders it for `isSidebarOpen && isMobile`, and `use-sidebar` forces
+`isSidebarOpen` false on mobile. Nothing ever rendered it, so nothing ever
+flagged it; asserting on what the component intends did (TD-36).
+
+**64. `next dev` puts its own control in the tab order.** `nextjs-portal` is a
+Tab stop in development and absent in production. A keyboard sweep against the
+dev server must exclude it, or it reports an off-screen stop at every width.
+
+**65. `/routines/[id]` had never been loaded by any check.** It is not in the
+capture manifest, so no screenshot phase saw it; the sweep is the first thing to
+render it, and it overflows from 320 to 768 with pre-restyle classes still in
+place (TD-35).
+
+**66. Two of TD-35's three recorded causes were wrong.** The routine-detail
+overflow was blamed on the day buttons and the session overflow on Phase 13's
+13px captions; measurement found `RoutineHeader`'s unwrapping action row and the
+set row's fixed column minimums. Both guesses were plausible readings of the
+sweep's offender list, which names the widest elements, not the constraint that
+put them there. Measure the constraint before recording a cause.
+
+**67. Playwright's output folders can crash ESLint.** `eslint .` globbed
+`test-results/` while a regression run was deleting it and exited 2 with a
+filesystem error, not a lint result. Neither folder was in ESLint's ignores;
+both are now.
+
+**68. A rule cited in a code comment is not in the design system.**
+`HeroSection` says "v1.0 §1.4 retires the photographic hero", and the splash's
+restyle nearly removed its photographs on that authority. `ui-design-system.md`
+contains no such rule — its §1.4 mention is v0.1's bet on structure-carried
+identity. The splash kept its photographs and was brought onto the rules that
+are written down. Check a cited rule in the document before acting on it.
+
+**69. Turbopack cannot build from the scratchpad.** A dev server started in a
+worktree under the session's scratchpad directory panicked on every request:
+the path to one font's source map exceeded Windows' length limit. A worktree
+beside the repository (`sunsteel/.claude-wt/`) built normally.
 
 ### New in Phase 13
 
@@ -2177,10 +2604,9 @@ used — the TD-28 failure class — so it is left alone deliberately.
 
 ## Known Risks
 
-- **`npm run typecheck` is red on unrelated in-flight work** (Findings 32).
-  Nine `@sunsteel/contracts` export errors from `aaaace9`. No restyle file is
-  implicated, but `npm run verify` and CI stay red until the package is published
-  and bumped.
+- **TD-36 keeps nine regression checks red** until the drawer gets a
+  reachable close control and stops being tabbable while closed. That is a
+  behaviour change, so a restyle phase cannot close it.
 - **Check the served stylesheet immediately after any git operation on
   `globals.css`** — stash, pop, checkout, rebase. Finding 33 cost a sweep and a
   full capture run.
@@ -2188,13 +2614,9 @@ used — the TD-28 failure class — so it is left alone deliberately.
   not a `file:` link, so a bumped manifest with a stale `node_modules` shows up as
   type errors in files nobody edited (Findings 28, resolved). Check the dependency
   tree before blaming a diff.
-- **The app is mid-migration and will look wrong in places.** The palette is
-  global but 449 raw palette classes in 36 files still override it. v1.0 §12.4
-  predicted this intermediate state; it is the map for Phase 8, not a defect
-  list. Do not "fix" a screen outside its batch.
-- **`.auth/state.json` has expired.** Any capture run silently lands on `/login`
-  — the harness asserts against that, but re-run `npm run ui:login` before
-  trusting a Phase 8 batch screenshot.
+- **Only a 400 from Supabase's token endpoint means `.auth/state.json` has
+  expired** (`npm run ui:login`). A bounce with a failed verify is the backend
+  (Findings 60); the precondition says which.
 - **`.next/` contention has now cost work twice.** Phase 4 lost a capture run to a
   stale Turbopack compile after a `git stash`; Phase 6 opened with a dead dev
   server because a build ran while it was up. Both are documented in `AGENTS.md`
@@ -2205,12 +2627,8 @@ used — the TD-28 failure class — so it is left alone deliberately.
   served the old compile and `touch` did not invalidate it. Screenshots taken
   against it were plausible and wrong. Verify the served CSS after any git
   operation on that file.
-- **No production build has been run against this change.** The owner's dev
-  server is up and `npm run build` shares `.next/`, so the compiled-stylesheet
-  grep at `.next/static/css/*.css` is **outstanding**. Every new utility was
-  instead verified live, which is a stronger check per element (computed styles
-  on real nodes, plus a substring scan of the served stylesheet) but does not
-  cover the production CSS pipeline. CI will.
+- **The compiled-stylesheet check was run in Phases 14 and 15** against a
+  production build. Repeat it after any new variant or arbitrary value.
 - **A Tailwind variant that does not exist emits no CSS and no error**, and
   passes lint, typecheck and build. It caused TD-28 and TD-29. Any new breakpoint
   or variant must be verified against the compiled stylesheet at
@@ -2232,9 +2650,10 @@ used — the TD-28 failure class — so it is left alone deliberately.
   Same `.next/`; the running server then 500s on every route and the app goes
   black in a way that looks like an auth bug.
 
-- **No production build has run against Phase 13.** Lint, typecheck and tests
-  are green; the compiled-stylesheet check and `next build` need the dev server
-  stopped, or a clean CI run.
+- **A backend restart mid-run fails the regression sweep.** The preconditions
+  run once per worker; a watch-mode restart during a run signs the app out and
+  every later check fails. The failure names the request — re-run once the
+  backend is stable, and do not record it as a defect.
 - **Reported, not fixed** in Phase 13: the search suggestions' full combobox
   keyboard contract (a11y 6), making the sidebar's "Soon" items inert (a11y 13),
   and regrouping the session set row's inputs for desktop (final 5). Each needs
@@ -2251,49 +2670,26 @@ used — the TD-28 failure class — so it is left alone deliberately.
 - **`npm ci` cannot be validated from Windows** (Findings 51). `npm ci --dry-run`
   does not check the Linux-only optional-dependency branch, so a green local run
   proves nothing about CI.
-- **Five silent-failure instances found so far** — `xs:`, `honour-bright` x2,
-  `slide-in-bottom`, and a `group-hover:` with no `group` ancestor (Findings 43).
-  Four emitted nothing; the fifth emitted valid CSS that could never match. Check
-  that a rule *reaches* its element, not only that the class exists.
-- **The capture harness does not enforce its own preconditions.** An active
-  session changes `/workouts`, `/routines` and the dashboard, and one Batch 4
-  capture run was taken during one (Findings 46). Check for an active session
-  before trusting a comparison — especially before Phase 12.
-- **`session-action-card.tsx` still references `honour-bright`**, the last of the
-  two. The session screen is §14 work, not a Phase 8 batch.
+- **The sweep is slow against `next dev`** — 57 minutes for 283 checks while
+  the owner was working on the same machine. Use `--grep` to re-run a family.
 - **A destructive confirmation is dominant by construction** (Findings 44).
   §4.3 rule 5, §11.9's "never dominant" and §11.9's "both full width when
   stacked" cannot all be satisfied at 390. Do not resolve it at a call site.
-- **Four undefined classes have now been found in this codebase** — `xs:`,
-  `honour-bright` (x2) and `slide-in-bottom`. Grep the served CSS for any class
-  that is not obviously Tailwind's own before trusting or preserving it.
 - **The stepper's horizontal layout needs `lg`, not `sm`.** At 768 the shell's
   main column is 512px. Do not move it back (Findings 39).
-- **`toast` still carries ~19 raw palette classes**, plus `rounded-xl`,
-  `backdrop-blur-md` and `shadow-lg`. §12.4 scheduled it with the Phase 7
-  primitives and Phase 7 skipped it; it is a Batch 4 surface (§8 names toasts as
-  one of the three things `--shadow-overlay` applies to).
-- **The two auth screens are still entirely off-palette** — §12.4 calls them a
-  self-contained batch, outside the protected shell and sharing no components
-  with it. `ModernBackground`'s blurred amber blobs and `(auth)/layout.tsx`'s
-  gradient-clipped wordmark are the largest remaining §4.3 rule 6 violations.
-- **The profile page has not been through any batch** and still carries
-  `bg-card/50 backdrop-blur-sm`, a gradient avatar halo and `group-hover:scale-110`.
-- **`honour-bright` is not a token** and two session-screen files still reference
-  it (Findings 36). They render in the wrong colour without erroring. Fix them in
-  the session batch, and grep the whole tree for other v0.1/direction-document
-  names before trusting any of them.
 - **`ClassicalLoader` is no longer gold**, by rule (§4.3 rule 3). If the owner
   wants the gold spinner back, that is a v1.0 amendment and should be recorded as
   one — not reverted quietly in a later batch.
 - **`--surface-sunk` cannot be used as a well on `--background`** (Findings 35).
   Later batches converting `panel` surfaces to `ruled` will hit this.
-- **`OrnateCorners`, `HeroBackdrop`, `HeroCard` and `WorkoutItem` now have zero
-  importers**, joining `popover` and `alert` as Phase 15 deletion candidates.
-  `HeroCard` and `WorkoutItem` were restyled, not deleted, on purpose.
-- **The history and search pages cap content at `max-w-3xl` / `max-w-6xl`**, not
-  at `--content-max` via `.ledger-page`. §10's container rules are not applied
-  anywhere yet; `.ledger-page` still has zero consumers.
+- **`npm install` or `uninstall` on Windows drops the `@emnapi` lock entries**
+  (TD-33) — it happened again when TD-32's dependencies were removed. Diff the
+  lock after any such command and restore them before pushing.
+- **A heading without a `type-*` class now renders in the system font.** The
+  Bebas element rule that caught unranked headings is gone (Phase 15), and the
+  body face does not reach `<html>` (TD-39). Give every new heading — including
+  one a primitive renders — its §5.3 rank, and drop any `text-*`/`font-*`
+  utility beside it, which would override the rank (Findings 72, 74).
 
 ## Do Not Revisit
 
@@ -2324,10 +2720,6 @@ used — the TD-28 failure class — so it is left alone deliberately.
   them under CVD (Findings 25). v1.0 removes the collision instead.
 - **WCAG contrast ratio as a test of whether two colours look different.** It
   measures luminance only (Findings 26).
-- **Deleting `--ss-*` or `.bg-marble-light` before their consumers migrate.**
-  Five files still read them. An undefined custom property is invalid at
-  computed-value time and fails silently. They are aliased to v1.0 roles until
-  Phase 8 clears the last consumer.
 - **Gold on completion anywhere.** The masthead percentage, each exercise's
   "Complete" label, the completed set number and the progress bar are all
   `--success` (§4.3 rule 2). Gold is for records and improvements only.
@@ -2387,31 +2779,38 @@ used — the TD-28 failure class — so it is left alone deliberately.
 - **Clicking "Finish Session" to open a dialog.** It only confirms when sets are
   outstanding; with everything complete it finishes immediately
   (`use-session-management`). Findings 22.
+- **Locating a Radix menu's trigger by role while the menu is open.** It is
+  `aria-hidden` then (Findings 61); measure it before opening.
+- **Reading a bounce to `/login` as an expired sign-in.** Read the auth requests
+  the precondition names (Findings 60).
+- **Loosening a sweep assertion to get a green run.** The nine remaining
+  failures are TD-36; the fix belongs in the app.
+- **Fixed column minimums on the set row below `sm`.** They needed 273px where
+  the row has 228 at 320 (Findings 66). Below `sm` the columns size to their
+  captions; the minimums apply from `sm`.
+- **The global `h1`–`h4` element rule.** Deleted in Phase 15 (§5.5). Rank is a
+  class; heading level is structure. Do not bring back an element selector to
+  style headings.
+- **`rounded-lg`, `rounded-xl` and bare `rounded`.** All were 4px; they are
+  `rounded-md`. §7 has three radii and `full`.
+- **Hand-rolled spinners.** `Loader2` inside a control, `ClassicalLoader` at
+  page level.
 
 ## Next Task
 
-**Phase 14 — Automated regression sweep.** Playwright was adopted in Phase 0
-(decision A), so this is scripted rather than manual.
+**The restyle plan is complete** — Phase 15 was its last phase. What remains
+needs the owner:
 
-Per the plan: 320/390/430/768/1024/1280/1440; no horizontal overflow, no new
-console errors, no broken components; navigation, modals, dropdowns, hover and
-focus states and the mobile drawer all working; screenshots rendering; and
-**`npm run verify` with the dev server stopped** — which also closes this
-phase's outstanding production build and the compiled-stylesheet check. Do not
-change tests to hide regressions.
+1. ~~Confirm deleting the thirteen zero-importer files~~ — **done**, TD-32
+   closed on 2026-09-13.
+2. **TD-38**: one batch for routine detail, the error boundaries and
+   `not-found`, and the two stale loading skeletons, using existing patterns.
+3. **TD-39**: decide whether unranked text should become Oswald, as §5.2 says.
+   The change is one class on `body`; the review is every screen in both themes.
+4. **TD-36**: the mobile drawer's close control and tab order — behaviour, so
+   outside a UI-only plan. Its nine checks are the only red ones in
+   `npm run ui:regression`.
+5. **Commit.** Nothing since `dc13b1f` is committed.
 
-Carry-forward:
-
-- **TD-34 first**: give the capture harness an active-session precondition, so
-  Phase 14's comparisons cannot be silently invalidated (Findings 46).
-- The component/state captures in `ui-restyle/capture-manifest.md` are now
-  mostly scripted in ad-hoc files that were deleted after use; Phase 14 is the
-  place to make them permanent specs.
-- Still off-palette (TD-31): `InitialLoadAnimation`, `PerformanceDebugPanel`.
-  (`/workouts/history/[id]` was restyled in the Phase 13 follow-up; add it to
-  the capture manifest, which has no target for it.)
-- Phase 15 deletion list (TD-32) grew: `ModernBackground`, `ModernBrandHero`,
-  `BackgroundOverlay`, `calendar` join `popover`, `alert`, `OrnateCorners`,
-  `HeroBackdrop`, `HeroCard`, `WorkoutItem`.
-- Reported, not fixed: search combobox keyboard contract, inert "Soon" items,
-  set-row desktop regrouping.
+Reported, not fixed, and still open: the search combobox keyboard contract,
+inert "Soon" items, set-row desktop regrouping.

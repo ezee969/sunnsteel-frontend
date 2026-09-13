@@ -18,7 +18,7 @@ export default function RootError({
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center p-6 text-center gap-4">
-			<h2 className="text-2xl font-bold">Something went wrong</h2>
+			<h2 className="type-section text-foreground">Something went wrong</h2>
 			<p className="text-sm text-muted-foreground max-w-md break-words">
 				{error.message || 'An unexpected error occurred.'}
 			</p>
