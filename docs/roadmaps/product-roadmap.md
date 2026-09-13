@@ -73,8 +73,9 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID  | Status | Owner | Branch / worktree | Claimed | Repositories |
-| --- | ------ | ----- | ----------------- | ------- | ------------ |
+| ID      | Status        | Owner  | Branch / worktree                                        | Claimed    | Repositories        |
+| ------- | ------------- | ------ | -------------------------------------------------------- | ---------- | ------------------- |
+| EXER-05 | `IN_PROGRESS` | Claude | `claude/exer-05` · `.claude-worktrees/exer-05-frontend` | 2026-09-13 | FE (routine wizard) |
 
 ## Current product snapshot
 
@@ -241,7 +242,7 @@ cold-start impact and showing that simpler rendering is insufficient.
 | EXER-02 | `CANDIDATE` | M    | Catalog browsing               | Filter exercises by muscle, equipment, movement pattern, favorites, and training history.                                                                             | EXER-09                        |
 | EXER-03 | `CANDIDATE` | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                              | Content-authoring process      |
 | EXER-04 | `CANDIDATE` | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                      | Curated assets and licenses    |
-| EXER-05 | `CANDIDATE` | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                    | EXER-09                        |
+| EXER-05 | `IN_PROGRESS` | M  | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                    | EXER-09                        |
 | EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
 | EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
 | EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
