@@ -5,7 +5,16 @@ import { Loader2 } from 'lucide-react'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import type { Exercise } from '@/lib/api/types'
+import {
+	describeAlternative,
+	findExerciseAlternatives,
+} from '@/lib/utils/exercise-alternatives'
+import {
+	defaultTrainingLocation,
+	listedEquipmentAt,
+} from '@/lib/utils/exercise-equipment'
 
 import { ExerciseConfigSection } from './components/ExerciseConfigSection'
 import { ExerciseHeader } from './components/ExerciseHeader'
@@ -59,6 +68,8 @@ export interface WizardExerciseCardProps {
 	onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
+	/** Exercises already on this day, never offered as alternatives. */
+	dayExerciseIds?: string[]
 	dragHandle?: React.ReactNode
 }
 
@@ -86,6 +97,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onStepWeight,
 	exercises = [],
 	isExercisesLoading = false,
+	dayExerciseIds,
 	dragHandle,
 }) => {
 	const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false)
@@ -133,6 +145,20 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 				ex.equipment?.toLowerCase().includes(search),
 		)
 	}, [exercises, editSearchValue])
+
+	// EXER-05: offered at the top of the change dropdown, ranked by the
+	// equipment the default gym lists. Never applied without a choice.
+	const { data: locations } = useTrainingLocations()
+	const gym = defaultTrainingLocation(locations)
+	const alternatives = useMemo(() => {
+		if (!isEditDropdownOpen || !exerciseData) return []
+		return findExerciseAlternatives(exerciseData, exercises, {
+			availableEquipment: listedEquipmentAt(gym),
+			exclude: dayExerciseIds,
+		})
+	}, [isEditDropdownOpen, exerciseData, exercises, gym, dayExerciseIds])
+	const showAlternatives =
+		!isExercisesLoading && !editSearchValue.trim() && alternatives.length > 0
 
 	// Close edit dropdown when clicking outside
 	useEffect(() => {
@@ -198,7 +224,40 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 									autoFocus
 								/>
 							</div>
-							<div className="max-h-[200px] overflow-y-auto p-2">
+							<div className="max-h-[320px] overflow-y-auto p-2">
+								{showAlternatives && (
+									<>
+										<p className="type-label px-3 pb-1 pt-1 text-ink-3">
+											Alternatives
+										</p>
+										<ul
+											aria-label="Alternatives"
+											className="mb-2 space-y-1 border-b border-rule-faint pb-2"
+										>
+											{alternatives.map(alternative => (
+												<li key={alternative.exercise.id}>
+													<button
+														type="button"
+														onClick={() =>
+															handleEditExercise(alternative.exercise.id)
+														}
+														className="w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
+													>
+														<span className="block text-sm font-medium">
+															{alternative.exercise.name}
+														</span>
+														<span className="type-body-sm block text-ink-3">
+															{describeAlternative(alternative, gym?.name)}
+														</span>
+													</button>
+												</li>
+											))}
+										</ul>
+										<p className="type-label px-3 pb-1 text-ink-3">
+											All exercises
+										</p>
+									</>
+								)}
 								{isExercisesLoading ? (
 									<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
 										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />

@@ -8,6 +8,11 @@ import {
 } from '@sunsteel/contracts'
 
 import type { Exercise } from '@/lib/api/types'
+import {
+	defaultTrainingLocation,
+	EQUIPMENT_LABELS,
+	normalizeLocationEquipment,
+} from '@/lib/utils/exercise-equipment'
 
 import type { RoutineSet, RoutineWizardData } from '../types'
 
@@ -98,70 +103,7 @@ const LOWER_PATTERNS = new Set<MovementPattern>([
 	'PLANTAR_FLEXION',
 ])
 
-export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
-	barbell: 'Barbell',
-	'ez-bar': 'EZ bar',
-	dumbbell: 'Dumbbells',
-	cable: 'Cable station',
-	machine: 'Machines',
-	'smith-machine': 'Smith machine',
-	bench: 'Flat bench',
-	'incline-bench': 'Incline bench',
-	'preacher-bench': 'Preacher bench',
-	rack: 'Rack',
-	'pull-up-bar': 'Pull-up bar',
-	'dip-station': 'Dip station',
-	bodyweight: 'Bodyweight',
-}
-
-const EQUIPMENT_VOCABULARY = new Set<string>(EXERCISE_EQUIPMENT)
-
-/**
- * Location equipment is free text ("barbell, rack, dumbbells"), so common
- * spellings are mapped onto the catalog vocabulary. An unrecognised entry is
- * simply not matched: the check then says an item is not *listed*, never that
- * the gym lacks it.
- */
-const EQUIPMENT_ALIASES: Record<string, ExerciseEquipment[]> = {
-	'adjustable-bench': ['bench', 'incline-bench'],
-	'flat-bench': ['bench'],
-	'cable-machine': ['cable'],
-	'cable-station': ['cable'],
-	cables: ['cable'],
-	'chin-up-bar': ['pull-up-bar'],
-	'chinup-bar': ['pull-up-bar'],
-	'pullup-bar': ['pull-up-bar'],
-	'dip-bar': ['dip-station'],
-	'dip-bars': ['dip-station'],
-	'ez-curl-bar': ['ez-bar'],
-	ezbar: ['ez-bar'],
-	'power-rack': ['rack'],
-	'squat-rack': ['rack'],
-	smith: ['smith-machine'],
-	machines: ['machine'],
-}
-
-const toVocabulary = (item: string): ExerciseEquipment[] => {
-	const slug = item
-		.trim()
-		.toLocaleLowerCase('en-US')
-		.replace(/[\s_]+/g, '-')
-	if (!slug) return []
-	if (EQUIPMENT_ALIASES[slug]) return EQUIPMENT_ALIASES[slug]
-	for (const candidate of [
-		slug,
-		slug.replace(/e?s$/, ''),
-		slug.replace(/s$/, ''),
-	]) {
-		if (EQUIPMENT_VOCABULARY.has(candidate))
-			return [candidate as ExerciseEquipment]
-	}
-	return []
-}
-
-export const normalizeLocationEquipment = (
-	items: string[],
-): Set<ExerciseEquipment> => new Set(items.flatMap(toVocabulary))
+export { EQUIPMENT_LABELS }
 
 const setReps = (set: RoutineSet): number => {
 	const reps =
@@ -247,8 +189,7 @@ export const checkEquipmentAtLocation = (
 	equipment: ExerciseEquipment[],
 	locations: TrainingLocationPreference[] | undefined,
 ): EquipmentCheck => {
-	const location =
-		locations?.find(candidate => candidate.isDefault) ?? locations?.[0]
+	const location = defaultTrainingLocation(locations)
 	if (!location) return { status: 'no-location' }
 	if (location.equipment.length === 0) {
 		return { status: 'nothing-listed', locationName: location.name }

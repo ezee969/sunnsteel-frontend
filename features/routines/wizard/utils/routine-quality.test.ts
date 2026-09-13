@@ -12,7 +12,6 @@ import {
 	estimateDaySeconds,
 	findLikelyImbalances,
 	formatSetCount,
-	normalizeLocationEquipment,
 } from './routine-quality'
 
 const exercise = (
@@ -178,26 +177,6 @@ describe('equipment', () => {
 				catalog,
 			),
 		).toEqual(['barbell', 'cable', 'bench', 'rack'])
-	})
-
-	it('maps free-text location equipment onto the catalog vocabulary', () => {
-		expect([
-			...normalizeLocationEquipment([
-				'Dumbbells',
-				'Power Rack',
-				'adjustable bench',
-				'cables',
-				'pull up bar',
-				'kettlebell',
-			]),
-		]).toEqual([
-			'dumbbell',
-			'rack',
-			'bench',
-			'incline-bench',
-			'cable',
-			'pull-up-bar',
-		])
 	})
 
 	it('checks the default location and reports what is not listed', () => {

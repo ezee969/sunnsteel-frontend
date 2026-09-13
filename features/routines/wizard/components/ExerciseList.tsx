@@ -86,6 +86,8 @@ export function ExerciseList({
 		)
 	}
 
+	const dayExerciseIds = day.exercises.map(exercise => exercise.exerciseId)
+
 	return (
 		<div className="space-y-4">
 			<Reorder.Group
@@ -131,6 +133,7 @@ export function ExerciseList({
 								registerRef={registerRef}
 								exercises={exercises}
 								isExercisesLoading={isExercisesLoading}
+								dayExerciseIds={dayExerciseIds}
 							/>
 						)
 					})}
@@ -166,6 +169,7 @@ interface ReorderableExerciseRowProps {
 	registerRef: (key: string, node: HTMLElement | null) => void
 	exercises?: Exercise[]
 	isExercisesLoading?: boolean
+	dayExerciseIds: string[]
 }
 
 function ReorderableExerciseRow({
@@ -194,6 +198,7 @@ function ReorderableExerciseRow({
 	registerRef,
 	exercises,
 	isExercisesLoading,
+	dayExerciseIds,
 }: ReorderableExerciseRowProps) {
 	const dragControls = useDragControls()
 
@@ -234,6 +239,7 @@ function ReorderableExerciseRow({
 				isRemovingSet={isRemovingSet}
 				exercises={exercises}
 				isExercisesLoading={isExercisesLoading}
+				dayExerciseIds={dayExerciseIds}
 				dragHandle={
 					<button
 						type="button"
