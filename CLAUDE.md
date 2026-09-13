@@ -116,6 +116,27 @@ Two coexisting styles — match whichever domain you are in:
 - `hooks/` — standalone (non-API) React hooks.
 - `lib/auth/` — framework-independent auth event controller and cancellation error; exercised with mocked dependencies in Node tests.
 
+## UI and styling
+
+Any change that affects rendered UI — including new components, loading/empty/error states, responsive layout, themes, interaction states or motion — must follow the [Sunnsteel Design System](docs/ui-design-system.md), currently **v1.0 · LOCKED**. Existing styling is not precedent where it conflicts with that document. If a locked rule cannot be implemented as written, report the contradiction instead of making a new visual decision locally.
+
+Before editing UI, always read §4.3 (colour rules), §5.3 (type-rank usage), §§7–10 (radii, elevation, motion and responsive behaviour) and §15 (verification), plus the relevant component subsection in §11. If changing tokens or global CSS, read §§3–4 in full. Restyle progress, direction, migration and QA/review documents are historical evidence only; they are not current styling authority.
+
+High-risk invariants:
+
+- **Use semantic tokens in component styling.** Do not add hardcoded colour literals or raw Tailwind palette classes. Literal values are permitted only when defining the approved tokens or when platform metadata requires them, and must match the design system.
+- **One filled primary action per region.** Repeated list controls are never primary.
+- **Colour roles do not overlap.** `success` means completed as planned; `honour` means exceeded expectations and is capped at two marks per viewport and one per row; `destructive` means data destruction; warning is a non-text mark. Colour never communicates state without a glyph, label or structural cue.
+- **Every visible `h1`–`h4` uses one `type-*` rank.** Do not combine it with utilities that override font family, size, weight, tracking, casing or line-height. Colour and layout utilities are allowed; screen-reader-only headings are exempt.
+- **Use only the defined radius roles in new UI:** none, small or medium; full is reserved for avatars. Do not introduce arbitrary radii.
+- **Elevation uses tone, not decoration.** `shadow-overlay` is the only shadow and is reserved for overlays. Do not add generic shadows, gradients, glow, backdrop blur or translucent cards.
+- **Ruled lists are the default.** Reuse the existing styled shadcn/Radix primitives and Sunnsteel patterns instead of inventing parallel components or replacing semantic primitives with styled generic elements.
+- **Motion uses the motion tokens and supports `prefers-reduced-motion`.** Do not add prohibited page entrances, per-section fade-ups, scale-on-hover, floating cards, glow or animated gradients.
+- **Inputs remain 16px below `md`.** Preserve their explicit boundary, focus and invalid-state treatment in both themes.
+- **Responsive decisions must account for the protected shell.** Apply the `viewport - 256px` content budget and exact-breakpoint verification described in Gotchas; do not reason from viewport width alone.
+
+For every UI change, inspect the affected states in both themes at the relevant exact boundary widths and run `npm run ui:regression`. The sweep requires the backend and a valid saved sign-in from `npm run ui:login`; if either prerequisite is unavailable, report exactly what blocked the run and what was verified instead — never imply the sweep passed. Follow the existing build/dev-server restriction when running the normal repository gates.
+
 ## Conventions
 
 - **Formatting is enforced, not a matter of taste (CL-06).** [.prettierrc](.prettierrc) is the single source of truth — tabs, single quotes, no semicolons, `printWidth` 80, `arrowParens: avoid`, `endOfLine: auto` — and `prettier/prettier` runs as an ESLint **error**, so `npm run lint` and CI fail on drift. Imports are sorted by `simple-import-sort`; run `npm run lint:fix` rather than arranging them by hand. Side-effect imports are not reordered. The repo used to have two coexisting styles with nothing arbitrating; don't reintroduce that by "matching the surrounding file".
