@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
 import { SessionRecapPanel } from '@/features/workout/session-recap'
+import { SessionShareButton } from '@/features/workout/session-share-dialog'
 import { useCollapseMap } from '@/hooks/use-collapse-map'
 import { useWorkoutSessionData } from '@/hooks/use-workout-session-data'
 import { useSessionRecap } from '@/lib/api/hooks/useWorkoutSession'
@@ -60,7 +61,10 @@ export default function WorkoutDetailPage() {
 
 			{session.status === 'COMPLETED' ? (
 				recap ? (
-					<SessionRecapPanel recap={recap} />
+					<SessionRecapPanel
+						recap={recap}
+						action={<SessionShareButton sessionId={session.id} />}
+					/>
 				) : (
 					<div
 						className={

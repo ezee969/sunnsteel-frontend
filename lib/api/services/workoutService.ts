@@ -1,3 +1,10 @@
+import type {
+	CreateSessionShareRequest,
+	SessionShare,
+	SessionShareListResponse,
+	SharedSessionRecap,
+} from '@sunsteel/contracts'
+
 import {
 	FinishWorkoutRequest,
 	FinishWorkoutResponse,
@@ -229,6 +236,38 @@ export const workoutService = {
 			},
 		)
 	},
+
+	createSessionShare: async (
+		sessionId: string,
+		data: CreateSessionShareRequest,
+	): Promise<SessionShare> =>
+		httpClient.request<SessionShare>(
+			`${WORKOUTS_API_URL}/sessions/${sessionId}/shares`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	listSessionShares: async (
+		sessionId: string,
+	): Promise<SessionShareListResponse> =>
+		httpClient.get<SessionShareListResponse>(
+			`${WORKOUTS_API_URL}/sessions/${sessionId}/shares`,
+			true,
+		),
+
+	revokeSessionShare: async (
+		sessionId: string,
+		shareId: string,
+	): Promise<void> =>
+		httpClient.delete<void>(
+			`${WORKOUTS_API_URL}/sessions/${sessionId}/shares/${shareId}`,
+			true,
+		),
+
+	// Unauthenticated on purpose: the token is the credential (SOC-07).
+	getSharedSession: async (token: string): Promise<SharedSessionRecap> =>
+		httpClient.get<SharedSessionRecap>(
+			`/shared/sessions/${encodeURIComponent(token)}`,
+		),
 
 	getSessionRecap: async (id: string): Promise<WorkoutSessionRecap> => {
 		return httpClient.request<WorkoutSessionRecap>(
