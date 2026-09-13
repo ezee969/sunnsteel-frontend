@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	buildExercisePerformanceQueryString,
 	buildMuscleGroupHeatmapQueryString,
+	buildPersonalGoalsQueryString,
 	buildProgressTimelineQueryString,
 	buildSessionComparisonQueryString,
 	buildSessionsQueryString,
@@ -130,6 +131,14 @@ describe('volume trend contract', () => {
 				weeks: 12,
 			}),
 		).toBe('?timeZone=Europe%2FBerlin&weeks=12')
+	})
+})
+
+describe('personal goals contract', () => {
+	it('serializes the analytics time zone', () => {
+		expect(buildPersonalGoalsQueryString('America/New_York')).toBe(
+			'?timeZone=America%2FNew_York',
+		)
 	})
 })
 

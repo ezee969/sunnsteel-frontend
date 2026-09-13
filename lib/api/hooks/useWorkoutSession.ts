@@ -34,6 +34,7 @@ import type {
 	ExerciseStrengthTrendQuery,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	PersonalGoalsResponse,
 	ProgressTimelineEventType,
 	ProgressTimelineResponse,
 	SessionComparisonResponse,
@@ -104,6 +105,8 @@ const qk = {
 			params.timeZone,
 			params.weeks ?? null,
 		] as const,
+	personalGoals: (timeZone: string) =>
+		['workout', 'progress', 'goals', timeZone] as const,
 	sessionComparison: (routineDayId?: string) =>
 		[
 			'workout',
@@ -226,6 +229,33 @@ export const useVolumeTrend = (weeks = 8) => {
 	const query = useQuery<VolumeTrendResponse>({
 		queryKey: qk.volumeTrend(params),
 		queryFn: () => workoutService.getVolumeTrend(params),
+		enabled: !isLoading && !!session && !!timeZone,
+	})
+	const bootstrapError =
+		analytics.error ??
+		(analytics.data?.state === 'FAILED'
+			? new Error('Analytics setup failed')
+			: null)
+	return {
+		...query,
+		isPending:
+			!bootstrapError &&
+			(analytics.isPending ||
+				analytics.data?.state === 'BUILDING' ||
+				query.isPending),
+		error: bootstrapError ?? query.error,
+		retry: bootstrapError ? analytics.retry : query.refetch,
+	}
+}
+
+export const usePersonalGoals = () => {
+	const { session, isLoading } = useAuth()
+	const analytics = useWorkoutAnalytics()
+	const timeZone =
+		analytics.data?.state === 'READY' ? analytics.data.timeZone : null
+	const query = useQuery<PersonalGoalsResponse>({
+		queryKey: qk.personalGoals(timeZone ?? ''),
+		queryFn: () => workoutService.getPersonalGoals(timeZone!),
 		enabled: !isLoading && !!session && !!timeZone,
 	})
 	const bootstrapError =

@@ -1,9 +1,11 @@
 import {
 	FollowSuggestionsResponse,
+	MeasurableGoal,
 	PublicUserProfile,
 	RelationshipListKind,
 	RelationshipListQuery,
 	RelationshipListResponse,
+	ReplaceMeasurableGoalsRequest,
 	ReplaceTrainingLocationsRequest,
 	TrainingLocationPreference,
 	UpdateProfileDiscoveryRequest,
@@ -68,6 +70,20 @@ export const userService = {
 				secure: true,
 			},
 		)
+	},
+
+	async getMeasurableGoals(): Promise<MeasurableGoal[]> {
+		return httpClient.get<MeasurableGoal[]>('/users/preferences/goals', true)
+	},
+
+	async replaceMeasurableGoals(
+		data: ReplaceMeasurableGoalsRequest,
+	): Promise<MeasurableGoal[]> {
+		return httpClient.request<MeasurableGoal[]>('/users/preferences/goals', {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		})
 	},
 
 	// Search users by name or username

@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { MeasurableGoalsSettingsCard } from '@/features/settings/measurable-goals-settings-card'
 import { MotionPreferenceCard } from '@/features/settings/motion-preference-card'
 import { PrivacyOverviewCard } from '@/features/settings/privacy-overview-card'
 import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
@@ -534,6 +535,8 @@ export default function SettingsPage() {
 			</div>
 
 			<TrainingLocationPreferencesCard weightUnit={formData.weightUnit} />
+
+			<MeasurableGoalsSettingsCard weightUnit={formData.weightUnit} />
 
 			{user ? (
 				<TrainingIdentitySettingsCard identity={user.trainingIdentity} />

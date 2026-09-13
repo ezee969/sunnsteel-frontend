@@ -16,6 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
+import { PersonalGoals } from '@/features/progress/personal-goals'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { SessionComparison } from '@/features/progress/session-comparison'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
@@ -25,6 +26,7 @@ import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
+	usePersonalGoals,
 	useProgressTimeline,
 	useSessionComparison,
 	useVolumeTrend,
@@ -73,6 +75,7 @@ export default function ProgressPage() {
 	)
 	const history = useExercisePerformanceHistory(historyParams)
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
+	const personalGoals = usePersonalGoals()
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
 	const timeline = useProgressTimeline(timelineFilter)
@@ -121,6 +124,14 @@ export default function ProgressPage() {
 						review every performance behind them.
 					</>
 				}
+			/>
+
+			<PersonalGoals
+				data={personalGoals.data}
+				weightUnit={weightUnit}
+				isPending={personalGoals.isPending}
+				isError={Boolean(personalGoals.error)}
+				onRetry={() => void personalGoals.retry()}
 			/>
 
 			<MuscleGroupHeatmap

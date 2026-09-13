@@ -1,5 +1,6 @@
 import type {
 	CreateSessionShareRequest,
+	PersonalGoalsResponse,
 	SessionShare,
 	SessionShareListResponse,
 	SharedSessionRecap,
@@ -109,6 +110,10 @@ export function buildVolumeTrendQueryString(params: VolumeTrendQuery): string {
 	return `?${search}`
 }
 
+export function buildPersonalGoalsQueryString(timeZone: string): string {
+	return `?${new URLSearchParams({ timeZone })}`
+}
+
 export function buildSessionComparisonQueryString(
 	params: SessionComparisonQuery,
 ): string {
@@ -166,6 +171,11 @@ export const workoutService = {
 	getVolumeTrend: (params: VolumeTrendQuery): Promise<VolumeTrendResponse> =>
 		httpClient.get<VolumeTrendResponse>(
 			`${WORKOUTS_API_URL}/progress/volume${buildVolumeTrendQueryString(params)}`,
+			true,
+		),
+	getPersonalGoals: (timeZone: string): Promise<PersonalGoalsResponse> =>
+		httpClient.get<PersonalGoalsResponse>(
+			`${WORKOUTS_API_URL}/progress/goals${buildPersonalGoalsQueryString(timeZone)}`,
 			true,
 		),
 	getSessionComparison: (
