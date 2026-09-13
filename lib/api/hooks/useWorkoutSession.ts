@@ -34,6 +34,7 @@ import type {
 	ExerciseStrengthTrendQuery,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	SessionComparisonResponse,
 	VolumeTrendQuery,
 	VolumeTrendResponse,
 } from '../types/workout-progress.type'
@@ -100,6 +101,13 @@ const qk = {
 			'volume',
 			params.timeZone,
 			params.weeks ?? null,
+		] as const,
+	sessionComparison: (routineDayId?: string) =>
+		[
+			'workout',
+			'progress',
+			'session-comparison',
+			routineDayId ?? null,
 		] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
@@ -231,6 +239,15 @@ export const useVolumeTrend = (weeks = 8) => {
 		error: bootstrapError ?? query.error,
 		retry: bootstrapError ? analytics.retry : query.refetch,
 	}
+}
+
+export const useSessionComparison = (routineDayId?: string) => {
+	const { session, isLoading } = useAuth()
+	return useQuery<SessionComparisonResponse>({
+		queryKey: qk.sessionComparison(routineDayId),
+		queryFn: () => workoutService.getSessionComparison({ routineDayId }),
+		enabled: !isLoading && !!session,
+	})
 }
 
 export const useActiveSession = () => {

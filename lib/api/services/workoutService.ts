@@ -18,6 +18,8 @@ import {
 	ExerciseStrengthTrendResponse,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	SessionComparisonQuery,
+	SessionComparisonResponse,
 	VolumeTrendQuery,
 	VolumeTrendResponse,
 	WorkoutProgress,
@@ -98,6 +100,15 @@ export function buildVolumeTrendQueryString(params: VolumeTrendQuery): string {
 	return `?${search}`
 }
 
+export function buildSessionComparisonQueryString(
+	params: SessionComparisonQuery,
+): string {
+	const search = new URLSearchParams()
+	if (params.routineDayId) search.set('routineDayId', params.routineDayId)
+	const query = search.toString()
+	return query ? `?${query}` : ''
+}
+
 export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
@@ -133,6 +144,13 @@ export const workoutService = {
 	getVolumeTrend: (params: VolumeTrendQuery): Promise<VolumeTrendResponse> =>
 		httpClient.get<VolumeTrendResponse>(
 			`${WORKOUTS_API_URL}/progress/volume${buildVolumeTrendQueryString(params)}`,
+			true,
+		),
+	getSessionComparison: (
+		params: SessionComparisonQuery,
+	): Promise<SessionComparisonResponse> =>
+		httpClient.get<SessionComparisonResponse>(
+			`${WORKOUTS_API_URL}/progress/session-comparison${buildSessionComparisonQueryString(params)}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {
