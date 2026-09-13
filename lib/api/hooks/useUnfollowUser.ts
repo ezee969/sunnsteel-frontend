@@ -14,6 +14,9 @@ export function useUnfollowUser(userId: string, profileIdentifier = userId) {
 				updatedProfile,
 			)
 			queryClient.invalidateQueries({ queryKey: ['user'] })
+			// The profile's follower list and the viewer's suggestions changed too.
+			queryClient.invalidateQueries({ queryKey: ['users', 'relationships'] })
+			queryClient.invalidateQueries({ queryKey: ['users', 'suggestions'] })
 		},
 	})
 }

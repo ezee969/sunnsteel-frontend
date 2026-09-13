@@ -5,6 +5,7 @@ import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { FollowSuggestions } from '@/features/profile/follow-suggestions'
 import { useUserSearch } from '@/lib/api/hooks/useUserSearch'
 
 export default function SearchPage() {
@@ -26,6 +27,9 @@ export default function SearchPage() {
 					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
 						Type a name or @username in the top search bar to find profiles.
 					</p>
+				</div>
+				<div className="mt-8 max-w-3xl">
+					<FollowSuggestions />
 				</div>
 			</div>
 		)

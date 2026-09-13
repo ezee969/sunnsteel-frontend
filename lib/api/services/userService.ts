@@ -1,5 +1,9 @@
 import {
+	FollowSuggestionsResponse,
 	PublicUserProfile,
+	RelationshipListKind,
+	RelationshipListQuery,
+	RelationshipListResponse,
 	ReplaceTrainingLocationsRequest,
 	TrainingLocationPreference,
 	UpdateProfileDiscoveryRequest,
@@ -8,6 +12,8 @@ import {
 	UserProfile,
 	UserSearchResponse,
 } from '@sunsteel/contracts'
+
+import { getRelationshipListApiPath } from '@/lib/utils/relationships'
 
 import { httpClient } from './httpClient'
 
@@ -87,6 +93,28 @@ export const userService = {
 	// Read the exact public view a signed-out recipient sees.
 	async getSharedProfile(identifier: string): Promise<PublicUserProfile> {
 		return httpClient.get<PublicUserProfile>(`/profiles/${identifier}`)
+	},
+
+	// One page of a member's followers, following or viewer-relative mutuals.
+	async getRelationshipList(
+		identifier: string,
+		kind: RelationshipListKind,
+		query: RelationshipListQuery = {},
+	): Promise<RelationshipListResponse> {
+		return httpClient.get<RelationshipListResponse>(
+			getRelationshipListApiPath(identifier, kind, query),
+			true,
+		)
+	},
+
+	async getFollowSuggestions(
+		limit?: number,
+	): Promise<FollowSuggestionsResponse> {
+		const search = limit === undefined ? '' : `?limit=${limit}`
+		return httpClient.get<FollowSuggestionsResponse>(
+			`/users/me/suggestions${search}`,
+			true,
+		)
 	},
 
 	// Follow user

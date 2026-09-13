@@ -20,6 +20,7 @@ import {
 	UserMinus,
 	UserPlus,
 } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -45,7 +46,9 @@ import {
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
-type ProfileViewProps =
+type RelationshipHrefs = { followers: string; following: string }
+
+type ProfileViewProps = (
 	| {
 			variant: 'owner'
 			profile: UserProfile
@@ -60,6 +63,10 @@ type ProfileViewProps =
 			isMutating?: boolean
 			onFollowToggle?: () => void
 	  }
+) & {
+	/** Only inside the authenticated shell; the public route keeps plain counts. */
+	relationshipHrefs?: RelationshipHrefs
+}
 
 export function ProfileView(props: ProfileViewProps) {
 	const { push } = useToast()
@@ -200,23 +207,21 @@ export function ProfileView(props: ProfileViewProps) {
 							{joinDateText}
 						</p>
 
-						{/* FIX-06: these counts are text, not controls. They used to carry
-							cursor-pointer and a hover state while leading nowhere. The browsable
-							follower/following lists, and the paginated endpoint they need, belong
-							to SOC-02. */}
+						{/* SOC-02: inside the authenticated shell the counts open the
+							browsable lists. The signed-out /members route passes no hrefs, so
+							there they stay plain text (FIX-06): its visitors cannot read
+							the lists. */}
 						<div className="flex gap-5 pt-2">
-							<p className="flex items-baseline gap-1.5">
-								<span className="type-data type-data-strong text-foreground">
-									{followerCount}
-								</span>
-								<span className="type-body-sm text-ink-3">Followers</span>
-							</p>
-							<p className="flex items-baseline gap-1.5">
-								<span className="type-data type-data-strong text-foreground">
-									{followingCount}
-								</span>
-								<span className="type-body-sm text-ink-3">Following</span>
-							</p>
+							<ProfileCount
+								count={followerCount}
+								label="Followers"
+								href={props.relationshipHrefs?.followers}
+							/>
+							<ProfileCount
+								count={followingCount}
+								label="Following"
+								href={props.relationshipHrefs?.following}
+							/>
 						</div>
 					</div>
 
@@ -500,6 +505,38 @@ export function ProfileView(props: ProfileViewProps) {
 				</div>
 			</div>
 		</div>
+	)
+}
+
+function ProfileCount({
+	count,
+	label,
+	href,
+}: {
+	count: number
+	label: string
+	href?: string
+}) {
+	const content = (
+		<>
+			<span className="type-data type-data-strong text-foreground">
+				{count}
+			</span>
+			<span className="type-body-sm text-ink-3 underline-offset-4 transition-colors duration-[var(--motion-fast)] ease-standard group-hover:text-foreground group-hover:underline">
+				{label}
+			</span>
+		</>
+	)
+	if (!href) {
+		return <p className="flex items-baseline gap-1.5">{content}</p>
+	}
+	return (
+		<Link
+			href={href}
+			className="group flex items-baseline gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+		>
+			{content}
+		</Link>
 	)
 }
 
