@@ -76,6 +76,7 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
 | PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
+| SOC-07   | `IN_PROGRESS` | Claude | `claude/soc-07` · `.claude-worktrees/soc-07-*`        | 2026-09-13 | CT, BE, FE   |
 
 ## Current product snapshot
 
@@ -304,7 +305,7 @@ Instructions and media make this a content project as well as an engineering one
 | SOC-04 | `QUEUED`    | M    | Selective activity sharing | Configure sharing defaults by event type and override visibility for one entry.                                   | SOC-03, PROF-06                   |
 | SOC-05 | `QUEUED`    | M    | Themed reactions           | Encourage activity with a small Sunnsteel-specific reaction set rather than a generic like counter.               | SOC-03, PROF-10                   |
 | SOC-06 | `QUEUED`    | L    | Comments                   | Discuss shared activity with deletion, reporting, and visibility enforcement.                                     | SOC-03, PROF-10, moderation tools |
-| SOC-07 | `QUEUED`    | M    | Structured workout sharing | Share a session recap that preserves selected statistics and links to permitted details.                          | LIVE-09, PROF-06                  |
+| SOC-07 | `IN_PROGRESS` | M  | Structured workout sharing | Share a session recap that preserves selected statistics and links to permitted details.                          | LIVE-09, PROF-06                  |
 | SOC-08 | `QUEUED`    | L    | Training partners          | Establish a mutual relationship with explicit shared schedule and progress permissions.                           | PROF-06, SOC-02                   |
 | SOC-09 | `CANDIDATE` | M    | Partner encouragement      | Send lightweight prompts such as Ready to train or Strong session without opening full messaging.                 | SOC-08, NOTIF-01                  |
 | SOC-10 | `CANDIDATE` | L    | Private challenges         | Invite friends to frequency, consistency, or relative-improvement goals.                                          | DATA-02, PROF-06                  |
