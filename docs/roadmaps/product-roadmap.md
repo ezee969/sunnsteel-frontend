@@ -76,6 +76,7 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
 | PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
+| EXER-09  | `IN_PROGRESS` | Claude | `claude/exer-09` · `.claude-worktrees/exer-09-*`       | 2026-09-13 | CT, BE, FE   |
 
 ## Current product snapshot
 
@@ -244,7 +245,7 @@ cold-start impact and showing that simpler rendering is insufficient.
 | EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
 | EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
 | EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
-| EXER-09 | `QUEUED`    | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
+| EXER-09 | `IN_PROGRESS` | L  | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
 
 The first Exercises release should emphasize the user's existing training data.
 Instructions and media make this a content project as well as an engineering one.
