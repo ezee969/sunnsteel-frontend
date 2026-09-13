@@ -76,7 +76,6 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
 | PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
-| SOC-07   | `IN_PROGRESS` | Claude | `claude/soc-07` · `.claude-worktrees/soc-07-*`        | 2026-09-13 | CT, BE, FE   |
 
 ## Current product snapshot
 
@@ -147,7 +146,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 5     | Identity and privacy     | XL   | PROF-03 through PROF-10, PROF-12 (PROF-03 through PROF-06, PROF-09 and PROF-12 shipped) | The dependency-ready identity, privacy, discovery and public-sharing foundation is complete; PROF-07, PROF-08 and PROF-10 await achievements, routine sharing and a moderation model. |
 | 6     | Progress destination     | L    | PROG-01 through PROG-04 and PROG-06 shipped; PROG-07 in progress; PROG-05 and PROG-08 queued | Progress combines record frontiers, session history, muscle distribution, bounded workload and same-day session comparisons.                                                     |
 | 7     | Achievements and ranks   | L    | ACH-01 through ACH-05                                                                   | Uses the events layer and turns the visual theme into a product mechanic.                                                                                                             |
-| 8     | Social core              | XL   | SOC-02 through SOC-08 (SOC-02 shipped)                                              | Builds safe discovery and activity before messaging.                                                                                                                                  |
+| 8     | Social core              | XL   | SOC-02 through SOC-08 (SOC-02 and SOC-07 shipped)                                              | Builds safe discovery and activity before messaging.                                                                                                                                  |
 | 9     | Schedule and push        | XL   | SCHED-01 through SCHED-07, NOTIF-01 through NOTIF-05, NOTIF-08                          | Improves retention and makes the installed PWA materially useful.                                                                                                                     |
 | 10    | Routine ecosystem        | XL   | ROUT-03 through ROUT-11                                                                 | Sharing depends on truthful history, identity, and privacy.                                                                                                                           |
 | 11    | Complex infrastructure   | XL   | OFFLINE-01, MSG-01 through MSG-05                                                       | Offline conflict resolution, realtime delivery, moderation, and unread state are substantial systems.                                                                                 |
@@ -305,7 +304,7 @@ Instructions and media make this a content project as well as an engineering one
 | SOC-04 | `QUEUED`    | M    | Selective activity sharing | Configure sharing defaults by event type and override visibility for one entry.                                   | SOC-03, PROF-06                   |
 | SOC-05 | `QUEUED`    | M    | Themed reactions           | Encourage activity with a small Sunnsteel-specific reaction set rather than a generic like counter.               | SOC-03, PROF-10                   |
 | SOC-06 | `QUEUED`    | L    | Comments                   | Discuss shared activity with deletion, reporting, and visibility enforcement.                                     | SOC-03, PROF-10, moderation tools |
-| SOC-07 | `IN_PROGRESS` | M  | Structured workout sharing | Share a session recap that preserves selected statistics and links to permitted details.                          | LIVE-09, PROF-06                  |
+| SOC-07 | `SHIPPED` | L | Structured workout sharing | From a completed session's recap in history, the owner creates a public link and chooses which parts it reveals: duration, volume, completed sets and personal records by default; progression changes and session notes opt-in. Anyone with the link sees only those parts, in the owner's kg/lb unit, with the owner's name, handle and avatar and a link to the privacy-filtered public profile; the previous-session comparison is never shared. Links are unguessable, capped at ten active per session and revocable at any time, after which they stop working immediately. Shipped 2026-09-13 through `@sunsteel/contracts@0.25.0` and a `SessionShare` migration; the size is corrected from `M` to `L` for that migration. | LIVE-09, PROF-06; `@sunsteel/contracts@0.25.0` |
 | SOC-08 | `QUEUED`    | L    | Training partners          | Establish a mutual relationship with explicit shared schedule and progress permissions.                           | PROF-06, SOC-02                   |
 | SOC-09 | `CANDIDATE` | M    | Partner encouragement      | Send lightweight prompts such as Ready to train or Strong session without opening full messaging.                 | SOC-08, NOTIF-01                  |
 | SOC-10 | `CANDIDATE` | L    | Private challenges         | Invite friends to frequency, consistency, or relative-improvement goals.                                          | DATA-02, PROF-06                  |
@@ -807,3 +806,10 @@ it again without addressing the original decision.
   together on a local integration build and a 283/283 regression sweep, then
   in an authenticated read-only production pass with no overflow, console or
   request errors.
+- **2026-09-13 (revision 36):** Shipped `SOC-07` and released its claim.
+  Owners share selected parts of a completed session through revocable,
+  unguessable links; the signed-out page renders only those parts in the
+  owner's unit and never the previous-session comparison. The item grew from
+  `M` to `L` because revocation needs a persisted `SessionShare` model and
+  migration; a stateless signed link was rejected because it could not be
+  revoked.
