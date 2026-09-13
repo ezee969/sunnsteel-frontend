@@ -13,6 +13,12 @@ import {
 	TrendingUp,
 } from 'lucide-react'
 
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -52,145 +58,151 @@ function PerformanceSessionCard({
 	)
 
 	return (
-		<article className="border border-rule bg-surface [content-visibility:auto] [contain-intrinsic-size:auto_28rem]">
-			<header className="grid gap-3 border-b border-rule-faint p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:p-5">
-				<div className="min-w-0">
-					<div className="flex flex-wrap items-center gap-2">
-						<h3 className="type-panel text-foreground">
-							{session.routineName}
-						</h3>
-						<Badge
-							variant={session.status === 'COMPLETED' ? 'success' : 'outline'}
-						>
-							{session.status === 'COMPLETED' ? 'Completed' : 'Aborted'}
-						</Badge>
-					</div>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{session.dayName || 'Workout day'}
-					</p>
-				</div>
-				<div className="type-body-sm space-y-1 text-ink-3 sm:text-right">
-					<p className="flex items-center gap-2 sm:justify-end">
-						<CalendarDays className="size-4" aria-hidden />
-						<time dateTime={session.endedAt}>
-							{PERFORMANCE_DATE_FORMATTER.format(new Date(session.endedAt))}
-						</time>
-					</p>
-					<p className="flex items-center gap-2 sm:justify-end">
-						<Clock3 className="size-4" aria-hidden />
-						{session.durationSec != null
-							? formatDuration(session.durationSec)
-							: 'Duration unavailable'}
-					</p>
-				</div>
-			</header>
-
-			<div className="space-y-5 p-4 sm:p-5">
-				<section aria-label="Completed sets" className="space-y-2">
-					<p className="type-label text-ink-3">Completed sets</p>
-					<div className="border-y border-rule-faint">
-						<div
-							aria-hidden
-							className="type-body-sm grid grid-cols-[3rem_minmax(0,1fr)_4rem] gap-3 py-2 text-ink-3"
-						>
-							<span>Set</span>
-							<span>Performance</span>
-							<span className="text-right">RPE</span>
-						</div>
-						<ol className="divide-y divide-rule-faint">
-							{session.sets.map(set => (
-								<li
-									key={`${set.routineExerciseId}:${set.setNumber}`}
-									className="type-data grid grid-cols-[3rem_minmax(0,1fr)_4rem] items-center gap-3 py-2 text-foreground"
+		<AccordionItem value={session.sessionId} className="border-0">
+			<article className="border border-rule bg-surface [content-visibility:auto] [contain-intrinsic-size:auto_8rem]">
+				<AccordionTrigger className="w-full rounded-none p-4 hover:no-underline sm:p-5 [&>svg]:mt-1">
+					<span className="grid min-w-0 flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+						<span className="min-w-0">
+							<span className="flex flex-wrap items-center gap-2">
+								<span className="type-panel text-foreground">
+									{session.routineName}
+								</span>
+								<Badge
+									variant={
+										session.status === 'COMPLETED' ? 'success' : 'outline'
+									}
 								>
-									<span>{set.setNumber}</span>
-									<span>
-										{set.weightKg != null && set.weightKg > 0
-											? `${formatWeightAmount(set.weightKg, weightUnit, 2)} ${unitLabel} × ${set.reps}`
-											: `${set.reps} reps · bodyweight`}
-									</span>
-									<span className="text-right">{set.rpe ?? '—'}</span>
-								</li>
-							))}
-						</ol>
-					</div>
-				</section>
+									{session.status === 'COMPLETED' ? 'Completed' : 'Aborted'}
+								</Badge>
+							</span>
+							<span className="type-body-sm mt-1 block text-ink-3">
+								{session.dayName || 'Workout day'}
+							</span>
+						</span>
+						<span className="type-body-sm space-y-1 text-ink-3 sm:text-right">
+							<span className="flex items-center gap-2 sm:justify-end">
+								<CalendarDays className="size-4" aria-hidden />
+								<time dateTime={session.endedAt}>
+									{PERFORMANCE_DATE_FORMATTER.format(new Date(session.endedAt))}
+								</time>
+							</span>
+							<span className="flex items-center gap-2 sm:justify-end">
+								<Clock3 className="size-4" aria-hidden />
+								{session.durationSec != null
+									? formatDuration(session.durationSec)
+									: 'Duration unavailable'}
+							</span>
+						</span>
+					</span>
+				</AccordionTrigger>
 
-				<div className="grid gap-4 lg:grid-cols-2">
-					<section aria-label="Notes" className="space-y-2">
-						<div className="flex items-center gap-2">
-							<NotebookPen className="size-4 text-ink-3" aria-hidden />
-							<p className="type-label text-ink-3">Notes</p>
-						</div>
-						<div className="space-y-2 bg-surface-sunk p-3">
-							<div>
-								<p className="type-body-sm text-ink-3">Session note</p>
-								<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
-									{session.sessionNotes?.trim() || 'No session note.'}
-								</p>
+				<AccordionContent className="space-y-5 border-t border-rule-faint p-4 sm:p-5">
+					<section aria-label="Completed sets" className="space-y-2">
+						<p className="type-label text-ink-3">Completed sets</p>
+						<div className="border-y border-rule-faint">
+							<div
+								aria-hidden
+								className="type-body-sm grid grid-cols-[3rem_minmax(0,1fr)_4rem] gap-3 py-2 text-ink-3"
+							>
+								<span>Set</span>
+								<span>Performance</span>
+								<span className="text-right">RPE</span>
 							</div>
-							<div className="border-t border-rule-faint pt-2">
-								<p className="type-body-sm text-ink-3">Prescription note</p>
-								<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
-									{prescriptionNotes.length
-										? prescriptionNotes.join('\n')
-										: 'No exercise note in this prescription.'}
-								</p>
-							</div>
-						</div>
-					</section>
-
-					<section aria-label="Progression changes" className="space-y-2">
-						<div className="flex items-center gap-2">
-							<TrendingUp className="size-4 text-honour" aria-hidden />
-							<p className="type-label text-ink-3">Progression</p>
-						</div>
-						{session.progressionChanges.length ? (
-							<div className="space-y-3 bg-surface-sunk p-3">
-								{session.progressionChanges.map(change => (
-									<div key={change.routineExerciseId}>
-										<p className="type-body-sm text-ink-2">
-											{getProgressionRuleExplanation(change, weightUnit)}
-										</p>
-										<ul className="mt-2 space-y-1">
-											{change.sets.map(set => {
-												const row = getProgressionSetPresentation(
-													set,
-													weightUnit,
-												)
-												return (
-													<li
-														key={set.setNumber}
-														className="type-data flex flex-wrap justify-between gap-2 text-ink-2"
-													>
-														<span>
-															{row.setLabel} · {row.repsLabel}
-														</span>
-														<span className="type-data-strong text-foreground">
-															{row.weightLabel}
-														</span>
-													</li>
-												)
-											})}
-										</ul>
-									</div>
+							<ol className="divide-y divide-rule-faint">
+								{session.sets.map(set => (
+									<li
+										key={`${set.routineExerciseId}:${set.setNumber}`}
+										className="type-data grid grid-cols-[3rem_minmax(0,1fr)_4rem] items-center gap-3 py-2 text-foreground"
+									>
+										<span>{set.setNumber}</span>
+										<span>
+											{set.weightKg != null && set.weightKg > 0
+												? `${formatWeightAmount(set.weightKg, weightUnit, 2)} ${unitLabel} × ${set.reps}`
+												: `${set.reps} reps · bodyweight`}
+										</span>
+										<span className="text-right">{set.rpe ?? '—'}</span>
+									</li>
 								))}
-							</div>
-						) : (
-							<p className="type-body-sm bg-surface-sunk p-3 text-ink-3">
-								No prescription change followed this session.
-							</p>
-						)}
+							</ol>
+						</div>
 					</section>
-				</div>
 
-				<Button variant="link" className="h-auto p-0" asChild>
-					<a href={'/workouts/sessions/' + session.sessionId}>
-						Open session recap
-					</a>
-				</Button>
-			</div>
-		</article>
+					<div className="grid gap-4 lg:grid-cols-2">
+						<section aria-label="Notes" className="space-y-2">
+							<div className="flex items-center gap-2">
+								<NotebookPen className="size-4 text-ink-3" aria-hidden />
+								<p className="type-label text-ink-3">Notes</p>
+							</div>
+							<div className="space-y-2 bg-surface-sunk p-3">
+								<div>
+									<p className="type-body-sm text-ink-3">Session note</p>
+									<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
+										{session.sessionNotes?.trim() || 'No session note.'}
+									</p>
+								</div>
+								<div className="border-t border-rule-faint pt-2">
+									<p className="type-body-sm text-ink-3">Prescription note</p>
+									<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
+										{prescriptionNotes.length
+											? prescriptionNotes.join('\n')
+											: 'No exercise note in this prescription.'}
+									</p>
+								</div>
+							</div>
+						</section>
+
+						<section aria-label="Progression changes" className="space-y-2">
+							<div className="flex items-center gap-2">
+								<TrendingUp className="size-4 text-honour" aria-hidden />
+								<p className="type-label text-ink-3">Progression</p>
+							</div>
+							{session.progressionChanges.length ? (
+								<div className="space-y-3 bg-surface-sunk p-3">
+									{session.progressionChanges.map(change => (
+										<div key={change.routineExerciseId}>
+											<p className="type-body-sm text-ink-2">
+												{getProgressionRuleExplanation(change, weightUnit)}
+											</p>
+											<ul className="mt-2 space-y-1">
+												{change.sets.map(set => {
+													const row = getProgressionSetPresentation(
+														set,
+														weightUnit,
+													)
+													return (
+														<li
+															key={set.setNumber}
+															className="type-data flex flex-wrap justify-between gap-2 text-ink-2"
+														>
+															<span>
+																{row.setLabel} · {row.repsLabel}
+															</span>
+															<span className="type-data-strong text-foreground">
+																{row.weightLabel}
+															</span>
+														</li>
+													)
+												})}
+											</ul>
+										</div>
+									))}
+								</div>
+							) : (
+								<p className="type-body-sm bg-surface-sunk p-3 text-ink-3">
+									No prescription change followed this session.
+								</p>
+							)}
+						</section>
+					</div>
+
+					<Button variant="link" className="h-auto p-0" asChild>
+						<a href={'/workouts/sessions/' + session.sessionId}>
+							Open session recap
+						</a>
+					</Button>
+				</AccordionContent>
+			</article>
+		</AccordionItem>
 	)
 }
 
@@ -214,15 +226,15 @@ export function ExercisePerformanceHistory({
 						Performance history
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Completed work from every finished session in this range.
+						Select a session to review its sets, notes, and progression.
 					</p>
 				</div>
 			</div>
 
 			{isPending ? (
 				<div className="space-y-4" aria-label="Loading performance history">
-					<Skeleton className="h-72" />
-					<Skeleton className="h-72" />
+					<Skeleton className="h-32" />
+					<Skeleton className="h-32" />
 				</div>
 			) : isError && sessions.length === 0 ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
@@ -247,7 +259,7 @@ export function ExercisePerformanceHistory({
 					</p>
 				</div>
 			) : (
-				<div className="space-y-4">
+				<Accordion type="multiple" className="space-y-4">
 					{sessions.map(session => (
 						<PerformanceSessionCard
 							key={session.sessionId}
@@ -255,7 +267,7 @@ export function ExercisePerformanceHistory({
 							weightUnit={weightUnit}
 						/>
 					))}
-				</div>
+				</Accordion>
 			)}
 
 			{isError && sessions.length > 0 ? (
