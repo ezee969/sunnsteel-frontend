@@ -76,6 +76,7 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
 | PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
+| ROUT-10  | `IN_PROGRESS` | Claude | `claude/rout-10` · `.claude-worktrees/rout-10-frontend` | 2026-09-13 | FE (routine wizard) |
 
 ## Current product snapshot
 
@@ -268,7 +269,7 @@ data. `instructions` and `mediaUrl` exist but stay empty until `EXER-03` and
 | ROUT-07 | `QUEUED`    | L    | Routine discovery              | Browse programs by goal, days, experience, equipment, duration, and muscle focus.                                                                                                                                          | ROUT-04, EXER-02                     |
 | ROUT-08 | `QUEUED`    | L    | Routine versions               | Create intentional versions, compare them, and restore an earlier setup.                                                                                                                                                   | DATA-04                              |
 | ROUT-09 | `QUEUED`    | XL   | Training blocks and deloads    | Organize dated program phases and apply temporary deload prescriptions without destroying the normal routine.                                                                                                              | ROUT-08, SCHED-01                    |
-| ROUT-10 | `QUEUED`    | M    | Quality summary                | Before saving, show weekly muscle-group sets, equipment, estimated duration, and likely imbalances.                                                                                                                        | EXER-09                              |
+| ROUT-10 | `IN_PROGRESS` | M  | Quality summary                | Before saving, show weekly muscle-group sets, equipment, estimated duration, and likely imbalances.                                                                                                                        | EXER-09                              |
 | ROUT-11 | `QUEUED`    | L    | Flexible day identity          | Support named and unscheduled rotation days instead of requiring every day to be only a weekday.                                                                                                                           | BE/CT routine model                  |
 | ROUT-12 | `CANDIDATE` | M    | Superset/circuit configuration | Group routine exercises and define order within a round.                                                                                                                                                                   | BE/CT schema; LIVE-14                |
 | ROUT-13 | `CANDIDATE` | M    | Routine import/export          | Back up and exchange programs through a stable versioned format.                                                                                                                                                           | EXPORT-01                            |
