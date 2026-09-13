@@ -34,6 +34,8 @@ import type {
 	ExerciseStrengthTrendQuery,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	VolumeTrendQuery,
+	VolumeTrendResponse,
 } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
 import { useWorkoutAnalytics } from './useWorkoutAnalytics'
@@ -88,6 +90,14 @@ const qk = {
 			'workout',
 			'progress',
 			'muscles',
+			params.timeZone,
+			params.weeks ?? null,
+		] as const,
+	volumeTrend: (params: VolumeTrendQuery) =>
+		[
+			'workout',
+			'progress',
+			'volume',
 			params.timeZone,
 			params.weeks ?? null,
 		] as const,
@@ -176,6 +186,34 @@ export const useMuscleGroupHeatmap = (weeks = 8) => {
 	const query = useQuery<MuscleGroupHeatmapResponse>({
 		queryKey: qk.muscleHeatmap(params),
 		queryFn: () => workoutService.getMuscleGroupHeatmap(params),
+		enabled: !isLoading && !!session && !!timeZone,
+	})
+	const bootstrapError =
+		analytics.error ??
+		(analytics.data?.state === 'FAILED'
+			? new Error('Analytics setup failed')
+			: null)
+	return {
+		...query,
+		isPending:
+			!bootstrapError &&
+			(analytics.isPending ||
+				analytics.data?.state === 'BUILDING' ||
+				query.isPending),
+		error: bootstrapError ?? query.error,
+		retry: bootstrapError ? analytics.retry : query.refetch,
+	}
+}
+
+export const useVolumeTrend = (weeks = 8) => {
+	const { session, isLoading } = useAuth()
+	const analytics = useWorkoutAnalytics()
+	const timeZone =
+		analytics.data?.state === 'READY' ? analytics.data.timeZone : null
+	const params = { timeZone: timeZone ?? '', weeks }
+	const query = useQuery<VolumeTrendResponse>({
+		queryKey: qk.volumeTrend(params),
+		queryFn: () => workoutService.getVolumeTrend(params),
 		enabled: !isLoading && !!session && !!timeZone,
 	})
 	const bootstrapError =
