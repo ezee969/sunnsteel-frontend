@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	buildExercisePerformanceQueryString,
 	buildMuscleGroupHeatmapQueryString,
+	buildSessionComparisonQueryString,
 	buildSessionsQueryString,
 	buildVolumeTrendQueryString,
 	MAX_SESSIONS_LIMIT,
@@ -128,5 +129,17 @@ describe('volume trend contract', () => {
 				weeks: 12,
 			}),
 		).toBe('?timeZone=Europe%2FBerlin&weeks=12')
+	})
+})
+
+describe('session comparison contract', () => {
+	it('omits a bare question mark for the default comparable day', () => {
+		expect(buildSessionComparisonQueryString({})).toBe('')
+	})
+
+	it('serialises the stable routine-day identity', () => {
+		expect(
+			buildSessionComparisonQueryString({ routineDayId: 'routine-day-1' }),
+		).toBe('?routineDayId=routine-day-1')
 	})
 })

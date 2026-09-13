@@ -15,6 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
+import { SessionComparison } from '@/features/progress/session-comparison'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { VolumeTrends } from '@/features/progress/volume-trends'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
@@ -22,6 +23,7 @@ import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
+	useSessionComparison,
 	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
@@ -58,6 +60,7 @@ export default function ProgressPage() {
 	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
 	const [volumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>(8)
 	const [exerciseId, setExerciseId] = useState<string>()
+	const [routineDayId, setRoutineDayId] = useState<string>()
 	const [rangeAnchor] = useState(() => new Date())
 	const historyParams = useMemo(
 		() => ({ exerciseId, ...getStrengthTrendRange(range, rangeAnchor) }),
@@ -66,6 +69,7 @@ export default function ProgressPage() {
 	const history = useExercisePerformanceHistory(historyParams)
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
 	const volumeTrend = useVolumeTrend(volumeWeeks)
+	const sessionComparison = useSessionComparison(routineDayId)
 	const historyPage = history.data?.pages[0]
 	const selectedExerciseId =
 		exerciseId ?? historyPage?.selectedExercise?.exerciseId
@@ -128,6 +132,15 @@ export default function ProgressPage() {
 				isError={Boolean(volumeTrend.error)}
 				onWeeksChange={setVolumeWeeks}
 				onRetry={() => void volumeTrend.retry()}
+			/>
+
+			<SessionComparison
+				data={sessionComparison.data}
+				selectedRoutineDayId={routineDayId}
+				isPending={sessionComparison.isPending}
+				isError={sessionComparison.isError}
+				onRoutineDayChange={setRoutineDayId}
+				onRetry={() => void sessionComparison.refetch()}
 			/>
 
 			<section className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
