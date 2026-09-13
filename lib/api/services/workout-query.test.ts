@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	buildExercisePerformanceQueryString,
 	buildMuscleGroupHeatmapQueryString,
+	buildProgressTimelineQueryString,
 	buildSessionComparisonQueryString,
 	buildSessionsQueryString,
 	buildVolumeTrendQueryString,
@@ -141,5 +142,18 @@ describe('session comparison contract', () => {
 		expect(
 			buildSessionComparisonQueryString({ routineDayId: 'routine-day-1' }),
 		).toBe('?routineDayId=routine-day-1')
+	})
+})
+
+describe('progress timeline contract', () => {
+	it('serializes filters and caps the page size', () => {
+		expect(buildProgressTimelineQueryString({})).toBe('')
+		expect(
+			buildProgressTimelineQueryString({
+				type: 'PROGRESSION_CHANGED',
+				cursor: 'event-1',
+				limit: 100,
+			}),
+		).toBe('?type=PROGRESSION_CHANGED&cursor=event-1&limit=50')
 	})
 })

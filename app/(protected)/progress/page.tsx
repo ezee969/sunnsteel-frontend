@@ -1,5 +1,6 @@
 'use client'
 
+import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -15,6 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
+import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { SessionComparison } from '@/features/progress/session-comparison'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { VolumeTrends } from '@/features/progress/volume-trends'
@@ -23,6 +25,7 @@ import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
+	useProgressTimeline,
 	useSessionComparison,
 	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
@@ -61,6 +64,8 @@ export default function ProgressPage() {
 	const [volumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>(8)
 	const [exerciseId, setExerciseId] = useState<string>()
 	const [routineDayId, setRoutineDayId] = useState<string>()
+	const [timelineFilter, setTimelineFilter] =
+		useState<ProgressTimelineEventType>()
 	const [rangeAnchor] = useState(() => new Date())
 	const historyParams = useMemo(
 		() => ({ exerciseId, ...getStrengthTrendRange(range, rangeAnchor) }),
@@ -70,6 +75,7 @@ export default function ProgressPage() {
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
+	const timeline = useProgressTimeline(timelineFilter)
 	const historyPage = history.data?.pages[0]
 	const selectedExerciseId =
 		exerciseId ?? historyPage?.selectedExercise?.exerciseId
@@ -95,6 +101,7 @@ export default function ProgressPage() {
 	const recentChanges = trend.data?.points.slice(-6).reverse() ?? []
 	const performanceSessions =
 		history.data?.pages.flatMap(page => page.items) ?? []
+	const timelineItems = timeline.data?.pages.flatMap(page => page.items) ?? []
 	const formatMetric = (value: number) =>
 		`${formatWeightInput(value, weightUnit)} ${unitLabel}`
 	const formatDate = (value: string) =>
@@ -141,6 +148,18 @@ export default function ProgressPage() {
 				isError={sessionComparison.isError}
 				onRoutineDayChange={setRoutineDayId}
 				onRetry={() => void sessionComparison.refetch()}
+			/>
+
+			<ProgressTimeline
+				items={timelineItems}
+				filter={timelineFilter}
+				isPending={timeline.isPending}
+				isError={timeline.isError || timeline.isFetchNextPageError}
+				hasNextPage={Boolean(timeline.hasNextPage)}
+				isFetchingNextPage={timeline.isFetchingNextPage}
+				onFilterChange={setTimelineFilter}
+				onRetry={() => void timeline.refetch()}
+				onLoadMore={() => void timeline.fetchNextPage()}
 			/>
 
 			<section className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">

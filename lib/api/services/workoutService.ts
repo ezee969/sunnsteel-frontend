@@ -18,6 +18,8 @@ import {
 	ExerciseStrengthTrendResponse,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	ProgressTimelineQuery,
+	ProgressTimelineResponse,
 	SessionComparisonQuery,
 	SessionComparisonResponse,
 	VolumeTrendQuery,
@@ -109,6 +111,19 @@ export function buildSessionComparisonQueryString(
 	return query ? `?${query}` : ''
 }
 
+export function buildProgressTimelineQueryString(
+	params: ProgressTimelineQuery,
+): string {
+	const search = new URLSearchParams()
+	if (params.type) search.set('type', params.type)
+	if (params.cursor) search.set('cursor', params.cursor)
+	if (params.limit != null) {
+		search.set('limit', String(Math.min(params.limit, 50)))
+	}
+	const query = search.toString()
+	return query ? `?${query}` : ''
+}
+
 export const workoutService = {
 	getStats: (params: WorkoutStatsQuery): Promise<WorkoutStats> =>
 		httpClient.get<WorkoutStats>(
@@ -151,6 +166,13 @@ export const workoutService = {
 	): Promise<SessionComparisonResponse> =>
 		httpClient.get<SessionComparisonResponse>(
 			`${WORKOUTS_API_URL}/progress/session-comparison${buildSessionComparisonQueryString(params)}`,
+			true,
+		),
+	getProgressTimeline: (
+		params: ProgressTimelineQuery,
+	): Promise<ProgressTimelineResponse> =>
+		httpClient.get<ProgressTimelineResponse>(
+			`${WORKOUTS_API_URL}/progress/timeline${buildProgressTimelineQueryString(params)}`,
 			true,
 		),
 	startSession: async (data: StartWorkoutRequest): Promise<WorkoutSession> => {

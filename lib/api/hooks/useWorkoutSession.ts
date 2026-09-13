@@ -34,6 +34,8 @@ import type {
 	ExerciseStrengthTrendQuery,
 	MuscleGroupHeatmapQuery,
 	MuscleGroupHeatmapResponse,
+	ProgressTimelineEventType,
+	ProgressTimelineResponse,
 	SessionComparisonResponse,
 	VolumeTrendQuery,
 	VolumeTrendResponse,
@@ -109,6 +111,8 @@ const qk = {
 			'session-comparison',
 			routineDayId ?? null,
 		] as const,
+	progressTimeline: (type?: ProgressTimelineEventType) =>
+		['workout', 'progress', 'timeline', type ?? null] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
 	previousPerformance: (id: string) =>
@@ -246,6 +250,25 @@ export const useSessionComparison = (routineDayId?: string) => {
 	return useQuery<SessionComparisonResponse>({
 		queryKey: qk.sessionComparison(routineDayId),
 		queryFn: () => workoutService.getSessionComparison({ routineDayId }),
+		enabled: !isLoading && !!session,
+	})
+}
+
+export const useProgressTimeline = (
+	type?: ProgressTimelineEventType,
+	limit = 20,
+) => {
+	const { session, isLoading } = useAuth()
+	return useInfiniteQuery<ProgressTimelineResponse>({
+		queryKey: qk.progressTimeline(type),
+		queryFn: ({ pageParam }) =>
+			workoutService.getProgressTimeline({
+				type,
+				cursor: (pageParam as string | undefined) ?? undefined,
+				limit,
+			}),
+		initialPageParam: undefined,
+		getNextPageParam: lastPage => lastPage.nextCursor,
 		enabled: !isLoading && !!session,
 	})
 }

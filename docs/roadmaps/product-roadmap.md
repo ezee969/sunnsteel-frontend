@@ -75,6 +75,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
+| PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
 | SOC-02   | `IN_PROGRESS` | Claude | `claude/soc-02` · `.claude-worktrees/soc-02-*`        | 2026-09-13 | CT, BE, FE   |
 | DASH-02  | `IN_PROGRESS` | Claude | `claude/dash-02` · `.claude-worktrees/dash-02-frontend` | 2026-09-13 | FE           |
 | DASH-10  | `IN_PROGRESS` | Claude | `claude/dash-10` · `.claude-worktrees/dash-10-frontend` | 2026-09-13 | FE           |
@@ -147,7 +148,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 3     | Daily session essentials | M    | LIVE-01 through LIVE-06, LIVE-19 (LIVE-01 through LIVE-05 and LIVE-19 shipped)          | `LIVE-05` is shipped; LIVE-06 remains product-blocked.                                                                                                                                |
 | 4     | Visible workout payoff   | M    | Complete — LIVE-07 through LIVE-10 shipped                                              | Session completion now exposes live records, progression explanations, recovery and a reconstructible recap.                                                                          |
 | 5     | Identity and privacy     | XL   | PROF-03 through PROF-10, PROF-12 (PROF-03 through PROF-06, PROF-09 and PROF-12 shipped) | The dependency-ready identity, privacy, discovery and public-sharing foundation is complete; PROF-07, PROF-08 and PROF-10 await achievements, routine sharing and a moderation model. |
-| 6     | Progress destination     | L    | PROG-01 through PROG-04 and PROG-06 shipped; PROG-05, PROG-07 and PROG-08 queued        | Progress combines record frontiers, session history, muscle distribution, bounded workload and same-day session comparisons.                                                          |
+| 6     | Progress destination     | L    | PROG-01 through PROG-04 and PROG-06 shipped; PROG-07 in progress; PROG-05 and PROG-08 queued | Progress combines record frontiers, session history, muscle distribution, bounded workload and same-day session comparisons.                                                     |
 | 7     | Achievements and ranks   | L    | ACH-01 through ACH-05                                                                   | Uses the events layer and turns the visual theme into a product mechanic.                                                                                                             |
 | 8     | Social core              | XL   | SOC-02 through SOC-08 (SOC-02 in progress)                                              | Builds safe discovery and activity before messaging.                                                                                                                                  |
 | 9     | Schedule and push        | XL   | SCHED-01 through SCHED-07, NOTIF-01 through NOTIF-05, NOTIF-08                          | Improves retention and makes the installed PWA materially useful.                                                                                                                     |
@@ -222,7 +223,7 @@ their writers before they can read what they need.
 | PROG-04 | `SHIPPED`   | M    | Volume trends                   | Progress compares external-load volume and completed work across the total, muscles, historical routines and exercises for 4, 8 or 12 Monday-based weeks. The current partial week is explicit and excluded from the latest-versus-previous completed-week delta. Overall and muscle data use the active timezone-matched `DATA-03` projection; routine and exercise dimensions use only the same bounded completed-session window. Bodyweight work contributes sets but no invented load, and muscle sets retain primary 1.0 / secondary 0.5 weighting. Shipped 2026-09-12 through `@sunsteel/contracts@0.21.0` without a migration or rebuild. | DATA-03; `@sunsteel/contracts@0.21.0`          |
 | PROG-05 | `QUEUED`    | M    | Consistency calendar            | Display completed, missed, aborted, scheduled, and recovery days.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | DATA-02, SCHED-01                              |
 | PROG-06 | `SHIPPED`   | M    | Session comparison              | Progress selects any preserved routine day with completed history and compares its latest two completions: duration, unit-aware load volume, completed sets, session notes and exercise-by-exercise actual sets. Exercises and sets match through stable snapshot identities rather than mutable names; skipped work plus exercises added or removed between executions stay explicit, while one-session days and absent notes use honest empty states. The read caps routine-day discovery at 100 and loads only the two selected sessions. Shipped 2026-09-13 through `@sunsteel/contracts@0.22.0` without a migration or backfill.                                                                 | DATA-04; `@sunsteel/contracts@0.22.0`          |
-| PROG-07 | `QUEUED`    | M    | Record and progression timeline | Show when records and prescription changes occurred and why.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | DATA-01, DATA-02                               |
+| PROG-07 | `IN_PROGRESS` | M  | Record and progression timeline | Show when records and prescription changes occurred and why.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | DATA-01, DATA-02                               |
 | PROG-08 | `QUEUED`    | L    | Personal goals                  | Track frequency, strength, volume, consistency, and optional body-measurement targets.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | PREF-02, DATA-03                               |
 | PROG-09 | `CANDIDATE` | M    | Plateau detection               | Surface exercises with repeated comparable performances and no meaningful progress.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | PROG-01, LIVE-04                               |
 | PROG-10 | `CANDIDATE` | M    | Fatigue indicators              | Combine RPE, missed targets, recent decline, and frequency to flag possible fatigue without diagnosing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | LIVE-04, DATA-03                               |
@@ -773,7 +774,15 @@ it again without addressing the original decision.
   selector-control warnings found during the pass were corrected before
   closure. `PROG-06` is the recommended next dependency-ready progress slice;
   `PROG-05` still waits on the schedule-instance model owned by `SCHED-01`.
-- **2026-09-13 (revision 32):** Shipped `PROG-06` across contracts, backend and
+- **2026-09-13 (revision 32):** Added [In-flight work](#in-flight-work) so
+  parallel agents working in separate worktrees can see each other's claims on
+  `main`, and tightened step 4 of the usage rules to require a claim before
+  implementation. Recorded the then-current claims: Codex on `PROG-06`, Claude on
+  `SOC-02` with `DASH-02`, `DASH-10` and `TRUST-02` reserved as `NEXT`, chosen
+  because none of them touches the Progress page, workout sessions, routine
+  snapshots or routine-day identity that `PROG-06` reads. Closed `NAV-06` as
+  already shipped by the sidebar `History` entry.
+- **2026-09-13 (revision 33):** Shipped `PROG-06` across contracts, backend and
   frontend. Published `@sunsteel/contracts@0.22.0` and added a bounded,
   owner-scoped comparison endpoint over existing `DATA-04` snapshots; no
   migration or historical rebuild was required. Progress now selects any
@@ -785,15 +794,8 @@ it again without addressing the original decision.
   days plus both themes at every required 320-1440 px width with no page
   overflow or browser errors; the 14-case automated Progress layout slice also
   passed. The broader sweep remains red on a pre-feature public Login resource
-  404. `PROG-07` is the recommended next
-  dependency-ready progress slice; `PROG-05` still waits on the
-  schedule-instance model owned by `SCHED-01`.
-- **2026-09-13 (revision 33):** Added [In-flight work](#in-flight-work) so
-  parallel agents working in separate worktrees can see each other's claims on
-  `main`, and tightened step 4 of the usage rules to require a claim before
-  implementation. Recorded the claims in flight: Codex on `PROG-06` (released once
-  revision 32 shipped it), Claude on
-  `SOC-02` with `DASH-02`, `DASH-10` and `TRUST-02` reserved as `NEXT`, chosen
-  because none of them touches the Progress page, workout sessions, routine
-  snapshots or routine-day identity that `PROG-06` reads. Closed `NAV-06` as
-  already shipped by the sidebar `History` entry.
+  404. `PROG-07` is the recommended next dependency-ready progress slice;
+  `PROG-05` still waits on the schedule-instance model owned by `SCHED-01`.
+- **2026-09-13 (revision 34):** Reconciled the claim ledger with the shipped
+  `PROG-06` delivery, released its completed claim and claimed `PROG-07` for
+  Codex across contracts, backend and frontend before implementation.
