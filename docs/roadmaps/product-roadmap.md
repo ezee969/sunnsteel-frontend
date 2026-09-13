@@ -76,7 +76,6 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | ----------------------------------------------------- | ---------- | ------------ |
 | PROG-07  | `IN_PROGRESS` | Codex  | `codex/prog-07` · `.codex-worktrees/prog-07-*`        | 2026-09-13 | CT, BE, FE   |
-| EXER-09  | `IN_PROGRESS` | Claude | `claude/exer-09` · `.claude-worktrees/exer-09-*`       | 2026-09-13 | CT, BE, FE   |
 
 ## Current product snapshot
 
@@ -245,10 +244,18 @@ cold-start impact and showing that simpler rendering is insufficient.
 | EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
 | EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
 | EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
-| EXER-09 | `IN_PROGRESS` | L  | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
+| EXER-09 | `SHIPPED`   | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
 
 The first Exercises release should emphasize the user's existing training data.
 Instructions and media make this a content project as well as an engineering one.
+
+`EXER-09` shipped the data those items were waiting on: every catalog exercise
+now carries a movement pattern, a compound/isolation mechanic, the equipment it
+needs (in the same lowercase vocabulary as `PREF-01` location equipment) and a
+substitution group of near-identical exercises that never crosses movement
+patterns. `EXER-02`, `EXER-05` and `ROUT-10` are no longer blocked on catalog
+data. `instructions` and `mediaUrl` exist but stay empty until `EXER-03` and
+`EXER-04` supply real content; nothing should render them before then.
 
 ### Routines and programming
 
@@ -476,6 +483,7 @@ it again without addressing the original decision.
 | 2026-09-13 | SOC-07 | CT `@sunsteel/contracts@0.25.0` share field, request, link and shared-recap types; BE `SessionShare` migration `20260913180000_session_shares`, `workout-session-share.service.ts`, owner `/workouts/sessions/:id/shares` routes and unguarded `GET /shared/sessions/:token` with twelve focused tests; FE `SessionShareButton` on the history recap, field-scoped `SessionRecapContent`, public `/shared/sessions/<token>` page and three utility tests; all three CI pipelines, Railway `827e893` (migration applied) and Vercel `09342d9` green | Links carry a 144-bit base64url token; the public read resolves only active tokens, rebuilds the recap and serializes only the selected fields plus the owner's identity and weight unit, with `Cache-Control: no-store`. Profile privacy does not gate a share: creating one is explicit per-session consent, while the linked `/members` profile keeps its own privacy. **Authenticated-browser verified 2026-09-13 in production:** the dialog opened with duration, volume, completed sets and records checked and progression/notes unchecked; creating a link returned 201 with exactly those fields; signed out, the page showed the routine, owner and those four regions, hid notes, progression and the comparison, exposed no email and linked to `/members/<username>`, with zero page overflow in both themes at 320/390/768/1024/1440 px and no failed Vercel/Railway requests. Revoking returned 204 and the same URL then rendered "This link is no longer available". An interrupted first run had left one active link; it was revoked in the same pass, so no public link remains. |
 
 | 2026-09-13 | A11Y-01 | FE `lib/utils/motion-preference.ts` (+ five tests), `hooks/use-motion-preference.ts`, `features/settings/motion-preference-card.tsx`, the pre-paint script in `app/layout.tsx`, the `data-motion` mirror in `app/globals.css`, `MotionConfig` in `providers/app-provider.tsx`, `InitialLoadAnimation.tsx` and `components/ui/toast.tsx`; local `npm run verify` (211 tests, build) with the mirror confirmed in the compiled stylesheet; frontend CI and Vercel `15375bf` green | The OS `prefers-reduced-motion` block already covered CSS; the gaps were framer-motion values it cannot reach and the absence of any in-app choice. The new Settings "Reduce motion" choice is stored per device, not per account: it must apply before first paint on the splash and on signed-out pages, before any account data loads, and syncing it would need a contract field. It can only add reduction, never re-enable motion the OS reduced. **Authenticated-browser verified 2026-09-13 in production:** enabling it set `data-motion="reduce"` and `ss-motion`, dropped `--motion-base` from 0.2s to 0.12s and stopped a probe spinner; all of that survived a reload and reverted when disabled. With the OS setting emulated, the card showed checked, disabled and explained why. A stored preference applied before paint on signed-out `/login`, and the reduced mobile splash rendered its load bar complete instead of growing it. The card had no overflow in both themes at 320/390/768/1024/1440 px, and no console or page errors occurred. |
+| 2026-09-13 | EXER-09 | CT `@sunsteel/contracts@0.26.0` `MOVEMENT_PATTERNS`, `EXERCISE_MECHANICS`, `EXERCISE_EQUIPMENT` and six new `Exercise` fields; BE single-source `prisma/exercise-catalog.ts`, migration `20260913200000_exercise_metadata` (two enums, six columns, two indexes, 80 generated backfill updates), `mapExercise` contract boundary and six focused tests in `scripts/exercise-catalog.test.ts` (`917666f`, `f04ba72`); FE contract bump `2cc2a82`; all three CI pipelines and Railway `f04ba72` (migration applied) green | Backend and contracts only; no user-facing surface changes. One catalog file now feeds both the seed and the migration: `buildExerciseMetadataSql()` generated the backfill, and a test fails if the two drift, so reclassifying production exercises needs a new generated migration, not only a seed run. Equipment is stored as text but `GET /exercises` drops values outside the closed vocabulary. The first deploy was gated by a red `analytics-integration` job because its hand-assembled test schema lacked the new migration and the generated client selected the new columns; `f04ba72` appended it and the pipeline went green before Railway deployed. **Production API verified 2026-09-13** with the owner session: `GET /exercises` returned 200 with 80 exercises, none missing a pattern, mechanic, substitution group or equipment; 22 movement patterns and 30 substitution groups were in use, `instructions` was empty and `mediaUrl` null for all of them. |
 ## Document history
 
 - **2026-09-06:** Created the canonical product registry from a review of the
@@ -821,3 +829,9 @@ it again without addressing the original decision.
   "Account preference" was delivered as a per-device setting, because it has
   to take effect before first paint and before the account loads; an
   account-synced copy would need a contract field and is not scheduled.
+- **2026-09-13 (revision 38):** Shipped `EXER-09` and released its claim.
+  Catalog metadata (movement pattern, mechanic, required equipment,
+  substitution group) is in production for all 80 exercises, which unblocks
+  `EXER-02`, `EXER-05` and `ROUT-10`. `LIVE-11` still waits on `EXER-05`.
+  Instruction and media fields exist but remain empty by design until
+  `EXER-03`/`EXER-04`.
