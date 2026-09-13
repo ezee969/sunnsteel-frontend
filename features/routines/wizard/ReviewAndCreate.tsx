@@ -12,10 +12,13 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
+import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 
 import { RoutineDayCard } from './components/RoutineDayCard'
+import { RoutineQualitySummary } from './components/RoutineQualitySummary'
 import { RoutineSummaryStats } from './components/RoutineSummaryStats'
 import { useRoutineExercisesLookup } from './hooks/useRoutineExercisesLookup'
+import { useRoutineQualitySummary } from './hooks/useRoutineQualitySummary'
 import { useRoutineSubmission } from './hooks/useRoutineSubmission'
 import { useRoutineSummaryStats } from './hooks/useRoutineSummaryStats'
 import type { RoutineWizardData } from './types'
@@ -46,7 +49,16 @@ export function ReviewAndCreate({
 	isEditing = false,
 	onComplete,
 }: ReviewAndCreateProps) {
-	const { data: exercises } = useExercises()
+	const {
+		data: exercises,
+		isLoading: isLoadingExercises,
+		isError: exercisesFailed,
+	} = useExercises()
+	const {
+		data: locations,
+		isLoading: isLoadingLocations,
+		isError: locationsFailed,
+	} = useTrainingLocations()
 	const weightUnit = useWeightUnit()
 	const exerciseMap = useRoutineExercisesLookup(exercises)
 
@@ -57,6 +69,14 @@ export function ReviewAndCreate({
 		onComplete,
 	})
 	const totals = useRoutineSummaryStats(data)
+	const quality = useRoutineQualitySummary(data, exerciseMap, locations)
+	const qualityStatus = exercises
+		? 'ready'
+		: isLoadingExercises
+			? 'loading'
+			: exercisesFailed
+				? 'error'
+				: 'loading'
 
 	return (
 		<div className="space-y-6">
@@ -133,6 +153,12 @@ export function ReviewAndCreate({
 			</Accordion>
 
 			<RoutineSummaryStats totals={totals} />
+
+			<RoutineQualitySummary
+				status={qualityStatus}
+				summary={quality}
+				showEquipmentCheck={!isLoadingLocations && !locationsFailed}
+			/>
 
 			<div className="flex gap-4">
 				<Button
