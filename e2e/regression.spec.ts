@@ -406,6 +406,9 @@ type SweepRoute = {
 const ROUTES: SweepRoute[] = [
 	{ slug: 'login', path: () => '/login', signedOut: true },
 	{ slug: 'signup', path: () => '/signup', signedOut: true },
+	{ slug: 'forgot-password', path: () => '/forgot-password', signedOut: true },
+	// Signed out, the reset page shows its "link can't be used" state (FIX-11).
+	{ slug: 'reset-password', path: () => '/reset-password', signedOut: true },
 	{
 		slug: 'members',
 		path: found => found.username && `/members/${found.username}`,

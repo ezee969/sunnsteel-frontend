@@ -8,6 +8,20 @@ import {
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { logger } from '@/lib/utils/logger'
 
+/** Email a password-reset link (FIX-11). */
+export const useRequestPasswordReset = () =>
+	useMutation({
+		mutationFn: ({ email }: { email: string }) =>
+			supabaseAuthService.requestPasswordReset(email),
+	})
+
+/** Set a new password for the current (recovery) session. */
+export const useUpdatePassword = () =>
+	useMutation({
+		mutationFn: ({ password }: { password: string }) =>
+			supabaseAuthService.updatePassword(password),
+	})
+
 /**
  * Hook for signing up with email and password
  * Redirects based on verification requirements.

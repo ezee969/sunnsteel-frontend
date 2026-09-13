@@ -5,6 +5,7 @@ import type {
 import type { Session } from '@supabase/supabase-js'
 
 import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
+import { buildPasswordResetRedirect } from '@/lib/auth/password-reset'
 import { PUBLIC_ENV } from '@/lib/config/env'
 import { supabase } from '@/lib/supabase/client'
 import { getFullErrorMessage } from '@/lib/utils/error-messages'
@@ -169,6 +170,39 @@ export class SupabaseAuthService {
 		}
 
 		return { url: data.url }
+	}
+
+	/**
+	 * Email a password-reset link (FIX-11). Supabase answers the same way
+	 * whether or not the address has an account, so callers must not claim one
+	 * exists. The link signs the user in and returns through `/auth/callback`
+	 * to `/reset-password`.
+	 */
+	async requestPasswordReset(email: string): Promise<void> {
+		const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
+		const siteUrl =
+			configuredBaseUrl ||
+			(typeof window !== 'undefined' ? window.location.origin : '')
+
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: buildPasswordResetRedirect(siteUrl),
+		})
+		if (error) {
+			logger.warn('[auth-service] password reset request rejected', error)
+			throw new Error(getFullErrorMessage(error.message))
+		}
+	}
+
+	/**
+	 * Set a new password for the signed-in (usually recovery) session. The
+	 * resulting USER_UPDATED event re-verifies the profile in the provider.
+	 */
+	async updatePassword(password: string): Promise<void> {
+		const { error } = await supabase.auth.updateUser({ password })
+		if (error) {
+			logger.warn('[auth-service] password update rejected', error)
+			throw new Error(getFullErrorMessage(error.message))
+		}
 	}
 
 	/**

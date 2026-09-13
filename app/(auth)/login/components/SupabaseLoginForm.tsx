@@ -163,7 +163,6 @@ export function SupabaseLoginForm() {
 										<Link
 											href="/forgot-password"
 											className="type-body-sm -mr-2 p-2 text-ink-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
-											tabIndex={-1}
 										>
 											Forgot password?
 										</Link>

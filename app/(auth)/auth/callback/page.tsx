@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
+import { callbackWithoutSessionRedirect } from '@/lib/auth/password-reset'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
@@ -22,7 +23,11 @@ function AuthCallbackContent() {
 			return
 		}
 		if (!session) {
-			router.replace('/login?error=no_session')
+			// An expired or already-used reset link carries no session; send it
+			// back to the request form with an explanation (FIX-11).
+			router.replace(
+				callbackWithoutSessionRedirect(searchParams.get('callbackUrl')),
+			)
 			return
 		}
 		// The provider publishes this profile only after the marker is settled.
