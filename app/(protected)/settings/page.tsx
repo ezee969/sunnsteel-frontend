@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { MotionPreferenceCard } from '@/features/settings/motion-preference-card'
 import { PrivacyOverviewCard } from '@/features/settings/privacy-overview-card'
 import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
@@ -547,6 +548,8 @@ export default function SettingsPage() {
 			{user ? (
 				<ProfilePrivacySettingsCard settings={user.privacySettings} />
 			) : null}
+
+			<MotionPreferenceCard />
 
 			<ImageCropper
 				open={cropperOpen}

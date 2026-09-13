@@ -5,6 +5,8 @@ import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
+import { useMotionPreference } from '@/hooks/use-motion-preference'
+import { getSplashMotion } from '@/lib/utils/motion-preference'
 
 let hasShownInitialLoader = false
 
@@ -37,17 +39,6 @@ const getRandomMobileBackground = () =>
 /** `--ease-standard` (design system §9). */
 const EASE_STANDARD = [0.2, 0, 0, 1] as const
 
-/**
- * One opacity fade, staggered by `delay`. The splash animates opacity only
- * (motion spec §4-§5): the rise, scale, spin, shimmer sweep and floating
- * particles it used to run are all on that spec's prohibited list.
- */
-const fadeIn = (delay: number, duration = 0.3) => ({
-	initial: { opacity: 0 },
-	animate: { opacity: 1 },
-	transition: { duration, delay, ease: EASE_STANDARD },
-})
-
 interface InitialLoadAnimationProps {
 	children: React.ReactNode
 }
@@ -65,6 +56,22 @@ export const InitialLoadAnimation = ({
 	const [showContent, setShowContent] = useState(!shouldAnimate)
 	const [backgroundImage, setBackgroundImage] = useState(MOBILE_BACKGROUNDS[0])
 	const hasRandomizedBackground = useRef(false)
+	// A11Y-01: the OS setting or the device preference. The splash keeps the
+	// same content either way; only how it arrives changes (motion spec §3).
+	const { reduced } = useMotionPreference()
+	const splash = getSplashMotion(reduced)
+
+	/**
+	 * One opacity fade, staggered by `delay`. The splash animates opacity only
+	 * (motion spec §4-§5): the rise, scale, spin, shimmer sweep and floating
+	 * particles it used to run are all on that spec's prohibited list. Reduced
+	 * motion drops the stagger and uses `--motion-fast`.
+	 */
+	const fadeIn = (delay: number, duration = 0.3) => ({
+		initial: { opacity: 0 },
+		animate: { opacity: 1 },
+		transition: { ...splash.fade(delay, duration), ease: EASE_STANDARD },
+	})
 
 	useEffect(() => {
 		if (!shouldAnimate) {
@@ -101,7 +108,10 @@ export const InitialLoadAnimation = ({
 						initial={{ opacity: 1 }}
 						exit={{
 							opacity: 0,
-							transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+							transition: {
+								duration: splash.exitDuration,
+								ease: [0.4, 0, 0.2, 1],
+							},
 						}}
 					>
 						<motion.div className="absolute inset-0" {...fadeIn(0, 0.35)}>
@@ -155,36 +165,47 @@ export const InitialLoadAnimation = ({
 									<p className="type-label text-ink-3">
 										Preparing Your Journey
 									</p>
+									{/* An infinite pulse is loading decoration; reduced motion
+									    holds the dots still, as it does the spinner (§3). */}
 									<div className="flex gap-1" aria-hidden>
-										{[0, 1, 2].map(i => (
-											<motion.span
-												key={i}
-												className="size-1.5 bg-ink-3"
-												animate={{ opacity: [0.3, 1, 0.3] }}
-												transition={{
-													duration: 0.9,
-													repeat: Infinity,
-													delay: i * 0.15,
-													ease: 'easeInOut',
-												}}
-											/>
-										))}
+										{[0, 1, 2].map(i =>
+											splash.pulseDots ? (
+												<motion.span
+													key={i}
+													className="size-1.5 bg-ink-3"
+													animate={{ opacity: [0.3, 1, 0.3] }}
+													transition={{
+														duration: 0.9,
+														repeat: Infinity,
+														delay: i * 0.15,
+														ease: 'easeInOut',
+													}}
+												/>
+											) : (
+												<span key={i} className="size-1.5 bg-ink-3" />
+											),
+										)}
 									</div>
 								</div>
 
 								{/* A square track with an ink fill: loading is progress,
-								    not honour, and radius is for avatars only (§7). */}
+								    not honour, and radius is for avatars only (§7). Under
+								    reduced motion the fill does not grow; it is simply full. */}
 								<div className="h-0.5 w-full max-w-xs overflow-hidden bg-rule-faint">
-									<motion.div
-										className="h-full bg-foreground"
-										initial={{ width: '0%' }}
-										animate={{ width: '100%' }}
-										transition={{
-											duration: 0.35,
-											delay: 0.85,
-											ease: [0.4, 0, 0.2, 1],
-										}}
-									/>
+									{splash.animateProgress ? (
+										<motion.div
+											className="h-full bg-foreground"
+											initial={{ width: '0%' }}
+											animate={{ width: '100%' }}
+											transition={{
+												duration: 0.35,
+												delay: 0.85,
+												ease: [0.4, 0, 0.2, 1],
+											}}
+										/>
+									) : (
+										<div className="h-full w-full bg-foreground" />
+									)}
 								</div>
 							</motion.div>
 						</motion.div>
@@ -199,7 +220,10 @@ export const InitialLoadAnimation = ({
 			<motion.div
 				initial={false}
 				animate={{ opacity: showContent ? 1 : 0 }}
-				transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+				transition={{
+					duration: splash.contentFadeDuration,
+					ease: [0.25, 0.1, 0.25, 1],
+				}}
 				className="min-h-screen"
 			>
 				{children}

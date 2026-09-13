@@ -10,6 +10,7 @@ import {
 	useState,
 } from 'react'
 
+import { useMotionPreference } from '@/hooks/use-motion-preference'
 import { cn } from '@/lib/utils'
 
 export type ToastVariant =
@@ -72,6 +73,7 @@ const variantStyles: Record<
 export function ToastProvider({ children }: { children: ReactNode }) {
 	const [toasts, setToasts] = useState<Toast[]>([])
 	const [mounted, setMounted] = useState(false)
+	const { reduced: reducedMotion } = useMotionPreference()
 	useEffect(() => {
 		setMounted(true)
 	}, [])
@@ -146,10 +148,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
 								{/* Auto-dismiss timer. It measures time, not status, so it
 								    takes no semantic colour (§4.3 rule 8's converse). */}
+								{/* Width is not animated under reduced motion (motion spec
+								    §3): the bar holds at full width until dismissal. */}
 								{t.duration && t.duration > 0 && (
 									<motion.div
 										initial={{ width: '100%' }}
-										animate={{ width: '0%' }}
+										animate={{ width: reducedMotion ? '100%' : '0%' }}
 										transition={{ duration: t.duration / 1000, ease: 'linear' }}
 										className="absolute bottom-0 left-0 h-[2px] bg-rule"
 									/>

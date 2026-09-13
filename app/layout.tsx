@@ -5,6 +5,7 @@ import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
 
 import DevInjections from '@/components/dev-injections'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
+import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
 import { AppProvider } from '@/providers/app-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
@@ -126,6 +127,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es" suppressHydrationWarning>
+			<head>
+				{/* A11Y-01: apply the device's stored reduce-motion choice before the
+				    first paint, the way next-themes applies the theme. */}
+				<script
+					dangerouslySetInnerHTML={{ __html: MOTION_PREFERENCE_SCRIPT }}
+				/>
+			</head>
 			<body
 				className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
 				suppressHydrationWarning
