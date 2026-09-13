@@ -130,12 +130,14 @@ export function SupabaseLoginForm() {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Email</FormLabel>
-									<FormControl>
-										<div className="relative">
-											<Mail
-												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
-												aria-hidden
-											/>
+									{/* FormControl wraps the input itself so the label and
+									    error bind to it, not to the icon container. */}
+									<div className="relative">
+										<Mail
+											className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+											aria-hidden
+										/>
+										<FormControl>
 											<Input
 												placeholder="name@example.com"
 												type="email"
@@ -146,8 +148,8 @@ export function SupabaseLoginForm() {
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
-										</div>
-									</FormControl>
+										</FormControl>
+									</div>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -167,12 +169,12 @@ export function SupabaseLoginForm() {
 											Forgot password?
 										</Link>
 									</div>
-									<FormControl>
-										<div className="relative">
-											<Lock
-												className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
-												aria-hidden
-											/>
+									<div className="relative">
+										<Lock
+											className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+											aria-hidden
+										/>
+										<FormControl>
 											<Input
 												type={showPassword ? 'text' : 'password'}
 												placeholder="••••••••"
@@ -181,23 +183,23 @@ export function SupabaseLoginForm() {
 												disabled={isPending || isGooglePending}
 												{...field}
 											/>
-											<button
-												type="button"
-												onClick={() => setShowPassword(!showPassword)}
-												aria-label={
-													showPassword ? 'Hide password' : 'Show password'
-												}
-												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
-												disabled={isPending || isGooglePending}
-											>
-												{showPassword ? (
-													<EyeOff className="h-4 w-4" />
-												) : (
-													<Eye className="h-4 w-4" />
-												)}
-											</button>
-										</div>
-									</FormControl>
+										</FormControl>
+										<button
+											type="button"
+											onClick={() => setShowPassword(!showPassword)}
+											aria-label={
+												showPassword ? 'Hide password' : 'Show password'
+											}
+											className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
+											disabled={isPending || isGooglePending}
+										>
+											{showPassword ? (
+												<EyeOff className="h-4 w-4" />
+											) : (
+												<Eye className="h-4 w-4" />
+											)}
+										</button>
+									</div>
 									<FormMessage />
 								</FormItem>
 							)}

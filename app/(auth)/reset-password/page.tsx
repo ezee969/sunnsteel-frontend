@@ -125,12 +125,12 @@ export default function ResetPasswordPage() {
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>{label}</FormLabel>
-												<FormControl>
-													<div className="relative">
-														<Lock
-															className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
-															aria-hidden
-														/>
+												<div className="relative">
+													<Lock
+														className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+														aria-hidden
+													/>
+													<FormControl>
 														<Input
 															type={showPassword ? 'text' : 'password'}
 															placeholder="••••••••"
@@ -139,27 +139,27 @@ export default function ResetPasswordPage() {
 															disabled={isPending}
 															{...field}
 														/>
-														{name === 'password' && (
-															<button
-																type="button"
-																onClick={() => setShowPassword(!showPassword)}
-																aria-label={
-																	showPassword
-																		? 'Hide passwords'
-																		: 'Show passwords'
-																}
-																className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
-																disabled={isPending}
-															>
-																{showPassword ? (
-																	<EyeOff className="h-4 w-4" />
-																) : (
-																	<Eye className="h-4 w-4" />
-																)}
-															</button>
-														)}
-													</div>
-												</FormControl>
+													</FormControl>
+													{name === 'password' && (
+														<button
+															type="button"
+															onClick={() => setShowPassword(!showPassword)}
+															aria-label={
+																showPassword
+																	? 'Hide passwords'
+																	: 'Show passwords'
+															}
+															className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
+															disabled={isPending}
+														>
+															{showPassword ? (
+																<EyeOff className="h-4 w-4" />
+															) : (
+																<Eye className="h-4 w-4" />
+															)}
+														</button>
+													)}
+												</div>
 												<FormMessage />
 											</FormItem>
 										)}

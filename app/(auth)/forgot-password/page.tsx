@@ -106,12 +106,14 @@ function ForgotPasswordContent() {
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>Email</FormLabel>
-											<FormControl>
-												<div className="relative">
-													<Mail
-														className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
-														aria-hidden
-													/>
+											{/* FormControl wraps the input itself so the label and
+											    error bind to it, not to the icon container. */}
+											<div className="relative">
+												<Mail
+													className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
+													aria-hidden
+												/>
+												<FormControl>
 													<Input
 														placeholder="name@example.com"
 														type="email"
@@ -122,8 +124,8 @@ function ForgotPasswordContent() {
 														disabled={isPending}
 														{...field}
 													/>
-												</div>
-											</FormControl>
+												</FormControl>
+											</div>
 											<FormMessage />
 										</FormItem>
 									)}
