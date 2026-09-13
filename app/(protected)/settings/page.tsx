@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { PrivacyOverviewCard } from '@/features/settings/privacy-overview-card'
 import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
@@ -536,6 +537,8 @@ export default function SettingsPage() {
 			{user ? (
 				<TrainingIdentitySettingsCard identity={user.trainingIdentity} />
 			) : null}
+
+			{user ? <PrivacyOverviewCard profile={user} /> : null}
 
 			{user ? (
 				<ProfileDiscoverySettingsCard settings={user.discoverySettings} />

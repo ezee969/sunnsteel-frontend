@@ -25,56 +25,48 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
 import { useUpdateProfilePrivacy } from '@/lib/api/hooks/useUpdateProfilePrivacy'
+import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
 
 interface PrivacyField {
 	key: keyof ProfilePrivacySettings
-	label: string
 	description: string
 }
 
 const PRIVACY_FIELDS: PrivacyField[] = [
 	{
 		key: 'biography',
-		label: 'Biography',
 		description: 'Controls the biography shown in the About section.',
 	},
 	{
 		key: 'location',
-		label: 'Location',
 		description: 'Controls the location shown in the About section.',
 	},
 	{
 		key: 'trainingIdentity',
-		label: 'Training identity',
 		description:
 			'Controls your goals, experience, disciplines, preferred style, and favorite exercises.',
 	},
 	{
 		key: 'workoutHistory',
-		label: 'Workout history',
 		description:
 			'Controls your completed workout count, total volume, and streak summary.',
 	},
 	{
 		key: 'records',
-		label: 'Personal records',
 		description: 'Controls the personal records shown on your profile.',
 	},
 	{
 		key: 'bodyMetrics',
-		label: 'Body metrics',
 		description:
 			'Controls age, sex, weight, and height. Your email is never shared.',
 	},
 	{
 		key: 'routines',
-		label: 'Routines',
 		description:
 			'Saves who may see routines when profile routine sharing becomes available.',
 	},
 	{
 		key: 'achievements',
-		label: 'Achievements',
 		description:
 			'Saves who may see achievements when profile achievements become available.',
 	},
@@ -147,7 +139,9 @@ export function ProfilePrivacySettingsCard({
 							className="grid gap-3 py-4 first:pt-0 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-center"
 						>
 							<div className="space-y-1">
-								<Label htmlFor={`privacy-${field.key}`}>{field.label}</Label>
+								<Label htmlFor={`privacy-${field.key}`}>
+									{PRIVACY_SECTION_LABELS[field.key]}
+								</Label>
 								<p className="type-body-sm text-ink-3">{field.description}</p>
 							</div>
 							<Select
