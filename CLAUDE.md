@@ -197,6 +197,8 @@ Active technical debt, with evidence and closure criteria, is tracked in [docs/r
 
 Before proposing or implementing product features, read [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md). It is the canonical cross-repository registry for shipped capabilities, the active queue, dependencies, deferred work and retained product decisions. Verify the code before changing a feature to `SHIPPED`; performance defects and cleanup remain in [docs/roadmaps/technical-debt.md](docs/roadmaps/technical-debt.md).
 
+Several agents work in parallel, each in its own git worktree. Before starting a roadmap item, read the roadmap's **In-flight work** table on `main`: never start a claimed item or one whose modules overlap a claim, and claim yours on `main` (status plus a row with owner and branch) before creating the worktree. A status changed only inside a feature branch is invisible to the other agents.
+
 ## Portfolio docs (monorepo parent folder)
 
 `../FEATURES.md` (product-facing) and `../TECH_STACK.md` (technical/portfolio-facing) live in the parent workspace folder (`sunsteel/`), **outside this repository**. They are derived documents: the code and [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md) are the sources of truth.
