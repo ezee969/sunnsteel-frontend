@@ -77,10 +77,15 @@ export function useTodaysWorkouts() {
 		return todays.filter(({ routine }) => !completedRoutineIds.has(routine.id))
 	}, [todays, completedRoutineIds])
 
+	// The query sorts by finish time, so the first item is today's latest
+	// completed workout — the one DASH-02 offers to review.
+	const completedToday = completedTodayQuery.data?.pages[0]?.items?.[0] ?? null
+
 	return {
 		todayDow,
 		entries,
 		active: activeQuery.data,
+		completedToday,
 		error: routinesQuery.error,
 		isPending:
 			routinesQuery.isPending ||

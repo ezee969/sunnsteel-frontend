@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, CalendarDays, ChevronRight, Dumbbell } from 'lucide-react'
+import { Calendar, ChevronRight, Dumbbell, History } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -28,6 +28,10 @@ import {
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { cn } from '@/lib/utils'
+import {
+	getDashboardPrimaryCopy,
+	resolveDashboardPrimaryAction,
+} from '@/lib/utils/dashboard-primary-action'
 import { weekdayName } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
@@ -42,6 +46,7 @@ export default function TodaysWorkouts() {
 		todayDow,
 		entries: visibleTodays,
 		active,
+		completedToday,
 		error,
 		isPending: isDataPending,
 	} = useTodaysWorkouts()
@@ -79,37 +84,19 @@ export default function TodaysWorkouts() {
 		)
 	}
 
-	if (!visibleTodays.length) {
-		return (
-			<Card>
-				<CardHeader>
-					<CardTitle className="type-section flex items-center gap-2 text-foreground">
-						<CalendarDays className="h-4 w-4 text-ink-3" aria-hidden />
-						No workouts scheduled today
-					</CardTitle>
-					<CardDescription>
-						You don’t have any routines planned for{' '}
-						{weekdayName(todayDow, 'long')}. Start one from your routines.
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<Button asChild aria-label="Go to routines">
-						<Link href="/routines">
-							<ClassicalIcon
-								name={'scroll-unfurled'}
-								aria-hidden
-								className={cn(
-									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
-									'text-primary-foreground',
-								)}
-							/>
-							Browse Routines
-						</Link>
-					</Button>
-				</CardContent>
-			</Card>
-		)
-	}
+	// DASH-02: one dominant action for the user's current state — resume an
+	// open session, start today's workout, review the one already finished, or
+	// browse routines. §4.3 rule 1: it is the only filled control in the card;
+	// every repeated row control is outline.
+	const action = resolveDashboardPrimaryAction({
+		active,
+		entries: visibleTodays,
+		completedToday,
+	})
+	const copy = getDashboardPrimaryCopy(action, {
+		plannedCount: visibleTodays.length,
+		todayName: weekdayName(todayDow, 'long'),
+	})
 
 	return (
 		<>
@@ -118,76 +105,119 @@ export default function TodaysWorkouts() {
 			<Card>
 				<CardHeader>
 					<CardTitle className="type-section text-foreground">
-						Today’s Workouts
+						{copy.title}
 					</CardTitle>
-					<CardDescription>
-						{visibleTodays.length === 1
-							? 'You have 1 workout planned.'
-							: `You have ${visibleTodays.length} workouts planned.`}
-					</CardDescription>
+					<CardDescription>{copy.description}</CardDescription>
 				</CardHeader>
-				<CardContent>
-					{visibleTodays.map(({ routine, day, canStartToday }) => {
-						const isActiveForThis =
-							active?.status === 'IN_PROGRESS' &&
-							active?.routineDayId === day.id
-						return (
-							<div
-								key={`${routine.id}:${day.id}`}
-								className="rule-row py-3 first:pt-0 last:pb-0 sm:flex sm:items-center sm:justify-between"
-							>
-								<div className="min-w-0 flex-1">
-									<div className="flex flex-wrap items-center gap-2">
-										<span className="type-panel min-w-0 truncate text-foreground">
-											{routine.name}
-										</span>
-										{/* §4.3 rule 3 — a scheduled weekday is not an achievement,
-										    so it is not an honour mark. */}
-										<Badge variant="outline">
-											<Calendar className="h-3 w-3" aria-hidden />
-											{weekdayName(day.dayOfWeek)}
-										</Badge>
+				<CardContent className="space-y-4">
+					{action.kind === 'RESUME' ? (
+						<Button
+							type="button"
+							onClick={() =>
+								router.push(`/workouts/sessions/${action.sessionId}`)
+							}
+							{...preloadOnHover('activeWorkoutSession')}
+						>
+							<Dumbbell aria-hidden />
+							Resume workout
+						</Button>
+					) : action.kind === 'REVIEW' ? (
+						<Button asChild>
+							<Link href={`/workouts/history/${action.sessionId}`}>
+								<History aria-hidden />
+								Review session
+							</Link>
+						</Button>
+					) : action.kind === 'BROWSE' ? (
+						<Button asChild>
+							<Link href="/routines">
+								<ClassicalIcon
+									name={'scroll-unfurled'}
+									aria-hidden
+									className={cn(
+										'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
+										'text-primary-foreground',
+									)}
+								/>
+								Browse Routines
+							</Link>
+						</Button>
+					) : null}
+
+					{visibleTodays.length > 0 ? (
+						<div>
+							{visibleTodays.map(({ routine, day, canStartToday }) => {
+								const isActiveForThis =
+									action.kind === 'RESUME' && action.routineDayId === day.id
+								const isPrimary =
+									action.kind === 'START' && action.routineDayId === day.id
+								return (
+									<div
+										key={`${routine.id}:${day.id}`}
+										className="rule-row py-3 first:pt-0 last:pb-0 sm:flex sm:items-center sm:justify-between"
+									>
+										<div className="min-w-0 flex-1">
+											<div className="flex flex-wrap items-center gap-2">
+												<span className="type-panel min-w-0 truncate text-foreground">
+													{routine.name}
+												</span>
+												{/* §4.3 rule 3 — a scheduled weekday is not an
+												    achievement, so it is not an honour mark. */}
+												<Badge variant="outline">
+													<Calendar className="h-3 w-3" aria-hidden />
+													{weekdayName(day.dayOfWeek)}
+												</Badge>
+											</div>
+											{isActiveForThis ? (
+												<p className="type-body-sm mt-1 text-ink-3">
+													In progress
+												</p>
+											) : null}
+										</div>
+										<div
+											className={cn(
+												'mt-3 grid w-full gap-2 sm:mt-0 sm:ml-3 sm:flex sm:w-auto sm:shrink-0 sm:items-center',
+												isActiveForThis ? 'grid-cols-1' : 'grid-cols-2',
+											)}
+										>
+											{isActiveForThis ? null : (
+												<Button
+													type="button"
+													className="w-full sm:w-auto"
+													variant={isPrimary ? 'default' : 'outline'}
+													aria-label={`Start ${routine.name}`}
+													onClick={() => handleStart(routine.id, day.id)}
+													disabled={isPending || !canStartToday}
+													title={
+														!canStartToday
+															? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}`
+															: undefined
+													}
+													{...preloadOnHover('activeWorkoutSession')}
+												>
+													<Dumbbell aria-hidden />
+													Start
+												</Button>
+											)}
+											<Button
+												asChild
+												variant="outline"
+												className="w-full sm:w-auto"
+											>
+												<Link
+													href={`/routines/${routine.id}`}
+													aria-label={`${routine.name} details`}
+												>
+													Details
+													<ChevronRight aria-hidden />
+												</Link>
+											</Button>
+										</div>
 									</div>
-								</div>
-								<div className="mt-3 grid w-full grid-cols-2 gap-2 sm:mt-0 sm:ml-3 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:gap-2">
-									<Button
-										type="button"
-										className="w-full sm:w-auto"
-										variant="default"
-										aria-label={
-											isActiveForThis ? 'Resume workout' : 'Start workout'
-										}
-										onClick={() =>
-											isActiveForThis && active?.id
-												? router.push(`/workouts/sessions/${active.id}`)
-												: handleStart(routine.id, day.id)
-										}
-										disabled={isPending || (!isActiveForThis && !canStartToday)}
-										title={
-											!canStartToday && !isActiveForThis
-												? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}`
-												: undefined
-										}
-										{...preloadOnHover('activeWorkoutSession')}
-									>
-										<Dumbbell className="mr-2 h-4 w-4" />
-										{isActiveForThis ? 'Resume' : 'Start'}
-									</Button>
-									<Button
-										asChild
-										variant="outline"
-										aria-label="View details"
-										className="w-full sm:w-auto"
-									>
-										<Link href={`/routines/${routine.id}`}>
-											Details
-											<ChevronRight className="ml-2 h-4 w-4" />
-										</Link>
-									</Button>
-								</div>
-							</div>
-						)
-					})}
+								)
+							})}
+						</div>
+					) : null}
 				</CardContent>
 			</Card>
 
