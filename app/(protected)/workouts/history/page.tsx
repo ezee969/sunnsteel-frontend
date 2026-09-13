@@ -15,6 +15,7 @@ import type {
 	ListSessionsParams,
 	WorkoutSessionListStatus,
 } from '@/lib/api/types/workout.type'
+import { hasActiveHistoryFilters } from '@/lib/utils/empty-states'
 
 function WorkoutHistoryContent() {
 	const { isMobile } = useSidebar()
@@ -219,6 +220,10 @@ function WorkoutHistoryContent() {
 							isFetchingNextPage,
 							fetchNextPage,
 							sentinelRef,
+						}}
+						emptyState={{
+							hasActiveFilters: hasActiveHistoryFilters(params),
+							onClearFilters: handleClearAll,
 						}}
 					/>
 				</div>

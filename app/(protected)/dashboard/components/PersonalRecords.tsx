@@ -2,9 +2,11 @@
 
 import { Trophy } from 'lucide-react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { PERSONAL_RECORDS_EMPTY_STATE } from '@/lib/utils/empty-states'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 import PersonalRecordItem from './PersonalRecordItem'
@@ -30,9 +32,7 @@ export default function PersonalRecords() {
 			</h2>
 			<div className="pt-1">
 				{records.length === 0 ? (
-					<p className="type-body-sm py-3 text-ink-3">
-						Log a few sets and your records will show up here.
-					</p>
+					<EmptyModule {...PERSONAL_RECORDS_EMPTY_STATE} />
 				) : (
 					records.map((record, index) => (
 						<PersonalRecordItem
