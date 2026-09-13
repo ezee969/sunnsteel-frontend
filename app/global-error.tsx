@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 
+import { RouteError } from '@/components/layout/RouteError'
 import { buttonVariants } from '@/components/ui/button'
 
 export default function GlobalError({
@@ -17,16 +18,20 @@ export default function GlobalError({
 		console.error('[app/global-error]', error)
 	}, [error])
 
+	// RouteError is plain markup - no providers, no hooks - so it is safe here.
 	return (
 		<html lang="es">
-			<body className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6 text-center text-foreground">
-				<h2 className="type-section text-foreground">Something went wrong</h2>
-				<p className="type-body-sm max-w-md break-words text-ink-2">
-					{error.message || 'A critical error occurred.'}
-				</p>
-				<button onClick={() => reset()} className={buttonVariants()}>
-					Try again
-				</button>
+			<body className="bg-background text-foreground">
+				<main className="ledger-page py-10 md:py-16">
+					<RouteError
+						title="Something went wrong"
+						message={error.message || 'A critical error occurred.'}
+					>
+						<button onClick={() => reset()} className={buttonVariants()}>
+							Try again
+						</button>
+					</RouteError>
+				</main>
 			</body>
 		</html>
 	)

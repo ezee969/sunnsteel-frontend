@@ -1,0 +1,12 @@
+#!/bin/sh
+# Refuses a commit whose staged package-lock.json names a dependency it has no
+# entry for (TD-33). A Windows `npm install <pkg>` or `npm uninstall` can drop
+# another platform's entries, and neither runs the root postinstall that would
+# repair them. Activated by `prepare` (scripts/install-git-hooks.mjs).
+if git diff --cached --name-only --diff-filter=ACMR | grep -qx 'package-lock.json'; then
+	if ! git show :package-lock.json | node scripts/check-lockfile.mjs --stdin; then
+		echo ''
+		echo 'Commit refused. Run `npm run lock:repair`, then `git add package-lock.json`.'
+		exit 1
+	fi
+fi

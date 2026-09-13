@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 
+import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
 
@@ -16,12 +17,10 @@ export default function Error({
 		logger.error(error)
 	}, [error])
 
+	// The signed-out shell supplies <main> and the form column.
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-foreground">
-			<h2 className="type-section mb-4 text-foreground">
-				Something went wrong!
-			</h2>
+		<RouteError title="Something went wrong!">
 			<Button onClick={reset}>Try again</Button>
-		</div>
+		</RouteError>
 	)
 }

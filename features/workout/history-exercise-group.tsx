@@ -38,7 +38,9 @@ export function HistoryExerciseGroup({
 	const panelId = `history-exercise-${group.routineExerciseId}`
 
 	return (
-		<section className={cn('mark py-4 pl-3', isComplete && 'mark-success')}>
+		<section
+			className={cn('rule-row mark py-4 pl-3', isComplete && 'mark-success')}
+		>
 			{/* A native button, so the toggle needs no hand-rolled key handler and
 			    reports its state. It was a `role="button"` card header. */}
 			<button

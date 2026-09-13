@@ -183,8 +183,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* `font-sans` is Oswald, the body face (§5.2). It must be set here: next/font
+     declares `--font-oswald` on <body>, while preflight sets the family on
+     <html>, where the variable does not exist - so unranked text used to fall
+     back to the system UI font (TD-39). Inputs inherit it via preflight. */
   body {
-    @apply bg-background text-foreground transition-colors;
+    @apply bg-background font-sans text-foreground transition-colors;
     transition-duration: var(--motion-slow);
   }
   /* Make interactive elements clearly clickable */

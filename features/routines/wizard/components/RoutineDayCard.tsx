@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
+import { formatExerciseCount } from '@/lib/utils/routine-format'
 import { formatTime } from '@/lib/utils/time'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
@@ -38,7 +39,9 @@ export function RoutineDayCard({
 		<Card key={day.dayOfWeek} className="border rounded-md p-3">
 			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
 				{displayName}
-				<Badge variant="outline">{day.exercises.length} exercises</Badge>
+				<Badge variant="outline">
+					{formatExerciseCount(day.exercises.length)}
+				</Badge>
 			</h4>
 			<div className="space-y-3">
 				{day.exercises.map((exercise, exerciseIndex) => {

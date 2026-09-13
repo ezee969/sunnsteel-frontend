@@ -16,7 +16,7 @@ import {
 	X,
 } from 'lucide-react'
 import Link from 'next/link'
-import type { CSSProperties } from 'react'
+import { type CSSProperties, useEffect, useRef } from 'react'
 
 import {
 	ClassicalIcon,
@@ -151,11 +151,33 @@ export default function Sidebar({
 		setIsSidebarOpen(!isSidebarOpen)
 	}
 
+	const closeButtonRef = useRef<HTMLButtonElement>(null)
+	const isDrawerOpen = isMobile && isMobileMenuOpen
+
+	// TD-36: below 768 the open drawer behaves as a modal. Focus moves into it,
+	// Escape closes it, and focus goes back to whatever opened it - the header's
+	// menu button. The layout makes the rest of the page inert meanwhile, and the
+	// closed drawer is inert below, so its off-screen links leave the tab order.
+	useEffect(() => {
+		if (!isDrawerOpen) return
+		const opener = document.activeElement
+		closeButtonRef.current?.focus()
+		const closeOnEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setIsMobileMenuOpen(false)
+		}
+		document.addEventListener('keydown', closeOnEscape)
+		return () => {
+			document.removeEventListener('keydown', closeOnEscape)
+			if (opener instanceof HTMLElement) opener.focus()
+		}
+	}, [isDrawerOpen, setIsMobileMenuOpen])
+
 	// Route prefetching is handled by next/link, which prefetches these nav
 	// targets automatically (they are all statically prerendered).
 
 	return (
 		<div
+			inert={isMobile && !isMobileMenuOpen}
 			className={cn(
 				// v1.0 §11.10: an index column, not a panel. Ground-coloured with a
 				// single rule on its right edge - no marble wash, no gold hex border,
@@ -181,8 +203,9 @@ export default function Sidebar({
 						SUNNSTEEL
 					</span>
 				</div>
-				{isSidebarOpen && isMobile && (
+				{isMobile && (
 					<Button
+						ref={closeButtonRef}
 						variant="ghost"
 						size="icon"
 						aria-label="Close navigation"
@@ -386,7 +409,14 @@ export default function Sidebar({
 				</nav>
 			</ScrollArea>
 			<div className="border-t border-rule p-4">
-				<Link href="/settings">
+				<Link
+					href="/settings"
+					onClick={() => {
+						if (isMobile) {
+							setIsMobileMenuOpen(false)
+						}
+					}}
+				>
 					<div
 						className={cn(
 							'flex cursor-pointer items-center gap-3 rounded-sm p-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',

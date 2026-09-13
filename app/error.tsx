@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 
+import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 import { logger } from '@/lib/utils/logger'
 
@@ -16,20 +17,18 @@ export default function RootError({
 		logger.error('[app/error]', error)
 	}, [error])
 
+	// Replaces every layout below the root, so it brings its own page grid.
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center p-6 text-center gap-4">
-			<h2 className="type-section text-foreground">Something went wrong</h2>
-			<p className="text-sm text-muted-foreground max-w-md break-words">
-				{error.message || 'An unexpected error occurred.'}
-			</p>
-			<div className="flex gap-2">
-				<Button variant="default" onClick={() => reset()}>
-					Try again
-				</Button>
+		<main className="ledger-page py-10 md:py-16">
+			<RouteError
+				title="Something went wrong"
+				message={error.message || 'An unexpected error occurred.'}
+			>
+				<Button onClick={() => reset()}>Try again</Button>
 				<Button variant="outline" onClick={() => window.location.assign('/')}>
 					Go home
 				</Button>
-			</div>
-		</div>
+			</RouteError>
+		</main>
 	)
 }

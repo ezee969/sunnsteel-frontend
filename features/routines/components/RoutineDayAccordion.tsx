@@ -9,10 +9,10 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { RoutineDay } from '@/lib/api/types/routine.type'
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
+import { formatExerciseCount } from '@/lib/utils/routine-format'
 
 import { ExerciseCard } from './ExerciseCard'
 
@@ -29,13 +29,12 @@ interface RoutineDayAccordionProps {
 }
 
 /**
- * Accordion component for displaying routine days with exercises and start buttons
- *
- * Features:
- * - Collapsible day sections with exercise details
- * - Start workout buttons with loading states
- * - Day of week matching indicators
- * - Program end state handling
+ * The routine's days as one ruled list (§11.5), and the page's only way to
+ * start one: each row carries its day's start control and opens onto its
+ * exercises as ruled entries beneath it (TD-38). The Quick Start tiles that
+ * started the same days a second time were removed (TD-41), so each row now
+ * also says what only they did: how many exercises the day has, and why Start
+ * is disabled on a day not scheduled for today.
  */
 export const RoutineDayAccordion = ({
 	weightUnit,
@@ -62,7 +61,10 @@ export const RoutineDayAccordion = ({
 	}
 
 	return (
-		<Accordion type="multiple" className="w-full">
+		// The item's own `border-b last:border-b-0` rules the rows. A `divide-y`
+		// here drew nothing: the item's border utility outranks divide's
+		// zero-specificity selector.
+		<Accordion type="multiple" className="w-full border-y border-rule">
 			{days.map(day => {
 				const isToday = day.dayOfWeek === todayDow
 				const hasActiveSession = activeSession?.routineDayId === day.id
@@ -71,33 +73,40 @@ export const RoutineDayAccordion = ({
 				// Check if this day can be started today
 				const dayValidation = validateRoutineDayDate(day)
 				const canStartToday = dayValidation.isValid
+				const isUnscheduled = !hasActiveSession && !canStartToday
 
 				return (
-					<AccordionItem key={day.id} value={day.id}>
-						<div className="flex items-center justify-between w-full border-b">
-							<AccordionTrigger className="hover:no-underline flex-1 py-4">
-								<div className="flex items-center gap-3">
-									<div className="flex items-center gap-2">
-										{isToday && <Calendar className="h-4 w-4 text-primary" />}
-										<span className="font-medium">
-											{getDayName(day.dayOfWeek)}
-										</span>
-									</div>
-									{isToday && (
-										<Badge variant="secondary" className="text-xs">
-											Today
-										</Badge>
-									)}
-								</div>
+					<AccordionItem
+						key={day.id}
+						value={day.id}
+						className="border-rule-faint"
+					>
+						<div className="flex w-full items-center justify-between">
+							<AccordionTrigger className="flex-1 py-4 hover:no-underline">
+								{/* The trigger carries the panel rank; nothing here may
+								    override its face or weight. Today is a glyph plus its
+								    word, never colour alone (§4.3 rule 8). The caption is
+								    body small inside a repeated row (§5.3). */}
+								<span className="flex flex-col gap-0.5">
+									<span className="flex items-center gap-2">
+										{isToday && <Calendar className="h-4 w-4" aria-hidden />}
+										{getDayName(day.dayOfWeek)}
+										{isToday && (
+											<span className="type-body-sm text-ink-3">Today</span>
+										)}
+									</span>
+									<span className="type-body-sm text-ink-3">
+										{formatExerciseCount(day.exercises?.length ?? 0)}
+										{isUnscheduled && ' · Not scheduled for today'}
+									</span>
+								</span>
 							</AccordionTrigger>
 
-							<div className="px-4 py-2">
+							<div className="py-2 pl-4">
 								<Button
 									size="sm"
 									variant={hasActiveSession ? 'default' : 'outline'}
-									disabled={
-										isLoadingThisDay || (!hasActiveSession && !canStartToday)
-									}
+									disabled={isLoadingThisDay || isUnscheduled}
 									onClick={() => onStartWorkout(day.id)}
 								>
 									{isLoadingThisDay ? (
@@ -113,22 +122,22 @@ export const RoutineDayAccordion = ({
 						</div>
 
 						<AccordionContent>
-							<div className="pt-4 space-y-4">
-								{day.exercises && day.exercises.length > 0 ? (
-									day.exercises.map(exercise => (
+							{day.exercises && day.exercises.length > 0 ? (
+								<div className="divide-y divide-rule-faint border-t border-rule-faint">
+									{day.exercises.map(exercise => (
 										<ExerciseCard
 											key={exercise.id}
 											exercise={exercise}
 											routineId={routine.id}
 											weightUnit={weightUnit}
 										/>
-									))
-								) : (
-									<p className="text-muted-foreground text-sm">
-										No exercises configured for this day.
-									</p>
-								)}
-							</div>
+									))}
+								</div>
+							) : (
+								<p className="type-body-sm text-ink-3">
+									No exercises configured for this day.
+								</p>
+							)}
 						</AccordionContent>
 					</AccordionItem>
 				)

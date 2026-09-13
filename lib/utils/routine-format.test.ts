@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDaysPerWeek } from './routine-format'
+import { formatDaysPerWeek, formatExerciseCount } from './routine-format'
 
 describe('formatDaysPerWeek', () => {
 	it.each([
@@ -9,5 +9,15 @@ describe('formatDaysPerWeek', () => {
 		{ days: 4, expected: '4 days/week' },
 	])('formats $days as $expected', ({ days, expected }) => {
 		expect(formatDaysPerWeek(days)).toBe(expected)
+	})
+})
+
+describe('formatExerciseCount', () => {
+	it.each([
+		{ count: 0, expected: '0 exercises' },
+		{ count: 1, expected: '1 exercise' },
+		{ count: 5, expected: '5 exercises' },
+	])('formats $count as $expected', ({ count, expected }) => {
+		expect(formatExerciseCount(count)).toBe(expected)
 	})
 })

@@ -1,0 +1,3 @@
+# Git hooks run under sh, which fails on CRLF. core.autocrlf is true on the
+# owner's machine, so pin them to LF in every checkout.
+.githooks/* text eol=lf

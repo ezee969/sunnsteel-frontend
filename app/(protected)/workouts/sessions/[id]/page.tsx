@@ -263,7 +263,9 @@ export default function ActiveSessionPage() {
 					</p>
 				) : null}
 
-				<div className="divide-y divide-rule-faint border-y border-rule">
+				{/* Rows rule themselves with `.rule-row` (§11.5). A `divide-*` colour
+				    here repainted every row's `.mark` edge but the last's (TD-42). */}
+				<div className="border-y border-rule">
 					{groupedLogs.map(group => {
 						const completedSets = group.sets.filter(
 							set => set.isCompleted,

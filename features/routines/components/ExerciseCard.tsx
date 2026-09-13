@@ -3,7 +3,6 @@
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Clock, FileText } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -40,18 +39,16 @@ interface ExerciseCardProps {
 }
 
 /**
- * Card component for displaying exercise details within routine days
- *
- * Features:
- * - Exercise name and progression scheme display
- * - Set details with reps, weight, and RPE/RIR
- * - Numbered set indicators
+ * One exercise in a routine day, as a ruled entry in the day's list rather than
+ * a boxed card (§11.5). Its prescription is read-only data, so it sits on the
+ * row ground in Space Mono, with no badge and no numbered tiles (§11.12). It
+ * was a bordered `bg-card` box with an outlined scheme badge (TD-38).
  */
 export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 	return (
-		<div className="rounded-md border p-4 bg-card">
-			<div className="flex items-center justify-between mb-2">
-				<div className="flex items-center gap-2">
+		<div className="py-4">
+			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+				<div className="flex min-w-0 items-center gap-2">
 					<h4 className="type-panel text-foreground">
 						{exercise.exercise?.name || 'Unknown Exercise'}
 					</h4>
@@ -92,59 +89,59 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 								<DialogHeader>
 									<DialogTitle>Exercise Note</DialogTitle>
 								</DialogHeader>
-								<div className="p-4 bg-muted/20 rounded-md">
+								<div className="bg-surface-sunk p-4">
 									<p className="text-sm whitespace-pre-wrap">{exercise.note}</p>
 								</div>
 							</DialogContent>
 						</Dialog>
 					)}
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="type-body-sm flex items-center gap-3 text-ink-3">
 					{exercise.restSeconds ? (
-						<div className="flex items-center gap-1 text-xs text-muted-foreground mr-1">
-							<Clock className="h-3 w-3" />
-							<span>{formatTime(exercise.restSeconds)}</span>
-						</div>
+						<span className="flex items-center gap-1">
+							<Clock className="h-3 w-3" aria-hidden />
+							<span className="sr-only">Rest</span>
+							<span className="type-data">
+								{formatTime(exercise.restSeconds)}
+							</span>
+						</span>
 					) : null}
 					{exercise.progressionScheme && (
-						<Badge variant="outline" className="text-xs">
-							{exercise.progressionScheme.replace(/_/g, ' ')}
-						</Badge>
+						<span>{exercise.progressionScheme.replace(/_/g, ' ')}</span>
 					)}
 				</div>
 			</div>
 
 			{exercise.sets && exercise.sets.length > 0 && (
-				<div className="space-y-1">
-					<p className="text-sm text-muted-foreground">Sets:</p>
-					{exercise.sets.map((set, index) => {
-						const repDisplay =
-							set.minReps && set.maxReps
-								? `${set.minReps}-${set.maxReps}`
-								: String(set.reps || set.minReps || 0)
+				<>
+					<p className="type-body-sm mt-2 text-ink-3">Sets</p>
+					<ol className="mt-1 space-y-1">
+						{exercise.sets.map((set, index) => {
+							const repDisplay =
+								set.minReps && set.maxReps
+									? `${set.minReps}-${set.maxReps}`
+									: String(set.reps || set.minReps || 0)
 
-						return (
-							<div
-								key={set.id || index}
-								className="text-sm flex items-center gap-2"
-							>
-								<span className="w-6 h-6 bg-muted flex items-center justify-center text-xs">
-									{index + 1}
-								</span>
-								<span>
-									{repDisplay}
-									{set.weight
-										? ` @ ${formatWeight(set.weight, weightUnit)}`
-										: ''}
-									{set.rpe && ` (RPE ${set.rpe})`}
-									{set.rir !== null &&
-										set.rir !== undefined &&
-										` (RIR ${set.rir})`}
-								</span>
-							</div>
-						)
-					})}
-				</div>
+							return (
+								<li key={set.id || index} className="flex items-baseline gap-3">
+									<span className="type-data w-6 shrink-0 text-ink-3">
+										{index + 1}
+									</span>
+									<span className="type-data text-foreground">
+										{repDisplay}
+										{set.weight
+											? ` @ ${formatWeight(set.weight, weightUnit)}`
+											: ''}
+										{set.rpe && ` (RPE ${set.rpe})`}
+										{set.rir !== null &&
+											set.rir !== undefined &&
+											` (RIR ${set.rir})`}
+									</span>
+								</li>
+							)
+						})}
+					</ol>
+				</>
 			)}
 		</div>
 	)

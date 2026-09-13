@@ -1,6 +1,5 @@
 'use client'
 
-import { Calendar, Loader2, Play } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
@@ -10,7 +9,6 @@ import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
 import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
-import { getDayName } from '@/features/routines/utils/routine-detail.utils'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useRoutine,
@@ -18,7 +16,6 @@ import {
 	useToggleRoutineFavorite,
 } from '@/lib/api/hooks/useRoutines'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
-import { validateRoutineDayDate } from '@/lib/utils/date'
 import { logger } from '@/lib/utils/logger'
 
 export default function RoutineDetailsPage() {
@@ -63,17 +60,25 @@ export default function RoutineDetailsPage() {
 		}
 	}
 
+	// The history detail page's grid (TD-38): `.ledger-page`, not `container`,
+	// so the two detail pages share a measure and gutters.
 	if (isLoading) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="space-y-6">
+			<div
+				className="ledger-page space-y-8 py-6 md:py-8"
+				role="status"
+				aria-label="Loading routine"
+			>
+				<div className="rule-heading space-y-2 pb-4">
 					<Skeleton className="h-8 w-1/3" />
 					<Skeleton className="h-4 w-2/3" />
-					<div className="space-y-4">
-						{[1, 2, 3].map(i => (
-							<Skeleton key={i} className="h-20" />
-						))}
-					</div>
+				</div>
+				<div className="divide-y divide-rule-faint border-y border-rule">
+					{[1, 2, 3].map(i => (
+						<div key={i} className="py-4">
+							<Skeleton className="h-6 w-40" />
+						</div>
+					))}
 				</div>
 			</div>
 		)
@@ -81,19 +86,21 @@ export default function RoutineDetailsPage() {
 
 	if (!routine) {
 		return (
-			<div className="container mx-auto px-4 py-8">
-				<div className="text-center">
-					<h1 className="type-page mb-4 text-foreground">Routine not found</h1>
-					<Button onClick={() => router.push('/routines')}>
-						Back to Routines
-					</Button>
+			<div className="ledger-page space-y-6 py-6 md:py-8">
+				<div className="rule-heading pb-4">
+					<h1 className="type-page corner-brackets inline-block text-foreground">
+						Routine not found
+					</h1>
 				</div>
+				<Button onClick={() => router.push('/routines')}>
+					Back to Routines
+				</Button>
 			</div>
 		)
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8 space-y-8">
+		<div className="ledger-page space-y-8 py-6 md:py-8">
 			{/* Header */}
 			<RoutineHeader
 				routine={routine}
@@ -105,74 +112,8 @@ export default function RoutineDetailsPage() {
 				isToggling={isTogglingFavorite || isTogglingCompleted}
 			/>
 
-			{/* Quick Start Section */}
-			{routine.days && routine.days.length > 0 && (
-				<div className="space-y-4">
-					<h2 className="type-section text-foreground">Quick Start</h2>
-					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-						{routine.days.map(day => {
-							const isToday = day.dayOfWeek === sessionManager.todayDow
-							const hasActiveSession = activeSession?.routineDayId === day.id
-							const isLoadingThisDay =
-								sessionManager.isStarting &&
-								sessionManager.startActingDayId === day.id
-
-							// Check if this day can be started today
-							const dayValidation = validateRoutineDayDate(day)
-							const canStartToday = dayValidation.isValid
-
-							return (
-								<Button
-									key={day.id}
-									variant={
-										hasActiveSession
-											? 'default'
-											: isToday
-												? 'secondary'
-												: 'outline'
-									}
-									className="h-auto p-4 flex flex-col items-start gap-2"
-									disabled={
-										isLoadingThisDay || (!hasActiveSession && !canStartToday)
-									}
-									onClick={() =>
-										sessionManager.handleStart(day.id, activeSession)
-									}
-								>
-									<div className="flex items-center gap-2 w-full">
-										{isToday && <Calendar className="h-4 w-4" />}
-										<span className="font-medium">
-											{getDayName(day.dayOfWeek)}
-										</span>
-										{isLoadingThisDay && (
-											<Loader2
-												className="ml-auto h-4 w-4 animate-spin"
-												aria-hidden
-											/>
-										)}
-										{!isLoadingThisDay && <Play className="h-4 w-4 ml-auto" />}
-									</div>
-									<div className="text-xs text-left opacity-75">
-										{day.exercises?.length || 0} exercises
-									</div>
-									{hasActiveSession && (
-										<div className="text-xs font-medium text-primary">
-											Resume Session
-										</div>
-									)}
-									{!hasActiveSession && !canStartToday && (
-										<div className="text-xs font-medium text-muted-foreground">
-											Not scheduled for today
-										</div>
-									)}
-								</Button>
-							)
-						})}
-					</div>
-				</div>
-			)}
-
-			{/* Routine Days */}
+			{/* Routine Days - the page's one start surface. The Quick Start tiles
+			    above it started the same days a second time (TD-41). */}
 			{routine.days && routine.days.length > 0 && (
 				<div className="space-y-4">
 					<h2 className="type-section text-foreground">Routine Days</h2>

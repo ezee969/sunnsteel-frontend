@@ -17,135 +17,112 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Four entries are open: `TD-33` from the Phase 8/9 UI restyle, `TD-36` from the
-Phase 14 regression sweep, and `TD-38` and `TD-39` from the Phase 15 cleanup.
-`TD-30` closed in Phase 13, `TD-34` in Phase 14, `TD-35`, `TD-37` and `TD-31`
-straight after it, and `TD-32` after Phase 15 (see the document history). All are frontend-only and none affects stored data.
+Three entries are open: `TD-40`, found during `TD-39`'s capture review, and
+`TD-41` and `TD-42`, found during `TD-38`'s. `TD-30` closed in Phase 13,
+`TD-34` in Phase 14, `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32`
+after Phase 15, and `TD-33`, `TD-36`, `TD-38` and `TD-39` on 2026-09-13 (see
+the document history). All three open entries are frontend-only and none
+affects stored data.
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
 
-<a id="td-33"></a>
+<a id="td-40"></a>
 
-### TD-33 — `npm ci` breaks whenever the lock is regenerated on Windows
+### TD-40 — `/profile` and `/search` are titled and marked as the Dashboard
 
-**Impact.** CI fails at the install step with `EUSAGE — Missing:
-@emnapi/runtime@1.11.3 from lock file`, before any check runs. It blocks every
-push until the lock is patched.
+**Impact.** On every profile page — the owner's and other members' — and on
+search results, the header reads "Dashboard" and the sidebar marks Dashboard as
+the current page, including `aria-current="page"` on its link. A sighted user
+is shown the wrong location, and a screen-reader user is told it.
 
-**Evidence.** `@img/sharp-wasm32` (an optional platform variant of `sharp`,
-pulled in transitively by `next`) declares `@emnapi/runtime@^1.11.3`, and
-`@rolldown/binding-wasm32-wasi` peer-depends on `@emnapi/core`. npm on Windows
-resolves the native win32 binary and never writes the wasm32 branch's
-dependencies into the lock; `npm ci` on Linux validates every platform and
-fails. `HEAD`, `origin/main` and the merged index all lacked the entries, so this
-predates the restyle. Fixed on 2026-09-09 by adding the two entries with
-integrity hashes taken verbatim from the registry (+23/−0, insert-only).
-**It recurred on 2026-09-13**: `npm uninstall` of two packages on Windows
-dropped all five `@emnapi` entries — the two above, `@emnapi/wasi-threads`,
-and two copies nested under `@tailwindcss/oxide-wasm32-wasi` — and added
-`"peer": true` to 17 unrelated entries. The lock was rebuilt from the
-pre-uninstall one minus exactly the removed packages, so every `@emnapi` entry
-stayed byte-identical. Any `npm install`/`uninstall` on Windows needs that same
-check until the durable fix lands.
+**Evidence.** `app/(protected)/layout.tsx` derives both from the pathname, in
+`getActiveNavFromPath` and `getTitleFromPath`. Neither has a case for
+`/profile` (`profile/[[...userId]]`, which serves both the owner and other
+members) or `/search`, and both fall back to `'dashboard'`/`'Dashboard'`. The
+other eleven protected routes are covered. Seen in the 2026-09-13 TD-39
+captures: `profile` at 1440 shows "DASHBOARD" in the header and the Dashboard
+marker in both themes.
 
-**Two approaches that do not work**, recorded so they are not retried:
-`npm install --package-lock-only` reproduces the same platform-blind resolution,
-and deleting the lock to regenerate it drifts the tree (`npm ci --dry-run` then
-reports "added 2, removed 4"). **`npm ci --dry-run` on Windows cannot reproduce
-the failure** — it does not validate the Linux-only branch — so CI is the only
-confirmation.
+**Solution direction.** Add title cases for both routes. Neither has a sidebar
+item, so the nav should resolve to an id outside `SIDEBAR_NAV_ITEMS`:
+`Sidebar.tsx` already hides the marker when the active id is not in that list.
+Replace the silent `'dashboard'` fallback too, so a future route shows no
+marker rather than a wrong one. The two titles' wording is a copy decision.
 
-**Solution direction.** Either regenerate the lock in CI/a Linux container and
-commit that, or keep patching the two entries after any Windows `npm install`.
-The durable fix is the former.
+**Closure.** On `/profile`, `/profile/<username>` and `/search` the header
+names the page and no sidebar item carries the marker or `aria-current`,
+checked in both themes at 390 and 1440, and `npm run ui:regression` stays green.
 
-**Closure.** A lock generated on Linux is committed, and a full `npm install` on
-Windows no longer drops the entries — or a CI step is added that fails loudly
-when they go missing.
+<a id="td-41"></a>
 
-<a id="td-36"></a>
+### TD-41 — Routine detail starts each day from two places and says "1 exercises"
 
-### TD-36 — The mobile drawer cannot be closed or skipped from the keyboard
+**Impact.** On `/routines/[id]` every day has two start controls: a Quick
+Start tile and the Start/Resume button on its row in Routine Days. The tiles
+are a grid of boxed buttons, where §11.5 keeps boxes for overlays, session set
+rows and a screen's single primary action. Each tile also reads "1 EXERCISES"
+for a one-exercise day.
 
-**Impact.** Below 768 the drawer has no close control, and while it is closed
-its links stay in the tab order off-screen: a keyboard user passes ten
-invisible stops — the nine nav items and the profile footer link — before
-reaching the header.
+**Evidence.** In `app/(protected)/routines/[id]/page.tsx` the Quick Start grid
+and `RoutineDayAccordion`'s `onStartWorkout` both call
+`sessionManager.handleStart(day.id, activeSession)`. The count is
+`{day.exercises?.length || 0} exercises` (`page.tsx:166`), and the wizard's
+`RoutineDayCard.tsx:41` has the same unpluralised count.
+`lib/utils/routine-format.ts` pluralises days (`formatDaysPerWeek`) but nothing
+covers exercises. Seen in the 2026-09-13 TD-38 captures of a three-day routine.
+The tiles also carry the only "Not scheduled for today" explanation: the row
+buttons are disabled without one.
 
-**Evidence.** `features/shell/components/Sidebar.tsx` renders "Close navigation"
-only when `isSidebarOpen && isMobile`, and `hooks/use-sidebar.ts` sets
-`isSidebarOpen` to `false` below 768 — so the condition is never true. The
-drawer closes only by tapping the scrim (a `div` with no key handler) or by
-following a link; Escape does nothing. Closed, it is moved off-screen with
-`-left-full` but stays rendered and focusable. The sweep's `mobile drawer close
-control` test fails at 320/390/430, and `keyboard focus` lists the off-screen
-stops at the same widths.
+**Solution direction.** Pluralise the count through a formatter beside
+`formatDaysPerWeek`, with a Node test, and use it in both places. Which start
+surface stays is the owner's decision — the tiles or the rows. Whichever stays
+must keep the "Not scheduled for today" explanation.
 
-**Solution direction.** Behaviour, so outside the restyle's UI-only scope:
-render the close control on the mobile branch, close on Escape, and make the
-closed drawer inert (`inert`, or `visibility: hidden` once it has left).
+**Closure.** Counts read "1 exercise" and "N exercises" everywhere; each day
+has one start control on the page, or the decision to keep both is recorded
+here; captured at 390/768/1440 in both themes; `npm run ui:regression` green.
 
-**Closure.** Both tests pass at 320, 390 and 430.
+<a id="td-42"></a>
 
-<a id="td-38"></a>
+### TD-42 — `divide-rule-faint` repaints the `.mark` edge of every row but the last
 
-### TD-38 — Four surfaces are clean on tokens but predate v1.0's composition
+**Impact.** In a ruled list whose rows carry `.mark`, every row except the last
+gets a 3px left bar in `--rule-faint`, and a status colour set through
+`.mark-success`, `.mark-honour` or `.mark-warning` is replaced by that grey. A
+completed exercise therefore loses its success mark (§4.3 rule 2) unless it is
+the last row, and an unmarked row gains a mark it should not have.
 
-**Impact.** Inconsistency of layout rather than colour. After Phase 15 none of
-these carries a raw colour, hex or off-scale radius, but none has been through a
-restyle batch or a capture run, so their structure is the pre-v1.0 one.
+**Evidence.** Tailwind v4's `divide-*` colour utility sets `border-color`, all
+four sides, on every child but the last, from `@layer utilities`. `.mark` and
+`.mark-*` set `border-left-color` in `@layer components`
+(`app/globals.css:345-356`), and a later layer wins regardless of specificity.
+Measured on 2026-09-13 on the session skeleton at 1440: rows 0 and 1 compute a
+3px left border in `--rule-faint` and the last row a transparent one. With
+`mark-success` added in place, row 0 still computed `--rule-faint` and the last
+row `--success-strong`. Three lists pair the two:
+- the session page (`workouts/sessions/[id]/page.tsx:266`). Its
+  `ExerciseGroup` uses `mark mark-fill`, whose completion fill is a `::before`
+  overlay, so completion still draws there but incomplete rows get the bar.
+- history detail (`workouts/history/[id]/page.tsx:87`). `HistoryExerciseGroup`
+  is `mark mark-success`, so the success mark is lost on every row but the
+  last.
+- `features/workout/session-loading-skeleton.tsx:82`.
 
-**Evidence.**
+Not yet observed on a live page: the one finished session in the dev data has a
+single exercise, which is always the last row. The other `divide-rule-faint`
+lists (progress, session comparison, performance history, muscle heatmap) have
+not been checked for `.mark` rows.
 
-- `/routines/[id]` (`RoutineHeader`, `RoutineDayAccordion`, `ExerciseCard`):
-  `container` widths instead of `.ledger-page`, boxed exercise cards and
-  outlined badges where §11.5 and §11.12 make lists ruled and read-only data
-  unboxed.
-- The route error boundaries (`app/error.tsx`, `global-error.tsx`, the four
-  segment `error.tsx` files) and `not-found.tsx`: centred stacks with no
-  masthead. They render only on failure, so no capture ever reached them.
-- `app/(protected)/workouts/sessions/loading.tsx` still sketches the session
-  screen's removed progress bar and action panel (Phase 13 removed both), and
-  `workouts/loading.tsx` sketches three medallion cards the page no longer has.
+**Solution direction.** Rule these lists with `.rule-row` on the rows instead of
+`divide-*` on the parent: §11.5 names `.rule-row` as the between-items rule, and
+it sets only `border-bottom`, so it never touches the mark's edge. Check the
+remaining `divide-rule-faint` lists at the same time.
 
-**Solution direction.** One batch applying the existing patterns — masthead
-over the double rule, ruled lists, skeletons that mirror the current page —
-with no new decisions. Recorded in Phase 15 because a cleanup pass that also
-recomposed pages would have been a restyle batch under another name.
-
-**Closure.** Each surface captured at 390/768/1440 in both themes against its
-current page, and the regression sweep's layout checks green on the routes that
-have them.
-
-<a id="td-39"></a>
-
-### TD-39 — Unranked text renders in the system font, not Oswald
-
-**Impact.** §5.1 and §5.2 make Oswald 400 the body face. Every element without a
-`type-*` class — plain paragraphs, list items, form hints, badges, and inputs,
-which inherit — renders in the platform's UI font instead: Segoe UI on Windows,
-San Francisco on Apple devices. Every restyle review and capture was taken in
-this state, so the approved look includes it.
-
-**Evidence.** Measured in Phase 15 on `/routines/[id]`: `html`, `body` and an
-unclassed paragraph all compute to `ui-sans-serif, system-ui, sans-serif, …`,
-Tailwind's preflight stack; `--font-oswald`, `--font-sans` and
-`--default-font-family` are empty on `:root`. `next/font` declares
-`--font-oswald` on `<body>` (`app/layout.tsx`), preflight sets `font-family` on
-`<html>` from `--default-font-family`, `@theme inline` inlines `--font-sans`
-into utilities rather than emitting it, and `body` sets no family of its own —
-so the chain never reaches the root. Ranked text is correct because each
-`.type-*` class names `var(--font-oswald)` on an element under `<body>`, where
-the variable exists.
-
-**Solution direction.** One line: `font-sans` on `body` in `globals.css`'s base
-layer, which resolves on `<body>`, where the variable lives. Deliberately not
-applied in Phase 15: it changes the face of all unranked text on every screen at
-once, which needs a capture review in both themes, not a cleanup commit.
-
-**Closure.** Unranked text computes to Oswald, and a full capture set at
-390/768/1440 in both themes has been reviewed.
+**Closure.** On a session and a history detail with at least three exercises,
+incomplete rows other than the last show no left bar and completed ones show
+`--success-strong`, in both themes. The skeleton matches, and
+`npm run ui:regression` is green.
 
 ---
 
@@ -183,6 +160,104 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-13 (revision 15):** Closed and removed `TD-39` on the owner's
+  review of the A|B capture set.
+
+  `TD-33` recurred at 12:28, and the new check caught it. The owner's
+  PowerShell history shows a bare `npm install` in both repos, run to update a
+  stale `node_modules`. It rewrote the frontend lock without four `@emnapi`
+  entries and with `"peer": true` added to 18 others; the backend's lock came
+  out unchanged. HEAD's lock already pinned the new version, so `npm ci` would
+  have written nothing. Measured in a scratch package: npm runs the root
+  `postinstall` after writing the lock for a bare `npm install` and for
+  `npm ci`, and not at all for `npm install <pkg>` or `npm uninstall`.
+
+  Three guards were added on that basis:
+  - `postinstall` runs `scripts/check-lockfile.mjs --postinstall`. It restores
+    missing entries unchanged from `HEAD`, at their original positions, and
+    never fails an install.
+  - `.githooks/pre-commit` refuses a staged lock that fails the check. It is
+    activated by `prepare` through `core.hooksPath`, and `.gitattributes`
+    pins it to LF.
+  - `npm run lock:repair` does the same restore by hand.
+
+  Tested on `d489872^`: 5 entries restored byte-identical to the fix commit,
+  in its order, and a second run changed nothing. Against a bad ref the
+  postinstall mode warned, exited 0 and left the lock untouched. In a scratch
+  clone the hook refused a damaged staged lock and accepted the repaired one.
+  The working lock was repaired the same way; its only difference from HEAD is
+  the 18 `peer` flags. `CLAUDE.md` and `AGENTS.md` now say to sync with
+  `npm ci`.
+- **2026-09-13 (revision 14):** Closed and removed `TD-33`, `TD-36` and
+  `TD-38`;
+  applied `TD-39`, which stays open pending the owner's capture review (see
+  its status note); recorded `TD-40`, spotted in that review's `profile`
+  captures; and recorded `TD-41` and `TD-42` from `TD-38`'s captures. `TD-42`'s
+  cascade was measured in the browser, but not yet on a live page with more
+  than one exercise.
+  `TD-33` closed by the entry's second route, a loud check, because a
+  Linux-generated lock was not available (no WSL or Docker on the owner's
+  machine). `scripts/check-lockfile.mjs` (`npm run lock:check`) walks
+  `package-lock.json` with Node's resolution rules — nearest `node_modules`
+  first, then upward — and fails, naming each gap, when a dependency, optional
+  dependency, root dev dependency or non-optional peer has no entry. It reads
+  only the lock, so it is the first step of both `npm run verify` and CI, ahead
+  of `npm ci`, and it runs on Windows, where `npm ci --dry-run` cannot see the
+  failure. Replayed over the last 40 lock revisions against 247 CI runs: it
+  flags all four revisions whose run failed at install with `EUSAGE`
+  (`60f0fba`, `f668e2d`, `ab2f151`, `cfacdbd`) and passes every revision whose
+  run was green; the other failures it passes were typecheck errors (`09f0285`,
+  `7639edc`) or February–March runs with no step data. Its first CI run is the
+  owner's next push. `TD-36`: the close control now renders on the mobile
+  branch; opening the drawer moves focus to it, Escape closes it, and focus
+  returns to the header's menu button; the closed drawer is `inert`, and the
+  main column is `inert` while the drawer is open, so Tab cannot reach controls
+  under the scrim. The footer profile link also closes the drawer now — it was
+  the one link that left it open. `inert` is a plain boolean: the App Router
+  renders with Next's vendored React 19.2 canary, and `@types/react/experimental`
+  types it, even though `package.json` pins React 18.3. Verified: `mobile
+  drawer`, `mobile drawer close control` and `keyboard focus` 20 of 20 at every
+  width in both themes, and a scripted pass at 320/390/430 — focus lands on the
+  close control, Tab never reaches covered content (past the last stop it
+  reaches only the dev-only Next.js overlay), Escape closes and restores focus,
+  and React logs no attribute warnings. The full `npm run ui:regression`
+  sweep then passed 283 of 283.
+
+  `TD-38`, one batch on existing patterns, as the entry asked:
+  - `/routines/[id]` moved to `.ledger-page`. `RoutineHeader` became the
+    history detail page's masthead: back control, bracketed inscription, the
+    schedule as a caption, and actions that wrap over the double rule.
+  - The days became one ruled list, with each exercise a ruled entry whose sets
+    are Space Mono data. That replaced the bordered `bg-card` boxes, the
+    numbered tiles and the outlined badges.
+  - The eight error and not-found boundaries now share
+    `components/layout/RouteError.tsx`: masthead, the error text in a `sunk`
+    well, one filled retry and outline alternatives. There were five segment
+    boundaries, not four, and `routines/error.tsx` lost a `// @ts-nocheck`.
+  - `sessions/loading.tsx` renders the page's own `SessionLoadingSkeleton`,
+    rewritten to the current screen without the removed action card, and
+    `workouts/loading.tsx` mirrors the "No Active Workout" page.
+
+  Captured at 390/768/1440 in both themes, 36 captures, reaching the
+  failure-only surfaces by holding or failing the requests that feed them:
+  - the routine detail, with a day open;
+  - `not-found`;
+  - the session skeleton, by holding the session request;
+  - `workouts/loading.tsx`, by holding the page chunk;
+  - `routines/error.tsx` inside the shell, by failing its chunk;
+  - `app/error.tsx` replacing the shell, by failing the dashboard chunk.
+
+  The other segment boundaries and `global-error.tsx` render the same
+  component, and were not captured individually. The captures caught one
+  defect before closure: a `border-b-0` meant to stop double rules also
+  cancelled the day list's `divide-y`, so the days had no rules. The sweep then
+  passed 283 of 283. Retained for future sessions: the
+  backend's `start:dev` is `node --watch`, which also watches `node_modules`,
+  so an `npm install` in the backend repo restarts it — one did at 12:28 and
+  took down a full sweep 171 tests in. A sweep that meets a restart reports the
+  saved sign-in as signed out, or the backend as not answering. For a long
+  sweep, run the backend without the watcher
+  (`node -r ts-node/register -r tsconfig-paths/register src/main.ts`).
 - **2026-09-13 (revision 13):** Closed and removed `TD-32` on the owner's
   confirmation. The thirteen files were re-checked first — their only importers
   were each other — then deleted with the two folders they left empty

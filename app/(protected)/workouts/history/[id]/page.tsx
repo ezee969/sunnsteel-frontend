@@ -84,7 +84,9 @@ export default function WorkoutDetailPage() {
 				<h2 id="history-exercises-heading" className="sr-only">
 					Exercises
 				</h2>
-				<div className="divide-y divide-rule-faint border-y border-rule">
+				{/* Rows rule themselves with `.rule-row`: a `divide-*` colour here
+				    greyed every completed row's success mark but the last's (TD-42). */}
+				<div className="border-y border-rule">
 					{exerciseGroups.map((group: ExerciseGroup) => (
 						<HistoryExerciseGroup
 							key={group.routineExerciseId}

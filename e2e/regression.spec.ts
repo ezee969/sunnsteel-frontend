@@ -621,8 +621,7 @@ for (const width of REGRESSION_WIDTHS) {
 			const close = page.getByRole('button', { name: 'Close navigation' })
 			await expect(
 				close,
-				'Sidebar.tsx renders "Close navigation" only when isSidebarOpen && ' +
-					'isMobile, and use-sidebar.ts sets isSidebarOpen false below 768',
+				'the open drawer has no visible "Close navigation" control (TD-36)',
 			).toBeVisible()
 			await close.click()
 			await expectDrawerClosed(page)

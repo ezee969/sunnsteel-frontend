@@ -77,7 +77,7 @@ export const ExerciseGroup = ({
 			// bottom instead of appearing, and the row settles onto the completed
 			// tone over the same 300ms. The fill is a transform on an overlay bar,
 			// so completing a set never reflows the row.
-			className={`mark mark-fill py-4 pl-3 transition-colors duration-[var(--motion-slow)] ease-standard ${
+			className={`rule-row mark mark-fill py-4 pl-3 transition-colors duration-[var(--motion-slow)] ease-standard ${
 				isComplete ? 'mark-success bg-surface/60' : ''
 			}`}
 		>

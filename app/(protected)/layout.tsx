@@ -41,7 +41,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		setIsMobileMenuOpen,
 	} = useSidebar()
 
-	// Determine active nav based on current pathname
+	// Determine active nav based on current pathname. A route without a sidebar
+	// item resolves to '', which marks nothing - `Sidebar` hides the marker for
+	// an id outside its list. The old 'dashboard' fallback marked Dashboard as
+	// the current page, `aria-current` included, on /profile and /search (TD-40).
 	const getActiveNavFromPath = (path: string) => {
 		if (path.startsWith('/dashboard')) return 'dashboard'
 		if (path.startsWith('/workouts/history')) return 'history'
@@ -49,10 +52,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/routines')) return 'routines'
 		if (path.startsWith('/progress')) return 'progress'
 		if (path.startsWith('/settings')) return 'settings'
-		return 'dashboard' // fallback
+		return ''
 	}
 
-	// Compute header title based on pathname
+	// Compute header title based on pathname. No fallback title: a route
+	// missing from this list should show none rather than another page's.
 	const getTitleFromPath = (path: string) => {
 		if (path.startsWith('/workouts/sessions')) return 'Active Session'
 		if (path.startsWith('/workouts/history')) return 'Workout History'
@@ -62,8 +66,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/routines')) return 'Routines'
 		if (path.startsWith('/progress')) return 'Progress'
 		if (path.startsWith('/settings')) return 'Profile Settings'
+		if (path.startsWith('/profile')) return 'Profile'
+		if (path.startsWith('/search')) return 'Search'
 		if (path.startsWith('/dashboard')) return 'Dashboard'
-		return 'Dashboard'
+		return ''
 	}
 
 	const [activeNav, setActiveNav] = useState(() =>
@@ -156,8 +162,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 					setIsMobileMenuOpen={setIsMobileMenuOpen}
 					onNavigateStart={() => setIsNavActive(true)}
 				/>
-				{/* Main Content */}
+				{/* Main Content. Inert behind the open mobile drawer, so Tab cannot
+				    leave the drawer for controls the scrim covers (TD-36). */}
 				<div
+					inert={isMobile && isMobileMenuOpen}
 					className={cn(
 						// `min-w-0` is load-bearing: the sidebar is `fixed`, so it takes no
 						// flow width, yet this column is `flex-1` inside a viewport-wide
