@@ -17,112 +17,12 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Three entries are open: `TD-40`, found during `TD-39`'s capture review, and
-`TD-41` and `TD-42`, found during `TD-38`'s. `TD-30` closed in Phase 13,
-`TD-34` in Phase 14, `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32`
-after Phase 15, and `TD-33`, `TD-36`, `TD-38` and `TD-39` on 2026-09-13 (see
-the document history). All three open entries are frontend-only and none
-affects stored data.
+No entries are open. `TD-30` closed in Phase 13, `TD-34` in Phase 14, `TD-35`,
+`TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and `TD-33` and
+`TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
-
-<a id="td-40"></a>
-
-### TD-40 — `/profile` and `/search` are titled and marked as the Dashboard
-
-**Impact.** On every profile page — the owner's and other members' — and on
-search results, the header reads "Dashboard" and the sidebar marks Dashboard as
-the current page, including `aria-current="page"` on its link. A sighted user
-is shown the wrong location, and a screen-reader user is told it.
-
-**Evidence.** `app/(protected)/layout.tsx` derives both from the pathname, in
-`getActiveNavFromPath` and `getTitleFromPath`. Neither has a case for
-`/profile` (`profile/[[...userId]]`, which serves both the owner and other
-members) or `/search`, and both fall back to `'dashboard'`/`'Dashboard'`. The
-other eleven protected routes are covered. Seen in the 2026-09-13 TD-39
-captures: `profile` at 1440 shows "DASHBOARD" in the header and the Dashboard
-marker in both themes.
-
-**Solution direction.** Add title cases for both routes. Neither has a sidebar
-item, so the nav should resolve to an id outside `SIDEBAR_NAV_ITEMS`:
-`Sidebar.tsx` already hides the marker when the active id is not in that list.
-Replace the silent `'dashboard'` fallback too, so a future route shows no
-marker rather than a wrong one. The two titles' wording is a copy decision.
-
-**Closure.** On `/profile`, `/profile/<username>` and `/search` the header
-names the page and no sidebar item carries the marker or `aria-current`,
-checked in both themes at 390 and 1440, and `npm run ui:regression` stays green.
-
-<a id="td-41"></a>
-
-### TD-41 — Routine detail starts each day from two places and says "1 exercises"
-
-**Impact.** On `/routines/[id]` every day has two start controls: a Quick
-Start tile and the Start/Resume button on its row in Routine Days. The tiles
-are a grid of boxed buttons, where §11.5 keeps boxes for overlays, session set
-rows and a screen's single primary action. Each tile also reads "1 EXERCISES"
-for a one-exercise day.
-
-**Evidence.** In `app/(protected)/routines/[id]/page.tsx` the Quick Start grid
-and `RoutineDayAccordion`'s `onStartWorkout` both call
-`sessionManager.handleStart(day.id, activeSession)`. The count is
-`{day.exercises?.length || 0} exercises` (`page.tsx:166`), and the wizard's
-`RoutineDayCard.tsx:41` has the same unpluralised count.
-`lib/utils/routine-format.ts` pluralises days (`formatDaysPerWeek`) but nothing
-covers exercises. Seen in the 2026-09-13 TD-38 captures of a three-day routine.
-The tiles also carry the only "Not scheduled for today" explanation: the row
-buttons are disabled without one.
-
-**Solution direction.** Pluralise the count through a formatter beside
-`formatDaysPerWeek`, with a Node test, and use it in both places. Which start
-surface stays is the owner's decision — the tiles or the rows. Whichever stays
-must keep the "Not scheduled for today" explanation.
-
-**Closure.** Counts read "1 exercise" and "N exercises" everywhere; each day
-has one start control on the page, or the decision to keep both is recorded
-here; captured at 390/768/1440 in both themes; `npm run ui:regression` green.
-
-<a id="td-42"></a>
-
-### TD-42 — `divide-rule-faint` repaints the `.mark` edge of every row but the last
-
-**Impact.** In a ruled list whose rows carry `.mark`, every row except the last
-gets a 3px left bar in `--rule-faint`, and a status colour set through
-`.mark-success`, `.mark-honour` or `.mark-warning` is replaced by that grey. A
-completed exercise therefore loses its success mark (§4.3 rule 2) unless it is
-the last row, and an unmarked row gains a mark it should not have.
-
-**Evidence.** Tailwind v4's `divide-*` colour utility sets `border-color`, all
-four sides, on every child but the last, from `@layer utilities`. `.mark` and
-`.mark-*` set `border-left-color` in `@layer components`
-(`app/globals.css:345-356`), and a later layer wins regardless of specificity.
-Measured on 2026-09-13 on the session skeleton at 1440: rows 0 and 1 compute a
-3px left border in `--rule-faint` and the last row a transparent one. With
-`mark-success` added in place, row 0 still computed `--rule-faint` and the last
-row `--success-strong`. Three lists pair the two:
-- the session page (`workouts/sessions/[id]/page.tsx:266`). Its
-  `ExerciseGroup` uses `mark mark-fill`, whose completion fill is a `::before`
-  overlay, so completion still draws there but incomplete rows get the bar.
-- history detail (`workouts/history/[id]/page.tsx:87`). `HistoryExerciseGroup`
-  is `mark mark-success`, so the success mark is lost on every row but the
-  last.
-- `features/workout/session-loading-skeleton.tsx:82`.
-
-Not yet observed on a live page: the one finished session in the dev data has a
-single exercise, which is always the last row. The other `divide-rule-faint`
-lists (progress, session comparison, performance history, muscle heatmap) have
-not been checked for `.mark` rows.
-
-**Solution direction.** Rule these lists with `.rule-row` on the rows instead of
-`divide-*` on the parent: §11.5 names `.rule-row` as the between-items rule, and
-it sets only `border-bottom`, so it never touches the mark's edge. Check the
-remaining `divide-rule-faint` lists at the same time.
-
-**Closure.** On a session and a history detail with at least three exercises,
-incomplete rows other than the last show no left bar and completed ones show
-`--success-strong`, in both themes. The skeleton matches, and
-`npm run ui:regression` is green.
 
 ---
 
@@ -161,7 +61,36 @@ a list of active debt.
 ## Document history
 
 - **2026-09-13 (revision 15):** Closed and removed `TD-39` on the owner's
-  review of the A|B capture set.
+  review of the A|B capture set, and `TD-40`, `TD-41` and `TD-42` once their
+  checks passed. The register is empty.
+
+  - `TD-40`: the layout titles `/profile` "Profile" and `/search` "Search", and
+    a route without a sidebar item resolves to no active id, so nothing is
+    marked. Neither function falls back to Dashboard any more.
+  - `TD-41`: the owner kept the day rows. The Quick Start tiles are gone, and
+    each row's caption now carries what only they said: `formatExerciseCount`
+    ("1 exercise", tested) and "Not scheduled for today" where Start is
+    disabled. The wizard's day card uses the same formatter.
+    `features/routines/utils/routine-detail.utils.ts` lost its only importer
+    and was deleted.
+  - `TD-42`: the session, history-detail and skeleton lists rule their rows
+    with `.rule-row` instead of `divide-*`.
+
+  Verified in the browser in both themes:
+  - `/profile`, `/profile/<username>` and `/search` at 390 and 1440: the right
+    title, 0 `aria-current`, 0 markers.
+  - The routine page at 390/768/1440: no Quick Start, three Start controls, and
+    every caption reads "1 exercise · Not scheduled for today".
+  - The only finished session has one exercise, so its row was cloned in place
+    into completed, incomplete, completed. On history detail and on the session
+    page, the completed rows computed `--success-strong`, the incomplete one a
+    transparent edge, and only the last row dropped its bottom rule. The
+    skeleton's rows were all transparent.
+
+  Vitest 180 of 180. The first full sweep failed one test, `layout profile` at
+  430 dark: the shell rendered before the profile content arrived. It passed on
+  re-run, all 14 profile widths passed, and a second full sweep passed 283 of
+  283.
 
   `TD-33` recurred at 12:28, and the new check caught it. The owner's
   PowerShell history shows a bare `npm install` in both repos, run to update a
