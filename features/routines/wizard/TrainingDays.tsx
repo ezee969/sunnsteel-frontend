@@ -25,6 +25,7 @@ import {
 	moveRotationDay,
 	removeRotationDay,
 	ROTATION_PRESETS,
+	toggleRestDay,
 	wizardDayLabel,
 } from './utils/schedule'
 
@@ -169,6 +170,50 @@ function RotationDays({ data, onUpdate }: TrainingDaysProps) {
 	)
 }
 
+/**
+ * SCHED-07: planned rest among the weekdays the routine does not train on.
+ * It shows on the schedule as a rest day instead of an empty one.
+ */
+function RestDays({ data, onUpdate }: TrainingDaysProps) {
+	const candidates = DAYS_OF_WEEK.filter(
+		day => !data.trainingDays.includes(day.id),
+	)
+	if (data.trainingDays.length === 0 || candidates.length === 0) return null
+	return (
+		<div>
+			<p id="rest-days-label" className="type-body-sm text-ink-3">
+				Rest days (optional)
+			</p>
+			<p className="type-body-sm mb-2 text-ink-3">
+				Planned rest shows on your schedule as a rest day instead of an empty
+				one.
+			</p>
+			<div
+				role="group"
+				aria-labelledby="rest-days-label"
+				className="flex flex-wrap gap-1"
+			>
+				{candidates.map(day => {
+					const isRest = data.restDays.includes(day.id)
+					return (
+						<Button
+							key={day.id}
+							type="button"
+							size="sm"
+							variant={isRest ? 'secondary' : 'ghost'}
+							aria-pressed={isRest}
+							aria-label={`Rest on ${day.name}`}
+							onClick={() => onUpdate(toggleRestDay(data, day.id))}
+						>
+							{day.short}
+						</Button>
+					)
+				})}
+			</div>
+		</div>
+	)
+}
+
 function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 	const { isMobile } = useSidebar()
 	const { toggleDay, selectSplit } = useTrainingDaySelection({
@@ -212,6 +257,8 @@ function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 					</div>
 				</div>
 			</div>
+
+			<RestDays data={data} onUpdate={onUpdate} />
 
 			<SelectedDaysSummary
 				trainingDays={data.trainingDays}

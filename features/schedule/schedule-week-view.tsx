@@ -8,6 +8,7 @@ import {
 	CircleDashed,
 	CircleSlash,
 	Loader2,
+	Moon,
 	PlayCircle,
 	RefreshCw,
 	Repeat,
@@ -59,6 +60,7 @@ const ENTRY_STATUS: Record<
 	IN_PROGRESS: { Icon: PlayCircle, label: 'In progress', tone: 'text-ink-2' },
 	PLANNED: { Icon: CalendarClock, label: 'Planned', tone: 'text-ink-3' },
 	NOT_LOGGED: { Icon: CircleDashed, label: 'Not logged', tone: 'text-ink-3' },
+	REST: { Icon: Moon, label: 'Rest day', tone: 'text-ink-3' },
 }
 
 const entryStatus = (entry: ScheduleEntry) =>
@@ -200,7 +202,8 @@ export function ScheduleWeekView({
 			<p className="type-body-sm max-w-2xl text-ink-3">
 				Planned days follow your weekly routines as they are now, from the day
 				each routine was created. Rotation days have no date: the next one is
-				shown below, and their sessions appear on the day you trained.
+				shown below, and their sessions appear on the day you trained. Rest days
+				come from each weekly routine's planned rest.
 			</p>
 
 			{isPending ? (
@@ -289,7 +292,7 @@ export function ScheduleWeekView({
 													key={
 														entry.kind === 'SESSION'
 															? entry.sessionId
-															: `${entry.routineId}-${entry.dayName}`
+															: `${entry.kind}-${entry.routineId}-${entry.dayName}`
 													}
 													entry={entry}
 													action={scheduleEntryAction(

@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
+import { weekdayName } from '@/lib/utils/date'
 
 import { RoutineDayCard } from './components/RoutineDayCard'
 import { RoutineQualitySummary } from './components/RoutineQualitySummary'
@@ -131,6 +132,12 @@ export function ReviewAndCreate({
 								? `${data.days.length}-day rotation: each day follows the last one you completed, on any weekday`
 								: `${data.trainingDays.length} training days per week`}
 						</p>
+						{data.scheduleMode === 'WEEKLY' && data.restDays.length > 0 ? (
+							<p className="text-sm text-muted-foreground">
+								Rest days:{' '}
+								{data.restDays.map(day => weekdayName(day, 'long')).join(', ')}
+							</p>
+						) : null}
 					</AccordionContent>
 				</AccordionItem>
 

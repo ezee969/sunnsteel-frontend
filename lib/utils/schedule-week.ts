@@ -39,6 +39,13 @@ export type ScheduleEntry =
 			routineName: string
 			dayName: string
 	  }
+	| {
+			/** SCHED-07: a weekday the routine rests on by plan. */
+			kind: 'REST'
+			routineId: string
+			routineName: string
+			dayName: null
+	  }
 
 export interface ScheduleDay {
 	/** Local calendar date, YYYY-MM-DD. */
@@ -67,6 +74,7 @@ export interface ScheduleWeek {
 		aborted: number
 		planned: number
 		notLogged: number
+		rest: number
 	}
 }
 
@@ -113,6 +121,7 @@ type ScheduleRoutine = Pick<
 	| 'createdAt'
 	| 'scheduleMode'
 	| 'nextRotationDayId'
+	| 'restDays'
 	| 'days'
 >
 
@@ -220,12 +229,29 @@ export function buildScheduleWeek({
 				},
 			})
 		}
+		// SCHED-07: planned rest is never "not logged"; a session replaces it.
+		for (const weekday of routine.restDays ?? []) {
+			const day = days.find(d => d.dayOfWeek === weekday)
+			if (!day || day.date < createdOn) continue
+			if (trained.has(`${routine.id}|${day.date}`)) continue
+			planned.push({
+				date: day.date,
+				entry: {
+					kind: 'REST',
+					routineId: routine.id,
+					routineName: routine.name,
+					dayName: null,
+				},
+			})
+		}
 	}
 	planned
-		.sort((a, b) =>
-			a.entry.routineName.localeCompare(b.entry.routineName, undefined, {
-				sensitivity: 'base',
-			}),
+		.sort(
+			(a, b) =>
+				Number(a.entry.kind === 'REST') - Number(b.entry.kind === 'REST') ||
+				a.entry.routineName.localeCompare(b.entry.routineName, undefined, {
+					sensitivity: 'base',
+				}),
 		)
 		.forEach(({ date, entry }) => byDate.get(date)?.entries.push(entry))
 
@@ -244,6 +270,7 @@ export function buildScheduleWeek({
 			aborted: count(e => e.kind === 'SESSION' && e.status === 'ABORTED'),
 			planned: count(e => e.kind === 'PLANNED'),
 			notLogged: count(e => e.kind === 'NOT_LOGGED'),
+			rest: count(e => e.kind === 'REST'),
 		},
 	}
 }
@@ -297,6 +324,9 @@ export function describeScheduleTotals(totals: ScheduleWeek['totals']): string {
 		totals.aborted ? `${totals.aborted} ended early` : null,
 		totals.planned ? `${totals.planned} planned` : null,
 		totals.notLogged ? `${totals.notLogged} not logged` : null,
+		totals.rest
+			? `${totals.rest} rest ${totals.rest === 1 ? 'day' : 'days'}`
+			: null,
 	].filter(Boolean)
 	return parts.length ? parts.join(' · ') : 'Nothing planned or logged'
 }

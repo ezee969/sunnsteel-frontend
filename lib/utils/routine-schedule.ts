@@ -73,13 +73,22 @@ export function routineDayTitle(
 
 /** The one-line schedule on a routine card. */
 export function describeRoutineSchedule(
-	routine: Pick<ScheduledRoutine, 'scheduleMode' | 'days'>,
+	routine: Pick<ScheduledRoutine, 'scheduleMode' | 'days'> & {
+		restDays?: readonly number[]
+	},
 ): string {
 	const days = orderedRoutineDays(routine)
 	if (isRotationRoutine(routine)) {
 		return ['Rotation', ...days.map(day => routineDayLabel(day))].join(' · ')
 	}
-	return days.map(day => weekdayName(day.dayOfWeek ?? 0, 'short')).join(' · ')
+	const training = days
+		.map(day => weekdayName(day.dayOfWeek ?? 0, 'short'))
+		.join(' · ')
+	// SCHED-07: planned rest follows the training days.
+	const rest = routine.restDays?.length
+		? ` · Rest ${routine.restDays.map(day => weekdayName(day, 'short')).join(', ')}`
+		: ''
+	return training + rest
 }
 
 /** "3 days/week" for a weekly routine, "3-day rotation" for a rotation. */

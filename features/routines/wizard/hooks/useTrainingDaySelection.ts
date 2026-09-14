@@ -23,6 +23,8 @@ export const useTrainingDaySelection = ({
 			const sorted = sortNumbersAscending(nextTrainingDays)
 			onUpdate({
 				trainingDays: sorted,
+				// A weekday that becomes a training day is no longer a rest day.
+				restDays: data.restDays.filter(day => !sorted.includes(day)),
 				days: sorted.map(slot => {
 					const existing = data.days.find(day => day.slot === slot)
 					return {
@@ -33,7 +35,7 @@ export const useTrainingDaySelection = ({
 				}),
 			})
 		},
-		[data.days, onUpdate],
+		[data.days, data.restDays, onUpdate],
 	)
 
 	const toggleDay = useCallback(

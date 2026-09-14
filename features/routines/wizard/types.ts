@@ -41,5 +41,7 @@ export interface RoutineWizardData {
 	scheduleMode: RoutineScheduleMode
 	/** The days' slots in display order. */
 	trainingDays: number[]
+	/** SCHED-07: weekdays a weekly routine rests on by plan; none on a rotation. */
+	restDays: number[]
 	days: RoutineWizardDay[]
 }

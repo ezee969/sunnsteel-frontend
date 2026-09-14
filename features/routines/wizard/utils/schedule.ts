@@ -49,7 +49,7 @@ const WEEKLY_FILL_ORDER = [1, 2, 3, 4, 5, 6, 0]
 type ScheduleUpdate = Pick<
 	RoutineWizardData,
 	'scheduleMode' | 'trainingDays' | 'days'
->
+> & { restDays?: number[] }
 
 const asRotation = (days: RoutineWizardDay[]): ScheduleUpdate => {
 	const renumbered = days.map((day, slot) => ({ ...day, slot }))
@@ -57,6 +57,8 @@ const asRotation = (days: RoutineWizardDay[]): ScheduleUpdate => {
 		scheduleMode: 'ROTATION',
 		days: renumbered,
 		trainingDays: renumbered.map(day => day.slot),
+		// Rotations have no rest days (SCHED-07).
+		restDays: [],
 	}
 }
 
@@ -160,6 +162,21 @@ export function isRotationPreset(
 		data.days.length === preset.days.length &&
 		data.days.every((day, index) => day.name?.trim() === preset.days[index])
 	)
+}
+
+/** SCHED-07: toggles a planned rest weekday; training weekdays never rest. */
+export function toggleRestDay(
+	data: RoutineWizardData,
+	weekday: number,
+): Pick<RoutineWizardData, 'restDays'> {
+	if (data.scheduleMode !== 'WEEKLY' || data.trainingDays.includes(weekday)) {
+		return { restDays: data.restDays }
+	}
+	return {
+		restDays: data.restDays.includes(weekday)
+			? data.restDays.filter(day => day !== weekday)
+			: [...data.restDays, weekday].sort((a, b) => a - b),
+	}
 }
 
 export function renameWizardDay(

@@ -54,6 +54,7 @@ export default function CreateRoutinePage() {
 		description: '',
 		scheduleMode: 'WEEKLY',
 		trainingDays: [],
+		restDays: [],
 		days: [],
 	})
 

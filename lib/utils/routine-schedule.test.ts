@@ -64,6 +64,9 @@ describe('routine schedule', () => {
 
 	it('summarises the schedule and its frequency', () => {
 		expect(describeRoutineSchedule(weekly)).toBe('Mon · Wed · Fri')
+		expect(describeRoutineSchedule({ ...weekly, restDays: [6, 0] })).toBe(
+			'Mon · Wed · Fri · Rest Sat, Sun',
+		)
 		expect(describeRoutineSchedule(rotation)).toBe(
 			'Rotation · Push · Day B · Legs',
 		)

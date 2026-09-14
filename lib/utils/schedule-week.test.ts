@@ -28,6 +28,7 @@ const routine = (overrides: Partial<Routine>): Routine => ({
 	isCompleted: false,
 	scheduleMode: 'WEEKLY',
 	nextRotationDayId: null,
+	restDays: [],
 	createdAt: new Date(2026, 8, 1).toISOString(),
 	updatedAt: new Date(2026, 8, 1).toISOString(),
 	days: [
@@ -91,6 +92,7 @@ describe('schedule week', () => {
 			aborted: 1,
 			planned: 1,
 			notLogged: 1,
+			rest: 0,
 		})
 		expect(describeScheduleTotals(week.totals)).toBe(
 			'1 completed · 1 ended early · 1 planned · 1 not logged',
@@ -157,6 +159,40 @@ describe('schedule week', () => {
 		expect(lastWeek.rotations).toEqual([])
 	})
 
+	it('shows planned rest before and after today, never as not logged', () => {
+		const week = buildScheduleWeek({
+			weekStart: WEEK,
+			now: NOW,
+			routines: [
+				routine({
+					days: [
+						{ id: 'fri', dayOfWeek: 5, name: null, order: 0, exercises: [] },
+					],
+					restDays: [1, 2, 3, 0],
+				}),
+			],
+			// Trained on a planned rest day: the session replaces the rest.
+			sessions: [session('s1', 'upper-lower', at(15), 'COMPLETED', 'Friday')],
+		})
+		expect(entriesOn(week, 14)).toEqual(['REST:null'])
+		expect(entriesOn(week, 15)).toEqual(['COMPLETED:Friday'])
+		expect(entriesOn(week, 16)).toEqual(['REST:null'])
+		expect(entriesOn(week, 18)).toEqual(['PLANNED:Friday'])
+		expect(entriesOn(week, 20)).toEqual(['REST:null'])
+		expect(week.totals).toEqual({
+			completed: 1,
+			aborted: 0,
+			planned: 1,
+			notLogged: 0,
+			rest: 3,
+		})
+		expect(describeScheduleTotals(week.totals)).toBe(
+			'1 completed · 1 planned · 3 rest days',
+		)
+		const today = week.days.find(d => d.isToday)!
+		expect(scheduleEntryAction(today.entries[0], today, false)).toBeNull()
+	})
+
 	it('names the week relative to today', () => {
 		expect(describeWeek('2026-09-14', NOW)).toBe('This week')
 		expect(describeWeek('2026-09-07', NOW)).toBe('Last week')
@@ -168,6 +204,7 @@ describe('schedule week', () => {
 				aborted: 0,
 				planned: 0,
 				notLogged: 0,
+				rest: 0,
 			}),
 		).toBe('Nothing planned or logged')
 	})

@@ -11,6 +11,7 @@ import {
 	removeRotationDay,
 	renameWizardDay,
 	ROTATION_PRESETS,
+	toggleRestDay,
 	wizardDayLabel,
 } from './schedule'
 
@@ -26,6 +27,7 @@ const weekly: RoutineWizardData = {
 	name: 'Split',
 	scheduleMode: 'WEEKLY',
 	trainingDays: [1, 3, 5],
+	restDays: [0, 6],
 	days: [
 		{ slot: 1, name: 'Push', exercises: [exercise('bench')] },
 		{ slot: 3, exercises: [exercise('row')] },
@@ -121,5 +123,16 @@ describe('wizard schedule', () => {
 			[null, 1],
 			[null, 2],
 		])
+	})
+
+	it('keeps rest days off training days and clears them for rotations', () => {
+		expect(toggleRestDay(weekly, 3).restDays).toEqual([0, 6])
+		expect(toggleRestDay(weekly, 2).restDays).toEqual([0, 2, 6])
+		expect(toggleRestDay(weekly, 6).restDays).toEqual([0])
+		const rotation = { ...weekly, ...changeScheduleMode(weekly, 'ROTATION') }
+		expect(rotation.restDays).toEqual([])
+		expect(toggleRestDay(rotation, 2).restDays).toEqual([])
+		expect(buildRoutineRequest(weekly).restDays).toEqual([0, 6])
+		expect(buildRoutineRequest(rotation).restDays).toEqual([])
 	})
 })

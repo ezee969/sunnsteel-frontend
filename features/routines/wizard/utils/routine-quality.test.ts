@@ -92,6 +92,7 @@ const routine = (...days: RoutineWizardExercise[][]): RoutineWizardData => ({
 	name: 'Test',
 	scheduleMode: 'WEEKLY',
 	trainingDays: days.map((_, index) => index + 1),
+	restDays: [],
 	days: days.map((exercises, index) => ({ slot: index + 1, exercises })),
 })
 
