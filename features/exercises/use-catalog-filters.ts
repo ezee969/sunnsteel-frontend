@@ -10,68 +10,77 @@ import {
 } from '@/lib/utils/exercise-catalog'
 
 /**
- * EXER-02: the URL is the source of truth for the catalog filters, so a
- * filtered view survives reloads, Back and shared links. The name search keeps
- * a local value while typing and writes the URL once typing pauses.
+ * EXER-02: the catalog filters are mirrored into the URL, so a filtered view
+ * survives a reload and can be shared. State is the source of every write;
+ * the URL is only followed when something else navigates, such as the
+ * sidebar link back to a bare `/exercises`.
+ *
+ * The URL lags `router.replace`, so an earlier write can land after a later
+ * one was requested. Those are remembered as pending and never read back as
+ * navigation — reading the URL instead of state let a stale write undo
+ * "Clear filters".
  */
 export function useCatalogFilters() {
 	const router = useRouter()
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
-	const urlFilters = useMemo(
-		() => parseCatalogFilters(searchParams),
-		[searchParams],
+	const urlSearch = serializeCatalogFilters(parseCatalogFilters(searchParams))
+
+	const [committed, setCommitted] = useState(() =>
+		parseCatalogFilters(searchParams),
 	)
-	const [query, setQuery] = useState(urlFilters.q)
+	// The typed search filters immediately and reaches the URL once it pauses.
+	const [query, setQuery] = useState(committed.q)
 	const debouncedQuery = useDebounce(query, 250)
-	// The search this hook last wrote, so its own URL update is not mistaken
-	// for navigation and does not overwrite what the user is still typing.
-	const writtenQuery = useRef<string | null>(null)
 	const lastDebouncedQuery = useRef(debouncedQuery)
 
-	const replaceUrl = useCallback(
-		(next: CatalogFilters) => {
-			const q = next.q.trim()
-			if (q !== urlFilters.q) writtenQuery.current = q
-			const search = serializeCatalogFilters(next)
-			router.replace(search ? `${pathname}?${search}` : pathname, {
-				scroll: false,
-			})
-		},
-		[pathname, router, urlFilters.q],
-	)
+	const latestWrite = useRef(urlSearch)
+	const pendingWrites = useRef(new Set<string>())
 
-	// Back, Forward or a shared link changed the search: follow it.
-	useEffect(() => {
-		if (writtenQuery.current === urlFilters.q) {
-			writtenQuery.current = null
-			return
-		}
-		setQuery(urlFilters.q)
-	}, [urlFilters.q])
-
-	// Only a settled change of the typed value writes the URL.
 	useEffect(() => {
 		if (lastDebouncedQuery.current === debouncedQuery) return
 		lastDebouncedQuery.current = debouncedQuery
 		const q = debouncedQuery.trim()
-		if (q !== urlFilters.q) replaceUrl({ ...urlFilters, q })
-	}, [debouncedQuery, replaceUrl, urlFilters])
+		setCommitted(current => (current.q === q ? current : { ...current, q }))
+	}, [debouncedQuery])
+
+	const nextSearch = serializeCatalogFilters(committed)
+	useEffect(() => {
+		if (nextSearch === latestWrite.current) return
+		latestWrite.current = nextSearch
+		pendingWrites.current.add(nextSearch)
+		router.replace(nextSearch ? `${pathname}?${nextSearch}` : pathname, {
+			scroll: false,
+		})
+	}, [nextSearch, pathname, router])
+
+	useEffect(() => {
+		if (urlSearch === latestWrite.current) {
+			pendingWrites.current.clear()
+			return
+		}
+		if (pendingWrites.current.has(urlSearch)) return
+		pendingWrites.current.clear()
+		latestWrite.current = urlSearch
+		const next = parseCatalogFilters(new URLSearchParams(urlSearch))
+		setCommitted(next)
+		setQuery(next.q)
+	}, [urlSearch])
 
 	const update = useCallback(
 		(patch: Partial<Omit<CatalogFilters, 'q'>>) =>
-			replaceUrl({ ...urlFilters, ...patch, q: query }),
-		[query, replaceUrl, urlFilters],
+			setCommitted(current => ({ ...current, ...patch, q: query.trim() })),
+		[query],
 	)
 
 	const clear = useCallback(() => {
 		setQuery('')
-		replaceUrl(EMPTY_CATALOG_FILTERS)
-	}, [replaceUrl])
+		setCommitted(EMPTY_CATALOG_FILTERS)
+	}, [])
 
 	const filters = useMemo(
-		() => ({ ...urlFilters, q: query }),
-		[query, urlFilters],
+		() => ({ ...committed, q: query }),
+		[committed, query],
 	)
 
 	return { filters, setQuery, update, clear }

@@ -193,7 +193,10 @@ function ExerciseRow({
 						</span>
 						<span className="lg:text-right">
 							<span className="lg:sr-only">Last trained </span>
-							<time dateTime={lastTrainedAt} className="type-data text-ink-2">
+							<time
+								dateTime={lastTrainedAt}
+								className="type-data whitespace-nowrap text-ink-2"
+							>
 								{formatDate(lastTrainedAt)}
 							</time>
 						</span>
