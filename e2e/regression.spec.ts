@@ -443,6 +443,7 @@ const ROUTES: SweepRoute[] = [
 		needs: 'at least one finished session',
 	},
 	{ slug: 'progress', path: () => '/progress' },
+	{ slug: 'achievements', path: () => '/achievements' },
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
 	{ slug: 'settings', path: () => '/settings' },
