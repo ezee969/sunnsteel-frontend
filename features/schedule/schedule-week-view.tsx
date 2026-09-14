@@ -203,7 +203,7 @@ export function ScheduleWeekView({
 				Planned days follow your weekly routines as they are now, from the day
 				each routine was created. Rotation days have no date: the next one is
 				shown below, and their sessions appear on the day you trained. Rest days
-				come from each weekly routine's planned rest.
+				come from each weekly routine&apos;s planned rest.
 			</p>
 
 			{isPending ? (
