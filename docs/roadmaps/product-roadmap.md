@@ -73,9 +73,10 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID     | Status        | Owner | Branch / worktree                                                       | Claimed    | Repositories |
-| ------ | ------------- | ----- | ----------------------------------------------------------------------- | ---------- | ------------ |
-| ACH-04 | `IN_PROGRESS` | Codex | `codex/ach-04` · `.codex-worktrees/ach-04-{frontend,backend,contracts}` | 2026-09-14 | FE, BE, CT   |
+| ID      | Status        | Owner  | Branch / worktree                                                           | Claimed    | Repositories |
+| ------- | ------------- | ------ | --------------------------------------------------------------------------- | ---------- | ------------ |
+| ACH-04  | `IN_PROGRESS` | Codex  | `codex/ach-04` · `.codex-worktrees/ach-04-{frontend,backend,contracts}`     | 2026-09-14 | FE, BE, CT   |
+| ROUT-11 | `IN_PROGRESS` | Claude | `claude/rout-11` · `.claude-worktrees/rout-11-{frontend,backend,contracts}` | 2026-09-14 | FE, BE, CT   |
 
 ## Current product snapshot
 
@@ -299,20 +300,20 @@ surface in the original description, stays hidden under `FIX-04` until
 
 ### Routines and programming
 
-| ID      | Status      | Size | Feature                        | User-facing behavior                                                                                                                                                                                                       | Dependencies                         |
-| ------- | ----------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| ROUT-03 | `QUEUED`    | M    | Starter templates              | Open curated programs in the existing wizard as fully editable drafts. Candidate to also serve as the Quick Workout replacement path (`LIVE-06`), which would extend selection with session duration and experience level. | Curated templates (no owning ID yet) |
-| ROUT-04 | `QUEUED`    | L    | Routine sharing                | Publish, share with followers, or expose through a private link under explicit visibility controls.                                                                                                                        | PROF-06                              |
-| ROUT-05 | `QUEUED`    | M    | Routine cloning                | Copy a shared routine into an independent editable version.                                                                                                                                                                | ROUT-04                              |
-| ROUT-06 | `QUEUED`    | M    | Routine lineage                | Preserve original authorship and identify the source of a clone.                                                                                                                                                           | ROUT-05, PROF-03                     |
-| ROUT-07 | `QUEUED`    | L    | Routine discovery              | Browse programs by goal, days, experience, equipment, duration, and muscle focus.                                                                                                                                          | ROUT-04, EXER-02                     |
-| ROUT-08 | `QUEUED`    | L    | Routine versions               | Create intentional versions, compare them, and restore an earlier setup.                                                                                                                                                   | DATA-04                              |
-| ROUT-09 | `QUEUED`    | XL   | Training blocks and deloads    | Organize dated program phases and apply temporary deload prescriptions without destroying the normal routine.                                                                                                              | ROUT-08, SCHED-01                    |
-| ROUT-10 | `SHIPPED`   | M    | Quality summary                | Before saving, show weekly muscle-group sets, equipment, estimated duration, and likely imbalances.                                                                                                                        | EXER-09                              |
-| ROUT-11 | `QUEUED`    | L    | Flexible day identity          | Support named and unscheduled rotation days instead of requiring every day to be only a weekday.                                                                                                                           | BE/CT routine model                  |
-| ROUT-12 | `CANDIDATE` | M    | Superset/circuit configuration | Group routine exercises and define order within a round.                                                                                                                                                                   | BE/CT schema; LIVE-14                |
-| ROUT-13 | `CANDIDATE` | M    | Routine import/export          | Back up and exchange programs through a stable versioned format.                                                                                                                                                           | EXPORT-01                            |
-| ROUT-14 | `DEFERRED`  | XL   | Collaborative editing          | Allow an invited coach or collaborator to suggest or make changes with an audit trail.                                                                                                                                     | COACH-01, DATA-02                    |
+| ID      | Status        | Size | Feature                        | User-facing behavior                                                                                                                                                                                                       | Dependencies                         |
+| ------- | ------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| ROUT-03 | `QUEUED`      | M    | Starter templates              | Open curated programs in the existing wizard as fully editable drafts. Candidate to also serve as the Quick Workout replacement path (`LIVE-06`), which would extend selection with session duration and experience level. | Curated templates (no owning ID yet) |
+| ROUT-04 | `QUEUED`      | L    | Routine sharing                | Publish, share with followers, or expose through a private link under explicit visibility controls.                                                                                                                        | PROF-06                              |
+| ROUT-05 | `QUEUED`      | M    | Routine cloning                | Copy a shared routine into an independent editable version.                                                                                                                                                                | ROUT-04                              |
+| ROUT-06 | `QUEUED`      | M    | Routine lineage                | Preserve original authorship and identify the source of a clone.                                                                                                                                                           | ROUT-05, PROF-03                     |
+| ROUT-07 | `QUEUED`      | L    | Routine discovery              | Browse programs by goal, days, experience, equipment, duration, and muscle focus.                                                                                                                                          | ROUT-04, EXER-02                     |
+| ROUT-08 | `QUEUED`      | L    | Routine versions               | Create intentional versions, compare them, and restore an earlier setup.                                                                                                                                                   | DATA-04                              |
+| ROUT-09 | `QUEUED`      | XL   | Training blocks and deloads    | Organize dated program phases and apply temporary deload prescriptions without destroying the normal routine.                                                                                                              | ROUT-08, SCHED-01                    |
+| ROUT-10 | `SHIPPED`     | M    | Quality summary                | Before saving, show weekly muscle-group sets, equipment, estimated duration, and likely imbalances.                                                                                                                        | EXER-09                              |
+| ROUT-11 | `IN_PROGRESS` | L    | Flexible day identity          | Support named and unscheduled rotation days instead of requiring every day to be only a weekday.                                                                                                                           | BE/CT routine model                  |
+| ROUT-12 | `CANDIDATE`   | M    | Superset/circuit configuration | Group routine exercises and define order within a round.                                                                                                                                                                   | BE/CT schema; LIVE-14                |
+| ROUT-13 | `CANDIDATE`   | M    | Routine import/export          | Back up and exchange programs through a stable versioned format.                                                                                                                                                           | EXPORT-01                            |
+| ROUT-14 | `DEFERRED`    | XL   | Collaborative editing          | Allow an invited coach or collaborator to suggest or make changes with an audit trail.                                                                                                                                     | COACH-01, DATA-02                    |
 
 ### Schedule
 
@@ -1020,3 +1021,11 @@ it again without addressing the original decision.
   with a check constraint; the other `PROG-09` thresholds stay fixed.
   `PROG-10` (fatigue indicators) remains the natural follow-up and still
   needs its own rule review before it starts.
+- **2026-09-14 (revision 60):** Claimed `ROUT-11` for Claude with the
+  owner's approved design: each routine is either weekly (days tied to
+  weekdays, as today) or a rotation (ordered days with no weekday); every day
+  may carry its own name in either mode; a rotation's next day follows the
+  last completed session of that routine, an aborted session does not
+  advance it, and the dashboard shows the next rotation day instead of a
+  weekday match. It changes the routine model, hence `L`, and unblocks
+  `SCHED-01` and `SCHED-06`.
