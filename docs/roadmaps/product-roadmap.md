@@ -73,8 +73,9 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID  | Status | Owner | Branch / worktree | Claimed | Repositories |
-| --- | ------ | ----- | ----------------- | ------- | ------------ |
+| ID      | Status        | Owner  | Branch / worktree                                                                            | Claimed    | Repositories                                 |
+| ------- | ------------- | ------ | -------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------- |
+| EXER-02 | `IN_PROGRESS` | Claude | `claude/exer-02` · `.claude-worktrees/exer-02-frontend`, `.claude-worktrees/exer-02-backend` | 2026-09-14 | FE (BE/CT only if the history read needs it) |
 
 ## Current product snapshot
 
@@ -240,17 +241,17 @@ cold-start impact and showing that simpler rendering is insufficient.
 
 ### Exercise library
 
-| ID      | Status      | Size | Feature                        | User-facing behavior                                                                                                                                                  | Dependencies                   |
-| ------- | ----------- | ---- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| EXER-01 | `CANDIDATE` | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                              | PROG-01, PROG-02               |
-| EXER-02 | `CANDIDATE` | M    | Catalog browsing               | Filter exercises by muscle, equipment, movement pattern, favorites, and training history.                                                                             | EXER-09                        |
-| EXER-03 | `CANDIDATE` | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                              | Content-authoring process      |
-| EXER-04 | `CANDIDATE` | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                      | Curated assets and licenses    |
-| EXER-05 | `SHIPPED`   | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                    | EXER-09                        |
-| EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
-| EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
-| EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
-| EXER-09 | `SHIPPED`   | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
+| ID      | Status        | Size | Feature                        | User-facing behavior                                                                                                                                                  | Dependencies                   |
+| ------- | ------------- | ---- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| EXER-01 | `CANDIDATE`   | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                              | PROG-01, PROG-02               |
+| EXER-02 | `IN_PROGRESS` | M    | Catalog browsing               | Filter exercises by muscle, equipment, movement pattern, favorites, and training history.                                                                             | EXER-09                        |
+| EXER-03 | `CANDIDATE`   | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                              | Content-authoring process      |
+| EXER-04 | `CANDIDATE`   | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                      | Curated assets and licenses    |
+| EXER-05 | `SHIPPED`     | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                    | EXER-09                        |
+| EXER-06 | `CANDIDATE`   | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
+| EXER-07 | `CANDIDATE`   | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
+| EXER-08 | `CANDIDATE`   | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
+| EXER-09 | `SHIPPED`     | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
 
 The first Exercises release should emphasize the user's existing training data.
 Instructions and media make this a content project as well as an engineering one.
@@ -904,3 +905,6 @@ it again without addressing the original decision.
   refresh and logged five 401s; that exact case passed immediately after the
   refreshed state was persisted. All 14 Achievements cases passed in the
   original run. `ACH-02` is the next dependency-ready achievement slice.
+- **2026-09-14 (revision 47):** Claimed `EXER-02` for Claude. The first
+  Exercises slice is frontend-first; backend or contracts change only if no
+  existing read already lists the exercises the user has trained.
