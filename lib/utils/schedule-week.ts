@@ -35,6 +35,7 @@ export type ScheduleEntry =
 	| {
 			kind: 'PLANNED' | 'NOT_LOGGED'
 			routineId: string
+			routineDayId: string
 			routineName: string
 			dayName: string
 	  }
@@ -51,11 +52,14 @@ export interface ScheduleDay {
 export interface ScheduleRotationNote {
 	routineId: string
 	routineName: string
+	nextDayId: string
 	nextDayName: string
 }
 
 export interface ScheduleWeek {
 	weekStart: string
+	/** The week contains today, so today's work can be started from it. */
+	includesToday: boolean
 	days: ScheduleDay[]
 	rotations: ScheduleRotationNote[]
 	totals: {
@@ -193,6 +197,7 @@ export function buildScheduleWeek({
 				rotations.push({
 					routineId: routine.id,
 					routineName: routine.name,
+					nextDayId: next.id,
 					nextDayName: routineDayLabel(next),
 				})
 			}
@@ -209,6 +214,7 @@ export function buildScheduleWeek({
 				entry: {
 					kind: day.isPast ? 'NOT_LOGGED' : 'PLANNED',
 					routineId: routine.id,
+					routineDayId: routineDay.id,
 					routineName: routine.name,
 					dayName: routineDayLabel(routineDay),
 				},
@@ -229,6 +235,7 @@ export function buildScheduleWeek({
 
 	return {
 		weekStart: localDateKey(weekStart),
+		includesToday: days.some(day => day.isToday),
 		days,
 		// A rotation's next day only matters for a week that is not over.
 		rotations: days[6].date >= today ? rotations : [],
@@ -239,6 +246,48 @@ export function buildScheduleWeek({
 			notLogged: count(e => e.kind === 'NOT_LOGGED'),
 		},
 	}
+}
+
+export type ScheduleAction =
+	| { kind: 'START'; routineId: string; routineDayId: string }
+	| { kind: 'RESUME'; sessionId: string }
+	| null
+
+/**
+ * SCHED-03: what an entry lets you do now, under the rules the routine card
+ * and dashboard already apply. The live session can be resumed. A weekly day
+ * starts only on its date — today — and nothing starts while a session is
+ * live, because starting would silently resume that one instead.
+ */
+export function scheduleEntryAction(
+	entry: ScheduleEntry,
+	day: Pick<ScheduleDay, 'isToday'>,
+	hasActiveSession: boolean,
+): ScheduleAction {
+	if (entry.kind === 'SESSION') {
+		return entry.status === 'IN_PROGRESS'
+			? { kind: 'RESUME', sessionId: entry.sessionId }
+			: null
+	}
+	if (entry.kind === 'PLANNED' && day.isToday && !hasActiveSession) {
+		return {
+			kind: 'START',
+			routineId: entry.routineId,
+			routineDayId: entry.routineDayId,
+		}
+	}
+	return null
+}
+
+/** A rotation's next day starts on any day of the current week. */
+export function rotationStartAction(
+	note: ScheduleRotationNote,
+	week: Pick<ScheduleWeek, 'includesToday'>,
+	hasActiveSession: boolean,
+): ScheduleAction {
+	return week.includesToday && !hasActiveSession
+		? { kind: 'START', routineId: note.routineId, routineDayId: note.nextDayId }
+		: null
 }
 
 /** "2 completed · 1 ended early · 3 planned · 1 not logged", zeros omitted. */

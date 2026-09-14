@@ -7,6 +7,7 @@ import {
 	ChevronRight,
 	CircleDashed,
 	CircleSlash,
+	Loader2,
 	PlayCircle,
 	RefreshCw,
 	Repeat,
@@ -20,7 +21,10 @@ import {
 	describeScheduleDay,
 	describeScheduleTotals,
 	describeWeek,
+	rotationStartAction,
+	type ScheduleAction,
 	type ScheduleEntry,
+	scheduleEntryAction,
 	type ScheduleWeek,
 } from '@/lib/utils/schedule-week'
 
@@ -30,6 +34,11 @@ interface ScheduleWeekViewProps {
 	isPending: boolean
 	isError: boolean
 	isCurrentWeek: boolean
+	/** SCHED-03: nothing starts while a session is live; it can be resumed. */
+	hasActiveSession: boolean
+	/** The routine day being started, while its request runs. */
+	startingDayId: string | null
+	onStart: (routineId: string, routineDayId: string) => void
 	onPrevious: () => void
 	onNext: () => void
 	onToday: () => void
@@ -62,8 +71,55 @@ const entryHref = (entry: ScheduleEntry) => {
 		: `/workouts/history/${entry.sessionId}`
 }
 
-function EntryRow({ entry }: { entry: ScheduleEntry }) {
+interface ActionProps {
+	action: ScheduleAction
+	/** What the action starts, for its accessible name. */
+	target: string
+	startingDayId: string | null
+	onStart: (routineId: string, routineDayId: string) => void
+}
+
+/** Repeated row controls are outline, never the region's primary (§4.3). */
+function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
+	if (!action) return null
+	if (action.kind === 'RESUME') {
+		return (
+			<Button asChild size="sm" variant="outline" className="shrink-0">
+				<Link
+					href={`/workouts/sessions/${action.sessionId}`}
+					aria-label={`Resume ${target}`}
+				>
+					Resume
+				</Link>
+			</Button>
+		)
+	}
+	return (
+		<Button
+			type="button"
+			size="sm"
+			variant="outline"
+			className="shrink-0"
+			aria-label={`Start ${target}`}
+			disabled={startingDayId !== null}
+			onClick={() => onStart(action.routineId, action.routineDayId)}
+		>
+			{startingDayId === action.routineDayId ? (
+				<Loader2 className="size-4 animate-spin" aria-hidden />
+			) : null}
+			Start
+		</Button>
+	)
+}
+
+function EntryRow({
+	entry,
+	...actionProps
+}: { entry: ScheduleEntry } & Omit<ActionProps, 'target'>) {
 	const { Icon, label, tone } = entryStatus(entry)
+	const target = entry.dayName
+		? `${entry.routineName} · ${entry.dayName}`
+		: entry.routineName
 	return (
 		<li className="flex items-start gap-2 py-1">
 			<Icon className={cn('mt-0.5 size-4 shrink-0', tone)} aria-hidden />
@@ -77,6 +133,7 @@ function EntryRow({ entry }: { entry: ScheduleEntry }) {
 				</Link>
 				<span className={cn('type-body-sm ml-2', tone)}>{label}</span>
 			</span>
+			<EntryAction target={target} {...actionProps} />
 		</li>
 	)
 }
@@ -88,6 +145,9 @@ export function ScheduleWeekView({
 	isPending,
 	isError,
 	isCurrentWeek,
+	hasActiveSession,
+	startingDayId,
+	onStart,
 	onPrevious,
 	onNext,
 	onToday,
@@ -177,7 +237,7 @@ export function ScheduleWeekView({
 									className="type-body-sm flex items-start gap-2 text-ink-3"
 								>
 									<Repeat className="mt-0.5 size-4 shrink-0" aria-hidden />
-									<span>
+									<span className="min-w-0 flex-1">
 										<Link
 											href={`/routines/${rotation.routineId}`}
 											className="text-foreground underline-offset-4 hover:underline"
@@ -188,6 +248,16 @@ export function ScheduleWeekView({
 										<span className="text-ink-2">{rotation.nextDayName}</span>,
 										any day
 									</span>
+									<EntryAction
+										action={rotationStartAction(
+											rotation,
+											week,
+											hasActiveSession,
+										)}
+										target={`${rotation.routineName} · ${rotation.nextDayName}`}
+										startingDayId={startingDayId}
+										onStart={onStart}
+									/>
 								</li>
 							))}
 						</ul>
@@ -222,6 +292,13 @@ export function ScheduleWeekView({
 															: `${entry.routineId}-${entry.dayName}`
 													}
 													entry={entry}
+													action={scheduleEntryAction(
+														entry,
+														day,
+														hasActiveSession,
+													)}
+													startingDayId={startingDayId}
+													onStart={onStart}
 												/>
 											))}
 										</ul>

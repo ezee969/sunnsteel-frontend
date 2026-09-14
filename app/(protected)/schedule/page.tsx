@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -8,7 +9,9 @@ import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
 	useActiveSession,
 	useSessions,
+	useStartSession,
 } from '@/lib/api/hooks/useWorkoutSession'
+import { logger } from '@/lib/utils/logger'
 import {
 	addDays,
 	buildScheduleWeek,
@@ -22,6 +25,9 @@ export default function SchedulePage() {
 	const [weekStart, setWeekStart] = useState(() => startOfWeek(now))
 	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
 
+	const router = useRouter()
+	const startSession = useStartSession()
+	const [startingDayId, setStartingDayId] = useState<string | null>(null)
 	const routines = useRoutines()
 	const active = useActiveSession()
 	const sessions = useSessions({ ...range, sort: 'startedAt:asc', limit: 50 })
@@ -58,6 +64,22 @@ export default function SchedulePage() {
 		now,
 	])
 
+	// SCHED-03: start the day, then open the session; the hook toasts failures.
+	const handleStart = async (routineId: string, routineDayId: string) => {
+		setStartingDayId(routineDayId)
+		try {
+			const session = await startSession.mutateAsync({
+				routineId,
+				routineDayId,
+			})
+			if (session?.id) router.push(`/workouts/sessions/${session.id}`)
+		} catch (error) {
+			logger.error('Failed to start session from the schedule', error)
+		} finally {
+			setStartingDayId(null)
+		}
+	}
+
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
 			<HeroSection
@@ -73,6 +95,11 @@ export default function SchedulePage() {
 				now={now}
 				isPending={isPending}
 				isError={isError}
+				hasActiveSession={active.data?.status === 'IN_PROGRESS'}
+				startingDayId={startingDayId}
+				onStart={(routineId, routineDayId) =>
+					void handleStart(routineId, routineDayId)
+				}
 				isCurrentWeek={
 					localDateKey(weekStart) === localDateKey(startOfWeek(now))
 				}

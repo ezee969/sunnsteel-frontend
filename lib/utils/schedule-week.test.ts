@@ -6,6 +6,8 @@ import {
 	describeScheduleTotals,
 	describeWeek,
 	localDateKey,
+	rotationStartAction,
+	scheduleEntryAction,
 	scheduleWeekRange,
 	startOfWeek,
 } from './schedule-week'
@@ -135,7 +137,12 @@ describe('schedule week', () => {
 			},
 		})
 		expect(week.rotations).toEqual([
-			{ routineId: 'ppl', routineName: 'PPL', nextDayName: 'Pull' },
+			{
+				routineId: 'ppl',
+				routineName: 'PPL',
+				nextDayId: 'pull',
+				nextDayName: 'Pull',
+			},
 		])
 		expect(entriesOn(week, 15)).toEqual(['COMPLETED:Push'])
 		expect(entriesOn(week, 16)).toEqual(['IN_PROGRESS:Pull'])
@@ -163,5 +170,67 @@ describe('schedule week', () => {
 				notLogged: 0,
 			}),
 		).toBe('Nothing planned or logged')
+	})
+
+	it("starts only today's planned days and the current rotation, and resumes the live session", () => {
+		const week = buildScheduleWeek({
+			weekStart: WEEK,
+			now: NOW,
+			// Wednesday is today: plan every weekday so each case exists.
+			routines: [
+				routine({
+					days: [
+						{ id: 'tue', dayOfWeek: 2, name: null, order: 0, exercises: [] },
+						{ id: 'wed', dayOfWeek: 3, name: null, order: 1, exercises: [] },
+						{ id: 'thu', dayOfWeek: 4, name: null, order: 2, exercises: [] },
+					],
+				}),
+			],
+			sessions: [],
+		})
+		const dayOf = (date: number) =>
+			week.days.find(d => d.date === localDateKey(new Date(2026, 8, date)))!
+		const actionOn = (date: number, active = false) =>
+			scheduleEntryAction(dayOf(date).entries[0], dayOf(date), active)
+		expect(week.includesToday).toBe(true)
+		expect(actionOn(15)).toBeNull()
+		expect(actionOn(16)).toEqual({
+			kind: 'START',
+			routineId: 'upper-lower',
+			routineDayId: 'wed',
+		})
+		expect(actionOn(17)).toBeNull()
+		expect(actionOn(16, true)).toBeNull()
+		expect(
+			scheduleEntryAction(
+				{
+					kind: 'SESSION',
+					status: 'IN_PROGRESS',
+					sessionId: 'live',
+					routineId: 'upper-lower',
+					routineName: 'Upper / Lower',
+					dayName: null,
+					startedAt: at(16, 9),
+				},
+				dayOf(16),
+				true,
+			),
+		).toEqual({ kind: 'RESUME', sessionId: 'live' })
+
+		const note = {
+			routineId: 'ppl',
+			routineName: 'PPL',
+			nextDayId: 'pull',
+			nextDayName: 'Pull',
+		}
+		expect(rotationStartAction(note, week, false)).toEqual({
+			kind: 'START',
+			routineId: 'ppl',
+			routineDayId: 'pull',
+		})
+		expect(rotationStartAction(note, week, true)).toBeNull()
+		expect(
+			rotationStartAction(note, { includesToday: false }, false),
+		).toBeNull()
 	})
 })
