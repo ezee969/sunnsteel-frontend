@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/hooks/use-sidebar'
+import { cn } from '@/lib/utils'
 
 import { CommonSplitCard } from './components/CommonSplitCard'
 import { SelectedDaysSummary } from './components/SelectedDaysSummary'
@@ -109,7 +110,12 @@ function RotationDays({ data, onUpdate }: TrainingDaysProps) {
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="size-11 sm:size-9"
+										// Hidden, not disabled, at the ends: a disabled button
+										// takes the sunk fill and reads as selected.
+										className={cn(
+											'size-11 sm:size-9',
+											index === 0 && 'invisible',
+										)}
 										aria-label={`Move ${label} earlier`}
 										disabled={index === 0}
 										onClick={() =>
@@ -122,7 +128,10 @@ function RotationDays({ data, onUpdate }: TrainingDaysProps) {
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="size-11 sm:size-9"
+										className={cn(
+											'size-11 sm:size-9',
+											index === data.days.length - 1 && 'invisible',
+										)}
 										aria-label={`Move ${label} later`}
 										disabled={index === data.days.length - 1}
 										onClick={() => onUpdate(moveRotationDay(data, day.slot, 1))}
