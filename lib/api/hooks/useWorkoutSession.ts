@@ -1,3 +1,7 @@
+import type {
+	SubstituteSessionExerciseRequest,
+	SubstituteSessionExerciseResponse,
+} from '@sunsteel/contracts'
 import {
 	useInfiniteQuery,
 	useMutation,
@@ -14,6 +18,7 @@ import { setSaveState } from '@/lib/utils/save-status-store'
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider'
 
+import { routineQueryKeys } from '../routines/routine-query'
 import { workoutService } from '../services/workoutService'
 import {
 	FinishWorkoutRequest,
@@ -647,6 +652,39 @@ export const useUpsertSetLog = (id: string) => {
 			// cache already holds the server's own row (see onSuccess), so the
 			// refetch that used to live in onSettled had nothing to correct.
 			qc.invalidateQueries({ queryKey: qk.session(id) })
+		},
+	})
+}
+
+/**
+ * LIVE-11: swap the exercise for one slot of the active session. The server
+ * returns the whole session (drafts for the slot are cleared), so it replaces
+ * the cache; the routine is refetched only when it was changed too.
+ */
+export const useSubstituteExercise = (id: string, routineId?: string) => {
+	const qc = useQueryClient()
+	return useMutation({
+		mutationFn: ({
+			routineExerciseId,
+			...data
+		}: SubstituteSessionExerciseRequest & { routineExerciseId: string }) =>
+			workoutService.substituteExercise(id, routineExerciseId, data),
+		onSuccess: (result: SubstituteSessionExerciseResponse) => {
+			qc.setQueryData(qk.session(id), result.session as WorkoutSession)
+			if (result.routineUpdated && routineId) {
+				qc.invalidateQueries({ queryKey: routineQueryKeys.detail(routineId) })
+			}
+		},
+	})
+}
+
+export const useRevertExerciseSubstitution = (id: string) => {
+	const qc = useQueryClient()
+	return useMutation({
+		mutationFn: (routineExerciseId: string) =>
+			workoutService.revertExerciseSubstitution(id, routineExerciseId),
+		onSuccess: (result: SubstituteSessionExerciseResponse) => {
+			qc.setQueryData(qk.session(id), result.session as WorkoutSession)
 		},
 	})
 }

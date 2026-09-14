@@ -4,6 +4,8 @@ import type {
 	SessionShare,
 	SessionShareListResponse,
 	SharedSessionRecap,
+	SubstituteSessionExerciseRequest,
+	SubstituteSessionExerciseResponse,
 } from '@sunsteel/contracts'
 
 import {
@@ -324,6 +326,35 @@ export const workoutService = {
 	): Promise<{ id: string }> => {
 		return httpClient.request<{ id: string }>(
 			`${WORKOUTS_API_URL}/sessions/${id}/set-logs/${routineExerciseId}/${setNumber}`,
+			{
+				method: 'DELETE',
+				secure: true,
+			},
+		)
+	},
+
+	/** LIVE-11: perform a different exercise for one slot of the session. */
+	substituteExercise: async (
+		id: string,
+		routineExerciseId: string,
+		data: SubstituteSessionExerciseRequest,
+	): Promise<SubstituteSessionExerciseResponse> => {
+		return httpClient.request<SubstituteSessionExerciseResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercises/${routineExerciseId}/substitution`,
+			{
+				method: 'PUT',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		)
+	},
+
+	revertExerciseSubstitution: async (
+		id: string,
+		routineExerciseId: string,
+	): Promise<SubstituteSessionExerciseResponse> => {
+		return httpClient.request<SubstituteSessionExerciseResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercises/${routineExerciseId}/substitution`,
 			{
 				method: 'DELETE',
 				secure: true,

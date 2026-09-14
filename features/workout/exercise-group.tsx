@@ -1,11 +1,12 @@
 'use client'
 
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ArrowLeftRight, ChevronDown, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
+import { comparablePrevious } from '@/lib/utils/session-substitutions'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
 import { PlateCalculatorDialog } from './plate-calculator-dialog'
@@ -40,6 +41,10 @@ interface ExerciseGroupProps {
 	onSetCompleted?: () => void
 	note?: string | null
 	onSaveNote: (note: string) => void
+	/** LIVE-11: the routine's own exercise when this slot was swapped. */
+	substitutedFrom?: string | null
+	/** Opens the swap dialog; omitted when the session cannot change. */
+	onSwapRequest?: () => void
 }
 
 /**
@@ -57,6 +62,8 @@ export const ExerciseGroup = ({
 	onSetCompleted,
 	note,
 	onSaveNote,
+	substitutedFrom,
+	onSwapRequest,
 }: ExerciseGroupProps) => {
 	const isComplete = completedSets === totalSets && totalSets > 0
 	const weightUnit = useWeightUnit()
@@ -100,11 +107,32 @@ export const ExerciseGroup = ({
 							<p className="type-data mt-0.5 text-ink-3">
 								{completedSets}/{totalSets} sets
 							</p>
+							{substitutedFrom ? (
+								<p className="type-body-sm line-clamp-1 text-ink-3">
+									Swapped from {substitutedFrom}
+								</p>
+							) : null}
 						</div>
 					</div>
 				</Button>
 
 				<div className="flex shrink-0 items-center gap-3">
+					{onSwapRequest ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							aria-label={`Swap ${exerciseName}`}
+							title="Swap exercise"
+							onClick={event => {
+								event.stopPropagation()
+								onSwapRequest()
+							}}
+						>
+							<ArrowLeftRight className="h-4 w-4" />
+						</Button>
+					) : null}
+
 					{calculatorTarget ? (
 						<PlateCalculatorDialog
 							exerciseName={exerciseName}
@@ -141,8 +169,10 @@ export const ExerciseGroup = ({
 							plannedWeight={set.plannedWeight}
 							plannedRir={set.plannedRir}
 							weightUnit={weightUnit}
-							previousPerformance={previousSets?.get(
-								`${set.routineExerciseId}:${set.setNumber}`,
+							// LIVE-11: last time counts only if it was the same exercise.
+							previousPerformance={comparablePrevious(
+								previousSets?.get(`${set.routineExerciseId}:${set.setNumber}`),
+								set.exerciseId,
 							)}
 							rpe={set.rpe}
 							onSave={onSave}

@@ -1,9 +1,13 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { ExerciseGroup } from '@/features/workout/exercise-group'
+import {
+	ExerciseSwapDialog,
+	type SwapTarget,
+} from '@/features/workout/exercise-swap-dialog'
 import { RestTimerBar } from '@/features/workout/rest-timer-bar'
 import { SessionActionCard } from '@/features/workout/session-action-card'
 import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
@@ -22,6 +26,10 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
+import {
+	applySessionSubstitutions,
+	substitutionFor,
+} from '@/lib/utils/session-substitutions'
 import type {
 	GroupedExerciseLogs,
 	UpsertSetLogPayload,
@@ -94,6 +102,9 @@ export default function ActiveSessionPage() {
 	// Collapsible exercises state
 	const { toggleExercise, isCollapsed } = useCollapsibleExercises()
 
+	// LIVE-11: the slot whose exercise is being swapped, if any.
+	const [swapTarget, setSwapTarget] = useState<SwapTarget | null>(null)
+
 	// Handlers
 	const handleSaveSetLog = useCallback(
 		(payload: UpsertSetLogPayload) => {
@@ -113,12 +124,19 @@ export default function ActiveSessionPage() {
 		const day = routine!.days.find(d => d.id === session.routineDayId)
 		if (!day) return [] as GroupedExerciseLogs[]
 
+		// A swapped slot is shown and logged as the exercise actually performed.
 		return groupSetLogsByExercise(
 			session.setLogs as SetLog[],
-			day.exercises,
+			applySessionSubstitutions(day.exercises, session.exerciseSubstitutions),
 			session.id,
 		)
-	}, [session?.setLogs, session?.routineDayId, session?.id, routine])
+	}, [
+		session?.setLogs,
+		session?.routineDayId,
+		session?.id,
+		session?.exerciseSubstitutions,
+		routine,
+	])
 	const previousSets = useMemo(
 		() =>
 			new Map(
@@ -271,6 +289,13 @@ export default function ActiveSessionPage() {
 							set => set.isCompleted,
 						).length
 						const totalSets = group.sets.length
+						const prescribed = day.exercises.find(
+							exercise => exercise.id === group.exerciseId,
+						)?.exercise
+						const substitution = substitutionFor(
+							session.exerciseSubstitutions,
+							group.exerciseId,
+						)
 
 						return (
 							<ExerciseGroup
@@ -285,6 +310,26 @@ export default function ActiveSessionPage() {
 								onSave={handleSaveSetLog}
 								previousSets={previousSets}
 								onSetCompleted={() => restTimer.start(group.restSeconds)}
+								substitutedFrom={
+									substitution && prescribed ? prescribed.name : null
+								}
+								onSwapRequest={
+									session.status === 'IN_PROGRESS' && prescribed
+										? () =>
+												setSwapTarget({
+													routineExerciseId: group.exerciseId,
+													performed: {
+														id: substitution?.exercise.id ?? prescribed.id,
+														name: group.exerciseName,
+													},
+													prescribed: {
+														id: prescribed.id,
+														name: prescribed.name,
+													},
+													hasCompletedSets: completedSets > 0,
+												})
+										: undefined
+								}
 								note={group.note}
 								onSaveNote={note => {
 									if (routineId) {
@@ -332,6 +377,15 @@ export default function ActiveSessionPage() {
 				routineName={routine!.name}
 				isFinishing={isFinishing}
 				status={finishStatus}
+			/>
+			<ExerciseSwapDialog
+				sessionId={session.id}
+				routineId={routineId || undefined}
+				target={swapTarget}
+				otherExerciseIds={groupedLogs
+					.filter(group => group.exerciseId !== swapTarget?.routineExerciseId)
+					.flatMap(group => (group.sets[0] ? [group.sets[0].exerciseId] : []))}
+				onClose={() => setSwapTarget(null)}
 			/>
 			<SessionRecapDialog recap={recap} onContinue={completeRecap} />
 		</div>

@@ -1,5 +1,7 @@
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 
+import { substitutionFor } from './session-substitutions'
+
 export interface ExerciseGroup {
 	routineExerciseId: string
 	exercise: {
@@ -19,6 +21,8 @@ export interface ExerciseGroup {
 		weight?: number | null
 	}[]
 	performedSets: SetLog[]
+	/** LIVE-11: the prescribed exercise when this slot was swapped. */
+	substitutedFrom?: { id: string; name: string }
 }
 
 function groupSetLogsByExercise(setLogs?: SetLog[]): Record<string, SetLog[]> {
@@ -43,10 +47,27 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 
 	const setLogsByExercise = groupSetLogsByExercise(session.setLogs)
 
-	return session.routineDay.exercises.map(routineExercise => ({
-		routineExerciseId: routineExercise.id,
-		exercise: routineExercise.exercise,
-		plannedSets: routineExercise.sets,
-		performedSets: setLogsByExercise[routineExercise.id] ?? [],
-	}))
+	return session.routineDay.exercises.map(routineExercise => {
+		const substitution = substitutionFor(
+			session.exerciseSubstitutions,
+			routineExercise.id,
+		)
+		return {
+			routineExerciseId: routineExercise.id,
+			exercise: substitution
+				? { ...substitution.exercise, equipment: null }
+				: routineExercise.exercise,
+			// The prescribed load belonged to the exercise that was replaced.
+			plannedSets: substitution
+				? routineExercise.sets.map(set => ({ ...set, weight: null }))
+				: routineExercise.sets,
+			performedSets: setLogsByExercise[routineExercise.id] ?? [],
+			substitutedFrom: substitution
+				? {
+						id: routineExercise.exercise.id,
+						name: routineExercise.exercise.name,
+					}
+				: undefined,
+		}
+	})
 }

@@ -58,9 +58,14 @@ export function HistoryExerciseGroup({
 				<div className="min-w-0 flex-1">
 					<h3 className="type-panel text-foreground">{group.exercise.name}</h3>
 					<p className="type-body-sm mt-0.5 text-ink-3">
-						{formatMuscleGroups(group.exercise.primaryMuscles)} ·{' '}
-						{group.exercise.equipment}
+						{formatMuscleGroups(group.exercise.primaryMuscles)}
+						{group.exercise.equipment ? ` · ${group.exercise.equipment}` : ''}
 					</p>
+					{group.substitutedFrom ? (
+						<p className="type-body-sm text-ink-3">
+							Swapped from {group.substitutedFrom.name}
+						</p>
+					) : null}
 				</div>
 				<span className="type-data shrink-0 text-ink-3">
 					{completedSets}/{totalSets} sets
