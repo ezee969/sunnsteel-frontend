@@ -107,7 +107,8 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Achievements',
 		icon: Medal,
 		classicalName: 'laurel-crown',
-		disabled: true,
+		href: '/achievements',
+		disabled: false,
 	},
 ] satisfies NavItem[]
 
