@@ -73,9 +73,10 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID     | Status        | Owner | Branch / worktree                                                       | Claimed    | Repositories |
-| ------ | ------------- | ----- | ----------------------------------------------------------------------- | ---------- | ------------ |
-| ACH-02 | `IN_PROGRESS` | Codex | `codex/ach-02` · `.codex-worktrees/ach-02-{frontend,backend,contracts}` | 2026-09-14 | FE, BE, CT   |
+| ID      | Status        | Owner  | Branch / worktree                                                                                  | Claimed    | Repositories                                 |
+| ------- | ------------- | ------ | -------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------- |
+| ACH-02  | `IN_PROGRESS` | Codex  | `codex/ach-02` · `.codex-worktrees/ach-02-{frontend,backend,contracts}`                            | 2026-09-14 | FE, BE, CT                                   |
+| EXER-01 | `IN_PROGRESS` | Claude | `claude/exer-01` · `.claude-worktrees/exer-01-frontend` (+ `-backend`/`-contracts` only if needed) | 2026-09-14 | FE (BE/CT only if existing reads fall short) |
 
 ## Current product snapshot
 
@@ -242,17 +243,17 @@ cold-start impact and showing that simpler rendering is insufficient.
 
 ### Exercise library
 
-| ID      | Status      | Size | Feature                        | User-facing behavior                                                                                                                                                   | Dependencies                   |
-| ------- | ----------- | ---- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| EXER-01 | `CANDIDATE` | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                               | PROG-01, PROG-02               |
-| EXER-02 | `SHIPPED`   | M    | Catalog browsing               | Filter the catalog by name, muscle, equipment (one item or everything listed at the default gym), movement pattern and training history. Favorites wait for `EXER-07`. | EXER-09                        |
-| EXER-03 | `CANDIDATE` | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                               | Content-authoring process      |
-| EXER-04 | `CANDIDATE` | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                       | Curated assets and licenses    |
-| EXER-05 | `SHIPPED`   | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                     | EXER-09                        |
-| EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                           | BE/CT ownership model          |
-| EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                            | User-exercise preference model |
-| EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                                | Administrative tooling         |
-| EXER-09 | `SHIPPED`   | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data.  | BE/CT schema; catalog backfill |
+| ID      | Status        | Size | Feature                        | User-facing behavior                                                                                                                                                   | Dependencies                   |
+| ------- | ------------- | ---- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| EXER-01 | `IN_PROGRESS` | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                               | PROG-01, PROG-02               |
+| EXER-02 | `SHIPPED`     | M    | Catalog browsing               | Filter the catalog by name, muscle, equipment (one item or everything listed at the default gym), movement pattern and training history. Favorites wait for `EXER-07`. | EXER-09                        |
+| EXER-03 | `CANDIDATE`   | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                               | Content-authoring process      |
+| EXER-04 | `CANDIDATE`   | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                       | Curated assets and licenses    |
+| EXER-05 | `SHIPPED`     | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                     | EXER-09                        |
+| EXER-06 | `CANDIDATE`   | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                           | BE/CT ownership model          |
+| EXER-07 | `CANDIDATE`   | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                            | User-exercise preference model |
+| EXER-08 | `CANDIDATE`   | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                                | Administrative tooling         |
+| EXER-09 | `SHIPPED`     | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data.  | BE/CT schema; catalog backfill |
 
 The first Exercises release should emphasize the user's existing training data.
 Instructions and media make this a content project as well as an engineering one.
@@ -930,3 +931,6 @@ it again without addressing the original decision.
   belongs to `EXER-07`'s preference model, and `PROF-05` profile favorites are
   not a substitute. `ROUT-07` and `NAV-01` no longer wait on `EXER-02`;
   `EXER-01` (personal exercise page) is the natural next Exercises slice.
+- **2026-09-14 (revision 49):** Claimed `EXER-01` for Claude. The personal
+  exercise page starts from the existing strength-trend, performance-history
+  and routine reads; backend or contracts change only if those fall short.
