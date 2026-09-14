@@ -73,9 +73,10 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID      | Status        | Owner  | Branch / worktree                                | Claimed    | Repositories         |
-| ------- | ------------- | ------ | ------------------------------------------------ | ---------- | -------------------- |
-| LIVE-11 | `IN_PROGRESS` | Claude | `claude/live-11` · `.claude-worktrees/live-11-*` | 2026-09-14 | CT, BE, FE (session) |
+| ID              | Status        | Owner  | Branch / worktree                                | Claimed    | Repositories              |
+| --------------- | ------------- | ------ | ------------------------------------------------ | ---------- | ------------------------- |
+| LIVE-11         | `IN_PROGRESS` | Claude | `claude/live-11` · `.claude-worktrees/live-11-*` | 2026-09-14 | CT, BE, FE (session)      |
+| ACH-01, DATA-02 | `IN_PROGRESS` | Codex  | `codex/ach-01` · `.codex-worktrees/ach-01-*`     | 2026-09-14 | CT, BE, FE (achievements) |
 
 ## Current product snapshot
 
@@ -325,15 +326,15 @@ data. `instructions` and `mediaUrl` exist but stay empty until `EXER-03` and
 
 ### Achievements and motivation
 
-| ID     | Status      | Size | Feature                | User-facing behavior                                                                                         | Dependencies      |
-| ------ | ----------- | ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------- |
-| ACH-01 | `QUEUED`    | L    | Milestone achievements | Award verified milestones for sessions, sets, volume, records, and streaks.                                  | DATA-01, DATA-02  |
-| ACH-02 | `QUEUED`    | M    | Renaissance ranks      | Progress from Initiate through themed ranks using consistency and participation rather than absolute weight. | ACH-01            |
-| ACH-03 | `QUEUED`    | M    | Achievement showcase   | Select medals and titles for the public profile.                                                             | PROF-06, PROF-07  |
-| ACH-04 | `QUEUED`    | M    | Achievement progress   | Show understandable progress toward the next milestone without encouraging unsafe behavior.                  | ACH-01            |
-| ACH-05 | `QUEUED`    | M    | Comeback recognition   | Recognize renewed consistency after a break rather than only rewarding uninterrupted streaks.                | DATA-02           |
-| ACH-06 | `CANDIDATE` | M    | Personal quests        | Offer short private targets based on the user's real schedule and current ability.                           | PROG-08, SCHED-01 |
-| ACH-07 | `CANDIDATE` | M    | Seasonal campaigns     | Run optional themed challenges without resetting permanent progress.                                         | SOC-11            |
+| ID     | Status        | Size | Feature                | User-facing behavior                                                                                         | Dependencies      |
+| ------ | ------------- | ---- | ---------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------- |
+| ACH-01 | `IN_PROGRESS` | L    | Milestone achievements | Award verified milestones for sessions, sets, volume, records, and streaks.                                  | DATA-01, DATA-02  |
+| ACH-02 | `QUEUED`      | M    | Renaissance ranks      | Progress from Initiate through themed ranks using consistency and participation rather than absolute weight. | ACH-01            |
+| ACH-03 | `QUEUED`      | M    | Achievement showcase   | Select medals and titles for the public profile.                                                             | PROF-06, PROF-07  |
+| ACH-04 | `QUEUED`      | M    | Achievement progress   | Show understandable progress toward the next milestone without encouraging unsafe behavior.                  | ACH-01            |
+| ACH-05 | `QUEUED`      | M    | Comeback recognition   | Recognize renewed consistency after a break rather than only rewarding uninterrupted streaks.                | DATA-02           |
+| ACH-06 | `CANDIDATE`   | M    | Personal quests        | Offer short private targets based on the user's real schedule and current ability.                           | PROG-08, SCHED-01 |
+| ACH-07 | `CANDIDATE`   | M    | Seasonal campaigns     | Run optional themed challenges without resetting permanent progress.                                         | SOC-11            |
 
 ### Dashboard and post-login experience
 
