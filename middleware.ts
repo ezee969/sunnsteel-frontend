@@ -7,6 +7,7 @@ const PROTECTED_PREFIXES = [
 	'/profile',
 	'/progress',
 	'/exercises',
+	'/schedule',
 	'/achievements',
 	'/settings',
 	'/search',

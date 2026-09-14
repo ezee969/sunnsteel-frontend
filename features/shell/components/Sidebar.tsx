@@ -101,7 +101,8 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Schedule',
 		icon: Calendar,
 		classicalName: 'hourglass',
-		disabled: true,
+		href: '/schedule',
+		disabled: false,
 	},
 	{
 		id: 'achievements',
