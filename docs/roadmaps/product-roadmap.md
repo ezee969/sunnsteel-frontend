@@ -988,3 +988,7 @@ it again without addressing the original decision.
   shipped, the remaining Exercises items need content (`EXER-03`/`EXER-04`),
   an ownership model (`EXER-06`) or moderation (`EXER-08`). `PROG-09` is the
   next dependency-ready slice with no new model.
+- **2026-09-14 (revision 55):** Follow-up to `EXER-07`: while training
+  history loads, both routine-wizard pickers show the "Recently trained"
+  group as a "Loading recent exercises…" status row instead of letting it
+  appear unannounced and push the list down. Frontend only.

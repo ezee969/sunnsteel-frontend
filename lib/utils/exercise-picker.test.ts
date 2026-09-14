@@ -47,6 +47,25 @@ describe('groupPickerExercises', () => {
 		expect(ids(groups[1].exercises)).toEqual(['f', 'g', 'h'])
 	})
 
+	it('keeps a pending recent group while history loads', () => {
+		const groups = groupPickerExercises(catalog, {
+			starred: ['b'],
+			recentPending: true,
+		})
+		expect(
+			groups.map(group => [
+				group.key,
+				group.pending ?? false,
+				ids(group.exercises),
+			]),
+		).toEqual([
+			['starred', false, ['b']],
+			['recent', true, []],
+			['other', false, ['a', 'c', 'd', 'e', 'f', 'g', 'h']],
+		])
+		expect(groups[2].label).toBe('Other exercises')
+	})
+
 	it('skips excluded and unknown exercises', () => {
 		const groups = groupPickerExercises(catalog, {
 			starred: ['missing', 'b'],

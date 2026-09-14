@@ -174,8 +174,15 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 				: groupPickerExercises(filteredExercises, {
 						starred: stars.data?.items.map(item => item.exerciseId),
 						recent: trained.data,
+						recentPending: trained.isPending,
 					}),
-		[editSearchValue, filteredExercises, stars.data, trained.data],
+		[
+			editSearchValue,
+			filteredExercises,
+			stars.data,
+			trained.data,
+			trained.isPending,
+		],
 	)
 
 	// Close edit dropdown when clicking outside
@@ -285,6 +292,18 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 												<p className="type-label px-3 pb-1 pt-1 text-ink-3">
 													{group.label}
 												</p>
+											) : null}
+											{'pending' in group && group.pending ? (
+												<div
+													role="status"
+													className="type-body-sm flex items-center gap-2 px-3 py-2 text-ink-3"
+												>
+													<Loader2
+														className="size-4 animate-spin"
+														aria-hidden
+													/>
+													Loading recent exercises…
+												</div>
 											) : null}
 											<div className="space-y-1">
 												{group.exercises.map(ex => (

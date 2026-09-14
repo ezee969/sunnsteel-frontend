@@ -18,19 +18,24 @@ export interface PickerGroup {
 	key: PickerGroupKey
 	label: string
 	exercises: Exercise[]
+	/** The recent group while training history loads: shown, but empty. */
+	pending?: boolean
 }
 
 /**
  * Starred exercises (newest star first), then up to five recently trained
  * ones that are not starred, then everything else in catalog order. Each
  * exercise appears once and empty groups are omitted; with no starred or
- * recent exercises the single group is labelled "All exercises".
+ * recent exercises the single group is labelled "All exercises". While the
+ * history is still loading (`recentPending`), the recent group is kept as an
+ * empty pending placeholder so its arrival reads as loading, not a jump.
  */
 export function groupPickerExercises(
 	exercises: readonly Exercise[],
 	{
 		starred = [],
 		recent = [],
+		recentPending = false,
 		exclude,
 	}: {
 		starred?: readonly string[]
@@ -38,6 +43,7 @@ export function groupPickerExercises(
 			ExercisePerformanceSummary,
 			'exerciseId' | 'lastPerformedAt'
 		>[]
+		recentPending?: boolean
 		exclude?: ReadonlySet<string>
 	},
 ): PickerGroup[] {
@@ -63,20 +69,25 @@ export function groupPickerExercises(
 	])
 	const other = exercises.filter(exercise => !shown.has(exercise.id))
 
-	const prioritized = starredGroup.length + recentGroup.length > 0
-	return [
-		{ key: 'starred' as const, label: 'Starred', exercises: starredGroup },
+	const prioritized =
+		recentPending || starredGroup.length + recentGroup.length > 0
+	const groups: PickerGroup[] = [
+		{ key: 'starred', label: 'Starred', exercises: starredGroup },
+		recentPending
+			? {
+					key: 'recent',
+					label: 'Recently trained',
+					exercises: [],
+					pending: true,
+				}
+			: { key: 'recent', label: 'Recently trained', exercises: recentGroup },
 		{
-			key: 'recent' as const,
-			label: 'Recently trained',
-			exercises: recentGroup,
-		},
-		{
-			key: 'other' as const,
+			key: 'other',
 			label: prioritized ? 'Other exercises' : 'All exercises',
 			exercises: other,
 		},
-	].filter(group => group.exercises.length > 0)
+	]
+	return groups.filter(group => group.pending || group.exercises.length > 0)
 }
 
 /** The optimistic cache value while a star or unstar request is in flight. */
