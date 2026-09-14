@@ -31,8 +31,8 @@ import { findRoutineUsages } from '@/lib/utils/exercise-detail'
 import { EQUIPMENT_LABELS } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
 import {
+	describeClosestShare,
 	describePlateauCount,
-	formatClosestRatio,
 	formatPlateauSet,
 } from '@/lib/utils/plateaus'
 import {
@@ -325,8 +325,12 @@ function BestPerformance({
 								<span className="type-data text-ink-2">
 									{formatPlateauSet(plateau.closest, weightUnit)}
 								</span>{' '}
-								({formatClosestRatio(plateau.closestRatio)} of the best
-								estimate).
+								(
+								{describeClosestShare(
+									plateau.closestRatio,
+									'the best estimate',
+								)}
+								).
 							</span>
 						</p>
 					) : null}

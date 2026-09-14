@@ -12,9 +12,9 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+	describeClosestShare,
 	describePlateauCount,
 	describePlateauRule,
-	formatClosestRatio,
 	formatEstimate,
 	formatPlateauSet,
 	getPlateauEmptyState,
@@ -79,7 +79,7 @@ function PlateauRow({
 						<span className="type-data text-ink-2">
 							{formatPlateauSet(plateau.closest, weightUnit)}
 						</span>{' '}
-						· {formatClosestRatio(plateau.closestRatio)} of that estimate
+						· {describeClosestShare(plateau.closestRatio)}
 					</dd>
 				</div>
 			</dl>

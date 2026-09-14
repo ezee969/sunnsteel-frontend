@@ -57,9 +57,17 @@ export function describePlateauCount(
 }
 
 /** Whole percent of the best estimate, never rounded up to 100. */
-export function formatClosestRatio(ratio: number): string {
-	const percent = Math.floor(ratio * 100)
-	return `${Math.min(percent, 100)}%`
+/**
+ * How close the best set since came: "matched that estimate" when it tied
+ * the best, otherwise the whole percent (never rounded up to a tie).
+ */
+export function describeClosestShare(
+	ratio: number,
+	estimate = 'that estimate',
+): string {
+	return ratio >= 1
+		? `matched ${estimate}`
+		: `${Math.floor(ratio * 100)}% of ${estimate}`
 }
 
 export function getPlateauEmptyState(

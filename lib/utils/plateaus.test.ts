@@ -2,9 +2,9 @@ import type { ExercisePlateau } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
+	describeClosestShare,
 	describePlateauCount,
 	describePlateauRule,
-	formatClosestRatio,
 	formatPlateauSet,
 	formatSpan,
 	getPlateauEmptyState,
@@ -77,9 +77,12 @@ describe('plateau copy', () => {
 	it('formats sets in the account unit and never rounds a ratio up to 100%', () => {
 		expect(formatPlateauSet(plateau().best, 'KG')).toBe('100 kg × 5')
 		expect(formatPlateauSet(plateau().best, 'LB')).toBe('220.46 lb × 5')
-		expect(formatClosestRatio(0.975)).toBe('97%')
-		expect(formatClosestRatio(0.999)).toBe('99%')
-		expect(formatClosestRatio(1)).toBe('100%')
+		expect(describeClosestShare(0.975)).toBe('97% of that estimate')
+		expect(describeClosestShare(0.999)).toBe('99% of that estimate')
+		expect(describeClosestShare(1)).toBe('matched that estimate')
+		expect(describeClosestShare(1, 'the best estimate')).toBe(
+			'matched the best estimate',
+		)
 	})
 
 	it('explains an empty result with the checked count', () => {
