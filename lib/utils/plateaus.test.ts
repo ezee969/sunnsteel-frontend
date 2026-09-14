@@ -8,6 +8,8 @@ import {
 	formatPlateauSet,
 	formatSpan,
 	getPlateauEmptyState,
+	getPlateauSessionLabel,
+	PLATEAU_SESSION_OPTIONS,
 } from './plateaus'
 
 const thresholds = {
@@ -82,6 +84,15 @@ describe('plateau copy', () => {
 		expect(describeClosestShare(1)).toBe('matched that estimate')
 		expect(describeClosestShare(1, 'the best estimate')).toBe(
 			'matched the best estimate',
+		)
+	})
+
+	it('offers every allowed minimum and names the default', () => {
+		expect(PLATEAU_SESSION_OPTIONS).toEqual([3, 4, 5, 6, 7, 8])
+		expect(getPlateauSessionLabel(4)).toBe('4 sessions (default)')
+		expect(getPlateauSessionLabel(6)).toBe('6 sessions')
+		expect(describePlateauRule({ ...thresholds, minSessions: 6 })).toMatch(
+			/^Lifts trained at least 6 times since their current best/,
 		)
 	})
 

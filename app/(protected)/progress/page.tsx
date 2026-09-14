@@ -32,6 +32,7 @@ import {
 	usePlateaus,
 	useProgressTimeline,
 	useSessionComparison,
+	useUpdatePlateauPreferences,
 	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
@@ -80,6 +81,7 @@ export default function ProgressPage() {
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
 	const personalGoals = usePersonalGoals()
 	const plateaus = usePlateaus()
+	const plateauPreferences = useUpdatePlateauPreferences()
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
 	const timeline = useProgressTimeline(timelineFilter)
@@ -144,6 +146,15 @@ export default function ProgressPage() {
 				isPending={plateaus.isPending}
 				isError={plateaus.isError}
 				onRetry={() => void plateaus.refetch()}
+				savingMinSessions={
+					plateauPreferences.isPending
+						? plateauPreferences.variables?.minSessions
+						: undefined
+				}
+				saveFailed={plateauPreferences.isError}
+				onMinSessionsChange={minSessions =>
+					plateauPreferences.mutate({ minSessions })
+				}
 			/>
 
 			<MuscleGroupHeatmap

@@ -1,4 +1,5 @@
 import type {
+	PlateauPreferences,
 	PlateausResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
@@ -20,6 +21,7 @@ import { setSaveState } from '@/lib/utils/save-status-store'
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider'
 
 import { routineQueryKeys } from '../routines/routine-query'
+import { userService } from '../services/userService'
 import { workoutService } from '../services/workoutService'
 import {
 	FinishWorkoutRequest,
@@ -230,6 +232,19 @@ export const usePlateaus = () => {
 		queryKey: qk.plateaus,
 		queryFn: workoutService.getPlateaus,
 		enabled: !isLoading && !!session,
+	})
+}
+
+/**
+ * PREF-05: saves the account's plateau sensitivity. It stays pending until
+ * the plateau watch has refetched, so the control never shows the old value
+ * beside a list computed for the new one.
+ */
+export const useUpdatePlateauPreferences = () => {
+	const qc = useQueryClient()
+	return useMutation<PlateauPreferences, Error, PlateauPreferences>({
+		mutationFn: userService.updatePlateauPreferences,
+		onSuccess: () => qc.invalidateQueries({ queryKey: qk.plateaus }),
 	})
 }
 

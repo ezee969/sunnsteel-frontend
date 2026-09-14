@@ -18,6 +18,8 @@ import {
 	formatEstimate,
 	formatPlateauSet,
 	getPlateauEmptyState,
+	getPlateauSessionLabel,
+	PLATEAU_SESSION_OPTIONS,
 } from '@/lib/utils/plateaus'
 
 const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
@@ -33,6 +35,68 @@ interface PlateauWatchProps {
 	isPending: boolean
 	isError: boolean
 	onRetry: () => void
+	/** The minimum being saved (PREF-05), until the list has refetched. */
+	savingMinSessions?: number
+	saveFailed: boolean
+	onMinSessionsChange: (minSessions: number) => void
+}
+
+/**
+ * PREF-05: how many sessions without a new best list a lift. Saved to the
+ * account, so Progress and the exercise pages agree on every device.
+ */
+function PlateauSensitivity({
+	current,
+	saving,
+	saveFailed,
+	onChange,
+}: {
+	current: number
+	saving?: number
+	saveFailed: boolean
+	onChange: (minSessions: number) => void
+}) {
+	const selected = saving ?? current
+	return (
+		<div className="space-y-1.5">
+			<p id="plateau-sensitivity" className="type-body-sm text-ink-3">
+				Sessions without a new best
+			</p>
+			<div
+				role="group"
+				aria-labelledby="plateau-sensitivity"
+				className="flex flex-wrap gap-1"
+			>
+				{PLATEAU_SESSION_OPTIONS.map(option => (
+					<Button
+						key={option}
+						type="button"
+						size="sm"
+						variant={selected === option ? 'secondary' : 'ghost'}
+						aria-pressed={selected === option}
+						aria-label={getPlateauSessionLabel(option)}
+						disabled={saving !== undefined}
+						onClick={() => {
+							if (option !== selected) onChange(option)
+						}}
+					>
+						{option}
+					</Button>
+				))}
+			</div>
+			{saveFailed ? (
+				<p role="alert" className="type-body-sm text-ink-2">
+					Not saved. The list still uses {current} sessions.
+				</p>
+			) : (
+				<p aria-live="polite" className="type-body-sm text-ink-3">
+					{saving !== undefined
+						? 'Saving and updating the list…'
+						: 'Saved to your account.'}
+				</p>
+			)}
+		</div>
+	)
 }
 
 function PlateauRow({
@@ -98,21 +162,38 @@ export function PlateauWatch({
 	isPending,
 	isError,
 	onRetry,
+	savingMinSessions,
+	saveFailed,
+	onMinSessionsChange,
 }: PlateauWatchProps) {
 	return (
-		<section aria-labelledby="plateau-watch" className="space-y-4">
-			<div className="rule-row flex items-start gap-2 pb-2">
-				<Gauge className="mt-0.5 size-4 text-ink-3" aria-hidden />
-				<div>
-					<h2 id="plateau-watch" className="type-section text-foreground">
-						Plateau watch
-					</h2>
-					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-						{data
-							? describePlateauRule(data.thresholds)
-							: 'Lifts you keep training without a new best set.'}
-					</p>
+		<section
+			aria-labelledby="plateau-watch"
+			aria-busy={savingMinSessions !== undefined}
+			className="space-y-4"
+		>
+			<div className="rule-row flex flex-wrap items-end justify-between gap-x-6 gap-y-3 pb-2">
+				<div className="flex items-start gap-2">
+					<Gauge className="mt-0.5 size-4 text-ink-3" aria-hidden />
+					<div>
+						<h2 id="plateau-watch" className="type-section text-foreground">
+							Plateau watch
+						</h2>
+						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
+							{data
+								? describePlateauRule(data.thresholds)
+								: 'Lifts you keep training without a new best set.'}
+						</p>
+					</div>
 				</div>
+				{data ? (
+					<PlateauSensitivity
+						current={data.thresholds.minSessions}
+						saving={savingMinSessions}
+						saveFailed={saveFailed}
+						onChange={onMinSessionsChange}
+					/>
+				) : null}
 			</div>
 
 			{isPending ? (

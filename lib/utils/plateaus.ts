@@ -1,8 +1,11 @@
-import type {
-	ExercisePlateau,
-	PlateauSet,
-	PlateausResponse,
-	WeightUnit,
+import {
+	type ExercisePlateau,
+	PLATEAU_MIN_SESSIONS,
+	PLATEAU_MIN_SESSIONS_MAX,
+	PLATEAU_MIN_SESSIONS_MIN,
+	type PlateauSet,
+	type PlateausResponse,
+	type WeightUnit,
 } from '@sunsteel/contracts'
 
 import type { EmptyStateCopy } from './empty-states'
@@ -56,7 +59,6 @@ export function describePlateauCount(
 	}
 }
 
-/** Whole percent of the best estimate, never rounded up to 100. */
 /**
  * How close the best set since came: "matched that estimate" when it tied
  * the best, otherwise the whole percent (never rounded up to a tie).
@@ -68,6 +70,18 @@ export function describeClosestShare(
 	return ratio >= 1
 		? `matched ${estimate}`
 		: `${Math.floor(ratio * 100)}% of ${estimate}`
+}
+
+/** PREF-05: every minimum the account may choose, smallest first. */
+export const PLATEAU_SESSION_OPTIONS: readonly number[] = Array.from(
+	{ length: PLATEAU_MIN_SESSIONS_MAX - PLATEAU_MIN_SESSIONS_MIN + 1 },
+	(_, index) => PLATEAU_MIN_SESSIONS_MIN + index,
+)
+
+export function getPlateauSessionLabel(sessions: number): string {
+	return sessions === PLATEAU_MIN_SESSIONS
+		? `${sessions} sessions (default)`
+		: `${sessions} sessions`
 }
 
 export function getPlateauEmptyState(

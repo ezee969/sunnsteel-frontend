@@ -1,6 +1,7 @@
 import {
 	FollowSuggestionsResponse,
 	MeasurableGoal,
+	PlateauPreferences,
 	PublicUserProfile,
 	RelationshipListKind,
 	RelationshipListQuery,
@@ -84,6 +85,19 @@ export const userService = {
 			body: JSON.stringify(data),
 			secure: true,
 		})
+	},
+
+	async updatePlateauPreferences(
+		data: PlateauPreferences,
+	): Promise<PlateauPreferences> {
+		return httpClient.request<PlateauPreferences>(
+			'/users/preferences/plateaus',
+			{
+				method: 'PUT',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		)
 	},
 
 	// Search users by name or username
