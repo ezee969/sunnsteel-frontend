@@ -44,8 +44,11 @@ export const buildRoutineRequest = (
 		name: data.name,
 		description: data.description,
 		isPeriodized: false,
+		scheduleMode: data.scheduleMode,
 		days: data.days.map((day, dayIndex) => ({
-			dayOfWeek: day.dayOfWeek,
+			// ROUT-11: rotation days run in order and have no weekday.
+			dayOfWeek: data.scheduleMode === 'ROTATION' ? null : day.slot,
+			name: day.name?.trim() || null,
 			order: dayIndex,
 			exercises: day.exercises.map((exercise, exerciseIndex) => ({
 				exerciseId: exercise.exerciseId,

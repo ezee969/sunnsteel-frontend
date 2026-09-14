@@ -1,4 +1,4 @@
-import { CalendarDays, CircleAlert, ListChecks } from 'lucide-react'
+import { CalendarDays, CircleAlert, ListChecks, Repeat } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { describeDaysAway } from '@/lib/utils/date'
@@ -8,6 +8,8 @@ interface RoutineScheduleNoteProps {
 	isCompleted: boolean
 	// Soonest upcoming training day, from `nextScheduledDay`
 	nextDay: { dayOfWeek: number; daysAway: number } | null
+	// ROUT-11: the label of a rotation's next day; rotations have no weekday
+	rotationNext?: string | null
 	className?: string
 }
 
@@ -30,6 +32,7 @@ interface RoutineScheduleNoteProps {
 export function RoutineScheduleNote({
 	isCompleted,
 	nextDay,
+	rotationNext,
 	className,
 }: RoutineScheduleNoteProps) {
 	// v1.0 §4.3: completion is `--success` and nothing else; "today" is neither
@@ -44,6 +47,15 @@ export function RoutineScheduleNote({
 				value: 'Completed',
 				iconTone: 'text-success',
 				valueTone: 'text-success',
+			}
+		}
+		if (rotationNext) {
+			return {
+				Icon: Repeat,
+				label: 'Next in rotation',
+				value: rotationNext,
+				iconTone: 'text-ink-3',
+				valueTone: 'text-foreground',
 			}
 		}
 		if (!nextDay) {

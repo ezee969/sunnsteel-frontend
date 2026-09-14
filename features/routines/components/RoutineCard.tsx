@@ -24,6 +24,14 @@ import {
 	weekdayName,
 } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
+import { formatDaysPerWeek } from '@/lib/utils/routine-format'
+import {
+	describeRoutineFrequency,
+	describeRoutineSchedule,
+	nextRotationDay,
+	routineDayTitle,
+	startableDayToday,
+} from '@/lib/utils/routine-schedule'
 
 import { RoutineMetaBadges } from './RoutineMetaBadges'
 import { RoutineScheduleNote } from './RoutineScheduleNote'
@@ -68,7 +76,9 @@ export function RoutineCard({
 	const todayDow = getTodayDow()
 	const workoutValidation = validateWorkoutDate(routine.days)
 	const canStartToday = workoutValidation.isValid
-	const todayRoutineDay = routine.days?.find(day => day.dayOfWeek === todayDow)
+	// ROUT-11: a rotation starts its next day on any weekday.
+	const todayRoutineDay = startableDayToday(routine, todayDow)
+	const rotationNext = nextRotationDay(routine)
 	const nextDay = nextScheduledDay(routine.days, todayDow)
 
 	// Determine if the start button should be disabled based on validation and routine state
@@ -99,9 +109,7 @@ export function RoutineCard({
 					    ground rather than a strip of outlined boxes (§11.12). */}
 					{routine.days && routine.days.length > 0 && (
 						<p className="type-data mt-1 text-ink-3">
-							{routine.days
-								.map(day => weekdayName(day.dayOfWeek, 'short'))
-								.join(' · ')}
+							{describeRoutineSchedule(routine)}
 						</p>
 					)}
 				</div>
@@ -134,11 +142,11 @@ export function RoutineCard({
 											}
 											title={
 												!canStartThisDay
-													? `This day is not scheduled for ${weekdayName(d.dayOfWeek, 'long')}`
+													? `${routineDayTitle(d)} is not scheduled for today`
 													: undefined
 											}
 										>
-											{weekdayName(d.dayOfWeek, 'short')}
+											{routineDayTitle(d, 'short')}
 										</DropdownMenuItem>
 									)
 								})}
@@ -167,12 +175,14 @@ export function RoutineCard({
 			<div className="mt-2 max-w-[var(--cluster-max)] space-y-2">
 				<RoutineMetaBadges
 					daysPerWeek={routine.days.length}
+					frequency={describeRoutineFrequency(routine, formatDaysPerWeek)}
 					isPeriodized={routine.isPeriodized}
 				/>
 
 				<RoutineScheduleNote
 					isCompleted={routine.isCompleted}
 					nextDay={nextDay}
+					rotationNext={rotationNext ? routineDayTitle(rotationNext) : null}
 				/>
 
 				<div className="flex items-center gap-1.5 pt-1">

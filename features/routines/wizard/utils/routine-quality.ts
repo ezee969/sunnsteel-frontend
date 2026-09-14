@@ -15,6 +15,7 @@ import {
 } from '@/lib/utils/exercise-equipment'
 
 import type { RoutineSet, RoutineWizardData } from '../types'
+import { wizardDayTitle } from './schedule'
 
 /**
  * ROUT-10 quality summary: what a routine asks of a week, derived only from
@@ -31,7 +32,9 @@ export interface MuscleSetCount {
 }
 
 export interface DayDurationEstimate {
-	dayOfWeek: number
+	/** The wizard slot and title of the day (ROUT-11). */
+	slot: number
+	label: string
 	/** Rounded to five minutes; 0 when the day has no exercises. */
 	seconds: number
 }
@@ -56,6 +59,8 @@ export interface RoutineImbalance {
 }
 
 export interface RoutineQualitySummary {
+	/** Set counts cover one pass through a rotation rather than a week. */
+	perRotation: boolean
 	muscleSets: MuscleSetCount[]
 	durations: DayDurationEstimate[]
 	equipment: ExerciseEquipment[]
@@ -212,6 +217,7 @@ export const findLikelyImbalances = (
 	exercises: ExerciseLookup,
 	muscleSets: MuscleSetCount[],
 ): RoutineImbalance[] => {
+	const period = data.scheduleMode === 'ROTATION' ? 'per rotation' : 'a week'
 	let upper = 0
 	let lower = 0
 	let push = 0
@@ -234,14 +240,14 @@ export const findLikelyImbalances = (
 		imbalances.push({
 			kind: 'NO_LOWER_BODY',
 			title: 'No lower-body exercises',
-			evidence: `${plural(upper, 'upper-body set')} a week and none for the legs.`,
+			evidence: `${plural(upper, 'upper-body set')} ${period} and none for the legs.`,
 		})
 	}
 	if (upper === 0 && lower >= MIN_BALANCE_SETS) {
 		imbalances.push({
 			kind: 'NO_UPPER_BODY',
 			title: 'No upper-body exercises',
-			evidence: `${plural(lower, 'lower-body set')} a week and none for the upper body.`,
+			evidence: `${plural(lower, 'lower-body set')} ${period} and none for the upper body.`,
 		})
 	}
 
@@ -256,7 +262,7 @@ export const findLikelyImbalances = (
 				push > pull
 					? 'More pressing than pulling'
 					: 'More pulling than pressing',
-			evidence: `${plural(push, 'pressing set')} and ${plural(pull, 'pulling set')} a week.`,
+			evidence: `${plural(push, 'pressing set')} and ${plural(pull, 'pulling set')} ${period}.`,
 		})
 	}
 
@@ -273,7 +279,7 @@ export const findLikelyImbalances = (
 				quads > hamstrings
 					? 'Quads outweigh hamstrings'
 					: 'Hamstrings outweigh quads',
-			evidence: `Quads ${formatSetCount(quads)} and hamstrings ${formatSetCount(hamstrings)} weekly set-equivalents.`,
+			evidence: `Quads ${formatSetCount(quads)} and hamstrings ${formatSetCount(hamstrings)} ${period === 'a week' ? 'weekly set-equivalents' : 'set-equivalents per rotation'}.`,
 		})
 	}
 
@@ -297,9 +303,11 @@ export const buildRoutineQualitySummary = (
 	)
 
 	return {
+		perRotation: data.scheduleMode === 'ROTATION',
 		muscleSets,
-		durations: data.days.map(day => ({
-			dayOfWeek: day.dayOfWeek,
+		durations: data.days.map((day, index) => ({
+			slot: day.slot,
+			label: wizardDayTitle(data.scheduleMode, day, index),
 			seconds: estimateDaySeconds(day),
 		})),
 		equipment,

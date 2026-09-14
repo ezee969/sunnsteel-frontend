@@ -11,10 +11,11 @@ import { formatTime } from '@/lib/utils/time'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 import type { RoutineWizardData } from '../types'
-import { DAYS_OF_WEEK } from '../utils/routine-summary'
 
 interface RoutineDayCardProps {
 	day: RoutineWizardData['days'][number]
+	/** The day's title, e.g. "Monday · Push" or "Day B" (ROUT-11). */
+	label: string
 	exerciseMap: Record<string, Exercise>
 	weightUnit: WeightUnit
 }
@@ -24,21 +25,20 @@ interface RoutineDayCardProps {
  *
  * Renders the day's name, a badge with the number of exercises, and a list of exercise summaries including name, primary muscles, equipment, rest, and set information.
  *
- * @param day - A day entry from RoutineWizardData['days'] (contains dayOfWeek and exercises).
+ * @param day - A day entry from RoutineWizardData['days'] (its slot, name and exercises).
  * @param exerciseMap - A lookup map of Exercise objects keyed by exercise ID used to resolve exercise metadata.
  * @returns The JSX element for the day's routine card.
  */
 export function RoutineDayCard({
 	day,
+	label,
 	exerciseMap,
 	weightUnit,
 }: RoutineDayCardProps) {
-	const displayName = DAYS_OF_WEEK[day.dayOfWeek]
-
 	return (
-		<Card key={day.dayOfWeek} className="border rounded-md p-3">
+		<Card className="border rounded-md p-3">
 			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
-				{displayName}
+				{label}
 				<Badge variant="outline">
 					{formatExerciseCount(day.exercises.length)}
 				</Badge>

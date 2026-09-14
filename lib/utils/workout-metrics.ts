@@ -1,4 +1,4 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import { routineDayLabel, type WeightUnit } from '@sunsteel/contracts'
 
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 import { formatDuration } from '@/lib/utils/time-format.utils'
@@ -7,27 +7,6 @@ import {
 	formatWeightAmount,
 	getWeightUnitLabel,
 } from '@/lib/utils/weight-unit'
-
-/**
- * Returns the day name for a given ISO day of week (0 = Sunday).
- */
-export function getDayName(dayOfWeek?: number): string {
-	if (dayOfWeek === undefined || dayOfWeek === null) {
-		return 'Unknown Day'
-	}
-
-	const days = [
-		' Sunday',
-		' Monday',
-		' Tuesday',
-		' Wednesday',
-		' Thursday',
-		' Friday',
-		' Saturday',
-	].map(day => day.trim())
-
-	return days[dayOfWeek] ?? 'Unknown Day'
-}
 
 /**
  * Formats a canonical kilogram value in the user's preferred unit.
@@ -103,7 +82,9 @@ export function buildSessionMetrics(
 
 	return {
 		statusLabel: session?.status ?? 'UNKNOWN',
-		dayLabel: getDayName(session?.routineDay?.dayOfWeek),
+		dayLabel:
+			(session?.routineDay && routineDayLabel(session.routineDay)) ||
+			'Unknown Day',
 		dateLabel: session?.startedAt
 			? new Date(session.startedAt).toLocaleDateString()
 			: 'Unknown Date',

@@ -64,12 +64,14 @@ describe('findRoutineUsages', () => {
 					{
 						id: 'thu',
 						dayOfWeek: 4,
+						name: null,
 						order: 1,
 						exercises: [slot('s3', 'bench', 0, [fixed(5), fixed(5)])],
 					},
 					{
 						id: 'mon',
 						dayOfWeek: 1,
+						name: null,
 						order: 0,
 						exercises: [
 							slot('s1', 'row', 0, [fixed(8)]),
@@ -81,6 +83,7 @@ describe('findRoutineUsages', () => {
 					{
 						id: 'fri',
 						dayOfWeek: 5,
+						name: null,
 						order: 0,
 						exercises: [slot('s4', 'curl', 0, [fixed(12)])],
 					},
@@ -89,6 +92,7 @@ describe('findRoutineUsages', () => {
 					{
 						id: 'sat',
 						dayOfWeek: 6,
+						name: null,
 						order: 0,
 						exercises: [slot('s5', 'bench', 0, [fixed(10)])],
 					},

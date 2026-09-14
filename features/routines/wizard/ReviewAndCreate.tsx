@@ -22,7 +22,7 @@ import { useRoutineQualitySummary } from './hooks/useRoutineQualitySummary'
 import { useRoutineSubmission } from './hooks/useRoutineSubmission'
 import { useRoutineSummaryStats } from './hooks/useRoutineSummaryStats'
 import type { RoutineWizardData } from './types'
-import { DAYS_OF_WEEK } from './utils/routine-summary'
+import { wizardDayTitle } from './utils/schedule'
 
 interface ReviewAndCreateProps {
 	data: RoutineWizardData
@@ -120,14 +120,16 @@ export function ReviewAndCreate({
 					</AccordionTrigger>
 					<AccordionContent className="pl-1">
 						<div className="flex flex-wrap gap-2 mb-2">
-							{data.trainingDays.map(dayId => (
-								<Badge key={dayId} variant="secondary">
-									{DAYS_OF_WEEK[dayId]}
+							{data.days.map((day, index) => (
+								<Badge key={day.slot} variant="secondary">
+									{wizardDayTitle(data.scheduleMode, day, index)}
 								</Badge>
 							))}
 						</div>
 						<p className="text-sm text-muted-foreground">
-							{data.trainingDays.length} training days per week
+							{data.scheduleMode === 'ROTATION'
+								? `${data.days.length}-day rotation: each day follows the last one you completed, on any weekday`
+								: `${data.trainingDays.length} training days per week`}
 						</p>
 					</AccordionContent>
 				</AccordionItem>
@@ -140,9 +142,10 @@ export function ReviewAndCreate({
 						</span>
 					</AccordionTrigger>
 					<AccordionContent className="space-y-4 pl-1">
-						{data.days.map(day => (
+						{data.days.map((day, index) => (
 							<RoutineDayCard
-								key={day.dayOfWeek}
+								key={day.slot}
+								label={wizardDayTitle(data.scheduleMode, day, index)}
 								day={day}
 								exerciseMap={exerciseMap}
 								weightUnit={weightUnit}

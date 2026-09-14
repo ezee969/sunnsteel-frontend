@@ -52,6 +52,7 @@ export default function CreateRoutinePage() {
 	const [routineData, setRoutineData] = useState<RoutineWizardData>({
 		name: '',
 		description: '',
+		scheduleMode: 'WEEKLY',
 		trainingDays: [],
 		days: [],
 	})

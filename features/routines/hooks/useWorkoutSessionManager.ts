@@ -78,7 +78,8 @@ export const useWorkoutSessionManager = (
 		}
 
 		// 3) Date mismatch confirmation (for valid days that don't match today)
-		if (day && day.dayOfWeek !== todayDow) {
+		// Rotation days (no weekday, ROUT-11) never need the confirmation.
+		if (day && day.dayOfWeek !== null && day.dayOfWeek !== todayDow) {
 			setPendingDayId(routineDayId)
 			setDateConfirmOpen(true)
 			return

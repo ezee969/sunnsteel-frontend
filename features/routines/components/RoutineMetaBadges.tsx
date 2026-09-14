@@ -4,6 +4,8 @@ import { formatDaysPerWeek } from '@/lib/utils/routine-format'
 
 interface RoutineMetaBadgesProps {
 	daysPerWeek: number
+	/** Overrides the days-per-week wording, e.g. "3-day rotation" (ROUT-11). */
+	frequency?: string
 	isPeriodized?: boolean
 	className?: string
 }
@@ -18,6 +20,7 @@ interface RoutineMetaBadgesProps {
  */
 export function RoutineMetaBadges({
 	daysPerWeek,
+	frequency,
 	isPeriodized,
 	className,
 }: RoutineMetaBadgesProps) {
@@ -33,7 +36,7 @@ export function RoutineMetaBadges({
 				className="h-3.5 w-3.5 flex-shrink-0 text-ink-3"
 				aria-hidden
 			/>
-			<span>{formatDaysPerWeek(daysPerWeek)}</span>
+			<span>{frequency ?? formatDaysPerWeek(daysPerWeek)}</span>
 			{isPeriodized && (
 				<>
 					<span aria-hidden className="text-ink-3">

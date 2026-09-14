@@ -41,6 +41,7 @@ const ReviewAndCreate = dynamic(
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 import { useCreateRoutine, useRoutine, useUpdateRoutine } from '@/lib/api/hooks'
 import { RoutineDay, RoutineExercise } from '@/lib/api/types'
+import { orderedRoutineDays } from '@/lib/utils/routine-schedule'
 
 const STEPS = [
 	{ id: 1, title: 'Basic Info', description: 'Name and description' },
@@ -79,6 +80,7 @@ export default function EditRoutinePage() {
 	const [routineData, setRoutineData] = useState<RoutineWizardData>({
 		name: '',
 		description: '',
+		scheduleMode: 'WEEKLY',
 		trainingDays: [],
 		days: [],
 	})
@@ -90,13 +92,19 @@ export default function EditRoutinePage() {
 	// Initialize form with routine data when loaded
 	useEffect(() => {
 		if (routine) {
-			// Transform the routine data to match our form state
+			// Transform the routine data to match our form state. A day's wizard
+			// slot is its weekday on a weekly routine, its position on a rotation.
+			const orderedDays = orderedRoutineDays(routine)
+			const slotOf = (day: RoutineDay, index: number) =>
+				routine.scheduleMode === 'ROTATION' ? index : (day.dayOfWeek ?? index)
 			const transformedData: RoutineWizardData = {
 				name: routine.name,
 				description: routine.description || '',
-				trainingDays: routine.days.map((day: RoutineDay) => day.dayOfWeek),
-				days: routine.days.map((day: RoutineDay) => ({
-					dayOfWeek: day.dayOfWeek,
+				scheduleMode: routine.scheduleMode,
+				trainingDays: orderedDays.map(slotOf),
+				days: orderedDays.map((day: RoutineDay, index) => ({
+					slot: slotOf(day, index),
+					name: day.name ?? '',
 					exercises: day.exercises.map((exercise: RoutineExercise) => ({
 						exerciseId: exercise.exercise.id,
 						note: exercise.note ?? undefined,

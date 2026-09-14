@@ -49,7 +49,9 @@ export const RoutineHeader = ({
 						{routine.name}
 					</h1>
 					<p className="type-body-sm mt-1 text-ink-3">
-						{daysPerWeek} {daysPerWeek === 1 ? 'day' : 'days'} per week
+						{routine.scheduleMode === 'ROTATION'
+							? `${daysPerWeek}-day rotation`
+							: `${daysPerWeek} ${daysPerWeek === 1 ? 'day' : 'days'} per week`}
 					</p>
 					{routine.description && (
 						<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">

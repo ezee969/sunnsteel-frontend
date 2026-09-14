@@ -1,5 +1,6 @@
 'use client'
 
+import { routineDayLabel } from '@sunsteel/contracts'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -245,7 +246,7 @@ export default function ActiveSessionPage() {
 			{/* Header */}
 			<SessionHeader
 				routineName={routine!.name}
-				dayName={`Day ${day.dayOfWeek}`}
+				dayName={routineDayLabel(day)}
 				startedAt={session.startedAt}
 				progressData={progressData}
 				onNavigateBack={handleBack}
@@ -262,7 +263,7 @@ export default function ActiveSessionPage() {
 				<SessionActionCard
 					sessionId={session.id}
 					routineName={routine!.name}
-					dayName={`Day ${day.dayOfWeek}`}
+					dayName={routineDayLabel(day)}
 					startedAt={session.startedAt}
 					progressData={progressData}
 					isFinishing={isFinishing}

@@ -1,6 +1,6 @@
 import type { Routine, RoutineSet } from '@sunsteel/contracts'
 
-import { weekdayName } from './date'
+import { routineDayTitle } from './routine-schedule'
 
 /**
  * EXER-01: where one exercise appears in the owner's current routines. Pure,
@@ -53,7 +53,10 @@ export function findRoutineUsages(
 			routineId: routine.id,
 			routineName: routine.name,
 			days: [...routine.days]
-				.sort((a, b) => a.order - b.order || a.dayOfWeek - b.dayOfWeek)
+				.sort(
+					(a, b) =>
+						a.order - b.order || (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0),
+				)
 				.flatMap(day => {
 					const slots = [...day.exercises]
 						.sort((a, b) => a.order - b.order)
@@ -62,7 +65,7 @@ export function findRoutineUsages(
 						? [
 								{
 									dayId: day.id,
-									dayName: weekdayName(day.dayOfWeek, 'long'),
+									dayName: routineDayTitle(day),
 									schemes: slots.map(slot => formatSetScheme(slot.sets)),
 								},
 							]

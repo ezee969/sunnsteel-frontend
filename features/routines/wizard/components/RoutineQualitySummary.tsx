@@ -15,7 +15,6 @@ import {
 	type RoutineQualitySummary as Summary,
 	SECONDS_PER_REP,
 } from '../utils/routine-quality'
-import { DAYS_OF_WEEK } from '../utils/routine-summary'
 
 interface RoutineQualitySummaryProps {
 	status: 'loading' | 'error' | 'ready'
@@ -132,7 +131,11 @@ export function RoutineQualitySummary({
 			{status === 'ready' && (
 				<div className="grid gap-6 lg:grid-cols-2">
 					<QualityBlock
-						title="Weekly sets by muscle"
+						title={
+							summary.perRotation
+								? 'Sets by muscle per rotation'
+								: 'Weekly sets by muscle'
+						}
 						caption="Secondary muscles count as half a set, as they do on Progress."
 					>
 						{summary.muscleSets.length === 0 ? (
@@ -189,14 +192,12 @@ export function RoutineQualitySummary({
 						caption={`Approximate: ${SECONDS_PER_REP} s per rep (${ASSUMED_REPS} reps when none are set), your rest after every set but the last, and 1 min to set up each exercise. Warm-ups are not included.`}
 					>
 						<ul>
-							{summary.durations.map(({ dayOfWeek, seconds }) => (
+							{summary.durations.map(({ slot, label, seconds }) => (
 								<li
-									key={dayOfWeek}
+									key={slot}
 									className="rule-row flex items-baseline justify-between gap-4 py-1.5"
 								>
-									<span className="type-body-sm text-ink">
-										{DAYS_OF_WEEK[dayOfWeek]}
-									</span>
+									<span className="type-body-sm text-ink">{label}</span>
 									<span className="type-data text-ink">
 										{seconds > 0 ? formatDuration(seconds) : '—'}
 									</span>

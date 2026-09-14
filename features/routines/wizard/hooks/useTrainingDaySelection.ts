@@ -23,11 +23,14 @@ export const useTrainingDaySelection = ({
 			const sorted = sortNumbersAscending(nextTrainingDays)
 			onUpdate({
 				trainingDays: sorted,
-				days: sorted.map(dayOfWeek => ({
-					dayOfWeek,
-					exercises:
-						data.days.find(day => day.dayOfWeek === dayOfWeek)?.exercises ?? [],
-				})),
+				days: sorted.map(slot => {
+					const existing = data.days.find(day => day.slot === slot)
+					return {
+						slot,
+						name: existing?.name,
+						exercises: existing?.exercises ?? [],
+					}
+				}),
 			})
 		},
 		[data.days, onUpdate],

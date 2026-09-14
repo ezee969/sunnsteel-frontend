@@ -122,6 +122,8 @@ export default function RoutineDetailsPage() {
 						days={routine.days}
 						routine={{
 							id: routine.id,
+							scheduleMode: routine.scheduleMode,
+							nextRotationDayId: routine.nextRotationDayId,
 						}}
 						activeSession={activeSession}
 						isStarting={sessionManager.isStarting}

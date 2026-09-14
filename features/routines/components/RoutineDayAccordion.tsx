@@ -1,7 +1,7 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
-import { Calendar, Loader2, Play } from 'lucide-react'
+import type { RoutineScheduleMode, WeightUnit } from '@sunsteel/contracts'
+import { Calendar, Loader2, Play, Repeat } from 'lucide-react'
 
 import {
 	Accordion,
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import type { RoutineDay } from '@/lib/api/types/routine.type'
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
 import { formatExerciseCount } from '@/lib/utils/routine-format'
+import { nextRotationDay, routineDayTitle } from '@/lib/utils/routine-schedule'
 
 import { ExerciseCard } from './ExerciseCard'
 
@@ -21,6 +22,8 @@ interface RoutineDayAccordionProps {
 	days: RoutineDay[]
 	routine: {
 		id: string
+		scheduleMode: RoutineScheduleMode
+		nextRotationDayId: string | null
 	}
 	activeSession?: { routineDayId: string } | null
 	isStarting: boolean
@@ -46,19 +49,8 @@ export const RoutineDayAccordion = ({
 	onStartWorkout,
 }: RoutineDayAccordionProps) => {
 	const todayDow = getTodayDow()
-
-	const getDayName = (dayOfWeek: number) => {
-		const dayNames = [
-			'Sunday',
-			'Monday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday',
-		]
-		return dayNames[dayOfWeek] || 'Unknown'
-	}
+	// ROUT-11: a rotation marks its next day the way a weekly routine marks today.
+	const nextDayId = nextRotationDay({ ...routine, days })?.id
 
 	return (
 		// The item's own `border-b last:border-b-0` rules the rows. A `divide-y`
@@ -67,6 +59,7 @@ export const RoutineDayAccordion = ({
 		<Accordion type="multiple" className="w-full border-y border-rule">
 			{days.map(day => {
 				const isToday = day.dayOfWeek === todayDow
+				const isNext = day.id === nextDayId
 				const hasActiveSession = activeSession?.routineDayId === day.id
 				const isLoadingThisDay = isStarting && startActingDayId === day.id
 
@@ -90,9 +83,13 @@ export const RoutineDayAccordion = ({
 								<span className="flex flex-col gap-0.5">
 									<span className="flex items-center gap-2">
 										{isToday && <Calendar className="h-4 w-4" aria-hidden />}
-										{getDayName(day.dayOfWeek)}
+										{isNext && <Repeat className="h-4 w-4" aria-hidden />}
+										{routineDayTitle(day)}
 										{isToday && (
 											<span className="type-body-sm text-ink-3">Today</span>
+										)}
+										{isNext && (
+											<span className="type-body-sm text-ink-3">Next</span>
 										)}
 									</span>
 									<span className="type-body-sm text-ink-3">

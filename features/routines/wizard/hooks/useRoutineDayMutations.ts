@@ -39,7 +39,7 @@ export function useRoutineDayMutations({
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
 		const targetDay = trainingDays[selectedDayIndex]
-		return data.days.findIndex(day => day.dayOfWeek === targetDay)
+		return data.days.findIndex(day => day.slot === targetDay)
 	}, [data.days, trainingDays, selectedDayIndex])
 
 	const withDayMutation = useCallback(

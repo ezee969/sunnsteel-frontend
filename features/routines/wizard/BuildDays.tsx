@@ -1,9 +1,12 @@
 'use client'
 
+import { ROUTINE_DAY_NAME_MAX } from '@sunsteel/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
@@ -14,22 +17,13 @@ import { ExercisePickerDropdown } from './components/ExercisePickerDropdown'
 import { useRoutineDayMutations } from './hooks/useRoutineDayMutations'
 import { useRoutineDaySelection } from './hooks/useRoutineDaySelection'
 import { RoutineWizardData } from './types'
+import { renameWizardDay, wizardDayLabel } from './utils/schedule'
 
 interface BuildDaysProps {
 	data: RoutineWizardData
 	onUpdate: (updates: Partial<RoutineWizardData>) => void
 	isEditing?: boolean
 }
-
-const DAYS_OF_WEEK = [
-	'Sunday',
-	'Monday',
-	'Tuesday',
-	'Wednesday',
-	'Thursday',
-	'Friday',
-	'Saturday',
-]
 
 /**
  * Render the training-day builder UI used by the routine wizard.
@@ -192,13 +186,21 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	)
 
 	const selectedDayId = data.trainingDays[selectedDay]
-	const selectedDayData = data.days.find(d => d.dayOfWeek === selectedDayId)
+	const selectedDayData = data.days.find(d => d.slot === selectedDayId)
 	const selectedDayExercisesCount = selectedDayData?.exercises?.length ?? 0
 	const selectedDaySetsCount =
 		selectedDayData?.exercises?.reduce(
 			(sum, ex) => sum + (ex.sets?.length ?? 0),
 			0,
 		) ?? 0
+
+	// ROUT-11: a day's tab and title use its name, else its weekday or rotation letter.
+	const labelFor = (slot: number, index: number) =>
+		wizardDayLabel(
+			data.scheduleMode,
+			data.days.find(d => d.slot === slot) ?? { slot },
+			index,
+		)
 
 	if (data.trainingDays.length === 0) {
 		return (
@@ -255,13 +257,13 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 									value={index.toString()}
 									className="flex-shrink-0 whitespace-nowrap h-10 px-4"
 								>
-									{DAYS_OF_WEEK[dayId]}
+									{labelFor(dayId, index)}
 									<Badge
 										variant="secondary"
 										className="ml-2 flex h-5 min-w-[1.25rem] items-center justify-center px-1 leading-none"
 									>
-										{data.days.find(d => d.dayOfWeek === dayId)?.exercises
-											?.length ?? 0}
+										{data.days.find(d => d.slot === dayId)?.exercises?.length ??
+											0}
 									</Badge>
 								</TabsTrigger>
 							))}
@@ -275,14 +277,14 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 					</div>
 
 					{data.trainingDays.map((dayId, tabIndex) => {
-						const day = data.days.find(d => d.dayOfWeek === dayId)
+						const day = data.days.find(d => d.slot === dayId)
 
 						const handleReorderExercises = (
 							newExercises: RoutineWizardData['days'][number]['exercises'],
 						) => {
 							// Persist reorder at the wizard-state level (array order)
 							const newDays = data.days.map(d =>
-								d.dayOfWeek === dayId ? { ...d, exercises: newExercises } : d,
+								d.slot === dayId ? { ...d, exercises: newExercises } : d,
 							)
 							onUpdate({ days: newDays })
 						}
@@ -321,7 +323,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 							>
 								<Card>
 									<CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
-										<CardTitle>{DAYS_OF_WEEK[dayId]} Workout</CardTitle>
+										<CardTitle>{labelFor(dayId, tabIndex)} Workout</CardTitle>
 										<ExercisePickerDropdown
 											ref={dropdownRef}
 											isOpen={isPickerOpen}
@@ -335,6 +337,26 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 										/>
 									</CardHeader>
 									<CardContent className="p-4 sm:p-6">
+										<div className="mb-4 max-w-sm space-y-2">
+											<Label htmlFor={`day-name-${dayId}`}>
+												Day name (optional)
+											</Label>
+											<Input
+												id={`day-name-${dayId}`}
+												value={day?.name ?? ''}
+												maxLength={ROUTINE_DAY_NAME_MAX}
+												placeholder={
+													data.scheduleMode === 'ROTATION'
+														? 'e.g. Push or Upper A'
+														: 'e.g. Push, or leave the weekday'
+												}
+												onChange={event =>
+													onUpdate(
+														renameWizardDay(data, dayId, event.target.value),
+													)
+												}
+											/>
+										</div>
 										<ExerciseList
 											weightUnit={weightUnit}
 											tabIndex={tabIndex}

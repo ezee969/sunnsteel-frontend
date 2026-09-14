@@ -25,13 +25,14 @@ export const isTodayDow = (dayOfWeek: number): boolean =>
 	dayOfWeek === getTodayDow()
 
 /**
- * Validates if a workout can be started today based on routine's scheduled days
+ * Validates if a workout can be started today based on routine's scheduled days.
+ * A rotation day (`dayOfWeek: null`, ROUT-11) can be started on any day.
  * @param routineDays - Array of routine days with dayOfWeek property
  * @param todayDow - Today's day of week (0=Sun..6=Sat), defaults to current day
  * @returns Object with validation result and message
  */
 export const validateWorkoutDate = (
-	routineDays: Array<{ dayOfWeek: number }> | undefined,
+	routineDays: Array<{ dayOfWeek: number | null }> | undefined,
 	todayDow: number = getTodayDow(),
 ): { isValid: boolean; message?: string; availableDays?: string[] } => {
 	if (!routineDays || routineDays.length === 0) {
@@ -40,8 +41,9 @@ export const validateWorkoutDate = (
 			message: 'No training days configured for this routine',
 		}
 	}
+	if (routineDays.some(day => day.dayOfWeek === null)) return { isValid: true }
 
-	const scheduledDays = routineDays.map(day => day.dayOfWeek)
+	const scheduledDays = routineDays.map(day => day.dayOfWeek as number)
 	const isScheduledToday = scheduledDays.includes(todayDow)
 
 	if (isScheduledToday) {
@@ -66,7 +68,7 @@ export const validateWorkoutDate = (
  * @returns Object with validation result and message
  */
 export const validateRoutineDayDate = (
-	routineDay: { dayOfWeek: number } | undefined,
+	routineDay: { dayOfWeek: number | null } | undefined,
 	todayDow: number = getTodayDow(),
 ): { isValid: boolean; message?: string } => {
 	if (!routineDay) {
@@ -76,7 +78,7 @@ export const validateRoutineDayDate = (
 		}
 	}
 
-	if (routineDay.dayOfWeek === todayDow) {
+	if (routineDay.dayOfWeek === null || routineDay.dayOfWeek === todayDow) {
 		return { isValid: true }
 	}
 
@@ -125,13 +127,14 @@ export const formatTimeAgo = (
  * routine trains today), or `null` when the routine has no days configured.
  */
 export const nextScheduledDay = (
-	routineDays: Array<{ dayOfWeek: number }> | undefined,
+	routineDays: Array<{ dayOfWeek: number | null }> | undefined,
 	todayDow: number = getTodayDow(),
 ): { dayOfWeek: number; daysAway: number } | null => {
 	if (!routineDays || routineDays.length === 0) return null
 
 	let best: { dayOfWeek: number; daysAway: number } | null = null
 	for (const day of routineDays) {
+		if (day.dayOfWeek === null) continue
 		const daysAway = (((day.dayOfWeek - todayDow) % 7) + 7) % 7
 		if (!best || daysAway < best.daysAway) {
 			best = { dayOfWeek: day.dayOfWeek, daysAway }

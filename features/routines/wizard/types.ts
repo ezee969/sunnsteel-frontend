@@ -1,3 +1,5 @@
+import type { RoutineScheduleMode } from '@sunsteel/contracts'
+
 import type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
 export type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
 
@@ -26,13 +28,18 @@ export interface RoutineWizardExercise {
 }
 
 export interface RoutineWizardDay {
-	dayOfWeek: number
+	/** The weekday (0=Sun..6=Sat) on a weekly routine; the position on a rotation. */
+	slot: number
+	/** Optional day name (ROUT-11); blank means none. */
+	name?: string
 	exercises: RoutineWizardExercise[]
 }
 
 export interface RoutineWizardData {
 	name: string
 	description?: string
+	scheduleMode: RoutineScheduleMode
+	/** The days' slots in display order. */
 	trainingDays: number[]
 	days: RoutineWizardDay[]
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, ChevronRight, Dumbbell, History } from 'lucide-react'
+import { Calendar, ChevronRight, Dumbbell, History, Repeat } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -34,6 +34,10 @@ import {
 } from '@/lib/utils/dashboard-primary-action'
 import { weekdayName } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
+import {
+	isRotationRoutine,
+	routineDayTitle,
+} from '@/lib/utils/routine-schedule'
 
 import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
 
@@ -164,8 +168,17 @@ export default function TodaysWorkouts() {
 												{/* §4.3 rule 3 — a scheduled weekday is not an
 												    achievement, so it is not an honour mark. */}
 												<Badge variant="outline">
-													<Calendar className="h-3 w-3" aria-hidden />
-													{weekdayName(day.dayOfWeek)}
+													{isRotationRoutine(routine) ? (
+														<>
+															<Repeat className="h-3 w-3" aria-hidden />
+															Next · {routineDayTitle(day)}
+														</>
+													) : (
+														<>
+															<Calendar className="h-3 w-3" aria-hidden />
+															{routineDayTitle(day, 'short')}
+														</>
+													)}
 												</Badge>
 											</div>
 											{isActiveForThis ? (

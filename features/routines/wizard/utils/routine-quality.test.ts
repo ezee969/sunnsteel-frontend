@@ -90,8 +90,9 @@ const planned = (
 
 const routine = (...days: RoutineWizardExercise[][]): RoutineWizardData => ({
 	name: 'Test',
+	scheduleMode: 'WEEKLY',
 	trainingDays: days.map((_, index) => index + 1),
-	days: days.map((exercises, index) => ({ dayOfWeek: index + 1, exercises })),
+	days: days.map((exercises, index) => ({ slot: index + 1, exercises })),
 })
 
 const location = (
@@ -161,7 +162,7 @@ describe('estimateDaySeconds', () => {
 	})
 
 	it('returns 0 for a day with no exercises', () => {
-		expect(estimateDaySeconds({ dayOfWeek: 1, exercises: [] })).toBe(0)
+		expect(estimateDaySeconds({ slot: 1, exercises: [] })).toBe(0)
 	})
 })
 
@@ -249,7 +250,10 @@ describe('buildRoutineQualitySummary', () => {
 		const data = routine([planned('custom', 2)], [planned('bench', 3)])
 		const summary = buildRoutineQualitySummary(data, catalog, undefined)
 		expect(summary.unclassifiedExercises).toBe(1)
-		expect(summary.durations.map(d => d.dayOfWeek)).toEqual([1, 2])
+		expect(summary.durations.map(d => [d.slot, d.label])).toEqual([
+			[1, 'Monday'],
+			[2, 'Tuesday'],
+		])
 		expect(summary.equipmentCheck).toEqual({ status: 'no-location' })
 	})
 
