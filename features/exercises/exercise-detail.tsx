@@ -18,6 +18,7 @@ import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
+	usePlateaus,
 	useProgressTimeline,
 	useTrainedExercises,
 } from '@/lib/api/hooks/useWorkoutSession'
@@ -29,6 +30,11 @@ import {
 import { findRoutineUsages } from '@/lib/utils/exercise-detail'
 import { EQUIPMENT_LABELS } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
+import {
+	describePlateauCount,
+	formatClosestRatio,
+	formatPlateauSet,
+} from '@/lib/utils/plateaus'
 import {
 	getStrengthDisplayPoints,
 	getStrengthTrendRange,
@@ -237,6 +243,11 @@ function BestPerformance({
 		[anchor, exerciseId],
 	)
 	const trend = useExerciseStrengthTrend(params, hasStrengthTrend)
+	// PROG-09: the same plateau watch Progress shows, for this lift only.
+	const plateaus = usePlateaus()
+	const plateau = plateaus.data?.plateaus.find(
+		item => item.exerciseId === exerciseId,
+	)
 	const current = trend.data?.selectedExercise
 	const formatMetric = (value: number) =>
 		`${formatWeightInput(value, weightUnit)} ${unitLabel}`
@@ -293,6 +304,32 @@ function BestPerformance({
 							</dd>
 						</div>
 					</dl>
+					{plateau && plateaus.data ? (
+						<p className="type-body-sm text-ink-2">
+							{
+								describePlateauCount(
+									plateau,
+									plateaus.data.thresholds,
+									formatDate,
+								).headline
+							}{' '}
+							<span className="text-ink-3">
+								{
+									describePlateauCount(
+										plateau,
+										plateaus.data.thresholds,
+										formatDate,
+									).since
+								}
+								; closest since{' '}
+								<span className="type-data text-ink-2">
+									{formatPlateauSet(plateau.closest, weightUnit)}
+								</span>{' '}
+								({formatClosestRatio(plateau.closestRatio)} of the best
+								estimate).
+							</span>
+						</p>
+					) : null}
 					<StrengthTrendChart
 						id="exercise-estimated-one-rep-max"
 						title="Estimated 1RM over time"

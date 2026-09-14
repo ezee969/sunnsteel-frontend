@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
 import { PersonalGoals } from '@/features/progress/personal-goals'
+import { PlateauWatch } from '@/features/progress/plateau-watch'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { SessionComparison } from '@/features/progress/session-comparison'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
@@ -28,6 +29,7 @@ import {
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
 	usePersonalGoals,
+	usePlateaus,
 	useProgressTimeline,
 	useSessionComparison,
 	useVolumeTrend,
@@ -77,6 +79,7 @@ export default function ProgressPage() {
 	const history = useExercisePerformanceHistory(historyParams)
 	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
 	const personalGoals = usePersonalGoals()
+	const plateaus = usePlateaus()
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
 	const timeline = useProgressTimeline(timelineFilter)
@@ -133,6 +136,14 @@ export default function ProgressPage() {
 				isPending={personalGoals.isPending}
 				isError={Boolean(personalGoals.error)}
 				onRetry={() => void personalGoals.retry()}
+			/>
+
+			<PlateauWatch
+				data={plateaus.data}
+				weightUnit={weightUnit}
+				isPending={plateaus.isPending}
+				isError={plateaus.isError}
+				onRetry={() => void plateaus.refetch()}
 			/>
 
 			<MuscleGroupHeatmap

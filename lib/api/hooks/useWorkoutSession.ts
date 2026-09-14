@@ -1,4 +1,5 @@
 import type {
+	PlateausResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
 } from '@sunsteel/contracts'
@@ -95,6 +96,7 @@ const qk = {
 			params.to ?? null,
 		] as const,
 	trainedExercises: ['workout', 'progress', 'trained-exercises'] as const,
+	plateaus: ['workout', 'progress', 'plateaus'] as const,
 	muscleHeatmap: (params: MuscleGroupHeatmapQuery) =>
 		[
 			'workout',
@@ -217,6 +219,16 @@ export const useTrainedExercises = () => {
 		queryKey: qk.trainedExercises,
 		queryFn: () => workoutService.getExercisePerformance({ limit: 1 }),
 		select: (data: ExercisePerformanceHistoryResponse) => data.exercises,
+		enabled: !isLoading && !!session,
+	})
+}
+
+/** PROG-09: the plateau watch; refreshed with the rest of Progress on finish. */
+export const usePlateaus = () => {
+	const { session, isLoading } = useAuth()
+	return useQuery<PlateausResponse>({
+		queryKey: qk.plateaus,
+		queryFn: workoutService.getPlateaus,
 		enabled: !isLoading && !!session,
 	})
 }

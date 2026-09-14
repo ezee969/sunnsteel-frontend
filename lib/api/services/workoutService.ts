@@ -1,6 +1,7 @@
 import type {
 	CreateSessionShareRequest,
 	PersonalGoalsResponse,
+	PlateausResponse,
 	SessionShare,
 	SessionShareListResponse,
 	SharedSessionRecap,
@@ -186,6 +187,12 @@ export const workoutService = {
 	): Promise<SessionComparisonResponse> =>
 		httpClient.get<SessionComparisonResponse>(
 			`${WORKOUTS_API_URL}/progress/session-comparison${buildSessionComparisonQueryString(params)}`,
+			true,
+		),
+	/** PROG-09: lifts that have gone several sessions without a new best. */
+	getPlateaus: (): Promise<PlateausResponse> =>
+		httpClient.get<PlateausResponse>(
+			`${WORKOUTS_API_URL}/progress/plateaus`,
 			true,
 		),
 	getProgressTimeline: (
