@@ -36,6 +36,18 @@ describe('achievement presentation', () => {
 		])
 	})
 
+	it('orders the strongest earned threshold first within a category', () => {
+		const first = earned('first', 'SESSIONS')
+		const tenth = { ...earned('tenth', 'SESSIONS'), threshold: 10 }
+		const twentyFifth = { ...earned('twenty-fifth', 'SESSIONS'), threshold: 25 }
+
+		expect(
+			groupAchievements([tenth, first, twentyFifth])[0].items.map(
+				achievement => achievement.threshold,
+			),
+		).toEqual([25, 10, 1])
+	})
+
 	it('keeps readable labels for every category', () => {
 		expect(Object.values(ACHIEVEMENT_CATEGORY_LABELS)).toEqual([
 			'Sessions',

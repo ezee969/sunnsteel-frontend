@@ -22,9 +22,9 @@ export const ACHIEVEMENT_CATEGORY_LABELS: Record<AchievementCategory, string> =
 
 export function groupAchievements(achievements: EarnedAchievement[]) {
 	return ACHIEVEMENT_CATEGORY_ORDER.flatMap(category => {
-		const items = achievements.filter(
-			achievement => achievement.category === category,
-		)
+		const items = achievements
+			.filter(achievement => achievement.category === category)
+			.toSorted((left, right) => right.threshold - left.threshold)
 		return items.length ? [{ category, items }] : []
 	})
 }
