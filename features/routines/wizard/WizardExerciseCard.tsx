@@ -5,7 +5,9 @@ import { Loader2 } from 'lucide-react'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
+import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
 import {
 	describeAlternative,
@@ -15,6 +17,7 @@ import {
 	defaultTrainingLocation,
 	listedEquipmentAt,
 } from '@/lib/utils/exercise-equipment'
+import { groupPickerExercises } from '@/lib/utils/exercise-picker'
 
 import { ExerciseConfigSection } from './components/ExerciseConfigSection'
 import { ExerciseHeader } from './components/ExerciseHeader'
@@ -160,6 +163,21 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	const showAlternatives =
 		!isExercisesLoading && !editSearchValue.trim() && alternatives.length > 0
 
+	// EXER-07: below the alternatives, starred and recently trained exercises
+	// lead the rest of the catalog; a search shows plain matches.
+	const stars = useStarredExercises()
+	const trained = useTrainedExercises()
+	const pickerGroups = useMemo(
+		() =>
+			editSearchValue.trim()
+				? [{ key: 'matches', label: null, exercises: filteredExercises }]
+				: groupPickerExercises(filteredExercises, {
+						starred: stars.data?.items.map(item => item.exerciseId),
+						recent: trained.data,
+					}),
+		[editSearchValue, filteredExercises, stars.data, trained.data],
+	)
+
 	// Close edit dropdown when clicking outside
 	useEffect(() => {
 		if (!isEditDropdownOpen) return
@@ -253,9 +271,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 												</li>
 											))}
 										</ul>
-										<p className="type-label px-3 pb-1 text-ink-3">
-											All exercises
-										</p>
 									</>
 								)}
 								{isExercisesLoading ? (
@@ -264,25 +279,36 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 										Loading...
 									</div>
 								) : filteredExercises.length > 0 ? (
-									<div className="space-y-1">
-										{filteredExercises.map(ex => (
-											<button
-												key={ex.id}
-												onClick={() => handleEditExercise(ex.id)}
-												className="w-full text-left px-3 py-3 rounded-md hover:bg-accent transition-colors"
-											>
-												<div className="flex flex-col items-start">
-													<span className="text-sm font-medium">{ex.name}</span>
-													<span className="text-xs text-muted-foreground">
-														{ex.primaryMuscles?.length
-															? ex.primaryMuscles.join(', ')
-															: 'Unknown'}{' '}
-														• {ex.equipment}
-													</span>
-												</div>
-											</button>
-										))}
-									</div>
+									pickerGroups.map(group => (
+										<div key={group.key} className="mb-2 last:mb-0">
+											{group.label ? (
+												<p className="type-label px-3 pb-1 pt-1 text-ink-3">
+													{group.label}
+												</p>
+											) : null}
+											<div className="space-y-1">
+												{group.exercises.map(ex => (
+													<button
+														key={ex.id}
+														onClick={() => handleEditExercise(ex.id)}
+														className="w-full text-left px-3 py-3 rounded-md hover:bg-accent transition-colors"
+													>
+														<div className="flex flex-col items-start">
+															<span className="text-sm font-medium">
+																{ex.name}
+															</span>
+															<span className="text-xs text-muted-foreground">
+																{ex.primaryMuscles?.length
+																	? ex.primaryMuscles.join(', ')
+																	: 'Unknown'}{' '}
+																• {ex.equipment}
+															</span>
+														</div>
+													</button>
+												))}
+											</div>
+										</div>
+									))
 								) : (
 									<div className="py-6 text-center text-sm text-muted-foreground">
 										No exercises found

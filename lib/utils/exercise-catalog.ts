@@ -65,6 +65,8 @@ export interface CatalogFilters {
 	pattern: MovementPattern | null
 	/** Only exercises with at least one completed set in a finished session. */
 	trained: boolean
+	/** Only exercises the owner starred (EXER-07). */
+	starred: boolean
 }
 
 export const EMPTY_CATALOG_FILTERS: CatalogFilters = {
@@ -73,6 +75,7 @@ export const EMPTY_CATALOG_FILTERS: CatalogFilters = {
 	equipment: null,
 	pattern: null,
 	trained: false,
+	starred: false,
 }
 
 const oneOf = <T extends string>(
@@ -96,6 +99,7 @@ export function parseCatalogFilters(params: {
 		),
 		pattern: oneOf(MOVEMENT_PATTERNS, params.get('pattern')),
 		trained: params.get('trained') === '1',
+		starred: params.get('starred') === '1',
 	}
 }
 
@@ -108,6 +112,7 @@ export function serializeCatalogFilters(filters: CatalogFilters): string {
 	if (filters.equipment) params.set('equipment', filters.equipment)
 	if (filters.pattern) params.set('pattern', filters.pattern)
 	if (filters.trained) params.set('trained', '1')
+	if (filters.starred) params.set('starred', '1')
 	return params.toString()
 }
 
@@ -117,7 +122,8 @@ export function hasActiveCatalogFilters(filters: CatalogFilters): boolean {
 		filters.muscle ||
 		filters.equipment ||
 		filters.pattern ||
-		filters.trained,
+		filters.trained ||
+		filters.starred,
 	)
 }
 
@@ -143,6 +149,8 @@ export interface CatalogContext {
 	trainedIds: ReadonlySet<string> | null
 	/** Equipment listed at the default location; required only for `gym`. */
 	listedEquipment: ReadonlySet<ExerciseEquipment> | null
+	/** Starred exercise ids; required only while the starred filter is on. */
+	starredIds: ReadonlySet<string> | null
 }
 
 const byName = (a: Exercise, b: Exercise) =>
@@ -188,6 +196,9 @@ export function filterCatalog(
 			return false
 		}
 		if (filters.trained && !context.trainedIds?.has(exercise.id)) {
+			return false
+		}
+		if (filters.starred && !context.starredIds?.has(exercise.id)) {
 			return false
 		}
 		return true
@@ -279,15 +290,25 @@ export function getCatalogEmptyState({
 	catalogSize,
 	filters,
 	hasTrainedExercises,
+	hasStarredExercises = null,
 }: {
 	catalogSize: number
 	filters: CatalogFilters
 	hasTrainedExercises: boolean | null
+	hasStarredExercises?: boolean | null
 }): EmptyStateCopy {
 	if (catalogSize === 0) {
 		return {
 			title: 'The catalog is empty',
 			description: 'No exercises are available yet.',
+		}
+	}
+	if (filters.starred && hasStarredExercises === false) {
+		return {
+			title: 'No starred exercises yet',
+			description:
+				'Star exercises here or on their pages to keep them at the top of your routine pickers.',
+			action: { kind: 'clear-filters', label: 'Show all exercises' },
 		}
 	}
 	if (filters.trained && hasTrainedExercises === false) {

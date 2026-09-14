@@ -1,7 +1,7 @@
 'use client'
 
 import type { MovementPattern, MuscleGroup } from '@sunsteel/contracts'
-import { Check, History, RefreshCw, Search, X } from 'lucide-react'
+import { Check, History, RefreshCw, Search, Star, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ReactNode, useMemo } from 'react'
 
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useExercises } from '@/lib/api/hooks/useExercises'
+import { useExercises, useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types/exercise.type'
@@ -35,6 +35,7 @@ import {
 } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
 
+import { StarToggle } from './star-toggle'
 import { useCatalogFilters } from './use-catalog-filters'
 
 // Below `lg` a row is two lines, title then inline data (§10). From `lg` the
@@ -163,22 +164,29 @@ function ExerciseRow({
 
 	return (
 		<li className={`rule-row py-3 ${ROW_GRID} lg:items-baseline`}>
-			<div className="min-w-0">
-				<h3 className="type-panel text-foreground">
-					<Link
-						href={`/exercises/${exercise.id}`}
-						className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-					>
-						{exercise.name}
-					</Link>
-				</h3>
-				<p className="type-body-sm mt-0.5 text-ink-2">
-					<span className="sr-only">Muscles: </span>
-					{primary || 'Not classified'}
-					{secondary ? (
-						<span className="text-ink-3"> · also {secondary}</span>
-					) : null}
-				</p>
+			<div className="flex min-w-0 items-start gap-1">
+				<StarToggle
+					exerciseId={exercise.id}
+					exerciseName={exercise.name}
+					className="-ml-2.5 -mt-2"
+				/>
+				<div className="min-w-0">
+					<h3 className="type-panel text-foreground">
+						<Link
+							href={`/exercises/${exercise.id}`}
+							className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+						>
+							{exercise.name}
+						</Link>
+					</h3>
+					<p className="type-body-sm mt-0.5 text-ink-2">
+						<span className="sr-only">Muscles: </span>
+						{primary || 'Not classified'}
+						{secondary ? (
+							<span className="text-ink-3"> · also {secondary}</span>
+						) : null}
+					</p>
+				</div>
 			</div>
 			{/* One inline line below `lg`; `lg:contents` turns each part into its
 			    own ledger column, and the middots drop out. */}
@@ -229,6 +237,14 @@ export function ExerciseCatalog() {
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
 	const locations = useTrainingLocations()
+	const stars = useStarredExercises()
+	const starredIds = useMemo(
+		() =>
+			stars.data
+				? new Set(stars.data.items.map(item => item.exerciseId))
+				: null,
+		[stars.data],
+	)
 
 	const exercises = useMemo(() => catalog.data ?? [], [catalog.data])
 	const lastTrained = useMemo(
@@ -252,8 +268,13 @@ export function ExerciseCatalog() {
 		[exercises, filters],
 	)
 	const results = useMemo(
-		() => filterCatalog(exercises, filters, { trainedIds, listedEquipment }),
-		[exercises, filters, listedEquipment, trainedIds],
+		() =>
+			filterCatalog(exercises, filters, {
+				trainedIds,
+				listedEquipment,
+				starredIds,
+			}),
+		[exercises, filters, listedEquipment, starredIds, trainedIds],
 	)
 	const hasActiveFilters = hasActiveCatalogFilters(filters)
 	const usesGym = filters.equipment === GYM_EQUIPMENT_FILTER
@@ -280,6 +301,16 @@ export function ExerciseCatalog() {
 				onRetry={() => void trained.refetch()}
 			/>
 		)
+	} else if (filters.starred && stars.isPending) {
+		body = <RowsSkeleton label="Loading your starred exercises" />
+	} else if (filters.starred && stars.isError) {
+		body = (
+			<RetryAlert
+				title="Your stars are unavailable"
+				description="We could not load your starred exercises. Try again, or turn off Starred."
+				onRetry={() => void stars.refetch()}
+			/>
+		)
 	} else if (usesGym && locations.isPending) {
 		body = <RowsSkeleton label="Loading your training locations" />
 	} else if (usesGym && locations.isError) {
@@ -300,6 +331,7 @@ export function ExerciseCatalog() {
 					catalogSize: exercises.length,
 					filters,
 					hasTrainedExercises: trainedIds ? trainedIds.size > 0 : null,
+					hasStarredExercises: starredIds ? starredIds.size > 0 : null,
 				})}
 				onClearFilters={clear}
 			/>
@@ -401,6 +433,20 @@ export function ExerciseCatalog() {
 							<History className="size-4" aria-hidden />
 						)}
 						Trained by me
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant={filters.starred ? 'secondary' : 'outline'}
+						aria-pressed={filters.starred}
+						onClick={() => update({ starred: !filters.starred })}
+					>
+						{filters.starred ? (
+							<Check className="size-4" aria-hidden />
+						) : (
+							<Star className="size-4" aria-hidden />
+						)}
+						Starred
 					</Button>
 					{trained.isError && !filters.trained ? (
 						<p className="type-body-sm text-ink-3">

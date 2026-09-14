@@ -1,11 +1,14 @@
 'use client'
 
 import { ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { forwardRef, useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useMemo, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useStarredExercises } from '@/lib/api/hooks/useExercises'
+import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
+import { groupPickerExercises } from '@/lib/utils/exercise-picker'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 
 export interface ExercisePickerDropdownProps {
@@ -36,6 +39,20 @@ export const ExercisePickerDropdown = forwardRef<
 	ref,
 ) {
 	const inputRef = useRef<HTMLInputElement>(null)
+	const stars = useStarredExercises()
+	const trained = useTrainedExercises()
+
+	// EXER-07: with no search, starred and recently trained exercises lead.
+	const groups = useMemo(
+		() =>
+			searchValue.trim()
+				? [{ key: 'matches', label: null, exercises }]
+				: groupPickerExercises(exercises, {
+						starred: stars.data?.items.map(item => item.exerciseId),
+						recent: trained.data,
+					}),
+		[exercises, searchValue, stars.data, trained.data],
+	)
 
 	useEffect(() => {
 		if (isOpen) {
@@ -73,38 +90,48 @@ export const ExercisePickerDropdown = forwardRef<
 							ref={inputRef}
 						/>
 					</div>
-					<div className="max-h-[200px] overflow-y-auto p-2">
+					<div className="max-h-[260px] overflow-y-auto p-2">
 						{isLoading ? (
 							<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
 								<Loader2 className="h-4 w-4 animate-spin" />
 								Loading...
 							</div>
 						) : exercises.length > 0 ? (
-							<div className="space-y-1">
-								{exercises.map(exercise => (
-									<Button
-										key={exercise.id}
-										variant="ghost"
-										className="w-full justify-start px-3 py-3 h-auto"
-										onClick={() => {
-											onSelect(exercise.id)
-											onClose()
-										}}
-									>
-										<div className="flex flex-col items-start text-left">
-											<span className="text-sm font-medium whitespace-normal break-words">
-												{exercise.name}
-											</span>
-											<span className="text-xs text-muted-foreground whitespace-normal">
-												{exercise.primaryMuscles?.length
-													? formatMuscleGroups(exercise.primaryMuscles)
-													: 'Unknown'}{' '}
-												• {exercise.equipment}
-											</span>
-										</div>
-									</Button>
-								))}
-							</div>
+							groups.map(group => (
+								<div key={group.key} className="mb-2 last:mb-0">
+									{group.label ? (
+										<p className="type-label px-3 pb-1 pt-1 text-ink-3">
+											{group.label}
+										</p>
+									) : null}
+									<ul aria-label={group.label ?? 'Matching exercises'}>
+										{group.exercises.map(exercise => (
+											<li key={exercise.id}>
+												<Button
+													variant="ghost"
+													className="w-full justify-start px-3 py-3 h-auto"
+													onClick={() => {
+														onSelect(exercise.id)
+														onClose()
+													}}
+												>
+													<div className="flex flex-col items-start text-left">
+														<span className="text-sm font-medium whitespace-normal break-words">
+															{exercise.name}
+														</span>
+														<span className="text-xs text-muted-foreground whitespace-normal">
+															{exercise.primaryMuscles?.length
+																? formatMuscleGroups(exercise.primaryMuscles)
+																: 'Unknown'}{' '}
+															• {exercise.equipment}
+														</span>
+													</div>
+												</Button>
+											</li>
+										))}
+									</ul>
+								</div>
+							))
 						) : (
 							<div className="py-6 text-center text-sm text-muted-foreground">
 								No exercises found

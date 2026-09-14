@@ -461,6 +461,8 @@ const ROUTES: SweepRoute[] = [
 		slug: 'exercises-filtered',
 		path: () => '/exercises?q=zzz&muscle=PECTORAL&trained=1',
 	},
+	// Starred only: the owner's stars, or the "no starred exercises" state.
+	{ slug: 'exercises-starred', path: () => '/exercises?starred=1' },
 	{
 		slug: 'exercise-detail',
 		path: found => found.exercise && `/exercises/${found.exercise}`,

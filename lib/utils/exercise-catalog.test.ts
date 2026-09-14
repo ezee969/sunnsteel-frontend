@@ -52,7 +52,7 @@ const curl = exercise('curl', {
 	equipmentRequired: ['cable'],
 })
 const catalog = [curl, dip, pushUp, bench]
-const none = { trainedIds: null, listedEquipment: null }
+const none = { trainedIds: null, listedEquipment: null, starredIds: null }
 const names = (exercises: Exercise[]) => exercises.map(item => item.name)
 
 describe('catalog filter URL state', () => {
@@ -63,10 +63,11 @@ describe('catalog filter URL state', () => {
 			equipment: 'gym',
 			pattern: 'VERTICAL_PUSH',
 			trained: true,
+			starred: true,
 		} as const
 		const query = serializeCatalogFilters(filters)
 		expect(query).toBe(
-			'q=press&muscle=TRICEPS&equipment=gym&pattern=VERTICAL_PUSH&trained=1',
+			'q=press&muscle=TRICEPS&equipment=gym&pattern=VERTICAL_PUSH&trained=1&starred=1',
 		)
 		expect(parseCatalogFilters(new URLSearchParams(query))).toEqual({
 			...filters,
@@ -79,7 +80,7 @@ describe('catalog filter URL state', () => {
 		expect(
 			parseCatalogFilters(
 				new URLSearchParams(
-					'muscle=chest&equipment=kettlebell&pattern=push&trained=yes',
+					'muscle=chest&equipment=kettlebell&pattern=push&trained=yes&starred=true',
 				),
 			),
 		).toEqual(EMPTY_CATALOG_FILTERS)
@@ -153,6 +154,7 @@ describe('filterCatalog', () => {
 				filterCatalog(catalog, filters, {
 					trainedIds: null,
 					listedEquipment: new Set(['barbell', 'bench']),
+					starredIds: null,
 				}),
 			),
 		).toEqual(['Bench Press', 'Push-ups'])
@@ -167,9 +169,23 @@ describe('filterCatalog', () => {
 				filterCatalog(catalog, filters, {
 					trainedIds: new Set(['dip', 'curl']),
 					listedEquipment: null,
+					starredIds: null,
 				}),
 			),
 		).toEqual(['Cable Curl', 'Dips'])
+		expect(filterCatalog(catalog, filters, none)).toEqual([])
+	})
+
+	it('keeps only starred exercises when that filter is on', () => {
+		const filters = { ...EMPTY_CATALOG_FILTERS, starred: true }
+		expect(
+			names(
+				filterCatalog(catalog, filters, {
+					...none,
+					starredIds: new Set(['bench']),
+				}),
+			),
+		).toEqual(['Bench Press'])
 		expect(filterCatalog(catalog, filters, none)).toEqual([])
 	})
 })
@@ -246,6 +262,14 @@ describe('catalog copy', () => {
 				hasTrainedExercises: false,
 			}).title,
 		).toBe('No trained exercises yet')
+		expect(
+			getCatalogEmptyState({
+				catalogSize: 80,
+				filters: { ...EMPTY_CATALOG_FILTERS, starred: true },
+				hasTrainedExercises: null,
+				hasStarredExercises: false,
+			}).title,
+		).toBe('No starred exercises yet')
 		expect(
 			getCatalogEmptyState({
 				catalogSize: 80,

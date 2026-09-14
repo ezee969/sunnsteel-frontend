@@ -39,6 +39,8 @@ import {
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
+import { StarToggle } from './star-toggle'
+
 const formatDate = (value: string) =>
 	new Intl.DateTimeFormat(undefined, {
 		month: 'short',
@@ -435,7 +437,14 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
-			<BackLink />
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<BackLink />
+				<StarToggle
+					exerciseId={exercise.id}
+					exerciseName={exercise.name}
+					showLabel
+				/>
+			</div>
 			<HeroSection
 				title={<>{exercise.name}</>}
 				subtitle={primary ? <>Trains {primary}</> : undefined}
