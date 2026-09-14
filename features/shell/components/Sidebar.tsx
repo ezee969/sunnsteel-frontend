@@ -93,7 +93,8 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		label: 'Exercises',
 		icon: Weight,
 		classicalName: 'two-dumbbells',
-		disabled: true,
+		href: '/exercises',
+		disabled: false,
 	},
 	{
 		id: 'schedule',

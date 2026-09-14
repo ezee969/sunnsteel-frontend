@@ -3,6 +3,7 @@ import type { Ref } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { NativeSelect } from '@/components/ui/native-select'
 import { Separator } from '@/components/ui/separator'
 import type { Routine } from '@/lib/api/types/routine.type'
 import type {
@@ -29,19 +30,6 @@ export const SORT_OPTIONS: Array<{
 	{ label: 'Started (newest)', value: 'startedAt:desc' },
 	{ label: 'Started (oldest)', value: 'startedAt:asc' },
 ]
-
-/**
- * The three native `<select>`s carry the same resting boundary the `Input`
- * primitive does (§11.6): 1px `--rule` on a `--surface` fill in both themes,
- * 44px tall below `md` and 40px above, with 16px text below `md` — the iOS
- * zoom-on-focus mitigation (§2.4), which a 14px select would have reintroduced
- * on exactly the control most likely to be tapped first.
- *
- * They stay native rather than becoming Radix `Select`s: swapping them is a
- * markup and event change, not a styling one.
- */
-const SELECT_CLASS =
-	'h-11 w-full rounded-sm border border-rule bg-surface px-3 text-base outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 md:h-10 md:text-sm'
 
 export interface WorkoutHistoryFiltersProps {
 	filters: {
@@ -145,10 +133,9 @@ export function WorkoutHistoryFilters({
 							<label htmlFor="status" className="type-body-sm text-ink-3">
 								Status
 							</label>
-							<select
+							<NativeSelect
 								id="status"
 								aria-label="Filter by status"
-								className={SELECT_CLASS}
 								value={f.status ?? ''}
 								onChange={e =>
 									a.handleChangeStatus(
@@ -162,7 +149,7 @@ export function WorkoutHistoryFilters({
 										{opt.label}
 									</option>
 								))}
-							</select>
+							</NativeSelect>
 						</div>
 
 						{/* Routine */}
@@ -170,10 +157,9 @@ export function WorkoutHistoryFilters({
 							<label htmlFor="routine" className="type-body-sm text-ink-3">
 								Routine
 							</label>
-							<select
+							<NativeSelect
 								id="routine"
 								aria-label="Filter by routine"
-								className={SELECT_CLASS}
 								value={f.routineId}
 								onChange={e => a.handleChangeRoutine(e.target.value)}
 							>
@@ -183,7 +169,7 @@ export function WorkoutHistoryFilters({
 										{r.name}
 									</option>
 								))}
-							</select>
+							</NativeSelect>
 						</div>
 
 						{/* From */}
@@ -252,10 +238,9 @@ export function WorkoutHistoryFilters({
 							<label htmlFor="sort" className="type-body-sm text-ink-3">
 								Sort
 							</label>
-							<select
+							<NativeSelect
 								id="sort"
 								aria-label="Sort order"
-								className={SELECT_CLASS}
 								value={f.sort}
 								onChange={e =>
 									a.handleChangeSort(
@@ -268,7 +253,7 @@ export function WorkoutHistoryFilters({
 										{opt.label}
 									</option>
 								))}
-							</select>
+							</NativeSelect>
 						</div>
 
 						<div className="flex items-end">

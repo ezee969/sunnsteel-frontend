@@ -94,6 +94,7 @@ const qk = {
 			params.from ?? null,
 			params.to ?? null,
 		] as const,
+	trainedExercises: ['workout', 'progress', 'trained-exercises'] as const,
 	muscleHeatmap: (params: MuscleGroupHeatmapQuery) =>
 		[
 			'workout',
@@ -193,6 +194,22 @@ export const useExercisePerformanceHistory = (
 			}),
 		initialPageParam: undefined,
 		getNextPageParam: lastPage => lastPage.nextCursor,
+		enabled: !isLoading && !!session,
+	})
+}
+
+/**
+ * Exercises with completed work in a finished session, each with its last
+ * date (EXER-02). The performance read already returns that list regardless
+ * of its date range; `limit: 1` keeps the page of sessions it also loads to a
+ * single one.
+ */
+export const useTrainedExercises = () => {
+	const { session, isLoading } = useAuth()
+	return useQuery({
+		queryKey: qk.trainedExercises,
+		queryFn: () => workoutService.getExercisePerformance({ limit: 1 }),
+		select: (data: ExercisePerformanceHistoryResponse) => data.exercises,
 		enabled: !isLoading && !!session,
 	})
 }

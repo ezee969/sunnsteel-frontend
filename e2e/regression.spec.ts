@@ -443,6 +443,12 @@ const ROUTES: SweepRoute[] = [
 		needs: 'at least one finished session',
 	},
 	{ slug: 'progress', path: () => '/progress' },
+	{ slug: 'exercises', path: () => '/exercises' },
+	// A filtered URL: the no-results state and the active-filter controls.
+	{
+		slug: 'exercises-filtered',
+		path: () => '/exercises?q=zzz&muscle=PECTORAL&trained=1',
+	},
 	{ slug: 'achievements', path: () => '/achievements' },
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
@@ -557,6 +563,7 @@ const NAV_TARGETS: Array<[string, RegExp]> = [
 	['Routines', /\/routines$/],
 	['History', /\/workouts\/history$/],
 	['Progress', /\/progress$/],
+	['Exercises', /\/exercises$/],
 	['Settings', /\/settings$/],
 	['Dashboard', /\/dashboard$/],
 ]
