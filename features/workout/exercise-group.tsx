@@ -155,7 +155,9 @@ export const ExerciseGroup = ({
 				<div className="mt-3 space-y-2">
 					{sets.map(set => (
 						<SetLogInput
-							key={`${set.routineExerciseId}-${set.setNumber}`}
+							// The exercise is part of the key: a LIVE-11 swap must remount the
+							// inputs, or values typed for the replaced exercise carry over.
+							key={`${set.routineExerciseId}-${set.exerciseId}-${set.setNumber}`}
 							sessionId={set.sessionId}
 							routineExerciseId={set.routineExerciseId}
 							exerciseId={set.exerciseId}
