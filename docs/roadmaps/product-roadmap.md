@@ -73,10 +73,9 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID      | Status        | Owner  | Branch / worktree                                                                            | Claimed    | Repositories                                 |
-| ------- | ------------- | ------ | -------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------- |
-| EXER-02 | `IN_PROGRESS` | Claude | `claude/exer-02` · `.claude-worktrees/exer-02-frontend`, `.claude-worktrees/exer-02-backend` | 2026-09-14 | FE (BE/CT only if the history read needs it) |
-| ACH-02  | `IN_PROGRESS` | Codex  | `codex/ach-02` · `.codex-worktrees/ach-02-{frontend,backend,contracts}`                      | 2026-09-14 | FE, BE, CT                                   |
+| ID     | Status        | Owner | Branch / worktree                                                       | Claimed    | Repositories |
+| ------ | ------------- | ----- | ----------------------------------------------------------------------- | ---------- | ------------ |
+| ACH-02 | `IN_PROGRESS` | Codex | `codex/ach-02` · `.codex-worktrees/ach-02-{frontend,backend,contracts}` | 2026-09-14 | FE, BE, CT   |
 
 ## Current product snapshot
 
@@ -101,6 +100,7 @@ else until it merges, so claims live here, on `main`.
 | PROG-07 | `SHIPPED` | Cursor-paginated record and prescription-change timeline with reasons, historical routine context and session recap links                         | FE `/progress`; BE indexed event read; CT timeline response                                     |
 | PROG-08 | `SHIPPED` | Up to eight private, measurable frequency, workload, streak, strength and current-body-weight goals with exact current/target/gap progress        | FE Settings/Progress; BE persisted goals and bounded aggregate; CT `@sunsteel/contracts@0.27.0` |
 | ACH-01  | `SHIPPED` | Verified milestones for completed sessions, sets, external-load volume, current record frontiers and best training streaks                        | FE `/achievements`; BE event-backed award/read; CT `@sunsteel/contracts@0.29.0`                 |
+| EXER-02 | `SHIPPED` | Exercise catalog browsing by name, muscle, equipment or the default gym, movement pattern and personal training history                           | FE `/exercises`; existing BE catalog and performance reads                                      |
 
 ## Immediate product-integrity work
 
@@ -242,17 +242,17 @@ cold-start impact and showing that simpler rendering is insufficient.
 
 ### Exercise library
 
-| ID      | Status        | Size | Feature                        | User-facing behavior                                                                                                                                                  | Dependencies                   |
-| ------- | ------------- | ---- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| EXER-01 | `CANDIDATE`   | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                              | PROG-01, PROG-02               |
-| EXER-02 | `IN_PROGRESS` | M    | Catalog browsing               | Filter exercises by muscle, equipment, movement pattern, favorites, and training history.                                                                             | EXER-09                        |
-| EXER-03 | `CANDIDATE`   | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                              | Content-authoring process      |
-| EXER-04 | `CANDIDATE`   | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                      | Curated assets and licenses    |
-| EXER-05 | `SHIPPED`     | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                    | EXER-09                        |
-| EXER-06 | `CANDIDATE`   | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                          | BE/CT ownership model          |
-| EXER-07 | `CANDIDATE`   | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                           | User-exercise preference model |
-| EXER-08 | `CANDIDATE`   | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                               | Administrative tooling         |
-| EXER-09 | `SHIPPED`     | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data. | BE/CT schema; catalog backfill |
+| ID      | Status      | Size | Feature                        | User-facing behavior                                                                                                                                                   | Dependencies                   |
+| ------- | ----------- | ---- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| EXER-01 | `CANDIDATE` | M    | Personal exercise page         | Show routines using the exercise, recent performances, best set, estimated 1RM, and progression history.                                                               | PROG-01, PROG-02               |
+| EXER-02 | `SHIPPED`   | M    | Catalog browsing               | Filter the catalog by name, muscle, equipment (one item or everything listed at the default gym), movement pattern and training history. Favorites wait for `EXER-07`. | EXER-09                        |
+| EXER-03 | `CANDIDATE` | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                               | Content-authoring process      |
+| EXER-04 | `CANDIDATE` | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                       | Curated assets and licenses    |
+| EXER-05 | `SHIPPED`   | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                     | EXER-09                        |
+| EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                           | BE/CT ownership model          |
+| EXER-07 | `CANDIDATE` | M    | Favorites and recents          | Prioritize commonly used exercises in the routine wizard and Quick Workout.                                                                                            | User-exercise preference model |
+| EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                                | Administrative tooling         |
+| EXER-09 | `SHIPPED`   | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data.  | BE/CT schema; catalog backfill |
 
 The first Exercises release should emphasize the user's existing training data.
 Instructions and media make this a content project as well as an engineering one.
@@ -264,6 +264,16 @@ substitution group of near-identical exercises that never crosses movement
 patterns. `EXER-02`, `EXER-05` and `ROUT-10` are no longer blocked on catalog
 data. `instructions` and `mediaUrl` exist but stay empty until `EXER-03` and
 `EXER-04` supply real content; nothing should render them before then.
+
+`EXER-02` shipped the first Exercises page on 2026-09-14 as catalog browsing
+only: filters for name, muscle, equipment, movement pattern and "Trained by me",
+with each exercise's last training date. It adds no backend read, because the
+existing performance history already lists every exercise with completed work.
+The favorites filter in the original description was deliberately left out:
+it needs the user-exercise preference model owned by `EXER-07`, which does not
+exist. The five favorite exercises on the `PROF-05` training identity are
+public-facing profile metadata, not a browsing preference, and were not reused
+as a substitute.
 
 ### Routines and programming
 
@@ -440,6 +450,9 @@ data. `instructions` and `mediaUrl` exist but stay empty until `EXER-03` and
   licensing process; engineering alone is not sufficient.
 - Automated training recommendations explain their evidence and require user
   confirmation. They do not diagnose injuries, recovery state, or health issues.
+- Catalog favorites wait for the `EXER-07` user-exercise preference model. The
+  `PROF-05` profile favorites are identity metadata governed by profile
+  privacy and must not be repurposed as a browsing or wizard preference.
 - An interim fix that replaces one false promise with another is not an
   improvement. When the honest short version of a feature would still mislead,
   leave the surface visibly unfinished and wait for the real capability. This
@@ -501,6 +514,7 @@ it again without addressing the original decision.
 
 | 2026-09-14 | LIVE-11 | CT `@sunsteel/contracts@0.28.0` `SessionExerciseSubstitution`, `WorkoutSession.exerciseSubstitutions` and the substitute request/response; BE migration `20260914090000_session_exercise_substitutions`, `workout-session-substitution.service.ts` with `PUT`/`DELETE /workouts/sessions/:id/exercises/:routineExerciseId/substitution`, `session-substitutions.ts` and twelve tests; FE `exercise-swap-dialog.tsx`, `session-substitutions.ts` (+ four tests), the session page, exercise row and history overlay; contracts publish `0da6502`, backend `1b627f8`/`30b3867` with CI run 34824965809 (checks and analytics-integration) and Railway green, frontend `4332c4a`/`9bffecd`/`f5020ee` with CI run 34826699878 and Vercel `f5020ee` green; backend 121 and frontend 243 tests | A swap is a session fact beside the immutable `DATA-04` snapshot, stored as JSON on the session with the substitute's muscles captured at the swap. The server refuses a swap once the slot has a completed set, clears the slot's incomplete drafts (their values belonged to the other exercise) and can also update the routine for future sessions (`applyToRoutine`, reporting whether the routine still had the slot). Set logging accepts the substitute; finish progression never advances a swapped slot; analytics muscle and record attribution (including rebuilds), session comparison and the session response all resolve the slot to the exercise performed, while recap and volume already read names from the logged set. The live screen shows the substitute with a "Swapped from" caption, keeps rep targets but drops the prescribed load, and shows "Last time" only for the same exercise; history shows the same caption. Suggestions reuse the `EXER-05` ranking against the routine's own exercise, plus a catalog search. **Browser-verified 2026-09-14 on the owner's local dev servers against a mocked in-progress session**: the swap, revert and set-log writes were answered in the browser, so no real session or set was written, while the routine ("Upper / Lower - Autumn Block"), catalog and gym were the owner's. Swapping Bench Press offered Push-ups first, then Dumbbell Bench Press, Hammer Chest Press, Incline Bench Press and Incline Dumbbell Press with their reasons; the request named the slot and exercise with `applyToRoutine` off; the row then showed Push-ups with "Swapped from Bench Press", hid "Last time" and left the weight empty; a completed set was logged against Push-ups and a further swap was refused; Switch back restored Bench Press and search reached the catalog. The first pass caught the planned load carrying into the swapped set inputs; `f5020ee` keys them by the performed exercise and the rerun passed. Both themes at 320/390/768/1024/1440 px had zero page overflow, the dialog stayed inside the viewport and there were no console errors; the local `ui:regression` workouts and history cases passed 42/42. Production was not browser-checked because the saved session belongs to the local origin; a real end-to-end swap is left to the owner. |
 | 2026-09-14 | ACH-01, DATA-02 | CT `@sunsteel/contracts@0.29.0` achievement catalog, response and `STREAK_MILESTONE`/`ACHIEVEMENT_UNLOCKED` payloads; BE nullable event session, migration `20260914103000_milestone_achievements`, `achievement-events.ts`, protected `GET /achievements` and four focused tests; FE protected `/achievements` ledger, service/hook and four presentation tests; contracts CI 34826055556, backend CI 34826830681, frontend CI 34828839264, Railway route/migration and Vercel production verified; backend 125 tests, frontend 247 tests | The fixed catalog has 25 thresholds across sessions, completed sets, external-load volume, current personal-record exercises and best streak days. The analytics writer awards every newly crossed threshold with a unique event key, so finish retries and rebuilds cannot duplicate it; streak thresholds also emit their own addressable event family. The first owner read reconciles existing READY projections and record counts into bounded immutable events marked `backfilled`, with no invented source session or earned date. The UI therefore says "Recognized from history" for prior work and links future unlocks to their source session. **Authenticated-browser verified 2026-09-14 in production:** the owner read returned 200 and displayed 19 earned milestones across all five categories, strongest threshold first, with no console errors or page overflow in either theme at 320/375/390/430/768/1024/1280/1440 px. The full production `ui:regression` passed 324/325 initially; the sole saved-token refresh race passed on its exact retry, and all 14 Achievements cases passed in the original run. No session, preference or goal data was changed. |
+| 2026-09-14 | EXER-02 | FE protected `/exercises` (`app/(protected)/exercises/page.tsx`), `features/exercises/exercise-catalog.tsx` and `use-catalog-filters.ts`, pure `lib/utils/exercise-catalog.ts` (+ fifteen tests), `useTrainedExercises` over the existing performance read, the shared `components/ui/native-select.tsx` (also used by workout history), the enabled sidebar entry, middleware prefix and both `/exercises` routes in the `ui:regression` sweep; no contract publish, backend change or migration; worktree `npm run verify` (262 tests, build), frontend `b7ee94d`/`301dc7a`/`ed8dc03` with CI run 34851160071 and Vercel `ed8dc03` green | The first Exercises page lists the 80-exercise catalog as a ruled ledger (name, primary and secondary muscles, movement and mechanic, required equipment and, for exercises the owner has trained, the last date) and filters it by name, muscle (primary matches first), one equipment item or everything listed at the default training location, movement pattern and "Trained by me". Trained exercises come from `/workouts/progress/performance`, which already returned every exercise with completed work regardless of its range, so no backend read was added. Filters live in the URL, survive a reload and reset from the sidebar link. Loading, catalog/history/location errors with retry, an empty catalog, no trained exercises, no results and a gym without listed equipment each have their own state. Instructions and media stay hidden until `EXER-03`/`EXER-04`; favorites were left out for `EXER-07` (see Exercise library). **Browser-verified 2026-09-14 on the owner's local dev servers**, read-only: both themes at 320/390/768/1024/1440 px had zero page overflow and no console or request errors for the full and filtered views; "press" gave 11 of 80, adding Triceps 10 and Trained by me 5; "Listed at Home Gym" gave 23 and Hinge within it 4; forced 500s, a hanging catalog and empty or unlisted locations rendered each state in both themes. The first pass caught Clear filters being undone by a search write composed from lagging search params (`301dc7a`); the rerun passed, and `ed8dc03` moved the writes to `history.replaceState` so no filter change costs an RSC request. The local `ui:regression` subset for the affected cases (new `exercises` and `exercises-filtered` layouts, history and history detail, navigation, sidebar, drawer, hover and keyboard focus) passed 94/94. In production, signed out, `/exercises` redirects to Login with `redirectTo=/exercises` and the route serves behind the session marker; the signed-in production view was not browser-checked because the saved session belongs to the local origin. |
 
 ## Document history
 
@@ -909,3 +923,10 @@ it again without addressing the original decision.
 - **2026-09-14 (revision 47):** Claimed `EXER-02` for Claude. The first
   Exercises slice is frontend-first; backend or contracts change only if no
   existing read already lists the exercises the user has trained.
+- **2026-09-14 (revision 48):** Shipped `EXER-02` and released its claim.
+  Catalog browsing is frontend-only: the existing performance read already
+  listed trained exercises, so no contract or backend change was needed. The
+  favorites filter was left out and recorded as a retained decision: it
+  belongs to `EXER-07`'s preference model, and `PROF-05` profile favorites are
+  not a substitute. `ROUT-07` and `NAV-01` no longer wait on `EXER-02`;
+  `EXER-01` (personal exercise page) is the natural next Exercises slice.
