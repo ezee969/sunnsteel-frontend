@@ -1,4 +1,4 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useDebounce } from '@/hooks/use-debounce'
@@ -15,13 +15,12 @@ import {
  * the URL is only followed when something else navigates, such as the
  * sidebar link back to a bare `/exercises`.
  *
- * The URL lags `router.replace`, so an earlier write can land after a later
- * one was requested. Those are remembered as pending and never read back as
+ * The URL can lag a write, so an earlier write can land after a later one
+ * was requested. Those are remembered as pending and never read back as
  * navigation — reading the URL instead of state let a stale write undo
  * "Clear filters".
  */
 export function useCatalogFilters() {
-	const router = useRouter()
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
 	const urlSearch = serializeCatalogFilters(parseCatalogFilters(searchParams))
@@ -49,10 +48,15 @@ export function useCatalogFilters() {
 		if (nextSearch === latestWrite.current) return
 		latestWrite.current = nextSearch
 		pendingWrites.current.add(nextSearch)
-		router.replace(nextSearch ? `${pathname}?${nextSearch}` : pathname, {
-			scroll: false,
-		})
-	}, [nextSearch, pathname, router])
+		// Filtering is client-only, so the history API is enough: Next syncs it
+		// into `useSearchParams` without the server round trip `router.replace`
+		// makes for every settled change.
+		window.history.replaceState(
+			null,
+			'',
+			nextSearch ? `${pathname}?${nextSearch}` : pathname,
+		)
+	}, [nextSearch, pathname])
 
 	useEffect(() => {
 		if (urlSearch === latestWrite.current) {
