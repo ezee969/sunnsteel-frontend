@@ -2,6 +2,7 @@
 
 import type { MovementPattern, MuscleGroup } from '@sunsteel/contracts'
 import { Check, History, RefreshCw, Search, X } from 'lucide-react'
+import Link from 'next/link'
 import { type ReactNode, useMemo } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -163,7 +164,14 @@ function ExerciseRow({
 	return (
 		<li className={`rule-row py-3 ${ROW_GRID} lg:items-baseline`}>
 			<div className="min-w-0">
-				<h3 className="type-panel text-foreground">{exercise.name}</h3>
+				<h3 className="type-panel text-foreground">
+					<Link
+						href={`/exercises/${exercise.id}`}
+						className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					>
+						{exercise.name}
+					</Link>
+				</h3>
 				<p className="type-body-sm mt-0.5 text-ink-2">
 					<span className="sr-only">Muscles: </span>
 					{primary || 'Not classified'}

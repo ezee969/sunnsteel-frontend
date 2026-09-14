@@ -164,5 +164,8 @@ describe('progress timeline contract', () => {
 				limit: 100,
 			}),
 		).toBe('?type=PROGRESSION_CHANGED&cursor=event-1&limit=50')
+		expect(
+			buildProgressTimelineQueryString({ exerciseId: 'exercise-1', limit: 10 }),
+		).toBe('?exerciseId=exercise-1&limit=10')
 	})
 })

@@ -25,7 +25,12 @@ type Theme = (typeof THEMES)[number]
 
 type ConsoleLog = { errors: string[]; warnings: string[] }
 
-type Ids = { history?: string; routine?: string; username?: string }
+type Ids = {
+	history?: string
+	routine?: string
+	username?: string
+	exercise?: string
+}
 
 /** `hooks/use-sidebar.ts` swaps the sidebar for a drawer below 768. */
 const MOBILE_MAX = 767
@@ -130,6 +135,13 @@ async function discoverIds(browser: Browser): Promise<Ids> {
 				.getAttribute('href')
 			found.routine = href?.split('/').pop()
 			await page.keyboard.press('Escape')
+		}
+
+		// A trained exercise, so its page renders every section with real data.
+		await page.goto('/exercises?trained=1', { waitUntil: 'networkidle' })
+		const exercise = page.locator('main li h3 a').first()
+		if ((await exercise.count()) > 0) {
+			found.exercise = (await exercise.getAttribute('href'))?.split('/').pop()
 		}
 
 		// Built from the contract's own pattern: a hand-written `[a-z0-9_]` stopped
@@ -448,6 +460,16 @@ const ROUTES: SweepRoute[] = [
 	{
 		slug: 'exercises-filtered',
 		path: () => '/exercises?q=zzz&muscle=PECTORAL&trained=1',
+	},
+	{
+		slug: 'exercise-detail',
+		path: found => found.exercise && `/exercises/${found.exercise}`,
+		needs: 'at least one trained exercise',
+	},
+	// An id outside the catalog: the page's not-found state.
+	{
+		slug: 'exercise-missing',
+		path: () => '/exercises/00000000-0000-4000-8000-000000000000',
 	},
 	{ slug: 'achievements', path: () => '/achievements' },
 	{ slug: 'profile', path: () => '/profile' },

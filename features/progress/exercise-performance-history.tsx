@@ -36,6 +36,13 @@ const PERFORMANCE_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
 })
 
 interface ExercisePerformanceHistoryProps {
+	/** Defaults to the Progress page's range-bound copy. */
+	copy?: {
+		title: string
+		description: string
+		emptyTitle: string
+		emptyDescription: string
+	}
 	sessions: ExercisePerformanceSession[]
 	isPending: boolean
 	isError: boolean
@@ -206,7 +213,15 @@ function PerformanceSessionCard({
 	)
 }
 
+const DEFAULT_COPY = {
+	title: 'Performance history',
+	description: 'Select a session to review its sets, notes, and progression.',
+	emptyTitle: 'No sessions in this range',
+	emptyDescription: 'Choose a longer range to review earlier performances.',
+}
+
 export function ExercisePerformanceHistory({
+	copy = DEFAULT_COPY,
 	sessions,
 	isPending,
 	isError,
@@ -223,11 +238,9 @@ export function ExercisePerformanceHistory({
 				<History className="size-4 text-ink-3" aria-hidden />
 				<div>
 					<h2 id="performance-history" className="type-section text-foreground">
-						Performance history
+						{copy.title}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3">
-						Select a session to review its sets, notes, and progression.
-					</p>
+					<p className="type-body-sm mt-1 text-ink-3">{copy.description}</p>
 				</div>
 			</div>
 
@@ -251,11 +264,9 @@ export function ExercisePerformanceHistory({
 				</div>
 			) : sessions.length === 0 ? (
 				<div className="border border-dashed border-rule bg-surface p-6 text-center">
-					<p className="type-panel text-foreground">
-						No sessions in this range
-					</p>
+					<p className="type-panel text-foreground">{copy.emptyTitle}</p>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Choose a longer range to review earlier performances.
+						{copy.emptyDescription}
 					</p>
 				</div>
 			) : (

@@ -120,8 +120,14 @@ const qk = {
 			'session-comparison',
 			routineDayId ?? null,
 		] as const,
-	progressTimeline: (type?: ProgressTimelineEventType) =>
-		['workout', 'progress', 'timeline', type ?? null] as const,
+	progressTimeline: (type?: ProgressTimelineEventType, exerciseId?: string) =>
+		[
+			'workout',
+			'progress',
+			'timeline',
+			type ?? null,
+			exerciseId ?? null,
+		] as const,
 	active: ['workout', 'session', 'active'] as const,
 	session: (id: string) => ['workout', 'session', id] as const,
 	previousPerformance: (id: string) =>
@@ -182,6 +188,7 @@ export const useExerciseStrengthTrend = (
 export const useExercisePerformanceHistory = (
 	params: Omit<ExercisePerformanceHistoryQuery, 'cursor' | 'limit'>,
 	limit = 10,
+	enabled = true,
 ) => {
 	const { session, isLoading } = useAuth()
 	return useInfiniteQuery<ExercisePerformanceHistoryResponse>({
@@ -194,7 +201,7 @@ export const useExercisePerformanceHistory = (
 			}),
 		initialPageParam: undefined,
 		getNextPageParam: lastPage => lastPage.nextCursor,
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 
@@ -306,22 +313,28 @@ export const useSessionComparison = (routineDayId?: string) => {
 	})
 }
 
+/** `exerciseId` narrows the feed to one exercise (EXER-01). */
 export const useProgressTimeline = (
 	type?: ProgressTimelineEventType,
-	limit = 20,
+	{
+		exerciseId,
+		limit = 20,
+		enabled = true,
+	}: { exerciseId?: string; limit?: number; enabled?: boolean } = {},
 ) => {
 	const { session, isLoading } = useAuth()
 	return useInfiniteQuery<ProgressTimelineResponse>({
-		queryKey: qk.progressTimeline(type),
+		queryKey: qk.progressTimeline(type, exerciseId),
 		queryFn: ({ pageParam }) =>
 			workoutService.getProgressTimeline({
 				type,
+				exerciseId,
 				cursor: (pageParam as string | undefined) ?? undefined,
 				limit,
 			}),
 		initialPageParam: undefined,
 		getNextPageParam: lastPage => lastPage.nextCursor,
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 

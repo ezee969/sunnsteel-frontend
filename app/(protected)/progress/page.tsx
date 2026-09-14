@@ -2,6 +2,7 @@
 
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -264,6 +265,12 @@ export default function ProgressPage() {
 							>
 								{selectedPerformance.exerciseName}
 							</h2>
+							<Link
+								href={`/exercises/${selectedPerformance.exerciseId}`}
+								className="type-body-sm ml-auto shrink-0 text-primary underline-offset-4 hover:underline"
+							>
+								Exercise page
+							</Link>
 						</div>
 					</section>
 

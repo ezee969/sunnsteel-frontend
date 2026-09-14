@@ -130,6 +130,7 @@ export function buildProgressTimelineQueryString(
 ): string {
 	const search = new URLSearchParams()
 	if (params.type) search.set('type', params.type)
+	if (params.exerciseId) search.set('exerciseId', params.exerciseId)
 	if (params.cursor) search.set('cursor', params.cursor)
 	if (params.limit != null) {
 		search.set('limit', String(Math.min(params.limit, 50)))

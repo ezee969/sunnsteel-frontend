@@ -36,6 +36,10 @@ const FILTERS: ReadonlyArray<{ label: string; value: TimelineFilter }> = [
 ]
 
 interface ProgressTimelineProps {
+	/** Defaults to the global Progress feed's heading. */
+	heading?: { id: string; title: string; description: string }
+	/** Off on a single exercise's page, where every event is that exercise. */
+	showExerciseName?: boolean
 	items: ProgressTimelineItem[]
 	filter: TimelineFilter
 	isPending: boolean
@@ -64,15 +68,19 @@ function TimelineContext({ item }: { item: ProgressTimelineItem }) {
 function RecordTimelineItem({
 	item,
 	weightUnit,
+	showExerciseName,
 }: {
 	item: Extract<ProgressTimelineItem, { type: 'PERSONAL_RECORD' }>
 	weightUnit: WeightUnit
+	showExerciseName: boolean
 }) {
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_8rem]">
 			<div className="flex flex-wrap items-center gap-2">
 				<Badge variant="outline">Record</Badge>
-				<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+				{showExerciseName ? (
+					<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+				) : null}
 			</div>
 			<TimelineContext item={item} />
 			<p className="type-body-sm text-ink-2">
@@ -100,15 +108,19 @@ function RecordTimelineItem({
 function ProgressionTimelineItem({
 	item,
 	weightUnit,
+	showExerciseName,
 }: {
 	item: Extract<ProgressTimelineItem, { type: 'PROGRESSION_CHANGED' }>
 	weightUnit: WeightUnit
+	showExerciseName: boolean
 }) {
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_9rem]">
 			<div className="flex flex-wrap items-center gap-2">
 				<Badge variant="outline">Progression</Badge>
-				<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+				{showExerciseName ? (
+					<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+				) : null}
 			</div>
 			<TimelineContext item={item} />
 			<p className="type-body-sm text-ink-2">
@@ -147,7 +159,16 @@ function ProgressionTimelineItem({
 	)
 }
 
+const DEFAULT_HEADING = {
+	id: 'progress-timeline',
+	title: 'Record & progression timeline',
+	description:
+		'See when your best sets and automatic prescriptions changed, with the reason preserved from that session.',
+}
+
 export function ProgressTimeline({
+	heading = DEFAULT_HEADING,
+	showExerciseName = true,
 	items,
 	filter,
 	isPending,
@@ -161,16 +182,15 @@ export function ProgressTimeline({
 	const weightUnit = useWeightUnit()
 
 	return (
-		<section aria-labelledby="progress-timeline" className="space-y-4">
+		<section aria-labelledby={heading.id} className="space-y-4">
 			<div className="rule-row flex items-start gap-2 pb-2">
 				<History className="mt-0.5 size-4 text-ink-3" aria-hidden />
 				<div>
-					<h2 id="progress-timeline" className="type-section text-foreground">
-						Record &amp; progression timeline
+					<h2 id={heading.id} className="type-section text-foreground">
+						{heading.title}
 					</h2>
 					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-						See when your best sets and automatic prescriptions changed, with
-						the reason preserved from that session.
+						{heading.description}
 					</p>
 				</div>
 			</div>
@@ -238,12 +258,14 @@ export function ProgressTimeline({
 								key={item.eventId}
 								item={item}
 								weightUnit={weightUnit}
+								showExerciseName={showExerciseName}
 							/>
 						) : (
 							<ProgressionTimelineItem
 								key={item.eventId}
 								item={item}
 								weightUnit={weightUnit}
+								showExerciseName={showExerciseName}
 							/>
 						),
 					)}
