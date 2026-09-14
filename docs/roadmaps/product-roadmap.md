@@ -73,9 +73,10 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID     | Status        | Owner | Branch / worktree                                                       | Claimed    | Repositories |
-| ------ | ------------- | ----- | ----------------------------------------------------------------------- | ---------- | ------------ |
-| ACH-04 | `IN_PROGRESS` | Codex | `codex/ach-04` · `.codex-worktrees/ach-04-{frontend,backend,contracts}` | 2026-09-14 | FE, BE, CT   |
+| ID       | Status        | Owner  | Branch / worktree                                                                                    | Claimed    | Repositories                                 |
+| -------- | ------------- | ------ | ---------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------- |
+| ACH-04   | `IN_PROGRESS` | Codex  | `codex/ach-04` · `.codex-worktrees/ach-04-{frontend,backend,contracts}`                              | 2026-09-14 | FE, BE, CT                                   |
+| SCHED-01 | `IN_PROGRESS` | Claude | `claude/sched-01` · `.claude-worktrees/sched-01-frontend` (+ `-backend`/`-contracts` only if needed) | 2026-09-14 | FE (BE/CT only if existing reads fall short) |
 
 ## Current product snapshot
 
@@ -317,17 +318,17 @@ surface in the original description, stays hidden under `FIX-04` until
 
 ### Schedule
 
-| ID       | Status      | Size | Feature                      | User-facing behavior                                                                   | Dependencies            |
-| -------- | ----------- | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | ----------------------- |
-| SCHED-01 | `QUEUED`    | L    | Weekly calendar              | Combine planned routine days, completed workouts, skipped sessions, and recovery days. | ROUT-11                 |
-| SCHED-02 | `QUEUED`    | M    | Monthly calendar             | Provide a higher-level history and consistency view.                                   | SCHED-01, DATA-02       |
-| SCHED-03 | `QUEUED`    | S    | Start from calendar          | Launch or resume the workout represented by a schedule entry.                          | SCHED-01                |
-| SCHED-04 | `QUEUED`    | L    | Reschedule one occurrence    | Move a workout without rewriting the entire routine.                                   | Schedule-instance model |
-| SCHED-05 | `QUEUED`    | M    | Skip and postpone            | Distinguish intentional schedule changes from missed training.                         | SCHED-04                |
-| SCHED-06 | `QUEUED`    | L    | Recurring and rotating plans | Support weekday schedules and non-weekly rotations.                                    | ROUT-11                 |
-| SCHED-07 | `QUEUED`    | M    | Rest-day planning            | Represent intentional recovery as part of the program rather than as inactivity.       | SCHED-01                |
-| SCHED-08 | `CANDIDATE` | M    | Travel or alternate gym      | Temporarily change available equipment and substitutions for a date range.             | PREF-01, EXER-05        |
-| SCHED-09 | `CANDIDATE` | M    | External calendar export     | Optionally expose scheduled workouts to common calendar applications.                  | Stable schedule model   |
+| ID       | Status        | Size | Feature                      | User-facing behavior                                                                   | Dependencies            |
+| -------- | ------------- | ---- | ---------------------------- | -------------------------------------------------------------------------------------- | ----------------------- |
+| SCHED-01 | `IN_PROGRESS` | L    | Weekly calendar              | Combine planned routine days, completed workouts, skipped sessions, and recovery days. | ROUT-11                 |
+| SCHED-02 | `QUEUED`      | M    | Monthly calendar             | Provide a higher-level history and consistency view.                                   | SCHED-01, DATA-02       |
+| SCHED-03 | `QUEUED`      | S    | Start from calendar          | Launch or resume the workout represented by a schedule entry.                          | SCHED-01                |
+| SCHED-04 | `QUEUED`      | L    | Reschedule one occurrence    | Move a workout without rewriting the entire routine.                                   | Schedule-instance model |
+| SCHED-05 | `QUEUED`      | M    | Skip and postpone            | Distinguish intentional schedule changes from missed training.                         | SCHED-04                |
+| SCHED-06 | `QUEUED`      | L    | Recurring and rotating plans | Support weekday schedules and non-weekly rotations.                                    | ROUT-11                 |
+| SCHED-07 | `QUEUED`      | M    | Rest-day planning            | Represent intentional recovery as part of the program rather than as inactivity.       | SCHED-01                |
+| SCHED-08 | `CANDIDATE`   | M    | Travel or alternate gym      | Temporarily change available equipment and substitutions for a date range.             | PREF-01, EXER-05        |
+| SCHED-09 | `CANDIDATE`   | M    | External calendar export     | Optionally expose scheduled workouts to common calendar applications.                  | Stable schedule model   |
 
 ### Profiles, identity, and privacy
 
@@ -1035,3 +1036,12 @@ it again without addressing the original decision.
   its next day on any weekday from the backend's `nextRotationDayId`. This
   unblocks `SCHED-01` (weekly calendar) and `SCHED-06` (recurring and rotating
   plans); `SCHED-01` is the next dependency-ready schedule slice.
+- **2026-09-14 (revision 62):** Claimed `SCHED-01` for Claude. The owner
+  delegated its three open rules, decided as follows. A past weekly day with
+  no session reads "Not logged" in neutral styling, never "missed", and only
+  from the routine's creation date on; rotation days have no date, so they
+  are never "not logged". Rest days are neither inferred nor stored: a day
+  with nothing planned says so, and intentional recovery stays with
+  `SCHED-07`. Rotations are not projected onto future dates; the week shows
+  each rotation's next day as a note, and its sessions on the days they
+  happened.
