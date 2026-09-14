@@ -1,9 +1,14 @@
-import type { EarnedAchievement } from '@sunsteel/contracts'
+import type {
+	EarnedAchievement,
+	RenaissanceRankProgress,
+} from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
+	formatNextRankRequirements,
+	formatRankEvidence,
 	groupAchievements,
 } from './achievements'
 
@@ -60,5 +65,52 @@ describe('achievement presentation', () => {
 
 	it('formats an earned date without exposing a time', () => {
 		expect(formatAchievementDate('2026-09-14T10:00:00.000Z')).not.toContain(':')
+	})
+
+	it('explains rank evidence and both remaining attendance requirements', () => {
+		const rank = {
+			currentRank: {
+				id: 'APPRENTICE',
+				title: 'Apprentice',
+				description: 'Learning the craft through regular practice.',
+				minimumSessions: 5,
+				minimumActiveWeeks: 3,
+			},
+			nextRank: {
+				id: 'ARTISAN',
+				title: 'Artisan',
+				description: 'Building a dependable training practice.',
+				minimumSessions: 15,
+				minimumActiveWeeks: 8,
+			},
+			completedSessions: 10,
+			activeWeeks: 7,
+			sessionsRemaining: 5,
+			activeWeeksRemaining: 1,
+		} satisfies RenaissanceRankProgress
+
+		expect(formatRankEvidence(rank)).toBe('10 sessions · 7 active weeks')
+		expect(formatNextRankRequirements(rank)).toBe(
+			'5 more sessions · 1 more active week',
+		)
+	})
+
+	it('states a met requirement and omits a next step at Laureate', () => {
+		const rank = {
+			currentRank: {
+				id: 'LAUREATE',
+				title: 'Laureate',
+				description: 'A lasting training practice recorded in the ledger.',
+				minimumSessions: 100,
+				minimumActiveWeeks: 52,
+			},
+			nextRank: null,
+			completedSessions: 120,
+			activeWeeks: 60,
+			sessionsRemaining: 0,
+			activeWeeksRemaining: 0,
+		} satisfies RenaissanceRankProgress
+
+		expect(formatNextRankRequirements(rank)).toBeNull()
 	})
 })

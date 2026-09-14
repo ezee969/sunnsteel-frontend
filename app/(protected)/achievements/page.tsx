@@ -2,6 +2,7 @@
 
 import HeroSection from '@/components/layout/HeroSection'
 import { AchievementLedger } from '@/features/achievements/achievement-ledger'
+import { RenaissanceRank } from '@/features/achievements/renaissance-rank'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 
 export default function AchievementsPage() {
@@ -16,6 +17,10 @@ export default function AchievementsPage() {
 						A record of training milestones verified from your completed work.
 					</>
 				}
+			/>
+			<RenaissanceRank
+				rank={achievements.data?.rank}
+				isPending={achievements.isPending}
 			/>
 			<AchievementLedger
 				data={achievements.data}
