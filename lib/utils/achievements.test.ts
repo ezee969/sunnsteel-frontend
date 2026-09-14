@@ -1,4 +1,5 @@
 import type {
+	AchievementCategoryProgress,
 	EarnedAchievement,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
@@ -7,9 +8,12 @@ import { describe, expect, it } from 'vitest'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
+	formatMilestoneProgressDetail,
+	formatMilestoneProgressEvidence,
 	formatNextRankRequirements,
 	formatRankEvidence,
 	groupAchievements,
+	orderMilestoneProgress,
 } from './achievements'
 
 const earned = (
@@ -65,6 +69,105 @@ describe('achievement presentation', () => {
 
 	it('formats an earned date without exposing a time', () => {
 		expect(formatAchievementDate('2026-09-14T10:00:00.000Z')).not.toContain(':')
+	})
+
+	it('keeps milestone categories in catalog order instead of proximity order', () => {
+		const progress = [
+			{
+				category: 'STREAK_DAYS',
+				currentValue: 4,
+				nextMilestone: null,
+				remaining: 0,
+			},
+			{
+				category: 'SETS',
+				currentValue: 99,
+				nextMilestone: null,
+				remaining: 0,
+			},
+			{
+				category: 'SESSIONS',
+				currentValue: 9,
+				nextMilestone: null,
+				remaining: 0,
+			},
+		] satisfies AchievementCategoryProgress[]
+
+		expect(orderMilestoneProgress(progress).map(item => item.category)).toEqual(
+			['SESSIONS', 'SETS', 'STREAK_DAYS'],
+		)
+	})
+
+	it('states exact next-milestone evidence without using a percentage', () => {
+		const progress = {
+			category: 'SESSIONS',
+			currentValue: 10,
+			nextMilestone: {
+				id: 'sessions:25',
+				category: 'SESSIONS',
+				threshold: 25,
+				title: '25 Sessions',
+				description: 'Complete 25 training sessions.',
+			},
+			remaining: 15,
+		} satisfies AchievementCategoryProgress
+
+		expect(formatMilestoneProgressEvidence(progress)).toBe('10 / 25 sessions')
+		expect(formatMilestoneProgressDetail(progress)).toBe(
+			'15 more sessions, within your own schedule.',
+		)
+	})
+
+	it('keeps volume and streak guidance explicit about safe pacing', () => {
+		const volume = {
+			category: 'VOLUME_KG',
+			currentValue: 49_250.5,
+			nextMilestone: {
+				id: 'volume_kg:50000',
+				category: 'VOLUME_KG',
+				threshold: 50_000,
+				title: '50,000 kg Moved',
+				description: 'Accumulate 50,000 kg of external-load volume.',
+			},
+			remaining: 749.5,
+		} satisfies AchievementCategoryProgress
+		const streak = {
+			category: 'STREAK_DAYS',
+			currentValue: 3,
+			nextMilestone: {
+				id: 'streak_days:5',
+				category: 'STREAK_DAYS',
+				threshold: 5,
+				title: '5-Day Streak',
+				description: 'Build a 5-day training streak.',
+			},
+			remaining: 2,
+		} satisfies AchievementCategoryProgress
+
+		expect(formatMilestoneProgressEvidence(volume)).toBe('49,250.5 / 50,000 kg')
+		expect(formatMilestoneProgressDetail(volume)).toContain(
+			'load should follow your plan',
+		)
+		expect(formatMilestoneProgressEvidence(streak)).toBe(
+			'Best 3 / next 5 training days',
+		)
+		expect(formatMilestoneProgressDetail(streak)).toContain(
+			'recovery days between sessions are compatible',
+		)
+	})
+
+	it('explains when a finite category catalog is complete', () => {
+		const progress = {
+			category: 'RECORDS',
+			currentValue: 56,
+			nextMilestone: null,
+			remaining: 0,
+		} satisfies AchievementCategoryProgress
+
+		expect(formatMilestoneProgressEvidence(progress)).toBe('56 exercises total')
+		expect(formatMilestoneProgressDetail(progress)).toBe(
+			'The five fixed milestones in this category are complete.',
+		)
 	})
 
 	it('explains rank evidence and both remaining attendance requirements', () => {

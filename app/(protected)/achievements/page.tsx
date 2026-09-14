@@ -2,6 +2,7 @@
 
 import HeroSection from '@/components/layout/HeroSection'
 import { AchievementLedger } from '@/features/achievements/achievement-ledger'
+import { MilestoneProgress } from '@/features/achievements/milestone-progress'
 import { RenaissanceRank } from '@/features/achievements/renaissance-rank'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 
@@ -20,6 +21,10 @@ export default function AchievementsPage() {
 			/>
 			<RenaissanceRank
 				rank={achievements.data?.rank}
+				isPending={achievements.isPending}
+			/>
+			<MilestoneProgress
+				data={achievements.data}
 				isPending={achievements.isPending}
 			/>
 			<AchievementLedger

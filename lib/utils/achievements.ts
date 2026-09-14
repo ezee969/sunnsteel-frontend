@@ -1,5 +1,6 @@
 import type {
 	AchievementCategory,
+	AchievementCategoryProgress,
 	EarnedAchievement,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
@@ -28,6 +29,70 @@ export function groupAchievements(achievements: EarnedAchievement[]) {
 			.toSorted((left, right) => right.threshold - left.threshold)
 		return items.length ? [{ category, items }] : []
 	})
+}
+
+export function orderMilestoneProgress(
+	progress: AchievementCategoryProgress[],
+): AchievementCategoryProgress[] {
+	return ACHIEVEMENT_CATEGORY_ORDER.flatMap(category => {
+		const item = progress.find(candidate => candidate.category === category)
+		return item ? [item] : []
+	})
+}
+
+const formatProgressNumber = (value: number) =>
+	value.toLocaleString('en-US', { maximumFractionDigits: 2 })
+
+const progressUnit = (category: AchievementCategory, value: number): string => {
+	switch (category) {
+		case 'SESSIONS':
+			return value === 1 ? 'session' : 'sessions'
+		case 'SETS':
+			return value === 1 ? 'set' : 'sets'
+		case 'VOLUME_KG':
+			return 'kg'
+		case 'RECORDS':
+			return value === 1 ? 'exercise' : 'exercises'
+		case 'STREAK_DAYS':
+			return value === 1 ? 'training day' : 'training days'
+	}
+}
+
+export function formatMilestoneProgressEvidence(
+	progress: AchievementCategoryProgress,
+): string {
+	const current = formatProgressNumber(progress.currentValue)
+	if (!progress.nextMilestone) {
+		return `${current} ${progressUnit(progress.category, progress.currentValue)} total`
+	}
+
+	const target = formatProgressNumber(progress.nextMilestone.threshold)
+	if (progress.category === 'STREAK_DAYS') {
+		return `Best ${current} / next ${target} training days`
+	}
+	return `${current} / ${target} ${progressUnit(progress.category, progress.nextMilestone.threshold)}`
+}
+
+export function formatMilestoneProgressDetail(
+	progress: AchievementCategoryProgress,
+): string {
+	if (!progress.nextMilestone) {
+		return 'The five fixed milestones in this category are complete.'
+	}
+
+	const remaining = formatProgressNumber(progress.remaining)
+	switch (progress.category) {
+		case 'SESSIONS':
+			return `${remaining} more ${progress.remaining === 1 ? 'session' : 'sessions'}, within your own schedule.`
+		case 'SETS':
+			return `${remaining} more completed ${progress.remaining === 1 ? 'set' : 'sets'} in planned training.`
+		case 'VOLUME_KG':
+			return 'Cumulative completed-set history; there is no deadline and load should follow your plan.'
+		case 'RECORDS':
+			return `${remaining} more ${progress.remaining === 1 ? 'exercise record' : 'exercise records'} through normal training.`
+		case 'STREAK_DAYS':
+			return 'Uses your best recorded streak; recovery days between sessions are compatible.'
+	}
 }
 
 export function formatAchievementDate(value: string): string {
