@@ -1,17 +1,21 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
+import { Button } from '@/components/ui/button'
+import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { ScheduleWeekView } from '@/features/schedule/schedule-week-view'
-import { useRoutines } from '@/lib/api/hooks/useRoutines'
-import {
-	useActiveSession,
-	useSessions,
-	useStartSession,
-} from '@/lib/api/hooks/useWorkoutSession'
+import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
+import {
+	addMonths,
+	buildScheduleMonth,
+	scheduleMonthRange,
+	startOfMonth,
+} from '@/lib/utils/schedule-month'
 import {
 	addDays,
 	buildScheduleWeek,
@@ -20,49 +24,53 @@ import {
 	startOfWeek,
 } from '@/lib/utils/schedule-week'
 
+type ScheduleView = 'week' | 'month'
+
+const fromKey = (key: string) => {
+	const [year, month, day] = key.split('-').map(Number)
+	return new Date(year, month - 1, day)
+}
+
 export default function SchedulePage() {
 	const [now] = useState(() => new Date())
+	const [view, setView] = useState<ScheduleView>('week')
 	const [weekStart, setWeekStart] = useState(() => startOfWeek(now))
-	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
+	const [monthStart, setMonthStart] = useState(() => startOfMonth(now))
+	const range = useMemo(
+		() =>
+			view === 'week'
+				? scheduleWeekRange(weekStart)
+				: scheduleMonthRange(monthStart),
+		[view, weekStart, monthStart],
+	)
+	const data = useScheduleData(range)
 
 	const router = useRouter()
 	const startSession = useStartSession()
 	const [startingDayId, setStartingDayId] = useState<string | null>(null)
-	const routines = useRoutines()
-	const active = useActiveSession()
-	const sessions = useSessions({ ...range, sort: 'startedAt:asc', limit: 50 })
-	const { hasNextPage, isFetchingNextPage, fetchNextPage } = sessions
 
-	// A week is bounded, so read every page rather than showing part of it.
-	useEffect(() => {
-		if (hasNextPage && !isFetchingNextPage) void fetchNextPage()
-	}, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-	const isPending =
-		routines.isPending ||
-		sessions.isPending ||
-		Boolean(hasNextPage) ||
-		isFetchingNextPage
-	const isError = routines.isError || sessions.isError
-
+	const ready =
+		!data.isPending && !data.isError && data.routines && data.sessions
 	const week = useMemo(() => {
-		if (isPending || isError || !routines.data || !sessions.data) return
+		if (view !== 'week' || !ready || !data.routines || !data.sessions) return
 		return buildScheduleWeek({
 			weekStart,
 			now,
-			routines: routines.data,
-			sessions: sessions.data.pages.flatMap(page => page.items),
-			active: active.data,
+			routines: data.routines,
+			sessions: data.sessions,
+			active: data.active,
 		})
-	}, [
-		isPending,
-		isError,
-		routines.data,
-		sessions.data,
-		active.data,
-		weekStart,
-		now,
-	])
+	}, [view, ready, data.routines, data.sessions, data.active, weekStart, now])
+	const month = useMemo(() => {
+		if (view !== 'month' || !ready || !data.routines || !data.sessions) return
+		return buildScheduleMonth({
+			monthStart,
+			now,
+			routines: data.routines,
+			sessions: data.sessions,
+			active: data.active,
+		})
+	}, [view, ready, data.routines, data.sessions, data.active, monthStart, now])
 
 	// SCHED-03: start the day, then open the session; the hook toasts failures.
 	const handleStart = async (routineId: string, routineDayId: string) => {
@@ -86,31 +94,65 @@ export default function SchedulePage() {
 				title={<>Schedule</>}
 				subtitle={
 					<>
-						Your planned routine days beside the workouts you logged, by week.
+						Your planned routine days beside the workouts you logged, by week or
+						by month.
 					</>
 				}
 			/>
-			<ScheduleWeekView
-				week={week}
-				now={now}
-				isPending={isPending}
-				isError={isError}
-				hasActiveSession={active.data?.status === 'IN_PROGRESS'}
-				startingDayId={startingDayId}
-				onStart={(routineId, routineDayId) =>
-					void handleStart(routineId, routineDayId)
-				}
-				isCurrentWeek={
-					localDateKey(weekStart) === localDateKey(startOfWeek(now))
-				}
-				onPrevious={() => setWeekStart(start => addDays(start, -7))}
-				onNext={() => setWeekStart(start => addDays(start, 7))}
-				onToday={() => setWeekStart(startOfWeek(now))}
-				onRetry={() => {
-					void routines.refetch()
-					void sessions.refetch()
-				}}
-			/>
+			<div role="group" aria-label="Schedule view" className="flex gap-1">
+				{(['week', 'month'] as const).map(option => (
+					<Button
+						key={option}
+						type="button"
+						size="sm"
+						variant={view === option ? 'secondary' : 'ghost'}
+						aria-pressed={view === option}
+						onClick={() => setView(option)}
+					>
+						{option === 'week' ? 'Week' : 'Month'}
+					</Button>
+				))}
+			</div>
+			{view === 'week' ? (
+				<ScheduleWeekView
+					week={week}
+					now={now}
+					isPending={data.isPending}
+					isError={data.isError}
+					hasActiveSession={data.active?.status === 'IN_PROGRESS'}
+					startingDayId={startingDayId}
+					onStart={(routineId, routineDayId) =>
+						void handleStart(routineId, routineDayId)
+					}
+					isCurrentWeek={
+						localDateKey(weekStart) === localDateKey(startOfWeek(now))
+					}
+					onPrevious={() => setWeekStart(start => addDays(start, -7))}
+					onNext={() => setWeekStart(start => addDays(start, 7))}
+					onToday={() => setWeekStart(startOfWeek(now))}
+					onRetry={data.refetch}
+				/>
+			) : (
+				<ScheduleMonthView
+					month={month}
+					now={now}
+					isPending={data.isPending}
+					isError={data.isError}
+					headingId="schedule-month"
+					isCurrentMonth={
+						localDateKey(monthStart) === localDateKey(startOfMonth(now))
+					}
+					onPrevious={() => setMonthStart(start => addMonths(start, -1))}
+					onNext={() => setMonthStart(start => addMonths(start, 1))}
+					onToday={() => setMonthStart(startOfMonth(now))}
+					onRetry={data.refetch}
+					// A day opens its week, where it can be started or reviewed.
+					onSelectDay={date => {
+						setWeekStart(startOfWeek(fromKey(date)))
+						setView('week')
+					}}
+				/>
+			)}
 		</div>
 	)
 }

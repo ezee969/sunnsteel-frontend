@@ -15,6 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ConsistencyCalendar } from '@/features/progress/consistency-calendar'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
 import { PersonalGoals } from '@/features/progress/personal-goals'
@@ -156,6 +157,8 @@ export default function ProgressPage() {
 					plateauPreferences.mutate({ minSessions })
 				}
 			/>
+
+			<ConsistencyCalendar />
 
 			<MuscleGroupHeatmap
 				data={muscleHeatmap.data}

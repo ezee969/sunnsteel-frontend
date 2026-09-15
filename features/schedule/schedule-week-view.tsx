@@ -1,15 +1,9 @@
 'use client'
 
 import {
-	CalendarClock,
-	CheckCircle2,
 	ChevronLeft,
 	ChevronRight,
-	CircleDashed,
-	CircleSlash,
 	Loader2,
-	Moon,
-	PlayCircle,
 	RefreshCw,
 	Repeat,
 } from 'lucide-react'
@@ -29,6 +23,8 @@ import {
 	type ScheduleWeek,
 } from '@/lib/utils/schedule-week'
 
+import { SCHEDULE_STATUS } from './schedule-status'
+
 interface ScheduleWeekViewProps {
 	week?: ScheduleWeek
 	now: Date
@@ -46,22 +42,10 @@ interface ScheduleWeekViewProps {
 	onRetry: () => void
 }
 
-/**
- * A status is a glyph plus words, never colour alone (§4.3 rule 8). Only a
- * completed session uses `success` — it is the one thing done as planned.
- * "Not logged" is neutral on purpose: the app cannot know why a day passed.
- */
 const ENTRY_STATUS: Record<
 	string,
-	{ Icon: typeof CheckCircle2; label: string; tone: string }
-> = {
-	COMPLETED: { Icon: CheckCircle2, label: 'Completed', tone: 'text-success' },
-	ABORTED: { Icon: CircleSlash, label: 'Ended early', tone: 'text-ink-3' },
-	IN_PROGRESS: { Icon: PlayCircle, label: 'In progress', tone: 'text-ink-2' },
-	PLANNED: { Icon: CalendarClock, label: 'Planned', tone: 'text-ink-3' },
-	NOT_LOGGED: { Icon: CircleDashed, label: 'Not logged', tone: 'text-ink-3' },
-	REST: { Icon: Moon, label: 'Rest day', tone: 'text-ink-3' },
-}
+	(typeof SCHEDULE_STATUS)[keyof typeof SCHEDULE_STATUS]
+> = SCHEDULE_STATUS
 
 const entryStatus = (entry: ScheduleEntry) =>
 	ENTRY_STATUS[entry.kind === 'SESSION' ? entry.status : entry.kind]
