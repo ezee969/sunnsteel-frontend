@@ -76,6 +76,7 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | --------------------------------------------------------------------- | ---------- | ------------ |
 | ACH-05   | `IN_PROGRESS` | Codex  | `codex/ach-05` / `.codex-worktrees/ach-05-*`                          | 2026-09-15 | CT, BE, FE   |
+| SCHED-04 | `IN_PROGRESS` | Claude | `claude/sched-04` · `.claude-worktrees/sched-04-*`                    | 2026-09-15 | FE, BE, CT   |
 
 ## Current product snapshot
 
@@ -330,7 +331,7 @@ surface in the original description, stays hidden under `FIX-04` until
 | SCHED-01 | `SHIPPED`     | L    | Weekly calendar              | The Schedule page shows one Monday-based week at a time: weekly routine days as planned from today on or "not logged" before it (never "missed", and only from each routine's creation date), completed, ended-early and live sessions on the day they started, and each rotation's next day as an undated note. Rest days are not inferred; intentional rest belongs to `SCHED-07`. The page states that planned days follow the routines as they are now. Shipped 2026-09-14 in the frontend over existing reads.                                 | ROUT-11                 |
 | SCHED-02 | `SHIPPED`     | M    | Monthly calendar             | The Schedule page switches between the week and a Monday-based month of the same rules, one mark per day, with the month's totals and how many of its days so far had a completed workout. Months page back and forward, and choosing a day opens its week. Shipped 2026-09-15 in the frontend with `PROG-05`, over existing reads.                                                                                                                                                                                                                 | SCHED-01, DATA-02       |
 | SCHED-03 | `SHIPPED`     | S    | Start from calendar          | The Schedule page starts today's planned weekly days and each rotation's next day in the current week, and resumes the workout in progress. Past and future days never start, matching the routine card and dashboard, and nothing starts while a session is live, since that would resume the live one instead. Shipped 2026-09-14 in the frontend.                                                                                                                                                                                                | SCHED-01                |
-| SCHED-04 | `QUEUED`      | L    | Reschedule one occurrence    | Move a workout without rewriting the entire routine.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Schedule-instance model |
+| SCHED-04 | `IN_PROGRESS` | L    | Reschedule one occurrence    | Move a workout without rewriting the entire routine.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Schedule-instance model |
 | SCHED-05 | `QUEUED`      | M    | Skip and postpone            | Distinguish intentional schedule changes from missed training.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | SCHED-04                |
 | SCHED-06 | `SHIPPED`     | L    | Rotation training weekdays   | Weekday schedules and rotations came with `ROUT-11`. A rotation can now pick training weekdays in the builder, and the Schedule places its days on them from today: the next day on the first one without a session of the routine, the rest in order. A past one without a session reads "not logged", with no day name; days still start on any weekday. Shipped 2026-09-15 through `@sunsteel/contracts@0.39.0` and migration `20260915170000_rotation_weekdays`.                                                                                | ROUT-11                 |
 | SCHED-07 | `SHIPPED`     | L    | Rest-day planning            | A weekly routine can mark rest days among the weekdays it does not train on, in the builder's schedule step. The Schedule page shows them as rest days before and after today, never as "not logged", and a workout of that routine on the day replaces the rest; the routine card and review list them. Rotations have no rest days: they advance only on completed workouts, so rest in a rotation is simply the days you do not train. Shipped 2026-09-15 through `@sunsteel/contracts@0.37.0` and migration `20260915090000_routine_rest_days`. | SCHED-01                |
@@ -1145,3 +1146,19 @@ it again without addressing the original decision.
   Rotations can train on chosen weekdays and appear on the schedule. The
   remaining schedule items need the schedule-instance model (`SCHED-04`,
   `SCHED-05`) or belong to push notifications.
+- **2026-09-15 (revision 75):** Claimed `SCHED-04` for Claude. The owner
+  delegated its rules, decided as follows. It introduces the
+  schedule-instance model as per-date overrides on a routine, so `SCHED-05`
+  (skip and postpone) can add its own kind later. An occurrence is a weekly
+  routine's planned day on one date; it can be moved to another date up to
+  six days before or after, neither date in the past, and not onto a date
+  where that routine is already planned. Moving again changes the target;
+  undoing restores the plan. Rotations are not moved: since `SCHED-06` their
+  plan re-flows from the next day on its own. On the Schedule the original
+  date reads "Moved to <day>" (never "not logged") and the target date
+  carries the planned day, marked as moved, with Start when it is today; a
+  session of the routine on either date completes the occurrence, and a
+  moved day on a planned rest day replaces the rest. The dashboard follows
+  the moves for today. Overrides are stored by calendar date, not by routine
+  day, because routine edits replace the days. Contracts, backend (a new
+  table) and frontend.
