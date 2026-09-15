@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
+import { RoutineVersions } from '@/features/routines/components/RoutineVersions'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
 import { useWorkoutSessionManager } from '@/features/routines/hooks/useWorkoutSessionManager'
@@ -134,6 +135,12 @@ export default function RoutineDetailsPage() {
 					/>
 				</div>
 			)}
+
+			<RoutineVersions
+				routine={routine}
+				hasLiveSession={activeSession?.routineId === routine.id}
+				weightUnit={weightUnit}
+			/>
 
 			{/* Dialogs */}
 			<WorkoutDialogs

@@ -75,4 +75,10 @@ export const routineQueryKeys = {
 		[...routineQueryKeys.all(), serializeRoutineFilters(filters)] as const,
 	detail: (routineId: string) =>
 		[...routineQueryKeys.all(), routineId] as const,
+	/**
+	 * ROUT-08: outside the `['routines']` prefix on purpose. Only saving,
+	 * restoring and deleting change versions, and the list-shaped cache
+	 * updates under that prefix expect routines.
+	 */
+	versions: (routineId: string) => ['routine-versions', routineId] as const,
 }

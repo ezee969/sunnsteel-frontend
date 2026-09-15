@@ -1,3 +1,10 @@
+import type {
+	CreateRoutineVersionRequest,
+	RestoreRoutineVersionResponse,
+	RoutineVersion,
+	RoutineVersionsResponse,
+} from '@sunsteel/contracts'
+
 import {
 	buildRoutineQueryString,
 	RoutineDetailOptions,
@@ -80,6 +87,37 @@ export const routineService = {
 			secure: true,
 		})
 	},
+
+	getVersions: async (id: string): Promise<RoutineVersionsResponse> =>
+		httpClient.request<RoutineVersionsResponse>(
+			`${ROUTINES_API_URL}/${id}/versions`,
+			{ method: 'GET', secure: true },
+		),
+
+	createVersion: async (
+		id: string,
+		data: CreateRoutineVersionRequest,
+	): Promise<RoutineVersion> =>
+		httpClient.request<RoutineVersion>(`${ROUTINES_API_URL}/${id}/versions`, {
+			method: 'POST',
+			body: JSON.stringify(data),
+			secure: true,
+		}),
+
+	restoreVersion: async (
+		id: string,
+		versionId: string,
+	): Promise<RestoreRoutineVersionResponse> =>
+		httpClient.request<RestoreRoutineVersionResponse>(
+			`${ROUTINES_API_URL}/${id}/versions/${versionId}/restore`,
+			{ method: 'POST', secure: true },
+		),
+
+	deleteVersion: async (id: string, versionId: string): Promise<void> =>
+		httpClient.request<void>(
+			`${ROUTINES_API_URL}/${id}/versions/${versionId}`,
+			{ method: 'DELETE', secure: true },
+		),
 
 	updateExerciseNote: async (
 		routineId: string,
