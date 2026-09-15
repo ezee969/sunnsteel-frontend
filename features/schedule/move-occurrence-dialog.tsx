@@ -61,7 +61,10 @@ function MoveOccurrenceContent({
 	request: MoveRequest
 	onClose: () => void
 }) {
-	const { action, target, targets } = request
+	const { action, target } = request
+	// The day it sits on now is left out: a disabled button takes the sunk
+	// fill and reads as selected, and the description already names it.
+	const targets = request.targets.filter(date => date !== action.currentDate)
 	const [selected, setSelected] = useState<string | null>(null)
 	const move = useMoveOccurrence()
 	const undo = useUndoMove()
@@ -140,7 +143,6 @@ function MoveOccurrenceContent({
 					>
 						{targets.map(date => {
 							const isOn = selected === date
-							const isCurrent = date === action.currentDate
 							return (
 								<Button
 									key={date}
@@ -148,7 +150,6 @@ function MoveOccurrenceContent({
 									size="sm"
 									variant={isOn ? 'secondary' : 'ghost'}
 									aria-pressed={isOn}
-									disabled={isCurrent}
 									onClick={() => setSelected(date)}
 								>
 									{describeShortDate(date)}
