@@ -22,6 +22,7 @@ export type ScheduleDayState =
 	| 'NOT_LOGGED'
 	| 'PLANNED'
 	| 'REST'
+	| 'MOVED'
 	| 'EMPTY'
 
 const PRECEDENCE: ScheduleDayState[] = [
@@ -31,6 +32,7 @@ const PRECEDENCE: ScheduleDayState[] = [
 	'NOT_LOGGED',
 	'PLANNED',
 	'REST',
+	'MOVED',
 ]
 
 const entryState = (entry: ScheduleEntry): ScheduleDayState =>
@@ -121,6 +123,7 @@ export function buildScheduleMonth({
 			planned: count(e => e.kind === 'PLANNED'),
 			notLogged: count(e => e.kind === 'NOT_LOGGED'),
 			rest: count(e => e.kind === 'REST'),
+			moved: count(e => e.kind === 'MOVED'),
 		},
 		trainedDays: elapsed.filter(cell =>
 			cell.entries.some(
@@ -175,6 +178,7 @@ const STATE_WORDS: Record<Exclude<ScheduleDayState, 'EMPTY'>, string> = {
 	NOT_LOGGED: 'not logged',
 	PLANNED: 'planned',
 	REST: 'rest day',
+	MOVED: 'moved',
 }
 
 /** A cell's accessible name: "Tuesday 15 September, today: 1 completed, 1 planned". */

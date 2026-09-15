@@ -34,6 +34,7 @@ export function ConsistencyCalendar() {
 			routines: data.routines,
 			sessions: data.sessions,
 			active: data.active,
+			overrides: data.overrides,
 		})
 	}, [
 		data.isPending,
@@ -41,6 +42,7 @@ export function ConsistencyCalendar() {
 		data.routines,
 		data.sessions,
 		data.active,
+		data.overrides,
 		monthStart,
 		now,
 	])

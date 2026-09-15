@@ -1,6 +1,8 @@
 import {
 	type Routine,
 	routineDayLabel,
+	SCHEDULE_MOVE_MAX_DAYS,
+	type ScheduleOverride,
 	type WorkoutSession,
 	type WorkoutSessionSummary,
 } from '@sunsteel/contracts'
@@ -46,6 +48,11 @@ export type ScheduleEntry =
 			routineDayId: string
 			routineName: string
 			dayName: string
+			/** SCHED-04: a weekly occurrence's planned date, so it can be moved. */
+			occurrenceDate?: string
+			/** Set when the occurrence was moved here from `movedFrom`. */
+			overrideId?: string
+			movedFrom?: string
 	  }
 	| {
 			kind: 'NOT_LOGGED'
@@ -54,6 +61,8 @@ export type ScheduleEntry =
 			routineDayId: string | null
 			routineName: string
 			dayName: string | null
+			overrideId?: string
+			movedFrom?: string
 	  }
 	| {
 			/** SCHED-07: a weekday the routine rests on by plan. */
@@ -61,6 +70,16 @@ export type ScheduleEntry =
 			routineId: string
 			routineName: string
 			dayName: null
+	  }
+	| {
+			/** SCHED-04: the planned date of an occurrence moved to `toDate`. */
+			kind: 'MOVED'
+			routineId: string
+			routineDayId: string
+			routineName: string
+			dayName: string
+			overrideId: string
+			toDate: string
 	  }
 
 export interface ScheduleDay {
@@ -91,6 +110,7 @@ export interface ScheduleWeek {
 		planned: number
 		notLogged: number
 		rest: number
+		moved: number
 	}
 }
 
@@ -235,12 +255,15 @@ export function buildScheduleWeek({
 	routines,
 	sessions,
 	active,
+	overrides,
 }: {
 	weekStart: Date
 	now: Date
 	routines: readonly ScheduleRoutine[]
 	sessions: readonly WorkoutSessionSummary[]
 	active?: ActiveSession | null
+	/** SCHED-04: per-date overrides whose date or target falls in the week. */
+	overrides?: readonly ScheduleOverride[]
 }): ScheduleWeek {
 	const today = localDateKey(now)
 	const days: ScheduleDay[] = Array.from({ length: 7 }, (_, index) => {
@@ -334,27 +357,78 @@ export function buildScheduleWeek({
 			continue
 		}
 		const createdOn = localDateKey(new Date(routine.createdAt))
+		const occurrence = (
+			day: ScheduleDay,
+			routineDay: Routine['days'][number],
+			move?: ScheduleOverride,
+		): ScheduleEntry => {
+			const base = {
+				routineId: routine.id,
+				routineDayId: routineDay.id,
+				routineName: routine.name,
+				dayName: routineDayLabel(routineDay),
+				...(move ? { overrideId: move.id, movedFrom: move.date } : {}),
+			}
+			return day.isPast
+				? { kind: 'NOT_LOGGED', ...base }
+				: { kind: 'PLANNED', ...base, occurrenceDate: move?.date ?? day.date }
+		}
+		// SCHED-04: this routine's moves, by planned date and by target.
+		const moves = (overrides ?? []).filter(
+			move =>
+				move.routineId === routine.id && move.kind === 'MOVE' && move.toDate,
+		)
+		const movedAway = new Map(moves.map(move => [move.date, move]))
+		const movedIn = new Set<string>()
 		for (const routineDay of routine.days) {
 			if (routineDay.dayOfWeek === null) continue
 			const day = days.find(d => d.dayOfWeek === routineDay.dayOfWeek)
 			if (!day || day.date < createdOn) continue
 			if (trained.has(`${routine.id}|${day.date}`)) continue
+			const move = movedAway.get(day.date)
 			planned.push({
 				date: day.date,
-				entry: {
-					kind: day.isPast ? 'NOT_LOGGED' : 'PLANNED',
-					routineId: routine.id,
-					routineDayId: routineDay.id,
-					routineName: routine.name,
-					dayName: routineDayLabel(routineDay),
-				},
+				entry: move?.toDate
+					? {
+							kind: 'MOVED',
+							routineId: routine.id,
+							routineDayId: routineDay.id,
+							routineName: routine.name,
+							dayName: routineDayLabel(routineDay),
+							overrideId: move.id,
+							toDate: move.toDate,
+						}
+					: occurrence(day, routineDay),
 			})
 		}
-		// SCHED-07: planned rest is never "not logged"; a session replaces it.
+		// A moved occurrence sits on its target unless a session of the routine
+		// happened on either date. Its day is the one on the planned weekday, so
+		// an edit that removed that weekday drops the move.
+		for (const move of moves) {
+			const target = byDate.get(move.toDate as string)
+			if (!target || move.date < createdOn) continue
+			const weekday = fromKey(move.date).getDay()
+			const routineDay = routine.days.find(d => d.dayOfWeek === weekday)
+			if (!routineDay) continue
+			if (
+				trained.has(`${routine.id}|${target.date}`) ||
+				trained.has(`${routine.id}|${move.date}`)
+			) {
+				continue
+			}
+			movedIn.add(target.date)
+			planned.push({
+				date: target.date,
+				entry: occurrence(target, routineDay, move),
+			})
+		}
+		// SCHED-07: planned rest is never "not logged"; a session replaces it,
+		// and so does a workout moved onto it (SCHED-04).
 		for (const weekday of routine.restDays ?? []) {
 			const day = days.find(d => d.dayOfWeek === weekday)
 			if (!day || day.date < createdOn) continue
 			if (trained.has(`${routine.id}|${day.date}`)) continue
+			if (movedIn.has(day.date)) continue
 			planned.push({
 				date: day.date,
 				entry: {
@@ -392,6 +466,7 @@ export function buildScheduleWeek({
 			planned: count(e => e.kind === 'PLANNED'),
 			notLogged: count(e => e.kind === 'NOT_LOGGED'),
 			rest: count(e => e.kind === 'REST'),
+			moved: count(e => e.kind === 'MOVED'),
 		},
 	}
 }
@@ -448,6 +523,7 @@ export function describeScheduleTotals(totals: ScheduleWeek['totals']): string {
 		totals.rest
 			? `${totals.rest} rest ${totals.rest === 1 ? 'day' : 'days'}`
 			: null,
+		totals.moved ? `${totals.moved} moved` : null,
 	].filter(Boolean)
 	return parts.length ? parts.join(' · ') : 'Nothing planned or logged'
 }
@@ -477,6 +553,99 @@ export function describeWeek(weekStart: string, now: Date): string {
 		return 'Next week'
 	}
 	return `Week of ${WEEK_FORMAT.format(fromKey(weekStart))}`
+}
+
+/** "Thu 17 Sep" */
+export const describeShortDate = (key: string) =>
+	`${weekdayName(fromKey(key).getDay(), 'short')} ${DAY_FORMAT.format(fromKey(key))}`
+
+export type ScheduleMoveAction =
+	| {
+			kind: 'MOVE'
+			routineId: string
+			/** The occurrence's planned date, which identifies it. */
+			occurrenceDate: string
+			/** Where it falls now: its planned date, or its target once moved. */
+			currentDate: string
+			overrideId: string | null
+	  }
+	| { kind: 'UNDO'; overrideId: string }
+	| null
+
+/**
+ * SCHED-04: whether an entry can be moved or its move undone. A weekly
+ * occurrence moves while neither its planned date nor where it sits now has
+ * passed; a moved one whose planned date passed can still be put back.
+ */
+export function scheduleMoveAction(
+	entry: ScheduleEntry,
+	day: Pick<ScheduleDay, 'date' | 'isPast'>,
+	now: Date,
+): ScheduleMoveAction {
+	if (entry.kind === 'MOVED') {
+		return { kind: 'UNDO', overrideId: entry.overrideId }
+	}
+	if (entry.kind !== 'PLANNED' || !entry.occurrenceDate || day.isPast) {
+		return null
+	}
+	if (entry.occurrenceDate < localDateKey(now)) {
+		return entry.overrideId
+			? { kind: 'UNDO', overrideId: entry.overrideId }
+			: null
+	}
+	return {
+		kind: 'MOVE',
+		routineId: entry.routineId,
+		occurrenceDate: entry.occurrenceDate,
+		currentDate: day.date,
+		overrideId: entry.overrideId ?? null,
+	}
+}
+
+/**
+ * SCHED-04: the dates an occurrence can move to — up to
+ * SCHEDULE_MOVE_MAX_DAYS before or after its planned date, from today on,
+ * never onto a date the routine is planned on (unless that occurrence moved
+ * away) nor one another of its occurrences moved to. The server checks the
+ * same rules.
+ */
+export function moveTargets({
+	occurrenceDate,
+	now,
+	routine,
+	overrides,
+}: {
+	occurrenceDate: string
+	now: Date
+	routine: Pick<Routine, 'id' | 'days'>
+	overrides: readonly ScheduleOverride[]
+}): string[] {
+	const today = localDateKey(now)
+	const weekdays = new Set(routine.days.map(day => day.dayOfWeek))
+	const others = overrides.filter(
+		move =>
+			move.routineId === routine.id &&
+			move.kind === 'MOVE' &&
+			move.date !== occurrenceDate,
+	)
+	const origin = fromKey(occurrenceDate)
+	const targets: string[] = []
+	for (
+		let offset = -SCHEDULE_MOVE_MAX_DAYS;
+		offset <= SCHEDULE_MOVE_MAX_DAYS;
+		offset += 1
+	) {
+		if (offset === 0) continue
+		const date = localDateKey(addDays(origin, offset))
+		if (date < today) continue
+		const plannedThere =
+			weekdays.has(fromKey(date).getDay()) &&
+			!others.some(move => move.date === date && move.toDate)
+		if (plannedThere) continue
+		if (others.some(move => move.toDate === date)) continue
+		targets.push(date)
+	}
+	return targets
 }
 
 export const describeScheduleDay = (day: ScheduleDay) => ({

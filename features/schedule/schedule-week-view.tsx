@@ -4,8 +4,10 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Loader2,
+	MoveRight,
 	RefreshCw,
 	Repeat,
+	Undo2,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -15,11 +17,14 @@ import { cn } from '@/lib/utils'
 import {
 	describeScheduleDay,
 	describeScheduleTotals,
+	describeShortDate,
 	describeWeek,
 	rotationStartAction,
 	type ScheduleAction,
 	type ScheduleEntry,
 	scheduleEntryAction,
+	type ScheduleMoveAction,
+	scheduleMoveAction,
 	type ScheduleWeek,
 } from '@/lib/utils/schedule-week'
 
@@ -36,6 +41,14 @@ interface ScheduleWeekViewProps {
 	/** The routine day being started, while its request runs. */
 	startingDayId: string | null
 	onStart: (routineId: string, routineDayId: string) => void
+	/** SCHED-04: opens the move dialog for a planned weekly workout. */
+	onMove: (
+		action: Extract<ScheduleMoveAction, { kind: 'MOVE' }>,
+		target: string,
+	) => void
+	onUndoMove: (overrideId: string, target: string) => void
+	/** The override being undone, while its request runs. */
+	undoingId: string | null
 	onPrevious: () => void
 	onNext: () => void
 	onToday: () => void
@@ -98,18 +111,82 @@ function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
 	)
 }
 
+interface MoveProps {
+	moveAction: ScheduleMoveAction
+	onMove: ScheduleWeekViewProps['onMove']
+	onUndoMove: ScheduleWeekViewProps['onUndoMove']
+	undoingId: string | null
+}
+
+/** SCHED-04: a quiet row control, beside Start rather than competing with it. */
+function MoveControl({
+	moveAction,
+	target,
+	onMove,
+	onUndoMove,
+	undoingId,
+}: MoveProps & { target: string }) {
+	if (!moveAction) return null
+	if (moveAction.kind === 'UNDO') {
+		return (
+			<Button
+				type="button"
+				size="sm"
+				variant="ghost"
+				className="shrink-0"
+				aria-label={`Undo the move of ${target}`}
+				disabled={undoingId !== null}
+				onClick={() => onUndoMove(moveAction.overrideId, target)}
+			>
+				{undoingId === moveAction.overrideId ? (
+					<Loader2 className="size-4 animate-spin" aria-hidden />
+				) : (
+					<Undo2 className="size-4" aria-hidden />
+				)}
+				Undo
+			</Button>
+		)
+	}
+	return (
+		<Button
+			type="button"
+			size="sm"
+			variant="ghost"
+			className="shrink-0"
+			aria-label={`Move ${target}`}
+			onClick={() => onMove(moveAction, target)}
+		>
+			<MoveRight className="size-4" aria-hidden />
+			Move
+		</Button>
+	)
+}
+
 function EntryRow({
 	entry,
+	moveAction,
+	onMove,
+	onUndoMove,
+	undoingId,
 	...actionProps
-}: { entry: ScheduleEntry } & Omit<ActionProps, 'target'>) {
-	const { Icon, label, tone } = entryStatus(entry)
+}: { entry: ScheduleEntry } & Omit<ActionProps, 'target'> & MoveProps) {
+	const status = entryStatus(entry)
+	const { Icon, tone } = status
+	const label =
+		entry.kind === 'MOVED'
+			? `Moved to ${describeShortDate(entry.toDate)}`
+			: status.label
+	const movedFrom =
+		(entry.kind === 'PLANNED' || entry.kind === 'NOT_LOGGED') && entry.movedFrom
+			? entry.movedFrom
+			: null
 	const target = entry.dayName
 		? `${entry.routineName} · ${entry.dayName}`
 		: entry.routineName
 	return (
-		<li className="flex items-start gap-2 py-1">
+		<li className="flex flex-wrap items-start gap-x-2 gap-y-1 py-1">
 			<Icon className={cn('mt-0.5 size-4 shrink-0', tone)} aria-hidden />
-			<span className="min-w-0 flex-1">
+			<span className="min-w-0 flex-1 basis-40">
 				<Link
 					href={entryHref(entry)}
 					className="type-body-sm text-foreground underline-offset-4 hover:underline"
@@ -118,8 +195,22 @@ function EntryRow({
 					{entry.dayName ? ` · ${entry.dayName}` : ''}
 				</Link>
 				<span className={cn('type-body-sm ml-2', tone)}>{label}</span>
+				{movedFrom ? (
+					<span className="type-body-sm ml-2 text-ink-3">
+						· moved from {describeShortDate(movedFrom)}
+					</span>
+				) : null}
 			</span>
-			<EntryAction target={target} {...actionProps} />
+			<span className="flex shrink-0 gap-1">
+				<EntryAction target={target} {...actionProps} />
+				<MoveControl
+					moveAction={moveAction}
+					target={target}
+					onMove={onMove}
+					onUndoMove={onUndoMove}
+					undoingId={undoingId}
+				/>
+			</span>
 		</li>
 	)
 }
@@ -134,6 +225,9 @@ export function ScheduleWeekView({
 	hasActiveSession,
 	startingDayId,
 	onStart,
+	onMove,
+	onUndoMove,
+	undoingId,
 	onPrevious,
 	onNext,
 	onToday,
@@ -187,7 +281,8 @@ export function ScheduleWeekView({
 				Planned days follow your weekly routines as they are now, from the day
 				each routine was created. Rotation days have no date: the next one is
 				shown below, and their sessions appear on the day you trained. Rest days
-				come from each weekly routine&apos;s planned rest.
+				come from each weekly routine&apos;s planned rest. Move puts one planned
+				workout on another day without changing the routine.
 			</p>
 
 			{isPending ? (
@@ -286,6 +381,10 @@ export function ScheduleWeekView({
 													)}
 													startingDayId={startingDayId}
 													onStart={onStart}
+													moveAction={scheduleMoveAction(entry, day, now)}
+													onMove={onMove}
+													onUndoMove={onUndoMove}
+													undoingId={undoingId}
 												/>
 											))}
 										</ul>

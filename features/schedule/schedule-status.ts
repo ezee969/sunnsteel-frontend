@@ -4,6 +4,7 @@ import {
 	CircleDashed,
 	CircleSlash,
 	Moon,
+	MoveRight,
 	PlayCircle,
 } from 'lucide-react'
 
@@ -14,7 +15,13 @@ import {
  * is neutral on purpose: the app cannot know why a day passed.
  */
 export const SCHEDULE_STATUS: Record<
-	'COMPLETED' | 'ABORTED' | 'IN_PROGRESS' | 'PLANNED' | 'NOT_LOGGED' | 'REST',
+	| 'COMPLETED'
+	| 'ABORTED'
+	| 'IN_PROGRESS'
+	| 'PLANNED'
+	| 'NOT_LOGGED'
+	| 'REST'
+	| 'MOVED',
 	{ Icon: typeof CheckCircle2; label: string; tone: string }
 > = {
 	COMPLETED: { Icon: CheckCircle2, label: 'Completed', tone: 'text-success' },
@@ -23,4 +30,6 @@ export const SCHEDULE_STATUS: Record<
 	NOT_LOGGED: { Icon: CircleDashed, label: 'Not logged', tone: 'text-ink-3' },
 	PLANNED: { Icon: CalendarClock, label: 'Planned', tone: 'text-ink-3' },
 	REST: { Icon: Moon, label: 'Rest day', tone: 'text-ink-3' },
+	// SCHED-04: the planned date of a workout moved elsewhere; neutral.
+	MOVED: { Icon: MoveRight, label: 'Moved', tone: 'text-ink-3' },
 }

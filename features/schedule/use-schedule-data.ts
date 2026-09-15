@@ -3,10 +3,12 @@
 import { useEffect, useMemo } from 'react'
 
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
+import { useScheduleOverrides } from '@/lib/api/hooks/useScheduleOverrides'
 import {
 	useActiveSession,
 	useSessions,
 } from '@/lib/api/hooks/useWorkoutSession'
+import { localDateKey } from '@/lib/utils/schedule-week'
 
 /**
  * The reads behind the week and month schedules: the cached routines, the
@@ -29,6 +31,15 @@ export function useScheduleData(range: { from: string; to: string }) {
 	}, [range.from, range.to])
 	const sessions = useSessions({ ...read, sort: 'startedAt:asc', limit: 50 })
 	const { hasNextPage, isFetchingNextPage, fetchNextPage } = sessions
+	// SCHED-04: the overrides whose date or target falls in the range.
+	const overrideRange = useMemo(
+		() => ({
+			from: localDateKey(new Date(range.from)),
+			to: localDateKey(new Date(range.to)),
+		}),
+		[range.from, range.to],
+	)
+	const overrides = useScheduleOverrides(overrideRange)
 
 	useEffect(() => {
 		if (hasNextPage && !isFetchingNextPage) void fetchNextPage()
@@ -43,15 +54,18 @@ export function useScheduleData(range: { from: string; to: string }) {
 		routines: routines.data,
 		sessions: items,
 		active: active.data,
+		overrides: overrides.data?.overrides,
 		isPending:
 			routines.isPending ||
 			sessions.isPending ||
+			overrides.isPending ||
 			Boolean(hasNextPage) ||
 			isFetchingNextPage,
-		isError: routines.isError || sessions.isError,
+		isError: routines.isError || sessions.isError || overrides.isError,
 		refetch: () => {
 			void routines.refetch()
 			void sessions.refetch()
+			void overrides.refetch()
 		},
 	}
 }

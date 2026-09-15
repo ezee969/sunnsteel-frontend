@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
+import { useScheduleOverrides } from '@/lib/api/hooks/useScheduleOverrides'
 import {
 	useActiveSession,
 	useSessions,
@@ -13,6 +14,7 @@ import {
 	isRotationRoutine,
 	startableDayToday,
 } from '@/lib/utils/routine-schedule'
+import { localDateKey } from '@/lib/utils/schedule-week'
 
 export interface TodaysWorkoutEntry {
 	routine: Routine
@@ -51,12 +53,25 @@ export function useTodaysWorkouts() {
 		limit: 50,
 	})
 
+	// SCHED-04: today's moves, away from today and onto it.
+	const todayKey = useMemo(() => localDateKey(new Date()), [])
+	const overridesQuery = useScheduleOverrides({ from: todayKey, to: todayKey })
+
 	const todays = useMemo<TodaysWorkoutEntry[]>(() => {
-		return (routinesQuery.data ?? [])
+		const moves = (overridesQuery.data?.overrides ?? []).filter(
+			move => move.kind === 'MOVE' && move.toDate,
+		)
+		const planned = (routinesQuery.data ?? [])
 			.map((routine: Routine) => {
 				// ROUT-11: a rotation offers its next day on any weekday.
 				const day = startableDayToday(routine, todayDow)
 				if (!day) return null
+				if (
+					!isRotationRoutine(routine) &&
+					moves.some(m => m.routineId === routine.id && m.date === todayKey)
+				) {
+					return null
+				}
 				// SCHED-06: a rotation on training weekdays is today's work only on
 				// them; it can still be started from its routine on any day.
 				if (
@@ -74,7 +89,23 @@ export function useTodaysWorkouts() {
 				return { routine, day, canStartToday: isValid }
 			})
 			.filter((x): x is TodaysWorkoutEntry => Boolean(x))
-	}, [routinesQuery.data, todayDow])
+		// A workout moved onto today is today's work, whatever its weekday.
+		const movedIn = moves.flatMap(move => {
+			if (move.toDate !== todayKey) return []
+			const routine = routinesQuery.data?.find(r => r.id === move.routineId)
+			if (!routine || routine.isCompleted || isRotationRoutine(routine)) {
+				return []
+			}
+			const [year, month, date] = move.date.split('-').map(Number)
+			const weekday = new Date(year, month - 1, date).getDay()
+			const day = routine.days.find(d => d.dayOfWeek === weekday)
+			if (!day || planned.some(entry => entry.routine.id === routine.id)) {
+				return []
+			}
+			return [{ routine, day, canStartToday: true }]
+		})
+		return [...planned, ...movedIn]
+	}, [routinesQuery.data, overridesQuery.data, todayDow, todayKey])
 
 	const completedRoutineIds = useMemo(() => {
 		const pages = completedTodayQuery.data?.pages ?? []
@@ -102,6 +133,7 @@ export function useTodaysWorkouts() {
 		isPending:
 			routinesQuery.isPending ||
 			activeQuery.isPending ||
-			completedTodayQuery.isPending,
+			completedTodayQuery.isPending ||
+			overridesQuery.isPending,
 	}
 }

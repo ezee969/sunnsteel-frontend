@@ -5,9 +5,15 @@ import { useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
+import {
+	MoveOccurrenceDialog,
+	type MoveRequest,
+} from '@/features/schedule/move-occurrence-dialog'
 import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { ScheduleWeekView } from '@/features/schedule/schedule-week-view'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import { useUndoMove } from '@/lib/api/hooks/useScheduleOverrides'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -20,6 +26,7 @@ import {
 	addDays,
 	buildScheduleWeek,
 	localDateKey,
+	moveTargets,
 	scheduleWeekRange,
 	startOfWeek,
 } from '@/lib/utils/schedule-week'
@@ -59,8 +66,18 @@ export default function SchedulePage() {
 			routines: data.routines,
 			sessions: data.sessions,
 			active: data.active,
+			overrides: data.overrides,
 		})
-	}, [view, ready, data.routines, data.sessions, data.active, weekStart, now])
+	}, [
+		view,
+		ready,
+		data.routines,
+		data.sessions,
+		data.active,
+		data.overrides,
+		weekStart,
+		now,
+	])
 	const month = useMemo(() => {
 		if (view !== 'month' || !ready || !data.routines || !data.sessions) return
 		return buildScheduleMonth({
@@ -69,8 +86,60 @@ export default function SchedulePage() {
 			routines: data.routines,
 			sessions: data.sessions,
 			active: data.active,
+			overrides: data.overrides,
 		})
-	}, [view, ready, data.routines, data.sessions, data.active, monthStart, now])
+	}, [
+		view,
+		ready,
+		data.routines,
+		data.sessions,
+		data.active,
+		data.overrides,
+		monthStart,
+		now,
+	])
+
+	// SCHED-04: moving opens a dialog with the allowed days; undoing is direct.
+	const [moving, setMoving] = useState<MoveRequest | null>(null)
+	const [undoingId, setUndoingId] = useState<string | null>(null)
+	const undoMove = useUndoMove()
+	const { push } = useToast()
+	const handleMove = (
+		action: MoveRequest['action'],
+		target: MoveRequest['target'],
+	) => {
+		const routine = data.routines?.find(r => r.id === action.routineId)
+		if (!routine) return
+		setMoving({
+			action,
+			target,
+			targets: moveTargets({
+				occurrenceDate: action.occurrenceDate,
+				now,
+				routine,
+				overrides: data.overrides ?? [],
+			}),
+		})
+	}
+	const handleUndoMove = async (overrideId: string, target: string) => {
+		setUndoingId(overrideId)
+		try {
+			await undoMove.mutateAsync(overrideId)
+			push({
+				title: 'Move undone',
+				description: `${target} is back on its planned day.`,
+				variant: 'success',
+			})
+		} catch (error) {
+			push({
+				title: 'Move not undone',
+				description: error instanceof Error ? error.message : undefined,
+				variant: 'destructive',
+			})
+		} finally {
+			setUndoingId(null)
+		}
+	}
 
 	// SCHED-03: start the day, then open the session; the hook toasts failures.
 	const handleStart = async (routineId: string, routineDayId: string) => {
@@ -124,6 +193,11 @@ export default function SchedulePage() {
 					onStart={(routineId, routineDayId) =>
 						void handleStart(routineId, routineDayId)
 					}
+					onMove={handleMove}
+					onUndoMove={(overrideId, target) =>
+						void handleUndoMove(overrideId, target)
+					}
+					undoingId={undoingId}
 					isCurrentWeek={
 						localDateKey(weekStart) === localDateKey(startOfWeek(now))
 					}
@@ -153,6 +227,7 @@ export default function SchedulePage() {
 					}}
 				/>
 			)}
+			<MoveOccurrenceDialog request={moving} onClose={() => setMoving(null)} />
 		</div>
 	)
 }
