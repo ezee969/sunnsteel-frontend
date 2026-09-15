@@ -3,6 +3,7 @@ import type {
 	ScheduleOverride,
 	ScheduleOverridesQuery,
 	ScheduleOverridesResponse,
+	SkipOccurrenceRequest,
 } from '@sunsteel/contracts'
 
 import { httpClient } from './httpClient'
@@ -26,6 +27,15 @@ export const scheduleService = {
 		data: MoveOccurrenceRequest,
 	): Promise<ScheduleOverride> =>
 		httpClient.request<ScheduleOverride>(`${OVERRIDES_API_URL}/move`, {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		}),
+
+	skipOccurrence: async (
+		data: SkipOccurrenceRequest,
+	): Promise<ScheduleOverride> =>
+		httpClient.request<ScheduleOverride>(`${OVERRIDES_API_URL}/skip`, {
 			method: 'PUT',
 			body: JSON.stringify(data),
 			secure: true,

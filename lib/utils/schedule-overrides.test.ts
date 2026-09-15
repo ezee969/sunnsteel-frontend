@@ -145,8 +145,11 @@ describe('moving one planned workout (SCHED-04)', () => {
 			kind: 'UNDO',
 			overrideId: 'o1',
 		})
-		// Monday has passed: nothing to move.
-		expect(scheduleMoveAction(day(14).entries[0], day(14), NOW)).toBeNull()
+		// Monday has passed: nothing to move, but it can be marked skipped.
+		expect(scheduleMoveAction(day(14).entries[0], day(14), NOW)).toMatchObject({
+			kind: 'SKIP',
+			occurrenceDate: '2026-09-14',
+		})
 
 		// Moved from a day that has since passed: it can only be put back.
 		const later = build([move('o2', '2026-09-14', '2026-09-17')])

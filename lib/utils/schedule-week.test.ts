@@ -95,6 +95,7 @@ describe('schedule week', () => {
 			notLogged: 1,
 			rest: 0,
 			moved: 0,
+			skipped: 0,
 		})
 		expect(describeScheduleTotals(week.totals)).toBe(
 			'1 completed · 1 ended early · 1 planned · 1 not logged',
@@ -188,6 +189,7 @@ describe('schedule week', () => {
 			notLogged: 0,
 			rest: 3,
 			moved: 0,
+			skipped: 0,
 		})
 		expect(describeScheduleTotals(week.totals)).toBe(
 			'1 completed · 1 planned · 3 rest days',
@@ -209,6 +211,7 @@ describe('schedule week', () => {
 				notLogged: 0,
 				rest: 0,
 				moved: 0,
+				skipped: 0,
 			}),
 		).toBe('Nothing planned or logged')
 	})

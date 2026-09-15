@@ -2,6 +2,7 @@ import type {
 	MoveOccurrenceRequest,
 	ScheduleOverridesQuery,
 	ScheduleOverridesResponse,
+	SkipOccurrenceRequest,
 } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -26,6 +27,17 @@ export const useMoveOccurrence = () => {
 	return useMutation({
 		mutationFn: (data: MoveOccurrenceRequest) =>
 			scheduleService.moveOccurrence(data),
+		onSuccess: () =>
+			queryClient.invalidateQueries({ queryKey: scheduleOverrideKeys.all() }),
+	})
+}
+
+/** SCHED-05: marks one occurrence skipped; a moved one is skipped whole. */
+export const useSkipOccurrence = () => {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (data: SkipOccurrenceRequest) =>
+			scheduleService.skipOccurrence(data),
 		onSuccess: () =>
 			queryClient.invalidateQueries({ queryKey: scheduleOverrideKeys.all() }),
 	})

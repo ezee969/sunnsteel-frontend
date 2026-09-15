@@ -68,7 +68,10 @@ export function useTodaysWorkouts() {
 				if (!day) return null
 				if (
 					!isRotationRoutine(routine) &&
-					moves.some(m => m.routineId === routine.id && m.date === todayKey)
+					// Moved away (SCHED-04) or skipped (SCHED-05) today.
+					(overridesQuery.data?.overrides ?? []).some(
+						o => o.routineId === routine.id && o.date === todayKey,
+					)
 				) {
 					return null
 				}

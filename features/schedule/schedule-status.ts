@@ -6,6 +6,7 @@ import {
 	Moon,
 	MoveRight,
 	PlayCircle,
+	SkipForward,
 } from 'lucide-react'
 
 /**
@@ -21,7 +22,8 @@ export const SCHEDULE_STATUS: Record<
 	| 'PLANNED'
 	| 'NOT_LOGGED'
 	| 'REST'
-	| 'MOVED',
+	| 'MOVED'
+	| 'SKIPPED',
 	{ Icon: typeof CheckCircle2; label: string; tone: string }
 > = {
 	COMPLETED: { Icon: CheckCircle2, label: 'Completed', tone: 'text-success' },
@@ -32,4 +34,6 @@ export const SCHEDULE_STATUS: Record<
 	REST: { Icon: Moon, label: 'Rest day', tone: 'text-ink-3' },
 	// SCHED-04: the planned date of a workout moved elsewhere; neutral.
 	MOVED: { Icon: MoveRight, label: 'Moved', tone: 'text-ink-3' },
+	// SCHED-05: skipped on purpose — neutral, and never "not logged".
+	SKIPPED: { Icon: SkipForward, label: 'Skipped', tone: 'text-ink-3' },
 }

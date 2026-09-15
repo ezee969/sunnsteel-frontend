@@ -96,6 +96,7 @@ describe('schedule month', () => {
 			notLogged: 1,
 			rest: 4,
 			moved: 0,
+			skipped: 0,
 		})
 		expect(month.includesToday).toBe(true)
 		expect(month.trainedDays).toBe(1)

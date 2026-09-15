@@ -13,7 +13,10 @@ import {
 import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { ScheduleWeekView } from '@/features/schedule/schedule-week-view'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
-import { useUndoMove } from '@/lib/api/hooks/useScheduleOverrides'
+import {
+	useSkipOccurrence,
+	useUndoMove,
+} from '@/lib/api/hooks/useScheduleOverrides'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -104,6 +107,32 @@ export default function SchedulePage() {
 	const [undoingId, setUndoingId] = useState<string | null>(null)
 	const undoMove = useUndoMove()
 	const { push } = useToast()
+	// SCHED-05: a passed day without a session is marked skipped directly.
+	const skipOccurrence = useSkipOccurrence()
+	const [skippingKey, setSkippingKey] = useState<string | null>(null)
+	const handleSkip = async (
+		routineId: string,
+		date: string,
+		target: string,
+	) => {
+		setSkippingKey(`${routineId}|${date}`)
+		try {
+			await skipOccurrence.mutateAsync({ routineId, date })
+			push({
+				title: 'Marked skipped',
+				description: `${target} reads as skipped, not as not logged.`,
+				variant: 'success',
+			})
+		} catch (error) {
+			push({
+				title: 'Not marked skipped',
+				description: error instanceof Error ? error.message : undefined,
+				variant: 'destructive',
+			})
+		} finally {
+			setSkippingKey(null)
+		}
+	}
 	const handleMove = (
 		action: MoveRequest['action'],
 		target: MoveRequest['target'],
@@ -126,13 +155,14 @@ export default function SchedulePage() {
 		try {
 			await undoMove.mutateAsync(overrideId)
 			push({
-				title: 'Move undone',
+				// SCHED-05: undoes a move or a skip alike.
+				title: 'Change undone',
 				description: `${target} is back on its planned day.`,
 				variant: 'success',
 			})
 		} catch (error) {
 			push({
-				title: 'Move not undone',
+				title: 'Change not undone',
 				description: error instanceof Error ? error.message : undefined,
 				variant: 'destructive',
 			})
@@ -197,7 +227,10 @@ export default function SchedulePage() {
 					onUndoMove={(overrideId, target) =>
 						void handleUndoMove(overrideId, target)
 					}
-					undoingId={undoingId}
+					onSkip={(routineId, date, target) =>
+						void handleSkip(routineId, date, target)
+					}
+					pendingKey={undoingId ?? skippingKey}
 					isCurrentWeek={
 						localDateKey(weekStart) === localDateKey(startOfWeek(now))
 					}

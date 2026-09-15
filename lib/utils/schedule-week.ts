@@ -2,6 +2,7 @@ import {
 	type Routine,
 	routineDayLabel,
 	SCHEDULE_MOVE_MAX_DAYS,
+	SCHEDULE_SKIP_PAST_DAYS,
 	type ScheduleOverride,
 	type WorkoutSession,
 	type WorkoutSessionSummary,
@@ -61,6 +62,8 @@ export type ScheduleEntry =
 			routineDayId: string | null
 			routineName: string
 			dayName: string | null
+			/** A weekly occurrence's planned date, so it can be marked skipped. */
+			occurrenceDate?: string
 			overrideId?: string
 			movedFrom?: string
 	  }
@@ -80,6 +83,15 @@ export type ScheduleEntry =
 			dayName: string
 			overrideId: string
 			toDate: string
+	  }
+	| {
+			/** SCHED-05: an occurrence skipped on purpose, never "not logged". */
+			kind: 'SKIPPED'
+			routineId: string
+			routineDayId: string
+			routineName: string
+			dayName: string
+			overrideId: string
 	  }
 
 export interface ScheduleDay {
@@ -111,6 +123,7 @@ export interface ScheduleWeek {
 		notLogged: number
 		rest: number
 		moved: number
+		skipped: number
 	}
 }
 
@@ -370,7 +383,11 @@ export function buildScheduleWeek({
 				...(move ? { overrideId: move.id, movedFrom: move.date } : {}),
 			}
 			return day.isPast
-				? { kind: 'NOT_LOGGED', ...base }
+				? {
+						kind: 'NOT_LOGGED',
+						...base,
+						occurrenceDate: move?.date ?? day.date,
+					}
 				: { kind: 'PLANNED', ...base, occurrenceDate: move?.date ?? day.date }
 		}
 		// SCHED-04: this routine's moves, by planned date and by target.
@@ -379,12 +396,34 @@ export function buildScheduleWeek({
 				move.routineId === routine.id && move.kind === 'MOVE' && move.toDate,
 		)
 		const movedAway = new Map(moves.map(move => [move.date, move]))
+		// SCHED-05: skipped occurrences, by planned date.
+		const skips = new Map(
+			(overrides ?? [])
+				.filter(skip => skip.routineId === routine.id && skip.kind === 'SKIP')
+				.map(skip => [skip.date, skip]),
+		)
 		const movedIn = new Set<string>()
 		for (const routineDay of routine.days) {
 			if (routineDay.dayOfWeek === null) continue
 			const day = days.find(d => d.dayOfWeek === routineDay.dayOfWeek)
 			if (!day || day.date < createdOn) continue
 			if (trained.has(`${routine.id}|${day.date}`)) continue
+			// A session on the date still counts; the skip only replaces the plan.
+			const skip = skips.get(day.date)
+			if (skip) {
+				planned.push({
+					date: day.date,
+					entry: {
+						kind: 'SKIPPED',
+						routineId: routine.id,
+						routineDayId: routineDay.id,
+						routineName: routine.name,
+						dayName: routineDayLabel(routineDay),
+						overrideId: skip.id,
+					},
+				})
+				continue
+			}
 			const move = movedAway.get(day.date)
 			planned.push({
 				date: day.date,
@@ -467,6 +506,7 @@ export function buildScheduleWeek({
 			notLogged: count(e => e.kind === 'NOT_LOGGED'),
 			rest: count(e => e.kind === 'REST'),
 			moved: count(e => e.kind === 'MOVED'),
+			skipped: count(e => e.kind === 'SKIPPED'),
 		},
 	}
 }
@@ -524,6 +564,7 @@ export function describeScheduleTotals(totals: ScheduleWeek['totals']): string {
 			? `${totals.rest} rest ${totals.rest === 1 ? 'day' : 'days'}`
 			: null,
 		totals.moved ? `${totals.moved} moved` : null,
+		totals.skipped ? `${totals.skipped} skipped` : null,
 	].filter(Boolean)
 	return parts.length ? parts.join(' · ') : 'Nothing planned or logged'
 }
@@ -570,6 +611,8 @@ export type ScheduleMoveAction =
 			overrideId: string | null
 	  }
 	| { kind: 'UNDO'; overrideId: string }
+	/** SCHED-05: a passed day without a session, marked skipped after all. */
+	| { kind: 'SKIP'; routineId: string; occurrenceDate: string }
 	| null
 
 /**
@@ -582,8 +625,21 @@ export function scheduleMoveAction(
 	day: Pick<ScheduleDay, 'date' | 'isPast'>,
 	now: Date,
 ): ScheduleMoveAction {
-	if (entry.kind === 'MOVED') {
+	if (entry.kind === 'MOVED' || entry.kind === 'SKIPPED') {
 		return { kind: 'UNDO', overrideId: entry.overrideId }
+	}
+	// SCHED-05: a passed weekly day without a session can still be explained
+	// as skipped, up to SCHEDULE_SKIP_PAST_DAYS back.
+	if (entry.kind === 'NOT_LOGGED') {
+		return entry.occurrenceDate &&
+			entry.occurrenceDate >=
+				localDateKey(addDays(now, -SCHEDULE_SKIP_PAST_DAYS))
+			? {
+					kind: 'SKIP',
+					routineId: entry.routineId,
+					occurrenceDate: entry.occurrenceDate,
+				}
+			: null
 	}
 	if (entry.kind !== 'PLANNED' || !entry.occurrenceDate || day.isPast) {
 		return null
@@ -623,10 +679,7 @@ export function moveTargets({
 	const today = localDateKey(now)
 	const weekdays = new Set(routine.days.map(day => day.dayOfWeek))
 	const others = overrides.filter(
-		move =>
-			move.routineId === routine.id &&
-			move.kind === 'MOVE' &&
-			move.date !== occurrenceDate,
+		move => move.routineId === routine.id && move.date !== occurrenceDate,
 	)
 	const origin = fromKey(occurrenceDate)
 	const targets: string[] = []
@@ -640,13 +693,25 @@ export function moveTargets({
 		if (date < today) continue
 		const plannedThere =
 			weekdays.has(fromKey(date).getDay()) &&
-			!others.some(move => move.date === date && move.toDate)
+			// A date whose own workout moved away or was skipped (SCHED-05) is free.
+			!others.some(
+				move => move.date === date && (move.toDate || move.kind === 'SKIP'),
+			)
 		if (plannedThere) continue
 		if (others.some(move => move.toDate === date)) continue
 		targets.push(date)
 	}
 	return targets
 }
+
+/**
+ * SCHED-05: postponing is a move to the first free day after where the
+ * workout sits now, from the targets `moveTargets` allows.
+ */
+export const postponeTarget = (
+	targets: readonly string[],
+	currentDate: string,
+): string | null => targets.find(date => date > currentDate) ?? null
 
 export const describeScheduleDay = (day: ScheduleDay) => ({
 	weekday: weekdayName(day.dayOfWeek, 'long'),

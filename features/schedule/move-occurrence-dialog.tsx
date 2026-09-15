@@ -1,6 +1,7 @@
 'use client'
 
 import { SCHEDULE_MOVE_MAX_DAYS } from '@sunsteel/contracts'
+import { SkipForward } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,10 +16,12 @@ import {
 import { useToast } from '@/components/ui/toast'
 import {
 	useMoveOccurrence,
+	useSkipOccurrence,
 	useUndoMove,
 } from '@/lib/api/hooks/useScheduleOverrides'
 import {
 	describeShortDate,
+	postponeTarget,
 	type ScheduleMoveAction,
 } from '@/lib/utils/schedule-week'
 
@@ -31,8 +34,9 @@ export interface MoveRequest {
 }
 
 /**
- * SCHED-04: moves one planned weekly workout to another day. Only this
- * occurrence changes; the routine and the rest of the plan stay as they are.
+ * SCHED-04/05: reschedules one planned weekly workout — postpone it to the
+ * next free day, move it to a day you pick, skip it, or put it back. Only
+ * this occurrence changes; the routine and the rest of the plan do not.
  */
 export function MoveOccurrenceDialog({
 	request,
@@ -65,39 +69,53 @@ function MoveOccurrenceContent({
 	// The day it sits on now is left out: a disabled button takes the sunk
 	// fill and reads as selected, and the description already names it.
 	const targets = request.targets.filter(date => date !== action.currentDate)
+	const postponeTo = postponeTarget(targets, action.currentDate)
 	const [selected, setSelected] = useState<string | null>(null)
 	const move = useMoveOccurrence()
+	const skip = useSkipOccurrence()
 	const undo = useUndoMove()
 	const { push } = useToast()
-	const busy = move.isPending || undo.isPending
+	const busy = move.isPending || skip.isPending || undo.isPending
 	const moved = action.currentDate !== action.occurrenceDate
 
-	const onMove = () => {
-		if (!selected) return
+	const fail = (title: string) => (error: Error) =>
+		push({ title, description: error.message, variant: 'destructive' })
+
+	const moveTo = (toDate: string) =>
 		move.mutate(
 			{
 				routineId: action.routineId,
 				date: action.occurrenceDate,
-				toDate: selected,
+				toDate,
 			},
 			{
 				onSuccess: () => {
 					push({
-						title: `Moved to ${describeShortDate(selected)}`,
+						title: `Moved to ${describeShortDate(toDate)}`,
 						description: `${target} now falls on that day.`,
 						variant: 'success',
 					})
 					onClose()
 				},
-				onError: error =>
-					push({
-						title: 'Workout not moved',
-						description: error.message,
-						variant: 'destructive',
-					}),
+				onError: fail('Workout not moved'),
 			},
 		)
-	}
+
+	const onSkip = () =>
+		skip.mutate(
+			{ routineId: action.routineId, date: action.occurrenceDate },
+			{
+				onSuccess: () => {
+					push({
+						title: 'Workout skipped',
+						description: `${target} reads as skipped, not as missed. You can undo it.`,
+						variant: 'success',
+					})
+					onClose()
+				},
+				onError: fail('Workout not skipped'),
+			},
+		)
 
 	const onPutBack = () => {
 		if (!action.overrideId) return
@@ -110,31 +128,50 @@ function MoveOccurrenceContent({
 				})
 				onClose()
 			},
-			onError: error =>
-				push({
-					title: 'Move not undone',
-					description: error.message,
-					variant: 'destructive',
-				}),
+			onError: fail('Move not undone'),
 		})
 	}
 
 	return (
 		<DialogContent className="max-w-md">
 			<DialogHeader>
-				<DialogTitle>Move {target}</DialogTitle>
+				<DialogTitle>Reschedule {target}</DialogTitle>
 				<DialogDescription>
 					Planned for {describeShortDate(action.occurrenceDate)}
 					{moved ? `, now on ${describeShortDate(action.currentDate)}` : ''}.
-					Only this workout moves; the routine and the rest of your plan stay as
-					they are.
+					Only this workout changes; the routine and the rest of your plan stay
+					as they are.
 				</DialogDescription>
 			</DialogHeader>
+
+			<div className="flex flex-wrap gap-2">
+				{postponeTo ? (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => moveTo(postponeTo)}
+						disabled={busy}
+					>
+						Postpone to {describeShortDate(postponeTo)}
+					</Button>
+				) : null}
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					onClick={onSkip}
+					disabled={busy}
+				>
+					<SkipForward className="size-4" aria-hidden />
+					Skip this workout
+				</Button>
+			</div>
 
 			{targets.length > 0 ? (
 				<div>
 					<p id="move-targets-label" className="type-body-sm mb-2 text-ink-3">
-						Move it to
+						Or move it to
 					</p>
 					<div
 						role="group"
@@ -179,7 +216,11 @@ function MoveOccurrenceContent({
 				<Button type="button" variant="outline" onClick={onClose}>
 					Cancel
 				</Button>
-				<Button type="button" onClick={onMove} disabled={!selected || busy}>
+				<Button
+					type="button"
+					onClick={() => selected && moveTo(selected)}
+					disabled={!selected || busy}
+				>
 					{move.isPending ? 'Moving…' : 'Move'}
 				</Button>
 			</DialogFooter>

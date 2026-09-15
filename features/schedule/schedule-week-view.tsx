@@ -1,12 +1,13 @@
 'use client'
 
 import {
+	CalendarSync,
 	ChevronLeft,
 	ChevronRight,
 	Loader2,
-	MoveRight,
 	RefreshCw,
 	Repeat,
+	SkipForward,
 	Undo2,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -47,8 +48,10 @@ interface ScheduleWeekViewProps {
 		target: string,
 	) => void
 	onUndoMove: (overrideId: string, target: string) => void
-	/** The override being undone, while its request runs. */
-	undoingId: string | null
+	/** SCHED-05: marks a passed day without a session skipped. */
+	onSkip: (routineId: string, occurrenceDate: string, target: string) => void
+	/** The override being undone, or `routineId|date` being skipped. */
+	pendingKey: string | null
 	onPrevious: () => void
 	onNext: () => void
 	onToday: () => void
@@ -115,35 +118,54 @@ interface MoveProps {
 	moveAction: ScheduleMoveAction
 	onMove: ScheduleWeekViewProps['onMove']
 	onUndoMove: ScheduleWeekViewProps['onUndoMove']
-	undoingId: string | null
+	onSkip: ScheduleWeekViewProps['onSkip']
+	pendingKey: string | null
 }
 
-/** SCHED-04: a quiet row control, beside Start rather than competing with it. */
+/**
+ * SCHED-04/05: a quiet row control, beside Start rather than competing with
+ * it: Reschedule on a planned workout, Undo on a moved or skipped one, and
+ * Mark skipped on a passed day without a session.
+ */
 function MoveControl({
 	moveAction,
 	target,
 	onMove,
 	onUndoMove,
-	undoingId,
+	onSkip,
+	pendingKey,
 }: MoveProps & { target: string }) {
 	if (!moveAction) return null
-	if (moveAction.kind === 'UNDO') {
+	if (moveAction.kind === 'UNDO' || moveAction.kind === 'SKIP') {
+		const key =
+			moveAction.kind === 'UNDO'
+				? moveAction.overrideId
+				: `${moveAction.routineId}|${moveAction.occurrenceDate}`
+		const Icon = moveAction.kind === 'UNDO' ? Undo2 : SkipForward
 		return (
 			<Button
 				type="button"
 				size="sm"
 				variant="ghost"
 				className="shrink-0"
-				aria-label={`Undo the move of ${target}`}
-				disabled={undoingId !== null}
-				onClick={() => onUndoMove(moveAction.overrideId, target)}
+				aria-label={
+					moveAction.kind === 'UNDO'
+						? `Undo the change to ${target}`
+						: `Mark ${target} skipped`
+				}
+				disabled={pendingKey !== null}
+				onClick={() =>
+					moveAction.kind === 'UNDO'
+						? onUndoMove(moveAction.overrideId, target)
+						: onSkip(moveAction.routineId, moveAction.occurrenceDate, target)
+				}
 			>
-				{undoingId === moveAction.overrideId ? (
+				{pendingKey === key ? (
 					<Loader2 className="size-4 animate-spin" aria-hidden />
 				) : (
-					<Undo2 className="size-4" aria-hidden />
+					<Icon className="size-4" aria-hidden />
 				)}
-				Undo
+				{moveAction.kind === 'UNDO' ? 'Undo' : 'Mark skipped'}
 			</Button>
 		)
 	}
@@ -153,11 +175,11 @@ function MoveControl({
 			size="sm"
 			variant="ghost"
 			className="shrink-0"
-			aria-label={`Move ${target}`}
+			aria-label={`Reschedule ${target}`}
 			onClick={() => onMove(moveAction, target)}
 		>
-			<MoveRight className="size-4" aria-hidden />
-			Move
+			<CalendarSync className="size-4" aria-hidden />
+			Reschedule
 		</Button>
 	)
 }
@@ -167,7 +189,8 @@ function EntryRow({
 	moveAction,
 	onMove,
 	onUndoMove,
-	undoingId,
+	onSkip,
+	pendingKey,
 	...actionProps
 }: { entry: ScheduleEntry } & Omit<ActionProps, 'target'> & MoveProps) {
 	const status = entryStatus(entry)
@@ -208,7 +231,8 @@ function EntryRow({
 					target={target}
 					onMove={onMove}
 					onUndoMove={onUndoMove}
-					undoingId={undoingId}
+					onSkip={onSkip}
+					pendingKey={pendingKey}
 				/>
 			</span>
 		</li>
@@ -227,7 +251,8 @@ export function ScheduleWeekView({
 	onStart,
 	onMove,
 	onUndoMove,
-	undoingId,
+	onSkip,
+	pendingKey,
 	onPrevious,
 	onNext,
 	onToday,
@@ -281,8 +306,9 @@ export function ScheduleWeekView({
 				Planned days follow your weekly routines as they are now, from the day
 				each routine was created. Rotation days have no date: the next one is
 				shown below, and their sessions appear on the day you trained. Rest days
-				come from each weekly routine&apos;s planned rest. Move puts one planned
-				workout on another day without changing the routine.
+				come from each weekly routine&apos;s planned rest. Reschedule postpones,
+				moves or skips one planned workout without changing the routine, and a
+				day that passed can still be marked skipped.
 			</p>
 
 			{isPending ? (
@@ -384,7 +410,8 @@ export function ScheduleWeekView({
 													moveAction={scheduleMoveAction(entry, day, now)}
 													onMove={onMove}
 													onUndoMove={onUndoMove}
-													undoingId={undoingId}
+													onSkip={onSkip}
+													pendingKey={pendingKey}
 												/>
 											))}
 										</ul>
