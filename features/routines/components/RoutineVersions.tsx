@@ -240,10 +240,13 @@ function CompareVersionDialog({
 					</div>
 				)}
 
-				<p className="type-body-sm text-ink-3">
-					{blocked ??
-						'Restoring saves the current setup as a new version first, so you can undo it. Loads return to this version’s, undoing any automatic progression since.'}
-				</p>
+				{/* An identical version already says so above. */}
+				{comparison.isEmpty ? null : (
+					<p className="type-body-sm text-ink-3">
+						{blocked ??
+							'Restoring saves the current setup as a new version first, so you can undo it. Loads return to this version’s, undoing any automatic progression since.'}
+					</p>
+				)}
 
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
@@ -305,7 +308,7 @@ export function RoutineVersions({
 	return (
 		<section aria-labelledby="routine-versions" className="space-y-3">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
-				<div className="min-w-0 basis-64">
+				<div className="min-w-0 flex-1 basis-64">
 					<h2 id="routine-versions" className="type-section text-foreground">
 						Versions
 					</h2>
@@ -372,25 +375,28 @@ export function RoutineVersions({
 										<p className="type-body-sm text-ink-3">{origin}</p>
 									) : null}
 								</div>
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={() => setComparing(version)}
-								>
-									<GitCompare aria-hidden />
-									Compare
-								</Button>
-								<Button
-									type="button"
-									variant="destructive"
-									size="sm"
-									onClick={() => setDeleting(version)}
-									aria-label={`Delete ${versionTitle(version)}`}
-								>
-									<Trash2 aria-hidden />
-									Delete
-								</Button>
+								{/* The row's two controls wrap together, never one alone. */}
+								<div className="flex gap-2">
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => setComparing(version)}
+									>
+										<GitCompare aria-hidden />
+										Compare
+									</Button>
+									<Button
+										type="button"
+										variant="destructive"
+										size="sm"
+										onClick={() => setDeleting(version)}
+										aria-label={`Delete ${versionTitle(version)}`}
+									>
+										<Trash2 aria-hidden />
+										Delete
+									</Button>
+								</div>
 							</li>
 						)
 					})}
