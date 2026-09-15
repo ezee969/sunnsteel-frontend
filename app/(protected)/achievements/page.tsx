@@ -2,6 +2,7 @@
 
 import HeroSection from '@/components/layout/HeroSection'
 import { AchievementLedger } from '@/features/achievements/achievement-ledger'
+import { ComebackRecognition } from '@/features/achievements/comeback-recognition'
 import { MilestoneProgress } from '@/features/achievements/milestone-progress'
 import { RenaissanceRank } from '@/features/achievements/renaissance-rank'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
@@ -21,6 +22,10 @@ export default function AchievementsPage() {
 			/>
 			<RenaissanceRank
 				rank={achievements.data?.rank}
+				isPending={achievements.isPending}
+			/>
+			<ComebackRecognition
+				data={achievements.data?.comeback}
 				isPending={achievements.isPending}
 			/>
 			<MilestoneProgress

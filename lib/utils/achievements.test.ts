@@ -1,5 +1,6 @@
 import type {
 	AchievementCategoryProgress,
+	ComebackRecognition,
 	EarnedAchievement,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
@@ -8,6 +9,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
+	formatComebackEvidence,
 	formatMilestoneProgressDetail,
 	formatMilestoneProgressEvidence,
 	formatNextRankRequirements,
@@ -69,6 +71,22 @@ describe('achievement presentation', () => {
 
 	it('formats an earned date without exposing a time', () => {
 		expect(formatAchievementDate('2026-09-14T10:00:00.000Z')).not.toContain(':')
+	})
+
+	it('states comeback evidence without rewarding same-day volume', () => {
+		const comeback = {
+			id: 'comeback:return:recognized:v1',
+			inactiveDays: 18,
+			returnedAt: '2026-09-01T10:00:00.000Z',
+			recognizedAt: '2026-09-12T10:00:00.000Z',
+			sourceSessionId: 'session-recognized',
+			activeDays: 3,
+			windowDays: 12,
+		} satisfies ComebackRecognition
+
+		expect(formatComebackEvidence(comeback)).toBe(
+			'18 full days away · 3 active days in 12 days',
+		)
 	})
 
 	it('keeps milestone categories in catalog order instead of proximity order', () => {

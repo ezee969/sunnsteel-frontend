@@ -1,6 +1,7 @@
 import type {
 	AchievementCategory,
 	AchievementCategoryProgress,
+	ComebackRecognition,
 	EarnedAchievement,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
@@ -101,6 +102,10 @@ export function formatAchievementDate(value: string): string {
 		month: 'short',
 		year: 'numeric',
 	}).format(new Date(value))
+}
+
+export function formatComebackEvidence(comeback: ComebackRecognition): string {
+	return `${comeback.inactiveDays} full days away · ${comeback.activeDays} active days in ${comeback.windowDays} days`
 }
 
 const countLabel = (value: number, singular: string, plural: string) =>
