@@ -9,6 +9,7 @@ const PROTECTED_PREFIXES = [
 	'/exercises',
 	'/schedule',
 	'/achievements',
+	'/notifications',
 	'/settings',
 	'/search',
 ] as const

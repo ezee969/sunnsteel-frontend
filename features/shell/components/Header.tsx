@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SearchBar } from '@/components/ui/search-bar'
 import { useToast } from '@/components/ui/toast'
+import { NotificationBell } from '@/features/notifications/notification-bell'
 import { useSupabaseLogout } from '@/lib/api/hooks/useSupabaseEmailAuth'
 import { useUser } from '@/lib/api/hooks/useUser'
 
@@ -65,6 +66,7 @@ export default function Header({
 				</div>
 			</div>
 			<div className="flex items-center gap-2 shrink-0">
+				<NotificationBell />
 				<ModeToggle />
 				<UserDropdown />
 			</div>

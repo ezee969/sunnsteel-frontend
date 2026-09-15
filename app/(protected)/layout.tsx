@@ -71,6 +71,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/exercises')) return 'Exercises'
 		if (path.startsWith('/schedule')) return 'Schedule'
 		if (path.startsWith('/achievements')) return 'Achievements'
+		if (path.startsWith('/notifications')) return 'Notifications'
 		if (path.startsWith('/settings')) return 'Profile Settings'
 		if (path.startsWith('/profile')) return 'Profile'
 		if (path.startsWith('/search')) return 'Search'
