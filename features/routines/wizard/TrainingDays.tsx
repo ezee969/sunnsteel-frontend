@@ -26,6 +26,7 @@ import {
 	removeRotationDay,
 	ROTATION_PRESETS,
 	toggleRestDay,
+	toggleRotationWeekday,
 	wizardDayLabel,
 } from './utils/schedule'
 
@@ -49,7 +50,7 @@ const MODES: ReadonlyArray<{
 		value: 'ROTATION',
 		label: 'Rotation',
 		caption:
-			'Days run in order, each after the last one you completed, on any weekday.',
+			'Days run in order, each after the last one you completed, on any weekday or on the weekdays you pick.',
 	},
 ]
 
@@ -165,6 +166,48 @@ function RotationDays({ data, onUpdate }: TrainingDaysProps) {
 					<Plus className="size-4" aria-hidden />
 					Add day
 				</Button>
+			</div>
+
+			<RotationWeekdays data={data} onUpdate={onUpdate} />
+		</div>
+	)
+}
+
+/**
+ * SCHED-06: the weekdays a rotation trains on. With them the schedule places
+ * its days on those weekdays in order; without them it runs on any day.
+ */
+function RotationWeekdays({ data, onUpdate }: TrainingDaysProps) {
+	return (
+		<div>
+			<p id="rotation-weekdays-label" className="type-body-sm text-ink-3">
+				Training weekdays (optional)
+			</p>
+			<p className="type-body-sm mb-2 text-ink-3">
+				Pick the weekdays you train on to see the rotation on your schedule.
+				Without them it runs on any day.
+			</p>
+			<div
+				role="group"
+				aria-labelledby="rotation-weekdays-label"
+				className="flex flex-wrap gap-1"
+			>
+				{DAYS_OF_WEEK.map(day => {
+					const isOn = data.rotationWeekdays.includes(day.id)
+					return (
+						<Button
+							key={day.id}
+							type="button"
+							size="sm"
+							variant={isOn ? 'secondary' : 'ghost'}
+							aria-pressed={isOn}
+							aria-label={`Train on ${day.name}`}
+							onClick={() => onUpdate(toggleRotationWeekday(data, day.id))}
+						>
+							{day.short}
+						</Button>
+					)
+				})}
 			</div>
 		</div>
 	)

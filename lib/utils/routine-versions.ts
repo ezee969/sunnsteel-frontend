@@ -27,6 +27,7 @@ export function routineSetup(routine: Routine): RoutineVersionSetup {
 		description: routine.description ?? null,
 		scheduleMode: routine.scheduleMode,
 		restDays: [...routine.restDays],
+		rotationWeekdays: [...(routine.rotationWeekdays ?? [])],
 		days: routine.days.map(day => ({
 			dayOfWeek: day.dayOfWeek,
 			name: day.name,

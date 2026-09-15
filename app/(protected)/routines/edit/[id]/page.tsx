@@ -83,6 +83,7 @@ export default function EditRoutinePage() {
 		scheduleMode: 'WEEKLY',
 		trainingDays: [],
 		restDays: [],
+		rotationWeekdays: [],
 		days: [],
 	})
 
@@ -103,6 +104,7 @@ export default function EditRoutinePage() {
 				description: routine.description || '',
 				scheduleMode: routine.scheduleMode,
 				restDays: routine.restDays ?? [],
+				rotationWeekdays: routine.rotationWeekdays ?? [],
 				trainingDays: orderedDays.map(slotOf),
 				days: orderedDays.map((day: RoutineDay, index) => ({
 					slot: slotOf(day, index),

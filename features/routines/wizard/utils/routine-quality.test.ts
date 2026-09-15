@@ -93,6 +93,7 @@ const routine = (...days: RoutineWizardExercise[][]): RoutineWizardData => ({
 	scheduleMode: 'WEEKLY',
 	trainingDays: days.map((_, index) => index + 1),
 	restDays: [],
+	rotationWeekdays: [],
 	days: days.map((exercises, index) => ({ slot: index + 1, exercises })),
 })
 

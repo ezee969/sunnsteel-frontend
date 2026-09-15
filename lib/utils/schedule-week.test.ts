@@ -29,6 +29,7 @@ const routine = (overrides: Partial<Routine>): Routine => ({
 	scheduleMode: 'WEEKLY',
 	nextRotationDayId: null,
 	restDays: [],
+	rotationWeekdays: [],
 	createdAt: new Date(2026, 8, 1).toISOString(),
 	updatedAt: new Date(2026, 8, 1).toISOString(),
 	days: [

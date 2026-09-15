@@ -28,6 +28,7 @@ const weekly: RoutineWizardData = {
 	scheduleMode: 'WEEKLY',
 	trainingDays: [1, 3, 5],
 	restDays: [0, 6],
+	rotationWeekdays: [],
 	days: [
 		{ slot: 1, name: 'Push', exercises: [exercise('bench')] },
 		{ slot: 3, exercises: [exercise('row')] },

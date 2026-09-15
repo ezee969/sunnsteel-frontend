@@ -6,7 +6,11 @@ import {
 } from '@sunsteel/contracts'
 
 import { weekdayName } from './date'
-import { isRotationRoutine, nextRotationDay } from './routine-schedule'
+import {
+	isRotationRoutine,
+	nextRotationDay,
+	orderedRoutineDays,
+} from './routine-schedule'
 
 /**
  * SCHED-01: one Monday-based week of planned routine days and logged
@@ -17,6 +21,10 @@ import { isRotationRoutine, nextRotationDay } from './routine-schedule'
  * - rest is neither inferred nor stored (intentional rest is SCHED-07);
  * - rotation days have no date, so they are never planned or not logged: the
  *   week notes each rotation's next day, and its sessions sit on their dates.
+ * SCHED-06 (2026-09-15): a rotation with training weekdays is placed on them
+ * from today — its next day on the first one without a session of the
+ * routine, the following days in order after it — and a past training
+ * weekday without a session reads "not logged", with no day name.
  * Planned days follow the routines as they are now.
  */
 
@@ -33,11 +41,19 @@ export type ScheduleEntry =
 			startedAt: string
 	  }
 	| {
-			kind: 'PLANNED' | 'NOT_LOGGED'
+			kind: 'PLANNED'
 			routineId: string
 			routineDayId: string
 			routineName: string
 			dayName: string
+	  }
+	| {
+			kind: 'NOT_LOGGED'
+			routineId: string
+			/** Null on a rotation's past training weekday: its day is unknown. */
+			routineDayId: string | null
+			routineName: string
+			dayName: string | null
 	  }
 	| {
 			/** SCHED-07: a weekday the routine rests on by plan. */
@@ -122,13 +138,96 @@ type ScheduleRoutine = Pick<
 	| 'scheduleMode'
 	| 'nextRotationDayId'
 	| 'restDays'
+	| 'rotationWeekdays'
 	| 'days'
 >
 
 type ActiveSession = Pick<
 	WorkoutSession,
 	'id' | 'status' | 'startedAt' | 'routineId' | 'routine' | 'routineDay'
->
+> &
+	Partial<Pick<WorkoutSession, 'routineDayId'>>
+
+/** Training weekday dates in [from, to), counted on local calendar days. */
+function countTrainingDays(from: Date, to: Date, weekdays: Set<number>) {
+	let count = 0
+	const end = localDateKey(to)
+	for (let day = from; localDateKey(day) < end; day = addDays(day, 1)) {
+		if (weekdays.has(day.getDay())) count += 1
+	}
+	return count
+}
+
+/**
+ * SCHED-06: a rotation on training weekdays over the week's dates. From today
+ * its days follow in order on the training weekdays, starting with its next
+ * day on the first one without a session of the routine; a live session
+ * trains that day now, so the plan continues after it. A past training
+ * weekday without a session is "not logged", with no day name.
+ */
+function planRotation(
+	routine: ScheduleRoutine,
+	{
+		days,
+		now,
+		trained,
+		trainedToday,
+		activeDayId,
+	}: {
+		days: readonly ScheduleDay[]
+		now: Date
+		trained: ReadonlySet<string>
+		trainedToday: boolean
+		activeDayId: string | null
+	},
+): Array<{ date: string; entry: ScheduleEntry }> {
+	const weekdays = new Set(routine.rotationWeekdays)
+	const ordered = orderedRoutineDays(routine)
+	const next = nextRotationDay(routine)
+	if (!next || ordered.length === 0) return []
+	const today = localDateKey(now)
+	const createdOn = localDateKey(new Date(routine.createdAt))
+	let start = ordered.findIndex(day => day.id === next.id)
+	if (activeDayId === next.id) start += 1
+	let first = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+	if (trainedToday) first = addDays(first, 1)
+	while (!weekdays.has(first.getDay())) first = addDays(first, 1)
+	const firstKey = localDateKey(first)
+
+	const plan: Array<{ date: string; entry: ScheduleEntry }> = []
+	for (const day of days) {
+		if (!weekdays.has(day.dayOfWeek)) continue
+		if (trained.has(`${routine.id}|${day.date}`)) continue
+		if (day.date < today) {
+			if (day.date < createdOn) continue
+			plan.push({
+				date: day.date,
+				entry: {
+					kind: 'NOT_LOGGED',
+					routineId: routine.id,
+					routineDayId: null,
+					routineName: routine.name,
+					dayName: null,
+				},
+			})
+			continue
+		}
+		if (day.date < firstKey) continue
+		const slot = countTrainingDays(first, fromKey(day.date), weekdays)
+		const routineDay = ordered[(start + slot) % ordered.length]
+		plan.push({
+			date: day.date,
+			entry: {
+				kind: 'PLANNED',
+				routineId: routine.id,
+				routineDayId: routineDay.id,
+				routineName: routine.name,
+				dayName: routineDayLabel(routineDay),
+			},
+		})
+	}
+	return plan
+}
 
 export function buildScheduleWeek({
 	weekStart,
@@ -188,6 +287,13 @@ export function buildScheduleWeek({
 		})
 	}
 	sessionEntries.sort((a, b) => a.startedAt.localeCompare(b.startedAt))
+	// SCHED-06: today's sessions decide where a rotation's plan starts, even
+	// when today is outside this week.
+	const trainedToday = new Set(
+		sessionEntries
+			.filter(entry => localDateKey(new Date(entry.startedAt)) === today)
+			.map(entry => entry.routineId),
+	)
 	for (const entry of sessionEntries) {
 		const date = localDateKey(new Date(entry.startedAt))
 		const day = byDate.get(date)
@@ -200,6 +306,21 @@ export function buildScheduleWeek({
 	const rotations: ScheduleRotationNote[] = []
 	for (const routine of routines) {
 		if (routine.isCompleted) continue
+		if (isRotationRoutine(routine) && routine.rotationWeekdays?.length) {
+			planned.push(
+				...planRotation(routine, {
+					days,
+					now,
+					trained,
+					trainedToday: trainedToday.has(routine.id),
+					activeDayId:
+						active?.status === 'IN_PROGRESS' && active.routineId === routine.id
+							? (active.routineDayId ?? null)
+							: null,
+				}),
+			)
+			continue
+		}
 		if (isRotationRoutine(routine)) {
 			const next = nextRotationDay(routine)
 			if (next) {

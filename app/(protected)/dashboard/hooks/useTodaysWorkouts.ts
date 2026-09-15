@@ -9,7 +9,10 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import { Routine, RoutineDay } from '@/lib/api/types/routine.type'
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
-import { startableDayToday } from '@/lib/utils/routine-schedule'
+import {
+	isRotationRoutine,
+	startableDayToday,
+} from '@/lib/utils/routine-schedule'
 
 export interface TodaysWorkoutEntry {
 	routine: Routine
@@ -54,6 +57,15 @@ export function useTodaysWorkouts() {
 				// ROUT-11: a rotation offers its next day on any weekday.
 				const day = startableDayToday(routine, todayDow)
 				if (!day) return null
+				// SCHED-06: a rotation on training weekdays is today's work only on
+				// them; it can still be started from its routine on any day.
+				if (
+					isRotationRoutine(routine) &&
+					routine.rotationWeekdays?.length &&
+					!routine.rotationWeekdays.includes(todayDow)
+				) {
+					return null
+				}
 
 				// Validate if this routine day can be started today based on
 				// scheduling rules

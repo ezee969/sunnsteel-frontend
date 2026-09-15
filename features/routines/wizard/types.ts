@@ -43,5 +43,7 @@ export interface RoutineWizardData {
 	trainingDays: number[]
 	/** SCHED-07: weekdays a weekly routine rests on by plan; none on a rotation. */
 	restDays: number[]
+	/** SCHED-06: weekdays a rotation trains on; none means any day. */
+	rotationWeekdays: number[]
 	days: RoutineWizardDay[]
 }

@@ -190,6 +190,7 @@ describe('routine versions', () => {
 			scheduleMode: 'WEEKLY',
 			nextRotationDayId: null,
 			restDays: [0],
+			rotationWeekdays: [],
 			createdAt: '2026-09-01T00:00:00.000Z',
 			updatedAt: '2026-09-01T00:00:00.000Z',
 			days: current.days.map((day, index) => ({

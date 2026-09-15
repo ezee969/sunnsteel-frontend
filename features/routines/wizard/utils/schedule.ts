@@ -49,7 +49,7 @@ const WEEKLY_FILL_ORDER = [1, 2, 3, 4, 5, 6, 0]
 type ScheduleUpdate = Pick<
 	RoutineWizardData,
 	'scheduleMode' | 'trainingDays' | 'days'
-> & { restDays?: number[] }
+> & { restDays?: number[]; rotationWeekdays?: number[] }
 
 const asRotation = (days: RoutineWizardDay[]): ScheduleUpdate => {
 	const renumbered = days.map((day, slot) => ({ ...day, slot }))
@@ -100,7 +100,13 @@ export function changeScheduleMode(
 			trainingDays: data.trainingDays,
 		}
 	}
-	if (mode === 'ROTATION') return asRotation(data.days)
+	if (mode === 'ROTATION') {
+		// SCHED-06: the weekly routine's weekdays become the rotation's.
+		return {
+			...asRotation(data.days),
+			rotationWeekdays: [...data.trainingDays].sort((a, b) => a - b),
+		}
+	}
 	const days = data.days
 		.map((day, index) => ({ ...day, slot: WEEKLY_FILL_ORDER[index] }))
 		.sort((a, b) => a.slot - b.slot)
@@ -108,6 +114,22 @@ export function changeScheduleMode(
 		scheduleMode: 'WEEKLY',
 		days,
 		trainingDays: days.map(day => day.slot),
+		rotationWeekdays: [],
+	}
+}
+
+/** SCHED-06: toggles a weekday a rotation trains on; weekly routines have none. */
+export function toggleRotationWeekday(
+	data: RoutineWizardData,
+	weekday: number,
+): Pick<RoutineWizardData, 'rotationWeekdays'> {
+	if (data.scheduleMode !== 'ROTATION') {
+		return { rotationWeekdays: data.rotationWeekdays }
+	}
+	return {
+		rotationWeekdays: data.rotationWeekdays.includes(weekday)
+			? data.rotationWeekdays.filter(day => day !== weekday)
+			: [...data.rotationWeekdays, weekday].sort((a, b) => a - b),
 	}
 }
 

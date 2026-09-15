@@ -129,7 +129,7 @@ export function ReviewAndCreate({
 						</div>
 						<p className="text-sm text-muted-foreground">
 							{data.scheduleMode === 'ROTATION'
-								? `${data.days.length}-day rotation: each day follows the last one you completed, on any weekday`
+								? `${data.days.length}-day rotation: each day follows the last one you completed, ${data.rotationWeekdays.length > 0 ? `on ${data.rotationWeekdays.map(day => weekdayName(day, 'long')).join(', ')}` : 'on any weekday'}`
 								: `${data.trainingDays.length} training days per week`}
 						</p>
 						{data.scheduleMode === 'WEEKLY' && data.restDays.length > 0 ? (

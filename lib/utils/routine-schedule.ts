@@ -75,11 +75,19 @@ export function routineDayTitle(
 export function describeRoutineSchedule(
 	routine: Pick<ScheduledRoutine, 'scheduleMode' | 'days'> & {
 		restDays?: readonly number[]
+		rotationWeekdays?: readonly number[]
 	},
 ): string {
 	const days = orderedRoutineDays(routine)
 	if (isRotationRoutine(routine)) {
-		return ['Rotation', ...days.map(day => routineDayLabel(day))].join(' · ')
+		// SCHED-06: the weekdays a rotation trains on follow its days.
+		const weekdays = routine.rotationWeekdays?.length
+			? ` · ${routine.rotationWeekdays.map(day => weekdayName(day, 'short')).join(', ')}`
+			: ''
+		return (
+			['Rotation', ...days.map(day => routineDayLabel(day))].join(' · ') +
+			weekdays
+		)
 	}
 	const training = days
 		.map(day => weekdayName(day.dayOfWeek ?? 0, 'short'))
