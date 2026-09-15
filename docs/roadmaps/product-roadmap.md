@@ -76,6 +76,7 @@ else until it merges, so claims live here, on `main`.
 | ID       | Status        | Owner  | Branch / worktree                                                     | Claimed    | Repositories |
 | -------- | ------------- | ------ | --------------------------------------------------------------------- | ---------- | ------------ |
 | ACH-05   | `IN_PROGRESS` | Codex  | `codex/ach-05` / `.codex-worktrees/ach-05-*`                          | 2026-09-15 | CT, BE, FE   |
+| SCHED-06 | `IN_PROGRESS` | Claude | `claude/sched-06` · `.claude-worktrees/sched-06-*`                    | 2026-09-15 | FE, BE, CT   |
 
 ## Current product snapshot
 
@@ -331,7 +332,7 @@ surface in the original description, stays hidden under `FIX-04` until
 | SCHED-03 | `SHIPPED`     | S    | Start from calendar          | The Schedule page starts today's planned weekly days and each rotation's next day in the current week, and resumes the workout in progress. Past and future days never start, matching the routine card and dashboard, and nothing starts while a session is live, since that would resume the live one instead. Shipped 2026-09-14 in the frontend.                                                                                                                                                                                                | SCHED-01                |
 | SCHED-04 | `QUEUED`      | L    | Reschedule one occurrence    | Move a workout without rewriting the entire routine.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Schedule-instance model |
 | SCHED-05 | `QUEUED`      | M    | Skip and postpone            | Distinguish intentional schedule changes from missed training.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | SCHED-04                |
-| SCHED-06 | `QUEUED`      | L    | Recurring and rotating plans | Support weekday schedules and non-weekly rotations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | ROUT-11                 |
+| SCHED-06 | `IN_PROGRESS` | L    | Recurring and rotating plans | Support weekday schedules and non-weekly rotations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | ROUT-11                 |
 | SCHED-07 | `SHIPPED`     | L    | Rest-day planning            | A weekly routine can mark rest days among the weekdays it does not train on, in the builder's schedule step. The Schedule page shows them as rest days before and after today, never as "not logged", and a workout of that routine on the day replaces the rest; the routine card and review list them. Rotations have no rest days: they advance only on completed workouts, so rest in a rotation is simply the days you do not train. Shipped 2026-09-15 through `@sunsteel/contracts@0.37.0` and migration `20260915090000_routine_rest_days`. | SCHED-01                |
 | SCHED-08 | `CANDIDATE`   | M    | Travel or alternate gym      | Temporarily change available equipment and substitutions for a date range.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | PREF-01, EXER-05        |
 | SCHED-09 | `CANDIDATE`   | M    | External calendar export     | Optionally expose scheduled workouts to common calendar applications.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Stable schedule model   |
@@ -1123,3 +1124,19 @@ it again without addressing the original decision.
   Routines keep intentional versions that can be compared and restored.
   `ROUT-09` (training blocks and deloads) is now dependency-ready and needs
   its own product rules before it starts.
+- **2026-09-15 (revision 73):** Claimed `SCHED-06` for Claude. `ROUT-11`
+  already delivered weekday schedules and non-weekly rotations, so the owner
+  chose to scope the rest as rotations on fixed training weekdays; the owner
+  delegated the details, decided as follows. A rotation may choose the
+  weekdays it trains on (for example Monday, Wednesday and Friday); without
+  any it behaves as before, on any day and without dates. With weekdays, the
+  Schedule projects the rotation from today: its next day falls on the first
+  training weekday from today without a session of the routine, and the
+  following days on the training weekdays after it. A past training weekday
+  without a session of the routine reads "Not logged", with no day name,
+  because which day it would have been is not known. Any rotation day can
+  still be started on any day, and the rotation still advances only on
+  completed sessions. Weekly routines are unchanged, rotations keep no rest
+  days (the other weekdays are simply not training days), the routine card
+  and dashboard give the next day its date, and versions (`ROUT-08`) keep
+  the weekdays. Contracts, backend and frontend.
