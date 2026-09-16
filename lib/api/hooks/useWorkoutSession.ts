@@ -14,7 +14,6 @@ import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
-import { logger } from '@/lib/utils/logger'
 import { buildPersonalRecordCelebration } from '@/lib/utils/personal-record-celebration'
 import { setSaveState } from '@/lib/utils/save-status-store'
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
@@ -50,6 +49,7 @@ import type {
 	VolumeTrendResponse,
 } from '../types/workout-progress.type'
 import { getWorkoutStatsQuery } from '../types/workout-stats.type'
+import { type StartedSession, startSessionOnce } from './start-session'
 import { useWorkoutAnalytics } from './useWorkoutAnalytics'
 
 // Serialize params object to ensure stable query keys
@@ -441,78 +441,19 @@ export function markSetPending(
 	setSaveState(`set:${sessionId}:${routineExerciseId}:${setNumber}`, 'pending')
 }
 
-// Module-scoped flag to prevent parallel start attempts across components/tabs (per tab)
-let inFlightStart = false
-
 export const useStartSession = () => {
 	const qc = useQueryClient()
 	const { push } = useToast()
 	return useMutation({
-		mutationFn: async (
-			data: StartWorkoutRequest,
-		): Promise<(WorkoutSession & { _reused?: boolean }) | undefined> => {
-			if (inFlightStart) {
-				logger.debug('[start-session] prevented parallel start attempt')
-				const active = await workoutService.getActiveSession()
-				return active ?? undefined
-			}
-			inFlightStart = true
-			try {
-				// 1) Reuse only an actually active session
-				logger.debug('[start-session] checking existing active session')
-				const existing = await workoutService.getActiveSession()
-				if (existing?.status === 'IN_PROGRESS' && existing.id) {
-					logger.debug(
-						'[start-session] found existing active session (reuse)',
-						existing.id,
-					)
-					// Re-enter through the idempotent start endpoint so the backend records
-					// that the owner explicitly resumed a recoverable stale session.
-					await workoutService.startSession(data)
-					// Mark reuse via side channel property (non-persistent)
-					return {
-						...existing,
-						lastActivityAt: new Date().toISOString(),
-						_reused: true,
-					} as WorkoutSession & {
-						_reused?: boolean
-					}
-				}
-
-				// 2) Start a new session (backend enforces uniqueness). Some backends may return 201 with empty body.
-				let started: WorkoutSession | undefined
-				try {
-					logger.debug('[start-session] POST /sessions/start', data)
-					started = await workoutService.startSession(data)
-				} catch (e) {
-					logger.debug(
-						'[start-session] start request threw, will poll active',
-						e,
-					)
-				}
-				if (started?.id) {
-					logger.debug('[start-session] start returned id', started.id)
-					return started
-				}
-
-				// 3) Poll the active session briefly to obtain the new session id (handles async persistence / race fallback)
-				for (let i = 0; i < 3; i++) {
-					logger.debug('[start-session] polling active attempt', i + 1)
-					const created = await workoutService.getActiveSession()
-					if (created?.id) return created
-					await new Promise(r => setTimeout(r, 250))
-				}
-
-				// Last attempt
-				logger.debug('[start-session] last attempt to get active session')
-				const fallback = await workoutService.getActiveSession()
-				return fallback ?? undefined
-			} finally {
-				inFlightStart = false
-			}
-		},
-		onSuccess: (data: (WorkoutSession & { _reused?: boolean }) | undefined) => {
-			if (!data) return
+		mutationFn: (data: StartWorkoutRequest): Promise<StartedSession> =>
+			startSessionOnce(
+				{
+					getActiveSession: () => workoutService.getActiveSession(),
+					startSession: payload => workoutService.startSession(payload),
+				},
+				data,
+			),
+		onSuccess: (data: StartedSession) => {
 			qc.setQueryData(qk.active, data)
 			qc.invalidateQueries({ queryKey: qk.stats })
 			if (data.id) {

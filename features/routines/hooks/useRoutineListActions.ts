@@ -9,6 +9,7 @@ import {
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { routineService } from '@/lib/api/services/routineService'
 import type { Routine } from '@/lib/api/types/routine.type'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * Manages UI state and action handlers for routine list operations.
@@ -100,8 +101,12 @@ export function useRoutineListActions() {
 			if (session?.id) {
 				router.push(`/workouts/sessions/${session.id}`)
 			}
-		} catch {
-			// handled by UI layer if needed
+		} catch (error) {
+			// useStartSession's onError raises the toast, so there is nothing to
+			// show here — but this used to be a bare `catch {}`, which meant a
+			// failed start left no trace in the UI, the console or the network log
+			// and could only be characterised by tracing the requests by hand.
+			logger.error('[routines] starting a session failed', error)
 		} finally {
 			setStartActingId(null)
 		}
