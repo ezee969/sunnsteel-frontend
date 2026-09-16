@@ -3,6 +3,14 @@ import { USERNAME_PATTERN_SOURCE } from '@sunsteel/contracts'
 
 import { BASE_URL, STATE_PATH } from './preconditions'
 
+/**
+ * The routine the portfolio frames should show: the active routine written by
+ * the backend's `db:seed:portfolio`. Set UI_SHOWCASE_ROUTINE to capture a
+ * different one; an unmatched name falls back to the first routine listed.
+ */
+const SHOWCASE_ROUTINE_NAME =
+	process.env.UI_SHOWCASE_ROUTINE ?? 'Upper / Lower - Autumn Block'
+
 /** Ids of the owner's own records, for the routes that need one. */
 export type Ids = {
 	history?: string
@@ -35,7 +43,16 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 		await page.goto('/routines', { waitUntil: 'networkidle' })
 		const actions = page.getByRole('button', { name: 'Routine actions' })
 		if ((await actions.count()) > 0) {
-			await actions.first().click()
+			// Not `.first()`: the list is the owner's real one, so a scratch or
+			// half-built routine can sit above the seeded showcase. The 2026-09-16
+			// run captured a "Quick Workout" with no exercises into both the
+			// builder and the detail frame. Card names and action buttons render
+			// one-to-one in the same order, so the name picks the index.
+			const names = (
+				await page.locator('main p.type-panel').allInnerTexts()
+			).map(name => name.trim())
+			const preferred = names.indexOf(SHOWCASE_ROUTINE_NAME)
+			await actions.nth(preferred === -1 ? 0 : preferred).click()
 			const href = await page
 				.getByRole('menuitem', { name: 'Open', exact: true })
 				.getAttribute('href')

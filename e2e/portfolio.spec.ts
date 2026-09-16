@@ -8,6 +8,7 @@ import { expect, test } from './fixtures'
 import {
 	type Cleanup,
 	PORTFOLIO_TARGETS,
+	type PortfolioTarget,
 	resolveRoute,
 } from './portfolio-targets'
 import { BASE_URL, findActiveSessionId, STATE_PATH } from './preconditions'
@@ -40,6 +41,8 @@ type ManifestEntry = {
 const ids: Ids = {}
 let ownerEmail = ''
 const captured: ManifestEntry[] = []
+/** Set as soon as a target that writes data starts, so a crash still records it. */
+let mutatedAt = ''
 
 test.use({ storageState: existsSync(STATE_PATH) ? STATE_PATH : undefined })
 
@@ -84,10 +87,14 @@ test.beforeAll(async ({ browser }) => {
 })
 
 test.afterAll(() => {
-	if (captured.length === 0) return
-	const previous: ManifestEntry[] = existsSync(MANIFEST_PATH)
-		? (JSON.parse(readFileSync(MANIFEST_PATH, 'utf8')).screenshots ?? [])
-		: []
+	if (captured.length === 0 && !mutatedAt) return
+	const file = existsSync(MANIFEST_PATH)
+		? (JSON.parse(readFileSync(MANIFEST_PATH, 'utf8')) as {
+				mutatedAt?: string
+				screenshots?: ManifestEntry[]
+			})
+		: {}
+	const previous: ManifestEntry[] = file.screenshots ?? []
 	const bySlug = new Map(previous.map(entry => [entry.slug, entry]))
 	for (const entry of captured) bySlug.set(entry.slug, entry)
 	// Target order, and nothing for a target that has been removed.
@@ -98,7 +105,18 @@ test.afterAll(() => {
 	mkdirSync(dirname(MANIFEST_PATH), { recursive: true })
 	writeFileSync(
 		MANIFEST_PATH,
-		`${JSON.stringify({ generatedBy: 'npm run ui:capture:portfolio', screenshots }, null, '\t')}\n`,
+		`${JSON.stringify(
+			{
+				generatedBy: 'npm run ui:capture:portfolio',
+				// When a run last wrote data the seed has to clear. Read by
+				// assertSeedNewerThanLastCapture, so it must survive a run that
+				// captured nothing.
+				mutatedAt: mutatedAt || file.mutatedAt,
+				screenshots,
+			},
+			null,
+			'\t',
+		)}\n`,
 	)
 })
 
@@ -168,6 +186,27 @@ async function prepare(page: Page) {
 		},
 		{ email: ownerEmail, replacement: PUBLIC_EMAIL },
 	)
+}
+
+/**
+ * Waits for the target's own content, so a frame is never taken of a loading
+ * skeleton, an empty state or the wrong record. Scoped to `main` where there
+ * is one, to keep the sidebar from satisfying a check by accident.
+ */
+async function waitUntilReady(page: Page, target: PortfolioTarget) {
+	const main = page.locator('main')
+	const scope = (await main.count()) > 0 ? main.first() : page.locator('body')
+	for (const needle of target.ready) {
+		// Any visible match, not the first match. getByText is a substring match,
+		// so "Exercises" also finds the builder's hidden step subtitle "Add
+		// exercises and sets" — and `.first()` would wait 20s on that one while
+		// the real label sat visible further down the page.
+		await expect(
+			scope.getByText(needle).filter({ visible: true }).first(),
+			`${target.slug}: ${needle} never appeared, so the frame would show a ` +
+				'skeleton, an empty state or the wrong record',
+		).toBeVisible({ timeout: 20_000 })
+	}
 }
 
 /** Width and height from the PNG's IHDR chunk. */
@@ -246,7 +285,13 @@ for (const target of PORTFOLIO_TARGETS) {
 				).not.toMatch(/^\/login/)
 			}
 
+			// After `setup`, not before it: `ready` describes the frame that gets
+			// photographed, and a setup step is usually what puts it there — the
+			// routine builder loads on step 1 and only reaches Build Days once
+			// setup has clicked it.
+			if (target.mutates) mutatedAt = new Date().toISOString()
 			if (target.setup) cleanup = await target.setup(shot)
+			await waitUntilReady(shot, target)
 			await shot.waitForLoadState('networkidle')
 			await shot.mouse.move(0, 0)
 			await shot.waitForTimeout(400)

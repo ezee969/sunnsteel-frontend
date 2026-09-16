@@ -6,6 +6,10 @@ This is the canonical product feature registry for Sunnsteel. It tells humans an
 coding agents what the product already does, what is next, which ideas are only
 candidates, and which foundations must exist before larger features are started.
 
+The shared [product vision](../../../PRODUCT_VISION.md) defines enduring
+direction and principles. It guides trade-offs but does not approve, schedule or
+mark features as shipped; this roadmap owns those decisions and states.
+
 This document is not a technical-debt log. Performance defects, cleanup, and
 implementation hazards belong in [technical-debt.md](technical-debt.md). The code
 remains the final source of truth when it disagrees with this file.

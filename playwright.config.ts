@@ -18,6 +18,7 @@ export default defineConfig<CaptureOptions>({
 	testDir: './e2e',
 	testMatch: '**/*.spec.ts',
 	// Screenshots must be deterministic and ordered, so never parallelise them.
+	globalSetup: './e2e/global-setup.ts',
 	workers: 1,
 	fullyParallel: false,
 	// A capture run is long; it is not a flaky test suite, so never retry.
