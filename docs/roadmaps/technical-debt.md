@@ -17,12 +17,360 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-No entries are open. `TD-30` closed in Phase 13, `TD-34` in Phase 14, `TD-35`,
-`TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and `TD-33` and
-`TD-36` to `TD-42` on 2026-09-13 (see the document history).
+Six entries are open: backend authentication debt `TD-43`, frontend PWA
+maintenance debt `TD-44`, the middleware matcher gap `TD-45`, proxy client-IP
+handling `TD-46`, dead pre-Supabase auth code `TD-47` and agent-document drift
+`TD-48`. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
+`TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
+`TD-33` and `TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-43"></a>
+
+### TD-43 — The authentication guard calls Supabase Auth on every protected request
+
+**Impact.** Every protected backend request waits for Supabase Auth and then
+for the local user lookup before its controller runs. A page that fans out into
+several API reads repeats both operations, adding avoidable latency and making
+ordinary data reads depend on the availability of the remote Auth service.
+This is not a demonstrated authorization defect or a measured production
+bottleneck; it is an unnecessary hot-path dependency now that the project can
+verify asymmetric access tokens locally.
+
+**Evidence.**
+
+- `SupabaseJwtStrategy.validate` calls `verifyToken` and then
+  `getOrCreateUser` for every route protected by `SupabaseJwtGuard`.
+- `verifyToken` calls `supabase.auth.getUser(token)`. Supabase documents that
+  `getUser` always makes a request to the Auth server. `getOrCreateUser` then
+  performs at least the unique local lookup by `supabaseUserId` and may also
+  synchronize email, link a migrated account or create the user.
+- The [July 2026 audit](../history/technical-debt-audit-2026-07.md) already
+  established that the same verification and synchronization also happen in
+  `POST /auth/supabase/verify`; that endpoint is not a prerequisite for
+  protected data reads because the guard provisions the local user itself.
+- Re-verified on 2026-09-16: the installed `@supabase/supabase-js` is `2.100.1`
+  and exposes `auth.getClaims`; the configured project's JWKS endpoint
+  advertises an `ES256` public key. Supabase documents `getClaims`/JWKS as the
+  local verification path for asymmetric JWTs, with managed public-key
+  caching. The legacy service-role API key being `HS256` does not require user
+  access tokens to be checked through `getUser`.
+
+**Solution direction.** Replace the normal `getUser(token)` hot path with
+`supabase.auth.getClaims(token)` and derive the Supabase identity from the
+verified `sub` claim. Preserve validation of expiry, issuer, audience and the
+authenticated role; do not merely decode the JWT. `getClaims` must retain its
+documented remote fallback for any still-valid symmetric token during the
+transition.
+
+Keep the frontend's established invariant that `/auth/supabase/verify` is not a
+gate: on a cold local-user miss, a protected request must still be able to link
+or create that user safely. Separate that provisioning path and explicit
+profile synchronization from the steady-state request path. First remove and
+measure the remote Auth call; the indexed local lookup may remain if it is not a
+meaningful cost. If measurement justifies caching, cache only the bounded,
+short-lived mapping from Supabase `sub` to the minimum local request identity,
+with invalidation for account/profile changes and deletion. Do not cache a
+mutable Prisma `User` indefinitely or add Redis solely for this item.
+
+**Closure.** All of the following are verified:
+
+- Repeated requests with a current asymmetric access token make no
+  `/auth/v1/user` call; a JWKS fetch on an empty key cache is allowed.
+- Malformed, expired, wrongly issued, wrongly targeted and unauthenticated-role
+  tokens receive `401`.
+- Existing, new and legacy-linked local users still resolve correctly; email
+  change and conflicting-email behaviour remain explicit and tested.
+- A protected request can still provision a new local account before
+  `/auth/supabase/verify` finishes, preserving the frontend's non-gating auth
+  flow.
+- The local lookup count is measured under repeated requests. Any cache added
+  has bounded TTL/size plus invalidation and multi-instance semantics covered
+  by tests; otherwise the measurement is recorded as the reason to retain the
+  indexed lookup.
+- Backend lint, typecheck, tests and build pass, and a real bearer-token check
+  confirms the production-shaped flow. The backend auth documentation is
+  updated in the same change.
+
+<a id="td-44"></a>
+
+### TD-44 — The hand-written service worker owns revisioning and cache lifecycle
+
+**Impact.** The current worker is functional and its known unsafe update paths
+have been corrected, so this is not an active user-facing defect. It is a
+release-safety and maintainability liability: Sunnsteel owns cache strategies,
+precache population, namespace revisioning, obsolete-cache cleanup and worker
+update coordination that mature service-worker tooling can generate or provide.
+Changes to those concerns have previously hidden current assets during
+development and required browser-only diagnosis. The risk increases when the
+queued [Web Push foundation](product-roadmap.md#notifications-and-retention)
+adds more responsibilities to the same worker.
+
+**Evidence.**
+
+- [public/sw.js](../../public/sw.js) hard-codes `CACHE_VERSION = 'v5'`, the
+  precache URL list, three cache namespaces and the routing strategies. Next.js
+  content-hashes its build assets, but stable URLs such as `/`, the manifest
+  and icons have no build-generated revision manifest; the project must reason
+  manually about when a namespace change is required.
+- [pwa-provider.tsx](../../providers/pwa-provider.tsx) owns registration,
+  waiting-worker activation, one-time reloads and development cleanup. Its
+  active-workout deferral is a product invariant that must survive a tooling
+  migration, not evidence that the caching implementation must remain manual.
+- The [July 2026 audit](../history/technical-debt-audit-2026-07.md) records the
+  concrete cost of this ownership: an oversized precached logo, five eager page
+  requests on activation, an unreachable API-cache branch, stale cached assets
+  obscuring current behavior, unsafe immediate activation and deletion of
+  caches not owned by Sunnsteel. `TD-04`, `TD-08`, `TD-13` and `TD-25` repaired
+  those symptoms without replacing the underlying manual machinery.
+- Workbox, `next-pwa` and Serwist have never been dependencies in this
+  repository. The original worker was introduced as a small direct PWA
+  implementation; there is no recorded evaluation that rejected build-time
+  revisioning in favor of the current design.
+
+**Solution direction.** Replace the hand-maintained precache and runtime-cache
+plumbing with an actively maintained, build-integrated service-worker tool. For
+the current Next.js application, evaluate `@serwist/next` with an injected
+precache manifest first; re-check its Next.js, webpack and Turbopack support at
+implementation time rather than pinning this future task to today's package
+compatibility. Raw Workbox or another maintained integration is acceptable if
+it preserves the same guarantees with less framework coupling. Do not adopt a
+zero-configuration default without auditing its generated routes and update
+lifecycle.
+
+Keep the application-specific policy explicit:
+
+- navigation HTML stays network-first with offline fallback;
+- same-origin static assets may use stale-while-revalidate;
+- backend, cross-origin and authenticated API responses are not cached;
+- production registration and development cleanup remain separate;
+- a waiting worker does not activate or reload the page during
+  `/workouts/sessions/*`; and
+- cleanup removes only caches owned by the old Sunnsteel worker or the selected
+  replacement, never every cache on the origin.
+
+Use custom registration or disable the integration's automatic registration
+and `skipWaiting` behavior where necessary to retain those rules. Plan the
+upgrade from the currently deployed `/sw.js` and `ss-*-v5` caches as part of
+the migration. Keep push subscription and notification behavior in the product
+roadmap; this item supplies a safer worker foundation but does not implement
+`NOTIF-02` or `NOTIF-08`.
+
+**Closure.** All of the following are verified:
+
+- A production build generates a content-revisioned precache manifest; no
+  developer-maintained global cache version or hand-written list of generated
+  Next.js assets remains.
+- A browser upgrading from the current `/sw.js` installs and activates the new
+  worker without an activation loop, mixed-version shell or deletion of
+  unrelated origin caches.
+- Online navigation, offline fallback, static-asset refresh, auth redirects and
+  recovery after reconnect behave as documented. No backend, cross-origin or
+  authenticated API response appears in Cache Storage.
+- An update discovered during an active workout remains waiting and neither
+  reloads nor takes control until the user leaves the session. First install
+  does not cause an unnecessary reload.
+- Development unregisters the Sunnsteel worker and clears only owned caches;
+  a normal development session is not controlled by a production worker.
+- The service-worker policy has automated coverage at the appropriate layer,
+  `npm run verify` passes, and production-browser checks cover a fresh install,
+  an update from the previous worker and an offline revisit. Because the PWA is
+  an iPhone target, an installed-iPhone update smoke test is required before
+  closure.
+- `AGENTS.md`, `CLAUDE.md`, the PWA documentation and the `CORE-02` evidence are
+  updated to describe the generated worker and its retained custom policy.
+
+<a id="td-45"></a>
+
+### TD-45 — The middleware matcher skips two protected prefixes
+
+**Impact.** The middleware does not redirect signed-out visits to `/schedule`
+and `/notifications`. The protected layout's client bundle loads and renders an
+empty shell, and only then sends the visitor to `/login`. That redirect has no
+`redirectTo`, so after signing in they land on the dashboard instead of the
+page they asked for. Signed-in visitors are unaffected. No data is exposed:
+every API read still requires a bearer token.
+
+**Evidence.**
+
+- [middleware.ts](../../middleware.ts) lists `/schedule` and `/notifications`
+  in `PROTECTED_PREFIXES`, but `config.matcher` has no `/schedule/:path*` or
+  `/notifications/:path*` entry, so Next.js never runs the middleware for those
+  paths. Every other protected prefix has a matcher entry.
+- [app/(protected)/layout.tsx](<../../app/(protected)/layout.tsx>) redirects
+  with `router.replace('/login')`, which carries no `redirectTo`.
+- Found in code while verifying `ARCHITECTURE.md` on 2026-09-16; not yet
+  reproduced in a browser.
+
+**Solution direction.** Add the two missing matcher entries. To stop the two
+lists drifting again, add a Node test that fails when a protected prefix or auth
+page has no matcher entry. Next.js requires `config.matcher` to be statically
+analysable, so the matcher cannot be generated from `PROTECTED_PREFIXES`.
+
+**Closure.** All of the following are verified:
+
+- In a production build, signed-out requests to `/schedule`,
+  `/schedule/<anything>` and `/notifications` get the middleware redirect to
+  `/login?redirectTo=<original>`.
+- Signed-in requests to the same paths pass.
+- A Node test fails when a protected prefix lacks a matcher entry.
+- `npm run verify` passes.
+
+<a id="td-46"></a>
+
+### TD-46 — Client IP handling behind the proxy is unverified (throttling and `/metrics`)
+
+**Impact.** Two backend controls depend on the caller's IP address, and
+neither sets how that address is derived behind Railway's proxy. If the rate
+limiter sees the proxy's address instead of the client's, all users share one
+bucket of 100 requests per minute. One busy client, or a page that fans out
+into many reads, could then exhaust it for everyone. Separately, the `/metrics`
+allowlist trusts a header the client can set, so a caller can claim an
+allowlisted address. The endpoint exposes only default Node process metrics, so
+the `/metrics` issue is low severity. Neither issue has been observed in
+production; this entry exists so both get checked.
+
+**Evidence.** Backend, verified in code on 2026-09-16:
+
+- `src/main.ts` never sets `trust proxy`, and no code overrides the
+  throttler's tracker. The installed `@nestjs/throttler`'s
+  `ThrottlerGuard.getTracker` returns `req.ip`. Without `trust proxy`, `req.ip`
+  is the socket peer, which behind a reverse proxy is the proxy itself.
+- `ThrottlerModule.forRoot` in `src/app.module.ts` registers one global limit:
+  100 requests per 60 s.
+- `MetricsController.clientIp` (`src/metrics/metrics.controller.ts`) uses the
+  first `X-Forwarded-For` entry when the header is present. Proxies usually
+  append the real peer to any incoming header, which leaves the client's own
+  value first. The allowlist defaults to `127.0.0.1,::1` when
+  `METRICS_IP_ALLOWLIST` is unset.
+- Not verified: what `req.ip` is in production, how Railway's edge sets
+  `X-Forwarded-For`, and whether `METRICS_IP_ALLOWLIST` is set in production.
+
+**Solution direction.** Measure first: temporarily log `req.ip`,
+`req.socket.remoteAddress` and `X-Forwarded-For` for one production request.
+Then set `trust proxy` to exactly the number of proxy hops Railway adds, so
+`req.ip` is the real client for both the throttler and `/metrics`. Change the
+metrics controller to use `req.ip` instead of parsing the header itself. If
+nothing scrapes `/metrics`, consider protecting it with a bearer secret, or
+disabling it, instead of relying on an IP allowlist.
+
+**Closure.** All of the following are verified:
+
+- The production measurement is recorded here.
+- Two clients on different addresses are throttled independently in
+  production, or the measurement shows they already were.
+- An external request to `/metrics` with a forged
+  `X-Forwarded-For: 127.0.0.1` is refused.
+- Backend lint, typecheck, tests and build pass.
+- `ARCHITECTURE.md` is updated.
+
+<a id="td-47"></a>
+
+### TD-47 — Dead pre-Supabase auth code and unused dependencies remain wired
+
+**Impact.** No user-visible effect. The leftover code misleads readers about how
+auth works: a JWT module, refresh tokens, a token blacklist and a password check
+all look live. It also keeps unused packages in the dependency audit, runs a
+nightly job against a table nothing writes, and leaves an unguarded
+password-checking endpoint reachable.
+
+**Evidence.** Verified on 2026-09-16 by searching every import in the backend's
+`src/`, `prisma/` and `scripts/` and in the frontend source.
+
+- **Unused dependencies.** Nothing imports `redis` or `passport-jwt` (backend
+  `dependencies`), or `@types/passport-jwt` and `@types/passport-local` (backend
+  `devDependencies`). The auth strategy uses `passport-http-bearer`.
+- **Dead token machinery.** `TokenModule`, `TokenService` and
+  `JwtModule.register({})` in `AuthModule` are registered, but nothing calls
+  `generateTokens`, `verifyRefreshToken`, `revokeAllUserTokens`,
+  `blacklistAccessToken` or `isTokenBlacklisted`. Only the midnight `@Cron`
+  runs, and it deletes expired `BlacklistedToken` rows that nothing creates. The
+  `RefreshToken` and `BlacklistedToken` models remain in the schema.
+- **Legacy password path.** `bcrypt` is used only by the unguarded
+  `POST /auth/supabase/migrate`, which checks a password against
+  `User.password`, and by `UsersService.create`, which has no callers. In the
+  frontend, `useSupabaseMigrateUser` and `useSupabaseProfile`
+  (`lib/api/hooks/useSupabaseAuth.ts`) have no consumers. They are the only
+  callers of their service methods, and so the only frontend callers of
+  `POST /auth/supabase/migrate` and `GET /auth/supabase/profile`.
+- **Inert cookie.** `POST /auth/supabase/verify` and `/logout` set and clear a
+  cookie on the backend's domain that the production middleware never sees.
+  The July audit already noted this under TD-18. The frontend's `signOut` still
+  calls `/logout` only for that cookie. `verify` also runs
+  `getUserBySupabaseId` just to label a log line.
+- **Broken script.** The backend's `docs:update` is an `echo`, and `docs:check`
+  runs `scripts/run-update-docs.js`, which wraps `update-docs.sh`/`.ps1` for a
+  backend `docs/` folder that was deliberately removed. The frontend removed its
+  equivalents in CL-05.
+
+**Solution direction.** Before removing the password path, query production
+for users that still have a `password` and no `supabaseUserId`. If any remain,
+decide with the owner how they migrate. Then, in one backend change:
+
+- uninstall the four packages;
+- delete `TokenModule`, `TokenService`, `JwtModule`, `@nestjs/jwt` and the cron;
+- delete the migrate endpoint, `UsersService.create` and `bcrypt`;
+- delete the backend's cookie handling and the `docs:*` scripts;
+- drop the two token tables, and `User.password` if the query allows, in a
+  migration that `scripts/prepare-analytics-test-db.ts` also applies.
+
+In the frontend, delete the two unused hooks, their service methods and the
+`/logout` call. Keep `passport` and `reflect-metadata`, which are required
+peers.
+
+**Closure.** All of the following are verified:
+
+- The result of the production password query is recorded here.
+- The listed code, packages, scripts and tables are gone, or kept with a
+  recorded reason.
+- `npm run verify` passes in both repositories, and so does the
+  analytics-integration job.
+- Sign-in, sign-out and a protected read work with a real Supabase token.
+- `ARCHITECTURE.md` §1 and `TECH_STACK.md` no longer list the removed items.
+
+<a id="td-48"></a>
+
+### TD-48 — Agent documents contradict the code
+
+**Impact.** Agents and contributors follow `CLAUDE.md` and `AGENTS.md` as
+instructions, so each contradiction below can send work in the wrong direction.
+The first one invites exactly the misunderstanding that TD-21, and decision D2
+in `ARCHITECTURE.md`, explain.
+
+**Evidence.** Verified on 2026-09-16:
+
+- **Backend `CLAUDE.md`/`AGENTS.md`, Auth.** They say that
+  `POST /auth/supabase/verify` sets the `ss_session=1` cookie the frontend
+  middleware uses for route protection. The middleware actually reads the
+  cookie set by the frontend's own `app/api/session/route.ts`. The backend's
+  cookie never reaches it in production (see `TD-47`).
+- **Backend `CLAUDE.md`/`AGENTS.md`, Commands.** They describe `start:dev` as
+  "tsx watch". `package.json` actually runs
+  `node --watch -r ts-node/register -r tsconfig-paths/register src/main.ts`.
+- **Backend `CLAUDE.md`/`AGENTS.md`, Workouts module.** They say the workout
+  services live under `src/workouts/services/`. Most of the listed services
+  (read, strength trend, exercise performance, muscle heatmap, volume trend,
+  progress timeline, plateaus) are top-level files in `src/workouts/`.
+- **Frontend `CLAUDE.md`/`AGENTS.md`, Conventions.** They say
+  `eslint-plugin-prettier`, `eslint-plugin-import` and
+  `eslint-plugin-simple-import-sort` are installed but not configured. All
+  three are imported and configured in `eslint.config.mjs`, which the same
+  file's formatting bullet relies on.
+- **`TECH_STACK.md`.** Its backend module list omits `schedule` (the
+  schedule-overrides module), `notifications` and `goals`.
+
+**Solution direction.** In one documentation change, correct each statement
+against the code in both twins of each repository and fix the module list in
+`TECH_STACK.md`.
+
+**Closure.** All of the following are verified:
+
+- Each statement above is corrected in both twins.
+- In each repository, the two twins differ only in their headers and
+  twin-pointer lines.
+- `TECH_STACK.md` lists every module in `src/app.module.ts`.
 
 ---
 
@@ -60,6 +408,23 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-16 (revision 18):** Recorded `TD-45` to `TD-48`, found while
+  verifying the new workspace `ARCHITECTURE.md` against all three repositories.
+  `TD-45`, `TD-47` and `TD-48` are verified in code. `TD-46` is verified in
+  code, but its production effect depends on how Railway's proxy forwards
+  addresses and still has to be measured. No implementation changed in this
+  revision.
+- **2026-09-16 (revision 17):** Recorded `TD-44`. The current service worker is
+  safe enough to remain shipped, but cache revisioning and lifecycle behavior
+  are still hand-maintained despite several closed incidents in the July audit.
+  The future migration must preserve production-only registration, scoped
+  cleanup, no API caching and active-workout update deferral. No implementation
+  changed in this revision.
+- **2026-09-16 (revision 16):** Recorded `TD-43` after re-verifying the backend
+  guard and current Supabase capabilities. The July audit already documented
+  the repeated `getUser` plus `getOrCreateUser` work, but only as evidence for
+  removing the frontend verification gate; it had never been retained as an
+  actionable backend optimization. No implementation changed in this revision.
 - **2026-09-13 (revision 15):** Closed and removed `TD-39` on the owner's
   review of the A|B capture set, and `TD-40`, `TD-41` and `TD-42` once their
   checks passed. The register is empty.

@@ -1,0 +1,138 @@
+{
+	"generatedBy": "npm run ui:capture:portfolio",
+	"screenshots": [
+		{
+			"slug": "login",
+			"route": "/login",
+			"features": [
+				"CORE-01",
+				"FIX-11"
+			],
+			"capturedAt": "2026-09-16T09:42:23.715Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "dashboard",
+			"route": "/dashboard",
+			"features": [
+				"DASH-01",
+				"DASH-02",
+				"CORE-03"
+			],
+			"capturedAt": "2026-09-16T09:42:28.183Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "routine-builder",
+			"route": "/routines/edit/:routine",
+			"features": [
+				"ROUT-01",
+				"ROUT-02",
+				"ROUT-11"
+			],
+			"capturedAt": "2026-09-16T09:42:32.873Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "routine-detail",
+			"route": "/routines/:routine",
+			"features": [
+				"ROUT-01",
+				"ROUT-02",
+				"ROUT-08"
+			],
+			"capturedAt": "2026-09-16T09:42:40.774Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "history",
+			"route": "/workouts/history",
+			"features": [
+				"HIST-01"
+			],
+			"capturedAt": "2026-09-16T09:42:44.360Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "history-detail",
+			"route": "/workouts/history/:history",
+			"features": [
+				"HIST-01",
+				"LIVE-09",
+				"SOC-07"
+			],
+			"capturedAt": "2026-09-16T09:42:50.075Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "progress",
+			"route": "/progress",
+			"features": [
+				"PROG-01",
+				"PROG-03",
+				"PROG-04",
+				"PROG-05"
+			],
+			"capturedAt": "2026-09-16T09:42:57.793Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "schedule-week",
+			"route": "/schedule",
+			"features": [
+				"SCHED-01",
+				"SCHED-03",
+				"SCHED-04",
+				"SCHED-05"
+			],
+			"capturedAt": "2026-09-16T09:43:01.770Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "achievements",
+			"route": "/achievements",
+			"features": [
+				"ACH-01",
+				"ACH-02",
+				"ACH-04",
+				"ACH-05"
+			],
+			"capturedAt": "2026-09-16T09:43:05.783Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "exercise-detail",
+			"route": "/exercises/:exercise",
+			"features": [
+				"EXER-01",
+				"EXER-07",
+				"PROG-02"
+			],
+			"capturedAt": "2026-09-16T09:43:11.697Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "member-profile",
+			"route": "/members/:username",
+			"features": [
+				"PROF-12",
+				"PROF-04",
+				"PROF-05",
+				"PROF-06"
+			],
+			"capturedAt": "2026-09-16T09:43:14.047Z",
+			"width": 1440,
+			"height": 900
+		}
+	]
+}

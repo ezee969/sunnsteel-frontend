@@ -6,7 +6,7 @@ import type { CaptureOptions } from './e2e/fixtures'
  * Playwright exists in this repo for the UI restyle (see
  * docs/ui-restyle-plan.md): reproducible screenshots (`before` / `after`) and,
  * since Phase 14, a regression sweep of layout and interaction states
- * (`regression`). It runs against the local dev server and is not part of
+ * (`regression`), plus the portfolio screenshot set (`portfolio`). It runs against the local dev server and is not part of
  * `npm run verify` or CI. Vitest stays Node-only for logic, auth orchestration
  * and contracts — that boundary is deliberate and documented in
  * docs/roadmaps/technical-debt.md.
@@ -49,6 +49,13 @@ export default defineConfig<CaptureOptions>({
 			name: 'regression',
 			testMatch: 'regression.spec.ts',
 			// The first request to each route compiles it under Turbopack.
+			use: { navigationTimeout: 90_000 },
+		},
+		{
+			// docs/portfolio/screenshots: 1440×900 dark frames of the pages listed
+			// in e2e/portfolio-targets.ts, plus docs/portfolio/manifest.json.
+			name: 'portfolio',
+			testMatch: 'portfolio.spec.ts',
 			use: { navigationTimeout: 90_000 },
 		},
 	],

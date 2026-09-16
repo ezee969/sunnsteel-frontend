@@ -26,6 +26,7 @@ npm run build          # next build
 npm run lock:check     # every dependency named in package-lock.json has an entry (TD-33); reads only the lock
 npm run lock:repair    # restore missing lock entries, unchanged, from HEAD (TD-33); postinstall runs it too
 npm run verify         # lock:check + lint + typecheck + test + build (run before considering work done)
+npm run ui:capture:portfolio  # Playwright: portfolio screenshots + manifest (dev server, backend, ui:login; not CI)
 ```
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lock:check → lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 22 (required by the current Supabase client).
@@ -141,6 +142,8 @@ High-risk invariants:
 
 For every UI change, inspect the affected states in both themes at the relevant exact boundary widths and run `npm run ui:regression`. The sweep requires the backend and a valid saved sign-in from `npm run ui:login`; if either prerequisite is unavailable, report exactly what blocked the run and what was verified instead — never imply the sweep passed. Follow the existing build/dev-server restriction when running the normal repository gates.
 
+**Portfolio screenshots.** When a user-facing page ships or visibly changes, add or update its entry in [e2e/portfolio-targets.ts](e2e/portfolio-targets.ts) in the same change (slug, route, roadmap IDs, optional setup with its cleanup, caption hint). `npm run ui:capture:portfolio` writes 1440×900 dark viewport frames to `docs/portfolio/screenshots/<slug>.png` and regenerates `docs/portfolio/manifest.json`, replacing the owner's email with `eze@sunnsteel.app`. It needs the same prerequisites as `ui:regression`, refuses to run while a workout session is active, and is not part of CI. A setup step may start a scratch session but never finishes one; it discards it afterwards.
+
 ## Conventions
 
 - **Formatting is enforced, not a matter of taste (CL-06).** [.prettierrc](.prettierrc) is the single source of truth — tabs, single quotes, no semicolons, `printWidth` 80, `arrowParens: avoid`, `endOfLine: auto` — and `prettier/prettier` runs as an ESLint **error**, so `npm run lint` and CI fail on drift. Imports are sorted by `simple-import-sort`; run `npm run lint:fix` rather than arranging them by hand. Side-effect imports are not reordered. The repo used to have two coexisting styles with nothing arbitrating; don't reintroduce that by "matching the surrounding file".
@@ -220,8 +223,8 @@ Several agents work in parallel, each in its own git worktree. Before starting a
 
 ## Portfolio docs (monorepo parent folder)
 
-`../FEATURES.md` (product-facing) and `../TECH_STACK.md` (technical/portfolio-facing) live in the parent workspace folder (`sunsteel/`), **outside this repository**. They are derived documents: the code and [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md) are the sources of truth.
+`../FEATURES.md` (product-facing), `../TECH_STACK.md` (technical/portfolio-facing) and `../ARCHITECTURE.md` (topology, one request end to end, the auth flow and engineering decisions) live in the parent workspace folder (`sunsteel/`), **outside this repository**. They are derived documents: the code and [docs/roadmaps/product-roadmap.md](docs/roadmaps/product-roadmap.md) are the sources of truth.
 
-Update them in the same change when: a feature moves to `SHIPPED` in the roadmap, an active user-facing feature is removed or hidden, a dependency/CI/build script changes, or an architecture decision recorded in this file changes. Keep `FEATURES.md` free of technical details and `TECH_STACK.md` free of unverified claims; update its "Last verified" date only when actually verified against code. Do not sync them for refactors, fixes, or in-progress work with no user-visible or stack-visible effect.
+Update them in the same change when: a feature moves to `SHIPPED` in the roadmap, an active user-facing feature is removed or hidden, a dependency/CI/build script changes, or an architecture decision recorded in this file changes. Update `ARCHITECTURE.md` in the same change when the system topology changes (a node, data store, job, external service or dependency is added, removed, or starts or stops being used), when the request flow it traces changes (layering, guard/pipe order, caching defaults, mappers), when the auth flow changes (the `ss_session` marker or the per-request `supabase.auth.getUser` check), or when one of its recorded engineering decisions changes; never invent a decision's rationale — ask the owner when the code and docs do not record it. Keep `FEATURES.md` free of technical details, give every bullet its roadmap ID as an HTML comment (e.g. `<!-- LIVE-04 -->`) kept current when features are added, merged or re-scoped, and bump its "Last updated" date whenever it changes. Keep `TECH_STACK.md` and `ARCHITECTURE.md` free of unverified claims; update their "Last verified" dates only when actually verified against code. Do not sync them for refactors, fixes, or in-progress work with no user-visible or stack-visible effect.
 
 `CLAUDE.md` is the Claude Code-facing twin of this file. **Keep the two in sync**: if you change one, mirror the change in the other.

@@ -24,6 +24,7 @@
     "ui:capture:before": "playwright test --project=before",
     "ui:capture:after": "playwright test --project=after",
     "ui:regression": "playwright test --project=regression",
+    "ui:capture:portfolio": "playwright test --project=portfolio",
     "verify:security": "npm audit --omit=dev"
   },
   "dependencies": {
