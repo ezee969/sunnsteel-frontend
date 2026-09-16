@@ -1,6 +1,11 @@
 import type {
+	FeaturedProfileItemKind,
 	FeaturedProfileSelection,
 	ReplaceFeaturedProfileItemsRequest,
+} from '@sunsteel/contracts'
+import {
+	FEATURED_PROFILE_ITEMS_MAX,
+	RENAISSANCE_RANK_DEFINITIONS,
 } from '@sunsteel/contracts'
 
 export function featuredProfileSelectionKey(
@@ -38,17 +43,28 @@ export function removeFeaturedProfileItem(
 		.map((item, position) => ({ ...item, position }))
 }
 
-export function addFeaturedRecord(
+export function addFeaturedProfileItem(
 	items: FeaturedProfileSelection[],
-	exerciseId: string,
+	kind: FeaturedProfileItemKind,
+	referenceId: string,
 ): FeaturedProfileSelection[] {
-	const key = `RECORD:${exerciseId}`
+	if (items.length >= FEATURED_PROFILE_ITEMS_MAX) return items
+	if (kind === 'RANK' && items.some(item => item.kind === 'RANK')) return items
+
+	const key = `${kind}:${referenceId}`
 	if (items.some(item => featuredProfileSelectionKey(item) === key))
 		return items
-	return [
-		...items,
-		{ kind: 'RECORD', referenceId: exerciseId, position: items.length },
-	]
+	return [...items, { kind, referenceId, position: items.length }]
+}
+
+export function reachedRenaissanceRanks(currentRankId?: string) {
+	if (!currentRankId) return []
+	const currentIndex = RENAISSANCE_RANK_DEFINITIONS.findIndex(
+		rank => rank.id === currentRankId,
+	)
+	return currentIndex < 0
+		? []
+		: RENAISSANCE_RANK_DEFINITIONS.slice(0, currentIndex + 1)
 }
 
 export function buildFeaturedProfileRequest(

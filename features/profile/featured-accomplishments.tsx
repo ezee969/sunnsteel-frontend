@@ -83,7 +83,7 @@ export function FeaturedAccomplishments({
 				</div>
 			) : (
 				<p className="type-body-sm py-3 text-ink-3">
-					Choose current records in{' '}
+					Choose records, earned medals, or a reached rank in{' '}
 					<Link
 						href="/settings"
 						className="text-primary underline-offset-4 hover:underline"

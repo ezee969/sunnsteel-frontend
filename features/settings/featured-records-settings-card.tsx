@@ -1,16 +1,20 @@
 'use client'
 
 import {
+	type EarnedAchievement,
 	FEATURED_PROFILE_ITEMS_MAX,
 	type FeaturedProfileSelection,
 	type PersonalRecordEntry,
+	type RenaissanceRankDefinition,
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import {
 	ArrowDown,
 	ArrowUp,
+	Award,
 	Bookmark,
 	Loader2,
+	Medal,
 	Plus,
 	Trash2,
 } from 'lucide-react'
@@ -25,16 +29,19 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
+import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	useFeaturedProfileItems,
 	useReplaceFeaturedProfileItems,
 } from '@/lib/api/hooks/useFeaturedProfileItems'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
+import { formatAchievementDate } from '@/lib/utils/achievements'
 import {
-	addFeaturedRecord,
+	addFeaturedProfileItem,
 	buildFeaturedProfileRequest,
 	featuredProfileSelectionKey,
 	moveFeaturedProfileItem,
+	reachedRenaissanceRanks,
 	removeFeaturedProfileItem,
 } from '@/lib/utils/featured-profile-items'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -45,9 +52,51 @@ interface FeaturedRecordsSettingsCardProps {
 }
 
 const EMPTY_RECORDS: PersonalRecordEntry[] = []
+const EMPTY_ACHIEVEMENTS: EarnedAchievement[] = []
 
 function recordSummary(record: PersonalRecordEntry, weightUnit: WeightUnit) {
 	return `${formatWeight(record.weight, weightUnit)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit)}`
+}
+
+function achievementSummary(achievement: EarnedAchievement) {
+	return achievement.backfilled
+		? 'Recognized from history'
+		: `Earned ${formatAchievementDate(achievement.unlockedAt)}`
+}
+
+function selectedItemPresentation(
+	item: FeaturedProfileSelection,
+	recordsById: Map<string, PersonalRecordEntry>,
+	achievementsById: Map<string, EarnedAchievement>,
+	ranksById: Map<string, RenaissanceRankDefinition>,
+	weightUnit: WeightUnit,
+) {
+	if (item.kind === 'RECORD') {
+		const record = recordsById.get(item.referenceId)
+		return {
+			kindLabel: 'Personal record',
+			title: record?.exerciseName ?? 'Record no longer available',
+			detail: record
+				? recordSummary(record, weightUnit)
+				: 'Remove this stale reference before saving.',
+		}
+	}
+	if (item.kind === 'ACHIEVEMENT') {
+		const achievement = achievementsById.get(item.referenceId)
+		return {
+			kindLabel: 'Achievement',
+			title: achievement?.title ?? 'Achievement no longer available',
+			detail: achievement
+				? achievementSummary(achievement)
+				: 'Remove this stale reference before saving.',
+		}
+	}
+	const rank = ranksById.get(item.referenceId)
+	return {
+		kindLabel: 'Renaissance rank',
+		title: rank?.title ?? 'Rank no longer available',
+		detail: rank?.description ?? 'Remove this stale reference before saving.',
+	}
 }
 
 export function FeaturedRecordsSettingsCard({
@@ -56,6 +105,7 @@ export function FeaturedRecordsSettingsCard({
 }: FeaturedRecordsSettingsCardProps) {
 	const selectionsQuery = useFeaturedProfileItems()
 	const profileQuery = usePublicUser(username)
+	const achievementsQuery = useAchievements()
 	const replaceItems = useReplaceFeaturedProfileItems()
 	const { push } = useToast()
 	const [drafts, setDrafts] = useState<FeaturedProfileSelection[]>([])
@@ -65,33 +115,63 @@ export function FeaturedRecordsSettingsCard({
 	}, [selectionsQuery.data])
 
 	const records = profileQuery.data?.personalRecords ?? EMPTY_RECORDS
+	const achievements =
+		achievementsQuery.data?.achievements ?? EMPTY_ACHIEVEMENTS
+	const reachedRanks = useMemo(
+		() => reachedRenaissanceRanks(achievementsQuery.data?.rank?.currentRank.id),
+		[achievementsQuery.data?.rank?.currentRank.id],
+	)
 	const recordsById = useMemo(
 		() => new Map(records.map(record => [record.exerciseId, record])),
 		[records],
 	)
-	const selectedKeys = new Set(drafts.map(featuredProfileSelectionKey))
+	const achievementsById = useMemo(
+		() =>
+			new Map(achievements.map(achievement => [achievement.id, achievement])),
+		[achievements],
+	)
+	const ranksById = useMemo(
+		() => new Map(reachedRanks.map(rank => [rank.id, rank])),
+		[reachedRanks],
+	)
+	const selectedKeys = useMemo(
+		() => new Set(drafts.map(featuredProfileSelectionKey)),
+		[drafts],
+	)
 	const availableRecords = records.filter(
 		record => !selectedKeys.has(`RECORD:${record.exerciseId}`),
 	)
+	const availableAchievements = achievements.filter(
+		achievement => !selectedKeys.has(`ACHIEVEMENT:${achievement.id}`),
+	)
+	const availableRanks = reachedRanks.filter(
+		rank => !selectedKeys.has(`RANK:${rank.id}`),
+	)
+	const hasSelectedRank = drafts.some(item => item.kind === 'RANK')
+	const slotsFull = drafts.length >= FEATURED_PROFILE_ITEMS_MAX
 	const savedKeys =
 		selectionsQuery.data?.items.map(featuredProfileSelectionKey).join('|') ?? ''
 	const draftKeys = drafts.map(featuredProfileSelectionKey).join('|')
 	const hasChanges = savedKeys !== draftKeys
-	const isLoading = selectionsQuery.isLoading || profileQuery.isLoading
-	const error = selectionsQuery.error ?? profileQuery.error
+	const isLoading =
+		selectionsQuery.isLoading ||
+		profileQuery.isLoading ||
+		achievementsQuery.isLoading
+	const error =
+		selectionsQuery.error ?? profileQuery.error ?? achievementsQuery.error
 
 	const save = () => {
 		replaceItems.mutate(buildFeaturedProfileRequest(drafts), {
 			onSuccess: () => {
 				push({
-					title: 'Featured profile saved',
+					title: 'Featured accomplishments saved',
 					description: 'Your profile now uses this accomplishment order.',
 					variant: 'success',
 				})
 			},
 			onError: mutationError => {
 				push({
-					title: 'Could not save featured records',
+					title: 'Could not save featured accomplishments',
 					description: mutationError.message,
 					variant: 'destructive',
 				})
@@ -107,9 +187,9 @@ export function FeaturedRecordsSettingsCard({
 					<CardTitle>Featured Accomplishments</CardTitle>
 				</div>
 				<CardDescription>
-					Choose and order up to {FEATURED_PROFILE_ITEMS_MAX} current records.
-					They follow your Personal Records privacy setting. Achievement and
-					rank selection will use these same slots when available.
+					Choose and order up to {FEATURED_PROFILE_ITEMS_MAX} current records,
+					earned medals, and one reached rank title. Records follow your
+					Personal Records privacy setting; medals and rank follow Achievements.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-5">
@@ -132,6 +212,7 @@ export function FeaturedRecordsSettingsCard({
 							onClick={() => {
 								void selectionsQuery.refetch()
 								void profileQuery.refetch()
+								void achievementsQuery.refetch()
 							}}
 						>
 							Try Again
@@ -146,30 +227,27 @@ export function FeaturedRecordsSettingsCard({
 							{drafts.length ? (
 								<div>
 									{drafts.map((item, index) => {
-										const record =
-											item.kind === 'RECORD'
-												? recordsById.get(item.referenceId)
-												: undefined
-										const title =
-											record?.exerciseName ??
-											(item.kind === 'ACHIEVEMENT'
-												? 'Featured achievement'
-												: item.kind === 'RANK'
-													? 'Featured rank'
-													: 'Record no longer available')
+										const presentation = selectedItemPresentation(
+											item,
+											recordsById,
+											achievementsById,
+											ranksById,
+											weightUnit,
+										)
 										return (
 											<div
 												key={featuredProfileSelectionKey(item)}
 												className="rule-row grid gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
 											>
 												<div className="min-w-0">
-													<p className="type-panel text-foreground">{title}</p>
 													<p className="type-body-sm text-ink-3">
-														{record
-															? recordSummary(record, weightUnit)
-															: item.kind === 'RECORD'
-																? 'Remove this stale reference before saving.'
-																: `Managed by the ${item.kind === 'RANK' ? 'rank' : 'achievement'} picker.`}
+														{presentation.kindLabel}
+													</p>
+													<p className="type-panel text-foreground">
+														{presentation.title}
+													</p>
+													<p className="type-body-sm text-ink-3">
+														{presentation.detail}
 													</p>
 												</div>
 												<div className="flex items-center gap-1">
@@ -177,7 +255,7 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Move ${title} up`}
+														aria-label={`Move ${presentation.title} up`}
 														disabled={index === 0}
 														onClick={() =>
 															setDrafts(current =>
@@ -195,7 +273,7 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Move ${title} down`}
+														aria-label={`Move ${presentation.title} down`}
 														disabled={index === drafts.length - 1}
 														onClick={() =>
 															setDrafts(current =>
@@ -213,7 +291,7 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Remove ${title}`}
+														aria-label={`Remove ${presentation.title}`}
 														onClick={() =>
 															setDrafts(current =>
 																removeFeaturedProfileItem(
@@ -262,10 +340,15 @@ export function FeaturedRecordsSettingsCard({
 											type="button"
 											variant="outline"
 											size="sm"
-											disabled={drafts.length >= FEATURED_PROFILE_ITEMS_MAX}
+											aria-label={`Feature ${record.exerciseName}`}
+											disabled={slotsFull}
 											onClick={() =>
 												setDrafts(current =>
-													addFeaturedRecord(current, record.exerciseId),
+													addFeaturedProfileItem(
+														current,
+														'RECORD',
+														record.exerciseId,
+													),
 												)
 											}
 										>
@@ -279,6 +362,109 @@ export function FeaturedRecordsSettingsCard({
 								Complete logged sets to establish records you can feature.
 							</p>
 						) : null}
+
+						<div>
+							<div className="flex items-center gap-2 border-b border-rule pb-2">
+								<Medal className="size-4 text-ink-3" aria-hidden />
+								<p className="type-label text-ink-3">Earned medals</p>
+							</div>
+							{availableAchievements.length ? (
+								availableAchievements.map(achievement => (
+									<div
+										key={achievement.id}
+										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+									>
+										<div className="min-w-0">
+											<p className="type-panel text-foreground">
+												{achievement.title}
+											</p>
+											<p className="type-body-sm text-ink-2">
+												{achievement.description}
+											</p>
+											<p className="type-body-sm text-ink-3">
+												{achievementSummary(achievement)}
+											</p>
+										</div>
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											aria-label={`Feature ${achievement.title}`}
+											disabled={slotsFull}
+											onClick={() =>
+												setDrafts(current =>
+													addFeaturedProfileItem(
+														current,
+														'ACHIEVEMENT',
+														achievement.id,
+													),
+												)
+											}
+										>
+											<Plus className="size-4" aria-hidden /> Feature
+										</Button>
+									</div>
+								))
+							) : achievementsQuery.data?.analyticsReady ? (
+								<p className="type-body-sm py-4 text-ink-3">
+									{achievements.length
+										? 'Every earned medal is already featured.'
+										: 'Complete workouts to earn verified medals you can feature.'}
+								</p>
+							) : (
+								<p className="type-body-sm py-4 text-ink-3">
+									Training history is preparing. Medals will appear when your
+									progress data is ready.
+								</p>
+							)}
+						</div>
+
+						<div>
+							<div className="flex items-center gap-2 border-b border-rule pb-2">
+								<Award className="size-4 text-ink-3" aria-hidden />
+								<p className="type-label text-ink-3">Reached ranks</p>
+							</div>
+							{availableRanks.length ? (
+								availableRanks.map(rank => (
+									<div
+										key={rank.id}
+										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+									>
+										<div className="min-w-0">
+											<p className="type-panel text-foreground">{rank.title}</p>
+											<p className="type-body-sm text-ink-2">
+												{rank.description}
+											</p>
+										</div>
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											aria-label={`Feature ${rank.title} rank`}
+											disabled={slotsFull || hasSelectedRank}
+											onClick={() =>
+												setDrafts(current =>
+													addFeaturedProfileItem(current, 'RANK', rank.id),
+												)
+											}
+										>
+											<Plus className="size-4" aria-hidden /> Feature rank
+										</Button>
+									</div>
+								))
+							) : (
+								<p className="type-body-sm py-4 text-ink-3">
+									{hasSelectedRank
+										? 'Your reached rank title is already featured.'
+										: 'Ranks will appear when your progress data is ready.'}
+								</p>
+							)}
+							{hasSelectedRank && availableRanks.length ? (
+								<p className="type-body-sm pt-2 text-ink-3">
+									Remove the featured rank before choosing another title.
+								</p>
+							) : null}
+						</div>
 
 						<div className="flex flex-wrap items-center justify-between gap-3 pt-2">
 							<p className="type-body-sm text-ink-3">
