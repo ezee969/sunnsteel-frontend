@@ -79,6 +79,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID      | Status        | Owner | Branch / worktree                              | Claimed    | Repositories |
 | ------- | ------------- | ----- | ---------------------------------------------- | ---------- | ------------ |
+| NAV-05  | `IN_PROGRESS` | Codex | `codex/nav-05` / `.codex-worktrees/nav-05-fe` | 2026-09-16 | FE           |
 
 ## Current product snapshot
 
@@ -413,7 +414,7 @@ surface in the original description, stays hidden under `FIX-04` until
 | NAV-02 | `CANDIDATE` | M    | Grouped suggestions       | Show categorized instant results before opening the full results page.                                                                          | NAV-01                    |
 | NAV-03 | `CANDIDATE` | S    | Recent searches           | Reopen recently viewed users, exercises, and routines.                                                                                          | NAV-01                    |
 | NAV-04 | `CANDIDATE` | M    | Mobile quick actions      | Start or resume a workout, create a routine, or open the timer from a compact menu.                                                             | LIVE-01                   |
-| NAV-05 | `CANDIDATE` | S    | Navigation badges         | Display restrained unread or upcoming indicators for notifications and schedule.                                                                | NOTIF-01, SCHED-01        |
+| NAV-05 | `IN_PROGRESS` | S    | Navigation badges         | Display restrained unread or upcoming indicators for notifications and schedule.                                                                | NOTIF-01, SCHED-01        |
 | NAV-06 | `SHIPPED`   | S    | Persistent history access | Keep workout history directly reachable even when Workouts redirects to an active session. Shipped as the dedicated `History` navigation entry. | None                      |
 
 ### Notifications and retention
@@ -1281,3 +1282,8 @@ it again without addressing the original decision.
   theme/width layout cases passed. `NAV-05` is the next recommended
   dependency-ready slice; `ACH-09` remains blocked on an approved rank-palette
   design-system amendment.
+- **2026-09-16 (revision 90):** Claimed `NAV-05` for Codex in the frontend.
+  Existing typed reads are sufficient: the notification indicator reuses
+  `NotificationsResponse.unreadCount`, while the schedule indicator reuses the
+  same derived, still-actionable workouts shown in Notifications Today. No
+  contract publish, backend change or migration is expected.
