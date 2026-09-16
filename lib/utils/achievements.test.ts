@@ -15,6 +15,7 @@ import {
 	formatNextRankRequirements,
 	formatRankEvidence,
 	groupAchievements,
+	hasVisibleProfileAchievements,
 	orderMilestoneProgress,
 } from './achievements'
 
@@ -45,6 +46,24 @@ describe('achievement presentation', () => {
 			'RECORDS',
 			'STREAK_DAYS',
 		])
+	})
+
+	it('recognizes visible content in a public profile achievement ledger', () => {
+		expect(hasVisibleProfileAchievements()).toBe(false)
+		expect(
+			hasVisibleProfileAchievements({
+				rank: null,
+				achievements: [],
+				comeback: null,
+			}),
+		).toBe(false)
+		expect(
+			hasVisibleProfileAchievements({
+				rank: null,
+				achievements: [earned('session', 'SESSIONS')],
+				comeback: null,
+			}),
+		).toBe(true)
 	})
 
 	it('orders the strongest earned threshold first within a category', () => {

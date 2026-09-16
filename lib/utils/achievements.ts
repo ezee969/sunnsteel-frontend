@@ -3,6 +3,7 @@ import type {
 	AchievementCategoryProgress,
 	ComebackRecognition,
 	EarnedAchievement,
+	PublicProfileAchievements,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
 
@@ -30,6 +31,17 @@ export function groupAchievements(achievements: EarnedAchievement[]) {
 			.toSorted((left, right) => right.threshold - left.threshold)
 		return items.length ? [{ category, items }] : []
 	})
+}
+
+export function hasVisibleProfileAchievements(
+	data?: PublicProfileAchievements,
+): boolean {
+	return Boolean(
+		data &&
+		(data.rank ||
+			data.achievements.length ||
+			data.comeback?.recognitions.length),
+	)
 }
 
 export function orderMilestoneProgress(

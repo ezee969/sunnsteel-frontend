@@ -2,6 +2,7 @@
 
 import {
 	FeaturedProfileItem,
+	PublicProfileAchievements,
 	PublicUserProfile,
 	UserProfile,
 	WeightUnit,
@@ -29,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
+import { ProfileAchievements } from '@/features/profile/profile-achievements'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	copyTextToClipboard,
@@ -57,6 +59,7 @@ type ProfileViewProps = (
 			progress?: WorkoutProgressResponse
 			stats?: WorkoutStatsResponse
 			featuredItems?: FeaturedProfileItem[]
+			achievements?: PublicProfileAchievements
 			weightUnit: WeightUnit
 	  }
 	| {
@@ -92,6 +95,11 @@ export function ProfileView(props: ProfileViewProps) {
 	const featuredItems = isOwnProfile
 		? (props.featuredItems ?? [])
 		: publicUser!.featuredItems
+	const canViewAchievements =
+		isOwnProfile || publicUser!.viewerAccess.achievements
+	const achievements = isOwnProfile
+		? props.achievements
+		: publicUser!.achievements
 	const joinDateText = formatDistanceToNow(new Date(profileCreatedAt), {
 		addSuffix: true,
 	})
@@ -407,6 +415,12 @@ export function ProfileView(props: ProfileViewProps) {
 					<FeaturedAccomplishments
 						items={featuredItems}
 						weightUnit={weightUnit}
+						isOwnProfile={isOwnProfile}
+					/>
+
+					<ProfileAchievements
+						data={achievements}
+						canView={canViewAchievements}
 						isOwnProfile={isOwnProfile}
 					/>
 
