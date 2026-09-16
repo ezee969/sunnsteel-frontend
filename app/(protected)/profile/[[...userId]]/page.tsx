@@ -96,6 +96,7 @@ export default function ProfilePage() {
 				progress={progress}
 				stats={stats}
 				featuredItems={publicUser?.featuredItems}
+				achievements={publicUser?.achievements}
 				weightUnit={viewer.weightUnit}
 				relationshipHrefs={getRelationshipHrefs(viewer.username)}
 			/>
