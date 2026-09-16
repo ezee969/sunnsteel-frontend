@@ -48,8 +48,9 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 			// run captured a "Quick Workout" with no exercises into both the
 			// builder and the detail frame. Card names and action buttons render
 			// one-to-one in the same order, so the name picks the index.
-			const names = (await page.locator('main p.type-panel').allInnerTexts())
-				.map(name => name.trim())
+			const names = (
+				await page.locator('main p.type-panel').allInnerTexts()
+			).map(name => name.trim())
 			const preferred = names.indexOf(SHOWCASE_ROUTINE_NAME)
 			await actions.nth(preferred === -1 ? 0 : preferred).click()
 			const href = await page
