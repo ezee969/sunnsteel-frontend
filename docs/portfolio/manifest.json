@@ -1,5 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
+	"mutatedAt": "2026-09-16T14:56:49.496Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -8,7 +9,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-09-16T12:05:48.644Z",
+			"capturedAt": "2026-09-16T14:55:27.606Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -20,7 +21,7 @@
 				"DASH-02",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-16T12:06:00.668Z",
+			"capturedAt": "2026-09-16T14:55:31.865Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -32,7 +33,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-09-16T12:06:11.763Z",
+			"capturedAt": "2026-09-16T15:00:14.762Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -44,7 +45,7 @@
 				"ROUT-02",
 				"ROUT-08"
 			],
-			"capturedAt": "2026-09-16T12:06:38.383Z",
+			"capturedAt": "2026-09-16T14:56:18.222Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -54,7 +55,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-09-16T12:06:47.732Z",
+			"capturedAt": "2026-09-16T14:56:21.758Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -66,7 +67,7 @@
 				"LIVE-09",
 				"SOC-07"
 			],
-			"capturedAt": "2026-09-16T12:06:58.187Z",
+			"capturedAt": "2026-09-16T14:56:25.090Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -79,7 +80,7 @@
 				"PROG-04",
 				"PROG-05"
 			],
-			"capturedAt": "2026-09-16T12:07:16.594Z",
+			"capturedAt": "2026-09-16T14:56:31.989Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -92,7 +93,7 @@
 				"SCHED-04",
 				"SCHED-05"
 			],
-			"capturedAt": "2026-09-16T12:07:27.129Z",
+			"capturedAt": "2026-09-16T14:56:35.392Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -105,7 +106,7 @@
 				"ACH-04",
 				"ACH-05"
 			],
-			"capturedAt": "2026-09-16T12:07:36.121Z",
+			"capturedAt": "2026-09-16T14:56:39.311Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -117,7 +118,7 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-09-16T12:07:49.677Z",
+			"capturedAt": "2026-09-16T14:56:44.520Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -130,7 +131,21 @@
 				"PROF-05",
 				"PROF-06"
 			],
-			"capturedAt": "2026-09-16T12:07:53.080Z",
+			"capturedAt": "2026-09-16T14:56:46.344Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "live-session",
+			"route": "/workouts/sessions/:session",
+			"features": [
+				"LIVE-00",
+				"LIVE-01",
+				"LIVE-03",
+				"LIVE-04",
+				"LIVE-05"
+			],
+			"capturedAt": "2026-09-16T14:56:59.491Z",
 			"width": 1440,
 			"height": 900
 		}

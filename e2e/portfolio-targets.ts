@@ -35,11 +35,31 @@ export type PortfolioTarget = {
 	/** Captured as a visitor with no session: middleware bounces a signed-in one. */
 	signedOut?: boolean
 	/**
+	 * `setup` writes data the API cannot fully take back — a discarded session
+	 * stays as ABORTED and reads "Ended early". Running one of these obliges the
+	 * next run to re-seed first; the manifest records that it happened.
+	 */
+	mutates?: boolean
+	/**
 	 * Brings the page into the state worth showing, after it has loaded. It may
 	 * create data only if it returns the cleanup that removes it, and must never
 	 * finish a workout session.
 	 */
 	setup?: (page: Page) => Promise<Cleanup | void>
+	/**
+	 * Text that has to be visible before the frame is worth photographing,
+	 * checked after the route loads and again after `setup`.
+	 *
+	 * Required, because "the page loaded" is not the same as "the page has
+	 * anything on it" and the run cannot tell the difference. The 2026-09-16
+	 * run reported `achievements` as passed while photographing its loading
+	 * skeleton, and an earlier one passed `routine-builder` and
+	 * `routine-detail` while pointed at a routine with no exercises in it.
+	 *
+	 * Pick strings from the page's own content, not from the shell: the
+	 * sidebar renders "Achievements" on every route.
+	 */
+	ready: readonly (string | RegExp)[]
 	/** What a caption for this frame should say. */
 	caption: string
 }
@@ -97,7 +117,18 @@ async function startScratchSession(page: Page): Promise<Cleanup> {
 			'scheduled for today, to capture the live session.',
 	).toBeVisible()
 	await start.first().click()
-	await page.waitForURL(/\/workouts\/sessions\/[^/]+$/, { timeout: 30_000 })
+	// The start occasionally resolves without routing anywhere. useStartSession
+	// guards against parallel starts by returning whatever getActiveSession()
+	// reports instead of starting again, and when that read lands before the new
+	// session is visible it resolves to undefined, so the caller has no id to
+	// push to. The session is created on the server either way — 201 with an id —
+	// so recover through /workouts, which replaces itself with the live session.
+	try {
+		await page.waitForURL(/\/workouts\/sessions\/[^/]+$/, { timeout: 20_000 })
+	} catch {
+		await page.goto('/workouts', { waitUntil: 'networkidle' })
+		await page.waitForURL(/\/workouts\/sessions\/[^/]+$/, { timeout: 30_000 })
+	}
 	await page.waitForLoadState('networkidle')
 
 	const discard: Cleanup = async () => {
@@ -172,12 +203,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/login',
 		features: ['CORE-01', 'FIX-11'],
 		signedOut: true,
+		ready: ['Welcome back', /Continue with Google/i],
 		caption: 'Sign in with email or Google; password reset from the same form.',
 	},
 	{
 		slug: 'dashboard',
 		route: '/dashboard',
 		features: ['DASH-01', 'DASH-02', 'CORE-03'],
+		ready: ['Weekly Workouts', 'Total Workouts', 'Total Volume'],
 		caption:
 			"Today's workout with one adaptive primary action, weekly stats and records.",
 	},
@@ -186,6 +219,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/routines/edit/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-11'],
 		setup: openBuildDaysStep,
+		ready: ['Build Your Training Days', 'Exercises', 'Sets', 'Days Ready'],
 		caption:
 			'The routine builder on its days step: exercises, sets, reps, load and rest per day.',
 	},
@@ -193,12 +227,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'routine-detail',
 		route: '/routines/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-08'],
+		ready: ['Routine Days', /\d+ exercises/],
 		caption: "A routine's days and prescriptions, with Start on today's day.",
 	},
 	{
 		slug: 'history',
 		route: '/workouts/history',
 		features: ['HIST-01'],
+		ready: [/History/i, /\d{4}/],
 		caption:
 			'Paginated workout history with status, routine, date and sort filters.',
 	},
@@ -206,12 +242,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'history-detail',
 		route: '/workouts/history/:history',
 		features: ['HIST-01', 'LIVE-09', 'SOC-07'],
+		ready: [/Volume|Sets|Duration/, /\d/],
 		caption: 'A finished session recap, shareable through a public link.',
 	},
 	{
 		slug: 'progress',
 		route: '/progress',
 		features: ['PROG-01', 'PROG-03', 'PROG-04', 'PROG-05'],
+		ready: ['Plateau watch', /Sessions without a new best/i],
 		caption:
 			'Strength trends, muscle heatmap and volume comparisons over time.',
 	},
@@ -219,6 +257,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'schedule-week',
 		route: '/schedule',
 		features: ['SCHED-01', 'SCHED-03', 'SCHED-04', 'SCHED-05'],
+		ready: ['This week', /Planned|Not logged|Completed/],
 		caption:
 			'The weekly schedule: planned, completed and moved workouts, never "missed".',
 	},
@@ -226,6 +265,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'achievements',
 		route: '/achievements',
 		features: ['ACH-01', 'ACH-02', 'ACH-04', 'ACH-05'],
+		ready: ['Current rank', 'Next milestones'],
 		caption:
 			'Verified milestones, Renaissance ranks and the next goal per category.',
 	},
@@ -233,6 +273,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'exercise-detail',
 		route: '/exercises/:exercise',
 		features: ['EXER-01', 'EXER-07', 'PROG-02'],
+		ready: ['Your best', 'Best set', 'Estimated 1RM'],
 		caption:
 			"A trained exercise's best set, estimated 1RM, recent sessions and progression.",
 	},
@@ -241,6 +282,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/members/:username',
 		features: ['PROF-12', 'PROF-04', 'PROF-05', 'PROF-06'],
 		signedOut: true,
+		ready: [/@/, /Workouts|Sessions|Volume/],
 		caption: 'The public member profile as a signed-out visitor sees it.',
 	},
 	// Last on purpose: while the scratch session is live every other protected
@@ -251,7 +293,9 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/workouts/sessions/:session',
 		openAt: '/routines',
 		features: ['LIVE-00', 'LIVE-01', 'LIVE-03', 'LIVE-04', 'LIVE-05'],
+		mutates: true,
 		setup: startScratchSession,
+		ready: [/^Target: /, 'Discard'],
 		caption:
 			'A live session with three sets logged, the rest timer and last-time comparison.',
 	},
