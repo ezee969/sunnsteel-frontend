@@ -1,4 +1,5 @@
 import {
+	FeaturedProfileSelectionsResponse,
 	FollowSuggestionsResponse,
 	MeasurableGoal,
 	PlateauPreferences,
@@ -6,6 +7,7 @@ import {
 	RelationshipListKind,
 	RelationshipListQuery,
 	RelationshipListResponse,
+	ReplaceFeaturedProfileItemsRequest,
 	ReplaceMeasurableGoalsRequest,
 	ReplaceTrainingLocationsRequest,
 	TrainingLocationPreference,
@@ -51,6 +53,26 @@ export const userService = {
 			body: JSON.stringify(data),
 			secure: true,
 		})
+	},
+
+	async getFeaturedProfileItems(): Promise<FeaturedProfileSelectionsResponse> {
+		return httpClient.get<FeaturedProfileSelectionsResponse>(
+			'/users/profile/featured',
+			true,
+		)
+	},
+
+	async replaceFeaturedProfileItems(
+		data: ReplaceFeaturedProfileItemsRequest,
+	): Promise<FeaturedProfileSelectionsResponse> {
+		return httpClient.request<FeaturedProfileSelectionsResponse>(
+			'/users/profile/featured',
+			{
+				method: 'PUT',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		)
 	},
 
 	async getTrainingLocations(): Promise<TrainingLocationPreference[]> {

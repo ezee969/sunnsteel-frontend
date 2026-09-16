@@ -43,8 +43,13 @@ export default function ProfilePage() {
 			(routeIdentifier === viewer.id ||
 				normalizeUsername(routeIdentifier) === viewer.username),
 		)
+	const publicProfileIdentifier = isUnknownSubpath
+		? ''
+		: isOwnByRoute
+			? viewer?.username || ''
+			: routeIdentifier || ''
 	const { data: publicUser, isLoading: isPublicLoading } = usePublicUser(
-		isOwnByRoute || isUnknownSubpath ? '' : routeIdentifier || '',
+		publicProfileIdentifier,
 	)
 	// Both are viewer-scoped endpoints, so the numbers they return only ever
 	// describe the signed-in user -- they are rendered on your own profile only.
@@ -58,7 +63,7 @@ export default function ProfilePage() {
 		return <ProfileNotFound title="Page not found" />
 	}
 
-	if (isViewerLoading || (!isOwnByRoute && isPublicLoading)) {
+	if (isViewerLoading || isPublicLoading) {
 		return <ProfileLoading />
 	}
 
@@ -90,6 +95,7 @@ export default function ProfilePage() {
 				profile={viewer}
 				progress={progress}
 				stats={stats}
+				featuredItems={publicUser?.featuredItems}
 				weightUnit={viewer.weightUnit}
 				relationshipHrefs={getRelationshipHrefs(viewer.username)}
 			/>

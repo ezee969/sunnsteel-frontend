@@ -1,6 +1,7 @@
 'use client'
 
 import {
+	FeaturedProfileItem,
 	PublicUserProfile,
 	UserProfile,
 	WeightUnit,
@@ -27,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	copyTextToClipboard,
@@ -54,6 +56,7 @@ type ProfileViewProps = (
 			profile: UserProfile
 			progress?: WorkoutProgressResponse
 			stats?: WorkoutStatsResponse
+			featuredItems?: FeaturedProfileItem[]
 			weightUnit: WeightUnit
 	  }
 	| {
@@ -86,6 +89,9 @@ export function ProfileView(props: ProfileViewProps) {
 	const followerCount = profile.followerCount
 	const followingCount = profile.followingCount
 	const isFollowedByMe = publicUser?.isFollowedByMe ?? false
+	const featuredItems = isOwnProfile
+		? (props.featuredItems ?? [])
+		: publicUser!.featuredItems
 	const joinDateText = formatDistanceToNow(new Date(profileCreatedAt), {
 		addSuffix: true,
 	})
@@ -398,6 +404,12 @@ export function ProfileView(props: ProfileViewProps) {
 				</div>
 
 				<div className="space-y-8 lg:col-span-2">
+					<FeaturedAccomplishments
+						items={featuredItems}
+						weightUnit={weightUnit}
+						isOwnProfile={isOwnProfile}
+					/>
+
 					{/* Final review 7: the three boxed stat cards with oversized
 					    watermark icons and emerald/orange/blue trend colours become one
 					    ruled band, the dashboard's pattern (§10.1). None of those
