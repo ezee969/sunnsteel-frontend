@@ -30,6 +30,7 @@ const routine: Routine = {
 	nextRotationDayId: null,
 	restDays: [0],
 	rotationWeekdays: [],
+	visibility: 'PRIVATE',
 	createdAt: new Date(2026, 7, 1).toISOString(),
 	updatedAt: new Date(2026, 7, 1).toISOString(),
 	days: [{ id: 'mon', dayOfWeek: 1, name: null, order: 0, exercises: [] }],

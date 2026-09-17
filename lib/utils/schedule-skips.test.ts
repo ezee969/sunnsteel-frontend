@@ -32,6 +32,7 @@ const split: Routine = {
 	nextRotationDayId: null,
 	restDays: [],
 	rotationWeekdays: [],
+	visibility: 'PRIVATE',
 	createdAt: new Date(2026, 8, 1).toISOString(),
 	updatedAt: new Date(2026, 8, 1).toISOString(),
 	days: [

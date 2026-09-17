@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
+import { RoutineSharing } from '@/features/routines/components/RoutineSharing'
 import { RoutineVersions } from '@/features/routines/components/RoutineVersions'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
@@ -16,6 +17,7 @@ import {
 	useToggleRoutineCompleted,
 	useToggleRoutineFavorite,
 } from '@/lib/api/hooks/useRoutines'
+import { useUser } from '@/lib/api/hooks/useUser'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
 
@@ -25,6 +27,8 @@ export default function RoutineDetailsPage() {
 	const routineId = params.id as string
 	const weightUnit = useWeightUnit()
 
+	// ROUT-04: the account rule caps each routine's own visibility.
+	const { user } = useUser()
 	// Data fetching
 	const { data: routine, isLoading } = useRoutine(routineId)
 	const { data: activeSession } = useActiveSession()
@@ -135,6 +139,12 @@ export default function RoutineDetailsPage() {
 					/>
 				</div>
 			)}
+
+			<RoutineSharing
+				routineId={routine.id}
+				visibility={routine.visibility}
+				accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
+			/>
 
 			<RoutineVersions
 				routine={routine}

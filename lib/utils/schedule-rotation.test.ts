@@ -23,6 +23,7 @@ const ppl = (overrides: Partial<Routine> = {}): Routine => ({
 	name: 'PPL',
 	description: null,
 	isPeriodized: false,
+	visibility: 'PRIVATE',
 	isFavorite: false,
 	isCompleted: false,
 	scheduleMode: 'ROTATION',

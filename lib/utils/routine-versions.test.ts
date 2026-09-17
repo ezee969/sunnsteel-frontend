@@ -191,6 +191,7 @@ describe('routine versions', () => {
 			nextRotationDayId: null,
 			restDays: [0],
 			rotationWeekdays: [],
+			visibility: 'PRIVATE',
 			createdAt: '2026-09-01T00:00:00.000Z',
 			updatedAt: '2026-09-01T00:00:00.000Z',
 			days: current.days.map((day, index) => ({
