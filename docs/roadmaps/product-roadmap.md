@@ -1,6 +1,6 @@
 # Sunnsteel Product Roadmap
 
-Last verified against the frontend, backend, and shared contracts: **2026-09-13**.
+Last verified against the frontend, backend, and shared contracts: **2026-09-17**.
 
 This is the canonical product feature registry for Sunnsteel. It tells humans and
 coding agents what the product already does, what is next, which ideas are only
@@ -77,9 +77,8 @@ else until it merges, so claims live here, on `main`.
 - **`@sunsteel/contracts` versions are serialized.** When two claims both need a
   publish, the second to publish rebases on the first and takes the next version.
 
-| ID      | Status        | Owner | Branch / worktree                              | Claimed    | Repositories |
-| ------- | ------------- | ----- | ---------------------------------------------- | ---------- | ------------ |
-| NAV-05  | `IN_PROGRESS` | Codex | `codex/nav-05` / `.codex-worktrees/nav-05-fe` | 2026-09-16 | FE           |
+| ID | Status | Owner | Branch / worktree | Claimed | Repositories |
+| -- | ------ | ----- | ----------------- | ------- | ------------ |
 
 ## Current product snapshot
 
@@ -121,6 +120,7 @@ else until it merges, so claims live here, on `main`.
 | ACH-04   | `SHIPPED` | One stable next milestone per achievement category with exact evidence, completed-category states and safety-conscious guidance                   | FE `/achievements`; BE verified category totals; CT `@sunsteel/contracts@0.32.0`                         |
 | ACH-05   | `SHIPPED` | Comeback recognition after 14 full inactive days and three distinct return-training dates inside an inclusive 14-day window                       | FE `/achievements`; BE bounded completed-event derivation; CT `@sunsteel/contracts@0.42.0`               |
 | NOTIF-01 | `SHIPPED` | Notification center: a top-bar bell, today's actions and read-state updates for achievements, session progress and followers                      | FE shell, notifications page; BE `Notification`; CT `@sunsteel/contracts@0.43.0`                         |
+| NAV-05   | `SHIPPED` | Restrained sidebar indicators for unread notifications and still-actionable workouts planned today                                                | FE shell over the existing notifications and schedule queries                                            |
 | EXER-02  | `SHIPPED` | Exercise catalog browsing by name, muscle, equipment or the default gym, movement pattern and personal training history                           | FE `/exercises`; existing BE catalog and performance reads                                               |
 | EXER-01  | `SHIPPED` | Personal exercise page with routine usage, best set, estimated 1RM trend, recent performances and a per-exercise progression history              | FE `/exercises/[id]`; BE timeline `exerciseId` filter; CT `@sunsteel/contracts@0.31.0`                   |
 | EXER-07  | `SHIPPED` | Private exercise stars, a starred catalog filter and starred/recent-first routine wizard pickers                                                  | FE catalog, exercise page and wizard pickers; BE `StarredExercise`; CT `@sunsteel/contracts@0.33.0`      |
@@ -476,7 +476,7 @@ two.
 | NAV-02 | `CANDIDATE` | M    | Grouped suggestions       | Show categorized instant results before opening the full results page.                                                                          | NAV-01                    |
 | NAV-03 | `CANDIDATE` | S    | Recent searches           | Reopen recently viewed users, exercises, and routines.                                                                                          | NAV-01                    |
 | NAV-04 | `CANDIDATE` | M    | Mobile quick actions      | Start or resume a workout, create a routine, or open the timer from a compact menu.                                                             | LIVE-01                   |
-| NAV-05 | `IN_PROGRESS` | S    | Navigation badges         | Display restrained unread or upcoming indicators for notifications and schedule.                                                                | NOTIF-01, SCHED-01        |
+| NAV-05 | `SHIPPED`   | S    | Navigation badges         | The protected sidebar includes Notifications and shows restrained numeric indicators for unread updates and still-actionable workouts planned today. Counts above nine compact to `9+` visually while the accessible name keeps the exact count. An active workout suppresses the schedule count because the global Resume banner already owns that state. Shipped 2026-09-17, frontend only, over the existing notification and schedule reads. | NOTIF-01, SCHED-01        |
 | NAV-06 | `SHIPPED`   | S    | Persistent history access | Keep workout history directly reachable even when Workouts redirects to an active session. Shipped as the dedicated `History` navigation entry. | None                      |
 
 ### Notifications and retention
@@ -705,6 +705,8 @@ it again without addressing the original decision.
 | 2026-09-16 | ACH-03 | [ACH-03 closure](../history/ach03-closure-2026-09-16.md); unchanged CT `@sunsteel/contracts@0.44.0` (`3824508`, npm registry integrity reverified); BE live earned-achievement and attained-rank validation coverage plus aligned agent docs (`62329ab`, CI 35141525337 with checks and analytics integration green, Railway green and production health 200); FE mixed featured-item picker, reached-rank eligibility, exact selected-item presentation and five utility tests (`230298f`, CI 35141537493, Vercel production green); isolated full gates (backend 174 and frontend 334 tests, both builds) | The existing PROF-07 persistence and endpoint were already authoritative, so ACH-03 required no contract publish, migration or backend production-code change. **Authenticated-browser verified 2026-09-16 against the real local stack:** Settings added the earned First Record medal and attained Artisan rank, the profile rendered both with achievement provenance, the PUT returned 200, no console errors appeared, and the original empty selection was restored exactly. All 28 affected profile/Settings layout cases passed across both themes and their exact widths. The complete 409-case sweep was not completed: repeated local backend Prisma interactive-transaction expirations produced unrelated 500s under the sustained run; production CI/deployments and the focused surfaces are green. A production-origin authenticated pass and follower/public mixed-visibility browser account were not exercised. `ACH-08` is the next recommended slice. |
 | 2026-09-16 | ACH-08 | [ACH-08 closure](../history/ach08-closure-2026-09-16.md); CT `@sunsteel/contracts@0.45.0` (`3235dac`, CI 35143656945, npm integrity verified); BE authoritative privacy-gated profile projection (`585f7de`, CI 35146599820, Railway green and production health 200); FE complete ruled profile ledger and presence helper (`fcd1322`, CI 35146614884, Vercel production deployment 6489798931); isolated full gates (backend 174 and frontend 335 tests, both builds) | No migration or account mutation. **Authenticated-browser verified 2026-09-16 on production:** Supabase refresh, backend verification and the app session marker returned 200; the member endpoint returned Artisan plus 21 earned milestones and no owner-only next-rank or milestone-progress fields. The owner profile rendered the full ledger, while the signed-out profile enforced the private setting and omitted the payload. The affected profile passed 14/14 layout cases across both themes and all seven canonical widths with one visible h1, no overflow or console errors. The full 409-case suite was not run against production because it contains mutating flows and assumes the local portfolio seed; a follower-visible or public-visible ledger and a real comeback row remain unobserved in browser, with those branches covered in backend/frontend tests. `NAV-05` is the next recommended dependency-ready slice; `ACH-09` still waits on a design-system amendment. |
 | 2026-09-17 | DASH-07, DASH-09 | FE `lib/utils/dashboard-insights.ts` and `lib/utils/dashboard-milestones.ts` (+ 18 tests), `app/(protected)/dashboard/components/TrainingInsights.tsx` and `UpcomingMilestones.tsx`, wired into `app/(protected)/dashboard/page.tsx`; `e2e/portfolio-targets.ts` dashboard entry updated. No contract publish, backend change or migration. Gates: lock:check, lint, typecheck, 359 tests across sixty-one files, and a clean `next build`; the 14 dashboard regression cases passed in both themes at 320/390/430/768/1024/1280/1440. Resolving the three conflict regions this file carried on `main` shipped in the same slice. |
+
+| 2026-09-17 | NAV-05 | [NAV-05 closure](../history/nav05-closure-2026-09-17.md); FE Notifications sidebar destination, exact accessible unread count, compact `9+` display, today's still-actionable schedule count and active-session suppression (`3200dff`, CI 35191360397, Vercel deployment `8KUqC9BuRMxfJoTeqowMDeRCpx1Q` green); isolated full gate (344 tests across 60 files and build) | Existing `NotificationsResponse.unreadCount` and the shared `useTodaysWorkouts` composition remained authoritative, so contracts, backend and migrations were unchanged. **Authenticated-browser verified 2026-09-17 on production, read-only:** the account showed 21 unread updates as `9+` and one planned workout as `1`; exact accessible names retained 21 and singular workout wording. Notifications and Schedule both acquired the correct active state after navigation. Light and dark themes passed all eight exact widths from 320 through 1440 px, plus the collapsed desktop sidebar, with one visible h1, no page overflow, failed requests, bad responses or console errors. The full 409-case suite and portfolio capture were not run because they include mutating, local-seed-dependent flows unsuitable for production. `PROF-10` is the next recommended dependency-ready foundation; it unlocks the safe social-core sequence. |
 
 ## Document history
 
@@ -1491,7 +1493,17 @@ it again without addressing the original decision.
   saying the same thing twice, `ACH-04` output belongs to `DASH-09` alone on
   this screen and `DASH-07` does not repeat it. No contract publish, backend
   change or migration is expected.
-- **2026-09-17 (revision 95):** Shipped `DASH-09` and `DASH-07` together and
+- **2026-09-17 (revision 95):** Shipped `NAV-05` and released its frontend
+  claim. Notifications is now a first-class sidebar destination; restrained
+  counts reuse the authoritative notification and today's-workout reads,
+  retain exact accessible names and avoid duplicating the global active-session
+  signal. The isolated gate, frontend CI, Vercel deployment and authenticated
+  read-only production checks passed in both themes at all eight exact widths,
+  including the collapsed desktop sidebar. Reconciled the conflict markers
+  accidentally committed while the social-roadmap revision and `ACH-08` merged,
+  preserving both decisions and renumbering their history sequentially.
+  `PROF-10` is the next recommended dependency-ready foundation.
+- **2026-09-17 (revision 96):** Shipped `DASH-09` and `DASH-07` together and
   released the frontend claim. Both are placements: `DASH-09` renders the
   `ACH-02` next rank and the `ACH-04` next milestone per category in catalog
   order with exact values, and `DASH-07` states the `DATA-03` week-over-week
@@ -1507,3 +1519,9 @@ it again without addressing the original decision.
   running backend: all 14 dashboard regression cases passed in both themes at
   every boundary width, and the rendered modules were read back from the live
   dashboard. No contract publish, backend change or migration.
+  Merged with the `NAV-05` closure, which landed on `origin/main` while this
+  slice was in its worktree. Both agents had resolved the same three inherited
+  conflict regions independently and to the same decisions, so the merge keeps
+  one resolution and every history entry: the redundancy pass is 93, this
+  slice's claim 94, and the `NAV-05` closure renumbered from 93 to 95 so the
+  log stays in order. The two features never touched the same file.
