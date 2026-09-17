@@ -2,7 +2,7 @@
 
 import { routineDayLabel } from '@sunsteel/contracts'
 import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ExerciseGroup } from '@/features/workout/exercise-group'
 import {
@@ -19,6 +19,8 @@ import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
+import { usePushSubscriptions } from '@/lib/api/hooks/usePushNotifications'
+import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
 import {
 	usePreviousPerformance,
@@ -81,6 +83,24 @@ export default function ActiveSessionPage() {
 	// LIVE-01: rest runs off the exercise's own restSeconds, started by the
 	// tap that ticks a set complete.
 	const restTimer = useRestTimer()
+
+	// NOTIF-03: the same deadline, sent to the server so the OS can ring when
+	// the screen is locked and LIVE-01's WebAudio tone cannot. Only attempted
+	// for accounts that actually have a subscribed device, so an account that
+	// never enabled notifications makes no extra request per set.
+	const { data: pushSubscriptions } = usePushSubscriptions()
+	const restAlert = useRestAlert(
+		idParam,
+		(pushSubscriptions?.subscriptions.length ?? 0) > 0,
+	)
+	const restingExerciseRef = useRef<string>('Your next set')
+	useEffect(() => {
+		if (restTimer.deadline === null) {
+			restAlert.cancel()
+			return
+		}
+		restAlert.schedule(restTimer.deadline, restingExerciseRef.current)
+	}, [restAlert, restTimer.deadline])
 
 	// Session management
 	const {
@@ -310,7 +330,10 @@ export default function ActiveSessionPage() {
 								totalSets={totalSets}
 								onSave={handleSaveSetLog}
 								previousSets={previousSets}
-								onSetCompleted={() => restTimer.start(group.restSeconds)}
+								onSetCompleted={() => {
+									restingExerciseRef.current = group.exerciseName
+									restTimer.start(group.restSeconds)
+								}}
 								substitutedFrom={
 									substitution && prescribed ? prescribed.name : null
 								}

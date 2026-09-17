@@ -12,6 +12,12 @@ const TICK_MS = 250
 export interface RestTimerState {
 	/** Seconds left, or null when no rest period is running. */
 	remaining: number | null
+	/**
+	 * Absolute epoch milliseconds the period ends at, or null. Exposed for
+	 * NOTIF-03: the push has to be scheduled against the same deadline the
+	 * display counts down to, and it changes on both start and extend.
+	 */
+	deadline: number | null
 	/** The full rest duration this period started with, including extensions. */
 	total: number
 	/** True once the deadline has passed and the alert has fired. */
@@ -104,6 +110,7 @@ export function useRestTimer(): RestTimerState {
 
 	return {
 		remaining,
+		deadline,
 		total,
 		isOver: remaining === 0,
 		start,

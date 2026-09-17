@@ -35,6 +35,7 @@ import { MotionPreferenceCard } from '@/features/settings/motion-preference-card
 import { PrivacyOverviewCard } from '@/features/settings/privacy-overview-card'
 import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
 import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
+import { PushNotificationsCard } from '@/features/settings/push-notifications-card'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
@@ -559,6 +560,8 @@ export default function SettingsPage() {
 			{user ? (
 				<ProfilePrivacySettingsCard settings={user.privacySettings} />
 			) : null}
+
+			<PushNotificationsCard />
 
 			<MotionPreferenceCard />
 

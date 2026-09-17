@@ -1,7 +1,8 @@
 // public/sw.js
-// Bumped to v5 in TD-04: PRECACHE_URLS changed (the 1.76 MB /logo.png is gone,
-// replaced by the 10 KB /icon-192.png), so old caches must be discarded.
-const CACHE_VERSION = 'v5'
+// Bumped to v6 for NOTIF-02: the worker gained push and notificationclick
+// handlers, so every client must pick up this version rather than keep serving
+// from a worker that cannot receive a notification.
+const CACHE_VERSION = 'v6'
 const RUNTIME_CACHE = `ss-runtime-${CACHE_VERSION}`
 const PRECACHE = `ss-precache-${CACHE_VERSION}`
 const PAGE_CACHE = `ss-pages-${CACHE_VERSION}`
@@ -145,5 +146,92 @@ self.addEventListener('fetch', event => {
 	// Default: try cache, then network
 	event.respondWith(
 		caches.match(request).then(cached => cached || fetch(request)),
+	)
+})
+
+// NOTIF-02/NOTIF-03 -----------------------------------------------------------
+//
+// A rest alert exists because the page cannot make a sound once the phone is
+// locked: LIVE-01's tone is WebAudio inside the document, and a backgrounded
+// PWA has its audio context suspended and its timers throttled. Only the OS can
+// ring then, and only a push can ask it to.
+
+const NOTIFICATION_DEFAULTS = {
+	icon: '/icon-192.png',
+	badge: '/icon-192.png',
+	// The alert is the point; a silent one would defeat the whole feature.
+	silent: false,
+	vibrate: [120, 60, 120],
+}
+
+self.addEventListener('push', event => {
+	// A push with no body, or one this version does not understand, must still
+	// show something rather than nothing: the OS has already woken the device.
+	let payload = {}
+	try {
+		payload = event.data ? event.data.json() : {}
+	} catch {
+		payload = {}
+	}
+
+	const title = payload.title || 'Sunnsteel'
+	const options = {
+		...NOTIFICATION_DEFAULTS,
+		body: payload.body || '',
+		tag: payload.tag || 'sunnsteel',
+		// Replace an older alert for the same session instead of stacking two.
+		renotify: Boolean(payload.tag),
+		data: { url: payload.url || '/dashboard' },
+	}
+
+	event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', event => {
+	event.notification.close()
+	const target = (event.notification.data && event.notification.data.url) || '/'
+
+	event.waitUntil(
+		(async () => {
+			const url = new URL(target, self.location.origin)
+			const clients = await self.clients.matchAll({
+				type: 'window',
+				includeUncontrolled: true,
+			})
+
+			// Focusing the open session beats opening a second copy of it: the
+			// athlete is mid-workout and the running page holds the live timer.
+			for (const client of clients) {
+				if (
+					new URL(client.url).pathname === url.pathname &&
+					'focus' in client
+				) {
+					return client.focus()
+				}
+			}
+			const anyClient = clients.find(client => 'navigate' in client)
+			if (anyClient) {
+				await anyClient.focus()
+				return anyClient.navigate(url.href)
+			}
+			return self.clients.openWindow(url.href)
+		})(),
+	)
+})
+
+// A subscription can be rotated by the browser at any time. The page cannot
+// re-register what it never learns about, so the worker tells whichever client
+// is open to send the new subscription to the server.
+self.addEventListener('pushsubscriptionchange', event => {
+	event.waitUntil(
+		(async () => {
+			const clients = await self.clients.matchAll({
+				type: 'window',
+				includeUncontrolled: true,
+			})
+			for (const client of clients) {
+				client.postMessage({ type: 'PUSH_SUBSCRIPTION_CHANGED' })
+			}
+		})(),
 	)
 })
