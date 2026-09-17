@@ -14,6 +14,7 @@ import type {
 export const CATEGORY_LABELS: Record<NotificationCategory, string> = {
 	REST_ALERT: 'Rest alerts',
 	TRAINING_REMINDER: 'Training reminders',
+	STREAK_AT_RISK: 'Streak at risk',
 }
 
 export const CATEGORY_DESCRIPTIONS: Record<NotificationCategory, string> = {
@@ -21,6 +22,8 @@ export const CATEGORY_DESCRIPTIONS: Record<NotificationCategory, string> = {
 		'When a rest period ends while Sunnsteel is closed or your screen is locked.',
 	TRAINING_REMINDER:
 		'Once on the days you are planned to train, at the time you choose below.',
+	STREAK_AT_RISK:
+		'On the last day a training run can still be continued. It replaces that day’s reminder rather than adding a second notification, and it states the dates rather than telling you to train.',
 }
 
 /** `1110` → `18:30`. Zero-padded so it round-trips through a time input. */

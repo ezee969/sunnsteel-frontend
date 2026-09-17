@@ -1,7 +1,10 @@
 import type { NotificationPreferencesResponse } from '@sunsteel/contracts'
+import { NOTIFICATION_CATEGORIES } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
+	CATEGORY_DESCRIPTIONS,
+	CATEGORY_LABELS,
 	describeQuietHours,
 	describeReminder,
 	describeTimeZone,
@@ -15,7 +18,11 @@ const response = (
 	preferences: Partial<NotificationPreferencesResponse['preferences']> = {},
 ): NotificationPreferencesResponse => ({
 	preferences: {
-		categories: { REST_ALERT: true, TRAINING_REMINDER: true },
+		categories: {
+			REST_ALERT: true,
+			TRAINING_REMINDER: true,
+			STREAK_AT_RISK: true,
+		},
 		quietHours: null,
 		reminder: { minuteOfDay: null },
 		timeZone: 'Europe/Berlin',
@@ -114,7 +121,13 @@ describe('the notice above the controls', () => {
 			preferencesNotice(
 				response(
 					{},
-					{ categories: { REST_ALERT: false, TRAINING_REMINDER: false } },
+					{
+						categories: {
+							REST_ALERT: false,
+							TRAINING_REMINDER: false,
+							STREAK_AT_RISK: false,
+						},
+					},
 				),
 			),
 		).toBe('ALL_CATEGORIES_OFF')
@@ -125,7 +138,13 @@ describe('the notice above the controls', () => {
 			preferencesNotice(
 				response(
 					{},
-					{ categories: { REST_ALERT: false, TRAINING_REMINDER: true } },
+					{
+						categories: {
+							REST_ALERT: false,
+							TRAINING_REMINDER: true,
+							STREAK_AT_RISK: false,
+						},
+					},
 				),
 			),
 		).toBeNull()
@@ -143,5 +162,25 @@ describe('time-zone copy', () => {
 
 	it('explains why reminders stay off without one', () => {
 		expect(describeTimeZone(null)).toMatch(/stay off/)
+	})
+})
+
+describe('the streak-at-risk category (NOTIF-06)', () => {
+	it('says it replaces the reminder rather than adding a push', () => {
+		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(/replaces/)
+		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(
+			/rather than adding a second/,
+		)
+	})
+
+	it('never promises to tell anyone to train', () => {
+		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(/states the dates/)
+	})
+
+	it('is switchable like the others, so every category has copy', () => {
+		for (const category of NOTIFICATION_CATEGORIES) {
+			expect(CATEGORY_LABELS[category]).toBeTruthy()
+			expect(CATEGORY_DESCRIPTIONS[category]).toBeTruthy()
+		}
 	})
 })
