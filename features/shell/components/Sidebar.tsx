@@ -6,7 +6,6 @@ import {
 	BellDot,
 	Calendar,
 	ChevronLeft,
-	ChevronRight,
 	Dumbbell,
 	History,
 	Home,
@@ -205,10 +204,18 @@ export default function Sidebar({
 				// single rule on its right edge - no marble wash, no gold hex border,
 				// no blur, no shadow. Elevation in this system is tonal (§8).
 				'fixed inset-y-0 z-50 flex flex-col border-r border-rule bg-background',
+				// Motion spec 2.3: the drawer slides on `transform`. `left` and
+				// `width` are on the never-animate list (1.2), so the drawer always
+				// occupies its open box and is pushed off-screen by a translate -
+				// `-left-full` could not be animated at all. Desktop collapse stays
+				// instant for the same reason: width is layout, not message.
 				isMobile
-					? isMobileMenuOpen
-						? 'left-0 w-[85%] max-w-[300px]'
-						: '-left-full'
+					? cn(
+							'left-0 w-[85%] max-w-[300px] transition-transform',
+							isMobileMenuOpen
+								? 'translate-x-0 duration-[var(--motion-slow)] ease-standard'
+								: '-translate-x-full duration-[var(--motion-base)] ease-exit',
+						)
 					: isSidebarOpen
 						? 'left-0 w-64'
 						: 'left-0 w-20',
@@ -245,11 +252,13 @@ export default function Sidebar({
 						aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
 						className={cn(!isSidebarOpen && 'ml-auto')}
 					>
-						{isSidebarOpen ? (
-							<ChevronLeft className="h-5 w-5" />
-						) : (
-							<ChevronRight className="h-5 w-5" />
-						)}
+						{/* Motion spec 2.3: one chevron rotated, not two glyphs swapped. */}
+						<ChevronLeft
+							className={cn(
+								'h-5 w-5 transition-transform duration-[var(--motion-base)] ease-standard',
+								!isSidebarOpen && 'rotate-180',
+							)}
+						/>
 					</Button>
 				)}
 			</div>
@@ -282,7 +291,8 @@ export default function Sidebar({
 						/>
 					)}
 					{SIDEBAR_NAV_ITEMS.map(item => {
-						const showTooltip = !isSidebarOpen && !isMobile
+						const isCollapsed = !isSidebarOpen && !isMobile
+						const showTooltip = isCollapsed
 						const isActive = activeNav === item.id
 						const indicator =
 							item.id === 'notifications'
@@ -299,7 +309,7 @@ export default function Sidebar({
 							// geometry, so both carry the same 3px left border.
 							'mark group relative w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
 							isMobile ? 'h-11' : 'h-9',
-							isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
+							isCollapsed ? 'justify-center' : 'justify-start',
 							isActive
 								? 'bg-surface font-semibold text-foreground'
 								: 'text-ink-2 hover:bg-surface hover:text-foreground',
@@ -312,41 +322,53 @@ export default function Sidebar({
 								? 'text-honour-strong'
 								: 'text-ink-3 group-hover:text-foreground',
 						)
+						const icon = item.classicalName ? (
+							<ClassicalIcon
+								name={item.classicalName}
+								aria-hidden
+								className={iconClassName}
+							/>
+						) : (
+							<ItemIcon className={iconClassName} aria-hidden />
+						)
 						const inner = (
 							<>
-								{item.classicalName ? (
-									<ClassicalIcon
-										name={item.classicalName}
-										aria-hidden
-										className={iconClassName}
-									/>
+								{/* Collapsed, the count belongs to the glyph: pinned to the
+								    icon's top-right as a superscript. It used to be
+								    `absolute right-1`, which parked it against the column's
+								    right rule with nothing to attach it to - it read as a
+								    stray character rather than as this item's count. The
+								    exact number stays in the link's `aria-label`. */}
+								{indicator && isCollapsed ? (
+									<span className="relative flex shrink-0 items-center justify-center">
+										{icon}
+										<span
+											aria-hidden
+											className="type-data pointer-events-none absolute -right-3 -top-1.5 text-[11px] leading-none text-ink-2"
+										>
+											{indicator.compactText}
+										</span>
+									</span>
 								) : (
-									<ItemIcon className={iconClassName} aria-hidden />
+									icon
 								)}
 								<span
 									className={cn(
 										'truncate',
-										!isSidebarOpen &&
-											!isMobile &&
-											'w-0 overflow-hidden opacity-0',
+										isCollapsed && 'w-0 overflow-hidden opacity-0',
 									)}
 								>
 									{item.label}
 								</span>
-								{indicator && (
+								{indicator && !isCollapsed && (
 									<span
 										aria-hidden
-										className={cn(
-											'type-data shrink-0 text-ink-2',
-											isSidebarOpen || isMobile
-												? 'ml-auto'
-												: 'absolute right-1',
-										)}
+										className="type-data ml-auto shrink-0 text-ink-2"
 									>
 										{indicator.compactText}
 									</span>
 								)}
-								{item.disabled && (isSidebarOpen || isMobile) && (
+								{item.disabled && !isCollapsed && (
 									<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
 										Soon
 									</span>

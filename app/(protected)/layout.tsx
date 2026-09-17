@@ -154,9 +154,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 			    the content. One flat surface, both themes. */}
 			<div className="absolute inset-0 -z-10 bg-background" />
 			<div className="flex h-screen">
-				{isMobile && isMobileMenuOpen && (
+				{/* Motion spec 2.3: the scrim fades with the drawer (200ms in, 140ms
+				    out), so it stays mounted and toggles opacity - unmounting it on
+				    close would cut the fade off mid-way. `pointer-events-none` keeps
+				    the invisible scrim from swallowing taps. */}
+				{isMobile && (
 					<div
-						className="fixed inset-0 z-50 touch-none bg-scrim"
+						aria-hidden
+						className={cn(
+							'fixed inset-0 z-50 bg-scrim transition-opacity',
+							isMobileMenuOpen
+								? 'touch-none opacity-100 duration-[var(--motion-base)] ease-standard'
+								: 'pointer-events-none opacity-0 duration-[140ms] ease-exit',
+						)}
 						onClick={() => setIsMobileMenuOpen(false)}
 					/>
 				)}
