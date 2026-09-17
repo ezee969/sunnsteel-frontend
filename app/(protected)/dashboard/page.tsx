@@ -8,6 +8,8 @@ import PersonalRecords from './components/PersonalRecords'
 import RecentActivity from './components/RecentActivity'
 import StatsOverview from './components/StatsOverview'
 import TodaysWorkouts from './components/TodaysWorkouts'
+import TrainingInsights from './components/TrainingInsights'
+import UpcomingMilestones from './components/UpcomingMilestones'
 import { useDashboardData } from './hooks/useDashboardData'
 
 export default function Dashboard() {
@@ -74,6 +76,18 @@ export default function Dashboard() {
 						<RecentActivity />
 						<PersonalRecords />
 					</div>
+
+					{/*
+					 * DASH-07 then DASH-09: what the record already says about the
+					 * weeks just finished, then what is next. Both run full width
+					 * because their rows carry a sentence beside a data column, and
+					 * they sit last so training actions keep the top of the screen.
+					 * Neither joins the readiness gate above — they own their own
+					 * skeletons, so a slower analytics read cannot hold the whole
+					 * dashboard back.
+					 */}
+					<TrainingInsights />
+					<UpcomingMilestones />
 				</div>
 			)}
 		</div>
