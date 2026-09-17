@@ -1139,10 +1139,38 @@ Size the mark to roughly **1.2× the wordmark's cap height** — at `text-xl` th
   in both states and at its unchanged 56/64 height: the full lockup expanded, the
   mark alone and centred when collapsed.
 
-### 18.4 Still to verify
+### 18.4 Verification
 
-Neither gate has been run for this change:
+Both gates were run on 2026-09-18 against a clean dev compile.
 
-- §15 gate 1 — confirm `.type-wordmark`'s new values are in the served CSS.
-- §15 gate 3 — both themes at 320/375/390/768/1024/1440, plus the collapsed
-  sidebar, the mobile drawer and the splash at both its size steps.
+- **§15 gate 1 — compiled stylesheet: pass.** The served CSS carries
+  `font-weight: 600; letter-spacing: .12em; margin-right: -.12em`, so the new
+  rank is in the bundle and not merely in source.
+- **§15 gate 3 — regression sweep: pass, 409/409.** `npm run ui:regression`
+  across 320/390/430/768/1024/1280/1440 in both themes: 398 passed in the full
+  sweep, and the remaining 11 passed on a targeted re-run after the two
+  pre-existing defects below were dealt with. Both themes, the collapsed
+  sidebar, the mobile drawer and the splash are covered by that set.
+
+The sweep took three attempts to complete, and the two earlier aborts were
+environmental rather than defects: a backend `--watch` restart mid-run, and a
+production build written over the running dev server's `.next/` (the failure
+mode CLAUDE.md describes — every route 500s and the pages photograph as blank).
+
+**Two pre-existing defects surfaced, neither caused by this change.**
+
+1. **The portfolio seed guard fired on every run.** `e2e/global-setup.ts` gated
+   it on `config.projects.some(p => p.name === 'portfolio')`, but
+   `FullConfig.projects` is the *configured* project list and never shrinks
+   under `--project=regression`. The guard is unrelated to the sweep, so it
+   blocked the check CLAUDE.md requires for every UI change. Fixed with
+   `runsProject` in `e2e/preconditions.ts`, which reads the flag from
+   `FullConfig.argv` and fails closed on anything it cannot parse.
+2. **`expectDrawerClosed` asserted the scrim was unmounted.** It cannot be:
+   motion spec §2.3 fades the scrim out, and an element cannot animate its own
+   opacity after removal, so the layout keeps it mounted for as long as
+   `isMobile` holds. Measured on a fresh `/dashboard` at 320 with the drawer
+   never opened: one `.bg-scrim`, opacity 0, pointer-events none. The assertion
+   now checks that it is not an interaction surface. Note that
+   `not.toBeVisible()` would have been a false pass — Playwright's visibility
+   check ignores opacity.

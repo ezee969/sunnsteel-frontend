@@ -279,7 +279,20 @@ async function expectDrawerClosed(page: Page) {
 			{ message: 'the drawer is still on screen' },
 		)
 		.toBeLessThanOrEqual(0)
-	await expect(page.locator('.bg-scrim')).toHaveCount(0)
+	// The scrim is NOT unmounted when the drawer closes, and asserting that it
+	// is could never pass: motion spec §2.3 fades it out, and an element cannot
+	// animate its own opacity after being removed, so `app/(protected)/layout.tsx`
+	// renders it for the whole time `isMobile` holds and hides it with
+	// `opacity-0 pointer-events-none`. Measured on a fresh /dashboard at 320 with
+	// the drawer never opened: one `.bg-scrim`, opacity 0, pointer-events none.
+	// So assert it is gone as an *interaction surface*, which is what "closed"
+	// means here — Playwright's own visibility check ignores opacity, so it would
+	// call this element visible.
+	const scrim = page.locator('.bg-scrim')
+	if ((await scrim.count()) > 0) {
+		await expect(scrim).toHaveCSS('opacity', '0')
+		await expect(scrim).toHaveCSS('pointer-events', 'none')
+	}
 }
 
 /**

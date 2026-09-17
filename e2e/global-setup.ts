@@ -1,6 +1,6 @@
 import type { FullConfig } from '@playwright/test'
 
-import { assertSeedNewerThanLastCapture } from './preconditions'
+import { assertSeedNewerThanLastCapture, runsProject } from './preconditions'
 
 /**
  * Run-level preconditions, checked once before any worker starts.
@@ -12,6 +12,7 @@ import { assertSeedNewerThanLastCapture } from './preconditions'
  * the previous run left behind, which is what the check is about.
  */
 export default function globalSetup(config: FullConfig) {
-	if (!config.projects.some(project => project.name === 'portfolio')) return
+	const configured = config.projects.map(project => project.name)
+	if (!runsProject(config.argv, configured, 'portfolio')) return
 	assertSeedNewerThanLastCapture('docs/portfolio/manifest.json')
 }

@@ -65,6 +65,64 @@ Or set UI_SKIP_SEED_CHECK=1 to capture the data as it stands.`,
 }
 
 /**
+ * Whether this run will execute the project called `name`.
+ *
+ * `FullConfig.projects` is the *configured* project list, never the selected
+ * one: it still holds all four after `--project=regression`, so a guard written
+ * as `config.projects.some(p => p.name === 'portfolio')` is true on every run
+ * and fires unconditionally. That is how the portfolio seed check came to block
+ * `npm run ui:regression`, which CLAUDE.md requires for every UI change, over
+ * the state of a screenshot set the sweep never writes to.
+ *
+ * Playwright does not hand `globalSetup` the filtered set, so the flag is read
+ * back out of the runner's own argv (`FullConfig.argv`).
+ *
+ * It fails **closed**: `--project` also accepts patterns, and a token that is
+ * not an exact configured name could still match `name`, so an unrecognised one
+ * answers true rather than silently skipping the guard.
+ */
+export function runsProject(
+	argv: readonly string[],
+	configuredNames: readonly string[],
+	name: string,
+): boolean {
+	const selected: string[] = []
+	let filtered = false
+
+	for (let index = 0; index < argv.length; index += 1) {
+		const arg = argv[index]
+
+		if (arg.startsWith('--project=')) {
+			filtered = true
+			selected.push(arg.slice('--project='.length))
+			continue
+		}
+		if (arg !== '--project') continue
+
+		filtered = true
+		let next = index + 1
+		if (next < argv.length && !argv[next].startsWith('-')) {
+			selected.push(argv[next])
+			next += 1
+			// `--project` is variadic. Keep consuming only tokens that name a real
+			// project, so a trailing file filter is not swallowed as one.
+			while (next < argv.length && configuredNames.includes(argv[next])) {
+				selected.push(argv[next])
+				next += 1
+			}
+		}
+		index = next - 1
+	}
+
+	if (!filtered) return true
+	// A flag with no readable value tells us nothing, so it is not a reason to
+	// skip the guard either.
+	if (selected.length === 0) return true
+	if (selected.includes(name)) return true
+	return selected.some(token => !configuredNames.includes(token))
+}
+
+/**
  * With the backend down, verification fails and the protected layout bounces
  * to /login — which looks exactly like an expired sign-in. Phase 14's first run
  * lost 136 tests to a backend restart reported as "session expired".
