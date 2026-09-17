@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
 import { ModeToggle } from '@/components/mode-toggle'
 
 /**
@@ -31,7 +32,7 @@ export default function AuthLayout({
 	return (
 		<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
 			<header className="flex h-14 shrink-0 items-center justify-between border-b border-rule px-4 md:h-16 md:px-8">
-				<span className="type-wordmark text-xl text-foreground">SUNNSTEEL</span>
+				<SunnsteelLockup className="text-xl text-foreground" />
 				{mounted ? (
 					<ModeToggle />
 				) : (

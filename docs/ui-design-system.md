@@ -297,7 +297,7 @@ Four faces, four jobs. No new font payload.
 
 | Face | Loaded | Job |
 | --- | --- | --- |
-| Cinzel | **600, 900 only** | Page and section inscriptions (600); wordmark (900) |
+| Cinzel | **600 only** | Page and section inscriptions; wordmark (§18) |
 | Bebas Neue | **400 only** | Large numerals only |
 | Oswald | 400, 500, 600, 700 | Body, labels, item titles, buttons |
 | Space Mono | **400, 700 only** | All data: weights, reps, dates, durations, timers |
@@ -320,7 +320,7 @@ once already (CL-07), and is **not** taken here.
 | Numeral, large | Bebas Neue 400 | 40 | 52 | 0.95 | 0.02em | — |
 | Data | Space Mono 400 | 13 | 13 | 1.50 | 0 | — |
 | Data, emphatic | Space Mono 700 | 13 | 13 | 1.50 | 0 | — |
-| Wordmark | Cinzel 900 | unchanged | — | — | UPPER |
+| Wordmark | Cinzel 600 | unchanged | — | 0.12em | UPPER |
 
 Changed from v0.1: page title 26/34 → **24/32** and tracking 0.06em → 0.045em
 (QA 5 — Cinzel's width was truncating titles); section 17 → **16** on mobile;
@@ -752,7 +752,7 @@ terminal action.
 ### 11.10 Navigation
 
 - Sidebar as an index column: ground-coloured, no panel fill, 1px `--rule` on its
-  right edge, Cinzel 900 wordmark, items Oswald 500 at 14/36px.
+  right edge, the brand lockup (§18), items Oswald 500 at 14/36px.
 - **Active item: no filled block.** A 3px `--honour-strong` left marker, ink text
   at 600, icon in `--honour-strong`. The light black slab and dark ivory slab
   both retire — that inversion is the heaviest object on every screen.
@@ -760,7 +760,8 @@ terminal action.
   not geometry.
 - Disabled / `SOON`: `--ink-3`, and `SOON` becomes the bare word at 10px
   uppercase tracked, right-aligned, no border box.
-- Topbar 56 mobile / 64 desktop, ground-coloured, 1px `--rule` below, page
+- Topbar 56 mobile / 64 desktop, ground-coloured, 1px `--rule` below, the
+  sidebar collapse chevron at its leading edge on desktop (§18.3), page
   inscription with its gold corner brackets, search as a 2px well.
 
 The active-nav marker is the one place `--honour-strong` marks something not
@@ -1069,3 +1070,79 @@ Open items that are **verification**, not decisions:
 - Re-measure §4.4 in the browser once the tokens land (§15 gate 2).
 - Confirm the new utilities emit in the compiled stylesheet (§15 gate 1).
 - QA 13's specific observation, if it recurs once the session screen is rebuilt.
+
+---
+
+## 18. Amendment — the brand lockup (2026-09-17)
+
+An owner-approved identity change, taken deliberately outside an implementation
+batch as §17 requires. It is recorded here rather than in a new document because
+it re-values two rows of §5 and one line of §11.10.
+
+### 18.1 Why the wordmark changed
+
+The wordmark was Cinzel 900 at 20px, tracked 0.05em, in a shell where `type-page`
+and `type-section` are also Cinzel uppercase. Three defects, in order of weight:
+
+1. **No voice of its own.** Set in the same face and case as every page and
+   section inscription, the wordmark read as one more heading. Nothing in the
+   chrome said "brand".
+2. **Wrong optical size.** Cinzel is Trajan-derived display type. At the 20px the
+   sidebar actually renders, 900 closes the counters of `S`, `E` and the two
+   `N`s; the word thickens rather than reading as carved.
+3. **Tracked like a label.** Heavy Roman capitals need 0.10–0.18em to separate at
+   that size. 0.05em is a body-label value.
+
+`SUNNSTEEL`'s double `N` compounds all three: Cinzel's wide `N` puts the heaviest,
+widest form dead centre in the word.
+
+### 18.2 What the lockup is
+
+A drawn **mark** plus the wordmark, as one object.
+
+The mark is a sun disc above a barbell — the two shapes the existing app icon is
+already built from, reduced to five strokes in a 24-unit box so the glyph holds
+at 16px. It lives in
+[components/brand/sunnsteel-lockup.tsx](../components/brand/sunnsteel-lockup.tsx)
+as inline SVG on `currentColor`, not as a `ClassicalIcon`: that component is the
+classical *icon set*, loaded by CSS mask from `public/icons/classical/`, and the
+brand mark belongs to neither that set nor a second request in the shell header.
+
+The mark carries the authority the 900 weight was being asked for, which is what
+lets the wordmark drop to **Cinzel 600 at 0.12em**. `.type-wordmark` also carries
+`margin-right: -0.12em`, because `letter-spacing` adds its gap after the last
+letter too and that throws off both optical centring and the gap to whatever sits
+right of it.
+
+Size the mark to roughly **1.2× the wordmark's cap height** — at `text-xl` that is
+`size-6`. Below that ratio the two read as separate objects.
+
+### 18.3 Consequences
+
+- **900 is no longer loaded.** The wordmark was its only consumer, so
+  [app/layout.tsx](../app/layout.tsx) now requests Cinzel 600 alone. The identity
+  change is net *negative* in font bytes; §13 item 4 is untouched, because no
+  weight was added.
+- **The public header drops the word below `sm`** and shows the mark alone. TD-35
+  had already measured that row at its limit at 320; this buys roughly 40px back
+  instead of spending any. The `<Link>` carries `aria-label="Sunnsteel"` in both
+  states, so hiding the word costs no accessible name.
+- **The splash brackets the whole lockup**, mark included — §11.11 allows one pair
+  per screen, and the lockup is one object.
+- **The collapsed rail carries the mark, and the collapse chevron moved to the
+  topbar.** At `w-20` the sidebar header has 48px of content width; the 40px
+  toggle filled it, so the two could not share the row. The chevron now sits in
+  the topbar, which is where motion spec §2.3 already named it ("Sidebar collapse
+  chevron (topbar)") — so this relocates a control to its documented home rather
+  than deciding a new one. On desktop it takes the slot the mobile menu button
+  occupies, so the two never coexist. The sidebar header is therefore brand only,
+  in both states and at its unchanged 56/64 height: the full lockup expanded, the
+  mark alone and centred when collapsed.
+
+### 18.4 Still to verify
+
+Neither gate has been run for this change:
+
+- §15 gate 1 — confirm `.type-wordmark`'s new values are in the served CSS.
+- §15 gate 3 — both themes at 320/375/390/768/1024/1440, plus the collapsed
+  sidebar, the mobile drawer and the splash at both its size steps.

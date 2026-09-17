@@ -5,7 +5,6 @@ import {
 	Bell,
 	BellDot,
 	Calendar,
-	ChevronLeft,
 	Dumbbell,
 	History,
 	Home,
@@ -20,6 +19,10 @@ import Link from 'next/link'
 import { type CSSProperties, useEffect, useRef } from 'react'
 
 import { useTodaysWorkouts } from '@/app/(protected)/dashboard/hooks/useTodaysWorkouts'
+import {
+	SunnsteelLockup,
+	SunnsteelMark,
+} from '@/components/brand/sunnsteel-lockup'
 import {
 	ClassicalIcon,
 	ClassicalIconName,
@@ -131,7 +134,6 @@ interface SidebarProps {
 	isMobileMenuOpen: boolean
 	activeNav: string
 	setActiveNav: (navItem: string) => void
-	setIsSidebarOpen: (isOpen: boolean) => void
 	setIsMobileMenuOpen: (isOpen: boolean) => void
 	onNavigateStart?: () => void
 }
@@ -142,7 +144,6 @@ export default function Sidebar({
 	isMobileMenuOpen,
 	activeNav,
 	setActiveNav,
-	setIsSidebarOpen,
 	setIsMobileMenuOpen,
 	onNavigateStart,
 }: SidebarProps) {
@@ -166,10 +167,6 @@ export default function Sidebar({
 			description:
 				'We are working hard on bringing this feature to Sunnsteel. Stay tuned!',
 		})
-	}
-
-	const toggleSidebar = () => {
-		setIsSidebarOpen(!isSidebarOpen)
 	}
 
 	const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -221,17 +218,24 @@ export default function Sidebar({
 						: 'left-0 w-20',
 			)}
 		>
-			<div className="flex h-14 items-center justify-between border-b border-rule px-4 md:h-16">
-				<div
-					className={cn(
-						'flex items-center gap-2 font-semibold',
-						!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
-					)}
-				>
-					<span className="type-wordmark text-xl text-foreground">
-						SUNNSTEEL
-					</span>
-				</div>
+			{/* Brand only. The collapse chevron used to share this row, which left
+			    48px of content at `w-20` - the 40px button filled it and the mark had
+			    nowhere to go. It now lives in the topbar, where motion spec §2.3
+			    already named it ("Sidebar collapse chevron (topbar)"), so the rail's
+			    crown carries the identity in both states: the full lockup expanded,
+			    the mark alone collapsed. The row keeps its 56/64 height either way,
+			    so its rule stays aligned with the topbar's. */}
+			<div
+				className={cn(
+					'flex h-14 items-center border-b border-rule px-4 md:h-16',
+					!isSidebarOpen && !isMobile ? 'justify-center' : 'justify-between',
+				)}
+			>
+				{!isSidebarOpen && !isMobile ? (
+					<SunnsteelMark className="size-7 text-foreground" />
+				) : (
+					<SunnsteelLockup className="text-xl text-foreground" />
+				)}
 				{isMobile && (
 					<Button
 						ref={closeButtonRef}
@@ -242,23 +246,6 @@ export default function Sidebar({
 						onClick={() => setIsMobileMenuOpen(false)}
 					>
 						<X className="h-5 w-5" />
-					</Button>
-				)}
-				{!isMobile && (
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={toggleSidebar}
-						aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-						className={cn(!isSidebarOpen && 'ml-auto')}
-					>
-						{/* Motion spec 2.3: one chevron rotated, not two glyphs swapped. */}
-						<ChevronLeft
-							className={cn(
-								'h-5 w-5 transition-transform duration-[var(--motion-base)] ease-standard',
-								!isSidebarOpen && 'rotate-180',
-							)}
-						/>
 					</Button>
 				)}
 			</div>

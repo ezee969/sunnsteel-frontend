@@ -279,14 +279,23 @@
     line-height: 0.95;
     letter-spacing: 0.02em;
   }
-  /* v1.0 §5.2 names a Wordmark rank (Cinzel 900) but §11.2 listed no class for
-     it, so the sidebar carried it as an inline style with a literal family name.
-     Cinzel ships 900, so this is the spec's own rank, not a new decision. */
+  /* v1.0 §5.2 names a Wordmark rank but §11.2 listed no class for it, so the
+     sidebar carried it as an inline style with a literal family name.
+
+     Re-cut 2026-09-17 with the owner from Cinzel 900/0.05em to 600/0.12em, and
+     the wordmark is now half of a lockup (§11.10). Two measured reasons: Cinzel
+     is a Trajan-derived display face, and at the 20px the shell actually renders
+     it 900 closes the counters of S, E and the two Ns; and heavy Roman capitals
+     need 0.10-0.18em to separate at that size, not the 0.05em of a body label.
+     The mark, not the weight, now carries the wordmark's authority. */
   .type-wordmark {
     font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
-    font-weight: 900;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    /* letter-spacing adds its gap after the last letter too, which throws off
+       optical centring (the splash) and the gap to anything right of it. */
+    margin-right: -0.12em;
   }
   .type-button {
     font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;

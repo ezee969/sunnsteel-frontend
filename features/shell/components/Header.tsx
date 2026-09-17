@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Settings, User } from 'lucide-react'
+import { ChevronLeft, Menu, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 
 import { ModeToggle } from '@/components/mode-toggle'
@@ -19,17 +19,22 @@ import { useToast } from '@/components/ui/toast'
 import { NotificationBell } from '@/features/notifications/notification-bell'
 import { useSupabaseLogout } from '@/lib/api/hooks/useSupabaseEmailAuth'
 import { useUser } from '@/lib/api/hooks/useUser'
+import { cn } from '@/lib/utils'
 
 interface HeaderProps {
 	title: string
 	isMobile: boolean
+	isSidebarOpen: boolean
 	setIsMobileMenuOpen: (isOpen: boolean) => void
+	onToggleSidebar: () => void
 }
 
 export default function Header({
 	title,
 	isMobile,
+	isSidebarOpen,
 	setIsMobileMenuOpen,
+	onToggleSidebar,
 }: HeaderProps) {
 	return (
 		// §11.10: 56 mobile / 64 desktop, ground-coloured, one rule below. Opaque,
@@ -37,7 +42,7 @@ export default function Header({
 		// are retired; the brackets now sit on the page inscription instead, one
 		// pair per screen (§11.11).
 		<header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-rule bg-background px-4 md:h-16">
-			{isMobile && (
+			{isMobile ? (
 				<Button
 					variant="ghost"
 					size="icon"
@@ -46,6 +51,28 @@ export default function Header({
 				>
 					<Menu className="h-5 w-5" />
 					<span className="sr-only">Toggle Menu</span>
+				</Button>
+			) : (
+				/* The sidebar collapse control, where motion spec §2.3 already placed
+				   it ("Sidebar collapse chevron (topbar)"). It moved out of the sidebar
+				   header so the rail's crown could carry the brand mark at `w-20`,
+				   where 48px of content width could not hold both. It takes the slot
+				   the mobile menu button occupies, so the two never coexist. */
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={onToggleSidebar}
+					aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+					aria-expanded={isSidebarOpen}
+					className="mr-1"
+				>
+					{/* Motion spec §2.3: one chevron rotated, not two glyphs swapped. */}
+					<ChevronLeft
+						className={cn(
+							'h-5 w-5 transition-transform duration-[var(--motion-base)] ease-standard',
+							!isSidebarOpen && 'rotate-180',
+						)}
+					/>
 				</Button>
 			)}
 			<div className="flex-1 min-w-0 mr-4 flex items-center justify-between">

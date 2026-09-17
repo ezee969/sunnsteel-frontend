@@ -31,16 +31,16 @@ const bebasNeue = Bebas_Neue({
 	display: 'swap',
 })
 
-// Only 600 and 900 are actually used: 900 for the two SUNNSTEEL wordmarks
-// (Sidebar and the mobile splash) and 600 for the splash tagline and loading
-// text. It used to load six weights. Cinzel is referenced by literal family
-// name from inline styles — that resolves, because next/font emits the
-// @font-face with the real `Cinzel` family, not a hashed one. `--font-cinzel`
-// is exposed but never referenced in CSS. See CL-07.
+// 600 is now the only weight used: the page and section inscriptions, and —
+// since the 2026-09-17 wordmark re-cut — the wordmark too, which used to be the
+// sole consumer of 900. It used to load six weights, then two (CL-07). Cinzel
+// is referenced by literal family name from inline styles — that resolves,
+// because next/font emits the @font-face with the real `Cinzel` family, not a
+// hashed one. `--font-cinzel` is exposed but never referenced in CSS.
 const cinzel = Cinzel({
 	variable: '--font-cinzel',
 	subsets: ['latin'],
-	weight: ['600', '900'],
+	weight: ['600'],
 	display: 'swap',
 })
 

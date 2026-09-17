@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
+import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { useMotionPreference } from '@/hooks/use-motion-preference'
 import { getSplashMotion } from '@/lib/utils/motion-preference'
@@ -129,13 +130,15 @@ export const InitialLoadAnimation = ({
 							{...fadeIn(0.05)}
 						>
 							{/* The screen's one pair of corner brackets (§11.11), in place
-							    of the four amber corner frames and the inner frame. Not a
-							    heading: the page mounted underneath already has its h1. */}
-							<motion.p
-								className="type-wordmark corner-brackets inline-block text-3xl text-foreground sm:text-6xl"
-								{...fadeIn(0.15)}
-							>
-								SUNNSTEEL
+							    of the four amber corner frames and the inner frame. They
+							    bracket the whole lockup, mark included — it is one object.
+							    Not a heading: the page mounted underneath already has its
+							    h1. */}
+							<motion.p className="text-foreground" {...fadeIn(0.15)}>
+								<SunnsteelLockup
+									className="corner-brackets text-3xl sm:text-6xl"
+									markClassName="size-8 sm:size-16"
+								/>
 							</motion.p>
 
 							<motion.div

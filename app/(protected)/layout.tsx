@@ -176,7 +176,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 					isMobileMenuOpen={isMobileMenuOpen}
 					activeNav={activeNav}
 					setActiveNav={setActiveNav}
-					setIsSidebarOpen={setIsSidebarOpen}
 					setIsMobileMenuOpen={setIsMobileMenuOpen}
 					onNavigateStart={() => setIsNavActive(true)}
 				/>
@@ -200,7 +199,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 					<Header
 						title={getTitleFromPath(pathname)}
 						isMobile={isMobile}
+						isSidebarOpen={isSidebarOpen}
 						setIsMobileMenuOpen={setIsMobileMenuOpen}
+						onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 					/>
 					{!isOnSessionPage && activeSession?.id && (
 						<div className="px-3 sm:px-6 mt-2">
