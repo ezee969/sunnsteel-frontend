@@ -1,9 +1,11 @@
 import type {
 	DeletePushSubscriptionRequest,
+	NotificationPreferencesResponse,
 	PushSubscriptionsResponse,
 	RegisterPushSubscriptionRequest,
 	ScheduleRestAlertRequest,
 	ScheduleRestAlertResponse,
+	UpdateNotificationPreferencesRequest,
 } from '@sunsteel/contracts'
 
 import { httpClient } from './httpClient'
@@ -38,6 +40,20 @@ export const pushService = {
 	): Promise<ScheduleRestAlertResponse> =>
 		httpClient.request<ScheduleRestAlertResponse>(
 			`/workouts/sessions/${sessionId}/rest-alert`,
+			{ method: 'PUT', body: JSON.stringify(body), secure: true },
+		),
+
+	getPreferences: (): Promise<NotificationPreferencesResponse> =>
+		httpClient.get<NotificationPreferencesResponse>(
+			'/notifications/preferences',
+			true,
+		),
+
+	updatePreferences: (
+		body: UpdateNotificationPreferencesRequest,
+	): Promise<NotificationPreferencesResponse> =>
+		httpClient.request<NotificationPreferencesResponse>(
+			'/notifications/preferences',
 			{ method: 'PUT', body: JSON.stringify(body), secure: true },
 		),
 
