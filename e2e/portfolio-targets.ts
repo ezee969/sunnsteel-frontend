@@ -256,10 +256,10 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'schedule-week',
 		route: '/schedule',
-		features: ['SCHED-01', 'SCHED-03', 'SCHED-04', 'SCHED-05'],
+		features: ['SCHED-01', 'SCHED-03', 'SCHED-04', 'SCHED-05', 'NAV-05'],
 		ready: ['This week', /Planned|Not logged|Completed/],
 		caption:
-			'The weekly schedule: planned, completed and moved workouts, never "missed".',
+			'The weekly schedule plus restrained navigation indicators for unread updates and today’s plan.',
 	},
 	{
 		slug: 'achievements',

@@ -2,6 +2,8 @@
 
 import {
 	Activity,
+	Bell,
+	BellDot,
 	Calendar,
 	ChevronLeft,
 	ChevronRight,
@@ -18,6 +20,7 @@ import {
 import Link from 'next/link'
 import { type CSSProperties, useEffect, useRef } from 'react'
 
+import { useTodaysWorkouts } from '@/app/(protected)/dashboard/hooks/useTodaysWorkouts'
 import {
 	ClassicalIcon,
 	ClassicalIconName,
@@ -32,8 +35,10 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useNotifications } from '@/lib/api/hooks/useNotifications'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { cn } from '@/lib/utils'
+import { buildNavigationIndicators } from '@/lib/utils/navigation-indicators'
 
 type NavItemBase = {
 	id: string
@@ -112,6 +117,13 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		href: '/achievements',
 		disabled: false,
 	},
+	{
+		id: 'notifications',
+		label: 'Notifications',
+		icon: Bell,
+		href: '/notifications',
+		disabled: false,
+	},
 ] satisfies NavItem[]
 
 interface SidebarProps {
@@ -136,7 +148,14 @@ export default function Sidebar({
 	onNavigateStart,
 }: SidebarProps) {
 	const { user } = useUser()
+	const notifications = useNotifications()
+	const today = useTodaysWorkouts()
 	const { push } = useToast()
+	const indicators = buildNavigationIndicators({
+		unreadNotifications: notifications.data?.unreadCount,
+		plannedToday: today.entries.length,
+		hasActiveSession: today.active?.status === 'IN_PROGRESS',
+	})
 
 	// -1 when the active route is not in this list (Settings), which hides the
 	// marker rather than parking it on the wrong row.
@@ -265,12 +284,20 @@ export default function Sidebar({
 					{SIDEBAR_NAV_ITEMS.map(item => {
 						const showTooltip = !isSidebarOpen && !isMobile
 						const isActive = activeNav === item.id
+						const indicator =
+							item.id === 'notifications'
+								? indicators.notifications
+								: item.id === 'schedule'
+									? indicators.schedule
+									: null
+						const ItemIcon =
+							item.id === 'notifications' && indicator ? BellDot : item.icon
 						const itemClassName = cn(
 							// §11.10: active is a 3px honour mark plus ink text, never
 							// a filled slab - that inversion was the heaviest object
 							// on every screen. Hover and active differ by colour, not
 							// geometry, so both carry the same 3px left border.
-							'mark group w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
+							'mark group relative w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
 							isMobile ? 'h-11' : 'h-9',
 							isSidebarOpen || isMobile ? 'justify-start' : 'justify-center',
 							isActive
@@ -294,7 +321,7 @@ export default function Sidebar({
 										className={iconClassName}
 									/>
 								) : (
-									<item.icon className={iconClassName} aria-hidden />
+									<ItemIcon className={iconClassName} aria-hidden />
 								)}
 								<span
 									className={cn(
@@ -306,6 +333,19 @@ export default function Sidebar({
 								>
 									{item.label}
 								</span>
+								{indicator && (
+									<span
+										aria-hidden
+										className={cn(
+											'type-data shrink-0 text-ink-2',
+											isSidebarOpen || isMobile
+												? 'ml-auto'
+												: 'absolute right-1',
+										)}
+									>
+										{indicator.compactText}
+									</span>
+								)}
 								{item.disabled && (isSidebarOpen || isMobile) && (
 									<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
 										Soon
@@ -334,6 +374,7 @@ export default function Sidebar({
 							<Button asChild variant="ghost" className={itemClassName}>
 								<Link
 									href={item.href}
+									aria-label={indicator?.accessibleLabel ?? item.label}
 									aria-current={isActive ? 'page' : undefined}
 									onClick={() => {
 										// Set active nav immediately for consistent visual state
