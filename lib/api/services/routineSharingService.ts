@@ -1,5 +1,7 @@
 import type {
+	CloneRoutineRequest,
 	MemberRoutinesResponse,
+	Routine,
 	RoutineShare,
 	RoutineShareListResponse,
 	RoutineVisibility,
@@ -46,4 +48,18 @@ export const routineSharingService = {
 			`/users/${identifier}/routines`,
 			true,
 		),
+
+	/** One of that member's routines, when this viewer is allowed to read it. */
+	getMemberRoutine: (
+		identifier: string,
+		routineId: string,
+	): Promise<SharedRoutine> =>
+		httpClient.get<SharedRoutine>(
+			`/users/${identifier}/routines/${routineId}`,
+			true,
+		),
+
+	/** ROUT-05: a copy of a routine the viewer could read, owned by them. */
+	cloneRoutine: (request: CloneRoutineRequest): Promise<Routine> =>
+		httpClient.post<Routine>('/routines/clones', request, true),
 }

@@ -1,10 +1,12 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 import { ProfileLoading } from '@/features/profile/profile-loading'
 import { ProfileView } from '@/features/profile/profile-view'
 import { RelationshipListsView } from '@/features/profile/relationship-lists-view'
+import { MemberRoutineView } from '@/features/routines/components/MemberRoutineView'
 import { useFollowUser } from '@/lib/api/hooks/useFollowUser'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
 import { useUnfollowUser } from '@/lib/api/hooks/useUnfollowUser'
@@ -17,6 +19,7 @@ import {
 	getRelationshipListHref,
 	parseRelationshipListKind,
 } from '@/lib/utils/relationships'
+import { parseProfileRoutineId } from '@/lib/utils/routine-sharing'
 import { normalizeUsername } from '@/lib/utils/username'
 
 function getRelationshipHrefs(username: string) {
@@ -33,8 +36,13 @@ export default function ProfilePage() {
 	// `/profile/<identifier>/<followers|following|mutuals>` (SOC-02). Any other
 	// sub-path is not a page, rather than a silent alias of the profile.
 	const relationshipKind = parseRelationshipListKind(segments[1])
+	// `/profile/<identifier>/routines/<routineId>` (PROF-08/ROUT-05): one of
+	// that member's routines, read under the same ROUT-04 rule as anywhere else.
+	const profileRoutineId = parseProfileRoutineId(segments)
 	const isUnknownSubpath =
-		segments.length > 2 || (segments.length === 2 && !relationshipKind)
+		segments.length > 3 ||
+		(segments.length === 3 && !profileRoutineId) ||
+		(segments.length === 2 && !relationshipKind)
 	const { user: viewer, isLoading: isViewerLoading } = useUser()
 	const isOwnByRoute =
 		!routeIdentifier ||
@@ -78,6 +86,11 @@ export default function ProfilePage() {
 	}
 
 	if (isOwnByRoute) {
+		// Your own routine already has a page, with its editing and sharing
+		// controls; the shared view would be a worse copy of it.
+		if (profileRoutineId) {
+			return <OwnRoutineRedirect routineId={profileRoutineId} />
+		}
 		if (relationshipKind) {
 			return (
 				<RelationshipListsView
@@ -105,6 +118,16 @@ export default function ProfilePage() {
 
 	if (!publicUser) {
 		return <ProfileNotFound title="User not found" />
+	}
+
+	if (profileRoutineId) {
+		return (
+			<MemberRoutineView
+				identifier={publicUser.username}
+				routineId={profileRoutineId}
+				profileHref={`/profile/${encodeURIComponent(publicUser.username)}`}
+			/>
+		)
 	}
 
 	if (relationshipKind) {
@@ -137,6 +160,14 @@ export default function ProfilePage() {
 			relationshipHrefs={getRelationshipHrefs(publicUser.username)}
 		/>
 	)
+}
+
+function OwnRoutineRedirect({ routineId }: { routineId: string }) {
+	const router = useRouter()
+	useEffect(() => {
+		router.replace(`/routines/${routineId}`)
+	}, [router, routineId])
+	return <ProfileLoading />
 }
 
 function ProfileNotFound({ title }: { title: string }) {

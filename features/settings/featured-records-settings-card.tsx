@@ -5,7 +5,9 @@ import {
 	FEATURED_PROFILE_ITEMS_MAX,
 	type FeaturedProfileSelection,
 	type PersonalRecordEntry,
+	type ProfileVisibility,
 	type RenaissanceRankDefinition,
+	type Routine,
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import {
@@ -13,6 +15,7 @@ import {
 	ArrowUp,
 	Award,
 	Bookmark,
+	Dumbbell,
 	Loader2,
 	Medal,
 	Plus,
@@ -35,6 +38,7 @@ import {
 	useReplaceFeaturedProfileItems,
 } from '@/lib/api/hooks/useFeaturedProfileItems'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
+import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { formatAchievementDate } from '@/lib/utils/achievements'
 import {
 	addFeaturedProfileItem,
@@ -44,15 +48,34 @@ import {
 	reachedRenaissanceRanks,
 	removeFeaturedProfileItem,
 } from '@/lib/utils/featured-profile-items'
+import {
+	describeVisibilityCap,
+	effectiveRoutineVisibility,
+} from '@/lib/utils/routine-sharing'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 interface FeaturedRecordsSettingsCardProps {
 	username: string
 	weightUnit: WeightUnit
+	/** PROF-06's routines rule, which caps every routine offered below. */
+	accountRoutinesRule: ProfileVisibility
 }
 
 const EMPTY_RECORDS: PersonalRecordEntry[] = []
 const EMPTY_ACHIEVEMENTS: EarnedAchievement[] = []
+const EMPTY_ROUTINES: Routine[] = []
+
+/** One routine's days and exercises, for a row nobody has opened yet. */
+function routineSummary(routine: Routine) {
+	const days = routine.days?.length ?? 0
+	const exercises = (routine.days ?? []).reduce(
+		(total, day) => total + (day.exercises?.length ?? 0),
+		0,
+	)
+	return `${days} ${days === 1 ? 'day' : 'days'} · ${exercises} ${
+		exercises === 1 ? 'exercise' : 'exercises'
+	} · ${routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'}`
+}
 
 function recordSummary(record: PersonalRecordEntry, weightUnit: WeightUnit) {
 	return `${formatWeight(record.weight, weightUnit)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit)}`
@@ -69,6 +92,7 @@ function selectedItemPresentation(
 	recordsById: Map<string, PersonalRecordEntry>,
 	achievementsById: Map<string, EarnedAchievement>,
 	ranksById: Map<string, RenaissanceRankDefinition>,
+	routinesById: Map<string, Routine>,
 	weightUnit: WeightUnit,
 ) {
 	if (item.kind === 'RECORD') {
@@ -91,6 +115,16 @@ function selectedItemPresentation(
 				: 'Remove this stale reference before saving.',
 		}
 	}
+	if (item.kind === 'ROUTINE') {
+		const routine = routinesById.get(item.referenceId)
+		return {
+			kindLabel: 'Routine',
+			title: routine?.name ?? 'Routine no longer shareable',
+			detail: routine
+				? routineSummary(routine)
+				: 'Remove this stale reference before saving.',
+		}
+	}
 	const rank = ranksById.get(item.referenceId)
 	return {
 		kindLabel: 'Renaissance rank',
@@ -102,10 +136,12 @@ function selectedItemPresentation(
 export function FeaturedRecordsSettingsCard({
 	username,
 	weightUnit,
+	accountRoutinesRule,
 }: FeaturedRecordsSettingsCardProps) {
 	const selectionsQuery = useFeaturedProfileItems()
 	const profileQuery = usePublicUser(username)
 	const achievementsQuery = useAchievements()
+	const routinesQuery = useRoutines()
 	const replaceItems = useReplaceFeaturedProfileItems()
 	const { push } = useToast()
 	const [drafts, setDrafts] = useState<FeaturedProfileSelection[]>([])
@@ -117,6 +153,23 @@ export function FeaturedRecordsSettingsCard({
 	const records = profileQuery.data?.personalRecords ?? EMPTY_RECORDS
 	const achievements =
 		achievementsQuery.data?.achievements ?? EMPTY_ACHIEVEMENTS
+	const routines = routinesQuery.data ?? EMPTY_ROUTINES
+	/**
+	 * PROF-08/ROUT-04: only routines somebody else could actually reach are
+	 * offered. Featuring one nobody can open would show the owner a slot that
+	 * never renders, and the account rule caps every routine's own setting.
+	 */
+	const shareableRoutines = useMemo(
+		() =>
+			routines.filter(
+				routine =>
+					effectiveRoutineVisibility(
+						accountRoutinesRule,
+						routine.visibility,
+					) !== 'PRIVATE',
+			),
+		[routines, accountRoutinesRule],
+	)
 	const reachedRanks = useMemo(
 		() => reachedRenaissanceRanks(achievementsQuery.data?.rank?.currentRank.id),
 		[achievementsQuery.data?.rank?.currentRank.id],
@@ -134,6 +187,10 @@ export function FeaturedRecordsSettingsCard({
 		() => new Map(reachedRanks.map(rank => [rank.id, rank])),
 		[reachedRanks],
 	)
+	const routinesById = useMemo(
+		() => new Map(shareableRoutines.map(routine => [routine.id, routine])),
+		[shareableRoutines],
+	)
 	const selectedKeys = useMemo(
 		() => new Set(drafts.map(featuredProfileSelectionKey)),
 		[drafts],
@@ -147,6 +204,9 @@ export function FeaturedRecordsSettingsCard({
 	const availableRanks = reachedRanks.filter(
 		rank => !selectedKeys.has(`RANK:${rank.id}`),
 	)
+	const availableRoutines = shareableRoutines.filter(
+		routine => !selectedKeys.has(`ROUTINE:${routine.id}`),
+	)
 	const hasSelectedRank = drafts.some(item => item.kind === 'RANK')
 	const slotsFull = drafts.length >= FEATURED_PROFILE_ITEMS_MAX
 	const savedKeys =
@@ -156,9 +216,13 @@ export function FeaturedRecordsSettingsCard({
 	const isLoading =
 		selectionsQuery.isLoading ||
 		profileQuery.isLoading ||
-		achievementsQuery.isLoading
+		achievementsQuery.isLoading ||
+		routinesQuery.isLoading
 	const error =
-		selectionsQuery.error ?? profileQuery.error ?? achievementsQuery.error
+		selectionsQuery.error ??
+		profileQuery.error ??
+		achievementsQuery.error ??
+		routinesQuery.error
 
 	const save = () => {
 		replaceItems.mutate(buildFeaturedProfileRequest(drafts), {
@@ -188,8 +252,10 @@ export function FeaturedRecordsSettingsCard({
 				</div>
 				<CardDescription>
 					Choose and order up to {FEATURED_PROFILE_ITEMS_MAX} current records,
-					earned medals, and one reached rank title. Records follow your
-					Personal Records privacy setting; medals and rank follow Achievements.
+					earned medals, shared routines, and one reached rank title. Records
+					follow your Personal Records privacy setting; medals and rank follow
+					Achievements; each routine follows its own sharing setting under your
+					Routines privacy.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-5">
@@ -213,6 +279,7 @@ export function FeaturedRecordsSettingsCard({
 								void selectionsQuery.refetch()
 								void profileQuery.refetch()
 								void achievementsQuery.refetch()
+								void routinesQuery.refetch()
 							}}
 						>
 							Try Again
@@ -232,6 +299,7 @@ export function FeaturedRecordsSettingsCard({
 											recordsById,
 											achievementsById,
 											ranksById,
+											routinesById,
 											weightUnit,
 										)
 										return (
@@ -415,6 +483,65 @@ export function FeaturedRecordsSettingsCard({
 								<p className="type-body-sm py-4 text-ink-3">
 									Training history is preparing. Medals will appear when your
 									progress data is ready.
+								</p>
+							)}
+						</div>
+
+						<div>
+							<div className="flex items-center gap-2 border-b border-rule pb-2">
+								<Dumbbell className="size-4 text-ink-3" aria-hidden />
+								<p className="type-label text-ink-3">Shared routines</p>
+							</div>
+							{availableRoutines.length ? (
+								availableRoutines.map(routine => {
+									const cap = describeVisibilityCap(
+										accountRoutinesRule,
+										routine.visibility,
+									)
+									return (
+										<div
+											key={routine.id}
+											className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+										>
+											<div className="min-w-0">
+												<p className="type-panel text-foreground">
+													{routine.name}
+												</p>
+												<p className="type-body-sm text-ink-3">
+													{routineSummary(routine)}
+												</p>
+												{cap ? (
+													<p className="type-body-sm text-ink-3">{cap}</p>
+												) : null}
+											</div>
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												aria-label={`Feature ${routine.name}`}
+												disabled={slotsFull}
+												onClick={() =>
+													setDrafts(current =>
+														addFeaturedProfileItem(
+															current,
+															'ROUTINE',
+															routine.id,
+														),
+													)
+												}
+											>
+												<Plus className="size-4" aria-hidden /> Feature
+											</Button>
+										</div>
+									)
+								})
+							) : (
+								<p className="type-body-sm py-4 text-ink-3">
+									{routines.length === 0
+										? 'Create a routine to share one from your profile.'
+										: shareableRoutines.length === 0
+											? 'No routine is shared yet. Open a routine and choose who can find it.'
+											: 'Every shared routine is already featured.'}
 								</p>
 							)}
 						</div>

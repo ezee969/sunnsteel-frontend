@@ -3,18 +3,26 @@ import { Bookmark } from 'lucide-react'
 import Link from 'next/link'
 
 import { formatTimeAgo } from '@/lib/utils/date'
+import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 interface FeaturedAccomplishmentsProps {
 	items: FeaturedProfileItem[]
 	weightUnit: WeightUnit
 	isOwnProfile: boolean
+	/**
+	 * PROF-08: where a featured routine opens, when it can be opened at all.
+	 * The signed-out profile passes nothing, because reading one needs an
+	 * account — the row still states what the routine is.
+	 */
+	routineHref?: (routineId: string) => string
 }
 
 export function FeaturedAccomplishments({
 	items,
 	weightUnit,
 	isOwnProfile,
+	routineHref,
 }: FeaturedAccomplishmentsProps) {
 	if (!items.length && !isOwnProfile) return null
 
@@ -40,14 +48,29 @@ export function FeaturedAccomplishments({
 										? 'Personal record'
 										: item.kind === 'ACHIEVEMENT'
 											? 'Achievement'
-											: 'Renaissance rank'}
+											: item.kind === 'ROUTINE'
+												? 'Routine'
+												: 'Renaissance rank'}
 								</p>
 								<h3 className="type-panel text-foreground">
-									{item.kind === 'RECORD'
-										? item.record.exerciseName
-										: item.kind === 'ACHIEVEMENT'
-											? item.achievement.title
-											: item.rank.title}
+									{item.kind === 'RECORD' ? (
+										item.record.exerciseName
+									) : item.kind === 'ACHIEVEMENT' ? (
+										item.achievement.title
+									) : item.kind === 'ROUTINE' ? (
+										routineHref ? (
+											<Link
+												href={routineHref(item.referenceId)}
+												className="underline-offset-4 hover:underline"
+											>
+												{item.routine.name}
+											</Link>
+										) : (
+											item.routine.name
+										)
+									) : (
+										item.rank.title
+									)}
 								</h3>
 								<p className="type-body-sm text-ink-2">
 									{item.kind === 'RECORD' ? (
@@ -62,6 +85,8 @@ export function FeaturedAccomplishments({
 										</>
 									) : item.kind === 'ACHIEVEMENT' ? (
 										item.achievement.description
+									) : item.kind === 'ROUTINE' ? (
+										describeRoutineSummary(item.routine)
 									) : (
 										item.rank.description
 									)}
@@ -83,7 +108,7 @@ export function FeaturedAccomplishments({
 				</div>
 			) : (
 				<p className="type-body-sm py-3 text-ink-3">
-					Choose records, earned medals, or a reached rank in{' '}
+					Choose records, earned medals, a shared routine, or a reached rank in{' '}
 					<Link
 						href="/settings"
 						className="text-primary underline-offset-4 hover:underline"

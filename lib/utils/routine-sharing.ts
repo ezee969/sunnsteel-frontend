@@ -2,6 +2,7 @@ import type {
 	ProfileVisibility,
 	RoutineVisibility,
 	SharedRoutine,
+	SharedRoutineSummary,
 } from '@sunsteel/contracts'
 import { ROUTINE_VISIBILITY_VALUES } from '@sunsteel/contracts'
 
@@ -98,3 +99,42 @@ export function describeSharedRoutineOwner(routine: SharedRoutine): string {
  */
 export const SHARED_ROUTINE_NOTE =
 	'This is the routine as it is programmed — days, exercises, sets and targets. It carries none of the owner’s workouts, records or notes.'
+
+// Routine cloning (ROUT-05) ---------------------------------------------------
+
+/**
+ * What a clone is, said before it is made. Two things are worth stating: the
+ * copy is the reader's own from the moment it exists, and it carries the
+ * programme rather than anything the original owner trained.
+ */
+export const CLONE_ROUTINE_NOTE =
+	'Cloning saves this programme as a routine of your own. You can edit it freely; the original is untouched, and nothing you change reaches its owner.'
+
+/** A clone is private until its new owner decides otherwise. */
+export const CLONE_ROUTINE_PRIVACY_NOTE =
+	'Your copy starts private, whoever could see the original.'
+
+/** One line summarising a routine nobody has opened yet. */
+export function describeRoutineSummary(routine: SharedRoutineSummary): string {
+	const days = `${routine.dayCount} ${routine.dayCount === 1 ? 'day' : 'days'}`
+	const exercises = `${routine.exerciseCount} ${
+		routine.exerciseCount === 1 ? 'exercise' : 'exercises'
+	}`
+	const mode = routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'
+	return `${days} · ${exercises} · ${mode}`
+}
+
+/**
+ * `/profile/<identifier>/routines/<routineId>` — one member's routine as the
+ * viewer may read it (PROF-08's featured slot leads here, ROUT-05 clones from
+ * it). It is a sub-path of the profile because whose routine it is decides
+ * whether it can be read at all.
+ */
+export function parseProfileRoutineId(segments: string[]): string | null {
+	if (segments.length !== 3) return null
+	return segments[1] === 'routines' && segments[2] ? segments[2] : null
+}
+
+export function profileRoutineHref(identifier: string, routineId: string) {
+	return `/profile/${encodeURIComponent(identifier)}/routines/${encodeURIComponent(routineId)}`
+}

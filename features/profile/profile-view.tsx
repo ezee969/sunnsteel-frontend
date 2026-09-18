@@ -36,6 +36,7 @@ import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
 } from '@/lib/utils/profile-sharing'
+import { profileRoutineHref } from '@/lib/utils/routine-sharing'
 import {
 	getPreferredTrainingStyleLabel,
 	getTrainingDisciplineLabel,
@@ -97,6 +98,17 @@ export function ProfileView(props: ProfileViewProps) {
 		: publicUser!.featuredItems
 	const canViewAchievements =
 		isOwnProfile || publicUser!.viewerAccess.achievements
+	/**
+	 * PROF-08. Your own featured routine opens its real page, with the editing
+	 * and sharing controls; somebody else's opens the read-only view under
+	 * their profile. The signed-out route passes no `relationshipHrefs` and
+	 * gets no link here either, because reading one needs an account.
+	 */
+	const featuredRoutineHref = isOwnProfile
+		? (routineId: string) => `/routines/${routineId}`
+		: props.relationshipHrefs
+			? (routineId: string) => profileRoutineHref(profileUsername, routineId)
+			: undefined
 	const achievements = isOwnProfile
 		? props.achievements
 		: publicUser!.achievements
@@ -416,6 +428,7 @@ export function ProfileView(props: ProfileViewProps) {
 						items={featuredItems}
 						weightUnit={weightUnit}
 						isOwnProfile={isOwnProfile}
+						routineHref={featuredRoutineHref}
 					/>
 
 					<ProfileAchievements

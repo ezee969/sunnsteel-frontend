@@ -545,6 +545,7 @@ export default function SettingsPage() {
 				<FeaturedRecordsSettingsCard
 					username={user.username}
 					weightUnit={formData.weightUnit}
+					accountRoutinesRule={user.privacySettings.routines}
 				/>
 			) : null}
 

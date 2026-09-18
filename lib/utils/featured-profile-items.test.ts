@@ -65,4 +65,24 @@ describe('featured profile selections', () => {
 			],
 		})
 	})
+
+	it('treats a routine as one more slot, deduplicated and not rank-limited', () => {
+		// PROF-08: a routine is a fourth kind in the same ordered six, so two
+		// routines are allowed where two ranks are not.
+		const withRoutine = addFeaturedProfileItem(items, 'ROUTINE', 'routine-1')
+		const withTwo = addFeaturedProfileItem(withRoutine, 'ROUTINE', 'routine-2')
+		expect(withTwo.map(item => [item.kind, item.referenceId])).toEqual([
+			['ACHIEVEMENT', 'sessions:10'],
+			['RECORD', 'squat'],
+			['ROUTINE', 'routine-1'],
+			['ROUTINE', 'routine-2'],
+		])
+		expect(addFeaturedProfileItem(withTwo, 'ROUTINE', 'routine-1')).toBe(
+			withTwo,
+		)
+		expect(buildFeaturedProfileRequest(withRoutine).items).toContainEqual({
+			kind: 'ROUTINE',
+			referenceId: 'routine-1',
+		})
+	})
 })
