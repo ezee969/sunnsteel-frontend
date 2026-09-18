@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
+import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
@@ -275,6 +276,12 @@ export function ProfileView(props: ProfileViewProps) {
 								)}
 							</Button>
 						)}
+						{/* PROF-10: blocking and reporting are only ever about somebody
+						    else, and only inside the authenticated shell — the signed-out
+						    route has no viewer to act as. */}
+						{!isOwnProfile && publicUser && props.relationshipHrefs ? (
+							<MemberModerationMenu profile={publicUser} />
+						) : null}
 					</div>
 				</div>
 			</section>

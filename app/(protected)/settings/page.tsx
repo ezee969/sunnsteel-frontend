@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { BlockedMembersCard } from '@/features/settings/blocked-members-card'
 import { FeaturedRecordsSettingsCard } from '@/features/settings/featured-records-settings-card'
 import { MeasurableGoalsSettingsCard } from '@/features/settings/measurable-goals-settings-card'
 import { MotionPreferenceCard } from '@/features/settings/motion-preference-card'
@@ -562,6 +563,8 @@ export default function SettingsPage() {
 			{user ? (
 				<ProfilePrivacySettingsCard settings={user.privacySettings} />
 			) : null}
+
+			<BlockedMembersCard />
 
 			<PushNotificationsCard />
 

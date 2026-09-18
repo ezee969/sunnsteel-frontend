@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
+import { RoutineLineageNote } from '@/features/routines/components/RoutineLineageNote'
 import { RoutineSharing } from '@/features/routines/components/RoutineSharing'
 import { RoutineVersions } from '@/features/routines/components/RoutineVersions'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
@@ -116,6 +117,8 @@ export default function RoutineDetailsPage() {
 				onToggleCompleted={handleToggleCompleted}
 				isToggling={isTogglingFavorite || isTogglingCompleted}
 			/>
+
+			<RoutineLineageNote lineage={routine.lineage} />
 
 			{/* Routine Days - the page's one start surface. The Quick Start tiles
 			    above it started the same days a second time (TD-41). */}
