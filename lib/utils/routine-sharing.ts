@@ -138,3 +138,25 @@ export function parseProfileRoutineId(segments: string[]): string | null {
 export function profileRoutineHref(identifier: string, routineId: string) {
 	return `/profile/${encodeURIComponent(identifier)}/routines/${encodeURIComponent(routineId)}`
 }
+
+/**
+ * Why the Settings routine picker is offering nothing. The account rule is
+ * named first because it outranks every routine: saying "no routine is shared
+ * yet" while the profile keeps all routines private sends the owner to change
+ * a setting that would change nothing.
+ */
+export function describeNoFeaturableRoutines(
+	accountRoutinesRule: ProfileVisibility,
+	counts: { routines: number; shareable: number },
+): string {
+	if (accountRoutinesRule === 'PRIVATE') {
+		return 'Your profile keeps routines private, so none can be featured. Change Routines under privacy in Settings first.'
+	}
+	if (counts.routines === 0) {
+		return 'Create a routine to share one from your profile.'
+	}
+	if (counts.shareable === 0) {
+		return 'No routine is shared yet. Open a routine and choose who can find it.'
+	}
+	return 'Every shared routine is already featured.'
+}

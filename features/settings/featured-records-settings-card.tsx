@@ -49,6 +49,7 @@ import {
 	removeFeaturedProfileItem,
 } from '@/lib/utils/featured-profile-items'
 import {
+	describeNoFeaturableRoutines,
 	describeVisibilityCap,
 	effectiveRoutineVisibility,
 } from '@/lib/utils/routine-sharing'
@@ -537,11 +538,10 @@ export function FeaturedRecordsSettingsCard({
 								})
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
-									{routines.length === 0
-										? 'Create a routine to share one from your profile.'
-										: shareableRoutines.length === 0
-											? 'No routine is shared yet. Open a routine and choose who can find it.'
-											: 'Every shared routine is already featured.'}
+									{describeNoFeaturableRoutines(accountRoutinesRule, {
+										routines: routines.length,
+										shareable: shareableRoutines.length,
+									})}
 								</p>
 							)}
 						</div>

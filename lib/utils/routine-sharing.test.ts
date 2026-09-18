@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
 	CLONE_ROUTINE_NOTE,
 	CLONE_ROUTINE_PRIVACY_NOTE,
+	describeNoFeaturableRoutines,
 	describeRoutineSummary,
 	describeVisibilityCap,
 	effectiveRoutineVisibility,
@@ -139,5 +140,31 @@ describe('a member routine sub-path', () => {
 	it('builds the href it parses, escaping both parts', () => {
 		const href = profileRoutineHref('a b', 'r/1')
 		expect(href).toBe('/profile/a%20b/routines/r%2F1')
+	})
+})
+
+describe('why no routine can be featured', () => {
+	it('names the account rule first, because it outranks every routine', () => {
+		// Saying "no routine is shared yet" here would send the owner to change a
+		// per-routine setting that the account rule would go on capping.
+		const copy = describeNoFeaturableRoutines('PRIVATE', {
+			routines: 3,
+			shareable: 0,
+		})
+		expect(copy).toMatch(/keeps routines private/i)
+		expect(copy).toMatch(/Settings/)
+		expect(copy).not.toMatch(/No routine is shared yet/)
+	})
+
+	it('otherwise says which of the three things is actually missing', () => {
+		expect(
+			describeNoFeaturableRoutines('PUBLIC', { routines: 0, shareable: 0 }),
+		).toMatch(/Create a routine/)
+		expect(
+			describeNoFeaturableRoutines('PUBLIC', { routines: 2, shareable: 0 }),
+		).toMatch(/No routine is shared yet/)
+		expect(
+			describeNoFeaturableRoutines('FOLLOWERS', { routines: 2, shareable: 2 }),
+		).toMatch(/already featured/)
 	})
 })
