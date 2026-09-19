@@ -43,6 +43,10 @@ export const buildRoutineRequest = (
 	return {
 		name: data.name,
 		description: data.description,
+		// ROUT-07: null clears the claim; it is never omitted, so editing a
+		// routine back to "not specified" actually removes what it declared.
+		goal: data.goal ?? null,
+		experienceLevel: data.experienceLevel ?? null,
 		isPeriodized: false,
 		scheduleMode: data.scheduleMode,
 		restDays:

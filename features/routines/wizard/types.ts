@@ -1,4 +1,8 @@
-import type { RoutineScheduleMode } from '@sunsteel/contracts'
+import type {
+	RoutineScheduleMode,
+	TrainingExperienceLevel,
+	TrainingGoal,
+} from '@sunsteel/contracts'
 
 import type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
 export type { ProgressionScheme, RepType } from '@/lib/api/types/routine.shared'
@@ -38,6 +42,13 @@ export interface RoutineWizardDay {
 export interface RoutineWizardData {
 	name: string
 	description?: string
+	/**
+	 * ROUT-07: what the author says this programme is for. Both optional and
+	 * both undeclared by default -- discovery never guesses them from the
+	 * author's own training identity.
+	 */
+	goal?: TrainingGoal | null
+	experienceLevel?: TrainingExperienceLevel | null
 	scheduleMode: RoutineScheduleMode
 	/** The days' slots in display order. */
 	trainingDays: number[]

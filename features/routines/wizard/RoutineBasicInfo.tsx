@@ -1,9 +1,21 @@
 'use client'
 
+import {
+	TRAINING_EXPERIENCE_LEVEL_VALUES,
+	TRAINING_GOAL_VALUES,
+	type TrainingExperienceLevel,
+	type TrainingGoal,
+} from '@sunsteel/contracts'
+
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NativeSelect } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import {
+	getTrainingExperienceLabel,
+	getTrainingGoalLabel,
+} from '@/lib/utils/training-identity'
 
 import { useRoutineMetadataForm } from './hooks/useRoutineMetadataForm'
 import { RoutineWizardData } from './types'
@@ -53,6 +65,56 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 						rows={4}
 					/>
 				</div>
+
+				{/* ROUT-07: both optional. Left unset the routine simply is not
+				    matched by those two discovery filters, which is honest -- the
+				    alternative would be guessing a claim on the author's behalf. */}
+				<div className="grid gap-4 sm:grid-cols-2">
+					<div className="space-y-2">
+						<Label htmlFor="routine-goal">Goal</Label>
+						<NativeSelect
+							id="routine-goal"
+							value={data.goal ?? ''}
+							onChange={e =>
+								onUpdate({
+									goal: (e.target.value || null) as TrainingGoal | null,
+								})
+							}
+						>
+							<option value="">Not specified</option>
+							{TRAINING_GOAL_VALUES.map(value => (
+								<option key={value} value={value}>
+									{getTrainingGoalLabel(value)}
+								</option>
+							))}
+						</NativeSelect>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="routine-experience">Experience level</Label>
+						<NativeSelect
+							id="routine-experience"
+							value={data.experienceLevel ?? ''}
+							onChange={e =>
+								onUpdate({
+									experienceLevel: (e.target.value ||
+										null) as TrainingExperienceLevel | null,
+								})
+							}
+						>
+							<option value="">Not specified</option>
+							{TRAINING_EXPERIENCE_LEVEL_VALUES.map(value => (
+								<option key={value} value={value}>
+									{getTrainingExperienceLabel(value)}
+								</option>
+							))}
+						</NativeSelect>
+					</div>
+				</div>
+				<p className="type-body-sm max-w-[68ch] text-ink-3">
+					These help other members find your routine if you share it. Leave them
+					unset and it still appears, just not under those filters.
+				</p>
 			</div>
 		</TooltipProvider>
 	)

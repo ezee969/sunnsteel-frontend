@@ -5,6 +5,7 @@ import {
 	Bell,
 	BellDot,
 	Calendar,
+	Compass,
 	Dumbbell,
 	History,
 	Home,
@@ -75,6 +76,16 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		icon: Activity,
 		classicalName: 'scroll-unfurled',
 		href: '/routines',
+		disabled: false,
+	},
+	// ROUT-07: discovery is a separate destination from your own routines. It
+	// lists other members' shared programmes, which the Routines page never
+	// shows, so folding it in would hide it behind a page about your own.
+	{
+		id: 'discover-routines',
+		label: 'Discover',
+		icon: Compass,
+		href: '/routines/discover',
 		disabled: false,
 	},
 	// History needs its own entry: `/workouts` redirects into the live session

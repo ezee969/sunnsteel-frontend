@@ -102,6 +102,10 @@ export default function EditRoutinePage() {
 			const transformedData: RoutineWizardData = {
 				name: routine.name,
 				description: routine.description || '',
+				// ROUT-07: an editor must show what was declared, or saving would
+				// silently clear it.
+				goal: routine.goal ?? null,
+				experienceLevel: routine.experienceLevel ?? null,
 				scheduleMode: routine.scheduleMode,
 				restDays: routine.restDays ?? [],
 				rotationWeekdays: routine.rotationWeekdays ?? [],
