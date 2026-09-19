@@ -79,6 +79,8 @@ else until it merges, so claims live here, on `main`.
 
 | ID | Status | Owner | Branch / worktree | Claimed | Repositories |
 | -- | ------ | ----- | ----------------- | ------- | ------------ |
+| SOC-03 | `IN_PROGRESS` | Claude | `claude/soc-03-soc-04` in each main checkout | 2026-09-19 | CT, BE, FE |
+| SOC-04 | `IN_PROGRESS` | Claude | `claude/soc-03-soc-04` in each main checkout | 2026-09-19 | CT, BE, FE |
 
 ## Current product snapshot
 
@@ -396,8 +398,8 @@ surface in the original description, stays hidden under `FIX-04` until
 | ID     | Status      | Size | Feature                    | User-facing behavior                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Dependencies                                   |
 | ------ | ----------- | ---- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
 | SOC-02 | `SHIPPED`   | M    | Relationship lists         | Signed-in members open any profile's followers, following and viewer-relative mutuals (people you follow who also follow them; mutual follows on your own profile) from the profile counts, paginated newest first with Follow/Unfollow on every row. Search suggests up to ten members: people who already follow you first, then accounts followed by people you follow that allow name or username discovery. Entries carry identity only, never email or privacy-governed sections, and the signed-out `/members` route keeps plain counts. Shipped 2026-09-13 through `@sunsteel/contracts@0.24.0` without a migration.                                                                                                         | FIX-06; `@sunsteel/contracts@0.24.0`           |
-| SOC-03 | `QUEUED`    | L    | Generated activity feed    | A feed built from what members actually did, not from posts they wrote. Entries are generated from verified product data: completed sessions, personal records, earned achievements, rank progression, streak milestones, comeback recognitions, routines the owner shared, and challenge progress or completion. Each entry names the record it came from and links to it only where the viewer is allowed to see that record. There is no free-text composer: the activity types are the ones the product can verify, and `ROUT-04` and `SOC-13` add theirs when they ship. Visibility is never implicit -- `SOC-04` owns the controls and nothing reaches a feed before they exist. | DATA-02, PROF-06, PROF-10                      |
-| SOC-04 | `QUEUED`    | M    | Selective activity sharing | Configure a default audience per activity type, override or withdraw a single entry after the fact, and see what each audience would see. Profile privacy is the upper bound: an activity type can never reveal more than the `PROF-06` section its data comes from, so a private records section cannot produce a public record entry. | SOC-03, PROF-06                                |
+| SOC-03 | `IN_PROGRESS` | L    | Generated activity feed    | A feed built from what members actually did, not from posts they wrote. Entries are generated from verified product data: completed sessions, personal records, earned achievements, rank progression, streak milestones, comeback recognitions, routines the owner shared, and challenge progress or completion. Each entry names the record it came from and links to it only where the viewer is allowed to see that record. There is no free-text composer: the activity types are the ones the product can verify, and `ROUT-04` and `SOC-13` add theirs when they ship. Visibility is never implicit -- `SOC-04` owns the controls and nothing reaches a feed before they exist. | DATA-02, PROF-06, PROF-10                      |
+| SOC-04 | `IN_PROGRESS` | M    | Selective activity sharing | Configure a default audience per activity type, override or withdraw a single entry after the fact, and see what each audience would see. Profile privacy is the upper bound: an activity type can never reveal more than the `PROF-06` section its data comes from, so a private records section cannot produce a public record entry. | SOC-03, PROF-06                                |
 | SOC-05 | `QUEUED`    | M    | Themed reactions           | A small fixed set of Sunnsteel-themed reactions in place of a generic Like, applied first to feed activity and later to shared workouts, achievements, challenge completions and community activity. The catalog stays deliberately small: reactions acknowledge work, they are never a score, and none of them affects ranks, records, challenge results or ordering. Blocking and the activity's own visibility are enforced before a reaction is shown or accepted. | SOC-03, PROF-10                                |
 | SOC-06 | `QUEUED`    | L    | Activity comments          | Discussion attached to one meaningful activity object -- a session, a record, an achievement, a challenge result -- rather than a general-purpose posting surface. Requires deletion by the author and by the activity's owner, reporting, block enforcement in both directions, the same visibility rule as the activity it hangs from, and the review queue owned by `TRUST-04`. It does not gain its own timeline, threads or profiles without a new decision. | SOC-03, PROF-10, TRUST-04                      |
 | SOC-07 | `SHIPPED`   | L    | Structured workout sharing | From a completed session's recap in history, the owner creates a public link and chooses which parts it reveals: duration, volume, completed sets and personal records by default; progression changes and session notes opt-in. Anyone with the link sees only those parts, in the owner's kg/lb unit, with the owner's name, handle and avatar and a link to the privacy-filtered public profile; the previous-session comparison is never shared. Links are unguessable, capped at ten active per session and revocable at any time, after which they stop working immediately. Shipped 2026-09-13 through `@sunsteel/contracts@0.25.0` and a `SessionShare` migration; the size is corrected from `M` to `L` for that migration. | LIVE-09, PROF-06; `@sunsteel/contracts@0.25.0` |
@@ -1855,3 +1857,58 @@ it again without addressing the original decision.
   to reach routines that were already readable, and the page says exactly that
   before listing anything -- otherwise shipping a browse surface would quietly
   redefine what members thought sharing meant.
+- **2026-09-19 (revision 112):** Claimed `SOC-03` and `SOC-04` as one slice.
+  They ship together rather than in sequence because `SOC-03` may not display
+  anything until `SOC-04`'s controls exist, so the feed alone would be a
+  surface with nothing it is allowed to show. Eight decisions are recorded
+  before the work. **An entry is one verified fact.** The types are the ones
+  the product can already verify: completed sessions, personal records, load
+  progressions (`PROGRESSION_CHANGED`), earned achievements, streak milestones,
+  `ACH-05` comebacks and `ROUT-04` shared routines. A session with three
+  records is three entries, shown together, so each can be overridden on its
+  own. A streak milestone is written as both an `ACHIEVEMENT_UNLOCKED` and a
+  `STREAK_MILESTONE` event; it is reported once, as the streak. Achievements
+  recognized from history never produce an entry, exactly as `NOTIF-01`
+  decided, because they have no honest date. **Rank progression is not an
+  activity type yet.** Nothing records when a rank was reached, and deriving
+  the moment would replay a member's whole attendance history on every read,
+  which the product rules forbid; it waits on a writer that records it, the way
+  `ACH-01` records milestones. Challenges are `SOC-13`, unshipped, and are not
+  stubbed. **Entries are generated on read and never stored.** They come from
+  `TrainingEvent` rows, the shipped `comebackRecognitionSummary` with its own
+  bounds, and the routine; only the owner's choices are stored -- a default
+  audience per type and an override per entry, keyed by the entry's stable
+  source key -- for the reason `ROUT-07` gave: a stored copy drifts from what
+  it copies. A shared routine needs the one fact that does not exist,
+  **when** it was shared, so `Routine.sharedAt` is set when a routine first
+  becomes visible to anyone; routines shared before this ships have none and
+  produce no entry rather than an invented date. **Every type starts at Only
+  me.** Visibility is never implicit: nothing reaches anyone until its owner
+  picks an audience for that type, from the `PROF-06` values, and the control
+  says that a default applies to past entries of the type as well as future
+  ones. **Profile privacy is the upper bound, through the shipped rule.** Each
+  type maps to one section -- sessions and load progressions to workout
+  history, records to records, achievements, streaks and comebacks to
+  achievements, shared routines to routines -- and an entry is visible only
+  when `canViewProfileSection` allows both the section and the entry's
+  audience, the shape `canViewRoutine` already has; a shared routine must also
+  pass `canViewRoutine` itself. An override may widen or narrow one entry but
+  never past its section, and the owner is told when a section is capping a
+  choice, as `ROUT-04` tells them about a capped routine. **Withdrawing is an
+  override to Only me**, so an entry has one state rather than two that could
+  disagree. **Who sees it, and where.** The feed at `/activity` shows the
+  members the viewer follows; a member's profile shows their activity to
+  whoever its audience allows, so Everyone and Followers differ; Everyone
+  means every signed-in member, and activity stays off the signed-out
+  `/members` page. The preview runs the same read as a hypothetical follower
+  or non-follower, so what the owner is shown is what that audience receives
+  rather than a second calculation of it. **Links are decided by the server.**
+  An entry always names its record and links to it only where the viewer may
+  open it: the owner reaches their own pages; another member reaches a record
+  only while it is still the current best the profile shows, an achievement,
+  streak or comeback through the profile ledger, and a routine through the
+  member routine page; a session or a load progression has no page another
+  member may open, so it carries no link. `PROF-10` applies through the pure
+  helpers with the service's own `db`: blocked members never appear in each
+  other's feed, and a member's activity answers 404 across a block. Expects
+  one contract publish and one migration.
