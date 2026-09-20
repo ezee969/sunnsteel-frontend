@@ -270,6 +270,17 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Verified milestones, Renaissance ranks and the next goal per category.',
 	},
 	{
+		// The owner's own list, because the local stack has one real account
+		// and the feed would photograph an empty state. It is the SOC-04 half:
+		// every entry with the audience that actually applies.
+		slug: 'activity-yours',
+		route: '/activity?view=yours',
+		features: ['SOC-03', 'SOC-04'],
+		ready: ['See it as', /can see this|Withdrawn/],
+		caption:
+			'Activity generated from verified training, each entry with who can see it and a preview as each audience.',
+	},
+	{
 		slug: 'exercise-detail',
 		route: '/exercises/:exercise',
 		features: ['EXER-01', 'EXER-07', 'PROG-02'],

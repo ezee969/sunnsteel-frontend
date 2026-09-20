@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+import { MemberActivity } from '@/features/profile/member-activity'
 import { ProfileLoading } from '@/features/profile/profile-loading'
 import { ProfileView } from '@/features/profile/profile-view'
 import { RelationshipListsView } from '@/features/profile/relationship-lists-view'
@@ -158,6 +159,12 @@ export default function ProfilePage() {
 			isMutating={followMutation.isPending || unfollowMutation.isPending}
 			onFollowToggle={onFollowToggle}
 			relationshipHrefs={getRelationshipHrefs(publicUser.username)}
+			activity={
+				<MemberActivity
+					identifier={publicUser.username}
+					weightUnit={viewer.weightUnit}
+				/>
+			}
 		/>
 	)
 }

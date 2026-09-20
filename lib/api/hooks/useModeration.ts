@@ -25,7 +25,7 @@ export function useBlockedMembers(enabled = true) {
 
 /**
  * A block changes what almost every read may return — search, suggestions,
- * relationship lists, profiles and that member's routines — so it invalidates
+ * relationship lists, profiles, that member's routines and activity — so it invalidates
  * broadly rather than patching one cache. A stale list that still shows a
  * blocked member reads as the control not working.
  */
@@ -37,7 +37,12 @@ function useBlockMutation(
 		mutationFn: run,
 		onSuccess: response => {
 			queryClient.setQueryData(moderationKeys.blocks(), response)
-			for (const key of [['users'], ['routines'], ['notifications']] as const) {
+			for (const key of [
+				['users'],
+				['routines'],
+				['notifications'],
+				['activity'],
+			] as const) {
 				void queryClient.invalidateQueries({ queryKey: key })
 			}
 		},

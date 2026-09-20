@@ -42,9 +42,15 @@ export function useSetRoutineVisibility(routineId: string) {
 		mutationFn: visibility =>
 			routineSharingService.setVisibility(routineId, visibility),
 		// The routine detail carries the visibility, so it must not keep
-		// showing the old one after a change.
+		// showing the old one after a change. Sharing a private routine is
+		// also an activity entry (SOC-03), and its visibility caps that entry.
+		// Both are awaited, as the single invalidation was before, so the
+		// control stays pending until the reads it changed have refetched.
 		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: routineQueryKeys.all() }),
+			Promise.all([
+				queryClient.invalidateQueries({ queryKey: routineQueryKeys.all() }),
+				queryClient.invalidateQueries({ queryKey: ['activity'] }),
+			]),
 	})
 }
 

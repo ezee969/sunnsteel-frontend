@@ -105,7 +105,11 @@ export function ProfileAchievements({
 	const comebacks = data?.comeback?.recognitions ?? []
 
 	return (
-		<section aria-labelledby="profile-achievements" className="space-y-5">
+		<section
+			id="achievements"
+			aria-labelledby="profile-achievements"
+			className="scroll-mt-24 space-y-5"
+		>
 			<h2
 				id="profile-achievements"
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"

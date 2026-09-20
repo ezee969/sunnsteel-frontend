@@ -11,6 +11,7 @@ import {
 	Home,
 	LucideIcon,
 	Medal,
+	Rss,
 	Settings,
 	TrendingUp,
 	Weight,
@@ -128,6 +129,15 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		icon: Medal,
 		classicalName: 'laurel-crown',
 		href: '/achievements',
+		disabled: false,
+	},
+	// SOC-03: what the members you follow did, and who sees what you did. It is
+	// not Notifications, which is about you; this is about the people you follow.
+	{
+		id: 'activity',
+		label: 'Activity',
+		icon: Rss,
+		href: '/activity',
 		disabled: false,
 	},
 	{

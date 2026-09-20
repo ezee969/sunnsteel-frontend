@@ -421,6 +421,8 @@ const ROUTES: SweepRoute[] = [
 		path: () => '/exercises/00000000-0000-4000-8000-000000000000',
 	},
 	{ slug: 'achievements', path: () => '/achievements' },
+	{ slug: 'activity', path: () => '/activity' },
+	{ slug: 'activity-yours', path: () => '/activity?view=yours' },
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
 	{ slug: 'settings', path: () => '/settings' },
@@ -535,6 +537,7 @@ const NAV_TARGETS: Array<[string, RegExp]> = [
 	['History', /\/workouts\/history$/],
 	['Progress', /\/progress$/],
 	['Exercises', /\/exercises$/],
+	['Activity', /\/activity$/],
 	['Settings', /\/settings$/],
 	['Dashboard', /\/dashboard$/],
 ]

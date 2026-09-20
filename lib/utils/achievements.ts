@@ -116,7 +116,12 @@ export function formatAchievementDate(value: string): string {
 	}).format(new Date(value))
 }
 
-export function formatComebackEvidence(comeback: ComebackRecognition): string {
+export function formatComebackEvidence(
+	comeback: Pick<
+		ComebackRecognition,
+		'inactiveDays' | 'activeDays' | 'windowDays'
+	>,
+): string {
 	return `${comeback.inactiveDays} full days away · ${comeback.activeDays} active days in ${comeback.windowDays} days`
 }
 

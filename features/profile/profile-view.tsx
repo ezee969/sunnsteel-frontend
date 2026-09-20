@@ -74,6 +74,11 @@ type ProfileViewProps = (
 ) & {
 	/** Only inside the authenticated shell; the public route keeps plain counts. */
 	relationshipHrefs?: RelationshipHrefs
+	/**
+	 * SOC-03: the member's activity, rendered last in the main column. Only
+	 * the authenticated shell passes one; activity is never shown signed out.
+	 */
+	activity?: React.ReactNode
 }
 
 export function ProfileView(props: ProfileViewProps) {
@@ -506,7 +511,7 @@ export function ProfileView(props: ProfileViewProps) {
 					    hover-boxed rows. One honour mark for the section - records are
 					    exactly what gold means, but at most two per viewport (§4.3
 					    rule 3), matching the dashboard and the session recap. */}
-					<section>
+					<section id="personal-records" className="scroll-mt-24">
 						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
 							<Trophy className="h-4 w-4 text-honour" aria-hidden /> Personal
 							Records
@@ -548,6 +553,8 @@ export function ProfileView(props: ProfileViewProps) {
 							</div>
 						)}
 					</section>
+
+					{props.activity}
 				</div>
 			</div>
 		</div>

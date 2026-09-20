@@ -49,11 +49,12 @@ const PRIVACY_FIELDS: PrivacyField[] = [
 	{
 		key: 'workoutHistory',
 		description:
-			'Controls your completed workout count, total volume, and streak summary.',
+			'Controls your completed workout count, total volume, and streak summary, and caps who can see your workout and load-progression activity.',
 	},
 	{
 		key: 'records',
-		description: 'Controls the personal records shown on your profile.',
+		description:
+			'Controls the personal records shown on your profile, and caps who can see your record activity.',
 	},
 	{
 		key: 'bodyMetrics',
@@ -63,12 +64,12 @@ const PRIVACY_FIELDS: PrivacyField[] = [
 	{
 		key: 'routines',
 		description:
-			'Saves who may see routines when profile routine sharing becomes available.',
+			'Caps who can find and open the routines you share, and your shared-routine activity. Each routine also has its own setting.',
 	},
 	{
 		key: 'achievements',
 		description:
-			'Saves who may see achievements when profile achievements become available.',
+			'Controls your rank, earned milestones and comebacks on your profile, and caps your achievement, streak and comeback activity.',
 	},
 ]
 

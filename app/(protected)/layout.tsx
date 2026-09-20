@@ -55,6 +55,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/schedule')) return 'schedule'
 		if (path.startsWith('/achievements')) return 'achievements'
 		if (path.startsWith('/notifications')) return 'notifications'
+		if (path.startsWith('/activity')) return 'activity'
 		if (path.startsWith('/settings')) return 'settings'
 		return ''
 	}
@@ -73,6 +74,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/schedule')) return 'Schedule'
 		if (path.startsWith('/achievements')) return 'Achievements'
 		if (path.startsWith('/notifications')) return 'Notifications'
+		if (path.startsWith('/activity')) return 'Activity'
 		if (path.startsWith('/settings')) return 'Profile Settings'
 		if (path.startsWith('/profile')) return 'Profile'
 		if (path.startsWith('/search')) return 'Search'
