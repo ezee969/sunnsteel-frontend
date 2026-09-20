@@ -166,6 +166,9 @@ active or requested generation when introducing retention later.
 - Pooled migration access hit a stale session advisory lock. The idle holder
   (no open transaction) was released and migration succeeded over the direct
   connection to the same Neon database. Use direct connections for migrations.
+  (Neon hosted the database at the time. It was replaced on 2026-09-20 by
+  Railway Postgres in production and a local PostgreSQL in development, so the
+  pooled/direct distinction this entry records no longer applies.)
 - The owner confirmed post-cutover functionality. The API legacy reader and
   projection-read flag were removed to close TD-27.
 - **TD-27 closed on 2026-09-07.** The staged sequence above ran to completion;
