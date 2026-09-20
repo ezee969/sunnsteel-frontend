@@ -49,6 +49,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/dashboard')) return 'dashboard'
 		if (path.startsWith('/workouts/history')) return 'history'
 		if (path.startsWith('/workouts')) return 'workouts'
+		// Before '/routines': discovery has its own sidebar entry (ROUT-07),
+		// and the prefix check would otherwise mark Routines as the current
+		// page while standing on Discover.
+		if (path.startsWith('/routines/discover')) return 'discover-routines'
 		if (path.startsWith('/routines')) return 'routines'
 		if (path.startsWith('/progress')) return 'progress'
 		if (path.startsWith('/exercises')) return 'exercises'
@@ -68,6 +72,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/workouts')) return 'Workouts'
 		if (path.startsWith('/routines/new')) return 'New Routine'
 		if (path.startsWith('/routines/edit')) return 'Edit Routine'
+		if (path.startsWith('/routines/discover')) return 'Discover Routines'
 		if (path.startsWith('/routines')) return 'Routines'
 		if (path.startsWith('/progress')) return 'Progress'
 		if (path.startsWith('/exercises')) return 'Exercises'

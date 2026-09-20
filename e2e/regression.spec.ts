@@ -537,6 +537,7 @@ const NAV_TARGETS: Array<[string, RegExp]> = [
 	['History', /\/workouts\/history$/],
 	['Progress', /\/progress$/],
 	['Exercises', /\/exercises$/],
+	['Discover', /\/routines\/discover$/],
 	['Activity', /\/activity$/],
 	['Settings', /\/settings$/],
 	['Dashboard', /\/dashboard$/],
