@@ -27,6 +27,8 @@ npm run lock:check     # every dependency named in package-lock.json has an entr
 npm run lock:repair    # restore missing lock entries, unchanged, from HEAD (TD-33); postinstall runs it too
 npm run verify         # lock:check + lint + typecheck + test + build (run before considering work done)
 npm run ui:capture:portfolio  # Playwright: portfolio screenshots + manifest (dev server, backend, ui:login; not CI)
+npm run ui:refresh     # renew the saved sign-in through the app's own refresh path (before a long sweep)
+npm run ui:regression  # the 437-case sweep; scope it with -- -g "<title pattern>" (see UI and styling)
 ```
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lock:check → lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 22 (required by the current Supabase client).
@@ -140,9 +142,35 @@ High-risk invariants:
 - **Inputs remain 16px below `md`.** Preserve their explicit boundary, focus and invalid-state treatment in both themes.
 - **Responsive decisions must account for the protected shell.** Apply the `viewport - 256px` content budget and exact-breakpoint verification described in Gotchas; do not reason from viewport width alone.
 
-For every UI change, inspect the affected states in both themes at the relevant exact boundary widths and run `npm run ui:regression`. The sweep requires the backend and a valid saved sign-in from `npm run ui:login`; if either prerequisite is unavailable, report exactly what blocked the run and what was verified instead — never imply the sweep passed. Follow the existing build/dev-server restriction when running the normal repository gates.
+For every UI change, inspect the affected states in both themes at the relevant exact boundary widths and run the regression sweep. It requires the backend and a valid saved sign-in; if either prerequisite is unavailable, report exactly what blocked the run and what was verified instead — **never imply the sweep passed**. Follow the existing build/dev-server restriction when running the normal repository gates.
+
+**Scope the sweep to what you touched; that is the default, not a shortcut.** The full run is 437 cases — 27 routes × 7 widths × 2 themes (378) plus 59 interaction cases — at roughly five seconds each, so it costs about 37 minutes and re-checks every route you did not change. One route is 14 cases. Select by test title (`layout <slug> @ <width> <theme>`, and the `navigation`/`drawer`/`sidebar`/`dialog`/`dropdowns`/`hover`/`keyboard focus` suites in [e2e/regression.spec.ts](e2e/regression.spec.ts)):
+
+```bash
+npm run ui:regression -- -g "layout activity|navigation|drawer|sidebar|dialog|dropdowns|hover|keyboard focus"
+```
+
+That is 87 cases, about 7 minutes: the two `activity` routes plus every interaction suite. Drop the suites when nothing outside one page changed (`-g "layout activity"`, 28 cases), and check a pattern with `--list` before trusting it — `layout activity @` matches `activity` but not `activity-yours`.
+
+**Run the whole 437 when the change is not confined to a page**: the protected shell or [Sidebar.tsx](features/shell/components/Sidebar.tsx), [app/globals.css](app/globals.css) or the design tokens, any `components/ui/*` primitive, motion or theme handling — and before a release. State in the closure which of the two you ran, with its tally.
+
+Two hazards that have each cost a run. **Renew the saved sign-in first** with `npm run ui:refresh`: the access token lasts an hour, a full sweep outlives it, and every context then refreshes from the same stored refresh token — the failure that lost two cases to a 401 in the `PROF-10` sweep. **Do not write files in `../sunnsteel-backend` while a sweep runs**: `npm run start:dev` watches the tree, restarts, and every case in flight fails with the backend unreachable.
+
+When the whole 437 is unavoidable, `-- --workers=3` after a refresh cuts it to about sixteen minutes: measured 2026-09-20, 437/437 passing serial (36.7m) and at three workers (16.1m), same cases. The committed default stays one worker, because parallel contexts share the one saved sign-in and that is the thing that has invalidated it before; renew first, and keep the run short enough that no context has to refresh mid-run.
 
 **Portfolio screenshots.** When a user-facing page ships or visibly changes, add or update its entry in [e2e/portfolio-targets.ts](e2e/portfolio-targets.ts) in the same change (slug, route, roadmap IDs, optional setup with its cleanup, caption hint). `npm run ui:capture:portfolio` writes 1440×900 dark viewport frames to `docs/portfolio/screenshots/<slug>.png` and regenerates `docs/portfolio/manifest.json`, replacing the owner's email with `eze@sunnsteel.app`. It needs the same prerequisites as `ui:regression`, refuses to run while a workout session is active, and is not part of CI. A setup step may start a scratch session but never finishes one; it discards it afterwards.
+
+## Closing a slice
+
+The order the gates run in, and the work each one is the only owner of. Doing
+one of these twice is the most common way a routine change takes an afternoon.
+
+1. **Contracts**, only when a shared shape changed: edit `../sunnsteel-contracts`, verify, publish, then install the new version here and in the backend.
+2. **`npm run verify`, once, at the end**, with the dev servers stopped. While iterating run `npm run lint`, `npm run typecheck` and `npm test`; the full gate re-runs all of them plus `next build`, so running it after every edit buys nothing. **The test tally is in `verify`'s own output** — do not run `npm test` again to read it.
+3. **Real-stack checks** against the running servers, for what a Node test structurally cannot reach: SQL and Prisma `where` clauses, JSON-path filters, authorization order, cursors over real rows. A rule already covered by a pure test does not need a second assertion over HTTP.
+4. **Browser pass** for behaviour only — links, copy, mutations, the states a person actually sees. Do not re-assert horizontal overflow, console errors or `h1` counts by hand: the sweep owns those, at more widths than a hand pass will ever cover.
+5. **Sweep**, scoped by the rule in [UI and styling](#ui-and-styling).
+6. **Docs**: the roadmap closure with its decisions and what you did *not* verify, `CLAUDE.md`/`AGENTS.md` kept in sync, `../FEATURES.md` when a feature ships.
 
 ## Conventions
 

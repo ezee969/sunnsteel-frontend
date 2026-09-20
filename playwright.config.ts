@@ -49,6 +49,11 @@ export default defineConfig<CaptureOptions>({
 		{
 			name: 'regression',
 			testMatch: 'regression.spec.ts',
+			// The sweep writes no screenshots, so its cases may run in any order.
+			// This is a no-op at the configured `workers: 1` and exists so a run
+			// can opt into `--workers=N`; parallel contexts share one saved
+			// sign-in, so renew it with `npm run ui:refresh` first.
+			fullyParallel: true,
 			// The first request to each route compiles it under Turbopack.
 			use: { navigationTimeout: 90_000 },
 		},
