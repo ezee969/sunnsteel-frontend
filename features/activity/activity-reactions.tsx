@@ -9,6 +9,11 @@ import {
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useSetActivityReaction } from '@/lib/api/hooks/useActivity'
 import { cn } from '@/lib/utils'
 import {
@@ -89,26 +94,36 @@ export function ActivityReactions({
 				// An untouched reaction is offered without a count; one that
 				// somebody gave shows how many, so a zero is never displayed.
 				return (
-					<Button
-						key={reaction}
-						type="button"
-						size="sm"
-						variant={chosen ? 'secondary' : 'ghost'}
-						aria-pressed={chosen}
-						aria-label={describeReactionAction(reaction, summary)}
-						disabled={setReaction.isPending}
-						onClick={() => choose(reaction)}
-					>
-						<ClassicalIcon
-							name={ACTIVITY_REACTION_ICONS[reaction]}
-							className={cn(
-								'size-4',
-								chosen ? 'text-foreground' : 'text-ink-3',
-							)}
-							aria-hidden
-						/>
-						{count > 0 ? <span className="type-data">{count}</span> : null}
-					</Button>
+					// The icons are a small closed set, so the name reaches a
+					// pointer through a tooltip and assistive technology through
+					// the accessible label. Neither is the only cue: the pressed
+					// state and the count both move when one is chosen.
+					<Tooltip key={reaction}>
+						<TooltipTrigger asChild>
+							<Button
+								type="button"
+								size="sm"
+								variant={chosen ? 'secondary' : 'ghost'}
+								aria-pressed={chosen}
+								aria-label={describeReactionAction(reaction, summary)}
+								disabled={setReaction.isPending}
+								onClick={() => choose(reaction)}
+							>
+								<ClassicalIcon
+									name={ACTIVITY_REACTION_ICONS[reaction]}
+									className={cn(
+										'size-4',
+										chosen ? 'text-foreground' : 'text-ink-3',
+									)}
+									aria-hidden
+								/>
+								{count > 0 ? <span className="type-data">{count}</span> : null}
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent sideOffset={6}>
+							{ACTIVITY_REACTION_LABELS[reaction]}
+						</TooltipContent>
+					</Tooltip>
 				)
 			})}
 		</div>
