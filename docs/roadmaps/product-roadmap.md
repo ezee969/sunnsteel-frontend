@@ -79,6 +79,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID | Status | Owner | Branch / worktree | Claimed | Repositories |
 | -- | ------ | ----- | ----------------- | ------- | ------------ |
+| TRUST-04 | `IN_PROGRESS` | Claude (Opus 5) | `claude/trust-04` | 2026-09-20 | CT, BE, FE |
 
 ## Current product snapshot
 
@@ -523,7 +524,7 @@ two.
 | TRUST-01  | `CANDIDATE` | L    | Account deletion                      | Clearly explain and complete removal of user data and stored media.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | BE deletion workflow                  |
 | TRUST-02  | `SHIPPED`   | M    | Privacy dashboard                     | Settings summarises, from saved settings, which live profile sections each audience sees and where: Everyone on the public `/members` link and inside the app, Followers only inside the app, Only me on the own profile. It also lists always-visible identity, member-search discovery and the rules stored for routines and achievements, and previews the signed-out profile. Shipped 2026-09-13, frontend only.                                                                                                                                                 | PROF-06                               |
 | TRUST-03  | `CANDIDATE` | M    | Connection and sync state             | Clearly distinguish offline, pending, saving, synchronized, and failed data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | OFFLINE-01                            |
-| TRUST-04  | `QUEUED`    | L    | Moderation foundation                 | The report queue, review actions, content removal, enforcement records and audit trail that every member-visible interaction needs: comments, reactions, public challenges, messages, rooms and communities all read this instead of each building its own. It is the ID for the previously unowned "moderation tools" dependency, and it builds the review side on top of the member-facing controls in `PROF-10`.                                                                                                                                                                                                                                                                             | PROF-10                               |
+| TRUST-04  | `IN_PROGRESS` | L    | Moderation foundation                 | The report queue, review actions, content removal, enforcement records and audit trail that every member-visible interaction needs: comments, reactions, public challenges, messages, rooms and communities all read this instead of each building its own. It is the ID for the previously unowned "moderation tools" dependency, and it builds the review side on top of the member-facing controls in `PROF-10`.                                                                                                                                                                                                                                                                             | PROF-10                               |
 
 ### Deferred infrastructure-heavy features
 
@@ -1994,3 +1995,46 @@ it again without addressing the original decision.
   entries in Activity › Yours, and `NOTIF-01` gathers from sources that are
   training events, which a reaction is not. Expects one contract publish and
   one migration.
+- **2026-09-20 (revision 116):** Claimed `TRUST-04`. `PROF-10` shipped the
+  member-facing half on 2026-09-18 and `MemberReport` rows have been
+  accumulating with nothing that reads them; `SOC-06` and every `COMM-*` item
+  wait on the review side. Nine decisions are recorded before the work.
+  **A moderator is a flag on the account, not a role system.** There is one
+  moderator, the owner, so `User.isModerator` is the whole authorization
+  model and a seed sets it for that account alone; a roles-and-permissions
+  table would be a subsystem built for a second moderator who does not exist.
+  **Two review actions, and no third.** A report may be **dismissed**, or the
+  reported subject **hidden from everyone but its owner**. Nothing in this
+  slice deletes a routine, a session or an account: a member's training data
+  is theirs, and a moderation decision is not a reason to destroy it.
+  **Hiding reuses the shipped rule rather than adding a gate beside it.** A
+  hidden routine is refused by `canViewRoutine` before it asks anything else,
+  a hidden session share stops resolving for its token, and a hidden account
+  answers 404 and drops out of search, suggestions, relationship lists,
+  activity and discovery -- the same shape `PROF-10` already gives a block.
+  Every one of those exclusions goes through one pair of helpers, so a read
+  added later cannot quietly omit it. **The owner is told.** A routine or a
+  share that has stopped resolving while its own control still reads "Public"
+  would be a switch with nothing behind it, which the product rules forbid, so
+  the owner's routine and share surfaces state that moderation has hidden it.
+  **Reviewing grants no new sight.** The queue resolves each subject through
+  the shipped `PROF-06`/`PROF-10` rules **as the reviewer**, and says plainly
+  when a subject is withheld from them rather than revealing it; there is no
+  moderator bypass, and a reviewer opens a subject on its own page rather than
+  through a mirror of it that could answer differently. A moderator who must
+  read private content has to be granted it the way anyone else would.
+  **Reading is itself an action.** Opening a reported subject writes a
+  `VIEW_SUBJECT` record with the moderator and the time, for the same reason
+  the enforcement records exist: an unlogged read is the one moderation power
+  nobody could ever audit. **Enforcement records are append-only.** A
+  `ModerationAction` row is never updated and never deleted; the service has
+  no path that could. **A hide is undone by appending, not by editing.**
+  Restoring writes a new `RESTORE_SUBJECT` record that supersedes the hide,
+  which is the only way "never editable" and "a mistaken hide is not
+  permanent" can both hold. This is one action more than the two named above
+  and is deliberately not a third enforcement power -- it removes one.
+  **The receipt does not change.** `PROF-10`'s report copy says the report was
+  recorded, that reviews happen as moderation is built out and that the
+  reporter will get no update on it. A queue existing is not a timetable, and
+  the copy must not drift into one now that somebody can read the row.
+  Expects one contract publish and one migration.
