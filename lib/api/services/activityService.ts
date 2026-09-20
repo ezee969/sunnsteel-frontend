@@ -8,6 +8,8 @@ import type {
 	OwnActivityResponse,
 	SetActivityEntryAudienceRequest,
 	SetActivityEntryAudienceResponse,
+	SetActivityReactionRequest,
+	SetActivityReactionResponse,
 	UpdateActivitySharingRequest,
 } from '@sunsteel/contracts'
 
@@ -68,6 +70,14 @@ export const activityService = {
 			body: JSON.stringify(request),
 			secure: true,
 		}),
+
+	setReaction: (
+		request: SetActivityReactionRequest,
+	): Promise<SetActivityReactionResponse> =>
+		httpClient.request<SetActivityReactionResponse>(
+			'/activity/entries/reaction',
+			{ method: 'PUT', body: JSON.stringify(request), secure: true },
+		),
 
 	setEntryAudience: (
 		request: SetActivityEntryAudienceRequest,

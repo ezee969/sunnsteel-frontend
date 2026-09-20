@@ -19,6 +19,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ActivityReactions } from '@/features/activity/activity-reactions'
 import {
 	activityHref,
 	describeActivity,
@@ -47,10 +48,13 @@ export const ACTIVITY_ICONS: Record<ActivityType, LucideIcon> = {
 export function ActivityFact({
 	entry,
 	weightUnit,
+	canReact = false,
 	children,
 }: {
 	entry: ActivityEntry
 	weightUnit: WeightUnit
+	/** SOC-05: false on your own activity, where there is nothing to acknowledge. */
+	canReact?: boolean
 	children?: ReactNode
 }) {
 	const Icon = ACTIVITY_ICONS[entry.type]
@@ -73,6 +77,11 @@ export function ActivityFact({
 				</p>
 				{detail ? <p className="type-body-sm text-ink-3">{detail}</p> : null}
 				{children}
+				<ActivityReactions
+					entryId={entry.id}
+					summary={entry.reactions}
+					canReact={canReact}
+				/>
 			</div>
 		</div>
 	)
@@ -128,6 +137,7 @@ export function ActivityEntryList({
 	showAuthor,
 	label,
 	ruled = true,
+	canReact = false,
 }: {
 	entries: ActivityEntry[]
 	weightUnit: WeightUnit
@@ -136,6 +146,8 @@ export function ActivityEntryList({
 	label: string
 	/** False under a heading that already draws its rule. */
 	ruled?: boolean
+	/** SOC-05: whether these entries may be reacted to (never your own). */
+	canReact?: boolean
 }) {
 	const groups = groupActivity(entries)
 	return (
@@ -158,7 +170,11 @@ export function ActivityEntryList({
 					<ul className="space-y-3">
 						{group.entries.map(entry => (
 							<li key={entry.id}>
-								<ActivityFact entry={entry} weightUnit={weightUnit} />
+								<ActivityFact
+									entry={entry}
+									weightUnit={weightUnit}
+									canReact={canReact}
+								/>
 							</li>
 						))}
 					</ul>

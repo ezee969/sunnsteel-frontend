@@ -9,6 +9,8 @@ import type {
 	OwnActivityResponse,
 	SetActivityEntryAudienceRequest,
 	SetActivityEntryAudienceResponse,
+	SetActivityReactionRequest,
+	SetActivityReactionResponse,
 	UpdateActivitySharingRequest,
 } from '@sunsteel/contracts'
 import {
@@ -20,7 +22,7 @@ import {
 } from '@tanstack/react-query'
 
 import { activityService } from '@/lib/api/services/activityService'
-import { applyEntrySharing } from '@/lib/utils/activity'
+import { applyEntryReactions, applyEntrySharing } from '@/lib/utils/activity'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 /**
@@ -124,6 +126,43 @@ export function useUpdateActivitySharing() {
 		onSuccess: settings => {
 			queryClient.setQueryData(activityKeys.sharing(), settings)
 			void queryClient.invalidateQueries({ queryKey: activityKeys.all() })
+		},
+	})
+}
+
+/**
+ * SOC-05. One entry's reactions, patched wherever that entry is loaded — the
+ * feed, a member's profile, the owner's list, a preview — because the same
+ * entry can be on screen in more than one of them and they must not disagree.
+ * The server returns the summary it resolved, so nothing is guessed here.
+ */
+export function useSetActivityReaction() {
+	const queryClient = useQueryClient()
+	return useMutation<
+		SetActivityReactionResponse,
+		Error,
+		SetActivityReactionRequest
+	>({
+		mutationFn: activityService.setReaction,
+		onSuccess: response => {
+			queryClient.setQueriesData(
+				{ queryKey: activityKeys.all() },
+				(current: unknown) =>
+					current &&
+					typeof current === 'object' &&
+					'pages' in current &&
+					Array.isArray((current as { pages: unknown }).pages)
+						? applyEntryReactions(
+								current as InfiniteData<{
+									entries: {
+										id: string
+										reactions: SetActivityReactionResponse['reactions']
+									}[]
+								}>,
+								response,
+							)
+						: current,
+			)
 		},
 	})
 }

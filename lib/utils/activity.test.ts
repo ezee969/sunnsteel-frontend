@@ -1,10 +1,12 @@
 import type {
 	ActivityEntry,
 	ActivityEntrySharing,
+	ActivityReaction,
+	ActivityReactionSummary,
 	OwnActivityEntry,
 	OwnActivityResponse,
 } from '@sunsteel/contracts'
-import { ACTIVITY_TYPES } from '@sunsteel/contracts'
+import { ACTIVITY_REACTIONS, ACTIVITY_TYPES } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
@@ -13,15 +15,20 @@ import { buildActivityParams } from '@/lib/api/services/activityService'
 import {
 	ACTIVITY_DEFAULTS_NOTE,
 	ACTIVITY_EVERYONE_NOTE,
+	ACTIVITY_REACTION_ICONS,
+	ACTIVITY_REACTION_LABELS,
 	ACTIVITY_TYPE_DESCRIPTIONS,
 	ACTIVITY_TYPE_LABELS,
 	activityHref,
+	applyEntryReactions,
 	applyEntrySharing,
 	describeActivity,
 	describeActivityCap,
 	describeEmptyFeed,
+	describeReactionAction,
 	describeSectionCap,
 	groupActivity,
+	reactionsGiven,
 } from './activity'
 
 const author = {
@@ -30,11 +37,20 @@ const author = {
 	lastName: 'Ray',
 	avatarUrl: null,
 }
+const summary = (
+	counts: Partial<Record<ActivityReaction, number>> = {},
+	viewerReaction: ActivityReaction | null = null,
+): ActivityReactionSummary => ({
+	counts: { STRENGTH: 0, DISCIPLINE: 0, RESPECT: 0, INSPIRING: 0, ...counts },
+	viewerReaction,
+})
+
 const base = {
 	occurredAt: '2026-09-19T10:00:00.000Z',
 	author,
 	link: null,
 	groupKey: null,
+	reactions: summary(),
 }
 
 const session = (id: string, groupKey: string | null): ActivityEntry => ({
@@ -272,6 +288,46 @@ describe('telling the owner what actually applies', () => {
 		const next = applyEntrySharing(data, { entryId: 'r', sharing: withdrawn })
 		expect(next.pages[0].entries[0].sharing).toEqual(withdrawn)
 		expect(next.pages[0].entries[1]).toBe(untouched)
+	})
+})
+
+describe('themed reactions', () => {
+	it('lists only the ones somebody gave, in catalog order', () => {
+		expect(reactionsGiven(summary({ RESPECT: 2, STRENGTH: 1 }))).toEqual([
+			{ reaction: 'STRENGTH', count: 1 },
+			{ reaction: 'RESPECT', count: 2 },
+		])
+		expect(reactionsGiven(summary())).toEqual([])
+	})
+
+	it('names every reaction and gives it one of the classical icons', () => {
+		for (const reaction of ACTIVITY_REACTIONS) {
+			expect(ACTIVITY_REACTION_LABELS[reaction]).toBeTruthy()
+			expect(ACTIVITY_REACTION_ICONS[reaction]).toBeTruthy()
+		}
+	})
+
+	it('says what pressing the control does, including undoing your own', () => {
+		expect(describeReactionAction('STRENGTH', summary())).toBe('Strength')
+		expect(describeReactionAction('STRENGTH', summary({ STRENGTH: 3 }))).toBe(
+			'Strength, 3 in total',
+		)
+		expect(
+			describeReactionAction('STRENGTH', summary({ STRENGTH: 3 }, 'STRENGTH')),
+		).toBe(
+			'Strength, 3 in total. You chose this; choose it again to remove it.',
+		)
+	})
+
+	it('replaces one entry wherever it is loaded, and leaves the others alone', () => {
+		const data: InfiniteData<{ entries: ActivityEntry[] }> = {
+			pageParams: [undefined],
+			pages: [{ entries: [record('r', null), session('s', null)] }],
+		}
+		const reactions = summary({ RESPECT: 1 }, 'RESPECT')
+		const next = applyEntryReactions(data, { entryId: 'r', reactions })
+		expect(next.pages[0].entries[0].reactions).toEqual(reactions)
+		expect(next.pages[0].entries[1]).toBe(data.pages[0].entries[1])
 	})
 })
 

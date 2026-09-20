@@ -4,16 +4,21 @@ import type {
 	ActivityEntrySharing,
 	ActivityLink,
 	ActivityPreviewAudience,
+	ActivityReaction,
+	ActivityReactionSummary,
 	ActivitySection,
 	ActivityType,
 	OwnActivityResponse,
 	ProfileVisibility,
 	SetActivityEntryAudienceResponse,
+	SetActivityReactionResponse,
 	SharedRoutineOwner,
 	WeightUnit,
 } from '@sunsteel/contracts'
+import { ACTIVITY_REACTIONS } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
+import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
 import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
@@ -283,6 +288,76 @@ export function applyEntrySharing(
 			entries: page.entries.map(entry =>
 				entry.id === response.entryId
 					? { ...entry, sharing: response.sharing }
+					: entry,
+			),
+		})),
+	}
+}
+
+// Themed reactions (SOC-05) --------------------------------------------------
+//
+// Four acknowledgements, each with one of the classical icons the app already
+// ships. They say "this was work"; nothing counts, ranks or orders by them.
+
+export const ACTIVITY_REACTION_LABELS: Record<ActivityReaction, string> = {
+	STRENGTH: 'Strength',
+	DISCIPLINE: 'Discipline',
+	RESPECT: 'Respect',
+	INSPIRING: 'Inspiring',
+}
+
+export const ACTIVITY_REACTION_ICONS: Record<
+	ActivityReaction,
+	ClassicalIconName
+> = {
+	STRENGTH: 'bicep-flexing',
+	DISCIPLINE: 'hourglass',
+	RESPECT: 'laurel-crown',
+	INSPIRING: 'torch',
+}
+
+/** Only the reactions somebody actually gave, in catalog order. */
+export function reactionsGiven(
+	summary: ActivityReactionSummary,
+): { reaction: ActivityReaction; count: number }[] {
+	return ACTIVITY_REACTIONS.filter(
+		reaction => summary.counts[reaction] > 0,
+	).map(reaction => ({ reaction, count: summary.counts[reaction] }))
+}
+
+/** What a reaction control says, including what pressing it again would do. */
+export function describeReactionAction(
+	reaction: ActivityReaction,
+	summary: ActivityReactionSummary,
+): string {
+	const label = ACTIVITY_REACTION_LABELS[reaction]
+	const count = summary.counts[reaction]
+	if (summary.viewerReaction === reaction) {
+		return `${label}, ${count} in total. You chose this; choose it again to remove it.`
+	}
+	return count > 0 ? `${label}, ${count} in total` : label
+}
+
+/**
+ * One entry's reactions replaced wherever it is loaded — the feed, a member's
+ * profile, the owner's list, a preview — so the control shows what the server
+ * resolved without refetching a page.
+ */
+export function applyEntryReactions<
+	Page extends {
+		entries: { id: string; reactions: ActivityReactionSummary }[]
+	},
+>(
+	data: InfiniteData<Page>,
+	response: SetActivityReactionResponse,
+): InfiniteData<Page> {
+	return {
+		...data,
+		pages: data.pages.map(page => ({
+			...page,
+			entries: page.entries.map(entry =>
+				entry.id === response.entryId
+					? { ...entry, reactions: response.reactions }
 					: entry,
 			),
 		})),

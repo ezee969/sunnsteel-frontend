@@ -79,6 +79,7 @@ export function ActivityFeed() {
 						weightUnit={weightUnit}
 						showAuthor
 						label="Activity from members you follow"
+						canReact
 					/>
 					{query.hasNextPage ? (
 						<Button

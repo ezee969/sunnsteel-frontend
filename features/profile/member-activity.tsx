@@ -66,6 +66,7 @@ export function MemberActivity({
 						showAuthor={false}
 						label="Activity"
 						ruled={false}
+						canReact
 					/>
 					{query.hasNextPage ? (
 						<Button
