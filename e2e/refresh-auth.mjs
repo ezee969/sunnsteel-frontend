@@ -20,10 +20,27 @@
  *   2. npm run ui:refresh
  *   3. npm run ui:regression
  */
+import { writeFile } from 'node:fs/promises'
+
 import { chromium } from '@playwright/test'
 
 const BASE_URL = process.env.UI_BASE_URL ?? 'http://localhost:3000'
 const STATE_PATH = '.auth/state.json'
+
+/**
+ * Whether a captured storage state is worth writing over the saved one. A
+ * Supabase session lives in `localStorage` under `sb-<ref>-auth-token`; a
+ * state without it is a signed-out browser, whatever else it carries.
+ */
+const holdsSession = state =>
+	Boolean(
+		state?.origins?.some(origin =>
+			origin.localStorage?.some(
+				item =>
+					item.name?.startsWith('sb-') && item.name.endsWith('-auth-token'),
+			),
+		),
+	)
 
 /** The Supabase session as the browser stores it, whatever the project ref is. */
 const readExpiry = page =>
@@ -95,8 +112,22 @@ try {
 	console.error(`\nCould not renew the session: ${error.message}\n`)
 	process.exitCode = 1
 } finally {
-	// Written back even on failure: the context may already hold newer tokens
-	// than the file, and leaving the file behind would strand them.
-	await context.storageState({ path: STATE_PATH })
+	// Written back even on failure, because the context may already hold newer
+	// tokens than the file and leaving the file behind would strand them --
+	// **but only when it still holds a session at all**. A refresh that fails
+	// because the stored refresh token was rejected ends on `/login` with an
+	// empty `localStorage`, and writing that back replaces a recoverable
+	// sign-in with a signed-out one. That turns "your token expired" into
+	// "your saved session is gone", which only an interactive `npm run
+	// ui:login` can undo. It cost a sweep exactly that way on 2026-09-21.
+	const captured = await context.storageState().catch(() => null)
+	if (holdsSession(captured)) {
+		await writeFile(STATE_PATH, `${JSON.stringify(captured, null, 2)}\n`)
+	} else {
+		console.error(
+			`Left ${STATE_PATH} as it was: the browser ended without a session, and overwriting it would have discarded the saved sign-in. Run "npm run ui:login" to sign in again.`,
+		)
+		process.exitCode = 1
+	}
 	await browser.close()
 }
