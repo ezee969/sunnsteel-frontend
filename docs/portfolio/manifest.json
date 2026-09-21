@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-09-16T14:56:49.496Z",
+	"mutatedAt": "2026-09-21T13:46:29.086Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -9,7 +9,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-09-16T14:55:27.606Z",
+			"capturedAt": "2026-09-21T13:45:37.202Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -19,9 +19,11 @@
 			"features": [
 				"DASH-01",
 				"DASH-02",
+				"DASH-07",
+				"DASH-09",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-16T14:55:31.865Z",
+			"capturedAt": "2026-09-21T13:45:41.043Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -33,7 +35,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-09-16T15:00:14.762Z",
+			"capturedAt": "2026-09-21T13:45:45.380Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -45,7 +47,7 @@
 				"ROUT-02",
 				"ROUT-08"
 			],
-			"capturedAt": "2026-09-16T14:56:18.222Z",
+			"capturedAt": "2026-09-21T13:45:52.767Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -55,7 +57,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-09-16T14:56:21.758Z",
+			"capturedAt": "2026-09-21T13:45:56.080Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -67,7 +69,7 @@
 				"LIVE-09",
 				"SOC-07"
 			],
-			"capturedAt": "2026-09-16T14:56:25.090Z",
+			"capturedAt": "2026-09-21T13:45:59.494Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -80,7 +82,7 @@
 				"PROG-04",
 				"PROG-05"
 			],
-			"capturedAt": "2026-09-16T14:56:31.989Z",
+			"capturedAt": "2026-09-21T13:46:03.729Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -91,9 +93,10 @@
 				"SCHED-01",
 				"SCHED-03",
 				"SCHED-04",
-				"SCHED-05"
+				"SCHED-05",
+				"NAV-05"
 			],
-			"capturedAt": "2026-09-16T14:56:35.392Z",
+			"capturedAt": "2026-09-21T13:46:07.157Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -106,7 +109,29 @@
 				"ACH-04",
 				"ACH-05"
 			],
-			"capturedAt": "2026-09-16T14:56:39.311Z",
+			"capturedAt": "2026-09-21T13:46:10.598Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "activity-yours",
+			"route": "/activity?view=yours",
+			"features": [
+				"SOC-03",
+				"SOC-04"
+			],
+			"capturedAt": "2026-09-21T13:46:13.877Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "moderation-queue",
+			"route": "/moderation",
+			"features": [
+				"TRUST-04",
+				"PROF-10"
+			],
+			"capturedAt": "2026-09-21T13:46:18.029Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -118,7 +143,7 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-09-16T14:56:44.520Z",
+			"capturedAt": "2026-09-21T13:46:21.791Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -131,7 +156,7 @@
 				"PROF-05",
 				"PROF-06"
 			],
-			"capturedAt": "2026-09-16T14:56:46.344Z",
+			"capturedAt": "2026-09-21T13:46:26.290Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -145,7 +170,7 @@
 				"LIVE-04",
 				"LIVE-05"
 			],
-			"capturedAt": "2026-09-16T14:56:59.491Z",
+			"capturedAt": "2026-09-21T13:46:33.182Z",
 			"width": 1440,
 			"height": 900
 		}
