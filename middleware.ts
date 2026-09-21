@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-const PROTECTED_PREFIXES = [
+export const PROTECTED_PREFIXES = [
 	'/dashboard',
 	'/workouts',
 	'/routines',
@@ -39,6 +39,23 @@ export async function middleware(request: NextRequest) {
 	return NextResponse.next()
 }
 
+/**
+ * Next.js only runs this file for paths the matcher names, so a prefix that is
+ * in `PROTECTED_PREFIXES` but missing here is **not protected by middleware at
+ * all**: the signed-out visitor loads the protected shell, renders an empty
+ * page, and is redirected by the client with no `redirectTo`, so signing in
+ * drops them on the dashboard instead of where they asked to go.
+ *
+ * That drifted four times (TD-45) — `/schedule` and `/notifications` were
+ * missed, then `/activity` with `SOC-03` and `/moderation` with `TRUST-04` —
+ * because the two lists are edited independently and nothing compared them.
+ * `middleware.test.ts` now does, so the next one fails a test rather than
+ * shipping.
+ *
+ * The matcher cannot be derived from `PROTECTED_PREFIXES` at runtime: Next.js
+ * statically analyses this array at build time and rejects a computed value.
+ * It has to stay literal, which is exactly why it needs the test.
+ */
 export const config = {
 	matcher: [
 		'/login',
@@ -53,8 +70,12 @@ export const config = {
 		'/profile/:path*',
 		'/progress/:path*',
 		'/exercises/:path*',
+		'/schedule/:path*',
 		'/achievements/:path*',
+		'/notifications/:path*',
 		'/settings/:path*',
 		'/search/:path*',
+		'/activity/:path*',
+		'/moderation/:path*',
 	],
 }

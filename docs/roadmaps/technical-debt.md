@@ -17,10 +17,10 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Six entries are open: backend authentication debt `TD-43`, frontend PWA
-maintenance debt `TD-44`, the middleware matcher gap `TD-45`, proxy client-IP
-handling `TD-46`, dead pre-Supabase auth code `TD-47` and agent-document drift
-`TD-48`. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
+Five entries are open: backend authentication debt `TD-43`, frontend PWA
+maintenance debt `TD-44`, proxy client-IP handling `TD-46`, dead pre-Supabase
+auth code `TD-47` and agent-document drift `TD-48`. `TD-45`, the middleware
+matcher gap, closed on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
 `TD-33` and `TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
@@ -184,7 +184,7 @@ roadmap; this item supplies a safer worker foundation but does not implement
 
 <a id="td-45"></a>
 
-### TD-45 — The middleware matcher skips two protected prefixes
+### TD-45 — The middleware matcher skipped four protected prefixes — CLOSED 2026-09-21
 
 **Impact.** The middleware does not redirect signed-out visits to `/schedule`
 and `/notifications`. The protected layout's client bundle loads and renders an
@@ -195,27 +195,35 @@ every API read still requires a bearer token.
 
 **Evidence.**
 
-- [middleware.ts](../../middleware.ts) lists `/schedule` and `/notifications`
-  in `PROTECTED_PREFIXES`, but `config.matcher` has no `/schedule/:path*` or
-  `/notifications/:path*` entry, so Next.js never runs the middleware for those
-  paths. Every other protected prefix has a matcher entry.
+- [middleware.ts](../../middleware.ts) listed `/schedule` and `/notifications`
+  in `PROTECTED_PREFIXES` with no matching `config.matcher` entry, so Next.js
+  never ran the middleware for those paths.
+- **It was four, not two, by the time it was fixed.** The drift kept happening
+  because the two lists are edited independently: `/activity` arrived with
+  `SOC-03` and `/moderation` with `TRUST-04`, each added to the prefixes and
+  each missed in the matcher. That is the argument for the test rather than a
+  one-time correction.
 - [app/(protected)/layout.tsx](<../../app/(protected)/layout.tsx>) redirects
   with `router.replace('/login')`, which carries no `redirectTo`.
 - Found in code while verifying `ARCHITECTURE.md` on 2026-09-16; not yet
   reproduced in a browser.
 
-**Solution direction.** Add the two missing matcher entries. To stop the two
-lists drifting again, add a Node test that fails when a protected prefix or auth
-page has no matcher entry. Next.js requires `config.matcher` to be statically
-analysable, so the matcher cannot be generated from `PROTECTED_PREFIXES`.
+**Resolution (2026-09-21).** All four entries added, `PROTECTED_PREFIXES`
+exported, and [middleware.test.ts](../../middleware.test.ts) added to compare
+the lists in both directions — a protected prefix with no matcher entry, and a
+matcher entry for a route nothing protects (the waste `TD-16` removed for
+`/auth/:path*`). Next.js statically analyses `config.matcher` at build time and
+rejects a computed value, so it has to stay literal; the test is what makes
+that safe.
 
 **Closure.** All of the following are verified:
 
-- In a production build, signed-out requests to `/schedule`,
-  `/schedule/<anything>` and `/notifications` get the middleware redirect to
-  `/login?redirectTo=<original>`.
-- Signed-in requests to the same paths pass.
-- A Node test fails when a protected prefix lacks a matcher entry.
+- Signed-out requests to `/schedule`, `/notifications`, `/activity` and
+  `/moderation` return `307` to `/login?redirectTo=<original>`, checked against
+  the running app; `/dashboard` still behaves identically.
+- The test fails, naming the missing prefix, when a matcher entry is removed —
+  confirmed by removing `/moderation/:path*` and watching it report
+  `expected [ '/moderation' ] to deeply equal []`.
 - `npm run verify` passes.
 
 <a id="td-46"></a>
