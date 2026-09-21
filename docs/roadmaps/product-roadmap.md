@@ -79,6 +79,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID | Status | Owner | Branch / worktree | Claimed | Repositories |
 | -- | ------ | ----- | ----------------- | ------- | ------------ |
+| SOC-06 | `IN_PROGRESS` | Claude (Opus 5) | `claude/soc-06` | 2026-09-21 | CT, BE, FE |
 
 ## Current product snapshot
 
@@ -403,7 +404,7 @@ surface in the original description, stays hidden under `FIX-04` until
 | SOC-03 | `SHIPPED`   | L    | Generated activity feed    | A feed built from what members actually did, not from posts they wrote, with no free-text composer. **Seven activity types, each one fact the product already verifies:** completed sessions, personal records, load progressions, earned achievements, streak milestones, `ACH-05` comebacks and `ROUT-04` shared routines. They are **generated on read and never stored** -- from `TrainingEvent` rows, the shipped `comebackRecognitionSummary` with its own bound, and a routine's new `sharedAt`, set when a private routine first becomes visible -- so nothing can drift from the data it describes. Achievements recognized from history never produce an entry (they have no honest date, as `NOTIF-01` decided), and a streak is reported once, as the streak, although it is written twice. **Rank progression is not a type:** nothing records when a rank was reached, and deriving it would replay a member's whole history on every read; challenges wait on `SOC-13`. `/activity` shows the members the viewer follows, and another member's profile shows their activity to whoever its audience allows; the facts of one workout are shown together. Each entry names the record it came from and **links to it only where the viewer may open it**, a decision the server makes: a record only while it is still the best the profile shows, and a session or load progression, which no page shows another member, never. Activity is signed-in only. Shipped 2026-09-20 through `@sunsteel/contracts@0.53.0` and migration `20260919120000_activity_sharing`. | DATA-02, PROF-06, PROF-10                      |
 | SOC-04 | `SHIPPED`   | M    | Selective activity sharing | A default audience per activity type -- Only me, Followers or Everyone, the `PROF-06` values -- **starting at Only me**, so nothing reaches anyone until its owner chooses; a default applies to past entries of its type too, and the control says so. Any single entry can then be given its own audience or withdrawn, which is the same thing as choosing Only me for it. **Profile privacy is the upper bound through the shipped rule:** each type maps to one section, and an entry is visible only when `canViewProfileSection` allows both that section and the entry's audience -- the shape `canViewRoutine` has -- so a private records section cannot produce a public record entry, not even through an override; a shared routine must also pass `canViewRoutine`. The owner is told which section, or which routine, is capping a choice. **The preview runs the same read as a hypothetical follower or non-follower**, so it shows exactly what that audience receives rather than a second calculation of it. Everyone means every signed-in member; activity never appears on the signed-out `/members` page. Shipped 2026-09-20 with `SOC-03`. | SOC-03, PROF-06                                |
 | SOC-05 | `SHIPPED`   | M    | Themed reactions           | Four themed reactions -- Strength, Discipline, Respect and Inspiring -- acknowledge one generated activity entry, in the feed and on a member's profile. **The activity read is the only gate**: the summary travels inside the entry it belongs to, so a reaction can never be shown on an entry the viewer was not allowed to see, and accepting one resolves the entry's author, rebuilds that viewer's plan and answers 404 when it does not allow it. **One per member per entry** -- another replaces it, the same one removes it -- so there is nothing to accumulate, and **nothing else reads these rows**: no total, no rank, no ordering. **Aggregates only**: counts and the viewer's own choice, never a list of who reacted, which is an identity surface with its own privacy question. Both sides of a block are absent from the counts, and **nobody reacts to their own entry**, which is refused rather than hidden. Reactions on shared workouts, achievements and community activity remain for the surfaces that own them. Shipped 2026-09-20 through `@sunsteel/contracts@0.54.0` and migration `20260920120000_activity_reactions`. | SOC-03, PROF-10                                |
-| SOC-06 | `QUEUED`    | L    | Activity comments          | Discussion attached to one meaningful activity object -- a session, a record, an achievement, a challenge result -- rather than a general-purpose posting surface. Requires deletion by the author and by the activity's owner, reporting, block enforcement in both directions, the same visibility rule as the activity it hangs from, and the review queue owned by `TRUST-04`. It does not gain its own timeline, threads or profiles without a new decision. **Every dependency has shipped**; a comment is a new reportable subject kind, which `TRUST-04`'s queue takes by adding one value to `ReportSubjectKind` and one branch to its subject resolver. | SOC-03, PROF-10, TRUST-04 (all shipped)        |
+| SOC-06 | `IN_PROGRESS` | L  | Activity comments          | Discussion attached to one meaningful activity object -- a session, a record, an achievement, a challenge result -- rather than a general-purpose posting surface. Requires deletion by the author and by the activity's owner, reporting, block enforcement in both directions, the same visibility rule as the activity it hangs from, and the review queue owned by `TRUST-04`. It does not gain its own timeline, threads or profiles without a new decision. **Every dependency has shipped**; a comment is a new reportable subject kind, which `TRUST-04`'s queue takes by adding one value to `ReportSubjectKind` and one branch to its subject resolver. | SOC-03, PROF-10, TRUST-04 (all shipped)        |
 | SOC-07 | `SHIPPED`   | L    | Structured workout sharing | From a completed session's recap in history, the owner creates a public link and chooses which parts it reveals: duration, volume, completed sets and personal records by default; progression changes and session notes opt-in. Anyone with the link sees only those parts, in the owner's kg/lb unit, with the owner's name, handle and avatar and a link to the privacy-filtered public profile; the previous-session comparison is never shared. Links are unguessable, capped at ten active per session and revocable at any time, after which they stop working immediately. Shipped 2026-09-13 through `@sunsteel/contracts@0.25.0` and a `SessionShare` migration; the size is corrected from `M` to `L` for that migration. | LIVE-09, PROF-06; `@sunsteel/contracts@0.25.0` |
 | SOC-08 | `QUEUED`    | L    | Training partners          | An explicit mutual relationship, accepted by both members and distinct from following, with its own permission set layered on profile privacy: shared schedule visibility, selected progress, workout activity, encouragement (`SOC-09`) and shared routines (`ROUT-04`). Every shared surface is opt-in per permission, visible to the member who granted it and revocable by either side; ending the partnership withdraws the access immediately. Challenge invitations join the same permission set only if `SOC-13` is approved, and the relationship never waits on them; messaging (`MSG-01`) integrates later and is likewise not a prerequisite. | PROF-06, SOC-02, PROF-10                       |
 | SOC-09 | `QUEUED`    | M    | Lightweight encouragement  | Send a member, normally a training partner, one of a small fixed set of contextual prompts -- Ready to train, Strong session, Good work, Keep going -- without opening a conversation. Prompts carry no free text, are rate-limited, respect blocks and the recipient's controls, and arrive through the existing notification centre. This is the deliberate bridge between following and private messaging; free text belongs to `MSG-01` and must not grow here. | SOC-08, NOTIF-01, PROF-10                      |
@@ -2089,3 +2090,44 @@ it again without addressing the original decision.
   discarded before the one that counts -- a backend that went down mid-run,
   then a lapsed sign-in that `ui:refresh` could not renew -- and neither was
   reported as a result. What was left unverified is in the completion log.
+- **2026-09-21 (revision 118):** Claimed `SOC-06`. It was the last item
+  blocked on moderation, and `TRUST-04` closed that gate the same day. Ten
+  decisions are recorded before the work. **A comment is the first free text
+  one member writes for another to read**, which is what separates this from
+  everything shipped so far: activity entries are derived from verified
+  training, reactions are a fixed catalogue of four, and a `PROF-10` report
+  goes only to the moderator. Every decision below follows from that.
+  **A comment hangs off an activity entry key, not a new object.** `SOC-03`
+  entries are generated on read and never stored, so the anchor is the stable
+  `entryKey` `SOC-05` already keys reactions by — an event's `eventKey`, a
+  `comeback:<id>` or a `routine:<id>` — with the author resolved and stored
+  beside it the same way. Nothing new identifies an activity. **The activity
+  read is the only gate, reused rather than restated.** A comment list travels
+  inside the entry it belongs to, so a comment can never render on an entry
+  the viewer was not allowed to see; posting resolves the entry's author,
+  rebuilds that viewer's plan and answers **404** when it does not allow the
+  entry, never 403, which would confirm it exists. **Anyone who may read the
+  entry may comment on it** (decided with the owner): no second visibility
+  rule, because a separate permission is the thing `SOC-05` and `TRUST-04`
+  both deliberately avoided, and an audience of Everyone already means every
+  signed-in member. **Two people may delete a comment**: its author, and the
+  owner of the activity it hangs from. The owner's reach is the point — it is
+  their workout the comment is attached to — and a deletion is a real delete
+  rather than a flag, because nothing else reads these rows. **A comment is
+  reportable, which is what makes it the first real use of the queue.**
+  `ReportSubjectKind` gains `COMMENT`, and `TRUST-04`'s resolver gains one
+  branch; a moderator hide narrows the comment exactly as it narrows a routine
+  — gone for everyone but its author, deleted for nobody. **Blocks apply in
+  both directions**, as they do to reaction counts, because a comment from
+  somebody the viewer blocked is worse than a number that included them.
+  **The owner is notified** (decided with the owner): `NOTIF-01` gathers on
+  read from training events, and a comment is a row rather than an event, so
+  this is a genuinely new source shape rather than another branch of the same
+  one — the first thing in the notification centre that another member caused
+  on purpose. **Flat, bounded and plain.** No threads, no mentions, no
+  editing, no reactions on comments, no comment timeline and no per-member
+  comment page; a length cap and a per-day rate limit, both contract
+  constants, and the count travels with the entry so a feed page stays one
+  query. **Nothing else may read these rows** — no total, no rank, no
+  ordering input — the guard that keeps acknowledgement from becoming a score,
+  carried over from `SOC-05`. Expects one contract publish and one migration.
