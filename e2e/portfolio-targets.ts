@@ -281,6 +281,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Activity generated from verified training, each entry with who can see it and a preview as each audience.',
 	},
 	{
+		// TRUST-04. Captured with the queue empty on purpose: seeding a report
+		// would leave a `MemberReport` row no API can take back, and `setup`
+		// may only create what its cleanup removes. The frame therefore shows
+		// the page's substance -- the scope line, the no-bypass note, the three
+		// states and the record tab -- with an honest "nothing to decide".
+		slug: 'moderation-queue',
+		route: '/moderation',
+		features: ['TRUST-04', 'PROF-10'],
+		ready: ['same privacy rules', 'Reports'],
+		caption:
+			'The moderation queue: reports to review under the same privacy rules as any member, with every action kept in an uneditable record.',
+	},
+	{
 		slug: 'exercise-detail',
 		route: '/exercises/:exercise',
 		features: ['EXER-01', 'EXER-07', 'PROG-02'],

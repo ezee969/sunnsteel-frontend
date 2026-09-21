@@ -1,7 +1,7 @@
 'use client'
 
 import type { ProfileVisibility, RoutineVisibility } from '@sunsteel/contracts'
-import { Link2, Share2, Trash2 } from 'lucide-react'
+import { EyeOff, Link2, Share2, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 	useRoutineShares,
 	useSetRoutineVisibility,
 } from '@/lib/api/hooks/useRoutineSharing'
+import { ROUTINE_HIDDEN_BY_MODERATION } from '@/lib/utils/moderation'
 import {
 	describeVisibilityCap,
 	ROUTINE_LINK_NOTE,
@@ -27,6 +28,8 @@ interface RoutineSharingProps {
 	visibility: RoutineVisibility
 	/** The account-level PROF-06 routines rule, which caps the setting below. */
 	accountRoutinesRule: ProfileVisibility
+	/** TRUST-04: a moderator has hidden the routine from everyone but its owner. */
+	isHiddenByModeration: boolean
 }
 
 /**
@@ -39,6 +42,7 @@ export function RoutineSharing({
 	routineId,
 	visibility,
 	accountRoutinesRule,
+	isHiddenByModeration,
 }: RoutineSharingProps) {
 	const { push } = useToast()
 	const shares = useRoutineShares(routineId)
@@ -75,6 +79,20 @@ export function RoutineSharing({
 				<Share2 className="h-4 w-4 text-ink-3" aria-hidden />
 				Sharing
 			</h2>
+
+			{/* TRUST-04: while a hide is in force, every control below describes
+			    something that is reaching nobody. Saying so first is the whole
+			    point -- a switch left reading "Public" with nothing behind it is
+			    the failure this notice exists to prevent. */}
+			{isHiddenByModeration ? (
+				<p
+					role="status"
+					className="type-body-sm flex max-w-[68ch] items-start gap-2 border border-rule bg-surface p-3 text-ink-2"
+				>
+					<EyeOff className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
+					{ROUTINE_HIDDEN_BY_MODERATION}
+				</p>
+			) : null}
 
 			<div className="space-y-2 pt-1">
 				<Label htmlFor="routine-visibility">Who can find this routine</Label>

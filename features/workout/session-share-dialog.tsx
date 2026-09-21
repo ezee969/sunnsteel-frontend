@@ -27,6 +27,7 @@ import {
 	useSessionShares,
 } from '@/lib/api/hooks/useSessionShares'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { SESSION_SHARE_HIDDEN_BY_MODERATION } from '@/lib/utils/moderation'
 import { copyTextToClipboard } from '@/lib/utils/profile-sharing'
 import {
 	describeShareFields,
@@ -189,6 +190,15 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 											<p className="type-body-sm text-ink-3">
 												Created {formatTimeAgo(share.createdAt)}
 											</p>
+											{/* TRUST-04: the link is still active and still
+											    copyable, but it opens for nobody while the hide
+											    is in force. An owner who was not told would
+											    read that as the link being broken. */}
+											{share.isHiddenByModeration ? (
+												<p className="type-body-sm text-ink-2">
+													{SESSION_SHARE_HIDDEN_BY_MODERATION}
+												</p>
+											) : null}
 										</div>
 										<Button
 											type="button"

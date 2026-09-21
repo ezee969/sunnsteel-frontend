@@ -13,6 +13,7 @@ const PROTECTED_PREFIXES = [
 	'/settings',
 	'/search',
 	'/activity',
+	'/moderation',
 ] as const
 
 const AUTH_PAGES = new Set(['/login', '/signup'])

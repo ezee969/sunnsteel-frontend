@@ -147,6 +147,7 @@ export default function RoutineDetailsPage() {
 				routineId={routine.id}
 				visibility={routine.visibility}
 				accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
+				isHiddenByModeration={routine.isHiddenByModeration ?? false}
 			/>
 
 			<RoutineVersions

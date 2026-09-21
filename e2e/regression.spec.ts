@@ -426,6 +426,9 @@ const ROUTES: SweepRoute[] = [
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
 	{ slug: 'settings', path: () => '/settings' },
+	// TRUST-04. The sweep signs in as the owner, who holds the moderator flag,
+	// so the page renders its own content rather than its not-found branch.
+	{ slug: 'moderation', path: () => '/moderation' },
 ]
 
 async function expectSoundLayout(page: Page) {

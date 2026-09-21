@@ -13,6 +13,7 @@ import {
 	Medal,
 	Rss,
 	Settings,
+	ShieldCheck,
 	TrendingUp,
 	Weight,
 	X,
@@ -149,6 +150,19 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 ] satisfies NavItem[]
 
+// TRUST-04: the review queue, appended only for an account that holds the
+// moderator flag. It is a real destination rather than a Settings card because
+// it is a working surface with its own paging and its own record, and the flag
+// is on the owner's own profile read -- the server answers 404 on every
+// moderation route regardless, so hiding the row is presentation, not control.
+const MODERATION_NAV_ITEM: NavItem = {
+	id: 'moderation',
+	label: 'Moderation',
+	icon: ShieldCheck,
+	href: '/moderation',
+	disabled: false,
+}
+
 interface SidebarProps {
 	isMobile: boolean
 	isSidebarOpen: boolean
@@ -172,6 +186,12 @@ export default function Sidebar({
 	const notifications = useNotifications()
 	const today = useTodaysWorkouts()
 	const { push } = useToast()
+	// The active marker is positioned from this list's own index, so the
+	// moderation row has to be part of the list the rows render from rather
+	// than spliced in afterwards.
+	const navItems = user?.isModerator
+		? [...SIDEBAR_NAV_ITEMS, MODERATION_NAV_ITEM]
+		: SIDEBAR_NAV_ITEMS
 	const indicators = buildNavigationIndicators({
 		unreadNotifications: notifications.data?.unreadCount,
 		plannedToday: today.entries.length,
@@ -180,7 +200,7 @@ export default function Sidebar({
 
 	// -1 when the active route is not in this list (Settings), which hides the
 	// marker rather than parking it on the wrong row.
-	const activeIndex = SIDEBAR_NAV_ITEMS.findIndex(item => item.id === activeNav)
+	const activeIndex = navItems.findIndex(item => item.id === activeNav)
 
 	const handleDisabledClick = (label: string) => {
 		push({
@@ -298,7 +318,7 @@ export default function Sidebar({
 							}}
 						/>
 					)}
-					{SIDEBAR_NAV_ITEMS.map(item => {
+					{navItems.map(item => {
 						const isCollapsed = !isSidebarOpen && !isMobile
 						const showTooltip = isCollapsed
 						const isActive = activeNav === item.id
