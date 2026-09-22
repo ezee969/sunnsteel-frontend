@@ -17,10 +17,10 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Four entries are open: backend authentication debt `TD-43`, frontend PWA
-maintenance debt `TD-44`, dead pre-Supabase auth code `TD-47` and
-agent-document drift `TD-48`. `TD-46`, proxy client-IP handling, closed on
-2026-09-22, and `TD-45`, the middleware matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
+Three entries are open: backend authentication debt `TD-43`, frontend PWA
+maintenance debt `TD-44` and agent-document drift `TD-48`. `TD-46`, proxy
+client-IP handling, and `TD-47`, the dead pre-Supabase auth code, both closed
+on 2026-09-22, and `TD-45`, the middleware matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
 `TD-33` and `TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
@@ -298,67 +298,76 @@ change of its security posture, so it was not made here.
 
 <a id="td-47"></a>
 
-### TD-47 — Dead pre-Supabase auth code and unused dependencies remain wired
+### TD-47 — Dead pre-Supabase auth code — CLOSED 2026-09-22
 
-**Impact.** No user-visible effect. The leftover code misleads readers about how
-auth works: a JWT module, refresh tokens, a token blacklist and a password check
-all look live. It also keeps unused packages in the dependency audit, runs a
-nightly job against a table nothing writes, and leaves an unguarded
-password-checking endpoint reachable.
+**The production query that gated it.** The database is private, so it was
+answered from inside the service by a temporary counting probe (counts only:
+no email, no id, no hash). On 2026-09-22, of **7 accounts: 0 with a password,
+0 stranded on one** — a password and no Supabase identity to sign in with
+instead. Nobody could lose a way in, so `User.password` went with the rest.
 
-**Evidence.** Verified on 2026-09-16 by searching every import in the backend's
-`src/`, `prisma/` and `scripts/` and in the frontend source.
+**Retired.** Backend: `TokenModule`, `TokenService`, `JwtModule`, `@nestjs/jwt`
+and the midnight cron; `POST /auth/supabase/migrate`; `GET
+/auth/supabase/profile`; `POST /auth/supabase/logout`; this service's
+`ss_session` cookie; `UsersService.create`; `bcrypt`; the `docs:check` and
+`docs:update` scripts and the three files behind them; and `redis`,
+`passport-jwt`, `@types/passport-jwt`, `@types/passport-local`. Migration
+`20260922140000_drop_legacy_auth` retires `RefreshToken`, `BlacklistedToken`
+and `User.password`, written `IF EXISTS` so a re-run is a no-op, and is
+registered in `scripts/prepare-analytics-test-db.ts`. Frontend:
+`useSupabaseProfile`, `useSupabaseMigrateUser`, their two service methods and
+the `/logout` call in `signOut`. Net 863 lines.
 
-- **Unused dependencies.** Nothing imports `redis` or `passport-jwt` (backend
-  `dependencies`), or `@types/passport-jwt` and `@types/passport-local` (backend
-  `devDependencies`). The auth strategy uses `passport-http-bearer`.
-- **Dead token machinery.** `TokenModule`, `TokenService` and
-  `JwtModule.register({})` in `AuthModule` are registered, but nothing calls
-  `generateTokens`, `verifyRefreshToken`, `revokeAllUserTokens`,
-  `blacklistAccessToken` or `isTokenBlacklisted`. Only the midnight `@Cron`
-  runs, and it deletes expired `BlacklistedToken` rows that nothing creates. The
-  `RefreshToken` and `BlacklistedToken` models remain in the schema.
-- **Legacy password path.** `bcrypt` is used only by the unguarded
-  `POST /auth/supabase/migrate`, which checks a password against
-  `User.password`, and by `UsersService.create`, which has no callers. In the
-  frontend, `useSupabaseMigrateUser` and `useSupabaseProfile`
-  (`lib/api/hooks/useSupabaseAuth.ts`) have no consumers. They are the only
-  callers of their service methods, and so the only frontend callers of
-  `POST /auth/supabase/migrate` and `GET /auth/supabase/profile`.
-- **Inert cookie.** `POST /auth/supabase/verify` and `/logout` set and clear a
-  cookie on the backend's domain that the production middleware never sees.
-  The July audit already noted this under TD-18. The frontend's `signOut` still
-  calls `/logout` only for that cookie. `verify` also runs
-  `getUserBySupabaseId` just to label a log line.
-- **Broken script.** The backend's `docs:update` is an `echo`, and `docs:check`
-  runs `scripts/run-update-docs.js`, which wraps `update-docs.sh`/`.ps1` for a
-  backend `docs/` folder that was deliberately removed. The frontend removed its
-  equivalents in CL-05.
+**Two things this entry did not have.**
 
-**Solution direction.** Before removing the password path, query production
-for users that still have a `password` and no `supabaseUserId`. If any remain,
-decide with the owner how they migrate. Then, in one backend change:
+- **`UsersService.findByEmailWithPassword`** — a second password reader, also
+  with no callers. It surfaced only because the compiler rejected its `select`
+  once the column was gone, which is the argument for retiring the column in
+  the same change rather than leaving it "harmlessly" in place.
+- **The migrate endpoint was a live surface, not just dead code.** Unguarded,
+  it took an email and password and returned the account id on a correct
+  match: a credential-testing and user-enumeration oracle, kept running for a
+  migration that had finished. That, rather than the tidiness, is what made
+  this worth doing.
 
-- uninstall the four packages;
-- delete `TokenModule`, `TokenService`, `JwtModule`, `@nestjs/jwt` and the cron;
-- delete the migrate endpoint, `UsersService.create` and `bcrypt`;
-- delete the backend's cookie handling and the `docs:*` scripts;
-- drop the two token tables, and `User.password` if the query allows, in a
-  migration that `scripts/prepare-analytics-test-db.ts` also applies.
+**Kept, with reasons.** `passport` and `reflect-metadata` are required peers.
+The `getUserBySupabaseId` read inside `verify`, which exists only to label a
+log line, is an extra query on the auth hot path and therefore belongs to
+`TD-43`, not here. `SupabaseMigrationResponse` stays in `@sunsteel/contracts`:
+nothing imports it now, and republishing the package to remove one unused type
+costs more than it returns — it goes with the next contracts change.
 
-In the frontend, delete the two unused hooks, their service methods and the
-`/logout` call. Keep `passport` and `reflect-metadata`, which are required
-peers.
+**Closure.** All verified on 2026-09-22:
 
-**Closure.** All of the following are verified:
-
-- The result of the production password query is recorded here.
+- The production query result is recorded above.
 - The listed code, packages, scripts and tables are gone, or kept with a
-  recorded reason.
-- `npm run verify` passes in both repositories, and so does the
-  analytics-integration job.
-- Sign-in, sign-out and a protected read work with a real Supabase token.
-- `ARCHITECTURE.md` §1 and `TECH_STACK.md` no longer list the removed items.
+  reason.
+- `npm run verify` passes in both repositories: backend lint (0 errors, the one
+  pre-existing warning), typecheck, 331 tests, build and build-import check;
+  frontend lock:check, lint, typecheck, 497 tests and `next build`. The
+  migration chain applies to a clean local database and `migrate status`
+  reports it up to date on a second run.
+- The endpoint surface was exercised against a local server running this
+  build: `POST /auth/supabase/migrate`, `POST /auth/supabase/logout` and
+  `GET /auth/supabase/profile` all answer **404**; `POST
+  /auth/supabase/verify` answers **401** to a bad token (the route is alive
+  and still rejecting), `GET /auth/supabase/health` answers 200, and
+  `GET /users/me` still answers 401 unauthenticated.
+- **Not done: a round trip with a real Supabase token.** The stored
+  `TEST_USER_PASSWORD` is rejected by Supabase with a 400, so
+  `npm run token:supabase` and `npm run ui:refresh` cannot sign in. That is a
+  stale credential and not a consequence of this change — the password grant
+  goes straight to Supabase and never reaches this backend — but it means
+  sign-in and sign-out were verified only as far as the guard, not through an
+  actual session. **Worth re-running once the credential is fixed**, since it
+  is the last check this entry asked for.
+- `ARCHITECTURE.md` and `TECH_STACK.md` no longer list the retired items.
+
+**One follow-up for the owner, not done here.** `JWT_ACCESS_SECRET`,
+`JWT_REFRESH_SECRET` and `JWT_SECRET` are still set on the Railway service and
+nothing reads them any more. Removing production variables is an ops action
+with no way back if something unseen depends on one, so it is left to the
+owner rather than taken silently.
 
 <a id="td-48"></a>
 
