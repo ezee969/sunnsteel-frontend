@@ -275,17 +275,23 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		// every entry with the audience that actually applies.
 		slug: 'activity-yours',
 		route: '/activity?view=yours',
-		features: ['SOC-03', 'SOC-04'],
+		// SOC-06 is tagged for the comment control on each entry, not for a
+		// conversation: the fixture leaves the owner's activity private, so no
+		// peer may comment on it and seeding one would show a discussion the
+		// shipped rule would have refused. SOC-05 is deliberately absent --
+		// nobody may acknowledge their own work, so this page never shows it.
+		features: ['SOC-03', 'SOC-04', 'SOC-06'],
 		ready: ['See it as', /can see this|Withdrawn/],
 		caption:
-			'Activity generated from verified training, each entry with who can see it and a preview as each audience.',
+			'Activity generated from verified training, each entry with who can see it, a preview as each audience, and discussion attached to the entry rather than to a posting surface.',
 	},
 	{
-		// TRUST-04. Captured with the queue empty on purpose: seeding a report
-		// would leave a `MemberReport` row no API can take back, and `setup`
-		// may only create what its cleanup removes. The frame therefore shows
-		// the page's substance -- the scope line, the no-bypass note, the three
-		// states and the record tab -- with an honest "nothing to decide".
+		// TRUST-04. The queue is seeded by `db:seed:portfolio`, which files
+		// three peer-about-peer reports and whose reset removes them in both
+		// directions -- an empty queue is an honest state but it does not show
+		// the feature. Never the owner as subject: a portfolio frame must not
+		// show its author reported. One names a peer routine the owner cannot
+		// read, so the no-bypass rule is visible in the screenshot itself.
 		slug: 'moderation-queue',
 		route: '/moderation',
 		features: ['TRUST-04', 'PROF-10'],
