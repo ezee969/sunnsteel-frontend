@@ -62,6 +62,19 @@ export function describeNotification(
 				href: `/profile/${actor.username}`,
 			}
 		}
+		case 'ACTIVITY_COMMENT': {
+			// SOC-06. The comment itself is never quoted: this row outlives it,
+			// and its author, the recipient or a moderator can each remove it —
+			// a copy here could be withdrawn by none of them. It says who wrote
+			// one and sends the reader to the entry, where the words live.
+			const { actor } = notification
+			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
+			return {
+				title: `${name} commented on your activity`,
+				detail: `@${actor.username} · open it to read the comment`,
+				href: '/activity?view=yours',
+			}
+		}
 	}
 }
 

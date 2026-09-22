@@ -1,10 +1,13 @@
 'use client'
 
 import type {
+	ActivityCommentsResponse,
+	ActivityCommentSummary,
 	ActivityFeedResponse,
 	ActivityPage,
 	ActivityPreviewAudience,
 	ActivitySharingSettings,
+	CreateActivityCommentRequest,
 	MemberActivityResponse,
 	OwnActivityResponse,
 	SetActivityEntryAudienceRequest,
@@ -22,7 +25,11 @@ import {
 } from '@tanstack/react-query'
 
 import { activityService } from '@/lib/api/services/activityService'
-import { applyEntryReactions, applyEntrySharing } from '@/lib/utils/activity'
+import {
+	applyEntryComments,
+	applyEntryReactions,
+	applyEntrySharing,
+} from '@/lib/utils/activity'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 /**
@@ -38,6 +45,9 @@ export const activityKeys = {
 	preview: (audience: ActivityPreviewAudience) =>
 		['activity', 'preview', audience] as const,
 	sharing: () => ['activity', 'sharing'] as const,
+	// SOC-06: under the same prefix, so one invalidation still reaches
+	// everything an entry is on screen in.
+	comments: (entryId: string) => ['activity', 'comments', entryId] as const,
 }
 
 /** SOC-03: the members the viewer follows, as their audiences allow. */
@@ -193,4 +203,80 @@ export function useSetActivityEntryAudience() {
 			}
 		},
 	})
+}
+
+/**
+ * SOC-06. One entry's comments, paged. `staleTime: 0` because a comment
+ * deleted by its author or hidden by a moderator must stop showing at once —
+ * a stale list of somebody else's words is the wrong thing to keep.
+ */
+export function useActivityComments(entryId: string, enabled = true) {
+	const { session } = useSupabaseAuth()
+	return useInfiniteQuery<ActivityCommentsResponse>({
+		queryKey: activityKeys.comments(entryId),
+		queryFn: ({ pageParam }) =>
+			activityService.comments({
+				entryId,
+				cursor: (pageParam as string | undefined) ?? undefined,
+			}),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: last => last.nextCursor ?? undefined,
+		enabled: enabled && !!session,
+		staleTime: 0,
+	})
+}
+
+/**
+ * Writing and removing both patch the count into every loaded activity query,
+ * because one entry can be on screen in the feed, on a profile and in the
+ * owner's list at once; the list itself is invalidated so the new or removed
+ * comment appears where it lives.
+ */
+function useCommentMutation<TVariables>(
+	run: (variables: TVariables) => Promise<{
+		entryId: string
+		summary: ActivityCommentSummary
+	}>,
+) {
+	const queryClient = useQueryClient()
+	return useMutation<
+		{ entryId: string; summary: ActivityCommentSummary },
+		Error,
+		TVariables
+	>({
+		mutationFn: run,
+		onSuccess: response => {
+			queryClient.setQueriesData(
+				{ queryKey: activityKeys.all() },
+				(current: unknown) =>
+					current &&
+					typeof current === 'object' &&
+					'pages' in current &&
+					Array.isArray((current as { pages: unknown }).pages)
+						? applyEntryComments(
+								current as InfiniteData<{
+									entries: { id: string; comments: ActivityCommentSummary }[]
+								}>,
+								response,
+							)
+						: current,
+			)
+			void queryClient.invalidateQueries({
+				queryKey: activityKeys.comments(response.entryId),
+			})
+		},
+	})
+}
+
+export function useCreateActivityComment() {
+	// The create response carries the comment as well, which the summary patch
+	// does not need; the list read is invalidated for it.
+	return useCommentMutation<CreateActivityCommentRequest>(async request => {
+		const response = await activityService.createComment(request)
+		return { entryId: request.entryId, summary: response.summary }
+	})
+}
+
+export function useDeleteActivityComment() {
+	return useCommentMutation<string>(activityService.deleteComment)
 }

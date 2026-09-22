@@ -1,9 +1,14 @@
 import type {
+	ActivityCommentsQuery,
+	ActivityCommentsResponse,
 	ActivityFeedResponse,
 	ActivityPage,
 	ActivityPageQuery,
 	ActivityPreviewAudience,
 	ActivitySharingSettings,
+	CreateActivityCommentRequest,
+	CreateActivityCommentResponse,
+	DeleteActivityCommentResponse,
 	MemberActivityResponse,
 	OwnActivityResponse,
 	SetActivityEntryAudienceRequest,
@@ -25,6 +30,14 @@ export function buildActivityParams(
 	if (query.cursor) params.set('cursor', query.cursor)
 	const serialized = params.toString()
 	return serialized ? `?${serialized}` : ''
+}
+
+/** SOC-06: only what is set, so an absent cursor is not sent as "". */
+export function buildCommentParams(query: ActivityCommentsQuery): string {
+	const params = new URLSearchParams({ entryId: query.entryId })
+	if (typeof query.limit === 'number') params.set('limit', String(query.limit))
+	if (query.cursor) params.set('cursor', query.cursor)
+	return `?${params.toString()}`
 }
 
 /** SOC-03/SOC-04: generated activity and the owner's sharing controls. */
@@ -85,5 +98,28 @@ export const activityService = {
 		httpClient.request<SetActivityEntryAudienceResponse>(
 			'/activity/entries/audience',
 			{ method: 'PUT', body: JSON.stringify(request), secure: true },
+		),
+
+	// SOC-06. All three answer 404 for an entry the viewer may not see, so a
+	// caller never has to ask whether it may.
+	comments: (query: ActivityCommentsQuery): Promise<ActivityCommentsResponse> =>
+		httpClient.get<ActivityCommentsResponse>(
+			`/activity/entries/comments${buildCommentParams(query)}`,
+			true,
+		),
+
+	createComment: (
+		request: CreateActivityCommentRequest,
+	): Promise<CreateActivityCommentResponse> =>
+		httpClient.post<CreateActivityCommentResponse>(
+			'/activity/entries/comments',
+			request,
+			true,
+		),
+
+	deleteComment: (commentId: string): Promise<DeleteActivityCommentResponse> =>
+		httpClient.delete<DeleteActivityCommentResponse>(
+			`/activity/entries/comments/${encodeURIComponent(commentId)}`,
+			true,
 		),
 }

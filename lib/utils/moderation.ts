@@ -58,6 +58,7 @@ export const REPORT_SUBJECT_LABELS: Record<ReportSubjectKind, string> = {
 	MEMBER: 'this member',
 	ROUTINE: 'this routine',
 	SESSION: 'this shared workout',
+	COMMENT: 'this comment',
 }
 
 /** Blocked members newest first, which is the order the server returns. */
@@ -141,6 +142,7 @@ export const REPORT_SUBJECT_HEADINGS: Record<ReportSubjectKind, string> = {
 	MEMBER: 'Member',
 	ROUTINE: 'Routine',
 	SESSION: 'Shared workout',
+	COMMENT: 'Comment',
 }
 
 /**
@@ -162,6 +164,13 @@ export function moderationSubjectHref(
 			return `/routines/${subject.resolvedId}`
 		case 'SESSION':
 			return `/shared/sessions/${subject.resolvedId}`
+		case 'COMMENT':
+			// SOC-06. A comment has no page of its own — it lives on the activity
+			// entry it hangs from, and the queue already shows its text as the
+			// subject title. Sending a reviewer to a route that would have to
+			// find the entry first, and might refuse it, is worse than showing
+			// them the words they need and no link.
+			return null
 	}
 }
 

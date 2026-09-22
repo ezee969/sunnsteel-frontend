@@ -8,6 +8,7 @@ import {
 import {
 	CheckCheck,
 	Medal,
+	MessageSquare,
 	RefreshCw,
 	TrendingUp,
 	UserPlus,
@@ -24,6 +25,7 @@ const KIND_ICON = {
 	ACHIEVEMENT: Medal,
 	SESSION_PROGRESS: TrendingUp,
 	NEW_FOLLOWER: UserPlus,
+	ACTIVITY_COMMENT: MessageSquare,
 } as const
 
 function NotificationRow({

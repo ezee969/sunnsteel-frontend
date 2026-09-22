@@ -20,10 +20,13 @@ import {
 	ACTIVITY_TYPE_DESCRIPTIONS,
 	ACTIVITY_TYPE_LABELS,
 	activityHref,
+	applyEntryComments,
 	applyEntryReactions,
 	applyEntrySharing,
 	describeActivity,
 	describeActivityCap,
+	describeCommentBudgetSpent,
+	describeCommentDelete,
 	describeEmptyFeed,
 	describeReactionAction,
 	describeSectionCap,
@@ -51,6 +54,9 @@ const base = {
 	link: null,
 	groupKey: null,
 	reactions: summary(),
+	// SOC-06: stated rather than defaulted, so a fixture cannot pass by having
+	// no comment summary at all.
+	comments: { count: 0, canComment: true },
 }
 
 const session = (id: string, groupKey: string | null): ActivityEntry => ({
@@ -347,5 +353,59 @@ describe('activity query serialization', () => {
 		expect(buildActivityParams({ audience: 'FOLLOWERS' })).toBe(
 			'?audience=FOLLOWERS',
 		)
+	})
+})
+
+describe('SOC-06 comment copy and cache patching', () => {
+	it('names whose comment is being deleted, because two people may', () => {
+		// The owner of an activity may delete somebody else's words from it, and
+		// a confirmation that did not say so would read as deleting your own.
+		expect(describeCommentDelete(true)).toMatch(/your comment/i)
+		expect(describeCommentDelete(false)).toMatch(/from your activity/i)
+		expect(describeCommentDelete(true)).toMatch(/cannot be undone/i)
+		expect(describeCommentDelete(false)).toMatch(/cannot be undone/i)
+	})
+
+	it('explains the spent budget rather than leaving a control that refuses', () => {
+		const copy = describeCommentBudgetSpent(100)
+		expect(copy).toMatch(/100/)
+		expect(copy).toMatch(/today/i)
+	})
+
+	it('patches a count into every loaded activity query', () => {
+		// One entry can be on screen in the feed, on a profile and in the
+		// owner's list at once, so a count updated in one place must reach the
+		// others — the same reason SOC-05 patches reactions.
+		const data = {
+			pageParams: [undefined],
+			pages: [
+				{
+					entries: [
+						{ id: 'a', comments: { count: 0, canComment: true } },
+						{ id: 'b', comments: { count: 5, canComment: true } },
+					],
+				},
+			],
+		}
+		const patched = applyEntryComments(data, {
+			entryId: 'a',
+			summary: { count: 1, canComment: true },
+		})
+		expect(patched.pages[0].entries[0].comments.count).toBe(1)
+		expect(patched.pages[0].entries[1].comments.count).toBe(5)
+	})
+
+	it('leaves every page alone when the entry is not loaded', () => {
+		const data = {
+			pageParams: [undefined],
+			pages: [
+				{ entries: [{ id: 'a', comments: { count: 2, canComment: true } }] },
+			],
+		}
+		const patched = applyEntryComments(data, {
+			entryId: 'missing',
+			summary: { count: 9, canComment: false },
+		})
+		expect(patched.pages[0].entries[0].comments.count).toBe(2)
 	})
 })

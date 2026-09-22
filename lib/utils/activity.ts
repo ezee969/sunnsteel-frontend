@@ -1,5 +1,6 @@
 import type {
 	ActivityAudience,
+	ActivityCommentSummary,
 	ActivityEntry,
 	ActivityEntrySharing,
 	ActivityLink,
@@ -363,6 +364,55 @@ export function applyEntryReactions<
 		})),
 	}
 }
+
+/**
+ * SOC-06. The same patch for a comment count, and for the same reason: one
+ * entry can be on screen in the feed, on a profile and in the owner's list at
+ * once, so a count updated in one place must reach the others.
+ */
+export function applyEntryComments<
+	Page extends {
+		entries: { id: string; comments: ActivityCommentSummary }[]
+	},
+>(
+	data: InfiniteData<Page>,
+	update: { entryId: string; summary: ActivityCommentSummary },
+): InfiniteData<Page> {
+	return {
+		...data,
+		pages: data.pages.map(page => ({
+			...page,
+			entries: page.entries.map(entry =>
+				entry.id === update.entryId
+					? { ...entry, comments: update.summary }
+					: entry,
+			),
+		})),
+	}
+}
+
+/** SOC-06 copy: what a comment surface says, and what it must not. */
+export const ACTIVITY_COMMENT_PLACEHOLDER = 'Say something about this.'
+
+/** An empty comment list says so plainly rather than rendering nothing. */
+export const ACTIVITY_COMMENTS_EMPTY = 'No comments yet.'
+
+/**
+ * The delete confirmation names whose comment it is, because the owner of the
+ * activity may delete somebody else's and should be told that is what they are
+ * doing.
+ */
+export const describeCommentDelete = (isOwnComment: boolean): string =>
+	isOwnComment
+		? 'Delete your comment? It is removed for everyone and cannot be undone.'
+		: 'Delete this comment from your activity? It is removed for everyone and cannot be undone.'
+
+/**
+ * Why the composer is absent. A control that is present but refuses on click
+ * reads as broken, so the reason replaces it.
+ */
+export const describeCommentBudgetSpent = (max: number): string =>
+	`You have written ${max} comments today. Each one frees up a day after you wrote it.`
 
 /** An empty feed says which of the two reasons it is. */
 export function describeEmptyFeed(followedCount: number): {

@@ -19,6 +19,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ActivityComments } from '@/features/activity/activity-comments'
 import { ActivityReactions } from '@/features/activity/activity-reactions'
 import {
 	activityHref,
@@ -82,6 +83,7 @@ export function ActivityFact({
 					summary={entry.reactions}
 					canReact={canReact}
 				/>
+				<ActivityComments entryId={entry.id} summary={entry.comments} />
 			</div>
 		</div>
 	)
