@@ -416,8 +416,8 @@ surface in the original description, stays hidden under `FIX-04` until
 Tables list IDs in numeric order; the delivery order inside this group is the
 dependency order: `PROF-10` and `TRUST-04` first, then `SOC-03` with `SOC-04`
 (activity is not generated before its visibility controls exist), then `SOC-05`
-and `SOC-06` on top of that activity, then `SOC-08` and `SOC-09`. The first
-four have shipped, so `SOC-06` and `SOC-08` are the dependency-ready pair.
+and `SOC-06` on top of that activity, then `SOC-08` and `SOC-09`. All of
+those have shipped, so `SOC-08` is the dependency-ready one.
 
 The three challenge items are `CANDIDATE` on purpose (decided 2026-09-16): the
 direction and the metrics are settled, the timing is not, and nothing else
