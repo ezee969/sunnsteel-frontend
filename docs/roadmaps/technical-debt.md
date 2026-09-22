@@ -353,33 +353,46 @@ costs more than it returns — it goes with the next contracts change.
   /auth/supabase/verify` answers **401** to a bad token (the route is alive
   and still rejecting), `GET /auth/supabase/health` answers 200, and
   `GET /users/me` still answers 401 unauthenticated.
-- **Open: a round trip with a real Supabase token.** Diagnosed on 2026-09-22,
-  and it was not the stale password it first looked like. `.env` sets
-  `TEST_USER_EMAIL` to `eze.olivero96@outlook.com`, and **that account does
-  not exist**: the Supabase project holds exactly one user, the owner's own
-  address. So `npm run token:supabase` cannot sign in and no password would
-  fix it — Supabase answers `invalid_credentials` because there is nobody to
-  authenticate. Unrelated to this change; the password grant never reaches
-  this backend.
+- **Done: a round trip with a real Supabase token**, 8 checks, all passing,
+  against a backend built from the post-removal source. A protected route
+  rendered rather than bouncing to `/login`; **12 protected reads returned 200
+  carrying a Bearer token** (`/users/profile`, `/workouts/sessions/active`,
+  `/routines` among them) with **no 401**; the app called none of the retired
+  endpoints; and sign-out returned to `/login`, issued the same-origin
+  `DELETE /api/session` that clears the marker, still reached Supabase, and
+  **never called the retired backend logout**.
 
-  `npm run ui:login` is unaffected by that config: it opens a real browser and
-  **the owner types the password, which the tooling never reads** — which is
-  why the saved session worked earlier the same day and why restoring it is
-  the owner's action, not an agent's. `npm run ui:refresh` failed only because
-  the saved session had aged out of its refresh window.
+  The owner signed in by hand, because the tooling deliberately never reads a
+  password. Supabase's own logout was intercepted and answered locally so the
+  client path ran in full while the refresh token survived — spending a
+  session somebody created by hand, to prove sign-out works, would have cost
+  another manual sign-in for nothing. `.auth/state.json` was left untouched
+  and still holds a session.
 
-  So sign-in and sign-out are verified as far as the guard, not through a
-  session. **To finish: run `npm run ui:login`, then a protected read through
-  the restored session.** The stale `TEST_USER_*` pair should be pointed at an
-  account that exists or dropped, which is an owner decision because it
-  determines which identity manual API testing runs as.
-- `ARCHITECTURE.md` and `TECH_STACK.md` no longer list the retired items.
+  Diagnosing the earlier failure found a separate, still-open problem: `.env`
+  sets `TEST_USER_EMAIL` to `eze.olivero96@outlook.com` and **that account
+  does not exist** — the Supabase project holds exactly one user, the owner's
+  own address — so `npm run token:supabase` cannot sign in and no password
+  would fix it. That pair should be pointed at an account that exists or
+  dropped; it is an owner decision, because it sets which identity manual API
+  testing runs as.
 
-**One follow-up for the owner, not done here.** `JWT_ACCESS_SECRET`,
-`JWT_REFRESH_SECRET` and `JWT_SECRET` are still set on the Railway service and
-nothing reads them any more. Removing production variables is an ops action
-with no way back if something unseen depends on one, so it is left to the
-owner rather than taken silently.
+**The Railway variables went too.** `JWT_ACCESS_SECRET`,
+`JWT_REFRESH_SECRET` and `JWT_SECRET` were removed from the production service
+on 2026-09-22 at the owner's instruction, after confirming no reference in any
+of the three repositories. The staged diff was reviewed first — exactly three
+removals, nothing else — and the service returned healthy afterwards, which is
+the confirmation that nothing read them.
+
+**A trap worth remembering.** A repository-wide sweep appeared to find two live
+readers of those names, in `dist/`. They were stale compiled output: `tsc`
+never prunes, so the retired token module survived its own deletion in the
+build directory. Nothing imported it, `dist` is gitignored and Railway builds
+in a fresh container, so production was never affected — but the build-import
+check runs against `dist`, where a stale module can validate an import path
+that no longer exists in source. `npm run build` now clears `dist` first. Had
+that sweep been trusted over the source search, the conclusion would have been
+the opposite and wrong.
 
 <a id="td-48"></a>
 
