@@ -369,13 +369,17 @@ costs more than it returns — it goes with the next contracts change.
   another manual sign-in for nothing. `.auth/state.json` was left untouched
   and still holds a session.
 
-  Diagnosing the earlier failure found a separate, still-open problem: `.env`
-  sets `TEST_USER_EMAIL` to `eze.olivero96@outlook.com` and **that account
-  does not exist** — the Supabase project holds exactly one user, the owner's
-  own address — so `npm run token:supabase` cannot sign in and no password
-  would fix it. That pair should be pointed at an account that exists or
-  dropped; it is an owner decision, because it sets which identity manual API
-  testing runs as.
+  Diagnosing the earlier failure found a separate problem, now also closed.
+  `.env` set `TEST_USER_EMAIL` to `eze.olivero96@outlook.com` and **that
+  account did not exist** — the Supabase project holds exactly one user, the
+  owner's own address — so `npm run token:supabase` could not sign in and no
+  password would have fixed it. It turned out the whole path was dead anyway:
+  the helper wrote its token into `test/api-manual-tests.http`, and **there is
+  no `test/` directory at all**. The script, its npm entry and the two
+  variables were removed on the owner's instruction rather than an account
+  being created for them. `npm run ui:login`, which the E2E and portfolio
+  tooling actually use, is untouched — it opens a real browser and never reads
+  a credential.
 
 **The Railway variables went too.** `JWT_ACCESS_SECRET`,
 `JWT_REFRESH_SECRET` and `JWT_SECRET` were removed from the production service
