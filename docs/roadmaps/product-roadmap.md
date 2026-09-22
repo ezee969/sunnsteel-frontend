@@ -80,6 +80,7 @@ else until it merges, so claims live here, on `main`.
 | ID     | Status        | Owner | Branch / worktree | Claimed    | Repositories |
 | ------ | ------------- | ----- | ----------------- | ---------- | ------------ |
 | SOC-08 | `IN_PROGRESS` | Codex | `codex/soc-08`    | 2026-09-22 | CT, BE, FE   |
+| LIVE-06 | `IN_PROGRESS` | Claude | `claude/live-06` | 2026-09-22 | FE           |
 
 ## Current product snapshot
 
@@ -234,7 +235,7 @@ implementation, the way `SOC-12` was decomposed into the `COMM-*` family.
 | LIVE-03 | `SHIPPED`   | M    | Previous performance inline    | Show the matching set from the most recent comparable workout beneath the current input and highlight improvement.                                                                                                                                                                                                                                                                                                                                                                                                                                 | Efficient previous-session query                                 |
 | LIVE-04 | `SHIPPED`   | S    | RPE capture                    | Let users enter the RPE already represented by set logs and displayed in history.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Existing set-log field                                           |
 | LIVE-05 | `SHIPPED`   | M    | Plate calculator               | The active session exposes one calculator per weighted exercise. It starts from the next incomplete set's target and the default training location, allows both to change, and returns the exact bar-plus-plates load or the closest inventory-bounded load without exceeding the target. The result is expressed per side in the account's kg/lb unit, handles a bare bar and warns when the bar itself exceeds the target. Shipped 2026-09-08 as a frontend-only consumer of PREF-01.                                                            | PREF-01                                                          |
-| LIVE-06 | `BLOCKED`   | L    | Ad-hoc workout replacement     | Blocked on a product decision, not on code: what replaces Quick Workout has not been designed. The direction under consideration is letting the user pick a template (full body, upper/lower, filtered by session duration and experience level) instead of starting from an empty session, which overlaps `ROUT-03` and needs those templates authored. Resolve the design before scheduling.                                                                                                                                                     | FIX-04; design decision pending; likely `ROUT-03`                |
+| LIVE-06 | `IN_PROGRESS` | S    | Train another day on demand    | **Decision taken 2026-09-22, and it made the item smaller.** Quick Workout is replaced by reaching a capability that already exists rather than by a new one: `startSession` has no date check and `/routines/[id]` already starts any day of any routine, so training off-plan works end to end and is merely four taps deep. This surfaces it where the need arises -- `/workouts`, where the dead button was, and the dashboard when today is a rest day or its plan is done -- as a picker over the owner's own routine days. No backend work and nothing to author. The template direction was **rejected for this item**: it answers "I have no routine at all", which is onboarding and belongs to `ROUT-03`, and adopting it here would block a two-tap fix behind a curated-content project with no owning ID. Free-form ad-hoc sessions were **rejected outright**; see the retained decision.                                                                                                                                                     | FIX-04; design decision pending; likely `ROUT-03`                |
 | LIVE-07 | `SHIPPED`   | M    | Live PR detection              | Completing a set now celebrates every weight, rep, volume and estimated-1RM frontier it crosses. The result is calculated against completed history plus other completed sets in the active session; identical autosaves do not repeat it, bodyweight work can earn only the truthful rep category, and weight-derived values display in the account's kg/lb preference. Shipped 2026-09-08 through `@sunsteel/contracts@0.9.0` and the BE/FE set-log mutation path.                                                                               | DATA-01; `@sunsteel/contracts@0.9.0`; BE/FE mutation path        |
 | LIVE-08 | `SHIPPED`   | M    | Progression transparency       | Finishing a workout now pauses before Dashboard when prescriptions advanced and names each exercise, the all-sets or per-set rule, performed/target reps, and old → new load in the account's kg/lb unit. Only completed sets can satisfy a progression rule. The finish response is retry-stable because each change is stored as an idempotent `PROGRESSION_CHANGED` event. Shipped 2026-09-09 through `@sunsteel/contracts@0.11.0`, BE migration/event writer and FE result dialog.                                                             | DATA-02 progression slice; `@sunsteel/contracts@0.11.0`          |
 | LIVE-09 | `SHIPPED`   | M    | Session recap                  | Completing a workout now pauses on a recap with duration, unit-aware volume, completed sets, the session's final record frontiers, persisted progression changes, session notes and duration/volume/set deltas against the latest completed session for the same preserved routine day. The same stable recap can be reopened from workout history; first sessions and absent notes use honest empty states. Shipped 2026-09-09 through `@sunsteel/contracts@0.12.0`, a reconstructible BE recap read/finish response and FE finish/history views. | DATA-01; DATA-02 progression slice; `@sunsteel/contracts@0.12.0` |
@@ -2162,3 +2163,33 @@ it again without addressing the original decision.
   else in the product; it is an `AlertDialog` like every other destructive
   confirmation, and it says which of the two deletions the viewer is making.
   What was left unverified is in the completion log.
+
+- **2026-09-22 (revision 120):** Resolved `LIVE-06`, which had been `BLOCKED`
+  on a product decision since 2026-09-07, and claimed it. Three decisions, the
+  first of which shrank the item from `L` to `S`.
+
+  **The capability already exists; only the route to it was missing.**
+  `startSession` validates ownership of the routine day and nothing about the
+  date, and `/routines/[id]` already passes a specific `dayId`, so training a
+  different day today works end to end today -- it is just four taps deep,
+  behind Routines and a routine. `LIVE-06` is therefore surfacing it at the
+  point of need, not building it. What Quick Workout did was different and
+  simply broken: it created a routine whose only day had `exercises: []`, so
+  the session had nothing loggable, which is why `FIX-04` hid it.
+
+  **The template direction is rejected for this item.** Picking a curated
+  programme answers "I have no routine at all", which is onboarding and is
+  already `ROUT-03`'s. Adopting it here would make a two-tap fix wait on
+  authoring a programme library that still has no owning ID. The two stay
+  separate, and the gap for a brand-new user stays visible under `ROUT-03`
+  rather than being closed by widening this item.
+
+  **Free-form ad-hoc sessions are rejected outright**, not deferred. Everything
+  in the system attributes through the routine snapshot -- progression,
+  records, analytics, activity -- and a session whose prescription changes
+  mid-flight is a second answer to "what was prescribed", which this codebase
+  refuses elsewhere on purpose: `LIVE-11` keeps the snapshot as the
+  prescription even when an exercise is substituted. It is also exactly what
+  made the original session unloggable. Unstructured logging, if it is ever
+  wanted, is its own decision with its own progression and attribution rules.
+
