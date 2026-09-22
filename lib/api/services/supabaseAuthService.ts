@@ -1,7 +1,4 @@
-import type {
-	SupabaseAuthResponse,
-	SupabaseMigrationResponse,
-} from '@sunsteel/contracts'
+import type { SupabaseAuthResponse } from '@sunsteel/contracts'
 import type { Session } from '@supabase/supabase-js'
 
 import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
@@ -221,12 +218,6 @@ export class SupabaseAuthService {
 			markerError = error
 		}
 
-		try {
-			await httpClient.post('/auth/supabase/logout')
-		} catch (err) {
-			logger.warn('[auth-service] backend logout cookie clear failed', err)
-		}
-
 		if (markerError) throw markerError
 	}
 
@@ -315,28 +306,6 @@ export class SupabaseAuthService {
 	}
 
 	/**
-	 * Get user profile using Supabase token.
-	 */
-	async getProfile(): Promise<AuthResponse> {
-		const session = await this.getSession()
-		if (!session) {
-			throw new Error('No session available')
-		}
-
-		const response = await httpClient.request<AuthResponse>(
-			'/auth/supabase/profile',
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${session.access_token}`,
-				},
-			},
-		)
-
-		return response
-	}
-
-	/**
 	 * Check if user is authenticated.
 	 */
 	async isAuthenticated(): Promise<boolean> {
@@ -367,19 +336,6 @@ export class SupabaseAuthService {
 		callback: (event: string, session: Session | null) => void,
 	) {
 		return supabase.auth.onAuthStateChange(callback)
-	}
-
-	/**
-	 * Migrate existing user (migration phase only).
-	 */
-	async migrateUser(email: string, password: string) {
-		return httpClient.post<SupabaseMigrationResponse>(
-			'/auth/supabase/migrate',
-			{
-				email,
-				password,
-			},
-		)
 	}
 }
 

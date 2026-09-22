@@ -119,31 +119,3 @@ export const useSupabaseSignOut = () => {
 		},
 	})
 }
-
-/**
- * Hook for getting user profile
- */
-export const useSupabaseProfile = () => {
-	return useMutation({
-		mutationFn: async (): Promise<AuthResponse> => {
-			return await supabaseAuthService.getProfile()
-		},
-	})
-}
-
-/**
- * Hook for migrating existing users
- */
-export const useSupabaseMigrateUser = () => {
-	return useMutation({
-		mutationFn: async ({
-			email,
-			password,
-		}: {
-			email: string
-			password: string
-		}) => {
-			return await supabaseAuthService.migrateUser(email, password)
-		},
-	})
-}
