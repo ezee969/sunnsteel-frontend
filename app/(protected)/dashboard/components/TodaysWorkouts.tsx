@@ -26,6 +26,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
+import { TrainAnotherDayDialog } from '@/features/workout/train-another-day-dialog'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { cn } from '@/lib/utils'
 import {
@@ -51,11 +52,13 @@ export default function TodaysWorkouts() {
 		entries: visibleTodays,
 		active,
 		completedToday,
+		hasTrainableDay,
 		error,
 		isPending: isDataPending,
 	} = useTodaysWorkouts()
 
 	const [activeConflictOpen, setActiveConflictOpen] = useState(false)
+	const [pickingDay, setPickingDay] = useState(false)
 
 	const handleStart = async (routineId: string, routineDayId: string) => {
 		if (!routineId || !routineDayId) return
@@ -96,6 +99,7 @@ export default function TodaysWorkouts() {
 		active,
 		entries: visibleTodays,
 		completedToday,
+		hasTrainableDay,
 	})
 	const copy = getDashboardPrimaryCopy(action, {
 		plannedCount: visibleTodays.length,
@@ -131,6 +135,11 @@ export default function TodaysWorkouts() {
 								<History aria-hidden />
 								Review session
 							</Link>
+						</Button>
+					) : action.kind === 'PICK_DAY' ? (
+						<Button type="button" onClick={() => setPickingDay(true)}>
+							<Dumbbell aria-hidden />
+							Train another day
 						</Button>
 					) : action.kind === 'BROWSE' ? (
 						<Button asChild>
@@ -262,6 +271,8 @@ export default function TodaysWorkouts() {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			<TrainAnotherDayDialog open={pickingDay} onOpenChange={setPickingDay} />
 		</>
 	)
 }

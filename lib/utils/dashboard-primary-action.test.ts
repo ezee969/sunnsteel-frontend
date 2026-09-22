@@ -28,6 +28,7 @@ describe('dashboard primary action', () => {
 	it('resumes an open session before anything scheduled or finished', () => {
 		expect(
 			resolveDashboardPrimaryAction({
+				hasTrainableDay: false,
 				active,
 				entries: [entry('routine-1', 'day-1')],
 				completedToday: completed,
@@ -44,6 +45,7 @@ describe('dashboard primary action', () => {
 	it('ignores a session that is no longer in progress', () => {
 		expect(
 			resolveDashboardPrimaryAction({
+				hasTrainableDay: false,
 				active: { ...active, status: 'COMPLETED' },
 				entries: [entry('routine-1', 'day-1')],
 			}).kind,
@@ -53,6 +55,7 @@ describe('dashboard primary action', () => {
 	it('starts the first workout that can actually be started today', () => {
 		expect(
 			resolveDashboardPrimaryAction({
+				hasTrainableDay: false,
 				entries: [
 					entry('routine-1', 'day-1', false),
 					entry('routine-2', 'day-2'),
@@ -65,6 +68,7 @@ describe('dashboard primary action', () => {
 	it('reviews today’s finished workout once nothing is left to start', () => {
 		expect(
 			resolveDashboardPrimaryAction({
+				hasTrainableDay: false,
 				entries: [entry('routine-1', 'day-1', false)],
 				completedToday: completed,
 			}),
@@ -76,10 +80,39 @@ describe('dashboard primary action', () => {
 		})
 	})
 
-	it('falls back to browsing routines', () => {
-		expect(resolveDashboardPrimaryAction({ entries: [] })).toEqual({
-			kind: 'BROWSE',
-		})
+	it('falls back to browsing routines when there is nothing to train', () => {
+		expect(
+			resolveDashboardPrimaryAction({ entries: [], hasTrainableDay: false }),
+		).toEqual({ kind: 'BROWSE' })
+	})
+
+	it('offers a day to train when nothing is planned but one exists', () => {
+		// LIVE-06. Sending someone to a routine list when they already have a
+		// trainable day is three taps of nothing: the API never required a day
+		// to be scheduled today.
+		expect(
+			resolveDashboardPrimaryAction({ entries: [], hasTrainableDay: true }),
+		).toEqual({ kind: 'PICK_DAY' })
+	})
+
+	it('still prefers today’s plan over offering another day', () => {
+		// The new branch is last but one; it must not displace the plan.
+		expect(
+			resolveDashboardPrimaryAction({
+				entries: [entry('routine-1', 'day-1')],
+				hasTrainableDay: true,
+			}),
+		).toMatchObject({ kind: 'START', routineDayId: 'day-1' })
+	})
+
+	it('still prefers reviewing a workout already finished today', () => {
+		expect(
+			resolveDashboardPrimaryAction({
+				entries: [],
+				completedToday: completed,
+				hasTrainableDay: true,
+			}),
+		).toMatchObject({ kind: 'REVIEW' })
 	})
 })
 

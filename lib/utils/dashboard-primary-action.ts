@@ -4,6 +4,7 @@ import type { WorkoutSession, WorkoutSessionSummary } from '@sunsteel/contracts'
  * DASH-02: the one action the dashboard puts first. Precedence is fixed:
  * an open session always wins (it is unfinished work), then a workout that
  * can be started today, then reviewing a workout already finished today,
+ * then offering a day to train that today's plan did not call for (LIVE-06),
  * and only then browsing routines.
  */
 export type DashboardPrimaryAction =
@@ -21,6 +22,13 @@ export type DashboardPrimaryAction =
 			routineName: string
 			dayName?: string | null
 	  }
+	/**
+	 * LIVE-06: nothing is planned, but the owner has a routine day with
+	 * exercises in it. Offering one beats sending them to a list — the session
+	 * it starts is an ordinary one, and the API never required a day to be
+	 * scheduled today.
+	 */
+	| { kind: 'PICK_DAY' }
 	| { kind: 'BROWSE' }
 
 type DashboardEntry = {
@@ -40,10 +48,17 @@ export function resolveDashboardPrimaryAction({
 	active,
 	entries,
 	completedToday,
+	hasTrainableDay,
 }: {
 	active?: ActiveSession | null
 	entries: DashboardEntry[]
 	completedToday?: CompletedSession | null
+	/**
+	 * Whether any routine of the owner's has a day with exercises in it.
+	 * Required rather than defaulted: adding it is what made the compiler name
+	 * every caller that has to decide between offering a day and a routine list.
+	 */
+	hasTrainableDay: boolean
 }): DashboardPrimaryAction {
 	if (active?.id && active.status === 'IN_PROGRESS') {
 		return {
@@ -73,7 +88,7 @@ export function resolveDashboardPrimaryAction({
 		}
 	}
 
-	return { kind: 'BROWSE' }
+	return hasTrainableDay ? { kind: 'PICK_DAY' } : { kind: 'BROWSE' }
 }
 
 function describeWorkout(routineName?: string, dayName?: string | null) {
@@ -107,6 +122,11 @@ export function getDashboardPrimaryCopy(
 			return {
 				title: 'Today’s workout is done',
 				description: `${describeWorkout(action.routineName, action.dayName)} is complete. Review how it went.`,
+			}
+		case 'PICK_DAY':
+			return {
+				title: 'No workouts scheduled today',
+				description: `Nothing is planned for ${todayName}. You can still train any day of your routines — it counts the same.`,
 			}
 		case 'BROWSE':
 			return {

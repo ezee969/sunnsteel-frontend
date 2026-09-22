@@ -15,6 +15,7 @@ import {
 	startableDayToday,
 } from '@/lib/utils/routine-schedule'
 import { localDateKey } from '@/lib/utils/schedule-week'
+import { trainableDays } from '@/lib/utils/train-another-day'
 
 export interface TodaysWorkoutEntry {
 	routine: Routine
@@ -132,6 +133,9 @@ export function useTodaysWorkouts() {
 		entries,
 		active: activeQuery.data,
 		completedToday,
+		// LIVE-06: whether anything could be trained at all, which decides
+		// between offering a day and sending the owner to the routine list.
+		hasTrainableDay: trainableDays(routinesQuery.data, todayDow).length > 0,
 		error: routinesQuery.error,
 		isPending:
 			routinesQuery.isPending ||
