@@ -315,6 +315,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		ready: [/@/, /Workouts|Sessions|Volume/],
 		caption: 'The public member profile as a signed-out visitor sees it.',
 	},
+	{
+		slug: 'training-partners-settings',
+		route: '/settings#training-partners',
+		features: ['SOC-08'],
+		setup: async page => {
+			await page
+				.getByRole('heading', { name: 'Training Partners' })
+				.scrollIntoViewIfNeeded()
+		},
+		ready: ['Training Partners', 'A request shares nothing by itself.'],
+		caption:
+			'Training-partner requests and independent access controls for schedule, progress, activity, routines and encouragement.',
+	},
 	// Last on purpose: while the scratch session is live every other protected
 	// page shows its Resume banner, so nothing may be captured after a failed
 	// cleanup. The spec also stops the run if the session survives.

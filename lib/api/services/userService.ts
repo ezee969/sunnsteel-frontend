@@ -11,6 +11,10 @@ import {
 	ReplaceMeasurableGoalsRequest,
 	ReplaceTrainingLocationsRequest,
 	TrainingLocationPreference,
+	TrainingPartnerPermissions,
+	TrainingPartnerScheduleResponse,
+	TrainingPartnership,
+	TrainingPartnershipsResponse,
 	UpdateProfileDiscoveryRequest,
 	UpdateProfilePrivacyRequest,
 	UpdateProfileRequest,
@@ -181,5 +185,64 @@ export const userService = {
 	// Unfollow user
 	async unfollowUser(userId: string): Promise<PublicUserProfile> {
 		return httpClient.delete<PublicUserProfile>(`/users/${userId}/follow`, true)
+	},
+
+	async getTrainingPartners(): Promise<TrainingPartnershipsResponse> {
+		return httpClient.get<TrainingPartnershipsResponse>(
+			'/users/me/training-partners',
+			true,
+		)
+	},
+
+	async requestTrainingPartner(
+		identifier: string,
+	): Promise<TrainingPartnership> {
+		return httpClient.post<TrainingPartnership>(
+			`/users/${identifier}/training-partner-request`,
+			undefined,
+			true,
+		)
+	},
+
+	async acceptTrainingPartner(
+		partnershipId: string,
+	): Promise<TrainingPartnership> {
+		return httpClient.post<TrainingPartnership>(
+			`/users/me/training-partners/${partnershipId}/accept`,
+			undefined,
+			true,
+		)
+	},
+
+	async removeTrainingPartner(
+		partnershipId: string,
+	): Promise<TrainingPartnershipsResponse> {
+		return httpClient.delete<TrainingPartnershipsResponse>(
+			`/users/me/training-partners/${partnershipId}`,
+			true,
+		)
+	},
+
+	async updateTrainingPartnerPermissions(
+		partnershipId: string,
+		permissions: TrainingPartnerPermissions,
+	): Promise<TrainingPartnership> {
+		return httpClient.request<TrainingPartnership>(
+			`/users/me/training-partners/${partnershipId}/permissions`,
+			{
+				method: 'PUT',
+				body: JSON.stringify(permissions),
+				secure: true,
+			},
+		)
+	},
+
+	async getTrainingPartnerSchedule(
+		partnershipId: string,
+	): Promise<TrainingPartnerScheduleResponse> {
+		return httpClient.get<TrainingPartnerScheduleResponse>(
+			`/users/me/training-partners/${partnershipId}/schedule`,
+			true,
+		)
 	},
 }

@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-09-22T08:50:51.257Z",
+	"mutatedAt": "2026-09-22T09:48:53.905Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -9,7 +9,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-09-22T08:49:54.266Z",
+			"capturedAt": "2026-09-22T09:47:53.696Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -23,7 +23,7 @@
 				"DASH-09",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-22T08:49:58.433Z",
+			"capturedAt": "2026-09-22T09:47:57.503Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -35,7 +35,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-09-22T08:50:04.697Z",
+			"capturedAt": "2026-09-22T09:48:04.034Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -47,7 +47,7 @@
 				"ROUT-02",
 				"ROUT-08"
 			],
-			"capturedAt": "2026-09-22T08:50:13.601Z",
+			"capturedAt": "2026-09-22T09:48:12.845Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -57,7 +57,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-09-22T08:50:17.698Z",
+			"capturedAt": "2026-09-22T09:48:15.811Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -69,7 +69,7 @@
 				"LIVE-09",
 				"SOC-07"
 			],
-			"capturedAt": "2026-09-22T08:50:22.535Z",
+			"capturedAt": "2026-09-22T09:48:18.910Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -82,7 +82,7 @@
 				"PROG-04",
 				"PROG-05"
 			],
-			"capturedAt": "2026-09-22T08:50:26.930Z",
+			"capturedAt": "2026-09-22T09:48:23.371Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -96,7 +96,7 @@
 				"SCHED-05",
 				"NAV-05"
 			],
-			"capturedAt": "2026-09-22T08:50:30.813Z",
+			"capturedAt": "2026-09-22T09:48:27.004Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -109,7 +109,7 @@
 				"ACH-04",
 				"ACH-05"
 			],
-			"capturedAt": "2026-09-22T08:50:34.693Z",
+			"capturedAt": "2026-09-22T09:48:30.703Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -121,7 +121,7 @@
 				"SOC-04",
 				"SOC-06"
 			],
-			"capturedAt": "2026-09-22T08:50:38.198Z",
+			"capturedAt": "2026-09-22T09:48:34.713Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -132,7 +132,7 @@
 				"TRUST-04",
 				"PROF-10"
 			],
-			"capturedAt": "2026-09-22T08:50:41.462Z",
+			"capturedAt": "2026-09-22T09:48:38.519Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -144,7 +144,7 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-09-22T08:50:45.185Z",
+			"capturedAt": "2026-09-22T09:48:43.630Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -157,7 +157,17 @@
 				"PROF-05",
 				"PROF-06"
 			],
-			"capturedAt": "2026-09-22T08:50:48.548Z",
+			"capturedAt": "2026-09-22T09:48:48.086Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "training-partners-settings",
+			"route": "/settings#training-partners",
+			"features": [
+				"SOC-08"
+			],
+			"capturedAt": "2026-09-22T09:50:01.860Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -171,7 +181,7 @@
 				"LIVE-04",
 				"LIVE-05"
 			],
-			"capturedAt": "2026-09-22T08:50:55.621Z",
+			"capturedAt": "2026-09-22T09:48:59.972Z",
 			"width": 1440,
 			"height": 900
 		}

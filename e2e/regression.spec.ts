@@ -832,3 +832,37 @@ for (const width of REGRESSION_WIDTHS) {
 		})
 	}
 }
+
+test('training partners request and cancel', async ({ page }) => {
+	await prepare(page, 1280, 'dark')
+	await load(page, '/profile/ken-watanabe')
+
+	const add = page.getByRole('button', { name: 'Add Training Partner' })
+	await expect(add).toBeVisible()
+	let requestCreated = false
+	try {
+		await add.click()
+		requestCreated = true
+		await expect(page.getByText('Request sent')).toBeVisible()
+		await expect(
+			page.getByRole('button', { name: 'Request Pending' }),
+		).toBeDisabled()
+
+		await load(page, '/settings#training-partners')
+		await expect(
+			page.getByRole('heading', { name: 'Training Partners' }),
+		).toBeVisible()
+		await expect(page.getByText('@ken-watanabe · request sent')).toBeVisible()
+	} finally {
+		if (requestCreated) {
+			if (!/\/settings/.test(pathOf(page))) {
+				await load(page, '/settings#training-partners')
+			}
+			const cancel = page.getByRole('button', { name: 'Cancel Request' })
+			if (await cancel.isVisible()) {
+				await cancel.click()
+				await expect(cancel).toHaveCount(0)
+			}
+		}
+	}
+})

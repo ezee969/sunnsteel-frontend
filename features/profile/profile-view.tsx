@@ -79,6 +79,9 @@ type ProfileViewProps = (
 	 * the authenticated shell passes one; activity is never shown signed out.
 	 */
 	activity?: React.ReactNode
+	/** SOC-08 controls and explicitly granted partner-only schedule/routines. */
+	trainingPartnerAction?: React.ReactNode
+	trainingPartnerContent?: React.ReactNode
 }
 
 export function ProfileView(props: ProfileViewProps) {
@@ -281,6 +284,7 @@ export function ProfileView(props: ProfileViewProps) {
 								)}
 							</Button>
 						)}
+						{props.trainingPartnerAction}
 						{/* PROF-10: blocking and reporting are only ever about somebody
 						    else, and only inside the authenticated shell — the signed-out
 						    route has no viewer to act as. */}
@@ -554,6 +558,7 @@ export function ProfileView(props: ProfileViewProps) {
 						)}
 					</section>
 
+					{props.trainingPartnerContent}
 					{props.activity}
 				</div>
 			</div>

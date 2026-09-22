@@ -41,6 +41,7 @@ import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-
 import { PushNotificationsCard } from '@/features/settings/push-notifications-card'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
+import { TrainingPartnersCard } from '@/features/settings/training-partners-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { supabase } from '@/lib/supabase/client'
@@ -566,6 +567,8 @@ export default function SettingsPage() {
 			) : null}
 
 			<ActivitySharingCard />
+
+			<TrainingPartnersCard />
 
 			<BlockedMembersCard />
 

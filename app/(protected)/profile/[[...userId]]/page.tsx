@@ -7,6 +7,8 @@ import { MemberActivity } from '@/features/profile/member-activity'
 import { ProfileLoading } from '@/features/profile/profile-loading'
 import { ProfileView } from '@/features/profile/profile-view'
 import { RelationshipListsView } from '@/features/profile/relationship-lists-view'
+import { TrainingPartnerAction } from '@/features/profile/training-partner-action'
+import { TrainingPartnerSharedSections } from '@/features/profile/training-partner-shared-sections'
 import { MemberRoutineView } from '@/features/routines/components/MemberRoutineView'
 import { useFollowUser } from '@/lib/api/hooks/useFollowUser'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
@@ -159,6 +161,13 @@ export default function ProfilePage() {
 			isMutating={followMutation.isPending || unfollowMutation.isPending}
 			onFollowToggle={onFollowToggle}
 			relationshipHrefs={getRelationshipHrefs(publicUser.username)}
+			trainingPartnerAction={<TrainingPartnerAction member={publicUser} />}
+			trainingPartnerContent={
+				<TrainingPartnerSharedSections
+					memberId={publicUser.id}
+					identifier={publicUser.username}
+				/>
+			}
 			activity={
 				<MemberActivity
 					identifier={publicUser.username}
