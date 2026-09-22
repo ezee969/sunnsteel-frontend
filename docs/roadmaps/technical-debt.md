@@ -17,10 +17,10 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Five entries are open: backend authentication debt `TD-43`, frontend PWA
-maintenance debt `TD-44`, proxy client-IP handling `TD-46`, dead pre-Supabase
-auth code `TD-47` and agent-document drift `TD-48`. `TD-45`, the middleware
-matcher gap, closed on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
+Four entries are open: backend authentication debt `TD-43`, frontend PWA
+maintenance debt `TD-44`, dead pre-Supabase auth code `TD-47` and
+agent-document drift `TD-48`. `TD-46`, proxy client-IP handling, closed on
+2026-09-22, and `TD-45`, the middleware matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
 `TD-33` and `TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
@@ -228,51 +228,73 @@ that safe.
 
 <a id="td-46"></a>
 
-### TD-46 — Client IP handling behind the proxy is unverified (throttling and `/metrics`)
+### TD-46 — Client IP handling behind the proxy — CLOSED 2026-09-22
 
-**Impact.** Two backend controls depend on the caller's IP address, and
-neither sets how that address is derived behind Railway's proxy. If the rate
-limiter sees the proxy's address instead of the client's, all users share one
-bucket of 100 requests per minute. One busy client, or a page that fans out
-into many reads, could then exhaust it for everyone. Separately, the `/metrics`
-allowlist trusts a header the client can set, so a caller can claim an
-allowlisted address. The endpoint exposes only default Node process metrics, so
-the `/metrics` issue is low severity. Neither issue has been observed in
-production; this entry exists so both get checked.
+**What it was.** Two controls keyed on the caller's address without setting how
+that address is derived behind Railway's proxy: the global 100-per-60s
+throttler, and the `/metrics` IP allowlist.
 
-**Evidence.** Backend, verified in code on 2026-09-16:
+**The measurement, which changed the fix.** A temporary probe on `/api/health`
+logged one production request on 2026-09-22:
 
-- `src/main.ts` never sets `trust proxy`, and no code overrides the
-  throttler's tracker. The installed `@nestjs/throttler`'s
-  `ThrottlerGuard.getTracker` returns `req.ip`. Without `trust proxy`, `req.ip`
-  is the socket peer, which behind a reverse proxy is the proxy itself.
-- `ThrottlerModule.forRoot` in `src/app.module.ts` registers one global limit:
-  100 requests per 60 s.
-- `MetricsController.clientIp` (`src/metrics/metrics.controller.ts`) uses the
-  first `X-Forwarded-For` entry when the header is present. Proxies usually
-  append the real peer to any incoming header, which leaves the client's own
-  value first. The allowlist defaults to `127.0.0.1,::1` when
-  `METRICS_IP_ALLOWLIST` is unset.
-- Not verified: what `req.ip` is in production, how Railway's edge sets
-  `X-Forwarded-For`, and whether `METRICS_IP_ALLOWLIST` is set in production.
+```
+req.ip          ::ffff:100.64.0.2
+req.ips         []
+socket          ::ffff:100.64.0.2
+X-Forwarded-For 89.10.231.195, 79.127.151.146
+X-Real-IP       89.10.231.195
+X-Railway-Edge  osl1
+trust proxy     false
+```
 
-**Solution direction.** Measure first: temporarily log `req.ip`,
-`req.socket.remoteAddress` and `X-Forwarded-For` for one production request.
-Then set `trust proxy` to exactly the number of proxy hops Railway adds, so
-`req.ip` is the real client for both the throttler and `/metrics`. Change the
-metrics controller to use `req.ip` instead of parsing the header itself. If
-nothing scrapes `/metrics`, consider protecting it with a bearer secret, or
-disabling it, instead of relying on an IP allowlist.
+Three results, two of which contradicted what this entry had assumed:
 
-**Closure.** All of the following are verified:
+- **The impact was recorded backwards.** This entry said all users share one
+  bucket. The internal hop *rotates*: consecutive requests from one client were
+  logged as `100.64.0.2` through `100.64.0.8`. Keying on `req.ip` therefore
+  spread one caller across buckets, so the limit was configured but never
+  reached — not shared, unenforced.
+- **Railway does send `X-Forwarded-For`**, despite its
+  [specs page](https://docs.railway.com/networking/public-networking/specs-and-limits)
+  listing only `X-Real-IP` and omitting it. Do not treat that page as complete.
+- **Neither header can be forged through the edge.** Requests carrying
+  `X-Real-IP: 127.0.0.1`, `X-Forwarded-For: 127.0.0.1` and `8.8.8.8` were
+  logged with none of those values present: the edge overwrites both rather
+  than appending.
 
-- The production measurement is recorded here.
-- Two clients on different addresses are throttled independently in
-  production, or the measurement shows they already were.
+**The recorded solution direction was wrong, and is kept here as the reason to
+measure first.** It said to set `trust proxy` to Railway's hop count. That
+would work today — the chain makes `trust proxy = 2` yield the client — but a
+hop count is a guess about topology that fails *silently*: one internal hop
+added or removed and `req.ip` quietly becomes a shared edge address, which is
+this defect returning with nothing to signal it.
+
+**What was done.** `src/common/client-ip.ts` is the one place the question is
+answered: `X-Real-IP` when the edge set it, the connection address otherwise,
+normalised so `::ffff:1.2.3.4` and `1.2.3.4` are one caller. The throttler
+takes it as its `getTracker`; the metrics controller uses it instead of parsing
+`X-Forwarded-For` itself. The comment records that trusting the header is a
+property of Railway's edge, not of the header, so a move to a host that appends
+is a change that has to be made deliberately.
+
+**Closure.** All verified on 2026-09-22:
+
+- The production measurement is recorded above.
+- One client now holds one bucket: `x-ratelimit-remaining-long` decrements
+  across consecutive production requests, where the rotating hop had left it at
+  99. Independence between clients is covered by the unit tests, since a second
+  external address was not available; the tracker is the address itself, so two
+  addresses cannot share a key.
 - An external request to `/metrics` with a forged
   `X-Forwarded-For: 127.0.0.1` is refused.
-- Backend lint, typecheck, tests and build pass.
+- Backend lint, typecheck, 331 tests and build pass.
 - `ARCHITECTURE.md` is updated.
+
+**Left deliberately.** `METRICS_IP_ALLOWLIST` is unset in production, so the
+allowlist is `127.0.0.1,::1` and no external caller can ever match it —
+`/metrics` is effectively closed rather than protected. Whether to give it a
+bearer secret or remove it is an ops decision for the owner, not a silent
+change of its security posture, so it was not made here.
 
 <a id="td-47"></a>
 
