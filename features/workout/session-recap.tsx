@@ -64,6 +64,8 @@ interface SessionRecapContentProps {
 	weightUnit?: WeightUnit
 	/** Regions to render. Hidden regions are omitted, never shown as zero. */
 	sections?: Partial<RecapSections>
+	/** LIVE-16: the owner's control for editing the notes, on history only. */
+	notesAction?: ReactNode
 }
 
 interface ComparisonMetricProps {
@@ -118,6 +120,7 @@ export function SessionRecapContent({
 	recap,
 	weightUnit: unitOverride,
 	sections,
+	notesAction,
 }: SessionRecapContentProps) {
 	const viewerUnit = useWeightUnit()
 	const weightUnit = unitOverride ?? viewerUnit
@@ -307,9 +310,25 @@ export function SessionRecapContent({
 						<NotebookPen className="size-4 text-ink-3" aria-hidden />
 						<h3 className="type-panel text-foreground">Session notes</h3>
 					</div>
-					<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
-						{recap.notes?.trim() || 'No notes were added to this session.'}
-					</p>
+					{recap.notes?.trim() || !recap.exerciseNotes?.length ? (
+						<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
+							{recap.notes?.trim() || 'No notes were added to this session.'}
+						</p>
+					) : null}
+					{recap.exerciseNotes?.length ? (
+						<ul className="space-y-2" aria-label="Exercise notes">
+							{recap.exerciseNotes.map(item => (
+								<li key={item.routineExerciseId} className="type-body-sm">
+									<span className="text-foreground">{item.exerciseName}</span>
+									<span className="whitespace-pre-line text-ink-2">
+										{' '}
+										{item.note}
+									</span>
+								</li>
+							))}
+						</ul>
+					) : null}
+					{notesAction}
 				</section>
 			) : null}
 		</div>
@@ -372,6 +391,7 @@ export function SessionRecapDialog({
 export function SessionRecapPanel({
 	recap,
 	action,
+	notesAction,
 }: SessionRecapContentProps & { action?: ReactNode }) {
 	return (
 		<section aria-labelledby="session-recap-heading" className="space-y-4">
@@ -390,7 +410,7 @@ export function SessionRecapPanel({
 				</div>
 				{action}
 			</div>
-			<SessionRecapContent recap={recap} />
+			<SessionRecapContent recap={recap} notesAction={notesAction} />
 		</section>
 	)
 }

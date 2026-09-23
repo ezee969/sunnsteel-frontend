@@ -6,6 +6,8 @@ import type {
 	SessionCorrectionsResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
+	UpdateSessionNotesRequest,
+	UpdateSessionNotesResponse,
 } from '@sunsteel/contracts'
 import {
 	useInfiniteQuery,
@@ -412,6 +414,35 @@ export const useSessionRecap = (id: string, enabled = true) => {
 		queryFn: () => workoutService.getSessionRecap(id),
 		enabled: enabled && !!id,
 		staleTime: Number.POSITIVE_INFINITY,
+	})
+}
+
+/**
+ * LIVE-16. The server answers with every note of the workout, so the session
+ * cache is patched with what it stored rather than guessed; the recap and the
+ * history list carry notes too and are refetched.
+ */
+export const useUpdateSessionNotes = (id: string) => {
+	const qc = useQueryClient()
+	return useMutation<
+		UpdateSessionNotesResponse,
+		Error,
+		UpdateSessionNotesRequest
+	>({
+		mutationFn: data => workoutService.updateSessionNotes(id, data),
+		onSuccess: saved => {
+			qc.setQueryData<WorkoutSession>(qk.session(id), current =>
+				current
+					? {
+							...current,
+							notes: saved.notes,
+							exerciseNotes: saved.exerciseNotes,
+						}
+					: current,
+			)
+			void qc.invalidateQueries({ queryKey: qk.recap(id) })
+			void qc.invalidateQueries({ queryKey: ['workout', 'sessions'] })
+		},
 	})
 }
 

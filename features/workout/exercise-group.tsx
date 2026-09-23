@@ -3,13 +3,13 @@
 import { ArrowLeftRight, ChevronDown, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { ExerciseNoteRow } from '@/features/routines/wizard/components/ExerciseNoteRow'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { comparablePrevious } from '@/lib/utils/session-substitutions'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
 import { PlateCalculatorDialog } from './plate-calculator-dialog'
+import { ExerciseNoteButton } from './session-notes'
 import { SetLogInput } from './set-log-input'
 
 interface ExerciseGroupProps {
@@ -39,8 +39,11 @@ interface ExerciseGroupProps {
 	previousSets?: ReadonlyMap<string, PreviousSetPerformance>
 	/** Fired when any set in this group is ticked complete (LIVE-01). */
 	onSetCompleted?: () => void
-	note?: string | null
-	onSaveNote: (note: string) => void
+	sessionId: string
+	/** The routine's own note: the standing instruction, shown, never edited here. */
+	instruction?: string | null
+	/** LIVE-16: what the owner noted about this exercise in this workout. */
+	sessionNote?: string | null
 	/** LIVE-11: the routine's own exercise when this slot was swapped. */
 	substitutedFrom?: string | null
 	/** Opens the swap dialog; omitted when the session cannot change. */
@@ -51,6 +54,7 @@ interface ExerciseGroupProps {
  * Reusable component for displaying collapsible exercise groups with set logs
  */
 export const ExerciseGroup = ({
+	exerciseId,
 	exerciseName,
 	sets,
 	isCollapsed,
@@ -60,8 +64,9 @@ export const ExerciseGroup = ({
 	onSave,
 	previousSets,
 	onSetCompleted,
-	note,
-	onSaveNote,
+	sessionId,
+	instruction,
+	sessionNote,
 	substitutedFrom,
 	onSwapRequest,
 }: ExerciseGroupProps) => {
@@ -112,6 +117,16 @@ export const ExerciseGroup = ({
 									Swapped from {substitutedFrom}
 								</p>
 							) : null}
+							{instruction ? (
+								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-3">
+									Routine note: {instruction}
+								</p>
+							) : null}
+							{sessionNote ? (
+								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-2">
+									Your note: {sessionNote}
+								</p>
+							) : null}
 						</div>
 					</div>
 				</Button>
@@ -140,10 +155,16 @@ export const ExerciseGroup = ({
 						/>
 					) : null}
 
-					{/* Note button (stops propagation to prevent toggle) */}
-					<div onClick={e => e.stopPropagation()}>
-						<ExerciseNoteRow note={note} onSave={onSaveNote} minimal />
-					</div>
+					{/* LIVE-16: a note for this workout. It used to write the
+					    routine's own note, so a remark about today overwrote the
+					    standing instruction for every workout after it. */}
+					<ExerciseNoteButton
+						sessionId={sessionId}
+						routineExerciseId={exerciseId}
+						exerciseName={exerciseName}
+						note={sessionNote ?? null}
+						instruction={instruction}
+					/>
 
 					{isComplete && (
 						<span className="type-label text-success">Complete</span>

@@ -89,6 +89,7 @@ export function sharedRecapToRecapView(shared: SharedSessionRecap): {
 			totalVolumeKg: shared.totalVolumeKg ?? 0,
 			completedSets: shared.completedSets ?? 0,
 			notes: shared.notes ?? null,
+			exerciseNotes: shared.exerciseNotes ?? [],
 			records: shared.records ?? [],
 			progressionChanges: shared.progressionChanges ?? [],
 			previousSession: null,

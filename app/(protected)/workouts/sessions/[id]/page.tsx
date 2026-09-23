@@ -14,6 +14,7 @@ import { SessionActionCard } from '@/features/workout/session-action-card'
 import { SessionConfirmationDialog } from '@/features/workout/session-confirmation-dialog'
 import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
+import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapDialog } from '@/features/workout/session-recap'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useRestTimer } from '@/hooks/use-rest-timer'
@@ -21,13 +22,14 @@ import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { usePushSubscriptions } from '@/lib/api/hooks/usePushNotifications'
 import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
-import { useRoutine, useUpdateExerciseNote } from '@/lib/api/hooks/useRoutines'
+import { useRoutine } from '@/lib/api/hooks/useRoutines'
 import {
 	usePreviousPerformance,
 	useSession,
 	useUpsertSetLog,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
+import { noteFor } from '@/lib/utils/session-notes'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
 import {
 	applySessionSubstitutions,
@@ -67,7 +69,6 @@ export default function ActiveSessionPage() {
 	const { data: previousPerformance, error: previousPerformanceError } =
 		usePreviousPerformance(idParam)
 	const { mutate: upsertSetLog } = useUpsertSetLog(idParam)
-	const { mutate: updateNote } = useUpdateExerciseNote()
 	const routineId = session?.routineId ?? ''
 	const {
 		data: routine,
@@ -354,20 +355,30 @@ export default function ActiveSessionPage() {
 												})
 										: undefined
 								}
-								note={group.note}
-								onSaveNote={note => {
-									if (routineId) {
-										updateNote({
-											routineId,
-											routineExerciseId: group.exerciseId,
-											note,
-										})
-									}
-								}}
+								sessionId={session.id}
+								instruction={group.note}
+								sessionNote={noteFor(session.exerciseNotes, group.exerciseId)}
 							/>
 						)
 					})}
 				</div>
+
+				{/* LIVE-16: the note about the whole workout, written as it happens. */}
+				<section aria-labelledby="workout-note-heading" className="space-y-3">
+					<h2
+						id="workout-note-heading"
+						className="type-section rule-heading pb-2 text-foreground"
+					>
+						Workout Note
+					</h2>
+					<p className="type-body-sm max-w-[68ch] whitespace-pre-line text-ink-2">
+						{session.notes?.trim() || 'Nothing noted for this workout yet.'}
+					</p>
+					<WorkoutNoteButton
+						sessionId={session.id}
+						note={session.notes ?? null}
+					/>
+				</section>
 
 				{/* Empty state */}
 				{groupedLogs.length === 0 && (

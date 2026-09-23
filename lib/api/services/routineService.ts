@@ -172,19 +172,4 @@ export const routineService = {
 			`${ROUTINES_API_URL}/${id}/training-blocks/${blockId}`,
 			{ method: 'DELETE', secure: true },
 		),
-
-	updateExerciseNote: async (
-		routineId: string,
-		routineExerciseId: string,
-		note: string,
-	): Promise<void> => {
-		return httpClient.request<void>(
-			`${ROUTINES_API_URL}/${routineId}/exercises/${routineExerciseId}/note`,
-			{
-				method: 'PATCH',
-				body: JSON.stringify({ note }),
-				secure: true,
-			},
-		)
-	},
 }

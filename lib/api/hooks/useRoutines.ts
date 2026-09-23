@@ -213,22 +213,3 @@ export const useUpdateRoutine = () => {
 		},
 	})
 }
-
-export const useUpdateExerciseNote = () => {
-	const queryClient = useQueryClient()
-
-	return useMutation<
-		void,
-		Error,
-		{ routineId: string; routineExerciseId: string; note: string }
-	>({
-		mutationFn: ({ routineId, routineExerciseId, note }) =>
-			routineService.updateExerciseNote(routineId, routineExerciseId, note),
-		onSuccess: (_, { routineId }) => {
-			queryClient.invalidateQueries({
-				queryKey: routineQueryKeys.detail(routineId),
-			})
-			queryClient.invalidateQueries({ queryKey: ROUTINES_QUERY_KEY })
-		},
-	})
-}

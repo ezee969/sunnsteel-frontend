@@ -9,6 +9,7 @@ import {
 	SessionCorrectionEditor,
 	SessionCorrectionSummary,
 } from '@/features/workout/session-corrections'
+import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapPanel } from '@/features/workout/session-recap'
 import { SessionShareButton } from '@/features/workout/session-share-dialog'
 import { useCollapseMap } from '@/hooks/use-collapse-map'
@@ -19,6 +20,7 @@ import {
 	useSessionRecap,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
+import { noteFor } from '@/lib/utils/session-notes'
 
 export default function WorkoutDetailPage() {
 	const params = useParams()
@@ -81,6 +83,12 @@ export default function WorkoutDetailPage() {
 					<SessionRecapPanel
 						recap={recap}
 						action={<SessionShareButton sessionId={session.id} />}
+						notesAction={
+							<WorkoutNoteButton
+								sessionId={session.id}
+								note={session.notes ?? null}
+							/>
+						}
 					/>
 				) : (
 					<div
@@ -131,6 +139,13 @@ export default function WorkoutDetailPage() {
 								group={group}
 								collapsed={isCollapsed(group.routineExerciseId)}
 								onToggle={() => toggle(group.routineExerciseId)}
+								sessionNote={noteFor(
+									session.exerciseNotes,
+									group.routineExerciseId,
+								)}
+								sessionId={
+									session.status === 'COMPLETED' ? session.id : undefined
+								}
 							/>
 						))}
 					</div>

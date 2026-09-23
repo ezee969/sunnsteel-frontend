@@ -10,6 +10,8 @@ import type {
 	SharedSessionRecap,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
+	UpdateSessionNotesRequest,
+	UpdateSessionNotesResponse,
 } from '@sunsteel/contracts'
 
 import {
@@ -301,6 +303,16 @@ export const workoutService = {
 			},
 		)
 	},
+
+	// LIVE-16: the owner's notes about one workout, during it or after it.
+	updateSessionNotes: async (
+		id: string,
+		data: UpdateSessionNotesRequest,
+	): Promise<UpdateSessionNotesResponse> =>
+		httpClient.request<UpdateSessionNotesResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/notes`,
+			{ method: 'PUT', body: JSON.stringify(data), secure: true },
+		),
 
 	// LIVE-17: whether the workout can still be corrected, and its trail.
 	getSessionCorrections: async (
