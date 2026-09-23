@@ -2,6 +2,7 @@ import type { FeaturedProfileItem, WeightUnit } from '@sunsteel/contracts'
 import { Bookmark } from 'lucide-react'
 import Link from 'next/link'
 
+import { RankCrest } from '@/features/achievements/rank-crest'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -42,55 +43,60 @@ export function FeaturedAccomplishments({
 							key={`${item.kind}:${item.referenceId}`}
 							className="rule-row grid gap-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-4"
 						>
-							<div className="min-w-0">
-								<p className="type-body-sm text-ink-3">
-									{item.kind === 'RECORD'
-										? 'Personal record'
-										: item.kind === 'ACHIEVEMENT'
-											? 'Achievement'
-											: item.kind === 'ROUTINE'
-												? 'Routine'
-												: 'Renaissance rank'}
-								</p>
-								<h3 className="type-panel text-foreground">
-									{item.kind === 'RECORD' ? (
-										item.record.exerciseName
-									) : item.kind === 'ACHIEVEMENT' ? (
-										item.achievement.title
-									) : item.kind === 'ROUTINE' ? (
-										routineHref ? (
-											<Link
-												href={routineHref(item.referenceId)}
-												className="underline-offset-4 hover:underline"
-											>
-												{item.routine.name}
-											</Link>
+							<div className="flex min-w-0 gap-3">
+								{item.kind === 'RANK' ? (
+									<RankCrest rankId={item.rank.id} className="mt-0.5" />
+								) : null}
+								<div className="min-w-0">
+									<p className="type-body-sm text-ink-3">
+										{item.kind === 'RECORD'
+											? 'Personal record'
+											: item.kind === 'ACHIEVEMENT'
+												? 'Achievement'
+												: item.kind === 'ROUTINE'
+													? 'Routine'
+													: 'Renaissance rank'}
+									</p>
+									<h3 className="type-panel text-foreground">
+										{item.kind === 'RECORD' ? (
+											item.record.exerciseName
+										) : item.kind === 'ACHIEVEMENT' ? (
+											item.achievement.title
+										) : item.kind === 'ROUTINE' ? (
+											routineHref ? (
+												<Link
+													href={routineHref(item.referenceId)}
+													className="underline-offset-4 hover:underline"
+												>
+													{item.routine.name}
+												</Link>
+											) : (
+												item.routine.name
+											)
 										) : (
-											item.routine.name
-										)
-									) : (
-										item.rank.title
-									)}
-								</h3>
-								<p className="type-body-sm text-ink-2">
-									{item.kind === 'RECORD' ? (
-										<>
-											<span className="type-data">
-												{formatWeight(item.record.weight, weightUnit)}
-											</span>{' '}
-											for {item.record.reps} reps · est. 1RM{' '}
-											<span className="type-data">
-												{formatWeight(item.record.estimated1rm, weightUnit)}
-											</span>
-										</>
-									) : item.kind === 'ACHIEVEMENT' ? (
-										item.achievement.description
-									) : item.kind === 'ROUTINE' ? (
-										describeRoutineSummary(item.routine)
-									) : (
-										item.rank.description
-									)}
-								</p>
+											item.rank.title
+										)}
+									</h3>
+									<p className="type-body-sm text-ink-2">
+										{item.kind === 'RECORD' ? (
+											<>
+												<span className="type-data">
+													{formatWeight(item.record.weight, weightUnit)}
+												</span>{' '}
+												for {item.record.reps} reps · est. 1RM{' '}
+												<span className="type-data">
+													{formatWeight(item.record.estimated1rm, weightUnit)}
+												</span>
+											</>
+										) : item.kind === 'ACHIEVEMENT' ? (
+											item.achievement.description
+										) : item.kind === 'ROUTINE' ? (
+											describeRoutineSummary(item.routine)
+										) : (
+											item.rank.description
+										)}
+									</p>
+								</div>
 							</div>
 							{item.kind === 'RECORD' ? (
 								<span className="type-body-sm whitespace-nowrap text-ink-3">

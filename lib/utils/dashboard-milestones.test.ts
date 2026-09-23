@@ -89,7 +89,16 @@ describe('upcoming milestones (DASH-09)', () => {
 			title: 'Artisan',
 			evidence: '18 sessions · 9 active weeks',
 			detail: '7 more sessions · 5 more active weeks',
+			rankId: 'ARTISAN',
 		})
+	})
+
+	it('carries a crest only on the rank row (ACH-09)', () => {
+		const milestones = buildUpcomingMilestones(response())
+
+		expect(
+			milestones.filter(item => item.rankId).map(item => item.key),
+		).toEqual(['RANK'])
 	})
 
 	it('states exact current and target values, never a percentage', () => {

@@ -1,7 +1,7 @@
 import type { RenaissanceRankProgress } from '@sunsteel/contracts'
-import { Award } from 'lucide-react'
 
 import { Skeleton } from '@/components/ui/skeleton'
+import { RankCrest } from '@/features/achievements/rank-crest'
 import {
 	formatNextRankRequirements,
 	formatRankEvidence,
@@ -41,9 +41,11 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 			<div className="grid border-y border-rule lg:grid-cols-2">
 				<div className="border-b border-rule py-4 lg:border-r lg:border-b-0 lg:pr-6">
 					<p className="type-label text-ink-3">Current rank</p>
-					<div className="mt-2 flex items-center gap-2">
-						<Award className="size-5 text-honour" aria-hidden />
-						<h3 className="type-panel text-honour">{rank.currentRank.title}</h3>
+					<div className="mt-2 flex items-center gap-3">
+						<RankCrest rankId={rank.currentRank.id} className="size-10" />
+						<h3 className="type-panel text-foreground">
+							{rank.currentRank.title}
+						</h3>
 					</div>
 					<p className="type-body-sm mt-2 text-ink-2">
 						{rank.currentRank.description}
@@ -57,9 +59,16 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 					{rank.nextRank && nextRequirements ? (
 						<>
 							<p className="type-label text-ink-3">Next rank</p>
-							<h3 className="type-panel mt-2 text-foreground">
-								{rank.nextRank.title}
-							</h3>
+							<div className="mt-2 flex items-center gap-3">
+								<RankCrest
+									rankId={rank.nextRank.id}
+									reached={false}
+									className="size-10"
+								/>
+								<h3 className="type-panel text-foreground">
+									{rank.nextRank.title}
+								</h3>
+							</div>
 							<p className="type-body-sm mt-2 text-ink-2">
 								{rank.nextRank.description}
 							</p>

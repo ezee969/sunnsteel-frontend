@@ -6,6 +6,7 @@ import type {
 import { Award, Check, Medal, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 
+import { RankCrest } from '@/features/achievements/rank-crest'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
@@ -129,9 +130,7 @@ export function ProfileAchievements({
 				<>
 					{data?.rank ? (
 						<div className="rule-row flex gap-3 py-4">
-							<span className="mt-0.5 flex size-8 shrink-0 items-center justify-center border border-rule bg-surface">
-								<Award className="size-4 text-ink-3" aria-hidden />
-							</span>
+							<RankCrest rankId={data.rank.id} className="mt-0.5 size-8" />
 							<div>
 								<p className="type-body-sm text-ink-3">
 									Current Renaissance rank

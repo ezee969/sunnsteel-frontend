@@ -5,6 +5,7 @@ import { Flag, RefreshCw } from 'lucide-react'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { RankCrest } from '@/features/achievements/rank-crest'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	buildUpcomingMilestones,
@@ -15,9 +16,20 @@ import {
 function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-			<div className="min-w-0">
-				<p className="type-body-sm text-ink-3">{milestone.group}</p>
-				<h3 className="type-panel mt-0.5 text-foreground">{milestone.title}</h3>
+			<div className="flex min-w-0 gap-3">
+				{milestone.rankId ? (
+					<RankCrest
+						rankId={milestone.rankId}
+						reached={false}
+						className="mt-0.5"
+					/>
+				) : null}
+				<div className="min-w-0">
+					<p className="type-body-sm text-ink-3">{milestone.group}</p>
+					<h3 className="type-panel mt-0.5 text-foreground">
+						{milestone.title}
+					</h3>
+				</div>
 			</div>
 			<div className="lg:text-right">
 				<p className="type-data text-ink-2">{milestone.evidence}</p>

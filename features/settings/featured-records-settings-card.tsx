@@ -32,6 +32,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
+import { RankCrest } from '@/features/achievements/rank-crest'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	useFeaturedProfileItems,
@@ -128,6 +129,7 @@ function selectedItemPresentation(
 	}
 	const rank = ranksById.get(item.referenceId)
 	return {
+		rankId: rank?.id,
 		kindLabel: 'Renaissance rank',
 		title: rank?.title ?? 'Rank no longer available',
 		detail: rank?.description ?? 'Remove this stale reference before saving.',
@@ -308,16 +310,24 @@ export function FeaturedRecordsSettingsCard({
 												key={featuredProfileSelectionKey(item)}
 												className="rule-row grid gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
 											>
-												<div className="min-w-0">
-													<p className="type-body-sm text-ink-3">
-														{presentation.kindLabel}
-													</p>
-													<p className="type-panel text-foreground">
-														{presentation.title}
-													</p>
-													<p className="type-body-sm text-ink-3">
-														{presentation.detail}
-													</p>
+												<div className="flex min-w-0 gap-3">
+													{'rankId' in presentation && presentation.rankId ? (
+														<RankCrest
+															rankId={presentation.rankId}
+															className="mt-0.5 size-5"
+														/>
+													) : null}
+													<div className="min-w-0">
+														<p className="type-body-sm text-ink-3">
+															{presentation.kindLabel}
+														</p>
+														<p className="type-panel text-foreground">
+															{presentation.title}
+														</p>
+														<p className="type-body-sm text-ink-3">
+															{presentation.detail}
+														</p>
+													</div>
 												</div>
 												<div className="flex items-center gap-1">
 													<Button
@@ -557,11 +567,16 @@ export function FeaturedRecordsSettingsCard({
 										key={rank.id}
 										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
 									>
-										<div className="min-w-0">
-											<p className="type-panel text-foreground">{rank.title}</p>
-											<p className="type-body-sm text-ink-2">
-												{rank.description}
-											</p>
+										<div className="flex min-w-0 gap-3">
+											<RankCrest rankId={rank.id} className="mt-0.5 size-5" />
+											<div className="min-w-0">
+												<p className="type-panel text-foreground">
+													{rank.title}
+												</p>
+												<p className="type-body-sm text-ink-2">
+													{rank.description}
+												</p>
+											</div>
 										</div>
 										<Button
 											type="button"

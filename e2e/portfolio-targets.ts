@@ -278,10 +278,10 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'achievements',
 		route: '/achievements',
-		features: ['ACH-01', 'ACH-02', 'ACH-04', 'ACH-05'],
+		features: ['ACH-01', 'ACH-02', 'ACH-04', 'ACH-05', 'ACH-09'],
 		ready: ['Current rank', 'Next milestones'],
 		caption:
-			'Verified milestones, Renaissance ranks and the next goal per category.',
+			'Verified milestones, Renaissance ranks with their own crest and pigment, and the next goal per category.',
 	},
 	{
 		slug: 'notifications',

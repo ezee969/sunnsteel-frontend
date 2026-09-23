@@ -54,6 +54,16 @@
   --color-warning-strong: var(--warning-strong);
   --color-scrim: var(--scrim);
 
+  /* §19. Rank identity (ACH-09): one mark-grade pigment per Renaissance rank,
+     cleared to 3:1 and never used as text. A rank colour means that rank and
+     nothing else, and only a rank the member holds is drawn in it. */
+  --color-rank-initiate: var(--rank-initiate);
+  --color-rank-apprentice: var(--rank-apprentice);
+  --color-rank-artisan: var(--rank-artisan);
+  --color-rank-maestro: var(--rank-maestro);
+  --color-rank-virtuoso: var(--rank-virtuoso);
+  --color-rank-laureate: var(--rank-laureate);
+
   /* §7. Explicit rather than derived from `--radius`, which is retired. `lg`
      and `xl` collapse onto 4px rather than being deleted, so the 36 existing
      `rounded-lg`/`rounded-xl` sites re-point instead of breaking; Phase 15
@@ -113,6 +123,13 @@
      invisible in light mode only. Verified 6.22:1. */
   --destructive-foreground: oklch(0.975 0.008 88);
   --scrim: oklch(0.235 0.014 62 / 0.42);
+  /* §19.1 rank pigments, cheapest to dearest. */
+  --rank-initiate: oklch(0.53 0.02 240);
+  --rank-apprentice: oklch(0.53 0.08 203);
+  --rank-artisan: oklch(0.5 0.115 248);
+  --rank-maestro: oklch(0.47 0.155 274);
+  --rank-virtuoso: oklch(0.48 0.15 308);
+  --rank-laureate: oklch(0.47 0.16 342);
 
   --sidebar: oklch(0.935 0.012 88);
   --sidebar-foreground: oklch(0.235 0.014 62);
@@ -168,6 +185,12 @@
   --destructive: oklch(0.66 0.15 28);
   --destructive-foreground: oklch(0.155 0.01 70);
   --scrim: oklch(0.075 0.006 70 / 0.62);
+  --rank-initiate: oklch(0.76 0.02 240);
+  --rank-apprentice: oklch(0.77 0.08 203);
+  --rank-artisan: oklch(0.74 0.105 248);
+  --rank-maestro: oklch(0.7 0.135 274);
+  --rank-virtuoso: oklch(0.72 0.135 308);
+  --rank-laureate: oklch(0.72 0.14 342);
 
   --sidebar: oklch(0.155 0.01 70);
   --sidebar-foreground: oklch(0.94 0.01 88);

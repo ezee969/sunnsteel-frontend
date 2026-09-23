@@ -12,6 +12,7 @@ import {
 	orderMilestoneProgress,
 } from './achievements'
 import type { EmptyStateCopy } from './empty-states'
+import type { RenaissanceRankId } from './rank-identity'
 
 /**
  * DASH-09 places what `ACH-02` and `ACH-04` already compute and adds no
@@ -28,6 +29,8 @@ export interface UpcomingMilestone {
 	evidence: string
 	/** What remains, stated without a deadline. */
 	detail: string
+	/** The next rank's stable ID, so the row can draw its crest (ACH-09). */
+	rankId?: RenaissanceRankId
 }
 
 function buildRankMilestone(
@@ -39,6 +42,7 @@ function buildRankMilestone(
 		key: 'RANK',
 		group: 'Renaissance rank',
 		title: rank.nextRank.title,
+		rankId: rank.nextRank.id,
 		evidence: formatRankEvidence(rank),
 		detail,
 	}

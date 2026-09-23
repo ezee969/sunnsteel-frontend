@@ -1174,3 +1174,106 @@ mode CLAUDE.md describes — every route 500s and the pages photograph as blank)
    now checks that it is not an interaction surface. Note that
    `not.toBeVisible()` would have been a false pass — Playwright's visibility
    check ignores opacity.
+
+---
+
+## 19. Amendment — rank identity (2026-09-23)
+
+An owner-approved addition for `ACH-09`, taken outside an implementation batch
+as §17 requires. The six Renaissance ranks (`INITIATE` … `LAUREATE`) each get a
+crest and a colour so the rank reads at a glance, the way ranked leagues give
+each tier its own crest. Nothing in §4 had a colour free for this: `honour`,
+`success`, `warning-strong` and `destructive` each mean exactly one thing, and
+a rank is none of them. Two crest families were drawn and compared in both
+themes; the owner chose the richer one described in §19.3.
+
+### 19.1 The palette
+
+Six **mark-grade** tokens, named for Renaissance pigments from cheapest to
+dearest, on a cool-to-regal hue path that rises in chroma with the rank. The
+warm half of the wheel is fully occupied by crimson (28), warning (52), gold
+(90) and green (152), so the palette lives in the cool half by necessity, not
+taste.
+
+| Token | Pigment | Light oklch | Dark oklch |
+| --- | --- | --- | --- |
+| `--rank-initiate` | Silverpoint | `oklch(0.53 0.02 240)` | `oklch(0.76 0.02 240)` |
+| `--rank-apprentice` | Verdigris | `oklch(0.53 0.08 203)` | `oklch(0.77 0.08 203)` |
+| `--rank-artisan` | Azurite | `oklch(0.5 0.115 248)` | `oklch(0.74 0.105 248)` |
+| `--rank-maestro` | Ultramarine | `oklch(0.47 0.155 274)` | `oklch(0.7 0.135 274)` |
+| `--rank-virtuoso` | Folium | `oklch(0.48 0.15 308)` | `oklch(0.72 0.135 308)` |
+| `--rank-laureate` | Tyrian purple | `oklch(0.47 0.16 342)` | `oklch(0.72 0.14 342)` |
+
+They follow §11.1: declared in `:root` and `.dark`, aliased in `@theme inline`
+as `--color-rank-*`, consumed as `text-rank-*` on the crest only.
+
+### 19.2 Rules
+
+1. **Rank colour is a mark, never text.** It colours the crest; the rank name
+   beside it stays `--foreground`. The values clear 3:1, not 4.5:1, on
+   purpose.
+2. **A rank colour means that rank and nothing else.** Never completion, a
+   record, risk, decoration or a fill behind content. Ranks never borrow
+   `honour`, `success`, `warning-strong` or `destructive`, and no other role
+   borrows a rank token. This retires the `text-honour` the `/achievements`
+   rank title carried: a rank is earned by attendance, not by doing better than
+   planned.
+3. **The crest is never shown without the rank name** in the same row, so
+   neither colour nor silhouette carries the rank alone (§4.3 rule 8). The crest
+   is `aria-hidden`.
+4. **Only a rank the member holds is coloured.** A rank not yet reached — the
+   next rank on `/achievements`, the dashboard's upcoming milestone — draws its
+   crest in `--ink-3`.
+5. **Ranks do not count toward the honour cap**, because they are not honour;
+   there is at most one rank crest per row.
+6. **Keyed by the contract's stable rank ID**, never by title or index.
+   [lib/utils/rank-identity.ts](../lib/utils/rank-identity.ts) owns the map.
+
+### 19.3 The crest family
+
+Inline SVG on `currentColor` in a 24-unit box, in
+[features/achievements/rank-crest.tsx](../features/achievements/rank-crest.tsx) —
+not a `ClassicalIcon`, for the reasons §18.2 gives for the brand mark. One
+*testa di cavallo* shield, the horse-head shield of Italian Renaissance
+heraldry, sits at a fixed place; each rank adds to it, so the ladder reads from
+the silhouette alone:
+
+| Rank | Crest |
+| --- | --- |
+| Initiate | Shield outline and a single point — the first mark on the page |
+| Apprentice | A tinted field and a chevron |
+| Artisan | A solid field with a bordure, a palla and the chevron cut into it |
+| Maestro | Laurel sprigs tied at the base |
+| Virtuoso | A star above |
+| Laureate | A jewelled crown and the full wreath |
+
+**Two tones only:** the rank colour, and that colour at 22% for the Apprentice
+field — a flat tint, never a gradient. The Artisan-and-above cut-outs are an
+SVG mask, whose white and black are luminance values rather than colours; they
+are the only literals in the component. Minimum size 16px, where the inner
+detail becomes texture and the outline and ornaments carry the rank. No glow,
+shadow or animation.
+
+Sizes in use: 40px on `/achievements`, 32px in the profile Achievements
+section, 24px in the featured row and the dashboard milestone, 20px in the
+Settings picker.
+
+### 19.4 Verification
+
+Computed with the §4.4 method, worst case across `--background`, `--surface`
+and `--surface-sunk`; marks target 3:1.
+
+| Token | Light | Dark | Nearest locked role (ΔEok, light / dark) |
+| --- | --- | --- | --- |
+| `rank-initiate` | 3.82 | 8.38 | `ink-3` 0.059 / `success` 0.098 |
+| `rank-apprentice` | 3.70 | 8.92 | `success-strong` 0.091 / `success` 0.077 |
+| `rank-artisan` | 4.33 | 7.83 | `ink-3` 0.129 / 0.152 |
+| `rank-maestro` | 5.18 | 6.56 | `ink-3` 0.166 / 0.157 |
+| `rank-virtuoso` | 5.11 | 6.86 | `ink-3` 0.157 / 0.163 |
+| `rank-laureate` | 5.43 | 6.76 | `destructive` 0.132 / 0.129 |
+
+Two accepted trade-offs. Adjacent ranks sit 0.065–0.092 ΔEok apart, and under
+simulated colour-vision deficiency the blue-violet steps converge (as low as
+0.019); the silhouette and the printed name carry the order, which is why rule 3
+exists. Initiate is a near-neutral cool grey — the unpigmented starting rank —
+and sits 0.059 from `ink-3` in light mode, deliberately.
