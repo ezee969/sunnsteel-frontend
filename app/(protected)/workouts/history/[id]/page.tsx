@@ -21,6 +21,7 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import { noteFor } from '@/lib/utils/session-notes'
+import { sessionRoutineTitle } from '@/lib/utils/session-prescription'
 
 export default function WorkoutDetailPage() {
 	const params = useParams()
@@ -72,7 +73,7 @@ export default function WorkoutDetailPage() {
 		<div className="ledger-page space-y-8 py-6 md:py-8">
 			{/* Header */}
 			<HistorySessionHeader
-				title={session?.routine?.name}
+				title={session ? sessionRoutineTitle(session) : undefined}
 				metrics={metrics}
 				onBack={() => router.back()}
 				showSummary={!recap}

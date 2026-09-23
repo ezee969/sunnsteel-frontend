@@ -233,7 +233,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'routine-detail',
 		route: '/routines/:routine',
-		features: ['ROUT-01', 'ROUT-02', 'ROUT-08', 'ROUT-09'],
+		features: ['ROUT-01', 'ROUT-02', 'ROUT-08', 'ROUT-09', 'ROUT-15'],
 		setup: async page => {
 			await page
 				.getByRole('region', { name: 'Training blocks' })
@@ -241,7 +241,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		},
 		ready: ['Routine Days', /\d+ exercises/, 'Autumn accumulation'],
 		caption:
-			"A routine's authored training-block timeline, alongside its saved versions.",
+			'A routine following its training block in force, with the authored block timeline and saved versions.',
 	},
 	{
 		slug: 'history',
@@ -270,10 +270,17 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'schedule-week',
 		route: '/schedule',
-		features: ['SCHED-01', 'SCHED-03', 'SCHED-04', 'SCHED-05', 'NAV-05'],
+		features: [
+			'SCHED-01',
+			'SCHED-03',
+			'SCHED-04',
+			'SCHED-05',
+			'NAV-05',
+			'ROUT-15',
+		],
 		ready: ['This week', /Planned|Not logged|Completed/],
 		caption:
-			'The weekly schedule plus restrained navigation indicators for unread updates and today’s plan.',
+			'The weekly schedule, each day following the training block in force, plus restrained navigation indicators.',
 	},
 	{
 		slug: 'achievements',

@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,6 +23,9 @@ import {
 import { useUser } from '@/lib/api/hooks/useUser'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
+import { routineOn } from '@/lib/utils/routine-schedule'
+import { describeBlockInForce } from '@/lib/utils/routine-training-blocks'
+import { localDateKey } from '@/lib/utils/schedule-week'
 
 export default function RoutineDetailsPage() {
 	const params = useParams()
@@ -42,7 +46,13 @@ export default function RoutineDetailsPage() {
 		useToggleRoutineCompleted()
 
 	// Custom hooks
-	const sessionManager = useWorkoutSessionManager(routineId, routine)
+	// ROUT-15: the page starts the plan in force today -- a training block's
+	// working-copy days while one covers today, the routine's own otherwise.
+	const todayPlan = useMemo(
+		() => (routine ? routineOn(routine, localDateKey(new Date())) : undefined),
+		[routine],
+	)
+	const sessionManager = useWorkoutSessionManager(routineId, todayPlan)
 	const routineData = useRoutineData(routine)
 
 	// Handlers
@@ -123,16 +133,23 @@ export default function RoutineDetailsPage() {
 
 			{/* Routine Days - the page's one start surface. The Quick Start tiles
 			    above it started the same days a second time (TD-41). */}
-			{routine.days && routine.days.length > 0 && (
+			{todayPlan && todayPlan.days.length > 0 && (
 				<div className="space-y-4">
-					<h2 className="type-section text-foreground">Routine Days</h2>
+					<div className="space-y-1">
+						<h2 className="type-section text-foreground">Routine Days</h2>
+						{todayPlan.trainingBlock ? (
+							<p className="type-body-sm text-ink-2">
+								{describeBlockInForce(todayPlan.trainingBlock)}
+							</p>
+						) : null}
+					</div>
 					<RoutineDayAccordion
 						weightUnit={weightUnit}
-						days={routine.days}
+						days={todayPlan.days}
 						routine={{
 							id: routine.id,
-							scheduleMode: routine.scheduleMode,
-							nextRotationDayId: routine.nextRotationDayId,
+							scheduleMode: todayPlan.scheduleMode,
+							nextRotationDayId: todayPlan.nextRotationDayId,
 						}}
 						activeSession={activeSession}
 						isStarting={sessionManager.isStarting}

@@ -190,6 +190,11 @@ export default function TodaysWorkouts() {
 													)}
 												</Badge>
 											</div>
+											{routine.trainingBlock ? (
+												<p className="type-body-sm mt-1 text-ink-3">
+													Training block · {routine.trainingBlock.name}
+												</p>
+											) : null}
 											{isActiveForThis ? (
 												<p className="type-body-sm mt-1 text-ink-3">
 													In progress

@@ -147,8 +147,10 @@ function TrainingBlockDialog({
 						{block ? `Revise ${block.name}` : 'Add training block'}
 					</DialogTitle>
 					<DialogDescription>
-						Choose the dates and copy a setup into this plan. The routine,
-						schedule and sessions do not switch automatically.
+						Choose the dates and copy a setup into this plan. While the block is
+						in force, the schedule, the dashboard and new workouts follow it,
+						and its loads progress on their own; the routine itself does not
+						change.
 					</DialogDescription>
 				</DialogHeader>
 				<form
@@ -317,7 +319,10 @@ function ReviewTrainingBlockDialog({
 	)
 }
 
-/** ROUT-09: the authored timeline. ROUT-15 will decide when it executes. */
+/**
+ * ROUT-09: the authored timeline. ROUT-15 executes it: while a block covers a
+ * date, that date trains the block's own working copy of its setup.
+ */
 export function RoutineTrainingBlocks({
 	routine,
 	weightUnit,
@@ -476,8 +481,10 @@ export function RoutineTrainingBlocks({
 			)}
 
 			<p className="type-body-sm text-ink-3">
-				Execution remains on the routine’s current setup until phase-aware
-				training ships.
+				While a block is in force, the schedule, the dashboard and new workouts
+				use its setup, and progression raises its loads, not the routine’s.
+				Revising it starts again from the loads you set, and the routine resumes
+				as it was the day after the block ends.
 			</p>
 
 			{editor ? (

@@ -30,8 +30,10 @@ import {
 	describeRoutineSchedule,
 	nextRotationDay,
 	routineDayTitle,
+	routineOn,
 	startableDayToday,
 } from '@/lib/utils/routine-schedule'
+import { localDateKey } from '@/lib/utils/schedule-week'
 
 import { RoutineMetaBadges } from './RoutineMetaBadges'
 import { RoutineScheduleNote } from './RoutineScheduleNote'
@@ -72,14 +74,17 @@ export function RoutineCard({
 	const router = useRouter()
 	const { preloadOnHover } = useComponentPreloading()
 
+	// ROUT-15: the card offers the plan in force today, a training block's
+	// days while one covers today.
+	const plan = routineOn(routine, localDateKey(new Date()))
 	// Date validation for workout scheduling
 	const todayDow = getTodayDow()
-	const workoutValidation = validateWorkoutDate(routine.days)
+	const workoutValidation = validateWorkoutDate(plan.days)
 	const canStartToday = workoutValidation.isValid
 	// ROUT-11: a rotation starts its next day on any weekday.
-	const todayRoutineDay = startableDayToday(routine, todayDow)
-	const rotationNext = nextRotationDay(routine)
-	const nextDay = nextScheduledDay(routine.days, todayDow)
+	const todayRoutineDay = startableDayToday(plan, todayDow)
+	const rotationNext = nextRotationDay(plan)
+	const nextDay = nextScheduledDay(plan.days, todayDow)
 
 	// Determine if the start button should be disabled based on validation and routine state
 	const isStartDisabled =
@@ -107,11 +112,16 @@ export function RoutineCard({
 					)}
 					{/* Day-of-week schedule: read-only data, so mono on the row
 					    ground rather than a strip of outlined boxes (§11.12). */}
-					{routine.days && routine.days.length > 0 && (
+					{plan.days.length > 0 && (
 						<p className="type-data mt-1 text-ink-3">
-							{describeRoutineSchedule(routine)}
+							{describeRoutineSchedule(plan)}
 						</p>
 					)}
+					{plan.trainingBlock ? (
+						<p className="type-body-sm text-ink-3">
+							Training block · {plan.trainingBlock.name}
+						</p>
+					) : null}
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -125,10 +135,10 @@ export function RoutineCard({
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						{routine.days.length > 0 && (
+						{plan.days.length > 0 && (
 							<>
 								<DropdownMenuLabel>Start session with day</DropdownMenuLabel>
-								{routine.days.map(d => {
+								{plan.days.map(d => {
 									const dayValidation = validateRoutineDayDate(d)
 									const canStartThisDay = dayValidation.isValid
 
@@ -174,8 +184,8 @@ export function RoutineCard({
 			    value at the far right, which is QA 7's exact failure. */}
 			<div className="mt-2 max-w-[var(--cluster-max)] space-y-2">
 				<RoutineMetaBadges
-					daysPerWeek={routine.days.length}
-					frequency={describeRoutineFrequency(routine, formatDaysPerWeek)}
+					daysPerWeek={plan.days.length}
+					frequency={describeRoutineFrequency(plan, formatDaysPerWeek)}
 					isPeriodized={routine.isPeriodized}
 				/>
 

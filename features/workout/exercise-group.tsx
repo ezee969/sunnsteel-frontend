@@ -97,7 +97,7 @@ export const ExerciseGroup = ({
 				<Button
 					variant="ghost"
 					onClick={onToggleCollapse}
-					className="h-auto flex-1 justify-between rounded-none p-0 hover:bg-transparent"
+					className="h-auto min-w-0 flex-1 justify-between rounded-none p-0 hover:bg-transparent"
 				>
 					<div className="flex min-w-0 flex-1 items-center gap-3">
 						{isCollapsed ? (

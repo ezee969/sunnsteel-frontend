@@ -1,7 +1,11 @@
 import {
+	type CalendarDate,
+	resolveRoutinePlan,
 	type RoutineDay,
 	routineDayLabel,
+	type RoutinePlanSource,
 	type RoutineScheduleMode,
+	type SessionTrainingBlock,
 } from '@sunsteel/contracts'
 
 import { weekdayName } from './date'
@@ -18,6 +22,35 @@ interface ScheduledRoutine<Day extends ScheduledDay = ScheduledDay> {
 	scheduleMode: RoutineScheduleMode
 	nextRotationDayId: string | null
 	days: readonly Day[]
+}
+
+/**
+ * ROUT-15: the routine as it trains on `date` -- its active training block's
+ * schedule and working-copy days while one covers the date, its baseline
+ * otherwise -- through the contracts' one resolver. Everything that decides
+ * what a date trains (schedule, dashboard, the routine page, a start) reads a
+ * routine through this rather than reading `days` directly.
+ */
+export type RoutineOnDate<R> = R & {
+	/** The block in force that date, or null for the baseline. */
+	trainingBlock:
+		(SessionTrainingBlock & { startDate: string; endDate: string }) | null
+}
+
+export function routineOn<
+	Day,
+	R extends RoutinePlanSource<Day> & { days: Day[] },
+>(routine: R, date: CalendarDate): RoutineOnDate<R> {
+	const plan = resolveRoutinePlan(routine, date)
+	return {
+		...routine,
+		scheduleMode: plan.scheduleMode,
+		restDays: plan.restDays,
+		rotationWeekdays: plan.rotationWeekdays,
+		nextRotationDayId: plan.nextRotationDayId,
+		days: plan.days,
+		trainingBlock: plan.block,
+	}
 }
 
 export const isRotationRoutine = (routine: {

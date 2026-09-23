@@ -50,7 +50,7 @@ describe('LIVE-06 which days can be trained now', () => {
 					id: 'r1',
 					name: 'Upper/Lower',
 					days: [day({ id: 'd1', dayOfWeek: 4, name: 'Upper' })],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			MONDAY,
 		)
@@ -72,7 +72,7 @@ describe('LIVE-06 which days can be trained now', () => {
 						day({ id: 'other', dayOfWeek: 4, order: 0 }),
 						day({ id: 'today', dayOfWeek: MONDAY, order: 1 }),
 					],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			MONDAY,
 		)
@@ -92,7 +92,7 @@ describe('LIVE-06 which days can be trained now', () => {
 						day({ id: 'empty', exercises: 0 }),
 						day({ id: 'real', exercises: 3 }),
 					],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			MONDAY,
 		)
@@ -109,7 +109,7 @@ describe('LIVE-06 which days can be trained now', () => {
 					id: 'done',
 					isCompleted: true,
 					days: [day({ id: 'd1' })],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			MONDAY,
 		)
@@ -126,7 +126,7 @@ describe('LIVE-06 which days can be trained now', () => {
 						day({ id: 'first', order: 0 }),
 						day({ id: 'second', order: 1 }),
 					],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			MONDAY,
 		)
@@ -142,7 +142,7 @@ describe('LIVE-06 which days can be trained now', () => {
 					id: 'r1',
 					scheduleMode: 'ROTATION',
 					days: [day({ id: 'd1', dayOfWeek: null, order: 0 })],
-				} as Partial<Routine> & { id: string }),
+				} as unknown as Partial<Routine> & { id: string }),
 			],
 			SUNDAY,
 		)
@@ -155,9 +155,43 @@ describe('LIVE-06 which days can be trained now', () => {
 		expect(trainableDays([], MONDAY)).toEqual([])
 		expect(
 			trainableDays(
-				[routine({ id: 'r1', days: [] } as Partial<Routine> & { id: string })],
+				[
+					routine({ id: 'r1', days: [] } as unknown as Partial<Routine> & {
+						id: string
+					}),
+				],
 				MONDAY,
 			),
 		).toEqual([])
+	})
+
+	it('offers the days of the training block in force, and names it (ROUT-15)', () => {
+		const split = routine({
+			id: 'split',
+			days: [day({ id: 'base-mon', dayOfWeek: MONDAY, name: 'Upper' })],
+			trainingBlocks: [
+				{
+					id: 'rev-1',
+					seriesId: 's-1',
+					revision: 1,
+					name: 'Strength',
+					startDate: '2026-09-01',
+					endDate: '2026-09-30',
+					scheduleMode: 'WEEKLY',
+					restDays: [],
+					rotationWeekdays: [],
+					nextRotationDayId: null,
+					days: [day({ id: 'block-mon', dayOfWeek: MONDAY, name: 'Heavy' })],
+				},
+			],
+		} as unknown as Partial<Routine> & { id: string })
+
+		const inBlock = trainableDays([split], MONDAY, '2026-09-14')
+		expect(inBlock.map(d => d.dayId)).toEqual(['block-mon'])
+		expect(inBlock[0].trainingBlockName).toBe('Strength')
+
+		const after = trainableDays([split], MONDAY, '2026-10-05')
+		expect(after.map(d => d.dayId)).toEqual(['base-mon'])
+		expect(after[0].trainingBlockName).toBeUndefined()
 	})
 })

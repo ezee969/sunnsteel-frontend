@@ -10,6 +10,8 @@ import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { routineService } from '@/lib/api/services/routineService'
 import type { Routine } from '@/lib/api/types/routine.type'
 import { logger } from '@/lib/utils/logger'
+import { routineOn } from '@/lib/utils/routine-schedule'
+import { localDateKey } from '@/lib/utils/schedule-week'
 
 /**
  * Manages UI state and action handlers for routine list operations.
@@ -87,10 +89,13 @@ export function useRoutineListActions() {
 	) => {
 		try {
 			setStartActingId(routine.id)
-			let dayId = routineDayId ?? routine.days?.[0]?.id
+			// ROUT-15: fall back to a day of the plan in force today, which is
+			// the only plan the server accepts a start for.
+			const today = localDateKey(new Date())
+			let dayId = routineDayId ?? routineOn(routine, today).days[0]?.id
 			if (!dayId) {
 				const full = await routineService.getById(routine.id)
-				dayId = full.days?.[0]?.id
+				dayId = routineOn(full, today).days[0]?.id
 			}
 			if (!dayId) return
 			const session = (await startSession({

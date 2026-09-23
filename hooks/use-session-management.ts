@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
 import { useFinishSession } from '@/lib/api/hooks'
-import type { Routine } from '@/lib/api/types/routine.type'
+import type { RoutineDay } from '@/lib/api/types/routine.type'
 import type { SetLog, WorkoutSessionRecap } from '@/lib/api/types/workout.type'
 import { SESSION_STATUS } from '@/lib/constants/session.constants'
 import { logger } from '@/lib/utils/logger'
@@ -19,8 +19,8 @@ import type {
 
 interface UseSessionManagementProps {
 	sessionId: string
-	routine?: Routine
-	routineDayId?: string
+	/** The prescription the session trains: its snapshot day (ROUT-15). */
+	day?: RoutineDay | null
 	setLogs?: SetLog[]
 }
 
@@ -48,8 +48,7 @@ interface UseSessionManagementReturn {
  */
 export const useSessionManagement = ({
 	sessionId,
-	routine,
-	routineDayId,
+	day,
 	setLogs,
 }: UseSessionManagementProps): UseSessionManagementReturn => {
 	const router = useRouter()
@@ -63,12 +62,7 @@ export const useSessionManagement = ({
 
 	// Calculate progress data
 	const progressData = (() => {
-		if (!routine || !routineDayId || !setLogs) {
-			return { totalSets: 0, completedSets: 0, percentage: 0 }
-		}
-
-		const day = routine.days.find(d => d.id === routineDayId)
-		if (!day) {
+		if (!day || !setLogs) {
 			return { totalSets: 0, completedSets: 0, percentage: 0 }
 		}
 
@@ -133,17 +127,13 @@ export const useSessionManagement = ({
 				return
 			}
 
-			if (!routine || !routineDayId || !setLogs) {
+			if (!day || !setLogs) {
 				setFinishStatus(status)
 				setIsConfirmingFinish(true)
 				return
 			}
 
-			const day = routine.days.find(d => d.id === routineDayId)
-
-			const allSetsCompleted = day
-				? areAllSetsCompleted(setLogs, day.exercises)
-				: false
+			const allSetsCompleted = areAllSetsCompleted(setLogs, day.exercises)
 
 			if (allSetsCompleted) {
 				executeFinish(status)
@@ -152,7 +142,7 @@ export const useSessionManagement = ({
 				setIsConfirmingFinish(true)
 			}
 		},
-		[routine, routineDayId, setLogs, executeFinish],
+		[day, setLogs, executeFinish],
 	)
 
 	/**

@@ -218,6 +218,11 @@ function EntryRow({
 					{entry.dayName ? ` · ${entry.dayName}` : ''}
 				</Link>
 				<span className={cn('type-body-sm ml-2', tone)}>{label}</span>
+				{entry.trainingBlockName ? (
+					<span className="type-body-sm ml-2 text-ink-3">
+						· {entry.trainingBlockName}
+					</span>
+				) : null}
 				{movedFrom ? (
 					<span className="type-body-sm ml-2 text-ink-3">
 						· moved from {describeShortDate(movedFrom)}
@@ -304,11 +309,12 @@ export function ScheduleWeekView({
 
 			<p className="type-body-sm max-w-2xl text-ink-3">
 				Planned days follow your weekly routines as they are now, from the day
-				each routine was created. Rotation days have no date: the next one is
-				shown below, and their sessions appear on the day you trained. Rest days
-				come from each weekly routine&apos;s planned rest. Reschedule postpones,
-				moves or skips one planned workout without changing the routine, and a
-				day that passed can still be marked skipped.
+				each routine was created, or the training block in force on that date,
+				which is named beside its days. Rotation days have no date: the next one
+				is shown below, and their sessions appear on the day you trained. Rest
+				days come from each weekly routine&apos;s planned rest. Reschedule
+				postpones, moves or skips one planned workout without changing the
+				routine, and a day that passed can still be marked skipped.
 			</p>
 
 			{isPending ? (
@@ -353,8 +359,11 @@ export function ScheduleWeekView({
 											{rotation.routineName}
 										</Link>{' '}
 										· next in rotation:{' '}
-										<span className="text-ink-2">{rotation.nextDayName}</span>,
-										any day
+										<span className="text-ink-2">{rotation.nextDayName}</span>
+										{rotation.trainingBlockName
+											? ` (${rotation.trainingBlockName})`
+											: ''}
+										, any day
 									</span>
 									<EntryAction
 										action={rotationStartAction(

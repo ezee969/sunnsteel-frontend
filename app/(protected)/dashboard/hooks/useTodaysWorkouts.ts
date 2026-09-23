@@ -12,13 +12,20 @@ import { Routine, RoutineDay } from '@/lib/api/types/routine.type'
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
 import {
 	isRotationRoutine,
+	routineOn,
+	type RoutineOnDate,
 	startableDayToday,
 } from '@/lib/utils/routine-schedule'
 import { localDateKey } from '@/lib/utils/schedule-week'
 import { trainableDays } from '@/lib/utils/train-another-day'
 
 export interface TodaysWorkoutEntry {
-	routine: Routine
+	/**
+	 * ROUT-15: the routine as it trains on the entry's date -- its training
+	 * block's schedule and days while one is in force -- so `day` is a day of
+	 * the plan the server will accept and `routine.trainingBlock` names it.
+	 */
+	routine: RoutineOnDate<Routine>
 	day: RoutineDay
 	canStartToday: boolean
 }
@@ -63,7 +70,8 @@ export function useTodaysWorkouts() {
 			move => move.kind === 'MOVE' && move.toDate,
 		)
 		const planned = (routinesQuery.data ?? [])
-			.map((routine: Routine) => {
+			.map(baseline => routineOn(baseline, todayKey))
+			.map(routine => {
 				// ROUT-11: a rotation offers its next day on any weekday.
 				const day = startableDayToday(routine, todayDow)
 				if (!day) return null
@@ -96,10 +104,11 @@ export function useTodaysWorkouts() {
 		// A workout moved onto today is today's work, whatever its weekday.
 		const movedIn = moves.flatMap(move => {
 			if (move.toDate !== todayKey) return []
-			const routine = routinesQuery.data?.find(r => r.id === move.routineId)
-			if (!routine || routine.isCompleted || isRotationRoutine(routine)) {
-				return []
-			}
+			const baseline = routinesQuery.data?.find(r => r.id === move.routineId)
+			if (!baseline || baseline.isCompleted) return []
+			// ROUT-15: the moved day is the one the plan on its own date had.
+			const routine = routineOn(baseline, move.date)
+			if (isRotationRoutine(routine)) return []
 			const [year, month, date] = move.date.split('-').map(Number)
 			const weekday = new Date(year, month - 1, date).getDay()
 			const day = routine.days.find(d => d.dayOfWeek === weekday)
@@ -135,7 +144,8 @@ export function useTodaysWorkouts() {
 		completedToday,
 		// LIVE-06: whether anything could be trained at all, which decides
 		// between offering a day and sending the owner to the routine list.
-		hasTrainableDay: trainableDays(routinesQuery.data, todayDow).length > 0,
+		hasTrainableDay:
+			trainableDays(routinesQuery.data, todayDow, todayKey).length > 0,
 		error: routinesQuery.error,
 		isPending:
 			routinesQuery.isPending ||

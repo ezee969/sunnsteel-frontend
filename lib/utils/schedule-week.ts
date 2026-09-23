@@ -13,6 +13,8 @@ import {
 	isRotationRoutine,
 	nextRotationDay,
 	orderedRoutineDays,
+	routineOn,
+	type RoutineOnDate,
 } from './routine-schedule'
 
 /**
@@ -29,70 +31,80 @@ import {
  * routine, the following days in order after it — and a past training
  * weekday without a session reads "not logged", with no day name.
  * Planned days follow the routines as they are now.
+ * ROUT-15 (2026-09-23): each date follows the plan in force on it -- a
+ * training block's schedule and days while one covers the date, the baseline
+ * otherwise -- so a week that crosses a block boundary is planned in
+ * segments. A rotation block starts on its own first day and the baseline
+ * rotation resumes where it left off.
  */
+
+/** ROUT-15: the block a planned entry comes from, when it is one. */
+type BlockName = { trainingBlockName?: string }
 
 export type ScheduleSessionStatus = 'COMPLETED' | 'ABORTED' | 'IN_PROGRESS'
 
-export type ScheduleEntry =
-	| {
-			kind: 'SESSION'
-			status: ScheduleSessionStatus
-			sessionId: string
-			routineId: string
-			routineName: string
-			dayName: string | null
-			startedAt: string
-	  }
-	| {
-			kind: 'PLANNED'
-			routineId: string
-			routineDayId: string
-			routineName: string
-			dayName: string
-			/** SCHED-04: a weekly occurrence's planned date, so it can be moved. */
-			occurrenceDate?: string
-			/** Set when the occurrence was moved here from `movedFrom`. */
-			overrideId?: string
-			movedFrom?: string
-	  }
-	| {
-			kind: 'NOT_LOGGED'
-			routineId: string
-			/** Null on a rotation's past training weekday: its day is unknown. */
-			routineDayId: string | null
-			routineName: string
-			dayName: string | null
-			/** A weekly occurrence's planned date, so it can be marked skipped. */
-			occurrenceDate?: string
-			overrideId?: string
-			movedFrom?: string
-	  }
-	| {
-			/** SCHED-07: a weekday the routine rests on by plan. */
-			kind: 'REST'
-			routineId: string
-			routineName: string
-			dayName: null
-	  }
-	| {
-			/** SCHED-04: the planned date of an occurrence moved to `toDate`. */
-			kind: 'MOVED'
-			routineId: string
-			routineDayId: string
-			routineName: string
-			dayName: string
-			overrideId: string
-			toDate: string
-	  }
-	| {
-			/** SCHED-05: an occurrence skipped on purpose, never "not logged". */
-			kind: 'SKIPPED'
-			routineId: string
-			routineDayId: string
-			routineName: string
-			dayName: string
-			overrideId: string
-	  }
+export type ScheduleEntry = BlockName &
+	(
+		| {
+				kind: 'SESSION'
+				status: ScheduleSessionStatus
+				sessionId: string
+				routineId: string
+				routineName: string
+				dayName: string | null
+				startedAt: string
+		  }
+		| {
+				kind: 'PLANNED'
+				routineId: string
+				routineDayId: string
+				routineName: string
+				dayName: string
+				/** SCHED-04: a weekly occurrence's planned date, so it can be moved. */
+				occurrenceDate?: string
+				/** Set when the occurrence was moved here from `movedFrom`. */
+				overrideId?: string
+				movedFrom?: string
+		  }
+		| {
+				kind: 'NOT_LOGGED'
+				routineId: string
+				/** Null on a rotation's past training weekday: its day is unknown. */
+				routineDayId: string | null
+				routineName: string
+				dayName: string | null
+				/** A weekly occurrence's planned date, so it can be marked skipped. */
+				occurrenceDate?: string
+				overrideId?: string
+				movedFrom?: string
+		  }
+		| {
+				/** SCHED-07: a weekday the routine rests on by plan. */
+				kind: 'REST'
+				routineId: string
+				routineName: string
+				dayName: null
+		  }
+		| {
+				/** SCHED-04: the planned date of an occurrence moved to `toDate`. */
+				kind: 'MOVED'
+				routineId: string
+				routineDayId: string
+				routineName: string
+				dayName: string
+				overrideId: string
+				toDate: string
+		  }
+		| {
+				/** SCHED-05: an occurrence skipped on purpose, never "not logged". */
+				kind: 'SKIPPED'
+				routineId: string
+				routineDayId: string
+				routineName: string
+				dayName: string
+				overrideId: string
+		  }
+	)
 
 export interface ScheduleDay {
 	/** Local calendar date, YYYY-MM-DD. */
@@ -103,7 +115,7 @@ export interface ScheduleDay {
 	entries: ScheduleEntry[]
 }
 
-export interface ScheduleRotationNote {
+export interface ScheduleRotationNote extends BlockName {
 	routineId: string
 	routineName: string
 	nextDayId: string
@@ -173,12 +185,37 @@ type ScheduleRoutine = Pick<
 	| 'restDays'
 	| 'rotationWeekdays'
 	| 'days'
+	| 'trainingBlocks'
 >
+
+type PlannedRoutine = RoutineOnDate<ScheduleRoutine>
+
+/**
+ * ROUT-15: when the plan in force on `date` began: its block's start, else
+ * the day after the latest block that ended before it, else never (empty).
+ */
+function planStart(
+	baseline: ScheduleRoutine,
+	routine: PlannedRoutine,
+	date: string,
+): string {
+	if (routine.trainingBlock) return routine.trainingBlock.startDate
+	const ended = (baseline.trainingBlocks ?? [])
+		.map(block => block.endDate)
+		.filter(endDate => endDate < date)
+		.sort()
+		.at(-1)
+	return ended ? localDateKey(addDays(fromKey(ended), 1)) : ''
+}
+
+const blockNameOf = (routine: PlannedRoutine): BlockName =>
+	routine.trainingBlock ? { trainingBlockName: routine.trainingBlock.name } : {}
 
 type ActiveSession = Pick<
 	WorkoutSession,
 	'id' | 'status' | 'startedAt' | 'routineId' | 'routine' | 'routineDay'
 > &
+	Partial<Pick<WorkoutSession, 'trainingBlock'>> &
 	Partial<Pick<WorkoutSession, 'routineDayId'>>
 
 /** Training weekday dates in [from, to), counted on local calendar days. */
@@ -206,12 +243,21 @@ function planRotation(
 		trained,
 		trainedToday,
 		activeDayId,
+		from,
+		trainingBlockName,
 	}: {
 		days: readonly ScheduleDay[]
 		now: Date
 		trained: ReadonlySet<string>
 		trainedToday: boolean
 		activeDayId: string | null
+		/**
+		 * ROUT-15: the date this plan came into force -- a block's start, or the
+		 * day after the block before it ended -- or empty for a baseline that
+		 * has always been in force. Rotation slots count from there.
+		 */
+		from: string
+		trainingBlockName?: string
 	},
 ): Array<{ date: string; entry: ScheduleEntry }> {
 	const weekdays = new Set(routine.rotationWeekdays)
@@ -224,6 +270,9 @@ function planRotation(
 	if (activeDayId === next.id) start += 1
 	let first = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 	if (trainedToday) first = addDays(first, 1)
+	// ROUT-15: a plan that begins later in the week counts its days from its
+	// own start, so a block's first training day is its first day.
+	if (from && localDateKey(first) < from) first = fromKey(from)
 	while (!weekdays.has(first.getDay())) first = addDays(first, 1)
 	const firstKey = localDateKey(first)
 
@@ -241,6 +290,7 @@ function planRotation(
 					routineDayId: null,
 					routineName: routine.name,
 					dayName: null,
+					...(trainingBlockName ? { trainingBlockName } : {}),
 				},
 			})
 			continue
@@ -256,6 +306,7 @@ function planRotation(
 				routineDayId: routineDay.id,
 				routineName: routine.name,
 				dayName: routineDayLabel(routineDay),
+				...(trainingBlockName ? { trainingBlockName } : {}),
 			},
 		})
 	}
@@ -304,6 +355,9 @@ export function buildScheduleWeek({
 			routineName: session.routine.name,
 			dayName: session.routine.dayName || null,
 			startedAt: session.startedAt,
+			...(session.routine.trainingBlockName
+				? { trainingBlockName: session.routine.trainingBlockName }
+				: {}),
 		})
 	}
 	if (
@@ -320,6 +374,9 @@ export function buildScheduleWeek({
 				? routineDayLabel(active.routineDay) || null
 				: null,
 			startedAt: active.startedAt,
+			...(active.trainingBlock
+				? { trainingBlockName: active.trainingBlock.name }
+				: {}),
 		})
 	}
 	sessionEntries.sort((a, b) => a.startedAt.localeCompare(b.startedAt))
@@ -340,37 +397,45 @@ export function buildScheduleWeek({
 
 	const planned: Array<{ date: string; entry: ScheduleEntry }> = []
 	const rotations: ScheduleRotationNote[] = []
-	for (const routine of routines) {
-		if (routine.isCompleted) continue
-		if (isRotationRoutine(routine) && routine.rotationWeekdays?.length) {
-			planned.push(
-				...planRotation(routine, {
-					days,
-					now,
-					trained,
-					trainedToday: trainedToday.has(routine.id),
-					activeDayId:
-						active?.status === 'IN_PROGRESS' && active.routineId === routine.id
-							? (active.routineDayId ?? null)
-							: null,
-				}),
-			)
-			continue
-		}
-		if (isRotationRoutine(routine)) {
-			const next = nextRotationDay(routine)
+	for (const baseline of routines) {
+		if (baseline.isCompleted) continue
+		const createdOn = localDateKey(new Date(baseline.createdAt))
+		// ROUT-15: the undated rotation note follows the plan in force from
+		// today, or from the week's start for a week still to come.
+		const noteRoutine = routineOn(
+			baseline,
+			days[0].date > today ? days[0].date : today,
+		)
+		if (
+			isRotationRoutine(noteRoutine) &&
+			!noteRoutine.rotationWeekdays?.length
+		) {
+			const next = nextRotationDay(noteRoutine)
 			if (next) {
 				rotations.push({
-					routineId: routine.id,
-					routineName: routine.name,
+					routineId: baseline.id,
+					routineName: baseline.name,
 					nextDayId: next.id,
 					nextDayName: routineDayLabel(next),
+					...blockNameOf(noteRoutine),
 				})
 			}
-			continue
 		}
-		const createdOn = localDateKey(new Date(routine.createdAt))
+
+		// SCHED-04: this routine's moves, by planned date and by target.
+		const moves = (overrides ?? []).filter(
+			move =>
+				move.routineId === baseline.id && move.kind === 'MOVE' && move.toDate,
+		)
+		const movedAway = new Map(moves.map(move => [move.date, move]))
+		// SCHED-05: skipped occurrences, by planned date.
+		const skips = new Map(
+			(overrides ?? [])
+				.filter(skip => skip.routineId === baseline.id && skip.kind === 'SKIP')
+				.map(skip => [skip.date, skip]),
+		)
 		const occurrence = (
+			routine: PlannedRoutine,
 			day: ScheduleDay,
 			routineDay: Routine['days'][number],
 			move?: ScheduleOverride,
@@ -380,6 +445,7 @@ export function buildScheduleWeek({
 				routineDayId: routineDay.id,
 				routineName: routine.name,
 				dayName: routineDayLabel(routineDay),
+				...blockNameOf(routine),
 				...(move ? { overrideId: move.id, movedFrom: move.date } : {}),
 			}
 			return day.isPast
@@ -390,93 +456,125 @@ export function buildScheduleWeek({
 					}
 				: { kind: 'PLANNED', ...base, occurrenceDate: move?.date ?? day.date }
 		}
-		// SCHED-04: this routine's moves, by planned date and by target.
-		const moves = (overrides ?? []).filter(
-			move =>
-				move.routineId === routine.id && move.kind === 'MOVE' && move.toDate,
-		)
-		const movedAway = new Map(moves.map(move => [move.date, move]))
-		// SCHED-05: skipped occurrences, by planned date.
-		const skips = new Map(
-			(overrides ?? [])
-				.filter(skip => skip.routineId === routine.id && skip.kind === 'SKIP')
-				.map(skip => [skip.date, skip]),
-		)
-		const movedIn = new Set<string>()
-		for (const routineDay of routine.days) {
-			if (routineDay.dayOfWeek === null) continue
-			const day = days.find(d => d.dayOfWeek === routineDay.dayOfWeek)
-			if (!day || day.date < createdOn) continue
-			if (trained.has(`${routine.id}|${day.date}`)) continue
-			// A session on the date still counts; the skip only replaces the plan.
-			const skip = skips.get(day.date)
-			if (skip) {
-				planned.push({
-					date: day.date,
-					entry: {
-						kind: 'SKIPPED',
-						routineId: routine.id,
-						routineDayId: routineDay.id,
-						routineName: routine.name,
-						dayName: routineDayLabel(routineDay),
-						overrideId: skip.id,
-					},
-				})
-				continue
-			}
-			const move = movedAway.get(day.date)
-			planned.push({
-				date: day.date,
-				entry: move?.toDate
-					? {
-							kind: 'MOVED',
-							routineId: routine.id,
-							routineDayId: routineDay.id,
-							routineName: routine.name,
-							dayName: routineDayLabel(routineDay),
-							overrideId: move.id,
-							toDate: move.toDate,
-						}
-					: occurrence(day, routineDay),
-			})
-		}
+
 		// A moved occurrence sits on its target unless a session of the routine
-		// happened on either date. Its day is the one on the planned weekday, so
-		// an edit that removed that weekday drops the move.
+		// happened on either date. Its day is the one on the planned weekday of
+		// the plan in force on the planned date, so an edit -- or a training
+		// block -- without that weekday drops the move.
+		const movedIn = new Set<string>()
 		for (const move of moves) {
 			const target = byDate.get(move.toDate as string)
 			if (!target || move.date < createdOn) continue
+			const routine = routineOn(baseline, move.date)
+			if (isRotationRoutine(routine)) continue
 			const weekday = fromKey(move.date).getDay()
 			const routineDay = routine.days.find(d => d.dayOfWeek === weekday)
 			if (!routineDay) continue
 			if (
-				trained.has(`${routine.id}|${target.date}`) ||
-				trained.has(`${routine.id}|${move.date}`)
+				trained.has(`${baseline.id}|${target.date}`) ||
+				trained.has(`${baseline.id}|${move.date}`)
 			) {
 				continue
 			}
 			movedIn.add(target.date)
 			planned.push({
 				date: target.date,
-				entry: occurrence(target, routineDay, move),
+				entry: occurrence(routine, target, routineDay, move),
 			})
 		}
-		// SCHED-07: planned rest is never "not logged"; a session replaces it,
-		// and so does a workout moved onto it (SCHED-04).
-		for (const weekday of routine.restDays ?? []) {
-			const day = days.find(d => d.dayOfWeek === weekday)
-			if (!day || day.date < createdOn) continue
-			if (trained.has(`${routine.id}|${day.date}`)) continue
-			if (movedIn.has(day.date)) continue
-			planned.push({
-				date: day.date,
-				entry: {
-					kind: 'REST',
-					routineId: routine.id,
-					routineName: routine.name,
-					dayName: null,
-				},
-			})
+
+		// ROUT-15: consecutive dates under the same plan form one segment.
+		const segments: Array<{ routine: PlannedRoutine; days: ScheduleDay[] }> = []
+		for (const day of days) {
+			const routine = routineOn(baseline, day.date)
+			const last = segments.at(-1)
+			if (
+				last &&
+				(last.routine.trainingBlock?.id ?? null) ===
+					(routine.trainingBlock?.id ?? null)
+			) {
+				last.days.push(day)
+			} else {
+				segments.push({ routine, days: [day] })
+			}
+		}
+
+		for (const { routine, days: segmentDays } of segments) {
+			if (isRotationRoutine(routine)) {
+				if (!routine.rotationWeekdays?.length) continue
+				planned.push(
+					...planRotation(routine, {
+						days: segmentDays,
+						now,
+						trained,
+						trainedToday: trainedToday.has(routine.id),
+						activeDayId:
+							active?.status === 'IN_PROGRESS' &&
+							active.routineId === routine.id
+								? (active.routineDayId ?? null)
+								: null,
+						from: planStart(baseline, routine, segmentDays[0].date),
+						trainingBlockName: routine.trainingBlock?.name,
+					}),
+				)
+				continue
+			}
+			for (const routineDay of routine.days) {
+				if (routineDay.dayOfWeek === null) continue
+				const day = segmentDays.find(d => d.dayOfWeek === routineDay.dayOfWeek)
+				if (!day || day.date < createdOn) continue
+				if (trained.has(`${routine.id}|${day.date}`)) continue
+				// A session on the date still counts; the skip only replaces the plan.
+				const skip = skips.get(day.date)
+				if (skip) {
+					planned.push({
+						date: day.date,
+						entry: {
+							kind: 'SKIPPED',
+							routineId: routine.id,
+							routineDayId: routineDay.id,
+							routineName: routine.name,
+							dayName: routineDayLabel(routineDay),
+							overrideId: skip.id,
+							...blockNameOf(routine),
+						},
+					})
+					continue
+				}
+				const move = movedAway.get(day.date)
+				planned.push({
+					date: day.date,
+					entry: move?.toDate
+						? {
+								kind: 'MOVED',
+								routineId: routine.id,
+								routineDayId: routineDay.id,
+								routineName: routine.name,
+								dayName: routineDayLabel(routineDay),
+								overrideId: move.id,
+								toDate: move.toDate,
+								...blockNameOf(routine),
+							}
+						: occurrence(routine, day, routineDay),
+				})
+			}
+			// SCHED-07: planned rest is never "not logged"; a session replaces it,
+			// and so does a workout moved onto it (SCHED-04).
+			for (const weekday of routine.restDays ?? []) {
+				const day = segmentDays.find(d => d.dayOfWeek === weekday)
+				if (!day || day.date < createdOn) continue
+				if (trained.has(`${routine.id}|${day.date}`)) continue
+				if (movedIn.has(day.date)) continue
+				planned.push({
+					date: day.date,
+					entry: {
+						kind: 'REST',
+						routineId: routine.id,
+						routineName: routine.name,
+						dayName: null,
+					},
+				})
+			}
 		}
 	}
 	planned
@@ -673,11 +771,24 @@ export function moveTargets({
 }: {
 	occurrenceDate: string
 	now: Date
-	routine: Pick<Routine, 'id' | 'days'>
+	routine: Pick<
+		Routine,
+		| 'id'
+		| 'days'
+		| 'scheduleMode'
+		| 'restDays'
+		| 'rotationWeekdays'
+		| 'nextRotationDayId'
+		| 'trainingBlocks'
+	>
 	overrides: readonly ScheduleOverride[]
 }): string[] {
 	const today = localDateKey(now)
-	const weekdays = new Set(routine.days.map(day => day.dayOfWeek))
+	// ROUT-15: a date is judged by the plan in force on it.
+	const trainsOn = (date: string) =>
+		routineOn(routine, date).days.some(
+			day => day.dayOfWeek === fromKey(date).getDay(),
+		)
 	const others = overrides.filter(
 		move => move.routineId === routine.id && move.date !== occurrenceDate,
 	)
@@ -692,7 +803,7 @@ export function moveTargets({
 		const date = localDateKey(addDays(origin, offset))
 		if (date < today) continue
 		const plannedThere =
-			weekdays.has(fromKey(date).getDay()) &&
+			trainsOn(date) &&
 			// A date whose own workout moved away or was skipped (SCHED-05) is free.
 			!others.some(
 				move => move.date === date && (move.toDate || move.kind === 'SKIP'),

@@ -1,6 +1,9 @@
 import type { Routine } from '@sunsteel/contracts'
 import { routineDayLabel } from '@sunsteel/contracts'
 
+import { routineOn } from './routine-schedule'
+import { localDateKey } from './schedule-week'
+
 /**
  * LIVE-06. Training a day that is not today's plan.
  *
@@ -23,6 +26,8 @@ export type TrainableDay = {
 	exerciseCount: number
 	/** True when this day is part of today's plan, which is offered first. */
 	isToday: boolean
+	/** ROUT-15: the training block in force today, when the day is one of its. */
+	trainingBlockName?: string
 }
 
 /**
@@ -33,15 +38,20 @@ export type TrainableDay = {
  * `FIX-04` hid: a session with nothing to log and no way to add anything.
  * A completed routine is left out as well, matching `routinesPlannedOn` on the
  * server, which skips one when deciding what a day plans.
+ *
+ * ROUT-15: while a training block is in force, its days are the ones offered;
+ * the server refuses a day of any other plan, so offering one would fail.
  */
 export function trainableDays(
 	routines: Routine[] | undefined,
 	todayDow: number,
+	today: string = localDateKey(new Date()),
 ): TrainableDay[] {
 	if (!routines?.length) return []
 
 	return routines
 		.filter(routine => !routine.isCompleted)
+		.map(routine => routineOn(routine, today))
 		.flatMap(routine =>
 			[...(routine.days ?? [])]
 				.sort((a, b) => a.order - b.order)
@@ -55,6 +65,9 @@ export function trainableDays(
 					// A rotation day has no weekday, so it is never "today's" by
 					// the calendar; the schedule decides that, not this list.
 					isToday: day.dayOfWeek === todayDow,
+					...(routine.trainingBlock
+						? { trainingBlockName: routine.trainingBlock.name }
+						: {}),
 				})),
 		)
 		.sort((a, b) => Number(b.isToday) - Number(a.isToday))

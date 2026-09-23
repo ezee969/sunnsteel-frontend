@@ -44,6 +44,11 @@ export interface SwapTarget {
 interface ExerciseSwapDialogProps {
 	sessionId: string
 	routineId?: string
+	/**
+	 * ROUT-15: set when the session trains a training block, whose working
+	 * copy -- not the routine -- is what "also use it" updates.
+	 */
+	trainingBlockName?: string
 	target: SwapTarget | null
 	/** Exercises performed in the day's other slots; never offered. */
 	otherExerciseIds: string[]
@@ -60,10 +65,17 @@ const SEARCH_LIMIT = 8
 export function ExerciseSwapDialog({
 	sessionId,
 	routineId,
+	trainingBlockName,
 	target,
 	otherExerciseIds,
 	onClose,
 }: ExerciseSwapDialogProps) {
+	const plan = trainingBlockName
+		? `the training block “${trainingBlockName}”`
+		: 'the routine'
+	const Plan = trainingBlockName
+		? `The training block “${trainingBlockName}”`
+		: 'The routine'
 	const { data: exercises, isLoading } = useExercises()
 	const { data: locations } = useTrainingLocations()
 	const gym = defaultTrainingLocation(locations)
@@ -131,8 +143,8 @@ export function ExerciseSwapDialog({
 						description: !applyToRoutine
 							? 'Only this session changed.'
 							: result.routineUpdated
-								? 'The routine uses it from the next session.'
-								: 'The routine no longer has this exercise, so only this session changed.',
+								? `${Plan} uses it from the next session.`
+								: `${Plan} no longer has this exercise, so only this session changed.`,
 						variant: 'success',
 					})
 					onClose()
@@ -279,7 +291,7 @@ export function ExerciseSwapDialog({
 								htmlFor="swap-apply-routine"
 								className="type-body-sm leading-snug"
 							>
-								Also use it in the routine from the next session
+								Also use it in {plan} from the next session
 							</Label>
 						</div>
 						<p className="type-body-sm text-ink-3">

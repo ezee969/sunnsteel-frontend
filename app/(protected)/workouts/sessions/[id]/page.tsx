@@ -22,7 +22,6 @@ import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
 import { usePushSubscriptions } from '@/lib/api/hooks/usePushNotifications'
 import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
-import { useRoutine } from '@/lib/api/hooks/useRoutines'
 import {
 	usePreviousPerformance,
 	useSession,
@@ -30,6 +29,10 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import { noteFor } from '@/lib/utils/session-notes'
+import {
+	sessionPrescription,
+	sessionRoutineTitle,
+} from '@/lib/utils/session-prescription'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
 import {
 	applySessionSubstitutions,
@@ -70,11 +73,13 @@ export default function ActiveSessionPage() {
 		usePreviousPerformance(idParam)
 	const { mutate: upsertSetLog } = useUpsertSetLog(idParam)
 	const routineId = session?.routineId ?? ''
-	const {
-		data: routine,
-		isFetched: isRoutineFetched,
-		error: routineError,
-	} = useRoutine(routineId)
+	// ROUT-15/LIVE-11: the session trains its own snapshot day, which is also
+	// the only place a training block's day can be read from.
+	const day = useMemo(
+		() => sessionPrescription(session),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[session?.routineDay],
+	)
 
 	// LIVE-02: hold the screen awake only while the session is genuinely in
 	// progress. Gating on the status rather than the route means finishing or
@@ -116,8 +121,7 @@ export default function ActiveSessionPage() {
 		completeRecap,
 	} = useSessionManagement({
 		sessionId: idParam,
-		routine,
-		routineDayId: session?.routineDayId,
+		day,
 		setLogs: session?.setLogs,
 	})
 
@@ -141,10 +145,7 @@ export default function ActiveSessionPage() {
 
 	// Group set logs by exercise for display
 	const groupedLogs = useMemo<GroupedExerciseLogs[]>(() => {
-		if (!session?.setLogs || !routine) return [] as GroupedExerciseLogs[]
-
-		const day = routine!.days.find(d => d.id === session.routineDayId)
-		if (!day) return [] as GroupedExerciseLogs[]
+		if (!session?.setLogs || !day) return [] as GroupedExerciseLogs[]
 
 		// A swapped slot is shown and logged as the exercise actually performed.
 		return groupSetLogsByExercise(
@@ -152,13 +153,7 @@ export default function ActiveSessionPage() {
 			applySessionSubstitutions(day.exercises, session.exerciseSubstitutions),
 			session.id,
 		)
-	}, [
-		session?.setLogs,
-		session?.routineDayId,
-		session?.id,
-		session?.exerciseSubstitutions,
-		routine,
-	])
+	}, [session?.setLogs, session?.id, session?.exerciseSubstitutions, day])
 	const previousSets = useMemo(
 		() =>
 			new Map(
@@ -170,9 +165,7 @@ export default function ActiveSessionPage() {
 		[previousPerformance?.sets],
 	)
 
-	// Loading state (session or routine). For routine, wait until first fetch completes when routineId exists
-	const routineFirstFetchPending = !!routineId && !isRoutineFetched
-	if (isLoading || routineFirstFetchPending) {
+	if (isLoading) {
 		return <SessionLoadingSkeleton />
 	}
 
@@ -211,41 +204,6 @@ export default function ActiveSessionPage() {
 		)
 	}
 
-	// Routine error state
-	if (routineError) {
-		return (
-			<div className={SHELL_CLASS}>
-				<div className="ledger-page space-y-4 py-16 text-center">
-					<h1 className="type-page text-destructive">Error Loading Routine</h1>
-					<p className="text-ink-2">
-						{routineError.message || 'Failed to load routine'}
-					</p>
-					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
-						Go Back
-					</button>
-				</div>
-			</div>
-		)
-	}
-
-	// No routine found (only after routine finished first fetch and routineId exists)
-	if (!!routineId && isRoutineFetched && !routine) {
-		return (
-			<div className={SHELL_CLASS}>
-				<div className="ledger-page space-y-4 py-16 text-center">
-					<h1 className="type-page">Routine Not Found</h1>
-					<p className="text-ink-2">
-						The routine associated with this session could not be loaded.
-					</p>
-					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
-						Go Back
-					</button>
-				</div>
-			</div>
-		)
-	}
-
-	const day = routine!.days.find(d => d.id === session.routineDayId)
 	if (!day) {
 		return (
 			<div className={SHELL_CLASS}>
@@ -266,7 +224,7 @@ export default function ActiveSessionPage() {
 		<div className={SHELL_CLASS}>
 			{/* Header */}
 			<SessionHeader
-				routineName={routine!.name}
+				routineName={sessionRoutineTitle(session)}
 				dayName={routineDayLabel(day)}
 				startedAt={session.startedAt}
 				progressData={progressData}
@@ -283,7 +241,7 @@ export default function ActiveSessionPage() {
 				{/* Action Card */}
 				<SessionActionCard
 					sessionId={session.id}
-					routineName={routine!.name}
+					routineName={sessionRoutineTitle(session)}
 					dayName={routineDayLabel(day)}
 					startedAt={session.startedAt}
 					progressData={progressData}
@@ -409,13 +367,14 @@ export default function ActiveSessionPage() {
 					if (finishStatus) executeFinish(finishStatus)
 				}}
 				progressData={progressData}
-				routineName={routine!.name}
+				routineName={sessionRoutineTitle(session)}
 				isFinishing={isFinishing}
 				status={finishStatus}
 			/>
 			<ExerciseSwapDialog
 				sessionId={session.id}
 				routineId={routineId || undefined}
+				trainingBlockName={session.trainingBlock?.name}
 				target={swapTarget}
 				otherExerciseIds={groupedLogs
 					.filter(group => group.exerciseId !== swapTarget?.routineExerciseId)

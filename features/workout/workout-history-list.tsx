@@ -115,6 +115,11 @@ export function WorkoutHistoryList({
 							<div className="type-panel min-w-0 text-foreground">
 								{s.routine.name}
 								{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
+								{s.routine.trainingBlockName ? (
+									<span className="type-body-sm block text-ink-3">
+										Training block · {s.routine.trainingBlockName}
+									</span>
+								) : null}
 							</div>
 							<div className="type-body-sm shrink-0 text-ink-3 sm:text-right xl:text-left">
 								{s.status}
