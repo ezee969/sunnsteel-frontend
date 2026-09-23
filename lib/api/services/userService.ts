@@ -10,6 +10,8 @@ import {
 	ReplaceFeaturedProfileItemsRequest,
 	ReplaceMeasurableGoalsRequest,
 	ReplaceTrainingLocationsRequest,
+	SendTrainingPartnerEncouragementRequest,
+	SendTrainingPartnerEncouragementResponse,
 	TrainingLocationPreference,
 	TrainingPartnerPermissions,
 	TrainingPartnerScheduleResponse,
@@ -242,6 +244,17 @@ export const userService = {
 	): Promise<TrainingPartnerScheduleResponse> {
 		return httpClient.get<TrainingPartnerScheduleResponse>(
 			`/users/me/training-partners/${partnershipId}/schedule`,
+			true,
+		)
+	},
+
+	async sendTrainingPartnerEncouragement(
+		partnershipId: string,
+		data: SendTrainingPartnerEncouragementRequest,
+	): Promise<SendTrainingPartnerEncouragementResponse> {
+		return httpClient.post<SendTrainingPartnerEncouragementResponse>(
+			`/users/me/training-partners/${partnershipId}/encouragements`,
+			data,
 			true,
 		)
 	},

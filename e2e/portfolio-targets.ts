@@ -270,6 +270,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Verified milestones, Renaissance ranks and the next goal per category.',
 	},
 	{
+		slug: 'notifications',
+		route: '/notifications',
+		features: ['NOTIF-01', 'SOC-09'],
+		ready: ['Updates', /Ken Watanabe sent encouragement: Good work/],
+		caption:
+			'Today’s training actions and a private fixed-prompt encouragement from a training partner.',
+	},
+	{
 		// The owner's own list, because the local stack has one real account
 		// and the feed would photograph an empty state. It is the SOC-04 half:
 		// every entry with the audience that actually applies.
@@ -306,6 +314,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		ready: ['Your best', 'Best set', 'Estimated 1RM'],
 		caption:
 			"A trained exercise's best set, estimated 1RM, recent sessions and progression.",
+	},
+	{
+		slug: 'training-partner-profile',
+		route: '/profile/ken-watanabe',
+		features: ['SOC-08', 'SOC-09'],
+		ready: ['Training Partner', 'Send Encouragement'],
+		caption:
+			'An active training partner profile with the four-prompt encouragement action granted by that partner.',
 	},
 	{
 		slug: 'member-profile',

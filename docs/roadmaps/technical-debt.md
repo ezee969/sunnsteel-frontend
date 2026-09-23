@@ -508,6 +508,18 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-23 (revision 20):** Closed two operational gaps found while
+  delivering `SOC-09`. The frontend lock pinned an invalid registry checksum
+  for optional `@emnapi/runtime@1.11.3` (`UK1R1` instead of the published
+  `UK1jR1`), which made a clean `npm ci` fail before `TD-33`'s structural
+  checker could run; the lock now matches the registry tarball and a clean
+  install plus `npm run lock:check` passes. The regression inventory also
+  omitted the protected `/notifications` page even though middleware and the
+  product both expose it. It is now the twenty-ninth layout route, taking the
+  complete sweep from 452 to 466 cases. The `SOC-09` scoped run covered its
+  notification and profile layouts in both themes at all seven widths, every
+  dropdown width, and the training-partner request flow: 36 of 36 passed.
+
 - **2026-09-23 (revision 19):** Closed `TD-48`. Two of its five statements had
   already been fixed by `TD-47`; the remaining three, a lost line in the
   frontend `AGENTS.md` and three stale test tallies were corrected in the

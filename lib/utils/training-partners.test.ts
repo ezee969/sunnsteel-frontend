@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
 	findTrainingPartnership,
+	TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS,
 	trainingPartnerActionLabel,
+	trainingPartnerEncouragementLabel,
 } from './training-partners'
 
 const relationship = (overrides: Record<string, unknown> = {}) => ({
@@ -50,5 +52,15 @@ describe('training-partner presentation', () => {
 		expect(trainingPartnerActionLabel(relationship({ status: 'ACTIVE' }))).toBe(
 			'Training Partner',
 		)
+	})
+
+	it('offers only the four fixed encouragement prompts', () => {
+		expect(TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS).toEqual([
+			{ kind: 'READY_TO_TRAIN', label: 'Ready to train' },
+			{ kind: 'STRONG_SESSION', label: 'Strong session' },
+			{ kind: 'GOOD_WORK', label: 'Good work' },
+			{ kind: 'KEEP_GOING', label: 'Keep going' },
+		])
+		expect(trainingPartnerEncouragementLabel('GOOD_WORK')).toBe('Good work')
 	})
 })

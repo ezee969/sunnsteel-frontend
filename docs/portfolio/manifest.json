@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-09-22T09:48:53.905Z",
+	"mutatedAt": "2026-09-23T08:51:46.868Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -9,7 +9,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-09-22T09:47:53.696Z",
+			"capturedAt": "2026-09-23T08:50:21.920Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -23,7 +23,7 @@
 				"DASH-09",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-22T09:47:57.503Z",
+			"capturedAt": "2026-09-23T08:50:26.043Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -35,7 +35,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-09-22T09:48:04.034Z",
+			"capturedAt": "2026-09-23T08:50:33.969Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -47,7 +47,7 @@
 				"ROUT-02",
 				"ROUT-08"
 			],
-			"capturedAt": "2026-09-22T09:48:12.845Z",
+			"capturedAt": "2026-09-23T08:50:43.437Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -57,7 +57,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-09-22T09:48:15.811Z",
+			"capturedAt": "2026-09-23T08:50:46.773Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -69,7 +69,7 @@
 				"LIVE-09",
 				"SOC-07"
 			],
-			"capturedAt": "2026-09-22T09:48:18.910Z",
+			"capturedAt": "2026-09-23T08:50:50.575Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -82,7 +82,7 @@
 				"PROG-04",
 				"PROG-05"
 			],
-			"capturedAt": "2026-09-22T09:48:23.371Z",
+			"capturedAt": "2026-09-23T08:50:56.866Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -96,7 +96,7 @@
 				"SCHED-05",
 				"NAV-05"
 			],
-			"capturedAt": "2026-09-22T09:48:27.004Z",
+			"capturedAt": "2026-09-23T08:51:00.929Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -109,7 +109,18 @@
 				"ACH-04",
 				"ACH-05"
 			],
-			"capturedAt": "2026-09-22T09:48:30.703Z",
+			"capturedAt": "2026-09-23T08:51:05.356Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "notifications",
+			"route": "/notifications",
+			"features": [
+				"NOTIF-01",
+				"SOC-09"
+			],
+			"capturedAt": "2026-09-23T08:51:09.907Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -121,7 +132,7 @@
 				"SOC-04",
 				"SOC-06"
 			],
-			"capturedAt": "2026-09-22T09:48:34.713Z",
+			"capturedAt": "2026-09-23T08:51:14.773Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -132,7 +143,7 @@
 				"TRUST-04",
 				"PROF-10"
 			],
-			"capturedAt": "2026-09-22T09:48:38.519Z",
+			"capturedAt": "2026-09-23T08:51:19.086Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -144,7 +155,18 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-09-22T09:48:43.630Z",
+			"capturedAt": "2026-09-23T08:51:25.068Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "training-partner-profile",
+			"route": "/profile/ken-watanabe",
+			"features": [
+				"SOC-08",
+				"SOC-09"
+			],
+			"capturedAt": "2026-09-23T08:51:28.672Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -157,7 +179,7 @@
 				"PROF-05",
 				"PROF-06"
 			],
-			"capturedAt": "2026-09-22T09:48:48.086Z",
+			"capturedAt": "2026-09-23T08:51:34.466Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -167,7 +189,7 @@
 			"features": [
 				"SOC-08"
 			],
-			"capturedAt": "2026-09-22T09:50:01.860Z",
+			"capturedAt": "2026-09-23T08:51:40.039Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -181,7 +203,7 @@
 				"LIVE-04",
 				"LIVE-05"
 			],
-			"capturedAt": "2026-09-22T09:48:59.972Z",
+			"capturedAt": "2026-09-23T08:51:54.118Z",
 			"width": 1440,
 			"height": 900
 		}

@@ -1,7 +1,26 @@
-import type {
+import {
+	TRAINING_PARTNER_ENCOURAGEMENT_KINDS,
+	type TrainingPartnerEncouragementKind,
 	TrainingPartnerPermissions,
 	TrainingPartnership,
 } from '@sunsteel/contracts'
+
+export const TRAINING_PARTNER_ENCOURAGEMENT_LABELS = {
+	READY_TO_TRAIN: 'Ready to train',
+	STRONG_SESSION: 'Strong session',
+	GOOD_WORK: 'Good work',
+	KEEP_GOING: 'Keep going',
+} as const satisfies Record<TrainingPartnerEncouragementKind, string>
+
+export const TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS =
+	TRAINING_PARTNER_ENCOURAGEMENT_KINDS.map(kind => ({
+		kind,
+		label: TRAINING_PARTNER_ENCOURAGEMENT_LABELS[kind],
+	}))
+
+export const trainingPartnerEncouragementLabel = (
+	kind: TrainingPartnerEncouragementKind,
+) => TRAINING_PARTNER_ENCOURAGEMENT_LABELS[kind]
 
 export const TRAINING_PARTNER_PERMISSION_FIELDS: Array<{
 	key: keyof TrainingPartnerPermissions
@@ -33,8 +52,7 @@ export const TRAINING_PARTNER_PERMISSION_FIELDS: Array<{
 	{
 		key: 'encouragement',
 		label: 'Encouragement',
-		description:
-			'Allow lightweight encouragement when that feature is enabled.',
+		description: 'Allow four fixed, private prompts from this partner.',
 	},
 ]
 

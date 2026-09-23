@@ -3,6 +3,8 @@ import type {
 	NotificationsResponse,
 } from '@sunsteel/contracts'
 
+import { trainingPartnerEncouragementLabel } from './training-partners'
+
 export interface NotificationView {
 	title: string
 	detail: string | null
@@ -73,6 +75,15 @@ export function describeNotification(
 				title: `${name} commented on your activity`,
 				detail: `@${actor.username} · open it to read the comment`,
 				href: '/activity?view=yours',
+			}
+		}
+		case 'TRAINING_PARTNER_ENCOURAGEMENT': {
+			const { actor } = notification
+			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
+			return {
+				title: `${name} sent encouragement: ${trainingPartnerEncouragementLabel(notification.encouragement.kind)}`,
+				detail: `@${actor.username} · from your training partner`,
+				href: `/profile/${actor.username}`,
 			}
 		}
 	}

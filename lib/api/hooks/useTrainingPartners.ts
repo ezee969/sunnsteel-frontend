@@ -1,6 +1,8 @@
 'use client'
 
 import type {
+	SendTrainingPartnerEncouragementResponse,
+	TrainingPartnerEncouragementKind,
 	TrainingPartnerPermissions,
 	TrainingPartnerScheduleResponse,
 	TrainingPartnership,
@@ -10,6 +12,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { userService } from '@/lib/api/services/userService'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
+
+import { notificationKeys } from './useNotifications'
 
 export const trainingPartnerKeys = {
 	all: ['users', 'me', 'training-partners'] as const,
@@ -89,5 +93,20 @@ export function useTrainingPartnerSchedule(
 		queryFn: () => userService.getTrainingPartnerSchedule(partnershipId),
 		enabled: enabled && !!session && !!partnershipId,
 		retry: false,
+	})
+}
+
+export function useSendTrainingPartnerEncouragement() {
+	const queryClient = useQueryClient()
+	return useMutation<
+		SendTrainingPartnerEncouragementResponse,
+		Error,
+		{ partnershipId: string; kind: TrainingPartnerEncouragementKind }
+	>({
+		mutationFn: ({ partnershipId, kind }) =>
+			userService.sendTrainingPartnerEncouragement(partnershipId, { kind }),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: notificationKeys.all() })
+		},
 	})
 }

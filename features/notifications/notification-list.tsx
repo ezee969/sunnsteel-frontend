@@ -7,6 +7,7 @@ import {
 } from '@sunsteel/contracts'
 import {
 	CheckCheck,
+	HeartHandshake,
 	Medal,
 	MessageSquare,
 	RefreshCw,
@@ -26,6 +27,7 @@ const KIND_ICON = {
 	SESSION_PROGRESS: TrendingUp,
 	NEW_FOLLOWER: UserPlus,
 	ACTIVITY_COMMENT: MessageSquare,
+	TRAINING_PARTNER_ENCOURAGEMENT: HeartHandshake,
 } as const
 
 function NotificationRow({
@@ -111,9 +113,9 @@ export function NotificationList({
 						Updates
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Achievements you earn, records and load changes from finished
-						sessions, and new followers, from the last{' '}
-						{NOTIFICATIONS_LOOKBACK_DAYS} days.
+						Achievements you earn, session progress, followers, comments and
+						partner encouragement from the last {NOTIFICATIONS_LOOKBACK_DAYS}{' '}
+						days.
 					</p>
 				</div>
 				{data && data.notifications.length > 0 ? (
@@ -157,7 +159,7 @@ export function NotificationList({
 			) : !data || data.notifications.length === 0 ? (
 				<EmptyModule
 					title="Nothing new yet"
-					description="Achievements you earn, new records and load changes from finished sessions, and new followers will appear here."
+					description="Achievements, session progress and updates from other members will appear here."
 				/>
 			) : (
 				<>

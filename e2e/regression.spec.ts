@@ -421,6 +421,7 @@ const ROUTES: SweepRoute[] = [
 		path: () => '/exercises/00000000-0000-4000-8000-000000000000',
 	},
 	{ slug: 'achievements', path: () => '/achievements' },
+	{ slug: 'notifications', path: () => '/notifications' },
 	{ slug: 'activity', path: () => '/activity' },
 	{ slug: 'activity-yours', path: () => '/activity?view=yours' },
 	{ slug: 'profile', path: () => '/profile' },

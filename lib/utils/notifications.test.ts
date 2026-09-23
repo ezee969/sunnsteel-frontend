@@ -51,6 +51,20 @@ const follower: AppNotification = {
 	},
 }
 
+const encouragement: AppNotification = {
+	...base,
+	id: 'n4',
+	kind: 'TRAINING_PARTNER_ENCOURAGEMENT',
+	actor: {
+		id: 'u3',
+		username: 'cassia',
+		name: 'Cassia',
+		lastName: null,
+		avatarUrl: null,
+	},
+	encouragement: { kind: 'GOOD_WORK' },
+}
+
 describe('notifications (NOTIF-01)', () => {
 	it('names what each notification announces and where it leads', () => {
 		expect(describeNotification(achievement)).toEqual({
@@ -74,6 +88,11 @@ describe('notifications (NOTIF-01)', () => {
 				actor: { ...follower.actor, lastName: null, isFollowedByMe: true },
 			} as AppNotification).detail,
 		).toBe('@marta · you follow them too')
+		expect(describeNotification(encouragement)).toEqual({
+			title: 'Cassia sent encouragement: Good work',
+			detail: '@cassia · from your training partner',
+			href: '/profile/cassia',
+		})
 	})
 
 	it('counts records and load changes in plain words', () => {
