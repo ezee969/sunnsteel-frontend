@@ -8,6 +8,7 @@ import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAc
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { RoutineLineageNote } from '@/features/routines/components/RoutineLineageNote'
 import { RoutineSharing } from '@/features/routines/components/RoutineSharing'
+import { RoutineTrainingBlocks } from '@/features/routines/components/RoutineTrainingBlocks'
 import { RoutineVersions } from '@/features/routines/components/RoutineVersions'
 import { WorkoutDialogs } from '@/features/routines/components/WorkoutDialogs'
 import { useRoutineData } from '@/features/routines/hooks/useRoutineData'
@@ -149,6 +150,8 @@ export default function RoutineDetailsPage() {
 				accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
 				isHiddenByModeration={routine.isHiddenByModeration ?? false}
 			/>
+
+			<RoutineTrainingBlocks routine={routine} weightUnit={weightUnit} />
 
 			<RoutineVersions
 				routine={routine}

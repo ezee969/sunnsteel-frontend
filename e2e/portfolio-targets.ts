@@ -233,9 +233,15 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'routine-detail',
 		route: '/routines/:routine',
-		features: ['ROUT-01', 'ROUT-02', 'ROUT-08'],
-		ready: ['Routine Days', /\d+ exercises/],
-		caption: "A routine's days and prescriptions, with Start on today's day.",
+		features: ['ROUT-01', 'ROUT-02', 'ROUT-08', 'ROUT-09'],
+		setup: async page => {
+			await page
+				.getByRole('region', { name: 'Training blocks' })
+				.scrollIntoViewIfNeeded()
+		},
+		ready: ['Routine Days', /\d+ exercises/, 'Autumn accumulation'],
+		caption:
+			"A routine's authored training-block timeline, alongside its saved versions.",
 	},
 	{
 		slug: 'history',

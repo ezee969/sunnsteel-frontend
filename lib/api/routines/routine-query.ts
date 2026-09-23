@@ -81,4 +81,14 @@ export const routineQueryKeys = {
 	 * updates under that prefix expect routines.
 	 */
 	versions: (routineId: string) => ['routine-versions', routineId] as const,
+	trainingBlocksAll: (routineId: string) =>
+		['routine-training-blocks', routineId] as const,
+	trainingBlocks: (routineId: string) =>
+		[...routineQueryKeys.trainingBlocksAll(routineId), 'list'] as const,
+	trainingBlockRevisions: (routineId: string, blockId: string) =>
+		[
+			...routineQueryKeys.trainingBlocksAll(routineId),
+			'revisions',
+			blockId,
+		] as const,
 }

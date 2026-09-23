@@ -73,4 +73,18 @@ describe('routineQueryKeys', () => {
 			'isFavorite:true',
 		])
 	})
+
+	it('keeps training-block list and revisions under one invalidation key', () => {
+		expect(routineQueryKeys.trainingBlocks('abc')).toEqual([
+			'routine-training-blocks',
+			'abc',
+			'list',
+		])
+		expect(routineQueryKeys.trainingBlockRevisions('abc', 'block-1')).toEqual([
+			'routine-training-blocks',
+			'abc',
+			'revisions',
+			'block-1',
+		])
+	})
 })

@@ -45,9 +45,10 @@
 			"features": [
 				"ROUT-01",
 				"ROUT-02",
-				"ROUT-08"
+				"ROUT-08",
+				"ROUT-09"
 			],
-			"capturedAt": "2026-09-23T08:50:43.437Z",
+			"capturedAt": "2026-09-23T14:33:34.031Z",
 			"width": 1440,
 			"height": 900
 		},

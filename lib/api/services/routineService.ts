@@ -1,8 +1,12 @@
 import type {
 	CreateRoutineVersionRequest,
 	RestoreRoutineVersionResponse,
+	RoutineTrainingBlock,
+	RoutineTrainingBlockRevisionsResponse,
+	RoutineTrainingBlocksResponse,
 	RoutineVersion,
 	RoutineVersionsResponse,
+	UpsertRoutineTrainingBlockRequest,
 } from '@sunsteel/contracts'
 
 import {
@@ -116,6 +120,56 @@ export const routineService = {
 	deleteVersion: async (id: string, versionId: string): Promise<void> =>
 		httpClient.request<void>(
 			`${ROUTINES_API_URL}/${id}/versions/${versionId}`,
+			{ method: 'DELETE', secure: true },
+		),
+
+	getTrainingBlocks: async (
+		id: string,
+	): Promise<RoutineTrainingBlocksResponse> =>
+		httpClient.request<RoutineTrainingBlocksResponse>(
+			`${ROUTINES_API_URL}/${id}/training-blocks`,
+			{ method: 'GET', secure: true },
+		),
+
+	createTrainingBlock: async (
+		id: string,
+		data: UpsertRoutineTrainingBlockRequest,
+	): Promise<RoutineTrainingBlock> =>
+		httpClient.request<RoutineTrainingBlock>(
+			`${ROUTINES_API_URL}/${id}/training-blocks`,
+			{
+				method: 'POST',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		),
+
+	updateTrainingBlock: async (
+		id: string,
+		blockId: string,
+		data: UpsertRoutineTrainingBlockRequest,
+	): Promise<RoutineTrainingBlock> =>
+		httpClient.request<RoutineTrainingBlock>(
+			`${ROUTINES_API_URL}/${id}/training-blocks/${blockId}`,
+			{
+				method: 'PUT',
+				body: JSON.stringify(data),
+				secure: true,
+			},
+		),
+
+	getTrainingBlockRevisions: async (
+		id: string,
+		blockId: string,
+	): Promise<RoutineTrainingBlockRevisionsResponse> =>
+		httpClient.request<RoutineTrainingBlockRevisionsResponse>(
+			`${ROUTINES_API_URL}/${id}/training-blocks/${blockId}/revisions`,
+			{ method: 'GET', secure: true },
+		),
+
+	deleteTrainingBlock: async (id: string, blockId: string): Promise<void> =>
+		httpClient.request<void>(
+			`${ROUTINES_API_URL}/${id}/training-blocks/${blockId}`,
 			{ method: 'DELETE', secure: true },
 		),
 
