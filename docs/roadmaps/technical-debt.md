@@ -17,10 +17,11 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Three entries are open: backend authentication debt `TD-43`, frontend PWA
-maintenance debt `TD-44` and agent-document drift `TD-48`. `TD-46`, proxy
-client-IP handling, and `TD-47`, the dead pre-Supabase auth code, both closed
-on 2026-09-22, and `TD-45`, the middleware matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
+Two entries are open: backend authentication debt `TD-43` and frontend PWA
+maintenance debt `TD-44`. `TD-48`, agent-document drift, closed on
+2026-09-23; `TD-46`, proxy client-IP handling, and `TD-47`, the dead
+pre-Supabase auth code, both on 2026-09-22; and `TD-45`, the middleware
+matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
 `TD-33` and `TD-36` to `TD-42` on 2026-09-13 (see the document history).
 Phase-by-phase narrative and the full measurement evidence live in
@@ -400,7 +401,7 @@ the opposite and wrong.
 
 <a id="td-48"></a>
 
-### TD-48 — Agent documents contradict the code
+### TD-48 — Agent documents contradict the code — CLOSED 2026-09-23
 
 **Impact.** Agents and contributors follow `CLAUDE.md` and `AGENTS.md` as
 instructions, so each contradiction below can send work in the wrong direction.
@@ -433,11 +434,42 @@ in `ARCHITECTURE.md`, explain.
 against the code in both twins of each repository and fix the module list in
 `TECH_STACK.md`.
 
+**Resolution (2026-09-23).** Two of the five had already been corrected in
+passing by `TD-47`, which rewrote the backend auth section: the `ss_session`
+statement now names the frontend's own marker, and `start:dev` is no longer
+called "tsx watch". The other three were still wrong when re-checked and are
+corrected here.
+
+- **Backend workouts module.** The list now splits the session lifecycle under
+  `src/workouts/services/` (start, log, finish, recap, substitution — the five
+  files `services/index.ts` exports) from the top-level reads, Progress
+  endpoints and session sharing that `workouts.service.ts` imports directly.
+  Six services the list had never named are now in it: recap, substitution,
+  progress, session comparison, personal goals and session shares.
+- **Frontend conventions.** The bullet now describes what
+  `eslint.config.mjs` actually enables: `prettier/prettier`, both
+  `simple-import-sort` rules and `import/no-duplicates`, with the
+  path-resolution rules off because their resolver is not installed.
+- **`TECH_STACK.md`.** The module list follows `src/app.module.ts`: it
+  gained `schedule`, `activity`, `moderation` and `notifications` with its
+  `push` submodule, and names `goals`, which `WorkoutsModule` imports. It
+  lost `token`, retired by `TD-47`. The same pass removed two other
+  `TD-47` leftovers, the "token cleanup" job and the Supabase-token helper,
+  and replaced both stale test tallies with measured ones (backend 335 across
+  43 files, frontend 509 across 73). Its "Last verified" date is unchanged,
+  because only these lines were re-verified.
+
+**Found on the way.** The frontend twins also differed in substance: the
+`AGENTS.md` twin had lost the "Runs on Windows 11." line, now restored. The
+frontend test tally in both twins was ten tests and one file behind, because
+`LIVE-06` added `train-another-day.test.ts` without updating it.
+
 **Closure.** All of the following are verified:
 
 - Each statement above is corrected in both twins.
 - In each repository, the two twins differ only in their headers and
-  twin-pointer lines.
+  twin-pointer lines — checked with `diff`; the frontend's remaining
+  differences are the header and the lines that name the other twin.
 - `TECH_STACK.md` lists every module in `src/app.module.ts`.
 
 ---
@@ -476,6 +508,10 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-23 (revision 19):** Closed `TD-48`. Two of its five statements had
+  already been fixed by `TD-47`; the remaining three, a lost line in the
+  frontend `AGENTS.md` and three stale test tallies were corrected in the
+  frontend, backend and workspace documents. Documentation only.
 - **2026-09-16 (revision 18):** Recorded `TD-45` to `TD-48`, found while
   verifying the new workspace `ARCHITECTURE.md` against all three repositories.
   `TD-45`, `TD-47` and `TD-48` are verified in code. `TD-46` is verified in
