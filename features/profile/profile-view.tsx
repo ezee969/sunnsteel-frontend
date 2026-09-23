@@ -23,7 +23,7 @@ import {
 	UserPlus,
 } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -33,6 +33,10 @@ import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishm
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
 import { formatTimeAgo } from '@/lib/utils/date'
+import {
+	buildProfileCardModel,
+	shareProfileCard,
+} from '@/lib/utils/profile-card'
 import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
@@ -183,6 +187,7 @@ export function ProfileView(props: ProfileViewProps) {
 				? `${(totalVolume / 1_000).toFixed(1)}k`
 				: formatWeightAmount(totalVolumeKg, weightUnit, 1)
 	const isMutating = props.variant === 'member' && props.isMutating
+	const [isPreparingCard, setIsPreparingCard] = useState(false)
 
 	const onFollowToggle = () => {
 		followAction?.()
@@ -203,6 +208,45 @@ export function ProfileView(props: ProfileViewProps) {
 				description: 'Check your browser permissions and try again.',
 				variant: 'destructive',
 			})
+		}
+	}
+
+	const onShareProfileCard = async () => {
+		setIsPreparingCard(true)
+		try {
+			const profileUrl = getSharedProfileUrl(
+				profileUsername,
+				window.location.origin,
+			)
+			const result = await shareProfileCard(
+				buildProfileCardModel({
+					name: profileName,
+					lastName: profileLastName,
+					username: profileUsername,
+					profileUrl,
+					featuredItems,
+					achievements,
+					weightUnit,
+				}),
+			)
+			push({
+				title:
+					result === 'shared' ? 'Profile card shared' : 'Profile card saved',
+				description:
+					result === 'shared'
+						? 'The image is ready in your share destination.'
+						: 'The PNG was downloaded to this device.',
+				variant: 'success',
+			})
+		} catch (error) {
+			if (error instanceof DOMException && error.name === 'AbortError') return
+			push({
+				title: 'Could not create profile card',
+				description: 'Try again from this browser.',
+				variant: 'destructive',
+			})
+		} finally {
+			setIsPreparingCard(false)
 		}
 	}
 
@@ -263,6 +307,15 @@ export function ProfileView(props: ProfileViewProps) {
 					<div className="flex flex-wrap gap-3">
 						<Button variant="outline" size="sm" onClick={onShareProfile}>
 							<Share2 className="mr-2 h-4 w-4" aria-hidden /> Share Profile
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onShareProfileCard}
+							disabled={isPreparingCard}
+						>
+							<Share2 className="mr-2 h-4 w-4" aria-hidden />
+							{isPreparingCard ? 'Preparing Card…' : 'Share Profile Card'}
 						</Button>
 						{!isOwnProfile && followAction && (
 							<Button

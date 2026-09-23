@@ -870,3 +870,77 @@ test('training partners request and cancel', async ({ page }) => {
 		}
 	}
 })
+
+test('profile card downloads a complete PNG', async ({ page }) => {
+	await page.addInitScript(() => {
+		Object.defineProperty(navigator, 'share', {
+			configurable: true,
+			value: undefined,
+		})
+	})
+	await prepare(page, 1280, 'dark')
+	await load(page, '/profile')
+
+	const downloadPromise = page.waitForEvent('download')
+	await page.getByRole('button', { name: 'Share Profile Card' }).click()
+	const download = await downloadPromise
+	expect(download.suggestedFilename()).toMatch(
+		/^sunnsteel-[a-z0-9_-]+-profile-card\.png$/,
+	)
+
+	const stream = await download.createReadStream()
+	const chunks: Buffer[] = []
+	for await (const chunk of stream) chunks.push(Buffer.from(chunk))
+	const png = Buffer.concat(chunks)
+	expect(png.subarray(0, 8)).toEqual(
+		Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+	)
+	expect(png.readUInt32BE(16)).toBe(1200)
+	expect(png.readUInt32BE(20)).toBe(1500)
+	await expect(page.getByText('Profile card saved')).toBeVisible()
+})
+
+test('profile card uses native file sharing when available', async ({
+	page,
+}) => {
+	await page.addInitScript(() => {
+		Object.defineProperty(navigator, 'canShare', {
+			configurable: true,
+			value: ({ files }: ShareData) =>
+				files?.length === 1 && files[0].type === 'image/png',
+		})
+		Object.defineProperty(navigator, 'share', {
+			configurable: true,
+			value: async ({ files }: ShareData) => {
+				const file = files?.[0]
+				;(window as typeof window & { __sharedProfileCard?: unknown })[
+					'__sharedProfileCard'
+				] = file ? { name: file.name, size: file.size, type: file.type } : null
+			},
+		})
+	})
+	await prepare(page, 390, 'light')
+	await load(page, '/profile')
+
+	await page.getByRole('button', { name: 'Share Profile Card' }).click()
+	await expect(page.getByText('Profile card shared')).toBeVisible()
+	await expect
+		.poll(() =>
+			page.evaluate(
+				() =>
+					(
+						window as typeof window & {
+							__sharedProfileCard?: {
+								name: string
+								size: number
+								type: string
+							}
+						}
+					).__sharedProfileCard,
+			),
+		)
+		.toMatchObject({
+			name: expect.stringMatching(/-profile-card\.png$/),
+			type: 'image/png',
+		})
+})
