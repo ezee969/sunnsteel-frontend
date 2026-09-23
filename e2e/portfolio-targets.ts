@@ -254,9 +254,10 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'history-detail',
 		route: '/workouts/history/:history',
-		features: ['HIST-01', 'LIVE-09', 'SOC-07'],
+		features: ['HIST-01', 'LIVE-09', 'SOC-07', 'LIVE-17'],
 		ready: [/Volume|Sets|Duration/, /\d/],
-		caption: 'A finished session recap, shareable through a public link.',
+		caption:
+			'A finished session recap, shareable through a public link, and correctable for two days with every change kept.',
 	},
 	{
 		slug: 'progress',

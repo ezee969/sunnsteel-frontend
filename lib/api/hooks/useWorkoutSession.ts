@@ -1,6 +1,9 @@
 import type {
+	CorrectSessionRequest,
+	CorrectSessionResponse,
 	PlateauPreferences,
 	PlateausResponse,
+	SessionCorrectionsResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
 } from '@sunsteel/contracts'
@@ -137,6 +140,8 @@ const qk = {
 	previousPerformance: (id: string) =>
 		['workout', 'session', id, 'previous-performance'] as const,
 	recap: (id: string) => ['workout', 'session', id, 'recap'] as const,
+	corrections: (id: string) =>
+		['workout', 'session', id, 'corrections'] as const,
 	sessions: (params: Omit<ListSessionsParams, 'cursor' | 'limit'>) =>
 		['workout', 'sessions', serializeSessionParams(params)] as const,
 }
@@ -407,6 +412,43 @@ export const useSessionRecap = (id: string, enabled = true) => {
 		queryFn: () => workoutService.getSessionRecap(id),
 		enabled: enabled && !!id,
 		staleTime: Number.POSITIVE_INFINITY,
+	})
+}
+
+/**
+ * LIVE-17. Read fresh every time: the window closes with the clock and with
+ * the next workout, and a stale "you can correct this" would be a promise the
+ * server then refuses.
+ */
+export const useSessionCorrections = (id: string, enabled = true) => {
+	return useQuery<SessionCorrectionsResponse>({
+		queryKey: qk.corrections(id),
+		queryFn: () => workoutService.getSessionCorrections(id),
+		enabled: enabled && !!id,
+		staleTime: 0,
+	})
+}
+
+/**
+ * A correction re-derives records, totals, achievements, the routine's loads
+ * and activity on the server, so every read built from them is stale after
+ * one — including the recap, which is otherwise cached forever.
+ */
+export const useCorrectSession = (id: string) => {
+	const qc = useQueryClient()
+	return useMutation<CorrectSessionResponse, Error, CorrectSessionRequest>({
+		mutationFn: data => workoutService.correctSession(id, data),
+		onSuccess: () => {
+			for (const queryKey of [
+				['workout'],
+				['routines'],
+				['achievements'],
+				['activity'],
+				['notifications'],
+				['users'],
+			])
+				void qc.invalidateQueries({ queryKey })
+		},
 	})
 }
 

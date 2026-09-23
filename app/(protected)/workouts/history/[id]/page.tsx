@@ -1,14 +1,23 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
+import {
+	SessionCorrectionEditor,
+	SessionCorrectionSummary,
+} from '@/features/workout/session-corrections'
 import { SessionRecapPanel } from '@/features/workout/session-recap'
 import { SessionShareButton } from '@/features/workout/session-share-dialog'
 import { useCollapseMap } from '@/hooks/use-collapse-map'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutSessionData } from '@/hooks/use-workout-session-data'
-import { useSessionRecap } from '@/lib/api/hooks/useWorkoutSession'
+import {
+	useSessionCorrections,
+	useSessionRecap,
+} from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 
 export default function WorkoutDetailPage() {
@@ -23,6 +32,14 @@ export default function WorkoutDetailPage() {
 		isLoading: isRecapLoading,
 		isError: isRecapError,
 	} = useSessionRecap(id, session?.status === 'COMPLETED')
+
+	// LIVE-17: whether it can still be corrected, and what was corrected.
+	const { data: corrections } = useSessionCorrections(
+		id,
+		session?.status === 'COMPLETED',
+	)
+	const weightUnit = useWeightUnit()
+	const [correcting, setCorrecting] = useState(false)
 
 	// UI state: collapsed exercises
 	const { toggle, isCollapsed } = useCollapseMap<string>()
@@ -81,26 +98,44 @@ export default function WorkoutDetailPage() {
 				)
 			) : null}
 
-			{/* Exercises: a ruled list, as on the session screen (§11.5). The
-			    heading is for the outline only — without it the exercise `h3`s
-			    sat under the recap's `h2`, or under no `h2` at all. */}
-			<section aria-labelledby="history-exercises-heading">
-				<h2 id="history-exercises-heading" className="sr-only">
-					Exercises
-				</h2>
-				{/* Rows rule themselves with `.rule-row`: a `divide-*` colour here
+			<SessionCorrectionSummary
+				correctionWindow={corrections?.window}
+				corrections={corrections?.corrections ?? []}
+				weightUnit={weightUnit}
+				editing={correcting}
+				onStart={() => setCorrecting(true)}
+			/>
+
+			{correcting ? (
+				<SessionCorrectionEditor
+					sessionId={session.id}
+					groups={exerciseGroups}
+					weightUnit={weightUnit}
+					onDone={() => setCorrecting(false)}
+				/>
+			) : (
+				// Exercises: a ruled list, as on the session screen (§11.5). The
+				// heading is for the outline only — without it the exercise `h3`s
+				// sat under the recap's `h2`, or under no `h2` at all. LIVE-17's
+				// editor takes its place while a correction is being made.
+				<section aria-labelledby="history-exercises-heading">
+					<h2 id="history-exercises-heading" className="sr-only">
+						Exercises
+					</h2>
+					{/* Rows rule themselves with `.rule-row`: a `divide-*` colour here
 				    greyed every completed row's success mark but the last's (TD-42). */}
-				<div className="border-y border-rule">
-					{exerciseGroups.map((group: ExerciseGroup) => (
-						<HistoryExerciseGroup
-							key={group.routineExerciseId}
-							group={group}
-							collapsed={isCollapsed(group.routineExerciseId)}
-							onToggle={() => toggle(group.routineExerciseId)}
-						/>
-					))}
-				</div>
-			</section>
+					<div className="border-y border-rule">
+						{exerciseGroups.map((group: ExerciseGroup) => (
+							<HistoryExerciseGroup
+								key={group.routineExerciseId}
+								group={group}
+								collapsed={isCollapsed(group.routineExerciseId)}
+								onToggle={() => toggle(group.routineExerciseId)}
+							/>
+						))}
+					</div>
+				</section>
+			)}
 		</div>
 	)
 }

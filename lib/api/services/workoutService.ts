@@ -1,7 +1,10 @@
 import type {
+	CorrectSessionRequest,
+	CorrectSessionResponse,
 	CreateSessionShareRequest,
 	PersonalGoalsResponse,
 	PlateausResponse,
+	SessionCorrectionsResponse,
 	SessionShare,
 	SessionShareListResponse,
 	SharedSessionRecap,
@@ -298,6 +301,24 @@ export const workoutService = {
 			},
 		)
 	},
+
+	// LIVE-17: whether the workout can still be corrected, and its trail.
+	getSessionCorrections: async (
+		id: string,
+	): Promise<SessionCorrectionsResponse> =>
+		httpClient.get<SessionCorrectionsResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/corrections`,
+			true,
+		),
+
+	correctSession: async (
+		id: string,
+		data: CorrectSessionRequest,
+	): Promise<CorrectSessionResponse> =>
+		httpClient.request<CorrectSessionResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/corrections`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
 
 	finishSession: async (
 		id: string,
