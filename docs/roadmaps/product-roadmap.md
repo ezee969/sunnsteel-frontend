@@ -80,6 +80,7 @@ else until it merges, so claims live here, on `main`.
 | ID      | Status        | Owner  | Branch / worktree | Claimed    | Repositories |
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
 | ROUT-09 | `IN_PROGRESS` | Codex  | `codex/rout-09`   | 2026-09-23 | CT, BE, FE   |
+| PROF-01 | `IN_PROGRESS` | Claude | `claude/avatar-storage` | 2026-09-23 | BE, FE, Supabase storage |
 
 ## Current product snapshot
 
