@@ -1,3 +1,5 @@
+import { avatarOutputSize } from './avatar-storage'
+
 export const createImage = (url: string): Promise<HTMLImageElement> =>
 	new Promise((resolve, reject) => {
 		const image = new Image()
@@ -72,9 +74,13 @@ export default async function getCroppedImg(
 		return null
 	}
 
-	// Set the size of the cropped canvas
-	croppedCanvas.width = pixelCrop.width
-	croppedCanvas.height = pixelCrop.height
+	// PROF-01: a crop of a phone photo is thousands of pixels square and
+	// several megabytes, for an image shown at ~128px. Scale it down (never up)
+	// so the upload stays far below the bucket's 2 MiB limit.
+	const output = avatarOutputSize(pixelCrop.width, pixelCrop.height)
+	croppedCanvas.width = output.width
+	croppedCanvas.height = output.height
+	croppedCtx.imageSmoothingQuality = 'high'
 
 	// Draw the cropped image onto the new canvas
 	croppedCtx.drawImage(
@@ -85,18 +91,22 @@ export default async function getCroppedImg(
 		pixelCrop.height,
 		0,
 		0,
-		pixelCrop.width,
-		pixelCrop.height,
+		output.width,
+		output.height,
 	)
 
 	// As a blob
 	return new Promise((resolve, reject) => {
-		croppedCanvas.toBlob(file => {
-			if (!file) {
-				reject(new Error('Canvas is empty'))
-				return
-			}
-			resolve(new File([file], 'cropped.jpeg', { type: 'image/jpeg' }))
-		}, 'image/jpeg')
+		croppedCanvas.toBlob(
+			file => {
+				if (!file) {
+					reject(new Error('Canvas is empty'))
+					return
+				}
+				resolve(new File([file], 'cropped.jpeg', { type: 'image/jpeg' }))
+			},
+			'image/jpeg',
+			0.9,
+		)
 	})
 }

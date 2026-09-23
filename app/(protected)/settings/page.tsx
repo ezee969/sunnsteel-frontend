@@ -44,8 +44,8 @@ import { TrainingIdentitySettingsCard } from '@/features/settings/training-ident
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { TrainingPartnersCard } from '@/features/settings/training-partners-card'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
+import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
-import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import {
 	getUsernameValidationError,
@@ -85,7 +85,8 @@ export default function SettingsPage() {
 	})
 
 	const [avatarUrl, setAvatarUrl] = useState('')
-	const [uploading, setUploading] = useState(false)
+	const uploadAvatar = useUploadAvatar()
+	const uploading = uploadAvatar.isPending
 
 	const [cropperOpen, setCropperOpen] = useState(false)
 	const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
@@ -170,50 +171,25 @@ export default function SettingsPage() {
 		}
 	}
 
-	const handleCroppedImageUpload = async (file: File) => {
-		try {
-			setUploading(true)
-
-			const fileExt = file.name.split('.').pop() || 'jpeg'
-			const fileName = `${user?.id}-${Math.random()}.${fileExt}`
-			const filePath = `${fileName}`
-
-			const { error: uploadError } = await supabase.storage
-				.from('avatars')
-				.upload(filePath, file)
-
-			if (uploadError) {
-				throw uploadError
-			}
-
-			const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
-
-			setAvatarUrl(data.publicUrl)
-
-			updateUserMutation.mutate(
-				{ avatarUrl: data.publicUrl },
-				{
-					onSuccess: () => {
-						push({
-							title: 'Avatar Updated',
-							description: 'Your new profile picture has been saved.',
-							variant: 'success',
-						})
-					},
-				},
-			)
-		} catch (error: unknown) {
-			logger.error('Error uploading avatar:', error)
-			push({
-				title: 'Error',
-				description:
-					(error as Error).message ||
-					'Error uploading avatar. Are you sure the "avatars" bucket is public and created?',
-				variant: 'destructive',
-			})
-		} finally {
-			setUploading(false)
-		}
+	const handleCroppedImageUpload = (file: File) => {
+		uploadAvatar.mutate(file, {
+			onSuccess: profile => {
+				setAvatarUrl(profile.avatarUrl || '')
+				push({
+					title: 'Avatar Updated',
+					description: 'Your new profile picture has been saved.',
+					variant: 'success',
+				})
+			},
+			onError: error => {
+				logger.error('Error uploading avatar:', error)
+				push({
+					title: 'Your photo was not changed',
+					description: error.message,
+					variant: 'destructive',
+				})
+			},
+		})
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
