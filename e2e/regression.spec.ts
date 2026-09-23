@@ -367,6 +367,9 @@ const ROUTES: SweepRoute[] = [
 	{ slug: 'forgot-password', path: () => '/forgot-password', signedOut: true },
 	// Signed out, the reset page shows its "link can't be used" state (FIX-11).
 	{ slug: 'reset-password', path: () => '/reset-password', signedOut: true },
+	// TD-44: the page the service worker serves offline; static, so it must
+	// render with no session at all.
+	{ slug: 'offline', path: () => '/offline', signedOut: true },
 	{
 		slug: 'members',
 		path: found => found.username && `/members/${found.username}`,

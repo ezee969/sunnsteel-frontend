@@ -25,6 +25,10 @@ const eslintConfig = [
 			'next-env.d.ts',
 			'test-results/**',
 			'playwright-report/**',
+			// TD-44: generated from worker/sw.ts by @serwist/next at build time.
+			'public/sw.js',
+			'public/sw.js.map',
+			'public/swe-worker-*.js',
 		],
 	},
 	...compat.extends('next/core-web-vitals', 'next/typescript'),

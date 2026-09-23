@@ -17,7 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-One entry is open: frontend PWA maintenance debt `TD-44`. `TD-43`, the
+One entry is open: frontend PWA maintenance debt `TD-44`, implemented on
+2026-09-23 and waiting only on the owner's installed-iPhone update smoke test
+before it can close. `TD-43`, the
 per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
 closed on 2026-09-23; `TD-46`, proxy client-IP handling, and `TD-47`, the dead
 pre-Supabase auth code, both on 2026-09-22; and `TD-45`, the middleware
@@ -156,7 +158,34 @@ that serves an unknown key id. Nothing was measured on an iPhone.
 
 <a id="td-44"></a>
 
-### TD-44 — The hand-written service worker owns revisioning and cache lifecycle
+### TD-44 — The hand-written service worker owns revisioning and cache lifecycle — IMPLEMENTED 2026-09-23, closure pending the iPhone smoke test
+
+**Status (2026-09-23).** Implemented and deployed; not closed, because the
+closure below requires an installed-iPhone update smoke test that only the
+owner can run. `worker/sw.ts` is compiled by `@serwist/next` 9.5 into
+`public/sw.js` during `next build` with a content-revisioned precache manifest
+(155 entries: every build chunk, CSS and font, plus the web manifest, the 192px
+icon, the favicon and a new static `/offline` page); the hand-written file, its
+`CACHE_VERSION` and its URL list are gone. The application policy is explicit
+in `lib/pwa/service-worker-policy.ts` and unit-tested; registration, deferral
+and the one-time reload stay in `providers/pwa-provider.tsx` unchanged, with the
+plugin's registration and `skipWaiting` off. Verified against a local
+production server (`next start`) in Chromium, one context carried across
+"deploys": the v6 worker upgrades to the generated one without a loop (one
+reload), its `ss-*-v6` caches are deleted and an unrelated origin cache is kept;
+a visited page opens offline from `ss-pages`, an unvisited one gets `/offline`,
+and reconnecting loads from the network; no backend, API, Supabase or other
+cross-origin response is in Cache Storage (172 entries checked); an update found
+on `/workouts/sessions/*` stays waiting with no reload; a first install does not
+reload; and the development server unregisters the production worker, removes
+every `ss-*` cache and keeps the unrelated one. **One check is not reliable:**
+after leaving the workout, the waiting worker sometimes does not take over
+because Chromium still reports work on the active worker; it reproduced with the
+old v6 worker as well (one run in four), so it is not introduced by this change.
+The update then applies at the next launch. **Remaining for closure:** the
+installed-iPhone update smoke test, and the `/offline` page seen on a real
+device.
+
 
 **Impact.** The current worker is functional and its known unsafe update paths
 have been corrected, so this is not an active user-facing defect. It is a
