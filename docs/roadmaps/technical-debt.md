@@ -17,9 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-Two entries are open: backend authentication debt `TD-43` and frontend PWA
-maintenance debt `TD-44`. `TD-48`, agent-document drift, closed on
-2026-09-23; `TD-46`, proxy client-IP handling, and `TD-47`, the dead
+One entry is open: frontend PWA maintenance debt `TD-44`. `TD-43`, the
+per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
+closed on 2026-09-23; `TD-46`, proxy client-IP handling, and `TD-47`, the dead
 pre-Supabase auth code, both on 2026-09-22; and `TD-45`, the middleware
 matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 `TD-35`, `TD-37` and `TD-31` straight after it, `TD-32` after Phase 15, and
@@ -30,7 +30,7 @@ actionable residue is recorded here.
 
 <a id="td-43"></a>
 
-### TD-43 — The authentication guard calls Supabase Auth on every protected request
+### TD-43 — The authentication guard calls Supabase Auth on every protected request — CLOSED 2026-09-23
 
 **Impact.** Every protected backend request waits for Supabase Auth and then
 for the local user lookup before its controller runs. A page that fans out into
@@ -76,24 +76,83 @@ short-lived mapping from Supabase `sub` to the minimum local request identity,
 with invalidation for account/profile changes and deletion. Do not cache a
 mutable Prisma `User` indefinitely or add Redis solely for this item.
 
-**Closure.** All of the following are verified:
+**How big it was.** Supabase's edge logs for the 24 hours before the fix held
+7,680 `GET /auth/v1/user` calls against 45 token refreshes, at 180 ms p50 and
+246 ms p95 of Supabase origin time each, and every token in them was ES256.
+Almost all came from local backends; production traffic is light, so the
+number measures the design rather than the load.
 
-- Repeated requests with a current asymmetric access token make no
-  `/auth/v1/user` call; a JWKS fetch on an empty key cache is allowed.
-- Malformed, expired, wrongly issued, wrongly targeted and unauthenticated-role
-  tokens receive `401`.
-- Existing, new and legacy-linked local users still resolve correctly; email
-  change and conflicting-email behaviour remain explicit and tested.
-- A protected request can still provision a new local account before
-  `/auth/supabase/verify` finishes, preserving the frontend's non-gating auth
-  flow.
-- The local lookup count is measured under repeated requests. Any cache added
-  has bounded TTL/size plus invalidation and multi-instance semantics covered
-  by tests; otherwise the measurement is recorded as the reason to retain the
-  indexed lookup.
-- Backend lint, typecheck, tests and build pass, and a real bearer-token check
-  confirms the production-shaped flow. The backend auth documentation is
-  updated in the same change.
+**Resolution (2026-09-23).** `SupabaseService.verifyToken` calls
+`supabase.auth.getClaims` in place of `getUser`. `getClaims` checks the
+signature against the project's JWKS and `exp`, and nothing else, so the new
+pure `identityFromClaims` (`src/auth/access-token-claims.ts`) requires the
+project's `iss`, the `authenticated` audience and role, and a subject.
+Identity, email and name now come from the claims; `getOrCreateUser` is
+otherwise unchanged, so provisioning still happens on whichever request
+arrives first.
+
+- **The JWKS cache is supabase-js's, and it is process-wide.** It lives in a
+  module-level map keyed by storage key, shared by every client in the
+  process, with a ten-minute TTL; a token with a key id not in the cache
+  refetches it. That is the whole cache story: nothing was added.
+- **The local lookup stays uncached.** `user.findUnique` by
+  `supabaseUserId` measured 1.8 ms p50 and 2.6 ms p95 over 90 reads, which is
+  not worth a cache and the invalidation it would need.
+- **The trade-off is revocation, and it is accepted.** A token stays accepted
+  until `exp` (an hour) after its session ends, where `getUser` refused it
+  at once. Nothing depends on immediate revocation: no product control
+  suspends a member's access, and moderation hides and the moderator flag are
+  read from the database on every request. An email change reaches the local
+  row when the client next refreshes its token; the product has no email
+  change flow today.
+- **A symmetric token still takes the remote path**, inside `getClaims`. The
+  project issues none, so this is the documented transition fallback rather
+  than a live path.
+
+**Closure.** All verified on 2026-09-23:
+
+- **No `/auth/v1/user` call with a current asymmetric token.** In
+  `scripts/supabase-auth.test.ts` the real supabase-js `getClaims` runs
+  against a stand-in Supabase Auth serving a JWKS for a key generated in the
+  test, which counts what it is asked: five verifications make no
+  `/auth/v1/user` call and at most one JWKS fetch. Locally, with the owner's
+  real session, 30 protected reads made **zero** Supabase calls on the new
+  code and **30** on the old. In production, Supabase's own edge logs show 30
+  `/auth/v1/user` calls from Railway for 30 requests before the deploy
+  (09:15:46-54 UTC) and, after it, **one JWKS fetch and no `/auth/v1/user`
+  call** for 33 requests.
+- **Malformed, expired, wrongly issued, wrongly targeted and
+  unauthenticated-role tokens get `401`.** Tested through the real
+  `getClaims` with signed tokens: malformed, three non-JWT segments, expired,
+  another key, a tampered payload, another issuer, another audience, the
+  `anon` role and no subject, each with no `/auth/v1/user` call; and in the
+  pure function for every claim. Also checked over HTTP locally and in
+  production (`POST /auth/supabase/verify` with a bad token: `401`).
+- **Existing, new and legacy-linked users still resolve, and email behaviour
+  is explicit.** Tested: an existing member resolves with one lookup and no
+  write, a changed email in the token is synced, a legacy row with the email
+  and no Supabase id is linked, an email already linked to another Supabase
+  user is a `409`, a new member is created and named from the metadata (or
+  the email when the metadata carries no string), and a concurrent first
+  request that wins the create is settled on.
+- **A protected request provisions a new account before `/verify`.** Tested
+  through `SupabaseJwtStrategy.validate` with a signed token and an empty
+  database: the member is created, with no `/auth/v1/user` call.
+- **The lookup was measured and no cache was added** (above).
+- **Gates and a real bearer-token check.** Backend `npm run verify` passes
+  (372 tests, 33 of them new). Locally, the owner signed in through the new
+  backend, which completes only once `/auth/supabase/verify` succeeds; the
+  sign-in and the page it opened cost one JWKS fetch between them. With that
+  real token, `GET /users/profile` went from p50 274.9 ms to 8.3 ms locally,
+  and in production from p50 276.5 ms / p95 412.4 ms to p50 122.2 ms / p95
+  169.2 ms, the remainder being network distance and the database; routines,
+  the active session and notifications all answer `200`. The backend
+  `CLAUDE.md`/`AGENTS.md`, `ARCHITECTURE.md` (the request trace, §3 and
+  decision D4) and `TECH_STACK.md` describe the new path.
+
+**Not verified.** The ten-minute JWKS refresh and a real key rotation were
+not observed in production; the rotation path is covered only by the test
+that serves an unknown key id. Nothing was measured on an iPhone.
 
 <a id="td-44"></a>
 
@@ -508,6 +567,11 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-23 (revision 20):** Closed `TD-43`. The guard verifies access
+  tokens locally with `getClaims` plus issuer, audience and role checks, and
+  no longer calls Supabase Auth per request; the local lookup was measured
+  and left uncached. Production went from 30 `/auth/v1/user` calls per 30
+  requests to none. `TD-44` is the one open entry.
 - **2026-09-23 (revision 20):** Closed two operational gaps found while
   delivering `SOC-09`. The frontend lock pinned an invalid registry checksum
   for optional `@emnapi/runtime@1.11.3` (`UK1R1` instead of the published
