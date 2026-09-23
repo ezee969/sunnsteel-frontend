@@ -17,9 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-One entry is open: frontend PWA maintenance debt `TD-44`, implemented on
-2026-09-23 and waiting only on the owner's installed-iPhone update smoke test
-before it can close. `TD-43`, the
+There are no open entries. Frontend PWA maintenance debt `TD-44` closed on
+2026-09-23 after the owner completed the required installed-iPhone update and
+offline-fallback smoke test. `TD-43`, the
 per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
 closed on 2026-09-23; `TD-46`, proxy client-IP handling, and `TD-47`, the dead
 pre-Supabase auth code, both on 2026-09-22; and `TD-45`, the middleware
@@ -158,11 +158,12 @@ that serves an unknown key id. Nothing was measured on an iPhone.
 
 <a id="td-44"></a>
 
-### TD-44 — The hand-written service worker owns revisioning and cache lifecycle — IMPLEMENTED 2026-09-23, closure pending the iPhone smoke test
+### TD-44 — The hand-written service worker owns revisioning and cache lifecycle — CLOSED 2026-09-23
 
-**Status (2026-09-23).** Implemented and deployed; not closed, because the
-closure below requires an installed-iPhone update smoke test that only the
-owner can run. `worker/sw.ts` is compiled by `@serwist/next` 9.5 into
+**Status (2026-09-23).** Implemented, deployed and closed. The owner confirmed
+that the installed Sunnsteel PWA updated successfully on an iPhone and that the
+real-device offline fallback worked. `worker/sw.ts` is compiled by
+`@serwist/next` 9.5 into
 `public/sw.js` during `next build` with a content-revisioned precache manifest
 (155 entries: every build chunk, CSS and font, plus the web manifest, the 192px
 icon, the favicon and a new static `/offline` page); the hand-written file, its
@@ -182,9 +183,9 @@ every `ss-*` cache and keeps the unrelated one. **One check is not reliable:**
 after leaving the workout, the waiting worker sometimes does not take over
 because Chromium still reports work on the active worker; it reproduced with the
 old v6 worker as well (one run in four), so it is not introduced by this change.
-The update then applies at the next launch. **Remaining for closure:** the
-installed-iPhone update smoke test, and the `/offline` page seen on a real
-device.
+The update then applies at the next launch. The required installed-iPhone update
+and `/offline` smoke test subsequently passed on the owner's device, closing the
+last verification gap.
 
 
 **Impact.** The current worker is functional and its known unsafe update paths
@@ -596,6 +597,11 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-23 (revision 21):** Closed `TD-44`. The owner completed the required
+  update smoke test on the installed iPhone PWA and confirmed the real-device
+  offline fallback. The generated Serwist worker, its local production-browser
+  coverage and the device check now satisfy every closure criterion; the active
+  register is empty.
 - **2026-09-23 (revision 20):** Closed `TD-43`. The guard verifies access
   tokens locally with `getClaims` plus issuer, audience and role checks, and
   no longer calls Supabase Auth per request; the local lookup was measured
