@@ -50,12 +50,18 @@ export function ActivityFact({
 	entry,
 	weightUnit,
 	canReact = false,
+	discussion = true,
 	children,
 }: {
 	entry: ActivityEntry
 	weightUnit: WeightUnit
 	/** SOC-05: false on your own activity, where there is nothing to acknowledge. */
 	canReact?: boolean
+	/**
+	 * False on the dashboard preview (DASH-08), which names the fact and leaves
+	 * reacting and commenting to the Activity page it links to.
+	 */
+	discussion?: boolean
 	children?: ReactNode
 }) {
 	const Icon = ACTIVITY_ICONS[entry.type]
@@ -78,18 +84,22 @@ export function ActivityFact({
 				</p>
 				{detail ? <p className="type-body-sm text-ink-3">{detail}</p> : null}
 				{children}
-				<ActivityReactions
-					entryId={entry.id}
-					summary={entry.reactions}
-					canReact={canReact}
-				/>
-				<ActivityComments entryId={entry.id} summary={entry.comments} />
+				{discussion ? (
+					<>
+						<ActivityReactions
+							entryId={entry.id}
+							summary={entry.reactions}
+							canReact={canReact}
+						/>
+						<ActivityComments entryId={entry.id} summary={entry.comments} />
+					</>
+				) : null}
 			</div>
 		</div>
 	)
 }
 
-function AuthorHeader({ entry }: { entry: ActivityEntry }) {
+export function AuthorHeader({ entry }: { entry: ActivityEntry }) {
 	const { author } = entry
 	const name = describeAuthor(author)
 	return (

@@ -4,6 +4,7 @@ import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
 
 import DashboardLoading from './components/DashboardLoading'
+import FollowingPreview from './components/FollowingPreview'
 import PersonalRecords from './components/PersonalRecords'
 import RecentActivity from './components/RecentActivity'
 import StatsOverview from './components/StatsOverview'
@@ -88,6 +89,14 @@ export default function Dashboard() {
 					 */}
 					<TrainingInsights />
 					<UpcomingMilestones />
+
+					{/*
+					 * DASH-08: a few updates from members you follow, last of all so
+					 * the social read never pushes a training action down. It is the
+					 * SOC-03 feed's own query, bounded here, with its own skeleton
+					 * for the same reason as the two sections above.
+					 */}
+					<FollowingPreview />
 				</div>
 			)}
 		</div>

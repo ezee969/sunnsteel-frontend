@@ -209,10 +209,17 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'dashboard',
 		route: '/dashboard',
-		features: ['DASH-01', 'DASH-02', 'DASH-07', 'DASH-09', 'CORE-03'],
+		features: [
+			'DASH-01',
+			'DASH-02',
+			'DASH-07',
+			'DASH-09',
+			'DASH-08',
+			'CORE-03',
+		],
 		ready: ['Weekly Workouts', 'Total Workouts', 'Total Volume'],
 		caption:
-			"Today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks and the next milestones.",
+			"Today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks, the next milestones and a few updates from members you follow.",
 	},
 	{
 		slug: 'routine-builder',
