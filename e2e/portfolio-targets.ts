@@ -344,6 +344,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		caption:
 			'Training-partner requests and independent access controls for schedule, progress, activity, routines and encouragement.',
 	},
+	{
+		slug: 'delete-account-settings',
+		route: '/settings',
+		features: ['TRUST-01'],
+		setup: async page => {
+			await page
+				.getByRole('heading', { name: 'Delete Account' })
+				.scrollIntoViewIfNeeded()
+		},
+		ready: ['Delete Account', 'cannot be undone'],
+		caption:
+			'Account deletion: immediate and complete, confirmed by typing the username, and refused for a moderator account.',
+	},
 	// Last on purpose: while the scratch session is live every other protected
 	// page shows its Resume banner, so nothing may be captured after a failed
 	// cleanup. The spec also stops the run if the session survives.

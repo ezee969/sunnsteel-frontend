@@ -4,9 +4,14 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
+import {
+	ACCOUNT_DELETED_NOTICE,
+	ACCOUNT_DELETED_PARAM,
+} from '@/lib/utils/account-deletion'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
+import { AuthNotice } from '../components/AuthPageParts'
 import { LoginHeader } from './components/LoginHeader'
 import { SupabaseLoginForm } from './components/SupabaseLoginForm'
 
@@ -17,6 +22,7 @@ function LoginContent() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const { isAuthenticated, isLoading } = useSupabaseAuth()
+	const accountDeleted = searchParams.get('account') === ACCOUNT_DELETED_PARAM
 
 	useEffect(() => {
 		// Redirect authenticated users away from /login
@@ -57,6 +63,11 @@ function LoginContent() {
 	return (
 		<div>
 			<LoginHeader />
+			{accountDeleted ? (
+				<AuthNotice tone="success" title="Account deleted" role="status">
+					{ACCOUNT_DELETED_NOTICE}
+				</AuthNotice>
+			) : null}
 			<SupabaseLoginForm />
 		</div>
 	)

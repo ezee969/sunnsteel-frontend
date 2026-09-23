@@ -222,6 +222,17 @@ export class SupabaseAuthService {
 	}
 
 	/**
+	 * TRUST-01: leave the app after the account was deleted. The marker goes
+	 * first, as on every path that ends a session (TD-21). The Supabase sign-out
+	 * is local only: the user no longer exists server-side, so there is no
+	 * session there to revoke and a network sign-out could only fail.
+	 */
+	async signOutDeletedAccount(): Promise<void> {
+		await this.clearSessionMarker()
+		await supabase.auth.signOut({ scope: 'local' })
+	}
+
+	/**
 	 * Set the same-origin `ss_session` marker cookie the middleware reads for
 	 * route protection. Must be set by the frontend (not the backend): a cookie
 	 * from the cross-site backend response is scoped to the backend domain and is

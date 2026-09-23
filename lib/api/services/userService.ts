@@ -1,4 +1,6 @@
 import {
+	DeleteAccountRequest,
+	DeleteAccountResponse,
 	FeaturedProfileSelectionsResponse,
 	FollowSuggestionsResponse,
 	MeasurableGoal,
@@ -34,6 +36,17 @@ export const userService = {
 	// Get current user profile
 	async getProfile(): Promise<UserProfile> {
 		return httpClient.get<UserProfile>('/users/profile', true)
+	},
+
+	/** TRUST-01: delete the signed-in account, immediately and completely. */
+	async deleteAccount(
+		data: DeleteAccountRequest,
+	): Promise<DeleteAccountResponse> {
+		return httpClient.request<DeleteAccountResponse>('/users/me', {
+			method: 'DELETE',
+			body: JSON.stringify(data),
+			secure: true,
+		})
 	},
 
 	// Update user profile
