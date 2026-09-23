@@ -24,8 +24,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useDeleteAccount } from '@/lib/api/hooks/useDeleteAccount'
 import {
+	ACCOUNT_DELETION_EXPORT_FIRST,
 	ACCOUNT_DELETION_KEEPS,
-	ACCOUNT_DELETION_NO_EXPORT,
 	ACCOUNT_DELETION_REMOVES,
 	canConfirmDeletion,
 	deletionBlockedReason,
@@ -107,7 +107,7 @@ export function DeleteAccountCard({
 							aria-hidden
 						/>
 						<p className="type-body-sm text-foreground">
-							{ACCOUNT_DELETION_NO_EXPORT}
+							{ACCOUNT_DELETION_EXPORT_FIRST}
 						</p>
 					</div>
 

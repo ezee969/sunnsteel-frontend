@@ -32,6 +32,7 @@ import { useToast } from '@/components/ui/toast'
 import { ActivitySharingCard } from '@/features/settings/activity-sharing-card'
 import { BlockedMembersCard } from '@/features/settings/blocked-members-card'
 import { DeleteAccountCard } from '@/features/settings/delete-account-card'
+import { DownloadDataCard } from '@/features/settings/download-data-card'
 import { FeaturedRecordsSettingsCard } from '@/features/settings/featured-records-settings-card'
 import { MeasurableGoalsSettingsCard } from '@/features/settings/measurable-goals-settings-card'
 import { MotionPreferenceCard } from '@/features/settings/motion-preference-card'
@@ -554,6 +555,8 @@ export default function SettingsPage() {
 			<NotificationControlsCard />
 
 			<MotionPreferenceCard />
+
+			<DownloadDataCard />
 
 			{user ? <DeleteAccountCard profile={user} /> : null}
 

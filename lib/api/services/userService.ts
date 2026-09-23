@@ -1,4 +1,5 @@
 import {
+	AccountExportV1,
 	DeleteAccountRequest,
 	DeleteAccountResponse,
 	FeaturedProfileSelectionsResponse,
@@ -36,6 +37,11 @@ export const userService = {
 	// Get current user profile
 	async getProfile(): Promise<UserProfile> {
 		return httpClient.get<UserProfile>('/users/profile', true)
+	},
+
+	/** EXPORT-01: everything the signed-in member owns, as one document. */
+	async exportAccount(): Promise<AccountExportV1> {
+		return httpClient.get<AccountExportV1>('/users/me/export', true)
 	},
 
 	/** TRUST-01: delete the signed-in account, immediately and completely. */

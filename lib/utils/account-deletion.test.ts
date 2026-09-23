@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
 	ACCOUNT_DELETED_LOGIN_URL,
+	ACCOUNT_DELETION_EXPORT_FIRST,
 	ACCOUNT_DELETION_KEEPS,
-	ACCOUNT_DELETION_NO_EXPORT,
 	ACCOUNT_DELETION_REMOVES,
 	canConfirmDeletion,
 	deletionBlockedReason,
@@ -19,13 +19,14 @@ describe('TRUST-01 account deletion copy', () => {
 		const everything = [
 			removes,
 			ACCOUNT_DELETION_KEEPS,
-			ACCOUNT_DELETION_NO_EXPORT,
+			ACCOUNT_DELETION_EXPORT_FIRST,
 		].join(' ')
 		expect(everything).not.toMatch(/restore|recover|undo|30 days|grace/i)
 	})
 
-	it('says plainly that no export exists yet', () => {
-		expect(ACCOUNT_DELETION_NO_EXPORT).toMatch(/no data export yet/)
+	it('points to the export before anything is deleted', () => {
+		expect(ACCOUNT_DELETION_EXPORT_FIRST).toMatch(/Download Your Data/)
+		expect(ACCOUNT_DELETION_EXPORT_FIRST).not.toMatch(/no data export/)
 	})
 
 	it('explains the moderator refusal and allows everyone else', () => {

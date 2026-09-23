@@ -345,6 +345,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Training-partner requests and independent access controls for schedule, progress, activity, routines and encouragement.',
 	},
 	{
+		slug: 'download-data-settings',
+		route: '/settings',
+		features: ['EXPORT-01'],
+		setup: async page => {
+			await page
+				.getByRole('heading', { name: 'Download Your Data' })
+				.scrollIntoViewIfNeeded()
+		},
+		ready: ['Download Your Data', 'Download My Data'],
+		caption:
+			'Download everything you own as one versioned JSON file, directly above account deletion.',
+	},
+	{
 		slug: 'delete-account-settings',
 		route: '/settings',
 		features: ['TRUST-01'],

@@ -19,11 +19,11 @@ export const ACCOUNT_DELETION_KEEPS =
 	'Copies other members made of your shared routines stay theirs. They no longer name you.'
 
 /**
- * EXPORT-01 does not exist yet. Saying so is the honest version of "download
- * your data first", which a member would otherwise look for and not find.
+ * EXPORT-01: the step to take first, named where it is -- the card directly
+ * above -- because the deletion is final.
  */
-export const ACCOUNT_DELETION_NO_EXPORT =
-	'There is no data export yet, so save anything you want to keep before you delete.'
+export const ACCOUNT_DELETION_EXPORT_FIRST =
+	'To keep a copy of your data, use Download Your Data, just above, before you delete.'
 
 export const ACCOUNT_DELETED_NOTICE =
 	'Your account and everything in it has been deleted. You can create a new account with the same email at any time.'
