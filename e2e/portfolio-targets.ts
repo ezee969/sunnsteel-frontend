@@ -365,7 +365,9 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		setup: async page => {
 			await page
 				.getByRole('heading', { name: 'Training signals' })
-				.scrollIntoViewIfNeeded()
+				.evaluate(heading =>
+					heading.closest('section')?.scrollIntoView({ block: 'center' }),
+				)
 		},
 		ready: ['Training signals', 'They state what changed, not why.'],
 		caption:

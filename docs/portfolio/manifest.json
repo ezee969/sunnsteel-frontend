@@ -163,6 +163,17 @@
 			"height": 900
 		},
 		{
+			"slug": "training-signals",
+			"route": "/progress#training-signals",
+			"features": [
+				"PROG-10",
+				"PROG-09"
+			],
+			"capturedAt": "2026-09-24T13:42:39.242Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
 			"slug": "training-partner-profile",
 			"route": "/profile/ken-watanabe",
 			"features": [
