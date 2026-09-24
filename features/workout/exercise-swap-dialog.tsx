@@ -49,6 +49,8 @@ interface ExerciseSwapDialogProps {
 	 * copy -- not the routine -- is what "also use it" updates.
 	 */
 	trainingBlockName?: string
+	/** ROUT-16: the session trains a deload, whose own copy "also use it" updates. */
+	deload?: boolean
 	target: SwapTarget | null
 	/** Exercises performed in the day's other slots; never offered. */
 	otherExerciseIds: string[]
@@ -66,16 +68,17 @@ export function ExerciseSwapDialog({
 	sessionId,
 	routineId,
 	trainingBlockName,
+	deload = false,
 	target,
 	otherExerciseIds,
 	onClose,
 }: ExerciseSwapDialogProps) {
-	const plan = trainingBlockName
-		? `the training block “${trainingBlockName}”`
-		: 'the routine'
-	const Plan = trainingBlockName
-		? `The training block “${trainingBlockName}”`
-		: 'The routine'
+	const plan = deload
+		? 'this deload'
+		: trainingBlockName
+			? `the training block “${trainingBlockName}”`
+			: 'the routine'
+	const Plan = plan[0].toUpperCase() + plan.slice(1)
 	const { data: exercises, isLoading } = useExercises()
 	const { data: locations } = useTrainingLocations()
 	const gym = defaultTrainingLocation(locations)

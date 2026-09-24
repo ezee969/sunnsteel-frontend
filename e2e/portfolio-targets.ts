@@ -244,6 +244,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'A routine following its training block in force, with the authored block timeline and saved versions.',
 	},
 	{
+		slug: 'routine-deload',
+		route: '/routines/:routine',
+		features: ['ROUT-16'],
+		// Opens the dialog only: the preview is computed in the browser, so the
+		// capture writes nothing.
+		setup: async page => {
+			await page.getByRole('button', { name: 'Plan deload' }).click()
+		},
+		ready: ['Plan a deload', 'What changes'],
+		caption:
+			'Planning a deload: a lighter copy of the plan in force, previewed exercise by exercise before it replaces those days.',
+	},
+	{
 		slug: 'history',
 		route: '/workouts/history',
 		features: ['HIST-01'],

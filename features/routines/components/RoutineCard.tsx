@@ -24,6 +24,7 @@ import {
 	weekdayName,
 } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
+import { planLabel } from '@/lib/utils/routine-deloads'
 import { formatDaysPerWeek } from '@/lib/utils/routine-format'
 import {
 	describeRoutineFrequency,
@@ -77,6 +78,11 @@ export function RoutineCard({
 	// ROUT-15: the card offers the plan in force today, a training block's
 	// days while one covers today.
 	const plan = routineOn(routine, localDateKey(new Date()))
+	// ROUT-15/ROUT-16: the block or deload today trains, when not the routine.
+	const planText = planLabel({
+		trainingBlockName: plan.trainingBlock?.name,
+		deload: !!plan.temporaryOverride,
+	})
 	// Date validation for workout scheduling
 	const todayDow = getTodayDow()
 	const workoutValidation = validateWorkoutDate(plan.days)
@@ -117,10 +123,8 @@ export function RoutineCard({
 							{describeRoutineSchedule(plan)}
 						</p>
 					)}
-					{plan.trainingBlock ? (
-						<p className="type-body-sm text-ink-3">
-							Training block · {plan.trainingBlock.name}
-						</p>
+					{planText ? (
+						<p className="type-body-sm text-ink-3">{planText}</p>
 					) : null}
 				</div>
 				<DropdownMenu>

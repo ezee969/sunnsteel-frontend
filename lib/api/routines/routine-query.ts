@@ -91,4 +91,6 @@ export const routineQueryKeys = {
 			'revisions',
 			blockId,
 		] as const,
+	/** ROUT-16: a routine's deloads, outside `['routines']` like versions. */
+	deloads: (routineId: string) => ['routine-deloads', routineId] as const,
 }

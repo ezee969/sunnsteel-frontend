@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
 import { cn } from '@/lib/utils'
 import { getHistoryEmptyState } from '@/lib/utils/empty-states'
+import { planLabel } from '@/lib/utils/routine-deloads'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 
 const getErrorMessage = (err: unknown): string => {
@@ -115,9 +116,15 @@ export function WorkoutHistoryList({
 							<div className="type-panel min-w-0 text-foreground">
 								{s.routine.name}
 								{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
-								{s.routine.trainingBlockName ? (
+								{planLabel({
+									trainingBlockName: s.routine.trainingBlockName,
+									deload: !!s.routine.temporaryOverrideKind,
+								}) ? (
 									<span className="type-body-sm block text-ink-3">
-										Training block · {s.routine.trainingBlockName}
+										{planLabel({
+											trainingBlockName: s.routine.trainingBlockName,
+											deload: !!s.routine.temporaryOverrideKind,
+										})}
 									</span>
 								) : null}
 							</div>

@@ -46,12 +46,19 @@ export function sessionPrescription(
 	}
 }
 
-/** "Upper / Lower · Strength" while a session trains a block. */
+/**
+ * "Upper / Lower · Strength" while a session trains a block, and
+ * "... · Deload" while it trains a deload (ROUT-16).
+ */
 export function sessionRoutineTitle(
-	session: Pick<WorkoutSession, 'routine' | 'trainingBlock'>,
+	session: Pick<WorkoutSession, 'routine' | 'trainingBlock'> &
+		Partial<Pick<WorkoutSession, 'temporaryOverride'>>,
 ): string {
-	const name = session.routine?.name ?? 'Workout'
-	return session.trainingBlock
-		? `${name} · ${session.trainingBlock.name}`
-		: name
+	return [
+		session.routine?.name ?? 'Workout',
+		session.trainingBlock?.name,
+		session.temporaryOverride ? 'Deload' : null,
+	]
+		.filter(Boolean)
+		.join(' · ')
 }

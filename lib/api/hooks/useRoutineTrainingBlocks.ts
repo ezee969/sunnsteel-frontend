@@ -30,12 +30,19 @@ export const useRoutineTrainingBlockRevisions = (
 		enabled: !!routineId && !!blockId,
 	})
 
+/**
+ * ROUT-15: the routine read carries the current blocks, which decide what
+ * each date trains, so a block write refreshes the routines too.
+ */
 function useInvalidateTrainingBlocks(routineId: string) {
 	const queryClient = useQueryClient()
 	return () =>
-		queryClient.invalidateQueries({
-			queryKey: routineQueryKeys.trainingBlocksAll(routineId),
-		})
+		Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: routineQueryKeys.trainingBlocksAll(routineId),
+			}),
+			queryClient.invalidateQueries({ queryKey: routineQueryKeys.all() }),
+		])
 }
 
 export const useCreateRoutineTrainingBlock = (routineId: string) => {

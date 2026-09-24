@@ -35,6 +35,7 @@ import {
 } from '@/lib/utils/dashboard-primary-action'
 import { weekdayName } from '@/lib/utils/date'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
+import { planLabel } from '@/lib/utils/routine-deloads'
 import {
 	isRotationRoutine,
 	routineDayTitle,
@@ -190,9 +191,15 @@ export default function TodaysWorkouts() {
 													)}
 												</Badge>
 											</div>
-											{routine.trainingBlock ? (
+											{planLabel({
+												trainingBlockName: routine.trainingBlock?.name,
+												deload: !!routine.temporaryOverride,
+											}) ? (
 												<p className="type-body-sm mt-1 text-ink-3">
-													Training block · {routine.trainingBlock.name}
+													{planLabel({
+														trainingBlockName: routine.trainingBlock?.name,
+														deload: !!routine.temporaryOverride,
+													})}
 												</p>
 											) : null}
 											{isActiveForThis ? (

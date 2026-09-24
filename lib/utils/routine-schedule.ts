@@ -5,6 +5,7 @@ import {
 	routineDayLabel,
 	type RoutinePlanSource,
 	type RoutineScheduleMode,
+	type SessionTemporaryOverride,
 	type SessionTrainingBlock,
 } from '@sunsteel/contracts'
 
@@ -27,7 +28,8 @@ interface ScheduledRoutine<Day extends ScheduledDay = ScheduledDay> {
 /**
  * ROUT-15: the routine as it trains on `date` -- its active training block's
  * schedule and working-copy days while one covers the date, its baseline
- * otherwise -- through the contracts' one resolver. Everything that decides
+ * otherwise, and a ROUT-16 deload's lighter days over either -- through the
+ * contracts' one resolver. Everything that decides
  * what a date trains (schedule, dashboard, the routine page, a start) reads a
  * routine through this rather than reading `days` directly.
  */
@@ -35,6 +37,12 @@ export type RoutineOnDate<R> = R & {
 	/** The block in force that date, or null for the baseline. */
 	trainingBlock:
 		(SessionTrainingBlock & { startDate: string; endDate: string }) | null
+	/**
+	 * ROUT-16: the deload in force that date, or null. Its days replace the
+	 * plan's; `trainingBlock` still names the block it lightens.
+	 */
+	temporaryOverride:
+		(SessionTemporaryOverride & { startDate: string; endDate: string }) | null
 }
 
 export function routineOn<
@@ -50,7 +58,29 @@ export function routineOn<
 		nextRotationDayId: plan.nextRotationDayId,
 		days: plan.days,
 		trainingBlock: plan.block,
+		temporaryOverride: plan.override,
 	}
+}
+
+/**
+ * ROUT-16: the version of a moved workout's day that the date it lands on
+ * trains. A deload lightens the plan it covers without changing its weekdays,
+ * so a workout moved into or out of one trains the same weekday's day of the
+ * deload or of the plan -- the only one the server starts on that date. Across
+ * two different plans (a training block boundary) the planned day stays.
+ */
+export function landingDay<
+	Day extends { dayOfWeek: number | null },
+	R extends RoutineOnDate<{ days: Day[] }>,
+>(planned: R, landing: R, day: Day): { routine: R; day: Day } {
+	const samePlan =
+		(planned.trainingBlock?.id ?? null) === (landing.trainingBlock?.id ?? null)
+	const sameVersion =
+		(planned.temporaryOverride?.id ?? null) ===
+		(landing.temporaryOverride?.id ?? null)
+	if (!samePlan || sameVersion) return { routine: planned, day }
+	const there = landing.days.find(other => other.dayOfWeek === day.dayOfWeek)
+	return there ? { routine: landing, day: there } : { routine: planned, day }
 }
 
 export const isRotationRoutine = (routine: {

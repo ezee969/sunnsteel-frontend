@@ -11,6 +11,7 @@ import {
 import { weekdayName } from './date'
 import {
 	isRotationRoutine,
+	landingDay,
 	nextRotationDay,
 	orderedRoutineDays,
 	routineOn,
@@ -38,8 +39,11 @@ import {
  * rotation resumes where it left off.
  */
 
-/** ROUT-15: the block a planned entry comes from, when it is one. */
-type BlockName = { trainingBlockName?: string }
+/**
+ * ROUT-15: the block a planned entry comes from, when it is one. ROUT-16:
+ * `deload` marks an entry of a deload, whose days are lighter.
+ */
+type BlockName = { trainingBlockName?: string; deload?: true }
 
 export type ScheduleSessionStatus = 'COMPLETED' | 'ABORTED' | 'IN_PROGRESS'
 
@@ -186,6 +190,7 @@ type ScheduleRoutine = Pick<
 	| 'rotationWeekdays'
 	| 'days'
 	| 'trainingBlocks'
+	| 'temporaryOverrides'
 >
 
 type PlannedRoutine = RoutineOnDate<ScheduleRoutine>
@@ -208,14 +213,18 @@ function planStart(
 	return ended ? localDateKey(addDays(fromKey(ended), 1)) : ''
 }
 
-const blockNameOf = (routine: PlannedRoutine): BlockName =>
-	routine.trainingBlock ? { trainingBlockName: routine.trainingBlock.name } : {}
+const blockNameOf = (routine: PlannedRoutine): BlockName => ({
+	...(routine.trainingBlock
+		? { trainingBlockName: routine.trainingBlock.name }
+		: {}),
+	...(routine.temporaryOverride ? { deload: true as const } : {}),
+})
 
 type ActiveSession = Pick<
 	WorkoutSession,
 	'id' | 'status' | 'startedAt' | 'routineId' | 'routine' | 'routineDay'
 > &
-	Partial<Pick<WorkoutSession, 'trainingBlock'>> &
+	Partial<Pick<WorkoutSession, 'trainingBlock' | 'temporaryOverride'>> &
 	Partial<Pick<WorkoutSession, 'routineDayId'>>
 
 /** Training weekday dates in [from, to), counted on local calendar days. */
@@ -244,7 +253,7 @@ function planRotation(
 		trainedToday,
 		activeDayId,
 		from,
-		trainingBlockName,
+		label,
 	}: {
 		days: readonly ScheduleDay[]
 		now: Date
@@ -257,7 +266,7 @@ function planRotation(
 		 * has always been in force. Rotation slots count from there.
 		 */
 		from: string
-		trainingBlockName?: string
+		label: BlockName
 	},
 ): Array<{ date: string; entry: ScheduleEntry }> {
 	const weekdays = new Set(routine.rotationWeekdays)
@@ -290,7 +299,7 @@ function planRotation(
 					routineDayId: null,
 					routineName: routine.name,
 					dayName: null,
-					...(trainingBlockName ? { trainingBlockName } : {}),
+					...label,
 				},
 			})
 			continue
@@ -306,7 +315,7 @@ function planRotation(
 				routineDayId: routineDay.id,
 				routineName: routine.name,
 				dayName: routineDayLabel(routineDay),
-				...(trainingBlockName ? { trainingBlockName } : {}),
+				...label,
 			},
 		})
 	}
@@ -358,6 +367,9 @@ export function buildScheduleWeek({
 			...(session.routine.trainingBlockName
 				? { trainingBlockName: session.routine.trainingBlockName }
 				: {}),
+			...(session.routine.temporaryOverrideKind
+				? { deload: true as const }
+				: {}),
 		})
 	}
 	if (
@@ -377,6 +389,7 @@ export function buildScheduleWeek({
 			...(active.trainingBlock
 				? { trainingBlockName: active.trainingBlock.name }
 				: {}),
+			...(active.temporaryOverride ? { deload: true as const } : {}),
 		})
 	}
 	sessionEntries.sort((a, b) => a.startedAt.localeCompare(b.startedAt))
@@ -465,11 +478,18 @@ export function buildScheduleWeek({
 		for (const move of moves) {
 			const target = byDate.get(move.toDate as string)
 			if (!target || move.date < createdOn) continue
-			const routine = routineOn(baseline, move.date)
-			if (isRotationRoutine(routine)) continue
+			const plannedOn = routineOn(baseline, move.date)
+			if (isRotationRoutine(plannedOn)) continue
 			const weekday = fromKey(move.date).getDay()
-			const routineDay = routine.days.find(d => d.dayOfWeek === weekday)
-			if (!routineDay) continue
+			const plannedDay = plannedOn.days.find(d => d.dayOfWeek === weekday)
+			if (!plannedDay) continue
+			// ROUT-16: moved into or out of a deload, it trains that date's
+			// version of the day, the one the server starts there.
+			const { routine, day: routineDay } = landingDay(
+				plannedOn,
+				routineOn(baseline, target.date),
+				plannedDay,
+			)
 			if (
 				trained.has(`${baseline.id}|${target.date}`) ||
 				trained.has(`${baseline.id}|${move.date}`)
@@ -483,16 +503,15 @@ export function buildScheduleWeek({
 			})
 		}
 
-		// ROUT-15: consecutive dates under the same plan form one segment.
+		// ROUT-15: consecutive dates under the same plan form one segment;
+		// ROUT-16: a deload starts and ends one inside its plan.
+		const planKey = (routine: PlannedRoutine) =>
+			`${routine.trainingBlock?.id ?? ''}|${routine.temporaryOverride?.id ?? ''}`
 		const segments: Array<{ routine: PlannedRoutine; days: ScheduleDay[] }> = []
 		for (const day of days) {
 			const routine = routineOn(baseline, day.date)
 			const last = segments.at(-1)
-			if (
-				last &&
-				(last.routine.trainingBlock?.id ?? null) ===
-					(routine.trainingBlock?.id ?? null)
-			) {
+			if (last && planKey(last.routine) === planKey(routine)) {
 				last.days.push(day)
 			} else {
 				segments.push({ routine, days: [day] })
@@ -513,8 +532,10 @@ export function buildScheduleWeek({
 							active.routineId === routine.id
 								? (active.routineDayId ?? null)
 								: null,
+						// ROUT-16: a deload continues its plan's rotation, so it
+						// counts from the plan's start, not its own.
 						from: planStart(baseline, routine, segmentDays[0].date),
-						trainingBlockName: routine.trainingBlock?.name,
+						label: blockNameOf(routine),
 					}),
 				)
 				continue
@@ -780,6 +801,7 @@ export function moveTargets({
 		| 'rotationWeekdays'
 		| 'nextRotationDayId'
 		| 'trainingBlocks'
+		| 'temporaryOverrides'
 	>
 	overrides: readonly ScheduleOverride[]
 }): string[] {

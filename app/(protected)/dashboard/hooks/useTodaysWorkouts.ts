@@ -12,6 +12,7 @@ import { Routine, RoutineDay } from '@/lib/api/types/routine.type'
 import { getTodayDow, validateRoutineDayDate } from '@/lib/utils/date'
 import {
 	isRotationRoutine,
+	landingDay,
 	routineOn,
 	type RoutineOnDate,
 	startableDayToday,
@@ -106,15 +107,25 @@ export function useTodaysWorkouts() {
 			if (move.toDate !== todayKey) return []
 			const baseline = routinesQuery.data?.find(r => r.id === move.routineId)
 			if (!baseline || baseline.isCompleted) return []
-			// ROUT-15: the moved day is the one the plan on its own date had.
-			const routine = routineOn(baseline, move.date)
-			if (isRotationRoutine(routine)) return []
+			// ROUT-15: the moved day is the one the plan on its own date had;
+			// ROUT-16: in the version today trains when a deload starts or ends
+			// between the two dates.
+			const plannedOn = routineOn(baseline, move.date)
+			if (isRotationRoutine(plannedOn)) return []
 			const [year, month, date] = move.date.split('-').map(Number)
 			const weekday = new Date(year, month - 1, date).getDay()
-			const day = routine.days.find(d => d.dayOfWeek === weekday)
-			if (!day || planned.some(entry => entry.routine.id === routine.id)) {
+			const plannedDay = plannedOn.days.find(d => d.dayOfWeek === weekday)
+			if (
+				!plannedDay ||
+				planned.some(entry => entry.routine.id === plannedOn.id)
+			) {
 				return []
 			}
+			const { routine, day } = landingDay(
+				plannedOn,
+				routineOn(baseline, todayKey),
+				plannedDay,
+			)
 			return [{ routine, day, canStartToday: true }]
 		})
 		return [...planned, ...movedIn]

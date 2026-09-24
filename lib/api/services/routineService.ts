@@ -1,6 +1,9 @@
 import type {
+	CreateDeloadRequest,
 	CreateRoutineVersionRequest,
 	RestoreRoutineVersionResponse,
+	RoutineTemporaryOverride,
+	RoutineTemporaryOverridesResponse,
 	RoutineTrainingBlock,
 	RoutineTrainingBlockRevisionsResponse,
 	RoutineTrainingBlocksResponse,
@@ -172,4 +175,34 @@ export const routineService = {
 			`${ROUTINES_API_URL}/${id}/training-blocks/${blockId}`,
 			{ method: 'DELETE', secure: true },
 		),
+
+	getDeloads: async (id: string): Promise<RoutineTemporaryOverridesResponse> =>
+		httpClient.request<RoutineTemporaryOverridesResponse>(
+			`${ROUTINES_API_URL}/${id}/deloads`,
+			{ method: 'GET', secure: true },
+		),
+
+	createDeload: async (
+		id: string,
+		data: CreateDeloadRequest,
+	): Promise<RoutineTemporaryOverride> =>
+		httpClient.request<RoutineTemporaryOverride>(
+			`${ROUTINES_API_URL}/${id}/deloads`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	endDeloadEarly: async (
+		id: string,
+		deloadId: string,
+	): Promise<RoutineTemporaryOverride> =>
+		httpClient.request<RoutineTemporaryOverride>(
+			`${ROUTINES_API_URL}/${id}/deloads/${deloadId}/end`,
+			{ method: 'POST', secure: true },
+		),
+
+	cancelDeload: async (id: string, deloadId: string): Promise<void> =>
+		httpClient.request<void>(`${ROUTINES_API_URL}/${id}/deloads/${deloadId}`, {
+			method: 'DELETE',
+			secure: true,
+		}),
 }

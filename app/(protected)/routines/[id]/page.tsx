@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
+import { RoutineDeloads } from '@/features/routines/components/RoutineDeloads'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { RoutineLineageNote } from '@/features/routines/components/RoutineLineageNote'
 import { RoutineSharing } from '@/features/routines/components/RoutineSharing'
@@ -23,6 +24,7 @@ import {
 import { useUser } from '@/lib/api/hooks/useUser'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
+import { describeDeloadInForce } from '@/lib/utils/routine-deloads'
 import { routineOn } from '@/lib/utils/routine-schedule'
 import { describeBlockInForce } from '@/lib/utils/routine-training-blocks'
 import { localDateKey } from '@/lib/utils/schedule-week'
@@ -137,7 +139,14 @@ export default function RoutineDetailsPage() {
 				<div className="space-y-4">
 					<div className="space-y-1">
 						<h2 className="type-section text-foreground">Routine Days</h2>
-						{todayPlan.trainingBlock ? (
+						{todayPlan.temporaryOverride ? (
+							<p className="type-body-sm text-ink-2">
+								{describeDeloadInForce(
+									todayPlan.temporaryOverride,
+									todayPlan.trainingBlock?.name ?? null,
+								)}
+							</p>
+						) : todayPlan.trainingBlock ? (
 							<p className="type-body-sm text-ink-2">
 								{describeBlockInForce(todayPlan.trainingBlock)}
 							</p>
@@ -169,6 +178,8 @@ export default function RoutineDetailsPage() {
 			/>
 
 			<RoutineTrainingBlocks routine={routine} weightUnit={weightUnit} />
+
+			<RoutineDeloads routine={routine} weightUnit={weightUnit} />
 
 			<RoutineVersions
 				routine={routine}

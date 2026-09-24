@@ -375,6 +375,7 @@ export default function ActiveSessionPage() {
 				sessionId={session.id}
 				routineId={routineId || undefined}
 				trainingBlockName={session.trainingBlock?.name}
+				deload={!!session.temporaryOverride}
 				target={swapTarget}
 				otherExerciseIds={groupedLogs
 					.filter(group => group.exerciseId !== swapTarget?.routineExerciseId)

@@ -223,6 +223,9 @@ function EntryRow({
 						· {entry.trainingBlockName}
 					</span>
 				) : null}
+				{entry.deload ? (
+					<span className="type-body-sm ml-2 text-ink-3">· Deload</span>
+				) : null}
 				{movedFrom ? (
 					<span className="type-body-sm ml-2 text-ink-3">
 						· moved from {describeShortDate(movedFrom)}
@@ -360,8 +363,13 @@ export function ScheduleWeekView({
 										</Link>{' '}
 										· next in rotation:{' '}
 										<span className="text-ink-2">{rotation.nextDayName}</span>
-										{rotation.trainingBlockName
-											? ` (${rotation.trainingBlockName})`
+										{rotation.trainingBlockName || rotation.deload
+											? ` (${[
+													rotation.trainingBlockName,
+													rotation.deload ? 'deload' : null,
+												]
+													.filter(Boolean)
+													.join(', ')})`
 											: ''}
 										, any day
 									</span>
