@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { routineQueryKeys } from '../routines/routine-query'
 import { routineService } from '../services/routineService'
+import { DELOAD_SUGGESTION_QUERY_KEY } from './useWorkoutSession'
 
 /** ROUT-16: a routine's deloads, newest start first. */
 export const useRoutineDeloads = (routineId: string) =>
@@ -28,6 +29,8 @@ function useInvalidateDeloads(routineId: string) {
 				queryKey: routineQueryKeys.deloads(routineId),
 			}),
 			queryClient.invalidateQueries({ queryKey: routineQueryKeys.all() }),
+			// INTEL-02: a planned or ended deload changes whether one is suggested.
+			queryClient.invalidateQueries({ queryKey: DELOAD_SUGGESTION_QUERY_KEY }),
 		])
 }
 

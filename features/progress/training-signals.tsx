@@ -1,13 +1,25 @@
 'use client'
 
-import type { TrainingSignalsResponse, WeightUnit } from '@sunsteel/contracts'
-import { Activity, AlertTriangle, RefreshCw } from 'lucide-react'
+import type {
+	DeloadSuggestionResponse,
+	TrainingSignalsResponse,
+	WeightUnit,
+} from '@sunsteel/contracts'
+import { Activity, AlertTriangle, CalendarRange, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import {
+	DELOAD_SUGGESTION_ACTION,
+	DELOAD_SUGGESTION_TITLE,
+	deloadSuggestionHref,
+	describeSuggestionEvidence,
+	describeSuggestionPlan,
+	hasDeloadSuggestion,
+} from '@/lib/utils/deload-suggestion'
 import {
 	describeDecline,
 	describeEffort,
@@ -33,6 +45,8 @@ interface TrainingSignalsProps {
 	isPending: boolean
 	isError: boolean
 	onRetry: () => void
+	/** INTEL-02: shown only when the server suggests a deload. */
+	deloadSuggestion?: DeloadSuggestionResponse
 }
 
 /**
@@ -84,6 +98,7 @@ export function TrainingSignals({
 	isPending,
 	isError,
 	onRetry,
+	deloadSuggestion,
 }: TrainingSignalsProps) {
 	return (
 		<section aria-labelledby="training-signals" className="space-y-4">
@@ -180,6 +195,30 @@ export function TrainingSignals({
 					>
 						<p className="type-body-sm text-ink-2">{describeWorkouts(data)}</p>
 					</SignalRow>
+					{hasDeloadSuggestion(deloadSuggestion) ? (
+						<li className="rule-row grid gap-2 py-4">
+							<h3 className="type-panel text-foreground">
+								{DELOAD_SUGGESTION_TITLE}
+							</h3>
+							<p className="type-body-sm text-ink-2">
+								{describeSuggestionEvidence(deloadSuggestion.evidence, data)}
+							</p>
+							<p className="type-body-sm text-ink-2">
+								{describeSuggestionPlan(deloadSuggestion.suggestion)}
+							</p>
+							<div>
+								{/* Outline on purpose: a suggestion is never the page's primary action. */}
+								<Button asChild size="sm" variant="outline">
+									<Link
+										href={deloadSuggestionHref(deloadSuggestion.suggestion)}
+									>
+										<CalendarRange className="size-4" aria-hidden />
+										{DELOAD_SUGGESTION_ACTION}
+									</Link>
+								</Button>
+							</div>
+						</li>
+					) : null}
 				</ul>
 			)}
 		</section>

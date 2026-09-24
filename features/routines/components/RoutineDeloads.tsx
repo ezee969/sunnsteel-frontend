@@ -21,7 +21,8 @@ import {
 	RefreshCw,
 	Trash2,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
 	AlertDialog,
@@ -62,6 +63,7 @@ import {
 	useRoutineDeloads,
 } from '@/lib/api/hooks/useRoutineDeloads'
 import type { Routine } from '@/lib/api/types/routine.type'
+import { parseSuggestedDeload } from '@/lib/utils/deload-suggestion'
 import {
 	DELOAD_DATE_PROBLEMS,
 	DELOAD_DEFAULT_DAYS,
@@ -96,18 +98,21 @@ function DeloadDialog({
 	today,
 	existing,
 	weightUnit,
+	initial,
 	onClose,
 }: {
 	routine: Routine
 	today: string
 	existing: RoutineTemporaryOverride[]
 	weightUnit: WeightUnit
+	/** INTEL-02: the dates a suggestion opened the dialog with. */
+	initial?: { startDate: string; length: number } | null
 	onClose: () => void
 }) {
-	const [startDate, setStartDate] = useState(() =>
-		firstFreeDate(today, existing),
+	const [startDate, setStartDate] = useState(
+		() => initial?.startDate ?? firstFreeDate(today, existing),
 	)
-	const [length, setLength] = useState(DELOAD_DEFAULT_DAYS)
+	const [length, setLength] = useState(initial?.length ?? DELOAD_DEFAULT_DAYS)
 	const [loadReductionPercent, setLoadReductionPercent] =
 		useState<DeloadLoadReduction>(DELOAD_DEFAULT_LOAD_REDUCTION)
 	const [setMode, setSetMode] = useState<DeloadSetMode>(DELOAD_DEFAULT_SET_MODE)
@@ -361,6 +366,27 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 	const cancel = useCancelDeload(routine.id)
 	const { push } = useToast()
 	const [creating, setCreating] = useState(false)
+	// INTEL-02: a suggestion link opens the dialog once, on its dates, and the
+	// query is dropped so a refresh or Back does not reopen it.
+	const searchParams = useSearchParams()
+	const router = useRouter()
+	const pathname = usePathname()
+	const suggested = useMemo(
+		() => parseSuggestedDeload(searchParams),
+		[searchParams],
+	)
+	const [initial, setInitial] = useState<{
+		startDate: string
+		length: number
+	} | null>(null)
+	const opened = useRef(false)
+	useEffect(() => {
+		if (!suggested || !deloads.data || opened.current) return
+		opened.current = true
+		setInitial(suggested)
+		setCreating(true)
+		router.replace(pathname, { scroll: false })
+	}, [suggested, deloads.data, router, pathname])
 	const [reviewing, setReviewing] = useState<RoutineTemporaryOverride | null>(
 		null,
 	)
@@ -513,7 +539,11 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 					today={deloads.data.today}
 					existing={list}
 					weightUnit={weightUnit}
-					onClose={() => setCreating(false)}
+					initial={initial}
+					onClose={() => {
+						setCreating(false)
+						setInitial(null)
+					}}
 				/>
 			) : null}
 

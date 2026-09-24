@@ -2,6 +2,7 @@ import type {
 	CorrectSessionRequest,
 	CorrectSessionResponse,
 	CreateSessionShareRequest,
+	DeloadSuggestionResponse,
 	PersonalGoalsResponse,
 	PlateausResponse,
 	SessionCorrectionsResponse,
@@ -199,6 +200,12 @@ export const workoutService = {
 	getPlateaus: (): Promise<PlateausResponse> =>
 		httpClient.get<PlateausResponse>(
 			`${WORKOUTS_API_URL}/progress/plateaus`,
+			true,
+		),
+	/** INTEL-02: a deload suggested from sustained signals, or why none is. */
+	getDeloadSuggestion: (): Promise<DeloadSuggestionResponse> =>
+		httpClient.get<DeloadSuggestionResponse>(
+			`${WORKOUTS_API_URL}/progress/deload-suggestion`,
 			true,
 		),
 	/** PROG-10: the four training signals, stated with their evidence. */

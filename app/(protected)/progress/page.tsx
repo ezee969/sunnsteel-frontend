@@ -27,6 +27,7 @@ import { TrainingSignals } from '@/features/progress/training-signals'
 import { VolumeTrends } from '@/features/progress/volume-trends'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
+	useDeloadSuggestion,
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
 	useMuscleGroupHeatmap,
@@ -86,6 +87,7 @@ export default function ProgressPage() {
 	const plateaus = usePlateaus()
 	const plateauPreferences = useUpdatePlateauPreferences()
 	const trainingSignals = useTrainingSignals()
+	const deloadSuggestion = useDeloadSuggestion()
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
 	const timeline = useProgressTimeline(timelineFilter)
@@ -167,6 +169,7 @@ export default function ProgressPage() {
 				isPending={trainingSignals.isPending}
 				isError={trainingSignals.isError}
 				onRetry={() => void trainingSignals.refetch()}
+				deloadSuggestion={deloadSuggestion.data}
 			/>
 
 			<ConsistencyCalendar />

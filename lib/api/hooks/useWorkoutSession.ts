@@ -1,6 +1,7 @@
 import type {
 	CorrectSessionRequest,
 	CorrectSessionResponse,
+	DeloadSuggestionResponse,
 	PlateauPreferences,
 	PlateausResponse,
 	SessionCorrectionsResponse,
@@ -80,6 +81,16 @@ function serializeSessionParams(
 		.join('|')
 }
 
+/**
+ * INTEL-02: under the Progress prefix so a finished workout refreshes it, and
+ * exported so a deload write can refresh it too.
+ */
+export const DELOAD_SUGGESTION_QUERY_KEY = [
+	'workout',
+	'progress',
+	'deload-suggestion',
+] as const
+
 const qk = {
 	stats: ['workout', 'stats'] as const,
 	progress: ['workout', 'progress'] as const,
@@ -106,6 +117,7 @@ const qk = {
 	trainedExercises: ['workout', 'progress', 'trained-exercises'] as const,
 	plateaus: ['workout', 'progress', 'plateaus'] as const,
 	trainingSignals: ['workout', 'progress', 'signals'] as const,
+	deloadSuggestion: DELOAD_SUGGESTION_QUERY_KEY,
 	muscleHeatmap: (params: MuscleGroupHeatmapQuery) =>
 		[
 			'workout',
@@ -250,6 +262,16 @@ export const useTrainingSignals = () => {
 	return useQuery<TrainingSignalsResponse>({
 		queryKey: qk.trainingSignals,
 		queryFn: workoutService.getTrainingSignals,
+		enabled: !isLoading && !!session,
+	})
+}
+
+/** INTEL-02: the deload suggestion shown under the training signals. */
+export const useDeloadSuggestion = () => {
+	const { session, isLoading } = useAuth()
+	return useQuery<DeloadSuggestionResponse>({
+		queryKey: qk.deloadSuggestion,
+		queryFn: workoutService.getDeloadSuggestion,
 		enabled: !isLoading && !!session,
 	})
 }
