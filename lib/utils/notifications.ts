@@ -86,6 +86,27 @@ export function describeNotification(
 				href: `/profile/${actor.username}`,
 			}
 		}
+		case 'TRAINING_PARTNER_SESSION': {
+			const { actor, session } = notification
+			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
+			const workout = session.dayName
+				? `${session.routineName} · ${session.dayName}`
+				: session.routineName
+			return {
+				title: `${name} completed a workout`,
+				detail: `${workout} · shared by your training partner`,
+				href: `/profile/${actor.username}`,
+			}
+		}
+		case 'TRAINING_PARTNER_ACHIEVEMENT': {
+			const { actor, achievement } = notification
+			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
+			return {
+				title: `${name} earned ${achievement.title}`,
+				detail: `@${actor.username} · shared by your training partner`,
+				href: `/profile/${actor.username}`,
+			}
+		}
 	}
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { NOTIFICATION_CATEGORIES } from '@sunsteel/contracts'
+import type { NotificationCategory } from '@sunsteel/contracts'
 import { SlidersHorizontal } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -33,6 +33,15 @@ import {
 
 const DEFAULT_QUIET_START = 22 * 60
 const DEFAULT_QUIET_END = 7 * 60
+const TRAINING_CATEGORIES = [
+	'REST_ALERT',
+	'TRAINING_REMINDER',
+	'STREAK_AT_RISK',
+] as const satisfies readonly NotificationCategory[]
+const PARTNER_CATEGORIES = [
+	'TRAINING_PARTNER_SESSION',
+	'TRAINING_PARTNER_ACHIEVEMENT',
+] as const satisfies readonly NotificationCategory[]
 
 /**
  * NOTIF-05, with the NOTIF-04 reminder time inside it because a reminder with
@@ -67,6 +76,39 @@ export function NotificationControlsCard() {
 	const quietHours = preferences.quietHours
 	const reminderMinute = preferences.reminder.minuteOfDay
 	const canRemind = preferences.timeZone !== null
+	const categoryRow = (category: NotificationCategory) => {
+		const id = `notify-${category}`
+		return (
+			<div
+				key={category}
+				className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3"
+			>
+				<div className="space-y-1">
+					<Label htmlFor={id}>{CATEGORY_LABELS[category]}</Label>
+					<p className="type-body-sm max-w-[68ch] text-ink-3">
+						{CATEGORY_DESCRIPTIONS[category]}
+					</p>
+				</div>
+				<Label
+					htmlFor={id}
+					className="flex size-11 cursor-pointer items-center justify-center"
+				>
+					<Checkbox
+						id={id}
+						checked={preferences.categories[category]}
+						disabled={update.isPending}
+						onCheckedChange={checked =>
+							update.mutate({
+								categories: { [category]: checked === true },
+							})
+						}
+						aria-label={CATEGORY_LABELS[category]}
+						className="size-5"
+					/>
+				</Label>
+			</div>
+		)
+	}
 
 	return (
 		<Card>
@@ -87,39 +129,20 @@ export function NotificationControlsCard() {
 				) : null}
 
 				<div className="space-y-3">
-					{NOTIFICATION_CATEGORIES.map(category => {
-						const id = `notify-${category}`
-						return (
-							<div
-								key={category}
-								className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3"
-							>
-								<div className="space-y-1">
-									<Label htmlFor={id}>{CATEGORY_LABELS[category]}</Label>
-									<p className="type-body-sm text-ink-3">
-										{CATEGORY_DESCRIPTIONS[category]}
-									</p>
-								</div>
-								<Label
-									htmlFor={id}
-									className="flex size-11 cursor-pointer items-center justify-center"
-								>
-									<Checkbox
-										id={id}
-										checked={preferences.categories[category]}
-										disabled={update.isPending}
-										onCheckedChange={checked =>
-											update.mutate({
-												categories: { [category]: checked === true },
-											})
-										}
-										aria-label={CATEGORY_LABELS[category]}
-										className="size-5"
-									/>
-								</Label>
-							</div>
-						)
-					})}
+					<p className="type-panel text-foreground">Training and rest</p>
+					{TRAINING_CATEGORIES.map(categoryRow)}
+				</div>
+
+				<div className="space-y-3 border-t border-rule pt-4">
+					<div className="space-y-1">
+						<p className="type-panel text-foreground">Partner activity</p>
+						<p className="type-body-sm max-w-[68ch] text-ink-3">
+							Off by default. An alert is created only while the partnership,
+							their activity grant and the event&apos;s sharing are all still
+							active. Turning one on starts with new activity from that moment.
+						</p>
+					</div>
+					{PARTNER_CATEGORIES.map(categoryRow)}
 				</div>
 
 				<div className="space-y-2 border-t border-rule pt-4">

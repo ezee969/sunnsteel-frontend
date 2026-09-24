@@ -22,6 +22,8 @@ const response = (
 			REST_ALERT: true,
 			TRAINING_REMINDER: true,
 			STREAK_AT_RISK: true,
+			TRAINING_PARTNER_SESSION: false,
+			TRAINING_PARTNER_ACHIEVEMENT: false,
 		},
 		quietHours: null,
 		reminder: { minuteOfDay: null },
@@ -126,6 +128,8 @@ describe('the notice above the controls', () => {
 							REST_ALERT: false,
 							TRAINING_REMINDER: false,
 							STREAK_AT_RISK: false,
+							TRAINING_PARTNER_SESSION: false,
+							TRAINING_PARTNER_ACHIEVEMENT: false,
 						},
 					},
 				),
@@ -143,6 +147,8 @@ describe('the notice above the controls', () => {
 							REST_ALERT: false,
 							TRAINING_REMINDER: true,
 							STREAK_AT_RISK: false,
+							TRAINING_PARTNER_SESSION: false,
+							TRAINING_PARTNER_ACHIEVEMENT: false,
 						},
 					},
 				),
@@ -182,5 +188,22 @@ describe('the streak-at-risk category (NOTIF-06)', () => {
 			expect(CATEGORY_LABELS[category]).toBeTruthy()
 			expect(CATEGORY_DESCRIPTIONS[category]).toBeTruthy()
 		}
+	})
+})
+
+describe('partner activity alerts (NOTIF-07)', () => {
+	it('states the selected facts and both privacy boundaries', () => {
+		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+			/active training partner/,
+		)
+		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+			/currently share/,
+		)
+		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+			/do not create extra alerts/,
+		)
+		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_ACHIEVEMENT).toMatch(
+			/Historical achievements are never replayed/,
+		)
 	})
 })

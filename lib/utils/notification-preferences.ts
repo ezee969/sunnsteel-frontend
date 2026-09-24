@@ -15,6 +15,8 @@ export const CATEGORY_LABELS: Record<NotificationCategory, string> = {
 	REST_ALERT: 'Rest alerts',
 	TRAINING_REMINDER: 'Training reminders',
 	STREAK_AT_RISK: 'Streak at risk',
+	TRAINING_PARTNER_SESSION: 'Partner workouts',
+	TRAINING_PARTNER_ACHIEVEMENT: 'Partner achievements',
 }
 
 export const CATEGORY_DESCRIPTIONS: Record<NotificationCategory, string> = {
@@ -24,6 +26,10 @@ export const CATEGORY_DESCRIPTIONS: Record<NotificationCategory, string> = {
 		'Once on the days you are planned to train, at the time you choose below.',
 	STREAK_AT_RISK:
 		'On the last day a training run can still be continued. It replaces that day’s reminder rather than adding a second notification, and it states the dates rather than telling you to train.',
+	TRAINING_PARTNER_SESSION:
+		'When an active training partner completes one workout they currently share with you. Records and load changes do not create extra alerts.',
+	TRAINING_PARTNER_ACHIEVEMENT:
+		'When an active training partner earns a new achievement they currently share with you. Historical achievements are never replayed.',
 }
 
 /** `1110` → `18:30`. Zero-padded so it round-trips through a time input. */

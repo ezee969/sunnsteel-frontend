@@ -65,6 +65,40 @@ const encouragement: AppNotification = {
 	encouragement: { kind: 'GOOD_WORK' },
 }
 
+const partnerSession: AppNotification = {
+	...base,
+	id: 'n5',
+	kind: 'TRAINING_PARTNER_SESSION',
+	actor: {
+		id: 'u3',
+		username: 'cassia',
+		name: 'Cassia',
+		lastName: 'Stone',
+		avatarUrl: null,
+	},
+	entryId: 'session:s2:completed:v1',
+	session: {
+		id: 's2',
+		routineName: 'Upper / Lower',
+		dayName: 'Lower',
+	},
+}
+
+const partnerAchievement: AppNotification = {
+	...base,
+	id: 'n6',
+	kind: 'TRAINING_PARTNER_ACHIEVEMENT',
+	actor: {
+		id: 'u3',
+		username: 'cassia',
+		name: 'Cassia',
+		lastName: null,
+		avatarUrl: null,
+	},
+	entryId: 'achievement:u3:sessions-10:v1',
+	achievement: { id: 'sessions-10', title: 'Ten sessions' },
+}
+
 describe('notifications (NOTIF-01)', () => {
 	it('names what each notification announces and where it leads', () => {
 		expect(describeNotification(achievement)).toEqual({
@@ -91,6 +125,16 @@ describe('notifications (NOTIF-01)', () => {
 		expect(describeNotification(encouragement)).toEqual({
 			title: 'Cassia sent encouragement: Good work',
 			detail: '@cassia · from your training partner',
+			href: '/profile/cassia',
+		})
+		expect(describeNotification(partnerSession)).toEqual({
+			title: 'Cassia Stone completed a workout',
+			detail: 'Upper / Lower · Lower · shared by your training partner',
+			href: '/profile/cassia',
+		})
+		expect(describeNotification(partnerAchievement)).toEqual({
+			title: 'Cassia earned Ten sessions',
+			detail: '@cassia · shared by your training partner',
 			href: '/profile/cassia',
 		})
 	})

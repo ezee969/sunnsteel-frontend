@@ -7,6 +7,7 @@ import {
 } from '@sunsteel/contracts'
 import {
 	CheckCheck,
+	Dumbbell,
 	HeartHandshake,
 	Medal,
 	MessageSquare,
@@ -28,6 +29,8 @@ const KIND_ICON = {
 	NEW_FOLLOWER: UserPlus,
 	ACTIVITY_COMMENT: MessageSquare,
 	TRAINING_PARTNER_ENCOURAGEMENT: HeartHandshake,
+	TRAINING_PARTNER_SESSION: Dumbbell,
+	TRAINING_PARTNER_ACHIEVEMENT: Medal,
 } as const
 
 function NotificationRow({
@@ -113,9 +116,8 @@ export function NotificationList({
 						Updates
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Achievements you earn, session progress, followers, comments and
-						partner encouragement from the last {NOTIFICATIONS_LOOKBACK_DAYS}{' '}
-						days.
+						Achievements you earn, session progress and permitted updates from
+						other members from the last {NOTIFICATIONS_LOOKBACK_DAYS} days.
 					</p>
 				</div>
 				{data && data.notifications.length > 0 ? (
