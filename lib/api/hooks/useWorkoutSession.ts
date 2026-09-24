@@ -6,6 +6,7 @@ import type {
 	SessionCorrectionsResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
+	TrainingSignalsResponse,
 	UpdateSessionNotesRequest,
 	UpdateSessionNotesResponse,
 } from '@sunsteel/contracts'
@@ -104,6 +105,7 @@ const qk = {
 		] as const,
 	trainedExercises: ['workout', 'progress', 'trained-exercises'] as const,
 	plateaus: ['workout', 'progress', 'plateaus'] as const,
+	trainingSignals: ['workout', 'progress', 'signals'] as const,
 	muscleHeatmap: (params: MuscleGroupHeatmapQuery) =>
 		[
 			'workout',
@@ -238,6 +240,16 @@ export const usePlateaus = () => {
 	return useQuery<PlateausResponse>({
 		queryKey: qk.plateaus,
 		queryFn: workoutService.getPlateaus,
+		enabled: !isLoading && !!session,
+	})
+}
+
+/** PROG-10: training signals; refreshed with the rest of Progress on finish. */
+export const useTrainingSignals = () => {
+	const { session, isLoading } = useAuth()
+	return useQuery<TrainingSignalsResponse>({
+		queryKey: qk.trainingSignals,
+		queryFn: workoutService.getTrainingSignals,
 		enabled: !isLoading && !!session,
 	})
 }

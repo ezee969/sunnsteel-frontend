@@ -359,6 +359,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			"A trained exercise's best set, estimated 1RM, recent sessions and progression.",
 	},
 	{
+		slug: 'training-signals',
+		route: '/progress#training-signals',
+		features: ['PROG-10', 'PROG-09'],
+		setup: async page => {
+			await page
+				.getByRole('heading', { name: 'Training signals' })
+				.scrollIntoViewIfNeeded()
+		},
+		ready: ['Training signals', 'They state what changed, not why.'],
+		caption:
+			'Effort, rep targets, declining lifts and workouts over the last two fortnights, each with its numbers and thresholds and never a cause.',
+	},
+	{
 		slug: 'training-partner-profile',
 		route: '/profile/ken-watanabe',
 		features: ['SOC-08', 'SOC-09'],

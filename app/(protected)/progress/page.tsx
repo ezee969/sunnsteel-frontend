@@ -23,6 +23,7 @@ import { PlateauWatch } from '@/features/progress/plateau-watch'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { SessionComparison } from '@/features/progress/session-comparison'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
+import { TrainingSignals } from '@/features/progress/training-signals'
 import { VolumeTrends } from '@/features/progress/volume-trends'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
@@ -33,6 +34,7 @@ import {
 	usePlateaus,
 	useProgressTimeline,
 	useSessionComparison,
+	useTrainingSignals,
 	useUpdatePlateauPreferences,
 	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
@@ -83,6 +85,7 @@ export default function ProgressPage() {
 	const personalGoals = usePersonalGoals()
 	const plateaus = usePlateaus()
 	const plateauPreferences = useUpdatePlateauPreferences()
+	const trainingSignals = useTrainingSignals()
 	const volumeTrend = useVolumeTrend(volumeWeeks)
 	const sessionComparison = useSessionComparison(routineDayId)
 	const timeline = useProgressTimeline(timelineFilter)
@@ -156,6 +159,14 @@ export default function ProgressPage() {
 				onMinSessionsChange={minSessions =>
 					plateauPreferences.mutate({ minSessions })
 				}
+			/>
+
+			<TrainingSignals
+				data={trainingSignals.data}
+				weightUnit={weightUnit}
+				isPending={trainingSignals.isPending}
+				isError={trainingSignals.isError}
+				onRetry={() => void trainingSignals.refetch()}
 			/>
 
 			<ConsistencyCalendar />
