@@ -19,11 +19,13 @@
 			"features": [
 				"DASH-01",
 				"DASH-02",
+				"DASH-03",
 				"DASH-07",
 				"DASH-09",
+				"DASH-08",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-23T08:50:26.043Z",
+			"capturedAt": "2026-09-24T14:06:45.796Z",
 			"width": 1440,
 			"height": 900
 		},
