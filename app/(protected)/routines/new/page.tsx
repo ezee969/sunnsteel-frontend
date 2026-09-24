@@ -2,8 +2,8 @@
 
 import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Stepper } from '@/components/ui/stepper'
+import { StarterTemplates } from '@/features/routines/components/StarterTemplates'
 // Step components. Steps 1-2 are static: the user always sees step 1 first and
 // step 2 immediately after. Steps 3-4 are the heavy ones and are loaded on
 // demand — there is no reason to ship them before the user has even named the
@@ -24,6 +25,11 @@ import { TrainingDays } from '@/features/routines/wizard/TrainingDays'
 import { RoutineWizardData } from '@/features/routines/wizard/types'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
+import { useExercises } from '@/lib/api/hooks/useExercises'
+import {
+	findRoutineTemplate,
+	templateDraft,
+} from '@/lib/utils/routine-templates'
 
 const BuildDays = dynamic(
 	() => import('@/features/routines/wizard/BuildDays').then(m => m.BuildDays),
@@ -45,19 +51,55 @@ const STEPS = [
 	{ id: 4, title: 'Review & Create', description: 'Review and save routine' },
 ]
 
+const EMPTY_DRAFT: RoutineWizardData = {
+	name: '',
+	description: '',
+	scheduleMode: 'WEEKLY',
+	trainingDays: [],
+	restDays: [],
+	rotationWeekdays: [],
+	days: [],
+}
+
 export default function CreateRoutinePage() {
+	// `useSearchParams` needs a Suspense boundary in the App Router.
+	return (
+		<Suspense fallback={<WizardStepSkeleton />}>
+			<CreateRoutineWizard />
+		</Suspense>
+	)
+}
+
+function CreateRoutineWizard() {
 	const router = useRouter()
 	const [currentStep, setCurrentStep] = useState(1)
 	const [visitedSteps, setVisitedSteps] = useState(new Set([1])) // Track visited steps
-	const [routineData, setRoutineData] = useState<RoutineWizardData>({
-		name: '',
-		description: '',
-		scheduleMode: 'WEEKLY',
-		trainingDays: [],
-		restDays: [],
-		rotationWeekdays: [],
-		days: [],
-	})
+	const [routineData, setRoutineData] = useState<RoutineWizardData>(EMPTY_DRAFT)
+
+	// ROUT-03: `?template=<slug>` opens a starter programme as the draft, once
+	// the catalog it names exercises from has loaded. Choosing another template
+	// replaces the draft; nothing is saved until the member creates it.
+	const templateSlug = useSearchParams().get('template')
+	const template = findRoutineTemplate(templateSlug)
+	const { data: catalog, isLoading: catalogLoading } = useExercises()
+	const [appliedTemplate, setAppliedTemplate] = useState<string | null>(null)
+	const [missingExercises, setMissingExercises] = useState<string[]>([])
+	useEffect(() => {
+		if (!template || !catalog || appliedTemplate === template.slug) return
+		const result = templateDraft(template, catalog)
+		setAppliedTemplate(template.slug)
+		setCurrentStep(1)
+		setVisitedSteps(new Set([1]))
+		if (result.ok) {
+			setMissingExercises([])
+			setRoutineData(result.draft)
+		} else {
+			setMissingExercises(result.missing)
+			setRoutineData(EMPTY_DRAFT)
+		}
+	}, [template, catalog, appliedTemplate])
+	const templateLoading =
+		!!template && appliedTemplate !== template.slug && catalogLoading
 
 	const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
 		setRoutineData(prev => ({ ...prev, ...updates }))
@@ -102,10 +144,32 @@ export default function CreateRoutinePage() {
 	}
 
 	const renderCurrentStep = () => {
+		if (templateLoading) return <WizardStepSkeleton />
 		switch (currentStep) {
 			case 1:
 				return (
-					<RoutineBasicInfo data={routineData} onUpdate={updateRoutineData} />
+					<div className="space-y-8">
+						{template && appliedTemplate === template.slug ? (
+							missingExercises.length ? (
+								<p role="status" className="type-body-sm text-ink-2">
+									The {template.name} template could not be opened because the
+									exercise catalog has no {missingExercises.join(', ')}. Start
+									from another template or build your own below.
+								</p>
+							) : (
+								<p role="status" className="type-body-sm text-ink-2">
+									Started from the {template.name} template. Change anything
+									before creating it; loads are yours to fill in.
+								</p>
+							)
+						) : null}
+						<RoutineBasicInfo data={routineData} onUpdate={updateRoutineData} />
+						{!template || missingExercises.length ? (
+							<div className="rule-row pt-6">
+								<StarterTemplates />
+							</div>
+						) : null}
+					</div>
 				)
 			case 2:
 				return <TrainingDays data={routineData} onUpdate={updateRoutineData} />

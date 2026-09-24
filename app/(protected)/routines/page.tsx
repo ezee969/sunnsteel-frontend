@@ -52,7 +52,14 @@ export default function RoutinesPage() {
 					activeFilter={activeFilter}
 					onFilterChange={setActiveFilter}
 				/>
-				<WorkoutsList routines={routines} isLoading={isLoading} error={error} />
+				<WorkoutsList
+					routines={routines}
+					isLoading={isLoading}
+					error={error}
+					filtered={
+						activeFilter === 'favorites' || activeFilter === 'completed'
+					}
+				/>
 			</div>
 		</div>
 	)

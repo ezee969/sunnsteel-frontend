@@ -22,6 +22,8 @@ interface WorkoutsListProps {
 	routines: Routine[] | undefined
 	isLoading: boolean
 	error: Error | null
+	/** A narrowing filter is applied, so an empty list is not an empty account. */
+	filtered?: boolean
 }
 
 /**
@@ -36,6 +38,7 @@ export default function WorkoutsList({
 	routines,
 	isLoading,
 	error,
+	filtered = false,
 }: WorkoutsListProps) {
 	const {
 		isDeleteDialogOpen,
@@ -70,8 +73,8 @@ export default function WorkoutsList({
 
 	if (displayedRoutines.length === 0) {
 		return (
-			<div className="flex min-h-0 flex-1 flex-col">
-				<EmptyRoutinesState />
+			<div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+				<EmptyRoutinesState filtered={filtered} />
 			</div>
 		)
 	}
