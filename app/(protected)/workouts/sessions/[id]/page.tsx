@@ -4,6 +4,7 @@ import { routineDayLabel } from '@sunsteel/contracts'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { useToast } from '@/components/ui/toast'
 import { ExerciseGroup } from '@/features/workout/exercise-group'
 import {
 	ExerciseSwapDialog,
@@ -23,6 +24,7 @@ import { useSessionManagement } from '@/hooks/use-session-management'
 import { usePushSubscriptions } from '@/lib/api/hooks/usePushNotifications'
 import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import {
+	useDeleteSetLog,
 	usePreviousPerformance,
 	useSession,
 	useUpsertSetLog,
@@ -72,6 +74,8 @@ export default function ActiveSessionPage() {
 	const { data: previousPerformance, error: previousPerformanceError } =
 		usePreviousPerformance(idParam)
 	const { mutate: upsertSetLog } = useUpsertSetLog(idParam)
+	const { mutate: deleteSetLog } = useDeleteSetLog(idParam)
+	const { push } = useToast()
 	const routineId = session?.routineId ?? ''
 	// ROUT-15/LIVE-11: the session trains its own snapshot day, which is also
 	// the only place a training block's day can be read from.
@@ -137,6 +141,25 @@ export default function ActiveSessionPage() {
 			upsertSetLog(payload)
 		},
 		[upsertSetLog],
+	)
+
+	// LIVE-15: only the last added set of an exercise can be taken back.
+	const handleRemoveSet = useCallback(
+		(routineExerciseId: string, setNumber: number) => {
+			deleteSetLog(
+				{ routineExerciseId, setNumber },
+				{
+					onError: error =>
+						push({
+							title: 'Could not remove the set',
+							description:
+								error instanceof Error ? error.message : 'Try again.',
+							variant: 'destructive',
+						}),
+				},
+			)
+		},
+		[deleteSetLog, push],
 	)
 
 	const handleBack = useCallback(() => {
@@ -312,6 +335,9 @@ export default function ActiveSessionPage() {
 													hasCompletedSets: completedSets > 0,
 												})
 										: undefined
+								}
+								onRemoveSet={
+									session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
 								}
 								sessionId={session.id}
 								instruction={group.note}

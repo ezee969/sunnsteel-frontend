@@ -13,6 +13,13 @@ import {
 } from '@/lib/utils/weight-unit'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
+/** The values a set row can be filled from (LIVE-15). */
+export interface SetValues {
+	reps: number
+	weight?: number | null
+	rpe?: number | null
+}
+
 interface UseSetLogFormProps {
 	sessionId: string
 	routineExerciseId: string
@@ -42,6 +49,8 @@ interface UseSetLogFormReturn {
 	setWeight: (value: string) => void
 	setRpe: (value: string) => void
 	handleCompletionToggle: (checked: boolean) => void
+	/** LIVE-15: put another set's values in the fields and save them. */
+	fill: (values: SetValues) => void
 
 	// Validation
 	isValid: boolean
@@ -256,6 +265,39 @@ export const useSetLogForm = ({
 		setRpeState(value)
 	}, [])
 
+	// A fill is one deliberate tap, not typing, so it saves at once instead of
+	// waiting out the debounce: a reload straight after it keeps the values,
+	// and the row below can offer them as its own fill.
+	const fill = useCallback(
+		(values: SetValues) => {
+			const reps = values.reps > 0 ? String(values.reps) : ''
+			const weight = formatWeightInput(values.weight ?? undefined, weightUnit)
+			const rpe = values.rpe != null ? String(values.rpe) : ''
+			setRepsState(reps)
+			setWeightState(weight)
+			setRpeState(rpe)
+
+			const payload = createPayload(reps, weight, rpe, isCompletedState)
+			if (!validateSetLogPayload(payload).isValid) return
+			markSetPending(sessionId, routineExerciseId, setNumber)
+			onSaveRef.current(payload)
+			lastSavedRef.current = {
+				reps: payload.reps,
+				weight: payload.weight,
+				rpe: payload.rpe,
+				isCompleted: isCompletedState,
+			}
+		},
+		[
+			weightUnit,
+			createPayload,
+			isCompletedState,
+			sessionId,
+			routineExerciseId,
+			setNumber,
+		],
+	)
+
 	const handleCompletionToggle = useCallback(
 		(checked: boolean) => {
 			setIsCompletedState(checked)
@@ -307,6 +349,7 @@ export const useSetLogForm = ({
 		setWeight,
 		setRpe,
 		handleCompletionToggle,
+		fill,
 
 		// Validation
 		isValid: validation.isValid,

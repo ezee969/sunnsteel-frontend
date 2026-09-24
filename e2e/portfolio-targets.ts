@@ -106,8 +106,14 @@ const SETS_TO_LOG = 3
  * writes records, progression and achievements. An aborted session writes none
  * of those, and un-completing the sets first keeps them out of the exercise
  * performance and plateau reads, which count sets from aborted sessions.
+ *
+ * With `extraSet` it also adds one set after the first exercise's last
+ * (LIVE-15), which the cleanup removes before anything else.
  */
-async function startScratchSession(page: Page): Promise<Cleanup> {
+async function startScratchSession(
+	page: Page,
+	{ extraSet = false }: { extraSet?: boolean } = {},
+): Promise<Cleanup> {
 	const start = page.locator(
 		'button[aria-label="Start session"]:not([disabled])',
 	)
@@ -143,6 +149,11 @@ async function startScratchSession(page: Page): Promise<Cleanup> {
 	const rows = page.getByTestId('set-log-container')
 	const logged: number[] = []
 	const cleanup: Cleanup = async () => {
+		const remove = page.getByRole('button', { name: /^Remove set / })
+		if (await remove.count()) {
+			await remove.first().click()
+			await expect(remove).toHaveCount(0)
+		}
 		for (const index of logged) {
 			const box = rows.nth(index).getByRole('checkbox', {
 				name: 'Mark set as complete',
@@ -187,6 +198,16 @@ async function startScratchSession(page: Page): Promise<Cleanup> {
 			await expect(box).toHaveAttribute('data-state', 'checked')
 		}
 		await page.waitForLoadState('networkidle')
+		if (extraSet) {
+			await page
+				.getByRole('button', { name: /^Add a set to / })
+				.first()
+				.click()
+			const extra = rows.filter({ hasText: 'Extra' }).first()
+			await expect(extra).toBeVisible()
+			await page.waitForLoadState('networkidle')
+			await extra.scrollIntoViewIfNeeded()
+		}
 		// The rest timer and any record celebration arrive with the last save.
 		await page.waitForTimeout(800)
 	} catch (error) {
@@ -462,5 +483,16 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		ready: [/^Target: /, 'Discard'],
 		caption:
 			'A live session with three sets logged, the rest timer and last-time comparison.',
+	},
+	{
+		slug: 'live-session-extra-set',
+		route: '/workouts/sessions/:session',
+		openAt: '/routines',
+		features: ['LIVE-15'],
+		mutates: true,
+		setup: page => startScratchSession(page, { extraSet: true }),
+		ready: ['Extra', 'No target', 'Add set'],
+		caption:
+			'Faster set editing: an extra set added after the prescription, one-tap fills from the set above, and only the last added set removable.',
 	},
 ]

@@ -21,6 +21,8 @@ export interface ExerciseGroup {
 		weight?: number | null
 	}[]
 	performedSets: SetLog[]
+	/** LIVE-15: sets logged beyond the prescription, in order. */
+	extraSets: SetLog[]
 	/** LIVE-11: the prescribed exercise when this slot was swapped. */
 	substitutedFrom?: { id: string; name: string }
 }
@@ -48,6 +50,11 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 	const setLogsByExercise = groupSetLogsByExercise(session.setLogs)
 
 	return session.routineDay.exercises.map(routineExercise => {
+		const performedSets = setLogsByExercise[routineExercise.id] ?? []
+		const prescribed = routineExercise.sets.reduce(
+			(max, set) => Math.max(max, set.setNumber),
+			0,
+		)
 		const substitution = substitutionFor(
 			session.exerciseSubstitutions,
 			routineExercise.id,
@@ -61,7 +68,10 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 			plannedSets: substitution
 				? routineExercise.sets.map(set => ({ ...set, weight: null }))
 				: routineExercise.sets,
-			performedSets: setLogsByExercise[routineExercise.id] ?? [],
+			performedSets,
+			extraSets: performedSets
+				.filter(set => set.setNumber > prescribed)
+				.sort((a, b) => a.setNumber - b.setNumber),
 			substitutedFrom: substitution
 				? {
 						id: routineExercise.exercise.id,

@@ -9,7 +9,9 @@ import { formatWeight as formatPlannedWeight } from '@/lib/utils/weight-unit'
 import { formatReps, formatWeight } from '@/lib/utils/workout-metrics'
 
 interface SetComparisonRowProps {
-	plannedSet: ExerciseGroup['plannedSets'][number]
+	setNumber: number
+	/** Absent for a LIVE-15 extra set, which had no prescription. */
+	plannedSet?: ExerciseGroup['plannedSets'][number]
 	performedSet?: SetLog
 	weightUnit: WeightUnit
 }
@@ -21,6 +23,7 @@ interface SetComparisonRowProps {
  * `sm` the group's column header carries them.
  */
 export function SetComparisonRow({
+	setNumber,
 	plannedSet,
 	performedSet,
 	weightUnit,
@@ -45,19 +48,19 @@ export function SetComparisonRow({
 	return (
 		<div className="rule-row grid grid-cols-3 gap-x-4 gap-y-2 py-3 sm:grid-cols-12 sm:items-center sm:gap-2 sm:py-2">
 			<div className="col-span-3 flex items-center justify-between sm:col-span-2">
-				<span className="type-label text-foreground">
-					Set {plannedSet.setNumber}
-				</span>
+				<span className="type-label text-foreground">Set {setNumber}</span>
 				<span className="sm:hidden">{completion}</span>
 			</div>
 
 			<div className="col-span-3 sm:col-span-3">
 				<div className="type-body-sm text-ink-3 sm:hidden">Planned</div>
 				<div className="type-data text-ink-2">
-					{plannedSet.repType === 'FIXED'
-						? `${plannedSet.reps} reps`
-						: `${plannedSet.minReps}-${plannedSet.maxReps} reps`}
-					{plannedSet.weight
+					{!plannedSet
+						? 'Extra set'
+						: plannedSet.repType === 'FIXED'
+							? `${plannedSet.reps} reps`
+							: `${plannedSet.minReps}-${plannedSet.maxReps} reps`}
+					{plannedSet?.weight
 						? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit)}`
 						: null}
 				</div>

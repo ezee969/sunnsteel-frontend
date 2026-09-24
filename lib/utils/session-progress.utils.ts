@@ -7,6 +7,38 @@ import type {
 	SessionProgressData,
 } from './workout-session.types'
 
+/** LIVE-15: an exercise takes at most this many sets beyond its prescription. */
+export const MAX_EXTRA_SETS = 10
+
+const prescribedSetCount = (exercise: RoutineExercise) =>
+	exercise.sets.reduce((max, set) => Math.max(max, set.setNumber), 0)
+
+/**
+ * LIVE-15: the sets logged beyond an exercise's prescription, in order. They
+ * are work done today -- counted wherever completed work counts -- but they
+ * have no target and progression never reads them.
+ */
+export const extraSetLogs = (
+	setLogs: SetLog[] | undefined,
+	exercise: RoutineExercise,
+): SetLog[] => {
+	const prescribed = prescribedSetCount(exercise)
+	return (setLogs ?? [])
+		.filter(
+			l => l.routineExerciseId === exercise.id && l.setNumber > prescribed,
+		)
+		.sort((a, b) => a.setNumber - b.setNumber)
+}
+
+/** Every set of an exercise in this session: its prescription, then its extras. */
+const sessionSetNumbers = (
+	setLogs: SetLog[] | undefined,
+	exercise: RoutineExercise,
+) => [
+	...exercise.sets.map(set => set.setNumber),
+	...extraSetLogs(setLogs, exercise).map(log => log.setNumber),
+]
+
 /**
  * Calculates overall session progress based on set logs and exercises
  * @param setLogs - Array of set logs from the session
@@ -21,7 +53,10 @@ export const calculateSessionProgress = (
 		return { totalSets: 0, completedSets: 0, percentage: 0 }
 	}
 
-	const totalSets = exercises.reduce((acc, re) => acc + re.sets.length, 0)
+	const totalSets = exercises.reduce(
+		(acc, re) => acc + sessionSetNumbers(setLogs, re).length,
+		0,
+	)
 
 	if (!setLogs || setLogs.length === 0) {
 		return { totalSets, completedSets: 0, percentage: 0 }
@@ -36,7 +71,9 @@ export const calculateSessionProgress = (
 	const completedSets = exercises.reduce(
 		(acc, re) =>
 			acc +
-			re.sets.filter(s => completedKeys.has(`${re.id}-${s.setNumber}`)).length,
+			sessionSetNumbers(setLogs, re).filter(n =>
+				completedKeys.has(`${re.id}-${n}`),
+			).length,
 		0,
 	)
 
@@ -56,14 +93,15 @@ export const calculateExerciseCompletion = (
 	setLogs: SetLog[],
 	exercise: RoutineExercise,
 ): ExerciseCompletionData => {
-	const completedSets = exercise.sets.filter(tpl => {
+	const setNumbers = sessionSetNumbers(setLogs, exercise)
+	const completedSets = setNumbers.filter(setNumber => {
 		const log = setLogs.find(
-			l => l.routineExerciseId === exercise.id && l.setNumber === tpl.setNumber,
+			l => l.routineExerciseId === exercise.id && l.setNumber === setNumber,
 		)
 		return log?.isCompleted
 	}).length
 
-	const totalSets = exercise.sets.length
+	const totalSets = setNumbers.length
 	const isCompleted = totalSets > 0 && completedSets === totalSets
 	const percentage =
 		totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0
@@ -116,7 +154,9 @@ export function areAllSetsCompleted(
 		)
 
 		return exercises.every(re =>
-			re.sets.every(set => completedSetLogs.has(`${re.id}-${set.setNumber}`)),
+			sessionSetNumbers(logs, re).every(n =>
+				completedSetLogs.has(`${re.id}-${n}`),
+			),
 		)
 	}
 
@@ -137,7 +177,9 @@ export function areAllSetsCompleted(
 	)
 
 	return day.exercises.every(re =>
-		re.sets.every(set => completedSetLogs.has(`${re.id}-${set.setNumber}`)),
+		sessionSetNumbers(logs, re).every(n =>
+			completedSetLogs.has(`${re.id}-${n}`),
+		),
 	)
 }
 
@@ -176,13 +218,32 @@ export function groupSetLogsByExercise(
 				plannedMaxReps: tpl.maxReps,
 				plannedWeight: tpl.weight,
 				plannedRir: tpl.rir,
+				isExtra: false,
 			}
 		})
+
+		const extras = extraSetLogs(setLogs, re).map(log => ({
+			id: log.id,
+			sessionId,
+			routineExerciseId: re.id,
+			exerciseId: re.exercise.id,
+			setNumber: log.setNumber,
+			reps: log.reps ?? 0,
+			weight: log.weight ?? undefined,
+			rpe: log.rpe ?? undefined,
+			isCompleted: log.isCompleted,
+			plannedReps: null,
+			plannedMinReps: null,
+			plannedMaxReps: null,
+			plannedWeight: null,
+			plannedRir: null,
+			isExtra: true,
+		}))
 
 		return {
 			exerciseId: re.id,
 			exerciseName: re.exercise.name,
-			sets,
+			sets: [...sets, ...extras],
 			progressionScheme: re.progressionScheme,
 			restSeconds: re.restSeconds,
 			note: re.note,

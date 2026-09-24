@@ -17,7 +17,7 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. Frontend PWA maintenance debt `TD-44` closed on
+`TD-49` is the one open entry. Frontend PWA maintenance debt `TD-44` closed on
 2026-09-23 after the owner completed the required installed-iPhone update and
 offline-fallback smoke test. `TD-43`, the
 per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
@@ -29,6 +29,36 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-49"></a>
+
+### TD-49 — Finishing a workout writes an unticked set's weight back to the routine
+
+**Impact.** At finish, progression copies the weight logged on every prescribed
+set into the routine, whether or not the set was ticked done. A weight typed or
+filled into a set that was never performed therefore becomes next workout's
+prescribed load. `LIVE-15` made this easier to reach: **Same as set N** and
+**Use last time** fill a row's weight in one tap, and autosave stores it, so a
+fill on a set that is then skipped moves the routine.
+
+**Evidence.** Verified on 2026-09-24 in `sunnsteel-backend`:
+`carryLoggedWeight` in `src/workouts/progression-changes.ts` pushes a
+`ProgressionUpdate` for any log with a numeric `weight`, while `hitTarget`
+beside it requires `isCompleted`. `buildProgressionOutcome` calls the former
+for every snapshot set, and `WorkoutSessionFinishService` writes the updates to
+`RoutineExerciseSet.weight`. The frontend saves weight only when a field
+changes, so an untouched prefilled row is not affected.
+
+**Direction.** Carry a logged weight only from a completed set, the same
+condition `hitTarget` uses, and cover it in `scripts/progression-changes.test.ts`
+beside the existing carry cases. Decide with the owner whether an unticked
+set's weight is ever meant as "use this next time"; nothing in the product says
+so today. A LIVE-17 correction re-derives progression through the same rule, so
+it changes with it.
+
+**Closure criteria.** A finish with an unticked prescribed set carrying a
+weight leaves that set's routine weight unchanged, a ticked one still carries
+it, and the change is tested and recorded in the backend `CLAUDE.md`.
 
 <a id="td-43"></a>
 
@@ -597,6 +627,10 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-24 (revision 22):** Recorded `TD-49`, found while delivering
+  `LIVE-15`: finishing a workout carries an unticked prescribed set's logged
+  weight into the routine. It was left outside `LIVE-15` by the owner's
+  decision, since fixing it changes progression rather than set editing.
 - **2026-09-23 (revision 21):** Closed `TD-44`. The owner completed the required
   update smoke test on the installed iPhone PWA and confirmed the real-device
   offline fallback. The generated Serwist worker, its local production-browser

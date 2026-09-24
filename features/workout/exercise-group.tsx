@@ -1,10 +1,11 @@
 'use client'
 
-import { ArrowLeftRight, ChevronDown, ChevronRight } from 'lucide-react'
+import { ArrowLeftRight, ChevronDown, ChevronRight, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
+import { MAX_EXTRA_SETS } from '@/lib/utils/session-progress.utils'
 import { comparablePrevious } from '@/lib/utils/session-substitutions'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
@@ -30,6 +31,7 @@ interface ExerciseGroupProps {
 		plannedMaxReps?: number | null
 		plannedWeight?: number | null
 		plannedRir?: number | null
+		isExtra?: boolean
 	}>
 	isCollapsed: boolean
 	onToggleCollapse: () => void
@@ -48,6 +50,11 @@ interface ExerciseGroupProps {
 	substitutedFrom?: string | null
 	/** Opens the swap dialog; omitted when the session cannot change. */
 	onSwapRequest?: () => void
+	/**
+	 * LIVE-15: take back an added set. Omitted when the session cannot change,
+	 * which also hides Add set.
+	 */
+	onRemoveSet?: (routineExerciseId: string, setNumber: number) => void
 }
 
 /**
@@ -69,6 +76,7 @@ export const ExerciseGroup = ({
 	sessionNote,
 	substitutedFrom,
 	onSwapRequest,
+	onRemoveSet,
 }: ExerciseGroupProps) => {
 	const isComplete = completedSets === totalSets && totalSets > 0
 	const weightUnit = useWeightUnit()
@@ -79,6 +87,24 @@ export const ExerciseGroup = ({
 	const calculatorTarget = nextWeightedSet
 		? (nextWeightedSet.plannedWeight ?? nextWeightedSet.weight)
 		: undefined
+
+	// LIVE-15: one more set at the end, saved at once with the last set's
+	// values and not ticked. It is today's work; the prescription is unchanged.
+	const lastSet = sets[sets.length - 1]
+	const extraCount = sets.filter(set => set.isExtra).length
+	const canAddSet =
+		lastSet !== undefined && Boolean(onRemoveSet) && extraCount < MAX_EXTRA_SETS
+	const addSet = () =>
+		lastSet &&
+		onSave({
+			routineExerciseId: lastSet.routineExerciseId,
+			exerciseId: lastSet.exerciseId,
+			setNumber: lastSet.setNumber + 1,
+			reps: lastSet.reps,
+			weight: lastSet.weight,
+			rpe: lastSet.rpe,
+			isCompleted: false,
+		})
 
 	return (
 		// De-boxed: a ruled entry on the page, not a card. The mark on the left
@@ -174,7 +200,7 @@ export const ExerciseGroup = ({
 
 			{!isCollapsed && (
 				<div className="mt-3 space-y-2">
-					{sets.map(set => (
+					{sets.map((set, index) => (
 						<SetLogInput
 							// The exercise is part of the key: a LIVE-11 swap must remount the
 							// inputs, or values typed for the replaced exercise carry over.
@@ -198,10 +224,39 @@ export const ExerciseGroup = ({
 								set.exerciseId,
 							)}
 							rpe={set.rpe}
+							isExtra={set.isExtra}
+							setAbove={
+								index > 0
+									? {
+											setNumber: sets[index - 1].setNumber,
+											reps: sets[index - 1].reps,
+											weight: sets[index - 1].weight,
+											rpe: sets[index - 1].rpe,
+										}
+									: undefined
+							}
+							onRemove={
+								onRemoveSet && set.isExtra && set === lastSet
+									? () => onRemoveSet(set.routineExerciseId, set.setNumber)
+									: undefined
+							}
 							onSave={onSave}
 							onSetCompleted={onSetCompleted}
 						/>
 					))}
+					{canAddSet ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className="type-body-sm h-11 px-2 text-ink-2 md:h-8"
+							aria-label={`Add a set to ${exerciseName}`}
+							onClick={addSet}
+						>
+							<Plus className="h-4 w-4" aria-hidden />
+							Add set
+						</Button>
+					) : null}
 				</div>
 			)}
 		</section>

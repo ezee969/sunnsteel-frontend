@@ -35,12 +35,14 @@ export function HistoryExerciseGroup({
 	sessionId,
 }: HistoryExerciseGroupProps) {
 	const weightUnit = useWeightUnit()
-	const totalSets = group.plannedSets.length
-	const completedSets = group.plannedSets.filter(
-		plannedSet =>
-			group.performedSets.find(set => set.setNumber === plannedSet.setNumber)
-				?.isCompleted,
-	).length
+	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
+	const totalSets = group.plannedSets.length + group.extraSets.length
+	const completedSets =
+		group.plannedSets.filter(
+			plannedSet =>
+				group.performedSets.find(set => set.setNumber === plannedSet.setNumber)
+					?.isCompleted,
+		).length + group.extraSets.filter(set => set.isCompleted).length
 	const isComplete = totalSets > 0 && completedSets === totalSets
 	const panelId = `history-exercise-${group.routineExerciseId}`
 
@@ -118,12 +120,21 @@ export function HistoryExerciseGroup({
 							return (
 								<SetComparisonRow
 									key={`${group.routineExerciseId}-${plannedSet.id ?? plannedSet.setNumber}`}
+									setNumber={plannedSet.setNumber}
 									plannedSet={plannedSet}
 									performedSet={performedSet}
 									weightUnit={weightUnit}
 								/>
 							)
 						})}
+						{group.extraSets.map(set => (
+							<SetComparisonRow
+								key={`${group.routineExerciseId}-extra-${set.setNumber}`}
+								setNumber={set.setNumber}
+								performedSet={set}
+								weightUnit={weightUnit}
+							/>
+						))}
 					</div>
 				</div>
 			)}

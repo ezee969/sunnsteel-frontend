@@ -1,17 +1,23 @@
 'use client'
 
 import type { WeightUnit } from '@sunsteel/contracts'
+import { X } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { useSetLogForm } from '@/hooks/use-set-log-form'
+import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import {
 	formatPreviousPerformance,
 	isSetPerformanceImproved,
 } from '@/lib/utils/previous-performance.utils'
 import { saveStateLabel } from '@/lib/utils/save-status-store'
-import { formatWeight, parseWeightInput } from '@/lib/utils/weight-unit'
+import {
+	formatWeight,
+	formatWeightInput,
+	parseWeightInput,
+} from '@/lib/utils/weight-unit'
 import type { LogRowProps } from '@/lib/utils/workout-session.types'
 
 interface SetLogInputProps extends LogRowProps {
@@ -22,7 +28,16 @@ interface SetLogInputProps extends LogRowProps {
 	rpe?: number
 	previousPerformance?: PreviousSetPerformance
 	weightUnit: WeightUnit
+	/** LIVE-15: a set logged beyond the prescription. */
+	isExtra?: boolean
+	/** LIVE-15: the set above in this workout, offered as a one-tap fill. */
+	setAbove?: SetValues & { setNumber: number }
+	/** LIVE-15: present only on the last added set, the one that can go. */
+	onRemove?: () => void
 }
+
+/** A LIVE-15 fill control: repeated on every row, so it is never primary. */
+const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
 
 /**
  * A numeric field keeps its own size classes so the 16px-below-`md` rule
@@ -61,6 +76,9 @@ export const SetLogInput = ({
 	rpe,
 	previousPerformance,
 	weightUnit,
+	isExtra,
+	setAbove,
+	onRemove,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -74,6 +92,7 @@ export const SetLogInput = ({
 		setWeight,
 		setRpe,
 		handleCompletionToggle,
+		fill,
 		isValid,
 		validationError,
 	} = useSetLogForm({
@@ -128,6 +147,25 @@ export const SetLogInput = ({
 			)
 		: false
 
+	// LIVE-15: a fill is offered only on a set not yet done, and only when it
+	// would change what the fields hold.
+	const holds = (values: SetValues) =>
+		(values.reps > 0 ? String(values.reps) : '') === repsState &&
+		formatWeightInput(values.weight ?? undefined, weightUnit) === weightState &&
+		(values.rpe != null ? String(values.rpe) : '') === rpeState
+	const canFillAbove =
+		!isCompletedState &&
+		setAbove !== undefined &&
+		(setAbove.reps > 0 || (setAbove.weight ?? 0) > 0) &&
+		!holds(setAbove)
+	const canFillPrevious =
+		!isCompletedState &&
+		previousPerformance !== undefined &&
+		!holds(previousPerformance)
+	const previousText = previousPerformance
+		? formatPreviousPerformance(previousPerformance, weightUnit)
+		: ''
+
 	return (
 		// The second of the three things v0.1 keeps boxed (§11.5): a dense grid of
 		// editable numeric fields needs edges to stay parseable. It is a `sunk`
@@ -155,11 +193,13 @@ export const SetLogInput = ({
 					>
 						Set {setNumber}
 					</span>
-					{plannedRir !== undefined && plannedRir !== null && (
+					{isExtra ? (
+						<span className="type-body-sm leading-none text-ink-3">Extra</span>
+					) : plannedRir !== undefined && plannedRir !== null ? (
 						<span className="type-data leading-none text-ink-3">
 							RIR {plannedRir}
 						</span>
-					)}
+					) : null}
 				</div>
 
 				{/* Reps */}
@@ -179,7 +219,7 @@ export const SetLogInput = ({
 						}`}
 					/>
 					<span className="type-body-sm text-center text-ink-3">
-						Target: {plannedRepsText}
+						{isExtra ? 'No target' : `Target: ${plannedRepsText}`}
 					</span>
 				</div>
 
@@ -201,7 +241,9 @@ export const SetLogInput = ({
 						}`}
 					/>
 					<span className="type-body-sm text-center text-ink-3">
-						Target: {formatWeight(plannedWeight, weightUnit)}
+						{isExtra
+							? 'No target'
+							: `Target: ${formatWeight(plannedWeight, weightUnit)}`}
 					</span>
 				</div>
 
@@ -259,13 +301,54 @@ export const SetLogInput = ({
 				>
 					<span>Last time</span>
 					<span className="type-data flex items-center gap-2">
-						{formatPreviousPerformance(previousPerformance, weightUnit)}
+						{previousText}
 						{/* An improvement is earned, so it is one of the few places
 						    gold belongs. */}
 						{hasImproved ? (
 							<span className="type-body-sm text-honour">↑ Improvement</span>
 						) : null}
 					</span>
+				</div>
+			) : null}
+
+			{canFillAbove || canFillPrevious || onRemove ? (
+				<div className="mt-1 flex flex-wrap items-center gap-x-1">
+					{canFillAbove && setAbove ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className={FILL_CLASS}
+							onClick={() => fill(setAbove)}
+						>
+							Same as set {setAbove.setNumber}
+						</Button>
+					) : null}
+					{canFillPrevious && previousPerformance ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className={FILL_CLASS}
+							aria-label={`Use last time: ${previousText}`}
+							onClick={() => fill(previousPerformance)}
+						>
+							Use last time
+						</Button>
+					) : null}
+					{onRemove ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className={`${FILL_CLASS} ml-auto`}
+							aria-label={`Remove set ${setNumber}`}
+							onClick={onRemove}
+						>
+							<X className="h-4 w-4" aria-hidden />
+							Remove
+						</Button>
+					) : null}
 				</div>
 			) : null}
 

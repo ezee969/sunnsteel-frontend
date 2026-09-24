@@ -83,6 +83,8 @@ export type GroupedExerciseLogs = {
 		plannedMaxReps?: number | null
 		plannedWeight?: number | null
 		plannedRir?: number | null
+		/** LIVE-15: logged beyond the prescription, so it has no target. */
+		isExtra?: boolean
 	}>
 	progressionScheme: ProgressionScheme
 	// LIVE-01 reads this to start the rest countdown.

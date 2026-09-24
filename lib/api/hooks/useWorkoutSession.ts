@@ -667,6 +667,8 @@ export const useUpsertSetLog = (id: string) => {
 										...l,
 										reps: data.reps,
 										weight: data.weight,
+										// The server leaves an omitted RPE as it was.
+										rpe: data.rpe ?? l.rpe,
 										isCompleted:
 											typeof data.isCompleted === 'boolean'
 												? data.isCompleted
@@ -685,6 +687,7 @@ export const useUpsertSetLog = (id: string) => {
 								setNumber: data.setNumber,
 								reps: data.reps,
 								weight: data.weight,
+								rpe: data.rpe ?? null,
 								isCompleted: !!data.isCompleted,
 								createdAt: now,
 								updatedAt: now,
