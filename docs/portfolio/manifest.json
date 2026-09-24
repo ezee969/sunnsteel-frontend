@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-09-24T19:01:40.739Z",
+	"mutatedAt": "2026-09-24T20:27:48.093Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -240,6 +240,16 @@
 				"LIVE-15"
 			],
 			"capturedAt": "2026-09-24T19:01:44.591Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "live-session-set-kinds",
+			"route": "/workouts/sessions/:session",
+			"features": [
+				"LIVE-12"
+			],
+			"capturedAt": "2026-09-24T20:27:51.740Z",
 			"width": 1440,
 			"height": 900
 		}

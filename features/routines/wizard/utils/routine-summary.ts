@@ -75,6 +75,8 @@ export const buildRoutineRequest = (
 						...(set.weight !== undefined &&
 							set.weight !== null && { weight: set.weight }),
 						...(set.rir !== undefined && set.rir !== null && { rir: set.rir }),
+						// LIVE-12: sent always, so editing a set back to working sticks.
+						kind: set.kind ?? 'WORKING',
 					}
 
 					if (set.repType === 'FIXED') {

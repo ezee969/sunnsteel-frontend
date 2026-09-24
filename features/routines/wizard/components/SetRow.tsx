@@ -1,4 +1,8 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import {
+	SET_KIND_LABELS,
+	SET_KINDS,
+	type WeightUnit,
+} from '@sunsteel/contracts'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +18,7 @@ import {
 } from '@/components/ui/select'
 
 import { useSetRowInputs } from '../hooks/useSetRowInputs'
-import type { ProgressionScheme, RoutineSet } from '../types'
+import type { ProgressionScheme, RoutineSet, SetField } from '../types'
 
 interface SetRowProps {
 	weightUnit: WeightUnit
@@ -25,7 +29,7 @@ interface SetRowProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		field: SetField,
 		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (
@@ -48,6 +52,8 @@ interface SetRowProps {
 	onRemoveSet: () => void
 	isRemoving: boolean
 	disableRemove: boolean
+	/** LIVE-12: the load follows the exercise's first working set. */
+	weightLocked: boolean
 }
 
 /**
@@ -82,6 +88,7 @@ export function SetRow({
 	onRemoveSet,
 	isRemoving,
 	disableRemove,
+	weightLocked,
 }: SetRowProps) {
 	const {
 		minInput,
@@ -113,32 +120,59 @@ export function SetRow({
 		>
 			<div className="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-2 items-stretch sm:items-center">
 				{/* Top line on mobile: Set Badge, Rep Type Select, Delete button */}
-				<div className="flex items-center justify-between sm:col-span-5 gap-2">
+				<div className="flex flex-wrap items-center justify-between gap-2 sm:col-span-5 sm:flex-nowrap">
 					<div className="flex items-center gap-2">
 						<Badge variant="outline" className="text-xs px-2 py-1">
 							Set {set.setNumber}
 						</Badge>
 					</div>
 
-					<div className="flex-1 max-w-[140px] sm:max-w-none">
-						<Select
-							value={set.repType}
-							onValueChange={value =>
-								onUpdateSet(exerciseIndex, setIndex, 'repType', value)
-							}
-							disabled={progressionScheme !== 'NONE'}
-						>
-							<SelectTrigger
-								aria-label="Rep type"
-								className="w-full h-9 sm:h-8"
+					{/* LIVE-12: the kind and the rep type wrap onto two lines in a
+					    narrow card rather than pushing the rep type off its edge. */}
+					<div className="order-last flex w-full min-w-0 flex-wrap gap-2 sm:order-none sm:w-auto sm:flex-1">
+						<div className="min-w-[104px] flex-1 sm:min-w-0">
+							<Select
+								value={set.kind ?? 'WORKING'}
+								onValueChange={value =>
+									onUpdateSet(exerciseIndex, setIndex, 'kind', value)
+								}
 							>
-								<SelectValue className="truncate" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="FIXED">Fixed</SelectItem>
-								<SelectItem value="RANGE">Range</SelectItem>
-							</SelectContent>
-						</Select>
+								<SelectTrigger
+									aria-label={`Set ${set.setNumber} kind`}
+									className="w-full h-9 sm:h-8"
+								>
+									<SelectValue className="truncate" />
+								</SelectTrigger>
+								<SelectContent>
+									{SET_KINDS.map(kind => (
+										<SelectItem key={kind} value={kind}>
+											{SET_KIND_LABELS[kind]}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						<div className="min-w-[104px] flex-1 sm:min-w-0">
+							<Select
+								value={set.repType}
+								onValueChange={value =>
+									onUpdateSet(exerciseIndex, setIndex, 'repType', value)
+								}
+								disabled={progressionScheme !== 'NONE'}
+							>
+								<SelectTrigger
+									aria-label="Rep type"
+									className="w-full h-9 sm:h-8"
+								>
+									<SelectValue className="truncate" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="FIXED">Fixed</SelectItem>
+									<SelectItem value="RANGE">Range</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
 
 					<Button
@@ -300,9 +334,7 @@ export function SetRow({
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
 									aria-label="Decrease weight"
-									disabled={
-										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-									}
+									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
 								>
 									<Minus className="h-3 w-3" />
@@ -317,13 +349,9 @@ export function SetRow({
 									value={weightInput}
 									onChange={event => handleWeightChange(event.target.value)}
 									onBlur={handleWeightBlur}
-									disabled={
-										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-									}
+									disabled={weightLocked}
 									className={`text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 ${
-										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-											? 'cursor-not-allowed'
-											: ''
+										weightLocked ? 'cursor-not-allowed' : ''
 									}`}
 								/>
 								<Button
@@ -332,9 +360,7 @@ export function SetRow({
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
 									aria-label="Increase weight"
-									disabled={
-										progressionScheme === 'DOUBLE_PROGRESSION' && setIndex > 0
-									}
+									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
 								>
 									<Plus className="h-3 w-3" />

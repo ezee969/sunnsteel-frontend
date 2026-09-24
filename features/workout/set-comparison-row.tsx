@@ -1,6 +1,6 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
+import { SET_KIND_LABELS, type WeightUnit } from '@sunsteel/contracts'
 import { Check, Minus } from 'lucide-react'
 
 import type { SetLog } from '@/lib/api/types/workout.type'
@@ -29,6 +29,8 @@ export function SetComparisonRow({
 	weightUnit,
 }: SetComparisonRowProps) {
 	const isCompleted = Boolean(performedSet?.isCompleted)
+	// LIVE-12: the kind it was done as, else the one it was planned as.
+	const kind = performedSet?.kind ?? plannedSet?.kind ?? 'WORKING'
 
 	// Completion is the glyph plus its name, in `--success` (§4.3 rules 2, 8).
 	// It was a filled-ink badge, the primary control's colour.
@@ -48,7 +50,14 @@ export function SetComparisonRow({
 	return (
 		<div className="rule-row grid grid-cols-3 gap-x-4 gap-y-2 py-3 sm:grid-cols-12 sm:items-center sm:gap-2 sm:py-2">
 			<div className="col-span-3 flex items-center justify-between sm:col-span-2">
-				<span className="type-label text-foreground">Set {setNumber}</span>
+				<span className="type-label text-foreground">
+					Set {setNumber}
+					{kind !== 'WORKING' ? (
+						<span className="type-body-sm ml-2 text-ink-3">
+							{SET_KIND_LABELS[kind]}
+						</span>
+					) : null}
+				</span>
 				<span className="sm:hidden">{completion}</span>
 			</div>
 

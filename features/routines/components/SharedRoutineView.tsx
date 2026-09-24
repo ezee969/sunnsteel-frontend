@@ -3,6 +3,7 @@
 import {
 	routineDayLabel,
 	type RoutineSet,
+	SET_KIND_LABELS,
 	type SharedRoutine,
 } from '@sunsteel/contracts'
 
@@ -31,9 +32,13 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 				: `${set.reps ?? '?'} reps`
 		// A shared routine carries its target loads: without them a program is
 		// not something a reader can actually follow.
+		const kind =
+			set.kind && set.kind !== 'WORKING'
+				? `${SET_KIND_LABELS[set.kind]} · `
+				: ''
 		return set.weight
-			? `${reps} · ${formatWeight(set.weight, weightUnit)}`
-			: reps
+			? `${kind}${reps} · ${formatWeight(set.weight, weightUnit)}`
+			: `${kind}${reps}`
 	}
 
 	return (

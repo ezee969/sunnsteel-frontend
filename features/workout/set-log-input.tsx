@@ -1,10 +1,24 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
-import { X } from 'lucide-react'
+import {
+	isSetKind,
+	SET_KIND_LABELS,
+	SET_KINDS,
+	type SetKind,
+	type WeightUnit,
+} from '@sunsteel/contracts'
+import { ChevronDown, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
@@ -34,6 +48,8 @@ interface SetLogInputProps extends LogRowProps {
 	setAbove?: SetValues & { setNumber: number }
 	/** LIVE-15: present only on the last added set, the one that can go. */
 	onRemove?: () => void
+	/** LIVE-12: what the set is for in this workout. */
+	kind?: SetKind
 }
 
 /** A LIVE-15 fill control: repeated on every row, so it is never primary. */
@@ -79,6 +95,7 @@ export const SetLogInput = ({
 	isExtra,
 	setAbove,
 	onRemove,
+	kind = 'WORKING',
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -93,6 +110,7 @@ export const SetLogInput = ({
 		setRpe,
 		handleCompletionToggle,
 		fill,
+		changeKind,
 		isValid,
 		validationError,
 	} = useSetLogForm({
@@ -186,14 +204,43 @@ export const SetLogInput = ({
 			<div className="flex items-stretch justify-between gap-1 sm:gap-2">
 				{/* Set number & RIR */}
 				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px]">
-					<span
-						className={`type-label ${
-							isCompletedState ? 'text-success' : 'text-ink-3'
-						}`}
-					>
-						Set {setNumber}
-					</span>
-					{isExtra ? (
+					{/* LIVE-12: the set number opens the kind menu. A warm-up never
+					    counts as work; only working and optional sets progress. */}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								aria-label={`Set ${setNumber}, ${SET_KIND_LABELS[kind]}. Change set kind`}
+								disabled={saveState === 'saving'}
+								className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 ${
+									isCompletedState ? 'text-success' : 'text-ink-3'
+								}`}
+							>
+								Set {setNumber}
+								<ChevronDown className="h-3 w-3" aria-hidden />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start">
+							<DropdownMenuLabel>Set kind</DropdownMenuLabel>
+							<DropdownMenuRadioGroup
+								value={kind}
+								onValueChange={value => {
+									if (isSetKind(value) && value !== kind) changeKind(value)
+								}}
+							>
+								{SET_KINDS.map(option => (
+									<DropdownMenuRadioItem key={option} value={option}>
+										{SET_KIND_LABELS[option]}
+									</DropdownMenuRadioItem>
+								))}
+							</DropdownMenuRadioGroup>
+						</DropdownMenuContent>
+					</DropdownMenu>
+					{kind !== 'WORKING' ? (
+						<span className="type-body-sm leading-none text-ink-3">
+							{SET_KIND_LABELS[kind]}
+						</span>
+					) : isExtra ? (
 						<span className="type-body-sm leading-none text-ink-3">Extra</span>
 					) : plannedRir !== undefined && plannedRir !== null ? (
 						<span className="type-data leading-none text-ink-3">

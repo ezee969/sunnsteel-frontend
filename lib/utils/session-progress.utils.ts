@@ -1,3 +1,5 @@
+import { requiredToFinish, type SetKind } from '@sunsteel/contracts'
+
 import type { Routine, RoutineExercise } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
 
@@ -38,6 +40,46 @@ const sessionSetNumbers = (
 	...exercise.sets.map(set => set.setNumber),
 	...extraSetLogs(setLogs, exercise).map(log => log.setNumber),
 ]
+
+/**
+ * LIVE-12: the kind each set of an exercise was done as -- its log's when it
+ * has one, else its prescription's -- keyed by set number.
+ */
+const sessionSetKinds = (
+	setLogs: SetLog[] | undefined,
+	exercise: RoutineExercise,
+): Map<number, SetKind> => {
+	const logKind = (setNumber: number) =>
+		(setLogs ?? []).find(
+			l => l.routineExerciseId === exercise.id && l.setNumber === setNumber,
+		)?.kind
+	const kinds = new Map<number, SetKind>()
+	for (const set of exercise.sets)
+		kinds.set(set.setNumber, logKind(set.setNumber) ?? set.kind ?? 'WORKING')
+	for (const log of extraSetLogs(setLogs, exercise))
+		kinds.set(log.setNumber, log.kind ?? 'WORKING')
+	return kinds
+}
+
+/** LIVE-12: the sets a workout needs done to finish without a prompt. */
+const requiredSetNumbers = (
+	setLogs: SetLog[] | undefined,
+	exercise: RoutineExercise,
+) =>
+	[...sessionSetKinds(setLogs, exercise)]
+		.filter(([, kind]) => requiredToFinish(kind))
+		.map(([setNumber]) => setNumber)
+
+const everyRequiredDone = (logs: SetLog[], exercises: RoutineExercise[]) => {
+	const completed = new Set(
+		logs
+			.filter(l => l.isCompleted)
+			.map(l => `${l.routineExerciseId}-${l.setNumber}`),
+	)
+	return exercises.every(re =>
+		requiredSetNumbers(logs, re).every(n => completed.has(`${re.id}-${n}`)),
+	)
+}
 
 /**
  * Calculates overall session progress based on set logs and exercises
@@ -141,23 +183,8 @@ export function areAllSetsCompleted(
 		const logs = routineOrSetLogs as SetLog[]
 		const exercises = routineDayIdOrExercises as RoutineExercise[]
 
-		// If no exercises, return true (vacuous truth)
-		if (exercises.length === 0) return true
-
-		// If no set logs but there are exercises, return false
-		if (logs.length === 0) return false
-
-		const completedSetLogs = new Set(
-			logs
-				.filter(l => l.isCompleted)
-				.map(l => `${l.routineExerciseId}-${l.setNumber}`),
-		)
-
-		return exercises.every(re =>
-			sessionSetNumbers(logs, re).every(n =>
-				completedSetLogs.has(`${re.id}-${n}`),
-			),
-		)
+		// Warm-ups and optional sets are never required (LIVE-12).
+		return everyRequiredDone(logs, exercises)
 	}
 
 	// Handle the original case (routine, routineDayId, setLogs)
@@ -170,17 +197,7 @@ export function areAllSetsCompleted(
 	const day = routine.days.find(d => d.id === routineDayId)
 	if (!day) return false
 
-	const completedSetLogs = new Set(
-		logs
-			.filter(l => l.isCompleted)
-			.map(l => `${l.routineExerciseId}-${l.setNumber}`),
-	)
-
-	return day.exercises.every(re =>
-		sessionSetNumbers(logs, re).every(n =>
-			completedSetLogs.has(`${re.id}-${n}`),
-		),
-	)
+	return everyRequiredDone(logs, day.exercises)
 }
 
 /**
@@ -219,6 +236,7 @@ export function groupSetLogsByExercise(
 				plannedWeight: tpl.weight,
 				plannedRir: tpl.rir,
 				isExtra: false,
+				kind: log?.kind ?? tpl.kind ?? 'WORKING',
 			}
 		})
 
@@ -238,6 +256,7 @@ export function groupSetLogsByExercise(
 			plannedWeight: null,
 			plannedRir: null,
 			isExtra: true,
+			kind: log.kind ?? 'WORKING',
 		}))
 
 		return {

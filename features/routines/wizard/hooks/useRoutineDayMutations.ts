@@ -1,9 +1,10 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import { isSetKind, type WeightUnit } from '@sunsteel/contracts'
 import { useCallback } from 'react'
 
 import { stepCanonicalWeight } from '@/lib/utils/weight-unit'
 
-import type { ProgressionScheme, RoutineWizardData } from '../types'
+import type { ProgressionScheme, RoutineWizardData, SetField } from '../types'
+import { syncLeadWeight } from '../utils/set-kinds'
 
 interface UseRoutineDayMutationsParams {
 	data: RoutineWizardData
@@ -142,17 +143,10 @@ export function useRoutineDayMutations({
 		[withDayMutation],
 	)
 
+	// LIVE-12: the lead is the first working or optional set, not set 1.
 	const syncDoubleProgressionWeights = (
 		exercise: RoutineWizardData['days'][number]['exercises'][number],
-		weight: number | null | undefined,
-	) => {
-		if (exercise.progressionScheme !== 'DOUBLE_PROGRESSION') return
-		if (typeof weight === 'undefined') return
-		exercise.sets.forEach((set, index) => {
-			if (index === 0) return
-			set.weight = weight ?? null
-		})
-	}
+	) => syncLeadWeight(exercise.sets, exercise.progressionScheme)
 
 	const updateProgressionScheme = useCallback(
 		(exerciseIndex: number, scheme: ProgressionScheme) => {
@@ -176,7 +170,7 @@ export function useRoutineDayMutations({
 				}
 
 				if (scheme === 'DOUBLE_PROGRESSION' && exercise.sets.length > 0) {
-					syncDoubleProgressionWeights(exercise, exercise.sets[0].weight)
+					syncDoubleProgressionWeights(exercise)
 				}
 			})
 		},
@@ -201,16 +195,11 @@ export function useRoutineDayMutations({
 						lastSet?.repType === 'RANGE' ? (lastSet?.maxReps ?? 12) : null,
 					weight: lastSet?.weight,
 					rir: lastSet?.rir ?? null,
-				}
-
-				if (
-					exercise.progressionScheme === 'DOUBLE_PROGRESSION' &&
-					exercise.sets.length > 0
-				) {
-					newSet.weight = exercise.sets[0].weight
+					kind: lastSet?.kind ?? 'WORKING',
 				}
 
 				exercise.sets.push(newSet)
+				syncDoubleProgressionWeights(exercise)
 			})
 		},
 		[withDayMutation],
@@ -285,10 +274,7 @@ export function useRoutineDayMutations({
 				const current = set.weight ?? 0
 				const next = stepCanonicalWeight(current, weightUnit, delta)
 				set.weight = next
-				syncDoubleProgressionWeights(
-					exercise,
-					setIndex === 0 ? next : exercise.sets[0]?.weight,
-				)
+				syncDoubleProgressionWeights(exercise)
 			})
 		},
 		[weightUnit, withDayMutation],
@@ -327,7 +313,7 @@ export function useRoutineDayMutations({
 		(
 			exerciseIndex: number,
 			setIndex: number,
-			field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+			field: SetField,
 			value: string | number | null,
 		) => {
 			withDayMutation(day => {
@@ -356,10 +342,10 @@ export function useRoutineDayMutations({
 						const parsed = parseFloat(String(value))
 						set.weight = Number.isNaN(parsed) ? undefined : Math.max(0, parsed)
 					}
-					syncDoubleProgressionWeights(
-						exercise,
-						value === '' ? undefined : set.weight,
-					)
+					if (value !== '') syncDoubleProgressionWeights(exercise)
+				} else if (field === 'kind') {
+					set.kind = isSetKind(value) ? value : 'WORKING'
+					syncDoubleProgressionWeights(exercise)
 				} else if (field === 'rir') {
 					if (value === null || value === '') {
 						set.rir = null

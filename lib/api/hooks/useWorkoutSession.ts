@@ -669,6 +669,7 @@ export const useUpsertSetLog = (id: string) => {
 										weight: data.weight,
 										// The server leaves an omitted RPE as it was.
 										rpe: data.rpe ?? l.rpe,
+										kind: data.kind ?? l.kind,
 										isCompleted:
 											typeof data.isCompleted === 'boolean'
 												? data.isCompleted
@@ -688,6 +689,8 @@ export const useUpsertSetLog = (id: string) => {
 								reps: data.reps,
 								weight: data.weight,
 								rpe: data.rpe ?? null,
+								// Omitted, the row keeps its prescription's kind (LIVE-12).
+								kind: data.kind,
 								isCompleted: !!data.isCompleted,
 								createdAt: now,
 								updatedAt: now,

@@ -1,5 +1,6 @@
 import type {
 	RoutineScheduleMode,
+	SetKind,
 	TrainingExperienceLevel,
 	TrainingGoal,
 } from '@sunsteel/contracts'
@@ -15,7 +16,13 @@ export interface RoutineSet {
 	maxReps?: number | null
 	weight?: number | null
 	rir?: number | null
+	/** LIVE-12: absent means a working set. */
+	kind?: SetKind
 }
+
+/** A set field the builder edits. */
+export type SetField =
+	'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir' | 'kind'
 
 export interface RoutineWizardExercise {
 	/**

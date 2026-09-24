@@ -1,6 +1,10 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
+import {
+	SET_KIND_LABELS,
+	type SetKind,
+	type WeightUnit,
+} from '@sunsteel/contracts'
 import { Clock, FileText } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +36,7 @@ interface ExerciseCardProps {
 			weight?: number | null
 			rir?: number | null
 			rpe?: number
+			kind?: SetKind
 		}[]
 	}
 	routineId?: string
@@ -137,6 +142,11 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 											set.rir !== undefined &&
 											` (RIR ${set.rir})`}
 									</span>
+									{set.kind && set.kind !== 'WORKING' ? (
+										<span className="type-body-sm text-ink-3">
+											{SET_KIND_LABELS[set.kind]}
+										</span>
+									) : null}
 								</li>
 							)
 						})}

@@ -8,6 +8,7 @@ import type {
 	RoutineVersionSetup,
 	WeightUnit,
 } from '@sunsteel/contracts'
+import { SET_KIND_LABELS } from '@sunsteel/contracts'
 
 import { formatSetScheme } from './exercise-detail'
 import { describeRoutineSchedule, routineDayTitle } from './routine-schedule'
@@ -117,6 +118,16 @@ function rirLabel(sets: readonly RoutineSet[]): string {
 	return values.join(', ')
 }
 
+/** LIVE-12: "2 warm-up, 3 working", in the order the kinds first appear. */
+function kindsLabel(sets: readonly RoutineSet[]): string {
+	const counts = new Map<string, number>()
+	for (const set of sets) {
+		const label = SET_KIND_LABELS[set.kind ?? 'WORKING'].toLowerCase()
+		counts.set(label, (counts.get(label) ?? 0) + 1)
+	}
+	return [...counts].map(([label, n]) => `${n} ${label}`).join(', ')
+}
+
 const seconds = (value: number) => `${value} s`
 
 function compareExercise(
@@ -130,6 +141,15 @@ function compareExercise(
 	const toScheme = formatSetScheme(target.sets)
 	if (fromScheme !== toScheme) {
 		changes.push(`${name}: ${fromScheme} → ${toScheme}`)
+	}
+	const fromKinds = kindsLabel(current.sets)
+	const toKinds = kindsLabel(target.sets)
+	// A plain change in the number of working sets is the scheme line above.
+	const anyNonWorking = [...current.sets, ...target.sets].some(
+		set => (set.kind ?? 'WORKING') !== 'WORKING',
+	)
+	if (anyNonWorking && fromKinds !== toKinds) {
+		changes.push(`${name}: ${fromKinds} → ${toKinds} sets`)
 	}
 	if (!sameLoads(current.sets, target.sets)) {
 		const from = loadsLabel(current.sets, unit)

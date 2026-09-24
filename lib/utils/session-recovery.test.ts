@@ -47,6 +47,7 @@ function makeSession(overrides: Partial<WorkoutSession> = {}): WorkoutSession {
 				setNumber: 1,
 				reps: 8,
 				isCompleted: true,
+				kind: 'WORKING',
 				createdAt: '2026-09-05T12:00:00Z',
 				updatedAt: '2026-09-05T12:00:00Z',
 			},

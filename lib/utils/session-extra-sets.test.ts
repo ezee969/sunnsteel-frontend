@@ -53,6 +53,7 @@ const log = (
 	weight: 80,
 	rpe: 8,
 	isCompleted,
+	kind: 'WORKING',
 	createdAt: '2026-09-24T08:00:00.000Z',
 	updatedAt: '2026-09-24T08:00:00.000Z',
 	...overrides,

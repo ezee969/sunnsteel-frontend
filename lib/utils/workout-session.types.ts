@@ -1,3 +1,5 @@
+import type { SetKind } from '@sunsteel/contracts'
+
 import type { ProgressionScheme } from '@/lib/api/types/routine.shared'
 import type { Routine } from '@/lib/api/types/routine.type'
 
@@ -9,6 +11,8 @@ export type UpsertSetLogPayload = {
 	weight?: number
 	rpe?: number
 	isCompleted?: boolean
+	/** LIVE-12: changes the set's kind; omitted, it keeps its own. */
+	kind?: SetKind
 }
 
 export type LogRowProps = {
@@ -85,6 +89,8 @@ export type GroupedExerciseLogs = {
 		plannedRir?: number | null
 		/** LIVE-15: logged beyond the prescription, so it has no target. */
 		isExtra?: boolean
+		/** LIVE-12: what the set is for in this workout. */
+		kind: SetKind
 	}>
 	progressionScheme: ProgressionScheme
 	// LIVE-01 reads this to start the rest countdown.

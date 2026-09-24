@@ -1,3 +1,5 @@
+import type { SetKind } from '@sunsteel/contracts'
+
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 
 import { substitutionFor } from './session-substitutions'
@@ -19,6 +21,7 @@ export interface ExerciseGroup {
 		minReps?: number | null
 		maxReps?: number | null
 		weight?: number | null
+		kind?: SetKind
 	}[]
 	performedSets: SetLog[]
 	/** LIVE-15: sets logged beyond the prescription, in order. */

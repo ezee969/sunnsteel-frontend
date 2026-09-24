@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
 
-import type { RoutineSet } from '../types'
+import type { RoutineSet, SetField } from '../types'
 import {
 	parseOptionalPositiveFloat,
 	sanitizeDecimalInput,
@@ -17,7 +17,7 @@ interface UseSetRowInputsOptions {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		field: SetField,
 		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (

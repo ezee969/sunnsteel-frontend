@@ -112,7 +112,10 @@ const SETS_TO_LOG = 3
  */
 async function startScratchSession(
 	page: Page,
-	{ extraSet = false }: { extraSet?: boolean } = {},
+	{
+		extraSet = false,
+		kindMenu = false,
+	}: { extraSet?: boolean; kindMenu?: boolean } = {},
 ): Promise<Cleanup> {
 	const start = page.locator(
 		'button[aria-label="Start session"]:not([disabled])',
@@ -149,6 +152,7 @@ async function startScratchSession(
 	const rows = page.getByTestId('set-log-container')
 	const logged: number[] = []
 	const cleanup: Cleanup = async () => {
+		await page.keyboard.press('Escape')
 		const remove = page.getByRole('button', { name: /^Remove set / })
 		if (await remove.count()) {
 			await remove.first().click()
@@ -207,6 +211,15 @@ async function startScratchSession(
 			await expect(extra).toBeVisible()
 			await page.waitForLoadState('networkidle')
 			await extra.scrollIntoViewIfNeeded()
+		}
+		if (kindMenu) {
+			// LIVE-12: the next set's kind menu, open; nothing is changed.
+			const trigger = page
+				.getByRole('button', { name: /Change set kind$/ })
+				.nth(SETS_TO_LOG)
+			await trigger.scrollIntoViewIfNeeded()
+			await trigger.click()
+			await expect(page.getByRole('menuitemradio').first()).toBeVisible()
 		}
 		// The rest timer and any record celebration arrive with the last save.
 		await page.waitForTimeout(800)
@@ -494,5 +507,17 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		ready: ['Extra', 'No target', 'Add set'],
 		caption:
 			'Faster set editing: an extra set added after the prescription, one-tap fills from the set above, and only the last added set removable.',
+	},
+	{
+		slug: 'live-session-set-kinds',
+		route: '/workouts/sessions/:session',
+		openAt: '/routines',
+		features: ['LIVE-12'],
+		mutates: true,
+		setup: page => startScratchSession(page, { kindMenu: true }),
+		// The open menu is portalled outside <main>; setup waits for it.
+		ready: [/^Target: /, 'Discard'],
+		caption:
+			'Set kinds: any set can be marked warm-up, working, drop or optional, so only intended work reaches progression, records and analytics.',
 	},
 ]

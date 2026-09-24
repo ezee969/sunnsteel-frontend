@@ -44,6 +44,7 @@ export function HistoryExerciseGroup({
 					?.isCompleted,
 		).length + group.extraSets.filter(set => set.isCompleted).length
 	const isComplete = totalSets > 0 && completedSets === totalSets
+	const hasWarmups = group.performedSets.some(set => set.kind === 'WARMUP')
 	const panelId = `history-exercise-${group.routineExerciseId}`
 
 	return (
@@ -102,6 +103,11 @@ export function HistoryExerciseGroup({
 
 			{!collapsed && (
 				<div id={panelId} className="mt-3 pl-7">
+					{hasWarmups ? (
+						<p className="type-body-sm mb-2 text-ink-3">
+							Warm-ups are not counted in volume, records or progress.
+						</p>
+					) : null}
 					{/* Captions are Body small in sentence case (§5.3). */}
 					<div className="type-body-sm mb-1 hidden grid-cols-12 gap-2 border-b border-rule-faint pb-1 text-ink-3 sm:grid">
 						<div className="col-span-2">Set</div>

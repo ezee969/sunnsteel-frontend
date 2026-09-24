@@ -41,6 +41,7 @@ export function sessionPrescription(
 				maxReps: set.maxReps,
 				weight: set.weight,
 				rir: set.rir,
+				kind: set.kind,
 			})),
 		})),
 	}

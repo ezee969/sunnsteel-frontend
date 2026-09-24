@@ -1,5 +1,6 @@
 'use client'
 
+import { requiredToFinish, type SetKind } from '@sunsteel/contracts'
 import { ArrowLeftRight, ChevronDown, ChevronRight, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,7 @@ interface ExerciseGroupProps {
 		plannedWeight?: number | null
 		plannedRir?: number | null
 		isExtra?: boolean
+		kind: SetKind
 	}>
 	isCollapsed: boolean
 	onToggleCollapse: () => void
@@ -78,7 +80,14 @@ export const ExerciseGroup = ({
 	onSwapRequest,
 	onRemoveSet,
 }: ExerciseGroupProps) => {
-	const isComplete = completedSets === totalSets && totalSets > 0
+	// LIVE-12: done once every required set is done; a skipped warm-up or
+	// optional set does not hold the mark back.
+	const required = sets.filter(set => requiredToFinish(set.kind))
+	const isComplete =
+		completedSets > 0 &&
+		(required.length > 0
+			? required.every(set => set.isCompleted)
+			: completedSets === totalSets)
 	const weightUnit = useWeightUnit()
 	const nextWeightedSet =
 		sets.find(
@@ -225,8 +234,10 @@ export const ExerciseGroup = ({
 							)}
 							rpe={set.rpe}
 							isExtra={set.isExtra}
+							kind={set.kind}
+							// LIVE-12: only a set of the same kind is worth copying.
 							setAbove={
-								index > 0
+								index > 0 && sets[index - 1].kind === set.kind
 									? {
 											setNumber: sets[index - 1].setNumber,
 											reps: sets[index - 1].reps,

@@ -24,7 +24,7 @@ import { ExerciseHeader } from './components/ExerciseHeader'
 import { SetListSection } from './components/SetListSection'
 import { useExerciseAccessibility } from './hooks/useExerciseAccessibility'
 import { useExerciseCardState } from './hooks/useExerciseCardState'
-import type { ProgressionScheme, RoutineWizardData } from './types'
+import type { ProgressionScheme, RoutineWizardData, SetField } from './types'
 
 export interface WizardExerciseCardProps {
 	weightUnit: WeightUnit
@@ -49,7 +49,7 @@ export interface WizardExerciseCardProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		field: SetField,
 		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (

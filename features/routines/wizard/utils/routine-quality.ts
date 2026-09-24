@@ -1,3 +1,4 @@
+import { countsAsWork } from '@sunsteel/contracts'
 import {
 	EXERCISE_EQUIPMENT,
 	type ExerciseEquipment,
@@ -122,8 +123,9 @@ const setReps = (set: RoutineSet): number => {
 
 /**
  * Working time at a steady tempo, the programmed rest after every set except
- * the day's last, and a fixed setup allowance per exercise. Warm-ups are not
- * modelled. Rounded to five minutes because the inputs are not more precise.
+ * the day's last, and a fixed setup allowance per exercise. Warm-up sets
+ * (LIVE-12) take time like any other; warm-ups not written into the routine
+ * are not modelled. Rounded to five minutes because the inputs are not more precise.
  */
 export const estimateDaySeconds = (
 	day: RoutineWizardData['days'][number],
@@ -151,17 +153,16 @@ export const computeWeeklyMuscleSets = (
 	for (const day of data.days) {
 		for (const planned of day.exercises) {
 			const meta = exercises[planned.exerciseId]
-			if (!meta || planned.sets.length === 0) continue
+			// LIVE-12: a warm-up is not a set of work for any muscle.
+			const workSets = planned.sets.filter(set => countsAsWork(set.kind)).length
+			if (!meta || workSets === 0) continue
 			const primary = new Set(meta.primaryMuscles)
 			for (const muscle of primary) {
-				totals.set(muscle, (totals.get(muscle) ?? 0) + planned.sets.length)
+				totals.set(muscle, (totals.get(muscle) ?? 0) + workSets)
 			}
 			for (const muscle of new Set(meta.secondaryMuscles)) {
 				if (primary.has(muscle)) continue
-				totals.set(
-					muscle,
-					(totals.get(muscle) ?? 0) + planned.sets.length * 0.5,
-				)
+				totals.set(muscle, (totals.get(muscle) ?? 0) + workSets * 0.5)
 			}
 		}
 	}
@@ -226,7 +227,7 @@ export const findLikelyImbalances = (
 		for (const planned of day.exercises) {
 			const pattern = exercises[planned.exerciseId]?.movementPattern
 			if (!pattern) continue
-			const sets = planned.sets.length
+			const sets = planned.sets.filter(set => countsAsWork(set.kind)).length
 			if (UPPER_PATTERNS.has(pattern)) upper += sets
 			if (LOWER_PATTERNS.has(pattern)) lower += sets
 			if (PUSH_PATTERNS.has(pattern)) push += sets

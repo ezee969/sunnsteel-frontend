@@ -1,4 +1,4 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import type { SetKind, WeightUnit } from '@sunsteel/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useDebounce } from '@/hooks/use-debounce'
@@ -51,6 +51,8 @@ interface UseSetLogFormReturn {
 	handleCompletionToggle: (checked: boolean) => void
 	/** LIVE-15: put another set's values in the fields and save them. */
 	fill: (values: SetValues) => void
+	/** LIVE-12: change what the set is for, saved at once with its values. */
+	changeKind: (kind: SetKind) => void
 
 	// Validation
 	isValid: boolean
@@ -170,7 +172,18 @@ export const useSetLogForm = ({
 
 	// Auto-save effect for debounced values
 	useEffect(() => {
-		if (isWeightUnitTransition || debouncedWeight !== weightState) return
+		// Wait until every debounced field has caught up with what is typed. A
+		// tick saves the live values at once; if this ran with a lagging
+		// debounced value it would save that stale value straight after
+		// (typing 8 reps and ticking within the delay stored 0 until the
+		// debounce caught up, and kept it if the workout finished first).
+		if (
+			isWeightUnitTransition ||
+			debouncedWeight !== weightState ||
+			debouncedReps !== repsState ||
+			debouncedRpe !== rpeState
+		)
+			return
 
 		const currentReps = Number(debouncedReps) || 0
 		const currentWeight = parseWeightInput(debouncedWeight, weightUnit)
@@ -211,6 +224,8 @@ export const useSetLogForm = ({
 		debouncedWeight,
 		debouncedRpe,
 		weightState,
+		repsState,
+		rpeState,
 		isWeightUnitTransition,
 		isCompletedState,
 		saveState,
@@ -298,6 +313,36 @@ export const useSetLogForm = ({
 		],
 	)
 
+	const changeKind = useCallback(
+		(kind: SetKind) => {
+			const payload = createPayload(
+				repsState,
+				weightState,
+				rpeState,
+				isCompletedState,
+			)
+			if (!validateSetLogPayload(payload).isValid) return
+			markSetPending(sessionId, routineExerciseId, setNumber)
+			onSaveRef.current({ ...payload, kind })
+			lastSavedRef.current = {
+				reps: payload.reps,
+				weight: payload.weight,
+				rpe: payload.rpe,
+				isCompleted: isCompletedState,
+			}
+		},
+		[
+			createPayload,
+			repsState,
+			weightState,
+			rpeState,
+			isCompletedState,
+			sessionId,
+			routineExerciseId,
+			setNumber,
+		],
+	)
+
 	const handleCompletionToggle = useCallback(
 		(checked: boolean) => {
 			setIsCompletedState(checked)
@@ -350,6 +395,7 @@ export const useSetLogForm = ({
 		setRpe,
 		handleCompletionToggle,
 		fill,
+		changeKind,
 
 		// Validation
 		isValid: validation.isValid,

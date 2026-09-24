@@ -3,7 +3,8 @@ import { ChevronsUpDown, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-import type { RoutineWizardExercise } from '../types'
+import type { RoutineWizardExercise, SetField } from '../types'
+import { isWeightLocked } from '../utils/set-kinds'
 import { SetRow } from './SetRow'
 
 interface SetListSectionProps {
@@ -18,7 +19,7 @@ interface SetListSectionProps {
 	onUpdateSet: (
 		exerciseIndex: number,
 		setIndex: number,
-		field: 'repType' | 'reps' | 'minReps' | 'maxReps' | 'weight' | 'rir',
+		field: SetField,
 		value: string | number | null,
 	) => void
 	onValidateMinMaxReps: (
@@ -103,7 +104,7 @@ export function SetListSection({
 				<div id={`sets-list-${tabIndex}-${exerciseIndex}`}>
 					<div className="hidden sm:grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground mb-2 px-1">
 						<div className="col-span-2">Set</div>
-						<div className="col-span-3">Type</div>
+						<div className="col-span-3">Kind · Type</div>
 						<div className="col-span-3">Reps</div>
 						<div className="col-span-2">
 							Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
@@ -134,6 +135,11 @@ export function SetListSection({
 									}
 									isRemoving={isRemovingSet(exerciseIndex, setIndex)}
 									disableRemove={exercise.sets.length === 1}
+									weightLocked={isWeightLocked(
+										exercise.sets,
+										setIndex,
+										exercise.progressionScheme,
+									)}
 								/>
 							</div>
 						))}
