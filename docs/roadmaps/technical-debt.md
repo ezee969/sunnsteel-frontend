@@ -17,7 +17,8 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-`TD-49` is the one open entry. Frontend PWA maintenance debt `TD-44` closed on
+There are no open entries. `TD-49`, an unticked set's weight reaching the
+routine at finish, closed on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
 2026-09-23 after the owner completed the required installed-iPhone update and
 offline-fallback smoke test. `TD-43`, the
 per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
@@ -32,7 +33,7 @@ actionable residue is recorded here.
 
 <a id="td-49"></a>
 
-### TD-49 — Finishing a workout writes an unticked set's weight back to the routine
+### TD-49 — Finishing a workout writes an unticked set's weight back to the routine — CLOSED 2026-09-24
 
 **Impact.** At finish, progression copies the weight logged on every prescribed
 set into the routine, whether or not the set was ticked done. A weight typed or
@@ -59,6 +60,20 @@ it changes with it.
 **Closure criteria.** A finish with an unticked prescribed set carrying a
 weight leaves that set's routine weight unchanged, a ticked one still carries
 it, and the change is tested and recorded in the backend `CLAUDE.md`.
+
+**Closed 2026-09-24.** The owner accepted the recommendation that an unticked set's weight is
+never meant as "use this next time". Backend
+[`bf12d55`](https://github.com/ezee969/sunnsteel-backend/commit/bf12d5523c81173a9a6224229f4a714667d6fae9)
+makes `carryLoggedWeight` require `isCompleted`; the existing
+incomplete-set test now asserts no carry, and a new one checks all three
+schemes (466 backend tests). CI 36047553264 green and Railway deployment
+`62b7b54e` SUCCESS. **Not verified against the real stack:** the rule is a
+pure function the finish service applies unchanged, so the pure tests are the
+evidence; no workout was finished on a real account to watch it. A workout
+finished before the deploy and corrected afterwards (possible only within
+LIVE-17's 48-hour window) reports its load change as kept instead of
+re-deriving it, because the recomputed finish no longer matches what the old
+rule wrote -- the conservative outcome, and it expires with the window.
 
 <a id="td-43"></a>
 
@@ -627,6 +642,9 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-24 (revision 23):** Closed `TD-49`. Only a completed set carries
+  its logged weight into the routine at finish and in a LIVE-17 correction.
+  The register is empty again.
 - **2026-09-24 (revision 22):** Recorded `TD-49`, found while delivering
   `LIVE-15`: finishing a workout carries an unticked prescribed set's logged
   weight into the routine. It was left outside `LIVE-15` by the owner's
