@@ -253,6 +253,26 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'A routine following its training block in force, with the authored block timeline and saved versions.',
 	},
 	{
+		slug: 'training-block-comparison',
+		route: '/routines/:routine',
+		features: ['PROG-11', 'ROUT-09'],
+		setup: async page => {
+			await page
+				.getByRole('button', { name: 'Compare training' })
+				.first()
+				.click()
+			await page
+				.getByRole('dialog')
+				.getByText('Lifts trained in both')
+				.waitFor()
+		},
+		// The dialog renders outside `main`, where `ready` looks, so the setup
+		// waits for its content and `ready` names the page behind it.
+		ready: ['Autumn accumulation', 'Compare training'],
+		caption:
+			'A training block beside the period before it: workouts against the plan, sets, load, effort, rep targets and every lift trained in both, stated and never ranked.',
+	},
+	{
 		slug: 'routine-deload',
 		route: '/routines/:routine',
 		features: ['ROUT-16'],

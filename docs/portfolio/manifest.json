@@ -55,6 +55,17 @@
 			"height": 900
 		},
 		{
+			"slug": "training-block-comparison",
+			"route": "/routines/:routine",
+			"features": [
+				"PROG-11",
+				"ROUT-09"
+			],
+			"capturedAt": "2026-09-24T17:45:38.312Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
 			"slug": "history",
 			"route": "/workouts/history",
 			"features": [
