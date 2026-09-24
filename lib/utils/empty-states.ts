@@ -61,7 +61,7 @@ export function getRecentActivityEmptyState(
 		: {
 				title: 'No routines yet',
 				description:
-					'Create a routine to plan your training and start logging workouts.',
+					'Start from a template or build your own to plan your training and start logging workouts.',
 				action: {
 					kind: 'link',
 					label: 'Create routine',

@@ -222,6 +222,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			"Today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks, the next milestones and a few updates from members you follow.",
 	},
 	{
+		slug: 'starter-templates',
+		route: '/routines/new',
+		features: ['ROUT-03'],
+		ready: ['Start from a template', 'Full Body Foundations', 'Use template'],
+		caption:
+			'Starting a routine from a curated template: each opens in the builder as an editable draft, with the loads left to the member.',
+	},
+	{
 		slug: 'routine-builder',
 		route: '/routines/edit/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-11'],
