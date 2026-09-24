@@ -10,6 +10,7 @@ import {
 	ROUTINE_TRAINING_BLOCKS_MAX,
 } from '@sunsteel/contracts'
 import {
+	Activity,
 	CalendarRange,
 	GitCompare,
 	Pencil,
@@ -51,6 +52,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
+import { TrainingBlockComparisonDialog } from '@/features/routines/components/TrainingBlockComparison'
 import {
 	useCreateRoutineTrainingBlock,
 	useDeleteRoutineTrainingBlock,
@@ -73,6 +75,7 @@ import {
 	routineSetup,
 	versionTitle,
 } from '@/lib/utils/routine-versions'
+import { BLOCK_COMPARISON_ACTION } from '@/lib/utils/training-block-comparison'
 
 interface RoutineTrainingBlocksProps {
 	routine: Routine
@@ -336,6 +339,7 @@ export function RoutineTrainingBlocks({
 	)
 	const [reviewing, setReviewing] = useState<RoutineTrainingBlock | null>(null)
 	const [deleting, setDeleting] = useState<RoutineTrainingBlock | null>(null)
+	const [comparing, setComparing] = useState<RoutineTrainingBlock | null>(null)
 	const list = blocks.data?.blocks ?? []
 	const max = blocks.data?.max ?? ROUTINE_TRAINING_BLOCKS_MAX
 	const full = list.length >= max
@@ -451,6 +455,18 @@ export function RoutineTrainingBlocks({
 									<GitCompare aria-hidden />
 									Review
 								</Button>
+								{/* PROG-11: a block that has started has training to compare. */}
+								{block.state !== 'FUTURE' ? (
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => setComparing(block)}
+									>
+										<Activity aria-hidden />
+										{BLOCK_COMPARISON_ACTION}
+									</Button>
+								) : null}
 								{block.state !== 'COMPLETE' ? (
 									<Button
 										type="button"
@@ -503,6 +519,15 @@ export function RoutineTrainingBlocks({
 					routine={routine}
 					weightUnit={weightUnit}
 					onClose={() => setReviewing(null)}
+				/>
+			) : null}
+
+			{comparing ? (
+				<TrainingBlockComparisonDialog
+					routineId={routine.id}
+					block={comparing}
+					weightUnit={weightUnit}
+					onClose={() => setComparing(null)}
 				/>
 			) : null}
 

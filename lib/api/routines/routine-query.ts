@@ -85,6 +85,13 @@ export const routineQueryKeys = {
 		['routine-training-blocks', routineId] as const,
 	trainingBlocks: (routineId: string) =>
 		[...routineQueryKeys.trainingBlocksAll(routineId), 'list'] as const,
+	/** PROG-11: under the block prefix, so every block write refreshes it. */
+	trainingBlockComparison: (routineId: string, seriesId: string) =>
+		[
+			...routineQueryKeys.trainingBlocksAll(routineId),
+			'comparison',
+			seriesId,
+		] as const,
 	trainingBlockRevisions: (routineId: string, blockId: string) =>
 		[
 			...routineQueryKeys.trainingBlocksAll(routineId),

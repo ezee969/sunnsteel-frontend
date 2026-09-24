@@ -1,6 +1,7 @@
 import type {
 	RoutineTrainingBlockRevisionsResponse,
 	RoutineTrainingBlocksResponse,
+	TrainingBlockComparisonResponse,
 	UpsertRoutineTrainingBlockRequest,
 } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -14,6 +15,25 @@ export const useRoutineTrainingBlocks = (routineId: string) =>
 		queryKey: routineQueryKeys.trainingBlocks(routineId),
 		queryFn: () => routineService.getTrainingBlocks(routineId),
 		enabled: !!routineId,
+	})
+
+/**
+ * PROG-11: read when the comparison opens, and never served stale, because a
+ * workout finished since would change it and nothing here is invalidated by it.
+ */
+export const useTrainingBlockComparison = (
+	routineId: string,
+	seriesId: string | null,
+) =>
+	useQuery<TrainingBlockComparisonResponse, Error>({
+		queryKey: routineQueryKeys.trainingBlockComparison(
+			routineId,
+			seriesId ?? 'closed',
+		),
+		queryFn: () =>
+			routineService.getTrainingBlockComparison(routineId, seriesId!),
+		enabled: !!routineId && !!seriesId,
+		staleTime: 0,
 	})
 
 export const useRoutineTrainingBlockRevisions = (

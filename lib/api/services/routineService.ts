@@ -9,6 +9,7 @@ import type {
 	RoutineTrainingBlocksResponse,
 	RoutineVersion,
 	RoutineVersionsResponse,
+	TrainingBlockComparisonResponse,
 	UpsertRoutineTrainingBlockRequest,
 } from '@sunsteel/contracts'
 
@@ -124,6 +125,16 @@ export const routineService = {
 		httpClient.request<void>(
 			`${ROUTINES_API_URL}/${id}/versions/${versionId}`,
 			{ method: 'DELETE', secure: true },
+		),
+
+	/** PROG-11: a block beside the one before it, from its own workouts. */
+	getTrainingBlockComparison: async (
+		id: string,
+		seriesId: string,
+	): Promise<TrainingBlockComparisonResponse> =>
+		httpClient.request<TrainingBlockComparisonResponse>(
+			`${ROUTINES_API_URL}/${id}/training-blocks/${seriesId}/comparison`,
+			{ method: 'GET', secure: true },
 		),
 
 	getTrainingBlocks: async (
