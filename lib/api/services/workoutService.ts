@@ -10,6 +10,7 @@ import type {
 	SharedSessionRecap,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
+	TrainingSignalsResponse,
 	UpdateSessionNotesRequest,
 	UpdateSessionNotesResponse,
 } from '@sunsteel/contracts'
@@ -198,6 +199,12 @@ export const workoutService = {
 	getPlateaus: (): Promise<PlateausResponse> =>
 		httpClient.get<PlateausResponse>(
 			`${WORKOUTS_API_URL}/progress/plateaus`,
+			true,
+		),
+	/** PROG-10: the four training signals, stated with their evidence. */
+	getTrainingSignals: (): Promise<TrainingSignalsResponse> =>
+		httpClient.get<TrainingSignalsResponse>(
+			`${WORKOUTS_API_URL}/progress/signals`,
 			true,
 		),
 	getProgressTimeline: (
