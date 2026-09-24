@@ -11,6 +11,7 @@ import StatsOverview from './components/StatsOverview'
 import TodaysWorkouts from './components/TodaysWorkouts'
 import TrainingInsights from './components/TrainingInsights'
 import UpcomingMilestones from './components/UpcomingMilestones'
+import WeekStrip from './components/WeekStrip'
 import { useDashboardData } from './hooks/useDashboardData'
 
 export default function Dashboard() {
@@ -68,6 +69,12 @@ export default function Dashboard() {
 					<div className="max-w-3xl">
 						<TodaysWorkouts />
 					</div>
+
+					{/*
+					 * DASH-03: the week around today, from the schedule's own week
+					 * build. It owns its skeleton, like the sections below.
+					 */}
+					<WeekStrip />
 
 					{/* Stats Overview */}
 					<StatsOverview />

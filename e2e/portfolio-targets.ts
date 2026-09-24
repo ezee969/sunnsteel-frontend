@@ -212,6 +212,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		features: [
 			'DASH-01',
 			'DASH-02',
+			'DASH-03',
 			'DASH-07',
 			'DASH-09',
 			'DASH-08',
