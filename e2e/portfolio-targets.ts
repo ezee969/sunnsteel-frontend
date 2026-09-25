@@ -276,7 +276,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'routine-builder-warm-ups',
 		route: '/routines/edit/:routine',
-		features: ['LIVE-13'],
+		features: ['LIVE-13', 'LIVE-20'],
 		setup: async page => {
 			await openBuildDaysStep(page)
 			const add = page
@@ -294,7 +294,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		// The dialog is portalled outside <main>; setup waits for it.
 		ready: ['Build Your Training Days', 'Sets'],
 		caption:
-			'Warm-up ramps: generated from the working load, the bar and your plates, previewed with what goes on each side before anything is added.',
+			'Warm-up ramps: generated from the working load, the bar and your plates, previewed with what goes on each side, and able to follow the working weight as it progresses.',
 	},
 	{
 		slug: 'routine-detail',

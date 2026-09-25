@@ -121,6 +121,7 @@ export default function EditRoutinePage() {
 								.progressionScheme,
 						),
 						minWeightIncrement: exercise.minWeightIncrement || 2.5,
+						warmUpsFollowLoad: exercise.warmUpsFollowLoad ?? false,
 						sets: exercise.sets.map((set, index) => ({
 							setNumber: index + 1,
 							repType: set.repType,
@@ -130,6 +131,7 @@ export default function EditRoutinePage() {
 							weight: set.weight,
 							rir: (set as unknown as { rir?: number | null }).rir ?? null,
 							kind: set.kind ?? 'WORKING',
+							warmUpShare: set.warmUpShare ?? null,
 						})),
 						restSeconds: exercise.restSeconds,
 					})),

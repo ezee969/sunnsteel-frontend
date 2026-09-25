@@ -2,6 +2,8 @@ import type { WeightUnit } from '@sunsteel/contracts'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 import type { RoutineWizardExercise, SetField } from '../types'
 import { isWeightLocked } from '../utils/set-kinds'
@@ -18,7 +20,11 @@ interface SetListSectionProps {
 	onAddSet: () => void
 	exerciseName: string
 	equipmentRequired?: readonly string[]
-	onReplaceWarmUps: (warmUps: { weightKg: number; reps: number }[]) => void
+	onReplaceWarmUps: (
+		warmUps: { weightKg: number; reps: number; share: number }[],
+		followLoad: boolean,
+	) => void
+	onSetWarmUpsFollowLoad: (followLoad: boolean) => void
 	registerSetRowRef: (setIndex: number, node: HTMLDivElement | null) => void
 	onUpdateSet: (
 		exerciseIndex: number,
@@ -77,6 +83,7 @@ export function SetListSection({
 	exerciseName,
 	equipmentRequired,
 	onReplaceWarmUps,
+	onSetWarmUpsFollowLoad,
 	registerSetRowRef,
 	onUpdateSet,
 	onValidateMinMaxReps,
@@ -146,6 +153,7 @@ export function SetListSection({
 										exercise.sets,
 										setIndex,
 										exercise.progressionScheme,
+										exercise.warmUpsFollowLoad,
 									)}
 								/>
 							</div>
@@ -170,7 +178,35 @@ export function SetListSection({
 							incrementKg={exercise.minWeightIncrement}
 							weightUnit={weightUnit}
 							onApply={onReplaceWarmUps}
+							warmUpsFollowLoad={exercise.warmUpsFollowLoad}
 						/>
+						{/* LIVE-20: only generated warm-ups know their share, so only
+						    they can follow; hand-written ones keep their loads. */}
+						{exercise.sets.some(
+							set =>
+								set.kind === 'WARMUP' && typeof set.warmUpShare === 'number',
+						) ? (
+							<div className="-mt-1 mb-3 flex items-center gap-1">
+								<label
+									htmlFor={`warm-ups-follow-${tabIndex}-${exerciseIndex}`}
+									className="flex size-11 shrink-0 cursor-pointer items-center justify-center"
+								>
+									<Checkbox
+										id={`warm-ups-follow-${tabIndex}-${exerciseIndex}`}
+										checked={Boolean(exercise.warmUpsFollowLoad)}
+										onCheckedChange={checked =>
+											onSetWarmUpsFollowLoad(checked === true)
+										}
+									/>
+								</label>
+								<Label
+									htmlFor={`warm-ups-follow-${tabIndex}-${exerciseIndex}`}
+									className="cursor-pointer"
+								>
+									Warm-ups follow the working weight
+								</Label>
+							</div>
+						) : null}
 					</div>
 				</div>
 			)}

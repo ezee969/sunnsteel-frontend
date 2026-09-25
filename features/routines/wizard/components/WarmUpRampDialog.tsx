@@ -47,7 +47,12 @@ interface WarmUpRampDialogProps {
 	equipmentRequired?: readonly string[]
 	incrementKg: number
 	weightUnit: WeightUnit
-	onApply: (warmUps: { weightKg: number; reps: number }[]) => void
+	onApply: (
+		warmUps: { weightKg: number; reps: number; share: number }[],
+		followLoad: boolean,
+	) => void
+	/** LIVE-20: whether the exercise's warm-ups follow its working load now. */
+	warmUpsFollowLoad?: boolean
 }
 
 /**
@@ -63,6 +68,7 @@ export function WarmUpRampDialog({
 	incrementKg,
 	weightUnit,
 	onApply,
+	warmUpsFollowLoad,
 }: WarmUpRampDialogProps) {
 	const [open, setOpen] = useState(false)
 	const lead = leadSetIndex(sets)
@@ -101,9 +107,10 @@ export function WarmUpRampDialog({
 					barLoaded={isBarLoaded(equipmentRequired)}
 					incrementKg={incrementKg}
 					weightUnit={weightUnit}
+					followsNow={warmUpsFollowLoad}
 					onClose={() => setOpen(false)}
-					onApply={warmUps => {
-						onApply(warmUps)
+					onApply={(warmUps, followLoad) => {
+						onApply(warmUps, followLoad)
 						setOpen(false)
 					}}
 				/>
@@ -120,6 +127,7 @@ function WarmUpRampPreview({
 	barLoaded,
 	incrementKg,
 	weightUnit,
+	followsNow,
 	onClose,
 	onApply,
 }: {
@@ -130,8 +138,12 @@ function WarmUpRampPreview({
 	barLoaded: boolean
 	incrementKg: number
 	weightUnit: WeightUnit
+	followsNow?: boolean
 	onClose: () => void
-	onApply: (warmUps: { weightKg: number; reps: number }[]) => void
+	onApply: (
+		warmUps: { weightKg: number; reps: number; share: number }[],
+		followLoad: boolean,
+	) => void
 }) {
 	const { push } = useToast()
 	const { data: locations = [] } = useTrainingLocations()
@@ -148,6 +160,9 @@ function WarmUpRampPreview({
 	// On by default only when nothing is saved yet: the question is then
 	// asked once. Filling an existing gym's empty plate list is opt-in.
 	const [remember, setRemember] = useState(basis.kind === 'NO_LOCATION')
+	// LIVE-20: the point of a ramp is to approach the first working set, so
+	// following it is the default; a fixed ramp stays one untick away.
+	const [followLoad, setFollowLoad] = useState(followsNow ?? true)
 
 	const platePairs =
 		basis.kind === 'SAVED'
@@ -189,7 +204,10 @@ function WarmUpRampPreview({
 				})
 			}
 		}
-		onApply(ramp.sets.map(({ weightKg, reps }) => ({ weightKg, reps })))
+		onApply(
+			ramp.sets.map(({ weightKg, reps, share }) => ({ weightKg, reps, share })),
+			followLoad,
+		)
 	}
 
 	const saveLabel =
@@ -205,8 +223,7 @@ function WarmUpRampPreview({
 					<DialogDescription>
 						A ramp up to {formatWeight(workingWeightKg, weightUnit)} for{' '}
 						{exerciseName}. Warm-ups never count toward volume, records or
-						progress, and their loads stay as written when progression moves the
-						working sets.
+						progress.
 					</DialogDescription>
 				</DialogHeader>
 
@@ -319,6 +336,29 @@ function WarmUpRampPreview({
 							These replace this exercise&apos;s current warm-ups.
 						</p>
 					) : null}
+
+					<div className="flex items-start gap-1">
+						<label
+							htmlFor="warm-up-follow"
+							className="flex size-11 shrink-0 cursor-pointer items-center justify-center"
+						>
+							<Checkbox
+								id="warm-up-follow"
+								checked={followLoad}
+								onCheckedChange={checked => setFollowLoad(checked === true)}
+							/>
+						</label>
+						<div className="pt-3">
+							<Label htmlFor="warm-up-follow" className="cursor-pointer">
+								Follow the working weight
+							</Label>
+							<p className="type-body-sm text-ink-3">
+								{followLoad
+									? 'When progression raises the first working set, these warm-ups are recalculated with it.'
+									: 'These warm-ups keep the loads above until you change them.'}
+							</p>
+						</div>
+					</div>
 
 					{asks ? (
 						<div className="flex items-center gap-1">

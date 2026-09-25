@@ -1,5 +1,10 @@
-import { isSetKind, type WeightUnit } from '@sunsteel/contracts'
-import { useCallback } from 'react'
+import {
+	followWorkingLoad,
+	isSetKind,
+	type WarmUpEquipment,
+	type WeightUnit,
+} from '@sunsteel/contracts'
+import { useCallback, useRef } from 'react'
 
 import { stepCanonicalWeight } from '@/lib/utils/weight-unit'
 
@@ -12,6 +17,10 @@ interface UseRoutineDayMutationsParams {
 	selectedDayIndex: number
 	trainingDays: number[]
 	weightUnit: WeightUnit
+	/** LIVE-20: what an exercise's following warm-ups are loaded from. */
+	warmUpEquipment?: (
+		exercise: RoutineWizardData['days'][number]['exercises'][number],
+	) => WarmUpEquipment
 }
 
 const MIN_REPS = 1
@@ -36,7 +45,12 @@ export function useRoutineDayMutations({
 	selectedDayIndex,
 	trainingDays,
 	weightUnit,
+	warmUpEquipment,
 }: UseRoutineDayMutationsParams) {
+	// Read through a ref: the callbacks below are memoised, and the gym and
+	// catalog behind this function arrive after the first render.
+	const warmUpEquipmentRef = useRef(warmUpEquipment)
+	warmUpEquipmentRef.current = warmUpEquipment
 	const getDayIndex = useCallback(() => {
 		if (selectedDayIndex >= trainingDays.length) return -1
 		const targetDay = trainingDays[selectedDayIndex]
@@ -138,15 +152,25 @@ export function useRoutineDayMutations({
 					MIN_WEIGHT_INCREMENT,
 					MAX_WEIGHT,
 				)
+				// Non-bar warm-ups round to this step.
+				syncDoubleProgressionWeights(exercise)
 			})
 		},
 		[withDayMutation],
 	)
 
 	// LIVE-12: the lead is the first working or optional set, not set 1.
+	// LIVE-20: following warm-ups are then recalculated from that lead, so
+	// every place a working load can change keeps them in step.
 	const syncDoubleProgressionWeights = (
 		exercise: RoutineWizardData['days'][number]['exercises'][number],
-	) => syncLeadWeight(exercise.sets, exercise.progressionScheme)
+	) => {
+		syncLeadWeight(exercise.sets, exercise.progressionScheme)
+		const equipmentFor = warmUpEquipmentRef.current
+		if (exercise.warmUpsFollowLoad && equipmentFor) {
+			exercise.sets = followWorkingLoad(exercise.sets, equipmentFor(exercise))
+		}
+	}
 
 	const updateProgressionScheme = useCallback(
 		(exerciseIndex: number, scheme: ProgressionScheme) => {
@@ -210,10 +234,15 @@ export function useRoutineDayMutations({
 	 * before its other sets. Working, drop and optional sets are untouched.
 	 */
 	const replaceWarmUps = useCallback(
-		(exerciseIndex: number, warmUps: { weightKg: number; reps: number }[]) => {
+		(
+			exerciseIndex: number,
+			warmUps: { weightKg: number; reps: number; share: number }[],
+			followLoad: boolean,
+		) => {
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
+				exercise.warmUpsFollowLoad = followLoad
 				const others = exercise.sets.filter(set => set.kind !== 'WARMUP')
 				exercise.sets = [
 					...warmUps.map(warmUp => ({
@@ -225,12 +254,26 @@ export function useRoutineDayMutations({
 						weight: warmUp.weightKg,
 						rir: null,
 						kind: 'WARMUP' as const,
+						warmUpShare: warmUp.share,
 					})),
 					...others,
 				]
 				exercise.sets.forEach((set, index) => {
 					set.setNumber = index + 1
 				})
+				syncDoubleProgressionWeights(exercise)
+			})
+		},
+		[withDayMutation],
+	)
+
+	/** LIVE-20: turn following on (recalculating at once) or off. */
+	const setWarmUpsFollowLoad = useCallback(
+		(exerciseIndex: number, followLoad: boolean) => {
+			withDayMutation(day => {
+				const exercise = day.exercises[exerciseIndex]
+				if (!exercise) return
+				exercise.warmUpsFollowLoad = followLoad
 				syncDoubleProgressionWeights(exercise)
 			})
 		},
@@ -246,6 +289,7 @@ export function useRoutineDayMutations({
 				exercise.sets.forEach((set, index) => {
 					set.setNumber = index + 1
 				})
+				syncDoubleProgressionWeights(exercise)
 			})
 		},
 		[withDayMutation],
@@ -377,6 +421,8 @@ export function useRoutineDayMutations({
 					if (value !== '') syncDoubleProgressionWeights(exercise)
 				} else if (field === 'kind') {
 					set.kind = isSetKind(value) ? value : 'WORKING'
+					// Only a warm-up follows the working load.
+					if (set.kind !== 'WARMUP') set.warmUpShare = null
 					syncDoubleProgressionWeights(exercise)
 				} else if (field === 'rir') {
 					if (value === null || value === '') {
@@ -426,6 +472,7 @@ export function useRoutineDayMutations({
 		updateMinWeightIncrement,
 		addSet,
 		replaceWarmUps,
+		setWarmUpsFollowLoad,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,

@@ -27,6 +27,7 @@ interface ExerciseCardProps {
 		note?: string | null
 		restSeconds?: number | null
 		progressionScheme?: string
+		warmUpsFollowLoad?: boolean
 		sets?: {
 			id?: string
 			setNumber?: number
@@ -114,6 +115,9 @@ export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
 					{exercise.progressionScheme && (
 						<span>{exercise.progressionScheme.replace(/_/g, ' ')}</span>
 					)}
+					{exercise.warmUpsFollowLoad ? (
+						<span>Warm-ups follow the working weight</span>
+					) : null}
 				</div>
 			</div>
 

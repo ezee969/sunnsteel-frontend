@@ -69,6 +69,7 @@ export const buildRoutineRequest = (
 				note: exercise.note,
 				progressionScheme: exercise.progressionScheme,
 				minWeightIncrement: exercise.minWeightIncrement,
+				warmUpsFollowLoad: Boolean(exercise.warmUpsFollowLoad),
 				sets: exercise.sets.map(set => {
 					const baseSet = {
 						setNumber: set.setNumber,
@@ -77,6 +78,10 @@ export const buildRoutineRequest = (
 						...(set.rir !== undefined && set.rir !== null && { rir: set.rir }),
 						// LIVE-12: sent always, so editing a set back to working sticks.
 						kind: set.kind ?? 'WORKING',
+						// LIVE-20: a generated warm-up's share of the working load.
+						...(set.kind === 'WARMUP' && typeof set.warmUpShare === 'number'
+							? { warmUpShare: set.warmUpShare }
+							: {}),
 					}
 
 					if (set.repType === 'FIXED') {

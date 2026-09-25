@@ -47,8 +47,11 @@ export interface WizardExerciseCardProps {
 	/** LIVE-13: replace this exercise's warm-ups with a generated ramp. */
 	onReplaceWarmUps: (
 		exerciseIndex: number,
-		warmUps: { weightKg: number; reps: number }[],
+		warmUps: { weightKg: number; reps: number; share: number }[],
+		followLoad: boolean,
 	) => void
+	/** LIVE-20: keep the warm-ups following the working load, or not. */
+	onSetWarmUpsFollowLoad: (exerciseIndex: number, followLoad: boolean) => void
 	isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean
 	onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void
 	onUpdateSet: (
@@ -97,6 +100,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onUpdateMinWeightIncrement,
 	onAddSet,
 	onReplaceWarmUps,
+	onSetWarmUpsFollowLoad,
 	isRemovingSet,
 	onRemoveSetAnimated,
 	onUpdateSet,
@@ -377,8 +381,11 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							onAddSet={handleAddSet}
 							exerciseName={exerciseData?.name ?? 'this exercise'}
 							equipmentRequired={exerciseData?.equipmentRequired}
-							onReplaceWarmUps={warmUps =>
-								onReplaceWarmUps(exerciseIndex, warmUps)
+							onReplaceWarmUps={(warmUps, followLoad) =>
+								onReplaceWarmUps(exerciseIndex, warmUps, followLoad)
+							}
+							onSetWarmUpsFollowLoad={followLoad =>
+								onSetWarmUpsFollowLoad(exerciseIndex, followLoad)
 							}
 							registerSetRowRef={registerSetRowRef}
 							onUpdateSet={onUpdateSet}

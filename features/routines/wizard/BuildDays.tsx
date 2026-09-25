@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
+import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
+import { defaultTrainingLocation } from '@/lib/utils/exercise-equipment'
 import { parseTime } from '@/lib/utils/time'
 
 import { ExerciseList } from './components/ExerciseList'
@@ -18,6 +20,7 @@ import { useRoutineDayMutations } from './hooks/useRoutineDayMutations'
 import { useRoutineDaySelection } from './hooks/useRoutineDaySelection'
 import { RoutineWizardData } from './types'
 import { renameWizardDay, wizardDayLabel } from './utils/schedule'
+import { builderWarmUpEquipment } from './utils/set-kinds'
 
 interface BuildDaysProps {
 	data: RoutineWizardData
@@ -44,6 +47,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	const exerciseRefs = useRef<Record<string, HTMLElement | null>>({})
 	const [pendingScrollKey, setPendingScrollKey] = useState<string | null>(null)
 	const { data: exercises, isLoading: exercisesLoading } = useExercises()
+	// LIVE-20: following warm-ups load from the default gym, as on the server.
+	const { data: locations } = useTrainingLocations()
 	const weightUnit = useWeightUnit()
 
 	// Fade hints on the day-tabs scroll container so it's clear there are
@@ -110,6 +115,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		updateMinWeightIncrement,
 		addSet,
 		replaceWarmUps,
+		setWarmUpsFollowLoad,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,
@@ -123,6 +129,14 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		selectedDayIndex: selectedDay,
 		trainingDays: data.trainingDays,
 		weightUnit,
+		warmUpEquipment: exercise =>
+			builderWarmUpEquipment({
+				equipmentRequired: exercises?.find(e => e.id === exercise.exerciseId)
+					?.equipmentRequired,
+				gym: defaultTrainingLocation(locations),
+				unit: weightUnit,
+				incrementKg: exercise.minWeightIncrement,
+			}),
 	})
 
 	// Note: we compute day-specific data on-demand below to avoid stale references
@@ -376,6 +390,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											onUpdateMinWeightIncrement={updateMinWeightIncrement}
 											onAddSet={addSet}
 											onReplaceWarmUps={replaceWarmUps}
+											onSetWarmUpsFollowLoad={setWarmUpsFollowLoad}
 											onRemoveSetAnimated={(exIdx, setIdx) => {
 												const key = `${exIdx}-${setIdx}`
 												setRemovingSets(prev => ({

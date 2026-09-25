@@ -18,6 +18,8 @@ export interface RoutineSet {
 	rir?: number | null
 	/** LIVE-12: absent means a working set. */
 	kind?: SetKind
+	/** LIVE-20: a generated warm-up's share of the first working set. */
+	warmUpShare?: number | null
 }
 
 /** A set field the builder edits. */
@@ -33,6 +35,8 @@ export interface RoutineWizardExercise {
 	exerciseId: string
 	progressionScheme: ProgressionScheme
 	minWeightIncrement: number
+	/** LIVE-20: warm-ups with a share follow the first working set. */
+	warmUpsFollowLoad?: boolean
 	note?: string
 	sets: RoutineSet[]
 	restSeconds: number

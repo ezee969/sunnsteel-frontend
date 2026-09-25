@@ -1,15 +1,33 @@
-import type {
-	PlatePairInventory,
-	ReplaceTrainingLocationsRequest,
-	TrainingLocationPreference,
-	WeightUnit,
+import {
+	type PlatePairInventory,
+	type PlateSetChoice,
+	type ReplaceTrainingLocationsRequest,
+	type TrainingLocationPreference,
+	type WeightUnit,
 } from '@sunsteel/contracts'
 
-import {
-	calculatePlateLoading,
-	type PlateLoadingItem,
-} from './plate-calculator'
-import { formatWeight, POUNDS_PER_KILOGRAM } from './weight-unit'
+import type { PlateLoadingItem } from './plate-calculator'
+import { formatWeight } from './weight-unit'
+
+// The ramp rule itself is shared with the server since LIVE-20.
+export {
+	BAR_CHOICES_KG,
+	BAR_WARM_UP_STEPS,
+	buildWarmUpRamp,
+	isBarLoaded,
+	LIMITED_SHORTFALL_KG,
+	MAX_SETS_PER_EXERCISE,
+	OTHER_WARM_UP_STEPS,
+	PLATE_SETS,
+	type PlateSetChoice,
+	type WarmUpRamp,
+	type WarmUpSet,
+} from '@sunsteel/contracts'
+
+export const PLATE_SET_LABELS: Record<PlateSetChoice, string> = {
+	STANDARD: 'Standard plates',
+	LIGHT: 'Lighter plates only',
+}
 
 /**
  * LIVE-13: warm-up sets generated in the routine builder from the exercise's
@@ -17,151 +35,7 @@ import { formatWeight, POUNDS_PER_KILOGRAM } from './weight-unit'
  * never count as work and progression never moves them.
  */
 
-/** An exercise holds at most this many sets, warm-ups included. */
-export const MAX_SETS_PER_EXERCISE = 10
-
-export interface WarmUpStep {
-	/** Share of the working load; 0 is the empty bar. */
-	share: number
-	reps: number
-}
-
-/** Plate-loaded work: the empty bar, then 40, 60 and 80 %. */
-export const BAR_WARM_UP_STEPS: readonly WarmUpStep[] = [
-	{ share: 0, reps: 10 },
-	{ share: 0.4, reps: 5 },
-	{ share: 0.6, reps: 3 },
-	{ share: 0.8, reps: 2 },
-]
-
-/** Dumbbells, machines and cables: 50 and 75 %. */
-export const OTHER_WARM_UP_STEPS: readonly WarmUpStep[] = [
-	{ share: 0.5, reps: 8 },
-	{ share: 0.75, reps: 3 },
-]
-
-const BAR_LOADED = new Set(['barbell', 'ez-bar', 'smith-machine'])
-
-/** Whether an exercise is loaded with a bar and plates. */
-export const isBarLoaded = (equipmentRequired: readonly string[] | undefined) =>
-	(equipmentRequired ?? []).some(item => BAR_LOADED.has(item))
-
-const lb = (pounds: number) => pounds / POUNDS_PER_KILOGRAM
-
-/** Bars offered when no location is saved, in the account's unit. */
-export const BAR_CHOICES_KG: Record<WeightUnit, number[]> = {
-	KG: [20, 15, 10],
-	LB: [lb(45), lb(35), lb(15)],
-}
-
-export type PlateSetChoice = 'STANDARD' | 'LIGHT'
-
-const pairs = (weights: number[], heaviestPairs: number) =>
-	weights.map((weightKg, index) => ({
-		weightKg,
-		pairCount: index === 0 ? heaviestPairs : 2,
-	}))
-
-/** The two plate sets offered when none are saved, in the account's unit. */
-export const PLATE_SETS: Record<
-	WeightUnit,
-	Record<PlateSetChoice, PlatePairInventory[]>
-> = {
-	KG: {
-		STANDARD: pairs([25, 20, 15, 10, 5, 2.5, 1.25], 4),
-		LIGHT: pairs([20, 15, 10, 5, 2.5, 1.25], 2),
-	},
-	LB: {
-		STANDARD: pairs([45, 35, 25, 10, 5, 2.5].map(lb), 4),
-		LIGHT: pairs([25, 10, 5, 2.5].map(lb), 2),
-	},
-}
-
-export const PLATE_SET_LABELS: Record<PlateSetChoice, string> = {
-	STANDARD: 'Standard plates',
-	LIGHT: 'Lighter plates only',
-}
-
-export interface WarmUpSet {
-	weightKg: number
-	reps: number
-	/** Bar-loaded only: what goes on each side. */
-	platesPerSide?: PlateLoadingItem[]
-	/** The plates fell short of the target by a standard small step or more. */
-	limited: boolean
-}
-
-export interface WarmUpRamp {
-	sets: WarmUpSet[]
-	/** Steps left out because the exercise had no room for them. */
-	leftOut: number
-}
-
-interface RampInput {
-	workingWeightKg: number
-	barLoaded: boolean
-	barWeightKg: number
-	platePairs: readonly PlatePairInventory[]
-	/** The exercise's own weight step, for anything not bar-loaded. */
-	incrementKg: number
-	/** Sets the exercise can still take. */
-	room: number
-}
-
-/**
- * A set is "the closest you can load" when the plates fall this far short of
- * its target: the step a standard set of plates (1.25 kg pairs) always makes.
- */
-export const LIMITED_SHORTFALL_KG = 2.5
-
 const round = (value: number) => Math.round(value * 10000) / 10000
-
-/**
- * The warm-up sets for a working load: each step rounded down to a load that
- * can be made, a step no heavier than the one before or reaching the working
- * load dropped, and the heaviest kept when there is no room for all of them.
- */
-export function buildWarmUpRamp(input: RampInput): WarmUpRamp {
-	const { workingWeightKg: work, barLoaded, barWeightKg } = input
-	if (!(work > 0)) return { sets: [], leftOut: 0 }
-	const steps = barLoaded ? BAR_WARM_UP_STEPS : OTHER_WARM_UP_STEPS
-	const increment = input.incrementKg > 0 ? input.incrementKg : 2.5
-
-	const sets: WarmUpSet[] = []
-	for (const step of steps) {
-		const target = step.share * work
-		let set: WarmUpSet
-		if (barLoaded) {
-			const loading = calculatePlateLoading(
-				Math.max(target, barWeightKg),
-				barWeightKg,
-				[...input.platePairs],
-			)
-			set = {
-				weightKg: round(loading.loadedWeightKg),
-				reps: step.reps,
-				platesPerSide: loading.platesPerSide,
-				limited:
-					step.share > 0 &&
-					loading.status === 'short' &&
-					loading.differenceKg >= LIMITED_SHORTFALL_KG - 1e-9,
-			}
-		} else {
-			set = {
-				weightKg: round(Math.floor(target / increment + 1e-9) * increment),
-				reps: step.reps,
-				limited: false,
-			}
-		}
-		const previous = sets[sets.length - 1]
-		if (set.weightKg <= 0 || set.weightKg >= work - 1e-9) continue
-		if (previous && set.weightKg <= previous.weightKg + 1e-9) continue
-		sets.push(set)
-	}
-	const room = Math.max(0, input.room)
-	const kept = sets.slice(Math.max(0, sets.length - room))
-	return { sets: kept, leftOut: sets.length - kept.length }
-}
 
 /** What the ramp is built from, as the preview states it. */
 export type EquipmentBasis =
