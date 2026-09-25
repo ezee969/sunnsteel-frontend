@@ -79,6 +79,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID      | Status        | Owner  | Branch / worktree | Claimed    | Repositories |
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
+| EXER-06 | `IN_PROGRESS` | Claude | `claude/exer-06`  | 2026-09-25 | CT, BE, FE   |
 
 ## Current product snapshot
 
@@ -325,7 +326,7 @@ cold-start impact and showing that simpler rendering is insufficient.
 | EXER-03 | `CANDIDATE` | XL   | Instructions and cues          | Provide setup, execution, common mistakes, and appropriate safety notes.                                                                                                               | LIB-01 content model            |
 | EXER-04 | `CANDIDATE` | XL   | Muscle visualization and media | Display targeted muscles and concise demonstrations where reliable assets exist.                                                                                                       | LIB-01; curated assets/licences |
 | EXER-05 | `SHIPPED`   | M    | Alternatives                   | Suggest substitutions based on movement, primary muscles, and available equipment.                                                                                                     | EXER-09                         |
-| EXER-06 | `CANDIDATE` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                                           | BE/CT ownership model           |
+| EXER-06 | `IN_PROGRESS` | L    | Custom exercises               | Let users create private catalog entries with muscles, equipment, and notes.                                                                                                           | BE/CT ownership model           |
 | EXER-07 | `SHIPPED`   | L    | Favorites and recents          | Star exercises privately and see starred, then recently trained, exercises first in the routine wizard's pickers; the catalog filters by stars. Quick Workout stays hidden (`FIX-04`). | Starred-exercise model          |
 | EXER-08 | `CANDIDATE` | L    | Catalog moderation             | Review duplicates, naming, instructions, and promoted user submissions.                                                                                                                | Administrative tooling          |
 | EXER-09 | `SHIPPED`   | L    | Exercise metadata expansion    | Extend the catalog with movement pattern, equipment detail, substitution grouping and instruction/media fields so dependent features stop blocking on undefined data.                  | BE/CT schema; catalog backfill  |
