@@ -20,6 +20,17 @@ import {
 import { useSetRowInputs } from '../hooks/useSetRowInputs'
 import type { ProgressionScheme, RoutineSet, SetField } from '../types'
 
+/**
+ * TD-50: the one-line row's columns from `lg`, shared with the header in
+ * [SetListSection](./SetListSection.tsx) so both grids line up. Each track has
+ * the floor its content needs -- the widest kind ("Optional"), a rep range of
+ * two-digit fields, a five-character load, a two-digit RIR -- and numeric
+ * tracks stop at `--field-max` (§10.2). Below `lg` the budget is too small
+ * for one line (the shell leaves 306px at 768), so a row takes two.
+ */
+export const SET_ROW_COLUMNS =
+	'lg:grid-cols-[3.5rem_minmax(6.25rem,1fr)_minmax(5.25rem,1fr)_minmax(6.75rem,1.5fr)_minmax(4.5rem,var(--field-max))_3.25rem_2rem]'
+
 interface SetRowProps {
 	weightUnit: WeightUnit
 	exerciseIndex: number
@@ -114,66 +125,20 @@ export function SetRow({
 
 	return (
 		<div
-			className={`bg-card border border-muted rounded-md p-2 sm:p-0 sm:bg-transparent sm:border-0 sm:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
+			className={`bg-card border border-muted rounded-md p-2 lg:p-0 lg:bg-transparent lg:border-0 lg:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
 				isRemoving ? 'animate-out fade-out-0 duration-[140ms] ease-exit' : ''
 			}`}
 		>
-			<div className="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-2 items-stretch sm:items-center">
-				{/* Top line on mobile: Set Badge, Rep Type Select, Delete button */}
-				<div className="flex flex-wrap items-center justify-between gap-2 sm:col-span-5 sm:flex-nowrap">
-					<div className="flex items-center gap-2">
-						<Badge variant="outline" className="text-xs px-2 py-1">
-							Set {set.setNumber}
-						</Badge>
-					</div>
-
-					{/* LIVE-12: the kind and the rep type wrap onto two lines in a
-					    narrow card rather than pushing the rep type off its edge. */}
-					<div className="order-last flex w-full min-w-0 flex-wrap gap-2 sm:order-none sm:w-auto sm:flex-1">
-						<div className="min-w-[104px] flex-1 sm:min-w-0">
-							<Select
-								value={set.kind ?? 'WORKING'}
-								onValueChange={value =>
-									onUpdateSet(exerciseIndex, setIndex, 'kind', value)
-								}
-							>
-								<SelectTrigger
-									aria-label={`Set ${set.setNumber} kind`}
-									className="w-full h-9 sm:h-8"
-								>
-									<SelectValue className="truncate" />
-								</SelectTrigger>
-								<SelectContent>
-									{SET_KINDS.map(kind => (
-										<SelectItem key={kind} value={kind}>
-											{SET_KIND_LABELS[kind]}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-
-						<div className="min-w-[104px] flex-1 sm:min-w-0">
-							<Select
-								value={set.repType}
-								onValueChange={value =>
-									onUpdateSet(exerciseIndex, setIndex, 'repType', value)
-								}
-								disabled={progressionScheme !== 'NONE'}
-							>
-								<SelectTrigger
-									aria-label="Rep type"
-									className="w-full h-9 sm:h-8"
-								>
-									<SelectValue className="truncate" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="FIXED">Fixed</SelectItem>
-									<SelectItem value="RANGE">Range</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
+			{/* TD-50: below `sm` a card of stacked fields with steppers; from `sm`
+			    two lines -- the set, its kind, its rep type and remove, then its
+			    fields -- and from `lg` one line under the column headings. */}
+			<div
+				className={`flex flex-col gap-2 sm:grid sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center ${SET_ROW_COLUMNS}`}
+			>
+				<div className="flex items-center justify-between gap-2 sm:contents">
+					<Badge variant="outline" className="w-fit text-xs px-2 py-1">
+						Set {set.setNumber}
+					</Badge>
 
 					<Button
 						variant="ghost"
@@ -187,13 +152,61 @@ export function SetRow({
 					</Button>
 				</div>
 
+				{/* LIVE-12: the kind and the rep type wrap onto two lines in a
+				    narrow card rather than pushing the rep type off its edge. */}
+				<div className="flex w-full min-w-0 flex-wrap gap-2 sm:contents">
+					<div className="min-w-[104px] flex-1 sm:min-w-0">
+						<Select
+							value={set.kind ?? 'WORKING'}
+							onValueChange={value =>
+								onUpdateSet(exerciseIndex, setIndex, 'kind', value)
+							}
+						>
+							<SelectTrigger
+								aria-label={`Set ${set.setNumber} kind`}
+								className="w-full h-9 sm:h-8"
+							>
+								<SelectValue className="truncate" />
+							</SelectTrigger>
+							<SelectContent>
+								{SET_KINDS.map(kind => (
+									<SelectItem key={kind} value={kind}>
+										{SET_KIND_LABELS[kind]}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+
+					<div className="min-w-[104px] flex-1 sm:min-w-0">
+						<Select
+							value={set.repType}
+							onValueChange={value =>
+								onUpdateSet(exerciseIndex, setIndex, 'repType', value)
+							}
+							disabled={progressionScheme !== 'NONE'}
+						>
+							<SelectTrigger
+								aria-label="Rep type"
+								className="w-full h-9 sm:h-8"
+							>
+								<SelectValue className="truncate" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="FIXED">Fixed</SelectItem>
+								<SelectItem value="RANGE">Range</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</div>
+
 				{/* Inputs: Reps gets its own row on mobile so its steppers/input aren't
 				    squeezed by Weight/RIR sharing the same row; contents on desktop
 				    (unchanged 12-col grid via col-span) */}
-				<div className="flex flex-col gap-2 sm:contents">
+				<div className="flex flex-col gap-2 sm:col-span-full sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-3 sm:gap-y-2 lg:contents">
 					{/* Reps Column */}
-					<div className="sm:col-span-3 space-y-1">
-						<Label className="sm:hidden">
+					<div className="space-y-1 lg:min-w-0">
+						<Label className="lg:hidden">
 							{set.repType === 'FIXED' ? 'Reps' : 'Reps Range'}
 						</Label>
 						{set.repType === 'FIXED' ? (
@@ -217,7 +230,7 @@ export function SetRow({
 									placeholder="0"
 									value={set.reps ?? ''}
 									onChange={event => handleFixedRepsChange(event.target.value)}
-									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0"
+									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 sm:w-16 sm:flex-none lg:w-full lg:max-w-[var(--field-max)]"
 								/>
 								<Button
 									type="button"
@@ -256,7 +269,7 @@ export function SetRow({
 											value={minInput}
 											onChange={event => handleMinChange(event.target.value)}
 											onBlur={handleMinBlur}
-											className="text-center h-9 sm:h-8 flex-1 min-w-0 sm:min-w-[64px]"
+											className="text-center h-9 sm:h-8 flex-1 min-w-0 sm:w-14 sm:flex-none lg:w-auto lg:flex-1"
 										/>
 										<Button
 											type="button"
@@ -297,7 +310,7 @@ export function SetRow({
 											value={maxInput}
 											onChange={event => handleMaxChange(event.target.value)}
 											onBlur={handleMaxBlur}
-											className="text-center h-9 sm:h-8 flex-1 min-w-0"
+											className="text-center h-9 sm:h-8 flex-1 min-w-0 sm:w-14 sm:flex-none lg:w-auto lg:flex-1"
 										/>
 										<Button
 											type="button"
@@ -323,8 +336,8 @@ export function SetRow({
 					    on desktop (unchanged 12-col grid) */}
 					<div className="flex flex-col gap-2 sm:contents">
 						{/* Weight Column */}
-						<div className="sm:col-span-2 space-y-1">
-							<Label className="sm:hidden">
+						<div className="space-y-1 lg:min-w-0">
+							<Label className="lg:hidden">
 								Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
 							</Label>
 							<div className="flex items-center gap-2 w-full">
@@ -350,7 +363,7 @@ export function SetRow({
 									onChange={event => handleWeightChange(event.target.value)}
 									onBlur={handleWeightBlur}
 									disabled={weightLocked}
-									className={`text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 ${
+									className={`text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 sm:w-20 sm:flex-none lg:w-full ${
 										weightLocked ? 'cursor-not-allowed' : ''
 									}`}
 								/>
@@ -369,8 +382,8 @@ export function SetRow({
 						</div>
 
 						{/* RIR Column */}
-						<div className="sm:col-span-1 space-y-1">
-							<Label className="sm:hidden">RIR</Label>
+						<div className="space-y-1 lg:min-w-0">
+							<Label className="lg:hidden">RIR</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button
 									type="button"
@@ -390,17 +403,15 @@ export function SetRow({
 									<Minus className="h-3 w-3" />
 								</Button>
 								<Input
-									type="number"
+									type="text"
 									inputMode="numeric"
-									min={0}
-									max={10}
-									step={1}
+									pattern="[0-9]*"
 									autoComplete="off"
 									aria-label="RIR"
 									placeholder="0"
 									value={rirInput}
 									onChange={event => handleRirChange(event.target.value)}
-									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0"
+									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 sm:w-14 sm:flex-none lg:w-full"
 								/>
 								<Button
 									type="button"
@@ -425,7 +436,7 @@ export function SetRow({
 				</div>
 
 				{/* Desktop-only delete button */}
-				<div className="hidden sm:flex sm:col-span-1 justify-end">
+				<div className="hidden sm:flex sm:col-start-4 sm:row-start-1 justify-end lg:col-start-auto lg:row-start-auto">
 					<Button
 						variant="ghost"
 						size="sm"

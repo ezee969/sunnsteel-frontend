@@ -17,8 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. `TD-49`, an unticked set's weight reaching the
-routine at finish, closed on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
+There are no open entries. `TD-50`, the routine builder's clipped set rows,
+closed on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
+routine at finish, on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
 2026-09-23 after the owner completed the required installed-iPhone update and
 offline-fallback smoke test. `TD-43`, the
 per-request call to Supabase Auth, and `TD-48`, agent-document drift, both
@@ -30,6 +31,63 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-50"></a>
+
+### TD-50 — The routine builder's set rows clip their kind, rep type and RIR — CLOSED 2026-09-25
+
+**Impact.** In step 3 of the routine builder every set row lost content at
+every width from `sm`: the kind select read "Warm-ur" at 1440, and the RIR
+field was too narrow to show its value. At 768 the kind and rep-type values
+had no room at all, so every set looked blank. At 320 the weight and RIR
+plus buttons stuck out past the row's card. `LIVE-12` added the kind select
+into space the row had already used up.
+
+**Evidence.** Measured 2026-09-25 on the local stack at 320, 390, 430, 639,
+640, 767, 768, 1023, 1024, 1279, 1280 and 1440, in both themes, with a
+Playwright probe. It compared each control's inner width with the text it
+must hold: the widest kind ("Optional"), "Range", a two-digit RIR and a
+five-character load. Every width from 640 failed. The kind value had 7px at
+640, none at 768 and 44px at 1440, where it needs 46px, and RIR had 3px at
+640. `SetRow` placed seven controls on a twelve-column grid from `sm`. The
+wizard, day and exercise cards leave that grid 434px at 640, 306px at 768
+(the sidebar arrives at `md`), 562px at 1024 and 610px at 1440, so a
+one-column RIR track was about 45px. RIR was also the row's only
+`type="number"` field, and Chrome reserves spinner width inside it. The
+header row used different spans (Set 2, Kind · Type 3), so its headings did
+not line up with the row either. At 320 the exercise card's default `px-6`
+left the row 128px for a 152px stepper line. **The sweep never saw it**:
+its `routine-edit` case opens only the first wizard step, and it checks
+page overflow, not clipped text inside a control.
+
+**Direction.** Lay the row out for the width it gets rather than the
+viewport: one line only where every track fits, two lines otherwise, and
+numeric fields capped at `--field-max` (§10.2). Inset the exercise card's
+content like its header. Make RIR a text field like reps and weight.
+
+**Closure criteria.** At every width above, in both themes, the widest kind,
+the rep type, a two-digit RIR and a five-character load fit their controls,
+no row overflows, and the headings sit over their columns.
+
+**Closed 2026-09-25.** `SetRow` now has three layouts. Below `sm` it keeps
+the card of stacked fields with steppers. From `sm` it takes two lines: the
+set, its kind, its rep type and remove, then captioned fields at fixed widths
+(reps 64 or two 56px range fields, weight 80, RIR 56). From `lg` it is one
+line under the headings, on `SET_ROW_COLUMNS` tracks that the header in
+`SetListSection` shares. Each track's minimum is what its content needs, and
+the numeric tracks stop at `--field-max`. The exercise card's content is
+inset `px-3 sm:px-4`, like its header, instead of the card's `px-6`. The set
+list and its Add Set area lost their redundant `px-2` below `sm`, giving a
+row 168px at 320. RIR is `type="text"` with `inputMode="numeric"`, so it
+has no spinner. It is sanitized by the same handler, which still drops
+non-digits and clamps to 10, checked by typing "a7" and "12". The probe passes
+at all twelve widths in both themes. The one-line row keeps at least 3px of
+room for every value at 1024, its tightest width. "Warm-up" and "Optional"
+were checked on screen at 1024, set in the builder and never saved. Scoped
+sweep `layout routine-edit|layout routines-new`: 28/28 at one worker. **Not
+verified:** a pound account's two-decimal loads, which the 80px and 96px
+weight fields should hold, and touch devices between 640 and 1023. At those
+widths the steppers stay hidden, as they were before.
 
 <a id="td-49"></a>
 
@@ -642,6 +700,9 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-25 (revision 24):** Recorded and closed `TD-50`, found while
+  checking `LIVE-20`: the routine builder's set rows clipped their kind, rep
+  type and RIR from `sm`, and overflowed at 320. The register is empty again.
 - **2026-09-24 (revision 23):** Closed `TD-49`. Only a completed set carries
   its logged weight into the routine at finish and in a LIVE-17 correction.
   The register is empty again.

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 
 import type { RoutineWizardExercise, SetField } from '../types'
 import { isWeightLocked } from '../utils/set-kinds'
-import { SetRow } from './SetRow'
+import { SET_ROW_COLUMNS, SetRow } from './SetRow'
 import { WarmUpRampDialog } from './WarmUpRampDialog'
 
 interface SetListSectionProps {
@@ -116,18 +116,20 @@ export function SetListSection({
 
 			{setsExpanded && (
 				<div id={`sets-list-${tabIndex}-${exerciseIndex}`}>
-					<div className="hidden sm:grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground mb-2 px-1">
-						<div className="col-span-2">Set</div>
-						<div className="col-span-3">Kind · Type</div>
-						<div className="col-span-3">Reps</div>
-						<div className="col-span-2">
-							Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
-						</div>
-						<div className="col-span-1">RIR</div>
-						<div className="col-span-1" />
+					{/* TD-50: headings only over the one-line row, on its columns. */}
+					<div
+						className={`hidden lg:grid gap-2 text-xs font-medium text-muted-foreground mb-2 ${SET_ROW_COLUMNS}`}
+					>
+						<div>Set</div>
+						<div>Kind</div>
+						<div>Type</div>
+						<div>Reps</div>
+						<div>Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})</div>
+						<div>RIR</div>
+						<div />
 					</div>
 
-					<div className="space-y-1.5 px-2 sm:px-0">
+					<div className="space-y-1.5">
 						{exercise.sets.map((set, setIndex) => (
 							<div
 								key={setIndex}
@@ -160,7 +162,7 @@ export function SetListSection({
 						))}
 					</div>
 
-					<div className="mt-3 pt-3 border-t border-muted px-2 sm:px-0 sm:border-0">
+					<div className="mt-3 pt-3 border-t border-muted sm:border-0">
 						<Button
 							data-testid={`add-set-btn-${tabIndex}-${exerciseIndex}`}
 							onClick={onAddSet}

@@ -347,8 +347,10 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 						</div>
 					)}
 				</div>
+				{/* TD-50: inset like the header above it (`p-3 sm:p-4`), not the
+				    card's default `px-6`, which left a set row 128px at 320. */}
 				<CardContent
-					className={`overflow-hidden transition-[max-height] duration-[var(--motion-slow)] ease-standard ${
+					className={`px-3 sm:px-4 overflow-hidden transition-[max-height] duration-[var(--motion-slow)] ease-standard ${
 						expanded ? 'max-h-[3000px]' : 'max-h-0'
 					}`}
 					aria-hidden={!expanded}
