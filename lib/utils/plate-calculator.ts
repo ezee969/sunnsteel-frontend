@@ -152,6 +152,28 @@ const solveSparse = (
 	}
 }
 
+/**
+ * The same total loaded heaviest plate first, if the inventory allows it.
+ * The knapsack finds the best reachable total but not which plates a lifter
+ * would reach for, so it can answer 15 + 15 where 20 + 10 is on the rack.
+ */
+const heaviestFirst = (
+	target: number,
+	pairValues: number[],
+	counts: number[],
+): number[] | null => {
+	let remaining = target
+	const selection = pairValues.map((value, index) => {
+		const take = Math.min(counts[index], Math.floor(remaining / value))
+		remaining -= take * value
+		return take
+	})
+	return remaining === 0 ? selection : null
+}
+
+const plateTotal = (selection: number[]) =>
+	selection.reduce((total, count) => total + count, 0)
+
 export const calculatePlateLoading = (
 	targetWeightKg: number,
 	barWeightKg: number,
@@ -188,6 +210,16 @@ export const calculatePlateLoading = (
 		capacity <= DENSE_CAPACITY_LIMIT
 			? solveDense(capacity, chunks, plates.length)
 			: solveSparse(capacity, chunks, plates.length)
+	const greedy = heaviestFirst(
+		solution.best,
+		pairValues.map(value => value / divisor),
+		plates.map(plate => plate.pairCount),
+	)
+	// Prefer the heaviest-first loading whenever it is no more plates.
+	const selection =
+		greedy && plateTotal(greedy) <= plateTotal(solution.selection)
+			? greedy
+			: solution.selection
 	const plateUnits = solution.best * divisor
 	const loadedUnits = barUnits + plateUnits
 	const differenceUnits = targetUnits - loadedUnits
@@ -198,11 +230,11 @@ export const calculatePlateLoading = (
 		differenceKg: fromCanonicalUnits(differenceUnits),
 		status: differenceUnits === 0 ? 'exact' : 'short',
 		platesPerSide: plates.flatMap((plate, index) =>
-			solution.selection[index] > 0
+			selection[index] > 0
 				? [
 						{
 							weightKg: plate.weightKg,
-							platesPerSide: solution.selection[index],
+							platesPerSide: selection[index],
 						},
 					]
 				: [],

@@ -29,6 +29,7 @@ export interface ExerciseListProps {
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
 	onAddSet: WizardExerciseCardProps['onAddSet']
+	onReplaceWarmUps: WizardExerciseCardProps['onReplaceWarmUps']
 	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
 	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
 	onValidateMinMaxReps: WizardExerciseCardProps['onValidateMinMaxReps']
@@ -66,6 +67,7 @@ export function ExerciseList({
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onAddSet,
+	onReplaceWarmUps,
 	onRemoveSetAnimated,
 	onUpdateSet,
 	onValidateMinMaxReps,
@@ -123,6 +125,7 @@ export function ExerciseList({
 								onUpdateProgressionScheme={onUpdateProgressionScheme}
 								onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
 								onAddSet={onAddSet}
+								onReplaceWarmUps={onReplaceWarmUps}
 								onRemoveSetAnimated={onRemoveSetAnimated}
 								onUpdateSet={onUpdateSet}
 								onValidateMinMaxReps={onValidateMinMaxReps}
@@ -159,6 +162,7 @@ interface ReorderableExerciseRowProps {
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
 	onAddSet: WizardExerciseCardProps['onAddSet']
+	onReplaceWarmUps: WizardExerciseCardProps['onReplaceWarmUps']
 	onRemoveSetAnimated: WizardExerciseCardProps['onRemoveSetAnimated']
 	onUpdateSet: WizardExerciseCardProps['onUpdateSet']
 	onValidateMinMaxReps: WizardExerciseCardProps['onValidateMinMaxReps']
@@ -188,6 +192,7 @@ function ReorderableExerciseRow({
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onAddSet,
+	onReplaceWarmUps,
 	onRemoveSetAnimated,
 	onUpdateSet,
 	onValidateMinMaxReps,
@@ -230,6 +235,7 @@ function ReorderableExerciseRow({
 				onUpdateProgressionScheme={onUpdateProgressionScheme}
 				onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
 				onAddSet={onAddSet}
+				onReplaceWarmUps={onReplaceWarmUps}
 				onRemoveSetAnimated={onRemoveSetAnimated}
 				onUpdateSet={onUpdateSet}
 				onValidateMinMaxReps={onValidateMinMaxReps}

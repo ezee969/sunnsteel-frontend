@@ -189,7 +189,7 @@ export function RoutineQualitySummary({
 
 					<QualityBlock
 						title="Estimated duration"
-						caption={`Approximate: ${SECONDS_PER_REP} s per rep (${ASSUMED_REPS} reps when none are set), your rest after every set but the last, and 1 min to set up each exercise. Warm-ups are not included.`}
+						caption={`Approximate: ${SECONDS_PER_REP} s per rep (${ASSUMED_REPS} reps when none are set), your rest after every set but the last, and 1 min to set up each exercise. Warm-up sets in the routine are included.`}
 					>
 						<ul>
 							{summary.durations.map(({ slot, label, seconds }) => (

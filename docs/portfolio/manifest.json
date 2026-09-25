@@ -42,6 +42,16 @@
 			"height": 900
 		},
 		{
+			"slug": "routine-builder-warm-ups",
+			"route": "/routines/edit/:routine",
+			"features": [
+				"LIVE-13"
+			],
+			"capturedAt": "2026-09-25T13:02:21.835Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
 			"slug": "routine-detail",
 			"route": "/routines/:routine",
 			"features": [

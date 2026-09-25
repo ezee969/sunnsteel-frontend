@@ -44,6 +44,11 @@ export interface WizardExerciseCardProps {
 	) => void
 	onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void
 	onAddSet: (exerciseIndex: number) => void
+	/** LIVE-13: replace this exercise's warm-ups with a generated ramp. */
+	onReplaceWarmUps: (
+		exerciseIndex: number,
+		warmUps: { weightKg: number; reps: number }[],
+	) => void
 	isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean
 	onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void
 	onUpdateSet: (
@@ -91,6 +96,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
 	onAddSet,
+	onReplaceWarmUps,
 	isRemovingSet,
 	onRemoveSetAnimated,
 	onUpdateSet,
@@ -369,6 +375,11 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							setsExpanded={setsExpanded}
 							onToggleSets={toggleSetsExpanded}
 							onAddSet={handleAddSet}
+							exerciseName={exerciseData?.name ?? 'this exercise'}
+							equipmentRequired={exerciseData?.equipmentRequired}
+							onReplaceWarmUps={warmUps =>
+								onReplaceWarmUps(exerciseIndex, warmUps)
+							}
 							registerSetRowRef={registerSetRowRef}
 							onUpdateSet={onUpdateSet}
 							onValidateMinMaxReps={onValidateMinMaxReps}

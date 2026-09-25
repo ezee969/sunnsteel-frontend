@@ -274,6 +274,29 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'The routine builder on its days step: exercises, sets, reps, load and rest per day.',
 	},
 	{
+		slug: 'routine-builder-warm-ups',
+		route: '/routines/edit/:routine',
+		features: ['LIVE-13'],
+		setup: async page => {
+			await openBuildDaysStep(page)
+			const add = page
+				.getByRole('button', { name: /^Add warm-up sets to / })
+				.first()
+			// The step re-renders once its exercises load; click waits for a
+			// stable, attached button.
+			await expect(add).toBeVisible()
+			await add.click()
+			await expect(
+				page.getByRole('list', { name: 'Warm-up sets to add' }),
+			).toBeVisible()
+			// Nothing is inserted: the frame is the preview, closed by the run.
+		},
+		// The dialog is portalled outside <main>; setup waits for it.
+		ready: ['Build Your Training Days', 'Sets'],
+		caption:
+			'Warm-up ramps: generated from the working load, the bar and your plates, previewed with what goes on each side before anything is added.',
+	},
+	{
 		slug: 'routine-detail',
 		route: '/routines/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-08', 'ROUT-09', 'ROUT-15'],

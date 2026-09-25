@@ -109,6 +109,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		updateProgressionScheme,
 		updateMinWeightIncrement,
 		addSet,
+		replaceWarmUps,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,
@@ -374,6 +375,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											onUpdateProgressionScheme={updateProgressionScheme}
 											onUpdateMinWeightIncrement={updateMinWeightIncrement}
 											onAddSet={addSet}
+											onReplaceWarmUps={replaceWarmUps}
 											onRemoveSetAnimated={(exIdx, setIdx) => {
 												const key = `${exIdx}-${setIdx}`
 												setRemovingSets(prev => ({

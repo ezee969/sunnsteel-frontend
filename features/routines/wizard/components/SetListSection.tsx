@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import type { RoutineWizardExercise, SetField } from '../types'
 import { isWeightLocked } from '../utils/set-kinds'
 import { SetRow } from './SetRow'
+import { WarmUpRampDialog } from './WarmUpRampDialog'
 
 interface SetListSectionProps {
 	weightUnit: WeightUnit
@@ -15,6 +16,9 @@ interface SetListSectionProps {
 	setsExpanded: boolean
 	onToggleSets: () => void
 	onAddSet: () => void
+	exerciseName: string
+	equipmentRequired?: readonly string[]
+	onReplaceWarmUps: (warmUps: { weightKg: number; reps: number }[]) => void
 	registerSetRowRef: (setIndex: number, node: HTMLDivElement | null) => void
 	onUpdateSet: (
 		exerciseIndex: number,
@@ -70,6 +74,9 @@ export function SetListSection({
 	setsExpanded,
 	onToggleSets,
 	onAddSet,
+	exerciseName,
+	equipmentRequired,
+	onReplaceWarmUps,
 	registerSetRowRef,
 	onUpdateSet,
 	onValidateMinMaxReps,
@@ -156,6 +163,14 @@ export function SetListSection({
 							<Plus className="h-4 w-4 mr-2" />
 							Add Set
 						</Button>
+						<WarmUpRampDialog
+							exerciseName={exerciseName}
+							sets={exercise.sets}
+							equipmentRequired={equipmentRequired}
+							incrementKg={exercise.minWeightIncrement}
+							weightUnit={weightUnit}
+							onApply={onReplaceWarmUps}
+						/>
 					</div>
 				</div>
 			)}

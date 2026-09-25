@@ -205,6 +205,38 @@ export function useRoutineDayMutations({
 		[withDayMutation],
 	)
 
+	/**
+	 * LIVE-13: replace an exercise's warm-ups with a generated ramp, placed
+	 * before its other sets. Working, drop and optional sets are untouched.
+	 */
+	const replaceWarmUps = useCallback(
+		(exerciseIndex: number, warmUps: { weightKg: number; reps: number }[]) => {
+			withDayMutation(day => {
+				const exercise = day.exercises[exerciseIndex]
+				if (!exercise) return
+				const others = exercise.sets.filter(set => set.kind !== 'WARMUP')
+				exercise.sets = [
+					...warmUps.map(warmUp => ({
+						setNumber: 0,
+						repType: 'FIXED' as const,
+						reps: warmUp.reps,
+						minReps: null,
+						maxReps: null,
+						weight: warmUp.weightKg,
+						rir: null,
+						kind: 'WARMUP' as const,
+					})),
+					...others,
+				]
+				exercise.sets.forEach((set, index) => {
+					set.setNumber = index + 1
+				})
+				syncDoubleProgressionWeights(exercise)
+			})
+		},
+		[withDayMutation],
+	)
+
 	const removeSet = useCallback(
 		(exerciseIndex: number, setIndex: number) => {
 			withDayMutation(day => {
@@ -393,6 +425,7 @@ export function useRoutineDayMutations({
 		updateProgressionScheme,
 		updateMinWeightIncrement,
 		addSet,
+		replaceWarmUps,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,
