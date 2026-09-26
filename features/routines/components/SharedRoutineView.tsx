@@ -6,6 +6,7 @@ import {
 	SET_KIND_LABELS,
 	type SharedRoutine,
 } from '@sunsteel/contracts'
+import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
@@ -76,38 +77,47 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 						})}
 					</h2>
 					<ul className="border-t border-rule-faint">
-						{day.exercises.map(exercise => (
-							<li
-								key={`${exercise.order}-${exercise.exercise.id}`}
-								className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6"
-							>
-								<div className="min-w-0">
-									<h3 className="type-panel text-foreground">
-										{exercise.exercise.name}
-									</h3>
-									<p className="type-body-sm mt-0.5 text-ink-3">
-										{exercise.sets.length}{' '}
-										{exercise.sets.length === 1 ? 'set' : 'sets'} ·{' '}
-										{exercise.restSeconds}s rest
-										{exercise.progressionScheme !== 'NONE'
-											? ' · progression on'
-											: ''}
-									</p>
-									{exercise.note ? (
-										<p className="type-body-sm mt-1 text-ink-2">
-											{exercise.note}
+						{day.exercises.map((exercise, index) => {
+							// ROUT-12: its place in a superset or circuit.
+							const position = exerciseGroupPosition(day.exercises, index)
+							return (
+								<li
+									key={`${exercise.order}-${exercise.exercise.id}`}
+									className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6"
+								>
+									<div className="min-w-0">
+										{position ? (
+											<p className="type-body-sm text-ink-3">
+												{exerciseGroupLabel(position)}
+											</p>
+										) : null}
+										<h3 className="type-panel text-foreground">
+											{exercise.exercise.name}
+										</h3>
+										<p className="type-body-sm mt-0.5 text-ink-3">
+											{exercise.sets.length}{' '}
+											{exercise.sets.length === 1 ? 'set' : 'sets'} ·{' '}
+											{exercise.restSeconds}s rest
+											{exercise.progressionScheme !== 'NONE'
+												? ' · progression on'
+												: ''}
 										</p>
-									) : null}
-								</div>
-								<ol className="type-data space-y-0.5 text-ink-2 lg:text-right">
-									{exercise.sets.map(set => (
-										<li key={set.setNumber}>
-											{set.setNumber}. {describeSet(set)}
-										</li>
-									))}
-								</ol>
-							</li>
-						))}
+										{exercise.note ? (
+											<p className="type-body-sm mt-1 text-ink-2">
+												{exercise.note}
+											</p>
+										) : null}
+									</div>
+									<ol className="type-data space-y-0.5 text-ink-2 lg:text-right">
+										{exercise.sets.map(set => (
+											<li key={set.setNumber}>
+												{set.setNumber}. {describeSet(set)}
+											</li>
+										))}
+									</ol>
+								</li>
+							)
+						})}
 					</ul>
 				</section>
 			))}

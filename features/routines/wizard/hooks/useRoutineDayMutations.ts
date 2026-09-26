@@ -4,8 +4,10 @@ import {
 	type WarmUpEquipment,
 	type WeightUnit,
 } from '@sunsteel/contracts'
+import { canLinkToNext } from '@sunsteel/contracts'
 import { useCallback, useRef } from 'react'
 
+import { linksAfterReorder } from '@/lib/utils/exercise-links'
 import { stepCanonicalWeight } from '@/lib/utils/weight-unit'
 
 import type { ProgressionScheme, RoutineWizardData, SetField } from '../types'
@@ -113,7 +115,13 @@ export function useRoutineDayMutations({
 	const removeExercise = useCallback(
 		(exerciseIndex: number) => {
 			withDayMutation(day => {
+				// ROUT-12: a removed member leaves the rest of its group linked.
+				const previous = [...day.exercises]
 				day.exercises.splice(exerciseIndex, 1)
+				const links = linksAfterReorder(previous, day.exercises)
+				day.exercises.forEach((exercise, index) => {
+					exercise.linkedToNext = links[index]
+				})
 			})
 		},
 		[withDayMutation],
@@ -275,6 +283,24 @@ export function useRoutineDayMutations({
 				if (!exercise) return
 				exercise.warmUpsFollowLoad = followLoad
 				syncDoubleProgressionWeights(exercise)
+			})
+		},
+		[withDayMutation],
+	)
+
+	/**
+	 * ROUT-12: link an exercise to the next one, or unlink it. Linking sets its
+	 * rest to 0:00, since the next exercise follows at once; unlinking leaves
+	 * the rest as it is.
+	 */
+	const setLinkedToNext = useCallback(
+		(exerciseIndex: number, linked: boolean) => {
+			withDayMutation(day => {
+				const exercise = day.exercises[exerciseIndex]
+				if (!exercise) return
+				if (linked && !canLinkToNext(day.exercises, exerciseIndex)) return
+				exercise.linkedToNext = linked
+				if (linked) exercise.restSeconds = 0
 			})
 		},
 		[withDayMutation],
@@ -473,6 +499,7 @@ export function useRoutineDayMutations({
 		addSet,
 		replaceWarmUps,
 		setWarmUpsFollowLoad,
+		setLinkedToNext,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,

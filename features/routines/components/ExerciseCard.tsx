@@ -28,6 +28,7 @@ interface ExerciseCardProps {
 		restSeconds?: number | null
 		progressionScheme?: string
 		warmUpsFollowLoad?: boolean
+		linkedToNext?: boolean
 		sets?: {
 			id?: string
 			setNumber?: number
@@ -42,6 +43,8 @@ interface ExerciseCardProps {
 	}
 	routineId?: string
 	weightUnit: WeightUnit
+	/** ROUT-12: "Superset A1", or null for an exercise on its own. */
+	groupLabel?: string | null
 }
 
 /**
@@ -50,9 +53,17 @@ interface ExerciseCardProps {
  * row ground in Space Mono, with no badge and no numbered tiles (§11.12). It
  * was a bordered `bg-card` box with an outlined scheme badge (TD-38).
  */
-export const ExerciseCard = ({ exercise, weightUnit }: ExerciseCardProps) => {
+export const ExerciseCard = ({
+	exercise,
+	weightUnit,
+	groupLabel,
+}: ExerciseCardProps) => {
 	return (
 		<div className="py-4">
+			{/* ROUT-12: its place in a superset or circuit. */}
+			{groupLabel ? (
+				<p className="type-body-sm pb-1 text-ink-3">{groupLabel}</p>
+			) : null}
 			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
 				<div className="flex min-w-0 items-center gap-2">
 					<h4 className="type-panel text-foreground">

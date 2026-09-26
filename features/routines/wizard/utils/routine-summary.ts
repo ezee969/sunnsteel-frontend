@@ -70,6 +70,7 @@ export const buildRoutineRequest = (
 				progressionScheme: exercise.progressionScheme,
 				minWeightIncrement: exercise.minWeightIncrement,
 				warmUpsFollowLoad: Boolean(exercise.warmUpsFollowLoad),
+				linkedToNext: Boolean(exercise.linkedToNext),
 				sets: exercise.sets.map(set => {
 					const baseSet = {
 						setNumber: set.setNumber,

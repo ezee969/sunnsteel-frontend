@@ -122,6 +122,7 @@ export default function EditRoutinePage() {
 						),
 						minWeightIncrement: exercise.minWeightIncrement || 2.5,
 						warmUpsFollowLoad: exercise.warmUpsFollowLoad ?? false,
+						linkedToNext: exercise.linkedToNext ?? false,
 						sets: exercise.sets.map((set, index) => ({
 							setNumber: index + 1,
 							repType: set.repType,

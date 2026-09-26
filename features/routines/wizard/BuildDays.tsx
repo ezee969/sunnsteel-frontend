@@ -12,6 +12,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useExercises } from '@/lib/api/hooks'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { defaultTrainingLocation } from '@/lib/utils/exercise-equipment'
+import { linksAfterReorder, withLinks } from '@/lib/utils/exercise-links'
 import { parseTime } from '@/lib/utils/time'
 
 import { ExerciseList } from './components/ExerciseList'
@@ -116,6 +117,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		addSet,
 		replaceWarmUps,
 		setWarmUpsFollowLoad,
+		setLinkedToNext,
 		removeSet,
 		stepFixedReps,
 		stepRangeReps,
@@ -297,9 +299,16 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 						const handleReorderExercises = (
 							newExercises: RoutineWizardData['days'][number]['exercises'],
 						) => {
-							// Persist reorder at the wizard-state level (array order)
+							// Persist reorder at the wizard-state level (array order).
+							// ROUT-12: a link stands only while its pair stays together.
+							const previous =
+								data.days.find(d => d.slot === dayId)?.exercises ?? []
+							const relinked = withLinks(
+								newExercises,
+								linksAfterReorder(previous, newExercises),
+							)
 							const newDays = data.days.map(d =>
-								d.slot === dayId ? { ...d, exercises: newExercises } : d,
+								d.slot === dayId ? { ...d, exercises: relinked } : d,
 							)
 							onUpdate({ days: newDays })
 						}
@@ -391,6 +400,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											onAddSet={addSet}
 											onReplaceWarmUps={replaceWarmUps}
 											onSetWarmUpsFollowLoad={setWarmUpsFollowLoad}
+											onSetLinkedToNext={setLinkedToNext}
 											onRemoveSetAnimated={(exIdx, setIdx) => {
 												const key = `${exIdx}-${setIdx}`
 												setRemovingSets(prev => ({

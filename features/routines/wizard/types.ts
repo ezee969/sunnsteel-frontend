@@ -37,6 +37,8 @@ export interface RoutineWizardExercise {
 	minWeightIncrement: number
 	/** LIVE-20: warm-ups with a share follow the first working set. */
 	warmUpsFollowLoad?: boolean
+	/** ROUT-12: done in rounds with the next exercise of the day. */
+	linkedToNext?: boolean
 	note?: string
 	sets: RoutineSet[]
 	restSeconds: number

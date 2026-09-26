@@ -1,6 +1,7 @@
 'use client'
 
 import type { RoutineScheduleMode, WeightUnit } from '@sunsteel/contracts'
+import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
 import { Calendar, Loader2, Play, Repeat } from 'lucide-react'
 
 import {
@@ -16,6 +17,14 @@ import { formatExerciseCount } from '@/lib/utils/routine-format'
 import { nextRotationDay, routineDayTitle } from '@/lib/utils/routine-schedule'
 
 import { ExerciseCard } from './ExerciseCard'
+
+const groupLabelAt = (
+	exercises: readonly { linkedToNext?: boolean }[],
+	index: number,
+) => {
+	const position = exerciseGroupPosition(exercises, index)
+	return position ? exerciseGroupLabel(position) : null
+}
 
 interface RoutineDayAccordionProps {
 	weightUnit: WeightUnit
@@ -121,10 +130,11 @@ export const RoutineDayAccordion = ({
 						<AccordionContent>
 							{day.exercises && day.exercises.length > 0 ? (
 								<div className="divide-y divide-rule-faint border-t border-rule-faint">
-									{day.exercises.map(exercise => (
+									{day.exercises.map((exercise, index) => (
 										<ExerciseCard
 											key={exercise.id}
 											exercise={exercise}
+											groupLabel={groupLabelAt(day.exercises, index)}
 											routineId={routine.id}
 											weightUnit={weightUnit}
 										/>
