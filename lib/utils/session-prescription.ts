@@ -27,6 +27,8 @@ export function sessionPrescription(
 			note: exercise.note ?? null,
 			progressionScheme: exercise.progressionScheme,
 			minWeightIncrement: exercise.minWeightIncrement,
+			// ROUT-12/LIVE-14: the grouping the workout runs in rounds.
+			linkedToNext: exercise.linkedToNext ?? false,
 			exercise: {
 				id: exercise.exercise.id,
 				name: exercise.exercise.name,

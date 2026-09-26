@@ -41,8 +41,12 @@ interface ExerciseGroupProps {
 	totalSets: number
 	onSave: (payload: UpsertSetLogPayload) => void
 	previousSets?: ReadonlyMap<string, PreviousSetPerformance>
-	/** Fired when any set in this group is ticked complete (LIVE-01). */
-	onSetCompleted?: () => void
+	/** Fired with the set's number when one is ticked complete (LIVE-01). */
+	onSetCompleted?: (setNumber: number) => void
+	/** LIVE-14: "Superset A1 · Round 2 of 3" while the exercise is in a group. */
+	roundLine?: string | null
+	/** LIVE-14: "Up next: set 2" while the next set of the rounds is this one's. */
+	upNext?: string | null
 	sessionId: string
 	/** The routine's own note: the standing instruction, shown, never edited here. */
 	instruction?: string | null
@@ -79,6 +83,8 @@ export const ExerciseGroup = ({
 	substitutedFrom,
 	onSwapRequest,
 	onRemoveSet,
+	roundLine,
+	upNext,
 }: ExerciseGroupProps) => {
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
@@ -120,6 +126,7 @@ export const ExerciseGroup = ({
 		// is what a completed exercise reads as at a glance — "done, as planned",
 		// so it is `--success` (§4.3 rule 2), not gold.
 		<section
+			id={`exercise-${exerciseId}`}
 			// Motion spec §2.9 signature 2: `mark-fill` makes the mark grow top to
 			// bottom instead of appearing, and the row settles onto the completed
 			// tone over the same 300ms. The fill is a transform on an overlay bar,
@@ -141,12 +148,18 @@ export const ExerciseGroup = ({
 							<ChevronDown className="h-4 w-4 shrink-0 text-ink-3" />
 						)}
 						<div className="min-w-0 text-left">
+							{roundLine ? (
+								<p className="type-body-sm text-ink-3">{roundLine}</p>
+							) : null}
 							<h3 className="type-panel line-clamp-1 text-foreground">
 								{exerciseName}
 							</h3>
 							<p className="type-data mt-0.5 text-ink-3">
 								{completedSets}/{totalSets} sets
 							</p>
+							{upNext ? (
+								<p className="type-body-sm text-foreground">{upNext}</p>
+							) : null}
 							{substitutedFrom ? (
 								<p className="type-body-sm line-clamp-1 text-ink-3">
 									Swapped from {substitutedFrom}
@@ -252,7 +265,9 @@ export const ExerciseGroup = ({
 									: undefined
 							}
 							onSave={onSave}
-							onSetCompleted={onSetCompleted}
+							onSetCompleted={
+								onSetCompleted ? () => onSetCompleted(set.setNumber) : undefined
+							}
 						/>
 					))}
 					{canAddSet ? (

@@ -37,6 +37,13 @@ import {
 } from '@/lib/utils/session-prescription'
 import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
 import {
+	describeRound,
+	describeUpNext,
+	nextSetAfter,
+	type RoundSlot,
+	roundStatus,
+} from '@/lib/utils/session-rounds'
+import {
 	applySessionSubstitutions,
 	substitutionFor,
 } from '@/lib/utils/session-substitutions'
@@ -132,6 +139,12 @@ export default function ActiveSessionPage() {
 	// Collapsible exercises state
 	const { toggleExercise, isCollapsed } = useCollapsibleExercises()
 
+	// LIVE-14: the set last ticked, which decides where the rounds go next.
+	const [lastCompleted, setLastCompleted] = useState<{
+		exerciseId: string
+		setNumber: number
+	} | null>(null)
+
 	// LIVE-11: the slot whose exercise is being swapped, if any.
 	const [swapTarget, setSwapTarget] = useState<SwapTarget | null>(null)
 
@@ -186,6 +199,26 @@ export default function ActiveSessionPage() {
 				]),
 			),
 		[previousPerformance?.sets],
+	)
+
+	// LIVE-14: the day's exercises as rounds see them -- grouped by the links
+	// the session's snapshot recorded (ROUT-12), in the order they are shown.
+	const roundSlots = useMemo<RoundSlot[]>(
+		() =>
+			groupedLogs.map(group => ({
+				exerciseId: group.exerciseId,
+				exerciseName: group.exerciseName,
+				linkedToNext: Boolean(
+					day?.exercises.find(exercise => exercise.id === group.exerciseId)
+						?.linkedToNext,
+				),
+				sets: group.sets,
+			})),
+		[day, groupedLogs],
+	)
+	const upNext = useMemo(
+		() => nextSetAfter(roundSlots, lastCompleted),
+		[roundSlots, lastCompleted],
 	)
 
 	if (isLoading) {
@@ -287,7 +320,8 @@ export default function ActiveSessionPage() {
 				{/* Rows rule themselves with `.rule-row` (§11.5). A `divide-*` colour
 				    here repainted every row's `.mark` edge but the last's (TD-42). */}
 				<div className="border-y border-rule">
-					{groupedLogs.map(group => {
+					{groupedLogs.map((group, groupIndex) => {
+						const status = roundStatus(roundSlots, groupIndex)
 						const completedSets = group.sets.filter(
 							set => set.isCompleted,
 						).length
@@ -312,9 +346,33 @@ export default function ActiveSessionPage() {
 								totalSets={totalSets}
 								onSave={handleSaveSetLog}
 								previousSets={previousSets}
-								onSetCompleted={() => {
-									restingExerciseRef.current = group.exerciseName
+								roundLine={
+									status ? `${status.label} · ${describeRound(status)}` : null
+								}
+								upNext={
+									status && upNext?.exerciseId === group.exerciseId
+										? describeUpNext(upNext)
+										: null
+								}
+								onSetCompleted={setNumber => {
+									// LIVE-14: in a superset or circuit the next set is the
+									// partner's; the rest is this exercise's own (0:00 when it
+									// hands straight over), and the alert names what follows.
+									const just = { exerciseId: group.exerciseId, setNumber }
+									const next = nextSetAfter(roundSlots, just)
+									setLastCompleted(just)
+									restingExerciseRef.current =
+										next?.exerciseName ?? group.exerciseName
 									restTimer.start(group.restSeconds)
+									if (status && next && next.exerciseId !== group.exerciseId) {
+										if (isCollapsed(next.exerciseId))
+											toggleExercise(next.exerciseId)
+										requestAnimationFrame(() =>
+											document
+												.getElementById(`exercise-${next.exerciseId}`)
+												?.scrollIntoView({ block: 'nearest' }),
+										)
+									}
 								}}
 								substitutedFrom={
 									substitution && prescribed ? prescribed.name : null
