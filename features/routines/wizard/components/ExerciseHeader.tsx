@@ -66,10 +66,13 @@ export function ExerciseHeader({
 			onClick={onHeaderClick}
 			onKeyDown={onHeaderKeyDown}
 		>
+			{/* TD-51: below `sm` the name takes the full width and the controls
+			    sit on their own line under it; four 36px buttons beside it left a
+			    name 90px at 390, cut to "Bench P…". From `sm` it is one line. */}
 			<div
 				className={cn(
-					'flex items-center justify-between',
-					expanded ? 'gap-3' : 'gap-2',
+					'flex flex-col sm:flex-row sm:items-center sm:justify-between',
+					expanded ? 'gap-2 sm:gap-3' : 'gap-1 sm:gap-2',
 				)}
 			>
 				<div className="flex-1 min-w-0">
@@ -77,14 +80,14 @@ export function ExerciseHeader({
 						<div className="flex-1 min-w-0">
 							<h4
 								className={cn(
-									'type-panel truncate',
+									'type-panel break-words',
 									expanded ? 'text-base sm:text-base' : 'text-sm sm:text-base',
 								)}
 							>
 								{exerciseData?.name ?? 'Exercise'}
 							</h4>
 							{expanded && (
-								<p className="text-xs sm:text-sm text-muted-foreground truncate">
+								<p className="text-xs sm:text-sm text-muted-foreground break-words">
 									{exerciseData?.primaryMuscles
 										? formatMuscleGroups(exerciseData.primaryMuscles)
 										: 'Unknown'}{' '}
@@ -107,7 +110,7 @@ export function ExerciseHeader({
 						)}
 					</div>
 				</div>
-				<div className="flex items-center gap-1.5 sm:gap-1 shrink-0">
+				<div className="flex items-center justify-end gap-1.5 sm:gap-1 shrink-0">
 					{dragHandle}
 					<Button
 						variant="ghost"

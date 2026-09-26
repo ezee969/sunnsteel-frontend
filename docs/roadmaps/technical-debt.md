@@ -17,8 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. `TD-50`, the routine builder's clipped set rows,
-closed on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
+There are no open entries. `TD-51`, exercise names cut off in the routine
+builder's card headers, closed on 2026-09-26; `TD-50`, the routine builder's
+clipped set rows, on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
 routine at finish, on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
 2026-09-23 after the owner completed the required installed-iPhone update and
 offline-fallback smoke test. `TD-43`, the
@@ -31,6 +32,38 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-51"></a>
+
+### TD-51 — The routine builder cuts exercise names off beside the card controls — CLOSED 2026-09-26
+
+**Impact.** On a phone the builder's exercise cards showed names like
+"Bench P…": the name had to share one line with four 36px controls (drag,
+collapse, edit and remove), and the header truncated whatever did not fit. A
+custom exercise (`EXER-06`) can be named up to 60 characters, so most of a
+name could be lost.
+
+**Evidence.** Seen on 2026-09-26 while checking `ROUT-12` at 390: "Bench
+Press" rendered as "Bench P…", and a superset's left rule made it slightly
+worse. `ExerciseHeader` laid the name and the controls out in one row at every
+width, with `truncate` on the name and the muscles line.
+
+**Direction.** Below `sm`, give the name the full width and move the controls
+to their own row. Let the name and the muscles line wrap instead of
+truncating. From `sm` the one-line header stays as it was.
+
+**Closure criteria.** At every width from 320 to 1440, in both themes, no
+exercise name or muscles line is cut, every control stays on screen, and the
+page never scrolls sideways.
+
+**Closed 2026-09-26.** `ExerciseHeader` is a column below `sm` (the name and
+muscles, then the controls aligned right) and a row from `sm`. Neither text
+line truncates any more. Measured on the local stack at 320, 390, 430, 639,
+640, 767, 768, 1023, 1024 and 1440 in both themes: no name cut, every control
+on screen, no sideways scroll. A 58-character name put into a card wrapped to
+at most three lines and was never cut. Scoped sweep `layout routine-edit|layout
+routines-new`: 28/28 at one worker. **Not verified:** the collapsed card
+header in a browser (it shares the same layout), and touch devices.
 
 <a id="td-50"></a>
 
@@ -700,6 +733,9 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-26 (revision 25):** Recorded and closed `TD-51`, found while
+  checking `ROUT-12`: the routine builder cut exercise names off beside the
+  card controls on phones. The register is empty again.
 - **2026-09-25 (revision 24):** Recorded and closed `TD-50`, found while
   checking `LIVE-20`: the routine builder's set rows clipped their kind, rep
   type and RIR from `sm`, and overflowed at 320. The register is empty again.
