@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { Exercise } from '@/lib/api/types'
+import { pickableExercises } from '@/lib/utils/custom-exercises'
 
 interface UseRoutineDaySelectionParams {
 	exercises?: Exercise[]
@@ -76,9 +77,11 @@ export function useRoutineDaySelection({
 
 	const filteredExercises = useMemo(() => {
 		const searchLower = searchValue.trim().toLowerCase()
-		if (!searchLower) return exercises
+		// EXER-06: an archived exercise is never offered.
+		const pickable = pickableExercises(exercises)
+		if (!searchLower) return pickable
 
-		return exercises.filter(exercise => {
+		return pickable.filter(exercise => {
 			if (exercise.name.toLowerCase().includes(searchLower)) return true
 			if (exercise.equipment.toLowerCase().includes(searchLower)) return true
 			return exercise.primaryMuscles.some(muscle =>

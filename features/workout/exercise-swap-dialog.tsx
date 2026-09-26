@@ -22,6 +22,7 @@ import {
 	useSubstituteExercise,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
+import { pickableExercises } from '@/lib/utils/custom-exercises'
 import {
 	describeAlternative,
 	findExerciseAlternatives,
@@ -101,7 +102,7 @@ export function ExerciseSwapDialog({
 	)
 	const search = query.trim().toLowerCase()
 	const options = useMemo(() => {
-		const catalog = exercises ?? []
+		const catalog = pickableExercises(exercises ?? [])
 		if (search) {
 			return catalog
 				.filter(

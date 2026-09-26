@@ -436,6 +436,24 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			"A trained exercise's best set, estimated 1RM, recent sessions and progression.",
 	},
 	{
+		slug: 'custom-exercise',
+		route: '/exercises',
+		features: ['EXER-06'],
+		setup: async page => {
+			const create = page.getByRole('button', { name: 'New exercise' })
+			await expect(create).toBeVisible()
+			await create.click()
+			await expect(
+				page.getByRole('dialog', { name: 'New exercise' }),
+			).toBeVisible()
+			// Nothing is created: the frame is the empty form, closed by the run.
+		},
+		// The dialog is portalled outside <main>; setup waits for it.
+		ready: ['Catalog'],
+		caption:
+			'Custom exercises: a movement the catalog lacks, with its muscles and equipment, private to the member who made it.',
+	},
+	{
 		slug: 'training-signals',
 		route: '/progress#training-signals',
 		features: ['PROG-10', 'PROG-09'],

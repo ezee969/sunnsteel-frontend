@@ -1,4 +1,8 @@
-import type { StarredExercisesResponse } from '@sunsteel/contracts'
+import type {
+	CustomExerciseInput,
+	StarredExercisesResponse,
+	UpdateCustomExerciseRequest,
+} from '@sunsteel/contracts'
 
 import { Exercise } from '../types/exercise.type'
 import { httpClient } from './httpClient'
@@ -29,4 +33,34 @@ export const exercisesService = {
 			`/exercises/${exerciseId}/star`,
 			{ method: 'DELETE', secure: true },
 		),
+
+	// EXER-06: the caller's own exercises.
+	createCustom: (input: CustomExerciseInput): Promise<Exercise> =>
+		httpClient.request<Exercise>('/exercises/custom', {
+			method: 'POST',
+			secure: true,
+			body: JSON.stringify(input),
+		}),
+
+	updateCustom: (
+		id: string,
+		patch: UpdateCustomExerciseRequest,
+	): Promise<Exercise> =>
+		httpClient.request<Exercise>(`/exercises/custom/${id}`, {
+			method: 'PATCH',
+			secure: true,
+			body: JSON.stringify(patch),
+		}),
+
+	setCustomArchived: (id: string, archived: boolean): Promise<Exercise> =>
+		httpClient.request<Exercise>(
+			`/exercises/custom/${id}/${archived ? 'archive' : 'restore'}`,
+			{ method: 'POST', secure: true },
+		),
+
+	deleteCustom: (id: string): Promise<void> =>
+		httpClient.request<void>(`/exercises/custom/${id}`, {
+			method: 'DELETE',
+			secure: true,
+		}),
 }

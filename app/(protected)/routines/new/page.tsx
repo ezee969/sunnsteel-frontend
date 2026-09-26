@@ -26,6 +26,7 @@ import { RoutineWizardData } from '@/features/routines/wizard/types'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
 import { useExercises } from '@/lib/api/hooks/useExercises'
+import { catalogExercises } from '@/lib/utils/custom-exercises'
 import {
 	findRoutineTemplate,
 	templateDraft,
@@ -86,7 +87,8 @@ function CreateRoutineWizard() {
 	const [missingExercises, setMissingExercises] = useState<string[]>([])
 	useEffect(() => {
 		if (!template || !catalog || appliedTemplate === template.slug) return
-		const result = templateDraft(template, catalog)
+		// EXER-06: templates name catalog exercises, never a member's own.
+		const result = templateDraft(template, catalogExercises(catalog))
 		setAppliedTemplate(template.slug)
 		setCurrentStep(1)
 		setVisitedSteps(new Set([1]))

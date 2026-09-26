@@ -36,6 +36,7 @@ import { useExercises } from '@/lib/api/hooks/useExercises'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import type { Exercise } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
+import { catalogExercises } from '@/lib/utils/custom-exercises'
 import {
 	PREFERRED_TRAINING_STYLE_OPTIONS,
 	TRAINING_DISCIPLINE_OPTIONS,
@@ -77,7 +78,8 @@ export function TrainingIdentitySettingsCard({
 	const exerciseResults = useMemo(() => {
 		const search = exerciseSearch.trim().toLowerCase()
 		if (!search) return []
-		return exercises
+		// EXER-06: favorites are public training identity, so catalog only.
+		return catalogExercises(exercises)
 			.filter(
 				exercise =>
 					!selectedExerciseIds.has(exercise.id) &&

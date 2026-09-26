@@ -9,6 +9,7 @@ import { useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
+import { pickableExercises } from '@/lib/utils/custom-exercises'
 import {
 	describeAlternative,
 	findExerciseAlternatives,
@@ -149,9 +150,11 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 
 	// Filter exercises for edit dropdown
 	const filteredExercises = useMemo(() => {
-		if (!editSearchValue.trim()) return exercises
+		// EXER-06: an archived exercise is never offered.
+		const pickable = pickableExercises(exercises)
+		if (!editSearchValue.trim()) return pickable
 		const search = editSearchValue.toLowerCase()
-		return exercises.filter(
+		return pickable.filter(
 			ex =>
 				ex.name.toLowerCase().includes(search) ||
 				ex.primaryMuscles?.some(m => m.toLowerCase().includes(search)) ||
@@ -165,10 +168,14 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	const gym = defaultTrainingLocation(locations)
 	const alternatives = useMemo(() => {
 		if (!isEditDropdownOpen || !exerciseData) return []
-		return findExerciseAlternatives(exerciseData, exercises, {
-			availableEquipment: listedEquipmentAt(gym),
-			exclude: dayExerciseIds,
-		})
+		return findExerciseAlternatives(
+			exerciseData,
+			pickableExercises(exercises),
+			{
+				availableEquipment: listedEquipmentAt(gym),
+				exclude: dayExerciseIds,
+			},
+		)
 	}, [isEditDropdownOpen, exerciseData, exercises, gym, dayExerciseIds])
 	const showAlternatives =
 		!isExercisesLoading && !editSearchValue.trim() && alternatives.length > 0

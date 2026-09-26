@@ -1,10 +1,12 @@
 'use client'
 
+import { exerciseNameKey } from '@sunsteel/contracts'
 import { ChevronsUpDown, Loader2, Plus } from 'lucide-react'
-import { forwardRef, useEffect, useMemo, useRef } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CustomExerciseDialog } from '@/features/exercises/custom-exercise-dialog'
 import { useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
@@ -41,6 +43,15 @@ export const ExercisePickerDropdown = forwardRef<
 	const inputRef = useRef<HTMLInputElement>(null)
 	const stars = useStarredExercises()
 	const trained = useTrainedExercises()
+	// EXER-06: a search that names no exercise offers to create it.
+	const [createName, setCreateName] = useState<string | null>(null)
+	const query = searchValue.trim()
+	const offerCreate =
+		query.length > 0 &&
+		!isLoading &&
+		!exercises.some(
+			exercise => exerciseNameKey(exercise.name) === exerciseNameKey(query),
+		)
 
 	// EXER-07: with no search, starred and recently trained exercises lead.
 	const groups = useMemo(
@@ -130,6 +141,7 @@ export const ExercisePickerDropdown = forwardRef<
 															{exercise.name}
 														</span>
 														<span className="text-xs text-muted-foreground whitespace-normal">
+															{exercise.isCustom ? 'Yours · ' : null}
 															{exercise.primaryMuscles?.length
 																? formatMuscleGroups(exercise.primaryMuscles)
 																: 'Unknown'}{' '}
@@ -147,9 +159,33 @@ export const ExercisePickerDropdown = forwardRef<
 								No exercises found
 							</div>
 						)}
+						{offerCreate ? (
+							<div className="border-t border-rule-faint pt-2">
+								<Button
+									type="button"
+									variant="ghost"
+									className="h-auto w-full justify-start px-3 py-3 text-left whitespace-normal"
+									onClick={() => setCreateName(query)}
+								>
+									<Plus className="size-4 shrink-0" aria-hidden />
+									Create “{query}” as your own exercise
+								</Button>
+							</div>
+						) : null}
 					</div>
 				</div>
 			)}
+			<CustomExerciseDialog
+				open={createName !== null}
+				onOpenChange={open => {
+					if (!open) setCreateName(null)
+				}}
+				initialName={createName ?? undefined}
+				onSaved={exercise => {
+					onSelect(exercise.id)
+					onClose()
+				}}
+			/>
 		</div>
 	)
 })

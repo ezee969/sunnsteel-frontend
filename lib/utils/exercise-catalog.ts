@@ -67,6 +67,8 @@ export interface CatalogFilters {
 	trained: boolean
 	/** Only exercises the owner starred (EXER-07). */
 	starred: boolean
+	/** Only the owner's own exercises, archived ones included (EXER-06). */
+	mine: boolean
 }
 
 export const EMPTY_CATALOG_FILTERS: CatalogFilters = {
@@ -76,6 +78,7 @@ export const EMPTY_CATALOG_FILTERS: CatalogFilters = {
 	pattern: null,
 	trained: false,
 	starred: false,
+	mine: false,
 }
 
 const oneOf = <T extends string>(
@@ -100,6 +103,7 @@ export function parseCatalogFilters(params: {
 		pattern: oneOf(MOVEMENT_PATTERNS, params.get('pattern')),
 		trained: params.get('trained') === '1',
 		starred: params.get('starred') === '1',
+		mine: params.get('mine') === '1',
 	}
 }
 
@@ -113,6 +117,7 @@ export function serializeCatalogFilters(filters: CatalogFilters): string {
 	if (filters.pattern) params.set('pattern', filters.pattern)
 	if (filters.trained) params.set('trained', '1')
 	if (filters.starred) params.set('starred', '1')
+	if (filters.mine) params.set('mine', '1')
 	return params.toString()
 }
 
@@ -123,7 +128,8 @@ export function hasActiveCatalogFilters(filters: CatalogFilters): boolean {
 		filters.equipment ||
 		filters.pattern ||
 		filters.trained ||
-		filters.starred,
+		filters.starred ||
+		filters.mine,
 	)
 }
 
@@ -161,6 +167,7 @@ const byName = (a: Exercise, b: Exercise) =>
  * exercises that train it as a primary muscle come before those that only
  * involve it secondarily. A filter whose data is missing from `context`
  * matches nothing — callers render its loading or error state instead.
+ * An archived custom exercise (EXER-06) shows only under "Yours".
  */
 export function filterCatalog(
 	exercises: readonly Exercise[],
@@ -169,6 +176,7 @@ export function filterCatalog(
 ): Exercise[] {
 	const q = filters.q.trim().toLocaleLowerCase('en-US')
 	const matches = exercises.filter(exercise => {
+		if (filters.mine ? !exercise.isCustom : exercise.archivedAt) return false
 		if (q && !exercise.name.toLocaleLowerCase('en-US').includes(q)) {
 			return false
 		}
@@ -291,16 +299,26 @@ export function getCatalogEmptyState({
 	filters,
 	hasTrainedExercises,
 	hasStarredExercises = null,
+	hasCustomExercises = null,
 }: {
 	catalogSize: number
 	filters: CatalogFilters
 	hasTrainedExercises: boolean | null
 	hasStarredExercises?: boolean | null
+	hasCustomExercises?: boolean | null
 }): EmptyStateCopy {
 	if (catalogSize === 0) {
 		return {
 			title: 'The catalog is empty',
 			description: 'No exercises are available yet.',
+		}
+	}
+	if (filters.mine && hasCustomExercises === false) {
+		return {
+			title: 'No exercises of your own yet',
+			description:
+				'Create one for a movement the catalog does not have. Only you can see and use it.',
+			action: { kind: 'clear-filters', label: 'Show all exercises' },
 		}
 	}
 	if (filters.starred && hasStarredExercises === false) {

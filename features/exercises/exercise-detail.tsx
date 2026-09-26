@@ -45,6 +45,7 @@ import {
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
+import { CustomExerciseActions } from './custom-exercise-actions'
 import { StarToggle } from './star-toggle'
 
 const formatDate = (value: string) =>
@@ -455,7 +456,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 				<BackLink />
 				<HeroSection title={<>Exercise not found</>} />
 				<EmptyModule
-					title="This exercise is not in the catalog"
+					title="This exercise is not available"
 					description="The link may be out of date. Browse the catalog to find the exercise you were looking for."
 					action={{
 						kind: 'link',
@@ -491,6 +492,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 				subtitle={primary ? <>Trains {primary}</> : undefined}
 			/>
 			<Overview exercise={exercise} lastTrained={lastTrained} />
+			{exercise.isCustom ? <CustomExerciseActions exercise={exercise} /> : null}
 			<RoutineUsages exerciseId={exercise.id} />
 			{trained.isPending ? (
 				<div role="status" aria-label="Loading your training history">

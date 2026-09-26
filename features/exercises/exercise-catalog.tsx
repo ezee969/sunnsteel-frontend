@@ -1,9 +1,19 @@
 'use client'
 
 import type { MovementPattern, MuscleGroup } from '@sunsteel/contracts'
-import { Check, History, RefreshCw, Search, Star, X } from 'lucide-react'
+import {
+	Check,
+	History,
+	Plus,
+	RefreshCw,
+	Search,
+	Star,
+	UserRound,
+	X,
+} from 'lucide-react'
 import Link from 'next/link'
-import { type ReactNode, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
@@ -15,6 +25,10 @@ import { useExercises, useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types/exercise.type'
+import {
+	isArchivedExercise,
+	isCustomExercise,
+} from '@/lib/utils/custom-exercises'
 import {
 	type CatalogEquipmentFilter,
 	catalogFilterOptions,
@@ -35,6 +49,7 @@ import {
 } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
 
+import { CustomExerciseDialog } from './custom-exercise-dialog'
 import { StarToggle } from './star-toggle'
 import { useCatalogFilters } from './use-catalog-filters'
 
@@ -179,6 +194,12 @@ function ExerciseRow({
 							{exercise.name}
 						</Link>
 					</h3>
+					{isCustomExercise(exercise) ? (
+						<p className="type-body-sm text-ink-3">
+							Yours
+							{isArchivedExercise(exercise) ? ' · Archived' : null}
+						</p>
+					) : null}
 					<p className="type-body-sm mt-0.5 text-ink-2">
 						<span className="sr-only">Muscles: </span>
 						{primary || 'Not classified'}
@@ -234,6 +255,8 @@ function ExerciseRow({
 
 export function ExerciseCatalog() {
 	const { filters, setQuery, update, clear } = useCatalogFilters()
+	const router = useRouter()
+	const [creating, setCreating] = useState(false)
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
 	const locations = useTrainingLocations()
@@ -276,6 +299,14 @@ export function ExerciseCatalog() {
 			}),
 		[exercises, filters, listedEquipment, starredIds, trainedIds],
 	)
+	// EXER-06: the count is of what the current view can hold.
+	const customCount = useMemo(
+		() => exercises.filter(isCustomExercise).length,
+		[exercises],
+	)
+	const viewTotal = filters.mine
+		? customCount
+		: exercises.filter(exercise => !isArchivedExercise(exercise)).length
 	const hasActiveFilters = hasActiveCatalogFilters(filters)
 	const usesGym = filters.equipment === GYM_EQUIPMENT_FILTER
 
@@ -332,6 +363,7 @@ export function ExerciseCatalog() {
 					filters,
 					hasTrainedExercises: trainedIds ? trainedIds.size > 0 : null,
 					hasStarredExercises: starredIds ? starredIds.size > 0 : null,
+					hasCustomExercises: customCount > 0,
 				})}
 				onClearFilters={clear}
 			/>
@@ -448,6 +480,20 @@ export function ExerciseCatalog() {
 						)}
 						Starred
 					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant={filters.mine ? 'secondary' : 'outline'}
+						aria-pressed={filters.mine}
+						onClick={() => update({ mine: !filters.mine })}
+					>
+						{filters.mine ? (
+							<Check className="size-4" aria-hidden />
+						) : (
+							<UserRound className="size-4" aria-hidden />
+						)}
+						Yours
+					</Button>
 					{trained.isError && !filters.trained ? (
 						<p className="type-body-sm text-ink-3">
 							Training history is unavailable.{' '}
@@ -477,14 +523,28 @@ export function ExerciseCatalog() {
 					>
 						Catalog
 					</h2>
-					<p role="status" className="type-body-sm text-ink-3">
-						{showCount
-							? formatCatalogCount(results.length, exercises.length)
-							: null}
-					</p>
+					<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+						<p role="status" className="type-body-sm text-ink-3">
+							{showCount ? formatCatalogCount(results.length, viewTotal) : null}
+						</p>
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onClick={() => setCreating(true)}
+						>
+							<Plus className="size-4" aria-hidden />
+							New exercise
+						</Button>
+					</div>
 				</div>
 				{body}
 			</section>
+			<CustomExerciseDialog
+				open={creating}
+				onOpenChange={setCreating}
+				onSaved={exercise => router.push(`/exercises/${exercise.id}`)}
+			/>
 		</>
 	)
 }

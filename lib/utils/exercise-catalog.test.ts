@@ -64,10 +64,11 @@ describe('catalog filter URL state', () => {
 			pattern: 'VERTICAL_PUSH',
 			trained: true,
 			starred: true,
+			mine: true,
 		} as const
 		const query = serializeCatalogFilters(filters)
 		expect(query).toBe(
-			'q=press&muscle=TRICEPS&equipment=gym&pattern=VERTICAL_PUSH&trained=1&starred=1',
+			'q=press&muscle=TRICEPS&equipment=gym&pattern=VERTICAL_PUSH&trained=1&starred=1&mine=1',
 		)
 		expect(parseCatalogFilters(new URLSearchParams(query))).toEqual({
 			...filters,
