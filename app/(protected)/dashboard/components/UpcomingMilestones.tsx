@@ -12,6 +12,7 @@ import {
 	getUpcomingMilestonesEmptyState,
 	type UpcomingMilestone,
 } from '@/lib/utils/dashboard-milestones'
+import { upcomingMilestonesSummary } from '@/lib/utils/dashboard-summaries'
 
 import { DashboardSection } from './DashboardSection'
 
@@ -55,6 +56,8 @@ export default function UpcomingMilestones() {
 		<DashboardSection
 			id="upcoming-milestones"
 			icon={<Flag className="h-4 w-4 text-ink-3" aria-hidden />}
+			collapsible
+			summary={upcomingMilestonesSummary(milestones)}
 		>
 			{isPending ? (
 				<div

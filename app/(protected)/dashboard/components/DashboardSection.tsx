@@ -2,6 +2,8 @@
 
 import type { DashboardSectionId } from '@sunsteel/contracts'
 
+import { CollapsibleHeading } from '@/components/layout/collapsible-section'
+import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import { cn } from '@/lib/utils'
 import { DASHBOARD_SECTION_LABELS } from '@/lib/utils/dashboard-layout'
 
@@ -22,6 +24,15 @@ interface DashboardSectionProps {
 	 * dashboard's look for no reader.
 	 */
 	headingHidden?: boolean
+	/**
+	 * UX-02: the section can close to its heading, closed below `md` until
+	 * the member opens it. The choice is per device, keyed by the permanent
+	 * id (`ss-open:dashboard-<id>`), and is separate from DASH-05's hidden,
+	 * which is per account and removes the section altogether.
+	 */
+	collapsible?: boolean
+	/** The one line a closed section keeps (design system §20.1). */
+	summary?: React.ReactNode
 	bodyClassName?: string
 	children: React.ReactNode
 }
@@ -38,11 +49,16 @@ export function DashboardSection({
 	description,
 	action,
 	headingHidden = false,
+	collapsible = false,
+	summary,
 	bodyClassName,
 	children,
 }: DashboardSectionProps) {
 	const headingId = dashboardSectionHeadingId(id)
 	const title = DASHBOARD_SECTION_LABELS[id]
+	const [storedOpen, setOpen] = useCollapsedState(`dashboard-${id}`, 'wide')
+	const open = !collapsible || storedOpen
+	const bodyId = `dashboard-${id}-body`
 
 	if (headingHidden) {
 		return (
@@ -55,18 +71,31 @@ export function DashboardSection({
 		)
 	}
 
-	const heading = (
-		<h2
+	const headingClassName = cn(
+		'type-section flex items-center gap-2 text-foreground',
+		!description && !action && 'rule-heading pb-2',
+	)
+	const heading = collapsible ? (
+		<CollapsibleHeading
 			id={headingId}
-			className={cn(
-				'type-section flex items-center gap-2 text-foreground',
-				!description && !action && 'rule-heading pb-2',
-			)}
+			controls={bodyId}
+			open={open}
+			onToggle={() => setOpen(!open)}
+			icon={icon}
+			className={headingClassName}
 		>
+			{title}
+		</CollapsibleHeading>
+	) : (
+		<h2 id={headingId} className={headingClassName}>
 			{icon}
 			{title}
 		</h2>
 	)
+	const closedSummary =
+		!open && summary ? (
+			<p className="type-body-sm pt-2 text-ink-3">{summary}</p>
+		) : null
 
 	return (
 		<section aria-labelledby={headingId} data-dashboard-section={id}>
@@ -81,7 +110,10 @@ export function DashboardSection({
 			) : (
 				heading
 			)}
-			<div className={bodyClassName ?? 'pt-1'}>{children}</div>
+			{closedSummary}
+			<div id={bodyId} hidden={!open} className={bodyClassName ?? 'pt-1'}>
+				{children}
+			</div>
 		</section>
 	)
 }

@@ -8,6 +8,7 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
+import { recentActivitySummary } from '@/lib/utils/dashboard-summaries'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { getRecentActivityEmptyState } from '@/lib/utils/empty-states'
 import { formatDuration } from '@/lib/utils/time-format.utils'
@@ -35,6 +36,13 @@ export default function RecentActivity() {
 		<DashboardSection
 			id="recent-activity"
 			icon={<Activity className="h-4 w-4 text-ink-3" aria-hidden />}
+			collapsible
+			summary={recentActivitySummary(
+				entries[0],
+				entries[0]
+					? formatTimeAgo(entries[0].endedAt ?? entries[0].startedAt)
+					: undefined,
+			)}
 		>
 			{entries.length === 0 ? (
 				<EmptyModule {...getRecentActivityEmptyState(hasRoutines)} />

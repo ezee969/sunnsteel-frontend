@@ -5,6 +5,7 @@ import { Trophy } from 'lucide-react'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
+import { personalRecordSummary } from '@/lib/utils/dashboard-summaries'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { PERSONAL_RECORDS_EMPTY_STATE } from '@/lib/utils/empty-states'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -29,6 +30,13 @@ export default function PersonalRecords() {
 		<DashboardSection
 			id="personal-records"
 			icon={<Trophy className="h-4 w-4 text-ink-3" aria-hidden />}
+			collapsible
+			summary={personalRecordSummary(
+				records[0],
+				records[0]
+					? `${formatWeight(records[0].weight, weightUnit)} × ${records[0].reps}`
+					: undefined,
+			)}
 		>
 			{records.length === 0 ? (
 				<EmptyModule {...PERSONAL_RECORDS_EMPTY_STATE} />

@@ -14,6 +14,7 @@ import {
 	type DashboardInsight,
 	describeDashboardInsightSources,
 } from '@/lib/utils/dashboard-insights'
+import { trainingInsightsSummary } from '@/lib/utils/dashboard-summaries'
 
 import { DashboardSection } from './DashboardSection'
 
@@ -84,6 +85,8 @@ export default function TrainingInsights() {
 		<DashboardSection
 			id="training-insights"
 			icon={<Gauge className="h-4 w-4 text-ink-3" aria-hidden />}
+			collapsible
+			summary={trainingInsightsSummary(insights)}
 		>
 			{isPending ? (
 				<div
