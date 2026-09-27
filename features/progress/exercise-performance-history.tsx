@@ -13,6 +13,7 @@ import {
 	TrendingUp,
 } from 'lucide-react'
 
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	Accordion,
 	AccordionContent,
@@ -232,6 +233,11 @@ export function ExercisePerformanceHistory({
 }: ExercisePerformanceHistoryProps) {
 	const weightUnit = useWeightUnit()
 
+	// UX-04: the first five sessions, then "Show N more"; the server's
+	// "Load earlier sessions" follows once every loaded one is shown.
+	const shownSessions = useShowMore(sessions, 5)
+	const allLoadedShown = !shownSessions.label || shownSessions.expanded
+
 	return (
 		<section aria-labelledby="performance-history" className="space-y-4">
 			<div className="rule-row flex items-center gap-2 pb-2">
@@ -270,8 +276,12 @@ export function ExercisePerformanceHistory({
 					</p>
 				</div>
 			) : (
-				<Accordion type="multiple" className="space-y-4">
-					{sessions.map(session => (
+				<Accordion
+					id="performance-history-list"
+					type="multiple"
+					className="space-y-4"
+				>
+					{shownSessions.visible.map(session => (
 						<PerformanceSessionCard
 							key={session.sessionId}
 							session={session}
@@ -280,6 +290,12 @@ export function ExercisePerformanceHistory({
 					))}
 				</Accordion>
 			)}
+			<ShowMoreButton
+				label={shownSessions.label}
+				expanded={shownSessions.expanded}
+				onToggle={shownSessions.toggle}
+				controls="performance-history-list"
+			/>
 
 			{isError && sessions.length > 0 ? (
 				<div role="alert" className="flex flex-wrap items-center gap-3">
@@ -292,7 +308,7 @@ export function ExercisePerformanceHistory({
 				</div>
 			) : null}
 
-			{hasNextPage ? (
+			{hasNextPage && allLoadedShown ? (
 				<Button
 					variant="outline"
 					className="w-full sm:w-auto"

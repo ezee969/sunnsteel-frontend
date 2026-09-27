@@ -8,6 +8,7 @@ import type {
 import { CalendarClock, History, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -181,6 +182,11 @@ export function ProgressTimeline({
 }: ProgressTimelineProps) {
 	const weightUnit = useWeightUnit()
 
+	// UX-04: the first five events, then "Show N more"; the server's
+	// "Load earlier events" follows once every loaded one is shown (§20.2).
+	const shownItems = useShowMore(items, 5)
+	const allLoadedShown = !shownItems.label || shownItems.expanded
+
 	return (
 		<section aria-labelledby={heading.id} className="space-y-4">
 			<div className="rule-row flex items-start gap-2 pb-2">
@@ -251,8 +257,8 @@ export function ProgressTimeline({
 					</p>
 				</div>
 			) : (
-				<ol className="border-y border-rule-faint">
-					{items.map(item =>
+				<ol id={`${heading.id}-list`} className="border-y border-rule-faint">
+					{shownItems.visible.map(item =>
 						item.type === 'PERSONAL_RECORD' ? (
 							<RecordTimelineItem
 								key={item.eventId}
@@ -271,6 +277,12 @@ export function ProgressTimeline({
 					)}
 				</ol>
 			)}
+			<ShowMoreButton
+				label={shownItems.label}
+				expanded={shownItems.expanded}
+				onToggle={shownItems.toggle}
+				controls={`${heading.id}-list`}
+			/>
 
 			{isError && items.length > 0 ? (
 				<div role="alert" className="flex flex-wrap items-center gap-3">
@@ -283,7 +295,7 @@ export function ProgressTimeline({
 				</div>
 			) : null}
 
-			{hasNextPage ? (
+			{hasNextPage && allLoadedShown ? (
 				<Button
 					variant="outline"
 					className="w-full sm:w-auto"

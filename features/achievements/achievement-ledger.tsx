@@ -5,6 +5,7 @@ import type {
 import { Check, Medal, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
+import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -124,21 +125,30 @@ export function AchievementLedger({
 					}}
 				/>
 			) : (
-				<div className="space-y-8">
+				// UX-07: each category closes to its heading and its count, closed
+				// below `md` until the member opens it (design system §20.1).
+				<div className="space-y-6">
 					{groups.map(group => (
-						<section
+						<CollapsibleSection
 							key={group.category}
-							aria-labelledby={`achievement-${group.category}`}
-						>
-							<div className="flex items-center gap-2 border-b border-rule pb-2">
-								<Medal className="size-4 text-ink-3" aria-hidden />
-								<h3
-									id={`achievement-${group.category}`}
-									className="type-panel text-foreground"
-								>
+							id={`achievement-${group.category}`}
+							headingLevel="h3"
+							headingClassName="type-panel"
+							divider="single"
+							defaultOpen="wide"
+							icon={<Medal className="size-4 text-ink-3" aria-hidden />}
+							title={
+								<>
 									{ACHIEVEMENT_CATEGORY_LABELS[group.category]}
-								</h3>
-							</div>
+									<span className="text-ink-3">
+										{' '}
+										· {group.items.length} earned
+									</span>
+								</>
+							}
+							// Items arrive highest threshold first.
+							summary={`Highest: ${group.items[0].title}`}
+						>
 							<ul>
 								{group.items.map(achievement => (
 									<AchievementRow
@@ -147,7 +157,7 @@ export function AchievementLedger({
 									/>
 								))}
 							</ul>
-						</section>
+						</CollapsibleSection>
 					))}
 				</div>
 			)}

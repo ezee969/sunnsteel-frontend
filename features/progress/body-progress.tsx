@@ -11,6 +11,8 @@ import { Loader2, Pencil, Scale, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useId, useState } from 'react'
 
+import { CollapsibleHeading } from '@/components/layout/collapsible-section'
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -33,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import {
 	type BodyProgressSource,
 	useBodyProgress,
@@ -509,13 +512,15 @@ function EntryList({
 	onEdit: (entry: BodyMeasurement) => void
 	onDelete: (entry: BodyMeasurement) => void
 }) {
-	if (entries.length === 0) return null
 	const newestFirst = [...entries].reverse()
+	// UX-04: the latest five entries, then "Show N more" (§20.2).
+	const shownEntries = useShowMore(newestFirst, 5)
+	if (entries.length === 0) return null
 	return (
 		<div>
 			<h3 className="type-body-sm text-ink-3">Entries in this range</h3>
-			<ul className="mt-1">
-				{newestFirst.map(entry => (
+			<ul id="body-progress-entries" className="mt-1">
+				{shownEntries.visible.map(entry => (
 					<li
 						key={entry.date}
 						className="rule-row flex items-center justify-between gap-3 py-2"
@@ -551,6 +556,12 @@ function EntryList({
 					</li>
 				))}
 			</ul>
+			<ShowMoreButton
+				label={shownEntries.label}
+				expanded={shownEntries.expanded}
+				onToggle={shownEntries.toggle}
+				controls="body-progress-entries"
+			/>
 		</div>
 	)
 }
@@ -583,6 +594,9 @@ export function BodyProgressSection({
 			key: Date.now(),
 		})
 
+	// UX-04: closed below `md` until the member opens it (§20.1).
+	const [open, setOpen] = useCollapsedState('progress-body', 'wide')
+
 	return (
 		<section
 			id="body-progress"
@@ -593,16 +607,19 @@ export function BodyProgressSection({
 				<div className="flex items-start gap-2">
 					<Scale className="mt-0.5 size-4 text-ink-3" aria-hidden />
 					<div>
-						<h2
+						<CollapsibleHeading
 							id="body-progress-heading"
+							controls="progress-body-body"
+							open={open}
+							onToggle={() => setOpen(!open)}
 							className="type-section text-foreground"
 						>
 							Body progress
-						</h2>
+						</CollapsibleHeading>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							Your weight and measurements over time. Who else sees them is your{' '}
 							<Link
-								href="/settings#profile-privacy"
+								href="/settings#privacy-bodyProgress"
 								className="underline underline-offset-4"
 							>
 								body progress privacy setting
@@ -622,73 +639,75 @@ export function BodyProgressSection({
 					</Button>
 				</div>
 			</div>
-			<BodyProgressBody
-				id="own-body-weight"
-				query={query}
-				goals={goals}
-				weightUnit={weightUnit}
-				emptyCopy="Log your weight or a measurement to start your history."
-			/>
-			{query.data ? (
-				<EntryList
-					entries={query.data.entries}
+			<div id="progress-body-body" hidden={!open} className="space-y-4">
+				<BodyProgressBody
+					id="own-body-weight"
+					query={query}
+					goals={goals}
 					weightUnit={weightUnit}
-					onEdit={entry =>
-						setDialog({
-							draft: draftFromBodyEntry(entry, weightUnit),
-							editing: true,
-							key: Date.now(),
-						})
-					}
-					onDelete={setDeleting}
+					emptyCopy="Log your weight or a measurement to start your history."
 				/>
-			) : null}
-			{dialog ? (
-				<BodyEntryDialog
-					key={dialog.key}
-					open
-					onOpenChange={open => !open && setDialog(null)}
-					initial={dialog.draft}
-					editing={dialog.editing}
-					weightUnit={weightUnit}
-				/>
-			) : null}
-			<AlertDialog
-				open={!!deleting}
-				onOpenChange={open => !open && setDeleting(null)}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Delete this entry?</AlertDialogTitle>
-						<AlertDialogDescription>
-							{deleting
-								? `Everything you logged on ${formatBodyDate(deleting.date)} is removed. Your current weight becomes the latest weight you logged before it.`
-								: null}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					{remove.isError ? (
-						<p role="alert" className="type-body-sm text-ink">
-							The entry could not be deleted. Try again.
-						</p>
-					) : null}
-					<AlertDialogFooter>
-						<AlertDialogCancel>Keep it</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={event => {
-								event.preventDefault()
-								if (!deleting) return
-								remove.mutate(deleting.date, {
-									onSuccess: () => setDeleting(null),
-								})
-							}}
-							disabled={remove.isPending}
-							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-						>
-							{remove.isPending ? 'Deleting…' : 'Delete entry'}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+				{query.data ? (
+					<EntryList
+						entries={query.data.entries}
+						weightUnit={weightUnit}
+						onEdit={entry =>
+							setDialog({
+								draft: draftFromBodyEntry(entry, weightUnit),
+								editing: true,
+								key: Date.now(),
+							})
+						}
+						onDelete={setDeleting}
+					/>
+				) : null}
+				{dialog ? (
+					<BodyEntryDialog
+						key={dialog.key}
+						open
+						onOpenChange={open => !open && setDialog(null)}
+						initial={dialog.draft}
+						editing={dialog.editing}
+						weightUnit={weightUnit}
+					/>
+				) : null}
+				<AlertDialog
+					open={!!deleting}
+					onOpenChange={open => !open && setDeleting(null)}
+				>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+							<AlertDialogDescription>
+								{deleting
+									? `Everything you logged on ${formatBodyDate(deleting.date)} is removed. Your current weight becomes the latest weight you logged before it.`
+									: null}
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						{remove.isError ? (
+							<p role="alert" className="type-body-sm text-ink">
+								The entry could not be deleted. Try again.
+							</p>
+						) : null}
+						<AlertDialogFooter>
+							<AlertDialogCancel>Keep it</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={event => {
+									event.preventDefault()
+									if (!deleting) return
+									remove.mutate(deleting.date, {
+										onSuccess: () => setDeleting(null),
+									})
+								}}
+								disabled={remove.isPending}
+								className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+							>
+								{remove.isPending ? 'Deleting…' : 'Delete entry'}
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</div>
 		</section>
 	)
 }

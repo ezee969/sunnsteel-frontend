@@ -69,6 +69,20 @@ function ProgressLoading() {
 	)
 }
 
+/** The Progress sections in page order, by the id of each one's heading. */
+const PROGRESS_SECTIONS = [
+	['personal-goals', 'Goals'],
+	['body-progress-heading', 'Body'],
+	['plateau-watch', 'Plateaus'],
+	['training-signals', 'Signals'],
+	['consistency-calendar', 'Consistency'],
+	['muscle-distribution', 'Muscles'],
+	['volume-trends', 'Volume'],
+	['session-comparison', 'Comparison'],
+	['progress-timeline', 'Timeline'],
+	['progress-exercise', 'By exercise'],
+] as const
+
 export default function ProgressPage() {
 	const [range, setRange] = useState<StrengthRange>('90D')
 	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
@@ -138,6 +152,24 @@ export default function ProgressPage() {
 					</>
 				}
 			/>
+
+			{/* UX-04: fourteen sections, so the page opens with an index of them.
+			    Plain fragment links: every target is mounted, so the browser's
+			    own jump moves <main>. */}
+			<nav aria-label="On this page" className="-mt-2 sm:-mt-4">
+				<ul className="flex flex-wrap gap-x-4 gap-y-0">
+					{PROGRESS_SECTIONS.map(([id, label]) => (
+						<li key={id}>
+							<a
+								href={`#${id}`}
+								className="type-body-sm inline-flex min-h-11 items-center text-foreground underline underline-offset-4 decoration-rule hover:decoration-current sm:min-h-8"
+							>
+								{label}
+							</a>
+						</li>
+					))}
+				</ul>
+			</nav>
 
 			<PersonalGoals
 				data={personalGoals.data}
@@ -219,7 +251,10 @@ export default function ProgressPage() {
 				onLoadMore={() => void timeline.fetchNextPage()}
 			/>
 
-			<section className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+			<section
+				id="progress-exercise"
+				className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+			>
 				<div className="min-w-0">
 					<label htmlFor="strength-exercise" className="type-label text-ink-3">
 						Exercise

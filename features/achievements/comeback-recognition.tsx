@@ -5,6 +5,7 @@ import type {
 import { RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
 	formatAchievementDate,
@@ -66,13 +67,17 @@ export function ComebackRecognition({
 				<h2 id="comeback-recognition" className="type-panel text-foreground">
 					Comeback recognition
 				</h2>
-				<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-					Time away does not erase the work of returning. A comeback is recorded
-					after {data.minimumInactiveDays} full days without a completed
-					workout, then {data.requiredActiveDays} separate training days within{' '}
-					{data.windowDays} days of returning. Sessions on the same day count
-					once.
-				</p>
+				<Explanation
+					className="mt-1"
+					summary="Time away does not erase the work of returning."
+				>
+					<p>
+						A comeback is recorded after {data.minimumInactiveDays} full days
+						without a completed workout, then {data.requiredActiveDays} separate
+						training days within {data.windowDays} days of returning. Sessions
+						on the same day count once.
+					</p>
+				</Explanation>
 			</div>
 
 			{data.recognitions.length ? (

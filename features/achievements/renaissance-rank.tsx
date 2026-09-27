@@ -1,5 +1,6 @@
 import type { RenaissanceRankProgress } from '@sunsteel/contracts'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import {
@@ -32,10 +33,13 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 				<h2 id="renaissance-rank" className="type-panel text-foreground">
 					Renaissance rank
 				</h2>
-				<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-					Earned through completed sessions and active training weeks, never
-					weight moved. An active week has at least one completed session.
-				</p>
+				{/* UX-07: the rule in one line, the definition one tap away. */}
+				<Explanation
+					className="mt-1"
+					summary="Earned through completed sessions and active training weeks, never weight moved."
+				>
+					<p>An active week has at least one completed session.</p>
+				</Explanation>
 			</div>
 
 			<div className="grid border-y border-rule lg:grid-cols-2">

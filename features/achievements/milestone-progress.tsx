@@ -4,6 +4,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Check, Flag } from 'lucide-react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
@@ -76,11 +77,17 @@ export function MilestoneProgress({ data, isPending }: MilestoneProgressProps) {
 				<h2 id="next-milestones" className="type-panel text-foreground">
 					Next milestones
 				</h2>
-				<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-					One fixed next milestone in each category, with no deadline.
-					Categories stay in a stable order, not ranked by what is closest.
-					Follow your plan, use appropriate loads, and keep recovery days.
-				</p>
+				{/* UX-07: the safety guidance stays in view (ACH-04, design system
+				    §20.1); only how the list is ordered moves behind the control. */}
+				<Explanation
+					className="mt-1"
+					summary="Follow your plan, use appropriate loads, and keep recovery days."
+				>
+					<p>
+						One fixed next milestone in each category, with no deadline.
+						Categories stay in a stable order, not ranked by what is closest.
+					</p>
+				</Explanation>
 			</div>
 
 			<ul className="border-y border-rule">

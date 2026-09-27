@@ -9,6 +9,7 @@ import { Gauge, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -166,6 +167,9 @@ export function PlateauWatch({
 	saveFailed,
 	onMinSessionsChange,
 }: PlateauWatchProps) {
+	// UX-04: the first three lifts, then "Show N more" (§20.2).
+	const shownPlateaus = useShowMore(data?.plateaus ?? [], 3)
+
 	return (
 		<section
 			aria-labelledby="plateau-watch"
@@ -230,16 +234,24 @@ export function PlateauWatch({
 					{...getPlateauEmptyState(data.checkedExercises, data.thresholds)}
 				/>
 			) : (
-				<ul className="border-t border-rule-faint">
-					{data.plateaus.map(plateau => (
-						<PlateauRow
-							key={plateau.exerciseId}
-							plateau={plateau}
-							thresholds={data.thresholds}
-							weightUnit={weightUnit}
-						/>
-					))}
-				</ul>
+				<div>
+					<ul id="plateau-watch-list" className="border-t border-rule-faint">
+						{shownPlateaus.visible.map(plateau => (
+							<PlateauRow
+								key={plateau.exerciseId}
+								plateau={plateau}
+								thresholds={data.thresholds}
+								weightUnit={weightUnit}
+							/>
+						))}
+					</ul>
+					<ShowMoreButton
+						label={shownPlateaus.label}
+						expanded={shownPlateaus.expanded}
+						onToggle={shownPlateaus.toggle}
+						controls="plateau-watch-list"
+					/>
+				</div>
 			)}
 		</section>
 	)
