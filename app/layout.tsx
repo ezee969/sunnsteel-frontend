@@ -52,7 +52,7 @@ const SHOW_PERF_PANEL = SHOULD_SHOW_PERFORMANCE_PANEL
 
 export const metadata: Metadata = {
 	title: {
-		default: 'SUNNSTEEL',
+		default: 'Sunnsteel',
 		template: '%s | Sunnsteel',
 	},
 	description: 'More than a routine logbook.',
@@ -67,17 +67,17 @@ export const metadata: Metadata = {
 		'ejercicio en casa',
 	],
 	authors: [{ name: 'Sunnsteel Team' }],
-	creator: 'SUNNSTEEL',
+	creator: 'Sunnsteel',
 	publisher: 'Sunnsteel',
 	metadataBase: new URL(PUBLIC_ENV.FRONTEND_URL),
 	alternates: {
 		canonical: '/',
 	},
 	openGraph: {
-		title: 'SUNNSTEEL',
+		title: 'Sunnsteel',
 		description: 'More than a routine logbook.',
 		url: '/',
-		siteName: 'SUNNSTEEL',
+		siteName: 'Sunnsteel',
 		images: [
 			{
 				url: '/og-image.jpg',
