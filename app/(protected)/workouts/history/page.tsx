@@ -162,20 +162,22 @@ function WorkoutHistoryContent() {
 			    the whole list is gone. The section heading and its rule carry the
 			    region instead. */}
 			<section>
-				<div className="rule-heading flex flex-col gap-2 pb-2 sm:flex-row sm:items-end sm:justify-between">
-					<div>
-						<h2 className="type-section text-foreground">Workout History</h2>
-						<p className="type-body-sm text-ink-3">
-							Browse your past workout sessions with filters.
-						</p>
-					</div>
+				<p className="type-body-sm text-ink-3">
+					Browse your past workout sessions with filters.
+				</p>
+				{/* UX-03 and design system §20.2: the list is the page, so the page
+				    scrolls and this row stays pinned with the Filter control on it.
+				    `-top-3 sm:-top-6` cancels <main>'s padding and `-mx-4` this
+				    page's own, so rows pass under an opaque edge. */}
+				<div className="rule-heading sticky -top-3 z-10 -mx-4 flex items-center justify-between gap-3 bg-background px-4 pb-2 pt-2 sm:-top-6">
+					<h2 className="type-section text-foreground">Workout History</h2>
 					<Button
 						variant="outline"
 						size="sm"
 						onClick={handleToggleFilters}
 						aria-expanded={isFiltersOpen}
 						aria-controls="workout-history-filters"
-						className="inline-flex items-center gap-1 self-start sm:self-auto"
+						className="inline-flex h-11 shrink-0 items-center gap-1 sm:h-9"
 					>
 						<span>Filter</span>
 						<ChevronDown

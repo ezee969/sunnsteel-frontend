@@ -139,3 +139,23 @@ export function markReadInCache(
 		unreadCount: ids ? Math.max(0, data.unreadCount - marked) : 0,
 	}
 }
+
+/**
+ * UX-09: how many updates each group, New and Earlier, shows before its own
+ * "Show N more". New is bounded too: an account that rarely opens the page
+ * can hold dozens of unread updates, and the control always names how many
+ * more there are, so nothing new is hidden without its count on screen.
+ */
+export const NEW_NOTIFICATIONS_SHOWN = 5
+export const EARLIER_NOTIFICATIONS_SHOWN = 5
+
+/** Unread first and read after, each newest first as the server sent them. */
+export function splitByRead(notifications: readonly AppNotification[]): {
+	unread: AppNotification[]
+	read: AppNotification[]
+} {
+	return {
+		unread: notifications.filter(n => !n.readAt),
+		read: notifications.filter(n => Boolean(n.readAt)),
+	}
+}

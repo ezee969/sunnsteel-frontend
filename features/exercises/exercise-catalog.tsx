@@ -7,6 +7,7 @@ import {
 	Plus,
 	RefreshCw,
 	Search,
+	SlidersHorizontal,
 	Star,
 	UserRound,
 	X,
@@ -30,6 +31,7 @@ import {
 	isCustomExercise,
 } from '@/lib/utils/custom-exercises'
 import {
+	activeCatalogFilterCount,
 	type CatalogEquipmentFilter,
 	catalogFilterOptions,
 	type CatalogOption,
@@ -308,6 +310,10 @@ export function ExerciseCatalog() {
 		? customCount
 		: exercises.filter(exercise => !isArchivedExercise(exercise)).length
 	const hasActiveFilters = hasActiveCatalogFilters(filters)
+	const filterCount = activeCatalogFilterCount(filters)
+	// UX-05: closed on a phone until asked for; ignored from `lg`, where the
+	// panel always shows.
+	const [filtersOpen, setFiltersOpen] = useState(false)
 	const usesGym = filters.equipment === GYM_EQUIPMENT_FILTER
 
 	let body: ReactNode
@@ -397,121 +403,149 @@ export function ExerciseCatalog() {
 
 	return (
 		<>
-			<section aria-label="Filter exercises" className="space-y-3">
-				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-					<div className="flex min-w-0 flex-col gap-1">
-						<Label htmlFor="exercise-search">Search</Label>
-						<div className="relative">
-							<Search
-								className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3"
-								aria-hidden
-							/>
-							<Input
-								id="exercise-search"
-								type="search"
-								autoComplete="off"
-								placeholder="Exercise name"
-								className="pl-9"
-								value={filters.q}
-								onChange={event => setQuery(event.target.value)}
-							/>
-						</div>
+			{/* UX-05 and design system §20.2: below `lg` the search and a Filters
+			    toggle share one row pinned at the top of <main> (its negative
+			    top cancels <main>'s padding). It sits in the page column, not
+			    in the filter section, because a sticky element cannot leave its
+			    parent. The other filters open under it; from `lg` everything
+			    shows, as before. */}
+			<div
+				role="search"
+				aria-label="Search exercises"
+				className="sticky -top-3 z-10 -mx-3 -mb-3 flex items-end gap-2 bg-background px-3 py-2 sm:-top-6 sm:-mx-6 sm:-mb-5 sm:px-6 lg:static lg:m-0 lg:p-0"
+			>
+				<div className="flex min-w-0 flex-1 flex-col gap-1">
+					<Label htmlFor="exercise-search">Search</Label>
+					<div className="relative">
+						<Search
+							className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3"
+							aria-hidden
+						/>
+						<Input
+							id="exercise-search"
+							type="search"
+							autoComplete="off"
+							placeholder="Exercise name"
+							className="pl-9"
+							value={filters.q}
+							onChange={event => setQuery(event.target.value)}
+						/>
 					</div>
-					<FilterSelect<MuscleGroup>
-						id="exercise-muscle"
-						label="Muscle"
-						anyLabel="Any muscle"
-						value={filters.muscle}
-						options={options.muscles}
-						disabled={!catalog.data}
-						onChange={muscle => update({ muscle })}
-					/>
-					<FilterSelect<CatalogEquipmentFilter>
-						id="exercise-equipment"
-						label="Equipment"
-						anyLabel="Any equipment"
-						value={filters.equipment}
-						options={options.equipment}
-						disabled={!catalog.data}
-						onChange={equipment => update({ equipment })}
-					>
-						{listedEquipment || usesGym ? (
-							<option value={GYM_EQUIPMENT_FILTER}>
-								{gym ? `Listed at ${gym.name}` : 'Listed at your gym'}
-							</option>
-						) : null}
-					</FilterSelect>
-					<FilterSelect<MovementPattern>
-						id="exercise-pattern"
-						label="Movement"
-						anyLabel="Any movement"
-						value={filters.pattern}
-						options={options.patterns}
-						disabled={!catalog.data}
-						onChange={pattern => update({ pattern })}
-					/>
 				</div>
-				<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-					<Button
-						type="button"
-						size="sm"
-						variant={filters.trained ? 'secondary' : 'outline'}
-						aria-pressed={filters.trained}
-						onClick={() => update({ trained: !filters.trained })}
-					>
-						{filters.trained ? (
-							<Check className="size-4" aria-hidden />
-						) : (
-							<History className="size-4" aria-hidden />
-						)}
-						Trained by me
-					</Button>
-					<Button
-						type="button"
-						size="sm"
-						variant={filters.starred ? 'secondary' : 'outline'}
-						aria-pressed={filters.starred}
-						onClick={() => update({ starred: !filters.starred })}
-					>
-						{filters.starred ? (
-							<Check className="size-4" aria-hidden />
-						) : (
-							<Star className="size-4" aria-hidden />
-						)}
-						Starred
-					</Button>
-					<Button
-						type="button"
-						size="sm"
-						variant={filters.mine ? 'secondary' : 'outline'}
-						aria-pressed={filters.mine}
-						onClick={() => update({ mine: !filters.mine })}
-					>
-						{filters.mine ? (
-							<Check className="size-4" aria-hidden />
-						) : (
-							<UserRound className="size-4" aria-hidden />
-						)}
-						Yours
-					</Button>
-					{trained.isError && !filters.trained ? (
-						<p className="type-body-sm text-ink-3">
-							Training history is unavailable.{' '}
-							<button
-								type="button"
-								className="text-primary underline-offset-4 hover:underline"
-								onClick={() => void trained.refetch()}
-							>
-								Retry
-							</button>
-						</p>
-					) : null}
-					{hasActiveFilters ? (
-						<Button type="button" size="sm" variant="ghost" onClick={clear}>
-							<X className="size-4" aria-hidden />
-							Clear filters
+				<Button
+					type="button"
+					variant={filterCount > 0 ? 'secondary' : 'outline'}
+					aria-expanded={filtersOpen}
+					aria-controls="exercise-filters"
+					onClick={() => setFiltersOpen(open => !open)}
+					className="h-11 shrink-0 lg:hidden"
+				>
+					<SlidersHorizontal className="size-4" aria-hidden />
+					{filterCount > 0 ? `Filters (${filterCount})` : 'Filters'}
+				</Button>
+			</div>
+			<section aria-label="Filter exercises" className="space-y-3">
+				<div
+					id="exercise-filters"
+					className={`space-y-3 ${filtersOpen ? 'block' : 'hidden'} lg:block`}
+				>
+					<div className="grid gap-3 sm:grid-cols-3">
+						<FilterSelect<MuscleGroup>
+							id="exercise-muscle"
+							label="Muscle"
+							anyLabel="Any muscle"
+							value={filters.muscle}
+							options={options.muscles}
+							disabled={!catalog.data}
+							onChange={muscle => update({ muscle })}
+						/>
+						<FilterSelect<CatalogEquipmentFilter>
+							id="exercise-equipment"
+							label="Equipment"
+							anyLabel="Any equipment"
+							value={filters.equipment}
+							options={options.equipment}
+							disabled={!catalog.data}
+							onChange={equipment => update({ equipment })}
+						>
+							{listedEquipment || usesGym ? (
+								<option value={GYM_EQUIPMENT_FILTER}>
+									{gym ? `Listed at ${gym.name}` : 'Listed at your gym'}
+								</option>
+							) : null}
+						</FilterSelect>
+						<FilterSelect<MovementPattern>
+							id="exercise-pattern"
+							label="Movement"
+							anyLabel="Any movement"
+							value={filters.pattern}
+							options={options.patterns}
+							disabled={!catalog.data}
+							onChange={pattern => update({ pattern })}
+						/>
+					</div>
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+						<Button
+							type="button"
+							size="sm"
+							variant={filters.trained ? 'secondary' : 'outline'}
+							aria-pressed={filters.trained}
+							onClick={() => update({ trained: !filters.trained })}
+						>
+							{filters.trained ? (
+								<Check className="size-4" aria-hidden />
+							) : (
+								<History className="size-4" aria-hidden />
+							)}
+							Trained by me
 						</Button>
-					) : null}
+						<Button
+							type="button"
+							size="sm"
+							variant={filters.starred ? 'secondary' : 'outline'}
+							aria-pressed={filters.starred}
+							onClick={() => update({ starred: !filters.starred })}
+						>
+							{filters.starred ? (
+								<Check className="size-4" aria-hidden />
+							) : (
+								<Star className="size-4" aria-hidden />
+							)}
+							Starred
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							variant={filters.mine ? 'secondary' : 'outline'}
+							aria-pressed={filters.mine}
+							onClick={() => update({ mine: !filters.mine })}
+						>
+							{filters.mine ? (
+								<Check className="size-4" aria-hidden />
+							) : (
+								<UserRound className="size-4" aria-hidden />
+							)}
+							Yours
+						</Button>
+						{trained.isError && !filters.trained ? (
+							<p className="type-body-sm text-ink-3">
+								Training history is unavailable.{' '}
+								<button
+									type="button"
+									className="text-primary underline-offset-4 hover:underline"
+									onClick={() => void trained.refetch()}
+								>
+									Retry
+								</button>
+							</p>
+						) : null}
+						{hasActiveFilters ? (
+							<Button type="button" size="sm" variant="ghost" onClick={clear}>
+								<X className="size-4" aria-hidden />
+								Clear filters
+							</Button>
+						) : null}
+					</div>
 				</div>
 			</section>
 

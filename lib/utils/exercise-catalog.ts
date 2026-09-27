@@ -134,6 +134,22 @@ export function hasActiveCatalogFilters(filters: CatalogFilters): boolean {
 }
 
 /**
+ * UX-05: how many filters besides the name search are narrowing the list,
+ * shown on the phone's "Filters" toggle so a closed panel still says it is
+ * doing something.
+ */
+export function activeCatalogFilterCount(filters: CatalogFilters): number {
+	return [
+		filters.muscle,
+		filters.equipment,
+		filters.pattern,
+		filters.trained,
+		filters.starred,
+		filters.mine,
+	].filter(Boolean).length
+}
+
+/**
  * Every required item is listed at the gym. Bodyweight never needs listing,
  * as in the alternatives ranking. An exercise with no known requirements is
  * not claimed to fit.

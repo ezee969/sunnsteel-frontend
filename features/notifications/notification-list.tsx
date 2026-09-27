@@ -18,10 +18,16 @@ import {
 import Link from 'next/link'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatTimeAgo } from '@/lib/utils/date'
-import { describeNotification } from '@/lib/utils/notifications'
+import {
+	describeNotification,
+	EARLIER_NOTIFICATIONS_SHOWN,
+	NEW_NOTIFICATIONS_SHOWN,
+	splitByRead,
+} from '@/lib/utils/notifications'
 
 const KIND_ICON = {
 	ACHIEVEMENT: Medal,
@@ -78,6 +84,74 @@ function NotificationRow({
 				</span>
 			</Link>
 		</li>
+	)
+}
+
+/**
+ * UX-09: unread updates under New, then read ones under Earlier, each group
+ * showing its first few and a "Show N more" that names the rest. The page
+ * keeps its one scroll (design system §20.2).
+ */
+function GroupedNotifications({
+	notifications,
+	now,
+	onOpen,
+}: {
+	notifications: readonly AppNotification[]
+	now: Date
+	onOpen: (id: string) => void
+}) {
+	const { unread, read } = splitByRead(notifications)
+	const fresh = useShowMore(unread, NEW_NOTIFICATIONS_SHOWN)
+	const earlier = useShowMore(read, EARLIER_NOTIFICATIONS_SHOWN)
+	const titled = unread.length > 0 && read.length > 0
+	return (
+		<>
+			{unread.length > 0 ? (
+				<div>
+					{titled ? <h3 className="type-label text-ink-3">New</h3> : null}
+					<ul id="notifications-new">
+						{fresh.visible.map(notification => (
+							<NotificationRow
+								key={notification.id}
+								notification={notification}
+								now={now}
+								onOpen={onOpen}
+							/>
+						))}
+					</ul>
+					<ShowMoreButton
+						label={fresh.label}
+						expanded={fresh.expanded}
+						onToggle={fresh.toggle}
+						controls="notifications-new"
+					/>
+				</div>
+			) : null}
+			{read.length > 0 ? (
+				<div>
+					{titled ? (
+						<h3 className="type-label pt-2 text-ink-3">Earlier</h3>
+					) : null}
+					<ul id="notifications-earlier">
+						{earlier.visible.map(notification => (
+							<NotificationRow
+								key={notification.id}
+								notification={notification}
+								now={now}
+								onOpen={onOpen}
+							/>
+						))}
+					</ul>
+					<ShowMoreButton
+						label={earlier.label}
+						expanded={earlier.expanded}
+						onToggle={earlier.toggle}
+						controls="notifications-earlier"
+					/>
+				</div>
+			) : null}
+		</>
 	)
 }
 
@@ -168,16 +242,11 @@ export function NotificationList({
 					<p className="sr-only" aria-live="polite">
 						{unread > 0 ? `${unread} unread` : 'All read'}
 					</p>
-					<ul>
-						{data.notifications.map(notification => (
-							<NotificationRow
-								key={notification.id}
-								notification={notification}
-								now={now}
-								onOpen={onOpen}
-							/>
-						))}
-					</ul>
+					<GroupedNotifications
+						notifications={data.notifications}
+						now={now}
+						onOpen={onOpen}
+					/>
 				</>
 			)}
 		</section>

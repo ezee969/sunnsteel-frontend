@@ -6,9 +6,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
 	describeNotification,
+	EARLIER_NOTIFICATIONS_SHOWN,
 	markReadInCache,
+	NEW_NOTIFICATIONS_SHOWN,
 	notificationsBellLabel,
 	sessionProgressSummary,
+	splitByRead,
 } from './notifications'
 
 const base = { createdAt: '2026-09-14T19:00:00.000Z', readAt: null }
@@ -169,5 +172,24 @@ describe('notifications (NOTIF-01)', () => {
 		const all = markReadInCache(data, undefined, now)
 		expect(all.unreadCount).toBe(0)
 		expect(all.notifications.every(n => n.readAt)).toBe(true)
+	})
+})
+
+describe('splitting updates into new and earlier (UX-09)', () => {
+	it('keeps every unread update and the server order in each group', () => {
+		const list: AppNotification[] = [
+			{ ...achievement, id: 'a' },
+			{ ...achievement, id: 'b', readAt: '2026-09-15T10:00:00.000Z' },
+			{ ...achievement, id: 'c' },
+			{ ...achievement, id: 'd', readAt: '2026-09-15T11:00:00.000Z' },
+		]
+		const { unread, read } = splitByRead(list)
+		expect(unread.map(n => n.id)).toEqual(['a', 'c'])
+		expect(read.map(n => n.id)).toEqual(['b', 'd'])
+	})
+
+	it('shows a few of each group before asking', () => {
+		expect(NEW_NOTIFICATIONS_SHOWN).toBeGreaterThan(0)
+		expect(EARLIER_NOTIFICATIONS_SHOWN).toBeGreaterThan(0)
 	})
 })

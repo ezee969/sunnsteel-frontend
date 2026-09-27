@@ -2,6 +2,7 @@ import type { Exercise } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
+	activeCatalogFilterCount,
 	catalogFilterOptions,
 	EMPTY_CATALOG_FILTERS,
 	filterCatalog,
@@ -281,5 +282,22 @@ describe('catalog copy', () => {
 			title: 'No exercises match these filters',
 			action: { kind: 'clear-filters' },
 		})
+	})
+})
+
+describe('the phone filter toggle count (UX-05)', () => {
+	it('counts every narrowing filter but the name search', () => {
+		expect(activeCatalogFilterCount(EMPTY_CATALOG_FILTERS)).toBe(0)
+		expect(
+			activeCatalogFilterCount({ ...EMPTY_CATALOG_FILTERS, q: 'press' }),
+		).toBe(0)
+		expect(
+			activeCatalogFilterCount({
+				...EMPTY_CATALOG_FILTERS,
+				muscle: 'PECTORAL',
+				trained: true,
+				mine: true,
+			}),
+		).toBe(3)
 	})
 })
