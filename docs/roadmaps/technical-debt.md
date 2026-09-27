@@ -18,8 +18,8 @@ Quick Workout problems are not duplicated here.
 ## Active debt
 
 `TD-56`, the double reload and splash after a deploy, was recorded and closed
-on 2026-09-27. `TD-54` is open, recorded on 2026-09-27 during the owner's mobile-density
-review; `TD-55`, from the same review, closed the same day. Their product-side companions are the `UX-*` items in the
+on 2026-09-27. There are no open entries. `TD-54` and `TD-55`, both from the owner's
+mobile-density review, were recorded and closed on 2026-09-27. Their product-side companions are the `UX-*` items in the
 roadmap's [Page density and long lists](product-roadmap.md#page-density-and-long-lists)
 section. `TD-53`, the sweep's training-partner test depending on local data,
 and `TD-52`, stacked dialog footers that put Cancel above the primary, both
@@ -41,7 +41,7 @@ actionable residue is recorded here.
 
 <a id="td-54"></a>
 
-### TD-54 — On a phone, /routines gives Create Routine a row of its own
+### TD-54 — On a phone, /routines gives Create Routine a row of its own — CLOSED 2026-09-27
 
 **Impact.** Below `sm`, Create Routine sits alone at the right of its own
 row, between the masthead and the filters. The left two-thirds of that row
@@ -88,6 +88,32 @@ dark theme:
 - The first routine starts no lower than the masthead plus one row of controls.
 - The loading and loaded headers occupy the same height.
 - The scoped sweep `layout routines` passes.
+
+**Closed 2026-09-27**, shipped with `UX-01`, whose §20 decides the scroll
+question: the owner chose one scroll per page, with the controls pinned.
+
+- **The fix.** The filter and Create Routine share one row that is
+  `sticky` at the top of `<main>`. Its negative top cancels `<main>`'s
+  padding, which a sticky offset is measured inside, so no row shows above
+  it. Below `lg` the four filter buttons are one `NativeSelect` ("All
+  routines", Favorites, Completed and the still-disabled Recent), because
+  inside the shell they wrapped or pushed Create Routine onto a row of its
+  own at every width up to 1023. From `lg` the buttons return, and the
+  selected one is `secondary` rather than filled, so Create Routine is the
+  row's one filled action (§11.4). Create Routine matches the select's
+  height, 44px until `md`. `WorkoutsList` no longer scrolls in a box of its
+  own, and `loading.tsx` draws the same one-row toolbar.
+- **Measured** on the worktree stack (`:3100` against a second backend on
+  `:4100`, the owner's local data) at 320, 390, 430, 639, 640, 767, 768,
+  1023, 1024, 1280 and 1440, in both themes. Each width has one toolbar row,
+  no inner scroll container and no sideways scroll. The first routine
+  starts 165px below the top of `<main>` below `sm` (it was about 330px at
+  330) and 194px from `md`. Scrolled 189px, the toolbar sits at 0. The
+  select still filters: Favorites showed 1 routine and All 2.
+- **Sweep:** `layout (routines|schedule) @` plus the dropdown, hover and
+  keyboard-focus suites, 56/56 at one worker.
+- **Not verified:** a touch device, and the loading state's height against
+  the loaded one; the loading file was read, not measured.
 
 <a id="td-55"></a>
 
@@ -1000,6 +1026,10 @@ written in Spanish and kept frozen as a historical record. It must not be used a
 a list of active debt.
 
 ## Document history
+
+- **2026-09-27 (revision 31):** Closed `TD-54` with `UX-01`: /routines keeps
+  its filter and Create Routine on one pinned row, and its list no longer
+  scrolls inside the page. The register is empty again.
 
 - **2026-09-27 (revision 30):** Recorded and closed `TD-56`: after a deploy,
   a sidebar click loaded the app twice (Next's build-ID hard navigation, then
