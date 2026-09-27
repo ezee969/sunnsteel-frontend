@@ -285,7 +285,7 @@ export function OwnActivity() {
 					Choose who sees each entry, or withdraw one. Defaults for each kind
 					are in{' '}
 					<Link
-						href="/settings#activity-sharing"
+						href="/settings/privacy#activity-sharing"
 						className="text-foreground underline underline-offset-4"
 					>
 						Settings

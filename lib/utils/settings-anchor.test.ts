@@ -30,8 +30,10 @@ describe('settings anchors (TD-55)', () => {
 
 	it('links to the select that decides a profile section', () => {
 		expect(privacySettingHref('workoutHistory')).toBe(
-			'/settings#privacy-workoutHistory',
+			'/settings/privacy#privacy-workoutHistory',
 		)
-		expect(privacySettingHref('routines')).toBe('/settings#privacy-routines')
+		expect(privacySettingHref('routines')).toBe(
+			'/settings/privacy#privacy-routines',
+		)
 	})
 })

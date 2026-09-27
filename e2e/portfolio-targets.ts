@@ -529,8 +529,16 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'The public member profile as a signed-out visitor sees it, with a branded image card ready to share or download.',
 	},
 	{
+		slug: 'settings-privacy',
+		route: '/settings/privacy',
+		features: ['PROF-06', 'PROF-09', 'UX-12'],
+		ready: ['Privacy Overview', 'Profile Privacy'],
+		caption:
+			'Settings in five tabs; Privacy gathers who can find you and who sees each part of your profile and activity.',
+	},
+	{
 		slug: 'training-partners-settings',
-		route: '/settings#training-partners',
+		route: '/settings/privacy#training-partners',
 		features: ['SOC-08'],
 		setup: async page => {
 			await page
@@ -543,7 +551,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	},
 	{
 		slug: 'download-data-settings',
-		route: '/settings',
+		route: '/settings/account',
 		features: ['EXPORT-01'],
 		setup: async page => {
 			await page
@@ -556,7 +564,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	},
 	{
 		slug: 'delete-account-settings',
-		route: '/settings',
+		route: '/settings/account',
 		features: ['TRUST-01'],
 		setup: async page => {
 			await page

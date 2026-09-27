@@ -153,7 +153,6 @@ export function ActivitySharingCard() {
 											<PrivacyCapNote
 												text={cap}
 												section={section}
-												withinSettings
 												className="type-body-sm text-ink-2"
 											/>
 										) : null}

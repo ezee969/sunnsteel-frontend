@@ -6,7 +6,8 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -29,27 +30,18 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
-import { ActivitySharingCard } from '@/features/settings/activity-sharing-card'
-import { BlockedMembersCard } from '@/features/settings/blocked-members-card'
-import { DeleteAccountCard } from '@/features/settings/delete-account-card'
-import { DownloadDataCard } from '@/features/settings/download-data-card'
 import { FeaturedRecordsSettingsCard } from '@/features/settings/featured-records-settings-card'
-import { MeasurableGoalsSettingsCard } from '@/features/settings/measurable-goals-settings-card'
-import { MotionPreferenceCard } from '@/features/settings/motion-preference-card'
-import { NotificationControlsCard } from '@/features/settings/notification-controls-card'
-import { PrivacyOverviewCard } from '@/features/settings/privacy-overview-card'
-import { ProfileDiscoverySettingsCard } from '@/features/settings/profile-discovery-settings-card'
-import { ProfilePrivacySettingsCard } from '@/features/settings/profile-privacy-settings-card'
-import { PushNotificationsCard } from '@/features/settings/push-notifications-card'
+import { SettingsTab } from '@/features/settings/settings-tab'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
-import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
-import { TrainingPartnersCard } from '@/features/settings/training-partners-card'
-import { useScrollToHash } from '@/hooks/use-scroll-to-hash'
+import { useHashForward } from '@/hooks/use-hash-forward'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { logger } from '@/lib/utils/logger'
 import { localDateKey } from '@/lib/utils/schedule-week'
+import { privacySettingHref } from '@/lib/utils/settings-anchor'
+import { SETTINGS_HASH_RULES } from '@/lib/utils/settings-tabs'
 import {
 	getUsernameValidationError,
 	normalizeUsername,
@@ -69,8 +61,17 @@ interface SettingsFormData {
 	weightUnit: WeightUnit
 }
 
-export default function SettingsPage() {
-	const { user, isLoading } = useUser()
+/**
+ * Settings › Profile (UX-12): the picture, the profile form with its one
+ * Save, training identity and featured accomplishments. An old `/settings#…`
+ * link to a card that moved is sent to its tab before anything renders.
+ */
+export default function SettingsProfilePage() {
+	const forwarding = useHashForward(SETTINGS_HASH_RULES)
+	const { user } = useUser()
+	// The saved unit, not the form's unsaved choice: featured records are
+	// shown as the profile shows them.
+	const savedWeightUnit = useWeightUnit()
 	const updateUserMutation = useUpdateUser()
 	const { push } = useToast()
 
@@ -90,11 +91,6 @@ export default function SettingsPage() {
 	const [avatarUrl, setAvatarUrl] = useState('')
 	const uploadAvatar = useUploadAvatar()
 	const uploading = uploadAvatar.isPending
-
-	// Links such as `/settings#privacy-workoutHistory` land on their section
-	// once the cards have mounted (TD-55).
-	const contentRef = useRef<HTMLDivElement>(null)
-	useScrollToHash(contentRef, !isLoading && Boolean(user))
 
 	const [cropperOpen, setCropperOpen] = useState(false)
 	const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
@@ -251,27 +247,12 @@ export default function SettingsPage() {
 		)
 	}
 
-	if (isLoading) {
-		return (
-			<div className="flex justify-center p-8">
-				<Loader2 className="h-8 w-8 animate-spin text-ink-3" />
-			</div>
-		)
-	}
+	if (forwarding) return null
 
 	const usernameError = getUsernameValidationError(formData.username)
 
 	return (
-		<div ref={contentRef} className="mx-auto max-w-4xl space-y-8">
-			<div className="rule-heading pb-4">
-				<h1 className="type-page corner-brackets inline-block text-foreground">
-					Profile Settings
-				</h1>
-				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
-					Manage your account settings and set your preferences.
-				</p>
-			</div>
-
+		<SettingsTab>
 			<div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
 				<Card>
 					<CardHeader>
@@ -405,7 +386,14 @@ export default function SettingsPage() {
 									autoComplete="address-level2"
 								/>
 								<p className="type-body-sm text-ink-3">
-									Optional. Control who sees it under Profile Privacy.
+									Optional. Control who sees it under{' '}
+									<Link
+										href={privacySettingHref('location')}
+										className="text-foreground underline underline-offset-4"
+									>
+										Profile Privacy
+									</Link>
+									.
 								</p>
 							</div>
 
@@ -527,47 +515,17 @@ export default function SettingsPage() {
 				</Card>
 			</div>
 
-			<TrainingLocationPreferencesCard weightUnit={formData.weightUnit} />
-
-			<MeasurableGoalsSettingsCard weightUnit={formData.weightUnit} />
-
-			{user ? (
-				<FeaturedRecordsSettingsCard
-					username={user.username}
-					weightUnit={formData.weightUnit}
-					accountRoutinesRule={user.privacySettings.routines}
-				/>
-			) : null}
-
 			{user ? (
 				<TrainingIdentitySettingsCard identity={user.trainingIdentity} />
 			) : null}
 
-			{user ? <PrivacyOverviewCard profile={user} /> : null}
-
 			{user ? (
-				<ProfileDiscoverySettingsCard settings={user.discoverySettings} />
+				<FeaturedRecordsSettingsCard
+					username={user.username}
+					weightUnit={savedWeightUnit}
+					accountRoutinesRule={user.privacySettings.routines}
+				/>
 			) : null}
-
-			{user ? (
-				<ProfilePrivacySettingsCard settings={user.privacySettings} />
-			) : null}
-
-			<ActivitySharingCard />
-
-			<TrainingPartnersCard />
-
-			<BlockedMembersCard />
-
-			<PushNotificationsCard />
-
-			<NotificationControlsCard />
-
-			<MotionPreferenceCard />
-
-			<DownloadDataCard />
-
-			{user ? <DeleteAccountCard profile={user} /> : null}
 
 			<ImageCropper
 				open={cropperOpen}
@@ -575,6 +533,6 @@ export default function SettingsPage() {
 				imageSrc={selectedImageSrc}
 				onCropComplete={handleCroppedImageUpload}
 			/>
-		</div>
+		</SettingsTab>
 	)
 }

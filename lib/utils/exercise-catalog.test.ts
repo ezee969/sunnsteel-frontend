@@ -242,7 +242,7 @@ describe('catalog copy', () => {
 	it('explains when the gym filter has no equipment to compare', () => {
 		expect(getGymFilterUnavailableState('Home Gym')).toMatchObject({
 			title: 'Home Gym lists no equipment',
-			action: { kind: 'link', href: '/settings' },
+			action: { kind: 'link', href: '/settings/training' },
 		})
 		expect(getGymFilterUnavailableState(null).title).toBe(
 			'No training location yet',

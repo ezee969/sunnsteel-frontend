@@ -63,7 +63,7 @@ function EquipmentCheckLine({ check }: { check: EquipmentCheck }) {
 				<p className="type-body-sm text-ink-3">
 					Add your gym&apos;s equipment in{' '}
 					<Link
-						href="/settings"
+						href="/settings/training"
 						className="text-ink underline underline-offset-4"
 					>
 						Settings

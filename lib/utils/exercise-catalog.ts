@@ -297,7 +297,11 @@ export function getGymFilterUnavailableState(
 			: 'No training location yet',
 		description:
 			'List the equipment you train with on your default training location in Settings to filter by it.',
-		action: { kind: 'link', label: 'Open Settings', href: '/settings' },
+		action: {
+			kind: 'link',
+			label: 'Open Settings',
+			href: '/settings/training',
+		},
 	}
 }
 

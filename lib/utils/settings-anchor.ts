@@ -32,9 +32,12 @@ export function hashTargetPlacement(tagName: string): 'control' | 'section' {
 		: 'section'
 }
 
-/** The one select in Settings that decides who sees a profile section. */
+/**
+ * The one select that decides who sees a profile section, on Settings ›
+ * Privacy (UX-12).
+ */
 export function privacySettingHref(
 	section: keyof ProfilePrivacySettings,
 ): string {
-	return `/settings#privacy-${section}`
+	return `/settings/privacy#privacy-${section}`
 }

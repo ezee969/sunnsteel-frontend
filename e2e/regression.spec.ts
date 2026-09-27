@@ -438,6 +438,11 @@ const ROUTES: SweepRoute[] = [
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
 	{ slug: 'settings', path: () => '/settings' },
+	// UX-12: Settings' other four tabs.
+	{ slug: 'settings-training', path: () => '/settings/training' },
+	{ slug: 'settings-privacy', path: () => '/settings/privacy' },
+	{ slug: 'settings-notifications', path: () => '/settings/notifications' },
+	{ slug: 'settings-account', path: () => '/settings/account' },
 	// TRUST-04. The sweep signs in as the owner, who holds the moderator flag,
 	// so the page renders its own content rather than its not-found branch.
 	{ slug: 'moderation', path: () => '/moderation' },
@@ -858,6 +863,16 @@ const PARTNER_CANDIDATES = [
 	'nadia-haddad',
 ]
 
+test('an old Settings link opens its tab', async ({ page }) => {
+	await prepare(page, 1280, 'dark')
+	// UX-12: links written before the tabs name a card on the one page.
+	await load(page, '/settings#training-partners')
+	await expect(page).toHaveURL(/\/settings\/privacy#training-partners$/)
+	await expect(
+		page.getByRole('heading', { name: 'Training Partners' }),
+	).toBeInViewport()
+})
+
 test('training partners request and cancel', async ({ page }) => {
 	await prepare(page, 1280, 'dark')
 
@@ -870,7 +885,7 @@ test('training partners request and cancel', async ({ page }) => {
 			response.request().method() === 'GET' &&
 			new URL(response.url()).pathname.endsWith('/users/me/training-partners'),
 	)
-	await load(page, '/settings#training-partners')
+	await load(page, '/settings/privacy#training-partners')
 	const { items } = (await (
 		await listed
 	).json()) as TrainingPartnershipsResponse
@@ -905,7 +920,7 @@ test('training partners request and cancel', async ({ page }) => {
 			page.getByRole('button', { name: 'Request Pending' }),
 		).toBeDisabled()
 
-		await load(page, '/settings#training-partners')
+		await load(page, '/settings/privacy#training-partners')
 		await expect(
 			page.getByRole('heading', { name: 'Training Partners' }),
 		).toBeVisible()
@@ -913,7 +928,7 @@ test('training partners request and cancel', async ({ page }) => {
 	} finally {
 		if (requestCreated) {
 			if (!/\/settings/.test(pathOf(page))) {
-				await load(page, '/settings#training-partners')
+				await load(page, '/settings/privacy#training-partners')
 			}
 			// Scoped to its row: other pending requests may sit beside it.
 			const cancel = page

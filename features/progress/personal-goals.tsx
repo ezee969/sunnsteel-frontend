@@ -155,7 +155,7 @@ export function PersonalGoals({
 					</p>
 				</div>
 				<Button asChild variant="outline" size="sm">
-					<Link href="/settings">Manage goals</Link>
+					<Link href="/settings/training">Manage goals</Link>
 				</Button>
 			</div>
 

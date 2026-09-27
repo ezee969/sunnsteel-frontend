@@ -611,7 +611,7 @@ export function BodyProgressSection({
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							Your weight and measurements over time. Who else sees them is your{' '}
 							<Link
-								href="/settings#privacy-bodyProgress"
+								href="/settings/privacy#privacy-bodyProgress"
 								className="underline underline-offset-4"
 							>
 								body progress privacy setting

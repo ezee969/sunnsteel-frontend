@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
+import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -137,6 +138,9 @@ function selectedItemPresentation(
 	}
 }
 
+/** Rows of each list of choices shown before "Show N more" (UX-12). */
+const CHOICES_SHOWN = 5
+
 export function FeaturedRecordsSettingsCard({
 	username,
 	weightUnit,
@@ -211,6 +215,12 @@ export function FeaturedRecordsSettingsCard({
 	const availableRoutines = shareableRoutines.filter(
 		routine => !selectedKeys.has(`ROUTINE:${routine.id}`),
 	)
+	// Design system §20.2: each list of choices shows its first rows and names
+	// how many more there are, so the card never runs the page long.
+	const shownRecords = useShowMore(availableRecords, CHOICES_SHOWN)
+	const shownAchievements = useShowMore(availableAchievements, CHOICES_SHOWN)
+	const shownRoutines = useShowMore(availableRoutines, CHOICES_SHOWN)
+	const shownRanks = useShowMore(availableRanks, CHOICES_SHOWN)
 	const hasSelectedRank = drafts.some(item => item.kind === 'RANK')
 	const slotsFull = drafts.length >= FEATURED_PROFILE_ITEMS_MAX
 	const savedKeys =
@@ -403,39 +413,47 @@ export function FeaturedRecordsSettingsCard({
 								<p className="type-label border-b border-rule pb-2 text-ink-3">
 									Available records
 								</p>
-								{availableRecords.map(record => (
-									<div
-										key={record.exerciseId}
-										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-									>
-										<div>
-											<p className="type-panel text-foreground">
-												{record.exerciseName}
-											</p>
-											<p className="type-body-sm text-ink-3">
-												{recordSummary(record, weightUnit)}
-											</p>
-										</div>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											aria-label={`Feature ${record.exerciseName}`}
-											disabled={slotsFull}
-											onClick={() =>
-												setDrafts(current =>
-													addFeaturedProfileItem(
-														current,
-														'RECORD',
-														record.exerciseId,
-													),
-												)
-											}
+								<div id="featured-choices-records">
+									{shownRecords.visible.map(record => (
+										<div
+											key={record.exerciseId}
+											className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
 										>
-											<Plus className="size-4" aria-hidden /> Feature
-										</Button>
-									</div>
-								))}
+											<div>
+												<p className="type-panel text-foreground">
+													{record.exerciseName}
+												</p>
+												<p className="type-body-sm text-ink-3">
+													{recordSummary(record, weightUnit)}
+												</p>
+											</div>
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												aria-label={`Feature ${record.exerciseName}`}
+												disabled={slotsFull}
+												onClick={() =>
+													setDrafts(current =>
+														addFeaturedProfileItem(
+															current,
+															'RECORD',
+															record.exerciseId,
+														),
+													)
+												}
+											>
+												<Plus className="size-4" aria-hidden /> Feature{' '}
+											</Button>{' '}
+										</div>
+									))}
+								</div>
+								<ShowMoreButton
+									label={shownRecords.label}
+									expanded={shownRecords.expanded}
+									onToggle={shownRecords.toggle}
+									controls="featured-choices-records"
+								/>
 							</div>
 						) : records.length === 0 ? (
 							<p className="type-body-sm text-ink-3">
@@ -449,42 +467,52 @@ export function FeaturedRecordsSettingsCard({
 								<p className="type-label text-ink-3">Earned medals</p>
 							</div>
 							{availableAchievements.length ? (
-								availableAchievements.map(achievement => (
-									<div
-										key={achievement.id}
-										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-									>
-										<div className="min-w-0">
-											<p className="type-panel text-foreground">
-												{achievement.title}
-											</p>
-											<p className="type-body-sm text-ink-2">
-												{achievement.description}
-											</p>
-											<p className="type-body-sm text-ink-3">
-												{achievementSummary(achievement)}
-											</p>
-										</div>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											aria-label={`Feature ${achievement.title}`}
-											disabled={slotsFull}
-											onClick={() =>
-												setDrafts(current =>
-													addFeaturedProfileItem(
-														current,
-														'ACHIEVEMENT',
-														achievement.id,
-													),
-												)
-											}
-										>
-											<Plus className="size-4" aria-hidden /> Feature
-										</Button>
+								<>
+									<div id="featured-choices-medals">
+										{shownAchievements.visible.map(achievement => (
+											<div
+												key={achievement.id}
+												className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+											>
+												<div className="min-w-0">
+													<p className="type-panel text-foreground">
+														{achievement.title}
+													</p>
+													<p className="type-body-sm text-ink-2">
+														{achievement.description}
+													</p>
+													<p className="type-body-sm text-ink-3">
+														{achievementSummary(achievement)}
+													</p>
+												</div>
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													aria-label={`Feature ${achievement.title}`}
+													disabled={slotsFull}
+													onClick={() =>
+														setDrafts(current =>
+															addFeaturedProfileItem(
+																current,
+																'ACHIEVEMENT',
+																achievement.id,
+															),
+														)
+													}
+												>
+													<Plus className="size-4" aria-hidden /> Feature{' '}
+												</Button>{' '}
+											</div>
+										))}
 									</div>
-								))
+									<ShowMoreButton
+										label={shownAchievements.label}
+										expanded={shownAchievements.expanded}
+										onToggle={shownAchievements.toggle}
+										controls="featured-choices-medals"
+									/>
+								</>
 							) : achievementsQuery.data?.analyticsReady ? (
 								<p className="type-body-sm py-4 text-ink-3">
 									{achievements.length
@@ -505,53 +533,62 @@ export function FeaturedRecordsSettingsCard({
 								<p className="type-label text-ink-3">Shared routines</p>
 							</div>
 							{availableRoutines.length ? (
-								availableRoutines.map(routine => {
-									const cap = describeVisibilityCap(
-										accountRoutinesRule,
-										routine.visibility,
-									)
-									return (
-										<div
-											key={routine.id}
-											className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-										>
-											<div className="min-w-0">
-												<p className="type-panel text-foreground">
-													{routine.name}
-												</p>
-												<p className="type-body-sm text-ink-3">
-													{routineSummary(routine)}
-												</p>
-												{cap ? (
-													<PrivacyCapNote
-														text={cap}
-														section="routines"
-														withinSettings
-														className="type-body-sm text-ink-3"
-													/>
-												) : null}
-											</div>
-											<Button
-												type="button"
-												variant="outline"
-												size="sm"
-												aria-label={`Feature ${routine.name}`}
-												disabled={slotsFull}
-												onClick={() =>
-													setDrafts(current =>
-														addFeaturedProfileItem(
-															current,
-															'ROUTINE',
-															routine.id,
-														),
-													)
-												}
-											>
-												<Plus className="size-4" aria-hidden /> Feature
-											</Button>
-										</div>
-									)
-								})
+								<>
+									<div id="featured-choices-routines">
+										{shownRoutines.visible.map(routine => {
+											const cap = describeVisibilityCap(
+												accountRoutinesRule,
+												routine.visibility,
+											)
+											return (
+												<div
+													key={routine.id}
+													className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+												>
+													<div className="min-w-0">
+														<p className="type-panel text-foreground">
+															{routine.name}
+														</p>
+														<p className="type-body-sm text-ink-3">
+															{routineSummary(routine)}
+														</p>
+														{cap ? (
+															<PrivacyCapNote
+																text={cap}
+																section="routines"
+																className="type-body-sm text-ink-3"
+															/>
+														) : null}
+													</div>
+													<Button
+														type="button"
+														variant="outline"
+														size="sm"
+														aria-label={`Feature ${routine.name}`}
+														disabled={slotsFull}
+														onClick={() =>
+															setDrafts(current =>
+																addFeaturedProfileItem(
+																	current,
+																	'ROUTINE',
+																	routine.id,
+																),
+															)
+														}
+													>
+														<Plus className="size-4" aria-hidden /> Feature
+													</Button>{' '}
+												</div>
+											)
+										})}
+									</div>
+									<ShowMoreButton
+										label={shownRoutines.label}
+										expanded={shownRoutines.expanded}
+										onToggle={shownRoutines.toggle}
+										controls="featured-choices-routines"
+									/>
+								</>
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
 									{describeNoFeaturableRoutines(accountRoutinesRule, {
@@ -568,38 +605,52 @@ export function FeaturedRecordsSettingsCard({
 								<p className="type-label text-ink-3">Reached ranks</p>
 							</div>
 							{availableRanks.length ? (
-								availableRanks.map(rank => (
-									<div
-										key={rank.id}
-										className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-									>
-										<div className="flex min-w-0 gap-3">
-											<RankCrest rankId={rank.id} className="mt-0.5 size-5" />
-											<div className="min-w-0">
-												<p className="type-panel text-foreground">
-													{rank.title}
-												</p>
-												<p className="type-body-sm text-ink-2">
-													{rank.description}
-												</p>
+								<>
+									<div id="featured-choices-ranks">
+										{shownRanks.visible.map(rank => (
+											<div
+												key={rank.id}
+												className="rule-row flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+											>
+												<div className="flex min-w-0 gap-3">
+													<RankCrest
+														rankId={rank.id}
+														className="mt-0.5 size-5"
+													/>
+													<div className="min-w-0">
+														<p className="type-panel text-foreground">
+															{rank.title}
+														</p>
+														<p className="type-body-sm text-ink-2">
+															{rank.description}
+														</p>
+													</div>
+												</div>
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													aria-label={`Feature ${rank.title} rank`}
+													disabled={slotsFull || hasSelectedRank}
+													onClick={() =>
+														setDrafts(current =>
+															addFeaturedProfileItem(current, 'RANK', rank.id),
+														)
+													}
+												>
+													<Plus className="size-4" aria-hidden /> Feature
+													rank{' '}
+												</Button>{' '}
 											</div>
-										</div>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											aria-label={`Feature ${rank.title} rank`}
-											disabled={slotsFull || hasSelectedRank}
-											onClick={() =>
-												setDrafts(current =>
-													addFeaturedProfileItem(current, 'RANK', rank.id),
-												)
-											}
-										>
-											<Plus className="size-4" aria-hidden /> Feature rank
-										</Button>
+										))}
 									</div>
-								))
+									<ShowMoreButton
+										label={shownRanks.label}
+										expanded={shownRanks.expanded}
+										onToggle={shownRanks.toggle}
+										controls="featured-choices-ranks"
+									/>
+								</>
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
 									{hasSelectedRank

@@ -18,11 +18,17 @@ export function useHashForward(rules: readonly HashRule[]): boolean {
 	const [forwarding, setForwarding] = useState(false)
 
 	useLayoutEffect(() => {
-		const target = tabForHash(window.location.hash, rules)
-		if (!target || target === pathname) return
-		setForwarding(true)
-		router.replace(`${target}${window.location.hash}`, { scroll: false })
-		// The rules are page constants; read them once, on arrival.
+		const forward = () => {
+			const target = tabForHash(window.location.hash, rules)
+			if (!target || target === pathname) return
+			setForwarding(true)
+			router.replace(`${target}${window.location.hash}`, { scroll: false })
+		}
+		forward()
+		// An old link followed while already on this tab changes only the hash.
+		window.addEventListener('hashchange', forward)
+		return () => window.removeEventListener('hashchange', forward)
+		// The rules are page constants and the tab's path does not change.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 

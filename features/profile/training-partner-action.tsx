@@ -102,7 +102,7 @@ export function TrainingPartnerAction({
 					</DropdownMenu>
 				) : null}
 				<Button asChild variant="outline" size="sm">
-					<Link href="/settings#training-partners">
+					<Link href="/settings/privacy#training-partners">
 						<Handshake className="mr-2 size-4" aria-hidden />
 						{label}
 					</Link>

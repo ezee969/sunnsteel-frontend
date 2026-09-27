@@ -127,7 +127,7 @@ export const PlateCalculatorDialog = ({
 							</p>
 						</div>
 						<Button asChild variant="outline">
-							<Link href="/settings">
+							<Link href="/settings/training">
 								<Settings className="h-4 w-4" />
 								Open Settings
 							</Link>
