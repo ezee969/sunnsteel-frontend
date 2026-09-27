@@ -274,7 +274,18 @@ export function describeSectionCap(
 		sectionRule === 'PRIVATE'
 			? 'nobody else'
 			: AUDIENCE_LABELS[sectionRule].toLowerCase()
-	return `Your ${PRIVACY_SECTION_LABELS[section].toLowerCase()} privacy is ${AUDIENCE_LABELS[sectionRule]}, so this reaches ${reached}. Change it in Settings under privacy.`
+	return `Your ${PRIVACY_SECTION_LABELS[section].toLowerCase()} privacy is ${AUDIENCE_LABELS[sectionRule]}, so this reaches ${reached}.`
+}
+
+/**
+ * The profile section whose privacy capped an entry, so the row can link to
+ * the one setting that changes it (UX-08); null for a routine's own cap,
+ * which is changed on the routine.
+ */
+export function activityCapSection(
+	sharing: ActivityEntrySharing,
+): ActivitySection | null {
+	return sharing.cappedBy === 'SECTION' ? sharing.section : null
 }
 
 /** The owner's list, with one entry's sharing replaced by what the server resolved. */

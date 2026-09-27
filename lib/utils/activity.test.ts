@@ -19,6 +19,7 @@ import {
 	ACTIVITY_REACTION_LABELS,
 	ACTIVITY_TYPE_DESCRIPTIONS,
 	ACTIVITY_TYPE_LABELS,
+	activityCapSection,
 	activityHref,
 	applyEntryComments,
 	applyEntryReactions,
@@ -249,11 +250,27 @@ describe('telling the owner what actually applies', () => {
 				}),
 			),
 		).toBe(
-			'Your personal records privacy is Followers, so this reaches followers. Change it in Settings under privacy.',
+			'Your personal records privacy is Followers, so this reaches followers.',
 		)
 		expect(describeSectionCap('workoutHistory', 'PRIVATE', 'PUBLIC')).toContain(
 			'reaches nobody else',
 		)
+	})
+
+	it('links a section cap to its setting, and a routine cap to nothing', () => {
+		expect(
+			activityCapSection(
+				sharing({
+					section: 'records',
+					sectionRule: 'FOLLOWERS',
+					cappedBy: 'SECTION',
+				}),
+			),
+		).toBe('records')
+		expect(
+			activityCapSection(sharing({ section: 'routines', cappedBy: 'ROUTINE' })),
+		).toBeNull()
+		expect(activityCapSection(sharing({}))).toBeNull()
 	})
 
 	it('names the routine when its own visibility narrows it', () => {

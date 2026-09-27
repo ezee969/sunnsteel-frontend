@@ -19,6 +19,7 @@ import {
 	ActivityEntryList,
 	ActivityFact,
 } from '@/features/activity/activity-entry-list'
+import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useActivityPreview,
@@ -27,6 +28,7 @@ import {
 } from '@/lib/api/hooks/useActivity'
 import {
 	ACTIVITY_EVERYONE_NOTE,
+	activityCapSection,
 	AUDIENCE_LABELS,
 	AUDIENCE_OPTIONS,
 	describeActivityCap,
@@ -124,7 +126,13 @@ function OwnActivityRow({
 						{formatTimeAgo(entry.occurredAt)}
 					</time>
 				</p>
-				{cap ? <p className="type-body-sm mt-1 text-ink-3">{cap}</p> : null}
+				{cap ? (
+					<PrivacyCapNote
+						text={cap}
+						section={activityCapSection(sharing)}
+						className="type-body-sm mt-1 text-ink-3"
+					/>
+				) : null}
 			</ActivityFact>
 			<div className="flex items-center gap-2 sm:justify-end">
 				<label htmlFor={selectId} className="sr-only">

@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
+import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	useFeaturedProfileItems,
@@ -522,7 +523,12 @@ export function FeaturedRecordsSettingsCard({
 													{routineSummary(routine)}
 												</p>
 												{cap ? (
-													<p className="type-body-sm text-ink-3">{cap}</p>
+													<PrivacyCapNote
+														text={cap}
+														section="routines"
+														withinSettings
+														className="type-body-sm text-ink-3"
+													/>
 												) : null}
 											</div>
 											<Button

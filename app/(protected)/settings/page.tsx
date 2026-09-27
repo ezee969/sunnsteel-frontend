@@ -6,7 +6,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -44,6 +44,7 @@ import { PushNotificationsCard } from '@/features/settings/push-notifications-ca
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
 import { TrainingLocationPreferencesCard } from '@/features/settings/training-location-preferences-card'
 import { TrainingPartnersCard } from '@/features/settings/training-partners-card'
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
@@ -89,6 +90,11 @@ export default function SettingsPage() {
 	const [avatarUrl, setAvatarUrl] = useState('')
 	const uploadAvatar = useUploadAvatar()
 	const uploading = uploadAvatar.isPending
+
+	// Links such as `/settings#privacy-workoutHistory` land on their section
+	// once the cards have mounted (TD-55).
+	const contentRef = useRef<HTMLDivElement>(null)
+	useScrollToHash(contentRef, !isLoading && Boolean(user))
 
 	const [cropperOpen, setCropperOpen] = useState(false)
 	const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
@@ -256,7 +262,7 @@ export default function SettingsPage() {
 	const usernameError = getUsernameValidationError(formData.username)
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8">
+		<div ref={contentRef} className="mx-auto max-w-4xl space-y-8">
 			<div className="rule-heading pb-4">
 				<h1 className="type-page corner-brackets inline-block text-foreground">
 					Profile Settings

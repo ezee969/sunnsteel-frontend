@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import {
 	useCreateRoutineShare,
 	useRevokeRoutineShare,
@@ -119,9 +120,12 @@ export function RoutineSharing({
 					}
 				</p>
 				{cap ? (
-					<p role="status" className="type-body-sm max-w-[68ch] text-ink-2">
-						{cap}
-					</p>
+					<PrivacyCapNote
+						role="status"
+						text={cap}
+						section="routines"
+						className="type-body-sm max-w-[68ch] text-ink-2"
+					/>
 				) : null}
 				{setVisibility.isError ? (
 					<p role="alert" className="type-body-sm text-ink-2">

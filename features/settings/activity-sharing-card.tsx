@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import {
 	useActivitySharing,
 	useUpdateActivitySharing,
@@ -85,7 +86,7 @@ export function ActivitySharingCard() {
 	}
 
 	return (
-		<Card id="activity-sharing">
+		<Card id="activity-sharing" className="scroll-mt-24">
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Rss className="h-5 w-5 text-primary" aria-hidden />
@@ -149,7 +150,12 @@ export function ActivitySharingCard() {
 											{ACTIVITY_TYPE_DESCRIPTIONS[type]}
 										</p>
 										{cap ? (
-											<p className="type-body-sm text-ink-2">{cap}</p>
+											<PrivacyCapNote
+												text={cap}
+												section={section}
+												withinSettings
+												className="type-body-sm text-ink-2"
+											/>
 										) : null}
 									</div>
 									<NativeSelect

@@ -40,10 +40,11 @@ describe('telling the owner when the account rule is capping them', () => {
 		expect(describeVisibilityCap('FOLLOWERS', 'FOLLOWERS')).toBeNull()
 	})
 
-	it('names who it actually reaches and where to change it', () => {
+	it('names who it actually reaches', () => {
 		const copy = describeVisibilityCap('FOLLOWERS', 'PUBLIC')
 		expect(copy).toContain('followers')
-		expect(copy).toMatch(/Settings/)
+		// Where to change it is a link beside the sentence (UX-08).
+		expect(copy).not.toMatch(/Settings/)
 	})
 
 	it('says plainly that nobody else sees it when the account is private', () => {

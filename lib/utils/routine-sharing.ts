@@ -68,7 +68,7 @@ export function describeVisibilityCap(
 	// so the account rule reads out of the same copy table.
 	const accountLabel =
 		ROUTINE_VISIBILITY_COPY[accountRoutinesRule].label.toLowerCase()
-	return `Your profile shares routines with ${accountLabel}, so this reaches ${reached}. Change it in Settings under privacy.`
+	return `Your profile shares routines with ${accountLabel}, so this reaches ${reached}.`
 }
 
 /** A link works whatever the visibility says, which the owner should know. */
