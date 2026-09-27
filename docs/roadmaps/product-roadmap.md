@@ -80,6 +80,7 @@ else until it merges, so claims live here, on `main`.
 | ID      | Status        | Owner  | Branch / worktree | Claimed    | Repositories |
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
 | PROG-12 | `IN_PROGRESS` | Claude | `claude/prog-12`  | 2026-09-26 | CT, BE, FE   |
+| TD-52   | `IN_PROGRESS` | Claude | `claude/td-52`    | 2026-09-27 | FE           |
 
 ## Current product snapshot
 
