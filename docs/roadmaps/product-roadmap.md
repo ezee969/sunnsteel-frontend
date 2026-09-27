@@ -81,6 +81,7 @@ else until it merges, so claims live here, on `main`.
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
 | DASH-05 | `IN_PROGRESS` | Claude | `claude/dash-05`  | 2026-09-27 | CT, BE, FE   |
 | PREF-03 | `IN_PROGRESS` | Claude | `claude/dash-05`  | 2026-09-27 | CT, BE, FE   |
+| TD-53   | `IN_PROGRESS` | Claude | `claude/td-53`    | 2026-09-27 | FE           |
 
 ## Current product snapshot
 
