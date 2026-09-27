@@ -51,7 +51,6 @@ export const PwaProvider = (): null => {
 	const deferUpdate = shouldDeferServiceWorkerUpdate(pathname)
 	const deferUpdateRef = useRef(deferUpdate)
 	const registrationRef = useRef<ServiceWorkerRegistration | null>(null)
-	const activationRequestedRef = useRef(false)
 	const reloadPendingRef = useRef(false)
 	const reloadedRef = useRef(false)
 
@@ -76,7 +75,6 @@ export const PwaProvider = (): null => {
 		const waitingWorker = registrationRef.current?.waiting
 		if (!waitingWorker) return
 
-		activationRequestedRef.current = true
 		logger.debug('[PWA] Activating deferred service worker update')
 		waitingWorker.postMessage({ type: 'SKIP_WAITING' })
 	}, [deferUpdate, reloadOnce])
@@ -111,7 +109,6 @@ export const PwaProvider = (): null => {
 		let registration: ServiceWorkerRegistration | null = null
 		let removeInstallingWorkerListener: (() => void) | null = null
 		let removeUpdateFoundListener: (() => void) | null = null
-		const hadControllerAtMount = Boolean(navigator.serviceWorker.controller)
 
 		const activateWorker = (worker: ServiceWorker): void => {
 			if (deferUpdateRef.current) {
@@ -119,27 +116,18 @@ export const PwaProvider = (): null => {
 				return
 			}
 
-			activationRequestedRef.current = true
 			logger.debug('[PWA] Activating new service worker')
 			worker.postMessage({ type: 'SKIP_WAITING' })
 		}
 
-		const onControllerChange = () => {
-			if (!hadControllerAtMount && !activationRequestedRef.current) return
-
-			if (deferUpdateRef.current) {
-				reloadPendingRef.current = true
-				logger.debug('[PWA] Deferring reload during active workout')
-				return
-			}
-
-			reloadOnce()
-		}
-
-		navigator.serviceWorker.addEventListener(
-			'controllerchange',
-			onControllerChange,
-		)
+		// No reload when the new worker takes control. Pages are network-first,
+		// and the browser looks for a worker update on each document load, so an
+		// update is almost always found by a page that was just fetched from the
+		// new build: reloading it re-downloaded the same build and replayed the
+		// splash. After a deploy that came on top of Next's own hard navigation
+		// (the router's build-ID check), so a sidebar click reloaded twice. A page
+		// that really is older than the new worker is refreshed by that same
+		// build-ID check on its next navigation.
 
 		void navigator.serviceWorker
 			.register(SERVICE_WORKER_URL)
@@ -189,10 +177,6 @@ export const PwaProvider = (): null => {
 			if (registrationRef.current === registration) {
 				registrationRef.current = null
 			}
-			navigator.serviceWorker.removeEventListener(
-				'controllerchange',
-				onControllerChange,
-			)
 		}
 	}, [reloadOnce])
 

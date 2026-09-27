@@ -8,8 +8,11 @@ import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { useMotionPreference } from '@/hooks/use-motion-preference'
 import { getSplashMotion } from '@/lib/utils/motion-preference'
-
-let hasShownInitialLoader = false
+import {
+	getSplashStorage,
+	hasSplashPlayed,
+	markSplashPlayed,
+} from '@/lib/utils/splash-session'
 
 /**
  * How long the splash stays up. Long enough for the entrance choreography to
@@ -51,7 +54,9 @@ export const InitialLoadAnimation = ({
 		() =>
 			typeof window !== 'undefined' &&
 			window.innerWidth < 1024 &&
-			!hasShownInitialLoader,
+			// Once per sign-in per tab, not once per document: a reload or a
+			// post-deploy hard navigation must not replay it (splash-session.ts).
+			!hasSplashPlayed(getSplashStorage()),
 	)
 	const [isLoading, setIsLoading] = useState(shouldAnimate)
 	const [showContent, setShowContent] = useState(!shouldAnimate)
@@ -79,7 +84,7 @@ export const InitialLoadAnimation = ({
 			return
 		}
 
-		hasShownInitialLoader = true
+		markSplashPlayed(getSplashStorage())
 
 		if (!hasRandomizedBackground.current) {
 			setBackgroundImage(getRandomMobileBackground())

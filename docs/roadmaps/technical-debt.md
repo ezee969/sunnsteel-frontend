@@ -17,7 +17,8 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-`TD-54` is open, recorded on 2026-09-27 during the owner's mobile-density
+`TD-56`, the double reload and splash after a deploy, was recorded and closed
+on 2026-09-27. `TD-54` is open, recorded on 2026-09-27 during the owner's mobile-density
 review; `TD-55`, from the same review, closed the same day. Their product-side companions are the `UX-*` items in the
 roadmap's [Page density and long lists](product-roadmap.md#page-density-and-long-lists)
 section. `TD-53`, the sweep's training-partner test depending on local data,
@@ -163,6 +164,56 @@ measured.
 - **Not verified:** touch devices, and whether a keyboard user sees a focus
   ring after a programmatic focus that followed a mouse click; Chromium
   showed none in that case.
+
+<a id="td-56"></a>
+
+### TD-56 — After a deploy, a sidebar click reloaded the app twice and replayed the splash — CLOSED 2026-09-27
+
+**Impact.** On a phone-width window, a member who stayed on any signed-in page
+for a few minutes and then used the sidebar saw the mobile splash (background
+photograph and load bar) twice before the page they asked for. Each was a full
+document load, so it also cost two downloads of the app and any unsaved page
+state. Production deployed ten times on the morning of 2026-09-27, so a few
+minutes on a page usually spanned one.
+
+**Evidence.** Two independent full loads, each replaying the splash:
+
+1. Next's router compares the build ID in every RSC response with the running
+   client's and, on a mismatch, falls back to a browser navigation
+   (`fetch-server-response.js`, `getAppBuildId() !== response.b`). A prefetched
+   payload from the old build is reused for `staleTimes` (180 s static, 30 s
+   dynamic), which is why only a page left open for a while triggered it.
+2. That fresh load made the browser check for a worker update, found the new
+   deploy's `sw.js`, activated it, and `pwa-provider.tsx` reloaded on
+   `controllerchange`, although the page had just been fetched from the new
+   build (pages are network-first).
+
+The splash's once-only flag was a module variable, so it survived client-side
+routing but not a document load. Reproduced against two local production
+builds of the same commit served in turn on one port, in one Chromium context
+at 390×844, idle 190 s after the "deploy", then a client-side link: **two**
+document loads on the original code.
+
+**Direction.** Drop the production `controllerchange` reload and keep the
+deferred activation; remember the splash per sign-in per tab.
+
+**Closure criteria.** The same reproduction loads the document once; the
+splash does not play on a reload or a hard navigation in the same tab, and
+still plays on a new tab and after signing out and in again.
+
+**Closed 2026-09-27.** `pwa-provider.tsx` no longer reloads when the new worker
+takes control; activation is still deferred on `/workouts/sessions/*`, and the
+development cleanup reload is unchanged. A page genuinely older than the
+worker is refreshed by the router's build-ID check on its next navigation.
+[splash-session.ts](../../lib/utils/splash-session.ts) keeps the splash's
+"played" mark in `sessionStorage` (memory fallback when storage throws), and
+the auth provider forgets it on a known signed-out state. The reproduction now
+records **one** document load, and the worker still takes control. Unit tests
+cover the reload, sign-out and throwing-storage cases. **Not verified:** the
+splash itself in the browser after a deploy (the local check ran on public
+pages, because the backend only allows `:3000`), and the installed iPhone PWA.
+Next's own hard navigation after a deploy remains; Vercel Skew Protection
+would remove it, and is a project setting left to the owner.
 
 <a id="td-53"></a>
 
@@ -950,6 +1001,10 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-27 (revision 30):** Recorded and closed `TD-56`: after a deploy,
+  a sidebar click loaded the app twice (Next's build-ID hard navigation, then
+  the service worker's reload) and played the mobile splash each time. The
+  worker reload is gone and the splash plays once per sign-in per tab.
 - **2026-09-27 (revision 29):** Closed `TD-55` with `UX-08`. Links into a
   section of Settings now land on it and keep it in view while the page
   finishes loading. `TD-54` is the one open entry.

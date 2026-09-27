@@ -17,6 +17,7 @@ import { supabaseAuthService } from '@/lib/api/services/supabaseAuthService'
 import { createAuthSessionController } from '@/lib/auth/auth-session-controller'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { forgetSplash, getSplashStorage } from '@/lib/utils/splash-session'
 
 interface SupabaseAuthContextType {
 	isAuthenticated: boolean
@@ -92,6 +93,12 @@ export const SupabaseAuthProvider = ({ children }: { children: ReactNode }) => {
 			subscription.unsubscribe()
 		}
 	}, [queryClient])
+
+	// A known signed-out state (never the loading one) forgets the splash, so
+	// the next sign-in in this tab plays it again.
+	useEffect(() => {
+		if (!isLoading && !session) forgetSplash(getSplashStorage())
+	}, [isLoading, session])
 
 	const value = {
 		// isAuthenticated requires both a Supabase session AND a verified backend user profile

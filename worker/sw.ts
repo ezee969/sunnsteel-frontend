@@ -6,7 +6,7 @@
 // which requests are cached and how (lib/pwa/service-worker-policy.ts), the
 // clean-up of the old worker's caches, and the push handlers.
 //
-// Registration, update and reload stay in providers/pwa-provider.tsx:
+// Registration and update stay in providers/pwa-provider.tsx:
 // skipWaiting is off, so a new worker waits until the page sends SKIP_WAITING
 // (which Serwist answers), and the page never sends it during a workout.
 
@@ -50,8 +50,9 @@ const serwist = new Serwist({
 	precacheOptions: { cleanupOutdatedCaches: true },
 	cacheId: SERVICE_WORKER_CACHE_ID,
 	skipWaiting: false,
-	// The old worker claimed clients on activation too; keeping it means the
-	// provider's controllerchange reload still happens exactly once.
+	// The old worker claimed clients on activation too. The provider no longer
+	// reloads when control changes: the page it claims was fetched from the
+	// network (pages are network-first), so it already runs this build.
 	clientsClaim: true,
 	navigationPreload: false,
 	runtimeCaching: [
