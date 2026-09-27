@@ -1,6 +1,10 @@
 import { existsSync } from 'node:fs'
 
 import type { Locator, Page, TestInfo } from '@playwright/test'
+import {
+	TRAINING_PARTNERS_MAX,
+	type TrainingPartnershipsResponse,
+} from '@sunsteel/contracts'
 
 import { REGRESSION_WIDTHS, THEMES } from './capture-targets'
 import { discoverIds, type Ids } from './discover-ids'
@@ -837,12 +841,57 @@ for (const width of REGRESSION_WIDTHS) {
 	}
 }
 
+/**
+ * The community members written by the backend's portfolio seed
+ * (`prisma/portfolio-seed.program.ts`). Any of them can take the request.
+ */
+const PARTNER_CANDIDATES = [
+	'ken-watanabe',
+	'lucia-moreno',
+	'darius-okonkwo',
+	'marta-ibanez',
+	'tomas-ferreira',
+	'nadia-haddad',
+]
+
 test('training partners request and cancel', async ({ page }) => {
 	await prepare(page, 1280, 'dark')
-	await load(page, '/profile/ken-watanabe')
 
+	// The request needs a member the owner has no partnership with, and the
+	// local data decides who that is: TD-53 found an accepted partnership with
+	// `ken-watanabe`, left by earlier work, that turned the add button into a
+	// link. So read the owner's partnerships from the list Settings loads.
+	const listed = page.waitForResponse(
+		response =>
+			response.request().method() === 'GET' &&
+			new URL(response.url()).pathname.endsWith('/users/me/training-partners'),
+	)
+	await load(page, '/settings#training-partners')
+	const { items } = (await (
+		await listed
+	).json()) as TrainingPartnershipsResponse
+	const active = items.filter(item => item.status === 'ACTIVE').length
+	test.skip(
+		active >= TRAINING_PARTNERS_MAX,
+		`The signed-in member already has ${active} training partners, the most ` +
+			'an account may have, so the server would refuse any request.',
+	)
+	const taken = new Set(items.map(item => item.member.username))
+	const member = PARTNER_CANDIDATES.find(
+		handle => handle !== ids.username && !taken.has(handle),
+	)
+	test.skip(
+		!member,
+		'The signed-in member already has a partnership or a request with every ' +
+			`seeded member (${PARTNER_CANDIDATES.join(', ')}), so there is nobody ` +
+			'to send one to. Remove one in Settings, or re-seed.',
+	)
+	const pending = `@${member} · request sent`
+
+	await load(page, `/profile/${member}`)
+	// Enabled, not just visible: the button reads "Add" while the list loads.
 	const add = page.getByRole('button', { name: 'Add Training Partner' })
-	await expect(add).toBeVisible()
+	await expect(add).toBeEnabled()
 	let requestCreated = false
 	try {
 		await add.click()
@@ -856,13 +905,17 @@ test('training partners request and cancel', async ({ page }) => {
 		await expect(
 			page.getByRole('heading', { name: 'Training Partners' }),
 		).toBeVisible()
-		await expect(page.getByText('@ken-watanabe · request sent')).toBeVisible()
+		await expect(page.getByText(pending)).toBeVisible()
 	} finally {
 		if (requestCreated) {
 			if (!/\/settings/.test(pathOf(page))) {
 				await load(page, '/settings#training-partners')
 			}
-			const cancel = page.getByRole('button', { name: 'Cancel Request' })
+			// Scoped to its row: other pending requests may sit beside it.
+			const cancel = page
+				.locator('.rule-row')
+				.filter({ hasText: pending })
+				.getByRole('button', { name: 'Cancel Request' })
 			if (await cancel.isVisible()) {
 				await cancel.click()
 				await expect(cancel).toHaveCount(0)

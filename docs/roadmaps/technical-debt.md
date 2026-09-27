@@ -17,8 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. `TD-52`, stacked dialog footers that put Cancel
-above the primary, closed on 2026-09-27; `TD-51`, exercise names cut off in
+There are no open entries. `TD-53`, the sweep's training-partner test
+depending on local data, and `TD-52`, stacked dialog footers that put Cancel
+above the primary, both closed on 2026-09-27; `TD-51`, exercise names cut off in
 the routine builder's card headers, on 2026-09-26; `TD-50`, the routine builder's
 clipped set rows, on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
 routine at finish, on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
@@ -33,6 +34,48 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-53"></a>
+
+### TD-53 — The sweep's training-partner test depends on local data — CLOSED 2026-09-27
+
+**Impact.** `training partners request and cancel` in
+`e2e/regression.spec.ts` always opened `/profile/ken-watanabe` and expected
+"Add Training Partner". When the signed-in member already had any
+partnership with that member, the page showed another control and the case
+failed, although nothing in the app was wrong. It was the one failure in
+`TD-52`'s full sweep (481/482).
+
+**Evidence.** On the local database `eze-prof` has an `ACTIVE` partnership
+with `ken-watanabe`, requested by `eze-prof` and accepted on 2026-09-23 at
+14:30:23, within a millisecond of its creation, so it was most likely
+written directly rather than through the app, probably while `SOC-09` was
+tested. The profile
+therefore shows a "Training Partner" link. The portfolio seed does not reset
+partnerships, so a re-seed would not have cleared it.
+
+**Direction.** Choose the member at run time, the way `discoverIds` finds the
+other ids, instead of hard-coding one; skip with the reason when no seeded
+member is free. Leave the fixture alone: it may belong to another agent's work.
+
+**Closure criteria.** The case passes against the current local data without
+touching the fixture, leaves no request behind, and says why when it cannot
+run.
+
+**Closed 2026-09-27.** The test opens Settings first and reads the owner's
+partnerships from the `GET /users/me/training-partners` response the page
+makes, then takes the first of the six portfolio-seed community members with
+no partnership or request in either direction (not the owner). It skips with
+a stated reason when every one is taken, or when the owner already has
+`TRAINING_PARTNERS_MAX` partners, since the server would refuse the request.
+It waits for the add button to be enabled, not only visible, because the
+button reads "Add Training Partner" while the list is still loading, and the
+cleanup cancels the request in that member's own row, so another pending
+request cannot make it ambiguous. The scoped sweep (`-g "training
+partners"`, one worker) passed 1/1 using `lucia-moreno`; the partnership
+with `ken-watanabe` was read before and after and is unchanged, and no other
+partnership remained. **Not verified:** the two skip paths, which the local
+data cannot reach without changing the owner's partnerships.
 
 <a id="td-52"></a>
 
@@ -73,7 +116,7 @@ partners request and cancel`, is not this change: it needs the signed-in
 member to have no partnership with `ken-watanabe`, and an active one was
 created and accepted in the same millisecond on 2026-09-23, so the page
 shows "Training Partner" instead of the add button. That fixture was left
-alone. **Not changed:** focus order still follows the DOM,
+alone, and `TD-53` made the test independent of it. **Not changed:** focus order still follows the DOM,
 so Tab reaches Cancel before the primary it sits under, as `AlertDialogFooter`
 always has. **Not verified:** the exercise-note dialog in a browser, and touch
 devices.
@@ -778,6 +821,10 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-27 (revision 27):** Recorded and closed `TD-53`, the one failure
+  in `TD-52`'s full sweep: the training-partner case hard-coded a member the
+  local data had already partnered. It now picks a free seeded member. The
+  register is empty again.
 - **2026-09-27 (revision 26):** Recorded and closed `TD-52`: below `sm`,
   every `Dialog` stacked Cancel above its primary, against §11.9. The
   register is empty again.
