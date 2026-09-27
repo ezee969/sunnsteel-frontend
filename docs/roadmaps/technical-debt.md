@@ -17,8 +17,8 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-`TD-54` and `TD-55` are open, both recorded on 2026-09-27 during the owner's
-mobile-density review. Their product-side companions are the `UX-*` items in the
+`TD-54` is open, recorded on 2026-09-27 during the owner's mobile-density
+review; `TD-55`, from the same review, closed the same day. Their product-side companions are the `UX-*` items in the
 roadmap's [Page density and long lists](product-roadmap.md#page-density-and-long-lists)
 section. `TD-53`, the sweep's training-partner test depending on local data,
 and `TD-52`, stacked dialog footers that put Cancel above the primary, both
@@ -90,7 +90,7 @@ dark theme:
 
 <a id="td-55"></a>
 
-### TD-55 — Links to a section of Settings open at the top of the page
+### TD-55 — Links to a section of Settings open at the top of the page — CLOSED 2026-09-27
 
 **Impact.** Three places link into a named part of Settings:
 
@@ -137,6 +137,32 @@ measured.
   `<main>`.
 - Under reduced motion the jump is instant.
 - The scoped sweep `layout settings` passes.
+
+**Closed 2026-09-27**, shipped with `UX-08`.
+
+- **The fix.** [`useScrollToHash`](../../hooks/use-scroll-to-hash.ts), called
+  by the Settings page once the profile has loaded, reads the hash through
+  the pure [`settings-anchor.ts`](../../lib/utils/settings-anchor.ts). It
+  brings a section to the top of `<main>`, and a control (a button, input or
+  select) to the middle of it with focus. It then re-aligns on every resize of
+  the page for three seconds, because the cards above the target keep
+  loading and growing after the first jump. It stops at the first wheel,
+  touch, key or pointer press, so it never fights the person. It also runs
+  on `hashchange`, for same-page links. The jump is always `instant`, so
+  reduced motion needs no branch of its own. `#activity-sharing` gained the
+  `scroll-mt-24` the other two anchors already had.
+- **Measured on the local stack, signed in, at 390 and 1440.** A cold load
+  of each of the three anchors left the section 96px below the top of
+  `<main>` (its `scroll-mt-24`). At 390 `<main>` scrolled 11,385px,
+  12,840px and 14,151px to get there. Client-side navigation from Activity's
+  "Settings" link to `#activity-sharing` landed the same way.
+  `/settings#privacy-workoutHistory` centred that select (387px down an
+  870px screen) and focused it. 12 of 12 checks passed.
+- **Sweep:** scoped `layout (settings|activity-yours|routine-detail) @`,
+  42/42 at one worker.
+- **Not verified:** touch devices, and whether a keyboard user sees a focus
+  ring after a programmatic focus that followed a mouse click; Chromium
+  showed none in that case.
 
 <a id="td-53"></a>
 
@@ -923,6 +949,10 @@ written in Spanish and kept frozen as a historical record. It must not be used a
 a list of active debt.
 
 ## Document history
+
+- **2026-09-27 (revision 29):** Closed `TD-55` with `UX-08`. Links into a
+  section of Settings now land on it and keep it in view while the page
+  finishes loading. `TD-54` is the one open entry.
 
 - **2026-09-27 (revision 28):** Recorded `TD-54` from the owner's review of
   mobile density. On a phone, /routines gives Create Routine a row of its own,
