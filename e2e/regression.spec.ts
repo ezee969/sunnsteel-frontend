@@ -408,6 +408,10 @@ const ROUTES: SweepRoute[] = [
 		needs: 'at least one finished session',
 	},
 	{ slug: 'progress', path: () => '/progress' },
+	{ slug: 'progress-strength', path: () => '/progress/strength' },
+	{ slug: 'progress-load', path: () => '/progress/load' },
+	{ slug: 'progress-workouts', path: () => '/progress/workouts' },
+	{ slug: 'progress-body', path: () => '/progress/body' },
 	{ slug: 'schedule', path: () => '/schedule' },
 	{ slug: 'exercises', path: () => '/exercises' },
 	// A filtered URL: the no-results state and the active-filter controls.

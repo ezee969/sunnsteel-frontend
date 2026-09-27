@@ -9,7 +9,6 @@ import { GitCompareArrows, NotebookPen, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { CollapsibleHeading } from '@/components/layout/collapsible-section'
 import {
 	Accordion,
 	AccordionContent,
@@ -25,7 +24,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { buildSessionExerciseComparisons } from '@/lib/utils/session-comparison'
 import { formatDuration } from '@/lib/utils/time-format.utils'
@@ -125,36 +123,20 @@ export function SessionComparison({
 	const formatVolume = (valueKg: number) =>
 		`${formatWeightAmount(valueKg, weightUnit)} ${unitLabel}`
 
-	// UX-04: closed below `md` until the member opens it (§20.1).
-	const [open, setOpen] = useCollapsedState(
-		'progress-session-comparison',
-		'wide',
-	)
-
 	return (
 		<section aria-labelledby="session-comparison" className="space-y-4">
 			<div className="rule-row flex items-start gap-2 pb-2">
 				<GitCompareArrows className="mt-0.5 size-4 text-ink-3" aria-hidden />
 				<div>
-					<CollapsibleHeading
-						id="session-comparison"
-						controls="progress-session-comparison-body"
-						open={open}
-						onToggle={() => setOpen(!open)}
-						className="type-section text-foreground"
-					>
+					<h2 id="session-comparison" className="type-section text-foreground">
 						Session comparison
-					</CollapsibleHeading>
+					</h2>
 					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 						Compare the latest two completions of the same routine day.
 					</p>
 				</div>
 			</div>
-			<div
-				id="progress-session-comparison-body"
-				hidden={!open}
-				className="space-y-4"
-			>
+			<div className="space-y-4">
 				{isPending && !data ? (
 					<div className="space-y-3" aria-label="Loading session comparison">
 						<Skeleton className="h-16" />

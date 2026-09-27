@@ -11,7 +11,6 @@ import { Loader2, Pencil, Scale, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useId, useState } from 'react'
 
-import { CollapsibleHeading } from '@/components/layout/collapsible-section'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	AlertDialog,
@@ -35,7 +34,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import {
 	type BodyProgressSource,
 	useBodyProgress,
@@ -594,9 +592,6 @@ export function BodyProgressSection({
 			key: Date.now(),
 		})
 
-	// UX-04: closed below `md` until the member opens it (§20.1).
-	const [open, setOpen] = useCollapsedState('progress-body', 'wide')
-
 	return (
 		<section
 			id="body-progress"
@@ -607,15 +602,12 @@ export function BodyProgressSection({
 				<div className="flex items-start gap-2">
 					<Scale className="mt-0.5 size-4 text-ink-3" aria-hidden />
 					<div>
-						<CollapsibleHeading
+						<h2
 							id="body-progress-heading"
-							controls="progress-body-body"
-							open={open}
-							onToggle={() => setOpen(!open)}
 							className="type-section text-foreground"
 						>
 							Body progress
-						</CollapsibleHeading>
+						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							Your weight and measurements over time. Who else sees them is your{' '}
 							<Link
@@ -639,7 +631,7 @@ export function BodyProgressSection({
 					</Button>
 				</div>
 			</div>
-			<div id="progress-body-body" hidden={!open} className="space-y-4">
+			<div id="progress-body-body" className="space-y-4">
 				<BodyProgressBody
 					id="own-body-weight"
 					query={query}
@@ -737,7 +729,7 @@ export function ProfileBodyProgress({
 				/>
 				{source.kind === 'own' ? (
 					<Link
-						href="/progress#body-progress"
+						href="/progress/body"
 						className="type-body-sm text-ink-2 underline underline-offset-4"
 					>
 						Log on Progress

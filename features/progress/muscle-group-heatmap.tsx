@@ -4,10 +4,8 @@ import type { MuscleGroupHeatmapResponse } from '@sunsteel/contracts'
 import { Activity, RefreshCw } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { CollapsibleHeading } from '@/components/layout/collapsible-section'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import { cn } from '@/lib/utils'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import {
@@ -59,24 +57,18 @@ export function MuscleGroupHeatmap({
 	const rows = useMemo(() => (data ? buildMuscleHeatmapRows(data) : []), [data])
 	const topMuscles = useMemo(() => getTopMuscleHeatmapRows(rows), [rows])
 
-	// UX-04: closed below `md` until the member opens it (§20.1).
-	const [open, setOpen] = useCollapsedState('progress-muscles', 'wide')
-
 	return (
 		<section aria-labelledby="muscle-distribution" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div className="flex items-start gap-2">
 					<Activity className="mt-0.5 size-4 text-honour" aria-hidden />
 					<div>
-						<CollapsibleHeading
+						<h2
 							id="muscle-distribution"
-							controls="progress-muscles-body"
-							open={open}
-							onToggle={() => setOpen(!open)}
 							className="type-section text-foreground"
 						>
 							Muscle distribution
-						</CollapsibleHeading>
+						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							Weekly completed-set emphasis across primary and secondary
 							muscles.
@@ -98,7 +90,7 @@ export function MuscleGroupHeatmap({
 					))}
 				</div>
 			</div>
-			<div id="progress-muscles-body" hidden={!open} className="space-y-4">
+			<div id="progress-muscles-body" className="space-y-4">
 				{isPending ? (
 					<div className="space-y-3" aria-label="Loading muscle distribution">
 						<Skeleton className="h-20" />

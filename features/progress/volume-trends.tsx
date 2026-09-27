@@ -4,7 +4,6 @@ import type { VolumeTrendResponse } from '@sunsteel/contracts'
 import { BarChart3, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { CollapsibleHeading } from '@/components/layout/collapsible-section'
 import { Button } from '@/components/ui/button'
 import {
 	Select,
@@ -14,7 +13,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	getSelectedVolumeTrend,
@@ -96,24 +94,15 @@ export function VolumeTrends({
 		)} ${unitLabel}`
 	const hasCompletedWork = data?.overall.some(point => point.completedSets > 0)
 
-	// UX-04: closed below `md` until the member opens it (§20.1).
-	const [open, setOpen] = useCollapsedState('progress-volume', 'wide')
-
 	return (
 		<section aria-labelledby="volume-trends" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div className="flex items-start gap-2">
 					<BarChart3 className="mt-0.5 size-4 text-honour" aria-hidden />
 					<div>
-						<CollapsibleHeading
-							id="volume-trends"
-							controls="progress-volume-body"
-							open={open}
-							onToggle={() => setOpen(!open)}
-							className="type-section text-foreground"
-						>
+						<h2 id="volume-trends" className="type-section text-foreground">
 							Load volume
-						</CollapsibleHeading>
+						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							Compare external-load volume by week, muscle, routine, or
 							exercise.
@@ -135,7 +124,7 @@ export function VolumeTrends({
 					))}
 				</div>
 			</div>
-			<div id="progress-volume-body" hidden={!open} className="space-y-4">
+			<div id="progress-volume-body" className="space-y-4">
 				{isPending ? (
 					<div className="space-y-3" aria-label="Loading load volume">
 						<Skeleton className="h-20" />

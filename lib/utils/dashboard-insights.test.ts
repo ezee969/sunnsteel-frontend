@@ -112,7 +112,7 @@ describe('dashboard insights (DASH-07)', () => {
 			key: 'WEEK_OVER_WEEK',
 			label: 'Week over week',
 			subject: 'Last two finished weeks',
-			href: '/progress',
+			href: '/progress/load',
 			statement: 'Completed sets went from 18 to 24.',
 			evidence: '2026-08-24: 18 sets · 300 kg → 2026-08-31: 24 sets · 400 kg',
 		})

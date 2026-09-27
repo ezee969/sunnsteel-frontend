@@ -1,187 +1,45 @@
 'use client'
 
-import type { ProgressTimelineEventType } from '@sunsteel/contracts'
-import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
-import HeroSection from '@/components/layout/HeroSection'
-import { Button } from '@/components/ui/button'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { BodyProgressSection } from '@/features/progress/body-progress'
-import { ConsistencyCalendar } from '@/features/progress/consistency-calendar'
-import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
-import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
 import { PersonalGoals } from '@/features/progress/personal-goals'
 import { PlateauWatch } from '@/features/progress/plateau-watch'
-import { ProgressTimeline } from '@/features/progress/progress-timeline'
-import { SessionComparison } from '@/features/progress/session-comparison'
-import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
+import { ProgressTab } from '@/features/progress/progress-tab'
 import { TrainingSignals } from '@/features/progress/training-signals'
-import { VolumeTrends } from '@/features/progress/volume-trends'
+import { useHashForward } from '@/hooks/use-hash-forward'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	useDeloadSuggestion,
-	useExercisePerformanceHistory,
-	useExerciseStrengthTrend,
-	useMuscleGroupHeatmap,
 	usePersonalGoals,
 	usePlateaus,
-	useProgressTimeline,
-	useSessionComparison,
 	useTrainingSignals,
 	useUpdatePlateauPreferences,
-	useVolumeTrend,
 } from '@/lib/api/hooks/useWorkoutSession'
-import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
-import {
-	getStrengthDisplayPoints,
-	getStrengthTrendRange,
-	STRENGTH_RANGE_OPTIONS,
-	type StrengthRange,
-} from '@/lib/utils/strength-trend'
-import type { VolumeTrendWeeks } from '@/lib/utils/volume-trend'
-import {
-	formatWeightInput,
-	getWeightUnitLabel,
-	kilogramsToDisplayWeight,
-} from '@/lib/utils/weight-unit'
+import { PROGRESS_HASH_RULES } from '@/lib/utils/progress-tabs'
 
-function ProgressLoading() {
-	return (
-		<div className="space-y-6" aria-label="Loading progress">
-			<div className="grid gap-4 sm:grid-cols-2">
-				<Skeleton className="h-20" />
-				<Skeleton className="h-20" />
-			</div>
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Skeleton className="h-80" />
-				<Skeleton className="h-80" />
-			</div>
-		</div>
-	)
-}
-
-/** The Progress sections in page order, by the id of each one's heading. */
-const PROGRESS_SECTIONS = [
-	['personal-goals', 'Goals'],
-	['body-progress-heading', 'Body'],
-	['plateau-watch', 'Plateaus'],
-	['training-signals', 'Signals'],
-	['consistency-calendar', 'Consistency'],
-	['muscle-distribution', 'Muscles'],
-	['volume-trends', 'Volume'],
-	['session-comparison', 'Comparison'],
-	['progress-timeline', 'Timeline'],
-	['progress-exercise', 'By exercise'],
-] as const
-
-export default function ProgressPage() {
-	const [range, setRange] = useState<StrengthRange>('90D')
-	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
-	const [volumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>(8)
-	const [exerciseId, setExerciseId] = useState<string>()
-	const [routineDayId, setRoutineDayId] = useState<string>()
-	const [timelineFilter, setTimelineFilter] =
-		useState<ProgressTimelineEventType>()
-	const [rangeAnchor] = useState(() => new Date())
-	const historyParams = useMemo(
-		() => ({ exerciseId, ...getStrengthTrendRange(range, rangeAnchor) }),
-		[exerciseId, range, rangeAnchor],
-	)
-	const history = useExercisePerformanceHistory(historyParams)
-	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
+/**
+ * Progress › Overview (UX-11): how training is going and whether anything
+ * is worth a look -- goals, plateaus and training signals with the deload
+ * suggestion. An old `/progress#…` link to a section that moved is sent to
+ * its tab before anything renders.
+ */
+export default function ProgressOverviewPage() {
+	const forwarding = useHashForward(PROGRESS_HASH_RULES)
+	const weightUnit = useWeightUnit()
 	const personalGoals = usePersonalGoals()
 	const plateaus = usePlateaus()
 	const plateauPreferences = useUpdatePlateauPreferences()
 	const trainingSignals = useTrainingSignals()
 	const deloadSuggestion = useDeloadSuggestion()
-	const volumeTrend = useVolumeTrend(volumeWeeks)
-	const sessionComparison = useSessionComparison(routineDayId)
-	const timeline = useProgressTimeline(timelineFilter)
-	const historyPage = history.data?.pages[0]
-	const selectedExerciseId =
-		exerciseId ?? historyPage?.selectedExercise?.exerciseId
-	const selectedPerformance = historyPage?.exercises.find(
-		exercise => exercise.exerciseId === selectedExerciseId,
-	)
-	const strengthParams = useMemo(
-		() => ({
-			exerciseId,
-			...getStrengthTrendRange(range, rangeAnchor),
-		}),
-		[exerciseId, range, rangeAnchor],
-	)
-	const trend = useExerciseStrengthTrend(
-		strengthParams,
-		exerciseId === undefined ||
-			Boolean(selectedExerciseId && selectedPerformance?.hasStrengthTrend),
-	)
-	const weightUnit = useWeightUnit()
-	const unitLabel = getWeightUnitLabel(weightUnit)
-	const displayPoints = trend.data ? getStrengthDisplayPoints(trend.data) : []
-	const current = trend.data?.selectedExercise
-	const recentChanges = trend.data?.points.slice(-6).reverse() ?? []
-	const performanceSessions =
-		history.data?.pages.flatMap(page => page.items) ?? []
-	const timelineItems = timeline.data?.pages.flatMap(page => page.items) ?? []
-	const formatMetric = (value: number) =>
-		`${formatWeightInput(value, weightUnit)} ${unitLabel}`
-	const formatDate = (value: string) =>
-		new Intl.DateTimeFormat(undefined, {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric',
-		}).format(new Date(value))
+
+	if (forwarding) return null
 
 	return (
-		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
-			<HeroSection
-				title={<>Training Progress</>}
-				subtitle={
-					<>
-						See how your training is distributed, follow record trends, and
-						review every performance behind them.
-					</>
-				}
-			/>
-
-			{/* UX-04: fourteen sections, so the page opens with an index of them.
-			    Plain fragment links: every target is mounted, so the browser's
-			    own jump moves <main>. */}
-			<nav aria-label="On this page" className="-mt-2 sm:-mt-4">
-				<ul className="flex flex-wrap gap-x-4 gap-y-0">
-					{PROGRESS_SECTIONS.map(([id, label]) => (
-						<li key={id}>
-							<a
-								href={`#${id}`}
-								className="type-body-sm inline-flex min-h-11 items-center text-foreground underline underline-offset-4 decoration-rule hover:decoration-current sm:min-h-8"
-							>
-								{label}
-							</a>
-						</li>
-					))}
-				</ul>
-			</nav>
-
+		<ProgressTab>
 			<PersonalGoals
 				data={personalGoals.data}
 				weightUnit={weightUnit}
 				isPending={personalGoals.isPending}
 				isError={Boolean(personalGoals.error)}
 				onRetry={() => void personalGoals.retry()}
-			/>
-
-			<BodyProgressSection
-				weightUnit={weightUnit}
-				goals={personalGoals.data?.goals}
 			/>
 
 			<PlateauWatch
@@ -209,288 +67,6 @@ export default function ProgressPage() {
 				onRetry={() => void trainingSignals.refetch()}
 				deloadSuggestion={deloadSuggestion.data}
 			/>
-
-			<ConsistencyCalendar />
-
-			<MuscleGroupHeatmap
-				data={muscleHeatmap.data}
-				weeks={heatmapWeeks}
-				isPending={muscleHeatmap.isPending}
-				isError={Boolean(muscleHeatmap.error)}
-				onWeeksChange={setHeatmapWeeks}
-				onRetry={() => void muscleHeatmap.retry()}
-			/>
-
-			<VolumeTrends
-				data={volumeTrend.data}
-				weeks={volumeWeeks}
-				isPending={volumeTrend.isPending}
-				isError={Boolean(volumeTrend.error)}
-				onWeeksChange={setVolumeWeeks}
-				onRetry={() => void volumeTrend.retry()}
-			/>
-
-			<SessionComparison
-				data={sessionComparison.data}
-				selectedRoutineDayId={routineDayId}
-				isPending={sessionComparison.isPending}
-				isError={sessionComparison.isError}
-				onRoutineDayChange={setRoutineDayId}
-				onRetry={() => void sessionComparison.refetch()}
-			/>
-
-			<ProgressTimeline
-				items={timelineItems}
-				filter={timelineFilter}
-				isPending={timeline.isPending}
-				isError={timeline.isError || timeline.isFetchNextPageError}
-				hasNextPage={Boolean(timeline.hasNextPage)}
-				isFetchingNextPage={timeline.isFetchingNextPage}
-				onFilterChange={setTimelineFilter}
-				onRetry={() => void timeline.refetch()}
-				onLoadMore={() => void timeline.fetchNextPage()}
-			/>
-
-			<section
-				id="progress-exercise"
-				className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
-			>
-				<div className="min-w-0">
-					<label htmlFor="strength-exercise" className="type-label text-ink-3">
-						Exercise
-					</label>
-					<Select
-						value={selectedExerciseId ?? ''}
-						onValueChange={setExerciseId}
-						disabled={!historyPage?.exercises.length}
-					>
-						<SelectTrigger
-							id="strength-exercise"
-							className="mt-2 w-full md:max-w-md"
-							aria-label="Exercise"
-						>
-							<SelectValue placeholder="Choose an exercise" />
-						</SelectTrigger>
-						<SelectContent>
-							{historyPage?.exercises.map(exercise => (
-								<SelectItem
-									key={exercise.exerciseId}
-									value={exercise.exerciseId}
-								>
-									{exercise.exerciseName}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
-				<div
-					role="group"
-					aria-label="Date range"
-					className="flex flex-wrap gap-1"
-				>
-					{STRENGTH_RANGE_OPTIONS.map(option => (
-						<Button
-							key={option.value}
-							type="button"
-							size="sm"
-							variant={range === option.value ? 'secondary' : 'ghost'}
-							aria-pressed={range === option.value}
-							onClick={() => setRange(option.value)}
-						>
-							{option.value === 'ALL' ? 'All' : option.value}
-						</Button>
-					))}
-				</div>
-			</section>
-
-			{history.isPending ? (
-				<ProgressLoading />
-			) : history.isError && !history.data ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<h2 className="type-section text-foreground">
-						Progress is unavailable
-					</h2>
-					<p className="type-body-sm mt-2 text-ink-3">
-						We could not load your exercise history. Try again.
-					</p>
-					<Button
-						className="mt-4"
-						variant="outline"
-						onClick={() => void history.refetch()}
-					>
-						<RefreshCw aria-hidden />
-						Retry
-					</Button>
-				</div>
-			) : !selectedPerformance ? (
-				<div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-rule bg-surface p-8 text-center">
-					<Dumbbell className="size-8 text-ink-3" aria-hidden />
-					<h2 className="type-section mt-4 text-foreground">
-						No exercise history yet
-					</h2>
-					<p className="type-body-sm mt-2 max-w-md text-ink-3">
-						Finish a session with at least one completed set to start building
-						your progress history.
-					</p>
-				</div>
-			) : (
-				<>
-					<section aria-labelledby="current-strength" className="space-y-3">
-						<div className="rule-row flex items-center gap-2 pb-2">
-							<TrendingUp className="size-4 text-honour" aria-hidden />
-							<h2
-								id="current-strength"
-								className="type-section text-foreground"
-							>
-								{selectedPerformance.exerciseName}
-							</h2>
-							<Link
-								href={`/exercises/${selectedPerformance.exerciseId}`}
-								className="type-body-sm ml-auto shrink-0 text-primary underline-offset-4 hover:underline"
-							>
-								Exercise page
-							</Link>
-						</div>
-					</section>
-
-					{selectedPerformance.hasStrengthTrend ? (
-						trend.isPending ? (
-							<div className="grid gap-6 lg:grid-cols-2">
-								<Skeleton className="h-80" />
-								<Skeleton className="h-80" />
-							</div>
-						) : trend.isError ? (
-							<div role="alert" className="border border-rule bg-surface p-5">
-								<p className="type-panel text-foreground">
-									Strength trends are unavailable
-								</p>
-								<p className="type-body-sm mt-1 text-ink-3">
-									Session history is still available below.
-								</p>
-								<Button
-									size="sm"
-									variant="outline"
-									className="mt-3"
-									onClick={() => void trend.refetch()}
-								>
-									<RefreshCw aria-hidden />
-									Retry trends
-								</Button>
-							</div>
-						) : current ? (
-							<>
-								<div className="grid gap-px bg-rule-faint sm:grid-cols-2">
-									<div className="bg-surface p-4 sm:p-5">
-										<p className="type-label text-ink-3">Current best set</p>
-										<p className="type-data type-data-strong mt-2 text-foreground">
-											{formatMetric(current.weightKg)} × {current.reps}
-										</p>
-									</div>
-									<div className="bg-surface p-4 sm:p-5">
-										<p className="type-label text-ink-3">Estimated 1RM</p>
-										<p className="type-data type-data-strong mt-2 text-foreground">
-											{formatMetric(current.estimated1rmKg)}
-										</p>
-									</div>
-								</div>
-
-								{trend.data?.baseline && trend.data.points.length === 0 ? (
-									<p role="status" className="type-body-sm text-ink-3">
-										Your best did not change in this range. The charts begin
-										with the record you carried into it.
-									</p>
-								) : null}
-
-								<div className="grid gap-6 lg:grid-cols-2">
-									<StrengthTrendChart
-										id="estimated-one-rep-max"
-										title="Estimated 1RM trend"
-										description="Estimated strength from each new best set."
-										points={displayPoints}
-										getValue={point =>
-											kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
-										}
-										formatValue={value =>
-											`${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
-										}
-										formatPointDetail={point =>
-											`${formatMetric(point.weightKg)} × ${point.reps}`
-										}
-									/>
-									<StrengthTrendChart
-										id="best-set-load"
-										title="Best-set load trend"
-										description="Load carried by each new best set; repetitions remain in its detail."
-										points={displayPoints}
-										getValue={point =>
-											kilogramsToDisplayWeight(point.weightKg, weightUnit)
-										}
-										formatValue={value =>
-											`${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
-										}
-										formatPointDetail={point => `${point.reps} reps`}
-									/>
-								</div>
-
-								{recentChanges.length > 0 ? (
-									<section
-										aria-labelledby="record-changes"
-										className="space-y-3"
-									>
-										<div className="rule-row pb-2">
-											<h2
-												id="record-changes"
-												className="type-section text-foreground"
-											>
-												Recent record changes
-											</h2>
-										</div>
-										<ol className="divide-y divide-rule-faint border-y border-rule-faint">
-											{recentChanges.map(point => (
-												<li
-													key={`${point.sessionId}-${point.achievedAt}`}
-													className="grid gap-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-6"
-												>
-													<time className="type-body-sm text-ink-3">
-														{formatDate(point.achievedAt)}
-													</time>
-													<span className="type-data text-foreground">
-														{formatMetric(point.weightKg)} × {point.reps}
-													</span>
-													<span className="type-body-sm text-ink-3 sm:text-right">
-														Est. 1RM {formatMetric(point.estimated1rmKg)}
-													</span>
-												</li>
-											))}
-										</ol>
-									</section>
-								) : null}
-
-								{trend.data?.truncated ? (
-									<p role="status" className="type-body-sm text-ink-3">
-										Showing the latest 500 record changes in this range.
-									</p>
-								) : null}
-							</>
-						) : null
-					) : (
-						<p className="type-body-sm border border-dashed border-rule bg-surface p-4 text-ink-3">
-							This exercise has session history but no weighted strength trend.
-						</p>
-					)}
-
-					<ExercisePerformanceHistory
-						sessions={performanceSessions}
-						isPending={history.isPending}
-						isError={history.isError || history.isFetchNextPageError}
-						hasNextPage={Boolean(history.hasNextPage)}
-						isFetchingNextPage={history.isFetchingNextPage}
-						onRetry={() => void history.refetch()}
-						onLoadMore={() => void history.fetchNextPage()}
-					/>
-				</>
-			)}
-		</div>
+		</ProgressTab>
 	)
 }

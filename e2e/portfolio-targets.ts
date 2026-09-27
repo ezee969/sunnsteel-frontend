@@ -373,10 +373,26 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'progress',
 		route: '/progress',
-		features: ['PROG-01', 'PROG-03', 'PROG-04', 'PROG-05'],
+		features: ['PROG-08', 'PROG-09', 'PROG-10', 'UX-11'],
 		ready: ['Plateau watch', /Sessions without a new best/i],
 		caption:
-			'Strength trends, muscle heatmap and volume comparisons over time.',
+			'Progress at a glance: goals, lifts without a new best and training signals, with the other views one tab away.',
+	},
+	{
+		slug: 'progress-strength',
+		route: '/progress/strength',
+		features: ['PROG-01', 'PROG-02', 'PROG-07', 'UX-11'],
+		ready: ['Record & progression timeline'],
+		caption:
+			'One lift at a time: its best set and estimated 1RM over time, every session behind them and the record timeline.',
+	},
+	{
+		slug: 'progress-load',
+		route: '/progress/load',
+		features: ['PROG-03', 'PROG-04', 'UX-11'],
+		ready: ['Muscle distribution', 'Load volume'],
+		caption:
+			'How the work spreads across muscles and weeks, with volume compared by muscle, routine and exercise.',
 	},
 	{
 		slug: 'schedule-week',
@@ -467,7 +483,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	},
 	{
 		slug: 'body-progress',
-		route: '/progress#body-progress',
+		route: '/progress/body',
 		features: ['PROG-12'],
 		setup: async page => {
 			await page
@@ -482,7 +498,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	},
 	{
 		slug: 'training-signals',
-		route: '/progress#training-signals',
+		route: '/progress',
 		features: ['PROG-10', 'PROG-09'],
 		setup: async page => {
 			await page

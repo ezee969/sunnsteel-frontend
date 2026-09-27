@@ -85,7 +85,8 @@ function buildWeekComparison(
 		key: 'WEEK_OVER_WEEK',
 		label: 'Week over week',
 		subject: 'Last two finished weeks',
-		href: '/progress',
+		// UX-11: the weekly load comparison lives on Progress › Load.
+		href: '/progress/load',
 		statement,
 		evidence:
 			`${formatWeekTotals(previousCompleteWeek, unit, formatWeek)} → ` +
