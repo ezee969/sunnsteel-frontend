@@ -250,11 +250,23 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'DASH-07',
 			'DASH-09',
 			'DASH-08',
+			'DASH-05',
 			'CORE-03',
 		],
 		ready: ['Weekly Workouts', 'Total Workouts', 'Total Volume'],
 		caption:
 			"Today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks, the next milestones and a few updates from members you follow.",
+	},
+	{
+		slug: 'dashboard-customize',
+		route: '/dashboard',
+		features: ['DASH-05', 'PREF-03'],
+		setup: async page => {
+			await page.getByRole('button', { name: 'Customize' }).click()
+		},
+		ready: ['Customize dashboard', 'Reset to default'],
+		caption:
+			"Choosing the dashboard's order and which sections it shows, saved to the member's account; Today's Workouts always stays first.",
 	},
 	{
 		slug: 'starter-templates',

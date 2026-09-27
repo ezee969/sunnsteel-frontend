@@ -20,6 +20,7 @@ import {
 	TrainingPartnerScheduleResponse,
 	TrainingPartnership,
 	TrainingPartnershipsResponse,
+	UpdateDashboardLayoutRequest,
 	UpdateProfileDiscoveryRequest,
 	UpdateProfilePrivacyRequest,
 	UpdateProfileRequest,
@@ -58,6 +59,17 @@ export const userService = {
 	// Update user profile
 	async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
 		return httpClient.patch<UserProfile>('/users/profile', data, true)
+	},
+
+	/** DASH-05 / PREF-03: the dashboard order and hidden sections. */
+	async updateDashboardLayout(
+		data: UpdateDashboardLayoutRequest,
+	): Promise<UserProfile> {
+		return httpClient.request<UserProfile>('/users/preferences/dashboard', {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		})
 	},
 
 	async updateProfilePrivacy(

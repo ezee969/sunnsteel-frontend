@@ -9,6 +9,7 @@ import { formatTimeAgo } from '@/lib/utils/date'
 import { PERSONAL_RECORDS_EMPTY_STATE } from '@/lib/utils/empty-states'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
+import { DashboardSection } from './DashboardSection'
 import PersonalRecordItem from './PersonalRecordItem'
 
 /**
@@ -25,26 +26,23 @@ export default function PersonalRecords() {
 
 	return (
 		// §11.5 — ruled, like every other list on this page.
-		<section>
-			<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
-				<Trophy className="h-4 w-4 text-ink-3" aria-hidden />
-				Personal Records
-			</h2>
-			<div className="pt-1">
-				{records.length === 0 ? (
-					<EmptyModule {...PERSONAL_RECORDS_EMPTY_STATE} />
-				) : (
-					records.map((record, index) => (
-						<PersonalRecordItem
-							key={record.exerciseId}
-							exercise={record.exerciseName}
-							timeAgo={formatTimeAgo(record.achievedAt)}
-							weight={`${formatWeight(record.weight, weightUnit)} × ${record.reps}`}
-							showSeparator={index < records.length - 1}
-						/>
-					))
-				)}
-			</div>
-		</section>
+		<DashboardSection
+			id="personal-records"
+			icon={<Trophy className="h-4 w-4 text-ink-3" aria-hidden />}
+		>
+			{records.length === 0 ? (
+				<EmptyModule {...PERSONAL_RECORDS_EMPTY_STATE} />
+			) : (
+				records.map((record, index) => (
+					<PersonalRecordItem
+						key={record.exerciseId}
+						exercise={record.exerciseName}
+						timeAgo={formatTimeAgo(record.achievedAt)}
+						weight={`${formatWeight(record.weight, weightUnit)} × ${record.reps}`}
+						showSeparator={index < records.length - 1}
+					/>
+				))
+			)}
+		</DashboardSection>
 	)
 }

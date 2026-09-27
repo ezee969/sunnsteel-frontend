@@ -15,6 +15,8 @@ import {
 	describeDashboardInsightSources,
 } from '@/lib/utils/dashboard-insights'
 
+import { DashboardSection } from './DashboardSection'
+
 const WEEK_FORMATTER = new Intl.DateTimeFormat(undefined, {
 	month: 'short',
 	day: 'numeric',
@@ -79,55 +81,49 @@ export default function TrainingInsights() {
 	}
 
 	return (
-		<section aria-labelledby="training-insights">
-			<h2
-				id="training-insights"
-				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
-			>
-				<Gauge className="h-4 w-4 text-ink-3" aria-hidden />
-				Training Insights
-			</h2>
-			<div className="pt-1">
-				{isPending ? (
-					<div
-						role="status"
-						aria-label="Loading training insights"
-						className="space-y-3 py-3"
+		<DashboardSection
+			id="training-insights"
+			icon={<Gauge className="h-4 w-4 text-ink-3" aria-hidden />}
+		>
+			{isPending ? (
+				<div
+					role="status"
+					aria-label="Loading training insights"
+					className="space-y-3 py-3"
+				>
+					<Skeleton className="h-14" />
+					<Skeleton className="h-14" />
+				</div>
+			) : isError ? (
+				<div role="alert" className="space-y-3 py-3">
+					<p className="type-body-sm text-foreground">
+						Training insights could not be loaded.
+					</p>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						onClick={retry}
+						disabled={plateaus.isFetching || volume.isFetching}
 					>
-						<Skeleton className="h-14" />
-						<Skeleton className="h-14" />
-					</div>
-				) : isError ? (
-					<div role="alert" className="space-y-3 py-3">
-						<p className="type-body-sm text-foreground">
-							Training insights could not be loaded.
-						</p>
-						<Button
-							type="button"
-							size="sm"
-							variant="outline"
-							onClick={retry}
-							disabled={plateaus.isFetching || volume.isFetching}
-						>
-							<RefreshCw className="size-4" aria-hidden />
-							Try again
-						</Button>
-					</div>
-				) : insights.length === 0 ? (
-					<EmptyModule {...DASHBOARD_INSIGHTS_EMPTY_STATE} />
-				) : (
-					<>
-						<p className="type-body-sm max-w-2xl pt-1 pb-2 text-ink-3">
-							{describeDashboardInsightSources(plateaus.data)}
-						</p>
-						<ul className="border-t border-rule-faint">
-							{insights.map(insight => (
-								<InsightRow key={insight.key} insight={insight} />
-							))}
-						</ul>
-					</>
-				)}
-			</div>
-		</section>
+						<RefreshCw className="size-4" aria-hidden />
+						Try again
+					</Button>
+				</div>
+			) : insights.length === 0 ? (
+				<EmptyModule {...DASHBOARD_INSIGHTS_EMPTY_STATE} />
+			) : (
+				<>
+					<p className="type-body-sm max-w-2xl pt-1 pb-2 text-ink-3">
+						{describeDashboardInsightSources(plateaus.data)}
+					</p>
+					<ul className="border-t border-rule-faint">
+						{insights.map(insight => (
+							<InsightRow key={insight.key} insight={insight} />
+						))}
+					</ul>
+				</>
+			)}
+		</DashboardSection>
 	)
 }

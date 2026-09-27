@@ -12,6 +12,7 @@ import {
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
+import { DashboardSection } from './DashboardSection'
 import StatCard from './StatCard'
 
 // FIX-08: these are shared app milestones, not the user's goals. Nothing in
@@ -21,7 +22,7 @@ import StatCard from './StatCard'
 const WEEKLY_MILESTONE = 4
 const TOTAL_SESSIONS_MILESTONE = 50
 
-export default function StatsOverview() {
+function StatsOverviewBody() {
 	const weightUnit = useWeightUnit()
 	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
 	const { data: progress } = useWorkoutProgress()
@@ -196,5 +197,14 @@ export default function StatsOverview() {
 				additionalText={compactVolume >= 100 ? 'Heavy' : 'Building'}
 			/>
 		</div>
+	)
+}
+
+/** DASH-05: the ruled stat band, as the configurable Training Stats section. */
+export default function StatsOverview() {
+	return (
+		<DashboardSection id="stats" headingHidden>
+			<StatsOverviewBody />
+		</DashboardSection>
 	)
 }

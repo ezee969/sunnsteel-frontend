@@ -23,6 +23,7 @@ import {
 } from '@/lib/utils/schedule-week'
 
 import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
+import { DashboardSection } from './DashboardSection'
 
 /**
  * DASH-03: this week at a glance. The days are the SCHED-01 week builder's,
@@ -70,118 +71,105 @@ export default function WeekStrip() {
 			})
 
 	return (
-		<section aria-labelledby="week-strip">
-			<div className="rule-heading flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-2">
-				<div>
-					<h2
-						id="week-strip"
-						className="type-section flex items-center gap-2 text-foreground"
-					>
-						<CalendarDays className="h-4 w-4 text-ink-3" aria-hidden />
-						This Week
-					</h2>
-					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
-						{week
-							? [describeScheduleTotals(week.totals), todayLine]
-									.filter(Boolean)
-									.join(' · ')
-							: ' '}
-					</p>
-				</div>
+		<DashboardSection
+			id="this-week"
+			icon={<CalendarDays className="h-4 w-4 text-ink-3" aria-hidden />}
+			description={
+				<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
+					{week
+						? [describeScheduleTotals(week.totals), todayLine]
+								.filter(Boolean)
+								.join(' · ')
+						: ' '}
+				</p>
+			}
+			action={
 				<Link
 					href={WEEK_STRIP_SCHEDULE_HREF}
 					className="type-body-sm text-ink-2 underline-offset-4 hover:underline"
 				>
 					Open schedule
 				</Link>
-			</div>
-
-			<div className="pt-3">
-				{data.isPending ? (
-					<div role="status" aria-label="Loading this week">
-						<Skeleton className="h-16 sm:h-20" />
-					</div>
-				) : data.isError || !week ? (
-					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">
-							This week is unavailable
-						</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							We could not load your routines or sessions for this week. Try
-							again.
-						</p>
-						<Button
-							type="button"
-							size="sm"
-							variant="outline"
-							className="mt-3"
-							onClick={data.refetch}
-						>
-							<RefreshCw className="size-4" aria-hidden />
-							Retry
-						</Button>
-					</div>
-				) : (
-					<>
-						<ol className="grid grid-cols-7 border-l border-t border-rule-faint">
-							{days.map(day => {
-								const status =
-									day.state === 'EMPTY' ? null : SCHEDULE_STATUS[day.state]
-								const Icon = status?.Icon
-								return (
-									<li
-										key={day.date}
-										className="border-b border-r border-rule-faint"
+			}
+			bodyClassName="pt-3"
+		>
+			{data.isPending ? (
+				<div role="status" aria-label="Loading this week">
+					<Skeleton className="h-16 sm:h-20" />
+				</div>
+			) : data.isError || !week ? (
+				<div role="alert" className="border border-rule bg-surface p-5">
+					<p className="type-panel text-foreground">This week is unavailable</p>
+					<p className="type-body-sm mt-1 text-ink-3">
+						We could not load your routines or sessions for this week. Try
+						again.
+					</p>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						className="mt-3"
+						onClick={data.refetch}
+					>
+						<RefreshCw className="size-4" aria-hidden />
+						Retry
+					</Button>
+				</div>
+			) : (
+				<>
+					<ol className="grid grid-cols-7 border-l border-t border-rule-faint">
+						{days.map(day => {
+							const status =
+								day.state === 'EMPTY' ? null : SCHEDULE_STATUS[day.state]
+							const Icon = status?.Icon
+							return (
+								<li
+									key={day.date}
+									className="border-b border-r border-rule-faint"
+								>
+									<Link
+										href={day.href}
+										aria-label={day.label}
+										aria-current={day.isToday ? 'date' : undefined}
+										className={cn(
+											'flex h-16 flex-col items-center justify-center gap-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-20',
+											// Today is a ring plus its accessible name, never colour alone.
+											day.isToday && 'ring-1 ring-inset ring-primary',
+										)}
 									>
-										<Link
-											href={day.href}
-											aria-label={day.label}
-											aria-current={day.isToday ? 'date' : undefined}
-											className={cn(
-												'flex h-16 flex-col items-center justify-center gap-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-20',
-												// Today is a ring plus its accessible name, never colour alone.
-												day.isToday && 'ring-1 ring-inset ring-primary',
-											)}
-										>
-											<span className="type-label text-ink-3">
-												{day.weekday}
-											</span>
-											<span className="type-data text-foreground">
-												{day.dayOfMonth}
-											</span>
-											{Icon ? (
-												<Icon
-													className={cn('size-4', status.tone)}
-													aria-hidden
-												/>
-											) : (
-												<span className="size-4" aria-hidden />
-											)}
-										</Link>
+										<span className="type-label text-ink-3">{day.weekday}</span>
+										<span className="type-data text-foreground">
+											{day.dayOfMonth}
+										</span>
+										{Icon ? (
+											<Icon className={cn('size-4', status.tone)} aria-hidden />
+										) : (
+											<span className="size-4" aria-hidden />
+										)}
+									</Link>
+								</li>
+							)
+						})}
+					</ol>
+					{weekStripStates(days).length > 0 ? (
+						<ul
+							aria-label="Legend"
+							className="type-body-sm mt-2 flex flex-wrap gap-x-4 gap-y-1 text-ink-3"
+						>
+							{weekStripStates(days).map(state => {
+								if (state === 'EMPTY') return null
+								const { Icon, label, tone } = SCHEDULE_STATUS[state]
+								return (
+									<li key={state} className="flex items-center gap-1.5">
+										<Icon className={cn('size-4', tone)} aria-hidden />
+										{label}
 									</li>
 								)
 							})}
-						</ol>
-						{weekStripStates(days).length > 0 ? (
-							<ul
-								aria-label="Legend"
-								className="type-body-sm mt-2 flex flex-wrap gap-x-4 gap-y-1 text-ink-3"
-							>
-								{weekStripStates(days).map(state => {
-									if (state === 'EMPTY') return null
-									const { Icon, label, tone } = SCHEDULE_STATUS[state]
-									return (
-										<li key={state} className="flex items-center gap-1.5">
-											<Icon className={cn('size-4', tone)} aria-hidden />
-											{label}
-										</li>
-									)
-								})}
-							</ul>
-						) : null}
-					</>
-				)}
-			</div>
-		</section>
+						</ul>
+					) : null}
+				</>
+			)}
+		</DashboardSection>
 	)
 }
