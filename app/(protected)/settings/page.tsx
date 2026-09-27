@@ -48,6 +48,7 @@ import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { logger } from '@/lib/utils/logger'
+import { localDateKey } from '@/lib/utils/schedule-week'
 import {
 	getUsernameValidationError,
 	normalizeUsername,
@@ -219,6 +220,8 @@ export default function SettingsPage() {
 				age: formData.age ? parseInt(formData.age, 10) : null,
 				sex: formData.sex ? (formData.sex as 'MALE' | 'FEMALE') : null,
 				weight: weightKg,
+				// PROG-12: a changed weight becomes this local date's body measurement.
+				localDate: localDateKey(new Date()),
 				height: formData.height ? parseFloat(formData.height) : null,
 				weightUnit: formData.weightUnit,
 				avatarUrl: avatarUrl || null,

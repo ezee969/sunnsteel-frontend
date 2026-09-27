@@ -454,6 +454,21 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Custom exercises: a movement the catalog lacks, with its muscles and equipment, private to the member who made it.',
 	},
 	{
+		slug: 'body-progress',
+		route: '/progress#body-progress',
+		features: ['PROG-12'],
+		setup: async page => {
+			await page
+				.getByRole('heading', { name: 'Body progress' })
+				.evaluate(heading =>
+					heading.closest('section')?.scrollIntoView({ block: 'start' }),
+				)
+		},
+		ready: ['Body progress', 'Log measurements'],
+		caption:
+			'Body weight and measurements over time, read against a body-weight goal, and shared on the profile only when the member chooses.',
+	},
+	{
 		slug: 'training-signals',
 		route: '/progress#training-signals',
 		features: ['PROG-10', 'PROG-09'],

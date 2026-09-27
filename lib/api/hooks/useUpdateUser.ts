@@ -1,6 +1,7 @@
 import { UpdateProfileRequest, UserProfile } from '@sunsteel/contracts'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { bodyProgressKey } from '@/lib/api/hooks/useBodyMeasurements'
 import { userService } from '@/lib/api/services/userService'
 
 export function useUpdateUser() {
@@ -10,6 +11,8 @@ export function useUpdateUser() {
 		mutationFn: data => userService.updateProfile(data),
 		onSuccess: updatedUser => {
 			queryClient.setQueryData(['user'], updatedUser)
+			// PROG-12: a changed weight is recorded as today's body measurement.
+			void queryClient.invalidateQueries({ queryKey: bodyProgressKey })
 		},
 	})
 }

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ProfileLoading } from '@/features/profile/profile-loading'
 import { ProfileView } from '@/features/profile/profile-view'
+import { ProfileBodyProgress } from '@/features/progress/body-progress'
 import { useSharedProfile } from '@/lib/api/hooks/useSharedProfile'
 import { HttpError } from '@/lib/api/services/httpClient'
 
@@ -41,5 +42,17 @@ export default function SharedProfilePage() {
 		)
 	}
 
-	return <ProfileView variant="member" profile={profile} weightUnit="KG" />
+	return (
+		<ProfileView
+			variant="member"
+			profile={profile}
+			weightUnit="KG"
+			bodyProgress={
+				<ProfileBodyProgress
+					source={{ kind: 'public', identifier: profile.username }}
+					weightUnit="KG"
+				/>
+			}
+		/>
+	)
 }

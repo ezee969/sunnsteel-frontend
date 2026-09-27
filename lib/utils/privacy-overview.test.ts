@@ -14,6 +14,7 @@ const privacy: ProfilePrivacySettings = {
 	workoutHistory: 'PRIVATE',
 	records: 'FOLLOWERS',
 	bodyMetrics: 'PRIVATE',
+	bodyProgress: 'FOLLOWERS',
 	routines: 'PUBLIC',
 	achievements: 'FOLLOWERS',
 }
@@ -23,7 +24,7 @@ describe('privacy overview', () => {
 		const groups = getPrivacyAudienceGroups(privacy, 'atlas_lifts')
 		expect(groups.map(group => [group.title, group.sections])).toEqual([
 			['Everyone', ['Biography', 'Training identity']],
-			['Followers', ['Location', 'Personal records']],
+			['Followers', ['Location', 'Personal records', 'Body progress']],
 			['Only me', ['Workout history', 'Body metrics']],
 		])
 		expect(groups[0].surfaces).toContain('/members/atlas_lifts')

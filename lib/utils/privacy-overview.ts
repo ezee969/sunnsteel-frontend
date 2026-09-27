@@ -15,6 +15,7 @@ export const PRIVACY_SECTION_LABELS: Record<
 	workoutHistory: 'Workout history',
 	records: 'Personal records',
 	bodyMetrics: 'Body metrics',
+	bodyProgress: 'Body progress',
 	routines: 'Routines',
 	achievements: 'Achievements',
 }
@@ -29,6 +30,7 @@ const LIVE_SECTIONS: Array<keyof ProfilePrivacySettings> = [
 	'workoutHistory',
 	'records',
 	'bodyMetrics',
+	'bodyProgress',
 ]
 const PENDING_SECTIONS: Array<keyof ProfilePrivacySettings> = [
 	'routines',

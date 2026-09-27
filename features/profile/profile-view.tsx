@@ -16,6 +16,7 @@ import {
 	Dumbbell,
 	Flame,
 	MapPin,
+	Scale,
 	Share2,
 	Target,
 	Trophy,
@@ -86,6 +87,11 @@ type ProfileViewProps = (
 	/** SOC-08 controls and explicitly granted partner-only schedule/routines. */
 	trainingPartnerAction?: React.ReactNode
 	trainingPartnerContent?: React.ReactNode
+	/**
+	 * PROG-12: the read-only body progress for this profile. Rendered only when
+	 * the viewer may see it (the owner, or `viewerAccess.bodyProgress`).
+	 */
+	bodyProgress?: React.ReactNode
 }
 
 export function ProfileView(props: ProfileViewProps) {
@@ -155,6 +161,8 @@ export function ProfileView(props: ProfileViewProps) {
 		: (publicUser!.personalRecords ?? [])
 	const canViewBodyMetrics =
 		isOwnProfile || publicUser!.viewerAccess.bodyMetrics
+	const canViewBodyProgress =
+		isOwnProfile || publicUser!.viewerAccess.bodyProgress === true
 	const canViewBiography = isOwnProfile || publicUser!.viewerAccess.biography
 	const biography = isOwnProfile ? ownerProfile!.bio : publicUser!.bio
 	const canViewLocation = isOwnProfile || publicUser!.viewerAccess.location
@@ -610,6 +618,22 @@ export function ProfileView(props: ProfileViewProps) {
 							</div>
 						)}
 					</section>
+
+					{props.bodyProgress !== undefined ? (
+						<section id="body-progress" className="scroll-mt-24">
+							<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
+								<Scale className="h-4 w-4 text-ink-3" aria-hidden /> Body
+								Progress
+							</h2>
+							{canViewBodyProgress ? (
+								props.bodyProgress
+							) : (
+								<p className="type-body-sm py-3 text-ink-3">
+									Body progress is private.
+								</p>
+							)}
+						</section>
+					) : null}
 
 					{props.trainingPartnerContent}
 					{props.activity}

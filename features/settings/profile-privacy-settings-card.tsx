@@ -62,6 +62,11 @@ const PRIVACY_FIELDS: PrivacyField[] = [
 			'Controls age, sex, weight, and height. Your email is never shared.',
 	},
 	{
+		key: 'bodyProgress',
+		description:
+			'Controls your weight trend and measurements over time on your profile. Separate from body metrics, which covers only your current weight.',
+	},
+	{
 		key: 'routines',
 		description:
 			'Caps who can find and open the routines you share, and your shared-routine activity. Each routine also has its own setting.',
@@ -121,7 +126,7 @@ export function ProfilePrivacySettingsCard({
 	}
 
 	return (
-		<Card>
+		<Card id="profile-privacy" className="scroll-mt-24">
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<ShieldCheck className="h-5 w-5 text-primary" aria-hidden />

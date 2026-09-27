@@ -9,6 +9,7 @@ import { ProfileView } from '@/features/profile/profile-view'
 import { RelationshipListsView } from '@/features/profile/relationship-lists-view'
 import { TrainingPartnerAction } from '@/features/profile/training-partner-action'
 import { TrainingPartnerSharedSections } from '@/features/profile/training-partner-shared-sections'
+import { ProfileBodyProgress } from '@/features/progress/body-progress'
 import { MemberRoutineView } from '@/features/routines/components/MemberRoutineView'
 import { useFollowUser } from '@/lib/api/hooks/useFollowUser'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
@@ -115,6 +116,12 @@ export default function ProfilePage() {
 				achievements={publicUser?.achievements}
 				weightUnit={viewer.weightUnit}
 				relationshipHrefs={getRelationshipHrefs(viewer.username)}
+				bodyProgress={
+					<ProfileBodyProgress
+						source={{ kind: 'own' }}
+						weightUnit={viewer.weightUnit}
+					/>
+				}
 			/>
 		)
 	}
@@ -162,6 +169,12 @@ export default function ProfilePage() {
 			onFollowToggle={onFollowToggle}
 			relationshipHrefs={getRelationshipHrefs(publicUser.username)}
 			trainingPartnerAction={<TrainingPartnerAction member={publicUser} />}
+			bodyProgress={
+				<ProfileBodyProgress
+					source={{ kind: 'member', identifier: publicUser.username }}
+					weightUnit={viewer.weightUnit}
+				/>
+			}
 			trainingPartnerContent={
 				<TrainingPartnerSharedSections
 					memberId={publicUser.id}

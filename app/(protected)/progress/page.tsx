@@ -15,6 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { BodyProgressSection } from '@/features/progress/body-progress'
 import { ConsistencyCalendar } from '@/features/progress/consistency-calendar'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { MuscleGroupHeatmap } from '@/features/progress/muscle-group-heatmap'
@@ -144,6 +145,11 @@ export default function ProgressPage() {
 				isPending={personalGoals.isPending}
 				isError={Boolean(personalGoals.error)}
 				onRetry={() => void personalGoals.retry()}
+			/>
+
+			<BodyProgressSection
+				weightUnit={weightUnit}
+				goals={personalGoals.data?.goals}
 			/>
 
 			<PlateauWatch

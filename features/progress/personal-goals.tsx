@@ -53,7 +53,7 @@ function getGoalName(goal: PersonalGoalProgress): string {
 
 function getMissingCopy(goal: PersonalGoalProgress): string {
 	return goal.type === 'BODY_WEIGHT'
-		? 'Add your current body weight in Settings to compare this target.'
+		? 'Log your weight under Body progress to compare this target.'
 		: 'Complete a loaded set for this exercise to establish your current estimate.'
 }
 
