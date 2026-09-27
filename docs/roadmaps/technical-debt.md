@@ -17,9 +17,12 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. `TD-53`, the sweep's training-partner test
-depending on local data, and `TD-52`, stacked dialog footers that put Cancel
-above the primary, both closed on 2026-09-27; `TD-51`, exercise names cut off in
+`TD-54` and `TD-55` are open, both recorded on 2026-09-27 during the owner's
+mobile-density review. Their product-side companions are the `UX-*` items in the
+roadmap's [Page density and long lists](product-roadmap.md#page-density-and-long-lists)
+section. `TD-53`, the sweep's training-partner test depending on local data,
+and `TD-52`, stacked dialog footers that put Cancel above the primary, both
+closed on 2026-09-27; `TD-51`, exercise names cut off in
 the routine builder's card headers, on 2026-09-26; `TD-50`, the routine builder's
 clipped set rows, on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
 routine at finish, on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
@@ -34,6 +37,106 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-54"></a>
+
+### TD-54 — On a phone, /routines gives Create Routine a row of its own
+
+**Impact.** Below `sm`, Create Routine sits alone at the right of its own
+row, between the masthead and the filters. The left two-thirds of that row
+are empty, so the owner reported it as a large empty gap before the button
+(screenshot, 2026-09-27). The four filter buttons then wrap to two rows, so
+the first routine starts about 330px down a 870px screen. Under all of this,
+the routine list scrolls in a box of its own inside the page, which already
+scrolls.
+
+**Evidence.** Checked on the local stack on 2026-09-27 at 330 and 390, in the
+dark theme:
+
+- `app/(protected)/routines/page.tsx:39-48` wraps the one `Button` in
+  `flex justify-end`, with nothing else in the row. The earlier dead band (an
+  empty spacer and a hidden button, removed in `4ad4be8`) is gone. What is left
+  is the empty row itself: a 40px control with 16px above and below.
+- `WorkoutFilters` puts "All Workout Routines", Recent, Favorites and
+  Completed in one `flex-wrap` row of 44px buttons. At 330 that wraps to two
+  rows.
+- The routine list is its own scroll box. The page root is
+  `h-full min-h-0 flex flex-col`, and `WorkoutsList.tsx:83-84` gives the list
+  `flex-1 min-h-0 overflow-y-auto overscroll-contain`. On a phone the list gets
+  what is left of the viewport below the header and filters.
+- `routines/loading.tsx` has no Create Routine button and uses `gap-6`, so
+  the header changes size when the page finishes loading.
+
+**Direction.**
+
+- Put Create Routine where it does not cost a row. The options are the
+  masthead row (as a trailing action, as `RoutineHeader` does on the detail
+  page) or the start of the filter row.
+- Tighten the filters below `sm` so they take one line: a segmented control, a
+  `NativeSelect`, or shorter labels such as "All".
+- Decide the nested scroll box under the page pattern `UX-01` records, rather
+  than on this page alone.
+- Make the loading header match the loaded one.
+- There is still one filled primary action per region (§11.4). Create Routine
+  stays that primary.
+
+**Closure criteria.**
+
+- At 320, 390, 430, 639, 640 and 768, in both themes, there is no row whose
+  only content is Create Routine.
+- The first routine starts no lower than the masthead plus one row of controls.
+- The loading and loaded headers occupy the same height.
+- The scoped sweep `layout routines` passes.
+
+<a id="td-55"></a>
+
+### TD-55 — Links to a section of Settings open at the top of the page
+
+**Impact.** Three places link into a named part of Settings:
+
+- Activity's "Defaults for each kind are in Settings" goes to
+  `/settings#activity-sharing`.
+- The training-partner action goes to `/settings#training-partners`.
+- Body progress's privacy link goes to `/settings#profile-privacy`.
+
+None of them scrolls to its section. On a phone, Profile Privacy is 11,537px
+below the top of Settings, so a person who follows the link has to find it by
+scrolling through the whole page. `UX-08` wants to add a fourth link of this
+kind, which would inherit the problem.
+
+**Evidence.** Measured on 2026-09-27 on the local stack at 390, signed in. A
+cold load of `/settings#profile-privacy` left `<main>` at `scrollTop` 0, and
+the `#profile-privacy` card at 11,537px. There are three reasons it cannot
+work:
+
+- `<main>` is the scroll container, not the document (`app/(protected)/layout.tsx:237`),
+  so the browser's own jump to a fragment does not move it.
+- The cards mount only once the profile has loaded, which is after the browser
+  has already looked for the fragment.
+- Nothing in the app reads `location.hash`.
+
+**Not verified:** a client-side `<Link>` navigation from another page. The
+test of it landed on `/login` because the saved sign-in was lost, so it was not
+measured.
+
+**Direction.**
+
+- Add one small hook on the Settings page that, once its cards have mounted,
+  scrolls the element named by the hash into view inside `<main>`. It must
+  respect `scroll-mt` and reduced motion (§9.3: jump, do not animate).
+- Optionally, move focus to the section's first control, such as
+  `#privacy-workoutHistory`, so a keyboard or screen-reader user lands on it
+  too.
+- Give `#activity-sharing` the `scroll-mt-24` that `#profile-privacy` already
+  has.
+
+**Closure criteria.**
+
+- At 390 and 1440, both a cold load and a client-side navigation to each of
+  the three anchors leave its section's heading visible at the top of
+  `<main>`.
+- Under reduced motion the jump is instant.
+- The scoped sweep `layout settings` passes.
 
 <a id="td-53"></a>
 
@@ -821,6 +924,13 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-27 (revision 28):** Recorded `TD-54` from the owner's review of
+  mobile density. On a phone, /routines gives Create Routine a row of its own,
+  wraps its filters to two rows and scrolls the list in a box of its own.
+  Also recorded `TD-55`, found while checking the Activity privacy link the
+  owner asked for: the three existing links into a section of Settings open at
+  the top of the page. The roadmap's new `UX-01` to `UX-09` record the rest of
+  the same review. No implementation changed in this revision.
 - **2026-09-27 (revision 27):** Recorded and closed `TD-53`, the one failure
   in `TD-52`'s full sweep: the training-partner case hard-coded a member the
   local data had already partnered. It now picks a free seeded member. The

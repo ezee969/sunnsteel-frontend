@@ -223,6 +223,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 11    | Complex infrastructure   | XL   | OFFLINE-01, MSG-01 through MSG-06                                                                                               | Offline conflict resolution, realtime delivery, moderation, and unread state are substantial systems. `MSG-06` is the single realtime transport both private messaging and community rooms read.                                                                                                                                                                                                                                                                                                                        |
 | 12    | Communities              | XL   | COMM-01 through COMM-08                                                                                                         | A persistent social space needs identity, privacy, blocking, moderation, verified activity and a realtime transport before it has anything to host. Decompose further before scheduling any of it.                                                                                                                                                                                                                                                                                                                      |
 | 13    | Develop layer            | XL   | LIB-01 through LIB-03, INTEL-05                                                                                                 | Content needs an ownership, authoring and moderation model before it can exist, and evidence-linked guidance needs content to point at. Training stays the measurable foundation throughout.                                                                                                                                                                                                                                                                                                                            |
+| 14    | Page density             | M    | UX-01 through UX-09, with the debt entries TD-54 and TD-55                                                                      | Frontend only, and independent of groups 11 to 13, so it can run beside them. `UX-01` decides the collapse, bounded-list and explanation patterns first; every other item applies them to one page. `UX-02` also waits for `DASH-05`, which touches the same dashboard sections, and `UX-08` waits for `TD-55`. `TD-54` needs only `UX-01`'s nested-scroll decision.                                                                                                                                                  |
 
 Order is dependency order, not priority: group 1 leads because it is already in
 flight, not because it outranks the honesty fixes in group 2, which were a day of
@@ -523,6 +524,53 @@ two.
 | NAV-04 | `CANDIDATE` | M    | Mobile quick actions      | Start or resume a workout, create a routine, or open the timer from a compact menu.                                                                                                                                                                                                                                                                                                                                                              | LIVE-01                   |
 | NAV-05 | `SHIPPED`   | S    | Navigation badges         | The protected sidebar includes Notifications and shows restrained numeric indicators for unread updates and still-actionable workouts planned today. Counts above nine compact to `9+` visually while the accessible name keeps the exact count. An active workout suppresses the schedule count because the global Resume banner already owns that state. Shipped 2026-09-17, frontend only, over the existing notification and schedule reads. | NOTIF-01, SCHED-01        |
 | NAV-06 | `SHIPPED`   | S    | Persistent history access | Keep workout history directly reachable even when Workouts redirects to an active session. Shipped as the dedicated `History` navigation entry.                                                                                                                                                                                                                                                                                                  | None                      |
+
+### Page density and long lists
+
+These items come from the owner's mobile review on 2026-09-27. Several pages
+state everything at once, and on a phone that makes them very long. The
+heights below were measured on the local stack at 390 in the dark theme, on
+the owner's account:
+
+| Page | Height at 390 |
+| --- | --- |
+| Dashboard | 3,365px |
+| History, first page of 20 | 4,362px |
+| Progress | 13,329px |
+| Exercises | 7,799px |
+| Schedule, week view | 1,395px |
+| Achievements | 4,306px |
+| Activity, Yours | 4,633px |
+| Notifications | 2,905px |
+
+None of these items adds data or a read. Each one decides how much of what
+already exists is shown at first.
+
+Two layout defects found in the same review are recorded as debt rather than
+here:
+
+- [`TD-54`](technical-debt.md#td-54): /routines gives Create Routine a row of
+  its own.
+- [`TD-55`](technical-debt.md#td-55): links to a section of Settings do not
+  scroll to it.
+
+**`UX-01` goes first.** Without it, each page would invent its own collapse
+and its own scroll box. The design system has no rule for either, and the code
+already has three ad-hoc versions: a native `<details>` in the Progress
+timeline, a `max-height` toggle in the history filters, and the nested scroll
+box on /routines.
+
+| ID    | Status   | Size | Feature                           | User-facing behavior | Dependencies |
+| ----- | -------- | ---- | --------------------------------- | -------------------- | ------------ |
+| UX-01 | `QUEUED` | S    | Long-content patterns             | Write the patterns every later `UX-*` item uses into the [design system](../ui-design-system.md) as a new §11 subsection, then build them once. There are three. **(1) Collapsible section.** The `h2` stays a heading, and the toggle is a button inside it with `aria-expanded` and `aria-controls`. A collapsed section shows a one-line summary in words, which must not restate the screen's progress (§11.8), and a chevron glyph. The height does not animate under reduced motion (§9.3); otherwise it uses `--motion-base`. The open or closed state is remembered per device, with `localStorage` read and written inside `try/catch`, as `ss-motion` is. There is no Collapsible primitive, so the choice is between adding the shadcn one and generalising the history-filter toggle. **(2) Bounded list.** Recommendation: on a phone, show the first N rows plus "Show N more" or "Show all (count)", and do not put a `max-height` scroll box inside a page that already scrolls. A nested box traps the thumb, chains scrolling unpredictably and hides rows with no cue; /routines shows all three today (`TD-54`). A height-bounded region is reserved for a page whose content *is* one list, and there it fills the rest of the viewport under controls that stay put. Decide here whether that is allowed at all. **(3) Explanation on demand.** A one-line summary plus an information control that opens on a tap or the keyboard, never on hover alone, because touch has no hover. `tooltip.tsx` opens on hover or focus and is too small for several sentences, and the Popover primitive was deleted in `TD-32`. Recommendation: an inline "How this works" disclosure built on pattern 1. | Design-system amendment |
+| UX-02 | `QUEUED` | S    | Collapsible dashboard sections    | Recent Activity (5 rows, 578px at 390), Personal Records (5 rows, 383px), Training Insights (at most 3 rows plus a source paragraph, 399px) and Upcoming Milestones (at most 6 rows, 705px) become collapsible sections (`UX-01`). Each keeps a summary line when closed, for example "Latest: Romanian Deadlift 85 kg × 10" or "Next rank: Maestro · 4 more active weeks". Recommendation: they start closed below `md` and open from `md`, and a member's choice is remembered. **Kept as they are:** Today's Workouts and This Week, which hold the one primary action (`DASH-02`), and From Members You Follow. The last is already capped at three rows and sits last on the screen, so collapsing it would shorten nothing above anything. The six-card stat band (about 500px at 390) is the largest block the owner did not list. Reshaping it belongs to `DASH-06`, not to a collapse. **Sequencing:** `DASH-05`/`PREF-03`, in progress now, add per-account reorder and hide to these same sections, so start this item after they ship. "Collapsed" is then a third state beside shown and hidden. Recommendation: store it per device, because a phone and a desktop want different defaults. | UX-01, DASH-05 |
+| UX-03 | `QUEUED` | S    | Workout history as one list       | The list loads 20 sessions per page and fetches the next page by itself as you scroll (an `IntersectionObserver` plus a Load more button), so it grows without end inside the page's own scroll. The owner asked for a scroll box with a maximum height. Under `UX-01` this page's list *is* the page, so the choice is between two options. One is a list that fills the viewport under the masthead and the Filter toggle, as /routines does. The other is a page that keeps scrolling, with the Filter toggle held at the top. A fixed-height box in the middle of the page is not one of the options. Month headings ("September 2026") give a long list landmarks. Infinite loading stays. | UX-01 |
+| UX-04 | `QUEUED` | M    | Progress page density             | The page has fourteen sections. Add a short jump index under the masthead, and apply `UX-01` section by section. **Kept open:** Personal goals (at most 8, 278px) and Training signals (586px), which carries the `INTEL-02` suggestion, so it is never closed by default. **Collapsible:** Body progress (511px, with its entry list bounded to the latest 5), Consistency (547px), Muscle distribution (a 17-row table, 1,397px, with its top-3 tiles as the closed summary), Load volume (832px) and Session comparison (1,469px). **Bounded lists:** Plateau watch (9 flagged lifts, 1,364px) shows 3 and then "Show 6 more", the Record & progression timeline (20 events, 3,787px) shows 5 before its existing "Load earlier events", and Performance history (10 accordion rows) shows 5. The exercise explorer (select, charts and record changes) stays open because it is the page's interactive core. Whether it should move up the page is a question for planning. | UX-01 |
+| UX-05 | `QUEUED` | S    | Exercise catalog on a phone       | All matching exercises render, about 81 today (the 80 in the catalog plus the member's own), with no pagination. The filters take 548px before the Catalog heading at 390. On a phone the filters collapse to the search field and a "Filters (n)" toggle, as history's do, and the search stays reachable while scrolling. The list follows `UX-01`: either a list that fills the viewport, or A–Z letter headings as landmarks. At about 80 rows virtualization is not needed. The result count stays stated. | UX-01 |
+| UX-06 | `QUEUED` | S    | Shorter schedule explanation      | The week view opens with a four-sentence paragraph of about 70 words (`schedule-week-view.tsx:313-320`), five lines at 390 above the days. It covers planned days, training blocks, rotations, rest days, and moving and skipping. Replace it with one line, "Planned days follow your routines as they are now", plus the `UX-01` explanation control holding the full text, opened on a tap. The rules must stay stated and reachable, because the schedule states its rules rather than leaving them implied. The same control is the candidate for the other long rule paragraphs: Training Insights' source note, each Achievements section's opening, and the Notifications "Today" subtitle. Those are listed so they are applied the same way, not as part of this item. | UX-01 |
+| UX-07 | `QUEUED` | S    | Achievements density              | Earned milestones takes 2,666px at 390: 21 of 25 items in five category groups. Each category becomes a collapsible group whose heading carries its count ("Sessions · 3 earned"). Recommendation: closed below `md`. Next milestones (5 rows) stays open, because it is the forward-looking part of the page. The three section introductions use the `UX-06` explanation pattern. A scroll box is not used. | UX-01, UX-06 |
+| UX-08 | `QUEUED` | S    | Privacy cap links to its setting  | Activity › Yours prints, for example, "Your workout history privacy is Only me, so this reaches nobody else. Change it in Settings under privacy." (`describeSectionCap`, `lib/utils/activity.ts:277`), and gives no way to get there. Make "Change it in Settings" a link to `/settings#profile-privacy` that lands on that section's own select (`#privacy-<section>`, for example `#privacy-workoutHistory`). That needs `TD-55`, since no anchor into Settings scrolls today. **Changing it from the Activity page was considered and not recommended as the first step.** The same setting decides what the profile shows, such as workout history, records, routines and achievements. Widening it from an activity row would silently widen the profile. If it is ever offered, it must be a dialog that names every surface the change reaches. | TD-55 |
+| UX-09 | `QUEUED` | S    | Notifications list                | Updates renders everything the server returns: up to 50 (`NOTIFICATIONS_LIST_LIMIT`) from the last 30 days, with no paging. That was about 22 rows and 2,500px at 390. Split it into New and Earlier, show every unread row and the first few read ones, then "Show earlier (n)". Mark all read stays at the top. This is frontend only while the 50 cap stands. A cursor for older updates would be a backend and contracts change, and is not part of this item. | UX-01 |
 
 ### Notifications and retention
 
@@ -2509,3 +2557,15 @@ it again without addressing the original decision.
 - **2026-09-27 (revision 156):** The owner deferred `PROG-13` (progress
   photos) and `SCHED-08` (travel or alternate gym). Claimed `DASH-05` with
   `PREF-03`, which ship as one change.
+- **2026-09-27 (revision 157):** Recorded the owner's mobile-density review as
+  the new Page density and long lists section, `UX-01` to `UX-09`, and queue
+  group 14. `UX-01` fixes the collapse, bounded-list and explanation patterns
+  in the design system before any page adopts them. Each page item states
+  what was measured at 390, what the owner asked for, and where the
+  recommendation differs from the ask, with the reason: no nested scroll box
+  inside a scrolling page; From Members You Follow kept as it is; the
+  profile-privacy setting reached through a link rather than changed from
+  Activity. The two layout defects from the same review are debt: `TD-54`
+  (/routines' Create Routine row) and `TD-55` (links to a section of
+  Settings do not scroll to it). `UX-02` waits for `DASH-05`, which is in
+  progress. No implementation changed.
