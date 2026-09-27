@@ -17,8 +17,9 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
-There are no open entries. `TD-51`, exercise names cut off in the routine
-builder's card headers, closed on 2026-09-26; `TD-50`, the routine builder's
+There are no open entries. `TD-52`, stacked dialog footers that put Cancel
+above the primary, closed on 2026-09-27; `TD-51`, exercise names cut off in
+the routine builder's card headers, on 2026-09-26; `TD-50`, the routine builder's
 clipped set rows, on 2026-09-25, and `TD-49`, an unticked set's weight reaching the
 routine at finish, on 2026-09-24. Frontend PWA maintenance debt `TD-44` closed on
 2026-09-23 after the owner completed the required installed-iPhone update and
@@ -32,6 +33,50 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-52"></a>
+
+### TD-52 — Stacked dialog footers put Cancel above the primary — CLOSED 2026-09-27
+
+**Impact.** Below `sm` (640px) every `Dialog` stacked its footer with Cancel
+on top and the primary underneath: "Cancel" over "Create exercise", "Send
+report", "Save note" and the rest. §11.9 asks for the primary first when the
+actions stack and last when they share a row. The confirmation dialogs were
+already right, because `AlertDialogFooter` reverses its stack.
+
+**Evidence.** Found on 2026-09-27 while reading `components/ui/dialog.tsx`:
+its comment quoted §11.9, but `DialogFooter` was `flex-col`, so the stack
+kept DOM order. All twenty `DialogFooter`s in `app/` and `features/`,
+including `PROG-12`'s new body-measurement dialog, put the primary last in
+the DOM, which is right for the row and wrong for the stack.
+`AlertDialogFooter` was already `flex-col-reverse`. `ExerciseNoteRow` also
+passed `sm:gap-0`, so from `sm` its Cancel and Save touched.
+
+**Direction.** Reverse the stack in the primitive, as `AlertDialogFooter`
+does, and keep every caller's DOM order, so the row stays primary last.
+
+**Closure criteria.** At 390 the primary is the top full-width action of a
+stacked footer, and at 768 the actions share a row with the primary last, in
+both themes; no footer relies on the old order.
+
+**Closed 2026-09-27.** `DialogFooter` is `flex-col-reverse` below `sm`, and
+`ExerciseNoteRow` no longer overrides its gap. All twenty `DialogFooter`s and
+twelve `AlertDialogFooter`s were read. The three-action footers reverse cleanly:
+`move-occurrence-dialog` stacks Move, Cancel, "Put back on …", and
+`stale-session-recovery-dialog` stacks Resume, "Finish saved work", Discard,
+so its destructive action is last. Measured on the local stack at 390 and 768
+in both themes, on "New exercise" (a `Dialog`) and a routine's delete
+confirmation (an `AlertDialog`). At 390 the primary sits 48px above Cancel,
+both the footer's full 308px. At 768 they share one row with Cancel first.
+Full sweep at one worker: 481/482 in 29.3m. The one failure, `training
+partners request and cancel`, is not this change: it needs the signed-in
+member to have no partnership with `ken-watanabe`, and an active one was
+created and accepted in the same millisecond on 2026-09-23, so the page
+shows "Training Partner" instead of the add button. That fixture was left
+alone. **Not changed:** focus order still follows the DOM,
+so Tab reaches Cancel before the primary it sits under, as `AlertDialogFooter`
+always has. **Not verified:** the exercise-note dialog in a browser, and touch
+devices.
 
 <a id="td-51"></a>
 
@@ -733,6 +778,9 @@ a list of active debt.
 
 ## Document history
 
+- **2026-09-27 (revision 26):** Recorded and closed `TD-52`: below `sm`,
+  every `Dialog` stacked Cancel above its primary, against §11.9. The
+  register is empty again.
 - **2026-09-26 (revision 25):** Recorded and closed `TD-51`, found while
   checking `ROUT-12`: the routine builder cut exercise names off beside the
   card controls on phones. The register is empty again.

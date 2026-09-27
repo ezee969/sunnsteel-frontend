@@ -101,8 +101,8 @@ function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
 			data-slot="dialog-footer"
 			className={cn(
 				// §11.9: primary last in a row; when stacked, primary first and both
-				// full width.
-				'flex flex-col gap-2 sm:flex-row sm:justify-end [&>*]:w-full sm:[&>*]:w-auto',
+				// full width. Callers put the primary last, so the stack reverses it.
+				'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end [&>*]:w-full sm:[&>*]:w-auto',
 				className,
 			)}
 			{...props}

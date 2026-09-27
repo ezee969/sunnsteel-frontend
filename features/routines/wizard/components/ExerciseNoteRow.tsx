@@ -112,7 +112,7 @@ export function ExerciseNoteRow({
 						className="min-h-[120px]"
 						rows={5}
 					/>
-					<DialogFooter className="gap-2 sm:gap-0">
+					<DialogFooter>
 						<Button variant="outline" onClick={() => setIsOpen(false)}>
 							Cancel
 						</Button>
