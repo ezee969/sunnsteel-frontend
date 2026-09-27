@@ -5,6 +5,7 @@ import { RELATIONSHIP_LIST_KINDS } from '@sunsteel/contracts'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { PageTabs } from '@/components/layout/page-tabs'
 import { Button } from '@/components/ui/button'
 import {
 	RelationshipMemberRow,
@@ -64,35 +65,15 @@ export function RelationshipListsView({
 				<p className="type-data text-ink-3">@{profile.username}</p>
 			</div>
 
-			{/* Route-backed tabs: each list has its own URL, so the control is
-			    navigation marked with aria-current rather than a Radix tablist.
-			    Same selected/unselected treatment as the Progress range group. */}
-			<nav aria-label="Connections" className="flex flex-wrap gap-1">
-				{RELATIONSHIP_LIST_KINDS.map(option => {
-					const isCurrent = option === kind
-					const count = counts[option]
-					return (
-						<Button
-							key={option}
-							asChild
-							size="sm"
-							variant={isCurrent ? 'secondary' : 'ghost'}
-						>
-							<Link
-								href={getRelationshipListHref(profile.username, option)}
-								aria-current={isCurrent ? 'page' : undefined}
-								replace
-								scroll={false}
-							>
-								{getRelationshipListLabel(option)}
-								{count === undefined ? null : (
-									<span className="type-data">{count}</span>
-								)}
-							</Link>
-						</Button>
-					)
-				})}
-			</nav>
+			{/* Route tabs (design system §21): each list has its own URL. */}
+			<PageTabs
+				label="Connections"
+				tabs={RELATIONSHIP_LIST_KINDS.map(option => ({
+					href: getRelationshipListHref(profile.username, option),
+					label: getRelationshipListLabel(option),
+					count: counts[option],
+				}))}
+			/>
 
 			<section aria-label={label} className="space-y-3">
 				{kind === 'mutuals' ? (

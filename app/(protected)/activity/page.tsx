@@ -1,46 +1,32 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
-import { Button } from '@/components/ui/button'
+import { PageTabs } from '@/components/layout/page-tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ActivityFeed } from '@/features/activity/activity-feed'
 import { OwnActivity } from '@/features/activity/own-activity'
 
-type ActivityView = 'following' | 'yours'
+/**
+ * `?view=yours` so Settings can send the owner straight to their own list.
+ * The two views are page tabs (design system §21): links that keep their
+ * URLs, so Back returns to the other view.
+ */
+const ACTIVITY_TABS = [
+	{ href: '/activity', label: 'Following' },
+	{ href: '/activity?view=yours', label: 'Yours' },
+] as const
 
-/** `?view=yours` so Settings can send the owner straight to their own list. */
 function ActivityViews() {
-	const router = useRouter()
-	const pathname = usePathname()
 	const params = useSearchParams()
-	const view: ActivityView =
-		params.get('view') === 'yours' ? 'yours' : 'following'
-
-	const choose = (next: ActivityView) =>
-		router.replace(next === 'yours' ? `${pathname}?view=yours` : pathname, {
-			scroll: false,
-		})
+	const yours = params.get('view') === 'yours'
 
 	return (
 		<>
-			<div role="group" aria-label="Activity view" className="flex gap-1">
-				{(['following', 'yours'] as const).map(option => (
-					<Button
-						key={option}
-						type="button"
-						size="sm"
-						variant={view === option ? 'secondary' : 'ghost'}
-						aria-pressed={view === option}
-						onClick={() => choose(option)}
-					>
-						{option === 'following' ? 'Following' : 'Yours'}
-					</Button>
-				))}
-			</div>
-			{view === 'following' ? <ActivityFeed /> : <OwnActivity />}
+			<PageTabs label="Activity views" tabs={ACTIVITY_TABS} />
+			{yours ? <OwnActivity /> : <ActivityFeed />}
 		</>
 	)
 }

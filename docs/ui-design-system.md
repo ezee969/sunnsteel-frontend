@@ -1360,3 +1360,74 @@ pinned at the top of `<main>` while it does.
   starts closed on every visit.
 - **The rules stay reachable.** This shortens what is shown first. It never
   removes a rule a page used to state.
+
+---
+
+## 21. Amendment — page tabs (2026-09-27)
+
+An owner-approved addition for `UX-10`, taken outside an implementation batch
+as §17 requires. The owner asked to reach each part of a long page directly,
+and delegated the groups, pages and links. On 2026-09-27 Settings measured
+17,622px at 390 and Progress 6,128px, even after §20. A page that holds
+several separate jobs is split into a few tabs, and never into one route per
+section: a route per section loses the overview and splits sections that only
+make sense together.
+
+`components/layout/page-tabs.tsx`, with its rules in `lib/utils/page-tabs.ts`.
+
+### 21.1 A tab is a route
+
+- **Each tab is a URL segment** (`/progress/body`), under a shared
+  `layout.tsx` that owns the masthead and the tab bar, so neither remounts
+  when the tab changes. A tab reads only its own data.
+- **The bare route is always the first tab**, so every existing link to the
+  page keeps working. A view that already lives in a query (Activity's
+  `?view=yours`) keeps it; the most specific match is the current tab.
+- **Three to six tabs.** Fewer is not worth a bar; more means the groups are
+  wrong.
+
+### 21.2 Navigation, not a tablist
+
+- Markup is a `nav` labelled for its page, with a list of links, and
+  `aria-current="page"` on the current one. It is not an ARIA `tablist`,
+  because every tab changes the URL, and Back must return to the tab before.
+- Changing tab is an ordinary navigation (history push) and returns `<main>`
+  to the top. The first render never scrolls, so a deep link keeps its
+  position.
+
+### 21.3 Look
+
+- One row under the masthead, pinned at the top of `<main>` like §20.2's
+  controls: `sticky`, with its negative top cancelling `<main>`'s padding,
+  on an opaque `--background` with a 1px `--rule` below and no shadow (§8).
+  It sits at `z-20`, above in-page sticky cells such as the muscle heatmap's
+  first column. The bar and the tab content share one parent, or the bar
+  stops pinning at the end of its wrapper.
+- A tab is Button type (§5) in `--ink-2`. The current tab is `--foreground`
+  over a 2px ink underline. **Never a filled block, and never `honour`**,
+  which §11.10 grandfathers for the sidebar's marker only. Hover changes the
+  colour only. The tab is 44px tall below `md` and 40px from it.
+- **Below `sm`, the row is one `NativeSelect` labelled "Section"**, which
+  navigates when changed. §20.2 collapses a row that does not fit rather
+  than wrapping it, and a sideways-scrolling row would hide tabs with no cue.
+  From `sm`, the links show.
+
+### 21.4 Old anchors
+
+- In-app links go straight to the tab that holds their target.
+- An old `#id` link (a bookmark, a portfolio target, a notification from
+  before the split) is forwarded by the bare tab to the tab that now holds
+  the element, through `useHashForward`, with rules that match exact ids
+  first and then id prefixes (`privacy-*`). Nothing renders while it
+  forwards.
+- The receiving tab lands on the element with `useScrollToHash` (TD-55).
+  That call is made in each tab, not in the layout, because it must re-run
+  when a tab mounts.
+
+### 21.5 With §20
+
+- §20 still applies inside a tab. A section that sits alone or with one other
+  section in its tab does not collapse, because the tab is already the choice;
+  bounded lists stay.
+- **Unsaved drafts do not survive a tab change**, exactly as leaving the page
+  never kept them. A tab holding a form keeps its one Save on that tab.
