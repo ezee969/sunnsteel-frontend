@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -310,15 +311,22 @@ export function ScheduleWeekView({
 				</div>
 			</div>
 
-			<p className="type-body-sm max-w-2xl text-ink-3">
-				Planned days follow your weekly routines as they are now, from the day
-				each routine was created, or the training block in force on that date,
-				which is named beside its days. Rotation days have no date: the next one
-				is shown below, and their sessions appear on the day you trained. Rest
-				days come from each weekly routine&apos;s planned rest. Reschedule
-				postpones, moves or skips one planned workout without changing the
-				routine, and a day that passed can still be marked skipped.
-			</p>
+			<Explanation summary="Planned days follow your routines as they are now.">
+				<p>
+					Each routine plans from the day it was created, or from the training
+					block in force on that date, which is named beside its days.
+				</p>
+				<p>
+					Rotation days have no date: the next one is shown below, and their
+					sessions appear on the day you trained.
+				</p>
+				<p>Rest days come from each weekly routine&apos;s planned rest.</p>
+				<p>
+					Reschedule postpones, moves or skips one planned workout without
+					changing the routine, and a day that passed can still be marked
+					skipped.
+				</p>
+			</Explanation>
 
 			{isPending ? (
 				<div role="status" aria-label="Loading schedule" className="space-y-3">

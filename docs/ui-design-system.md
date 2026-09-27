@@ -1284,3 +1284,79 @@ simulated colour-vision deficiency the blue-violet steps converge (as low as
 0.019); the silhouette and the printed name carry the order, which is why rule 3
 exists. Initiate is a near-neutral cool grey — the unpigmented starting rank —
 and sits 0.059 from `ink-3` in light mode, deliberately.
+
+---
+
+## 20. Amendment — long content (2026-09-27)
+
+An owner-approved addition for `UX-01`, taken outside an implementation batch
+as §17 requires. The owner's mobile review on 2026-09-27 measured pages that
+state everything at once: Progress was 13,329px tall at 390, and Exercises
+7,799px. Nothing in v1.0 said how much of a page shows first, and three
+one-off answers had grown in its place: a native `<details>` in the Progress
+timeline, a `max-height` toggle in the history filters, and a scroll box
+inside /routines. These three patterns replace them. Every later `UX-*` item
+applies them; none invents a fourth.
+
+**The rule under all three: a page has one scroll.** The owner chose it on
+2026-09-27. A list never scrolls in a box of its own inside a page that also
+scrolls: on a phone that traps the thumb, chains scrolling unpredictably and
+hides rows with no cue. A page whose content is one long list (History,
+Exercises, Notifications, Routines) scrolls as a whole, and its controls stay
+pinned at the top of `<main>` while it does.
+
+### 20.1 Collapsible section
+
+`components/layout/collapsible-section.tsx`.
+
+- **The heading stays a heading.** Its whole text is a `button` inside the
+  `h2` (or `h3`), with `aria-expanded` and `aria-controls`. The accessible
+  name is the title, and the state is `aria-expanded`, never colour alone. A
+  `ChevronDown` in `--ink-3` turns over when open.
+- **A closed section still says something.** An optional one-line summary in
+  Body small `--ink-3` shows only while it is closed. It states what the
+  section holds, such as "Latest: Romanian Deadlift 85 kg × 10". It must not
+  restate the screen's overall progress (§11.8).
+- **Nothing animates its height.** The body is `hidden`, not unmounted, so
+  its reads still run and it opens instantly. That satisfies §9.3 without a
+  reduced-motion branch. The chevron turns without a transition.
+- **The member's choice is remembered per device**, in `localStorage` under
+  `ss-open:<section id>`. A phone and a desktop want different defaults, so it
+  is not an account preference. Storage that throws only means the choice is
+  not remembered.
+- **Defaults are open, closed, or `'wide'`**: closed below `md`, open from
+  it, until the member chooses. `md` is where the protected shell gains its
+  sidebar (§10).
+- A section that holds a screen's one primary action, or a warning the
+  member should not miss, is never collapsible.
+
+### 20.2 Bounded list
+
+`components/layout/show-more.tsx`.
+
+- Inside a page with several sections, a long list shows its first N rows,
+  then a ghost "Show N more" that always names the count, then
+  "Show fewer". A list that fits shows no control.
+- A list that pages from the server keeps its own "Load more", which follows
+  the shown rows.
+- **Pinned controls.** On a page whose content is one list, the filters,
+  search and page actions share one row that is `sticky top-0` inside
+  `<main>`. It sits on an opaque `--background`, bled over `<main>`'s padding,
+  with no shadow (§8), so the rows pass under it. One row means one: below
+  the width where the controls fit, they collapse, for example into a
+  `NativeSelect` (`TD-54`), rather than wrap.
+
+### 20.3 Explanation on demand
+
+`components/layout/explanation.tsx`.
+
+- A page's rules are stated in one line, followed by a ghost "How this
+  works" control (an `Info` glyph, the label and a chevron) that reveals the
+  full text inline, under a 1px `--rule` left edge.
+- **It opens on a tap or the keyboard, never on hover alone**, because touch
+  has no hover. `tooltip.tsx` opens on hover and focus and is too small for
+  several sentences. The Popover primitive was deleted in `TD-32`.
+- It pushes the content below it down instead of floating over it, and it
+  starts closed on every visit.
+- **The rules stay reachable.** This shortens what is shown first. It never
+  removes a rule a page used to state.

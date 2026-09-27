@@ -73,15 +73,15 @@ export default function WorkoutsList({
 
 	if (displayedRoutines.length === 0) {
 		return (
-			<div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+			<div>
 				<EmptyRoutinesState filtered={filtered} />
 			</div>
 		)
 	}
 
 	return (
-		<div className="flex min-h-0 flex-1 h-full flex-col">
-			<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+		<div>
+			<div>
 				{/* §11.5 — one ruled ledger, not a stack of boxes. The rules come
 				    from each row's `.rule-row`, so the gap that used to separate
 				    the cards is gone. */}

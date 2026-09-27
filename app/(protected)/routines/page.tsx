@@ -30,28 +30,30 @@ export default function RoutinesPage() {
 	}, [router])
 
 	return (
-		<div className="h-full min-h-0 flex flex-col gap-4 sm:gap-6">
-			{/* Classical Hero */}
+		<div className="flex flex-col gap-4 sm:gap-6">
 			<HeroSection
 				title={<>Routines</>}
 				subtitle={<>Plan, track, and refine your training.</>}
 			/>
-			{/* Header Section — the empty spacer div that used to sit opposite this
-			    button left a band of dead space under the masthead. */}
-			<div className="flex justify-end">
-				<Button asChild className="gap-2">
-					<Link href="/routines/new" prefetch>
-						<Plus className="h-4 w-4" />
-						<span>Create Routine</span>
-					</Link>
-				</Button>
-			</div>
-
-			<div className="flex min-h-0 flex-1 flex-col gap-4">
-				<WorkoutFilters
-					activeFilter={activeFilter}
-					onFilterChange={setActiveFilter}
-				/>
+			{/* TD-54 and design system §20.2: the filters and Create Routine share
+			    one row, pinned while the page scrolls. Its negative top cancels
+			    <main>'s padding, which a sticky offset is measured inside, so no
+			    row shows above it. The list is not a scroll box of its own; the
+			    page is the one scroll. Create Routine matches the select's
+			    height (44px until `md`) so the two line up. */}
+			<div className="flex flex-col gap-4">
+				<div className="sticky -top-3 z-10 -mx-3 -my-2 flex items-center gap-2 bg-background px-3 py-2 sm:-top-6 sm:-mx-6 sm:px-6">
+					<WorkoutFilters
+						activeFilter={activeFilter}
+						onFilterChange={setActiveFilter}
+					/>
+					<Button asChild className="ml-auto h-11 shrink-0 gap-2 md:h-10">
+						<Link href="/routines/new" prefetch>
+							<Plus className="h-4 w-4" />
+							<span>Create Routine</span>
+						</Link>
+					</Button>
+				</div>
 				<WorkoutsList
 					routines={routines}
 					isLoading={isLoading}

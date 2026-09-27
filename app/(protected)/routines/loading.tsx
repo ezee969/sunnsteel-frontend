@@ -2,19 +2,23 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function RoutinesLoading() {
 	return (
-		<div className="flex flex-col gap-6 sm:gap-8">
+		<div className="flex flex-col gap-4 sm:gap-6">
 			{/* Masthead */}
 			<div className="rule-heading pb-4">
 				<Skeleton className="mb-2 h-8 w-48" />
 				<Skeleton className="h-4 w-64" />
 			</div>
 
-			{/* Filters */}
-			<div className="flex flex-wrap gap-2">
-				<Skeleton className="h-10 w-20" />
-				<Skeleton className="h-10 w-24" />
-				<Skeleton className="h-10 w-28" />
-				<Skeleton className="h-10 w-32" />
+			{/* The toolbar: one row, as on the loaded page (TD-54) */}
+			<div className="flex items-center gap-2">
+				<Skeleton className="h-11 flex-1 lg:hidden" />
+				<div className="hidden gap-2 lg:flex">
+					<Skeleton className="h-10 w-44" />
+					<Skeleton className="h-10 w-24" />
+					<Skeleton className="h-10 w-28" />
+					<Skeleton className="h-10 w-28" />
+				</div>
+				<Skeleton className="ml-auto h-11 w-40 shrink-0 md:h-10" />
 			</div>
 
 			{/* The routines ledger: ruled rows, matching what loads (§11.5) */}
