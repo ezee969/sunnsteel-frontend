@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1.5 1.25 21 21">
+	<style>
+		g { stroke: #231d17; }
+		@media (prefers-color-scheme: dark) { g { stroke: #eeebe4; } }
+	</style>
+	<g fill="none" stroke-width="2" stroke-linecap="butt">
+	<circle cx="12" cy="7" r="4.5" />
+	<path d="M3 18h18" />
+	<path d="M8 14v8M16 14v8" />
+	<path d="M4 16v4M20 16v4" />
+	</g>
+</svg>

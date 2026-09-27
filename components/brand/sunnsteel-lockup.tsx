@@ -1,8 +1,9 @@
 import { cn } from '@/lib/utils'
 
 /**
- * The brand mark: a sun disc above a barbell - the two shapes the app icon is
- * already built from, reduced to five strokes so the glyph survives at 16px.
+ * The brand mark: a sun disc above a barbell, reduced to five strokes so the
+ * glyph survives at 16px. The favicon and the installed-app icons are drawn
+ * from this geometry by scripts/generate-brand-icons.mjs; change both together.
  *
  * Authored rather than drawn through `ClassicalIcon`: that component is the
  * classical *icon set*, loaded by CSS mask from `/public/icons/classical/`, and
