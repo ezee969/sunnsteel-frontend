@@ -1,7 +1,9 @@
 import type { Locale } from '@/i18n/config'
 
 import enShell from './en/shell.json'
+import enWorkout from './en/workout.json'
 import esShell from './es/shell.json'
+import esWorkout from './es/workout.json'
 
 /**
  * I18N-01: one JSON file per area and language, joined here into the object
@@ -10,6 +12,7 @@ import esShell from './es/shell.json'
  */
 const en = {
 	shell: enShell,
+	workout: enWorkout,
 }
 
 export type Messages = typeof en
@@ -18,5 +21,6 @@ export const MESSAGES: Record<Locale, Messages> = {
 	en,
 	es: {
 		shell: esShell,
+		workout: esWorkout,
 	},
 }
