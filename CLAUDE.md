@@ -30,7 +30,7 @@ npm run lock:repair    # restore missing lock entries, unchanged, from HEAD (TD-
 npm run verify         # lock:check + lint + typecheck + test + build (run before considering work done)
 npm run ui:capture:portfolio  # Playwright: portfolio screenshots + manifest (dev server, backend, ui:login; not CI)
 npm run ui:refresh     # renew the saved sign-in through the app's own refresh path (before a long sweep)
-npm run ui:regression  # the 480-case sweep; scope it with -- -g "<title pattern>" (see UI and styling)
+npm run ui:regression  # the full sweep (623 cases); scope it with -- -g "<title pattern>" (see UI and styling)
 ```
 
 **Vitest is configured** (added in T-01) — `npm test` / `npm run test:watch`. `npm run verify` runs lock:check → lint → typecheck → **test** → build, and CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) mirrors it on Node 22 (required by the current Supabase client).
@@ -154,7 +154,7 @@ npm run ui:regression -- -g "layout activity|navigation|drawer|sidebar|dialog|dr
 
 That is 87 cases, about 7 minutes: the two `activity` routes plus every interaction suite. Drop the suites when nothing outside one page changed (`-g "layout activity"`, 28 cases), and check a pattern with `--list` before trusting it — `layout activity @` matches `activity` but not `activity-yours`.
 
-**Run the whole 480 when the change is not confined to a page**: the protected shell or [Sidebar.tsx](features/shell/components/Sidebar.tsx), [app/globals.css](app/globals.css) or the design tokens, any `components/ui/*` primitive, motion or theme handling — and before a release. State in the closure which of the two you ran, with its tally.
+**Run the whole sweep (623 cases on 2026-09-28) when the change is not confined to a page**: the protected shell or [Sidebar.tsx](features/shell/components/Sidebar.tsx), [app/globals.css](app/globals.css) or the design tokens, any `components/ui/*` primitive, motion or theme handling — and before a release. State in the closure which of the two you ran, with its tally.
 
 Four hazards, three of which have each already cost a run. **Start the local PostgreSQL server first**: the backend cannot serve a request without it, and it is not registered as a Windows service, so a reboot leaves it down — the backend's `CLAUDE.md` carries the `pg_ctl` command. **Renew the saved sign-in** with `npm run ui:refresh`: the access token lasts an hour, a full sweep outlives it, and every context then refreshes from the same stored refresh token — the failure that lost two cases to a 401 in the `PROF-10` sweep. A refresh that cannot renew now **leaves `.auth/state.json` alone** and says so, rather than writing a signed-out browser over a recoverable session; when it reports that, `npm run ui:login` is the only way back and it needs the owner. **Do not write files in `../sunnsteel-backend` while a sweep runs**: `npm run start:dev` watches the tree, restarts, and every case in flight fails with the backend unreachable. **Check whether another agent is working before running the sweep in parallel**, and use one worker when one is: the local PostgreSQL server is shared by every agent on this machine, and on 2026-09-22 a three-worker run alongside another agent's work drove the backend into a crash loop. The same scope passed 28/28 at `--workers=1` straight afterwards.
 
