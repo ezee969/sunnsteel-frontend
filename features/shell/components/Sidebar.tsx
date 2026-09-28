@@ -22,7 +22,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { type CSSProperties, useEffect, useRef } from 'react'
 
-import { useTodaysWorkouts } from '@/app/(protected)/dashboard/hooks/useTodaysWorkouts'
+import { useTodaysWorkouts } from '@/app/[locale]/(protected)/dashboard/hooks/useTodaysWorkouts'
 import {
 	SunnsteelLockup,
 	SunnsteelMark,

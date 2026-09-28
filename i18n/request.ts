@@ -1,17 +1,15 @@
-import { cookies, headers } from 'next/headers'
+import { hasLocale } from 'next-intl'
 import { getRequestConfig } from 'next-intl/server'
 
 import { MESSAGES } from '@/messages'
 
-import { LOCALE_COOKIE, resolveLocale } from './config'
+import { DEFAULT_LOCALE, LOCALES } from './config'
 
-// I18N-01: `next-intl` without locale routing. Every request resolves its
-// language from the cookie (and, once enabled, the browser), which is why the
-// root layout renders per request rather than at build time.
-export default getRequestConfig(async () => {
-	const locale = resolveLocale({
-		cookie: (await cookies()).get(LOCALE_COOKIE)?.value,
-		acceptLanguage: (await headers()).get('accept-language'),
-	})
+// I18N-01: the language comes from the `[locale]` segment the middleware
+// rewrote to, never from cookies or headers here, so every page can still be
+// built once per language and served statically.
+export default getRequestConfig(async ({ requestLocale }) => {
+	const requested = await requestLocale
+	const locale = hasLocale(LOCALES, requested) ? requested : DEFAULT_LOCALE
 	return { locale, messages: MESSAGES[locale] }
 })

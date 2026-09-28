@@ -27,14 +27,13 @@ import {
 	FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { TopLoadingBar } from '@/components/ui/top-loading-bar'
 import {
 	useSupabaseGoogleSignIn,
 	useSupabaseSignIn,
 } from '@/lib/api/hooks/useSupabaseAuth'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { LoginFormValues, loginSchema } from '@/schema/login-schema'
-
-import { TopLoadingBar } from '../../../../components/ui/top-loading-bar'
 
 /**
  * Renders a login UI that supports email/password and Google sign-in via Supabase.

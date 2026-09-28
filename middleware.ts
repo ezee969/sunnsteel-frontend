@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
+import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/i18n/config'
+
 export const PROTECTED_PREFIXES = [
 	'/dashboard',
 	'/workouts',
@@ -22,8 +24,25 @@ function isProtectedPath(pathname: string) {
 	return PROTECTED_PREFIXES.some(prefix => pathname.startsWith(prefix))
 }
 
+/** The locale an address names in its first segment, if any. */
+export function localePrefixOf(pathname: string) {
+	const first = pathname.split('/')[1]
+	return isLocale(first) ? first : null
+}
+
 export async function middleware(request: NextRequest) {
 	const path = request.nextUrl.pathname
+
+	// I18N-01: the language is never part of the address. A `/es/...` link
+	// typed or pasted by hand goes to the same page without the prefix, where
+	// the cookie decides; the rewrite below is the only way into `[locale]`.
+	const prefix = localePrefixOf(path)
+	if (prefix) {
+		const url = request.nextUrl.clone()
+		url.pathname = path.slice(prefix.length + 1) || '/'
+		return NextResponse.redirect(url)
+	}
+
 	const hasValidSession = request.cookies.get('ss_session')?.value === '1'
 
 	if (isProtectedPath(path) && !hasValidSession) {
@@ -36,46 +55,35 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.redirect(new URL('/dashboard', request.url))
 	}
 
-	return NextResponse.next()
+	// The root has no page of its own. It used to redirect from a Server
+	// Component reading this cookie, which a static `[locale]` build cannot do
+	// per request, so the decision is made here instead.
+	if (path === '/') {
+		return NextResponse.redirect(
+			new URL(hasValidSession ? '/dashboard' : '/login', request.url),
+		)
+	}
+
+	const locale = resolveLocale({
+		cookie: request.cookies.get(LOCALE_COOKIE)?.value,
+		acceptLanguage: request.headers.get('accept-language'),
+	})
+	const url = request.nextUrl.clone()
+	url.pathname = `/${locale}${path}`
+	return NextResponse.rewrite(url)
 }
 
 /**
- * Next.js only runs this file for paths the matcher names, so a prefix that is
- * in `PROTECTED_PREFIXES` but missing here is **not protected by middleware at
- * all**: the signed-out visitor loads the protected shell, renders an empty
- * page, and is redirected by the client with no `redirectTo`, so signing in
- * drops them on the dashboard instead of where they asked to go.
+ * I18N-01: every page is rewritten into its `[locale]` build, so the
+ * middleware runs for every page address. It skips the route handlers under
+ * `/api`, Next's own files and anything with a file extension (icons, the
+ * manifest, `sw.js`), none of which is a page -- no username, id or share
+ * token contains a dot.
  *
- * That drifted four times (TD-45) — `/schedule` and `/notifications` were
- * missed, then `/activity` with `SOC-03` and `/moderation` with `TRUST-04` —
- * because the two lists are edited independently and nothing compared them.
- * `middleware.test.ts` now does, so the next one fails a test rather than
- * shipping.
- *
- * The matcher cannot be derived from `PROTECTED_PREFIXES` at runtime: Next.js
- * statically analyses this array at build time and rejects a computed value.
- * It has to stay literal, which is exactly why it needs the test.
+ * That also closed TD-45 for good: a protected prefix can no longer be left out
+ * of the matcher, because the matcher no longer lists prefixes.
+ * `middleware.test.ts` asserts it still reaches every one of them.
  */
 export const config = {
-	matcher: [
-		'/login',
-		'/signup',
-		// '/auth/:path*' used to be here. The function does nothing with those
-		// paths (they are in neither PROTECTED_PREFIXES nor AUTH_PAGES), so every
-		// visit to /auth/callback paid a middleware invocation to fall through to
-		// NextResponse.next(). Removed in TD-16.
-		'/dashboard/:path*',
-		'/workouts/:path*',
-		'/routines/:path*',
-		'/profile/:path*',
-		'/progress/:path*',
-		'/exercises/:path*',
-		'/schedule/:path*',
-		'/achievements/:path*',
-		'/notifications/:path*',
-		'/settings/:path*',
-		'/search/:path*',
-		'/activity/:path*',
-		'/moderation/:path*',
-	],
+	matcher: ['/((?!api/|_next/|_vercel/|.*\\.[^/]+$).*)'],
 }

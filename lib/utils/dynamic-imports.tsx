@@ -12,16 +12,16 @@
 export const preloadComponents = {
 	// Active workout session - heavy real-time component
 	activeWorkoutSession: () => {
-		import('@/app/(protected)/workouts/sessions/[id]/page')
+		import('@/app/[locale]/(protected)/workouts/sessions/[id]/page')
 	},
 
 	// Wizard entry point - heavy routine creation flow
 	newRoutinePage: () => {
-		import('@/app/(protected)/routines/new/page')
+		import('@/app/[locale]/(protected)/routines/new/page')
 	},
 
 	workoutHistoryPage: () => {
-		import('@/app/(protected)/workouts/history/page')
+		import('@/app/[locale]/(protected)/workouts/history/page')
 	},
 }
 

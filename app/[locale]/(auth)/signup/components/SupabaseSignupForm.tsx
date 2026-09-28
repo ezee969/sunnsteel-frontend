@@ -27,13 +27,12 @@ import {
 	FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { TopLoadingBar } from '@/components/ui/top-loading-bar'
 import {
 	useSupabaseGoogleSignIn,
 	useSupabaseSignUp,
 } from '@/lib/api/hooks/useSupabaseAuth'
 import { SignupFormValues, signupSchema } from '@/schema/signup-schema'
-
-import { TopLoadingBar } from '../../../../components/ui/top-loading-bar'
 
 // Password strength calculator
 function calculatePasswordStrength(password: string): {

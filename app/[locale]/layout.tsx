@@ -1,10 +1,13 @@
-import './globals.css'
+import '../globals.css'
 
 import type { Metadata } from 'next'
 import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
-import { getLocale, getMessages } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { hasLocale } from 'next-intl'
+import { getMessages, setRequestLocale } from 'next-intl/server'
 
 import DevInjections from '@/components/dev-injections'
+import { LOCALES } from '@/i18n/config'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
@@ -125,16 +128,31 @@ export const viewport: Viewport = {
 	initialScale: 1,
 }
 
+// I18N-01: one static build of every page per language. The address never
+// carries the language: middleware.ts rewrites `/dashboard` to
+// `/<locale>/dashboard` from the `ss-locale` cookie, so the pages stay static
+// and served from the CDN, and every link stays as it was.
+export function generateStaticParams() {
+	return LOCALES.map(locale => ({ locale }))
+}
+
+export const dynamicParams = false
+
 export default async function RootLayout({
 	children,
+	params,
 }: Readonly<{
 	children: React.ReactNode
+	params: Promise<{ locale: string }>
 }>) {
-	// I18N-01: the language is resolved per request (i18n/request.ts), so
-	// `lang` is right on the first byte and screen readers pronounce the page in
-	// the language it is written in. It said "es" over English text until now.
-	const locale = await getLocale()
+	const { locale } = await params
+	if (!hasLocale(LOCALES, locale)) notFound()
+	// Lets next-intl read the language from the segment rather than from the
+	// request, which is what keeps the page static.
+	setRequestLocale(locale)
 	const messages = (await getMessages()) as Messages
+	// `lang` is the page's language on the first byte, so screen readers
+	// pronounce it right. It said "es" over English text until I18N-01.
 	return (
 		<html lang={locale} suppressHydrationWarning>
 			<head>
