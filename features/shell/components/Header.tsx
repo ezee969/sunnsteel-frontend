@@ -2,6 +2,7 @@
 
 import { ChevronLeft, Menu, Settings, User } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { ModeToggle } from '@/components/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -36,6 +37,7 @@ export default function Header({
 	setIsMobileMenuOpen,
 	onToggleSidebar,
 }: HeaderProps) {
+	const t = useTranslations('shell.header')
 	return (
 		// §11.10: 56 mobile / 64 desktop, ground-coloured, one rule below. Opaque,
 		// not blurred - nothing in v1.0 is translucent. The framing OrnateCorners
@@ -50,7 +52,7 @@ export default function Header({
 					className="mr-1 size-11 md:size-10"
 				>
 					<Menu className="h-5 w-5" />
-					<span className="sr-only">Toggle Menu</span>
+					<span className="sr-only">{t('toggleMenu')}</span>
 				</Button>
 			) : (
 				/* The sidebar collapse control, where motion spec §2.3 already placed
@@ -62,7 +64,7 @@ export default function Header({
 					variant="ghost"
 					size="icon"
 					onClick={onToggleSidebar}
-					aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+					aria-label={isSidebarOpen ? t('collapseSidebar') : t('expandSidebar')}
 					aria-expanded={isSidebarOpen}
 					className="mr-1"
 				>
@@ -102,6 +104,7 @@ export default function Header({
 }
 
 function UserDropdown() {
+	const t = useTranslations('shell.header')
 	const { user } = useUser()
 	const { push } = useToast()
 	const { mutate: logout, isPending } = useSupabaseLogout()
@@ -109,8 +112,8 @@ function UserDropdown() {
 		logout(undefined, {
 			onError: () => {
 				push({
-					title: 'Could not sign out',
-					description: 'Check your connection and try again.',
+					title: t('signOutFailedTitle'),
+					description: t('signOutFailedBody'),
 					variant: 'destructive',
 				})
 			},
@@ -122,13 +125,13 @@ function UserDropdown() {
 				<Button
 					variant="ghost"
 					size="icon"
-					aria-label="Account menu"
+					aria-label={t('accountMenu')}
 					className="size-11 rounded-full md:size-10"
 				>
 					<Avatar className="h-8 w-8 border border-rule">
 						<AvatarImage
 							src={user?.avatarUrl || ''}
-							alt="User"
+							alt={t('userAvatar')}
 							className="object-cover"
 						/>
 						<AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
@@ -136,23 +139,23 @@ function UserDropdown() {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
-				<DropdownMenuLabel>My Account</DropdownMenuLabel>
+				<DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
 					<Link href="/profile" className="cursor-pointer">
 						<User className="mr-2 h-4 w-4" />
-						Profile
+						{t('profile')}
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuItem asChild>
 					<Link href="/settings" className="cursor-pointer">
 						<Settings className="mr-2 h-4 w-4" />
-						Settings
+						{t('settings')}
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={handleLogout} disabled={isPending}>
-					{isPending ? 'Signing out…' : 'Log out'}
+					{isPending ? t('signingOut') : t('logOut')}
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

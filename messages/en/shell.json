@@ -1,0 +1,70 @@
+{
+	"nav": {
+		"dashboard": "Dashboard",
+		"workouts": "Workouts",
+		"routines": "Routines",
+		"discover": "Discover",
+		"history": "History",
+		"progress": "Progress",
+		"exercises": "Exercises",
+		"schedule": "Schedule",
+		"achievements": "Achievements",
+		"activity": "Activity",
+		"notifications": "Notifications",
+		"moderation": "Moderation",
+		"settings": "Settings",
+		"closeNavigation": "Close navigation",
+		"comingSoonTitle": "{label} - Coming Soon",
+		"comingSoonBody": "We are working hard on bringing this feature to Sunnsteel. Stay tuned!",
+		"soon": "Soon",
+		"userAvatar": "User avatar"
+	},
+	"indicators": {
+		"notifications": "Notifications, {count} unread",
+		"schedule": "Schedule, {count, plural, one {# workout} other {# workouts}} planned today"
+	},
+	"header": {
+		"toggleMenu": "Toggle Menu",
+		"collapseSidebar": "Collapse sidebar",
+		"expandSidebar": "Expand sidebar",
+		"accountMenu": "Account menu",
+		"userAvatar": "User",
+		"myAccount": "My Account",
+		"profile": "Profile",
+		"settings": "Settings",
+		"signingOut": "Signing out…",
+		"logOut": "Log out",
+		"signOutFailedTitle": "Could not sign out",
+		"signOutFailedBody": "Check your connection and try again."
+	},
+	"titles": {
+		"activeSession": "Active Session",
+		"workoutHistory": "Workout History",
+		"workouts": "Workouts",
+		"newRoutine": "New Routine",
+		"editRoutine": "Edit Routine",
+		"discoverRoutines": "Discover Routines",
+		"routines": "Routines",
+		"progress": "Progress",
+		"exercises": "Exercises",
+		"schedule": "Schedule",
+		"achievements": "Achievements",
+		"notifications": "Notifications",
+		"activity": "Activity",
+		"moderation": "Moderation",
+		"settings": "Settings",
+		"profile": "Profile",
+		"search": "Search",
+		"dashboard": "Dashboard"
+	},
+	"layout": {
+		"cleanupFailedTitle": "Session cleanup needs one more step",
+		"cleanupPendingTitle": "Finishing session cleanup…",
+		"cleanupFailedBody": "This browser could not clear its routing session. Check your connection and try again.",
+		"cleanupPendingBody": "Clearing this browser session securely.",
+		"tryAgain": "Try again",
+		"activeSessionBanner": "Active workout session in progress.",
+		"resumeLabel": "Resume active session",
+		"resume": "Resume"
+	}
+}

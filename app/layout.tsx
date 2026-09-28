@@ -2,12 +2,15 @@ import './globals.css'
 
 import type { Metadata } from 'next'
 import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
+import { getLocale, getMessages } from 'next-intl/server'
 
 import DevInjections from '@/components/dev-injections'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
+import type { Messages } from '@/messages'
 import { AppProvider } from '@/providers/app-provider'
+import { IntlProvider } from '@/providers/intl-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
 
@@ -122,13 +125,18 @@ export const viewport: Viewport = {
 	initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode
 }>) {
+	// I18N-01: the language is resolved per request (i18n/request.ts), so
+	// `lang` is right on the first byte and screen readers pronounce the page in
+	// the language it is written in. It said "es" over English text until now.
+	const locale = await getLocale()
+	const messages = (await getMessages()) as Messages
 	return (
-		<html lang="es" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<head>
 				{/* A11Y-01: apply the device's stored reduce-motion choice before the
 				    first paint, the way next-themes applies the theme. */}
@@ -146,7 +154,9 @@ export default function RootLayout({
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<PwaProvider />
-					<AppProvider>{children}</AppProvider>
+					<IntlProvider locale={locale} messages={messages}>
+						<AppProvider>{children}</AppProvider>
+					</IntlProvider>
 					<DevInjections showPerfPanel={SHOW_PERF_PANEL} />
 				</ThemeProvider>
 			</body>

@@ -1,0 +1,70 @@
+{
+	"nav": {
+		"dashboard": "Inicio",
+		"workouts": "Entrenamientos",
+		"routines": "Rutinas",
+		"discover": "Descubrir",
+		"history": "Historial",
+		"progress": "Progreso",
+		"exercises": "Ejercicios",
+		"schedule": "Calendario",
+		"achievements": "Logros",
+		"activity": "Actividad",
+		"notifications": "Notificaciones",
+		"moderation": "Moderación",
+		"settings": "Ajustes",
+		"closeNavigation": "Cerrar navegación",
+		"comingSoonTitle": "{label}: muy pronto",
+		"comingSoonBody": "Estamos trabajando para traer esta función a Sunnsteel.",
+		"soon": "Pronto",
+		"userAvatar": "Foto de perfil"
+	},
+	"indicators": {
+		"notifications": "Notificaciones, {count} sin leer",
+		"schedule": "Calendario, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy"
+	},
+	"header": {
+		"toggleMenu": "Abrir menú",
+		"collapseSidebar": "Contraer barra lateral",
+		"expandSidebar": "Expandir barra lateral",
+		"accountMenu": "Menú de la cuenta",
+		"userAvatar": "Usuario",
+		"myAccount": "Mi cuenta",
+		"profile": "Perfil",
+		"settings": "Ajustes",
+		"signingOut": "Cerrando sesión…",
+		"logOut": "Cerrar sesión",
+		"signOutFailedTitle": "No se pudo cerrar la sesión",
+		"signOutFailedBody": "Revisa tu conexión e inténtalo de nuevo."
+	},
+	"titles": {
+		"activeSession": "Sesión en curso",
+		"workoutHistory": "Historial de entrenamientos",
+		"workouts": "Entrenamientos",
+		"newRoutine": "Nueva rutina",
+		"editRoutine": "Editar rutina",
+		"discoverRoutines": "Descubrir rutinas",
+		"routines": "Rutinas",
+		"progress": "Progreso",
+		"exercises": "Ejercicios",
+		"schedule": "Calendario",
+		"achievements": "Logros",
+		"notifications": "Notificaciones",
+		"activity": "Actividad",
+		"moderation": "Moderación",
+		"settings": "Ajustes",
+		"profile": "Perfil",
+		"search": "Buscar",
+		"dashboard": "Inicio"
+	},
+	"layout": {
+		"cleanupFailedTitle": "Falta un paso para cerrar la sesión",
+		"cleanupPendingTitle": "Terminando de cerrar la sesión…",
+		"cleanupFailedBody": "Este navegador no pudo borrar su sesión de navegación. Revisa tu conexión e inténtalo de nuevo.",
+		"cleanupPendingBody": "Borrando la sesión de este navegador de forma segura.",
+		"tryAgain": "Reintentar",
+		"activeSessionBanner": "Hay un entrenamiento en curso.",
+		"resumeLabel": "Retomar el entrenamiento en curso",
+		"resume": "Retomar"
+	}
+}

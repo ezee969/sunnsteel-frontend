@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 export interface NavigationIndicator {
 	compactText: string
 	accessibleLabel: string
@@ -19,11 +21,14 @@ const positiveCount = (count: number | undefined) =>
  * that already own the underlying truth. A live session suppresses the
  * schedule count because the global Resume banner already carries that state.
  */
-export function buildNavigationIndicators({
-	unreadNotifications,
-	plannedToday,
-	hasActiveSession,
-}: NavigationIndicatorInput) {
+export function buildNavigationIndicators(
+	{
+		unreadNotifications,
+		plannedToday,
+		hasActiveSession,
+	}: NavigationIndicatorInput,
+	t: Translator<'shell.indicators'>,
+) {
 	const unread = positiveCount(unreadNotifications)
 	const planned = hasActiveSession ? 0 : positiveCount(plannedToday)
 
@@ -32,14 +37,14 @@ export function buildNavigationIndicators({
 			unread > 0
 				? {
 						compactText: compactCount(unread),
-						accessibleLabel: `Notifications, ${unread} unread`,
+						accessibleLabel: t('notifications', { count: unread }),
 					}
 				: null,
 		schedule:
 			planned > 0
 				? {
 						compactText: compactCount(planned),
-						accessibleLabel: `Schedule, ${planned} ${planned === 1 ? 'workout' : 'workouts'} planned today`,
+						accessibleLabel: t('schedule', { count: planned }),
 					}
 				: null,
 	} satisfies Record<'notifications' | 'schedule', NavigationIndicator | null>

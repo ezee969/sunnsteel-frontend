@@ -19,6 +19,7 @@ import {
 	X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { type CSSProperties, useEffect, useRef } from 'react'
 
 import { useTodaysWorkouts } from '@/app/(protected)/dashboard/hooks/useTodaysWorkouts'
@@ -45,9 +46,24 @@ import { useUser } from '@/lib/api/hooks/useUser'
 import { cn } from '@/lib/utils'
 import { buildNavigationIndicators } from '@/lib/utils/navigation-indicators'
 
+type NavLabelKey =
+	| 'dashboard'
+	| 'workouts'
+	| 'routines'
+	| 'discover'
+	| 'history'
+	| 'progress'
+	| 'exercises'
+	| 'schedule'
+	| 'achievements'
+	| 'activity'
+	| 'notifications'
+	| 'moderation'
+
 type NavItemBase = {
 	id: string
-	label: string
+	/** I18N-01: a key under `shell.nav`, never the English label itself. */
+	labelKey: NavLabelKey
 	icon: LucideIcon
 	classicalName?: ClassicalIconName
 }
@@ -58,7 +74,7 @@ type NavItem = NavItemBase &
 const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	{
 		id: 'dashboard',
-		label: 'Dashboard',
+		labelKey: 'dashboard',
 		icon: Home,
 		classicalName: 'pillar-icon',
 		href: '/dashboard',
@@ -66,7 +82,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'workouts',
-		label: 'Workouts',
+		labelKey: 'workouts',
 		icon: Dumbbell,
 		classicalName: 'dumbbell',
 		href: '/workouts',
@@ -74,7 +90,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'routines',
-		label: 'Routines',
+		labelKey: 'routines',
 		icon: Activity,
 		classicalName: 'scroll-unfurled',
 		href: '/routines',
@@ -85,7 +101,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	// shows, so folding it in would hide it behind a page about your own.
 	{
 		id: 'discover-routines',
-		label: 'Discover',
+		labelKey: 'discover',
 		icon: Compass,
 		href: '/routines/discover',
 		disabled: false,
@@ -95,14 +111,14 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	// unreachable for exactly as long as the user has something to review.
 	{
 		id: 'history',
-		label: 'History',
+		labelKey: 'history',
 		icon: History,
 		href: '/workouts/history',
 		disabled: false,
 	},
 	{
 		id: 'progress',
-		label: 'Progress',
+		labelKey: 'progress',
 		icon: TrendingUp,
 		classicalName: 'compass',
 		href: '/progress',
@@ -110,7 +126,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'exercises',
-		label: 'Exercises',
+		labelKey: 'exercises',
 		icon: Weight,
 		classicalName: 'two-dumbbells',
 		href: '/exercises',
@@ -118,7 +134,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'schedule',
-		label: 'Schedule',
+		labelKey: 'schedule',
 		icon: Calendar,
 		classicalName: 'hourglass',
 		href: '/schedule',
@@ -126,7 +142,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'achievements',
-		label: 'Achievements',
+		labelKey: 'achievements',
 		icon: Medal,
 		classicalName: 'laurel-crown',
 		href: '/achievements',
@@ -136,14 +152,14 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 	// not Notifications, which is about you; this is about the people you follow.
 	{
 		id: 'activity',
-		label: 'Activity',
+		labelKey: 'activity',
 		icon: Rss,
 		href: '/activity',
 		disabled: false,
 	},
 	{
 		id: 'notifications',
-		label: 'Notifications',
+		labelKey: 'notifications',
 		icon: Bell,
 		href: '/notifications',
 		disabled: false,
@@ -157,7 +173,7 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 // moderation route regardless, so hiding the row is presentation, not control.
 const MODERATION_NAV_ITEM: NavItem = {
 	id: 'moderation',
-	label: 'Moderation',
+	labelKey: 'moderation',
 	icon: ShieldCheck,
 	href: '/moderation',
 	disabled: false,
@@ -186,17 +202,22 @@ export default function Sidebar({
 	const notifications = useNotifications()
 	const today = useTodaysWorkouts()
 	const { push } = useToast()
+	const t = useTranslations('shell.nav')
+	const tIndicators = useTranslations('shell.indicators')
 	// The active marker is positioned from this list's own index, so the
 	// moderation row has to be part of the list the rows render from rather
 	// than spliced in afterwards.
 	const navItems = user?.isModerator
 		? [...SIDEBAR_NAV_ITEMS, MODERATION_NAV_ITEM]
 		: SIDEBAR_NAV_ITEMS
-	const indicators = buildNavigationIndicators({
-		unreadNotifications: notifications.data?.unreadCount,
-		plannedToday: today.entries.length,
-		hasActiveSession: today.active?.status === 'IN_PROGRESS',
-	})
+	const indicators = buildNavigationIndicators(
+		{
+			unreadNotifications: notifications.data?.unreadCount,
+			plannedToday: today.entries.length,
+			hasActiveSession: today.active?.status === 'IN_PROGRESS',
+		},
+		tIndicators,
+	)
 
 	// -1 when the active route is not in this list (Settings), which hides the
 	// marker rather than parking it on the wrong row.
@@ -204,9 +225,8 @@ export default function Sidebar({
 
 	const handleDisabledClick = (label: string) => {
 		push({
-			title: `${label} - Coming Soon`,
-			description:
-				'We are working hard on bringing this feature to Sunnsteel. Stay tuned!',
+			title: t('comingSoonTitle', { label }),
+			description: t('comingSoonBody'),
 		})
 	}
 
@@ -282,7 +302,7 @@ export default function Sidebar({
 						ref={closeButtonRef}
 						variant="ghost"
 						size="icon"
-						aria-label="Close navigation"
+						aria-label={t('closeNavigation')}
 						className="size-11"
 						onClick={() => setIsMobileMenuOpen(false)}
 					>
@@ -319,6 +339,7 @@ export default function Sidebar({
 						/>
 					)}
 					{navItems.map(item => {
+						const label = t(item.labelKey)
 						const isCollapsed = !isSidebarOpen && !isMobile
 						const showTooltip = isCollapsed
 						const isActive = activeNav === item.id
@@ -386,7 +407,7 @@ export default function Sidebar({
 										isCollapsed && 'w-0 overflow-hidden opacity-0',
 									)}
 								>
-									{item.label}
+									{label}
 								</span>
 								{indicator && !isCollapsed && (
 									<span
@@ -398,7 +419,7 @@ export default function Sidebar({
 								)}
 								{item.disabled && !isCollapsed && (
 									<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
-										Soon
+										{t('soon')}
 									</span>
 								)}
 							</>
@@ -416,7 +437,7 @@ export default function Sidebar({
 								variant="ghost"
 								aria-disabled
 								className={itemClassName}
-								onClick={() => handleDisabledClick(item.label)}
+								onClick={() => handleDisabledClick(label)}
 							>
 								{inner}
 							</Button>
@@ -424,7 +445,7 @@ export default function Sidebar({
 							<Button asChild variant="ghost" className={itemClassName}>
 								<Link
 									href={item.href}
-									aria-label={indicator?.accessibleLabel ?? item.label}
+									aria-label={indicator?.accessibleLabel ?? label}
 									aria-current={isActive ? 'page' : undefined}
 									onClick={() => {
 										// Set active nav immediately for consistent visual state
@@ -448,7 +469,7 @@ export default function Sidebar({
 									<Tooltip>
 										<TooltipTrigger asChild>{control}</TooltipTrigger>
 										<TooltipContent side="right" sideOffset={8}>
-											{item.label}
+											{label}
 										</TooltipContent>
 									</Tooltip>
 								) : (
@@ -496,7 +517,7 @@ export default function Sidebar({
 										'w-0 overflow-hidden opacity-0',
 								)}
 							>
-								Settings
+								{t('settings')}
 							</span>
 						</Link>
 					</Button>
@@ -520,7 +541,7 @@ export default function Sidebar({
 						<Avatar className="h-10 w-10 border border-rule">
 							<AvatarImage
 								src={user?.avatarUrl || ''}
-								alt="User avatar"
+								alt={t('userAvatar')}
 								className="object-cover"
 							/>
 							<AvatarFallback>

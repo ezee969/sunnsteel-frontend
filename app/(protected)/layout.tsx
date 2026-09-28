@@ -3,6 +3,7 @@
 import { Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React, { ReactNode, Suspense, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	const pathname = usePathname()
 	const router = useRouter()
+	const t = useTranslations('shell')
 	const {
 		session,
 		user,
@@ -68,24 +70,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 	// Compute header title based on pathname. No fallback title: a route
 	// missing from this list should show none rather than another page's.
 	const getTitleFromPath = (path: string) => {
-		if (path.startsWith('/workouts/sessions')) return 'Active Session'
-		if (path.startsWith('/workouts/history')) return 'Workout History'
-		if (path.startsWith('/workouts')) return 'Workouts'
-		if (path.startsWith('/routines/new')) return 'New Routine'
-		if (path.startsWith('/routines/edit')) return 'Edit Routine'
-		if (path.startsWith('/routines/discover')) return 'Discover Routines'
-		if (path.startsWith('/routines')) return 'Routines'
-		if (path.startsWith('/progress')) return 'Progress'
-		if (path.startsWith('/exercises')) return 'Exercises'
-		if (path.startsWith('/schedule')) return 'Schedule'
-		if (path.startsWith('/achievements')) return 'Achievements'
-		if (path.startsWith('/notifications')) return 'Notifications'
-		if (path.startsWith('/activity')) return 'Activity'
-		if (path.startsWith('/moderation')) return 'Moderation'
-		if (path.startsWith('/settings')) return 'Settings'
-		if (path.startsWith('/profile')) return 'Profile'
-		if (path.startsWith('/search')) return 'Search'
-		if (path.startsWith('/dashboard')) return 'Dashboard'
+		if (path.startsWith('/workouts/sessions')) return t('titles.activeSession')
+		if (path.startsWith('/workouts/history')) return t('titles.workoutHistory')
+		if (path.startsWith('/workouts')) return t('titles.workouts')
+		if (path.startsWith('/routines/new')) return t('titles.newRoutine')
+		if (path.startsWith('/routines/edit')) return t('titles.editRoutine')
+		if (path.startsWith('/routines/discover'))
+			return t('titles.discoverRoutines')
+		if (path.startsWith('/routines')) return t('titles.routines')
+		if (path.startsWith('/progress')) return t('titles.progress')
+		if (path.startsWith('/exercises')) return t('titles.exercises')
+		if (path.startsWith('/schedule')) return t('titles.schedule')
+		if (path.startsWith('/achievements')) return t('titles.achievements')
+		if (path.startsWith('/notifications')) return t('titles.notifications')
+		if (path.startsWith('/activity')) return t('titles.activity')
+		if (path.startsWith('/moderation')) return t('titles.moderation')
+		if (path.startsWith('/settings')) return t('titles.settings')
+		if (path.startsWith('/profile')) return t('titles.profile')
+		if (path.startsWith('/search')) return t('titles.search')
+		if (path.startsWith('/dashboard')) return t('titles.dashboard')
 		return ''
 	}
 
@@ -135,16 +138,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 				>
 					<h1 className="type-section text-foreground">
 						{sessionCleanupError
-							? 'Session cleanup needs one more step'
-							: 'Finishing session cleanup…'}
+							? t('layout.cleanupFailedTitle')
+							: t('layout.cleanupPendingTitle')}
 					</h1>
 					<p className="text-sm text-ink-2">
 						{sessionCleanupError
-							? 'This browser could not clear its routing session. Check your connection and try again.'
-							: 'Clearing this browser session securely.'}
+							? t('layout.cleanupFailedBody')
+							: t('layout.cleanupPendingBody')}
 					</p>
 					{sessionCleanupError && (
-						<Button onClick={retrySessionCleanup}>Try again</Button>
+						<Button onClick={retrySessionCleanup}>
+							{t('layout.tryAgain')}
+						</Button>
 					)}
 				</div>
 			</div>
@@ -217,16 +222,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 							<div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
 								<div className="flex items-center gap-2 text-sm">
 									<Dumbbell className="h-3 w-3" />
-									<span>Active workout session in progress.</span>
+									<span>{t('layout.activeSessionBanner')}</span>
 								</div>
 								<Button
 									asChild
 									size="sm"
 									variant="default"
-									aria-label="Resume active session"
+									aria-label={t('layout.resumeLabel')}
 								>
 									<Link href={`/workouts/sessions/${activeSession.id}`}>
-										Resume
+										{t('layout.resume')}
 									</Link>
 								</Button>
 							</div>

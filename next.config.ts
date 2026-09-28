@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import withSerwistInit from '@serwist/next'
 import type { NextConfig } from 'next'
 import { PHASE_DEVELOPMENT_SERVER } from 'next/constants'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 // Content-Security-Policy is intentionally not set here: the app relies on a
 // service worker (generated into public/sw.js), a PWA manifest, Supabase (fetch + realtime
@@ -83,10 +84,12 @@ const withSerwist = withSerwistInit({
 	],
 })
 
+// I18N-01: points `next-intl` at the per-request language and messages.
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+
 // Development runs on Turbopack and never registers a worker (the provider
 // clears one instead), so the webpack plugin is only applied to builds.
 export default function config(phase: string): NextConfig {
-	return phase === PHASE_DEVELOPMENT_SERVER
-		? nextConfig
-		: withSerwist(nextConfig)
+	const config = withNextIntl(nextConfig)
+	return phase === PHASE_DEVELOPMENT_SERVER ? config : withSerwist(config)
 }

@@ -53,6 +53,7 @@
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.477.0",
     "next": "^15.5.25",
+    "next-intl": "^4.14.7",
     "next-themes": "^0.4.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -64,6 +65,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@formatjs/icu-messageformat-parser": "^3.5.20",
     "@playwright/test": "^1.63.0",
     "@serwist/next": "^9.5.12",
     "@tailwindcss/postcss": "^4",
