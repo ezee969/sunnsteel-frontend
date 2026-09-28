@@ -54,7 +54,7 @@ scrolls.
 **Evidence.** Checked on the local stack on 2026-09-27 at 330 and 390, in the
 dark theme:
 
-- `app/(protected)/routines/page.tsx:39-48` wraps the one `Button` in
+- `app/[locale]/(protected)/routines/page.tsx:39-48` wraps the one `Button` in
   `flex justify-end`, with nothing else in the row. The earlier dead band (an
   empty spacer and a hidden button, removed in `4ad4be8`) is gone. What is left
   is the empty row itself: a 40px control with 16px above and below.
@@ -136,7 +136,7 @@ cold load of `/settings#profile-privacy` left `<main>` at `scrollTop` 0, and
 the `#profile-privacy` card at 11,537px. There are three reasons it cannot
 work:
 
-- `<main>` is the scroll container, not the document (`app/(protected)/layout.tsx:237`),
+- `<main>` is the scroll container, not the document (`app/[locale]/(protected)/layout.tsx:237`),
   so the browser's own jump to a fragment does not move it.
 - The cards mount only once the profile has loaded, which is after the browser
   has already looked for the fragment.
@@ -723,7 +723,7 @@ every API read still requires a bearer token.
   `SOC-03` and `/moderation` with `TRUST-04`, each added to the prefixes and
   each missed in the matcher. That is the argument for the test rather than a
   one-time correction.
-- [app/(protected)/layout.tsx](<../../app/(protected)/layout.tsx>) redirects
+- [app/[locale]/(protected)/layout.tsx](<../../app/[locale]/(protected)/layout.tsx>) redirects
   with `router.replace('/login')`, which carries no `redirectTo`.
 - Found in code while verifying `ARCHITECTURE.md` on 2026-09-16; not yet
   reproduced in a browser.
@@ -1223,7 +1223,7 @@ a list of active debt.
   - the session skeleton, by holding the session request;
   - `workouts/loading.tsx`, by holding the page chunk;
   - `routines/error.tsx` inside the shell, by failing its chunk;
-  - `app/error.tsx` replacing the shell, by failing the dashboard chunk.
+  - `app/[locale]/error.tsx` replacing the shell, by failing the dashboard chunk.
 
   The other segment boundaries and `global-error.tsx` render the same
   component, and were not captured individually. The captures caught one
@@ -1239,7 +1239,7 @@ a list of active debt.
 - **2026-09-13 (revision 13):** Closed and removed `TD-32` on the owner's
   confirmation. The thirteen files were re-checked first — their only importers
   were each other — then deleted with the two folders they left empty
-  (`components/backgrounds/`, `app/(auth)/components/`) and the two
+  (`components/backgrounds/`, `app/[locale]/(auth)/components/`) and the two
   dependencies only they imported, `react-day-picker` and
   `@radix-ui/react-popover` (with `react-day-picker`'s own three). Counted again over the Phase 1 scope, every file now matches live code: 2 hex values (the theme grounds in `themeColor`), 0 `rgba()`, 0 raw palette classes, 5 radius values, only `shadow-overlay` and `shadow-none`, and 7 files whose inline styles carry runtime values.
   The uninstall reproduced `TD-33` — recorded under that entry. `npm run verify` passes end to end on the final tree, after a clean `npm ci` from the rebuilt lock (549 packages, five fewer).

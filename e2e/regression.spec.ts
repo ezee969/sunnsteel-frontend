@@ -285,7 +285,7 @@ async function expectDrawerClosed(page: Page) {
 		.toBeLessThanOrEqual(0)
 	// The scrim is NOT unmounted when the drawer closes, and asserting that it
 	// is could never pass: motion spec §2.3 fades it out, and an element cannot
-	// animate its own opacity after being removed, so `app/(protected)/layout.tsx`
+	// animate its own opacity after being removed, so `app/[locale]/(protected)/layout.tsx`
 	// renders it for the whole time `isMobile` holds and hides it with
 	// `opacity-0 pointer-events-none`. Measured on a fresh /dashboard at 320 with
 	// the drawer never opened: one `.bg-scrim`, opacity 0, pointer-events none.

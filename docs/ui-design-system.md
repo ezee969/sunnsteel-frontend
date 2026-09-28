@@ -1120,7 +1120,7 @@ Size the mark to roughly **1.2× the wordmark's cap height** — at `text-xl` th
 ### 18.3 Consequences
 
 - **900 is no longer loaded.** The wordmark was its only consumer, so
-  [app/layout.tsx](../app/layout.tsx) now requests Cinzel 600 alone. The identity
+  [app/[locale]/layout.tsx](../app/[locale]/layout.tsx) now requests Cinzel 600 alone. The identity
   change is net *negative* in font bytes; §13 item 4 is untouched, because no
   weight was added.
 - **The public header drops the word below `sm`** and shows the mark alone. TD-35
