@@ -363,7 +363,14 @@ type SweepRoute = {
 	signedOut?: boolean
 	/** Why `path` can come back empty. */
 	needs?: string
+	/**
+	 * A11Y-02: device preferences seeded before the app runs, so the same page
+	 * is swept again under higher contrast and larger controls.
+	 */
+	storage?: Record<string, string>
 }
+
+const DISPLAY_PREFERENCES = { 'ss-contrast': 'more', 'ss-controls': 'large' }
 
 const ROUTES: SweepRoute[] = [
 	{ slug: 'login', path: () => '/login', signedOut: true },
@@ -406,6 +413,19 @@ const ROUTES: SweepRoute[] = [
 		slug: 'session',
 		path: found => found.history && `/workouts/sessions/${found.history}`,
 		needs: 'at least one finished session',
+	},
+	// A11Y-02 / LIVE-18: the workout screen and the dashboard again with higher
+	// contrast and larger controls on, the densest and the most visited pages.
+	{
+		slug: 'session-display',
+		path: found => found.history && `/workouts/sessions/${found.history}`,
+		needs: 'at least one finished session',
+		storage: DISPLAY_PREFERENCES,
+	},
+	{
+		slug: 'dashboard-display',
+		path: () => '/dashboard',
+		storage: DISPLAY_PREFERENCES,
 	},
 	{ slug: 'progress', path: () => '/progress' },
 	{ slug: 'progress-strength', path: () => '/progress/strength' },
@@ -513,6 +533,16 @@ for (const route of ROUTES) {
 				expect(path, `${route.slug} needs ${route.needs}`).toBeTruthy()
 
 				if (!route.signedOut) {
+					if (route.storage) {
+						await page.addInitScript(entries => {
+							try {
+								for (const [key, value] of Object.entries(entries))
+									window.localStorage.setItem(key, value)
+							} catch {
+								// Blocked storage: the page is swept with its defaults.
+							}
+						}, route.storage)
+					}
 					await prepare(page, width, theme)
 					await load(page, path!)
 					expect(

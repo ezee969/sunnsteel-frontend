@@ -35,16 +35,26 @@ import {
 interface PlateCalculatorDialogProps {
 	exerciseName: string
 	initialTargetWeightKg: number
+	/**
+	 * LIVE-18: opened from the exercise's More menu under larger controls. When
+	 * `open` is given the caller owns it and no trigger is drawn.
+	 */
+	open?: boolean
+	onOpenChange?: (open: boolean) => void
 }
 
 export const PlateCalculatorDialog = ({
 	exerciseName,
 	initialTargetWeightKg,
+	open,
+	onOpenChange,
 }: PlateCalculatorDialogProps) => {
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const { data: locations, isLoading, error, refetch } = useTrainingLocations()
-	const [isOpen, setIsOpen] = useState(false)
+	const [ownOpen, setOwnOpen] = useState(false)
+	const controlled = open !== undefined
+	const isOpen = controlled ? open : ownOpen
 	const [selectedLocationId, setSelectedLocationId] = useState('')
 	const [targetInput, setTargetInput] = useState(() =>
 		formatWeightInput(initialTargetWeightKg, weightUnit),
@@ -70,9 +80,10 @@ export const PlateCalculatorDialog = ({
 	const formatWeight = (weightKg: number) =>
 		`${formatWeightAmount(weightKg, weightUnit)} ${unitLabel}`
 
-	const handleOpenChange = (open: boolean) => {
-		setIsOpen(open)
-		if (open) {
+	const handleOpenChange = (next: boolean) => {
+		if (controlled) onOpenChange?.(next)
+		else setOwnOpen(next)
+		if (next) {
 			setSelectedLocationId(defaultLocation?.id ?? '')
 			setTargetInput(formatWeightInput(initialTargetWeightKg, weightUnit))
 		}
@@ -80,17 +91,20 @@ export const PlateCalculatorDialog = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					aria-label={`Calculate plates for ${exerciseName}`}
-					title="Plate calculator"
-				>
-					<Calculator className="h-4 w-4" />
-				</Button>
-			</DialogTrigger>
+			{controlled ? null : (
+				<DialogTrigger asChild>
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className="size-11 md:size-10"
+						aria-label={`Calculate plates for ${exerciseName}`}
+						title="Plate calculator"
+					>
+						<Calculator className="h-4 w-4" />
+					</Button>
+				</DialogTrigger>
+			)}
 			<DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Plate Calculator</DialogTitle>

@@ -1,8 +1,9 @@
 'use client'
 
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ZoomIn, ZoomOut } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { useDisplayPreference } from '@/hooks/use-display-preference'
 import { formatDuration, formatTime } from '@/lib/utils/time-format.utils'
 import type { SessionProgressData } from '@/lib/utils/workout-session.types'
 
@@ -25,6 +26,9 @@ export const SessionHeader = ({
 	onNavigateBack,
 }: SessionHeaderProps) => {
 	const { completedSets, totalSets, percentage } = progressData
+	// LIVE-18: the gym is where larger controls are needed, so the switch is
+	// here as well as in Settings. It is the same device choice, not a mode.
+	const { largeControls, setControlSize } = useDisplayPreference()
 	const isComplete = percentage === 100
 	const duration = formatDuration(
 		Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000),
@@ -88,6 +92,30 @@ export const SessionHeader = ({
 								{Math.round(percentage)}%
 							</p>
 						</div>
+
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							aria-pressed={largeControls}
+							aria-label="Larger controls"
+							title={
+								largeControls ? 'Larger controls: on' : 'Larger controls: off'
+							}
+							className={
+								'size-11 md:size-10 ' +
+								(largeControls ? 'border border-rule bg-muted' : '')
+							}
+							onClick={() =>
+								setControlSize(largeControls ? 'standard' : 'large')
+							}
+						>
+							{largeControls ? (
+								<ZoomOut className="size-5" aria-hidden />
+							) : (
+								<ZoomIn className="size-5" aria-hidden />
+							)}
+						</Button>
 					</div>
 				</div>
 

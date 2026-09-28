@@ -27,11 +27,14 @@ const buttonVariants = cva(
 					'text-ink-2 hover:text-foreground hover:underline hover:underline-offset-4',
 				link: 'text-primary underline-offset-4 hover:underline',
 			},
+			// A11Y-02 (§22): the device's larger-controls choice lifts every size
+			// to at least 44px and the default to 48px, whatever a call site sets.
 			size: {
-				default: 'h-10 px-5 has-[>svg]:px-4',
-				sm: 'h-9 gap-1.5 px-3 has-[>svg]:px-2.5',
-				lg: 'h-11 px-6 has-[>svg]:px-5',
-				icon: 'size-10',
+				default:
+					'h-10 px-5 has-[>svg]:px-4 large-controls:h-12 large-controls:px-6',
+				sm: 'h-9 gap-1.5 px-3 has-[>svg]:px-2.5 large-controls:h-11 large-controls:px-4',
+				lg: 'h-11 px-6 has-[>svg]:px-5 large-controls:h-12',
+				icon: 'size-10 large-controls:size-12',
 			},
 		},
 		defaultVariants: {

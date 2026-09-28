@@ -3,6 +3,18 @@
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
+/* A11Y-02 (§22): the device's larger-controls choice, and higher contrast from
+   the device or the OS. Components use them only where a size or a boundary
+   changes; colour changes come from the tokens below, not from these. */
+@custom-variant large-controls (&:where([data-controls='large'] *));
+@custom-variant contrast-more {
+  &:where([data-contrast='more'] *) {
+    @slot;
+  }
+  @media (prefers-contrast: more) {
+    @slot;
+  }
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -200,6 +212,85 @@
   --sidebar-accent-foreground: oklch(0.94 0.01 88);
   --sidebar-border: oklch(0.37 0.012 72);
   --sidebar-ring: oklch(0.84 0.11 90);
+}
+
+/* A11Y-02 (§22): higher contrast. Every text role clears 7:1 against
+   --background, --surface and --surface-sunk, every mark 4.5:1, rules 3:1 and
+   faint rules 2:1, in both themes; ink-2 stays a step above ink-3. Applied by
+   the device choice (`data-contrast="more"`) and by the OS
+   (`prefers-contrast: more`); the two blocks below are the same values and
+   change together, like the reduced-motion pair. `:not(.dark)` keeps the light
+   values from overriding Night, which has the same specificity otherwise. */
+:root[data-contrast='more']:not(.dark) {
+  --ink-2: oklch(0.32 0.013 62);
+  --muted-foreground: oklch(0.32 0.013 62);
+  --ink-3: oklch(0.385 0.012 70);
+  --success: oklch(0.375 0.1 152);
+  --success-strong: oklch(0.475 0.11 152);
+  --honour: oklch(0.385 0.09 90);
+  --honour-strong: oklch(0.49 0.115 90);
+  --warning-strong: oklch(0.5 0.13 52);
+  --destructive: oklch(0.4 0.17 28);
+  --rule: oklch(0.58 0.014 84);
+  --border: oklch(0.58 0.014 84);
+  --input: oklch(0.58 0.014 84);
+  --sidebar-border: oklch(0.58 0.014 84);
+  --rule-faint: oklch(0.685 0.01 86);
+}
+:root.dark[data-contrast='more'] {
+  --ink-2: oklch(0.85 0.01 84);
+  --muted-foreground: oklch(0.85 0.01 84);
+  --ink-3: oklch(0.715 0.01 80);
+  --destructive: oklch(0.735 0.15 28);
+  --rule: oklch(0.51 0.012 72);
+  --border: oklch(0.51 0.012 72);
+  --input: oklch(0.51 0.012 72);
+  --sidebar-border: oklch(0.51 0.012 72);
+  --rule-faint: oklch(0.415 0.01 72);
+}
+@media (prefers-contrast: more) {
+  :root:not(.dark) {
+    --ink-2: oklch(0.32 0.013 62);
+    --muted-foreground: oklch(0.32 0.013 62);
+    --ink-3: oklch(0.385 0.012 70);
+    --success: oklch(0.375 0.1 152);
+    --success-strong: oklch(0.475 0.11 152);
+    --honour: oklch(0.385 0.09 90);
+    --honour-strong: oklch(0.49 0.115 90);
+    --warning-strong: oklch(0.5 0.13 52);
+    --destructive: oklch(0.4 0.17 28);
+    --rule: oklch(0.58 0.014 84);
+    --border: oklch(0.58 0.014 84);
+    --input: oklch(0.58 0.014 84);
+    --sidebar-border: oklch(0.58 0.014 84);
+    --rule-faint: oklch(0.685 0.01 86);
+  }
+  :root.dark {
+    --ink-2: oklch(0.85 0.01 84);
+    --muted-foreground: oklch(0.85 0.01 84);
+    --ink-3: oklch(0.715 0.01 80);
+    --destructive: oklch(0.735 0.15 28);
+    --rule: oklch(0.51 0.012 72);
+    --border: oklch(0.51 0.012 72);
+    --input: oklch(0.51 0.012 72);
+    --sidebar-border: oklch(0.51 0.012 72);
+    --rule-faint: oklch(0.415 0.01 72);
+  }
+}
+
+/* A11Y-02 (§22): under higher contrast every focused control also takes a
+   solid 3px outline in the focus-ring colour, because several primitives draw
+   their ring at 40% and a translucent 2px ring is the first thing bright light
+   washes out. */
+:root[data-contrast='more'] :focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (prefers-contrast: more) {
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 @layer base {

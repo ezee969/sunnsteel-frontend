@@ -141,30 +141,44 @@ export function ExerciseNoteButton({
 	exerciseName,
 	note,
 	instruction,
+	...props
 }: {
 	sessionId: string
 	routineExerciseId: string
 	exerciseName: string
 	note: string | null
 	instruction?: string | null
+	/**
+	 * LIVE-18: opened from the exercise's More menu under larger controls. When
+	 * `open` is given the caller owns it and no button is drawn.
+	 */
+	open?: boolean
+	onOpenChange?: (open: boolean) => void
 }) {
-	const [open, setOpen] = useState(false)
+	const [ownOpen, setOwnOpen] = useState(false)
+	const controlled = props.open !== undefined
+	const open = controlled ? props.open === true : ownOpen
+	const setOpen = (next: boolean) =>
+		controlled ? props.onOpenChange?.(next) : setOwnOpen(next)
 	const { run, pending } = useSaveNote(sessionId)
 	return (
 		<>
-			<Button
-				type="button"
-				variant="ghost"
-				size="icon"
-				aria-label={exerciseNoteLabel(exerciseName, !!note)}
-				title={note ? 'Edit note' : 'Add note'}
-				onClick={event => {
-					event.stopPropagation()
-					setOpen(true)
-				}}
-			>
-				<NotebookPen className="size-4" aria-hidden />
-			</Button>
+			{controlled ? null : (
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className="size-11 md:size-10"
+					aria-label={exerciseNoteLabel(exerciseName, !!note)}
+					title={note ? 'Edit note' : 'Add note'}
+					onClick={event => {
+						event.stopPropagation()
+						setOpen(true)
+					}}
+				>
+					<NotebookPen className="size-4" aria-hidden />
+				</Button>
+			)}
 			{open ? (
 				<NoteDialog
 					open
@@ -202,6 +216,7 @@ export function WorkoutNoteButton({
 				type="button"
 				variant="outline"
 				size="sm"
+				className="h-11 md:h-9"
 				onClick={() => setOpen(true)}
 			>
 				<NotebookPen className="size-4" aria-hidden />

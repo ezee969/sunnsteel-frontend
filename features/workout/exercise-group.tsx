@@ -1,9 +1,25 @@
 'use client'
 
 import { requiredToFinish, type SetKind } from '@sunsteel/contracts'
-import { ArrowLeftRight, ChevronDown, ChevronRight, Plus } from 'lucide-react'
+import {
+	ArrowLeftRight,
+	Calculator,
+	ChevronDown,
+	ChevronRight,
+	MoreHorizontal,
+	NotebookPen,
+	Plus,
+} from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useDisplayPreference } from '@/hooks/use-display-preference'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { MAX_EXTRA_SETS } from '@/lib/utils/session-progress.utils'
@@ -95,6 +111,10 @@ export const ExerciseGroup = ({
 			? required.every(set => set.isCompleted)
 			: completedSets === totalSets)
 	const weightUnit = useWeightUnit()
+	// LIVE-18: under larger controls the swap, plate calculator and note move
+	// into one More menu, so the header keeps the exercise and one control.
+	const { largeControls } = useDisplayPreference()
+	const [openTool, setOpenTool] = useState<'plates' | 'note' | null>(null)
 	const nextWeightedSet =
 		sets.find(
 			set => !set.isCompleted && (set.plannedWeight ?? set.weight ?? 0) > 0,
@@ -139,7 +159,7 @@ export const ExerciseGroup = ({
 				<Button
 					variant="ghost"
 					onClick={onToggleCollapse}
-					className="h-auto min-w-0 flex-1 justify-between rounded-none p-0 hover:bg-transparent"
+					className="h-auto min-h-11 min-w-0 flex-1 justify-between rounded-none p-0 hover:bg-transparent large-controls:h-auto large-controls:min-h-12 large-controls:px-0"
 				>
 					<div className="flex min-w-0 flex-1 items-center gap-3">
 						{isCollapsed ? (
@@ -180,39 +200,95 @@ export const ExerciseGroup = ({
 				</Button>
 
 				<div className="flex shrink-0 items-center gap-3">
-					{onSwapRequest ? (
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon"
-							aria-label={`Swap ${exerciseName}`}
-							title="Swap exercise"
-							onClick={event => {
-								event.stopPropagation()
-								onSwapRequest()
-							}}
-						>
-							<ArrowLeftRight className="h-4 w-4" />
-						</Button>
-					) : null}
+					{largeControls ? (
+						<>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										aria-label={`More for ${exerciseName}`}
+										onClick={event => event.stopPropagation()}
+									>
+										<MoreHorizontal className="size-5" aria-hidden />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									{onSwapRequest ? (
+										<DropdownMenuItem onSelect={() => onSwapRequest()}>
+											<ArrowLeftRight aria-hidden />
+											Swap exercise
+										</DropdownMenuItem>
+									) : null}
+									{calculatorTarget ? (
+										<DropdownMenuItem onSelect={() => setOpenTool('plates')}>
+											<Calculator aria-hidden />
+											Calculate plates
+										</DropdownMenuItem>
+									) : null}
+									<DropdownMenuItem onSelect={() => setOpenTool('note')}>
+										<NotebookPen aria-hidden />
+										{sessionNote ? 'Edit note' : 'Add note'}
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+							{calculatorTarget ? (
+								<PlateCalculatorDialog
+									exerciseName={exerciseName}
+									initialTargetWeightKg={calculatorTarget}
+									open={openTool === 'plates'}
+									onOpenChange={open => setOpenTool(open ? 'plates' : null)}
+								/>
+							) : null}
+							<ExerciseNoteButton
+								sessionId={sessionId}
+								routineExerciseId={exerciseId}
+								exerciseName={exerciseName}
+								note={sessionNote ?? null}
+								instruction={instruction}
+								open={openTool === 'note'}
+								onOpenChange={open => setOpenTool(open ? 'note' : null)}
+							/>
+						</>
+					) : (
+						<>
+							{onSwapRequest ? (
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className="size-11 md:size-10"
+									aria-label={`Swap ${exerciseName}`}
+									title="Swap exercise"
+									onClick={event => {
+										event.stopPropagation()
+										onSwapRequest()
+									}}
+								>
+									<ArrowLeftRight className="h-4 w-4" />
+								</Button>
+							) : null}
 
-					{calculatorTarget ? (
-						<PlateCalculatorDialog
-							exerciseName={exerciseName}
-							initialTargetWeightKg={calculatorTarget}
-						/>
-					) : null}
+							{calculatorTarget ? (
+								<PlateCalculatorDialog
+									exerciseName={exerciseName}
+									initialTargetWeightKg={calculatorTarget}
+								/>
+							) : null}
 
-					{/* LIVE-16: a note for this workout. It used to write the
+							{/* LIVE-16: a note for this workout. It used to write the
 					    routine's own note, so a remark about today overwrote the
 					    standing instruction for every workout after it. */}
-					<ExerciseNoteButton
-						sessionId={sessionId}
-						routineExerciseId={exerciseId}
-						exerciseName={exerciseName}
-						note={sessionNote ?? null}
-						instruction={instruction}
-					/>
+							<ExerciseNoteButton
+								sessionId={sessionId}
+								routineExerciseId={exerciseId}
+								exerciseName={exerciseName}
+								note={sessionNote ?? null}
+								instruction={instruction}
+							/>
+						</>
+					)}
 
 					{isComplete && (
 						<span className="type-label text-success">Complete</span>

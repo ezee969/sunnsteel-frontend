@@ -5,6 +5,7 @@ import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
 
 import DevInjections from '@/components/dev-injections'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
+import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
 import { AppProvider } from '@/providers/app-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
@@ -133,6 +134,10 @@ export default function RootLayout({
 				    first paint, the way next-themes applies the theme. */}
 				<script
 					dangerouslySetInnerHTML={{ __html: MOTION_PREFERENCE_SCRIPT }}
+				/>
+				{/* A11Y-02: the same for higher contrast and larger controls. */}
+				<script
+					dangerouslySetInnerHTML={{ __html: DISPLAY_PREFERENCE_SCRIPT }}
 				/>
 			</head>
 			<body

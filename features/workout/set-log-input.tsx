@@ -14,12 +14,15 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { useDisplayPreference } from '@/hooks/use-display-preference'
 import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import {
@@ -69,7 +72,10 @@ const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
  * the weight column at 320.
  */
 const FIELD_CLASS =
-	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40'
+	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
+	// A11Y-02 / LIVE-18 (§22): gym mode's taller fields and larger digits, and
+	// under higher contrast a visible boundary instead of the well's tone alone.
+	'large-controls:h-14 large-controls:text-xl large-controls:placeholder:text-base contrast-more:border contrast-more:border-rule'
 
 const FIELD_INVALID_CLASS = 'text-destructive ring-2 ring-destructive/50'
 
@@ -128,6 +134,9 @@ export const SetLogInput = ({
 	})
 
 	const statusText = saveStateLabel(saveState)
+	// LIVE-18: under larger controls the row keeps only its fields and its
+	// tick; the fills and Remove move into the set's own menu.
+	const { largeControls } = useDisplayPreference()
 	// a11y review 7: the invalid field and its message are linked, so a screen
 	// reader user editing one of several repeated rows hears which one failed.
 	const errorId = `set-${routineExerciseId}-${setNumber}-error`
@@ -210,9 +219,13 @@ export const SetLogInput = ({
 						<DropdownMenuTrigger asChild>
 							<button
 								type="button"
-								aria-label={`Set ${setNumber}, ${SET_KIND_LABELS[kind]}. Change set kind`}
+								aria-label={
+									largeControls
+										? `Set ${setNumber}, ${SET_KIND_LABELS[kind]}. More for this set`
+										: `Set ${setNumber}, ${SET_KIND_LABELS[kind]}. Change set kind`
+								}
 								disabled={saveState === 'saving'}
-								className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 ${
+								className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
 									isCompletedState ? 'text-success' : 'text-ink-3'
 								}`}
 							>
@@ -234,6 +247,32 @@ export const SetLogInput = ({
 									</DropdownMenuRadioItem>
 								))}
 							</DropdownMenuRadioGroup>
+							{largeControls &&
+							((canFillAbove && setAbove) ||
+								(canFillPrevious && previousPerformance) ||
+								onRemove) ? (
+								<>
+									<DropdownMenuSeparator />
+									{canFillAbove && setAbove ? (
+										<DropdownMenuItem onSelect={() => fill(setAbove)}>
+											Same as set {setAbove.setNumber}
+										</DropdownMenuItem>
+									) : null}
+									{canFillPrevious && previousPerformance ? (
+										<DropdownMenuItem
+											onSelect={() => fill(previousPerformance)}
+										>
+											Use last time: {previousText}
+										</DropdownMenuItem>
+									) : null}
+									{onRemove ? (
+										<DropdownMenuItem variant="destructive" onSelect={onRemove}>
+											<X className="h-4 w-4" aria-hidden />
+											Remove set {setNumber}
+										</DropdownMenuItem>
+									) : null}
+								</>
+							) : null}
 						</DropdownMenuContent>
 					</DropdownMenu>
 					{kind !== 'WORKING' ? (
@@ -335,7 +374,7 @@ export const SetLogInput = ({
 						// Checked colour comes from the primitive (`--success-strong`,
 						// v1.0 §4.3 rule 2). This call site only sizes the box and draws
 						// the save-state ring; it must not re-specify the fill.
-						className={`relative size-5 after:absolute after:-inset-3 after:content-[''] ${saveRingClass}`}
+						className={`relative size-5 after:absolute after:-inset-3 after:content-[''] large-controls:size-8 ${saveRingClass}`}
 					/>
 				</div>
 			</div>
@@ -358,7 +397,7 @@ export const SetLogInput = ({
 				</div>
 			) : null}
 
-			{canFillAbove || canFillPrevious || onRemove ? (
+			{!largeControls && (canFillAbove || canFillPrevious || onRemove) ? (
 				<div className="mt-1 flex flex-wrap items-center gap-x-1">
 					{canFillAbove && setAbove ? (
 						<Button

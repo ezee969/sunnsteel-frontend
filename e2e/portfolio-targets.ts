@@ -529,6 +529,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'The public member profile as a signed-out visitor sees it, with a branded image card ready to share or download.',
 	},
 	{
+		slug: 'settings-display',
+		route: '/settings/account',
+		features: ['A11Y-02', 'LIVE-18', 'A11Y-01'],
+		ready: ['Display', 'Higher contrast', 'Larger controls'],
+		caption:
+			"This device's display choices: higher contrast, which also follows the operating system, and larger controls, which turn the workout screen into gym mode.",
+	},
+	{
 		slug: 'settings-privacy',
 		route: '/settings/privacy',
 		features: ['PROF-06', 'PROF-09', 'UX-12'],

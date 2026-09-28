@@ -1431,3 +1431,124 @@ make sense together.
   bounded lists stay.
 - **Unsaved drafts do not survive a tab change**, exactly as leaving the page
   never kept them. A tab holding a form keeps its one Save on that tab.
+
+## 22. Amendment — higher contrast and larger controls (2026-09-28)
+
+Owner-approved on 2026-09-28 with `A11Y-02`, whose hardest case is the live
+workout screen (`LIVE-18`, gym mode). It adds two device preferences on top
+of §4 and §10. It changes nothing for a member who has neither, apart from the
+44px floor in §22.3, which was a defect.
+
+### 22.1 Two device preferences
+
+- **Higher contrast** and **Larger controls** live in Settings › Account ›
+  Display, beside Motion (A11Y-01). Both are stored on the device
+  (`ss-contrast`, `ss-controls`) and set as attributes on `<html>` before
+  first paint (`data-contrast="more"`, `data-controls="large"`), exactly as
+  `data-motion` is.
+- **Higher contrast also follows the OS** (`prefers-contrast: more`). Like
+  reduced motion, the device choice can add it but never turn off what the
+  OS asked for; the checkbox then shows on and disabled, with a line saying
+  why.
+- **Larger controls is also a switch on the workout screen's masthead**
+  (§22.4), the same device choice rather than a second mode.
+- Two Tailwind variants carry them: `large-controls:` for sizes and
+  `contrast-more:` for a boundary that only exists under higher contrast.
+  Colour never comes from a variant; it comes from re-valued tokens.
+
+### 22.2 Higher-contrast tokens
+
+The standard values in §4.1 and §4.2 are unchanged. Under higher contrast
+these roles are re-valued; the others keep their standard value because it
+already clears the target. The ratios were **measured in the browser** on
+2026-09-28, worst case across `--background`, `--surface` and
+`--surface-sunk`.
+
+| Role | Light | Measured | Dark | Measured | Target |
+| --- | --- | --- | --- | --- | --- |
+| `ink` | unchanged | 12.09 | unchanged | 15.11 | 7 |
+| `ink-2`, `muted-foreground` | `oklch(0.32 0.013 62)` | 9.27 | `oklch(0.85 0.01 84)` | 11.37 | 7 |
+| `ink-3` | `oklch(0.385 0.012 70)` | 7.10 | `oklch(0.715 0.01 80)` | 7.08 | 7 |
+| `success` | `oklch(0.375 0.1 152)` | 7.11 | unchanged | 9.20 | 7 |
+| `honour` | `oklch(0.385 0.09 90)` | 7.15 | unchanged | 9.62 | 7 |
+| `destructive` | `oklch(0.4 0.17 28)` | 7.14 | `oklch(0.735 0.15 28)` | 7.21 | 7 |
+| `success-strong` | `oklch(0.475 0.11 152)` | 4.61 | unchanged | 8.14 | 4.5 |
+| `honour-strong` | `oklch(0.49 0.115 90)` | 4.54 | unchanged | 11.03 | 4.5 |
+| `warning-strong` | `oklch(0.5 0.13 52)` | 4.55 | unchanged | 8.06 | 4.5 |
+| `rule`, `border`, `input`, `sidebar-border` | `oklch(0.58 0.014 84)` | 3.10 | `oklch(0.51 0.012 72)` | 3.12 | 3 |
+| `rule-faint` | `oklch(0.685 0.01 86)` | 2.06 | `oklch(0.415 0.01 72)` | 2.08 | 2 |
+
+- Text roles reach WCAG AAA (7:1). Marks reach 4.5:1. Rules reach 3:1, the
+  non-text minimum, so every field and control edge is visible in a bright
+  room.
+- **`ink-2` stays a step above `ink-3`.** Solving each role alone put both at
+  the same light value, which would erase the caption rank (§3.3), so `ink-2`
+  goes darker still in light and lighter in dark.
+- Roles keep their meanings (§4.3). Nothing moves or changes size.
+- **The focus indicator doubles.** Under higher contrast every
+  `:focus-visible` element also takes a solid 3px outline in `--ring`, offset
+  2px, because several primitives draw their ring at 40% and a translucent
+  ring is the first thing bright light washes out.
+- **A boundary where the standard design relies on tone.** The set-log
+  fields (§11.7) have no resting border and sit in a sunk well; under higher
+  contrast they draw a 1px `--rule` border (`contrast-more:`).
+- The CSS carries the values twice, for the attribute and for the media
+  query, and the two blocks change together, like the reduced-motion pair.
+  Light blocks are scoped `:not(.dark)`, because a bare `:root` in the media
+  block has the same specificity as `.dark` and would override Night.
+
+### 22.3 Control sizes
+
+**On every touch width, every control on the workout screen is at least
+44px**, with or without Larger controls. Before this amendment the rest bar's
++15s and Skip were 36px, the swap, plate and note icons 40px, the Workout Note
+button 36px, and the exercise header had no minimum. From `md` they keep their
+compact desktop sizes.
+
+Under **Larger controls**, through the primitives, so every page follows:
+
+| Control | Standard | Larger |
+| --- | --- | --- |
+| Button, default | 40px | 48px |
+| Button, `sm` | 36px | 44px |
+| Button, `lg` | 44px | 48px |
+| Icon button | 40px | 48px |
+| Input, native select | 44px / 40px from `md`, 16px / 14px text | 48px, 18px text |
+| Checkbox | 16px | 24px |
+| Menu item | 44px / 32px from `md` | 48px |
+
+`large-controls:` utilities are emitted after the responsive ones, so they
+win over a call site's `md:` size too; that was measured at 1440 (Finish
+Session 48px).
+
+### 22.4 The workout screen under Larger controls (gym mode, LIVE-18)
+
+Gym mode is not a separate mode with its own state: it is what the workout
+screen does under Larger controls.
+
+- **Bigger working surface:**
+  - the Reps, Weight and RPE fields are 56px with 20px digits; placeholders
+    stay at 16px so "Reps" fits the column at 320;
+  - the completion tick is 32px inside a 56px hit area;
+  - the rest countdown is 36px;
+  - +15s and Skip are 56px.
+- **Fewer secondary actions.**
+  - Each exercise's swap, plate calculator and note move into one **More
+    for <exercise>** menu, so the header keeps the exercise's name, its
+    progress and one control.
+  - Each set's "Same as set N", "Use last time" and Remove move into that
+    set's own **Set N** menu, which already held its kind. The row keeps
+    its fields and its tick.
+  - The standard screen keeps every control where it was.
+- **The switch is on the masthead**, as a 44px icon button with
+  `aria-pressed`. Its glyph changes (zoom in, zoom out) and it takes a
+  bordered fill when on, so its state is never carried by colour alone.
+
+### 22.5 Verification
+
+- §15 gate 2 was run for §22.2: every role in both themes, with and without
+  higher contrast, measured in the page by painting each token and reading
+  its sRGB. The standard values measured within 0.05 of §4.4.
+- The regression sweep has two more routes, `session-display` and
+  `dashboard-display`: the same pages with both preferences seeded before
+  the app runs.

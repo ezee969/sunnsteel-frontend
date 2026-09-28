@@ -68,7 +68,7 @@ export const RestTimerBar = ({
 						aria-live={isOver ? 'polite' : 'off'}
 						// A countdown must be tabular or the digits shuffle every
 						// second; Space Mono is monospaced, so it is by construction.
-						className={`type-data-strong text-2xl leading-tight ${
+						className={`type-data-strong text-2xl leading-tight large-controls:text-4xl ${
 							isOver ? 'text-success' : 'text-foreground'
 						}`}
 					>
@@ -82,7 +82,7 @@ export const RestTimerBar = ({
 						size="sm"
 						onClick={onExtend}
 						aria-label={`Add ${REST_TIMER_EXTEND_SECONDS} seconds to the rest timer`}
-						className="type-button h-9 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
+						className="type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
 					>
 						<Plus className="mr-1 h-4 w-4" aria-hidden />
 						{REST_TIMER_EXTEND_SECONDS}s
@@ -95,7 +95,7 @@ export const RestTimerBar = ({
 						size="sm"
 						onClick={onDismiss}
 						aria-label={isOver ? 'Dismiss the rest timer' : 'Skip the rest'}
-						className={`type-button h-9 rounded-sm shadow-none ${
+						className={`type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
 							isOver
 								? 'border-success bg-transparent text-success hover:bg-success/10'
 								: 'border-rule bg-transparent text-foreground hover:bg-muted'
