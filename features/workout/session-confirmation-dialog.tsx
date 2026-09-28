@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, CheckCircle, Target, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	AlertDialog,
@@ -40,11 +41,13 @@ export const SessionConfirmationDialog = ({
 	isFinishing,
 	status,
 }: SessionConfirmationDialogProps) => {
+	const t = useTranslations('workout.sessionResolution')
+	const tDialog = useTranslations('workout.sessionConfirmationDialog')
 	const { completedSets, totalSets, percentage } = progressData
 	const isComplete = percentage === 100
 	const isDiscarding = status === 'ABORTED'
 	const incompleteSets = totalSets - completedSets
-	const copy = getSessionResolutionCopy(status)
+	const copy = getSessionResolutionCopy(status, t)
 
 	return (
 		<AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -73,7 +76,9 @@ export const SessionConfirmationDialog = ({
 							{/* Progress Summary */}
 							<div className="space-y-2 bg-surface-sunk p-3">
 								<div className="flex items-baseline justify-between">
-									<span className="type-label text-ink-3">Progress</span>
+									<span className="type-label text-ink-3">
+										{tDialog('progress')}
+									</span>
 									<span
 										className={`type-data type-data-strong ${
 											isComplete ? 'text-success' : 'text-foreground'
@@ -86,7 +91,10 @@ export const SessionConfirmationDialog = ({
 								<div className="flex items-center gap-2 text-sm text-ink-2">
 									<Target className="h-4 w-4 shrink-0 text-ink-3" />
 									<span>
-										{completedSets} of {totalSets} sets completed
+										{tDialog('setsCompleted', {
+											completed: completedSets,
+											total: totalSets,
+										})}
 									</span>
 								</div>
 
@@ -97,8 +105,7 @@ export const SessionConfirmationDialog = ({
 											aria-hidden
 										/>
 										<span>
-											{incompleteSets} set{incompleteSets !== 1 ? 's' : ''}{' '}
-											remaining
+											{tDialog('setsRemaining', { count: incompleteSets })}
 										</span>
 									</div>
 								)}
@@ -109,18 +116,18 @@ export const SessionConfirmationDialog = ({
 								<div className="mark border-l-destructive bg-surface-sunk p-3">
 									<p className="text-sm text-ink-2">
 										<strong className="text-destructive">
-											Discarding is permanent.
+											{tDialog('discardingPermanent')}
 										</strong>{' '}
-										This session and its saved sets will not appear in workout
-										history.
+										{tDialog('discardingBody')}
 									</p>
 								</div>
 							) : !isComplete ? (
 								<div className="mark mark-warning bg-surface-sunk p-3">
 									<p className="text-sm text-ink-2">
-										<strong className="text-ink-2">Note:</strong> Finishing with
-										incomplete sets will still save your progress, but you
-										won&apos;t get the full benefit of the workout.
+										<strong className="text-ink-2">
+											{tDialog('noteLabel')}
+										</strong>{' '}
+										{tDialog('incompleteFinishBody')}
 									</p>
 								</div>
 							) : null}
@@ -129,9 +136,10 @@ export const SessionConfirmationDialog = ({
 							{!isDiscarding && isComplete && (
 								<div className="mark mark-success bg-surface-sunk p-3">
 									<p className="text-sm text-ink-2">
-										<strong className="text-success">Great job!</strong>{' '}
-										You&apos;ve completed all sets. Your progress will be saved
-										and applied to future workouts.
+										<strong className="text-success">
+											{tDialog('greatJob')}
+										</strong>{' '}
+										{tDialog('completeBody')}
 									</p>
 								</div>
 							)}
@@ -142,7 +150,9 @@ export const SessionConfirmationDialog = ({
 				<AlertDialogFooter>
 					{/* Cancel is quiet, so the one crimson fill in the dialog is
 					    unambiguously the thing that proceeds (§4.3 rule 1). */}
-					<AlertDialogCancel disabled={isFinishing}>Cancel</AlertDialogCancel>
+					<AlertDialogCancel disabled={isFinishing}>
+						{tDialog('cancel')}
+					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={onConfirm}
 						disabled={isFinishing}

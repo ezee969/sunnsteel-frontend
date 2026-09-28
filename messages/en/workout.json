@@ -51,6 +51,7 @@
 		"noProgressionChanges": "No prescriptions changed after this session.",
 		"sessionNotes": "Session notes",
 		"noNotesAdded": "No notes were added to this session.",
+		"exerciseNotesAria": "Exercise notes",
 		"sessionComplete": "Session complete",
 		"continueToDashboard": "Continue to dashboard",
 		"sessionRecap": "Session recap"
@@ -148,6 +149,7 @@
 		"notDone": "not done",
 		"rpeValue": "RPE {rpe}",
 		"setCorrectionLine": "{exerciseName}, set {setNumber}: {before} → {after}",
+		"listConjunction": " and ",
 		"keptProgressionOne": "The load change for {list} was kept, because you edited the routine after this workout.",
 		"problemInvalidWeight": "Enter a weight of 0 or more.",
 		"problemInvalidReps": "Reps must be a whole number.",

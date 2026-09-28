@@ -8,6 +8,10 @@ import type {
 } from '@sunsteel/contracts'
 import { SESSION_CORRECTION_WINDOW_HOURS } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
+
 import {
 	areCanonicalWeightsEqual,
 	formatWeightInput,
@@ -21,37 +25,39 @@ import {
  * turns what the owner typed into the request.
  */
 
-const DATE_TIME = new Intl.DateTimeFormat(undefined, {
-	weekday: 'short',
-	day: 'numeric',
-	month: 'short',
-	hour: 'numeric',
-	minute: '2-digit',
-})
-
-export const CORRECTION_EFFECTS =
-	'Your records, weekly totals, achievements and the loads this workout set for next time are recalculated from the corrected sets. A record or load change that no longer holds leaves your activity, with any reactions and comments on it. Every correction is kept with the values before and after.'
-
 /** Why the window is open until when, or why it is closed. */
 export function describeCorrectionWindow(
 	window: SessionCorrectionWindow,
+	t: Translator<'workout.corrections'>,
+	locale: Locale,
 ): string | null {
 	if (window.correctableUntil) {
-		return `You can correct this workout until ${DATE_TIME.format(new Date(window.correctableUntil))}, or until you start another one.`
+		return t('windowOpenUntil', {
+			until: dateFormatter(locale, {
+				weekday: 'short',
+				day: 'numeric',
+				month: 'short',
+				hour: 'numeric',
+				minute: '2-digit',
+			}).format(new Date(window.correctableUntil)),
+		})
 	}
-	return describeClosedReason(window.closedReason)
+	return describeClosedReason(window.closedReason, t)
 }
 
 export function describeClosedReason(
 	reason: SessionCorrectionClosedReason | null,
+	t: Translator<'workout.corrections'>,
 ): string | null {
 	switch (reason) {
 		case 'WINDOW_PASSED':
-			return `Corrections close ${SESSION_CORRECTION_WINDOW_HOURS} hours after a workout ends.`
+			return t('closedReasonWindowPassed', {
+				hours: SESSION_CORRECTION_WINDOW_HOURS,
+			})
 		case 'LATER_SESSION':
-			return 'Corrections closed when you started another workout, which was built on this one.'
+			return t('closedReasonLaterSession')
 		case 'LIMIT_REACHED':
-			return 'This workout has been corrected as many times as allowed.'
+			return t('closedReasonLimitReached')
 		// Older workouts and unfinished ones say nothing: there is nothing the
 		// owner could have done here.
 		case 'NOT_LATEST':
@@ -65,32 +71,42 @@ export function describeClosedReason(
 export function describeSetValues(
 	values: SetLogValues,
 	unit: WeightUnit,
+	t: Translator<'workout.corrections'>,
 ): string {
 	const load =
 		values.weight === null || values.weight === 0
-			? 'Bodyweight'
+			? t('bodyweight')
 			: `${formatWeightInput(values.weight, unit)} ${getWeightUnitLabel(unit)}`
-	const reps = values.reps === null ? 'no reps' : `${values.reps}`
+	const reps = values.reps === null ? t('noReps') : `${values.reps}`
 	const parts = [`${load} × ${reps}`]
-	if (values.rpe !== null) parts.push(`RPE ${values.rpe}`)
-	if (!values.isCompleted) parts.push('not done')
+	if (values.rpe !== null) parts.push(t('rpeValue', { rpe: values.rpe }))
+	if (!values.isCompleted) parts.push(t('notDone'))
 	return parts.join(' · ')
 }
 
 export function describeSetCorrection(
 	change: SessionSetCorrection,
 	unit: WeightUnit,
+	t: Translator<'workout.corrections'>,
 ): string {
-	return `${change.exerciseName}, set ${change.setNumber}: ${describeSetValues(change.before, unit)} → ${describeSetValues(change.after, unit)}`
+	return t('setCorrectionLine', {
+		exerciseName: change.exerciseName,
+		setNumber: change.setNumber,
+		before: describeSetValues(change.before, unit, t),
+		after: describeSetValues(change.after, unit, t),
+	})
 }
 
-export function describeKeptProgression(names: string[]): string | null {
+export function describeKeptProgression(
+	names: string[],
+	t: Translator<'workout.corrections'>,
+): string | null {
 	if (names.length === 0) return null
 	const list =
 		names.length === 1
 			? names[0]
-			: `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
-	return `The load change for ${list} was kept, because you edited the routine after this workout.`
+			: `${names.slice(0, -1).join(', ')}${t('listConjunction')}${names.at(-1)}`
+	return t('keptProgressionOne', { list })
 }
 
 /** What the owner is typing, one row per logged set, in their unit. */
@@ -139,6 +155,7 @@ export function buildCorrectionRequest(
 	draft: Record<string, CorrectionDraftSet>,
 	logs: CorrectableSetLog[],
 	unit: WeightUnit,
+	t: Translator<'workout.corrections'>,
 ): { sets: CorrectSessionSetRequest[]; problems: DraftProblem[] } {
 	const sets: CorrectSessionSetRequest[] = []
 	const problems: DraftProblem[] = []
@@ -152,7 +169,7 @@ export function buildCorrectionRequest(
 			if (parsed === undefined) {
 				problems.push({
 					setLogId: log.id,
-					message: 'Enter a weight of 0 or more.',
+					message: t('problemInvalidWeight'),
 				})
 				continue
 			}
@@ -165,7 +182,7 @@ export function buildCorrectionRequest(
 		if (reps !== null && (!Number.isInteger(reps) || reps < 0)) {
 			problems.push({
 				setLogId: log.id,
-				message: 'Reps must be a whole number.',
+				message: t('problemInvalidReps'),
 			})
 			continue
 		}
@@ -173,14 +190,14 @@ export function buildCorrectionRequest(
 		if (rpe !== null && (!Number.isFinite(rpe) || rpe < 0 || rpe > 10)) {
 			problems.push({
 				setLogId: log.id,
-				message: 'RPE must be between 0 and 10.',
+				message: t('problemInvalidRpe'),
 			})
 			continue
 		}
 		if (row.isCompleted && (reps === null || reps < 1)) {
 			problems.push({
 				setLogId: log.id,
-				message: 'A done set needs at least one rep.',
+				message: t('problemCompletedNeedsReps'),
 			})
 			continue
 		}

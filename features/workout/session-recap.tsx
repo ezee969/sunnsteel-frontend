@@ -11,6 +11,7 @@ import {
 	Trophy,
 	Weight,
 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { dateFormatter } from '@/i18n/date-locale'
 import {
 	getProgressionRuleExplanation,
 	getProgressionSetPresentation,
@@ -32,7 +34,7 @@ import {
 	formatRecapRecordValue,
 	formatRecapSetsDelta,
 	formatRecapWeightDelta,
-	RECAP_RECORD_LABELS,
+	recapRecordLabel,
 } from '@/lib/utils/session-recap'
 import type { RecapSections } from '@/lib/utils/session-share'
 import { formatDuration } from '@/lib/utils/time-format.utils'
@@ -81,6 +83,7 @@ function ComparisonMetric({
 	previous,
 	change,
 }: ComparisonMetricProps) {
+	const t = useTranslations('workout.recap')
 	return (
 		// §5.3 — captions inside a repeated item are Body small in sentence case.
 		// The tracked uppercase micro-cap this had is the region-caption rank, and
@@ -90,7 +93,9 @@ function ComparisonMetric({
 			<p className="type-data type-data-strong mt-2 text-foreground">
 				{current}
 			</p>
-			<p className="type-body-sm text-ink-3">Previous {previous}</p>
+			<p className="type-body-sm text-ink-3">
+				{t('previousValue', { value: previous })}
+			</p>
 			<p className="type-data mt-1 text-ink-2">{change}</p>
 		</div>
 	)
@@ -122,6 +127,8 @@ export function SessionRecapContent({
 	sections,
 	notesAction,
 }: SessionRecapContentProps) {
+	const t = useTranslations('workout.recap')
+	const locale = useLocale()
 	const viewerUnit = useWeightUnit()
 	const weightUnit = unitOverride ?? viewerUnit
 	const unitLabel = getWeightUnitLabel(weightUnit)
@@ -133,7 +140,7 @@ export function SessionRecapContent({
 			<HeadlineMetric
 				key="duration"
 				icon={<Clock3 className="size-5 shrink-0 text-ink-3" aria-hidden />}
-				label="Duration"
+				label={t('duration')}
 				value={formatDuration(recap.durationSec)}
 			/>
 		) : null,
@@ -141,7 +148,7 @@ export function SessionRecapContent({
 			<HeadlineMetric
 				key="volume"
 				icon={<Weight className="size-5 shrink-0 text-ink-3" aria-hidden />}
-				label="Volume"
+				label={t('volume')}
 				value={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
 			/>
 		) : null,
@@ -149,7 +156,7 @@ export function SessionRecapContent({
 			<HeadlineMetric
 				key="completedSets"
 				icon={<CheckCheck className="size-5 shrink-0 text-ink-3" aria-hidden />}
-				label="Completed sets"
+				label={t('completedSets')}
 				value={recap.completedSets}
 			/>
 		) : null,
@@ -172,42 +179,49 @@ export function SessionRecapContent({
 					<div className="rule-row flex items-center gap-2 pb-2">
 						<GitCompareArrows className="size-4 text-ink-3" aria-hidden />
 						<h3 className="type-panel text-foreground">
-							Compared with last time
+							{t('comparedWithLastTime')}
 						</h3>
 					</div>
 					{previous ? (
 						<>
 							<p className="type-body-sm text-ink-3">
-								Previous session finished{' '}
-								{new Date(previous.endedAt).toLocaleDateString()}.
+								{t('previousSessionFinished', {
+									date: dateFormatter(locale, { dateStyle: 'medium' }).format(
+										new Date(previous.endedAt),
+									),
+								})}
 							</p>
 							<div className="grid grid-cols-1 gap-px bg-rule-faint sm:grid-cols-3">
 								<ComparisonMetric
-									label="Duration"
+									label={t('duration')}
 									current={formatDuration(recap.durationSec)}
 									previous={formatDuration(previous.durationSec)}
-									change={formatRecapDurationDelta(previous.durationDeltaSec)}
+									change={formatRecapDurationDelta(
+										previous.durationDeltaSec,
+										t,
+									)}
 								/>
 								<ComparisonMetric
-									label="Volume"
+									label={t('volume')}
 									current={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
 									previous={`${formatWeightAmount(previous.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
 									change={formatRecapWeightDelta(
 										previous.volumeDeltaKg,
 										weightUnit,
+										t,
 									)}
 								/>
 								<ComparisonMetric
-									label="Completed sets"
+									label={t('completedSets')}
 									current={String(recap.completedSets)}
 									previous={String(previous.completedSets)}
-									change={formatRecapSetsDelta(previous.completedSetsDelta)}
+									change={formatRecapSetsDelta(previous.completedSetsDelta, t)}
 								/>
 							</div>
 						</>
 					) : (
 						<p className="type-body-sm text-ink-3">
-							This is the first completed session for this routine day.
+							{t('firstCompletedSession')}
 						</p>
 					)}
 				</section>
@@ -222,7 +236,9 @@ export function SessionRecapContent({
 					    the whole budget on one list. */}
 					<div className="rule-row flex items-center gap-2 pb-2">
 						<Trophy className="size-4 text-honour" aria-hidden />
-						<h3 className="type-panel text-foreground">Personal records</h3>
+						<h3 className="type-panel text-foreground">
+							{t('personalRecords')}
+						</h3>
 					</div>
 					{recap.records.length > 0 ? (
 						<ul className="grid grid-cols-1 gap-px bg-rule-faint sm:grid-cols-2">
@@ -235,18 +251,19 @@ export function SessionRecapContent({
 										{record.exerciseName}
 									</p>
 									<p className="type-body-sm text-ink-3">
-										{RECAP_RECORD_LABELS[record.kind]} · Set {record.setNumber}
+										{t('recordCaption', {
+											label: recapRecordLabel(record.kind, t),
+											setNumber: record.setNumber,
+										})}
 									</p>
 									<p className="type-data type-data-strong mt-1 text-foreground">
-										{formatRecapRecordValue(record, weightUnit)}
+										{formatRecapRecordValue(record, weightUnit, t)}
 									</p>
 								</li>
 							))}
 						</ul>
 					) : (
-						<p className="type-body-sm text-ink-3">
-							No new personal records in this session.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('noNewRecords')}</p>
 					)}
 				</section>
 			) : null}
@@ -257,7 +274,9 @@ export function SessionRecapContent({
 					    definition of "better than planned". */}
 					<div className="rule-row flex items-center gap-2 pb-2">
 						<TrendingUp className="size-4 text-honour" aria-hidden />
-						<h3 className="type-panel text-foreground">Progression changes</h3>
+						<h3 className="type-panel text-foreground">
+							{t('progressionChanges')}
+						</h3>
 					</div>
 					{recap.progressionChanges.length > 0 ? (
 						<div className="space-y-px bg-rule-faint">
@@ -298,7 +317,7 @@ export function SessionRecapContent({
 						</div>
 					) : (
 						<p className="type-body-sm text-ink-3">
-							No prescriptions changed after this session.
+							{t('noProgressionChanges')}
 						</p>
 					)}
 				</section>
@@ -308,15 +327,17 @@ export function SessionRecapContent({
 				<section className="space-y-3">
 					<div className="rule-row flex items-center gap-2 pb-2">
 						<NotebookPen className="size-4 text-ink-3" aria-hidden />
-						<h3 className="type-panel text-foreground">Session notes</h3>
+						<h3 className="type-panel text-foreground">
+							{t('sessionNotes')}
+						</h3>
 					</div>
 					{recap.notes?.trim() || !recap.exerciseNotes?.length ? (
 						<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
-							{recap.notes?.trim() || 'No notes were added to this session.'}
+							{recap.notes?.trim() || t('noNotesAdded')}
 						</p>
 					) : null}
 					{recap.exerciseNotes?.length ? (
-						<ul className="space-y-2" aria-label="Exercise notes">
+						<ul className="space-y-2" aria-label={t('exerciseNotesAria')}>
 							{recap.exerciseNotes.map(item => (
 								<li key={item.routineExerciseId} className="type-body-sm">
 									<span className="text-foreground">{item.exerciseName}</span>
@@ -344,6 +365,7 @@ export function SessionRecapDialog({
 	recap,
 	onContinue,
 }: SessionRecapDialogProps) {
+	const t = useTranslations('workout.recap')
 	return (
 		<Dialog
 			open={Boolean(recap)}
@@ -364,7 +386,7 @@ export function SessionRecapDialog({
 							<div className="flex size-10 items-center justify-center rounded-sm bg-surface-sunk text-ink-2">
 								<Sparkles className="size-5" aria-hidden />
 							</div>
-							<DialogTitle>Session complete</DialogTitle>
+							<DialogTitle>{t('sessionComplete')}</DialogTitle>
 							<DialogDescription>
 								{recap.routineName}
 								{recap.dayName ? ` · ${recap.dayName}` : ''}
@@ -373,7 +395,7 @@ export function SessionRecapDialog({
 						<SessionRecapContent recap={recap} />
 						<DialogFooter>
 							<Button onClick={onContinue} className="w-full sm:w-auto">
-								Continue to dashboard
+								{t('continueToDashboard')}
 							</Button>
 						</DialogFooter>
 					</>
@@ -393,6 +415,7 @@ export function SessionRecapPanel({
 	action,
 	notesAction,
 }: SessionRecapContentProps & { action?: ReactNode }) {
+	const t = useTranslations('workout.recap')
 	return (
 		<section aria-labelledby="session-recap-heading" className="space-y-4">
 			<div className="flex flex-wrap items-end justify-between gap-3 border-b border-rule pb-2">
@@ -401,7 +424,7 @@ export function SessionRecapPanel({
 						id="session-recap-heading"
 						className="type-section text-foreground"
 					>
-						Session recap
+						{t('sessionRecap')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
 						{recap.routineName}

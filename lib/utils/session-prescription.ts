@@ -1,5 +1,7 @@
 import type { RoutineDay, WorkoutSession } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /**
  * ROUT-15/LIVE-11: what a session trains is the prescription captured when it
  * started -- the session's own `routineDay`, which the backend serves from the
@@ -56,11 +58,12 @@ export function sessionPrescription(
 export function sessionRoutineTitle(
 	session: Pick<WorkoutSession, 'routine' | 'trainingBlock'> &
 		Partial<Pick<WorkoutSession, 'temporaryOverride'>>,
+	t: Translator<'workout.prescription'>,
 ): string {
 	return [
-		session.routine?.name ?? 'Workout',
+		session.routine?.name ?? t('workoutFallback'),
 		session.trainingBlock?.name,
-		session.temporaryOverride ? 'Deload' : null,
+		session.temporaryOverride ? t('deload') : null,
 	]
 		.filter(Boolean)
 		.join(' · ')

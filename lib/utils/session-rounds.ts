@@ -5,6 +5,8 @@ import {
 	type SetKind,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /**
  * LIVE-14: a workout runs a routine's supersets and circuits (ROUT-12) in
  * rounds. Warm-ups come first, exercise by exercise; then each round is every
@@ -136,15 +138,20 @@ export function roundStatus(
 }
 
 /** "Round 2 of 3", or "All 3 rounds done". */
-export function describeRound(status: RoundStatus): string {
+export function describeRound(
+	status: RoundStatus,
+	t: Translator<'workout.rounds'>,
+): string {
 	if (status.finished) {
 		return status.rounds === 1
-			? 'Round done'
-			: `All ${status.rounds} rounds done`
+			? t('roundDone')
+			: t('allRoundsDone', { count: status.rounds })
 	}
-	return `Round ${status.round} of ${status.rounds}`
+	return t('roundOfTotal', { round: status.round, rounds: status.rounds })
 }
 
 /** The line a group member shows while the next set is its own. */
-export const describeUpNext = (next: SetTarget) =>
-	`Up next: set ${next.setNumber}`
+export const describeUpNext = (
+	next: SetTarget,
+	t: Translator<'workout.rounds'>,
+) => t('upNext', { setNumber: next.setNumber })

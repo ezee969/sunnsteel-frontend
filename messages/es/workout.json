@@ -51,6 +51,7 @@
 		"noProgressionChanges": "Ninguna prescripción cambió después de esta sesión.",
 		"sessionNotes": "Notas de la sesión",
 		"noNotesAdded": "No se agregaron notas a esta sesión.",
+		"exerciseNotesAria": "Notas de ejercicios",
 		"sessionComplete": "Sesión completada",
 		"continueToDashboard": "Continuar a Inicio",
 		"sessionRecap": "Resumen de la sesión"
@@ -148,6 +149,7 @@
 		"notDone": "sin hacer",
 		"rpeValue": "RPE {rpe}",
 		"setCorrectionLine": "{exerciseName}, serie {setNumber}: {before} → {after}",
+		"listConjunction": " y ",
 		"keptProgressionOne": "El cambio de carga de {list} se mantuvo, porque editaste la rutina después de este entrenamiento.",
 		"problemInvalidWeight": "Ingresa un peso de 0 o más.",
 		"problemInvalidReps": "Las repeticiones deben ser un número entero.",

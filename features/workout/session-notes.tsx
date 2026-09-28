@@ -5,6 +5,7 @@ import {
 	SESSION_NOTE_MAX_LENGTH,
 } from '@sunsteel/contracts'
 import { Loader2, NotebookPen } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -20,12 +21,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
 import { useUpdateSessionNotes } from '@/lib/api/hooks/useWorkoutSession'
-import {
-	EXERCISE_NOTE_SCOPE,
-	exerciseNoteLabel,
-	remainingCharacters,
-	WORKOUT_NOTE_SCOPE,
-} from '@/lib/utils/session-notes'
+import { exerciseNoteLabel, remainingCharacters } from '@/lib/utils/session-notes'
 
 function NoteDialog({
 	open,
@@ -48,6 +44,7 @@ function NoteDialog({
 	pending: boolean
 	onSave: (value: string) => void
 }) {
+	const t = useTranslations('workout.notes')
 	const [draft, setDraft] = useState(initial)
 	const fieldId = useId()
 	const countId = useId()
@@ -66,7 +63,9 @@ function NoteDialog({
 				</DialogHeader>
 				{instruction ? (
 					<div className="space-y-1">
-						<p className="type-body-sm text-ink-3">Routine note</p>
+						<p className="type-body-sm text-ink-3">
+							{t('routineNoteCaption')}
+						</p>
 						<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
 							{instruction}
 						</p>
@@ -74,7 +73,7 @@ function NoteDialog({
 				) : null}
 				<div className="space-y-1">
 					<Label htmlFor={fieldId} className="type-body-sm text-ink-3">
-						Your note
+						{t('yourNoteFieldLabel')}
 					</Label>
 					<Textarea
 						id={fieldId}
@@ -85,7 +84,7 @@ function NoteDialog({
 						onChange={event => setDraft(event.target.value)}
 					/>
 					<p id={countId} className="type-body-sm text-ink-3">
-						{remainingCharacters(draft, max)}
+						{remainingCharacters(draft, max, t)}
 					</p>
 				</div>
 				<DialogFooter>
@@ -95,7 +94,7 @@ function NoteDialog({
 						onClick={() => onOpenChange(false)}
 						disabled={pending}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						type="button"
@@ -105,7 +104,7 @@ function NoteDialog({
 						{pending ? (
 							<Loader2 className="size-4 animate-spin" aria-hidden />
 						) : null}
-						Save note
+						{t('saveNote')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -114,6 +113,7 @@ function NoteDialog({
 }
 
 function useSaveNote(sessionId: string) {
+	const t = useTranslations('workout.notes')
 	const { push } = useToast()
 	const save = useUpdateSessionNotes(sessionId)
 	const run = (body: Parameters<typeof save.mutate>[0], onDone: () => void) =>
@@ -121,7 +121,7 @@ function useSaveNote(sessionId: string) {
 			onSuccess: onDone,
 			onError: error =>
 				push({
-					title: 'Could not save the note',
+					title: t('couldNotSaveTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -155,6 +155,7 @@ export function ExerciseNoteButton({
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 }) {
+	const t = useTranslations('workout.notes')
 	const [ownOpen, setOwnOpen] = useState(false)
 	const controlled = props.open !== undefined
 	const open = controlled ? props.open === true : ownOpen
@@ -169,8 +170,8 @@ export function ExerciseNoteButton({
 					variant="ghost"
 					size="icon"
 					className="size-11 md:size-10"
-					aria-label={exerciseNoteLabel(exerciseName, !!note)}
-					title={note ? 'Edit note' : 'Add note'}
+					aria-label={exerciseNoteLabel(exerciseName, !!note, t)}
+					title={note ? t('editNoteTitle') : t('addNoteTitle')}
 					onClick={event => {
 						event.stopPropagation()
 						setOpen(true)
@@ -183,8 +184,8 @@ export function ExerciseNoteButton({
 				<NoteDialog
 					open
 					onOpenChange={setOpen}
-					title={`${exerciseName}: note for this workout`}
-					description={EXERCISE_NOTE_SCOPE}
+					title={t('exerciseNoteDialogTitle', { exerciseName })}
+					description={t('exerciseScope')}
 					instruction={instruction}
 					initial={note ?? ''}
 					max={SESSION_EXERCISE_NOTE_MAX_LENGTH}
@@ -208,6 +209,7 @@ export function WorkoutNoteButton({
 	sessionId: string
 	note: string | null
 }) {
+	const t = useTranslations('workout.notes')
 	const [open, setOpen] = useState(false)
 	const { run, pending } = useSaveNote(sessionId)
 	return (
@@ -220,14 +222,14 @@ export function WorkoutNoteButton({
 				onClick={() => setOpen(true)}
 			>
 				<NotebookPen className="size-4" aria-hidden />
-				{note ? 'Edit workout note' : 'Add workout note'}
+				{note ? t('editWorkoutNote') : t('addWorkoutNote')}
 			</Button>
 			{open ? (
 				<NoteDialog
 					open
 					onOpenChange={setOpen}
-					title="Workout note"
-					description={WORKOUT_NOTE_SCOPE}
+					title={t('workoutNoteDialogTitle')}
+					description={t('workoutScope')}
 					initial={note ?? ''}
 					max={SESSION_NOTE_MAX_LENGTH}
 					pending={pending}

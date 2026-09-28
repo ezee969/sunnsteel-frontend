@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	formatPreviousPerformance,
 	isSetPerformanceImproved,
 } from './previous-performance.utils'
+
+const en = translatorFor('en', 'workout.previousPerformance')
+const es = translatorFor('es', 'workout.previousPerformance')
 
 const previous = {
 	routineExerciseId: 'routine-exercise-1',
@@ -51,16 +56,27 @@ describe('isSetPerformanceImproved', () => {
 
 describe('formatPreviousPerformance', () => {
 	it('displays a logged weight in the selected unit', () => {
-		expect(formatPreviousPerformance(previous, 'KG')).toBe('8 reps · 80 kg')
-		expect(formatPreviousPerformance(previous, 'LB')).toBe('8 reps · 176.37 lb')
+		expect(formatPreviousPerformance(previous, 'KG', en)).toBe('8 reps · 80 kg')
+		expect(formatPreviousPerformance(previous, 'LB', en)).toBe(
+			'8 reps · 176.37 lb',
+		)
 	})
 
 	it('does not invent a weight for bodyweight sets', () => {
-		expect(formatPreviousPerformance({ ...previous, weight: null }, 'LB')).toBe(
-			'8 reps',
+		expect(
+			formatPreviousPerformance({ ...previous, weight: null }, 'LB', en),
+		).toBe('8 reps')
+		expect(
+			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG', en),
+		).toBe('1 rep')
+	})
+
+	it('says the same in Spanish, singular and plural (I18N-04)', () => {
+		expect(formatPreviousPerformance(previous, 'KG', es)).toBe(
+			'8 repeticiones · 80 kg',
 		)
 		expect(
-			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG'),
-		).toBe('1 rep')
+			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG', es),
+		).toBe('1 repetición')
 	})
 })
