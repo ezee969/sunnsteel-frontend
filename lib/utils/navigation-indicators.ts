@@ -49,3 +49,12 @@ export function buildNavigationIndicators(
 				: null,
 	} satisfies Record<'notifications' | 'schedule', NavigationIndicator | null>
 }
+
+/** NOTIF-01: the top bar bell's accessible name, which carries the count. */
+export function notificationsBellLabel(
+	unreadCount: number,
+	t: Translator<'shell.indicators'>,
+) {
+	const unread = positiveCount(unreadCount)
+	return unread > 0 ? t('notifications', { count: unread }) : t('bell')
+}

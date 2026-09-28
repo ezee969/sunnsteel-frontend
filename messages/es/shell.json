@@ -21,7 +21,8 @@
 	},
 	"indicators": {
 		"notifications": "Notificaciones, {count} sin leer",
-		"schedule": "Calendario, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy"
+		"schedule": "Calendario, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy",
+		"bell": "Notificaciones"
 	},
 	"header": {
 		"toggleMenu": "Abrir menú",
@@ -66,5 +67,15 @@
 		"activeSessionBanner": "Hay un entrenamiento en curso.",
 		"resumeLabel": "Retomar el entrenamiento en curso",
 		"resume": "Retomar"
+	},
+	"search": {
+		"placeholder": "Busca por nombre o @usuario...",
+		"topResults": "Resultados",
+		"viewAll": "Ver todos los resultados de \"{query}\"",
+		"noUsers": "No hay usuarios para \"{query}\""
+	},
+	"theme": {
+		"toLight": "Cambiar al tema claro",
+		"toDark": "Cambiar al tema oscuro"
 	}
 }

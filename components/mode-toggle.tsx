@@ -1,11 +1,13 @@
 'use client'
 
 import { Moon, Sun } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 
 import { Button } from '@/components/ui/button'
 
 export const ModeToggle = () => {
+	const t = useTranslations('shell.theme')
 	const { theme, setTheme, resolvedTheme } = useTheme()
 
 	const toggleTheme = () => {
@@ -26,8 +28,7 @@ export const ModeToggle = () => {
 	// it is in or the one it moves to. The cycle above always lands on the
 	// opposite of the resolved theme, so that is what the label names. Theme is
 	// unknown on the server, hence the hydration suppression on this element.
-	const label =
-		resolvedTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+	const label = resolvedTheme === 'dark' ? t('toLight') : t('toDark')
 
 	return (
 		// a11y review 12: 44px below `md`. The extra hover wash (a raw

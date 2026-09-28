@@ -9,7 +9,6 @@ import {
 	EARLIER_NOTIFICATIONS_SHOWN,
 	markReadInCache,
 	NEW_NOTIFICATIONS_SHOWN,
-	notificationsBellLabel,
 	sessionProgressSummary,
 	splitByRead,
 } from './notifications'
@@ -148,8 +147,6 @@ describe('notifications (NOTIF-01)', () => {
 		expect(sessionProgressSummary(2, 2)).toBe(
 			'2 new records and 2 load changes',
 		)
-		expect(notificationsBellLabel(0)).toBe('Notifications')
-		expect(notificationsBellLabel(3)).toBe('Notifications, 3 unread')
 	})
 
 	it('marks read in the cache the way the server will', () => {

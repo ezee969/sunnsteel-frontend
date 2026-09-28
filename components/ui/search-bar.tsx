@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { useUserSearch } from '@/lib/api/hooks/useUserSearch'
@@ -11,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './avatar'
 import { Input } from './input'
 
 export function SearchBar() {
+	const t = useTranslations('shell.search')
 	const [query, setQuery] = useState('')
 	const [debouncedQuery, setDebouncedQuery] = useState('')
 	const [isFocused, setIsFocused] = useState(false)
@@ -70,7 +72,7 @@ export function SearchBar() {
 				    look like the rest of them. */}
 				<Input
 					type="text"
-					placeholder="Search by name or @username..."
+					placeholder={t('placeholder')}
 					className="w-full pl-9 pr-10"
 					value={query}
 					onChange={e => setQuery(e.target.value)}
@@ -95,7 +97,7 @@ export function SearchBar() {
 						{results.length > 0 ? (
 							<div className="flex max-h-[300px] flex-col overflow-y-auto py-2">
 								<span className="type-label mb-1 px-3 text-ink-3">
-									Top Results
+									{t('topResults')}
 								</span>
 								{results.map(
 									(
@@ -134,13 +136,13 @@ export function SearchBar() {
 										handleSearchSubmit(e as unknown as React.FormEvent)
 									}}
 								>
-									View all results for &quot;{debouncedQuery}&quot;
+									{t('viewAll', { query: debouncedQuery })}
 								</button>
 							</div>
 						) : (
 							!isLoading && (
 								<div className="type-body-sm p-4 text-center text-ink-3">
-									No users found for &quot;{debouncedQuery}&quot;
+									{t('noUsers', { query: debouncedQuery })}
 								</div>
 							)
 						)}

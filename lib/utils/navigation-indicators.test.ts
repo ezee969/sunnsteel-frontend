@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
 
-import { buildNavigationIndicators } from './navigation-indicators'
+import {
+	buildNavigationIndicators,
+	notificationsBellLabel,
+} from './navigation-indicators'
 
 const en = translatorFor('en', 'shell.indicators')
 const es = translatorFor('es', 'shell.indicators')
@@ -64,5 +67,12 @@ describe('navigation indicators (NAV-05)', () => {
 				en,
 			),
 		).toEqual({ notifications: null, schedule: null })
+	})
+
+	it('names the bell, with the unread count when there is one', () => {
+		expect(notificationsBellLabel(0, en)).toBe('Notifications')
+		expect(notificationsBellLabel(3, en)).toBe('Notifications, 3 unread')
+		expect(notificationsBellLabel(0, es)).toBe('Notificaciones')
+		expect(notificationsBellLabel(3, es)).toBe('Notificaciones, 3 sin leer')
 	})
 })

@@ -21,7 +21,8 @@
 	},
 	"indicators": {
 		"notifications": "Notifications, {count} unread",
-		"schedule": "Schedule, {count, plural, one {# workout} other {# workouts}} planned today"
+		"schedule": "Schedule, {count, plural, one {# workout} other {# workouts}} planned today",
+		"bell": "Notifications"
 	},
 	"header": {
 		"toggleMenu": "Toggle Menu",
@@ -66,5 +67,15 @@
 		"activeSessionBanner": "Active workout session in progress.",
 		"resumeLabel": "Resume active session",
 		"resume": "Resume"
+	},
+	"search": {
+		"placeholder": "Search by name or @username...",
+		"topResults": "Top Results",
+		"viewAll": "View all results for \"{query}\"",
+		"noUsers": "No users found for \"{query}\""
+	},
+	"theme": {
+		"toLight": "Switch to light theme",
+		"toDark": "Switch to dark theme"
 	}
 }

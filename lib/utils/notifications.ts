@@ -111,11 +111,6 @@ export function describeNotification(
 }
 
 /** The bell's accessible name, which carries the unread count. */
-export const notificationsBellLabel = (unreadCount: number) =>
-	unreadCount > 0
-		? `Notifications, ${count(unreadCount, 'unread', 'unread')}`
-		: 'Notifications'
-
 /**
  * Marks notifications read in a cached list, as the server will: the given
  * ids, or every one without ids. Already-read ones keep their time.
