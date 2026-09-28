@@ -79,6 +79,7 @@ else until it merges, so claims live here, on `main`.
 
 | ID      | Status        | Owner  | Branch / worktree | Claimed    | Repositories |
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
+| I18N-01 | `IN_PROGRESS` | Claude | `claude/i18n-01`  | 2026-09-28 | FE           |
 
 ## Current product snapshot
 
@@ -680,7 +681,7 @@ Rules for every item below:
 
 | ID      | Status   | Size | Feature                             | User-facing behavior | Dependencies |
 | ------- | -------- | ---- | ----------------------------------- | -------------------- | ------------ |
-| I18N-01 | `QUEUED` | S    | Translation foundation              | Install `next-intl` without routing. The locale resolves from an `ss-locale` cookie, then the browser's `Accept-Language`, then `en`, and is set on `<html lang>` before first paint. Messages live in `messages/en.json` and `messages/es.json`, split by area; keys are typed. Dates and numbers go through one formatting boundary (`useFormatter` plus the matching `date-fns` locale), replacing the scattered `toLocale*` and `date-fns` calls. A Vitest check fails when the two files differ in keys or ICU placeholders. The shell, the sidebar and the top bar are translated first, to prove the pattern. | None |
+| I18N-01 | `IN_PROGRESS` | S    | Translation foundation              | Install `next-intl` without routing. The locale resolves from an `ss-locale` cookie, then the browser's `Accept-Language`, then `en`, and is set on `<html lang>` before first paint. Messages live in `messages/en.json` and `messages/es.json`, split by area; keys are typed. Dates and numbers go through one formatting boundary (`useFormatter` plus the matching `date-fns` locale), replacing the scattered `toLocale*` and `date-fns` calls. A Vitest check fails when the two files differ in keys or ICU placeholders. The shell, the sidebar and the top bar are translated first, to prove the pattern. | None |
 | I18N-02 | `QUEUED` | M    | Language preference                 | Settings › Account gains a **Language** select: English, Español, or "Same as this device". The choice is stored on the account (`User.locale`, null follows the device) so every device agrees, mirrored into the cookie so signed-out pages and first paint use it, and applied without a reload. Contracts own `SUPPORTED_LOCALES`; the backend adds `PUT /users/preferences/locale` and a migration. Takes the language part of `PREF-04`. | I18N-01; `@sunsteel/contracts` |
 | I18N-03 | `QUEUED` | S    | Translate auth and public pages     | Login, Sign up, Forgot and Reset password, the OAuth callback states, `/members/<username>`, shared workouts and shared routines, `/offline`, page titles and metadata. The signed-out pages read the cookie or the browser, since there is no account. | I18N-01 |
 | I18N-04 | `QUEUED` | S    | Translate training                  | Dashboard, the live session (rest timer, set rows, rounds, swaps, notes), history and corrections, routines and the wizard, deloads and training blocks, schedule, and the exercise pages. Includes the copy modules behind them and their tests in both languages. | I18N-01 |
@@ -2721,8 +2722,9 @@ it again without addressing the original decision.
   choices, recorded as design-system amendment §22; gym mode is the workout
   screen under larger controls, with a masthead switch. Every workout control
   is now at least 44px on phones. Frontend only.
-- **2026-09-28 (revision 179):** Re-scoped `I18N-07` to `L`. Catalog exercise
+- **2026-09-28 (revision 180):** Re-scoped `I18N-07` to `L`. Catalog exercise
   names are translated in the database, because catalog ids differ per
   environment and the backend already writes `exerciseName` into responses
   and pushes. A starter template is translated when it opens and is then the
   member's own text.
+- **2026-09-28 (revision 181):** Claimed `I18N-01`, the translation foundation.
