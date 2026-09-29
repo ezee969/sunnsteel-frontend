@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronDown, Info } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -24,9 +25,11 @@ interface ExplanationProps {
 export function Explanation({
 	summary,
 	children,
-	label = 'How this works',
+	label,
 	className,
 }: ExplanationProps) {
+	const t = useTranslations('core.common')
+	const resolvedLabel = label ?? t('howThisWorks')
 	const [open, setOpen] = useState(false)
 	const bodyId = useId()
 
@@ -44,7 +47,7 @@ export function Explanation({
 					className="-ml-3 h-11 sm:ml-0 sm:h-9"
 				>
 					<Info aria-hidden />
-					{label}
+					{resolvedLabel}
 					<ChevronDown aria-hidden className={cn(open && 'rotate-180')} />
 				</Button>
 			</div>

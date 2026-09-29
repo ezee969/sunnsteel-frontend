@@ -1,9 +1,12 @@
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 
-export default function NotFound() {
+export default async function NotFound() {
+	const t = await getTranslations('core.notFound')
+
 	return (
 		<main className="ledger-page space-y-2 py-10 md:py-16">
 			{/* The number is this block's headline, so it keeps the large-numeral
@@ -11,12 +14,9 @@ export default function NotFound() {
 			<p className="type-numeral text-ink-3" aria-hidden>
 				404
 			</p>
-			<RouteError
-				title="Page not found"
-				description="The page you're looking for doesn't exist or has been moved."
-			>
+			<RouteError title={t('title')} description={t('description')}>
 				<Button asChild>
-					<Link href="/">Go home</Link>
+					<Link href="/">{t('goHome')}</Link>
 				</Button>
 			</RouteError>
 		</main>

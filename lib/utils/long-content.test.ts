@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	collapseStorageKey,
 	parseStoredOpen,
@@ -8,6 +10,9 @@ import {
 	showMoreLabel,
 	visibleRows,
 } from './long-content'
+
+const en = translatorFor('en', 'core.common')
+const es = translatorFor('es', 'core.common')
 
 describe('collapsible sections (UX-01)', () => {
 	it('stores a choice per section under its own key', () => {
@@ -48,12 +53,17 @@ describe('bounded lists (UX-01)', () => {
 	})
 
 	it('names how many rows the control reveals', () => {
-		expect(showMoreLabel(5, 3, false)).toBe('Show 2 more')
-		expect(showMoreLabel(5, 3, true)).toBe('Show fewer')
+		expect(showMoreLabel(5, 3, false, en)).toBe('Show 2 more')
+		expect(showMoreLabel(5, 3, true, en)).toBe('Show fewer')
 	})
 
 	it('offers nothing when every row fits', () => {
-		expect(showMoreLabel(3, 3, false)).toBeNull()
-		expect(showMoreLabel(0, 3, true)).toBeNull()
+		expect(showMoreLabel(3, 3, false, en)).toBeNull()
+		expect(showMoreLabel(0, 3, true, en)).toBeNull()
+	})
+
+	it('says the same in Spanish (I18N-03)', () => {
+		expect(showMoreLabel(5, 3, false, es)).toBe('Mostrar 2 más')
+		expect(showMoreLabel(5, 3, true, es)).toBe('Mostrar menos')
 	})
 })

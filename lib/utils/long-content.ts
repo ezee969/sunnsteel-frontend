@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 /**
  * The long-content patterns every page shares (UX-01, design system §20):
  * a collapsible section, a bounded list and an explanation on demand. The
@@ -61,8 +63,9 @@ export function showMoreLabel(
 	total: number,
 	limit: number,
 	expanded: boolean,
+	t: Translator<'core.common'>,
 ): string | null {
 	if (total <= limit) return null
-	if (expanded) return 'Show fewer'
-	return `Show ${total - limit} more`
+	if (expanded) return t('showFewer')
+	return t('showMore', { count: total - limit })
 }

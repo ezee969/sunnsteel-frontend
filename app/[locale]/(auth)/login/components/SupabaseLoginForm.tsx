@@ -11,6 +11,7 @@ import {
 	Lock,
 	Mail,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -43,6 +44,8 @@ import { LoginFormValues, loginSchema } from '@/schema/login-schema'
  * @returns The login form React element.
  */
 export function SupabaseLoginForm() {
+	const t = useTranslations('core.login')
+	const tCommon = useTranslations('core.authCommon')
 	const { mutate: signIn, isPending, isError, error } = useSupabaseSignIn()
 	const { mutate: googleSignIn, isPending: isGooglePending } =
 		useSupabaseGoogleSignIn()
@@ -90,10 +93,8 @@ export function SupabaseLoginForm() {
 						aria-hidden
 					/>
 					<div className="flex-1">
-						<p className="type-panel mb-1">Account created!</p>
-						<p className="text-ink-2">
-							Check your email to verify your account.
-						</p>
+						<p className="type-panel mb-1">{tCommon('accountCreated')}</p>
+						<p className="text-ink-2">{tCommon('checkEmailVerify')}</p>
 					</div>
 				</div>
 			)}
@@ -108,9 +109,9 @@ export function SupabaseLoginForm() {
 						aria-hidden
 					/>
 					<div className="flex-1">
-						<p className="type-panel mb-1">Unable to sign in</p>
+						<p className="type-panel mb-1">{t('unableToSignIn')}</p>
 						<p className="text-ink-2">
-							{error?.message || 'Please check your credentials.'}
+							{error?.message || t('checkCredentials')}
 						</p>
 					</div>
 				</div>
@@ -128,7 +129,7 @@ export function SupabaseLoginForm() {
 							name="email"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Email</FormLabel>
+									<FormLabel>{tCommon('email')}</FormLabel>
 									{/* FormControl wraps the input itself so the label and
 									    error bind to it, not to the icon container. */}
 									<div className="relative">
@@ -160,12 +161,12 @@ export function SupabaseLoginForm() {
 							render={({ field }) => (
 								<FormItem>
 									<div className="flex items-center justify-between">
-										<FormLabel>Password</FormLabel>
+										<FormLabel>{tCommon('password')}</FormLabel>
 										<Link
 											href="/forgot-password"
 											className="type-body-sm -mr-2 p-2 text-ink-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 										>
-											Forgot password?
+											{t('forgotPasswordLink')}
 										</Link>
 									</div>
 									<div className="relative">
@@ -187,7 +188,9 @@ export function SupabaseLoginForm() {
 											type="button"
 											onClick={() => setShowPassword(!showPassword)}
 											aria-label={
-												showPassword ? 'Hide password' : 'Show password'
+												showPassword
+													? tCommon('hidePassword')
+													: tCommon('showPassword')
 											}
 											className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 											disabled={isPending || isGooglePending}
@@ -213,11 +216,11 @@ export function SupabaseLoginForm() {
 							{isPending ? (
 								<>
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Signing in...
+									{t('signingIn')}
 								</>
 							) : (
 								<>
-									Log in
+									{tCommon('logIn')}
 									<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 								</>
 							)}
@@ -230,7 +233,9 @@ export function SupabaseLoginForm() {
 						<span className="w-full border-t border-rule" />
 					</div>
 					<div className="relative flex justify-center">
-						<span className="type-label bg-surface px-4 text-ink-3">Or</span>
+						<span className="type-label bg-surface px-4 text-ink-3">
+							{tCommon('or')}
+						</span>
 					</div>
 				</div>
 
@@ -247,23 +252,23 @@ export function SupabaseLoginForm() {
 					) : (
 						<Image
 							src="/icons/google-icon-logo-svgrepo-com.svg"
-							alt="Google"
+							alt={tCommon('googleAlt')}
 							width={16}
 							height={16}
 							className="mr-2 h-4 w-4"
 						/>
 					)}
-					Continue with Google
+					{tCommon('continueWithGoogle')}
 				</Button>
 			</div>
 
 			<div className="type-body-sm mt-6 text-center text-ink-2">
-				Don&apos;t have an account?{' '}
+				{t('noAccountPrompt')}{' '}
 				<Link
 					href="/signup"
 					className="p-2 font-semibold text-foreground underline-offset-4 hover:underline"
 				>
-					Sign up
+					{tCommon('signUp')}
 				</Link>
 			</div>
 		</div>

@@ -1,11 +1,15 @@
 import type { SetKind, WeightUnit } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useDebounce } from '@/hooks/use-debounce'
 import { markSetPending } from '@/lib/api/hooks/useWorkoutSession'
 import { DEBOUNCE_DELAYS } from '@/lib/constants/session.constants'
 import { useSaveState } from '@/lib/utils/save-status-store'
-import { validateSetLogPayload } from '@/lib/utils/session-validation.utils'
+import {
+	type SetLogValidationField,
+	validateSetLogPayload,
+} from '@/lib/utils/session-validation.utils'
 import {
 	areCanonicalWeightsEqual,
 	formatWeightInput,
@@ -57,6 +61,7 @@ interface UseSetLogFormReturn {
 	// Validation
 	isValid: boolean
 	validationError?: string
+	validationField?: SetLogValidationField
 }
 
 /**
@@ -75,6 +80,7 @@ export const useSetLogForm = ({
 	onSave,
 	onSetCompleted,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
+	const t = useTranslations('core.setLogValidation')
 	// Form state
 	const [repsState, setRepsState] = useState<string>(
 		initialReps > 0 ? String(initialReps) : '',
@@ -168,7 +174,7 @@ export const useSetLogForm = ({
 		rpeState,
 		isCompletedState,
 	)
-	const validation = validateSetLogPayload(currentPayload)
+	const validation = validateSetLogPayload(currentPayload, t)
 
 	// Auto-save effect for debounced values
 	useEffect(() => {
@@ -293,7 +299,7 @@ export const useSetLogForm = ({
 			setRpeState(rpe)
 
 			const payload = createPayload(reps, weight, rpe, isCompletedState)
-			if (!validateSetLogPayload(payload).isValid) return
+			if (!validateSetLogPayload(payload, t).isValid) return
 			markSetPending(sessionId, routineExerciseId, setNumber)
 			onSaveRef.current(payload)
 			lastSavedRef.current = {
@@ -310,6 +316,7 @@ export const useSetLogForm = ({
 			sessionId,
 			routineExerciseId,
 			setNumber,
+			t,
 		],
 	)
 
@@ -321,7 +328,7 @@ export const useSetLogForm = ({
 				rpeState,
 				isCompletedState,
 			)
-			if (!validateSetLogPayload(payload).isValid) return
+			if (!validateSetLogPayload(payload, t).isValid) return
 			markSetPending(sessionId, routineExerciseId, setNumber)
 			onSaveRef.current({ ...payload, kind })
 			lastSavedRef.current = {
@@ -340,6 +347,7 @@ export const useSetLogForm = ({
 			sessionId,
 			routineExerciseId,
 			setNumber,
+			t,
 		],
 	)
 
@@ -354,7 +362,7 @@ export const useSetLogForm = ({
 
 			// Immediately save completion toggle
 			const payload = createPayload(repsState, weightState, rpeState, checked)
-			if (validateSetLogPayload(payload).isValid) {
+			if (validateSetLogPayload(payload, t).isValid) {
 				onSaveRef.current(payload)
 				// Update last saved values to prevent redundant saves
 				const w = parseWeightInput(weightState, weightUnit)
@@ -376,6 +384,7 @@ export const useSetLogForm = ({
 			rpeState,
 			createPayload,
 			weightUnit,
+			t,
 		],
 	)
 
@@ -399,6 +408,7 @@ export const useSetLogForm = ({
 
 		// Validation
 		isValid: validation.isValid,
-		validationError: validation.errors[0], // Use first error from errors array
+		validationError: validation.errors[0]?.message, // Use first error from errors array
+		validationField: validation.errors[0]?.field,
 	}
 }

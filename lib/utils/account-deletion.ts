@@ -1,5 +1,7 @@
 import { matchesDeletionConfirmation } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /**
  * TRUST-01. What deleting an account does, stated before it is done.
  *
@@ -7,43 +9,58 @@ import { matchesDeletionConfirmation } from '@sunsteel/contracts'
  * goes, the one thing that stays and the one thing the product cannot offer
  * yet, rather than a single line of warning a member has learned to skip.
  */
-export const ACCOUNT_DELETION_REMOVES = [
-	'Your profile, username, photo and privacy settings',
-	'Every routine you made, with its versions and share links',
-	'Your workout history, records, goals, achievements and rank',
-	'Your follows, training partners, activity, comments, reactions and reports',
-	'Your sign-in, so this email can only start a new, empty account',
-] as const
+export function accountDeletionRemoves(
+	t: Translator<'core.accountDeletion'>,
+): string[] {
+	return [
+		t('removesProfile'),
+		t('removesRoutines'),
+		t('removesHistory'),
+		t('removesSocial'),
+		t('removesSignIn'),
+	]
+}
 
-export const ACCOUNT_DELETION_KEEPS =
-	'Copies other members made of your shared routines stay theirs. They no longer name you.'
+export function accountDeletionKeeps(
+	t: Translator<'core.accountDeletion'>,
+): string {
+	return t('keeps')
+}
 
 /**
  * EXPORT-01: the step to take first, named where it is -- the card directly
  * above -- because the deletion is final.
  */
-export const ACCOUNT_DELETION_EXPORT_FIRST =
-	'To keep a copy of your data, use Download Your Data, just above, before you delete.'
+export function accountDeletionExportFirst(
+	t: Translator<'core.accountDeletion'>,
+): string {
+	return t('exportFirst')
+}
 
-export const ACCOUNT_DELETED_NOTICE =
-	'Your account and everything in it has been deleted. You can create a new account with the same email at any time.'
+export function accountDeletedNotice(
+	t: Translator<'core.accountDeletion'>,
+): string {
+	return t('deletedNotice')
+}
 
 /**
  * Why this account cannot be deleted from Settings, or null when it can. The
  * server refuses the same case; stating it here keeps the control from
  * looking broken.
  */
-export function deletionBlockedReason(profile: {
-	isModerator: boolean
-}): string | null {
-	return profile.isModerator
-		? 'A moderator account cannot be deleted here. Its moderator access has to be removed first, because the moderation record depends on it.'
-		: null
+export function deletionBlockedReason(
+	profile: { isModerator: boolean },
+	t: Translator<'core.accountDeletion'>,
+): string | null {
+	return profile.isModerator ? t('moderatorBlocked') : null
 }
 
 /** The prompt above the confirmation field, naming exactly what to type. */
-export function deletionConfirmationPrompt(username: string): string {
-	return `Type ${username} to confirm.`
+export function deletionConfirmationPrompt(
+	username: string,
+	t: Translator<'core.accountDeletion'>,
+): string {
+	return t('confirmationPrompt', { username })
 }
 
 /** Whether the typed confirmation lets the delete control be used. */
@@ -51,7 +68,7 @@ export function canConfirmDeletion(typed: string, username: string): boolean {
 	return matchesDeletionConfirmation(typed, username)
 }
 
-/** The value the login page reads to show `ACCOUNT_DELETED_NOTICE`. */
+/** The value the login page reads to show `accountDeletedNotice`. */
 export const ACCOUNT_DELETED_PARAM = 'deleted'
 
 export const ACCOUNT_DELETED_LOGIN_URL = `/login?account=${ACCOUNT_DELETED_PARAM}`

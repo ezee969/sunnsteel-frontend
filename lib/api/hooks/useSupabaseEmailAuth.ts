@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -19,6 +20,7 @@ export interface EmailSignupInput extends EmailLoginInput {
 export function useSupabaseEmailAuth() {
 	const qc = useQueryClient()
 	const router = useRouter()
+	const t = useTranslations('core.errorMessages')
 	const [signinError, setSigninError] = useState<Error | null>(null)
 
 	const signinMutation = useMutation({
@@ -30,7 +32,7 @@ export function useSupabaseEmailAuth() {
 			password: string
 		}) => {
 			setSigninError(null)
-			return supabaseAuthService.signIn(email, password)
+			return supabaseAuthService.signIn(email, password, t)
 		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: ['user'] })
@@ -51,7 +53,7 @@ export function useSupabaseEmailAuth() {
 			password: string
 			name: string
 		}) => {
-			return supabaseAuthService.signUp(email, password, name)
+			return supabaseAuthService.signUp(email, password, name, t)
 		},
 		onSuccess: data => {
 			qc.invalidateQueries({ queryKey: ['user'] })
@@ -99,9 +101,10 @@ export function useSupabaseEmailAuth() {
 export function useSupabaseEmailLogin() {
 	const qc = useQueryClient()
 	const router = useRouter()
+	const t = useTranslations('core.errorMessages')
 	return useMutation({
 		mutationFn: async ({ email, password }: EmailLoginInput) => {
-			return supabaseAuthService.signIn(email, password)
+			return supabaseAuthService.signIn(email, password, t)
 		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: ['user'] })
@@ -117,9 +120,10 @@ export function useSupabaseEmailLogin() {
 export function useSupabaseEmailSignup() {
 	const qc = useQueryClient()
 	const router = useRouter()
+	const t = useTranslations('core.errorMessages')
 	return useMutation({
 		mutationFn: async ({ email, password, name }: EmailSignupInput) => {
-			return supabaseAuthService.signUp(email, password, name)
+			return supabaseAuthService.signUp(email, password, name, t)
 		},
 		onSuccess: data => {
 			qc.invalidateQueries({ queryKey: ['user'] })

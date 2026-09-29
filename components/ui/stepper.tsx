@@ -1,8 +1,10 @@
 'use client'
 
 import { Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
+import type { Translator } from '@/i18n/translator'
 import { cn } from '@/lib/utils'
 
 interface Step {
@@ -55,11 +57,14 @@ function titleTone({ isCompleted, isActive, isClickable }: StepState) {
 	return 'text-ink-3'
 }
 
-function stateLabel({ isCompleted, isActive, isClickable }: StepState) {
-	if (isActive) return 'current step'
-	if (isCompleted) return 'completed'
-	if (isClickable) return 'available'
-	return 'not available yet'
+function stateLabel(
+	{ isCompleted, isActive, isClickable }: StepState,
+	t: Translator<'core.stepper'>,
+) {
+	if (isActive) return t('stateCurrent')
+	if (isCompleted) return t('stateCompleted')
+	if (isClickable) return t('stateAvailable')
+	return t('stateUnavailable')
 }
 
 const FOCUS_RING =
@@ -89,6 +94,7 @@ export function Stepper({
 	completedSteps,
 	canStepClick,
 }: StepperProps) {
+	const t = useTranslations('core.stepper')
 	const total = steps.length
 
 	const stateOf = (step: Step): StepState => {
@@ -107,7 +113,12 @@ export function Stepper({
 		onClick: () => state.isClickable && onStepClick?.(step.id),
 		'aria-current': state.isActive ? ('step' as const) : undefined,
 		'aria-disabled': !state.isClickable && !state.isActive ? true : undefined,
-		'aria-label': `Step ${step.id} of ${total}: ${step.title}, ${stateLabel(state)}`,
+		'aria-label': t('stepAriaLabel', {
+			current: step.id,
+			total,
+			title: step.title,
+			state: stateLabel(state, t),
+		}),
 	})
 
 	const current = steps.find(step => step.id === currentStep)
@@ -116,7 +127,7 @@ export function Stepper({
 		<div className={cn('w-full', className)}>
 			{/* Compact tracker, below `lg` */}
 			<div className="lg:hidden">
-				<ol className="flex items-center gap-2" aria-label="Routine steps">
+				<ol className="flex items-center gap-2" aria-label={t('routineSteps')}>
 					{steps.map((step, index) => {
 						const state = stateOf(step)
 						const isLast = index === total - 1
@@ -176,7 +187,7 @@ export function Stepper({
 			{/* Horizontal layout, from `lg` */}
 			<ol
 				className="hidden w-full items-start lg:flex"
-				aria-label="Routine steps"
+				aria-label={t('routineSteps')}
 			>
 				{steps.map((step, index) => {
 					const state = stateOf(step)

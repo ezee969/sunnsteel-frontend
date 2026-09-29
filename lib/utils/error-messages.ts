@@ -1,12 +1,27 @@
+import type { Translator } from '@/i18n/translator'
+
 /**
  * Maps raw Supabase error messages to user-friendly messages
  * with actionable guidance
  */
 
+type ErrorMessageKey =
+	| 'emailAlreadyRegistered'
+	| 'invalidEmail'
+	| 'weakPassword'
+	| 'rateLimit'
+	| 'emailNotVerified'
+	| 'invalidCredentials'
+	| 'networkError'
+	| 'sessionExpired'
+	| 'authFailed'
+
+type ErrorMessageGuidanceKey = `${ErrorMessageKey}Guidance`
+
 export interface ErrorMessageMapping {
 	pattern: RegExp | string
-	friendlyMessage: string
-	actionableGuidance?: string
+	messageKey: ErrorMessageKey
+	guidanceKey: ErrorMessageGuidanceKey
 }
 
 const errorMappings: ErrorMessageMapping[] = [
@@ -14,79 +29,74 @@ const errorMappings: ErrorMessageMapping[] = [
 	{
 		pattern:
 			/user already registered|email.*already.*registered|duplicate.*email/i,
-		friendlyMessage: 'This email is already registered',
-		actionableGuidance:
-			'If this is your account, try logging in instead. Forgot your password? Use the password reset option.',
+		messageKey: 'emailAlreadyRegistered',
+		guidanceKey: 'emailAlreadyRegisteredGuidance',
 	},
 	// Invalid email format
 	{
 		pattern: /invalid.*email|email.*invalid/i,
-		friendlyMessage: 'Invalid email address',
-		actionableGuidance:
-			'Please enter a valid email address (e.g., name@example.com)',
+		messageKey: 'invalidEmail',
+		guidanceKey: 'invalidEmailGuidance',
 	},
 	// Weak password
 	{
 		pattern:
 			/password.*too.*short|password.*at least.*6|password.*weak|password.*strength/i,
-		friendlyMessage: 'Password is too weak',
-		actionableGuidance:
-			'Password must be at least 6 characters long. Use a mix of letters, numbers, and symbols for better security.',
+		messageKey: 'weakPassword',
+		guidanceKey: 'weakPasswordGuidance',
 	},
 	// Rate limit exceeded
 	{
 		pattern: /rate.*limit|too.*many.*requests|email.*rate.*limit/i,
-		friendlyMessage: 'Too many attempts',
-		actionableGuidance:
-			'You have made too many requests. Please wait a few minutes and try again.',
+		messageKey: 'rateLimit',
+		guidanceKey: 'rateLimitGuidance',
 	},
 	// Email not verified
 	{
 		pattern: /email.*not.*confirmed|email.*not.*verified/i,
-		friendlyMessage: 'Email not verified',
-		actionableGuidance:
-			'Please check your email and click the verification link before logging in.',
+		messageKey: 'emailNotVerified',
+		guidanceKey: 'emailNotVerifiedGuidance',
 	},
 	// Invalid credentials (login)
 	{
 		pattern: /invalid.*credentials|invalid.*login|incorrect.*password/i,
-		friendlyMessage: 'Incorrect email or password',
-		actionableGuidance:
-			'Please check your credentials and try again. Passwords are case-sensitive.',
+		messageKey: 'invalidCredentials',
+		guidanceKey: 'invalidCredentialsGuidance',
 	},
 	// Network errors
 	{
 		pattern: /network.*error|failed.*to.*fetch|fetch.*failed/i,
-		friendlyMessage: 'Connection error',
-		actionableGuidance:
-			'Unable to connect to the server. Please check your internet connection and try again.',
+		messageKey: 'networkError',
+		guidanceKey: 'networkErrorGuidance',
 	},
 	// Session expired
 	{
 		pattern: /session.*expired|token.*expired|jwt.*expired/i,
-		friendlyMessage: 'Session expired',
-		actionableGuidance: 'Your session has expired. Please log in again.',
+		messageKey: 'sessionExpired',
+		guidanceKey: 'sessionExpiredGuidance',
 	},
 	// Generic authentication error
 	{
 		pattern: /authentication.*failed|auth.*error/i,
-		friendlyMessage: 'Authentication failed',
-		actionableGuidance: 'Unable to authenticate. Please try again.',
+		messageKey: 'authFailed',
+		guidanceKey: 'authFailedGuidance',
 	},
 ]
 
 /**
  * Converts a raw error message to a user-friendly message
  * @param errorMessage - The raw error message from Supabase or backend
+ * @param t - `core.errorMessages` translator
  * @returns Friendly error message with optional guidance
  */
 export function getFriendlyErrorMessage(
 	errorMessage: string | undefined | null,
+	t: Translator<'core.errorMessages'>,
 ): { message: string; guidance?: string } {
 	if (!errorMessage) {
 		return {
-			message: 'An unexpected error occurred',
-			guidance: 'Please try again. If the problem persists, contact support.',
+			message: t('unexpectedTitle'),
+			guidance: t('unexpectedGuidance'),
 		}
 	}
 
@@ -99,8 +109,8 @@ export function getFriendlyErrorMessage(
 
 		if (matches) {
 			return {
-				message: mapping.friendlyMessage,
-				guidance: mapping.actionableGuidance,
+				message: t(mapping.messageKey),
+				guidance: t(mapping.guidanceKey),
 			}
 		}
 	}
@@ -117,8 +127,8 @@ export function getFriendlyErrorMessage(
 		.trim()
 
 	return {
-		message: sanitized || 'An error occurred',
-		guidance: 'Please try again. If the problem persists, contact support.',
+		message: sanitized || t('genericError'),
+		guidance: t('unexpectedGuidance'),
 	}
 }
 
@@ -127,8 +137,9 @@ export function getFriendlyErrorMessage(
  */
 export function getErrorMessage(
 	errorMessage: string | undefined | null,
+	t: Translator<'core.errorMessages'>,
 ): string {
-	return getFriendlyErrorMessage(errorMessage).message
+	return getFriendlyErrorMessage(errorMessage, t).message
 }
 
 /**
@@ -136,7 +147,8 @@ export function getErrorMessage(
  */
 export function getFullErrorMessage(
 	errorMessage: string | undefined | null,
+	t: Translator<'core.errorMessages'>,
 ): string {
-	const { message, guidance } = getFriendlyErrorMessage(errorMessage)
+	const { message, guidance } = getFriendlyErrorMessage(errorMessage, t)
 	return guidance ? `${message}. ${guidance}` : message
 }

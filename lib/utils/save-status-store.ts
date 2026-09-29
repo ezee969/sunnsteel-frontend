@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import type { Translator } from '@/i18n/translator'
+
 export type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error'
 
 interface Entry {
@@ -72,16 +74,19 @@ export function useSaveState(key: string) {
 }
 
 // Convenience label helper
-export function saveStateLabel(state: SaveState) {
+export function saveStateLabel(
+	state: SaveState,
+	t: Translator<'core.saveStatus'>,
+) {
 	switch (state) {
 		case 'pending':
-			return 'Unsaved'
+			return t('unsaved')
 		case 'saving':
-			return 'Saving…'
+			return t('saving')
 		case 'saved':
-			return 'Saved'
+			return t('saved')
 		case 'error':
-			return 'Error'
+			return t('error')
 		default:
 			return ''
 	}

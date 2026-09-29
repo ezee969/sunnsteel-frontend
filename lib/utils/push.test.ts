@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	describeDevice,
 	isIosDevice,
@@ -7,6 +9,9 @@ import {
 	resolvePushStatus,
 	urlBase64ToUint8Array,
 } from './push'
+
+const en = translatorFor('en', 'core.push')
+const es = translatorFor('es', 'core.push')
 
 const IPHONE =
 	'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1'
@@ -71,51 +76,68 @@ describe('iOS detection', () => {
 
 describe('push availability (NOTIF-02)', () => {
 	it('offers the prompt only when it can actually be honoured', () => {
-		const status = resolvePushStatus(env())
+		const status = resolvePushStatus(env(), en)
 		expect(status.availability).toBe('READY')
 		expect(status.canEnable).toBe(true)
 	})
 
 	it('refuses to prompt in an iOS browser tab and says to install first', () => {
-		const status = resolvePushStatus(env({ isIos: true, isStandalone: false }))
+		const status = resolvePushStatus(
+			env({ isIos: true, isStandalone: false }),
+			en,
+		)
 		expect(status.availability).toBe('REQUIRES_INSTALL')
 		expect(status.canEnable).toBe(false)
 		expect(status.description).toMatch(/home screen/i)
 	})
 
+	it('says the same in Spanish (I18N-03)', () => {
+		const status = resolvePushStatus(
+			env({ isIos: true, isStandalone: false }),
+			es,
+		)
+		expect(status.availability).toBe('REQUIRES_INSTALL')
+		expect(status.description).toMatch(/pantalla de inicio/i)
+	})
+
 	it('prompts on an installed iOS PWA', () => {
 		expect(
-			resolvePushStatus(env({ isIos: true, isStandalone: true })).canEnable,
+			resolvePushStatus(env({ isIos: true, isStandalone: true }), en)
+				.canEnable,
 		).toBe(true)
 	})
 
 	it('never prompts when the server holds no key', () => {
-		const status = resolvePushStatus(env({ vapidPublicKey: null }))
+		const status = resolvePushStatus(env({ vapidPublicKey: null }), en)
 		expect(status.availability).toBe('SERVER_UNAVAILABLE')
 		expect(status.canEnable).toBe(false)
 	})
 
 	it('never re-prompts once the browser has refused', () => {
-		const status = resolvePushStatus(env({ permission: 'denied' }))
+		const status = resolvePushStatus(env({ permission: 'denied' }), en)
 		expect(status.availability).toBe('BLOCKED')
 		expect(status.canEnable).toBe(false)
 	})
 
 	it('reports an unsupported browser instead of a broken button', () => {
-		const status = resolvePushStatus(env({ supported: false }))
+		const status = resolvePushStatus(env({ supported: false }), en)
 		expect(status.availability).toBe('UNSUPPORTED')
 		expect(status.canEnable).toBe(false)
 	})
 
 	it('shows the enabled state only when permission and subscription agree', () => {
 		expect(
-			resolvePushStatus(env({ isSubscribed: true, permission: 'granted' }))
-				.availability,
+			resolvePushStatus(
+				env({ isSubscribed: true, permission: 'granted' }),
+				en,
+			).availability,
 		).toBe('ENABLED')
 		// A subscription the browser no longer permits is not enabled.
 		expect(
-			resolvePushStatus(env({ isSubscribed: true, permission: 'default' }))
-				.availability,
+			resolvePushStatus(
+				env({ isSubscribed: true, permission: 'default' }),
+				en,
+			).availability,
 		).toBe('READY')
 	})
 
@@ -124,22 +146,25 @@ describe('push availability (NOTIF-02)', () => {
 		expect(
 			resolvePushStatus(
 				env({ isIos: true, isStandalone: false, vapidPublicKey: null }),
+				en,
 			).availability,
 		).toBe('REQUIRES_INSTALL')
 	})
 
-	it('never promises a countdown anywhere in its copy', () => {
-		const copy = (
-			[
-				env(),
-				env({ isSubscribed: true, permission: 'granted' }),
-				env({ isIos: true, isStandalone: false }),
-			] as PushEnvironment[]
-		)
-			.map(resolvePushStatus)
-			.map(status => `${status.title} ${status.description}`)
-			.join(' ')
+	it('never promises a countdown anywhere in its copy, in either language', () => {
+		const envs = [
+			env(),
+			env({ isSubscribed: true, permission: 'granted' }),
+			env({ isIos: true, isStandalone: false }),
+		] as PushEnvironment[]
 
-		expect(copy).not.toMatch(/countdown|counts down|ticking/i)
+		const copy = (translator: typeof en) =>
+			envs
+				.map(e => resolvePushStatus(e, translator))
+				.map(status => `${status.title} ${status.description}`)
+				.join(' ')
+
+		expect(copy(en)).not.toMatch(/countdown|counts down|ticking/i)
+		expect(copy(es)).not.toMatch(/cuenta regresiva|contando|marcando/i)
 	})
 })

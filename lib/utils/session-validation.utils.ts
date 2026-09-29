@@ -1,33 +1,56 @@
+import type { Translator } from '@/i18n/translator'
+
 import type { UpsertSetLogPayload } from './workout-session.types'
+
+type Translated = Translator<'core.setLogValidation'>
+
+/** Which field a validation problem belongs to, for marking the right input. */
+export type SetLogValidationField =
+	| 'routineExerciseId'
+	| 'exerciseId'
+	| 'setNumber'
+	| 'reps'
+	| 'weight'
+	| 'rpe'
+
+export interface SetLogValidationError {
+	field: SetLogValidationField
+	message: string
+}
 
 /**
  * Validates a set log payload before submission
  * @param payload - The set log payload to validate
+ * @param t - `core.setLogValidation` translator
  * @returns Object with isValid boolean and errors array
  */
 export const validateSetLogPayload = (
 	payload: UpsertSetLogPayload,
-): { isValid: boolean; errors: string[] } => {
-	const errors: string[] = []
+	t: Translated,
+): { isValid: boolean; errors: SetLogValidationError[] } => {
+	const errors: SetLogValidationError[] = []
 
 	if (!payload.routineExerciseId) {
-		errors.push('Routine exercise ID is required')
+		errors.push({
+			field: 'routineExerciseId',
+			message: t('routineExerciseIdRequired'),
+		})
 	}
 
 	if (!payload.exerciseId) {
-		errors.push('Exercise ID is required')
+		errors.push({ field: 'exerciseId', message: t('exerciseIdRequired') })
 	}
 
 	if (payload.setNumber < 1) {
-		errors.push('Set number must be greater than 0')
+		errors.push({ field: 'setNumber', message: t('setNumberPositive') })
 	}
 
 	if (payload.reps < 0) {
-		errors.push('Reps must be 0 or greater')
+		errors.push({ field: 'reps', message: t('repsNonNegative') })
 	}
 
 	if (payload.weight !== undefined && payload.weight < 0) {
-		errors.push('Weight must be 0 or greater')
+		errors.push({ field: 'weight', message: t('weightNonNegative') })
 	}
 
 	// RPE is optional. History renders it as `n/10`, so anything outside that
@@ -36,7 +59,7 @@ export const validateSetLogPayload = (
 		payload.rpe !== undefined &&
 		(payload.rpe < 0 || payload.rpe > 10 || Number.isNaN(payload.rpe))
 	) {
-		errors.push('RPE must be between 0 and 10')
+		errors.push({ field: 'rpe', message: t('rpeRange') })
 	}
 
 	return {
@@ -65,11 +88,13 @@ export const isSetComplete = (reps: number, isCompleted?: boolean): boolean => {
  * Validates session finish requirements
  * @param completedSets - Number of completed sets
  * @param totalSets - Total number of sets
+ * @param t - `core.setLogValidation` translator
  * @returns Object with validation results
  */
 export const validateSessionFinish = (
 	completedSets: number,
 	totalSets: number,
+	t: Translated,
 ): { isValid: boolean; canFinish: boolean; warnings: string[] } => {
 	const warnings: string[] = []
 
@@ -78,7 +103,7 @@ export const validateSessionFinish = (
 		return {
 			isValid: false,
 			canFinish: false,
-			warnings: ['Invalid session data'],
+			warnings: [t('invalidSessionData')],
 		}
 	}
 
@@ -86,7 +111,7 @@ export const validateSessionFinish = (
 		return {
 			isValid: false,
 			canFinish: false,
-			warnings: ['Invalid session data'],
+			warnings: [t('invalidSessionData')],
 		}
 	}
 
@@ -102,7 +127,9 @@ export const validateSessionFinish = (
 	// Add warning for incomplete sets
 	const incompleteSets = totalSets - completedSets
 	if (incompleteSets > 0) {
-		warnings.push(`${incompleteSets} out of ${totalSets} sets are incomplete`)
+		warnings.push(
+			t('incompleteSets', { incomplete: incompleteSets, total: totalSets }),
+		)
 	}
 
 	return {
@@ -116,30 +143,32 @@ export const validateSessionFinish = (
  * Validates weight input for exercises
  * @param weight - Weight value to validate
  * @param allowZero - Whether zero weight is allowed
+ * @param t - `core.setLogValidation` translator
  * @returns Object with isValid boolean and error message if invalid
  */
 export const validateWeightDetailed = (
 	weight: number | undefined | null,
 	allowZero: boolean = true,
+	t?: Translated,
 ): { isValid: boolean; error?: string } => {
 	if (weight === undefined || weight === null) {
 		return { isValid: true } // Weight is optional
 	}
 
 	if (isNaN(weight)) {
-		return { isValid: false, error: 'Weight must be a valid number' }
+		return { isValid: false, error: t?.('weightMustBeNumber') }
 	}
 
 	if (!isFinite(weight)) {
-		return { isValid: false, error: 'Weight must be a finite number' }
+		return { isValid: false, error: t?.('weightMustBeFinite') }
 	}
 
 	if (weight < 0) {
-		return { isValid: false, error: 'Weight cannot be negative' }
+		return { isValid: false, error: t?.('weightCannotBeNegative') }
 	}
 
 	if (!allowZero && weight === 0) {
-		return { isValid: false, error: 'Weight must be greater than zero' }
+		return { isValid: false, error: t?.('weightMustBeGreaterThanZero') }
 	}
 
 	return { isValid: true }

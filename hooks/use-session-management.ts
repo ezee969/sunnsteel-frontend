@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
@@ -53,6 +54,7 @@ export const useSessionManagement = ({
 }: UseSessionManagementProps): UseSessionManagementReturn => {
 	const router = useRouter()
 	const { push } = useToast()
+	const t = useTranslations('core.common')
 	const { mutate: finishSession, isPending: isFinishing } =
 		useFinishSession(sessionId)
 
@@ -104,7 +106,7 @@ export const useSessionManagement = ({
 							description:
 								error instanceof Error
 									? error.message
-									: 'Please check your connection and try again.',
+									: t('connectionErrorFallback'),
 						})
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)
@@ -113,7 +115,7 @@ export const useSessionManagement = ({
 				},
 			)
 		},
-		[finishSession, push, router],
+		[finishSession, push, router, t],
 	)
 
 	/**

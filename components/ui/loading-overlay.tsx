@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
@@ -25,9 +26,11 @@ interface LoadingOverlayProps {
  */
 export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 	show,
-	message = 'Signing you in...',
+	message,
 	className,
 }) => {
+	const t = useTranslations('core.common')
+	const resolvedMessage = message ?? t('signingIn')
 	if (!show) return null
 
 	return (
@@ -40,8 +43,8 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 			role="status"
 		>
 			<div className="flex flex-col items-center gap-4 rounded-md border border-rule bg-popover px-6 py-5 shadow-overlay dark:shadow-none">
-				<ClassicalLoader size="md" label={message} />
-				<p className="type-body-sm text-ink-2">{message}</p>
+				<ClassicalLoader size="md" label={resolvedMessage} />
+				<p className="type-body-sm text-ink-2">{resolvedMessage}</p>
 			</div>
 		</div>
 	)

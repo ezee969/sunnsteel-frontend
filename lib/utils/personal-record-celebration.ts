@@ -4,20 +4,36 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { formatWeight } from './weight-unit'
 
-const KIND_LABELS: Record<PersonalRecordKind, string> = {
-	WEIGHT: 'Weight',
-	REPS: 'Reps',
-	VOLUME: 'Volume',
-	ESTIMATED_1RM: 'Est. 1RM',
+type Translated = Translator<'core.personalRecordCelebration'>
+
+const kindLabel = (kind: PersonalRecordKind, t: Translated): string => {
+	switch (kind) {
+		case 'WEIGHT':
+			return t('kindWeight')
+		case 'REPS':
+			return t('kindReps')
+		case 'VOLUME':
+			return t('kindVolume')
+		case 'ESTIMATED_1RM':
+			return t('kindEstimated1Rm')
+	}
 }
 
-const SINGLE_RECORD_TITLES: Record<PersonalRecordKind, string> = {
-	WEIGHT: 'New weight record',
-	REPS: 'New rep record',
-	VOLUME: 'New volume record',
-	ESTIMATED_1RM: 'New estimated 1RM record',
+const singleRecordTitle = (kind: PersonalRecordKind, t: Translated): string => {
+	switch (kind) {
+		case 'WEIGHT':
+			return t('singleWeightTitle')
+		case 'REPS':
+			return t('singleRepsTitle')
+		case 'VOLUME':
+			return t('singleVolumeTitle')
+		case 'ESTIMATED_1RM':
+			return t('singleEstimated1RmTitle')
+	}
 }
 
 function formatRecordValue(
@@ -32,17 +48,18 @@ function formatRecordValue(
 export function buildPersonalRecordCelebration(
 	records: EarnedPersonalRecord[],
 	weightUnit: WeightUnit,
+	t: Translated,
 ): { title: string; description: string } | null {
 	if (records.length === 0) return null
 
 	const title =
 		records.length === 1
-			? SINGLE_RECORD_TITLES[records[0].kind]
-			: `${records.length} new personal records`
+			? singleRecordTitle(records[0].kind, t)
+			: t('multipleTitle', { count: records.length })
 	const details = records
 		.map(
 			record =>
-				`${KIND_LABELS[record.kind]} ${formatRecordValue(record, weightUnit)}`,
+				`${kindLabel(record.kind, t)} ${formatRecordValue(record, weightUnit)}`,
 		)
 		.join(' · ')
 

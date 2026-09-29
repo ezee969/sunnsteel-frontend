@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,10 +12,11 @@ import { showMoreLabel, visibleRows } from '@/lib/utils/long-content'
  * scroll; there is never a scroll box inside it.
  */
 export function useShowMore<T>(items: readonly T[], limit: number) {
+	const t = useTranslations('core.common')
 	const [expanded, setExpanded] = useState(false)
 	return {
 		visible: visibleRows(items, limit, expanded),
-		label: showMoreLabel(items.length, limit, expanded),
+		label: showMoreLabel(items.length, limit, expanded, t),
 		expanded,
 		toggle: () => setExpanded(current => !current),
 	}

@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -50,6 +51,7 @@ interface InitialLoadAnimationProps {
 export const InitialLoadAnimation = ({
 	children,
 }: InitialLoadAnimationProps) => {
+	const t = useTranslations('core.splash')
 	const [shouldAnimate] = useState(
 		() =>
 			typeof window !== 'undefined' &&
@@ -123,7 +125,7 @@ export const InitialLoadAnimation = ({
 						<motion.div className="absolute inset-0" {...fadeIn(0, 0.35)}>
 							<Image
 								src={backgroundImage}
-								alt="Training background"
+								alt={t('backgroundAlt')}
 								fill
 								className="object-cover object-center"
 								priority
@@ -162,7 +164,7 @@ export const InitialLoadAnimation = ({
 							</motion.div>
 
 							<motion.p className="type-section text-ink-2" {...fadeIn(0.4)}>
-								Forge Your Legacy
+								{t('tagline')}
 							</motion.p>
 
 							<motion.div
@@ -171,7 +173,7 @@ export const InitialLoadAnimation = ({
 							>
 								<div className="flex items-center gap-3">
 									<p className="type-label text-ink-3">
-										Preparing Your Journey
+										{t('preparingJourney')}
 									</p>
 									{/* An infinite pulse is loading decoration; reduced motion
 									    holds the dots still, as it does the spinner (§3). */}

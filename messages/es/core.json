@@ -1,0 +1,285 @@
+{
+	"common": {
+		"loading": "Cargando",
+		"howThisWorks": "Cómo funciona",
+		"close": "Cerrar",
+		"section": "Sección",
+		"signingIn": "Iniciando sesión…",
+		"dismissNotification": "Descartar notificación",
+		"notifications": "Notificaciones",
+		"tryAgain": "Reintentar",
+		"connectionErrorFallback": "Revisa tu conexión e inténtalo de nuevo.",
+		"showFewer": "Mostrar menos",
+		"showMore": "Mostrar {count} más"
+	},
+	"metadata": {
+		"title": "Sunnsteel",
+		"description": "Más que un registro de rutinas.",
+		"ogAlt": "Sunnsteel - Más que un registro de rutinas."
+	},
+	"notFound": {
+		"title": "Página no encontrada",
+		"description": "La página que buscas no existe o fue movida.",
+		"goHome": "Ir al inicio"
+	},
+	"appError": {
+		"title": "Ocurrió un error",
+		"fallbackMessage": "Ocurrió un error inesperado.",
+		"tryAgain": "Reintentar",
+		"goHome": "Ir al inicio"
+	},
+	"authError": {
+		"title": "Ocurrió un error.",
+		"tryAgain": "Reintentar"
+	},
+	"offline": {
+		"metaTitle": "Sin conexión",
+		"title": "Estás sin conexión",
+		"description": "Esta página todavía no se guardó en este dispositivo. Las páginas que ya abriste pueden seguir cargando; reconéctate para abrir el resto.",
+		"cta": "Ir al inicio"
+	},
+	"authCommon": {
+		"email": "Correo electrónico",
+		"password": "Contraseña",
+		"showPassword": "Mostrar contraseña",
+		"hidePassword": "Ocultar contraseña",
+		"or": "O",
+		"continueWithGoogle": "Continuar con Google",
+		"googleAlt": "Google",
+		"logIn": "Iniciar sesión",
+		"signUp": "Crear cuenta",
+		"accountCreated": "Cuenta creada.",
+		"checkEmailVerify": "Revisa tu correo para verificar tu cuenta."
+	},
+	"login": {
+		"welcomeTitle": "Hola de nuevo",
+		"welcomeDescription": "Ingresa tus datos para acceder a tu cuenta.",
+		"checkingAuthLabel": "Verificando tu sesión",
+		"checkingAuthText": "Verificando tu sesión…",
+		"accountDeletedTitle": "Cuenta eliminada",
+		"loadingFallback": "Cargando…",
+		"unableToSignIn": "No se pudo iniciar sesión",
+		"checkCredentials": "Revisa tus credenciales.",
+		"forgotPasswordLink": "¿Olvidaste tu contraseña?",
+		"signingIn": "Iniciando sesión…",
+		"noAccountPrompt": "¿No tienes una cuenta?"
+	},
+	"signup": {
+		"createAccountTitle": "Crear cuenta",
+		"createAccountDescription": "Únete a la élite y comienza tu camino.",
+		"signUpFailedTitle": "No se pudo crear la cuenta",
+		"genericSignupError": "Ocurrió un error al crear la cuenta",
+		"fullNameLabel": "Nombre completo",
+		"confirmPasswordLabel": "Confirmar contraseña",
+		"passwordStrengthWeak": "Débil",
+		"passwordStrengthFair": "Regular",
+		"passwordStrengthGood": "Buena",
+		"passwordStrengthStrong": "Fuerte",
+		"strengthPrefix": "Fortaleza: ",
+		"creatingAccount": "Creando cuenta…",
+		"alreadyHaveAccount": "¿Ya tienes una cuenta?"
+	},
+	"forgotPassword": {
+		"title": "Restablecer contraseña",
+		"description": "Ingresa el correo con el que inicias sesión y te enviaremos un enlace para elegir una nueva contraseña.",
+		"checkEmailTitle": "Revisa tu correo",
+		"checkEmailBody": "Si existe una cuenta para {email}, un enlace para elegir una nueva contraseña está en camino. Puede tardar unos minutos, así que revisa también tu carpeta de spam. El enlace funciona una sola vez.",
+		"sendAnotherLink": "Enviar otro enlace",
+		"unableToSendTitle": "No se pudo enviar el enlace",
+		"tryAgainMinutes": "Inténtalo de nuevo en unos minutos.",
+		"linkExpiredTitle": "Ese enlace ya no se puede usar",
+		"linkExpiredBody": "Los enlaces de restablecimiento vencen y funcionan una sola vez. Solicita uno nuevo abajo.",
+		"sending": "Enviando…",
+		"sendResetLink": "Enviar enlace de restablecimiento",
+		"rememberedIt": "¿Ya la recordaste?"
+	},
+	"resetPassword": {
+		"checkingLinkLabel": "Verificando tu enlace",
+		"checkingLinkText": "Verificando tu enlace…",
+		"title": "Elige una nueva contraseña",
+		"description": "Elige la contraseña que usarás para iniciar sesión de ahora en adelante.",
+		"passwordUpdatedTitle": "Contraseña actualizada",
+		"passwordUpdatedBody": "Iniciaste sesión con tu nueva contraseña.",
+		"goToDashboard": "Ir al inicio",
+		"linkCantBeUsedTitle": "Este enlace ya no se puede usar",
+		"linkCantBeUsedBody": "Los enlaces de restablecimiento vencen y funcionan una sola vez, y esta página solo se abre desde uno. Solicita un enlace nuevo para continuar.",
+		"requestNewLink": "Solicitar un enlace nuevo",
+		"unableToUpdateTitle": "No se pudo actualizar tu contraseña",
+		"tryAgain": "Inténtalo de nuevo.",
+		"newPasswordLabel": "Nueva contraseña",
+		"confirmNewPasswordLabel": "Confirmar nueva contraseña",
+		"showPasswords": "Mostrar contraseñas",
+		"hidePasswords": "Ocultar contraseñas",
+		"updating": "Actualizando…",
+		"updatePassword": "Actualizar contraseña"
+	},
+	"authCallback": {
+		"completingAuthLabel": "Completando el inicio de sesión",
+		"completingAuthTitle": "Completando el inicio de sesión…",
+		"completingAuthBody": "Espera mientras verificamos tus datos",
+		"preparingAuthLabel": "Preparando el inicio de sesión",
+		"loadingFallback": "Cargando…",
+		"preparingAuthText": "Preparando el inicio de sesión…"
+	},
+	"publicLayout": {
+		"signIn": "Iniciar sesión",
+		"join": "Unirme"
+	},
+	"memberProfileMeta": {
+		"title": "Perfil de miembro",
+		"description": "Un perfil de miembro de Sunnsteel compartido contigo."
+	},
+	"memberProfile": {
+		"notFoundTitle": "Perfil no encontrado",
+		"loadErrorTitle": "No se pudo cargar este perfil",
+		"notFoundDescription": "Revisa el nombre de usuario e inténtalo de nuevo.",
+		"loadErrorDescription": "Revisa tu conexión e inténtalo de nuevo.",
+		"tryAgain": "Reintentar"
+	},
+	"sharedRoutineMeta": {
+		"title": "Rutina compartida",
+		"description": "Una rutina de entrenamiento de Sunnsteel compartida contigo."
+	},
+	"sharedRoutine": {
+		"loadingLabel": "Cargando rutina compartida",
+		"linkGoneTitle": "Este enlace ya no está disponible",
+		"unavailableTitle": "Rutina no disponible",
+		"linkGoneDescription": "El propietario lo revocó, o nunca existió. Pídele uno nuevo.",
+		"unavailableDescription": "No se pudo cargar la rutina. Inténtalo de nuevo en un momento.",
+		"tryAgain": "Reintentar",
+		"signInLinkLabel": "Inicia sesión",
+		"signInToSaveSuffix": "para guardar este programa como una rutina propia."
+	},
+	"sharedSessionMeta": {
+		"title": "Entrenamiento compartido",
+		"description": "Un entrenamiento de Sunnsteel compartido contigo."
+	},
+	"sharedSession": {
+		"loadingLabel": "Cargando entrenamiento compartido",
+		"linkGoneTitle": "Este enlace ya no está disponible",
+		"loadErrorTitle": "No se pudo cargar este entrenamiento",
+		"linkGoneDescription": "Puede que el propietario lo haya revocado, o que el enlace esté incompleto.",
+		"loadErrorDescription": "Revisa tu conexión e inténtalo de nuevo.",
+		"tryAgain": "Reintentar"
+	},
+	"errorMessages": {
+		"unexpectedTitle": "Ocurrió un error inesperado",
+		"unexpectedGuidance": "Inténtalo de nuevo. Si el problema continúa, contacta a soporte.",
+		"emailAlreadyRegistered": "Este correo ya está registrado",
+		"emailAlreadyRegisteredGuidance": "Si esta es tu cuenta, prueba iniciar sesión en su lugar. ¿Olvidaste tu contraseña? Usa la opción de restablecer contraseña.",
+		"invalidEmail": "Dirección de correo no válida",
+		"invalidEmailGuidance": "Ingresa una dirección de correo válida (por ejemplo, nombre@ejemplo.com)",
+		"weakPassword": "La contraseña es muy débil",
+		"weakPasswordGuidance": "La contraseña debe tener al menos 6 caracteres. Usa una combinación de letras, números y símbolos para mayor seguridad.",
+		"rateLimit": "Demasiados intentos",
+		"rateLimitGuidance": "Hiciste demasiadas solicitudes. Espera unos minutos e inténtalo de nuevo.",
+		"emailNotVerified": "Correo no verificado",
+		"emailNotVerifiedGuidance": "Revisa tu correo y haz clic en el enlace de verificación antes de iniciar sesión.",
+		"invalidCredentials": "Correo o contraseña incorrectos",
+		"invalidCredentialsGuidance": "Revisa tus datos e inténtalo de nuevo. Las contraseñas distinguen mayúsculas de minúsculas.",
+		"networkError": "Error de conexión",
+		"networkErrorGuidance": "No se pudo conectar con el servidor. Revisa tu conexión a internet e inténtalo de nuevo.",
+		"sessionExpired": "Sesión vencida",
+		"sessionExpiredGuidance": "Tu sesión venció. Inicia sesión de nuevo.",
+		"authFailed": "No se pudo autenticar",
+		"authFailedGuidance": "No se pudo autenticar. Inténtalo de nuevo.",
+		"genericError": "Ocurrió un error",
+		"accountCreationFailed": "No se pudo crear la cuenta. Inténtalo de nuevo o contacta a soporte si el problema continúa.",
+		"verifyEmailBeforeLogin": "Revisa tu correo para verificar tu cuenta antes de iniciar sesión.",
+		"signInFailed": "No se pudo iniciar sesión. Revisa tus datos e inténtalo de nuevo."
+	},
+	"accountDeletion": {
+		"removesProfile": "Tu perfil, nombre de usuario, foto y ajustes de privacidad",
+		"removesRoutines": "Todas tus rutinas, con sus versiones y enlaces para compartir",
+		"removesHistory": "Tu historial de entrenamientos, récords, objetivos, logros y rango",
+		"removesSocial": "Tus seguidores, compañeros de entrenamiento, actividad, comentarios, reacciones y denuncias",
+		"removesSignIn": "Tu acceso, de modo que este correo solo podrá crear una cuenta nueva y vacía",
+		"keeps": "Las copias que otros miembros hicieron de tus rutinas compartidas siguen siendo suyas. Ya no te mencionan a ti.",
+		"exportFirst": "Para guardar una copia de tus datos, usa Descargar tus datos, justo arriba, antes de eliminar tu cuenta.",
+		"deletedNotice": "Tu cuenta y todo su contenido fueron eliminados. Puedes crear una cuenta nueva con el mismo correo cuando quieras.",
+		"moderatorBlocked": "Una cuenta de moderador no se puede eliminar aquí. Primero hay que quitarle el acceso de moderador, porque el registro de moderación depende de él.",
+		"confirmationPrompt": "Escribe {username} para confirmar."
+	},
+	"push": {
+		"unsupportedTitle": "No es compatible con este navegador",
+		"unsupportedDescription": "Este navegador no puede recibir notificaciones. El aviso sonoro dentro de la app sigue funcionando mientras la pantalla de la sesión está abierta.",
+		"requiresInstallTitle": "Agrega Sunnsteel a tu pantalla de inicio primero",
+		"requiresInstallDescription": "En iPhone y iPad, las notificaciones solo llegan a una app instalada. Compartir → Agregar a pantalla de inicio, y luego abre Sunnsteel desde ahí.",
+		"serverUnavailableTitle": "Las notificaciones no están disponibles",
+		"serverUnavailableDescription": "Este servidor todavía no está configurado para enviar notificaciones. Esto no afecta tu entrenamiento.",
+		"blockedTitle": "Las notificaciones están bloqueadas",
+		"blockedDescription": "Tu navegador está rechazando las notificaciones de Sunnsteel. Permítelas en su configuración del sitio y vuelve.",
+		"enabledTitle": "Este dispositivo recibe avisos",
+		"enabledDescription": "Cuando el descanso termina mientras Sunnsteel está cerrado o tu pantalla está bloqueada, este dispositivo recibe un aviso.",
+		"readyTitle": "Recibe un aviso cuando termine el descanso",
+		"readyDescription": "El aviso sonoro dentro de la app no puede sonar si tu pantalla está bloqueada. Una notificación sí puede, y nombra el siguiente ejercicio.",
+		"pushUnavailableServer": "Las notificaciones no están disponibles en este servidor",
+		"permissionDenied": "Tu navegador rechazó las notificaciones para Sunnsteel.",
+		"permissionNotGranted": "No se activaron las notificaciones."
+	},
+	"exercisesHook": {
+		"starNotSavedTitle": "No se guardó la estrella",
+		"tryAgainMoment": "Inténtalo de nuevo en un momento.",
+		"exerciseNotCreatedTitle": "No se creó el ejercicio",
+		"exerciseNotSavedTitle": "No se guardó el ejercicio",
+		"exerciseNotChangedTitle": "No se pudo cambiar el ejercicio",
+		"exerciseNotDeletedTitle": "No se eliminó el ejercicio"
+	},
+	"workoutSession": {
+		"resumedSessionTitle": "Sesión retomada",
+		"resumedSessionDescription": "Continuando tu entrenamiento en curso.",
+		"cannotStartSessionTitle": "No se pudo iniciar la sesión",
+		"routineNotFound": "No se encontró la rutina o el día de la rutina.",
+		"unexpectedErrorTryAgain": "Error inesperado. Inténtalo de nuevo."
+	},
+	"personalRecordCelebration": {
+		"kindWeight": "Peso",
+		"kindReps": "Reps",
+		"kindVolume": "Volumen",
+		"kindEstimated1Rm": "1RM est.",
+		"singleWeightTitle": "Nuevo récord de peso",
+		"singleRepsTitle": "Nuevo récord de repeticiones",
+		"singleVolumeTitle": "Nuevo récord de volumen",
+		"singleEstimated1RmTitle": "Nuevo récord de 1RM estimado",
+		"multipleTitle": "{count} récords personales nuevos"
+	},
+	"saveStatus": {
+		"unsaved": "Sin guardar",
+		"saving": "Guardando…",
+		"saved": "Guardado",
+		"error": "Error"
+	},
+	"setLogValidation": {
+		"routineExerciseIdRequired": "Se requiere el ID del ejercicio de la rutina",
+		"exerciseIdRequired": "Se requiere el ID del ejercicio",
+		"setNumberPositive": "El número de serie debe ser mayor que 0",
+		"repsNonNegative": "Las repeticiones deben ser 0 o más",
+		"weightNonNegative": "El peso debe ser 0 o más",
+		"rpeRange": "El RPE debe estar entre 0 y 10",
+		"invalidSessionData": "Datos de la sesión no válidos",
+		"incompleteSets": "{incomplete} de {total} series están sin completar",
+		"weightMustBeNumber": "El peso debe ser un número válido",
+		"weightMustBeFinite": "El peso debe ser un número finito",
+		"weightCannotBeNegative": "El peso no puede ser negativo",
+		"weightMustBeGreaterThanZero": "El peso debe ser mayor que cero"
+	},
+	"stepper": {
+		"routineSteps": "Pasos de la rutina",
+		"stateCurrent": "paso actual",
+		"stateCompleted": "completado",
+		"stateAvailable": "disponible",
+		"stateUnavailable": "todavía no disponible",
+		"stepAriaLabel": "Paso {current} de {total}: {title}, {state}"
+	},
+	"imageCropper": {
+		"title": "Recortar foto de perfil",
+		"zoom": "Zoom",
+		"cancel": "Cancelar",
+		"save": "Guardar"
+	},
+	"splash": {
+		"backgroundAlt": "Fondo de entrenamiento",
+		"tagline": "Forja tu legado",
+		"preparingJourney": "Preparando tu camino"
+	}
+}

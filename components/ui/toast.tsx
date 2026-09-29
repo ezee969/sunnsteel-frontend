@@ -1,6 +1,7 @@
 'use client'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, CheckCircle2, Info, X, XCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import {
 	createContext,
 	ReactNode,
@@ -71,6 +72,7 @@ const variantStyles: Record<
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+	const tCommon = useTranslations('core.common')
 	const [toasts, setToasts] = useState<Toast[]>([])
 	const [mounted, setMounted] = useState(false)
 	const { reduced: reducedMotion } = useMotionPreference()
@@ -102,7 +104,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 					className="fixed bottom-4 right-4 z-[9999] flex w-80 flex-col gap-3"
 					aria-live="polite"
 					aria-relevant="additions removals"
-					aria-label="Notifications"
+					aria-label={tCommon('notifications')}
 				>
 					<AnimatePresence mode="popLayout">
 						{toasts.map(t => (
@@ -139,7 +141,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 									    `opacity-0` — invisible, but still clickable. */}
 									<button
 										onClick={() => remove(t.id)}
-										aria-label="Dismiss notification"
+										aria-label={tCommon('dismissNotification')}
 										className="hover-reveal absolute top-3 right-3 rounded-sm p-1 after:absolute after:-inset-3 after:content-[''] text-ink-3 opacity-0 transition-opacity duration-[var(--motion-fast)] ease-standard group-hover:opacity-100 focus-visible:opacity-100 hover:text-foreground"
 									>
 										<X className="h-3.5 w-3.5" aria-hidden />

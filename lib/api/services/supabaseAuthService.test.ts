@@ -2,12 +2,15 @@ import type { SupabaseAuthResponse } from '@sunsteel/contracts'
 import type { Session } from '@supabase/supabase-js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import { createAuthSessionController } from '@/lib/auth/auth-session-controller'
 import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
 import { supabase } from '@/lib/supabase/client'
 
 import { httpClient } from './httpClient'
 import { SupabaseAuthService } from './supabaseAuthService'
+
+const t = translatorFor('en', 'core.errorMessages')
 
 vi.mock('@/lib/config/env', () => ({ PUBLIC_ENV: {} }))
 vi.mock('@/lib/supabase/client', () => ({
@@ -86,7 +89,7 @@ describe('auth verification and marker ordering', () => {
 		})
 		try {
 			await expect(
-				service.signIn('athlete@example.test', 'not-a-real-password'),
+				service.signIn('athlete@example.test', 'not-a-real-password', t),
 			).resolves.toEqual(profile)
 			await published.promise
 			expect(httpClient.post).toHaveBeenCalledTimes(1)

@@ -8,6 +8,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { ChevronDown, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -119,6 +120,7 @@ export const SetLogInput = ({
 		changeKind,
 		isValid,
 		validationError,
+		validationField,
 	} = useSetLogForm({
 		sessionId,
 		routineExerciseId,
@@ -133,16 +135,17 @@ export const SetLogInput = ({
 		weightUnit,
 	})
 
-	const statusText = saveStateLabel(saveState)
+	const tSaveStatus = useTranslations('core.saveStatus')
+	const statusText = saveStateLabel(saveState, tSaveStatus)
 	// LIVE-18: under larger controls the row keeps only its fields and its
 	// tick; the fills and Remove move into the set's own menu.
 	const { largeControls } = useDisplayPreference()
 	// a11y review 7: the invalid field and its message are linked, so a screen
 	// reader user editing one of several repeated rows hears which one failed.
 	const errorId = `set-${routineExerciseId}-${setNumber}-error`
-	const repsInvalid = !isValid && Boolean(validationError?.includes('reps'))
-	const weightInvalid = !isValid && Boolean(validationError?.includes('weight'))
-	const rpeInvalid = !isValid && Boolean(validationError?.includes('RPE'))
+	const repsInvalid = !isValid && validationField === 'reps'
+	const weightInvalid = !isValid && validationField === 'weight'
+	const rpeInvalid = !isValid && validationField === 'rpe'
 	// TD-28: the save state is drawn on the completion checkbox instead of in
 	// its own column -- after the RPE input there is no width left for one. A
 	// Tailwind ring is a box-shadow, so it costs no layout space. The focus

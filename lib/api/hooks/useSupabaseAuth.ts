@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -9,18 +10,22 @@ import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { logger } from '@/lib/utils/logger'
 
 /** Email a password-reset link (FIX-11). */
-export const useRequestPasswordReset = () =>
-	useMutation({
+export const useRequestPasswordReset = () => {
+	const t = useTranslations('core.errorMessages')
+	return useMutation({
 		mutationFn: ({ email }: { email: string }) =>
-			supabaseAuthService.requestPasswordReset(email),
+			supabaseAuthService.requestPasswordReset(email, t),
 	})
+}
 
 /** Set a new password for the current (recovery) session. */
-export const useUpdatePassword = () =>
-	useMutation({
+export const useUpdatePassword = () => {
+	const t = useTranslations('core.errorMessages')
+	return useMutation({
 		mutationFn: ({ password }: { password: string }) =>
-			supabaseAuthService.updatePassword(password),
+			supabaseAuthService.updatePassword(password, t),
 	})
+}
 
 /**
  * Hook for signing up with email and password
@@ -28,6 +33,7 @@ export const useUpdatePassword = () =>
  */
 export const useSupabaseSignUp = () => {
 	const router = useRouter()
+	const t = useTranslations('core.errorMessages')
 
 	return useMutation({
 		mutationFn: async ({
@@ -39,7 +45,7 @@ export const useSupabaseSignUp = () => {
 			password: string
 			name: string
 		}) => {
-			return await supabaseAuthService.signUp(email, password, name)
+			return await supabaseAuthService.signUp(email, password, name, t)
 		},
 		onSuccess: data => {
 			if (data.requiresEmailVerification) {
@@ -61,6 +67,7 @@ export const useSupabaseSignUp = () => {
  */
 export const useSupabaseSignIn = () => {
 	const router = useRouter()
+	const t = useTranslations('core.errorMessages')
 
 	return useMutation({
 		mutationFn: async ({
@@ -72,7 +79,7 @@ export const useSupabaseSignIn = () => {
 			redirectTo?: string
 		}) => {
 			logger.debug('[auth] login mutation start')
-			const result = await supabaseAuthService.signIn(email, password)
+			const result = await supabaseAuthService.signIn(email, password, t)
 			logger.debug('[auth] login mutation success', { userId: result.user?.id })
 			return result
 		},

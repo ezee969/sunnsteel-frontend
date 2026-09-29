@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 
 import { RouteError } from '@/components/layout/RouteError'
@@ -13,14 +14,16 @@ export default function Error({
 	error: Error & { digest?: string }
 	reset: () => void
 }) {
+	const t = useTranslations('core.authError')
+
 	useEffect(() => {
 		logger.error(error)
 	}, [error])
 
 	// The signed-out shell supplies <main> and the form column.
 	return (
-		<RouteError title="Something went wrong!">
-			<Button onClick={reset}>Try again</Button>
+		<RouteError title={t('title')}>
+			<Button onClick={reset}>{t('tryAgain')}</Button>
 		</RouteError>
 	)
 }

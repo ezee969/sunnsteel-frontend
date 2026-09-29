@@ -2,6 +2,7 @@
 
 import type { PushSubscriptionsResponse } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 import {
@@ -62,6 +63,7 @@ export interface PushControls extends PushStatus {
  * permanently blocked.
  */
 export function usePushNotifications(): PushControls {
+	const t = useTranslations('core.push')
 	const queryClient = useQueryClient()
 	const { data } = usePushSubscriptions()
 	const [endpoint, setEndpoint] = useState<string | null>(null)
@@ -98,15 +100,15 @@ export function usePushNotifications(): PushControls {
 	const enable = useMutation({
 		mutationFn: async () => {
 			const vapidPublicKey = data?.vapidPublicKey
-			if (!vapidPublicKey) throw new Error('Push is unavailable on this server')
+			if (!vapidPublicKey) throw new Error(t('pushUnavailableServer'))
 
 			const result = await Notification.requestPermission()
 			setPermission(result)
 			if (result !== 'granted') {
 				throw new Error(
 					result === 'denied'
-						? 'Your browser refused notifications for Sunnsteel.'
-						: 'Notifications were not enabled.',
+						? t('permissionDenied')
+						: t('permissionNotGranted'),
 				)
 			}
 
@@ -163,21 +165,24 @@ export function usePushNotifications(): PushControls {
 		data?.subscriptions.some(subscription => subscription.isCurrentDevice),
 	)
 
-	const status = resolvePushStatus({
-		supported: hasPushSupport(),
-		permission,
-		// The server marks the current device only when the endpoint was sent
-		// with the read, so registration state is confirmed by the local one.
-		isSubscribed:
-			isSubscribed || (Boolean(endpoint) && permission === 'granted'),
-		vapidPublicKey: data?.vapidPublicKey ?? null,
-		isStandalone:
-			typeof window !== 'undefined' &&
-			window.matchMedia('(display-mode: standalone)').matches,
-		isIos:
-			typeof navigator !== 'undefined' &&
-			isIosDevice(navigator.userAgent, navigator.maxTouchPoints ?? 0),
-	})
+	const status = resolvePushStatus(
+		{
+			supported: hasPushSupport(),
+			permission,
+			// The server marks the current device only when the endpoint was sent
+			// with the read, so registration state is confirmed by the local one.
+			isSubscribed:
+				isSubscribed || (Boolean(endpoint) && permission === 'granted'),
+			vapidPublicKey: data?.vapidPublicKey ?? null,
+			isStandalone:
+				typeof window !== 'undefined' &&
+				window.matchMedia('(display-mode: standalone)').matches,
+			isIos:
+				typeof navigator !== 'undefined' &&
+				isIosDevice(navigator.userAgent, navigator.maxTouchPoints ?? 0),
+		},
+		t,
+	)
 
 	return {
 		...status,

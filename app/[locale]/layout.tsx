@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { hasLocale } from 'next-intl'
-import { getMessages, setRequestLocale } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 
 import DevInjections from '@/components/dev-injections'
 import { LOCALES } from '@/i18n/config'
@@ -57,66 +57,84 @@ import { Viewport } from 'next'
 
 const SHOW_PERF_PANEL = SHOULD_SHOW_PERFORMANCE_PANEL
 
-export const metadata: Metadata = {
-	title: {
-		default: 'Sunnsteel',
-		template: '%s | Sunnsteel',
-	},
-	description: 'More than a routine logbook.',
-	keywords: [
-		'fitness',
-		'ejercicio',
-		'entrenamiento',
-		'salud',
-		'bienestar',
-		'rutinas',
-		'gimnasio',
-		'ejercicio en casa',
-	],
-	authors: [{ name: 'Sunnsteel Team' }],
-	creator: 'Sunnsteel',
-	publisher: 'Sunnsteel',
-	metadataBase: new URL(PUBLIC_ENV.FRONTEND_URL),
-	alternates: {
-		canonical: '/',
-	},
-	openGraph: {
-		title: 'Sunnsteel',
-		description: 'More than a routine logbook.',
-		url: '/',
-		siteName: 'Sunnsteel',
-		images: [
-			{
-				url: '/og-image.jpg',
-				width: 1200,
-				height: 630,
-				alt: 'Sunnsteel - More than a routine logbook.',
-			},
+/**
+ * I18N-03: title, description and the OpenGraph alt text follow the language;
+ * everything else (brand names, icons, keywords) is not product copy and
+ * stays fixed. `openGraph.locale` is the BCP 47 tag the language actually
+ * renders in, `en_US` or `es_ES` -- it read `es_ES` even for English before
+ * this, which was never corrected until translation made it visible.
+ */
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const t = await getTranslations({ locale, namespace: 'core.metadata' })
+	const title = t('title')
+	const description = t('description')
+
+	return {
+		title: {
+			default: title,
+			template: `%s | ${title}`,
+		},
+		description,
+		keywords: [
+			'fitness',
+			'ejercicio',
+			'entrenamiento',
+			'salud',
+			'bienestar',
+			'rutinas',
+			'gimnasio',
+			'ejercicio en casa',
 		],
-		locale: 'es_ES',
-		type: 'website',
-	},
-	icons: {
-		icon: [
-			{ url: '/favicon.ico', sizes: '48x48' },
-			{ url: '/icon.svg', type: 'image/svg+xml' },
-			{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-			{ url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-		],
-		apple: [
-			{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-		],
-	},
-	// iOS-installed PWA is the declared target platform, so the title and status
-	// bar style are set explicitly rather than left to Safari's defaults.
-	// `black-translucent` lets the app paint under the status bar, which is what
-	// the full-bleed dark layout expects. See TD-20.
-	appleWebApp: {
-		capable: true,
-		title: 'Sunnsteel',
-		statusBarStyle: 'black-translucent',
-	},
-	manifest: '/site.webmanifest',
+		authors: [{ name: 'Sunnsteel Team' }],
+		creator: 'Sunnsteel',
+		publisher: 'Sunnsteel',
+		metadataBase: new URL(PUBLIC_ENV.FRONTEND_URL),
+		alternates: {
+			canonical: '/',
+		},
+		openGraph: {
+			title,
+			description,
+			url: '/',
+			siteName: 'Sunnsteel',
+			images: [
+				{
+					url: '/og-image.jpg',
+					width: 1200,
+					height: 630,
+					alt: t('ogAlt'),
+				},
+			],
+			locale: locale === 'es' ? 'es_ES' : 'en_US',
+			type: 'website',
+		},
+		icons: {
+			icon: [
+				{ url: '/favicon.ico', sizes: '48x48' },
+				{ url: '/icon.svg', type: 'image/svg+xml' },
+				{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+				{ url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+			],
+			apple: [
+				{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+			],
+		},
+		// iOS-installed PWA is the declared target platform, so the title and
+		// status bar style are set explicitly rather than left to Safari's
+		// defaults. `black-translucent` lets the app paint under the status bar,
+		// which is what the full-bleed dark layout expects. See TD-20.
+		appleWebApp: {
+			capable: true,
+			title: 'Sunnsteel',
+			statusBarStyle: 'black-translucent',
+		},
+		manifest: '/site.webmanifest',
+	}
 }
 
 export const viewport: Viewport = {

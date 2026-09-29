@@ -1,12 +1,21 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 
-export const metadata: Metadata = {
-	title: 'Offline',
-	robots: { index: false },
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const t = await getTranslations({ locale, namespace: 'core.offline' })
+	return {
+		title: t('metaTitle'),
+		robots: { index: false },
+	}
 }
 
 /**
@@ -15,15 +24,14 @@ export const metadata: Metadata = {
  * it renders with no network at all. Pages already visited still come from
  * the cache first; this is only for the rest.
  */
-export default function OfflinePage() {
+export default async function OfflinePage() {
+	const t = await getTranslations('core.offline')
+
 	return (
 		<main className="ledger-page py-10 md:py-16">
-			<RouteError
-				title="You are offline"
-				description="This page has not been saved on this device yet. Pages you have already opened may still load; reconnect to open the rest."
-			>
+			<RouteError title={t('title')} description={t('description')}>
 				<Button asChild>
-					<Link href="/dashboard">Go to the dashboard</Link>
+					<Link href="/dashboard">{t('cta')}</Link>
 				</Button>
 			</RouteError>
 		</main>

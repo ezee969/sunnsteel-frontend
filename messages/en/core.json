@@ -1,0 +1,286 @@
+{
+	"common": {
+		"loading": "Loading",
+		"howThisWorks": "How this works",
+		"close": "Close",
+		"section": "Section",
+		"signingIn": "Signing you in...",
+		"dismissNotification": "Dismiss notification",
+		"notifications": "Notifications",
+		"tryAgain": "Try again",
+		"connectionErrorFallback": "Please check your connection and try again.",
+		"showFewer": "Show fewer",
+		"showMore": "Show {count} more"
+	},
+	"metadata": {
+		"title": "Sunnsteel",
+		"description": "More than a routine logbook.",
+		"ogAlt": "Sunnsteel - More than a routine logbook."
+	},
+	"notFound": {
+		"title": "Page not found",
+		"description": "The page you're looking for doesn't exist or has been moved.",
+		"goHome": "Go home"
+	},
+	"appError": {
+		"title": "Something went wrong",
+		"fallbackMessage": "An unexpected error occurred.",
+		"tryAgain": "Try again",
+		"goHome": "Go home"
+	},
+	"authError": {
+		"title": "Something went wrong!",
+		"tryAgain": "Try again"
+	},
+	"offline": {
+		"metaTitle": "Offline",
+		"title": "You are offline",
+		"description": "This page has not been saved on this device yet. Pages you have already opened may still load; reconnect to open the rest.",
+		"cta": "Go to the dashboard"
+	},
+	"authCommon": {
+		"email": "Email",
+		"password": "Password",
+		"showPassword": "Show password",
+		"hidePassword": "Hide password",
+		"or": "Or",
+		"continueWithGoogle": "Continue with Google",
+		"googleAlt": "Google",
+		"logIn": "Log in",
+		"signUp": "Sign up",
+		"accountCreated": "Account created!",
+		"checkEmailVerify": "Check your email to verify your account.",
+		"emailPlaceholder": "name@example.com"
+	},
+	"login": {
+		"welcomeTitle": "Welcome Back",
+		"welcomeDescription": "Enter your credentials to access your account.",
+		"checkingAuthLabel": "Checking authentication",
+		"checkingAuthText": "Checking authentication...",
+		"accountDeletedTitle": "Account deleted",
+		"loadingFallback": "Loading...",
+		"unableToSignIn": "Unable to sign in",
+		"checkCredentials": "Please check your credentials.",
+		"forgotPasswordLink": "Forgot password?",
+		"signingIn": "Signing in...",
+		"noAccountPrompt": "Don't have an account?"
+	},
+	"signup": {
+		"createAccountTitle": "Create Account",
+		"createAccountDescription": "Join the elite and begin your journey.",
+		"signUpFailedTitle": "Sign up failed",
+		"genericSignupError": "An error occurred during signup",
+		"fullNameLabel": "Full Name",
+		"confirmPasswordLabel": "Confirm Password",
+		"passwordStrengthWeak": "Weak",
+		"passwordStrengthFair": "Fair",
+		"passwordStrengthGood": "Good",
+		"passwordStrengthStrong": "Strong",
+		"strengthPrefix": "Strength: ",
+		"creatingAccount": "Creating account...",
+		"alreadyHaveAccount": "Already have an account?"
+	},
+	"forgotPassword": {
+		"title": "Reset Password",
+		"description": "Enter the email you sign in with and we'll send you a link to choose a new password.",
+		"checkEmailTitle": "Check your email",
+		"checkEmailBody": "If an account exists for {email}, a link to choose a new password is on its way. It can take a few minutes, so check your spam folder too. The link works once.",
+		"sendAnotherLink": "Send another link",
+		"unableToSendTitle": "Unable to send the link",
+		"tryAgainMinutes": "Please try again in a few minutes.",
+		"linkExpiredTitle": "That link can't be used",
+		"linkExpiredBody": "Reset links expire and work only once. Request a new one below.",
+		"sending": "Sending...",
+		"sendResetLink": "Send reset link",
+		"rememberedIt": "Remembered it?"
+	},
+	"resetPassword": {
+		"checkingLinkLabel": "Checking your reset link",
+		"checkingLinkText": "Checking your reset link...",
+		"title": "Choose a New Password",
+		"description": "Pick the password you'll use to sign in from now on.",
+		"passwordUpdatedTitle": "Password updated",
+		"passwordUpdatedBody": "You're signed in with your new password.",
+		"goToDashboard": "Go to Dashboard",
+		"linkCantBeUsedTitle": "This link can't be used",
+		"linkCantBeUsedBody": "Reset links expire and work only once, and this page opens only from one. Request a new link to continue.",
+		"requestNewLink": "Request a new link",
+		"unableToUpdateTitle": "Unable to update your password",
+		"tryAgain": "Please try again.",
+		"newPasswordLabel": "New password",
+		"confirmNewPasswordLabel": "Confirm new password",
+		"showPasswords": "Show passwords",
+		"hidePasswords": "Hide passwords",
+		"updating": "Updating...",
+		"updatePassword": "Update password"
+	},
+	"authCallback": {
+		"completingAuthLabel": "Completing authentication",
+		"completingAuthTitle": "Completing authentication...",
+		"completingAuthBody": "Please wait while we verify your credentials",
+		"preparingAuthLabel": "Preparing authentication",
+		"loadingFallback": "Loading...",
+		"preparingAuthText": "Preparing authentication..."
+	},
+	"publicLayout": {
+		"signIn": "Sign in",
+		"join": "Join"
+	},
+	"memberProfileMeta": {
+		"title": "Member profile",
+		"description": "A Sunnsteel member profile shared with you."
+	},
+	"memberProfile": {
+		"notFoundTitle": "Profile not found",
+		"loadErrorTitle": "Could not load this profile",
+		"notFoundDescription": "Check the username and try again.",
+		"loadErrorDescription": "Check your connection and try again.",
+		"tryAgain": "Try again"
+	},
+	"sharedRoutineMeta": {
+		"title": "Shared routine",
+		"description": "A Sunnsteel training routine shared with you."
+	},
+	"sharedRoutine": {
+		"loadingLabel": "Loading shared routine",
+		"linkGoneTitle": "This link is no longer available",
+		"unavailableTitle": "Routine unavailable",
+		"linkGoneDescription": "The owner revoked it, or it never existed. Ask them for a new one.",
+		"unavailableDescription": "The routine could not be loaded. Try again in a moment.",
+		"tryAgain": "Try again",
+		"signInLinkLabel": "Sign in",
+		"signInToSaveSuffix": "to save this programme as a routine of your own."
+	},
+	"sharedSessionMeta": {
+		"title": "Shared workout",
+		"description": "A Sunnsteel workout shared with you."
+	},
+	"sharedSession": {
+		"loadingLabel": "Loading shared workout",
+		"linkGoneTitle": "This link is no longer available",
+		"loadErrorTitle": "Could not load this workout",
+		"linkGoneDescription": "The owner may have revoked it, or the link is incomplete.",
+		"loadErrorDescription": "Check your connection and try again.",
+		"tryAgain": "Try again"
+	},
+	"errorMessages": {
+		"unexpectedTitle": "An unexpected error occurred",
+		"unexpectedGuidance": "Please try again. If the problem persists, contact support.",
+		"emailAlreadyRegistered": "This email is already registered",
+		"emailAlreadyRegisteredGuidance": "If this is your account, try logging in instead. Forgot your password? Use the password reset option.",
+		"invalidEmail": "Invalid email address",
+		"invalidEmailGuidance": "Please enter a valid email address (e.g., name@example.com)",
+		"weakPassword": "Password is too weak",
+		"weakPasswordGuidance": "Password must be at least 6 characters long. Use a mix of letters, numbers, and symbols for better security.",
+		"rateLimit": "Too many attempts",
+		"rateLimitGuidance": "You have made too many requests. Please wait a few minutes and try again.",
+		"emailNotVerified": "Email not verified",
+		"emailNotVerifiedGuidance": "Please check your email and click the verification link before logging in.",
+		"invalidCredentials": "Incorrect email or password",
+		"invalidCredentialsGuidance": "Please check your credentials and try again. Passwords are case-sensitive.",
+		"networkError": "Connection error",
+		"networkErrorGuidance": "Unable to connect to the server. Please check your internet connection and try again.",
+		"sessionExpired": "Session expired",
+		"sessionExpiredGuidance": "Your session has expired. Please log in again.",
+		"authFailed": "Authentication failed",
+		"authFailedGuidance": "Unable to authenticate. Please try again.",
+		"genericError": "An error occurred",
+		"accountCreationFailed": "Unable to create account. Please try again or contact support if the problem persists.",
+		"verifyEmailBeforeLogin": "Please check your email to verify your account before logging in.",
+		"signInFailed": "Unable to sign in. Please check your credentials and try again."
+	},
+	"accountDeletion": {
+		"removesProfile": "Your profile, username, photo and privacy settings",
+		"removesRoutines": "Every routine you made, with its versions and share links",
+		"removesHistory": "Your workout history, records, goals, achievements and rank",
+		"removesSocial": "Your follows, training partners, activity, comments, reactions and reports",
+		"removesSignIn": "Your sign-in, so this email can only start a new, empty account",
+		"keeps": "Copies other members made of your shared routines stay theirs. They no longer name you.",
+		"exportFirst": "To keep a copy of your data, use Download Your Data, just above, before you delete.",
+		"deletedNotice": "Your account and everything in it has been deleted. You can create a new account with the same email at any time.",
+		"moderatorBlocked": "A moderator account cannot be deleted here. Its moderator access has to be removed first, because the moderation record depends on it.",
+		"confirmationPrompt": "Type {username} to confirm."
+	},
+	"push": {
+		"unsupportedTitle": "Not supported on this browser",
+		"unsupportedDescription": "This browser cannot receive notifications. The in-app rest tone still works while the session screen is open.",
+		"requiresInstallTitle": "Add Sunnsteel to your Home Screen first",
+		"requiresInstallDescription": "On iPhone and iPad, notifications only reach an installed app. Share → Add to Home Screen, then open Sunnsteel from there.",
+		"serverUnavailableTitle": "Notifications are unavailable",
+		"serverUnavailableDescription": "This server is not set up to send notifications yet. Nothing about your training is affected.",
+		"blockedTitle": "Notifications are blocked",
+		"blockedDescription": "Your browser is refusing notifications for Sunnsteel. Allow them in its site settings, then come back.",
+		"enabledTitle": "This device receives alerts",
+		"enabledDescription": "When rest ends while Sunnsteel is closed or your screen is locked, this device is notified.",
+		"readyTitle": "Get an alert when rest ends",
+		"readyDescription": "The in-app tone cannot play once your screen locks. A notification can, and it names the lift that is up next.",
+		"pushUnavailableServer": "Push is unavailable on this server",
+		"permissionDenied": "Your browser refused notifications for Sunnsteel.",
+		"permissionNotGranted": "Notifications were not enabled."
+	},
+	"exercisesHook": {
+		"starNotSavedTitle": "Star not saved",
+		"tryAgainMoment": "Try again in a moment.",
+		"exerciseNotCreatedTitle": "Exercise not created",
+		"exerciseNotSavedTitle": "Exercise not saved",
+		"exerciseNotChangedTitle": "Exercise not changed",
+		"exerciseNotDeletedTitle": "Exercise not deleted"
+	},
+	"workoutSession": {
+		"resumedSessionTitle": "Resumed session",
+		"resumedSessionDescription": "Continuing your in-progress workout.",
+		"cannotStartSessionTitle": "Cannot start session",
+		"routineNotFound": "The routine or routine day was not found.",
+		"unexpectedErrorTryAgain": "Unexpected error. Please try again."
+	},
+	"personalRecordCelebration": {
+		"kindWeight": "Weight",
+		"kindReps": "Reps",
+		"kindVolume": "Volume",
+		"kindEstimated1Rm": "Est. 1RM",
+		"singleWeightTitle": "New weight record",
+		"singleRepsTitle": "New rep record",
+		"singleVolumeTitle": "New volume record",
+		"singleEstimated1RmTitle": "New estimated 1RM record",
+		"multipleTitle": "{count} new personal records"
+	},
+	"saveStatus": {
+		"unsaved": "Unsaved",
+		"saving": "Saving…",
+		"saved": "Saved",
+		"error": "Error"
+	},
+	"setLogValidation": {
+		"routineExerciseIdRequired": "Routine exercise ID is required",
+		"exerciseIdRequired": "Exercise ID is required",
+		"setNumberPositive": "Set number must be greater than 0",
+		"repsNonNegative": "Reps must be 0 or greater",
+		"weightNonNegative": "Weight must be 0 or greater",
+		"rpeRange": "RPE must be between 0 and 10",
+		"invalidSessionData": "Invalid session data",
+		"incompleteSets": "{incomplete} out of {total} sets are incomplete",
+		"weightMustBeNumber": "Weight must be a valid number",
+		"weightMustBeFinite": "Weight must be a finite number",
+		"weightCannotBeNegative": "Weight cannot be negative",
+		"weightMustBeGreaterThanZero": "Weight must be greater than zero"
+	},
+	"stepper": {
+		"routineSteps": "Routine steps",
+		"stateCurrent": "current step",
+		"stateCompleted": "completed",
+		"stateAvailable": "available",
+		"stateUnavailable": "not available yet",
+		"stepAriaLabel": "Step {current} of {total}: {title}, {state}"
+	},
+	"imageCropper": {
+		"title": "Crop Profile Picture",
+		"zoom": "Zoom",
+		"cancel": "Cancel",
+		"save": "Save"
+	},
+	"splash": {
+		"backgroundAlt": "Training background",
+		"tagline": "Forge Your Legacy",
+		"preparingJourney": "Preparing Your Journey"
+	}
+}

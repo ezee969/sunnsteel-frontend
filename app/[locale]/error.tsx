@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 
 import { RouteError } from '@/components/layout/RouteError'
@@ -13,6 +14,8 @@ export default function RootError({
 	error: Error & { digest?: string }
 	reset: () => void
 }) {
+	const t = useTranslations('core.appError')
+
 	useEffect(() => {
 		logger.error('[app/error]', error)
 	}, [error])
@@ -21,12 +24,12 @@ export default function RootError({
 	return (
 		<main className="ledger-page py-10 md:py-16">
 			<RouteError
-				title="Something went wrong"
-				message={error.message || 'An unexpected error occurred.'}
+				title={t('title')}
+				message={error.message || t('fallbackMessage')}
 			>
-				<Button onClick={() => reset()}>Try again</Button>
+				<Button onClick={() => reset()}>{t('tryAgain')}</Button>
 				<Button variant="outline" onClick={() => window.location.assign('/')}>
-					Go home
+					{t('goHome')}
 				</Button>
 			</RouteError>
 		</main>

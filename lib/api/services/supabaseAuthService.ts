@@ -1,6 +1,7 @@
 import type { SupabaseAuthResponse } from '@sunsteel/contracts'
 import type { Session } from '@supabase/supabase-js'
 
+import type { Translator } from '@/i18n/translator'
 import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
 import { buildPasswordResetRedirect } from '@/lib/auth/password-reset'
 import { PUBLIC_ENV } from '@/lib/config/env'
@@ -61,6 +62,7 @@ export class SupabaseAuthService {
 		email: string,
 		password: string,
 		name: string,
+		t: Translator<'core.errorMessages'>,
 	): Promise<AuthResponse> {
 		logger.debug('[auth-service] signUp start', { email })
 
@@ -82,14 +84,12 @@ export class SupabaseAuthService {
 
 		if (error) {
 			logger.warn('[auth-service] signUp rejected', error)
-			const friendlyMessage = getFullErrorMessage(error.message)
+			const friendlyMessage = getFullErrorMessage(error.message, t)
 			throw new Error(friendlyMessage)
 		}
 
 		if (!data.user) {
-			throw new Error(
-				'Unable to create account. Please try again or contact support if the problem persists.',
-			)
+			throw new Error(t('accountCreationFailed'))
 		}
 
 		const session = await supabase.auth.getSession()
@@ -105,8 +105,7 @@ export class SupabaseAuthService {
 					supabaseUserId: data.user.id,
 					weightUnit: 'KG',
 				},
-				message:
-					'Please check your email to verify your account before logging in.',
+				message: t('verifyEmailBeforeLogin'),
 				requiresEmailVerification: true,
 			}
 		}
@@ -118,7 +117,11 @@ export class SupabaseAuthService {
 	/**
 	 * Sign in with email and password.
 	 */
-	async signIn(email: string, password: string): Promise<AuthResponse> {
+	async signIn(
+		email: string,
+		password: string,
+		t: Translator<'core.errorMessages'>,
+	): Promise<AuthResponse> {
 		const { data, error } = await supabase.auth.signInWithPassword({
 			email,
 			password,
@@ -126,14 +129,12 @@ export class SupabaseAuthService {
 
 		if (error) {
 			logger.warn('[auth-service] signIn rejected', error)
-			const friendlyMessage = getFullErrorMessage(error.message)
+			const friendlyMessage = getFullErrorMessage(error.message, t)
 			throw new Error(friendlyMessage)
 		}
 
 		if (!data.session) {
-			throw new Error(
-				'Unable to sign in. Please check your credentials and try again.',
-			)
+			throw new Error(t('signInFailed'))
 		}
 
 		return this.verifyToken(data.session.access_token)
@@ -175,7 +176,10 @@ export class SupabaseAuthService {
 	 * exists. The link signs the user in and returns through `/auth/callback`
 	 * to `/reset-password`.
 	 */
-	async requestPasswordReset(email: string): Promise<void> {
+	async requestPasswordReset(
+		email: string,
+		t: Translator<'core.errorMessages'>,
+	): Promise<void> {
 		const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
 		const siteUrl =
 			configuredBaseUrl ||
@@ -186,7 +190,7 @@ export class SupabaseAuthService {
 		})
 		if (error) {
 			logger.warn('[auth-service] password reset request rejected', error)
-			throw new Error(getFullErrorMessage(error.message))
+			throw new Error(getFullErrorMessage(error.message, t))
 		}
 	}
 
@@ -194,11 +198,14 @@ export class SupabaseAuthService {
 	 * Set a new password for the signed-in (usually recovery) session. The
 	 * resulting USER_UPDATED event re-verifies the profile in the provider.
 	 */
-	async updatePassword(password: string): Promise<void> {
+	async updatePassword(
+		password: string,
+		t: Translator<'core.errorMessages'>,
+	): Promise<void> {
 		const { error } = await supabase.auth.updateUser({ password })
 		if (error) {
 			logger.warn('[auth-service] password update rejected', error)
-			throw new Error(getFullErrorMessage(error.message))
+			throw new Error(getFullErrorMessage(error.message, t))
 		}
 	}
 

@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 /**
  * NOTIF-02. Everything here is pure so the conditions under which push is and
  * is not available can be tested — they are the part most likely to be got
@@ -95,14 +97,16 @@ export interface PushStatus {
  * permission request the user gets and deliver nothing, so it is refused with
  * the reason stated instead.
  */
-export function resolvePushStatus(env: PushEnvironment): PushStatus {
+export function resolvePushStatus(
+	env: PushEnvironment,
+	t: Translator<'core.push'>,
+): PushStatus {
 	if (!env.supported) {
 		return {
 			availability: 'UNSUPPORTED',
 			canEnable: false,
-			title: 'Not supported on this browser',
-			description:
-				'This browser cannot receive notifications. The in-app rest tone still works while the session screen is open.',
+			title: t('unsupportedTitle'),
+			description: t('unsupportedDescription'),
 		}
 	}
 
@@ -110,9 +114,8 @@ export function resolvePushStatus(env: PushEnvironment): PushStatus {
 		return {
 			availability: 'REQUIRES_INSTALL',
 			canEnable: false,
-			title: 'Add Sunnsteel to your Home Screen first',
-			description:
-				'On iPhone and iPad, notifications only reach an installed app. Share → Add to Home Screen, then open Sunnsteel from there.',
+			title: t('requiresInstallTitle'),
+			description: t('requiresInstallDescription'),
 		}
 	}
 
@@ -120,9 +123,8 @@ export function resolvePushStatus(env: PushEnvironment): PushStatus {
 		return {
 			availability: 'SERVER_UNAVAILABLE',
 			canEnable: false,
-			title: 'Notifications are unavailable',
-			description:
-				'This server is not set up to send notifications yet. Nothing about your training is affected.',
+			title: t('serverUnavailableTitle'),
+			description: t('serverUnavailableDescription'),
 		}
 	}
 
@@ -130,9 +132,8 @@ export function resolvePushStatus(env: PushEnvironment): PushStatus {
 		return {
 			availability: 'BLOCKED',
 			canEnable: false,
-			title: 'Notifications are blocked',
-			description:
-				'Your browser is refusing notifications for Sunnsteel. Allow them in its site settings, then come back.',
+			title: t('blockedTitle'),
+			description: t('blockedDescription'),
 		}
 	}
 
@@ -140,18 +141,16 @@ export function resolvePushStatus(env: PushEnvironment): PushStatus {
 		return {
 			availability: 'ENABLED',
 			canEnable: false,
-			title: 'This device receives alerts',
-			description:
-				'When rest ends while Sunnsteel is closed or your screen is locked, this device is notified.',
+			title: t('enabledTitle'),
+			description: t('enabledDescription'),
 		}
 	}
 
 	return {
 		availability: 'READY',
 		canEnable: true,
-		title: 'Get an alert when rest ends',
-		description:
-			'The in-app tone cannot play once your screen locks. A notification can, and it names the lift that is up next.',
+		title: t('readyTitle'),
+		description: t('readyDescription'),
 	}
 }
 

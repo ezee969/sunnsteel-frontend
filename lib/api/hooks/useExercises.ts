@@ -4,6 +4,7 @@ import type {
 	UpdateCustomExerciseRequest,
 } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 
 import { useToast } from '@/components/ui/toast'
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
@@ -45,6 +46,7 @@ export const useStarredExercises = () => {
 export const useToggleExerciseStar = () => {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
+	const t = useTranslations('core.exercisesHook')
 	return useMutation<
 		StarredExercisesResponse,
 		Error,
@@ -77,8 +79,8 @@ export const useToggleExerciseStar = () => {
 				void queryClient.invalidateQueries({ queryKey: starredExercisesKey })
 			}
 			push({
-				title: 'Star not saved',
-				description: error.message || 'Try again in a moment.',
+				title: t('starNotSavedTitle'),
+				description: error.message || t('tryAgainMoment'),
 			})
 		},
 		onSuccess: data => {
@@ -91,12 +93,19 @@ export const useToggleExerciseStar = () => {
  * EXER-06: a custom exercise write refreshes the catalog, and the routines,
  * which name their exercises and would otherwise show a stale name.
  */
+type CustomExerciseFailureKey =
+	| 'exerciseNotCreatedTitle'
+	| 'exerciseNotSavedTitle'
+	| 'exerciseNotChangedTitle'
+	| 'exerciseNotDeletedTitle'
+
 function useCustomExerciseWrite<TVariables, TResult>(
 	mutationFn: (variables: TVariables) => Promise<TResult>,
-	failureTitle: string,
+	failureTitleKey: CustomExerciseFailureKey,
 ) {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
+	const t = useTranslations('core.exercisesHook')
 	return useMutation<TResult, Error, TVariables>({
 		mutationFn,
 		onSuccess: async () => {
@@ -107,7 +116,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 		},
 		onError: error => {
 			push({
-				title: failureTitle,
+				title: t(failureTitleKey),
 				description: describeCustomExerciseError(error.message),
 			})
 		},
@@ -117,7 +126,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 export const useCreateCustomExercise = () =>
 	useCustomExerciseWrite<CustomExerciseInput, Exercise>(
 		exercisesService.createCustom,
-		'Exercise not created',
+		'exerciseNotCreatedTitle',
 	)
 
 export const useUpdateCustomExercise = () =>
@@ -126,13 +135,13 @@ export const useUpdateCustomExercise = () =>
 		Exercise
 	>(
 		({ id, patch }) => exercisesService.updateCustom(id, patch),
-		'Exercise not saved',
+		'exerciseNotSavedTitle',
 	)
 
 export const useArchiveCustomExercise = () =>
 	useCustomExerciseWrite<{ id: string; archived: boolean }, Exercise>(
 		({ id, archived }) => exercisesService.setCustomArchived(id, archived),
-		'Exercise not changed',
+		'exerciseNotChangedTitle',
 	)
 
 /**
@@ -143,6 +152,7 @@ export const useArchiveCustomExercise = () =>
 export const useDeleteCustomExercise = () => {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
+	const t = useTranslations('core.exercisesHook')
 	return useMutation<void, Error, string>({
 		mutationFn: exercisesService.deleteCustom,
 		onSuccess: () => {
@@ -150,7 +160,7 @@ export const useDeleteCustomExercise = () => {
 		},
 		onError: error => {
 			push({
-				title: 'Exercise not deleted',
+				title: t('exerciseNotDeletedTitle'),
 				description: describeCustomExerciseError(error.message),
 			})
 		},

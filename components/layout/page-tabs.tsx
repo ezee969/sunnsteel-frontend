@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useId, useRef } from 'react'
@@ -40,6 +41,7 @@ export function PageTabs({
 	bleedClassName = '-mx-3 px-3 sm:-mx-6 sm:px-6',
 	className,
 }: PageTabsProps) {
+	const t = useTranslations('core.common')
 	const pathname = usePathname()
 	const search = useSearchParams()
 	const router = useRouter()
@@ -66,7 +68,7 @@ export function PageTabs({
 		>
 			<div className="py-2 sm:hidden">
 				<label htmlFor={selectId} className="sr-only">
-					Section
+					{t('section')}
 				</label>
 				<NativeSelect
 					id={selectId}

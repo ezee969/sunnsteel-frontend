@@ -17,6 +17,7 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
@@ -551,6 +552,7 @@ export function markSetPending(
 export const useStartSession = () => {
 	const qc = useQueryClient()
 	const { push } = useToast()
+	const t = useTranslations('core.workoutSession')
 	return useMutation({
 		mutationFn: (data: StartWorkoutRequest): Promise<StartedSession> =>
 			startSessionOnce(
@@ -574,8 +576,8 @@ export const useStartSession = () => {
 			}
 			if (data._reused) {
 				push({
-					title: 'Resumed session',
-					description: 'Continuing your in-progress workout.',
+					title: t('resumedSessionTitle'),
+					description: t('resumedSessionDescription'),
 				})
 			}
 		},
@@ -590,15 +592,15 @@ export const useStartSession = () => {
 			if (!Number.isNaN(code) && code >= 400 && code < 500) {
 				let friendly = serverMessage
 				if (code === 404) {
-					friendly = 'The routine or routine day was not found.'
+					friendly = t('routineNotFound')
 				}
-				push({ title: 'Cannot start session', description: friendly })
+				push({ title: t('cannotStartSessionTitle'), description: friendly })
 				return
 			}
 			// Fallback
 			push({
-				title: 'Cannot start session',
-				description: 'Unexpected error. Please try again.',
+				title: t('cannotStartSessionTitle'),
+				description: t('unexpectedErrorTryAgain'),
 			})
 		},
 	})
@@ -623,6 +625,7 @@ export const useUpsertSetLog = (id: string) => {
 	const qc = useQueryClient()
 	const { push } = useToast()
 	const weightUnit = useWeightUnit()
+	const t = useTranslations('core.personalRecordCelebration')
 	return useMutation({
 		// Serialize all set-log writes for this session. Editing reps/weight fires a
 		// debounced upsert (carrying the current isCompleted), and the completion
@@ -746,6 +749,7 @@ export const useUpsertSetLog = (id: string) => {
 			const celebration = buildPersonalRecordCelebration(
 				res.earnedRecords,
 				weightUnit,
+				t,
 			)
 			if (celebration) {
 				push({ ...celebration, variant: 'success', duration: 6000 })

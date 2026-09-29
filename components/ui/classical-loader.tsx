@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { cn } from '@/lib/utils'
 
@@ -35,14 +37,16 @@ export interface ClassicalLoaderProps {
 export function ClassicalLoader({
 	size = 'md',
 	className,
-	label = 'Loading',
+	label,
 }: ClassicalLoaderProps) {
+	const t = useTranslations('core.common')
+	const resolvedLabel = label ?? t('loading')
 	const { box, ring, icon } = SIZES[size]
 
 	return (
 		<span
 			role="status"
-			aria-label={label}
+			aria-label={resolvedLabel}
 			className={cn(
 				'relative inline-flex shrink-0 items-center justify-center',
 				box,

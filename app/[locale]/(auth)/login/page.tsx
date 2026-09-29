@@ -1,11 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import {
-	ACCOUNT_DELETED_NOTICE,
+	accountDeletedNotice,
 	ACCOUNT_DELETED_PARAM,
 } from '@/lib/utils/account-deletion'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
@@ -19,6 +20,8 @@ import { SupabaseLoginForm } from './components/SupabaseLoginForm'
 export const dynamic = 'force-dynamic'
 
 function LoginContent() {
+	const t = useTranslations('core.login')
+	const tAccountDeletion = useTranslations('core.accountDeletion')
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const { isAuthenticated, isLoading } = useSupabaseAuth()
@@ -49,8 +52,8 @@ function LoginContent() {
 	if (isLoading) {
 		return (
 			<div className="flex min-h-[400px] flex-col items-center justify-center gap-3">
-				<ClassicalLoader size="md" label="Checking authentication" />
-				<p className="type-body-sm text-ink-3">Checking authentication...</p>
+				<ClassicalLoader size="md" label={t('checkingAuthLabel')} />
+				<p className="type-body-sm text-ink-3">{t('checkingAuthText')}</p>
 			</div>
 		)
 	}
@@ -64,8 +67,12 @@ function LoginContent() {
 		<div>
 			<LoginHeader />
 			{accountDeleted ? (
-				<AuthNotice tone="success" title="Account deleted" role="status">
-					{ACCOUNT_DELETED_NOTICE}
+				<AuthNotice
+					tone="success"
+					title={t('accountDeletedTitle')}
+					role="status"
+				>
+					{accountDeletedNotice(tAccountDeletion)}
 				</AuthNotice>
 			) : null}
 			<SupabaseLoginForm />
@@ -74,8 +81,9 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
+	const t = useTranslations('core.login')
 	return (
-		<Suspense fallback={<div>Loading...</div>}>
+		<Suspense fallback={<div>{t('loadingFallback')}</div>}>
 			<LoginContent />
 		</Suspense>
 	)
