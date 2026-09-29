@@ -1,7 +1,9 @@
 import type { Locale } from '@/i18n/config'
 
+import enCatalog from './en/catalog.json'
 import enRoutines from './en/routines.json'
 import enShell from './en/shell.json'
+import esCatalog from './es/catalog.json'
 import esRoutines from './es/routines.json'
 import esShell from './es/shell.json'
 
@@ -12,6 +14,7 @@ import esShell from './es/shell.json'
  */
 const en = {
 	shell: enShell,
+	catalog: enCatalog,
 	routines: enRoutines,
 }
 
@@ -21,6 +24,7 @@ export const MESSAGES: Record<Locale, Messages> = {
 	en,
 	es: {
 		shell: esShell,
+		catalog: esCatalog,
 		routines: esRoutines,
 	},
 }
