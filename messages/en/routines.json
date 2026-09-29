@@ -618,7 +618,9 @@
 		"unknownExercise": "Unknown Exercise",
 		"viewNote": "View Note",
 		"exerciseNote": "Exercise Note",
-		"warmUpsFollow": "Warm-ups follow the working weight"
+		"warmUpsFollow": "Warm-ups follow the working weight",
+		"min": "Min",
+		"max": "Max"
 	},
 	"presets": {
 		"dayPush": "Push",
@@ -772,7 +774,8 @@
 		"loadingRoutineDataEllipsis": "Loading routine data...",
 		"errorLoadingRoutine": "Error loading routine",
 		"errorLoadingRoutineBody": "We couldn't load the routine data. Please check your connection and try again.",
-		"tryAgain": "Try Again"
+		"tryAgain": "Try Again",
+		"editErrorBody": "Failed to load or save routine changes. Your data should be preserved."
 	},
 	"listing": {
 		"pageTitle": "Routines",

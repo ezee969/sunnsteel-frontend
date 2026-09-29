@@ -618,7 +618,9 @@
 		"unknownExercise": "Ejercicio desconocido",
 		"viewNote": "Ver la nota",
 		"exerciseNote": "Nota del ejercicio",
-		"warmUpsFollow": "El calentamiento sigue el peso de trabajo"
+		"warmUpsFollow": "El calentamiento sigue el peso de trabajo",
+		"min": "Mín",
+		"max": "Máx"
 	},
 	"presets": {
 		"dayPush": "Empuje",
@@ -772,7 +774,8 @@
 		"loadingRoutineDataEllipsis": "Cargando los datos de la rutina...",
 		"errorLoadingRoutine": "Error al cargar la rutina",
 		"errorLoadingRoutineBody": "No pudimos cargar los datos de la rutina. Revisa tu conexión e inténtalo de nuevo.",
-		"tryAgain": "Reintentar"
+		"tryAgain": "Reintentar",
+		"editErrorBody": "No se pudo cargar ni guardar los cambios de la rutina. Tus datos deberían conservarse."
 	},
 	"listing": {
 		"pageTitle": "Rutinas",

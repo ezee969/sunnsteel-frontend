@@ -60,7 +60,9 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 				<p className="type-data text-ink-3">
 					{setup.days.length} {setup.days.length === 1 ? 'day' : 'days'} ·{' '}
 					{exerciseCount} {exerciseCount === 1 ? 'exercise' : 'exercises'} ·{' '}
-					{setup.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'}
+					{setup.scheduleMode === 'ROTATION'
+						? tSharing('summaryRotation')
+						: tSharing('summaryWeekly')}
 				</p>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
 					{sharedRoutineNote(tSharing)}

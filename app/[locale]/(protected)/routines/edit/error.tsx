@@ -15,10 +15,11 @@ export default function RoutineEditError({
 	reset,
 }: RoutineEditErrorProps) {
 	const t = useTranslations('routines.listing')
+	const tBuilder = useTranslations('routines.builder')
 	return (
 		<RouteError
 			title={t('editErrorTitle')}
-			description="Failed to load or save routine changes. Your data should be preserved."
+			description={tBuilder('editErrorBody')}
 			message={error.message}
 		>
 			<Button onClick={() => reset()}>{t('retryEdit')}</Button>

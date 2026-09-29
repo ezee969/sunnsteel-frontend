@@ -264,7 +264,7 @@ export function SetRow({
 											aria-label={t('minReps')}
 											inputMode="numeric"
 											pattern="[0-9]*"
-											placeholder="Min"
+											placeholder={t('min')}
 											autoComplete="off"
 											value={minInput}
 											onChange={event => handleMinChange(event.target.value)}
@@ -305,7 +305,7 @@ export function SetRow({
 											aria-label={t('maxReps')}
 											inputMode="numeric"
 											pattern="[0-9]*"
-											placeholder="Max"
+											placeholder={t('max')}
 											autoComplete="off"
 											value={maxInput}
 											onChange={event => handleMaxChange(event.target.value)}

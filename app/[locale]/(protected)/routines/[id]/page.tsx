@@ -39,6 +39,7 @@ export default function RoutineDetailsPage() {
 	const t = useTranslations('routines.detail')
 	const tDeloads = useTranslations('routines.deloads')
 	const tBlocks = useTranslations('routines.trainingBlocks')
+	const tListing = useTranslations('routines.listing')
 
 	// ROUT-04: the account rule caps each routine's own visibility.
 	const { user } = useUser()
@@ -91,7 +92,7 @@ export default function RoutineDetailsPage() {
 			<div
 				className="ledger-page space-y-8 py-6 md:py-8"
 				role="status"
-				aria-label="Loading routine"
+				aria-label={tListing('loadingRoutine')}
 			>
 				<div className="rule-heading space-y-2 pb-4">
 					<Skeleton className="h-8 w-1/3" />
