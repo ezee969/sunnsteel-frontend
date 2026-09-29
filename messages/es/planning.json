@@ -1,0 +1,98 @@
+{
+	"emptyStates": {
+		"historyFilteredTitle": "Ninguna sesión coincide con estos filtros",
+		"historyFilteredDescription": "Quítalos para ver todo tu archivo de entrenamiento.",
+		"clearFilters": "Quitar los filtros",
+		"historyEmptyTitle": "Todavía no registraste entrenamientos",
+		"historyEmptyDescription": "Termina una sesión y queda archivada aquí con sus series, su volumen y sus notas.",
+		"chooseRoutine": "Elegir una rutina",
+		"recentNoFinishedTitle": "Todavía no hay entrenamientos terminados",
+		"recentNoFinishedDescription": "Empieza un entrenamiento desde cualquier rutina y aparecerá aquí con su volumen y su duración.",
+		"browseRoutines": "Ver las rutinas",
+		"recentNoRoutinesTitle": "Todavía no hay rutinas",
+		"recentNoRoutinesDescription": "Empieza desde una plantilla o arma la tuya para planificar tu entrenamiento y registrar sesiones.",
+		"createRoutine": "Crear una rutina",
+		"recordsTitle": "Todavía no hay récords",
+		"recordsDescription": "Completa una serie en cualquier entrenamiento y tu mejor levantamiento de cada ejercicio queda registrado aquí."
+	},
+	"dashboardFollowing": {
+		"more": "y {count} más de este entrenamiento",
+		"findMembers": "Buscar miembros"
+	},
+	"dashboardLayout": {
+		"shownCount": "{shown} de {total} secciones visibles",
+		"sections": {
+			"this-week": "Esta semana",
+			"stats": "Estadísticas de entrenamiento",
+			"recent-activity": "Actividad reciente",
+			"personal-records": "Récords personales",
+			"training-insights": "Señales de entrenamiento",
+			"upcoming-milestones": "Próximos hitos",
+			"following": "De los miembros que sigues"
+		},
+		"movedAnnouncement": "{section} se movió a la posición {position} de {total}."
+	},
+	"dashboardPrimary": {
+		"resumeTitle": "Entrenamiento en curso",
+		"resumeDescription": "{workout} sigue abierto. Retoma donde lo dejaste.",
+		"resumeDescriptionBare": "Retoma donde lo dejaste.",
+		"startTitle": "Entrenamientos de hoy",
+		"startDescription": "{count, plural, one {Tienes 1 entrenamiento planificado.} other {Tienes # entrenamientos planificados.}}",
+		"reviewTitle": "El entrenamiento de hoy está hecho",
+		"reviewDescription": "{workout} está completo. Revisa cómo fue.",
+		"noneTitle": "No hay entrenamientos planificados para hoy",
+		"pickDayDescription": "No hay nada planificado para el {today}. Igual puedes entrenar cualquier día de tus rutinas: cuenta lo mismo.",
+		"browseDescription": "No tienes ninguna rutina planificada para el {today}. Empieza una desde tus rutinas."
+	},
+	"dashboardSummaries": {
+		"latestWorkout": "Último: {routine} — {day}",
+		"latestWorkoutAgo": "Último: {routine} — {day}, {timeAgo}",
+		"latestRecord": "Último: {exercise}",
+		"latestRecordSet": "Último: {exercise} {set}",
+		"facts": "{count, plural, one {# dato de tu entrenamiento reciente} other {# datos de tu entrenamiento reciente}}",
+		"next": "Próximo: {title}",
+		"nextMore": "Próximo: {title}, y {rest} más"
+	},
+	"plateaus": {
+		"weeks": "{count, plural, one {# semana} other {# semanas}}",
+		"days": "{count, plural, one {# día} other {# días}}",
+		"rule": "Ejercicios entrenados al menos {minSessions} veces desde su mejor marca actual, con esa marca de al menos {minDaysSinceBest} y el ejercicio entrenado en {recentDays}, mirando {windowDays} hacia atrás. Son tus números, no un diagnóstico.",
+		"noNewBest": "{count, plural, one {Sin nueva mejor marca en # sesión} other {Sin nueva mejor marca en # sesiones}}",
+		"sinceWindow": "en {span}; mejor serie del {date}",
+		"sinceBest": "desde tu mejor marca del {date}",
+		"estimateThat": "esa estimación",
+		"matched": "igualó {estimate}",
+		"shareOf": "{percent}% de {estimate}",
+		"sessionsDefault": "{sessions} sesiones (predeterminado)",
+		"sessionsOption": "{sessions} sesiones",
+		"nothingToCheckTitle": "Todavía no hay nada que revisar",
+		"nothingToCheckDescription": "El control de estancamiento necesita un ejercicio con una mejor serie cargada que hayas entrenado en {span}.",
+		"noPlateausTitle": "Ningún estancamiento por ahora",
+		"noPlateausDescription": "{count, plural, one {Ninguno de los # ejercicio que entrenaste en {span} lleva {minSessions} sesiones sin una nueva mejor marca.} other {Ninguno de los # ejercicios que entrenaste en {span} lleva {minSessions} sesiones sin una nueva mejor marca.}}",
+		"estimateBest": "la mejor estimación"
+	},
+	"dashboardInsights": {
+		"sets": "{count, plural, one {# serie} other {# series}}",
+		"weekTotals": "{week}: {sets} · {volume} {unit}",
+		"best": "Mejor {set} · 1RM est. {estimate}",
+		"closestSince": "lo más cerca desde {set}",
+		"weekLabel": "Semana contra semana",
+		"weekSubject": "Las dos últimas semanas terminadas",
+		"weekHeld": "Las series completadas se mantuvieron en {sets}.",
+		"weekChanged": "Las series completadas pasaron de {from} a {to}.",
+		"weekEvidence": "{previous} → {latest}",
+		"closestLabel": "Lo más cerca de una nueva mejor marca",
+		"closestStatement": "Mejor serie desde entonces: {share}.",
+		"estimateYourBest": "tu mejor estimación",
+		"closestEvidence": "{best} — {closest}",
+		"longestLabel": "Más tiempo sin una nueva mejor marca",
+		"longestStatement": "{headline} {since}.",
+		"longestEvidenceExtra": " — {closest}, {share}",
+		"sourcesWithThreshold": "los levantamientos que sigue tu control de estancamiento a {minSessions} sesiones sin una nueva mejor marca",
+		"sourcesPlain": "los levantamientos que sigue tu control de estancamiento",
+		"sources": "De tus semanas de entrenamiento terminadas y {scope}. Son tus números, no un diagnóstico.",
+		"emptyTitle": "Todavía no hay nada que decir",
+		"emptyDescription": "Los datos aparecen cuando tengas dos semanas de entrenamiento terminadas, o un levantamiento que siga tu control de estancamiento.",
+		"openProgress": "Abrir Progreso"
+	}
+}

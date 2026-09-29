@@ -1,6 +1,8 @@
 import type { ExercisePlateau } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	describeClosestShare,
 	describePlateauCount,
@@ -72,6 +74,7 @@ describe('plateau copy', () => {
 				}),
 				thresholds,
 				date,
+				en,
 			),
 		).toEqual({
 			headline: 'No new best in 1 session',

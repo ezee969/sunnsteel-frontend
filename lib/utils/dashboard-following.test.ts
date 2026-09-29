@@ -1,6 +1,8 @@
 import type { ActivityEntry } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { describeEmptyFeed } from './activity'
 import {
 	buildFollowingPreview,
@@ -51,6 +53,9 @@ const entry = (
 const ids = (rows: ReturnType<typeof buildFollowingPreview>) =>
 	rows.map(row => row.entries.map(item => item.id))
 
+const en = translatorFor('en', 'planning.dashboardFollowing')
+const es = translatorFor('es', 'planning.dashboardFollowing')
+
 describe('the dashboard following preview is a bounded slice of the feed', () => {
 	it('shows at most three rows, newest first, in the feed order', () => {
 		const feed = ['a', 'b', 'c', 'd', 'e'].map(id => entry(id, null))
@@ -79,7 +84,7 @@ describe('the dashboard following preview is a bounded slice of the feed', () =>
 		expect(FOLLOWING_PREVIEW_FACTS_PER_ROW).toBe(2)
 		expect(row.entries.map(item => item.id)).toEqual(['s', 'r1'])
 		expect(row.moreCount).toBe(2)
-		expect(describeMoreFacts(row.moreCount)).toBe(
+		expect(describeMoreFacts(row.moreCount, en)).toBe(
 			'and 2 more from this workout',
 		)
 	})
@@ -96,16 +101,25 @@ describe('the dashboard following preview is a bounded slice of the feed', () =>
 
 describe('the preview empty states are the feed empty states', () => {
 	it('offers finding members to someone who follows nobody', () => {
-		expect(getFollowingPreviewEmptyState(0)).toEqual({
+		expect(getFollowingPreviewEmptyState(0, describeEmptyFeed(0), en)).toEqual({
 			...describeEmptyFeed(0),
 			action: { kind: 'link', href: '/search', label: 'Find members' },
 		})
 	})
 
 	it('offers nothing when the members followed share nothing', () => {
-		const state = getFollowingPreviewEmptyState(4)
+		const state = getFollowingPreviewEmptyState(4, describeEmptyFeed(4), en)
 		expect(state).toEqual(describeEmptyFeed(4))
 		expect(state.action).toBeUndefined()
 		expect(state.description).toContain('Everyone starts private')
+	})
+})
+
+describe('the preview copy in Spanish (I18N-04)', () => {
+	it('names the remainder as this workout\u2019s', () => {
+		expect(describeMoreFacts(2, es)).toBe('y 2 más de este entrenamiento')
+		expect(
+			getFollowingPreviewEmptyState(0, describeEmptyFeed(0), es).action,
+		).toMatchObject({ href: '/search', label: 'Buscar miembros' })
 	})
 })

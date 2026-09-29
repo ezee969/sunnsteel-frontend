@@ -5,9 +5,11 @@ import {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	DASHBOARD_SECTION_LABELS,
 	dashboardRows,
+	dashboardSectionLabel,
 	describeShownCount,
 	moveDashboardSection,
 	sameDashboardLayout,
@@ -20,10 +22,13 @@ const layout = (...entries: Array<[string, boolean?]>): DashboardLayout =>
 		hidden: hidden ?? false,
 	})) as DashboardLayout
 
+const en = translatorFor('en', 'planning.dashboardLayout')
+const es = translatorFor('es', 'planning.dashboardLayout')
+
 describe('dashboard layout', () => {
 	it('names every section', () => {
 		for (const id of DASHBOARD_SECTION_IDS) {
-			expect(DASHBOARD_SECTION_LABELS[id]).toBeTruthy()
+			expect(dashboardSectionLabel(id, en)).toBeTruthy()
 		}
 	})
 
@@ -95,6 +100,22 @@ describe('dashboard layout', () => {
 				...DEFAULT_DASHBOARD_LAYOUT,
 			]),
 		).toBe(true)
-		expect(describeShownCount(hidden)).toBe('6 of 7 sections shown')
+		expect(describeShownCount(hidden, en)).toBe('6 of 7 sections shown')
+	})
+})
+
+describe('the layout copy in Spanish (I18N-04)', () => {
+	it('counts what is shown and names every section', () => {
+		const hidden = setDashboardSectionShown(
+			DEFAULT_DASHBOARD_LAYOUT,
+			'following',
+			false,
+		)
+		expect(describeShownCount(hidden, es)).toBe('6 de 7 secciones visibles')
+		expect(dashboardSectionLabel('this-week', es)).toBe('Esta semana')
+		// Every id the contract defines has a name in both languages.
+		for (const entry of DEFAULT_DASHBOARD_LAYOUT) {
+			expect(dashboardSectionLabel(entry.id, es)).toBeTruthy()
+		}
 	})
 })

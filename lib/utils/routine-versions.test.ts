@@ -18,22 +18,42 @@ import {
 
 const enVersions = translatorFor('en', 'routines.versions')
 const enDate = translatorFor('en', 'routines.date')
+const enFormat = translatorFor('en', 'routines.format')
 const enSchedule = translatorFor('en', 'routines.schedule')
 const esVersions = translatorFor('es', 'routines.versions')
 const esDate = translatorFor('es', 'routines.date')
+const esFormat = translatorFor('es', 'routines.format')
 const esSchedule = translatorFor('es', 'routines.schedule')
 
 const compare = (
 	current: RoutineVersionSetup,
 	target: RoutineVersionSetup,
 	unit: 'KG' | 'LB' = 'KG',
-) => compareRoutineSetups(current, target, unit, enVersions, enDate, enSchedule)
+) =>
+	compareRoutineSetups(
+		current,
+		target,
+		unit,
+		enVersions,
+		enDate,
+		enSchedule,
+		enFormat,
+	)
 
 const compareEs = (
 	current: RoutineVersionSetup,
 	target: RoutineVersionSetup,
 	unit: 'KG' | 'LB' = 'KG',
-) => compareRoutineSetups(current, target, unit, esVersions, esDate, esSchedule)
+) =>
+	compareRoutineSetups(
+		current,
+		target,
+		unit,
+		esVersions,
+		esDate,
+		esSchedule,
+		esFormat,
+	)
 
 const exercise = (
 	id: string,

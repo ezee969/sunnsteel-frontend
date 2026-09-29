@@ -12,7 +12,7 @@ import type {
 
 import type { Translator } from '@/i18n/translator'
 
-import { formatSetScheme } from './exercise-detail'
+import { describeSetScheme } from './exercise-detail'
 import { describeRoutineSchedule, routineDayTitle } from './routine-schedule'
 import { areCanonicalWeightsEqual, formatWeight } from './weight-unit'
 
@@ -173,11 +173,12 @@ function compareExercise(
 	target: RoutineVersionExercise,
 	unit: WeightUnit,
 	t: Translator<'routines.versions'>,
+	tFormat: Translator<'routines.format'>,
 ): string[] {
 	const name = target.exercise.name
 	const changes: string[] = []
-	const fromScheme = formatSetScheme(current.sets)
-	const toScheme = formatSetScheme(target.sets)
+	const fromScheme = describeSetScheme(current.sets, tFormat)
+	const toScheme = describeSetScheme(target.sets, tFormat)
 	if (fromScheme !== toScheme) {
 		changes.push(t('exerciseScheme', { name, from: fromScheme, to: toScheme }))
 	}
@@ -277,6 +278,7 @@ function compareDay(
 	target: RoutineVersionDay,
 	unit: WeightUnit,
 	t: Translator<'routines.versions'>,
+	tFormat: Translator<'routines.format'>,
 ): string[] {
 	const changes: string[] = []
 	const fromName = current.name?.trim() || null
@@ -293,12 +295,14 @@ function compareDay(
 	const pairs = pairExercises(current.exercises, target.exercises)
 	for (const pair of pairs) {
 		if (pair.current && pair.target) {
-			changes.push(...compareExercise(pair.current, pair.target, unit, t))
+			changes.push(
+				...compareExercise(pair.current, pair.target, unit, t, tFormat),
+			)
 		} else if (pair.target) {
 			changes.push(
 				t('exerciseAdds', {
 					name: pair.target.exercise.name,
-					scheme: formatSetScheme(pair.target.sets),
+					scheme: describeSetScheme(pair.target.sets, tFormat),
 				}),
 			)
 		} else if (pair.current) {
@@ -337,6 +341,7 @@ export function compareRoutineSetups(
 	t: Translator<'routines.versions'>,
 	tDate: Translator<'routines.date'>,
 	tSchedule: Translator<'routines.schedule'>,
+	tFormat: Translator<'routines.format'>,
 ): SetupComparison {
 	const routine: string[] = []
 	if (current.name.trim() !== target.name.trim()) {
@@ -387,7 +392,7 @@ export function compareRoutineSetups(
 			})
 			continue
 		}
-		const changes = compareDay(before, day, unit, t)
+		const changes = compareDay(before, day, unit, t, tFormat)
 		if (changes.length) {
 			days.push({
 				title: routineDayTitle(day, 'long', tDate),

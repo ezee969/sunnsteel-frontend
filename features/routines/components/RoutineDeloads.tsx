@@ -110,6 +110,7 @@ function DeloadDialog({
 	const tVersions = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
 	const tSchedule = useTranslations('routines.schedule')
+	const tFormat = useTranslations('routines.format')
 	const locale = useLocale() as Locale
 	const [startDate, setStartDate] = useState(
 		() => initial?.startDate ?? firstFreeDate(today, existing),
@@ -157,9 +158,10 @@ function DeloadDialog({
 						tVersions,
 						tDate,
 						tSchedule,
+						tFormat,
 					)
 				: null,
-		[original, lighter, weightUnit, tVersions, tDate, tSchedule],
+		[original, lighter, weightUnit, tVersions, tDate, tSchedule, tFormat],
 	)
 	const valid = !!startDate && !problem && !!lighter
 
@@ -338,6 +340,7 @@ function ReviewDeloadDialog({
 	const tVersions = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
 	const tSchedule = useTranslations('routines.schedule')
+	const tFormat = useTranslations('routines.format')
 	const locale = useLocale() as Locale
 	const comparison = useMemo(
 		() =>
@@ -348,8 +351,9 @@ function ReviewDeloadDialog({
 				tVersions,
 				tDate,
 				tSchedule,
+				tFormat,
 			),
-		[deload, weightUnit, tVersions, tDate, tSchedule],
+		[deload, weightUnit, tVersions, tDate, tSchedule, tFormat],
 	)
 	return (
 		<Dialog open onOpenChange={open => !open && onClose()}>

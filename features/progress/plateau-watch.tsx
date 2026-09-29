@@ -7,6 +7,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Gauge, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -57,6 +58,7 @@ function PlateauSensitivity({
 	saveFailed: boolean
 	onChange: (minSessions: number) => void
 }) {
+	const t = useTranslations('planning.plateaus')
 	const selected = saving ?? current
 	return (
 		<div className="space-y-1.5">
@@ -75,7 +77,7 @@ function PlateauSensitivity({
 						size="sm"
 						variant={selected === option ? 'secondary' : 'ghost'}
 						aria-pressed={selected === option}
-						aria-label={getPlateauSessionLabel(option)}
+						aria-label={getPlateauSessionLabel(option, t)}
 						disabled={saving !== undefined}
 						onClick={() => {
 							if (option !== selected) onChange(option)
@@ -109,7 +111,8 @@ function PlateauRow({
 	thresholds: PlateausResponse['thresholds']
 	weightUnit: WeightUnit
 }) {
-	const count = describePlateauCount(plateau, thresholds, formatDate)
+	const t = useTranslations('planning.plateaus')
+	const count = describePlateauCount(plateau, thresholds, formatDate, t)
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
 			<div className="min-w-0">
@@ -144,7 +147,7 @@ function PlateauRow({
 						<span className="type-data text-ink-2">
 							{formatPlateauSet(plateau.closest, weightUnit)}
 						</span>{' '}
-						· {describeClosestShare(plateau.closestRatio)}
+						· {describeClosestShare(plateau.closestRatio, t)}
 					</dd>
 				</div>
 			</dl>
@@ -167,6 +170,7 @@ export function PlateauWatch({
 	saveFailed,
 	onMinSessionsChange,
 }: PlateauWatchProps) {
+	const t = useTranslations('planning.plateaus')
 	// UX-04: the first three lifts, then "Show N more" (§20.2).
 	const shownPlateaus = useShowMore(data?.plateaus ?? [], 3)
 
@@ -185,7 +189,7 @@ export function PlateauWatch({
 						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							{data
-								? describePlateauRule(data.thresholds)
+								? describePlateauRule(data.thresholds, t)
 								: 'Lifts you keep training without a new best set.'}
 						</p>
 					</div>
@@ -231,7 +235,7 @@ export function PlateauWatch({
 				</div>
 			) : data.plateaus.length === 0 ? (
 				<EmptyModule
-					{...getPlateauEmptyState(data.checkedExercises, data.thresholds)}
+					{...getPlateauEmptyState(data.checkedExercises, data.thresholds, t)}
 				/>
 			) : (
 				<div>

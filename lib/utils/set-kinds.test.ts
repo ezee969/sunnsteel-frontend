@@ -203,6 +203,7 @@ describe('versions name a change of set kinds (LIVE-12)', () => {
 			translatorFor('en', 'routines.versions'),
 			translatorFor('en', 'routines.date'),
 			translatorFor('en', 'routines.schedule'),
+			translatorFor('en', 'routines.format'),
 		)
 		expect(JSON.stringify(result.days)).toContain(
 			'Bench Press: 3 working → 1 warm-up, 2 working sets',

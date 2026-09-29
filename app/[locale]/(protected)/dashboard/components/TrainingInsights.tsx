@@ -2,6 +2,7 @@
 
 import { Gauge, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
@@ -10,9 +11,9 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { usePlateaus, useVolumeTrend } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	buildDashboardInsights,
-	DASHBOARD_INSIGHTS_EMPTY_STATE,
 	type DashboardInsight,
 	describeDashboardInsightSources,
+	getDashboardInsightsEmptyState,
 } from '@/lib/utils/dashboard-insights'
 import { trainingInsightsSummary } from '@/lib/utils/dashboard-summaries'
 
@@ -62,6 +63,9 @@ function InsightRow({ insight }: { insight: DashboardInsight }) {
  * not decide which of them matters most.
  */
 export default function TrainingInsights() {
+	const tSummaries = useTranslations('planning.dashboardSummaries')
+	const tInsights = useTranslations('planning.dashboardInsights')
+	const tPlateaus = useTranslations('planning.plateaus')
 	const weightUnit = useWeightUnit()
 	const plateaus = usePlateaus()
 	const volume = useVolumeTrend(4)
@@ -74,6 +78,8 @@ export default function TrainingInsights() {
 		weightUnit,
 		formatWeek,
 		formatDate,
+		t: tInsights,
+		tPlateaus,
 	})
 
 	const retry = () => {
@@ -86,7 +92,7 @@ export default function TrainingInsights() {
 			id="training-insights"
 			icon={<Gauge className="h-4 w-4 text-ink-3" aria-hidden />}
 			collapsible
-			summary={trainingInsightsSummary(insights)}
+			summary={trainingInsightsSummary(insights, tSummaries)}
 		>
 			{isPending ? (
 				<div
@@ -114,11 +120,11 @@ export default function TrainingInsights() {
 					</Button>
 				</div>
 			) : insights.length === 0 ? (
-				<EmptyModule {...DASHBOARD_INSIGHTS_EMPTY_STATE} />
+				<EmptyModule {...getDashboardInsightsEmptyState(tInsights)} />
 			) : (
 				<>
 					<p className="type-body-sm max-w-2xl pt-1 pb-2 text-ink-3">
-						{describeDashboardInsightSources(plateaus.data)}
+						{describeDashboardInsightSources(tInsights, plateaus.data)}
 					</p>
 					<ul className="border-t border-rule-faint">
 						{insights.map(insight => (

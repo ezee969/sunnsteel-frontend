@@ -6,6 +6,8 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import type { EmptyStateCopy } from './empty-states'
 import {
 	describeClosestShare,
@@ -37,26 +39,36 @@ export interface DashboardInsight {
 	evidence: string
 }
 
+type T = Translator<'planning.dashboardInsights'>
+
 const SET_FORMATTER = new Intl.NumberFormat('en-US', {
 	maximumFractionDigits: 1,
 })
-
-const formatSets = (value: number) =>
-	`${SET_FORMATTER.format(value)} ${value === 1 ? 'set' : 'sets'}`
 
 const formatWeekTotals = (
 	point: VolumeTrendPoint,
 	unit: WeightUnit,
 	formatWeek: (weekStart: string) => string,
+	t: T,
 ) =>
-	`${formatWeek(point.weekStart)}: ${formatSets(point.completedSets)} · ` +
-	`${formatWeightAmount(point.volumeKg, unit, 0)} ${getWeightUnitLabel(unit)}`
+	t('weekTotals', {
+		week: formatWeek(point.weekStart),
+		sets: t('sets', { count: point.completedSets }),
+		volume: formatWeightAmount(point.volumeKg, unit, 0),
+		unit: getWeightUnitLabel(unit),
+	})
 
-const describeBest = (plateau: ExercisePlateau, unit: WeightUnit) =>
-	`Best ${formatPlateauSet(plateau.best, unit)} · est. 1RM ${formatEstimate(plateau.best, unit)}`
+const describeBest = (plateau: ExercisePlateau, unit: WeightUnit, t: T) =>
+	t('best', {
+		set: formatPlateauSet(plateau.best, unit),
+		estimate: formatEstimate(plateau.best, unit),
+	})
 
-const describeClosestSince = (plateau: ExercisePlateau, unit: WeightUnit) =>
-	`closest since ${formatPlateauSet(plateau.closest, unit)}`
+const describeClosestSince = (
+	plateau: ExercisePlateau,
+	unit: WeightUnit,
+	t: T,
+) => t('closestSince', { set: formatPlateauSet(plateau.closest, unit) })
 
 /**
  * The last two *finished* weeks. The current week is partial by definition, so
@@ -66,6 +78,7 @@ function buildWeekComparison(
 	volume: VolumeTrendResponse | undefined,
 	unit: WeightUnit,
 	formatWeek: (weekStart: string) => string,
+	t: T,
 ): DashboardInsight | null {
 	if (!volume) return null
 
@@ -78,19 +91,23 @@ function buildWeekComparison(
 	const previous = previousCompleteWeek.completedSets
 	const statement =
 		latest === previous
-			? `Completed sets held at ${SET_FORMATTER.format(latest)}.`
-			: `Completed sets went from ${SET_FORMATTER.format(previous)} to ${SET_FORMATTER.format(latest)}.`
+			? t('weekHeld', { sets: SET_FORMATTER.format(latest) })
+			: t('weekChanged', {
+					from: SET_FORMATTER.format(previous),
+					to: SET_FORMATTER.format(latest),
+				})
 
 	return {
 		key: 'WEEK_OVER_WEEK',
-		label: 'Week over week',
-		subject: 'Last two finished weeks',
+		label: t('weekLabel'),
+		subject: t('weekSubject'),
 		// UX-11: the weekly load comparison lives on Progress › Load.
 		href: '/progress/load',
 		statement,
-		evidence:
-			`${formatWeekTotals(previousCompleteWeek, unit, formatWeek)} → ` +
-			`${formatWeekTotals(latestCompleteWeek, unit, formatWeek)}`,
+		evidence: t('weekEvidence', {
+			previous: formatWeekTotals(previousCompleteWeek, unit, formatWeek, t),
+			latest: formatWeekTotals(latestCompleteWeek, unit, formatWeek, t),
+		}),
 	}
 }
 
@@ -108,14 +125,25 @@ function findClosestToBest(
 function buildClosestInsight(
 	plateau: ExercisePlateau,
 	unit: WeightUnit,
+	t: T,
+	tPlateaus: Translator<'planning.plateaus'>,
 ): DashboardInsight {
 	return {
 		key: 'CLOSEST_TO_BEST',
-		label: 'Closest to a new best',
+		label: t('closestLabel'),
 		subject: plateau.exerciseName,
 		href: `/exercises/${plateau.exerciseId}`,
-		statement: `Best set since: ${describeClosestShare(plateau.closestRatio, 'your best estimate')}.`,
-		evidence: `${describeBest(plateau, unit)} — ${describeClosestSince(plateau, unit)}`,
+		statement: t('closestStatement', {
+			share: describeClosestShare(
+				plateau.closestRatio,
+				tPlateaus,
+				t('estimateYourBest'),
+			),
+		}),
+		evidence: t('closestEvidence', {
+			best: describeBest(plateau, unit, t),
+			closest: describeClosestSince(plateau, unit, t),
+		}),
 	}
 }
 
@@ -125,18 +153,30 @@ function buildLongestPlateauInsight(
 	formatDate: (iso: string) => string,
 	unit: WeightUnit,
 	includeClosestShare: boolean,
+	t: T,
+	tPlateaus: Translator<'planning.plateaus'>,
 ): DashboardInsight {
-	const count = describePlateauCount(plateau, thresholds, formatDate)
+	const count = describePlateauCount(plateau, thresholds, formatDate, tPlateaus)
 	const closest = includeClosestShare
-		? ` — ${describeClosestSince(plateau, unit)}, ${describeClosestShare(plateau.closestRatio, 'your best estimate')}`
+		? t('longestEvidenceExtra', {
+				closest: describeClosestSince(plateau, unit, t),
+				share: describeClosestShare(
+					plateau.closestRatio,
+					tPlateaus,
+					t('estimateYourBest'),
+				),
+			})
 		: ''
 	return {
 		key: 'LONGEST_PLATEAU',
-		label: 'Longest without a new best',
+		label: t('longestLabel'),
 		subject: plateau.exerciseName,
 		href: `/exercises/${plateau.exerciseId}`,
-		statement: `${count.headline} ${count.since}.`,
-		evidence: `${describeBest(plateau, unit)}${closest}`,
+		statement: t('longestStatement', {
+			headline: count.headline,
+			since: count.since,
+		}),
+		evidence: `${describeBest(plateau, unit, t)}${closest}`,
 	}
 }
 
@@ -147,6 +187,8 @@ export interface DashboardInsightSources {
 	/** Injected so the facts are testable without depending on a locale. */
 	formatWeek: (weekStart: string) => string
 	formatDate: (iso: string) => string
+	t: T
+	tPlateaus: Translator<'planning.plateaus'>
 }
 
 /**
@@ -161,10 +203,12 @@ export function buildDashboardInsights({
 	weightUnit,
 	formatWeek,
 	formatDate,
+	t,
+	tPlateaus,
 }: DashboardInsightSources): DashboardInsight[] {
 	const insights: DashboardInsight[] = []
 
-	const weekComparison = buildWeekComparison(volume, weightUnit, formatWeek)
+	const weekComparison = buildWeekComparison(volume, weightUnit, formatWeek, t)
 	if (weekComparison) insights.push(weekComparison)
 
 	const list = plateaus?.plateaus ?? []
@@ -173,7 +217,7 @@ export function buildDashboardInsights({
 	const sameLift = longest !== null && longest === closest
 
 	if (closest && !sameLift) {
-		insights.push(buildClosestInsight(closest, weightUnit))
+		insights.push(buildClosestInsight(closest, weightUnit, t, tPlateaus))
 	}
 	if (longest && plateaus) {
 		insights.push(
@@ -183,6 +227,8 @@ export function buildDashboardInsights({
 				formatDate,
 				weightUnit,
 				sameLift,
+				t,
+				tPlateaus,
 			),
 		)
 	}
@@ -192,17 +238,21 @@ export function buildDashboardInsights({
 
 /** What the facts are drawn from, so no row is read as a wider claim. */
 export function describeDashboardInsightSources(
+	t: T,
 	plateaus?: PlateausResponse,
 ): string {
 	const scope = plateaus
-		? `the lifts your plateau watch follows at ${plateaus.thresholds.minSessions} sessions without a new best`
-		: 'the lifts your plateau watch follows'
-	return `From your finished training weeks and ${scope}. These are your numbers, not a diagnosis.`
+		? t('sourcesWithThreshold', {
+				minSessions: plateaus.thresholds.minSessions,
+			})
+		: t('sourcesPlain')
+	return t('sources', { scope })
 }
 
-export const DASHBOARD_INSIGHTS_EMPTY_STATE: EmptyStateCopy = {
-	title: 'Nothing to state yet',
-	description:
-		'Facts appear once you have two finished training weeks, or a lift your plateau watch is following.',
-	action: { kind: 'link', label: 'Open progress', href: '/progress' },
+export function getDashboardInsightsEmptyState(t: T): EmptyStateCopy {
+	return {
+		title: t('emptyTitle'),
+		description: t('emptyDescription'),
+		action: { kind: 'link', label: t('openProgress'), href: '/progress' },
+	}
 }

@@ -2,6 +2,7 @@
 
 import { Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -21,6 +22,8 @@ import { DashboardSection } from './DashboardSection'
  * The last few finished sessions, with the volume each one actually moved.
  */
 export default function RecentActivity() {
+	const tEmpty = useTranslations('planning.emptyStates')
+	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const router = useRouter()
 	const weightUnit = useWeightUnit()
 	const { data } = useWorkoutProgress()
@@ -42,10 +45,11 @@ export default function RecentActivity() {
 				entries[0]
 					? formatTimeAgo(entries[0].endedAt ?? entries[0].startedAt)
 					: undefined,
+				tSummaries,
 			)}
 		>
 			{entries.length === 0 ? (
-				<EmptyModule {...getRecentActivityEmptyState(hasRoutines)} />
+				<EmptyModule {...getRecentActivityEmptyState(hasRoutines, tEmpty)} />
 			) : (
 				entries.map((entry, index) => (
 					<button

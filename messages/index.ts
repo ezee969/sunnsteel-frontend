@@ -2,11 +2,13 @@ import type { Locale } from '@/i18n/config'
 
 import enCatalog from './en/catalog.json'
 import enCore from './en/core.json'
+import enPlanning from './en/planning.json'
 import enRoutines from './en/routines.json'
 import enShell from './en/shell.json'
 import enWorkout from './en/workout.json'
 import esCatalog from './es/catalog.json'
 import esCore from './es/core.json'
+import esPlanning from './es/planning.json'
 import esRoutines from './es/routines.json'
 import esShell from './es/shell.json'
 import esWorkout from './es/workout.json'
@@ -22,6 +24,7 @@ const en = {
 	workout: enWorkout,
 	catalog: enCatalog,
 	routines: enRoutines,
+	planning: enPlanning,
 }
 
 export type Messages = typeof en
@@ -34,5 +37,6 @@ export const MESSAGES: Record<Locale, Messages> = {
 		workout: esWorkout,
 		catalog: esCatalog,
 		routines: esRoutines,
+		planning: esPlanning,
 	},
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import {
 	getDashboardPrimaryCopy,
 	resolveDashboardPrimaryAction,
@@ -23,6 +24,9 @@ const completed = {
 	id: 'session-0',
 	routine: { id: 'routine-1', name: 'Push Pull Legs', dayName: 'Push' },
 }
+
+const en = translatorFor('en', 'planning.dashboardPrimary')
+const es = translatorFor('es', 'planning.dashboardPrimary')
 
 describe('dashboard primary action', () => {
 	it('resumes an open session before anything scheduled or finished', () => {
@@ -130,35 +134,60 @@ describe('dashboard primary copy', () => {
 					dayName: 'Upper A',
 				},
 				context,
+				en,
 			).description,
 		).toBe('Upper / Lower · Upper A is still open. Pick up where you left off.')
 		expect(
 			getDashboardPrimaryCopy(
 				{ kind: 'RESUME', sessionId: 's', routineDayId: 'd' },
 				context,
+				en,
 			).description,
 		).toBe('Pick up where you left off.')
 		expect(
 			getDashboardPrimaryCopy(
 				{ kind: 'REVIEW', sessionId: 's', routineName: 'Full Body' },
 				context,
+				en,
 			).description,
 		).toBe('Full Body is complete. Review how it went.')
 	})
 
 	it('pluralises the planned count and names the weekday', () => {
 		const start = { kind: 'START', routineId: 'r', routineDayId: 'd' } as const
-		expect(getDashboardPrimaryCopy(start, context).description).toBe(
+		expect(getDashboardPrimaryCopy(start, context, en).description).toBe(
 			'You have 1 workout planned.',
 		)
 		expect(
-			getDashboardPrimaryCopy(start, { ...context, plannedCount: 3 })
-				.description,
+			getDashboardPrimaryCopy(
+				start,
+				{ plannedCount: 3, todayName: 'domingo' },
+				en,
+			).description,
 		).toBe('You have 3 workouts planned.')
 		expect(
-			getDashboardPrimaryCopy({ kind: 'BROWSE' }, context).description,
+			getDashboardPrimaryCopy({ kind: 'BROWSE' }, context, en).description,
 		).toBe(
 			'You don’t have any routines planned for Sunday. Start one from your routines.',
 		)
+	})
+})
+
+describe('the primary card copy in Spanish (I18N-04)', () => {
+	it('agrees the planned count with its noun', () => {
+		expect(
+			getDashboardPrimaryCopy(
+				{ kind: 'START', routineId: 'r', routineDayId: 'd' },
+				{ plannedCount: 1, todayName: 'domingo' },
+				es,
+			).description,
+		).toBe('Tienes 1 entrenamiento planificado.')
+		expect(
+			getDashboardPrimaryCopy(
+				{ kind: 'START', routineId: 'r', routineDayId: 'd' },
+				{ plannedCount: 3, todayName: 'domingo' },
+				es,
+			).description,
+		).toBe('Tienes 3 entrenamientos planificados.')
 	})
 })

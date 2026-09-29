@@ -1,11 +1,12 @@
 'use client'
 
 import type { DashboardSectionId } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { CollapsibleHeading } from '@/components/layout/collapsible-section'
 import { useCollapsedState } from '@/hooks/use-collapsed-state'
 import { cn } from '@/lib/utils'
-import { DASHBOARD_SECTION_LABELS } from '@/lib/utils/dashboard-layout'
+import { dashboardSectionLabel } from '@/lib/utils/dashboard-layout'
 
 export const dashboardSectionHeadingId = (id: DashboardSectionId) =>
 	`dashboard-${id}-heading`
@@ -55,7 +56,8 @@ export function DashboardSection({
 	children,
 }: DashboardSectionProps) {
 	const headingId = dashboardSectionHeadingId(id)
-	const title = DASHBOARD_SECTION_LABELS[id]
+	const t = useTranslations('planning.dashboardLayout')
+	const title = dashboardSectionLabel(id, t)
 	const [storedOpen, setOpen] = useCollapsedState(`dashboard-${id}`, 'wide')
 	const open = !collapsible || storedOpen
 	const bodyId = `dashboard-${id}-body`

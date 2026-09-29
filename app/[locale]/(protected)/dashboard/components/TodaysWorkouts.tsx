@@ -47,6 +47,7 @@ import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
 export default function TodaysWorkouts() {
 	const router = useRouter()
 	const tDate = useTranslations('routines.date')
+	const tPrimary = useTranslations('planning.dashboardPrimary')
 	const tDeloads = useTranslations('routines.deloads')
 	const { preloadOnHover } = useComponentPreloading()
 	const { mutateAsync: startSession, isPending } = useStartSession()
@@ -105,10 +106,14 @@ export default function TodaysWorkouts() {
 		completedToday,
 		hasTrainableDay,
 	})
-	const copy = getDashboardPrimaryCopy(action, {
-		plannedCount: visibleTodays.length,
-		todayName: weekdayName(todayDow, 'long', tDate),
-	})
+	const copy = getDashboardPrimaryCopy(
+		action,
+		{
+			plannedCount: visibleTodays.length,
+			todayName: weekdayName(todayDow, 'long', tDate),
+		},
+		tPrimary,
+	)
 
 	return (
 		<>

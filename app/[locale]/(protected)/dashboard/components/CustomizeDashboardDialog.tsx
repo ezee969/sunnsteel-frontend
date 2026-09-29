@@ -6,6 +6,7 @@ import {
 	normalizeDashboardLayout,
 } from '@sunsteel/contracts'
 import { ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { useUpdateDashboardLayout } from '@/lib/api/hooks/useUpdateDashboardLayout'
 import {
-	DASHBOARD_SECTION_LABELS,
+	dashboardSectionLabel,
 	describeShownCount,
 	moveDashboardSection,
 	sameDashboardLayout,
@@ -46,6 +47,7 @@ export function CustomizeDashboardDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
+	const t = useTranslations('planning.dashboardLayout')
 	const saved = normalizeDashboardLayout(layout)
 	const [draft, setDraft] = useState(saved)
 	const [announcement, setAnnouncement] = useState('')
@@ -60,7 +62,11 @@ export function CustomizeDashboardDialog({
 		const moved = next[target]
 		setDraft(next)
 		setAnnouncement(
-			`${DASHBOARD_SECTION_LABELS[moved.id]} moved to position ${target + 1} of ${next.length}.`,
+			t('movedAnnouncement', {
+				section: dashboardSectionLabel(moved.id, t),
+				position: target + 1,
+				total: next.length,
+			}),
 		)
 		// The row keeps its focused button as it moves. At either end that button
 		// is disabled, so hand focus to the other one rather than dropping it.
@@ -98,10 +104,12 @@ export function CustomizeDashboardDialog({
 				</DialogHeader>
 
 				<div>
-					<p className="type-body-sm text-ink-3">{describeShownCount(draft)}</p>
+					<p className="type-body-sm text-ink-3">
+						{describeShownCount(draft, t)}
+					</p>
 					<ol ref={listRef} className="mt-2 border-t border-rule-faint">
 						{draft.map((entry, index) => {
-							const label = DASHBOARD_SECTION_LABELS[entry.id]
+							const label = dashboardSectionLabel(entry.id, t)
 							const showId = `${baseId}-show-${entry.id}`
 							return (
 								<li

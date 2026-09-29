@@ -171,9 +171,10 @@ function Overview({
 function RoutineUsages({ exerciseId }: { exerciseId: string }) {
 	const routines = useRoutines()
 	const tDate = useTranslations('routines.date')
+	const tFormat = useTranslations('routines.format')
 	const usages = useMemo(
-		() => findRoutineUsages(routines.data ?? [], exerciseId, tDate),
-		[exerciseId, routines.data, tDate],
+		() => findRoutineUsages(routines.data ?? [], exerciseId, tDate, tFormat),
+		[exerciseId, routines.data, tDate, tFormat],
 	)
 
 	return (
@@ -242,6 +243,7 @@ function BestPerformance({
 	hasStrengthTrend: boolean
 }) {
 	const weightUnit = useWeightUnit()
+	const tPlateaus = useTranslations('planning.plateaus')
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const [anchor] = useState(() => new Date())
 	const params = useMemo(
@@ -317,6 +319,7 @@ function BestPerformance({
 									plateau,
 									plateaus.data.thresholds,
 									formatDate,
+									tPlateaus,
 								).headline
 							}{' '}
 							<span className="text-ink-3">
@@ -325,6 +328,7 @@ function BestPerformance({
 										plateau,
 										plateaus.data.thresholds,
 										formatDate,
+										tPlateaus,
 									).since
 								}
 								; closest since{' '}
@@ -334,7 +338,8 @@ function BestPerformance({
 								(
 								{describeClosestShare(
 									plateau.closestRatio,
-									'the best estimate',
+									tPlateaus,
+									tPlateaus('estimateBest'),
 								)}
 								).
 							</span>

@@ -5,6 +5,8 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	buildDashboardInsights,
 	describeDashboardInsightSources,
@@ -76,11 +78,21 @@ const plateaus = (list: ExercisePlateau[]): PlateausResponse => ({
 	plateaus: list,
 })
 
+const enInsights = translatorFor('en', 'planning.dashboardInsights')
+const esInsights = translatorFor('es', 'planning.dashboardInsights')
+const enPlateaus = translatorFor('en', 'planning.plateaus')
+const esPlateaus = translatorFor('es', 'planning.plateaus')
+
 const sources = {
 	weightUnit: 'KG' as const,
 	formatWeek,
 	formatDate,
+	t: enInsights,
+	tPlateaus: enPlateaus,
 }
+
+/** The same sources read in Spanish, for the copy rules that must hold there. */
+const spanishSources = { ...sources, t: esInsights, tPlateaus: esPlateaus }
 
 describe('dashboard insights (DASH-07)', () => {
 	it('keeps a fixed order and never ranks the facts', () => {
@@ -217,8 +229,25 @@ describe('dashboard insights (DASH-07)', () => {
 
 describe('dashboard insight sources', () => {
 	it('names the scope so no row reads as a wider claim', () => {
-		expect(describeDashboardInsightSources(plateaus([]))).toBe(
+		expect(describeDashboardInsightSources(enInsights, plateaus([]))).toBe(
 			'From your finished training weeks and the lifts your plateau watch follows at 4 sessions without a new best. These are your numbers, not a diagnosis.',
 		)
+	})
+
+	it('states the same scope in Spanish, and still disclaims diagnosis', () => {
+		const copy = describeDashboardInsightSources(esInsights, plateaus([]))
+		expect(copy).toContain('4 sesiones')
+		expect(copy).toContain('no un diagnóstico')
+		// The retained rule: evidence first, never a cause.
+		expect(copy).not.toMatch(/porque|debido|deberías/i)
+	})
+
+	it('reads every row in Spanish, with the counts agreed', () => {
+		const insights = buildDashboardInsights({
+			...spanishSources,
+			volume,
+		})
+		expect(insights[0].label).toBe('Semana contra semana')
+		expect(insights[0].subject).toBe('Las dos últimas semanas terminadas')
 	})
 })

@@ -2,6 +2,7 @@
 
 import { RefreshCw, Users } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -13,6 +14,7 @@ import {
 } from '@/features/activity/activity-entry-list'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useActivityFeed } from '@/lib/api/hooks/useActivity'
+import { describeEmptyFeed } from '@/lib/utils/activity'
 import {
 	buildFollowingPreview,
 	describeMoreFacts,
@@ -29,6 +31,7 @@ import { DashboardSection } from './DashboardSection'
  * further page: the preview is bounded, and the rest lives behind the link.
  */
 export default function FollowingPreview() {
+	const t = useTranslations('planning.dashboardFollowing')
 	const query = useActivityFeed()
 	const weightUnit = useWeightUnit()
 	const rows = useMemo(
@@ -71,7 +74,13 @@ export default function FollowingPreview() {
 					</Button>
 				</div>
 			) : rows.length === 0 ? (
-				<EmptyModule {...getFollowingPreviewEmptyState(followedCount)} />
+				<EmptyModule
+					{...getFollowingPreviewEmptyState(
+						followedCount,
+						describeEmptyFeed(followedCount),
+						t,
+					)}
+				/>
 			) : (
 				<>
 					<ul
@@ -94,7 +103,7 @@ export default function FollowingPreview() {
 								</ul>
 								{row.moreCount > 0 ? (
 									<p className="type-body-sm pl-7 text-ink-3">
-										{describeMoreFacts(row.moreCount)}
+										{describeMoreFacts(row.moreCount, t)}
 									</p>
 								) : null}
 							</li>

@@ -61,6 +61,7 @@ export function WorkoutHistoryList({
 	const locale = useLocale()
 	const router = useRouter()
 	const tDeloads = useTranslations('routines.deloads')
+	const tEmpty = useTranslations('planning.emptyStates')
 	const statusLabel = (status: string) =>
 		tMetrics(STATUS_KEYS[status as keyof typeof STATUS_KEYS] ?? 'statusUnknown')
 	const dateTime = (iso: string) =>
@@ -89,7 +90,7 @@ export function WorkoutHistoryList({
 	if (items.length === 0) {
 		return (
 			<EmptyModule
-				{...getHistoryEmptyState(hasActiveFilters)}
+				{...getHistoryEmptyState(hasActiveFilters, tEmpty)}
 				onClearFilters={onClearFilters}
 			/>
 		)

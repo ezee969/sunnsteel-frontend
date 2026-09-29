@@ -158,6 +158,7 @@ function CompareVersionDialog({
 	const t = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
 	const tSchedule = useTranslations('routines.schedule')
+	const tFormat = useTranslations('routines.format')
 	const restore = useRestoreRoutineVersion(routine.id)
 	const { push } = useToast()
 	const title = versionTitle(version, t)
@@ -170,8 +171,9 @@ function CompareVersionDialog({
 				t,
 				tDate,
 				tSchedule,
+				tFormat,
 			),
-		[routine, version.setup, weightUnit, t, tDate, tSchedule],
+		[routine, version.setup, weightUnit, t, tDate, tSchedule, tFormat],
 	)
 	const blocked = restoreBlockedReason({
 		comparison,

@@ -1,6 +1,7 @@
 'use client'
 
 import { Flag, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
@@ -49,6 +50,7 @@ function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
  * rules, and the dashboard does not get its own version of them.
  */
 export default function UpcomingMilestones() {
+	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const { data, isPending, isError, refetch, isFetching } = useAchievements()
 	const milestones = buildUpcomingMilestones(data)
 
@@ -57,7 +59,7 @@ export default function UpcomingMilestones() {
 			id="upcoming-milestones"
 			icon={<Flag className="h-4 w-4 text-ink-3" aria-hidden />}
 			collapsible
-			summary={upcomingMilestonesSummary(milestones)}
+			summary={upcomingMilestonesSummary(milestones, tSummaries)}
 		>
 			{isPending ? (
 				<div

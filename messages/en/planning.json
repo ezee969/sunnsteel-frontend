@@ -1,0 +1,98 @@
+{
+	"emptyStates": {
+		"historyFilteredTitle": "No sessions match these filters",
+		"historyFilteredDescription": "Clear them to see your whole training archive.",
+		"clearFilters": "Clear filters",
+		"historyEmptyTitle": "No workouts logged yet",
+		"historyEmptyDescription": "Finish a session and it is archived here with its sets, volume and notes.",
+		"chooseRoutine": "Choose a routine",
+		"recentNoFinishedTitle": "No finished workouts yet",
+		"recentNoFinishedDescription": "Start a workout from any routine and it will appear here with its volume and duration.",
+		"browseRoutines": "Browse routines",
+		"recentNoRoutinesTitle": "No routines yet",
+		"recentNoRoutinesDescription": "Start from a template or build your own to plan your training and start logging workouts.",
+		"createRoutine": "Create routine",
+		"recordsTitle": "No records yet",
+		"recordsDescription": "Complete a set in any workout and your best lift for each exercise is recorded here."
+	},
+	"dashboardFollowing": {
+		"more": "and {count} more from this workout",
+		"findMembers": "Find members"
+	},
+	"dashboardLayout": {
+		"shownCount": "{shown} of {total} sections shown",
+		"sections": {
+			"this-week": "This Week",
+			"stats": "Training Stats",
+			"recent-activity": "Recent Activity",
+			"personal-records": "Personal Records",
+			"training-insights": "Training Insights",
+			"upcoming-milestones": "Upcoming Milestones",
+			"following": "From Members You Follow"
+		},
+		"movedAnnouncement": "{section} moved to position {position} of {total}."
+	},
+	"dashboardPrimary": {
+		"resumeTitle": "Workout in progress",
+		"resumeDescription": "{workout} is still open. Pick up where you left off.",
+		"resumeDescriptionBare": "Pick up where you left off.",
+		"startTitle": "Today’s Workouts",
+		"startDescription": "{count, plural, one {You have 1 workout planned.} other {You have # workouts planned.}}",
+		"reviewTitle": "Today’s workout is done",
+		"reviewDescription": "{workout} is complete. Review how it went.",
+		"noneTitle": "No workouts scheduled today",
+		"pickDayDescription": "Nothing is planned for {today}. You can still train any day of your routines — it counts the same.",
+		"browseDescription": "You don’t have any routines planned for {today}. Start one from your routines."
+	},
+	"dashboardSummaries": {
+		"latestWorkout": "Latest: {routine} — {day}",
+		"latestWorkoutAgo": "Latest: {routine} — {day}, {timeAgo}",
+		"latestRecord": "Latest: {exercise}",
+		"latestRecordSet": "Latest: {exercise} {set}",
+		"facts": "{count, plural, one {# fact from your recent training} other {# facts from your recent training}}",
+		"next": "Next: {title}",
+		"nextMore": "Next: {title}, and {rest} more"
+	},
+	"plateaus": {
+		"weeks": "{count, plural, one {# week} other {# weeks}}",
+		"days": "{count, plural, one {# day} other {# days}}",
+		"rule": "Lifts trained at least {minSessions} times since their current best, with that best at least {minDaysSinceBest} old and the lift trained in the last {recentDays}, looking back {windowDays}. These are your numbers, not a diagnosis.",
+		"noNewBest": "{count, plural, one {No new best in # session} other {No new best in # sessions}}",
+		"sinceWindow": "in the last {span}; best set on {date}",
+		"sinceBest": "since your best on {date}",
+		"estimateThat": "that estimate",
+		"matched": "matched {estimate}",
+		"shareOf": "{percent}% of {estimate}",
+		"sessionsDefault": "{sessions} sessions (default)",
+		"sessionsOption": "{sessions} sessions",
+		"nothingToCheckTitle": "Nothing to check yet",
+		"nothingToCheckDescription": "Plateau watch needs a lift with a loaded best set that you trained in the last {span}.",
+		"noPlateausTitle": "No plateaus right now",
+		"noPlateausDescription": "{count, plural, one {None of the # lift you trained in the last {span} has gone {minSessions} sessions without a new best.} other {None of the # lifts you trained in the last {span} has gone {minSessions} sessions without a new best.}}",
+		"estimateBest": "the best estimate"
+	},
+	"dashboardInsights": {
+		"sets": "{count, plural, one {# set} other {# sets}}",
+		"weekTotals": "{week}: {sets} · {volume} {unit}",
+		"best": "Best {set} · est. 1RM {estimate}",
+		"closestSince": "closest since {set}",
+		"weekLabel": "Week over week",
+		"weekSubject": "Last two finished weeks",
+		"weekHeld": "Completed sets held at {sets}.",
+		"weekChanged": "Completed sets went from {from} to {to}.",
+		"weekEvidence": "{previous} → {latest}",
+		"closestLabel": "Closest to a new best",
+		"closestStatement": "Best set since: {share}.",
+		"estimateYourBest": "your best estimate",
+		"closestEvidence": "{best} — {closest}",
+		"longestLabel": "Longest without a new best",
+		"longestStatement": "{headline} {since}.",
+		"longestEvidenceExtra": " — {closest}, {share}",
+		"sourcesWithThreshold": "the lifts your plateau watch follows at {minSessions} sessions without a new best",
+		"sourcesPlain": "the lifts your plateau watch follows",
+		"sources": "From your finished training weeks and {scope}. These are your numbers, not a diagnosis.",
+		"emptyTitle": "Nothing to state yet",
+		"emptyDescription": "Facts appear once you have two finished training weeks, or a lift your plateau watch is following.",
+		"openProgress": "Open progress"
+	}
+}

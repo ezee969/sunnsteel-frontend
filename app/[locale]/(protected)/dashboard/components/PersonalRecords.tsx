@@ -1,13 +1,14 @@
 'use client'
 
 import { Trophy } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { personalRecordSummary } from '@/lib/utils/dashboard-summaries'
 import { formatTimeAgo } from '@/lib/utils/date'
-import { PERSONAL_RECORDS_EMPTY_STATE } from '@/lib/utils/empty-states'
+import { getPersonalRecordsEmptyState } from '@/lib/utils/empty-states'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 import { DashboardSection } from './DashboardSection'
@@ -21,6 +22,8 @@ import PersonalRecordItem from './PersonalRecordItem'
  * out of sync.
  */
 export default function PersonalRecords() {
+	const tEmpty = useTranslations('planning.emptyStates')
+	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const { data } = useWorkoutProgress()
 	const weightUnit = useWeightUnit()
 	const records = data?.personalRecords ?? []
@@ -36,10 +39,11 @@ export default function PersonalRecords() {
 				records[0]
 					? `${formatWeight(records[0].weight, weightUnit)} × ${records[0].reps}`
 					: undefined,
+				tSummaries,
 			)}
 		>
 			{records.length === 0 ? (
-				<EmptyModule {...PERSONAL_RECORDS_EMPTY_STATE} />
+				<EmptyModule {...getPersonalRecordsEmptyState(tEmpty)} />
 			) : (
 				records.map((record, index) => (
 					<PersonalRecordItem

@@ -257,6 +257,7 @@ function ReviewTrainingBlockDialog({
 	const tVersions = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
 	const tSchedule = useTranslations('routines.schedule')
+	const tFormat = useTranslations('routines.format')
 	const revisions = useRoutineTrainingBlockRevisions(routine.id, block.id)
 	const [selectedId, setSelectedId] = useState(block.id)
 	const selected =
@@ -271,8 +272,9 @@ function ReviewTrainingBlockDialog({
 				tVersions,
 				tDate,
 				tSchedule,
+				tFormat,
 			),
-		[routine, selected.setup, weightUnit, tVersions, tDate, tSchedule],
+		[routine, selected.setup, weightUnit, tVersions, tDate, tSchedule, tFormat],
 	)
 
 	return (
