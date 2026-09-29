@@ -3,6 +3,7 @@
 import type { RoutineTrainingBlock, WeightUnit } from '@sunsteel/contracts'
 import { RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -39,6 +40,7 @@ export function TrainingBlockComparisonDialog({
 	weightUnit: WeightUnit
 	onClose: () => void
 }) {
+	const t = useTranslations('routines.listing')
 	const comparison = useTrainingBlockComparison(routineId, block.seriesId)
 	const data = comparison.data
 
@@ -48,16 +50,14 @@ export function TrainingBlockComparisonDialog({
 				<DialogHeader>
 					<DialogTitle>Compare {block.name}</DialogTitle>
 					<DialogDescription>
-						{data
-							? describeComparisonScope(data)
-							: 'This block beside the one before it, from the workouts of this routine.'}
+						{data ? describeComparisonScope(data) : t('comparisonNote')}
 					</DialogDescription>
 				</DialogHeader>
 
 				{comparison.isPending ? (
 					<div
 						role="status"
-						aria-label="Loading comparison"
+						aria-label={t('loadingComparison')}
 						className="space-y-3"
 					>
 						<Skeleton className="h-10" />
@@ -70,8 +70,7 @@ export function TrainingBlockComparisonDialog({
 							The comparison is unavailable
 						</p>
 						<p className="type-body-sm mt-1 text-ink-3">
-							{comparison.error?.message ??
-								'We could not read the workouts of these periods. Try again.'}
+							{comparison.error?.message ?? t('comparisonFailed')}
 						</p>
 						<Button
 							type="button"
@@ -93,7 +92,7 @@ export function TrainingBlockComparisonDialog({
 									className="min-w-0"
 								>
 									<dt className="type-label text-ink-3">
-										{period === data.current ? 'This block' : 'Before'}
+										{period === data.current ? t('thisBlock') : t('before')}
 									</dt>
 									<dd className="type-panel text-foreground">
 										{periodName(period)}

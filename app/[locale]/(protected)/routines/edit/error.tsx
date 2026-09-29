@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 
@@ -12,13 +14,14 @@ export default function RoutineEditError({
 	error,
 	reset,
 }: RoutineEditErrorProps) {
+	const t = useTranslations('routines.listing')
 	return (
 		<RouteError
-			title="Edit Routine Error"
+			title={t('editErrorTitle')}
 			description="Failed to load or save routine changes. Your data should be preserved."
 			message={error.message}
 		>
-			<Button onClick={() => reset()}>Retry Edit</Button>
+			<Button onClick={() => reset()}>{t('retryEdit')}</Button>
 			<Button
 				variant="outline"
 				onClick={() => (window.location.href = '/routines')}

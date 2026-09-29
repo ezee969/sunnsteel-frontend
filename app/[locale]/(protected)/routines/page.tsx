@@ -3,6 +3,7 @@
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -14,6 +15,7 @@ import WorkoutsList from './components/WorkoutsList'
 import { WorkoutFilter } from './types'
 
 export default function RoutinesPage() {
+	const t = useTranslations('routines.listing')
 	const router = useRouter()
 	const [activeFilter, setActiveFilter] = useState<WorkoutFilter>('all')
 
@@ -32,8 +34,8 @@ export default function RoutinesPage() {
 	return (
 		<div className="flex flex-col gap-4 sm:gap-6">
 			<HeroSection
-				title={<>Routines</>}
-				subtitle={<>Plan, track, and refine your training.</>}
+				title={<>{t('pageTitle')}</>}
+				subtitle={<>{t('pageSubtitle')}</>}
 			/>
 			{/* TD-54 and design system §20.2: the filters and Create Routine share
 			    one row, pinned while the page scrolls. Its negative top cancels
@@ -50,7 +52,7 @@ export default function RoutinesPage() {
 					<Button asChild className="ml-auto h-11 shrink-0 gap-2 md:h-10">
 						<Link href="/routines/new" prefetch>
 							<Plus className="h-4 w-4" />
-							<span>Create Routine</span>
+							<span>{t('createRoutine')}</span>
 						</Link>
 					</Button>
 				</div>

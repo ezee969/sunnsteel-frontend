@@ -2,6 +2,7 @@
 
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,6 +27,7 @@ export function MemberRoutineView({
 	routineId,
 	profileHref,
 }: MemberRoutineViewProps) {
+	const t = useTranslations('routines.listing')
 	const { data, error, isLoading, refetch } = useMemberRoutine(
 		identifier,
 		routineId,
@@ -41,7 +43,11 @@ export function MemberRoutineView({
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6" aria-busy="true" aria-label="Loading routine">
+			<div
+				className="space-y-6"
+				aria-busy="true"
+				aria-label={t('loadingRoutine')}
+			>
 				<Skeleton className="h-8 w-2/3" />
 				<Skeleton className="h-4 w-1/3" />
 				<Skeleton className="h-24 w-full" />
@@ -55,12 +61,10 @@ export function MemberRoutineView({
 			<div className="space-y-3">
 				{back}
 				<h1 className="type-section text-foreground">
-					{isGone ? 'Routine unavailable' : 'Could not load this routine'}
+					{isGone ? t('routineUnavailable') : t('couldNotLoadRoutine')}
 				</h1>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{isGone
-						? 'It is no longer shared, or it never was.'
-						: 'Check your connection and try again.'}
+					{isGone ? t('noLongerShared') : t('checkConnection')}
 				</p>
 				{!isGone ? (
 					<Button type="button" variant="outline" onClick={() => refetch()}>

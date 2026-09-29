@@ -1,6 +1,7 @@
 'use client'
 
 import { Clock, Heart, LayoutGrid, ListChecks } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	ClassicalIcon,
@@ -8,6 +9,7 @@ import {
 } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/native-select'
+import type { MessageKey } from '@/i18n/translator'
 import { cn } from '@/lib/utils'
 
 import type { WorkoutFilter } from '../types'
@@ -19,9 +21,9 @@ interface WorkoutFiltersProps {
 
 type FilterItem = {
 	id: WorkoutFilter
-	label: string
+	labelKey: MessageKey<'routines.listing'>
 	/** The option's wording in the phone select, where space is short. */
-	shortLabel: string
+	shortLabelKey: MessageKey<'routines.listing'>
 	icon: React.ComponentType<{ className?: string }>
 	classicalName?: ClassicalIconName
 	disabled: boolean
@@ -30,31 +32,31 @@ type FilterItem = {
 const filters: readonly FilterItem[] = [
 	{
 		id: 'all',
-		label: 'All Workout Routines',
-		shortLabel: 'All routines',
+		labelKey: 'filterAllLabel',
+		shortLabelKey: 'filterAllShort',
 		icon: LayoutGrid,
 		classicalName: 'pillar-icon',
 		disabled: false,
 	},
 	{
 		id: 'recent',
-		label: 'Recent',
-		shortLabel: 'Recent',
+		labelKey: 'filterRecentLabel',
+		shortLabelKey: 'filterRecentShort',
 		icon: Clock,
 		classicalName: 'hourglass',
 		disabled: true,
 	},
 	{
 		id: 'favorites',
-		label: 'Favorites',
-		shortLabel: 'Favorites',
+		labelKey: 'filterFavoritesLabel',
+		shortLabelKey: 'filterFavoritesShort',
 		icon: Heart,
 		disabled: false,
 	},
 	{
 		id: 'completed',
-		label: 'Completed',
-		shortLabel: 'Completed',
+		labelKey: 'filterCompletedLabel',
+		shortLabelKey: 'filterCompletedShort',
 		icon: ListChecks,
 		disabled: false,
 	},
@@ -64,13 +66,14 @@ export default function WorkoutFilters({
 	activeFilter,
 	onFilterChange,
 }: WorkoutFiltersProps) {
+	const t = useTranslations('routines.listing')
 	return (
 		<>
 			{/* TD-54: below `lg` the four buttons wrapped to two rows, or pushed
 			    Create Routine onto a row of its own; one select keeps both on a
 			    single line. */}
 			<label htmlFor="routine-filter" className="sr-only">
-				Show
+				{t('show')}
 			</label>
 			<NativeSelect
 				id="routine-filter"
@@ -80,7 +83,7 @@ export default function WorkoutFilters({
 			>
 				{filters.map(filter => (
 					<option key={filter.id} value={filter.id} disabled={filter.disabled}>
-						{filter.shortLabel}
+						{t(filter.shortLabelKey)}
 					</option>
 				))}
 			</NativeSelect>
@@ -105,7 +108,7 @@ export default function WorkoutFilters({
 						) : (
 							<filter.icon className="h-4 w-4 flex-shrink-0" />
 						)}
-						<span className="truncate">{filter.label}</span>
+						<span className="truncate">{t(filter.labelKey)}</span>
 					</Button>
 				))}
 			</div>

@@ -1,5 +1,7 @@
 'use client'
+
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	AlertDialog,
@@ -40,6 +42,7 @@ export default function WorkoutsList({
 	error,
 	filtered = false,
 }: WorkoutsListProps) {
+	const t = useTranslations('routines.listing')
 	const {
 		isDeleteDialogOpen,
 		setIsDeleteDialogOpen,
@@ -120,14 +123,14 @@ export default function WorkoutsList({
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+						<AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete your
 							routine and remove all associated data.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={handleConfirmDelete}
 							disabled={isDeleting}
@@ -139,7 +142,7 @@ export default function WorkoutsList({
 									Deleting...
 								</>
 							) : (
-								'Delete'
+								t('delete')
 							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>
