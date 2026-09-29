@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import type { RoutineWizardData } from '../types'
 import { buildRoutineRequest } from './routine-summary'
 import {
@@ -14,6 +16,9 @@ import {
 	toggleRestDay,
 	wizardDayLabel,
 } from './schedule'
+
+const enPresets = translatorFor('en', 'routines.presets')
+const esPresets = translatorFor('es', 'routines.presets')
 
 const exercise = (exerciseId: string) => ({
 	exerciseId,
@@ -93,7 +98,7 @@ describe('wizard schedule', () => {
 		const [ppl, upperLower] = ROTATION_PRESETS
 		const withPreset = {
 			...rotation,
-			...applyRotationPreset(rotation, upperLower),
+			...applyRotationPreset(rotation, upperLower, enPresets),
 		}
 		expect(
 			withPreset.days.map(d => [d.name, d.exercises[0].exerciseId]),
@@ -101,8 +106,20 @@ describe('wizard schedule', () => {
 			['Upper', 'bench'],
 			['Lower', 'row'],
 		])
-		expect(isRotationPreset(withPreset, upperLower)).toBe(true)
-		expect(isRotationPreset(withPreset, ppl)).toBe(false)
+		expect(isRotationPreset(withPreset, upperLower, enPresets)).toBe(true)
+		expect(isRotationPreset(withPreset, ppl, enPresets)).toBe(false)
+
+		// A preset's day names are the member's own text from then on, so they
+		// arrive in the member's language.
+		const spanish = {
+			...rotation,
+			...applyRotationPreset(rotation, upperLower, esPresets),
+		}
+		expect(spanish.days.map(d => d.name)).toEqual([
+			'Tren superior',
+			'Tren inferior',
+		])
+		expect(isRotationPreset(spanish, upperLower, esPresets)).toBe(true)
 		expect(renameWizardDay(withPreset, 0, 'Upper A').days[0].name).toBe(
 			'Upper A',
 		)

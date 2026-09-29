@@ -1,53 +1,37 @@
 import type { RoutineWizardData } from '../types'
 
+/**
+ * The weekday a control stands for. Its label is looked up from the messages
+ * with `weekdayName` (I18N-01); the number is the stored value.
+ */
 export interface TrainingDayInfo {
 	readonly id: number
-	readonly name: string
-	readonly short: string
 }
 
+export type TrainingSplitKey =
+	'pushPullLegs' | 'pushPullLegsX6' | 'upperLower' | 'fullBody' | 'broSplit'
+
 export interface TrainingSplit {
-	readonly name: string
+	readonly key: TrainingSplitKey
 	readonly days: number[]
-	readonly description: string
 }
 
 export const DAYS_OF_WEEK: readonly TrainingDayInfo[] = [
-	{ id: 0, name: 'Sunday', short: 'Sun' },
-	{ id: 1, name: 'Monday', short: 'Mon' },
-	{ id: 2, name: 'Tuesday', short: 'Tue' },
-	{ id: 3, name: 'Wednesday', short: 'Wed' },
-	{ id: 4, name: 'Thursday', short: 'Thu' },
-	{ id: 5, name: 'Friday', short: 'Fri' },
-	{ id: 6, name: 'Saturday', short: 'Sat' },
+	{ id: 0 },
+	{ id: 1 },
+	{ id: 2 },
+	{ id: 3 },
+	{ id: 4 },
+	{ id: 5 },
+	{ id: 6 },
 ] as const
 
 export const COMMON_SPLITS: readonly TrainingSplit[] = [
-	{
-		name: 'Push/Pull/Legs',
-		days: [1, 3, 5],
-		description: '3-day split: Mon, Wed, Fri',
-	},
-	{
-		name: 'Push/Pull/Legs (x6)',
-		days: [1, 2, 3, 4, 5, 6],
-		description: '6-day split: Mon-Sat (Push, Pull, Legs, Push, Pull, Legs)',
-	},
-	{
-		name: 'Upper/Lower',
-		days: [1, 2, 4, 5],
-		description: '4-day split: Mon, Tue, Thu, Fri',
-	},
-	{
-		name: 'Full Body',
-		days: [1, 3, 5],
-		description: '3-day full body: Mon, Wed, Fri',
-	},
-	{
-		name: 'Bro Split',
-		days: [1, 2, 3, 4, 5],
-		description: '5-day split: Mon-Fri',
-	},
+	{ key: 'pushPullLegs', days: [1, 3, 5] },
+	{ key: 'pushPullLegsX6', days: [1, 2, 3, 4, 5, 6] },
+	{ key: 'upperLower', days: [1, 2, 4, 5] },
+	{ key: 'fullBody', days: [1, 3, 5] },
+	{ key: 'broSplit', days: [1, 2, 3, 4, 5] },
 ] as const
 
 export const isSameTrainingSplit = (
@@ -60,3 +44,13 @@ export const isSameTrainingSplit = (
 
 	return currentDays.every(day => candidateDays.includes(day))
 }
+
+const SPLIT_NAME_KEYS = {
+	pushPullLegs: 'splitPushPullLegsName',
+	pushPullLegsX6: 'splitPushPullLegsX6Name',
+	upperLower: 'splitUpperLowerName',
+	fullBody: 'splitFullBodyName',
+	broSplit: 'splitBroSplitName',
+} as const
+
+export const SPLIT_NAME_KEY_BY_SPLIT = SPLIT_NAME_KEYS

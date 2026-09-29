@@ -15,34 +15,59 @@ import type { RoutineWizardData, RoutineWizardDay } from '../types'
  * order the days are shown. Every helper returns the fields to update.
  */
 
+type PresetTranslator = Translator<'routines.presets'>
+
+/**
+ * A preset is named by its key, never by its English text: its day names are
+ * copied into the draft and become the member's own words from then on, so
+ * they arrive in the member's language (the rule starter templates follow).
+ */
 export interface RotationPreset {
-	readonly name: string
-	readonly days: readonly string[]
-	readonly description: string
+	readonly key: 'pushPullLegs' | 'upperLower' | 'fullBodyAB' | 'upperLowerPPL'
+	readonly dayKeys: readonly PresetDayKey[]
 }
 
+type PresetDayKey =
+	| 'dayPush'
+	| 'dayPull'
+	| 'dayLegs'
+	| 'dayUpper'
+	| 'dayLower'
+	| 'dayFullBodyA'
+	| 'dayFullBodyB'
+
 export const ROTATION_PRESETS: readonly RotationPreset[] = [
+	{ key: 'pushPullLegs', dayKeys: ['dayPush', 'dayPull', 'dayLegs'] },
+	{ key: 'upperLower', dayKeys: ['dayUpper', 'dayLower'] },
+	{ key: 'fullBodyAB', dayKeys: ['dayFullBodyA', 'dayFullBodyB'] },
 	{
-		name: 'Push/Pull/Legs',
-		days: ['Push', 'Pull', 'Legs'],
-		description: '3 days: Push, Pull, Legs',
-	},
-	{
-		name: 'Upper/Lower',
-		days: ['Upper', 'Lower'],
-		description: '2 days: Upper, Lower',
-	},
-	{
-		name: 'Full Body A/B',
-		days: ['Full Body A', 'Full Body B'],
-		description: '2 days: alternate A and B',
-	},
-	{
-		name: 'Upper/Lower/Push/Pull/Legs',
-		days: ['Upper', 'Lower', 'Push', 'Pull', 'Legs'],
-		description: '5 days: Upper, Lower, Push, Pull, Legs',
+		key: 'upperLowerPPL',
+		dayKeys: ['dayUpper', 'dayLower', 'dayPush', 'dayPull', 'dayLegs'],
 	},
 ]
+
+const PRESET_NAME_KEYS = {
+	pushPullLegs: 'pushPullLegsName',
+	upperLower: 'upperLowerName',
+	fullBodyAB: 'fullBodyABName',
+	upperLowerPPL: 'upperLowerPushPullLegsName',
+} as const
+
+/** The preset as a member reads it: its name, its day names and its summary. */
+export function describeRotationPreset(
+	preset: RotationPreset,
+	t: PresetTranslator,
+): { name: string; days: string[]; description: string } {
+	const days = preset.dayKeys.map(key => t(key))
+	return {
+		name: t(PRESET_NAME_KEYS[preset.key]),
+		days,
+		description:
+			preset.key === 'fullBodyAB'
+				? t('fullBodyABDescription')
+				: t('daysWithNames', { count: days.length, days: days.join(', ') }),
+	}
+}
 
 /** Weekdays that rotation days take, in order, when switching to weekly. */
 const WEEKLY_FILL_ORDER = [1, 2, 3, 4, 5, 6, 0]
@@ -171,9 +196,10 @@ export function moveRotationDay(
 export function applyRotationPreset(
 	data: RoutineWizardData,
 	preset: RotationPreset,
+	t: PresetTranslator,
 ): ScheduleUpdate {
 	return asRotation(
-		preset.days.map((name, index) => ({
+		describeRotationPreset(preset, t).days.map((name, index) => ({
 			slot: index,
 			name,
 			exercises: data.days[index]?.exercises ?? [],
@@ -184,11 +210,13 @@ export function applyRotationPreset(
 export function isRotationPreset(
 	data: RoutineWizardData,
 	preset: RotationPreset,
+	t: PresetTranslator,
 ): boolean {
+	const days = describeRotationPreset(preset, t).days
 	return (
 		data.scheduleMode === 'ROTATION' &&
-		data.days.length === preset.days.length &&
-		data.days.every((day, index) => day.name?.trim() === preset.days[index])
+		data.days.length === days.length &&
+		data.days.every((day, index) => day.name?.trim() === days[index])
 	)
 }
 

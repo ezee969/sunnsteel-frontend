@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { weekdayName } from '@/lib/utils/date'
 import { formatDaysPerWeek } from '@/lib/utils/routine-format'
 
 import type { TrainingDayInfo } from '../constants/training-days'
@@ -19,6 +20,7 @@ export const SelectedDaysSummary = ({
 }: SelectedDaysSummaryProps) => {
 	const t = useTranslations('routines.dayCard')
 	const tFormat = useTranslations('routines.format')
+	const tDate = useTranslations('routines.date')
 	return (
 		<div className="bg-muted/50 p-3 md:p-4 rounded-md">
 			<h4 className="type-panel mb-2 text-foreground md:mb-3">
@@ -49,7 +51,7 @@ export const SelectedDaysSummary = ({
 								trainingDays.includes(day.id) ? 'opacity-100' : 'opacity-0',
 							)}
 						>
-							{day.name}
+							{weekdayName(day.id, 'long', tDate)}
 						</Badge>
 					))}
 				</div>
