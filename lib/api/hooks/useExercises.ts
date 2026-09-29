@@ -4,6 +4,7 @@ import type {
 	UpdateCustomExerciseRequest,
 } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 
 import { useToast } from '@/components/ui/toast'
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
@@ -97,6 +98,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 ) {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
+	const t = useTranslations('routines.customExercise')
 	return useMutation<TResult, Error, TVariables>({
 		mutationFn,
 		onSuccess: async () => {
@@ -108,7 +110,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 		onError: error => {
 			push({
 				title: failureTitle,
-				description: describeCustomExerciseError(error.message),
+				description: describeCustomExerciseError(error.message, t),
 			})
 		},
 	})
@@ -143,7 +145,8 @@ export const useArchiveCustomExercise = () =>
 export const useDeleteCustomExercise = () => {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
-	return useMutation<void, Error, string>({
+	const t = useTranslations('routines.customExercise')
+return useMutation<void, Error, string>({
 		mutationFn: exercisesService.deleteCustom,
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: ['exercises'] })
@@ -151,7 +154,7 @@ export const useDeleteCustomExercise = () => {
 		onError: error => {
 			push({
 				title: 'Exercise not deleted',
-				description: describeCustomExerciseError(error.message),
+				description: describeCustomExerciseError(error.message, t),
 			})
 		},
 	})

@@ -1,6 +1,7 @@
 'use client'
 
 import { Archive, ArchiveRestore, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -20,8 +21,8 @@ import {
 } from '@/lib/api/hooks/useExercises'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
-	CUSTOM_EXERCISE_COPY,
-	isArchivedExercise,
+	customExerciseCopy,
+isArchivedExercise,
 } from '@/lib/utils/custom-exercises'
 
 import { CustomExerciseDialog } from './custom-exercise-dialog'
@@ -32,7 +33,8 @@ import { CustomExerciseDialog } from './custom-exercise-dialog'
  * rather than refused on click -- and archiving is the way out otherwise.
  */
 export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
-	const router = useRouter()
+	const copy = customExerciseCopy(useTranslations('routines.customExercise'))
+const router = useRouter()
 	const [editing, setEditing] = useState(false)
 	const [confirmingDelete, setConfirmingDelete] = useState(false)
 	const archive = useArchiveCustomExercise()
@@ -98,10 +100,10 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 			</div>
 			<p className="type-body-sm text-ink-3">
 				{exercise.inUse
-					? CUSTOM_EXERCISE_COPY.inUse
+					? copy.inUse
 					: archived
-						? CUSTOM_EXERCISE_COPY.deleteDescription
-						: CUSTOM_EXERCISE_COPY.archiveDescription}
+						? copy.deleteDescription
+						: copy.archiveDescription}
 			</p>
 
 			<CustomExerciseDialog
@@ -119,7 +121,7 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete {exercise.name}?</AlertDialogTitle>
 						<AlertDialogDescription>
-							{CUSTOM_EXERCISE_COPY.deleteDescription} Nothing uses it now, so
+							{copy.deleteDescription} Nothing uses it now, so
 							nothing else changes.
 						</AlertDialogDescription>
 					</AlertDialogHeader>

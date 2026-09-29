@@ -36,8 +36,8 @@ import {
 } from '@/lib/api/hooks/useExercises'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
-	CUSTOM_EXERCISE_COPY,
-	type CustomExerciseDraft,
+	customExerciseCopy,
+type CustomExerciseDraft,
 	customExerciseDraftProblem,
 	type CustomExerciseField,
 	customExerciseInput,
@@ -142,7 +142,9 @@ function CustomExerciseForm({
 	onSaved?: (exercise: Exercise) => void
 }) {
 	const tMuscles = useTranslations('routines.muscles')
-	const tEquipment = useTranslations('routines.equipment')
+	const tCustom = useTranslations('routines.customExercise')
+	const copy = customExerciseCopy(tCustom)
+const tEquipment = useTranslations('routines.equipment')
 	const [draft, setDraft] = useState<CustomExerciseDraft>(() =>
 		exercise
 			? draftFromExercise(exercise)
@@ -161,8 +163,8 @@ function CustomExerciseForm({
 	const problemId = useId()
 
 	const problem = useMemo(
-		() => customExerciseDraftProblem(draft, exercises, exercise?.id),
-		[draft, exercises, exercise?.id],
+		() => customExerciseDraftProblem(draft, exercises, tCustom, exercise?.id),
+[draft, exercises, exercise?.id, tCustom],
 	)
 	const shownProblem = attempted ? problem : null
 	const problemFor = (field: CustomExerciseField) =>
@@ -196,12 +198,12 @@ function CustomExerciseForm({
 			<DialogHeader>
 				<DialogTitle>
 					{exercise
-						? CUSTOM_EXERCISE_COPY.editTitle
-						: CUSTOM_EXERCISE_COPY.createTitle}
+						? copy.editTitle
+						: copy.createTitle}
 				</DialogTitle>
 				<DialogDescription>
-					{CUSTOM_EXERCISE_COPY.description}
-					{exercise ? ` ${CUSTOM_EXERCISE_COPY.editNote}` : ''}
+					{copy.description}
+					{exercise ? ` ${copy.editNote}` : ''}
 				</DialogDescription>
 			</DialogHeader>
 
@@ -330,7 +332,7 @@ function CustomExerciseForm({
 						}
 					/>
 					<p id={noteCountId} className="type-body-sm text-ink-3">
-						{CUSTOM_EXERCISE_COPY.noteHint}{' '}
+						{copy.noteHint}{' '}
 						{remainingCharacters(draft.note, CUSTOM_EXERCISE_NOTE_MAX)}
 					</p>
 				</div>

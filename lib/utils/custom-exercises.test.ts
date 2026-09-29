@@ -1,3 +1,4 @@
+import { translatorFor } from '@/i18n/translator'
 import { describe, expect, it } from 'vitest'
 
 import type { Exercise } from '@/lib/api/types/exercise.type'
@@ -51,6 +52,8 @@ const oldOne = exercise({
 	archivedAt: '2026-09-20T00:00:00.000Z',
 })
 const all = [bench, landmine, oldOne]
+const en = translatorFor('en', 'routines.customExercise')
+const es = translatorFor('es', 'routines.customExercise')
 
 const valid = () => ({
 	...emptyCustomExerciseDraft('Zercher Squat'),
@@ -109,33 +112,42 @@ describe('the custom exercise draft (EXER-06)', () => {
 
 	it('names the field of the first problem', () => {
 		expect(
-			customExerciseDraftProblem({ ...valid(), name: ' ' }, all)?.field,
+			customExerciseDraftProblem({ ...valid(), name: ' ' }, all, en)?.field,
 		).toBe('name')
 		expect(
-			customExerciseDraftProblem({ ...valid(), primaryMuscles: [] }, all)
-				?.field,
+			customExerciseDraftProblem({ ...valid(), primaryMuscles: [] }, all, en)
+?.field,
 		).toBe('primaryMuscles')
 		expect(
-			customExerciseDraftProblem({ ...valid(), equipmentRequired: [] }, all)
-				?.field,
+			customExerciseDraftProblem({ ...valid(), equipmentRequired: [] }, all, en)
+?.field,
 		).toBe('equipmentRequired')
-		expect(customExerciseDraftProblem(valid(), all)).toBeNull()
+		expect(customExerciseDraftProblem(valid(), all, en)).toBeNull()
 	})
 
 	it('refuses a name the catalog or the member already has, but not its own', () => {
 		expect(
-			customExerciseDraftProblem({ ...valid(), name: 'bench  press' }, all),
+			customExerciseDraftProblem({ ...valid(), name: 'bench  press' }, all, en),
 		).toEqual({
 			field: 'name',
 			message:
 				'You already have an exercise by that name, or the catalog does.',
 		})
 		expect(
-			customExerciseDraftProblem({ ...valid(), name: 'old press' }, all)?.field,
+			customExerciseDraftProblem({ ...valid(), name: 'old press' }, all, en)?.field,
 		).toBe('name')
 		expect(
-			customExerciseDraftProblem(draftFromExercise(landmine), all, 'c1'),
+			customExerciseDraftProblem(draftFromExercise(landmine), all, en, 'c1'),
 		).toBeNull()
+	})
+
+	it('words the problems in Spanish (I18N-03)', () => {
+		expect(
+			customExerciseDraftProblem({ ...valid(), name: ' ' }, all, es)?.message,
+		).toBe('Ponle un nombre al ejercicio.')
+		expect(describeCustomExerciseError('', es)).toBe(
+			'No se guardó el ejercicio. Inténtalo de nuevo en un momento.',
+		)
 	})
 
 	it('sends an empty note as none', () => {
@@ -147,9 +159,10 @@ describe('the custom exercise draft (EXER-06)', () => {
 		expect(
 			describeCustomExerciseError(
 				'NAME_TAKEN: you already have an exercise by that name, or the catalog does',
-			),
+en,
+),
 		).toBe('You already have an exercise by that name, or the catalog does.')
-		expect(describeCustomExerciseError('')).toBe(
+		expect(describeCustomExerciseError('', en)).toBe(
 			'The exercise was not saved. Try again in a moment.',
 		)
 	})
