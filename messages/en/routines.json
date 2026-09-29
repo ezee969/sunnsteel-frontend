@@ -615,7 +615,10 @@
 		"decreaseRir": "Decrease RIR",
 		"rir": "RIR",
 		"increaseRir": "Increase RIR",
-		"unknownExercise": "Unknown Exercise"
+		"unknownExercise": "Unknown Exercise",
+		"viewNote": "View Note",
+		"exerciseNote": "Exercise Note",
+		"warmUpsFollow": "Warm-ups follow the working weight"
 	},
 	"presets": {
 		"dayPush": "Push",
@@ -704,7 +707,13 @@
 		"noLinks": "No links yet. A link is the only way to show this routine to someone without an account.",
 		"linkCopied": "Link copied",
 		"couldNotCopy": "Could not copy the link",
-		"couldNotCopyDetail": "Open it and copy from the address bar instead."
+		"couldNotCopyDetail": "Open it and copy from the address bar instead.",
+		"routineCloned": "Routine cloned",
+		"routineClonedDetail": "{name} is now one of your routines.",
+		"couldNotClone": "Could not clone this routine",
+		"makeItYours": "Make it yours",
+		"cloneAria": "Clone {name}",
+		"cloneThisRoutine": "Clone this routine"
 	},
 	"builder": {
 		"review": "Review",
@@ -741,7 +750,29 @@
 		"dragToReorder": "Drag to reorder",
 		"noTrainingDays": "No training days selected. Go back to select training days first.",
 		"buildYourDays": "Build Your Training Days",
-		"statDaysReady": "Days Ready"
+		"statDaysReady": "Days Ready",
+		"stepBasicInfoTitle": "Basic Info",
+		"stepBasicInfoDescription": "Name and description",
+		"stepTrainingDaysTitle": "Training Days",
+		"stepTrainingDaysDescription": "Select workout days",
+		"stepBuildDaysTitle": "Build Days",
+		"stepBuildDaysDescription": "Add exercises and sets",
+		"stepReviewCreateTitle": "Review & Create",
+		"stepReviewCreateDescription": "Review and save routine",
+		"stepReviewUpdateTitle": "Review & Update",
+		"stepReviewUpdateDescription": "Review and save changes",
+		"designTitle": "Design Your Program",
+		"designSubtitle": "Build days, choose progression, set your path.",
+		"refineTitle": "Refine Your Program",
+		"refineSubtitle": "Adjust days, progressions, and details.",
+		"backToRoutines": "Back to Routines",
+		"createNewRoutine": "Create New Routine",
+		"editRoutine": "Edit Routine",
+		"loadingRoutineData": "Loading routine data",
+		"loadingRoutineDataEllipsis": "Loading routine data...",
+		"errorLoadingRoutine": "Error loading routine",
+		"errorLoadingRoutineBody": "We couldn't load the routine data. Please check your connection and try again.",
+		"tryAgain": "Try Again"
 	},
 	"listing": {
 		"pageTitle": "Routines",

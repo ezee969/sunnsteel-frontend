@@ -99,12 +99,12 @@ export const ExerciseCard = ({
 											</text>
 										</svg>
 									</span>
-									<span className="sr-only">View Note</span>
+									<span className="sr-only">{t('viewNote')}</span>
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
-									<DialogTitle>Exercise Note</DialogTitle>
+									<DialogTitle>{t('exerciseNote')}</DialogTitle>
 								</DialogHeader>
 								<div className="bg-surface-sunk p-4">
 									<p className="text-sm whitespace-pre-wrap">{exercise.note}</p>
@@ -127,7 +127,7 @@ export const ExerciseCard = ({
 						<span>{exercise.progressionScheme.replace(/_/g, ' ')}</span>
 					)}
 					{exercise.warmUpsFollowLoad ? (
-						<span>Warm-ups follow the working weight</span>
+						<span>{t('warmUpsFollow')}</span>
 					) : null}
 				</div>
 			</div>

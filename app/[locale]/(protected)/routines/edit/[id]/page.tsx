@@ -3,7 +3,8 @@
 import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
@@ -43,12 +44,28 @@ import { useCreateRoutine, useRoutine, useUpdateRoutine } from '@/lib/api/hooks'
 import { RoutineDay, RoutineExercise } from '@/lib/api/types'
 import { orderedRoutineDays } from '@/lib/utils/routine-schedule'
 
-const STEPS = [
-	{ id: 1, title: 'Basic Info', description: 'Name and description' },
-	{ id: 2, title: 'Training Days', description: 'Select workout days' },
-	{ id: 3, title: 'Build Days', description: 'Add exercises and sets' },
-	{ id: 4, title: 'Review & Update', description: 'Review and save changes' },
-]
+const STEP_KEYS = [
+	{
+		id: 1,
+		title: 'stepBasicInfoTitle',
+		description: 'stepBasicInfoDescription',
+	},
+	{
+		id: 2,
+		title: 'stepTrainingDaysTitle',
+		description: 'stepTrainingDaysDescription',
+	},
+	{
+		id: 3,
+		title: 'stepBuildDaysTitle',
+		description: 'stepBuildDaysDescription',
+	},
+	{
+		id: 4,
+		title: 'stepReviewUpdateTitle',
+		description: 'stepReviewUpdateDescription',
+	},
+] as const
 
 // Normalize/compatibility mapping for legacy backend values
 // Backend may send 'DYNAMIC' | 'DYNAMIC_DOUBLE'; the wizard uses
@@ -72,6 +89,16 @@ const mapProgressionScheme = (
 }
 
 export default function EditRoutinePage() {
+	const t = useTranslations('routines.builder')
+	const STEPS = useMemo(
+		() =>
+			STEP_KEYS.map(step => ({
+				id: step.id,
+				title: t(step.title),
+				description: t(step.description),
+			})),
+		[t],
+	)
 	const params = useParams<{ id: string }>()
 	const routineId = (params?.id ?? '') as string
 	const router = useRouter()
@@ -200,8 +227,10 @@ export default function EditRoutinePage() {
 		if (isLoading) {
 			return (
 				<div className="flex flex-col items-center justify-center h-64 space-y-4">
-					<ClassicalLoader size="lg" label="Loading routine data" />
-					<p className="type-body-sm text-ink-3">Loading routine data...</p>
+					<ClassicalLoader size="lg" label={t('loadingRoutineData')} />
+					<p className="type-body-sm text-ink-3">
+						{t('loadingRoutineDataEllipsis')}
+					</p>
 				</div>
 			)
 		}
@@ -225,17 +254,16 @@ export default function EditRoutinePage() {
 						</svg>
 					</div>
 					<h3 className="type-section text-foreground">
-						Error loading routine
+						{t('errorLoadingRoutine')}
 					</h3>
 					<p className="text-muted-foreground max-w-md mx-auto">
-						{error.message ||
-							"We couldn't load the routine data. Please check your connection and try again."}
+						{error.message || t('errorLoadingRoutineBody')}
 					</p>
 					<div className="flex justify-center gap-3 mt-4">
 						<Button variant="outline" onClick={() => router.push('/routines')}>
-							Back to Routines
+							{t('backToRoutines')}
 						</Button>
-						<Button onClick={() => router.refresh()}>Try Again</Button>
+						<Button onClick={() => router.refresh()}>{t('tryAgain')}</Button>
 					</div>
 				</div>
 			)
@@ -287,8 +315,8 @@ export default function EditRoutinePage() {
 			{/* Classical Hero */}
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
-				title={<>Refine Your Program</>}
-				subtitle={<>Adjust days, progressions, and details.</>}
+				title={<>{t('refineTitle')}</>}
+				subtitle={<>{t('refineSubtitle')}</>}
 			/>
 			{/* Header */}
 			<div className="mb-8">
@@ -303,7 +331,7 @@ export default function EditRoutinePage() {
 						Back to Routines
 					</Button>
 				</div>
-				<h2 className="type-section text-foreground">Edit Routine</h2>
+				<h2 className="type-section text-foreground">{t('editRoutine')}</h2>
 				<p className="type-body-sm mt-1 text-ink-3">
 					Update your workout routine step by step
 				</p>

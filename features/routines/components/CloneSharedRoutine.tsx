@@ -38,15 +38,17 @@ export function CloneSharedRoutine({
 		clone.mutate(source, {
 			onSuccess: routine => {
 				push({
-					title: 'Routine cloned',
-					description: `${routine.name} is now one of your routines.`,
+					title: tSharing('routineCloned'),
+					description: tSharing('routineClonedDetail', {
+						name: routine.name,
+					}),
 					variant: 'success',
 				})
 				router.push(`/routines/${routine.id}`)
 			},
 			onError: error => {
 				push({
-					title: 'Could not clone this routine',
+					title: tSharing('couldNotClone'),
 					description: error.message,
 					variant: 'destructive',
 				})
@@ -61,7 +63,7 @@ export function CloneSharedRoutine({
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 			>
 				<Copy className="h-4 w-4 text-ink-3" aria-hidden />
-				Make it yours
+				{tSharing('makeItYours')}
 			</h2>
 			<p className="type-body-sm max-w-[68ch] text-ink-2">
 				{cloneRoutineNote(tSharing)}
@@ -73,12 +75,12 @@ export function CloneSharedRoutine({
 				type="button"
 				onClick={run}
 				disabled={clone.isPending}
-				aria-label={`Clone ${routineName}`}
+				aria-label={tSharing('cloneAria', { name: routineName })}
 			>
 				{clone.isPending ? (
 					<Loader2 className="size-4 animate-spin" aria-hidden />
 				) : null}
-				Clone this routine
+				{tSharing('cloneThisRoutine')}
 			</Button>
 		</section>
 	)

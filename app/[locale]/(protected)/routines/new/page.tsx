@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
@@ -46,12 +46,28 @@ const ReviewAndCreate = dynamic(
 	{ loading: () => <WizardStepSkeleton />, ssr: false },
 )
 
-const STEPS = [
-	{ id: 1, title: 'Basic Info', description: 'Name and description' },
-	{ id: 2, title: 'Training Days', description: 'Select workout days' },
-	{ id: 3, title: 'Build Days', description: 'Add exercises and sets' },
-	{ id: 4, title: 'Review & Create', description: 'Review and save routine' },
-]
+const STEP_KEYS = [
+	{
+		id: 1,
+		title: 'stepBasicInfoTitle',
+		description: 'stepBasicInfoDescription',
+	},
+	{
+		id: 2,
+		title: 'stepTrainingDaysTitle',
+		description: 'stepTrainingDaysDescription',
+	},
+	{
+		id: 3,
+		title: 'stepBuildDaysTitle',
+		description: 'stepBuildDaysDescription',
+	},
+	{
+		id: 4,
+		title: 'stepReviewCreateTitle',
+		description: 'stepReviewCreateDescription',
+	},
+] as const
 
 const EMPTY_DRAFT: RoutineWizardData = {
 	name: '',
@@ -74,6 +90,17 @@ export default function CreateRoutinePage() {
 
 function CreateRoutineWizard() {
 	const router = useRouter()
+	const t = useTranslations('routines.builder')
+	const STEPS = useMemo(
+		() =>
+			STEP_KEYS.map(step => ({
+				id: step.id,
+				title: t(step.title),
+				description: t(step.description),
+			})),
+		[t],
+	)
+
 	const tTemplates = useTranslations('routines.templates')
 	const [currentStep, setCurrentStep] = useState(1)
 	const [visitedSteps, setVisitedSteps] = useState(new Set([1])) // Track visited steps
@@ -204,8 +231,8 @@ function CreateRoutineWizard() {
 			{/* Classical Hero */}
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
-				title={<>Design Your Program</>}
-				subtitle={<>Build days, choose progression, set your path.</>}
+				title={<>{t('designTitle')}</>}
+				subtitle={<>{t('designSubtitle')}</>}
 			/>
 			{/* Header */}
 			<div className="mb-4 sm:mb-8">
@@ -217,10 +244,12 @@ function CreateRoutineWizard() {
 						className="flex items-center gap-2 p-2 sm:px-4"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span className="hidden sm:inline">Back to Routines</span>
+						<span className="hidden sm:inline">{t('backToRoutines')}</span>
 					</Button>
 				</div>
-				<h2 className="type-section text-foreground">Create New Routine</h2>
+				<h2 className="type-section text-foreground">
+					{t('createNewRoutine')}
+				</h2>
 				<p className="type-body-sm mt-1 text-ink-3">
 					Build your custom workout routine step by step
 				</p>

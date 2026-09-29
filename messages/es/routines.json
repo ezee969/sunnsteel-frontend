@@ -615,7 +615,10 @@
 		"decreaseRir": "Bajar el RIR",
 		"rir": "RIR",
 		"increaseRir": "Subir el RIR",
-		"unknownExercise": "Ejercicio desconocido"
+		"unknownExercise": "Ejercicio desconocido",
+		"viewNote": "Ver la nota",
+		"exerciseNote": "Nota del ejercicio",
+		"warmUpsFollow": "El calentamiento sigue el peso de trabajo"
 	},
 	"presets": {
 		"dayPush": "Empuje",
@@ -704,7 +707,13 @@
 		"noLinks": "Todavía no hay enlaces. Un enlace es la única forma de mostrarle esta rutina a alguien sin cuenta.",
 		"linkCopied": "Enlace copiado",
 		"couldNotCopy": "No se pudo copiar el enlace",
-		"couldNotCopyDetail": "Ábrelo y cópialo desde la barra de direcciones."
+		"couldNotCopyDetail": "Ábrelo y cópialo desde la barra de direcciones.",
+		"routineCloned": "Rutina clonada",
+		"routineClonedDetail": "{name} ya es una de tus rutinas.",
+		"couldNotClone": "No se pudo clonar esta rutina",
+		"makeItYours": "Házla tuya",
+		"cloneAria": "Clonar {name}",
+		"cloneThisRoutine": "Clonar esta rutina"
 	},
 	"builder": {
 		"review": "Revisar",
@@ -741,7 +750,29 @@
 		"dragToReorder": "Arrastra para reordenar",
 		"noTrainingDays": "No hay días de entrenamiento elegidos. Vuelve atrás para elegirlos primero.",
 		"buildYourDays": "Arma tus días de entrenamiento",
-		"statDaysReady": "Días listos"
+		"statDaysReady": "Días listos",
+		"stepBasicInfoTitle": "Información básica",
+		"stepBasicInfoDescription": "Nombre y descripción",
+		"stepTrainingDaysTitle": "Días de entrenamiento",
+		"stepTrainingDaysDescription": "Elige los días de entrenamiento",
+		"stepBuildDaysTitle": "Arma los días",
+		"stepBuildDaysDescription": "Agrega ejercicios y series",
+		"stepReviewCreateTitle": "Revisar y crear",
+		"stepReviewCreateDescription": "Revisa y guarda la rutina",
+		"stepReviewUpdateTitle": "Revisar y actualizar",
+		"stepReviewUpdateDescription": "Revisa y guarda los cambios",
+		"designTitle": "Diseña tu programa",
+		"designSubtitle": "Arma los días, elige la progresión, traza tu camino.",
+		"refineTitle": "Afina tu programa",
+		"refineSubtitle": "Ajusta días, progresiones y detalles.",
+		"backToRoutines": "Volver a Rutinas",
+		"createNewRoutine": "Crear una rutina nueva",
+		"editRoutine": "Editar la rutina",
+		"loadingRoutineData": "Cargando los datos de la rutina",
+		"loadingRoutineDataEllipsis": "Cargando los datos de la rutina...",
+		"errorLoadingRoutine": "Error al cargar la rutina",
+		"errorLoadingRoutineBody": "No pudimos cargar los datos de la rutina. Revisa tu conexión e inténtalo de nuevo.",
+		"tryAgain": "Reintentar"
 	},
 	"listing": {
 		"pageTitle": "Rutinas",
