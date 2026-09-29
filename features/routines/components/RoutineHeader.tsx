@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowLeft, Check, Edit, Heart } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import type { Routine } from '@/lib/api/types/routine.type'
@@ -31,6 +32,7 @@ export const RoutineHeader = ({
 	onToggleCompleted,
 	isToggling,
 }: RoutineHeaderProps) => {
+	const t = useTranslations('routines.detail')
 	return (
 		<header className="rule-heading pb-4">
 			<div className="flex items-start gap-2">
@@ -38,7 +40,7 @@ export const RoutineHeader = ({
 					variant="ghost"
 					size="sm"
 					onClick={onBack}
-					aria-label="Back to Routines"
+					aria-label={t('backToRoutines')}
 					className="-ml-2 size-11 shrink-0 rounded-sm p-2 text-ink-2 hover:bg-muted hover:text-foreground md:size-9"
 				>
 					<ArrowLeft className="h-4 w-4" aria-hidden />
@@ -50,8 +52,8 @@ export const RoutineHeader = ({
 					</h1>
 					<p className="type-body-sm mt-1 text-ink-3">
 						{routine.scheduleMode === 'ROTATION'
-							? `${daysPerWeek}-day rotation`
-							: `${daysPerWeek} ${daysPerWeek === 1 ? 'day' : 'days'} per week`}
+							? t('rotationDays', { days: daysPerWeek })
+							: t('daysPerWeek', { days: daysPerWeek })}
 					</p>
 					{routine.description && (
 						<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
@@ -74,7 +76,7 @@ export const RoutineHeader = ({
 					<Heart
 						className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-foreground' : ''}`}
 					/>
-					{routine.isFavorite ? 'Unfavorite' : 'Favorite'}
+					{routine.isFavorite ? t('unfavorite') : t('favorite')}
 				</Button>
 
 				<Button
@@ -86,12 +88,12 @@ export const RoutineHeader = ({
 					<Check
 						className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-success' : ''}`}
 					/>
-					{routine.isCompleted ? 'Mark Incomplete' : 'Mark Complete'}
+					{routine.isCompleted ? t('markIncomplete') : t('markComplete')}
 				</Button>
 
 				<Button variant="outline" size="sm" onClick={onEdit}>
 					<Edit className="h-4 w-4 mr-2" />
-					Edit
+					{t('edit')}
 				</Button>
 			</div>
 		</header>

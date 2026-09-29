@@ -1,6 +1,7 @@
 'use client'
 
 import { ROUTINE_DAY_NAME_MAX } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -41,6 +42,7 @@ interface BuildDaysProps {
  * @returns A JSX element containing the training-days builder interface
  */
 export function BuildDays({ data, onUpdate }: BuildDaysProps) {
+	const t = useTranslations('routines.builder')
 	const [expandedMapByDay, setExpandedMapByDay] = useState<
 		Record<number, Record<string, boolean>>
 	>({})
@@ -222,7 +224,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 	if (data.trainingDays.length === 0) {
 		return (
 			<div className="text-center py-8 text-muted-foreground">
-				<p>No training days selected. Go back to select training days first.</p>
+				<p>{t('noTrainingDays')}</p>
 			</div>
 		)
 	}
@@ -231,7 +233,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		<div className="space-y-6">
 			<div>
 				<h3 className="type-section mb-4 text-foreground">
-					Build Your Training Days
+					{t('buildYourDays')}
 					<span className="text-destructive ml-1">*</span>
 				</h3>
 
@@ -241,20 +243,24 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{selectedDayExercisesCount}
 						</div>
-						<div className="type-label mt-1 text-ink-3">Exercises</div>
+						<div className="type-label mt-1 text-ink-3">
+							{t('statExercises')}
+						</div>
 					</div>
 					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{selectedDaySetsCount}
 						</div>
-						<div className="type-label mt-1 text-ink-3">Sets</div>
+						<div className="type-label mt-1 text-ink-3">{t('statSets')}</div>
 					</div>
 					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
 						<div className="text-base font-bold leading-none text-primary sm:text-xl">
 							{data.days.filter(day => day.exercises.length > 0).length}/
 							{data.days.length}
 						</div>
-						<div className="type-label mt-1 text-ink-3">Days Ready</div>
+						<div className="type-label mt-1 text-ink-3">
+							{t('statDaysReady')}
+						</div>
 					</div>
 				</div>
 

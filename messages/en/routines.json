@@ -574,7 +574,25 @@
 		"noExercisesFound": "No exercises found"
 	},
 	"detail": {
-		"routineDays": "Routine Days"
+		"routineDays": "Routine Days",
+		"backToRoutines": "Back to Routines",
+		"rotationDays": "{days}-day rotation",
+		"daysPerWeek": "{days, plural, one {# day per week} other {# days per week}}",
+		"unfavorite": "Unfavorite",
+		"favorite": "Favorite",
+		"markIncomplete": "Mark Incomplete",
+		"markComplete": "Mark Complete",
+		"edit": "Edit",
+		"activeSessionTitle": "Active Session Detected",
+		"activeSessionBody": "You have an active workout session for a different day. Please finish or abandon your current session before starting a new one.",
+		"cancel": "Cancel",
+		"goToActiveSession": "Go to Active Session",
+		"cannotStartTitle": "Cannot Start Workout",
+		"cannotStartBody": "This workout day cannot be started today. Please check the program schedule or try again on the appropriate day.",
+		"ok": "OK",
+		"confirmDayTitle": "Confirm Workout Day",
+		"confirmDayBody": "This workout is scheduled for a different day of the week. Are you sure you want to start it today?",
+		"startAnyway": "Start Anyway"
 	},
 	"setRow": {
 		"removeSet": "Remove set",
@@ -715,6 +733,14 @@
 		"statSets": "Sets",
 		"restTime": "Rest time",
 		"weightIncrement": "Weight Inc. ({unit})",
-		"minimumWeightIncrement": "Minimum weight increment"
+		"minimumWeightIncrement": "Minimum weight increment",
+		"unlinkFromNext": "Unlink from next",
+		"doInRoundsWithNext": "Do in rounds with next",
+		"circuitLimit": "A circuit holds at most {max} exercises.",
+		"reorderExercise": "Reorder exercise",
+		"dragToReorder": "Drag to reorder",
+		"noTrainingDays": "No training days selected. Go back to select training days first.",
+		"buildYourDays": "Build Your Training Days",
+		"statDaysReady": "Days Ready"
 	}
 }

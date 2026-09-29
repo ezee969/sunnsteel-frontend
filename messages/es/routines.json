@@ -574,7 +574,25 @@
 		"noExercisesFound": "No se encontraron ejercicios"
 	},
 	"detail": {
-		"routineDays": "Días de la rutina"
+		"routineDays": "Días de la rutina",
+		"backToRoutines": "Volver a Rutinas",
+		"rotationDays": "Rotación de {days} días",
+		"daysPerWeek": "{days, plural, one {# día por semana} other {# días por semana}}",
+		"unfavorite": "Quitar de favoritas",
+		"favorite": "Favorita",
+		"markIncomplete": "Marcar sin terminar",
+		"markComplete": "Marcar terminada",
+		"edit": "Editar",
+		"activeSessionTitle": "Hay una sesión en curso",
+		"activeSessionBody": "Tienes una sesión de entrenamiento en curso de otro día. Termina o abandona la sesión actual antes de empezar una nueva.",
+		"cancel": "Cancelar",
+		"goToActiveSession": "Ir a la sesión en curso",
+		"cannotStartTitle": "No se puede empezar el entrenamiento",
+		"cannotStartBody": "Este día de entrenamiento no se puede empezar hoy. Revisa el calendario del programa o vuelve a intentarlo el día que corresponde.",
+		"ok": "Aceptar",
+		"confirmDayTitle": "Confirma el día de entrenamiento",
+		"confirmDayBody": "Este entrenamiento está planificado para otro día de la semana. ¿Seguro que quieres empezarlo hoy?",
+		"startAnyway": "Empezar igual"
 	},
 	"setRow": {
 		"removeSet": "Quitar la serie",
@@ -715,6 +733,14 @@
 		"statSets": "Series",
 		"restTime": "Descanso",
 		"weightIncrement": "Incremento ({unit})",
-		"minimumWeightIncrement": "Incremento mínimo de peso"
+		"minimumWeightIncrement": "Incremento mínimo de peso",
+		"unlinkFromNext": "Desvincular del siguiente",
+		"doInRoundsWithNext": "Hacer en rondas con el siguiente",
+		"circuitLimit": "Un circuito tiene como máximo {max} ejercicios.",
+		"reorderExercise": "Reordenar el ejercicio",
+		"dragToReorder": "Arrastra para reordenar",
+		"noTrainingDays": "No hay días de entrenamiento elegidos. Vuelve atrás para elegirlos primero.",
+		"buildYourDays": "Arma tus días de entrenamiento",
+		"statDaysReady": "Días listos"
 	}
 }

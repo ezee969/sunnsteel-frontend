@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -44,25 +46,23 @@ export const WorkoutDialogs = ({
 	onDateConfirm,
 	onDateConfirmClose,
 }: WorkoutDialogsProps) => {
+	const t = useTranslations('routines.detail')
 	return (
 		<>
 			{/* Active Session Conflict Dialog */}
 			<Dialog open={activeConflictOpen} onOpenChange={onActiveConflictClose}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Active Session Detected</DialogTitle>
-						<DialogDescription>
-							You have an active workout session for a different day. Please
-							finish or abandon your current session before starting a new one.
-						</DialogDescription>
+						<DialogTitle>{t('activeSessionTitle')}</DialogTitle>
+						<DialogDescription>{t('activeSessionBody')}</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
 						<Button variant="outline" onClick={onActiveConflictClose}>
-							Cancel
+							{t('cancel')}
 						</Button>
 						{onGoToActiveSession && (
 							<Button onClick={onGoToActiveSession}>
-								Go to Active Session
+								{t('goToActiveSession')}
 							</Button>
 						)}
 					</DialogFooter>
@@ -73,15 +73,12 @@ export const WorkoutDialogs = ({
 			<Dialog open={dateValidationOpen} onOpenChange={onDateValidationClose}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Cannot Start Workout</DialogTitle>
-						<DialogDescription>
-							This workout day cannot be started today. Please check the program
-							schedule or try again on the appropriate day.
-						</DialogDescription>
+						<DialogTitle>{t('cannotStartTitle')}</DialogTitle>
+						<DialogDescription>{t('cannotStartBody')}</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
 						<Button variant="outline" onClick={onDateValidationClose}>
-							OK
+							{t('ok')}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -91,17 +88,14 @@ export const WorkoutDialogs = ({
 			<Dialog open={dateConfirmOpen} onOpenChange={onDateConfirmClose}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Confirm Workout Day</DialogTitle>
-						<DialogDescription>
-							This workout is scheduled for a different day of the week. Are you
-							sure you want to start it today?
-						</DialogDescription>
+						<DialogTitle>{t('confirmDayTitle')}</DialogTitle>
+						<DialogDescription>{t('confirmDayBody')}</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
 						<Button variant="outline" onClick={onDateConfirmClose}>
-							Cancel
+							{t('cancel')}
 						</Button>
-						<Button onClick={onDateConfirm}>Start Anyway</Button>
+						<Button onClick={onDateConfirm}>{t('startAnyway')}</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>

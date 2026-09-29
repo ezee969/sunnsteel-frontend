@@ -9,6 +9,7 @@ import {
 } from '@sunsteel/contracts'
 import { AnimatePresence, Reorder, useDragControls } from 'framer-motion'
 import { GripVertical, Link2, Unlink2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -92,6 +93,7 @@ export function ExerciseList({
 	exercises,
 	isExercisesLoading,
 }: ExerciseListProps) {
+	const t = useTranslations('routines.builder')
 	if (!day || day.exercises.length === 0) {
 		return (
 			<div className="text-center text-sm text-muted-foreground py-8">
@@ -175,12 +177,11 @@ export function ExerciseList({
 												) : (
 													<Link2 className="size-4" aria-hidden />
 												)}
-												{linked ? 'Unlink from next' : 'Do in rounds with next'}
+												{linked ? t('unlinkFromNext') : t('doInRoundsWithNext')}
 											</Button>
 											{!linked && !canLink ? (
 												<span className="type-body-sm text-ink-3">
-													A circuit holds at most {EXERCISE_GROUP_MAX}{' '}
-													exercises.
+													{t('circuitLimit', { max: EXERCISE_GROUP_MAX })}
 												</span>
 											) : null}
 										</div>
@@ -261,6 +262,7 @@ function ReorderableExerciseRow({
 	groupLabel,
 	linkControl,
 }: ReorderableExerciseRowProps) {
+	const t = useTranslations('routines.builder')
 	const dragControls = useDragControls()
 
 	return (
@@ -315,8 +317,8 @@ function ReorderableExerciseRow({
 					dragHandle={
 						<button
 							type="button"
-							aria-label="Reorder exercise"
-							title="Drag to reorder"
+							aria-label={t('reorderExercise')}
+							title={t('dragToReorder')}
 							onPointerDown={e => {
 								e.preventDefault()
 								e.stopPropagation()
