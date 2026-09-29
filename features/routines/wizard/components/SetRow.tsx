@@ -1,9 +1,6 @@
-import {
-	SET_KIND_LABELS,
-	SET_KINDS,
-	type WeightUnit,
-} from '@sunsteel/contracts'
+import { SET_KINDS, type WeightUnit } from '@sunsteel/contracts'
 import { Minus, Plus, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,6 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { setKindLabel } from '@/lib/utils/set-kind-label'
 
 import { useSetRowInputs } from '../hooks/useSetRowInputs'
 import type { ProgressionScheme, RoutineSet, SetField } from '../types'
@@ -101,6 +99,8 @@ export function SetRow({
 	disableRemove,
 	weightLocked,
 }: SetRowProps) {
+	const t = useTranslations('routines.setRow')
+	const tKinds = useTranslations('workout.setKinds')
 	const {
 		minInput,
 		maxInput,
@@ -144,7 +144,7 @@ export function SetRow({
 						variant="ghost"
 						size="sm"
 						onClick={onRemoveSet}
-						aria-label="Remove set"
+						aria-label={t('removeSet')}
 						disabled={disableRemove}
 						className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
 					>
@@ -171,7 +171,7 @@ export function SetRow({
 							<SelectContent>
 								{SET_KINDS.map(kind => (
 									<SelectItem key={kind} value={kind}>
-										{SET_KIND_LABELS[kind]}
+										{setKindLabel(kind, tKinds)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -187,14 +187,14 @@ export function SetRow({
 							disabled={progressionScheme !== 'NONE'}
 						>
 							<SelectTrigger
-								aria-label="Rep type"
+								aria-label={t('repType')}
 								className="w-full h-9 sm:h-8"
 							>
 								<SelectValue className="truncate" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="FIXED">Fixed</SelectItem>
-								<SelectItem value="RANGE">Range</SelectItem>
+								<SelectItem value="FIXED">{t('fixed')}</SelectItem>
+								<SelectItem value="RANGE">{t('range')}</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
@@ -207,7 +207,7 @@ export function SetRow({
 					{/* Reps Column */}
 					<div className="space-y-1 lg:min-w-0">
 						<Label className="lg:hidden">
-							{set.repType === 'FIXED' ? 'Reps' : 'Reps Range'}
+							{set.repType === 'FIXED' ? t('reps') : t('repsRange')}
 						</Label>
 						{set.repType === 'FIXED' ? (
 							<div className="flex items-center gap-2 w-full">
@@ -216,7 +216,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Decrease reps"
+									aria-label={t('decreaseReps')}
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, -1)}
 								>
 									<Minus className="h-3 w-3" />
@@ -226,7 +226,7 @@ export function SetRow({
 									inputMode="numeric"
 									pattern="[0-9]*"
 									autoComplete="off"
-									aria-label="Reps"
+									aria-label={t('reps')}
 									placeholder="0"
 									value={set.reps ?? ''}
 									onChange={event => handleFixedRepsChange(event.target.value)}
@@ -237,7 +237,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Increase reps"
+									aria-label={t('increaseReps')}
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, 1)}
 								>
 									<Plus className="h-3 w-3" />
@@ -252,7 +252,7 @@ export function SetRow({
 											variant="outline"
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
-											aria-label="Decrease minimum reps"
+											aria-label={t('decreaseMinReps')}
 											onClick={() =>
 												onStepRangeReps(exerciseIndex, setIndex, 'minReps', -1)
 											}
@@ -261,7 +261,7 @@ export function SetRow({
 										</Button>
 										<Input
 											type="text"
-											aria-label="Min reps"
+											aria-label={t('minReps')}
 											inputMode="numeric"
 											pattern="[0-9]*"
 											placeholder="Min"
@@ -276,7 +276,7 @@ export function SetRow({
 											variant="outline"
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
-											aria-label="Increase minimum reps"
+											aria-label={t('increaseMinReps')}
 											onClick={() =>
 												onStepRangeReps(exerciseIndex, setIndex, 'minReps', 1)
 											}
@@ -293,7 +293,7 @@ export function SetRow({
 											variant="outline"
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
-											aria-label="Decrease maximum reps"
+											aria-label={t('decreaseMaxReps')}
 											onClick={() =>
 												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', -1)
 											}
@@ -302,7 +302,7 @@ export function SetRow({
 										</Button>
 										<Input
 											type="text"
-											aria-label="Max reps"
+											aria-label={t('maxReps')}
 											inputMode="numeric"
 											pattern="[0-9]*"
 											placeholder="Max"
@@ -317,7 +317,7 @@ export function SetRow({
 											variant="outline"
 											size="icon"
 											className="h-8 w-8 p-0 shrink-0 inline-flex sm:hidden"
-											aria-label="Increase maximum reps"
+											aria-label={t('increaseMaxReps')}
 											onClick={() =>
 												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', 1)
 											}
@@ -346,7 +346,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Decrease weight"
+									aria-label={t('decreaseWeight')}
 									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
 								>
@@ -357,7 +357,7 @@ export function SetRow({
 									inputMode="decimal"
 									pattern="[0-9]*[.]?[0-9]*"
 									autoComplete="off"
-									aria-label="Weight"
+									aria-label={t('weight')}
 									placeholder="0"
 									value={weightInput}
 									onChange={event => handleWeightChange(event.target.value)}
@@ -372,7 +372,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Increase weight"
+									aria-label={t('increaseWeight')}
 									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
 								>
@@ -390,7 +390,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Decrease RIR"
+									aria-label={t('decreaseRir')}
 									onClick={() =>
 										onUpdateSet(
 											exerciseIndex,
@@ -407,7 +407,7 @@ export function SetRow({
 									inputMode="numeric"
 									pattern="[0-9]*"
 									autoComplete="off"
-									aria-label="RIR"
+									aria-label={t('rir')}
 									placeholder="0"
 									value={rirInput}
 									onChange={event => handleRirChange(event.target.value)}
@@ -418,7 +418,7 @@ export function SetRow({
 									variant="outline"
 									size="icon"
 									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label="Increase RIR"
+									aria-label={t('increaseRir')}
 									onClick={() =>
 										onUpdateSet(
 											exerciseIndex,
@@ -441,7 +441,7 @@ export function SetRow({
 						variant="ghost"
 						size="sm"
 						onClick={onRemoveSet}
-						aria-label="Remove set"
+						aria-label={t('removeSet')}
 						disabled={disableRemove}
 						className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
 					>

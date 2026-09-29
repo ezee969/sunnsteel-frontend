@@ -6,9 +6,9 @@ import type {
 	RoutineVersionDay,
 	RoutineVersionExercise,
 	RoutineVersionSetup,
+	SetKind,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { SET_KIND_LABELS } from '@sunsteel/contracts'
 
 import type { Translator } from '@/i18n/translator'
 
@@ -130,14 +130,23 @@ function rirLabel(
 	return values.join(', ')
 }
 
-/** LIVE-12: "2 warm-up, 3 working", in the order the kinds first appear. */
-function kindsLabel(sets: readonly RoutineSet[]): string {
-	const counts = new Map<string, number>()
+/**
+ * LIVE-12: "2 warm-up, 3 working", in the order the kinds first appear. Each
+ * count is its own message rather than a number beside a lowercased label,
+ * because Spanish agrees the word with the count.
+ */
+function kindsLabel(
+	sets: readonly RoutineSet[],
+	t: Translator<'routines.versions'>,
+): string {
+	const counts = new Map<SetKind, number>()
 	for (const set of sets) {
-		const label = SET_KIND_LABELS[set.kind ?? 'WORKING'].toLowerCase()
-		counts.set(label, (counts.get(label) ?? 0) + 1)
+		const kind = set.kind ?? 'WORKING'
+		counts.set(kind, (counts.get(kind) ?? 0) + 1)
 	}
-	return [...counts].map(([label, n]) => `${n} ${label}`).join(', ')
+	return [...counts]
+		.map(([kind, count]) => t(`kind${kind}`, { count }))
+		.join(', ')
 }
 
 function progressionLabel(
@@ -172,8 +181,8 @@ function compareExercise(
 	if (fromScheme !== toScheme) {
 		changes.push(t('exerciseScheme', { name, from: fromScheme, to: toScheme }))
 	}
-	const fromKinds = kindsLabel(current.sets)
-	const toKinds = kindsLabel(target.sets)
+	const fromKinds = kindsLabel(current.sets, t)
+	const toKinds = kindsLabel(target.sets, t)
 	// A plain change in the number of working sets is the scheme line above.
 	const anyNonWorking = [...current.sets, ...target.sets].some(
 		set => (set.kind ?? 'WORKING') !== 'WORKING',

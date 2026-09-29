@@ -1,11 +1,8 @@
 'use client'
 
-import {
-	SET_KIND_LABELS,
-	type SetKind,
-	type WeightUnit,
-} from '@sunsteel/contracts'
+import { type SetKind, type WeightUnit } from '@sunsteel/contracts'
 import { Clock, FileText } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +12,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import { setKindLabel } from '@/lib/utils/set-kind-label'
 import { formatTime } from '@/lib/utils/time'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
@@ -58,6 +56,8 @@ export const ExerciseCard = ({
 	weightUnit,
 	groupLabel,
 }: ExerciseCardProps) => {
+	const t = useTranslations('routines.setRow')
+	const tKinds = useTranslations('workout.setKinds')
 	return (
 		<div className="py-4">
 			{/* ROUT-12: its place in a superset or circuit. */}
@@ -67,7 +67,7 @@ export const ExerciseCard = ({
 			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
 				<div className="flex min-w-0 items-center gap-2">
 					<h4 className="type-panel text-foreground">
-						{exercise.exercise?.name || 'Unknown Exercise'}
+						{exercise.exercise?.name || t('unknownExercise')}
 					</h4>
 					{exercise.note && (
 						<Dialog>
@@ -159,7 +159,7 @@ export const ExerciseCard = ({
 									</span>
 									{set.kind && set.kind !== 'WORKING' ? (
 										<span className="type-body-sm text-ink-3">
-											{SET_KIND_LABELS[set.kind]}
+											{setKindLabel(set.kind, tKinds)}
 										</span>
 									) : null}
 								</li>

@@ -109,7 +109,11 @@
 		"deleting": "Deleting…",
 		"toastDeletedTitle": "{title} deleted",
 		"toastDeletedDescription": "The routine itself did not change.",
-		"toastDeleteFailedTitle": "Version not deleted"
+		"toastDeleteFailedTitle": "Version not deleted",
+		"kindWORKING": "{count, plural, one {# working} other {# working}}",
+		"kindWARMUP": "{count, plural, one {# warm-up} other {# warm-up}}",
+		"kindDROP": "{count, plural, one {# drop} other {# drop}}",
+		"kindOPTIONAL": "{count, plural, one {# optional} other {# optional}}"
 	},
 	"trainingBlocks": {
 		"upcoming": "Upcoming",
@@ -571,5 +575,28 @@
 	},
 	"detail": {
 		"routineDays": "Routine Days"
+	},
+	"setRow": {
+		"removeSet": "Remove set",
+		"repType": "Rep type",
+		"fixed": "Fixed",
+		"range": "Range",
+		"reps": "Reps",
+		"repsRange": "Reps Range",
+		"decreaseReps": "Decrease reps",
+		"increaseReps": "Increase reps",
+		"decreaseMinReps": "Decrease minimum reps",
+		"minReps": "Min reps",
+		"increaseMinReps": "Increase minimum reps",
+		"decreaseMaxReps": "Decrease maximum reps",
+		"maxReps": "Max reps",
+		"increaseMaxReps": "Increase maximum reps",
+		"decreaseWeight": "Decrease weight",
+		"weight": "Weight",
+		"increaseWeight": "Increase weight",
+		"decreaseRir": "Decrease RIR",
+		"rir": "RIR",
+		"increaseRir": "Increase RIR",
+		"unknownExercise": "Unknown Exercise"
 	}
 }

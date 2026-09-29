@@ -3,10 +3,10 @@
 import {
 	routineDayLabel,
 	type RoutineSet,
-	SET_KIND_LABELS,
 	type SharedRoutine,
 } from '@sunsteel/contracts'
 import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
@@ -14,6 +14,7 @@ import {
 	describeSharedRoutineOwner,
 	SHARED_ROUTINE_NOTE,
 } from '@/lib/utils/routine-sharing'
+import { setKindLabel } from '@/lib/utils/set-kind-label'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 /**
@@ -23,6 +24,7 @@ import { formatWeight } from '@/lib/utils/weight-unit'
  */
 export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 	const weightUnit = useWeightUnit()
+	const tKinds = useTranslations('workout.setKinds')
 	const { setup } = routine
 	const exerciseCount = countSharedExercises(routine)
 
@@ -35,7 +37,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 		// not something a reader can actually follow.
 		const kind =
 			set.kind && set.kind !== 'WORKING'
-				? `${SET_KIND_LABELS[set.kind]} · `
+				? `${setKindLabel(set.kind, tKinds)} · `
 				: ''
 		return set.weight
 			? `${kind}${reps} · ${formatWeight(set.weight, weightUnit)}`
