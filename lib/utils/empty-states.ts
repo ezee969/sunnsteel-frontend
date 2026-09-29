@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 /**
  * DASH-10: an empty module names the most useful next step instead of only
  * saying that nothing is there. Copy lives here so every state is testable.
@@ -33,38 +35,45 @@ export function hasActiveHistoryFilters(filters: HistoryFilterState): boolean {
 
 export function getHistoryEmptyState(
 	hasActiveFilters: boolean,
+	t: Translator<'planning.emptyStates'>,
 ): EmptyStateCopy {
 	return hasActiveFilters
 		? {
-				title: 'No sessions match these filters',
-				description: 'Clear them to see your whole training archive.',
-				action: { kind: 'clear-filters', label: 'Clear filters' },
+				title: t('historyFilteredTitle'),
+				description: t('historyFilteredDescription'),
+				action: { kind: 'clear-filters', label: t('clearFilters') },
 			}
 		: {
-				title: 'No workouts logged yet',
-				description:
-					'Finish a session and it is archived here with its sets, volume and notes.',
-				action: { kind: 'link', label: 'Choose a routine', href: '/routines' },
+				title: t('historyEmptyTitle'),
+				description: t('historyEmptyDescription'),
+				action: {
+					kind: 'link',
+					label: t('chooseRoutine'),
+					href: '/routines',
+				},
 			}
 }
 
 export function getRecentActivityEmptyState(
 	hasRoutines: boolean,
+	t: Translator<'planning.emptyStates'>,
 ): EmptyStateCopy {
 	return hasRoutines
 		? {
-				title: 'No finished workouts yet',
-				description:
-					'Start a workout from any routine and it will appear here with its volume and duration.',
-				action: { kind: 'link', label: 'Browse routines', href: '/routines' },
-			}
-		: {
-				title: 'No routines yet',
-				description:
-					'Start from a template or build your own to plan your training and start logging workouts.',
+				title: t('recentNoFinishedTitle'),
+				description: t('recentNoFinishedDescription'),
 				action: {
 					kind: 'link',
-					label: 'Create routine',
+					label: t('browseRoutines'),
+					href: '/routines',
+				},
+			}
+		: {
+				title: t('recentNoRoutinesTitle'),
+				description: t('recentNoRoutinesDescription'),
+				action: {
+					kind: 'link',
+					label: t('createRoutine'),
 					href: '/routines/new',
 				},
 			}
@@ -72,8 +81,11 @@ export function getRecentActivityEmptyState(
 
 // No button of its own: the adjacent Recent Activity module and the primary
 // card above already carry the same action, and repeating it is noise.
-export const PERSONAL_RECORDS_EMPTY_STATE: EmptyStateCopy = {
-	title: 'No records yet',
-	description:
-		'Complete a set in any workout and your best lift for each exercise is recorded here.',
+export function getPersonalRecordsEmptyState(
+	t: Translator<'planning.emptyStates'>,
+): EmptyStateCopy {
+	return {
+		title: t('recordsTitle'),
+		description: t('recordsDescription'),
+	}
 }

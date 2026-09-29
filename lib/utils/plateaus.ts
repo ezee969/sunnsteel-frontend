@@ -8,6 +8,8 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import type { EmptyStateCopy } from './empty-states'
 import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
@@ -17,22 +19,21 @@ import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
  */
 
 type Thresholds = PlateausResponse['thresholds']
+type T = Translator<'planning.plateaus'>
 
-export function formatSpan(days: number): string {
-	if (days % 7 === 0) {
-		const weeks = days / 7
-		return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`
-	}
-	return `${days} ${days === 1 ? 'day' : 'days'}`
+export function formatSpan(days: number, t: T): string {
+	return days % 7 === 0
+		? t('weeks', { count: days / 7 })
+		: t('days', { count: days })
 }
 
-export function describePlateauRule(thresholds: Thresholds): string {
-	return (
-		`Lifts trained at least ${thresholds.minSessions} times since their current best, ` +
-		`with that best at least ${formatSpan(thresholds.minDaysSinceBest)} old and the lift ` +
-		`trained in the last ${formatSpan(thresholds.recentDays)}, looking back ` +
-		`${formatSpan(thresholds.windowDays)}. These are your numbers, not a diagnosis.`
-	)
+export function describePlateauRule(thresholds: Thresholds, t: T): string {
+	return t('rule', {
+		minSessions: thresholds.minSessions,
+		minDaysSinceBest: formatSpan(thresholds.minDaysSinceBest, t),
+		recentDays: formatSpan(thresholds.recentDays, t),
+		windowDays: formatSpan(thresholds.windowDays, t),
+	})
 }
 
 export function formatPlateauSet(set: PlateauSet, unit: WeightUnit): string {
@@ -48,14 +49,15 @@ export function describePlateauCount(
 	plateau: ExercisePlateau,
 	thresholds: Thresholds,
 	formatDate: (iso: string) => string,
+	t: T,
 ): { headline: string; since: string } {
-	const sessions = plateau.sessionsWithoutNewBest
 	const fromWindow = plateau.countedSince > plateau.best.achievedAt
+	const date = formatDate(plateau.best.achievedAt)
 	return {
-		headline: `No new best in ${sessions} ${sessions === 1 ? 'session' : 'sessions'}`,
+		headline: t('noNewBest', { count: plateau.sessionsWithoutNewBest }),
 		since: fromWindow
-			? `in the last ${formatSpan(thresholds.windowDays)}; best set on ${formatDate(plateau.best.achievedAt)}`
-			: `since your best on ${formatDate(plateau.best.achievedAt)}`,
+			? t('sinceWindow', { span: formatSpan(thresholds.windowDays, t), date })
+			: t('sinceBest', { date }),
 	}
 }
 
@@ -65,11 +67,13 @@ export function describePlateauCount(
  */
 export function describeClosestShare(
 	ratio: number,
-	estimate = 'that estimate',
+	t: T,
+	estimate?: string,
 ): string {
+	const target = estimate ?? t('estimateThat')
 	return ratio >= 1
-		? `matched ${estimate}`
-		: `${Math.floor(ratio * 100)}% of ${estimate}`
+		? t('matched', { estimate: target })
+		: t('shareOf', { percent: Math.floor(ratio * 100), estimate: target })
 }
 
 /** PREF-05: every minimum the account may choose, smallest first. */
@@ -78,25 +82,30 @@ export const PLATEAU_SESSION_OPTIONS: readonly number[] = Array.from(
 	(_, index) => PLATEAU_MIN_SESSIONS_MIN + index,
 )
 
-export function getPlateauSessionLabel(sessions: number): string {
+export function getPlateauSessionLabel(sessions: number, t: T): string {
 	return sessions === PLATEAU_MIN_SESSIONS
-		? `${sessions} sessions (default)`
-		: `${sessions} sessions`
+		? t('sessionsDefault', { sessions })
+		: t('sessionsOption', { sessions })
 }
 
 export function getPlateauEmptyState(
 	checkedExercises: number,
 	thresholds: Thresholds,
+	t: T,
 ): EmptyStateCopy {
+	const span = formatSpan(thresholds.recentDays, t)
 	if (checkedExercises === 0) {
 		return {
-			title: 'Nothing to check yet',
-			description: `Plateau watch needs a lift with a loaded best set that you trained in the last ${formatSpan(thresholds.recentDays)}.`,
+			title: t('nothingToCheckTitle'),
+			description: t('nothingToCheckDescription', { span }),
 		}
 	}
-	const lifts = checkedExercises === 1 ? 'lift' : 'lifts'
 	return {
-		title: 'No plateaus right now',
-		description: `None of the ${checkedExercises} ${lifts} you trained in the last ${formatSpan(thresholds.recentDays)} has gone ${thresholds.minSessions} sessions without a new best.`,
+		title: t('noPlateausTitle'),
+		description: t('noPlateausDescription', {
+			count: checkedExercises,
+			span,
+			minSessions: thresholds.minSessions,
+		}),
 	}
 }

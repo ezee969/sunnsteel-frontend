@@ -246,7 +246,11 @@
 	},
 	"format": {
 		"daysPerWeek": "{days, plural, one {# day} other {# days}}/week",
-		"exerciseCount": "{count, plural, one {# exercise} other {# exercises}}"
+		"exerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+		"noSets": "No sets",
+		"sets": "{count, plural, one {# set} other {# sets}}",
+		"scheme": "{count} × {reps}",
+		"schemePerSet": "{sets} · {reps} reps"
 	},
 	"card": {
 		"routineActions": "Routine actions",

@@ -36,20 +36,24 @@ const repsLabel = (set: RoutineSet): string | null => {
  * "3 × 8–12" when every set shares a target, otherwise the per-set targets
  * ("3 sets · 10, 8, 6 reps"), and just the count when a target is missing.
  */
-export function formatSetScheme(sets: readonly RoutineSet[]): string {
-	if (sets.length === 0) return 'No sets'
+export function describeSetScheme(
+	sets: readonly RoutineSet[],
+	t: Translator<'routines.format'>,
+): string {
+	if (sets.length === 0) return t('noSets')
 	const labels = sets.map(repsLabel)
-	const count = `${sets.length} ${sets.length === 1 ? 'set' : 'sets'}`
+	const count = t('sets', { count: sets.length })
 	if (labels.some(label => label === null)) return count
 	return new Set(labels).size === 1
-		? `${sets.length} × ${labels[0]}`
-		: `${count} · ${labels.join(', ')} reps`
+		? t('scheme', { count: sets.length, reps: labels[0] ?? '' })
+		: t('schemePerSet', { sets: count, reps: labels.join(', ') })
 }
 
 export function findRoutineUsages(
 	routines: readonly Routine[],
 	exerciseId: string,
-	t: Translator<'routines.date'>,
+	tDate: Translator<'routines.date'>,
+	tFormat: Translator<'routines.format'>,
 ): RoutineUsage[] {
 	return routines
 		.map(routine => ({
@@ -68,8 +72,10 @@ export function findRoutineUsages(
 						? [
 								{
 									dayId: day.id,
-									dayName: routineDayTitle(day, 'long', t),
-									schemes: slots.map(slot => formatSetScheme(slot.sets)),
+									dayName: routineDayTitle(day, 'long', tDate),
+									schemes: slots.map(slot =>
+										describeSetScheme(slot.sets, tFormat),
+									),
 								},
 							]
 						: []
