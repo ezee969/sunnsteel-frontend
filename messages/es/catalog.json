@@ -1,0 +1,132 @@
+{
+	"exercises": {
+		"Bench Press": "Press de banca",
+		"Incline Bench Press": "Press de banca inclinado",
+		"Dumbbell Bench Press": "Press de banca con mancuernas",
+		"Incline Dumbbell Press": "Press inclinado con mancuernas",
+		"Push-ups": "Flexiones",
+		"Chest Dips": "Fondos para pecho",
+		"Cable Fly": "Aperturas en polea",
+		"Deadlift": "Peso muerto",
+		"Pull-ups": "Dominadas",
+		"Chin-ups": "Dominadas supinas",
+		"Bent-over Row": "Remo inclinado con barra",
+		"Dumbbell Row": "Remo con mancuerna",
+		"T-Bar Row": "Remo en T",
+		"Lat Pulldown": "Jalón al pecho",
+		"Cable Row": "Remo en polea",
+		"Overhead Press": "Press militar",
+		"Dumbbell Shoulder Press": "Press de hombros con mancuernas",
+		"Lateral Raises": "Elevaciones laterales",
+		"Front Raises": "Elevaciones frontales",
+		"Rear Delt Fly": "Aperturas para deltoide posterior",
+		"Upright Row": "Remo al mentón",
+		"Barbell Curl": "Curl con barra",
+		"Dumbbell Curl": "Curl con mancuernas",
+		"Hammer Curl": "Curl martillo",
+		"Preacher Curl": "Curl predicador",
+		"Cable Curl": "Curl en polea",
+		"Close-Grip Bench Press": "Press de banca con agarre cerrado",
+		"Tricep Dips": "Fondos para tríceps",
+		"Overhead Tricep Extension": "Extensión de tríceps sobre la cabeza",
+		"Tricep Pushdown": "Extensión de tríceps en polea",
+		"Diamond Push-ups": "Flexiones diamante",
+		"Squat": "Sentadilla",
+		"Front Squat": "Sentadilla frontal",
+		"Leg Press": "Prensa de piernas",
+		"Leg Extension": "Extensión de cuádriceps",
+		"Bulgarian Split Squat": "Sentadilla búlgara",
+		"Lunges": "Zancadas",
+		"Romanian Deadlift": "Peso muerto rumano",
+		"Leg Curl": "Curl femoral",
+		"Good Morning": "Buenos días",
+		"Stiff Leg Deadlift": "Peso muerto con piernas rígidas",
+		"Hip Thrust": "Hip thrust",
+		"Glute Bridge": "Puente de glúteos",
+		"Sumo Deadlift": "Peso muerto sumo",
+		"Calf Raise": "Elevación de talones",
+		"Seated Calf Raise": "Elevación de talones sentado",
+		"Standing Calf Raise": "Elevación de talones de pie",
+		"Plank": "Plancha",
+		"Crunches": "Abdominales",
+		"Russian Twists": "Giros rusos",
+		"Mountain Climbers": "Escaladores",
+		"Dead Bug": "Dead bug",
+		"Hanging Leg Raise": "Elevación de piernas colgado",
+		"Chest Supported T-Bar Row": "Remo en T con apoyo de pecho",
+		"Neutral Grip Lat Pulldown": "Jalón al pecho con agarre neutro",
+		"Wide Grip Behind-the-Neck Pulldown": "Jalón tras nuca con agarre abierto",
+		"Seated One-Arm Cable Pulldown": "Jalón a una mano en polea, sentado",
+		"One-Arm Cable Pullover": "Pullover a una mano en polea",
+		"Hammer Chest Press": "Press de pecho Hammer",
+		"Incline Cable Fly (Upper Chest Focus)": "Aperturas inclinadas en polea (pecho superior)",
+		"Decline Cable Fly (Lower Chest Focus)": "Aperturas declinadas en polea (pecho inferior)",
+		"Cable Lateral Raises": "Elevaciones laterales en polea",
+		"Dumbbell Lateral Raises": "Elevaciones laterales con mancuernas",
+		"Chest Supported Dumbbell Lateral Raises": "Elevaciones laterales con mancuernas y apoyo de pecho",
+		"Seated AD Press": "Press de deltoide anterior, sentado",
+		"Smith Machine JM Press": "Press JM en máquina Smith",
+		"Overhead Rope Triceps Extension": "Extensión de tríceps con cuerda sobre la cabeza",
+		"One-Arm Overhead Triceps Extension": "Extensión de tríceps a una mano sobre la cabeza",
+		"Seated Cable Triceps Pushdown": "Extensión de tríceps en polea, sentado",
+		"Incline Dumbbell Curl": "Curl inclinado con mancuernas",
+		"One-Arm Machine Preacher Curl": "Curl predicador a una mano en máquina",
+		"One-Arm Bayesian Curl": "Curl bayesiano a una mano",
+		"EZ Bar Reverse Curl": "Curl invertido con barra EZ",
+		"Dumbbell Hammer Curl": "Curl martillo con mancuernas",
+		"Smith Machine Squat": "Sentadilla en máquina Smith",
+		"Hack Squat": "Sentadilla hack",
+		"Seated Leg Curl": "Curl femoral sentado",
+		"Seated Leg Extension": "Extensión de cuádriceps, sentado",
+		"Dumbbell Bulgarian Split Squat": "Sentadilla búlgara con mancuernas",
+		"Chest Supported Dumbbell Shrug": "Encogimientos con mancuernas y apoyo de pecho"
+	},
+	"achievements": {
+		"SESSIONS": {
+			"title": "{threshold, plural, =1 {Primera sesión} other {{count, number} sesiones}}",
+			"description": "Completa {count, number} {threshold, plural, =1 {sesión de entrenamiento} other {sesiones de entrenamiento}}."
+		},
+		"SETS": {
+			"title": "{count, number} series completadas",
+			"description": "Completa {count, number} series registradas."
+		},
+		"VOLUME_KG": {
+			"title": "{count, number} kg movidos",
+			"description": "Acumula {count, number} kg de volumen con carga externa."
+		},
+		"RECORDS": {
+			"title": "{threshold, plural, =1 {Primer récord} other {{count, number} récords}}",
+			"description": "Establece récords en {count, number} {threshold, plural, =1 {ejercicio} other {ejercicios}}."
+		},
+		"STREAK_DAYS": {
+			"title": "Racha de {count, number} días",
+			"description": "Construye una racha de entrenamiento de {count, number} días."
+		}
+	},
+	"ranks": {
+		"INITIATE": {
+			"title": "Iniciado",
+			"description": "Aquí comienza tu lugar en el registro de entrenamiento."
+		},
+		"APPRENTICE": {
+			"title": "Aprendiz",
+			"description": "Aprendiendo el oficio con práctica regular."
+		},
+		"ARTISAN": {
+			"title": "Artesano",
+			"description": "Construyendo una práctica de entrenamiento confiable."
+		},
+		"MAESTRO": {
+			"title": "Maestro",
+			"description": "Sosteniendo un trabajo con propósito durante muchas semanas."
+		},
+		"VIRTUOSO": {
+			"title": "Virtuoso",
+			"description": "Mostrando una disciplina duradera temporada tras temporada."
+		},
+		"LAUREATE": {
+			"title": "Laureado",
+			"description": "Una práctica de entrenamiento duradera, anotada en el registro."
+		}
+	}
+}

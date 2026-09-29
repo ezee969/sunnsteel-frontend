@@ -1,0 +1,132 @@
+{
+	"exercises": {
+		"Bench Press": "Bench Press",
+		"Incline Bench Press": "Incline Bench Press",
+		"Dumbbell Bench Press": "Dumbbell Bench Press",
+		"Incline Dumbbell Press": "Incline Dumbbell Press",
+		"Push-ups": "Push-ups",
+		"Chest Dips": "Chest Dips",
+		"Cable Fly": "Cable Fly",
+		"Deadlift": "Deadlift",
+		"Pull-ups": "Pull-ups",
+		"Chin-ups": "Chin-ups",
+		"Bent-over Row": "Bent-over Row",
+		"Dumbbell Row": "Dumbbell Row",
+		"T-Bar Row": "T-Bar Row",
+		"Lat Pulldown": "Lat Pulldown",
+		"Cable Row": "Cable Row",
+		"Overhead Press": "Overhead Press",
+		"Dumbbell Shoulder Press": "Dumbbell Shoulder Press",
+		"Lateral Raises": "Lateral Raises",
+		"Front Raises": "Front Raises",
+		"Rear Delt Fly": "Rear Delt Fly",
+		"Upright Row": "Upright Row",
+		"Barbell Curl": "Barbell Curl",
+		"Dumbbell Curl": "Dumbbell Curl",
+		"Hammer Curl": "Hammer Curl",
+		"Preacher Curl": "Preacher Curl",
+		"Cable Curl": "Cable Curl",
+		"Close-Grip Bench Press": "Close-Grip Bench Press",
+		"Tricep Dips": "Tricep Dips",
+		"Overhead Tricep Extension": "Overhead Tricep Extension",
+		"Tricep Pushdown": "Tricep Pushdown",
+		"Diamond Push-ups": "Diamond Push-ups",
+		"Squat": "Squat",
+		"Front Squat": "Front Squat",
+		"Leg Press": "Leg Press",
+		"Leg Extension": "Leg Extension",
+		"Bulgarian Split Squat": "Bulgarian Split Squat",
+		"Lunges": "Lunges",
+		"Romanian Deadlift": "Romanian Deadlift",
+		"Leg Curl": "Leg Curl",
+		"Good Morning": "Good Morning",
+		"Stiff Leg Deadlift": "Stiff Leg Deadlift",
+		"Hip Thrust": "Hip Thrust",
+		"Glute Bridge": "Glute Bridge",
+		"Sumo Deadlift": "Sumo Deadlift",
+		"Calf Raise": "Calf Raise",
+		"Seated Calf Raise": "Seated Calf Raise",
+		"Standing Calf Raise": "Standing Calf Raise",
+		"Plank": "Plank",
+		"Crunches": "Crunches",
+		"Russian Twists": "Russian Twists",
+		"Mountain Climbers": "Mountain Climbers",
+		"Dead Bug": "Dead Bug",
+		"Hanging Leg Raise": "Hanging Leg Raise",
+		"Chest Supported T-Bar Row": "Chest Supported T-Bar Row",
+		"Neutral Grip Lat Pulldown": "Neutral Grip Lat Pulldown",
+		"Wide Grip Behind-the-Neck Pulldown": "Wide Grip Behind-the-Neck Pulldown",
+		"Seated One-Arm Cable Pulldown": "Seated One-Arm Cable Pulldown",
+		"One-Arm Cable Pullover": "One-Arm Cable Pullover",
+		"Hammer Chest Press": "Hammer Chest Press",
+		"Incline Cable Fly (Upper Chest Focus)": "Incline Cable Fly (Upper Chest Focus)",
+		"Decline Cable Fly (Lower Chest Focus)": "Decline Cable Fly (Lower Chest Focus)",
+		"Cable Lateral Raises": "Cable Lateral Raises",
+		"Dumbbell Lateral Raises": "Dumbbell Lateral Raises",
+		"Chest Supported Dumbbell Lateral Raises": "Chest Supported Dumbbell Lateral Raises",
+		"Seated AD Press": "Seated AD Press",
+		"Smith Machine JM Press": "Smith Machine JM Press",
+		"Overhead Rope Triceps Extension": "Overhead Rope Triceps Extension",
+		"One-Arm Overhead Triceps Extension": "One-Arm Overhead Triceps Extension",
+		"Seated Cable Triceps Pushdown": "Seated Cable Triceps Pushdown",
+		"Incline Dumbbell Curl": "Incline Dumbbell Curl",
+		"One-Arm Machine Preacher Curl": "One-Arm Machine Preacher Curl",
+		"One-Arm Bayesian Curl": "One-Arm Bayesian Curl",
+		"EZ Bar Reverse Curl": "EZ Bar Reverse Curl",
+		"Dumbbell Hammer Curl": "Dumbbell Hammer Curl",
+		"Smith Machine Squat": "Smith Machine Squat",
+		"Hack Squat": "Hack Squat",
+		"Seated Leg Curl": "Seated Leg Curl",
+		"Seated Leg Extension": "Seated Leg Extension",
+		"Dumbbell Bulgarian Split Squat": "Dumbbell Bulgarian Split Squat",
+		"Chest Supported Dumbbell Shrug": "Chest Supported Dumbbell Shrug"
+	},
+	"achievements": {
+		"SESSIONS": {
+			"title": "{threshold, plural, =1 {First Session} other {{count, number} Sessions}}",
+			"description": "Complete {count, number} {threshold, plural, =1 {training session} other {training sessions}}."
+		},
+		"SETS": {
+			"title": "{count, number} Sets Completed",
+			"description": "Complete {count, number} logged sets."
+		},
+		"VOLUME_KG": {
+			"title": "{count, number} kg Moved",
+			"description": "Accumulate {count, number} kg of external-load volume."
+		},
+		"RECORDS": {
+			"title": "{threshold, plural, =1 {First Record} other {{count, number} Records}}",
+			"description": "Establish records for {count, number} {threshold, plural, =1 {exercise} other {exercises}}."
+		},
+		"STREAK_DAYS": {
+			"title": "{count, number}-Day Streak",
+			"description": "Build a {count, number}-day training streak."
+		}
+	},
+	"ranks": {
+		"INITIATE": {
+			"title": "Initiate",
+			"description": "Your place in the training ledger begins here."
+		},
+		"APPRENTICE": {
+			"title": "Apprentice",
+			"description": "Learning the craft through regular practice."
+		},
+		"ARTISAN": {
+			"title": "Artisan",
+			"description": "Building a dependable training practice."
+		},
+		"MAESTRO": {
+			"title": "Maestro",
+			"description": "Sustaining purposeful work across many weeks."
+		},
+		"VIRTUOSO": {
+			"title": "Virtuoso",
+			"description": "Showing enduring discipline through repeated seasons."
+		},
+		"LAUREATE": {
+			"title": "Laureate",
+			"description": "A lasting training practice recorded in the ledger."
+		}
+	}
+}
