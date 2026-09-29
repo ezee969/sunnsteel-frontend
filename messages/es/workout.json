@@ -25,7 +25,8 @@
 			"successTitle": "Entrenamiento descartado",
 			"successDescription": "Puedes empezar un entrenamiento nuevo cuando quieras.",
 			"errorTitle": "No se pudo descartar el entrenamiento"
-		}
+		},
+		"checkConnection": "Revisa tu conexión e inténtalo de nuevo."
 	},
 	"recap": {
 		"recordLabel": {
@@ -250,7 +251,8 @@
 		"planNoLongerHas": "{plan} ya no tiene este ejercicio, así que solo cambió esta sesión.",
 		"couldNotSwapTitle": "No se pudo cambiar el ejercicio",
 		"backToTitle": "De vuelta a {exercise}",
-		"couldNotSwitchBackTitle": "No se pudo volver al original"
+		"couldNotSwitchBackTitle": "No se pudo volver al original",
+		"optionsAria": "Opciones de ejercicio"
 	},
 	"historyExerciseGroup": {
 		"swappedFrom": "Cambiado desde {name}",
@@ -273,7 +275,8 @@
 		"repsValue": "{count, plural, one {# repetición} other {# repeticiones}}",
 		"repsCaption": "Reps",
 		"weightCaption": "Peso",
-		"rpeCaption": "RPE"
+		"rpeCaption": "RPE",
+		"repsRange": "{min}-{max} reps"
 	},
 	"sessionHeader": {
 		"back": "Atrás",
@@ -346,7 +349,8 @@
 		"saving": "Guardando…",
 		"saved": "Guardado",
 		"unsaved": "Sin guardar",
-		"error": "Error"
+		"error": "Error",
+		"targetRange": "Objetivo: {min}-{max}"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",
@@ -356,7 +360,7 @@
 	},
 	"staleSessionRecovery": {
 		"title": "Recupera tu entrenamiento",
-		"hasNotHadActivity": "{routine} no tiene actividad guardada desde {time}. Elige qué hacer antes de empezar otro entrenamiento.",
+		"hasNotHadActivity": "no tiene actividad guardada desde {time}. Elige qué hacer antes de empezar otro entrenamiento.",
 		"checkingSets": "Revisando series guardadas…",
 		"savedSetCountUnavailable": "No se puede saber cuántas series se guardaron",
 		"setsSaved": "{completed} de {total} series guardadas",
@@ -484,5 +488,11 @@
 	},
 	"loading": {
 		"workoutsAria": "Cargando entrenamientos"
+	},
+	"setKinds": {
+		"WORKING": "Efectiva",
+		"WARMUP": "Calentamiento",
+		"DROP": "Descendente",
+		"OPTIONAL": "Opcional"
 	}
 }

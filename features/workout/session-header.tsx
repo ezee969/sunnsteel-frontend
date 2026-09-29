@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowLeft, ZoomIn, ZoomOut } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
@@ -25,6 +26,7 @@ export const SessionHeader = ({
 	progressData,
 	onNavigateBack,
 }: SessionHeaderProps) => {
+	const t = useTranslations('workout.sessionHeader')
 	const { completedSets, totalSets, percentage } = progressData
 	// LIVE-18: the gym is where larger controls are needed, so the switch is
 	// here as well as in Settings. It is the same device choice, not a mode.
@@ -47,7 +49,7 @@ export const SessionHeader = ({
 							variant="ghost"
 							size="sm"
 							onClick={onNavigateBack}
-							aria-label="Back"
+							aria-label={t('back')}
 							className="-ml-2 size-11 rounded-sm p-2 text-ink-2 hover:bg-muted hover:text-foreground md:size-9"
 						>
 							<ArrowLeft className="h-4 w-4" aria-hidden />
@@ -66,12 +68,12 @@ export const SessionHeader = ({
 					    figures are the scannable rank rather than their captions. */}
 					<div className="flex shrink-0 items-center gap-6">
 						<div className="hidden text-right sm:block">
-							<p className="type-label text-ink-3">Elapsed</p>
+							<p className="type-label text-ink-3">{t('elapsed')}</p>
 							<p className="type-data text-foreground">{duration}</p>
 						</div>
 
 						<div className="hidden text-right sm:block">
-							<p className="type-label text-ink-3">Sets</p>
+							<p className="type-label text-ink-3">{t('sets')}</p>
 							<p className="type-data text-foreground">
 								{completedSets}/{totalSets}
 							</p>
@@ -82,7 +84,7 @@ export const SessionHeader = ({
 						    gold (§4.3 rule 2). */}
 						<div className="text-right">
 							<p className="type-label text-ink-3">
-								{isComplete ? 'Complete' : 'Progress'}
+								{isComplete ? t('complete') : t('progress')}
 							</p>
 							<p
 								className={`type-data type-data-strong ${
@@ -98,9 +100,9 @@ export const SessionHeader = ({
 							variant="ghost"
 							size="icon"
 							aria-pressed={largeControls}
-							aria-label="Larger controls"
+							aria-label={t('largerControlsAria')}
 							title={
-								largeControls ? 'Larger controls: on' : 'Larger controls: off'
+								largeControls ? t('largerControlsOn') : t('largerControlsOff')
 							}
 							className={
 								'size-11 md:size-10 ' +
@@ -122,17 +124,17 @@ export const SessionHeader = ({
 				{/* Mobile stats row */}
 				<div className="mt-3 flex items-center justify-between border-t border-rule-faint pt-2 sm:hidden">
 					<div>
-						<p className="type-label text-ink-3">Elapsed</p>
+						<p className="type-label text-ink-3">{t('elapsed')}</p>
 						<p className="type-data text-foreground">{duration}</p>
 					</div>
 					<div>
-						<p className="type-label text-ink-3">Sets</p>
+						<p className="type-label text-ink-3">{t('sets')}</p>
 						<p className="type-data text-foreground">
 							{completedSets}/{totalSets}
 						</p>
 					</div>
 					<div className="text-right">
-						<p className="type-label text-ink-3">Started</p>
+						<p className="type-label text-ink-3">{t('started')}</p>
 						<p className="type-data text-foreground">{formatTime(startedAt)}</p>
 					</div>
 				</div>

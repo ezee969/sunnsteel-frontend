@@ -10,6 +10,7 @@ import {
 	NotebookPen,
 	Plus,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -102,6 +103,7 @@ export const ExerciseGroup = ({
 	roundLine,
 	upNext,
 }: ExerciseGroupProps) => {
+	const t = useTranslations('workout.exerciseGroup')
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
 	const required = sets.filter(set => requiredToFinish(set.kind))
@@ -175,24 +177,24 @@ export const ExerciseGroup = ({
 								{exerciseName}
 							</h3>
 							<p className="type-data mt-0.5 text-ink-3">
-								{completedSets}/{totalSets} sets
+								{t('setsCount', { completed: completedSets, total: totalSets })}
 							</p>
 							{upNext ? (
 								<p className="type-body-sm text-foreground">{upNext}</p>
 							) : null}
 							{substitutedFrom ? (
 								<p className="type-body-sm line-clamp-1 text-ink-3">
-									Swapped from {substitutedFrom}
+									{t('swappedFrom', { name: substitutedFrom })}
 								</p>
 							) : null}
 							{instruction ? (
 								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-3">
-									Routine note: {instruction}
+									{t('routineNote', { note: instruction })}
 								</p>
 							) : null}
 							{sessionNote ? (
 								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-2">
-									Your note: {sessionNote}
+									{t('yourNote', { note: sessionNote })}
 								</p>
 							) : null}
 						</div>
@@ -208,7 +210,7 @@ export const ExerciseGroup = ({
 										type="button"
 										variant="ghost"
 										size="icon"
-										aria-label={`More for ${exerciseName}`}
+										aria-label={t('moreForAria', { exercise: exerciseName })}
 										onClick={event => event.stopPropagation()}
 									>
 										<MoreHorizontal className="size-5" aria-hidden />
@@ -218,18 +220,18 @@ export const ExerciseGroup = ({
 									{onSwapRequest ? (
 										<DropdownMenuItem onSelect={() => onSwapRequest()}>
 											<ArrowLeftRight aria-hidden />
-											Swap exercise
+											{t('swapExercise')}
 										</DropdownMenuItem>
 									) : null}
 									{calculatorTarget ? (
 										<DropdownMenuItem onSelect={() => setOpenTool('plates')}>
 											<Calculator aria-hidden />
-											Calculate plates
+											{t('calculatePlates')}
 										</DropdownMenuItem>
 									) : null}
 									<DropdownMenuItem onSelect={() => setOpenTool('note')}>
 										<NotebookPen aria-hidden />
-										{sessionNote ? 'Edit note' : 'Add note'}
+										{sessionNote ? t('editNote') : t('addNote')}
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
@@ -259,8 +261,8 @@ export const ExerciseGroup = ({
 									variant="ghost"
 									size="icon"
 									className="size-11 md:size-10"
-									aria-label={`Swap ${exerciseName}`}
-									title="Swap exercise"
+									aria-label={t('swapAria', { exercise: exerciseName })}
+									title={t('swapTitle')}
 									onClick={event => {
 										event.stopPropagation()
 										onSwapRequest()
@@ -291,7 +293,7 @@ export const ExerciseGroup = ({
 					)}
 
 					{isComplete && (
-						<span className="type-label text-success">Complete</span>
+						<span className="type-label text-success">{t('complete')}</span>
 					)}
 				</div>
 			</div>
@@ -352,11 +354,11 @@ export const ExerciseGroup = ({
 							variant="ghost"
 							size="sm"
 							className="type-body-sm h-11 px-2 text-ink-2 md:h-8"
-							aria-label={`Add a set to ${exerciseName}`}
+							aria-label={t('addSetAria', { exercise: exerciseName })}
 							onClick={addSet}
 						>
 							<Plus className="h-4 w-4" aria-hidden />
-							Add set
+							{t('addSet')}
 						</Button>
 					) : null}
 				</div>

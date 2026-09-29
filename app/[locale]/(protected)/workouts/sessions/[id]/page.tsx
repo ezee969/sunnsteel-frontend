@@ -2,6 +2,7 @@
 
 import { routineDayLabel } from '@sunsteel/contracts'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
@@ -72,6 +73,9 @@ const BACK_BUTTON_CLASS =
  * @returns The React element tree for the active session UI.
  */
 export default function ActiveSessionPage() {
+	const t = useTranslations('workout.sessionPage')
+	const tRounds = useTranslations('workout.rounds')
+	const tPrescription = useTranslations('workout.prescription')
 	const params = useParams<{ id: string | string[] }>()
 	const router = useRouter()
 	const idParam = Array.isArray(params.id) ? params.id[0] : params.id
@@ -164,15 +168,15 @@ export default function ActiveSessionPage() {
 				{
 					onError: error =>
 						push({
-							title: 'Could not remove the set',
+							title: t('couldNotRemoveSetTitle'),
 							description:
-								error instanceof Error ? error.message : 'Try again.',
+								error instanceof Error ? error.message : t('tryAgain'),
 							variant: 'destructive',
 						}),
 				},
 			)
 		},
-		[deleteSetLog, push],
+		[deleteSetLog, push, t],
 	)
 
 	const handleBack = useCallback(() => {
@@ -230,12 +234,12 @@ export default function ActiveSessionPage() {
 		return (
 			<div className={SHELL_CLASS}>
 				<div className="ledger-page space-y-4 py-16 text-center">
-					<h1 className="type-page text-destructive">Error Loading Session</h1>
+					<h1 className="type-page text-destructive">{t('errorTitle')}</h1>
 					<p className="text-ink-2">
-						{error.message || 'Failed to load workout session'}
+						{error.message || t('failedToLoadSession')}
 					</p>
 					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
-						Go Back
+						{t('goBack')}
 					</button>
 				</div>
 			</div>
@@ -247,13 +251,10 @@ export default function ActiveSessionPage() {
 		return (
 			<div className={SHELL_CLASS}>
 				<div className="ledger-page space-y-4 py-16 text-center">
-					<h1 className="type-page">Session Not Found</h1>
-					<p className="text-ink-2">
-						The workout session you&apos;re looking for doesn&apos;t exist or
-						has been deleted.
-					</p>
+					<h1 className="type-page">{t('sessionNotFoundTitle')}</h1>
+					<p className="text-ink-2">{t('sessionNotFoundBody')}</p>
 					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
-						Go Back
+						{t('goBack')}
 					</button>
 				</div>
 			</div>
@@ -264,12 +265,10 @@ export default function ActiveSessionPage() {
 		return (
 			<div className={SHELL_CLASS}>
 				<div className="ledger-page space-y-4 py-16 text-center">
-					<h1 className="type-page">Day Not Found</h1>
-					<p className="text-ink-2">
-						The routine day associated with this session could not be found.
-					</p>
+					<h1 className="type-page">{t('dayNotFoundTitle')}</h1>
+					<p className="text-ink-2">{t('dayNotFoundBody')}</p>
 					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
-						Go Back
+						{t('goBack')}
 					</button>
 				</div>
 			</div>
@@ -280,7 +279,7 @@ export default function ActiveSessionPage() {
 		<div className={SHELL_CLASS}>
 			{/* Header */}
 			<SessionHeader
-				routineName={sessionRoutineTitle(session)}
+				routineName={sessionRoutineTitle(session, tPrescription)}
 				dayName={routineDayLabel(day)}
 				startedAt={session.startedAt}
 				progressData={progressData}
@@ -297,7 +296,7 @@ export default function ActiveSessionPage() {
 				{/* Action Card */}
 				<SessionActionCard
 					sessionId={session.id}
-					routineName={sessionRoutineTitle(session)}
+					routineName={sessionRoutineTitle(session, tPrescription)}
 					dayName={routineDayLabel(day)}
 					startedAt={session.startedAt}
 					progressData={progressData}
@@ -313,7 +312,7 @@ export default function ActiveSessionPage() {
 						className="type-label border-l-2 border-warning-strong bg-surface-sunk px-3 py-2 text-ink-2"
 						role="status"
 					>
-						Previous performance is temporarily unavailable.
+						{t('previousPerformanceUnavailable')}
 					</p>
 				) : null}
 
@@ -347,11 +346,13 @@ export default function ActiveSessionPage() {
 								onSave={handleSaveSetLog}
 								previousSets={previousSets}
 								roundLine={
-									status ? `${status.label} · ${describeRound(status)}` : null
+									status
+										? `${status.label} · ${describeRound(status, tRounds)}`
+										: null
 								}
 								upNext={
 									status && upNext?.exerciseId === group.exerciseId
-										? describeUpNext(upNext)
+										? describeUpNext(upNext, tRounds)
 										: null
 								}
 								onSetCompleted={setNumber => {
@@ -411,10 +412,10 @@ export default function ActiveSessionPage() {
 						id="workout-note-heading"
 						className="type-section rule-heading pb-2 text-foreground"
 					>
-						Workout Note
+						{t('workoutNoteHeading')}
 					</h2>
 					<p className="type-body-sm max-w-[68ch] whitespace-pre-line text-ink-2">
-						{session.notes?.trim() || 'Nothing noted for this workout yet.'}
+						{session.notes?.trim() || t('noNoteYet')}
 					</p>
 					<WorkoutNoteButton
 						sessionId={session.id}
@@ -425,10 +426,10 @@ export default function ActiveSessionPage() {
 				{/* Empty state */}
 				{groupedLogs.length === 0 && (
 					<div className="border-t border-rule py-16 text-center">
-						<h3 className="type-section text-foreground">No Exercises Found</h3>
-						<p className="mt-4 text-sm text-ink-2">
-							This workout session doesn&apos;t have any exercises to log.
-						</p>
+						<h3 className="type-section text-foreground">
+							{t('noExercisesTitle')}
+						</h3>
+						<p className="mt-4 text-sm text-ink-2">{t('noExercisesBody')}</p>
 					</div>
 				)}
 			</div>
@@ -451,7 +452,7 @@ export default function ActiveSessionPage() {
 					if (finishStatus) executeFinish(finishStatus)
 				}}
 				progressData={progressData}
-				routineName={sessionRoutineTitle(session)}
+				routineName={sessionRoutineTitle(session, tPrescription)}
 				isFinishing={isFinishing}
 				status={finishStatus}
 			/>

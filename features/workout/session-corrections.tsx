@@ -141,7 +141,6 @@ export function SessionCorrectionEditor({
 	onDone: () => void
 }) {
 	const t = useTranslations('workout.corrections')
-	const locale = useLocale()
 	const { push } = useToast()
 	const correct = useCorrectSession(sessionId)
 	const logs = useMemo(

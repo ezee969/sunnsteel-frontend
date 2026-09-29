@@ -21,7 +21,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
 import { useUpdateSessionNotes } from '@/lib/api/hooks/useWorkoutSession'
-import { exerciseNoteLabel, remainingCharacters } from '@/lib/utils/session-notes'
+import {
+	exerciseNoteLabel,
+	remainingCharacters,
+} from '@/lib/utils/session-notes'
 
 function NoteDialog({
 	open,
@@ -63,9 +66,7 @@ function NoteDialog({
 				</DialogHeader>
 				{instruction ? (
 					<div className="space-y-1">
-						<p className="type-body-sm text-ink-3">
-							{t('routineNoteCaption')}
-						</p>
+						<p className="type-body-sm text-ink-3">{t('routineNoteCaption')}</p>
 						<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
 							{instruction}
 						</p>

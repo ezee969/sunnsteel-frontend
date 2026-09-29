@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowLeft } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -19,11 +20,12 @@ interface HistorySessionHeaderProps {
  * the global element rule, with the summary in a boxed card below it (TD-31).
  */
 export function HistorySessionHeader({
-	title = 'Workout Session',
+	title,
 	metrics,
 	onBack,
 	showSummary = true,
 }: HistorySessionHeaderProps) {
+	const t = useTranslations('workout.historySessionHeader')
 	return (
 		<header className="rule-heading pb-4">
 			<div className="flex items-start gap-2">
@@ -31,7 +33,7 @@ export function HistorySessionHeader({
 					variant="ghost"
 					size="sm"
 					onClick={onBack}
-					aria-label="Back"
+					aria-label={t('back')}
 					className="-ml-2 size-11 shrink-0 rounded-sm p-2 text-ink-2 hover:bg-muted hover:text-foreground md:size-9"
 				>
 					<ArrowLeft className="h-4 w-4" aria-hidden />
@@ -39,7 +41,7 @@ export function HistorySessionHeader({
 				<div className="min-w-0 pt-1.5 md:pt-0.5">
 					{/* Wraps rather than truncating (§11.11). */}
 					<h1 className="type-page corner-brackets inline-block text-foreground">
-						{title}
+						{title ?? t('defaultTitle')}
 					</h1>
 					<p className="type-body-sm mt-1 text-ink-3">
 						{metrics.dayLabel} · {metrics.dateLabel}
@@ -63,25 +65,25 @@ export function HistorySessionHeader({
 								metrics.statusLabel === 'ABORTED' && 'mark-warning',
 							)}
 						>
-							<dt className="type-body-sm text-ink-3">Status</dt>
+							<dt className="type-body-sm text-ink-3">{t('status')}</dt>
 							<dd className="type-label mt-0.5 text-foreground">
 								{metrics.statusLabel}
 							</dd>
 						</div>
 						<div className="mark pl-3">
-							<dt className="type-body-sm text-ink-3">Duration</dt>
+							<dt className="type-body-sm text-ink-3">{t('duration')}</dt>
 							<dd className="type-data mt-0.5 text-foreground">
 								{metrics.durationLabel}
 							</dd>
 						</div>
 						<div className="mark pl-3">
-							<dt className="type-body-sm text-ink-3">Completed sets</dt>
+							<dt className="type-body-sm text-ink-3">{t('completedSets')}</dt>
 							<dd className="type-data mt-0.5 text-foreground">
 								{metrics.completedSets}
 							</dd>
 						</div>
 						<div className="mark pl-3">
-							<dt className="type-body-sm text-ink-3">Volume</dt>
+							<dt className="type-body-sm text-ink-3">{t('volume')}</dt>
 							<dd className="type-data mt-0.5 text-foreground">
 								{metrics.totalVolumeLabel}
 							</dd>

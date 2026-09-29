@@ -1,5 +1,5 @@
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
@@ -104,9 +104,7 @@ export const useSessionManagement = ({
 						push({
 							title: copy.errorTitle,
 							description:
-								error instanceof Error
-									? error.message
-									: 'Please check your connection and try again.',
+								error instanceof Error ? error.message : t('checkConnection'),
 						})
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)
@@ -115,7 +113,7 @@ export const useSessionManagement = ({
 				},
 			)
 		},
-		[finishSession, push, router],
+		[finishSession, push, router, t],
 	)
 
 	/**

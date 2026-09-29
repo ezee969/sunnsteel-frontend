@@ -45,9 +45,7 @@ describe('the correction window is stated, or says why it closed', () => {
 		expect(describeClosedReason('LATER_SESSION', en)).toContain(
 			'another workout',
 		)
-		expect(describeClosedReason('LIMIT_REACHED', en)).toContain(
-			'as many times',
-		)
+		expect(describeClosedReason('LIMIT_REACHED', en)).toContain('as many times')
 		expect(describeClosedReason('NOT_LATEST', en)).toBeNull()
 		expect(describeClosedReason('NOT_COMPLETED', en)).toBeNull()
 	})
@@ -68,9 +66,7 @@ describe('the correction window is stated, or says why it closed', () => {
 			'es',
 		)
 		expect(text).toMatch(/^Puedes corregir este entrenamiento hasta el /)
-		expect(describeClosedReason('LIMIT_REACHED', es)).toContain(
-			'tantas veces',
-		)
+		expect(describeClosedReason('LIMIT_REACHED', es)).toContain('tantas veces')
 	})
 })
 
@@ -177,7 +173,10 @@ describe('the draft becomes a request', () => {
 		draft.a = { ...draft.a, reps: '2.5' }
 		const { problems } = buildCorrectionRequest(draft, [log], 'KG', es)
 		expect(problems).toEqual([
-			{ setLogId: 'a', message: 'Las repeticiones deben ser un número entero.' },
+			{
+				setLogId: 'a',
+				message: 'Las repeticiones deben ser un número entero.',
+			},
 		])
 	})
 })

@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -31,6 +32,7 @@ export const RestTimerBar = ({
 	onExtend,
 	onDismiss,
 }: RestTimerBarProps) => {
+	const t = useTranslations('workout.restTimer')
 	if (remaining === null) return null
 
 	const progress = restProgress(remaining, total)
@@ -61,7 +63,7 @@ export const RestTimerBar = ({
 			<div className="ledger-page flex items-center gap-3 py-3">
 				<div className="flex flex-col">
 					<span className="type-label text-ink-3">
-						{isOver ? 'Rest over' : 'Resting'}
+						{isOver ? t('restOver') : t('resting')}
 					</span>
 					<span
 						// Announce the end once, rather than reading every tick aloud.
@@ -81,11 +83,13 @@ export const RestTimerBar = ({
 						variant="outline"
 						size="sm"
 						onClick={onExtend}
-						aria-label={`Add ${REST_TIMER_EXTEND_SECONDS} seconds to the rest timer`}
+						aria-label={t('addSecondsAria', {
+							seconds: REST_TIMER_EXTEND_SECONDS,
+						})}
 						className="type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
 					>
 						<Plus className="mr-1 h-4 w-4" aria-hidden />
-						{REST_TIMER_EXTEND_SECONDS}s
+						{t('secondsShort', { seconds: REST_TIMER_EXTEND_SECONDS })}
 					</Button>
 					{/* The `classical` gold-gradient variant is retired in v0.1 — gold
 					    never fills a control. This is not the region's primary action
@@ -94,7 +98,7 @@ export const RestTimerBar = ({
 						variant="outline"
 						size="sm"
 						onClick={onDismiss}
-						aria-label={isOver ? 'Dismiss the rest timer' : 'Skip the rest'}
+						aria-label={isOver ? t('dismissAria') : t('skipAria')}
 						className={`type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
 							isOver
 								? 'border-success bg-transparent text-success hover:bg-success/10'
@@ -102,7 +106,7 @@ export const RestTimerBar = ({
 						}`}
 					>
 						<X className="mr-1 h-4 w-4" aria-hidden />
-						{isOver ? 'Done' : 'Skip'}
+						{isOver ? t('done') : t('skip')}
 					</Button>
 				</div>
 			</div>

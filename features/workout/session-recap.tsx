@@ -327,9 +327,7 @@ export function SessionRecapContent({
 				<section className="space-y-3">
 					<div className="rule-row flex items-center gap-2 pb-2">
 						<NotebookPen className="size-4 text-ink-3" aria-hidden />
-						<h3 className="type-panel text-foreground">
-							{t('sessionNotes')}
-						</h3>
+						<h3 className="type-panel text-foreground">{t('sessionNotes')}</h3>
 					</div>
 					{recap.notes?.trim() || !recap.exerciseNotes?.length ? (
 						<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">

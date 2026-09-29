@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 
@@ -9,11 +11,12 @@ interface WorkoutsErrorProps {
 }
 
 export default function WorkoutsError({ error, reset }: WorkoutsErrorProps) {
+	const t = useTranslations('workout.errors')
 	return (
-		<RouteError title="Failed to load workouts" message={error.message}>
-			<Button onClick={() => reset()}>Retry</Button>
+		<RouteError title={t('workoutsFailedTitle')} message={error.message}>
+			<Button onClick={() => reset()}>{t('retry')}</Button>
 			<Button variant="outline" onClick={() => window.location.reload()}>
-				Hard reload
+				{t('hardReload')}
 			</Button>
 		</RouteError>
 	)

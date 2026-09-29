@@ -1,8 +1,8 @@
 'use client'
 
 import { CalendarCheck, Dumbbell, Loader2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -81,9 +81,7 @@ export function TrainAnotherDayDialog({
 			<DialogContent className="max-w-lg">
 				<DialogHeader>
 					<DialogTitle>{t('title')}</DialogTitle>
-					<DialogDescription>
-						{trainAnotherDayDescription(t)}
-					</DialogDescription>
+					<DialogDescription>{trainAnotherDayDescription(t)}</DialogDescription>
 				</DialogHeader>
 
 				{isLoading ? (

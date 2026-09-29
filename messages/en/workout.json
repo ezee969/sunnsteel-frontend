@@ -25,7 +25,8 @@
 			"successTitle": "Workout discarded",
 			"successDescription": "You can start a new workout whenever you are ready.",
 			"errorTitle": "Could not discard workout"
-		}
+		},
+		"checkConnection": "Please check your connection and try again."
 	},
 	"recap": {
 		"recordLabel": {
@@ -250,7 +251,8 @@
 		"planNoLongerHas": "{plan} no longer has this exercise, so only this session changed.",
 		"couldNotSwapTitle": "Could not swap the exercise",
 		"backToTitle": "Back to {exercise}",
-		"couldNotSwitchBackTitle": "Could not switch back"
+		"couldNotSwitchBackTitle": "Could not switch back",
+		"optionsAria": "Exercise options"
 	},
 	"historyExerciseGroup": {
 		"swappedFrom": "Swapped from {name}",
@@ -273,7 +275,8 @@
 		"repsValue": "{count, plural, one {# rep} other {# reps}}",
 		"repsCaption": "Reps",
 		"weightCaption": "Weight",
-		"rpeCaption": "RPE"
+		"rpeCaption": "RPE",
+		"repsRange": "{min}-{max} reps"
 	},
 	"sessionHeader": {
 		"back": "Back",
@@ -346,7 +349,8 @@
 		"saving": "Saving…",
 		"saved": "Saved",
 		"unsaved": "Unsaved",
-		"error": "Error"
+		"error": "Error",
+		"targetRange": "Target: {min}-{max}"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",
@@ -356,7 +360,7 @@
 	},
 	"staleSessionRecovery": {
 		"title": "Recover your workout",
-		"hasNotHadActivity": "{routine} has not had saved activity since {time}. Choose what to do before starting another workout.",
+		"hasNotHadActivity": "has not had saved activity since {time}. Choose what to do before starting another workout.",
 		"checkingSets": "Checking saved sets…",
 		"savedSetCountUnavailable": "Saved set count unavailable",
 		"setsSaved": "{completed} of {total} sets saved",
@@ -484,5 +488,11 @@
 	},
 	"loading": {
 		"workoutsAria": "Loading workouts"
+	},
+	"setKinds": {
+		"WORKING": "Working",
+		"WARMUP": "Warm-up",
+		"DROP": "Drop",
+		"OPTIONAL": "Optional"
 	}
 }

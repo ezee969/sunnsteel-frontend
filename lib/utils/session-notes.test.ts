@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
 
-import { exerciseNoteLabel, noteFor, remainingCharacters } from './session-notes'
+import {
+	exerciseNoteLabel,
+	noteFor,
+	remainingCharacters,
+} from './session-notes'
 
 const en = translatorFor('en', 'workout.notes')
 const es = translatorFor('es', 'workout.notes')

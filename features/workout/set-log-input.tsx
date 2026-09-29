@@ -2,12 +2,12 @@
 
 import {
 	isSetKind,
-	SET_KIND_LABELS,
 	SET_KINDS,
 	type SetKind,
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { ChevronDown, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -105,6 +105,8 @@ export const SetLogInput = ({
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
+	const t = useTranslations('workout.setLogInput')
+	const tKinds = useTranslations('workout.setKinds')
 	const {
 		repsState,
 		weightState,
@@ -133,7 +135,8 @@ export const SetLogInput = ({
 		weightUnit,
 	})
 
-	const statusText = saveStateLabel(saveState)
+	const tPrev = useTranslations('workout.previousPerformance')
+	const statusText = saveStateLabel(saveState, t)
 	// LIVE-18: under larger controls the row keeps only its fields and its
 	// tick; the fills and Remove move into the set's own menu.
 	const { largeControls } = useDisplayPreference()
@@ -190,7 +193,7 @@ export const SetLogInput = ({
 		previousPerformance !== undefined &&
 		!holds(previousPerformance)
 	const previousText = previousPerformance
-		? formatPreviousPerformance(previousPerformance, weightUnit)
+		? formatPreviousPerformance(previousPerformance, weightUnit, tPrev)
 		: ''
 
 	return (
@@ -221,20 +224,26 @@ export const SetLogInput = ({
 								type="button"
 								aria-label={
 									largeControls
-										? `Set ${setNumber}, ${SET_KIND_LABELS[kind]}. More for this set`
-										: `Set ${setNumber}, ${SET_KIND_LABELS[kind]}. Change set kind`
+										? t('setKindMenuMoreAria', {
+												number: setNumber,
+												kind: tKinds(kind),
+											})
+										: t('setKindMenuChangeAria', {
+												number: setNumber,
+												kind: tKinds(kind),
+											})
 								}
 								disabled={saveState === 'saving'}
 								className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
 									isCompletedState ? 'text-success' : 'text-ink-3'
 								}`}
 							>
-								Set {setNumber}
+								{t('setLabel', { number: setNumber })}
 								<ChevronDown className="h-3 w-3" aria-hidden />
 							</button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="start">
-							<DropdownMenuLabel>Set kind</DropdownMenuLabel>
+							<DropdownMenuLabel>{t('setKindHeading')}</DropdownMenuLabel>
 							<DropdownMenuRadioGroup
 								value={kind}
 								onValueChange={value => {
@@ -243,7 +252,7 @@ export const SetLogInput = ({
 							>
 								{SET_KINDS.map(option => (
 									<DropdownMenuRadioItem key={option} value={option}>
-										{SET_KIND_LABELS[option]}
+										{tKinds(option)}
 									</DropdownMenuRadioItem>
 								))}
 							</DropdownMenuRadioGroup>
@@ -255,20 +264,20 @@ export const SetLogInput = ({
 									<DropdownMenuSeparator />
 									{canFillAbove && setAbove ? (
 										<DropdownMenuItem onSelect={() => fill(setAbove)}>
-											Same as set {setAbove.setNumber}
+											{t('sameAsSet', { number: setAbove.setNumber })}
 										</DropdownMenuItem>
 									) : null}
 									{canFillPrevious && previousPerformance ? (
 										<DropdownMenuItem
 											onSelect={() => fill(previousPerformance)}
 										>
-											Use last time: {previousText}
+											{t('useLastTimeWithValue', { value: previousText })}
 										</DropdownMenuItem>
 									) : null}
 									{onRemove ? (
 										<DropdownMenuItem variant="destructive" onSelect={onRemove}>
 											<X className="h-4 w-4" aria-hidden />
-											Remove set {setNumber}
+											{t('removeSetAria', { number: setNumber })}
 										</DropdownMenuItem>
 									) : null}
 								</>
@@ -277,13 +286,15 @@ export const SetLogInput = ({
 					</DropdownMenu>
 					{kind !== 'WORKING' ? (
 						<span className="type-body-sm leading-none text-ink-3">
-							{SET_KIND_LABELS[kind]}
+							{tKinds(kind)}
 						</span>
 					) : isExtra ? (
-						<span className="type-body-sm leading-none text-ink-3">Extra</span>
+						<span className="type-body-sm leading-none text-ink-3">
+							{t('extra')}
+						</span>
 					) : plannedRir !== undefined && plannedRir !== null ? (
 						<span className="type-data leading-none text-ink-3">
-							RIR {plannedRir}
+							{t('rir', { value: plannedRir })}
 						</span>
 					) : null}
 				</div>
@@ -293,8 +304,8 @@ export const SetLogInput = ({
 					<Input
 						type="number"
 						inputMode="numeric"
-						aria-label="Performed reps"
-						placeholder="Reps"
+						aria-label={t('performedRepsAria')}
+						placeholder={t('repsPlaceholder')}
 						aria-invalid={repsInvalid || undefined}
 						aria-describedby={repsInvalid ? errorId : undefined}
 						value={repsState}
@@ -305,7 +316,11 @@ export const SetLogInput = ({
 						}`}
 					/>
 					<span className="type-body-sm text-center text-ink-3">
-						{isExtra ? 'No target' : `Target: ${plannedRepsText}`}
+						{isExtra
+							? t('noTarget')
+							: plannedMinReps && plannedMaxReps
+								? t('targetRange', { min: plannedMinReps, max: plannedMaxReps })
+								: t('targetReps', { value: plannedRepsText })}
 					</span>
 				</div>
 
@@ -315,8 +330,12 @@ export const SetLogInput = ({
 						type="number"
 						inputMode="decimal"
 						step={weightUnit === 'LB' ? 1 : 0.5}
-						aria-label={`Performed weight in ${weightUnit === 'LB' ? 'pounds' : 'kilograms'}`}
-						placeholder="Weight"
+						aria-label={
+							weightUnit === 'LB'
+								? t('performedWeightLbAria')
+								: t('performedWeightKgAria')
+						}
+						placeholder={t('weightPlaceholder')}
 						aria-invalid={weightInvalid || undefined}
 						aria-describedby={weightInvalid ? errorId : undefined}
 						value={weightState}
@@ -328,8 +347,10 @@ export const SetLogInput = ({
 					/>
 					<span className="type-body-sm text-center text-ink-3">
 						{isExtra
-							? 'No target'
-							: `Target: ${formatWeight(plannedWeight, weightUnit)}`}
+							? t('noTarget')
+							: t('targetWeight', {
+									value: formatWeight(plannedWeight, weightUnit),
+								})}
 					</span>
 				</div>
 
@@ -343,8 +364,8 @@ export const SetLogInput = ({
 						step="0.5"
 						min="0"
 						max="10"
-						aria-label="Rate of perceived exertion, 0 to 10"
-						placeholder="RPE"
+						aria-label={t('rpeAria')}
+						placeholder={t('rpePlaceholder')}
 						aria-invalid={rpeInvalid || undefined}
 						aria-describedby={rpeInvalid ? errorId : undefined}
 						value={rpeState}
@@ -354,7 +375,9 @@ export const SetLogInput = ({
 							rpeInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span className="type-body-sm text-center text-ink-3">Optional</span>
+					<span className="type-body-sm text-center text-ink-3">
+						{t('optional')}
+					</span>
 				</div>
 
 				{/* Completion checkbox, doubling as the save-state indicator */}
@@ -369,7 +392,7 @@ export const SetLogInput = ({
 						onCheckedChange={(checked: boolean | 'indeterminate') =>
 							handleCompletionToggle(Boolean(checked))
 						}
-						aria-label="Mark set as complete"
+						aria-label={t('markCompleteAria')}
 						disabled={saveState === 'saving'}
 						// Checked colour comes from the primitive (`--success-strong`,
 						// v1.0 §4.3 rule 2). This call site only sizes the box and draws
@@ -385,13 +408,15 @@ export const SetLogInput = ({
 						hasImproved ? 'text-honour' : 'text-ink-3'
 					}`}
 				>
-					<span>Last time</span>
+					<span>{t('lastTime')}</span>
 					<span className="type-data flex items-center gap-2">
 						{previousText}
 						{/* An improvement is earned, so it is one of the few places
 						    gold belongs. */}
 						{hasImproved ? (
-							<span className="type-body-sm text-honour">↑ Improvement</span>
+							<span className="type-body-sm text-honour">
+								{t('improvement')}
+							</span>
 						) : null}
 					</span>
 				</div>
@@ -407,7 +432,7 @@ export const SetLogInput = ({
 							className={FILL_CLASS}
 							onClick={() => fill(setAbove)}
 						>
-							Same as set {setAbove.setNumber}
+							{t('sameAsSet', { number: setAbove.setNumber })}
 						</Button>
 					) : null}
 					{canFillPrevious && previousPerformance ? (
@@ -416,10 +441,10 @@ export const SetLogInput = ({
 							variant="ghost"
 							size="sm"
 							className={FILL_CLASS}
-							aria-label={`Use last time: ${previousText}`}
+							aria-label={t('useLastTimeWithValue', { value: previousText })}
 							onClick={() => fill(previousPerformance)}
 						>
-							Use last time
+							{t('useLastTime')}
 						</Button>
 					) : null}
 					{onRemove ? (
@@ -428,11 +453,11 @@ export const SetLogInput = ({
 							variant="ghost"
 							size="sm"
 							className={`${FILL_CLASS} ml-auto`}
-							aria-label={`Remove set ${setNumber}`}
+							aria-label={t('removeSetAria', { number: setNumber })}
 							onClick={onRemove}
 						>
 							<X className="h-4 w-4" aria-hidden />
-							Remove
+							{t('remove')}
 						</Button>
 					) : null}
 				</div>
@@ -456,7 +481,7 @@ export const SetLogInput = ({
 					role="alert"
 				>
 					<span className="mr-2 inline-block h-1.5 w-1.5 bg-current" />
-					<span>Error saving set. Please try again.</span>
+					<span>{t('errorSaving')}</span>
 				</div>
 			)}
 		</div>
