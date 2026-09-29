@@ -1,6 +1,8 @@
 import type { ActivityEntry, SharedRoutineOwner } from '@sunsteel/contracts'
 
-import { describeEmptyFeed, groupActivity } from './activity'
+import type { Translator } from '@/i18n/translator'
+
+import { groupActivity } from './activity'
 import type { EmptyStateCopy } from './empty-states'
 
 /**
@@ -40,26 +42,33 @@ export function buildFollowingPreview(
 }
 
 /** Only a workout groups several facts, so the remainder is named as its. */
-export function describeMoreFacts(count: number): string {
-	return `and ${count.toLocaleString()} more from this workout`
+export function describeMoreFacts(
+	count: number,
+	t: Translator<'planning.dashboardFollowing'>,
+): string {
+	return t('more', { count })
 }
 
 /**
  * The feed's own empty copy, so the two surfaces never disagree about why
  * nothing is there. Following nobody offers the way to change that; following
  * members who share nothing offers nothing, because the choice is theirs.
+ * `feedEmpty` is the feed's own copy (`describeEmptyFeed`), passed in so this
+ * module never owns its wording.
  */
 export function getFollowingPreviewEmptyState(
 	followedCount: number,
+	feedEmpty: EmptyStateCopy,
+	t: Translator<'planning.dashboardFollowing'>,
 ): EmptyStateCopy {
 	return {
-		...describeEmptyFeed(followedCount),
+		...feedEmpty,
 		...(followedCount === 0
 			? {
 					action: {
 						kind: 'link' as const,
 						href: '/search',
-						label: 'Find members',
+						label: t('findMembers'),
 					},
 				}
 			: {}),

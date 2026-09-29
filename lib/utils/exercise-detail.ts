@@ -1,5 +1,7 @@
 import type { Routine, RoutineSet } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { routineDayTitle } from './routine-schedule'
 
 /**
@@ -34,6 +36,24 @@ const repsLabel = (set: RoutineSet): string | null => {
  * "3 × 8–12" when every set shares a target, otherwise the per-set targets
  * ("3 sets · 10, 8, 6 reps"), and just the count when a target is missing.
  */
+export function describeSetScheme(
+	sets: readonly RoutineSet[],
+	t: Translator<'planning.exerciseDetail'>,
+): string {
+	if (sets.length === 0) return t('noSets')
+	const labels = sets.map(repsLabel)
+	const count = t('sets', { count: sets.length })
+	if (labels.some(label => label === null)) return count
+	return new Set(labels).size === 1
+		? t('scheme', { count: sets.length, reps: labels[0] ?? '' })
+		: t('schemePerSet', { sets: count, reps: labels.join(', ') })
+}
+
+/**
+ * The English wording, kept for `routine-versions.ts` (I18N-03..05: owned by
+ * the routines area), whose change lines are still English. New code calls
+ * `describeSetScheme`.
+ */
 export function formatSetScheme(sets: readonly RoutineSet[]): string {
 	if (sets.length === 0) return 'No sets'
 	const labels = sets.map(repsLabel)
@@ -47,6 +67,7 @@ export function formatSetScheme(sets: readonly RoutineSet[]): string {
 export function findRoutineUsages(
 	routines: readonly Routine[],
 	exerciseId: string,
+	t: Translator<'planning.exerciseDetail'>,
 ): RoutineUsage[] {
 	return routines
 		.map(routine => ({
@@ -66,7 +87,7 @@ export function findRoutineUsages(
 								{
 									dayId: day.id,
 									dayName: routineDayTitle(day),
-									schemes: slots.map(slot => formatSetScheme(slot.sets)),
+									schemes: slots.map(slot => describeSetScheme(slot.sets, t)),
 								},
 							]
 						: []

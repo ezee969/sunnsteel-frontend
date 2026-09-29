@@ -4,15 +4,14 @@ import {
 	normalizeDashboardLayout,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /** The name each section carries on the dashboard and in Customize. */
-export const DASHBOARD_SECTION_LABELS: Record<DashboardSectionId, string> = {
-	'this-week': 'This Week',
-	stats: 'Training Stats',
-	'recent-activity': 'Recent Activity',
-	'personal-records': 'Personal Records',
-	'training-insights': 'Training Insights',
-	'upcoming-milestones': 'Upcoming Milestones',
-	following: 'From Members You Follow',
+export function dashboardSectionLabel(
+	id: DashboardSectionId,
+	t: Translator<'planning.dashboardLayout'>,
+): string {
+	return t(`sections.${id}`)
 }
 
 /** A copy with one section moved by `delta` places; out of range is a no-op. */
@@ -88,7 +87,10 @@ export function dashboardRows(
 }
 
 /** "3 of 7 shown"-style line for the Customize dialog. */
-export function describeShownCount(layout: DashboardLayout): string {
+export function describeShownCount(
+	layout: DashboardLayout,
+	t: Translator<'planning.dashboardLayout'>,
+): string {
 	const shown = layout.filter(entry => !entry.hidden).length
-	return `${shown} of ${layout.length} sections shown`
+	return t('shownCount', { shown, total: layout.length })
 }

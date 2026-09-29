@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 import type { DashboardInsight } from './dashboard-insights'
 import type { UpcomingMilestone } from './dashboard-milestones'
 
@@ -8,40 +10,46 @@ import type { UpcomingMilestone } from './dashboard-milestones'
  * to name, and the section's own empty state is what shows once opened.
  */
 
+type T = Translator<'planning.dashboardSummaries'>
+
 export function recentActivitySummary(
 	latest: { routineName: string; dayName: string } | undefined,
 	timeAgo: string | undefined,
+	t: T,
 ): string | null {
 	if (!latest) return null
-	const when = timeAgo ? `, ${timeAgo}` : ''
-	return `Latest: ${latest.routineName} — ${latest.dayName}${when}`
+	const values = { routine: latest.routineName, day: latest.dayName }
+	return timeAgo
+		? t('latestWorkoutAgo', { ...values, timeAgo })
+		: t('latestWorkout', values)
 }
 
 export function personalRecordSummary(
 	latest: { exerciseName: string } | undefined,
 	formattedSet: string | undefined,
+	t: T,
 ): string | null {
 	if (!latest) return null
 	return formattedSet
-		? `Latest: ${latest.exerciseName} ${formattedSet}`
-		: `Latest: ${latest.exerciseName}`
+		? t('latestRecordSet', { exercise: latest.exerciseName, set: formattedSet })
+		: t('latestRecord', { exercise: latest.exerciseName })
 }
 
 export function trainingInsightsSummary(
 	insights: readonly Pick<DashboardInsight, 'key'>[],
+	t: T,
 ): string | null {
 	if (insights.length === 0) return null
-	return insights.length === 1
-		? '1 fact from your recent training'
-		: `${insights.length} facts from your recent training`
+	return t('facts', { count: insights.length })
 }
 
 export function upcomingMilestonesSummary(
 	milestones: readonly Pick<UpcomingMilestone, 'title'>[],
+	t: T,
 ): string | null {
 	if (milestones.length === 0) return null
 	const rest = milestones.length - 1
 	return rest > 0
-		? `Next: ${milestones[0].title}, and ${rest} more`
-		: `Next: ${milestones[0].title}`
+		? t('nextMore', { title: milestones[0].title, rest })
+		: t('next', { title: milestones[0].title })
 }

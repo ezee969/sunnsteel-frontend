@@ -72,10 +72,3 @@ export function trainableDays(
 		)
 		.sort((a, b) => Number(b.isToday) - Number(a.isToday))
 }
-
-/** Copy for the empty case, which is a different problem from an empty day. */
-export const TRAIN_ANOTHER_DAY_EMPTY =
-	'No routine of yours has a day with exercises in it yet. Build one first — a workout with nothing in it cannot be logged.'
-
-export const TRAIN_ANOTHER_DAY_DESCRIPTION =
-	'Start any day from your routines, whether or not it is planned for today. It counts the same: the same prescription, progression and records.'

@@ -1,5 +1,7 @@
 import type { WorkoutSession, WorkoutSessionSummary } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /**
  * DASH-02: the one action the dashboard puts first. Precedence is fixed:
  * an open session always wins (it is unfinished work), then a workout that
@@ -99,39 +101,39 @@ function describeWorkout(routineName?: string, dayName?: string | null) {
 export function getDashboardPrimaryCopy(
 	action: DashboardPrimaryAction,
 	{ plannedCount, todayName }: { plannedCount: number; todayName: string },
+	t: Translator<'planning.dashboardPrimary'>,
 ): { title: string; description: string } {
 	switch (action.kind) {
 		case 'RESUME': {
 			const workout = describeWorkout(action.routineName, action.dayName)
 			return {
-				title: 'Workout in progress',
+				title: t('resumeTitle'),
 				description: workout
-					? `${workout} is still open. Pick up where you left off.`
-					: 'Pick up where you left off.',
+					? t('resumeDescription', { workout })
+					: t('resumeDescriptionBare'),
 			}
 		}
 		case 'START':
 			return {
-				title: 'Today’s Workouts',
-				description:
-					plannedCount === 1
-						? 'You have 1 workout planned.'
-						: `You have ${plannedCount} workouts planned.`,
+				title: t('startTitle'),
+				description: t('startDescription', { count: plannedCount }),
 			}
 		case 'REVIEW':
 			return {
-				title: 'Today’s workout is done',
-				description: `${describeWorkout(action.routineName, action.dayName)} is complete. Review how it went.`,
+				title: t('reviewTitle'),
+				description: t('reviewDescription', {
+					workout: describeWorkout(action.routineName, action.dayName) ?? '',
+				}),
 			}
 		case 'PICK_DAY':
 			return {
-				title: 'No workouts scheduled today',
-				description: `Nothing is planned for ${todayName}. You can still train any day of your routines — it counts the same.`,
+				title: t('noneTitle'),
+				description: t('pickDayDescription', { today: todayName }),
 			}
 		case 'BROWSE':
 			return {
-				title: 'No workouts scheduled today',
-				description: `You don’t have any routines planned for ${todayName}. Start one from your routines.`,
+				title: t('noneTitle'),
+				description: t('browseDescription', { today: todayName }),
 			}
 	}
 }
