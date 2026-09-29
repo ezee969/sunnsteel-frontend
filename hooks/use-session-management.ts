@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
@@ -53,6 +54,7 @@ export const useSessionManagement = ({
 }: UseSessionManagementProps): UseSessionManagementReturn => {
 	const router = useRouter()
 	const { push } = useToast()
+	const t = useTranslations('workout.sessionResolution')
 	const { mutate: finishSession, isPending: isFinishing } =
 		useFinishSession(sessionId)
 
@@ -75,7 +77,7 @@ export const useSessionManagement = ({
 	const executeFinish = useCallback(
 		(status: SessionStatus) => {
 			if (!status) return
-			const copy = getSessionResolutionCopy(status)
+			const copy = getSessionResolutionCopy(status, t)
 
 			finishSession(
 				{ status },

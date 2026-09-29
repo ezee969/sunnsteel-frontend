@@ -1,6 +1,8 @@
 import type { Routine } from '@sunsteel/contracts'
 import { routineDayLabel } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { routineOn } from './routine-schedule'
 import { localDateKey } from './schedule-week'
 
@@ -74,8 +76,12 @@ export function trainableDays(
 }
 
 /** Copy for the empty case, which is a different problem from an empty day. */
-export const TRAIN_ANOTHER_DAY_EMPTY =
-	'No routine of yours has a day with exercises in it yet. Build one first — a workout with nothing in it cannot be logged.'
+export function trainAnotherDayEmpty(t: Translator<'workout.trainAnotherDay'>) {
+	return t('empty')
+}
 
-export const TRAIN_ANOTHER_DAY_DESCRIPTION =
-	'Start any day from your routines, whether or not it is planned for today. It counts the same: the same prescription, progression and records.'
+export function trainAnotherDayDescription(
+	t: Translator<'workout.trainAnotherDay'>,
+) {
+	return t('description')
+}

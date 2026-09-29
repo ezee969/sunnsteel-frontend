@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
@@ -26,11 +27,13 @@ export function useWorkoutSessionData(
 ): UseWorkoutSessionDataResult {
 	const { data, isLoading, isError, error } = useSession(sessionId ?? '')
 	const weightUnit = useWeightUnit()
+	const t = useTranslations('workout.metrics')
+	const locale = useLocale()
 
 	const exerciseGroups = useMemo(() => buildExerciseGroups(data), [data])
 	const metrics = useMemo(
-		() => buildSessionMetrics(data, weightUnit),
-		[data, weightUnit],
+		() => buildSessionMetrics(data, weightUnit, t, locale),
+		[data, weightUnit, t, locale],
 	)
 
 	return {
