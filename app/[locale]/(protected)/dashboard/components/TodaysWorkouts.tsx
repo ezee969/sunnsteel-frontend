@@ -1,6 +1,7 @@
 'use client'
 
 import { Calendar, ChevronRight, Dumbbell, History, Repeat } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -45,6 +46,8 @@ import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
 
 export default function TodaysWorkouts() {
 	const router = useRouter()
+	const tDate = useTranslations('routines.date')
+	const tDeloads = useTranslations('routines.deloads')
 	const { preloadOnHover } = useComponentPreloading()
 	const { mutateAsync: startSession, isPending } = useStartSession()
 
@@ -104,7 +107,7 @@ export default function TodaysWorkouts() {
 	})
 	const copy = getDashboardPrimaryCopy(action, {
 		plannedCount: visibleTodays.length,
-		todayName: weekdayName(todayDow, 'long'),
+		todayName: weekdayName(todayDow, 'long', tDate),
 	})
 
 	return (
@@ -181,25 +184,31 @@ export default function TodaysWorkouts() {
 													{isRotationRoutine(routine) ? (
 														<>
 															<Repeat className="h-3 w-3" aria-hidden />
-															Next · {routineDayTitle(day)}
+															Next · {routineDayTitle(day, 'long', tDate)}
 														</>
 													) : (
 														<>
 															<Calendar className="h-3 w-3" aria-hidden />
-															{routineDayTitle(day, 'short')}
+															{routineDayTitle(day, 'short', tDate)}
 														</>
 													)}
 												</Badge>
 											</div>
-											{planLabel({
-												trainingBlockName: routine.trainingBlock?.name,
-												deload: !!routine.temporaryOverride,
-											}) ? (
+											{planLabel(
+												{
+													trainingBlockName: routine.trainingBlock?.name,
+													deload: !!routine.temporaryOverride,
+												},
+												tDeloads,
+											) ? (
 												<p className="type-body-sm mt-1 text-ink-3">
-													{planLabel({
-														trainingBlockName: routine.trainingBlock?.name,
-														deload: !!routine.temporaryOverride,
-													})}
+													{planLabel(
+														{
+															trainingBlockName: routine.trainingBlock?.name,
+															deload: !!routine.temporaryOverride,
+														},
+														tDeloads,
+													)}
 												</p>
 											) : null}
 											{isActiveForThis ? (
@@ -224,7 +233,7 @@ export default function TodaysWorkouts() {
 													disabled={isPending || !canStartToday}
 													title={
 														!canStartToday
-															? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}`
+															? `This workout is not scheduled for ${weekdayName(todayDow, 'long', tDate)}`
 															: undefined
 													}
 													{...preloadOnHover('activeWorkoutSession')}

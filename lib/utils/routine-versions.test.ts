@@ -5,6 +5,8 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	compareRoutineSetups,
 	describeSetupSize,
@@ -13,6 +15,25 @@ import {
 	routineSetup,
 	versionTitle,
 } from './routine-versions'
+
+const enVersions = translatorFor('en', 'routines.versions')
+const enDate = translatorFor('en', 'routines.date')
+const enSchedule = translatorFor('en', 'routines.schedule')
+const esVersions = translatorFor('es', 'routines.versions')
+const esDate = translatorFor('es', 'routines.date')
+const esSchedule = translatorFor('es', 'routines.schedule')
+
+const compare = (
+	current: RoutineVersionSetup,
+	target: RoutineVersionSetup,
+	unit: 'KG' | 'LB' = 'KG',
+) => compareRoutineSetups(current, target, unit, enVersions, enDate, enSchedule)
+
+const compareEs = (
+	current: RoutineVersionSetup,
+	target: RoutineVersionSetup,
+	unit: 'KG' | 'LB' = 'KG',
+) => compareRoutineSetups(current, target, unit, esVersions, esDate, esSchedule)
 
 const exercise = (
 	id: string,
@@ -64,7 +85,7 @@ const current: RoutineVersionSetup = {
 
 describe('routine versions', () => {
 	it('matches the current routine to a version with no changes', () => {
-		const comparison = compareRoutineSetups(current, current, 'KG')
+		const comparison = compare(current, current)
 		expect(comparison).toEqual({ routine: [], days: [], isEmpty: true })
 		expect(
 			restoreBlockedReason({
@@ -72,6 +93,7 @@ describe('routine versions', () => {
 				versionCount: 1,
 				max: 20,
 				hasLiveSession: false,
+				t: enVersions,
 			}),
 		).toMatch(/matches/)
 	})
@@ -103,7 +125,7 @@ describe('routine versions', () => {
 				},
 			],
 		}
-		const comparison = compareRoutineSetups(current, target, 'KG')
+		const comparison = compare(current, target)
 		expect(comparison.isEmpty).toBe(false)
 		expect(comparison.routine[0]).toBe('Name: Upper Lower → Upper Lower v1')
 		expect(comparison.routine[1]).toMatch(/^Schedule: .*Wed.* → .*Fri/)
@@ -141,37 +163,41 @@ describe('routine versions', () => {
 				})),
 			})),
 		})
-		const comparison = compareRoutineSetups(rotation(80), rotation(100), 'LB')
+		const comparison = compare(rotation(80), rotation(100), 'LB')
 		expect(comparison.routine).toEqual([])
 		expect(comparison.days.map(day => day.title)).toEqual(['Upper', 'Lower'])
 		expect(comparison.days[1].changes).toEqual(['Squat: 176.37 lb → 220.46 lb'])
 	})
 
 	it('names versions and blocks restores the server would refuse', () => {
-		expect(versionTitle({ number: 3, name: null })).toBe('Version 3')
-		expect(versionTitle({ number: 3, name: ' Block A ' })).toBe('Block A')
-		expect(describeSetupSize(current)).toBe('2 days · 3 exercises')
+		expect(versionTitle({ number: 3, name: null }, enVersions)).toBe(
+			'Version 3',
+		)
+		expect(versionTitle({ number: 3, name: ' Block A ' }, enVersions)).toBe(
+			'Block A',
+		)
+		expect(describeSetupSize(current, enVersions)).toBe('2 days · 3 exercises')
 		expect(
-			describeVersionOrigin({
-				kind: 'BEFORE_RESTORE',
-				restoredVersionNumber: 2,
-			}),
+			describeVersionOrigin(
+				{ kind: 'BEFORE_RESTORE', restoredVersionNumber: 2 },
+				enVersions,
+			),
 		).toBe('Saved automatically before restoring Version 2')
 		expect(
-			describeVersionOrigin({ kind: 'SAVED', restoredVersionNumber: null }),
+			describeVersionOrigin(
+				{ kind: 'SAVED', restoredVersionNumber: null },
+				enVersions,
+			),
 		).toBeNull()
 
-		const changed = compareRoutineSetups(
-			current,
-			{ ...current, name: 'Other' },
-			'KG',
-		)
+		const changed = compare(current, { ...current, name: 'Other' })
 		const reason = (versionCount: number, hasLiveSession: boolean) =>
 			restoreBlockedReason({
 				comparison: changed,
 				versionCount,
 				max: 20,
 				hasLiveSession,
+				t: enVersions,
 			})
 		expect(reason(3, false)).toBeNull()
 		expect(reason(3, true)).toMatch(/workout in progress/)
@@ -209,6 +235,44 @@ describe('routine versions', () => {
 			id: 'bench',
 			name: 'Bench Press',
 		})
-		expect(compareRoutineSetups(setup, current, 'KG').isEmpty).toBe(true)
+		expect(compare(setup, current).isEmpty).toBe(true)
+	})
+
+	it('says the same in Spanish (I18N-03)', () => {
+		expect(versionTitle({ number: 3, name: null }, esVersions)).toBe(
+			'Versión 3',
+		)
+		expect(describeSetupSize(current, esVersions)).toBe(
+			'2 días · 3 ejercicios',
+		)
+		expect(
+			describeSetupSize(
+				{ ...current, days: [current.days[0]] },
+				esVersions,
+			),
+		).toBe('1 día · 2 ejercicios')
+		expect(
+			describeVersionOrigin(
+				{ kind: 'BEFORE_RESTORE', restoredVersionNumber: 2 },
+				esVersions,
+			),
+		).toBe('Guardada automáticamente antes de restaurar Versión 2')
+
+		const comparisonEs = compareEs(current, {
+			...current,
+			name: 'Upper Lower v1',
+		})
+		expect(comparisonEs.routine[0]).toBe(
+			'Nombre: Upper Lower → Upper Lower v1',
+		)
+		expect(
+			restoreBlockedReason({
+				comparison: comparisonEs,
+				versionCount: 20,
+				max: 20,
+				hasLiveSession: false,
+				t: esVersions,
+			}),
+		).toMatch(/Elimina una versión/)
 	})
 })

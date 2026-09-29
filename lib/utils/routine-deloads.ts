@@ -7,6 +7,10 @@ import {
 	type TemporaryOverrideSource,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
+
 import { formatTrainingBlockRange } from './routine-training-blocks'
 
 /**
@@ -17,19 +21,20 @@ import { formatTrainingBlockRange } from './routine-training-blocks'
  * its checks so the dialog can say why it would refuse.
  */
 
-const DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
+const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 	month: 'short',
 	day: 'numeric',
 	year: 'numeric',
 	timeZone: 'UTC',
-})
+}
 
 const parse = (date: CalendarDate) => {
 	const [year, month, day] = date.split('-').map(Number)
 	return Date.UTC(year, month - 1, day, 12)
 }
 
-const format = (date: CalendarDate) => DATE_FORMAT.format(parse(date))
+const format = (date: CalendarDate, locale: Locale) =>
+	dateFormatter(locale, DATE_FORMAT_OPTIONS).format(parse(date))
 
 export function addCalendarDays(date: CalendarDate, days: number): string {
 	return new Date(parse(date) + days * 86_400_000).toISOString().slice(0, 10)
@@ -48,35 +53,46 @@ export const DELOAD_LENGTHS = Array.from(
 
 export { DELOAD_DEFAULT_DAYS }
 
-export function describeDeloadLength(days: number): string {
-	if (days === 7) return '1 week'
-	if (days === 14) return '2 weeks'
-	return `${days} ${days === 1 ? 'day' : 'days'}`
+export function describeDeloadLength(
+	days: number,
+	t: Translator<'routines.deloads'>,
+): string {
+	if (days === 7) return t('weekLength')
+	if (days === 14) return t('twoWeeksLength')
+	return t('daysLength', { count: days })
 }
 
 /** "10% lighter · first half of the sets" */
-export function describeDeloadOptions({
-	loadReductionPercent,
-	setMode,
-}: DeloadOptions): string {
+export function describeDeloadOptions(
+	{ loadReductionPercent, setMode }: DeloadOptions,
+	t: Translator<'routines.deloads'>,
+): string {
 	const load =
 		loadReductionPercent === 0
-			? 'Same loads'
-			: `${loadReductionPercent}% lighter`
-	const sets = setMode === 'HALF' ? 'first half of the sets' : 'every set'
+			? t('sameLoads')
+			: t('percentLighter', { percent: loadReductionPercent })
+	const sets = setMode === 'HALF' ? t('halfSets') : t('everySet')
 	return `${load} · ${sets}`
 }
 
-export function deloadStateLabel(state: RoutineTemporaryOverride['state']) {
-	return { FUTURE: 'Upcoming', ACTIVE: 'In progress', COMPLETE: 'Complete' }[
-		state
-	]
+export function deloadStateLabel(
+	state: RoutineTemporaryOverride['state'],
+	t: Translator<'routines.deloads'>,
+) {
+	return {
+		FUTURE: t('stateUpcoming'),
+		ACTIVE: t('stateInProgress'),
+		COMPLETE: t('stateComplete'),
+	}[state]
 }
 
-export function describeDeloadSource(source: TemporaryOverrideSource): string {
+export function describeDeloadSource(
+	source: TemporaryOverrideSource,
+	t: Translator<'routines.deloads'>,
+): string {
 	return source.kind === 'TRAINING_BLOCK' && source.trainingBlockName
-		? `Lightens the training block “${source.trainingBlockName}”`
-		: 'Lightens the routine'
+		? t('sourceLightensBlock', { name: source.trainingBlockName })
+		: t('sourceLightensRoutine')
 }
 
 /**
@@ -85,10 +101,12 @@ export function describeDeloadSource(source: TemporaryOverrideSource): string {
  */
 export function describeDeloadRange(
 	deload: Pick<RoutineTemporaryOverride, 'startDate' | 'endDate'>,
+	locale: Locale,
+	t: Translator<'routines.deloads'>,
 ): string {
 	return deload.endDate < deload.startDate
-		? `${format(deload.startDate)} · ended on its first day`
-		: formatTrainingBlockRange(deload.startDate, deload.endDate)
+		? t('rangeEndedFirstDay', { date: format(deload.startDate, locale) })
+		: formatTrainingBlockRange(deload.startDate, deload.endDate, locale)
 }
 
 /**
@@ -98,25 +116,36 @@ export function describeDeloadRange(
 export function describeDeloadInForce(
 	deload: { endDate: CalendarDate },
 	blockName: string | null,
+	locale: Locale,
+	t: Translator<'routines.deloads'>,
 ): string {
-	const plan = blockName ? `the training block “${blockName}”` : 'the routine'
-	return `A deload is in force until ${format(deload.endDate)}, so these are its lighter days and loads don't progress. ${plan[0].toUpperCase()}${plan.slice(1)} returns on ${format(addCalendarDays(deload.endDate, 1))}.`
+	return t('inForce', {
+		hasBlock: blockName ? 'true' : 'false',
+		blockName: blockName ?? '',
+		endDate: format(deload.endDate, locale),
+		resumeDate: format(addCalendarDays(deload.endDate, 1), locale),
+	})
 }
 
 /**
  * The short label naming the plan a date or a workout trains, or null for the
  * routine itself: "Training block · Strength", "Deload", or both.
  */
-export function planLabel({
-	trainingBlockName,
-	deload,
-}: {
-	trainingBlockName?: string | null
-	deload?: boolean
-}): string | null {
+export function planLabel(
+	{
+		trainingBlockName,
+		deload,
+	}: {
+		trainingBlockName?: string | null
+		deload?: boolean
+	},
+	t: Translator<'routines.deloads'>,
+): string | null {
 	const parts = [
-		...(trainingBlockName ? [`Training block · ${trainingBlockName}`] : []),
-		...(deload ? ['Deload'] : []),
+		...(trainingBlockName
+			? [t('planLabelTrainingBlock', { name: trainingBlockName })]
+			: []),
+		...(deload ? [t('planLabelDeload')] : []),
 	]
 	return parts.length ? parts.join(' · ') : null
 }
@@ -182,12 +211,13 @@ export function deloadDateProblem({
 	return null
 }
 
-export const DELOAD_DATE_PROBLEMS: Record<
-	Exclude<DeloadDateProblem, null>,
-	string
-> = {
-	PAST: 'A deload starts today or later.',
-	OVERLAPS_DELOAD: 'Another deload of this routine covers some of those days.',
-	CROSSES_BLOCK:
-		'A deload stays inside one plan: those days cross the start or end of a training block. Shorten it or move it.',
+export function deloadDateProblemMessage(
+	problem: Exclude<DeloadDateProblem, null>,
+	t: Translator<'routines.deloads'>,
+): string {
+	return {
+		PAST: t('problemPast'),
+		OVERLAPS_DELOAD: t('problemOverlapsDeload'),
+		CROSSES_BLOCK: t('problemCrossesBlock'),
+	}[problem]
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
@@ -40,6 +41,7 @@ export interface TodaysWorkoutEntry {
  */
 export function useTodaysWorkouts() {
 	const todayDow = getTodayDow()
+	const tDate = useTranslations('routines.date')
 
 	const routinesQuery = useRoutines()
 	const activeQuery = useActiveSession()
@@ -97,7 +99,7 @@ export function useTodaysWorkouts() {
 
 				// Validate if this routine day can be started today based on
 				// scheduling rules
-				const { isValid } = validateRoutineDayDate(day)
+				const { isValid } = validateRoutineDayDate(day, todayDow, tDate)
 
 				return { routine, day, canStartToday: isValid }
 			})
@@ -129,7 +131,7 @@ export function useTodaysWorkouts() {
 			return [{ routine, day, canStartToday: true }]
 		})
 		return [...planned, ...movedIn]
-	}, [routinesQuery.data, overridesQuery.data, todayDow, todayKey])
+	}, [routinesQuery.data, overridesQuery.data, todayDow, todayKey, tDate])
 
 	const completedRoutineIds = useMemo(() => {
 		const pages = completedTodayQuery.data?.pages ?? []

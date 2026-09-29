@@ -10,6 +10,8 @@ import type {
 } from '@sunsteel/contracts'
 import { SET_KIND_LABELS } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { formatSetScheme } from './exercise-detail'
 import { describeRoutineSchedule, routineDayTitle } from './routine-schedule'
 import { areCanonicalWeightsEqual, formatWeight } from './weight-unit'
@@ -48,30 +50,37 @@ export function routineSetup(routine: Routine): RoutineVersionSetup {
 
 export function versionTitle(
 	version: Pick<RoutineVersion, 'number' | 'name'>,
+	t: Translator<'routines.versions'>,
 ): string {
-	return version.name?.trim() || `Version ${version.number}`
+	return version.name?.trim() || t('versionNumber', { number: version.number })
 }
 
 /** "4 days · 18 exercises" */
-export function describeSetupSize(setup: RoutineVersionSetup): string {
+export function describeSetupSize(
+	setup: RoutineVersionSetup,
+	t: Translator<'routines.versions'>,
+): string {
 	const days = setup.days.length
 	const exercises = setup.days.reduce(
 		(total, day) => total + day.exercises.length,
 		0,
 	)
-	return `${days} ${days === 1 ? 'day' : 'days'} · ${exercises} ${
-		exercises === 1 ? 'exercise' : 'exercises'
-	}`
+	return t('setupSize', { days, exercises })
 }
 
 /** Why a version exists when it was not saved by hand. */
 export function describeVersionOrigin(
 	version: Pick<RoutineVersion, 'kind' | 'restoredVersionNumber'>,
+	t: Translator<'routines.versions'>,
 ): string | null {
 	if (version.kind !== 'BEFORE_RESTORE') return null
 	return version.restoredVersionNumber
-		? `Saved automatically before restoring Version ${version.restoredVersionNumber}`
-		: 'Saved automatically before a restore'
+		? t('originRestore', {
+				version: t('versionNumber', {
+					number: version.restoredVersionNumber,
+				}),
+			})
+		: t('originRestoreGeneric')
 }
 
 export interface DayComparison {
@@ -87,19 +96,19 @@ export interface SetupComparison {
 	isEmpty: boolean
 }
 
-const PROGRESSION_LABELS: Partial<Record<ProgressionScheme, string>> = {
-	NONE: 'none',
-	DOUBLE_PROGRESSION: 'double progression',
-	DYNAMIC_DOUBLE_PROGRESSION: 'dynamic double progression',
-}
-
 const unique = (values: string[]) => [...new Set(values)]
 
-function loadsLabel(sets: readonly RoutineSet[], unit: WeightUnit): string {
+function loadsLabel(
+	sets: readonly RoutineSet[],
+	unit: WeightUnit,
+	t: Translator<'routines.versions'>,
+): string {
 	const loads = unique(
-		sets.map(set => (set.weight ? formatWeight(set.weight, unit) : 'no load')),
+		sets.map(set =>
+			set.weight ? formatWeight(set.weight, unit) : t('noLoad'),
+		),
 	)
-	return loads.length ? loads.join(', ') : 'no load'
+	return loads.length ? loads.join(', ') : t('noLoad')
 }
 
 function sameLoads(a: readonly RoutineSet[], b: readonly RoutineSet[]) {
@@ -111,9 +120,12 @@ function sameLoads(a: readonly RoutineSet[], b: readonly RoutineSet[]) {
 	)
 }
 
-function rirLabel(sets: readonly RoutineSet[]): string {
+function rirLabel(
+	sets: readonly RoutineSet[],
+	t: Translator<'routines.versions'>,
+): string {
 	const values = unique(
-		sets.map(set => (set.rir == null ? 'none' : String(set.rir))),
+		sets.map(set => (set.rir == null ? t('none') : String(set.rir))),
 	)
 	return values.join(', ')
 }
@@ -128,19 +140,37 @@ function kindsLabel(sets: readonly RoutineSet[]): string {
 	return [...counts].map(([label, n]) => `${n} ${label}`).join(', ')
 }
 
-const seconds = (value: number) => `${value} s`
+function progressionLabel(
+	scheme: ProgressionScheme,
+	t: Translator<'routines.versions'>,
+): string {
+	switch (scheme) {
+		case 'NONE':
+			return t('progressionNone')
+		case 'DOUBLE_PROGRESSION':
+			return t('progressionDouble')
+		case 'DYNAMIC_DOUBLE_PROGRESSION':
+			return t('progressionDynamicDouble')
+		default:
+			return String(scheme).toLowerCase()
+	}
+}
+
+const seconds = (value: number, t: Translator<'routines.versions'>) =>
+	t('seconds', { value })
 
 function compareExercise(
 	current: RoutineVersionExercise,
 	target: RoutineVersionExercise,
 	unit: WeightUnit,
+	t: Translator<'routines.versions'>,
 ): string[] {
 	const name = target.exercise.name
 	const changes: string[] = []
 	const fromScheme = formatSetScheme(current.sets)
 	const toScheme = formatSetScheme(target.sets)
 	if (fromScheme !== toScheme) {
-		changes.push(`${name}: ${fromScheme} → ${toScheme}`)
+		changes.push(t('exerciseScheme', { name, from: fromScheme, to: toScheme }))
 	}
 	const fromKinds = kindsLabel(current.sets)
 	const toKinds = kindsLabel(target.sets)
@@ -149,30 +179,40 @@ function compareExercise(
 		set => (set.kind ?? 'WORKING') !== 'WORKING',
 	)
 	if (anyNonWorking && fromKinds !== toKinds) {
-		changes.push(`${name}: ${fromKinds} → ${toKinds} sets`)
-	}
-	if (!sameLoads(current.sets, target.sets)) {
-		const from = loadsLabel(current.sets, unit)
-		const to = loadsLabel(target.sets, unit)
 		changes.push(
-			from === to
-				? `${name}: loads change per set`
-				: `${name}: ${from} → ${to}`,
+			t('exerciseSetsKind', { name, from: fromKinds, to: toKinds }),
 		)
 	}
-	const fromRir = rirLabel(current.sets)
-	const toRir = rirLabel(target.sets)
-	if (fromRir !== toRir) changes.push(`${name}: RIR ${fromRir} → ${toRir}`)
+	if (!sameLoads(current.sets, target.sets)) {
+		const from = loadsLabel(current.sets, unit, t)
+		const to = loadsLabel(target.sets, unit, t)
+		changes.push(
+			from === to
+				? t('exerciseLoadsPerSet', { name })
+				: t('exerciseLoadChange', { name, from, to }),
+		)
+	}
+	const fromRir = rirLabel(current.sets, t)
+	const toRir = rirLabel(target.sets, t)
+	if (fromRir !== toRir) {
+		changes.push(t('exerciseRirChange', { name, from: fromRir, to: toRir }))
+	}
 	if (current.restSeconds !== target.restSeconds) {
 		changes.push(
-			`${name}: rest ${seconds(current.restSeconds)} → ${seconds(target.restSeconds)}`,
+			t('exerciseRestChange', {
+				name,
+				from: seconds(current.restSeconds, t),
+				to: seconds(target.restSeconds, t),
+			}),
 		)
 	}
 	if (current.progressionScheme !== target.progressionScheme) {
-		const label = (scheme: ProgressionScheme) =>
-			PROGRESSION_LABELS[scheme] ?? scheme.toLowerCase()
 		changes.push(
-			`${name}: progression ${label(current.progressionScheme)} → ${label(target.progressionScheme)}`,
+			t('exerciseProgressionChange', {
+				name,
+				from: progressionLabel(current.progressionScheme, t),
+				to: progressionLabel(target.progressionScheme, t),
+			}),
 		)
 	}
 	if (
@@ -182,14 +222,18 @@ function compareExercise(
 		)
 	) {
 		changes.push(
-			`${name}: load step ${formatWeight(current.minWeightIncrement, unit)} → ${formatWeight(target.minWeightIncrement, unit)}`,
+			t('exerciseLoadStepChange', {
+				name,
+				from: formatWeight(current.minWeightIncrement, unit),
+				to: formatWeight(target.minWeightIncrement, unit),
+			}),
 		)
 	}
 	if ((current.note ?? '').trim() !== (target.note ?? '').trim()) {
 		changes.push(
 			target.note?.trim()
-				? `${name}: note becomes “${target.note.trim()}”`
-				: `${name}: note removed`,
+				? t('exerciseNoteBecomes', { name, note: target.note.trim() })
+				: t('exerciseNoteRemoved', { name }),
 		)
 	}
 	return changes
@@ -225,6 +269,7 @@ function compareDay(
 	current: RoutineVersionDay,
 	target: RoutineVersionDay,
 	unit: WeightUnit,
+	t: Translator<'routines.versions'>,
 ): string[] {
 	const changes: string[] = []
 	const fromName = current.name?.trim() || null
@@ -232,20 +277,25 @@ function compareDay(
 	if (fromName !== toName) {
 		changes.push(
 			toName
-				? `Named “${toName}”${fromName ? ` instead of “${fromName}”` : ''}`
-				: `Name “${fromName}” removed`,
+				? fromName
+					? t('dayNamedInsteadOf', { name: toName, previous: fromName })
+					: t('dayNamed', { name: toName })
+				: t('dayNameRemoved', { name: fromName ?? '' }),
 		)
 	}
 	const pairs = pairExercises(current.exercises, target.exercises)
 	for (const pair of pairs) {
 		if (pair.current && pair.target) {
-			changes.push(...compareExercise(pair.current, pair.target, unit))
+			changes.push(...compareExercise(pair.current, pair.target, unit, t))
 		} else if (pair.target) {
 			changes.push(
-				`Adds ${pair.target.exercise.name} (${formatSetScheme(pair.target.sets)})`,
+				t('exerciseAdds', {
+					name: pair.target.exercise.name,
+					scheme: formatSetScheme(pair.target.sets),
+				}),
 			)
 		} else if (pair.current) {
-			changes.push(`Removes ${pair.current.exercise.name}`)
+			changes.push(t('exerciseRemoves', { name: pair.current.exercise.name }))
 		}
 	}
 	const kept = (list: readonly RoutineVersionExercise[], other: Set<string>) =>
@@ -259,7 +309,7 @@ function compareDay(
 		kept(current.exercises, targetIds).join('|') !==
 		kept(target.exercises, currentIds).join('|')
 	) {
-		changes.push('Exercise order changes')
+		changes.push(t('exerciseOrderChanges'))
 	}
 	return changes
 }
@@ -277,28 +327,38 @@ export function compareRoutineSetups(
 	current: RoutineVersionSetup,
 	target: RoutineVersionSetup,
 	unit: WeightUnit,
+	t: Translator<'routines.versions'>,
+	tDate: Translator<'routines.date'>,
+	tSchedule: Translator<'routines.schedule'>,
 ): SetupComparison {
 	const routine: string[] = []
 	if (current.name.trim() !== target.name.trim()) {
-		routine.push(`Name: ${current.name} → ${target.name}`)
+		routine.push(t('nameChange', { from: current.name, to: target.name }))
 	}
 	if (
 		(current.description ?? '').trim() !== (target.description ?? '').trim()
 	) {
 		routine.push(
 			target.description?.trim()
-				? 'Description changes'
-				: 'Description removed',
+				? t('descriptionChanges')
+				: t('descriptionRemoved'),
 		)
 	}
-	const fromSchedule = describeRoutineSchedule(withIds(current))
-	const toSchedule = describeRoutineSchedule(withIds(target))
+	const fromSchedule = describeRoutineSchedule(
+		withIds(current),
+		tDate,
+		tSchedule,
+	)
+	const toSchedule = describeRoutineSchedule(withIds(target), tDate, tSchedule)
 	if (
 		current.scheduleMode !== target.scheduleMode ||
 		fromSchedule !== toSchedule
 	) {
 		routine.push(
-			`Schedule: ${fromSchedule || 'no days'} → ${toSchedule || 'no days'}`,
+			t('scheduleChange', {
+				from: fromSchedule || t('noDays'),
+				to: toSchedule || t('noDays'),
+			}),
 		)
 	}
 
@@ -314,25 +374,27 @@ export function compareRoutineSetups(
 		if (!before) {
 			const count = day.exercises.length
 			days.push({
-				title: routineDayTitle(day),
+				title: routineDayTitle(day, 'long', tDate),
 				status: 'ADDED',
-				changes: [
-					`Adds this day with ${count} ${count === 1 ? 'exercise' : 'exercises'}`,
-				],
+				changes: [t('dayAdds', { count })],
 			})
 			continue
 		}
-		const changes = compareDay(before, day, unit)
+		const changes = compareDay(before, day, unit, t)
 		if (changes.length) {
-			days.push({ title: routineDayTitle(day), status: 'CHANGED', changes })
+			days.push({
+				title: routineDayTitle(day, 'long', tDate),
+				status: 'CHANGED',
+				changes,
+			})
 		}
 	}
 	for (const day of [...current.days].sort((a, b) => a.order - b.order)) {
 		if (!targetKeys.has(key(day))) {
 			days.push({
-				title: routineDayTitle(day),
+				title: routineDayTitle(day, 'long', tDate),
 				status: 'REMOVED',
-				changes: ['Removes this day'],
+				changes: [t('dayRemoves')],
 			})
 		}
 	}
@@ -348,19 +410,16 @@ export function restoreBlockedReason({
 	versionCount,
 	max,
 	hasLiveSession,
+	t,
 }: {
 	comparison: SetupComparison
 	versionCount: number
 	max: number
 	hasLiveSession: boolean
+	t: Translator<'routines.versions'>
 }): string | null {
-	if (comparison.isEmpty)
-		return 'This version matches the routine as it is now.'
-	if (hasLiveSession) {
-		return 'Finish the workout in progress on this routine before restoring.'
-	}
-	if (versionCount >= max) {
-		return `This routine already keeps ${max} versions, and restoring saves the current setup first. Delete a version to restore this one.`
-	}
+	if (comparison.isEmpty) return t('restoreMatches')
+	if (hasLiveSession) return t('restoreLiveSession')
+	if (versionCount >= max) return t('restoreVersionLimit', { max })
 	return null
 }

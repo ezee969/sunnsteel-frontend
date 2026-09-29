@@ -1,6 +1,7 @@
 'use client'
 
 import { Heart, ListChecks, Loader2, MoreVertical } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -74,18 +75,26 @@ export function RoutineCard({
 }: RoutineCardProps) {
 	const router = useRouter()
 	const { preloadOnHover } = useComponentPreloading()
+	const t = useTranslations('routines.card')
+	const tDate = useTranslations('routines.date')
+	const tSchedule = useTranslations('routines.schedule')
+	const tFormat = useTranslations('routines.format')
+	const tDeloads = useTranslations('routines.deloads')
 
 	// ROUT-15: the card offers the plan in force today, a training block's
 	// days while one covers today.
 	const plan = routineOn(routine, localDateKey(new Date()))
 	// ROUT-15/ROUT-16: the block or deload today trains, when not the routine.
-	const planText = planLabel({
-		trainingBlockName: plan.trainingBlock?.name,
-		deload: !!plan.temporaryOverride,
-	})
+	const planText = planLabel(
+		{
+			trainingBlockName: plan.trainingBlock?.name,
+			deload: !!plan.temporaryOverride,
+		},
+		tDeloads,
+	)
 	// Date validation for workout scheduling
 	const todayDow = getTodayDow()
-	const workoutValidation = validateWorkoutDate(plan.days)
+	const workoutValidation = validateWorkoutDate(plan.days, todayDow, tDate)
 	const canStartToday = workoutValidation.isValid
 	// ROUT-11: a rotation starts its next day on any weekday.
 	const todayRoutineDay = startableDayToday(plan, todayDow)
@@ -120,7 +129,7 @@ export function RoutineCard({
 					    ground rather than a strip of outlined boxes (§11.12). */}
 					{plan.days.length > 0 && (
 						<p className="type-data mt-1 text-ink-3">
-							{describeRoutineSchedule(plan)}
+							{describeRoutineSchedule(plan, tDate, tSchedule)}
 						</p>
 					)}
 					{planText ? (
@@ -132,7 +141,7 @@ export function RoutineCard({
 						<Button
 							variant="ghost"
 							size="icon"
-							aria-label="Routine actions"
+							aria-label={t('routineActions')}
 							className="-mr-1 size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						>
 							<MoreVertical className="h-4 w-4" />
@@ -141,9 +150,15 @@ export function RoutineCard({
 					<DropdownMenuContent align="end">
 						{plan.days.length > 0 && (
 							<>
-								<DropdownMenuLabel>Start session with day</DropdownMenuLabel>
+								<DropdownMenuLabel>
+									{t('startSessionWithDay')}
+								</DropdownMenuLabel>
 								{plan.days.map(d => {
-									const dayValidation = validateRoutineDayDate(d)
+									const dayValidation = validateRoutineDayDate(
+										d,
+										todayDow,
+										tDate,
+									)
 									const canStartThisDay = dayValidation.isValid
 
 									return (
@@ -156,11 +171,13 @@ export function RoutineCard({
 											}
 											title={
 												!canStartThisDay
-													? `${routineDayTitle(d)} is not scheduled for today`
+													? t('dayNotScheduled', {
+															day: routineDayTitle(d, 'long', tDate),
+														})
 													: undefined
 											}
 										>
-											{routineDayTitle(d, 'short')}
+											{routineDayTitle(d, 'short', tDate)}
 										</DropdownMenuItem>
 									)
 								})}
@@ -168,16 +185,16 @@ export function RoutineCard({
 							</>
 						)}
 						<DropdownMenuItem asChild>
-							<Link href={`/routines/${routine.id}`}>Open</Link>
+							<Link href={`/routines/${routine.id}`}>{t('open')}</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem asChild>
-							<Link href={`/routines/edit/${routine.id}`}>Edit</Link>
+							<Link href={`/routines/edit/${routine.id}`}>{t('edit')}</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="text-destructive"
 							onSelect={() => onDelete(routine.id)}
 						>
-							Delete
+							{t('delete')}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -189,14 +206,20 @@ export function RoutineCard({
 			<div className="mt-2 max-w-[var(--cluster-max)] space-y-2">
 				<RoutineMetaBadges
 					daysPerWeek={plan.days.length}
-					frequency={describeRoutineFrequency(plan, formatDaysPerWeek)}
+					frequency={describeRoutineFrequency(
+						plan,
+						days => formatDaysPerWeek(days, tFormat),
+						tSchedule,
+					)}
 					isPeriodized={routine.isPeriodized}
 				/>
 
 				<RoutineScheduleNote
 					isCompleted={routine.isCompleted}
 					nextDay={nextDay}
-					rotationNext={rotationNext ? routineDayTitle(rotationNext) : null}
+					rotationNext={
+						rotationNext ? routineDayTitle(rotationNext, 'long', tDate) : null
+					}
 				/>
 
 				<div className="flex items-center gap-1.5 pt-1">
@@ -206,7 +229,7 @@ export function RoutineCard({
 							variant="default"
 							size="sm"
 							className="relative flex-1 touch-manipulation pl-6 sm:flex-initial sm:min-w-[120px]"
-							aria-label="Resume active workout session"
+							aria-label={t('resumeActiveSession')}
 							onClick={e => {
 								e.preventDefault()
 								if (activeSessionId) {
@@ -223,7 +246,7 @@ export function RoutineCard({
 							{...preloadOnHover('activeWorkoutSession')}
 						>
 							<span className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-current opacity-70 animate-pulse-opacity" />
-							Resume
+							{t('resume')}
 						</Button>
 					) : (
 						<Button
@@ -231,7 +254,7 @@ export function RoutineCard({
 							variant="default"
 							size="sm"
 							className="flex-1 touch-manipulation sm:flex-initial sm:min-w-[120px]"
-							aria-label="Start session"
+							aria-label={t('startSession')}
 							onClick={e => {
 								e.preventDefault()
 								if (canStartToday) {
@@ -248,7 +271,9 @@ export function RoutineCard({
 							disabled={isStartDisabled}
 							title={
 								!canStartToday
-									? `This workout is not scheduled for ${weekdayName(todayDow, 'long')}`
+									? t('notScheduledForToday', {
+											day: weekdayName(todayDow, 'long', tDate),
+										})
 									: undefined
 							}
 							{...preloadOnHover('activeWorkoutSession')}
@@ -262,7 +287,7 @@ export function RoutineCard({
 									aria-hidden
 								/>
 							)}
-							{lastStartReused ? 'Resume' : 'Start'}
+							{lastStartReused ? t('resume') : t('start')}
 						</Button>
 					)}
 					<Button
@@ -271,7 +296,7 @@ export function RoutineCard({
 						size="icon"
 						className="size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						aria-label={
-							routine.isCompleted ? 'Unmark completed' : 'Mark as completed'
+							routine.isCompleted ? t('unmarkCompleted') : t('markCompleted')
 						}
 						disabled
 						aria-pressed={routine.isCompleted}
@@ -298,7 +323,7 @@ export function RoutineCard({
 						size="icon"
 						className="size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						aria-label={
-							routine.isFavorite ? 'Unmark favorite' : 'Mark as favorite'
+							routine.isFavorite ? t('unmarkFavorite') : t('markFavorite')
 						}
 						aria-pressed={routine.isFavorite}
 						onClick={() => onToggleFavorite(routine)}

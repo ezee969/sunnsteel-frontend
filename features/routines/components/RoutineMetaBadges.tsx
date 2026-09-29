@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl'
+
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { cn } from '@/lib/utils'
 import { formatDaysPerWeek } from '@/lib/utils/routine-format'
@@ -24,6 +26,8 @@ export function RoutineMetaBadges({
 	isPeriodized,
 	className,
 }: RoutineMetaBadgesProps) {
+	const t = useTranslations('routines.format')
+	const tCard = useTranslations('routines.card')
 	return (
 		<p
 			className={cn(
@@ -36,13 +40,13 @@ export function RoutineMetaBadges({
 				className="h-3.5 w-3.5 flex-shrink-0 text-ink-3"
 				aria-hidden
 			/>
-			<span>{frequency ?? formatDaysPerWeek(daysPerWeek)}</span>
+			<span>{frequency ?? formatDaysPerWeek(daysPerWeek, t)}</span>
 			{isPeriodized && (
 				<>
 					<span aria-hidden className="text-ink-3">
 						·
 					</span>
-					<span>Periodized</span>
+					<span>{tCard('periodized')}</span>
 				</>
 			)}
 		</p>

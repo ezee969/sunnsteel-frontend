@@ -1,6 +1,8 @@
 import type { Exercise } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	activeCatalogFilterCount,
 	catalogFilterOptions,
@@ -14,6 +16,9 @@ import {
 	parseCatalogFilters,
 	serializeCatalogFilters,
 } from './exercise-catalog'
+
+const enMuscles = translatorFor('en', 'routines.muscles')
+const enEquipment = translatorFor('en', 'routines.equipment')
 
 const exercise = (id: string, overrides: Partial<Exercise> = {}): Exercise => ({
 	id,
@@ -203,7 +208,12 @@ describe('fitsListedEquipment', () => {
 
 describe('catalogFilterOptions', () => {
 	it('offers only values the catalog uses, in vocabulary order', () => {
-		const options = catalogFilterOptions(catalog, EMPTY_CATALOG_FILTERS)
+		const options = catalogFilterOptions(
+			catalog,
+			EMPTY_CATALOG_FILTERS,
+			enMuscles,
+			enEquipment,
+		)
 		expect(options.muscles.map(option => option.label)).toEqual([
 			'Pecs',
 			'Biceps',
@@ -224,10 +234,12 @@ describe('catalogFilterOptions', () => {
 	})
 
 	it('keeps a selected value the catalog no longer uses', () => {
-		const options = catalogFilterOptions(catalog, {
-			...EMPTY_CATALOG_FILTERS,
-			pattern: 'SQUAT',
-		})
+		const options = catalogFilterOptions(
+			catalog,
+			{ ...EMPTY_CATALOG_FILTERS, pattern: 'SQUAT' },
+			enMuscles,
+			enEquipment,
+		)
 		expect(options.patterns.map(option => option.value)).toContain('SQUAT')
 	})
 })

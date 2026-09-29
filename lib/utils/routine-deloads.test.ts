@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	DELOAD_LENGTHS,
 	deloadDateProblem,
+	deloadDateProblemMessage,
 	deloadEndDate,
 	describeDeloadInForce,
 	describeDeloadLength,
@@ -12,6 +15,9 @@ import {
 	firstFreeDate,
 	planLabel,
 } from './routine-deloads'
+
+const en = translatorFor('en', 'routines.deloads')
+const es = translatorFor('es', 'routines.deloads')
 
 const TODAY = '2026-10-05'
 const block = { id: 'block-1', startDate: '2026-10-01', endDate: '2026-10-14' }
@@ -31,9 +37,9 @@ describe('deload copy and date rules (ROUT-16)', () => {
 		expect(deloadEndDate('2026-10-05', 1)).toBe('2026-10-05')
 		expect(DELOAD_LENGTHS.at(0)).toBe(1)
 		expect(DELOAD_LENGTHS.at(-1)).toBe(14)
-		expect(describeDeloadLength(7)).toBe('1 week')
-		expect(describeDeloadLength(1)).toBe('1 day')
-		expect(describeDeloadLength(10)).toBe('10 days')
+		expect(describeDeloadLength(7, en)).toBe('1 week')
+		expect(describeDeloadLength(1, en)).toBe('1 day')
+		expect(describeDeloadLength(10, en)).toBe('10 days')
 	})
 
 	it('mirrors the server: today or later, no overlap, one plan', () => {
@@ -72,54 +78,88 @@ describe('deload copy and date rules (ROUT-16)', () => {
 
 	it('says what it changes and where it came from', () => {
 		expect(
-			describeDeloadOptions({ loadReductionPercent: 10, setMode: 'HALF' }),
+			describeDeloadOptions({ loadReductionPercent: 10, setMode: 'HALF' }, en),
 		).toBe('10% lighter · first half of the sets')
 		expect(
-			describeDeloadOptions({ loadReductionPercent: 0, setMode: 'HALF' }),
+			describeDeloadOptions({ loadReductionPercent: 0, setMode: 'HALF' }, en),
 		).toBe('Same loads · first half of the sets')
 		expect(
-			describeDeloadSource({
-				kind: 'TRAINING_BLOCK',
-				trainingBlockId: 's',
-				trainingBlockName: 'Strength',
-			}),
+			describeDeloadSource(
+				{
+					kind: 'TRAINING_BLOCK',
+					trainingBlockId: 's',
+					trainingBlockName: 'Strength',
+				},
+				en,
+			),
 		).toBe('Lightens the training block “Strength”')
 		expect(
-			describeDeloadSource({
-				kind: 'BASELINE',
-				trainingBlockId: null,
-				trainingBlockName: null,
-			}),
+			describeDeloadSource(
+				{ kind: 'BASELINE', trainingBlockId: null, trainingBlockName: null },
+				en,
+			),
 		).toBe('Lightens the routine')
 	})
 
 	it('names a deload ended on its first day by that day', () => {
 		expect(
-			describeDeloadRange({ startDate: '2026-10-05', endDate: '2026-10-04' }),
+			describeDeloadRange(
+				{ startDate: '2026-10-05', endDate: '2026-10-04' },
+				'en',
+				en,
+			),
 		).toBe('Oct 5, 2026 · ended on its first day')
 		expect(
-			describeDeloadRange({ startDate: '2026-10-05', endDate: '2026-10-11' }),
+			describeDeloadRange(
+				{ startDate: '2026-10-05', endDate: '2026-10-11' },
+				'en',
+				en,
+			),
 		).toContain('Oct 11, 2026')
 	})
 
 	it('explains the days in force and when the plan returns', () => {
-		const line = describeDeloadInForce({ endDate: '2026-10-11' }, null)
+		const line = describeDeloadInForce(
+			{ endDate: '2026-10-11' },
+			null,
+			'en',
+			en,
+		)
 		expect(line).toContain('until Oct 11, 2026')
 		expect(line).toContain("loads don't progress")
 		expect(line).toContain('The routine returns on Oct 12, 2026')
 		expect(
-			describeDeloadInForce({ endDate: '2026-10-11' }, 'Strength'),
+			describeDeloadInForce({ endDate: '2026-10-11' }, 'Strength', 'en', en),
 		).toContain('The training block “Strength” returns')
 	})
 
 	it('labels the plan a date or workout trains', () => {
-		expect(planLabel({})).toBeNull()
-		expect(planLabel({ deload: true })).toBe('Deload')
-		expect(planLabel({ trainingBlockName: 'Strength' })).toBe(
+		expect(planLabel({}, en)).toBeNull()
+		expect(planLabel({ deload: true }, en)).toBe('Deload')
+		expect(planLabel({ trainingBlockName: 'Strength' }, en)).toBe(
 			'Training block · Strength',
 		)
-		expect(planLabel({ trainingBlockName: 'Strength', deload: true })).toBe(
+		expect(planLabel({ trainingBlockName: 'Strength', deload: true }, en)).toBe(
 			'Training block · Strength · Deload',
 		)
+	})
+
+	it('names the date problems it mirrors from the server', () => {
+		expect(deloadDateProblemMessage('PAST', en)).toMatch(/today or later/)
+	})
+
+	it('says the same in Spanish (I18N-03)', () => {
+		expect(describeDeloadLength(7, es)).toBe('1 semana')
+		expect(describeDeloadLength(14, es)).toBe('2 semanas')
+		expect(describeDeloadLength(1, es)).toBe('1 día')
+		expect(describeDeloadLength(2, es)).toBe('2 días')
+		expect(
+			describeDeloadOptions({ loadReductionPercent: 10, setMode: 'HALF' }, es),
+		).toBe('10% más ligero · la primera mitad de las series')
+		expect(planLabel({ deload: true }, es)).toBe('Descarga')
+		expect(
+			describeDeloadInForce({ endDate: '2026-10-11' }, 'Strength', 'es', es),
+		).toContain('El bloque de entrenamiento “Strength” vuelve')
+		expect(deloadDateProblemMessage('PAST', es)).toMatch(/hoy o después/)
 	})
 })

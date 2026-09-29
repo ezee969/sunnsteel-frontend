@@ -4,27 +4,37 @@ import {
 	type TrainingLocationPreference,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 /**
  * The EXER-09 equipment vocabulary as people read it, and the bridge from the
  * free-text equipment a training location lists (PREF-01) onto that
  * vocabulary. Shared by the routine quality summary (ROUT-10) and exercise
- * alternatives (EXER-05).
+ * alternatives (EXER-05). I18N-07 will reuse this fixed vocabulary from the
+ * catalog too.
  */
 
-export const EQUIPMENT_LABELS: Record<ExerciseEquipment, string> = {
-	barbell: 'Barbell',
-	'ez-bar': 'EZ bar',
-	dumbbell: 'Dumbbells',
-	cable: 'Cable station',
-	machine: 'Machines',
-	'smith-machine': 'Smith machine',
-	bench: 'Flat bench',
-	'incline-bench': 'Incline bench',
-	'preacher-bench': 'Preacher bench',
-	rack: 'Rack',
-	'pull-up-bar': 'Pull-up bar',
-	'dip-station': 'Dip station',
-	bodyweight: 'Bodyweight',
+const EQUIPMENT_KEYS: Record<ExerciseEquipment, string> = {
+	barbell: 'barbell',
+	'ez-bar': 'ezBar',
+	dumbbell: 'dumbbell',
+	cable: 'cable',
+	machine: 'machine',
+	'smith-machine': 'smithMachine',
+	bench: 'bench',
+	'incline-bench': 'inclineBench',
+	'preacher-bench': 'preacherBench',
+	rack: 'rack',
+	'pull-up-bar': 'pullUpBar',
+	'dip-station': 'dipStation',
+	bodyweight: 'bodyweight',
+}
+
+export function equipmentLabel(
+	item: ExerciseEquipment,
+	t: Translator<'routines.equipment'>,
+): string {
+	return t(EQUIPMENT_KEYS[item])
 }
 
 const EQUIPMENT_VOCABULARY = new Set<string>(EXERCISE_EQUIPMENT)

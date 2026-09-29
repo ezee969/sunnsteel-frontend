@@ -1,4 +1,5 @@
 import { CalendarDays, CircleAlert, ListChecks, Repeat } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
 import { describeDaysAway } from '@/lib/utils/date'
@@ -35,6 +36,8 @@ export function RoutineScheduleNote({
 	rotationNext,
 	className,
 }: RoutineScheduleNoteProps) {
+	const t = useTranslations('routines.card')
+	const tDate = useTranslations('routines.date')
 	// v1.0 §4.3: completion is `--success` and nothing else; "today" is neither
 	// completion nor honour, so it is emphasised with ink rather than gold. A
 	// routine with no training days is a risk, and warning has no text grade
@@ -43,8 +46,8 @@ export function RoutineScheduleNote({
 		if (isCompleted) {
 			return {
 				Icon: ListChecks,
-				label: 'Status',
-				value: 'Completed',
+				label: t('statusLabel'),
+				value: t('completedValue'),
 				iconTone: 'text-success',
 				valueTone: 'text-success',
 			}
@@ -52,7 +55,7 @@ export function RoutineScheduleNote({
 		if (rotationNext) {
 			return {
 				Icon: Repeat,
-				label: 'Next in rotation',
+				label: t('nextInRotationLabel'),
 				value: rotationNext,
 				iconTone: 'text-ink-3',
 				valueTone: 'text-foreground',
@@ -61,16 +64,16 @@ export function RoutineScheduleNote({
 		if (!nextDay) {
 			return {
 				Icon: CircleAlert,
-				label: 'Schedule',
-				value: 'No training days',
+				label: t('scheduleLabel'),
+				value: t('noTrainingDays'),
 				iconTone: 'text-warning-strong',
 				valueTone: 'text-ink-2',
 			}
 		}
 		return {
 			Icon: CalendarDays,
-			label: 'Next session',
-			value: describeDaysAway(nextDay.dayOfWeek, nextDay.daysAway),
+			label: t('nextSessionLabel'),
+			value: describeDaysAway(nextDay.dayOfWeek, nextDay.daysAway, tDate),
 			iconTone: 'text-ink-3',
 			valueTone: nextDay.daysAway === 0 ? 'text-foreground' : 'text-ink-2',
 		}

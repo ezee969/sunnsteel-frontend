@@ -1,24 +1,38 @@
+import type { Translator } from '@/i18n/translator'
+
 export const getTodayDow = (): number => {
 	// Local device weekday (0=Sun..6=Sat)
 	return new Date().getDay()
 }
 
+const SHORT_KEYS = [
+	'weekdayShort.sun',
+	'weekdayShort.mon',
+	'weekdayShort.tue',
+	'weekdayShort.wed',
+	'weekdayShort.thu',
+	'weekdayShort.fri',
+	'weekdayShort.sat',
+] as const
+
+const LONG_KEYS = [
+	'weekdayLong.sunday',
+	'weekdayLong.monday',
+	'weekdayLong.tuesday',
+	'weekdayLong.wednesday',
+	'weekdayLong.thursday',
+	'weekdayLong.friday',
+	'weekdayLong.saturday',
+] as const
+
 export const weekdayName = (
 	dayOfWeek: number,
 	style: 'short' | 'long' = 'short',
+	t: Translator<'routines.date'>,
 ): string => {
-	const short = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
-	const long = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-	] as const
-	const src = style === 'long' ? long : short
-	return src[dayOfWeek] ?? `Day ${dayOfWeek}`
+	const keys = style === 'long' ? LONG_KEYS : SHORT_KEYS
+	const key = keys[dayOfWeek]
+	return key ? t(key) : t('day', { day: dayOfWeek })
 }
 
 export const isTodayDow = (dayOfWeek: number): boolean =>
@@ -34,11 +48,12 @@ export const isTodayDow = (dayOfWeek: number): boolean =>
 export const validateWorkoutDate = (
 	routineDays: Array<{ dayOfWeek: number | null }> | undefined,
 	todayDow: number = getTodayDow(),
+	t: Translator<'routines.date'>,
 ): { isValid: boolean; message?: string; availableDays?: string[] } => {
 	if (!routineDays || routineDays.length === 0) {
 		return {
 			isValid: false,
-			message: 'No training days configured for this routine',
+			message: t('noTrainingDays'),
 		}
 	}
 	if (routineDays.some(day => day.dayOfWeek === null)) return { isValid: true }
@@ -52,11 +67,14 @@ export const validateWorkoutDate = (
 
 	const availableDayNames = scheduledDays
 		.sort()
-		.map(dow => weekdayName(dow, 'long'))
+		.map(dow => weekdayName(dow, 'long', t))
 
 	return {
 		isValid: false,
-		message: `Today is ${weekdayName(todayDow, 'long')}, but this routine is scheduled for ${availableDayNames.join(', ')}`,
+		message: t('scheduledForOtherDays', {
+			today: weekdayName(todayDow, 'long', t),
+			days: availableDayNames.join(', '),
+		}),
 		availableDays: availableDayNames,
 	}
 }
@@ -70,11 +88,12 @@ export const validateWorkoutDate = (
 export const validateRoutineDayDate = (
 	routineDay: { dayOfWeek: number | null } | undefined,
 	todayDow: number = getTodayDow(),
+	t: Translator<'routines.date'>,
 ): { isValid: boolean; message?: string } => {
 	if (!routineDay) {
 		return {
 			isValid: false,
-			message: 'Invalid routine day',
+			message: t('invalidRoutineDay'),
 		}
 	}
 
@@ -84,7 +103,10 @@ export const validateRoutineDayDate = (
 
 	return {
 		isValid: false,
-		message: `Today is ${weekdayName(todayDow, 'long')}, but this workout is scheduled for ${weekdayName(routineDay.dayOfWeek, 'long')}`,
+		message: t('scheduledForOtherDay', {
+			today: weekdayName(todayDow, 'long', t),
+			day: weekdayName(routineDay.dayOfWeek, 'long', t),
+		}),
 	}
 }
 
@@ -150,8 +172,9 @@ export const nextScheduledDay = (
 export const describeDaysAway = (
 	dayOfWeek: number,
 	daysAway: number,
+	t: Translator<'routines.date'>,
 ): string => {
-	if (daysAway === 0) return 'Today'
-	if (daysAway === 1) return 'Tomorrow'
-	return weekdayName(dayOfWeek, 'long')
+	if (daysAway === 0) return t('today')
+	if (daysAway === 1) return t('tomorrow')
+	return weekdayName(dayOfWeek, 'long', t)
 }

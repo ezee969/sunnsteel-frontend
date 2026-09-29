@@ -2,6 +2,7 @@
 
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { type ReactNode, useMemo, useState } from 'react'
 
@@ -28,7 +29,7 @@ import {
 	MOVEMENT_PATTERN_LABELS,
 } from '@/lib/utils/exercise-catalog'
 import { findRoutineUsages } from '@/lib/utils/exercise-detail'
-import { EQUIPMENT_LABELS } from '@/lib/utils/exercise-equipment'
+import { equipmentLabel } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
 import {
 	describeClosestShare,
@@ -131,6 +132,8 @@ function Overview({
 	exercise: Exercise
 	lastTrained: ReactNode
 }) {
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
 	const movement = [
 		exercise.movementPattern
 			? MOVEMENT_PATTERN_LABELS[exercise.movementPattern]
@@ -139,15 +142,16 @@ function Overview({
 	]
 		.filter(Boolean)
 		.join(' · ')
-	const secondary = getFriendlyMuscleNames(exercise.secondaryMuscles)
+	const secondary = getFriendlyMuscleNames(exercise.secondaryMuscles, tMuscles)
 
 	return (
 		<section aria-labelledby="exercise-overview">
 			<SectionHeading id="exercise-overview" title="Overview" />
 			<dl className="grid sm:grid-cols-2 sm:gap-x-8">
 				<Fact label="Primary muscles">
-					{getFriendlyMuscleNames(exercise.primaryMuscles).join(', ') ||
-						'Not classified'}
+					{getFriendlyMuscleNames(exercise.primaryMuscles, tMuscles).join(
+						', ',
+					) || 'Not classified'}
 				</Fact>
 				<Fact label="Secondary muscles">
 					{secondary.length ? secondary.join(', ') : 'None'}
@@ -155,7 +159,7 @@ function Overview({
 				<Fact label="Movement">{movement || 'Not classified'}</Fact>
 				<Fact label="Equipment">
 					{exercise.equipmentRequired
-						.map(item => EQUIPMENT_LABELS[item])
+						.map(item => equipmentLabel(item, tEquipment))
 						.join(', ') || 'Not listed'}
 				</Fact>
 				<Fact label="Last trained">{lastTrained}</Fact>
@@ -166,9 +170,10 @@ function Overview({
 
 function RoutineUsages({ exerciseId }: { exerciseId: string }) {
 	const routines = useRoutines()
+	const tDate = useTranslations('routines.date')
 	const usages = useMemo(
-		() => findRoutineUsages(routines.data ?? [], exerciseId),
-		[exerciseId, routines.data],
+		() => findRoutineUsages(routines.data ?? [], exerciseId, tDate),
+		[exerciseId, routines.data, tDate],
 	)
 
 	return (

@@ -10,6 +10,7 @@ import {
 	SkipForward,
 	Undo2,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { Explanation } from '@/components/layout/explanation'
@@ -194,11 +195,12 @@ function EntryRow({
 	pendingKey,
 	...actionProps
 }: { entry: ScheduleEntry } & Omit<ActionProps, 'target'> & MoveProps) {
+	const tDate = useTranslations('routines.date')
 	const status = entryStatus(entry)
 	const { Icon, tone } = status
 	const label =
 		entry.kind === 'MOVED'
-			? `Moved to ${describeShortDate(entry.toDate)}`
+			? `Moved to ${describeShortDate(entry.toDate, tDate)}`
 			: status.label
 	const movedFrom =
 		(entry.kind === 'PLANNED' || entry.kind === 'NOT_LOGGED') && entry.movedFrom
@@ -229,7 +231,7 @@ function EntryRow({
 				) : null}
 				{movedFrom ? (
 					<span className="type-body-sm ml-2 text-ink-3">
-						· moved from {describeShortDate(movedFrom)}
+						· moved from {describeShortDate(movedFrom, tDate)}
 					</span>
 				) : null}
 			</span>
@@ -267,6 +269,7 @@ export function ScheduleWeekView({
 	onToday,
 	onRetry,
 }: ScheduleWeekViewProps) {
+	const tDate = useTranslations('routines.date')
 	return (
 		<section aria-labelledby="schedule-week" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
@@ -398,7 +401,7 @@ export function ScheduleWeekView({
 
 					<ol className="border-t border-rule">
 						{week.days.map(day => {
-							const { weekday, date } = describeScheduleDay(day)
+							const { weekday, date } = describeScheduleDay(day, tDate)
 							return (
 								<li
 									key={day.date}

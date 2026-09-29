@@ -1,6 +1,7 @@
 'use client'
 
 import { CalendarDays, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -33,6 +34,7 @@ import { DashboardSection } from './DashboardSection'
  * filled action.
  */
 export default function WeekStrip() {
+	const tDate = useTranslations('routines.date')
 	const [now] = useState(() => new Date())
 	const weekStart = useMemo(() => startOfWeek(now), [now])
 	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
@@ -61,7 +63,10 @@ export default function WeekStrip() {
 		weekStart,
 		now,
 	])
-	const days = useMemo(() => (week ? buildWeekStrip(week) : []), [week])
+	const days = useMemo(
+		() => (week ? buildWeekStrip(week, tDate) : []),
+		[week, tDate],
+	)
 	const todayLine = today.isPending
 		? null
 		: describeWeekStripToday({

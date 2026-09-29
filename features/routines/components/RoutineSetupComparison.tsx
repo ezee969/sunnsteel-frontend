@@ -1,21 +1,22 @@
-import type { SetupComparison } from '@/lib/utils/routine-versions'
+import { useTranslations } from 'next-intl'
 
-const DAY_STATUS_WORDS = {
-	ADDED: 'New day',
-	REMOVED: 'Removed day',
-	CHANGED: null,
-} as const
+import type { SetupComparison } from '@/lib/utils/routine-versions'
 
 export function RoutineSetupComparison({
 	comparison,
 }: {
 	comparison: SetupComparison
 }) {
+	const t = useTranslations('routines.versions')
+	const DAY_STATUS_WORDS = {
+		ADDED: t('newDay'),
+		REMOVED: t('removedDay'),
+		CHANGED: null,
+	} as const
+
 	if (comparison.isEmpty) {
 		return (
-			<p className="type-body-sm text-ink-2">
-				This setup matches the routine as it is now.
-			</p>
+			<p className="type-body-sm text-ink-2">{t('setupMatches')}</p>
 		)
 	}
 
