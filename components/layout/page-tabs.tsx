@@ -1,8 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef } from 'react'
 
 import { NativeSelect } from '@/components/ui/native-select'

@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, Loader2, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 import {
@@ -24,9 +25,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useDeleteAccount } from '@/lib/api/hooks/useDeleteAccount'
 import {
-	ACCOUNT_DELETION_EXPORT_FIRST,
-	ACCOUNT_DELETION_KEEPS,
-	ACCOUNT_DELETION_REMOVES,
+	accountDeletionExportFirst,
+	accountDeletionKeeps,
+	accountDeletionRemoves,
 	canConfirmDeletion,
 	deletionBlockedReason,
 	deletionConfirmationPrompt,
@@ -44,11 +45,12 @@ export function DeleteAccountCard({
 }: {
 	profile: { username: string; isModerator: boolean }
 }) {
+	const t = useTranslations('core.accountDeletion')
 	const [open, setOpen] = useState(false)
 	const [typed, setTyped] = useState('')
 	const remove = useDeleteAccount()
 	const inputId = useId()
-	const blocked = deletionBlockedReason(profile)
+	const blocked = deletionBlockedReason(profile, t)
 	const confirmed = canConfirmDeletion(typed, profile.username)
 
 	const onOpenChange = (next: boolean) => {
@@ -96,18 +98,18 @@ export function DeleteAccountCard({
 					</AlertDialogHeader>
 
 					<ul className="type-body-sm list-disc space-y-1 pl-5 text-ink-2">
-						{ACCOUNT_DELETION_REMOVES.map(item => (
+						{accountDeletionRemoves(t).map(item => (
 							<li key={item}>{item}</li>
 						))}
 					</ul>
-					<p className="type-body-sm text-ink-2">{ACCOUNT_DELETION_KEEPS}</p>
+					<p className="type-body-sm text-ink-2">{accountDeletionKeeps(t)}</p>
 					<div className="mark mark-warning flex gap-2 bg-surface-sunk py-2 pl-3 pr-3">
 						<AlertTriangle
 							className="mt-0.5 size-4 shrink-0 text-warning-strong"
 							aria-hidden
 						/>
 						<p className="type-body-sm text-foreground">
-							{ACCOUNT_DELETION_EXPORT_FIRST}
+							{accountDeletionExportFirst(t)}
 						</p>
 					</div>
 
@@ -120,7 +122,7 @@ export function DeleteAccountCard({
 						}}
 					>
 						<Label htmlFor={inputId}>
-							{deletionConfirmationPrompt(profile.username)}
+							{deletionConfirmationPrompt(profile.username, t)}
 						</Label>
 						<Input
 							id={inputId}

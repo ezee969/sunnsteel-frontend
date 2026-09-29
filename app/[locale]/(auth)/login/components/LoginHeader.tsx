@@ -12,9 +12,7 @@ export function LoginHeader() {
 			<h1 className="type-page corner-brackets inline-block text-foreground">
 				{t('welcomeTitle')}
 			</h1>
-			<p className="type-body-sm mt-2 text-ink-2">
-				{t('welcomeDescription')}
-			</p>
+			<p className="type-body-sm mt-2 text-ink-2">{t('welcomeDescription')}</p>
 		</div>
 	)
 }

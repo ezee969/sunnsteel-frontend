@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, Loader2, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Suspense } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -34,6 +35,8 @@ export const dynamic = 'force-dynamic'
  * the address has an account, so the page cannot be used to probe for one.
  */
 function ForgotPasswordContent() {
+	const t = useTranslations('core.forgotPassword')
+	const tCommon = useTranslations('core.authCommon')
 	const searchParams = useSearchParams()
 	const linkExpired = searchParams.get('link') === 'expired'
 	const { mutate, reset, isPending, isError, error, isSuccess, variables } =
@@ -46,10 +49,7 @@ function ForgotPasswordContent() {
 
 	return (
 		<div>
-			<AuthPageHeader
-				title="Reset Password"
-				description="Enter the email you sign in with and we'll send you a link to choose a new password."
-			/>
+			<AuthPageHeader title={t('title')} description={t('description')} />
 
 			<div className="w-full rounded-sm border border-rule bg-surface p-5 sm:p-6">
 				<TopLoadingBar show={isPending} />
@@ -57,9 +57,7 @@ function ForgotPasswordContent() {
 				{isSuccess ? (
 					<>
 						<AuthNotice tone="success" title="Check your email" role="status">
-							If an account exists for {variables?.email}, a link to choose a
-							new password is on its way. It can take a few minutes, so check
-							your spam folder too. The link works once.
+							{t('checkEmailBody', { email: variables?.email ?? '' })}
 						</AuthNotice>
 						<Button
 							variant="outline"
@@ -68,7 +66,7 @@ function ForgotPasswordContent() {
 							type="button"
 							onClick={() => reset()}
 						>
-							Send another link
+							{t('sendAnotherLink')}
 						</Button>
 					</>
 				) : (
@@ -76,20 +74,19 @@ function ForgotPasswordContent() {
 						{isError ? (
 							<AuthNotice
 								tone="warning"
-								title="Unable to send the link"
+								title={t('unableToSendTitle')}
 								role="alert"
 							>
-								{error?.message || 'Please try again in a few minutes.'}
+								{error?.message || t('tryAgainMinutes')}
 							</AuthNotice>
 						) : (
 							linkExpired && (
 								<AuthNotice
 									tone="warning"
-									title="That link can't be used"
+									title={t('linkExpiredTitle')}
 									role="status"
 								>
-									Reset links expire and work only once. Request a new one
-									below.
+									{t('linkExpiredBody')}
 								</AuthNotice>
 							)
 						)}
@@ -105,7 +102,7 @@ function ForgotPasswordContent() {
 									name="email"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Email</FormLabel>
+											<FormLabel>{tCommon('email')}</FormLabel>
 											{/* FormControl wraps the input itself so the label and
 											    error bind to it, not to the icon container. */}
 											<div className="relative">
@@ -115,7 +112,7 @@ function ForgotPasswordContent() {
 												/>
 												<FormControl>
 													<Input
-														placeholder="name@example.com"
+														placeholder={tCommon('emailPlaceholder')}
 														type="email"
 														autoCapitalize="none"
 														autoComplete="email"
@@ -140,11 +137,11 @@ function ForgotPasswordContent() {
 									{isPending ? (
 										<>
 											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											Sending...
+											{t('sending')}
 										</>
 									) : (
 										<>
-											Send reset link
+											{t('sendResetLink')}
 											<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 										</>
 									)}
@@ -155,12 +152,12 @@ function ForgotPasswordContent() {
 				)}
 
 				<div className="type-body-sm mt-6 text-center text-ink-2">
-					Remembered it?{' '}
+					{t('rememberedIt')}{' '}
 					<Link
 						href="/login"
 						className="p-2 font-semibold text-foreground underline-offset-4 hover:underline"
 					>
-						Log in
+						{tCommon('logIn')}
 					</Link>
 				</div>
 			</div>

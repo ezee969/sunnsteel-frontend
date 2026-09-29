@@ -1,10 +1,24 @@
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-	title: 'Shared workout',
-	description: 'A Sunnsteel workout shared with you.',
-	// A share link is meant for the people it was sent to, not for search.
-	robots: { index: false, follow: false },
+import type { Locale } from '@/i18n/config'
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const t = await getTranslations({
+		locale: locale as Locale,
+		namespace: 'core.sharedSessionMeta',
+	})
+	return {
+		title: t('title'),
+		description: t('description'),
+		// A share link is meant for the people it was sent to, not for search.
+		robots: { index: false, follow: false },
+	}
 }
 
 export default function SharedSessionLayout({

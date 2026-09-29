@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { TopLoadingBar } from '@/components/ui/top-loading-bar'
+import type { Translator } from '@/i18n/translator'
 import {
 	useSupabaseGoogleSignIn,
 	useSupabaseSignUp,
@@ -35,7 +37,10 @@ import {
 import { SignupFormValues, signupSchema } from '@/schema/signup-schema'
 
 // Password strength calculator
-function calculatePasswordStrength(password: string): {
+function calculatePasswordStrength(
+	password: string,
+	t: Translator<'core.signup'>,
+): {
 	strength: number
 	label: string
 	color: string
@@ -54,17 +59,17 @@ function calculatePasswordStrength(password: string): {
 	if (/[0-9]/.test(password)) strength += 15
 	if (/[^a-zA-Z0-9]/.test(password)) strength += 25
 
-	let label = 'Weak'
+	let label = t('passwordStrengthWeak')
 	let color = 'bg-destructive'
 
 	if (strength >= 80) {
-		label = 'Strong'
+		label = t('passwordStrengthStrong')
 		color = 'bg-success-strong'
 	} else if (strength >= 60) {
-		label = 'Good'
+		label = t('passwordStrengthGood')
 		color = 'bg-ink-2'
 	} else if (strength >= 40) {
-		label = 'Fair'
+		label = t('passwordStrengthFair')
 		color = 'bg-warning-strong'
 	}
 
@@ -72,6 +77,8 @@ function calculatePasswordStrength(password: string): {
 }
 
 export function SupabaseSignupForm() {
+	const t = useTranslations('core.signup')
+	const tCommon = useTranslations('core.authCommon')
 	const {
 		mutate: signUp,
 		isPending,
@@ -112,6 +119,7 @@ export function SupabaseSignupForm() {
 	// Calculate password strength
 	const passwordStrength = calculatePasswordStrength(
 		form.watch('password') || '',
+		t,
 	)
 
 	return (
@@ -122,10 +130,8 @@ export function SupabaseSignupForm() {
 				<div className="type-body-sm mark mark-success mb-6 flex items-center gap-3 bg-surface-sunk p-3 text-foreground">
 					<CheckCircle2 className="h-5 w-5 shrink-0 text-success" aria-hidden />
 					<div className="flex-1">
-						<p className="type-panel">Account created!</p>
-						<p className="text-ink-2">
-							Check your email to verify your account.
-						</p>
+						<p className="type-panel">{tCommon('accountCreated')}</p>
+						<p className="text-ink-2">{tCommon('checkEmailVerify')}</p>
 					</div>
 				</div>
 			)}
@@ -140,9 +146,9 @@ export function SupabaseSignupForm() {
 						aria-hidden
 					/>
 					<div className="flex-1">
-						<p className="type-panel">Sign up failed</p>
+						<p className="type-panel">{t('signUpFailedTitle')}</p>
 						<p className="text-ink-2">
-							{error?.message || 'An error occurred during signup'}
+							{error?.message || t('genericSignupError')}
 						</p>
 					</div>
 				</div>
@@ -156,7 +162,7 @@ export function SupabaseSignupForm() {
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Full Name</FormLabel>
+									<FormLabel>{t('fullNameLabel')}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<User
@@ -185,7 +191,7 @@ export function SupabaseSignupForm() {
 							name="email"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Email</FormLabel>
+									<FormLabel>{tCommon('email')}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Mail
@@ -193,7 +199,7 @@ export function SupabaseSignupForm() {
 												aria-hidden
 											/>
 											<Input
-												placeholder="name@example.com"
+												placeholder={tCommon('emailPlaceholder')}
 												type="email"
 												autoCapitalize="none"
 												autoComplete="email"
@@ -214,7 +220,7 @@ export function SupabaseSignupForm() {
 							name="password"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Password</FormLabel>
+									<FormLabel>{tCommon('password')}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Lock
@@ -232,7 +238,9 @@ export function SupabaseSignupForm() {
 												type="button"
 												onClick={() => setShowPassword(!showPassword)}
 												aria-label={
-													showPassword ? 'Hide password' : 'Show password'
+													showPassword
+														? tCommon('hidePassword')
+														: tCommon('showPassword')
 												}
 												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 												tabIndex={-1}
@@ -255,7 +263,7 @@ export function SupabaseSignupForm() {
 									</div>
 									{field.value && (
 										<p className="type-body-sm mt-1 text-ink-3">
-											Strength:{' '}
+											{t('strengthPrefix')}
 											<span className="font-medium">
 												{passwordStrength.label}
 											</span>
@@ -272,7 +280,7 @@ export function SupabaseSignupForm() {
 							name="confirmPassword"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Confirm Password</FormLabel>
+									<FormLabel>{t('confirmPasswordLabel')}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Lock
@@ -293,8 +301,8 @@ export function SupabaseSignupForm() {
 												}
 												aria-label={
 													showConfirmPassword
-														? 'Hide password'
-														: 'Show password'
+														? tCommon('hidePassword')
+														: tCommon('showPassword')
 												}
 												className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 												tabIndex={-1}
@@ -321,11 +329,11 @@ export function SupabaseSignupForm() {
 							{isPending ? (
 								<>
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-									Creating account...
+									{t('creatingAccount')}
 								</>
 							) : (
 								<>
-									Create Account
+									{t('createAccountTitle')}
 									<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 								</>
 							)}
@@ -338,7 +346,9 @@ export function SupabaseSignupForm() {
 						<span className="w-full border-t border-rule" />
 					</div>
 					<div className="relative flex justify-center">
-						<span className="type-label bg-surface px-4 text-ink-3">Or</span>
+						<span className="type-label bg-surface px-4 text-ink-3">
+							{tCommon('or')}
+						</span>
 					</div>
 				</div>
 
@@ -355,23 +365,23 @@ export function SupabaseSignupForm() {
 					) : (
 						<Image
 							src="/icons/google-icon-logo-svgrepo-com.svg"
-							alt="Google"
+							alt={tCommon('googleAlt')}
 							width={16}
 							height={16}
 							className="mr-2 h-4 w-4"
 						/>
 					)}
-					Continue with Google
+					{tCommon('continueWithGoogle')}
 				</Button>
 			</div>
 
 			<div className="type-body-sm mt-6 text-center text-ink-2">
-				Already have an account?{' '}
+				{t('alreadyHaveAccount')}{' '}
 				<Link
 					href="/login"
 					className="p-2 font-semibold text-foreground underline-offset-4 hover:underline"
 				>
-					Log in
+					{tCommon('logIn')}
 				</Link>
 			</div>
 		</div>

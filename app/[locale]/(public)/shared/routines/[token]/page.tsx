@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +13,8 @@ import { HttpError } from '@/lib/api/services/httpClient'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 export default function SharedRoutinePage() {
+	const t = useTranslations('core.sharedRoutine')
+
 	const params = useParams<{ token: string }>()
 	const token = params?.token || ''
 	const { session } = useSupabaseAuth()
@@ -22,7 +25,7 @@ export default function SharedRoutinePage() {
 			<div
 				className="mx-auto w-full max-w-3xl space-y-6 px-4 py-8 sm:px-6 sm:py-12"
 				aria-busy="true"
-				aria-label="Loading shared routine"
+				aria-label={t('loadingLabel')}
 			>
 				<Skeleton className="h-8 w-2/3" />
 				<Skeleton className="h-4 w-1/3" />
@@ -38,16 +41,14 @@ export default function SharedRoutinePage() {
 		return (
 			<div className="mx-auto w-full max-w-3xl space-y-3 px-4 py-8 sm:px-6 sm:py-12">
 				<h1 className="type-section text-foreground">
-					{isGone ? 'This link is no longer available' : 'Routine unavailable'}
+					{isGone ? t('linkGoneTitle') : t('unavailableTitle')}
 				</h1>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{isGone
-						? 'The owner revoked it, or it never existed. Ask them for a new one.'
-						: 'The routine could not be loaded. Try again in a moment.'}
+					{isGone ? t('linkGoneDescription') : t('unavailableDescription')}
 				</p>
 				{!isGone ? (
 					<Button type="button" variant="outline" onClick={() => refetch()}>
-						Try again
+						{t('tryAgain')}
 					</Button>
 				) : null}
 			</div>
@@ -67,9 +68,9 @@ export default function SharedRoutinePage() {
 						href={`/login?redirectTo=/shared/routines/${token}`}
 						className="text-primary underline-offset-4 hover:underline"
 					>
-						Sign in
+						{t('signInLinkLabel')}
 					</Link>{' '}
-					to save this programme as a routine of your own.
+					{t('signInToSaveSuffix')}
 				</p>
 			)}
 		</div>

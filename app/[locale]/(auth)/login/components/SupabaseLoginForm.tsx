@@ -11,10 +11,10 @@ import {
 	Lock,
 	Mail,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -139,7 +139,7 @@ export function SupabaseLoginForm() {
 										/>
 										<FormControl>
 											<Input
-												placeholder="name@example.com"
+												placeholder={tCommon('emailPlaceholder')}
 												type="email"
 												autoCapitalize="none"
 												autoComplete="email"

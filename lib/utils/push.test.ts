@@ -102,8 +102,7 @@ describe('push availability (NOTIF-02)', () => {
 
 	it('prompts on an installed iOS PWA', () => {
 		expect(
-			resolvePushStatus(env({ isIos: true, isStandalone: true }), en)
-				.canEnable,
+			resolvePushStatus(env({ isIos: true, isStandalone: true }), en).canEnable,
 		).toBe(true)
 	})
 
@@ -127,17 +126,13 @@ describe('push availability (NOTIF-02)', () => {
 
 	it('shows the enabled state only when permission and subscription agree', () => {
 		expect(
-			resolvePushStatus(
-				env({ isSubscribed: true, permission: 'granted' }),
-				en,
-			).availability,
+			resolvePushStatus(env({ isSubscribed: true, permission: 'granted' }), en)
+				.availability,
 		).toBe('ENABLED')
 		// A subscription the browser no longer permits is not enabled.
 		expect(
-			resolvePushStatus(
-				env({ isSubscribed: true, permission: 'default' }),
-				en,
-			).availability,
+			resolvePushStatus(env({ isSubscribed: true, permission: 'default' }), en)
+				.availability,
 		).toBe('READY')
 	})
 

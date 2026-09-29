@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -29,10 +30,10 @@ import {
 import { AuthNotice, AuthPageHeader } from '../components/AuthPageParts'
 
 const PASSWORD_FIELDS = [
-	{ name: 'password', label: 'New password', autoComplete: 'new-password' },
+	{ name: 'password', label: 'newPasswordLabel', autoComplete: 'new-password' },
 	{
 		name: 'confirmPassword',
-		label: 'Confirm new password',
+		label: 'confirmNewPasswordLabel',
 		autoComplete: 'new-password',
 	},
 ] as const
@@ -44,6 +45,7 @@ const PASSWORD_FIELDS = [
  * that cannot succeed.
  */
 export default function ResetPasswordPage() {
+	const t = useTranslations('core.resetPassword')
 	const { session, isLoading } = useSupabaseAuth()
 	const { mutate, isPending, isError, error, isSuccess } = useUpdatePassword()
 	const [showPassword, setShowPassword] = useState(false)
@@ -56,43 +58,43 @@ export default function ResetPasswordPage() {
 	if (isLoading) {
 		return (
 			<div className="flex min-h-[400px] flex-col items-center justify-center gap-3">
-				<ClassicalLoader size="md" label="Checking your reset link" />
-				<p className="type-body-sm text-ink-3">Checking your reset link...</p>
+				<ClassicalLoader size="md" label={t('checkingLinkLabel')} />
+				<p className="type-body-sm text-ink-3">{t('checkingLinkText')}</p>
 			</div>
 		)
 	}
 
 	return (
 		<div>
-			<AuthPageHeader
-				title="Choose a New Password"
-				description="Pick the password you'll use to sign in from now on."
-			/>
+			<AuthPageHeader title={t('title')} description={t('description')} />
 
 			<div className="w-full rounded-sm border border-rule bg-surface p-5 sm:p-6">
 				<TopLoadingBar show={isPending} />
 
 				{isSuccess ? (
 					<>
-						<AuthNotice tone="success" title="Password updated" role="status">
-							You&apos;re signed in with your new password.
+						<AuthNotice
+							tone="success"
+							title={t('passwordUpdatedTitle')}
+							role="status"
+						>
+							{t('passwordUpdatedBody')}
 						</AuthNotice>
 						<Button asChild size="lg" className="w-full">
 							<Link href="/dashboard">
-								Go to Dashboard
+								{t('goToDashboard')}
 								<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 							</Link>
 						</Button>
 					</>
 				) : !session ? (
 					<>
-						<AuthNotice tone="warning" title="This link can't be used">
-							Reset links expire and work only once, and this page opens only
-							from one. Request a new link to continue.
+						<AuthNotice tone="warning" title={t('linkCantBeUsedTitle')}>
+							{t('linkCantBeUsedBody')}
 						</AuthNotice>
 						<Button asChild size="lg" className="w-full">
 							<Link href={FORGOT_PASSWORD_PATH}>
-								Request a new link
+								{t('requestNewLink')}
 								<ChevronRight className="ml-2 h-4 w-4" aria-hidden />
 							</Link>
 						</Button>
@@ -102,10 +104,10 @@ export default function ResetPasswordPage() {
 						{isError && (
 							<AuthNotice
 								tone="warning"
-								title="Unable to update your password"
+								title={t('unableToUpdateTitle')}
 								role="alert"
 							>
-								{error?.message || 'Please try again.'}
+								{error?.message || t('tryAgain')}
 							</AuthNotice>
 						)}
 
@@ -124,7 +126,7 @@ export default function ResetPasswordPage() {
 										name={name}
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>{label}</FormLabel>
+												<FormLabel>{t(label)}</FormLabel>
 												<div className="relative">
 													<Lock
 														className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-ink-3"
@@ -146,8 +148,8 @@ export default function ResetPasswordPage() {
 															onClick={() => setShowPassword(!showPassword)}
 															aria-label={
 																showPassword
-																	? 'Hide passwords'
-																	: 'Show passwords'
+																	? t('hidePasswords')
+																	: t('showPasswords')
 															}
 															className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground"
 															disabled={isPending}
@@ -175,10 +177,10 @@ export default function ResetPasswordPage() {
 									{isPending ? (
 										<>
 											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											Updating...
+											{t('updating')}
 										</>
 									) : (
-										'Update password'
+										t('updatePassword')
 									)}
 								</Button>
 							</form>

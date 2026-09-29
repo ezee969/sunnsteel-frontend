@@ -56,8 +56,8 @@ describe('personal record celebration copy', () => {
 		})
 
 		const records = [record('WEIGHT', 100), record('REPS', 8)]
-		expect(
-			buildPersonalRecordCelebration(records, 'LB', es)?.title,
-		).toBe('2 récords personales nuevos')
+		expect(buildPersonalRecordCelebration(records, 'LB', es)?.title).toBe(
+			'2 récords personales nuevos',
+		)
 	})
 })

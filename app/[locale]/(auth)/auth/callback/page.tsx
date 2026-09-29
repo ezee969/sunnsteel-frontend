@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Suspense, useEffect } from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
@@ -12,6 +13,7 @@ import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 export const dynamic = 'force-dynamic'
 
 function AuthCallbackContent() {
+	const t = useTranslations('core.authCallback')
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const { session, user, error, isLoading } = useSupabaseAuth()
@@ -40,11 +42,11 @@ function AuthCallbackContent() {
 	return (
 		<div className="flex min-h-screen items-center justify-center">
 			<div className="flex flex-col items-center space-y-4">
-				<ClassicalLoader size="lg" label="Completing authentication" />
+				<ClassicalLoader size="lg" label={t('completingAuthLabel')} />
 				<div className="text-center space-y-2">
-					<p className="text-lg font-medium">Completing authentication...</p>
+					<p className="text-lg font-medium">{t('completingAuthTitle')}</p>
 					<p className="text-sm text-muted-foreground">
-						Please wait while we verify your credentials
+						{t('completingAuthBody')}
 					</p>
 				</div>
 			</div>
@@ -53,16 +55,17 @@ function AuthCallbackContent() {
 }
 
 export default function AuthCallback() {
+	const t = useTranslations('core.authCallback')
 	return (
 		<Suspense
 			fallback={
 				<div className="flex min-h-screen items-center justify-center">
 					<div className="flex flex-col items-center space-y-4">
-						<ClassicalLoader size="lg" label="Preparing authentication" />
+						<ClassicalLoader size="lg" label={t('preparingAuthLabel')} />
 						<div className="text-center space-y-2">
-							<p className="text-lg font-medium">Loading...</p>
+							<p className="text-lg font-medium">{t('loadingFallback')}</p>
 							<p className="text-sm text-muted-foreground">
-								Preparing authentication...
+								{t('preparingAuthText')}
 							</p>
 						</div>
 					</div>

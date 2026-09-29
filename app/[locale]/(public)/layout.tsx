@@ -1,14 +1,16 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
 import { ModeToggle } from '@/components/mode-toggle'
 import { Button } from '@/components/ui/button'
 
-export default function PublicLayout({
+export default async function PublicLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
+	const t = await getTranslations('core.publicLayout')
 	return (
 		<div className="min-h-screen bg-background">
 			<header className="sticky top-0 z-30 border-b border-rule bg-background">
@@ -34,10 +36,10 @@ export default function PublicLayout({
 							size="sm"
 							className="px-2.5 sm:px-3"
 						>
-							<Link href="/login">Sign in</Link>
+							<Link href="/login">{t('signIn')}</Link>
 						</Button>
 						<Button asChild size="sm" className="px-2.5 sm:px-3">
-							<Link href="/signup">Join</Link>
+							<Link href="/signup">{t('join')}</Link>
 						</Button>
 					</div>
 				</div>

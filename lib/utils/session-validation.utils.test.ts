@@ -56,28 +56,22 @@ describe('validateSetLogPayload', () => {
 
 	it('accepts the ends of the 0-10 scale the history view renders against', () => {
 		expect(validateSetLogPayload({ ...valid, rpe: 0 }, en).isValid).toBe(true)
-		expect(validateSetLogPayload({ ...valid, rpe: 7.5 }, en).isValid).toBe(
-			true,
-		)
+		expect(validateSetLogPayload({ ...valid, rpe: 7.5 }, en).isValid).toBe(true)
 		expect(validateSetLogPayload({ ...valid, rpe: 10 }, en).isValid).toBe(true)
 	})
 
 	it('rejects an RPE outside 0-10, which would render as a bogus n/10', () => {
-		expect(validateSetLogPayload({ ...valid, rpe: -1 }, en).isValid).toBe(
-			false,
-		)
-		expect(validateSetLogPayload({ ...valid, rpe: 11 }, en).isValid).toBe(
-			false,
-		)
+		expect(validateSetLogPayload({ ...valid, rpe: -1 }, en).isValid).toBe(false)
+		expect(validateSetLogPayload({ ...valid, rpe: 11 }, en).isValid).toBe(false)
 		expect(validateSetLogPayload({ ...valid, rpe: NaN }, en).isValid).toBe(
 			false,
 		)
 	})
 
 	it('rejects a set number below 1', () => {
-		expect(
-			validateSetLogPayload({ ...valid, setNumber: 0 }, en).isValid,
-		).toBe(false)
+		expect(validateSetLogPayload({ ...valid, setNumber: 0 }, en).isValid).toBe(
+			false,
+		)
 	})
 
 	it('reports every problem at once rather than stopping at the first, tagging the field', () => {

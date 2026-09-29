@@ -6,12 +6,7 @@ type Translated = Translator<'core.setLogValidation'>
 
 /** Which field a validation problem belongs to, for marking the right input. */
 export type SetLogValidationField =
-	| 'routineExerciseId'
-	| 'exerciseId'
-	| 'setNumber'
-	| 'reps'
-	| 'weight'
-	| 'rpe'
+	'routineExerciseId' | 'exerciseId' | 'setNumber' | 'reps' | 'weight' | 'rpe'
 
 export interface SetLogValidationError {
 	field: SetLogValidationField

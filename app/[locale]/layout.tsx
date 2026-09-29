@@ -4,10 +4,14 @@ import type { Metadata } from 'next'
 import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { hasLocale } from 'next-intl'
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
+import {
+	getMessages,
+	getTranslations,
+	setRequestLocale,
+} from 'next-intl/server'
 
 import DevInjections from '@/components/dev-injections'
-import { LOCALES } from '@/i18n/config'
+import { type Locale, LOCALES } from '@/i18n/config'
 import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
@@ -70,7 +74,10 @@ export async function generateMetadata({
 	params: Promise<{ locale: string }>
 }): Promise<Metadata> {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: 'core.metadata' })
+	const t = await getTranslations({
+		locale: locale as Locale,
+		namespace: 'core.metadata',
+	})
 	const title = t('title')
 	const description = t('description')
 

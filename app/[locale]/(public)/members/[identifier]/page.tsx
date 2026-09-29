@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { ProfileLoading } from '@/features/profile/profile-loading'
@@ -10,6 +11,8 @@ import { useSharedProfile } from '@/lib/api/hooks/useSharedProfile'
 import { HttpError } from '@/lib/api/services/httpClient'
 
 export default function SharedProfilePage() {
+	const t = useTranslations('core.memberProfile')
+
 	const params = useParams<{ identifier: string }>()
 	const identifier = params?.identifier || ''
 	const {
@@ -26,16 +29,14 @@ export default function SharedProfilePage() {
 		return (
 			<div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
 				<h1 className="type-section text-foreground">
-					{isNotFound ? 'Profile not found' : 'Could not load this profile'}
+					{isNotFound ? t('notFoundTitle') : t('loadErrorTitle')}
 				</h1>
 				<p className="type-body-sm max-w-md text-ink-3">
-					{isNotFound
-						? 'Check the username and try again.'
-						: 'Check your connection and try again.'}
+					{isNotFound ? t('notFoundDescription') : t('loadErrorDescription')}
 				</p>
 				{!isNotFound && (
 					<Button variant="outline" onClick={() => refetch()}>
-						Try again
+						{t('tryAgain')}
 					</Button>
 				)}
 			</div>

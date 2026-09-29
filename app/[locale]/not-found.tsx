@@ -1,5 +1,5 @@
-import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'

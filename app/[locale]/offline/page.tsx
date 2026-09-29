@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
+import type { Locale } from '@/i18n/config'
 
 export async function generateMetadata({
 	params,
@@ -11,7 +12,10 @@ export async function generateMetadata({
 	params: Promise<{ locale: string }>
 }): Promise<Metadata> {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: 'core.offline' })
+	const t = await getTranslations({
+		locale: locale as Locale,
+		namespace: 'core.offline',
+	})
 	return {
 		title: t('metaTitle'),
 		robots: { index: false },

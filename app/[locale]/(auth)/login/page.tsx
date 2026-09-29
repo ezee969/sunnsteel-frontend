@@ -1,13 +1,13 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Suspense, useEffect } from 'react'
 
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import {
-	accountDeletedNotice,
 	ACCOUNT_DELETED_PARAM,
+	accountDeletedNotice,
 } from '@/lib/utils/account-deletion'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'

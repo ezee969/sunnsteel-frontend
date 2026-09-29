@@ -49,7 +49,8 @@
 		"logIn": "Iniciar sesión",
 		"signUp": "Crear cuenta",
 		"accountCreated": "Cuenta creada.",
-		"checkEmailVerify": "Revisa tu correo para verificar tu cuenta."
+		"checkEmailVerify": "Revisa tu correo para verificar tu cuenta.",
+		"emailPlaceholder": "nombre@ejemplo.com"
 	},
 	"login": {
 		"welcomeTitle": "Hola de nuevo",
