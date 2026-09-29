@@ -1,4 +1,5 @@
 import { FileText, StickyNote } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -29,6 +30,7 @@ export function ExerciseNoteRow({
 	onSave,
 	minimal = false,
 }: ExerciseNoteRowProps) {
+	const t = useTranslations('routines.builder')
 	const [isOpen, setIsOpen] = useState(false)
 	const [draft, setDraft] = useState(note || '')
 
@@ -95,7 +97,7 @@ export function ExerciseNoteRow({
 						</Button>
 					</TooltipTrigger>
 					<TooltipContent>
-						<p>{note ? 'Edit note' : 'Add note'}</p>
+						<p>{note ? t('editNote') : t('addNote')}</p>
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
@@ -103,12 +105,12 @@ export function ExerciseNoteRow({
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Exercise Note</DialogTitle>
+						<DialogTitle>{t('exerciseNote')}</DialogTitle>
 					</DialogHeader>
 					<Textarea
 						value={draft}
 						onChange={e => setDraft(e.target.value)}
-						placeholder="Add a note about this exercise..."
+						placeholder={t('notePlaceholder')}
 						className="min-h-[120px]"
 						rows={5}
 					/>
@@ -116,7 +118,7 @@ export function ExerciseNoteRow({
 						<Button variant="outline" onClick={() => setIsOpen(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleSave}>Save</Button>
+						<Button onClick={handleSave}>{t('save')}</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>

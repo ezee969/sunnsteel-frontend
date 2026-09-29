@@ -1,4 +1,5 @@
 import type { WeightUnit } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Input } from '@/components/ui/input'
@@ -53,6 +54,7 @@ export function ExerciseConfigSection({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 }: ExerciseConfigSectionProps) {
+	const t = useTranslations('routines.builder')
 	// Local state for rest time input: allow free typing (digits and ":")
 	const [restFocused, setRestFocused] = useState(false)
 	const [restInput, setRestInput] = useState<string>(
@@ -95,7 +97,9 @@ export function ExerciseConfigSection({
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Label className="text-sm font-medium text-muted-foreground">
-							Weight Inc. ({weightUnit === 'LB' ? 'lb' : 'kg'})
+							{t('weightIncrement', {
+								unit: weightUnit === 'LB' ? 'lb' : 'kg',
+							})}
 						</Label>
 					</div>
 					<div className="flex items-center gap-2 sm:gap-2">
@@ -104,7 +108,7 @@ export function ExerciseConfigSection({
 							inputMode="decimal"
 							pattern="[0-9]*[.]?[0-9]*"
 							autoComplete="off"
-							aria-label="Minimum weight increment"
+							aria-label={t('minimumWeightIncrement')}
 							placeholder="2.5"
 							value={weightIncInput}
 							onChange={event => onWeightIncChange(event.target.value)}

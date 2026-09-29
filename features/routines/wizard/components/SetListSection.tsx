@@ -1,5 +1,6 @@
 import type { WeightUnit } from '@sunsteel/contracts'
 import { ChevronsUpDown, Plus } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -93,14 +94,15 @@ export function SetListSection({
 	onRemoveSetAnimated,
 	isRemovingSet,
 }: SetListSectionProps) {
+	const t = useTranslations('routines.builder')
 	return (
 		<>
 			<div className="flex items-center justify-between mb-2 px-1">
-				<h5 className="text-sm font-medium">Sets</h5>
+				<h5 className="text-sm font-medium">{t('sets')}</h5>
 				<Button
 					variant="ghost"
 					size="sm"
-					aria-label="Toggle set rows"
+					aria-label={t('toggleSetRows')}
 					aria-expanded={setsExpanded}
 					aria-controls={`sets-list-${tabIndex}-${exerciseIndex}`}
 					onClick={onToggleSets}
@@ -120,12 +122,16 @@ export function SetListSection({
 					<div
 						className={`hidden lg:grid gap-2 text-xs font-medium text-muted-foreground mb-2 ${SET_ROW_COLUMNS}`}
 					>
-						<div>Set</div>
-						<div>Kind</div>
-						<div>Type</div>
-						<div>Reps</div>
-						<div>Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})</div>
-						<div>RIR</div>
+						<div>{t('columnSet')}</div>
+						<div>{t('columnKind')}</div>
+						<div>{t('columnType')}</div>
+						<div>{t('columnReps')}</div>
+						<div>
+							{t('columnWeight', {
+								unit: weightUnit === 'LB' ? 'lb' : 'kg',
+							})}
+						</div>
+						<div>{t('columnRir')}</div>
 						<div />
 					</div>
 
@@ -171,7 +177,7 @@ export function SetListSection({
 							disabled={exercise.sets.length >= 10}
 						>
 							<Plus className="h-4 w-4 mr-2" />
-							Add Set
+							{t('addSet')}
 						</Button>
 						<WarmUpRampDialog
 							exerciseName={exerciseName}
@@ -205,7 +211,7 @@ export function SetListSection({
 									htmlFor={`warm-ups-follow-${tabIndex}-${exerciseIndex}`}
 									className="cursor-pointer"
 								>
-									Warm-ups follow the working weight
+									{t('warmUpsFollow')}
 								</Label>
 							</div>
 						) : null}

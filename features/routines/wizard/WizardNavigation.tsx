@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -53,7 +54,8 @@ export function WizardNavigation({
 	nextLabel,
 }: WizardNavigationProps) {
 	// Determine default label if not provided
-	const defaultLabel = currentStep === totalSteps - 1 ? 'Review' : 'Next'
+	const t = useTranslations('routines.builder')
+	const defaultLabel = currentStep === totalSteps - 1 ? t('review') : t('next')
 	const label = nextLabel ?? defaultLabel
 
 	// Should show next button? (Only if strictly less than total steps)
@@ -68,10 +70,10 @@ export function WizardNavigation({
 					onClick={onPrevious}
 					disabled={isPreviousDisabled || isSubmitting}
 					className="gap-2"
-					aria-label="Previous"
+					aria-label={t('previous')}
 				>
 					<ArrowLeft className="h-4 w-4" />
-					<span className="sr-only sm:not-sr-only">Previous</span>
+					<span className="sr-only sm:not-sr-only">{t('previous')}</span>
 				</Button>
 
 				{showNextButton ? (

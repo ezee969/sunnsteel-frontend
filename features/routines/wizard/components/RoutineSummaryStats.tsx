@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl'
+
 import { RoutineTotals } from '../utils/routine-summary'
 
 interface RoutineSummaryStatsProps {
@@ -11,6 +13,7 @@ interface RoutineSummaryStatsProps {
  * @returns A JSX element containing the styled routine summary card.
  */
 export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
+	const t = useTranslations('routines.builder')
 	return (
 		<div className="rounded-md border bg-card text-card-foreground p-4">
 			<h3 className="type-panel mb-3 text-center text-foreground">
@@ -21,17 +24,17 @@ export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 					<p className="text-xl font-bold text-primary">
 						{totals.trainingDays}
 					</p>
-					<p className="text-xs text-muted-foreground">Days</p>
+					<p className="text-xs text-muted-foreground">{t('statDays')}</p>
 				</div>
 				<div>
 					<p className="text-xl font-bold text-primary">
 						{totals.totalExercises}
 					</p>
-					<p className="text-xs text-muted-foreground">Exercises</p>
+					<p className="text-xs text-muted-foreground">{t('statExercises')}</p>
 				</div>
 				<div>
 					<p className="text-xl font-bold text-primary">{totals.totalSets}</p>
-					<p className="text-xs text-muted-foreground">Sets</p>
+					<p className="text-xs text-muted-foreground">{t('statSets')}</p>
 				</div>
 			</div>
 		</div>

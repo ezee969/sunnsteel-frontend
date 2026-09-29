@@ -1,4 +1,5 @@
 import { Clock } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,6 +27,7 @@ export function RestTimeExerciseConfig({
 	restSeconds,
 	setRestFocused,
 }: Props) {
+	const t = useTranslations('routines.builder')
 	return (
 		<div className="flex items-center justify-between gap-3">
 			<div className="flex items-center gap-2">
@@ -35,7 +37,7 @@ export function RestTimeExerciseConfig({
 				</Label>
 			</div>
 			<Input
-				aria-label="Rest time"
+				aria-label={t('restTime')}
 				type="text"
 				inputMode="numeric"
 				pattern="[0-9:]*"

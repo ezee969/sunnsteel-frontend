@@ -1,4 +1,5 @@
 import { ProgressionScheme } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { Label } from '@/components/ui/label'
 import {
@@ -23,6 +24,7 @@ export function ProgressionSelect({
 	exerciseIndex,
 	onUpdateProgressionScheme,
 }: Props) {
+	const t = useTranslations('routines.builder')
 	return (
 		<div className="flex items-center justify-between gap-3">
 			<div className="flex items-center gap-2">
@@ -37,15 +39,17 @@ export function ProgressionSelect({
 				}
 			>
 				<SelectTrigger
-					aria-label="Progression scheme"
+					aria-label={t('progressionScheme')}
 					size="sm"
 					className="w-32 sm:w-40 max-w-[60vw] h-9 truncate"
 				>
 					<SelectValue className="truncate" />
 				</SelectTrigger>
 				<SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
-					<SelectItem value="NONE">None</SelectItem>
-					<SelectItem value="DOUBLE_PROGRESSION">Double Progression</SelectItem>
+					<SelectItem value="NONE">{t('progressionNone')}</SelectItem>
+					<SelectItem value="DOUBLE_PROGRESSION">
+						{t('progressionDouble')}
+					</SelectItem>
 					<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
 						Dynamic Double Progression
 					</SelectItem>
