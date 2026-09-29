@@ -2,6 +2,7 @@
 
 import type { VolumeTrendResponse } from '@sunsteel/contracts'
 import { BarChart3, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -69,18 +70,19 @@ export function VolumeTrends({
 	onWeeksChange,
 	onRetry,
 }: VolumeTrendsProps) {
+	const tMuscles = useTranslations('routines.muscles')
 	const [scope, setScope] = useState<VolumeTrendScope>('overall')
 	const [selectedId, setSelectedId] = useState<string>()
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const series = useMemo(
 		() =>
-			data && scope !== 'overall' ? getVolumeTrendSeries(data, scope) : [],
-		[data, scope],
+			data && scope !== 'overall' ? getVolumeTrendSeries(data, scope, tMuscles) : [],
+		[data, scope, tMuscles],
 	)
 	const selection = useMemo(
-		() => (data ? getSelectedVolumeTrend(data, scope, selectedId) : null),
-		[data, scope, selectedId],
+		() => (data ? getSelectedVolumeTrend(data, scope, selectedId, tMuscles) : null),
+		[data, scope, selectedId, tMuscles],
 	)
 	const summary = useMemo(
 		() => (selection ? getVolumeTrendSummary(selection.points) : null),

@@ -5,7 +5,7 @@ import type { Translator } from '@/i18n/translator'
  * Keys mirror `MUSCLE_GROUP_LABELS`' old English keys; an enum value with no
  * message key falls back to a lowercased, space-joined version of itself.
  */
-const MUSCLE_GROUP_KEYS: Record<string, string> = {
+const MUSCLE_GROUP_KEYS = {
 	// Chest
 	PECTORAL: 'pectoral',
 
@@ -35,7 +35,9 @@ const MUSCLE_GROUP_KEYS: Record<string, string> = {
 	// Core
 	CORE: 'core',
 	ADDUCTOR: 'adductor',
-}
+} as const
+
+type MuscleKey = (typeof MUSCLE_GROUP_KEYS)[keyof typeof MUSCLE_GROUP_KEYS]
 
 /**
  * Convert technical muscle group name to user-friendly name
@@ -44,7 +46,7 @@ export function getFriendlyMuscleName(
 	muscleGroup: string,
 	t: Translator<'routines.muscles'>,
 ): string {
-	const key = MUSCLE_GROUP_KEYS[muscleGroup]
+	const key = (MUSCLE_GROUP_KEYS as Record<string, MuscleKey>)[muscleGroup]
 	return key ? t(key) : muscleGroup.toLowerCase().replace(/_/g, ' ')
 }
 

@@ -2,6 +2,7 @@
 
 import type { MuscleGroupHeatmapResponse } from '@sunsteel/contracts'
 import { Activity, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,7 @@ export function MuscleGroupHeatmap({
 	onWeeksChange,
 	onRetry,
 }: MuscleGroupHeatmapProps) {
+	const tMuscles = useTranslations('routines.muscles')
 	const rows = useMemo(() => (data ? buildMuscleHeatmapRows(data) : []), [data])
 	const topMuscles = useMemo(() => getTopMuscleHeatmapRows(rows), [rows])
 
@@ -130,7 +132,7 @@ export function MuscleGroupHeatmap({
 										{index === 0 ? 'Most trained' : `Rank ${index + 1}`}
 									</p>
 									<p className="type-panel mt-1 text-foreground">
-										{getFriendlyMuscleName(row.muscle)}
+										{getFriendlyMuscleName(row.muscle, tMuscles)}
 									</p>
 									<p className="type-data mt-1 text-ink-3">
 										{formatSets(row.totalWeightedSets)} weighted sets
@@ -177,7 +179,7 @@ export function MuscleGroupHeatmap({
 												scope="row"
 												className="type-body-sm sticky left-0 z-10 bg-surface px-3 py-2 text-left font-medium text-foreground"
 											>
-												{getFriendlyMuscleName(row.muscle)}
+												{getFriendlyMuscleName(row.muscle, tMuscles)}
 											</th>
 											{row.weightedSets.map((value, index) => {
 												const level = getMuscleHeatmapLevel(
@@ -191,7 +193,7 @@ export function MuscleGroupHeatmap({
 													>
 														<span
 															className="type-data flex min-h-9 items-center justify-center gap-1.5 bg-surface-sunk px-2 text-foreground"
-															title={`${getFriendlyMuscleName(row.muscle)}, week of ${formatWeek(data.weeks[index].weekStart)}: ${formatSets(value)} weighted sets`}
+															title={`${getFriendlyMuscleName(row.muscle, tMuscles)}, week of ${formatWeek(data.weeks[index].weekStart)}: ${formatSets(value)} weighted sets`}
 														>
 															<span
 																className={cn(

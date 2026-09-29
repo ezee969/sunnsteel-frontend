@@ -14,7 +14,7 @@ import type { Translator } from '@/i18n/translator'
  * catalog too.
  */
 
-const EQUIPMENT_KEYS: Record<ExerciseEquipment, string> = {
+const EQUIPMENT_KEYS = {
 	barbell: 'barbell',
 	'ez-bar': 'ezBar',
 	dumbbell: 'dumbbell',
@@ -28,7 +28,7 @@ const EQUIPMENT_KEYS: Record<ExerciseEquipment, string> = {
 	'pull-up-bar': 'pullUpBar',
 	'dip-station': 'dipStation',
 	bodyweight: 'bodyweight',
-}
+} as const satisfies Record<ExerciseEquipment, string>
 
 export function equipmentLabel(
 	item: ExerciseEquipment,

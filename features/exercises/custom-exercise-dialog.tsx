@@ -12,6 +12,7 @@ import {
 	type MuscleGroup,
 } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -49,7 +50,7 @@ import {
 	MECHANIC_LABELS,
 	MOVEMENT_PATTERN_LABELS,
 } from '@/lib/utils/exercise-catalog'
-import { EQUIPMENT_LABELS } from '@/lib/utils/exercise-equipment'
+import { equipmentLabel } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import { remainingCharacters } from '@/lib/utils/session-notes'
 
@@ -140,6 +141,8 @@ function CustomExerciseForm({
 	onClose: () => void
 	onSaved?: (exercise: Exercise) => void
 }) {
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
 	const [draft, setDraft] = useState<CustomExerciseDraft>(() =>
 		exercise
 			? draftFromExercise(exercise)
@@ -231,7 +234,7 @@ function CustomExerciseForm({
 					legend="Primary muscles"
 					values={MUSCLE_GROUPS}
 					selected={draft.primaryMuscles}
-					label={getFriendlyMuscleName}
+					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
 					problemId={problemFor('primaryMuscles')}
 					onToggle={muscle =>
 						setDraft(current => toggleMuscle(current, 'primary', muscle))
@@ -241,7 +244,7 @@ function CustomExerciseForm({
 					legend="Secondary muscles (optional, counted as half a set)"
 					values={MUSCLE_GROUPS}
 					selected={draft.secondaryMuscles}
-					label={getFriendlyMuscleName}
+					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
 					problemId={problemFor('secondaryMuscles')}
 					onToggle={muscle =>
 						setDraft(current => toggleMuscle(current, 'secondary', muscle))
@@ -251,7 +254,7 @@ function CustomExerciseForm({
 					legend="Equipment it needs"
 					values={EXERCISE_EQUIPMENT}
 					selected={draft.equipmentRequired}
-					label={value => EQUIPMENT_LABELS[value]}
+					label={value => equipmentLabel(value, tEquipment)}
 					problemId={problemFor('equipmentRequired')}
 					onToggle={item =>
 						setDraft(current => ({

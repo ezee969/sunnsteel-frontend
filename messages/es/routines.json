@@ -196,6 +196,12 @@
 		"adductor": "Aductores",
 		"moreCount": "{names} y {count} más"
 	},
+	"alternatives": {
+		"nearIdentical": "Movimiento casi idéntico",
+		"sameMovement": "Mismo movimiento · {muscles}",
+		"notListed": "{reason} · Sin listar: {items}",
+		"notListedAt": "{reason} · Sin listar en {location}: {items}"
+	},
 	"equipment": {
 		"barbell": "Barra",
 		"ezBar": "Barra Z",

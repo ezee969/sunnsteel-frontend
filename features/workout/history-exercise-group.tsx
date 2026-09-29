@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { cn } from '@/lib/utils'
@@ -35,6 +36,7 @@ export function HistoryExerciseGroup({
 	sessionId,
 }: HistoryExerciseGroupProps) {
 	const weightUnit = useWeightUnit()
+	const tMuscles = useTranslations('routines.muscles')
 	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
 	const totalSets = group.plannedSets.length + group.extraSets.length
 	const completedSets =
@@ -73,7 +75,7 @@ export function HistoryExerciseGroup({
 							{group.exercise.name}
 						</h3>
 						<p className="type-body-sm mt-0.5 text-ink-3">
-							{formatMuscleGroups(group.exercise.primaryMuscles)}
+							{formatMuscleGroups(group.exercise.primaryMuscles, tMuscles)}
 							{group.exercise.equipment ? ` · ${group.exercise.equipment}` : ''}
 						</p>
 						{group.substitutedFrom ? (

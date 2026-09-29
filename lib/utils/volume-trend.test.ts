@@ -1,12 +1,16 @@
 import type { VolumeTrendResponse } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	getSelectedVolumeTrend,
 	getVolumeBarPercent,
 	getVolumeTrendSeries,
 	getVolumeTrendSummary,
 } from './volume-trend'
+
+const tMuscles = translatorFor('en', 'routines.muscles')
 
 const data: VolumeTrendResponse = {
 	timeZone: 'Europe/Berlin',
@@ -62,8 +66,8 @@ describe('volume trend presentation', () => {
 	})
 
 	it('uses friendly muscle names and falls back to the leading series', () => {
-		expect(getVolumeTrendSeries(data, 'muscle')[0].name).toBe('Pecs')
-		expect(getSelectedVolumeTrend(data, 'muscle', 'missing').name).toBe('Pecs')
+		expect(getVolumeTrendSeries(data, 'muscle', tMuscles)[0].name).toBe('Pecs')
+		expect(getSelectedVolumeTrend(data, 'muscle', 'missing', tMuscles).name).toBe('Pecs')
 	})
 
 	it('scales visible bars against the selected peak', () => {

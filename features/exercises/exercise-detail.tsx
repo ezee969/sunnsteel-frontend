@@ -422,6 +422,7 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
  * an untrained exercise never requests a history it does not have.
  */
 export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
+	const tMusclesPage = useTranslations('routines.muscles')
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
 	const exercise = catalog.data?.find(item => item.id === exerciseId)
@@ -473,7 +474,10 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		)
 	}
 
-	const primary = getFriendlyMuscleNames(exercise.primaryMuscles).join(', ')
+	const primary = getFriendlyMuscleNames(
+		exercise.primaryMuscles,
+		tMusclesPage,
+	).join(', ')
 	const lastTrained = trained.isPending
 		? 'Checking your history…'
 		: trained.isError
