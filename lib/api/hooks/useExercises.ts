@@ -106,6 +106,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 	const queryClient = useQueryClient()
 	const { push } = useToast()
 	const t = useTranslations('core.exercisesHook')
+	const tRefusal = useTranslations('routines.customExercise')
 	return useMutation<TResult, Error, TVariables>({
 		mutationFn,
 		onSuccess: async () => {
@@ -117,7 +118,7 @@ function useCustomExerciseWrite<TVariables, TResult>(
 		onError: error => {
 			push({
 				title: t(failureTitleKey),
-				description: describeCustomExerciseError(error.message),
+				description: describeCustomExerciseError(error.message, tRefusal),
 			})
 		},
 	})
@@ -153,6 +154,7 @@ export const useDeleteCustomExercise = () => {
 	const queryClient = useQueryClient()
 	const { push } = useToast()
 	const t = useTranslations('core.exercisesHook')
+	const tRefusal = useTranslations('routines.customExercise')
 	return useMutation<void, Error, string>({
 		mutationFn: exercisesService.deleteCustom,
 		onSuccess: () => {
@@ -161,7 +163,7 @@ export const useDeleteCustomExercise = () => {
 		onError: error => {
 			push({
 				title: t('exerciseNotDeletedTitle'),
-				description: describeCustomExerciseError(error.message),
+				description: describeCustomExerciseError(error.message, tRefusal),
 			})
 		},
 	})

@@ -1,12 +1,24 @@
 import type { ExerciseEquipment } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
 
 import {
 	describeAlternative,
 	findExerciseAlternatives,
 } from './exercise-alternatives'
+
+const en = [
+	translatorFor('en', 'routines.alternatives'),
+	translatorFor('en', 'routines.muscles'),
+	translatorFor('en', 'routines.equipment'),
+] as const
+const es = [
+	translatorFor('es', 'routines.alternatives'),
+	translatorFor('es', 'routines.muscles'),
+	translatorFor('es', 'routines.equipment'),
+] as const
 
 const exercise = (
 	id: string,
@@ -119,14 +131,20 @@ describe('describeAlternative', () => {
 			bench,
 			catalog,
 		)
-		expect(describeAlternative(nearIdentical)).toBe('Near-identical movement')
-		expect(describeAlternative(samePattern)).toBe('Same movement · Pecs')
+		expect(describeAlternative(nearIdentical, undefined, ...en)).toBe('Near-identical movement')
+		expect(describeAlternative(samePattern, undefined, ...en)).toBe('Same movement · Pecs')
 
 		const [, , machine] = findExerciseAlternatives(bench, catalog, {
 			availableEquipment: new Set(['barbell', 'bench', 'dumbbell']),
 		})
-		expect(describeAlternative(machine, 'Home Gym')).toBe(
+		expect(describeAlternative(machine, 'Home Gym', ...en)).toBe(
 			'Near-identical movement · Machines not listed at Home Gym',
+		)
+		expect(describeAlternative(machine, 'Home Gym', ...es)).toBe(
+			'Movimiento casi idéntico · Sin listar en Home Gym: Máquinas',
+		)
+		expect(describeAlternative(samePattern, undefined, ...es)).toBe(
+			'Mismo movimiento · Pectorales',
 		)
 	})
 })

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
 	FeaturedProfileItem,
 	PublicProfileAchievements,
@@ -95,7 +96,8 @@ type ProfileViewProps = (
 }
 
 export function ProfileView(props: ProfileViewProps) {
-	const { push } = useToast()
+	const tIdentity = useTranslations('routines.identity')
+const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
 	const profile = props.profile
 	const ownerProfile = props.variant === 'owner' ? props.profile : undefined
@@ -401,7 +403,7 @@ export function ProfileView(props: ProfileViewProps) {
 										<dd className="flex flex-wrap gap-2">
 											{trainingIdentity.goals.map(goal => (
 												<Badge key={goal} variant="secondary">
-													{getTrainingGoalLabel(goal)}
+													{getTrainingGoalLabel(goal, tIdentity)}
 												</Badge>
 											))}
 										</dd>
@@ -412,8 +414,9 @@ export function ProfileView(props: ProfileViewProps) {
 										<dt className="type-label text-ink-3">Experience</dt>
 										<dd>
 											{getTrainingExperienceLabel(
-												trainingIdentity.experienceLevel,
-											)}
+trainingIdentity.experienceLevel,
+tIdentity,
+)}
 										</dd>
 									</div>
 								) : null}
@@ -423,7 +426,7 @@ export function ProfileView(props: ProfileViewProps) {
 										<dd className="flex flex-wrap gap-2">
 											{trainingIdentity.disciplines.map(discipline => (
 												<Badge key={discipline} variant="outline">
-													{getTrainingDisciplineLabel(discipline)}
+													{getTrainingDisciplineLabel(discipline, tIdentity)}
 												</Badge>
 											))}
 										</dd>
@@ -434,8 +437,9 @@ export function ProfileView(props: ProfileViewProps) {
 										<dt className="type-label text-ink-3">Preferred style</dt>
 										<dd>
 											{getPreferredTrainingStyleLabel(
-												trainingIdentity.preferredStyle,
-											)}
+trainingIdentity.preferredStyle,
+tIdentity,
+)}
 										</dd>
 									</div>
 								) : null}

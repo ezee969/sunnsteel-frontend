@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
 	type PreferredTrainingStyle,
 	PROFILE_FAVORITE_EXERCISES_MAX,
@@ -38,10 +39,10 @@ import type { Exercise } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 import { catalogExercises } from '@/lib/utils/custom-exercises'
 import {
-	PREFERRED_TRAINING_STYLE_OPTIONS,
-	TRAINING_DISCIPLINE_OPTIONS,
-	TRAINING_EXPERIENCE_OPTIONS,
-	TRAINING_GOAL_OPTIONS,
+	preferredTrainingStyleOptions,
+	trainingDisciplineOptions,
+	trainingExperienceOptions,
+	trainingGoalOptions,
 } from '@/lib/utils/training-identity'
 
 interface TrainingIdentitySettingsCardProps {
@@ -60,7 +61,8 @@ const cloneIdentity = (identity: TrainingIdentity): TrainingIdentity => ({
 export function TrainingIdentitySettingsCard({
 	identity,
 }: TrainingIdentitySettingsCardProps) {
-	const [draft, setDraft] = useState(() => cloneIdentity(identity))
+	const tIdentity = useTranslations('routines.identity')
+const [draft, setDraft] = useState(() => cloneIdentity(identity))
 	const [exerciseSearch, setExerciseSearch] = useState('')
 	const exerciseQuery = useExercises()
 	const exercises = exerciseQuery.data ?? EMPTY_EXERCISES
@@ -202,7 +204,7 @@ export function TrainingIdentitySettingsCard({
 						</span>
 					</div>
 					<div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-						{TRAINING_GOAL_OPTIONS.map(option => {
+						{trainingGoalOptions(tIdentity).map(option => {
 							const selected = draft.goals.includes(option.value)
 							return (
 								<Button
@@ -248,7 +250,7 @@ export function TrainingIdentitySettingsCard({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="NOT_SET">Not set</SelectItem>
-								{TRAINING_EXPERIENCE_OPTIONS.map(option => (
+								{trainingExperienceOptions(tIdentity).map(option => (
 									<SelectItem key={option.value} value={option.value}>
 										{option.label}
 									</SelectItem>
@@ -276,7 +278,7 @@ export function TrainingIdentitySettingsCard({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="NOT_SET">Not set</SelectItem>
-								{PREFERRED_TRAINING_STYLE_OPTIONS.map(option => (
+								{preferredTrainingStyleOptions(tIdentity).map(option => (
 									<SelectItem key={option.value} value={option.value}>
 										{option.label}
 									</SelectItem>
@@ -298,7 +300,7 @@ export function TrainingIdentitySettingsCard({
 						</span>
 					</div>
 					<div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-						{TRAINING_DISCIPLINE_OPTIONS.map(option => {
+						{trainingDisciplineOptions(tIdentity).map(option => {
 							const selected = draft.disciplines.includes(option.value)
 							return (
 								<Button

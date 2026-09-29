@@ -4,6 +4,7 @@ import type {
 	VolumeTrendSeries,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 
 export const VOLUME_TREND_WEEK_OPTIONS = [4, 8, 12] as const
@@ -19,11 +20,12 @@ export interface VolumeTrendSelection {
 export function getVolumeTrendSeries(
 	data: VolumeTrendResponse,
 	scope: Exclude<VolumeTrendScope, 'overall'>,
+	tMuscles: Translator<'routines.muscles'>,
 ): VolumeTrendSeries[] {
 	if (scope === 'muscle') {
 		return data.muscles.map(series => ({
 			...series,
-			name: getFriendlyMuscleName(series.id),
+			name: getFriendlyMuscleName(series.id, tMuscles),
 		}))
 	}
 	return scope === 'routine' ? data.routines : data.exercises
@@ -32,12 +34,13 @@ export function getVolumeTrendSeries(
 export function getSelectedVolumeTrend(
 	data: VolumeTrendResponse,
 	scope: VolumeTrendScope,
-	selectedId?: string,
+	selectedId: string | undefined,
+	tMuscles: Translator<'routines.muscles'>,
 ): VolumeTrendSelection {
 	if (scope === 'overall') {
 		return { id: 'overall', name: 'All training', points: data.overall }
 	}
-	const series = getVolumeTrendSeries(data, scope)
+	const series = getVolumeTrendSeries(data, scope, tMuscles)
 	const selected = series.find(item => item.id === selectedId) ?? series[0]
 	return (
 		selected ?? {

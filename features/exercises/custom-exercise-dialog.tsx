@@ -36,8 +36,8 @@ import {
 } from '@/lib/api/hooks/useExercises'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
-	CUSTOM_EXERCISE_COPY,
-	type CustomExerciseDraft,
+	customExerciseCopy,
+type CustomExerciseDraft,
 	customExerciseDraftProblem,
 	type CustomExerciseField,
 	customExerciseInput,
@@ -50,7 +50,7 @@ import {
 	MECHANIC_LABELS,
 	MOVEMENT_PATTERN_LABELS,
 } from '@/lib/utils/exercise-catalog'
-import { EQUIPMENT_LABELS } from '@/lib/utils/exercise-equipment'
+import { equipmentLabel } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import { remainingCharacters } from '@/lib/utils/session-notes'
 
@@ -142,6 +142,10 @@ function CustomExerciseForm({
 	onSaved?: (exercise: Exercise) => void
 }) {
 	const tNotes = useTranslations('workout.notes')
+	const tMuscles = useTranslations('routines.muscles')
+	const tCustom = useTranslations('routines.customExercise')
+	const tEquipment = useTranslations('routines.equipment')
+	const copy = customExerciseCopy(tCustom)
 	const [draft, setDraft] = useState<CustomExerciseDraft>(() =>
 		exercise
 			? draftFromExercise(exercise)
@@ -160,8 +164,8 @@ function CustomExerciseForm({
 	const problemId = useId()
 
 	const problem = useMemo(
-		() => customExerciseDraftProblem(draft, exercises, exercise?.id),
-		[draft, exercises, exercise?.id],
+		() => customExerciseDraftProblem(draft, exercises, tCustom, exercise?.id),
+[draft, exercises, exercise?.id, tCustom],
 	)
 	const shownProblem = attempted ? problem : null
 	const problemFor = (field: CustomExerciseField) =>
@@ -195,12 +199,12 @@ function CustomExerciseForm({
 			<DialogHeader>
 				<DialogTitle>
 					{exercise
-						? CUSTOM_EXERCISE_COPY.editTitle
-						: CUSTOM_EXERCISE_COPY.createTitle}
+						? copy.editTitle
+						: copy.createTitle}
 				</DialogTitle>
 				<DialogDescription>
-					{CUSTOM_EXERCISE_COPY.description}
-					{exercise ? ` ${CUSTOM_EXERCISE_COPY.editNote}` : ''}
+					{copy.description}
+					{exercise ? ` ${copy.editNote}` : ''}
 				</DialogDescription>
 			</DialogHeader>
 
@@ -233,7 +237,7 @@ function CustomExerciseForm({
 					legend="Primary muscles"
 					values={MUSCLE_GROUPS}
 					selected={draft.primaryMuscles}
-					label={getFriendlyMuscleName}
+					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
 					problemId={problemFor('primaryMuscles')}
 					onToggle={muscle =>
 						setDraft(current => toggleMuscle(current, 'primary', muscle))
@@ -243,7 +247,7 @@ function CustomExerciseForm({
 					legend="Secondary muscles (optional, counted as half a set)"
 					values={MUSCLE_GROUPS}
 					selected={draft.secondaryMuscles}
-					label={getFriendlyMuscleName}
+					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
 					problemId={problemFor('secondaryMuscles')}
 					onToggle={muscle =>
 						setDraft(current => toggleMuscle(current, 'secondary', muscle))
@@ -253,7 +257,7 @@ function CustomExerciseForm({
 					legend="Equipment it needs"
 					values={EXERCISE_EQUIPMENT}
 					selected={draft.equipmentRequired}
-					label={value => EQUIPMENT_LABELS[value]}
+					label={value => equipmentLabel(value, tEquipment)}
 					problemId={problemFor('equipmentRequired')}
 					onToggle={item =>
 						setDraft(current => ({
@@ -329,7 +333,7 @@ function CustomExerciseForm({
 						}
 					/>
 					<p id={noteCountId} className="type-body-sm text-ink-3">
-						{CUSTOM_EXERCISE_COPY.noteHint}{' '}
+						{copy.noteHint}{' '}
 						{remainingCharacters(draft.note, CUSTOM_EXERCISE_NOTE_MAX, tNotes)}
 					</p>
 				</div>

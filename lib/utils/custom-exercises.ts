@@ -1,5 +1,6 @@
 import {
-	CUSTOM_EXERCISE_PROBLEM_MESSAGES,
+	CUSTOM_EXERCISE_NAME_MAX,
+	CUSTOM_EXERCISE_NOTE_MAX,
 	CUSTOM_EXERCISE_REFUSALS,
 	type CustomExerciseInput,
 	type CustomExerciseProblem,
@@ -11,6 +12,7 @@ import {
 	type MuscleGroup,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 
 /**
@@ -117,6 +119,25 @@ const PROBLEM_FIELDS: Record<CustomExerciseProblem, CustomExerciseField> = {
 	NOTE_TOO_LONG: 'note',
 }
 
+type T = Translator<'routines.customExercise'>
+
+function problemMessage(problem: CustomExerciseProblem, t: T): string {
+	switch (problem) {
+		case 'NAME_REQUIRED':
+			return t('nameRequired')
+		case 'NAME_TOO_LONG':
+			return t('nameTooLong', { max: CUSTOM_EXERCISE_NAME_MAX })
+		case 'PRIMARY_MUSCLE_REQUIRED':
+			return t('primaryMuscleRequired')
+		case 'MUSCLE_LISTED_TWICE':
+			return t('muscleListedTwice')
+		case 'EQUIPMENT_REQUIRED':
+			return t('equipmentRequired')
+		default:
+			return t('noteTooLong', { max: CUSTOM_EXERCISE_NOTE_MAX })
+	}
+}
+
 export interface CustomExerciseDraftProblem {
 	field: CustomExerciseField
 	message: string
@@ -131,13 +152,14 @@ export interface CustomExerciseDraftProblem {
 export function customExerciseDraftProblem(
 	draft: CustomExerciseDraft,
 	exercises: readonly Pick<Exercise, 'id' | 'name'>[],
+	t: T,
 	exceptId?: string,
 ): CustomExerciseDraftProblem | null {
 	const problem = customExerciseProblem(customExerciseInput(draft))
 	if (problem) {
 		return {
 			field: PROBLEM_FIELDS[problem],
-			message: CUSTOM_EXERCISE_PROBLEM_MESSAGES[problem],
+			message: problemMessage(problem, t),
 		}
 	}
 	const key = exerciseNameKey(draft.name)
@@ -149,15 +171,14 @@ export function customExerciseDraftProblem(
 	) {
 		return {
 			field: 'name',
-			message:
-				'You already have an exercise by that name, or the catalog does.',
+			message: t('nameTaken'),
 		}
 	}
 	return null
 }
 
 /** The server's refusal, without its leading code. */
-export function describeCustomExerciseError(message: string): string {
+export function describeCustomExerciseError(message: string, t: T): string {
 	for (const code of Object.values(CUSTOM_EXERCISE_REFUSALS)) {
 		const prefix = `${code}: `
 		const at = message.indexOf(prefix)
@@ -166,21 +187,17 @@ export function describeCustomExerciseError(message: string): string {
 			return rest.charAt(0).toUpperCase() + rest.slice(1) + '.'
 		}
 	}
-	return message || 'The exercise was not saved. Try again in a moment.'
+	return message || t('saveFailed')
 }
 
-export const CUSTOM_EXERCISE_COPY = {
-	createTitle: 'New exercise',
-	editTitle: 'Edit exercise',
-	description:
-		'Only you can see and use your own exercises. Anyone you share a routine, a workout or a record with sees its name.',
-	noteHint: 'Only you see the note.',
-	archiveDescription:
-		'Archiving takes it out of the catalog and the routine pickers. Routines that use it, and its workouts and records, keep it. You can restore it at any time.',
-	deleteDescription:
-		'Deleting removes it for good. It is only possible while no routine or workout uses it.',
-	inUse:
-		'A routine or a workout uses this exercise, so it can be archived but not deleted.',
-	editNote:
-		'Changes apply from now on. Past workouts keep the muscles they were logged with.',
-} as const
+export const customExerciseCopy = (t: T) =>
+	({
+		createTitle: t('createTitle'),
+		editTitle: t('editTitle'),
+		description: t('description'),
+		noteHint: t('noteHint'),
+		archiveDescription: t('archiveDescription'),
+		deleteDescription: t('deleteDescription'),
+		inUse: t('inUse'),
+		editNote: t('editNote'),
+	}) as const

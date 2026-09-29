@@ -3,6 +3,7 @@ import type {
 	StarredExercisesResponse,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 
 /**
@@ -33,11 +34,13 @@ export interface PickerGroup {
 export function groupPickerExercises(
 	exercises: readonly Exercise[],
 	{
+		t,
 		starred = [],
 		recent = [],
 		recentPending = false,
 		exclude,
 	}: {
+		t: Translator<'routines.picker'>
 		starred?: readonly string[]
 		recent?: readonly Pick<
 			ExercisePerformanceSummary,
@@ -72,18 +75,18 @@ export function groupPickerExercises(
 	const prioritized =
 		recentPending || starredGroup.length + recentGroup.length > 0
 	const groups: PickerGroup[] = [
-		{ key: 'starred', label: 'Starred', exercises: starredGroup },
+		{ key: 'starred', label: t('starred'), exercises: starredGroup },
 		recentPending
 			? {
 					key: 'recent',
-					label: 'Recently trained',
+					label: t('recent'),
 					exercises: [],
 					pending: true,
 				}
-			: { key: 'recent', label: 'Recently trained', exercises: recentGroup },
+			: { key: 'recent', label: t('recent'), exercises: recentGroup },
 		{
 			key: 'other',
-			label: prioritized ? 'Other exercises' : 'All exercises',
+			label: prioritized ? t('other') : t('all'),
 			exercises: other,
 		},
 	]

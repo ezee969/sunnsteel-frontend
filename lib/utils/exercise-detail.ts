@@ -1,5 +1,7 @@
 import type { Routine, RoutineSet } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { routineDayTitle } from './routine-schedule'
 
 /**
@@ -47,6 +49,7 @@ export function formatSetScheme(sets: readonly RoutineSet[]): string {
 export function findRoutineUsages(
 	routines: readonly Routine[],
 	exerciseId: string,
+	t: Translator<'routines.date'>,
 ): RoutineUsage[] {
 	return routines
 		.map(routine => ({
@@ -65,7 +68,7 @@ export function findRoutineUsages(
 						? [
 								{
 									dayId: day.id,
-									dayName: routineDayTitle(day),
+									dayName: routineDayTitle(day, 'long', t),
 									schemes: slots.map(slot => formatSetScheme(slot.sets)),
 								},
 							]

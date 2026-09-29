@@ -9,6 +9,7 @@ import {
 	ROUTINE_DURATION_BANDS,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import {
 	getTrainingExperienceLabel,
 	getTrainingGoalLabel,
@@ -20,42 +21,51 @@ import {
  * is making the claim, and that is a backend concern.
  */
 
-export const DURATION_BAND_LABELS: Record<RoutineDurationBand, string> = {
-	SHORT: `Under ${ROUTINE_DURATION_BAND_MAX_MINUTES.SHORT} min`,
-	MEDIUM: `${ROUTINE_DURATION_BAND_MAX_MINUTES.SHORT}–${ROUTINE_DURATION_BAND_MAX_MINUTES.MEDIUM} min`,
-	LONG: `Over ${ROUTINE_DURATION_BAND_MAX_MINUTES.MEDIUM} min`,
+type T = Translator<'routines.discovery'>
+
+export function durationBandLabel(band: RoutineDurationBand, t: T): string {
+	const { SHORT, MEDIUM } = ROUTINE_DURATION_BAND_MAX_MINUTES
+	switch (band) {
+		case 'SHORT':
+			return t('durationShort', { max: SHORT })
+		case 'MEDIUM':
+			return t('durationMedium', { min: SHORT, max: MEDIUM })
+		default:
+			return t('durationLong', { min: MEDIUM })
+	}
 }
 
-export const DURATION_BAND_OPTIONS = ROUTINE_DURATION_BANDS.map(value => ({
-	value,
-	label: DURATION_BAND_LABELS[value],
-}))
+export const durationBandOptions = (t: T) =>
+	ROUTINE_DURATION_BANDS.map(value => ({
+		value,
+		label: durationBandLabel(value, t),
+	}))
 
 /**
  * The duration is an estimate from sets, reps and rest, not a measured time,
  * and every surface that shows it has to say so — `ROUT-10` established that
  * and discovery quotes the same number from the same rule.
  */
-export const DURATION_ESTIMATE_NOTE =
-	'Session lengths are estimated from the sets, reps and rest each day programs, not measured from anyone’s workouts.'
+export const durationEstimateNote = (t: T) => t('estimateNote')
 
 /** What discovery can and cannot show, said once at the top of the page. */
-export const DISCOVERY_SCOPE_NOTE =
-	'These are routines members chose to share. You see the same ones you could already open from their profile — browsing does not reveal anything that was private.'
+export const discoveryScopeNote = (t: T) => t('scopeNote')
 
 /** Shown when the bounded scan ran out before the whole catalogue did. */
-export const DISCOVERY_TRUNCATED_NOTE =
-	'Showing the most recently updated routines. Narrow the filters to reach older ones.'
+export const discoveryTruncatedNote = (t: T) => t('truncatedNote')
 
 /** A routine's declared claims, or an honest absence of them. */
-export function describeClassification(routine: {
-	goal?: TrainingGoal | null
-	experienceLevel?: TrainingExperienceLevel | null
-}): string | null {
+export function describeClassification(
+	routine: {
+		goal?: TrainingGoal | null
+		experienceLevel?: TrainingExperienceLevel | null
+	},
+	tIdentity: Translator<'routines.identity'>,
+): string | null {
 	const parts = [
-		routine.goal ? getTrainingGoalLabel(routine.goal) : null,
+		routine.goal ? getTrainingGoalLabel(routine.goal, tIdentity) : null,
 		routine.experienceLevel
-			? getTrainingExperienceLabel(routine.experienceLevel)
+			? getTrainingExperienceLabel(routine.experienceLevel, tIdentity)
 			: null,
 	].filter(Boolean)
 	// Null, not "Not specified": the caller decides whether an absent claim is
@@ -66,13 +76,14 @@ export function describeClassification(routine: {
 /** The one-line facts under a discovered routine's name. */
 export function describeDiscoveredRoutine(
 	routine: DiscoverableRoutine,
+	t: T,
 ): string {
-	const days = `${routine.dayCount} ${routine.dayCount === 1 ? 'day' : 'days'}`
-	const exercises = `${routine.exerciseCount} ${
-		routine.exerciseCount === 1 ? 'exercise' : 'exercises'
-	}`
-	const mode = routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'
-	return `${days} · ${exercises} · ${mode} · ~${routine.longestDayMinutes} min`
+	return t('routineFacts', {
+		days: routine.dayCount,
+		exercises: routine.exerciseCount,
+		mode: routine.scheduleMode === 'ROTATION' ? 'rotation' : 'weekly',
+		minutes: routine.longestDayMinutes,
+	})
 }
 
 export function describeDiscoveredAuthor(routine: DiscoverableRoutine): string {

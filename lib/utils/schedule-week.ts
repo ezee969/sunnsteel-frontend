@@ -8,6 +8,8 @@ import {
 	type WorkoutSessionSummary,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { weekdayName } from './date'
 import {
 	isRotationRoutine,
@@ -716,8 +718,11 @@ export function describeWeek(weekStart: string, now: Date): string {
 }
 
 /** "Thu 17 Sep" */
-export const describeShortDate = (key: string) =>
-	`${weekdayName(fromKey(key).getDay(), 'short')} ${DAY_FORMAT.format(fromKey(key))}`
+export const describeShortDate = (
+	key: string,
+	t: Translator<'routines.date'>,
+) =>
+	`${weekdayName(fromKey(key).getDay(), 'short', t)} ${DAY_FORMAT.format(fromKey(key))}`
 
 export type ScheduleMoveAction =
 	| {
@@ -846,7 +851,10 @@ export const postponeTarget = (
 	currentDate: string,
 ): string | null => targets.find(date => date > currentDate) ?? null
 
-export const describeScheduleDay = (day: ScheduleDay) => ({
-	weekday: weekdayName(day.dayOfWeek, 'long'),
+export const describeScheduleDay = (
+	day: ScheduleDay,
+	t: Translator<'routines.date'>,
+) => ({
+	weekday: weekdayName(day.dayOfWeek, 'long', t),
 	date: DAY_FORMAT.format(fromKey(day.date)),
 })

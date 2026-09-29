@@ -37,6 +37,7 @@ export function HistoryExerciseGroup({
 }: HistoryExerciseGroupProps) {
 	const t = useTranslations('workout.historyExerciseGroup')
 	const weightUnit = useWeightUnit()
+	const tMuscles = useTranslations('routines.muscles')
 	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
 	const totalSets = group.plannedSets.length + group.extraSets.length
 	const completedSets =
@@ -75,7 +76,7 @@ export function HistoryExerciseGroup({
 							{group.exercise.name}
 						</h3>
 						<p className="type-body-sm mt-0.5 text-ink-3">
-							{formatMuscleGroups(group.exercise.primaryMuscles)}
+							{formatMuscleGroups(group.exercise.primaryMuscles, tMuscles)}
 							{group.exercise.equipment ? ` · ${group.exercise.equipment}` : ''}
 						</p>
 						{group.substitutedFrom ? (

@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n/translator'
+
 import { weekdayName } from './date'
 import {
 	describeMonthCell,
@@ -47,7 +49,10 @@ export function weekStripHref(day: Pick<ScheduleDay, 'entries'>): string {
 		: WEEK_STRIP_SCHEDULE_HREF
 }
 
-export function buildWeekStrip(week: ScheduleWeek): WeekStripDay[] {
+export function buildWeekStrip(
+	week: ScheduleWeek,
+	t: Translator<'routines.date'>,
+): WeekStripDay[] {
 	return week.days.map(day => {
 		const href = weekStripHref(day)
 		const destination = href.startsWith('/workouts/sessions/')
@@ -57,7 +62,7 @@ export function buildWeekStrip(week: ScheduleWeek): WeekStripDay[] {
 				: 'Opens the schedule.'
 		return {
 			date: day.date,
-			weekday: weekdayName(day.dayOfWeek, 'short'),
+			weekday: weekdayName(day.dayOfWeek, 'short', t),
 			dayOfMonth: Number(day.date.slice(8)),
 			isToday: day.isToday,
 			state: scheduleDayState(day),

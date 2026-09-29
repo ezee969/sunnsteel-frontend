@@ -1,8 +1,9 @@
 import type { ExerciseEquipment, MuscleGroup } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
 
-import { EQUIPMENT_LABELS } from './exercise-equipment'
+import { equipmentLabel } from './exercise-equipment'
 import { getFriendlyMuscleName } from './muscle-groups'
 
 /**
@@ -114,17 +115,24 @@ export function findExerciseAlternatives(
 /** One-line reason shown under a suggestion. */
 export function describeAlternative(
 	alternative: ExerciseAlternative,
-	locationName?: string,
+	locationName: string | undefined,
+	t: Translator<'routines.alternatives'>,
+	tMuscles: Translator<'routines.muscles'>,
+	tEquipment: Translator<'routines.equipment'>,
 ): string {
 	const reason =
 		alternative.match === 'SUBSTITUTION_GROUP'
-			? 'Near-identical movement'
-			: `Same movement · ${alternative.sharedPrimaryMuscles
-					.map(getFriendlyMuscleName)
-					.join(', ')}`
+			? t('nearIdentical')
+			: t('sameMovement', {
+					muscles: alternative.sharedPrimaryMuscles
+						.map(muscle => getFriendlyMuscleName(muscle, tMuscles))
+						.join(', '),
+				})
 	if (alternative.unlistedEquipment.length === 0) return reason
 	const items = alternative.unlistedEquipment
-		.map(item => EQUIPMENT_LABELS[item])
+		.map(item => equipmentLabel(item, tEquipment))
 		.join(', ')
-	return `${reason} · ${items} not listed${locationName ? ` at ${locationName}` : ''}`
+	return locationName
+		? t('notListedAt', { reason, items, location: locationName })
+		: t('notListed', { reason, items })
 }

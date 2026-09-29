@@ -12,6 +12,7 @@ import {
 	UserRound,
 	X,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useMemo, useState } from 'react'
@@ -46,7 +47,7 @@ import {
 } from '@/lib/utils/exercise-catalog'
 import {
 	defaultTrainingLocation,
-	EQUIPMENT_LABELS,
+	equipmentLabel,
 	listedEquipmentAt,
 } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleNames } from '@/lib/utils/muscle-groups'
@@ -165,8 +166,15 @@ function ExerciseRow({
 	lastTrainedAt: string | undefined
 	historyKnown: boolean
 }) {
-	const primary = getFriendlyMuscleNames(exercise.primaryMuscles).join(', ')
-	const secondary = getFriendlyMuscleNames(exercise.secondaryMuscles).join(', ')
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
+	const primary = getFriendlyMuscleNames(exercise.primaryMuscles, tMuscles).join(
+		', ',
+	)
+	const secondary = getFriendlyMuscleNames(
+		exercise.secondaryMuscles,
+		tMuscles,
+	).join(', ')
 	const movement = [
 		exercise.movementPattern
 			? MOVEMENT_PATTERN_LABELS[exercise.movementPattern]
@@ -176,7 +184,7 @@ function ExerciseRow({
 		.filter(Boolean)
 		.join(' · ')
 	const equipment = exercise.equipmentRequired
-		.map(item => EQUIPMENT_LABELS[item])
+		.map(item => equipmentLabel(item, tEquipment))
 		.join(', ')
 
 	return (
@@ -258,6 +266,8 @@ function ExerciseRow({
 export function ExerciseCatalog() {
 	const { filters, setQuery, update, clear } = useCatalogFilters()
 	const router = useRouter()
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
 	const [creating, setCreating] = useState(false)
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
@@ -289,8 +299,8 @@ export function ExerciseCatalog() {
 	const gym = defaultTrainingLocation(locations.data)
 	const listedEquipment = useMemo(() => listedEquipmentAt(gym), [gym])
 	const options = useMemo(
-		() => catalogFilterOptions(exercises, filters),
-		[exercises, filters],
+		() => catalogFilterOptions(exercises, filters, tMuscles, tEquipment),
+		[exercises, filters, tMuscles, tEquipment],
 	)
 	const results = useMemo(
 		() =>

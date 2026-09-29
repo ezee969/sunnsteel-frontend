@@ -1,6 +1,8 @@
 import type { Routine, WorkoutSessionSummary } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { describeRoutineSchedule } from './routine-schedule'
 import { compareRoutineSetups, routineSetup } from './routine-versions'
 import {
@@ -9,6 +11,10 @@ import {
 	scheduleEntryAction,
 	startOfWeek,
 } from './schedule-week'
+
+const enDate = translatorFor('en', 'routines.date')
+const enSchedule = translatorFor('en', 'routines.schedule')
+const enVersions = translatorFor('en', 'routines.versions')
 
 // Wednesday 16 Sep 2026, local time. PPL trains Monday, Wednesday, Friday.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -144,14 +150,17 @@ describe('rotation on training weekdays (SCHED-06)', () => {
 		expect(week.days.flatMap(day => day.entries)).toEqual([])
 		expect(week.rotations.map(note => note.nextDayName)).toEqual(['Pull'])
 
-		expect(describeRoutineSchedule(ppl())).toMatch(
+		expect(describeRoutineSchedule(ppl(), enDate, enSchedule)).toMatch(
 			/^Rotation · .* · Mon, Wed, Fri$/,
 		)
-		expect(describeRoutineSchedule(undated)).not.toMatch(/Mon/)
+		expect(describeRoutineSchedule(undated, enDate, enSchedule)).not.toMatch(/Mon/)
 		const comparison = compareRoutineSetups(
 			routineSetup(ppl()),
 			routineSetup(undated),
 			'KG',
+			enVersions,
+			enDate,
+			enSchedule,
 		)
 		expect(comparison.routine[0]).toMatch(/^Schedule: .*Mon, Wed, Fri → /)
 	})

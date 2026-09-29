@@ -2,17 +2,23 @@ import type { DiscoverableRoutine } from '@sunsteel/contracts'
 import { ROUTINE_DURATION_BANDS } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import { buildDiscoveryParams } from '@/lib/api/services/routineDiscoveryService'
 
 import {
 	describeClassification,
 	describeDiscoveredAuthor,
 	describeDiscoveredRoutine,
-	DISCOVERY_SCOPE_NOTE,
-	DURATION_BAND_LABELS,
-	DURATION_ESTIMATE_NOTE,
-	hasActiveFilters,
+	discoveryScopeNote,
+	durationBandLabel,
+	durationEstimateNote,
+hasActiveFilters,
 } from './routine-discovery'
+
+const en = translatorFor('en', 'routines.discovery')
+const es = translatorFor('es', 'routines.discovery')
+const enId = translatorFor('en', 'routines.identity')
+const esId = translatorFor('es', 'routines.identity')
 
 const routine = (
 	overrides: Partial<DiscoverableRoutine> = {},
@@ -42,27 +48,54 @@ describe('discovery scope copy', () => {
 	it('says browsing reveals nothing that was private', () => {
 		// Discovery is not a visibility tier; the page has to say so, or a
 		// member could reasonably assume sharing now means "listed publicly".
-		expect(DISCOVERY_SCOPE_NOTE).toMatch(/chose to share/i)
-		expect(DISCOVERY_SCOPE_NOTE).toMatch(
+		expect(discoveryScopeNote(en)).toMatch(/chose to share/i)
+		expect(discoveryScopeNote(en)).toMatch(
 			/does not reveal anything that was private/i,
 		)
 	})
 
 	it('labels the session length an estimate, never a measurement', () => {
-		expect(DURATION_ESTIMATE_NOTE).toMatch(/estimated/i)
-		expect(DURATION_ESTIMATE_NOTE).toMatch(/not measured/i)
+		expect(durationEstimateNote(en)).toMatch(/estimated/i)
+		expect(durationEstimateNote(en)).toMatch(/not measured/i)
 	})
 
 	it('labels every duration band the contract defines', () => {
 		for (const band of ROUTINE_DURATION_BANDS) {
-			expect(DURATION_BAND_LABELS[band]).toBeTruthy()
+			expect(durationBandLabel(band, en)).toBeTruthy()
+			expect(durationBandLabel(band, es)).toBeTruthy()
 		}
+	})
+})
+
+describe('discovery copy in Spanish (I18N-03)', () => {
+	it('keeps the scope and estimate rules', () => {
+		expect(discoveryScopeNote(es)).toMatch(/decidieron compartir/i)
+		expect(discoveryScopeNote(es)).toMatch(
+			/no revela nada que fuera privado/i,
+		)
+		expect(durationEstimateNote(es)).toMatch(/se estima/i)
+		expect(durationEstimateNote(es)).toMatch(/no se mide/i)
+	})
+
+	it('words the facts and claims in Spanish', () => {
+		expect(describeDiscoveredRoutine(routine(), es)).toBe(
+			'4 días · 20 ejercicios · Semanal · ~62 min',
+		)
+		expect(
+			describeDiscoveredRoutine(
+				routine({ dayCount: 1, exerciseCount: 1, scheduleMode: 'ROTATION' }),
+				es,
+			),
+		).toBe('1 día · 1 ejercicio · Rotación · ~62 min')
+		expect(describeClassification(routine(), esId)).toBe(
+			'Fuerza · Intermedio',
+		)
 	})
 })
 
 describe('describing a discovered routine', () => {
 	it('states days, exercises, mode and the estimate as approximate', () => {
-		expect(describeDiscoveredRoutine(routine())).toBe(
+		expect(describeDiscoveredRoutine(routine(), en)).toBe(
 			'4 days · 20 exercises · Weekly · ~62 min',
 		)
 	})
@@ -71,7 +104,8 @@ describe('describing a discovered routine', () => {
 		expect(
 			describeDiscoveredRoutine(
 				routine({ dayCount: 1, exerciseCount: 1, scheduleMode: 'ROTATION' }),
-			),
+					en,
+				),
 		).toBe('1 day · 1 exercise · Rotation · ~62 min')
 	})
 
@@ -94,22 +128,22 @@ describe('describing a discovered routine', () => {
 
 describe('declared classification', () => {
 	it('shows what was declared', () => {
-		expect(describeClassification(routine())).toMatch(/Strength/i)
-		expect(describeClassification(routine())).toMatch(/Intermediate/i)
+		expect(describeClassification(routine(), enId)).toMatch(/Strength/i)
+		expect(describeClassification(routine(), enId)).toMatch(/Intermediate/i)
 	})
 
 	it('returns nothing rather than inventing "not specified"', () => {
 		// An undeclared goal is unknown. A routine is not worse for making no
 		// claim, so the row simply omits the line.
 		expect(
-			describeClassification({ goal: null, experienceLevel: null }),
+			describeClassification({ goal: null, experienceLevel: null }, enId),
 		).toBeNull()
-		expect(describeClassification({})).toBeNull()
+		expect(describeClassification({}, enId)).toBeNull()
 	})
 
 	it('shows one claim when only one was made', () => {
 		expect(
-			describeClassification({ goal: 'FAT_LOSS', experienceLevel: null }),
+			describeClassification({ goal: 'FAT_LOSS', experienceLevel: null }, enId),
 		).toMatch(/Fat/i)
 	})
 })

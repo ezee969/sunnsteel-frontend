@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import type { Ref } from 'react'
@@ -60,6 +61,7 @@ export function WorkoutHistoryList({
 	const tMetrics = useTranslations('workout.metrics')
 	const locale = useLocale()
 	const router = useRouter()
+	const tDeloads = useTranslations('routines.deloads')
 	const statusLabel = (status: string) =>
 		tMetrics(STATUS_KEYS[status as keyof typeof STATUS_KEYS] ?? 'statusUnknown')
 	const dateTime = (iso: string) =>
@@ -152,15 +154,21 @@ export function WorkoutHistoryList({
 										<div className="type-panel min-w-0 text-foreground">
 											{s.routine.name}
 											{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
-											{planLabel({
-												trainingBlockName: s.routine.trainingBlockName,
-												deload: !!s.routine.temporaryOverrideKind,
-											}) ? (
+											{planLabel(
+												{
+													trainingBlockName: s.routine.trainingBlockName,
+													deload: !!s.routine.temporaryOverrideKind,
+												},
+												tDeloads,
+											) ? (
 												<span className="type-body-sm block text-ink-3">
-													{planLabel({
-														trainingBlockName: s.routine.trainingBlockName,
-														deload: !!s.routine.temporaryOverrideKind,
-													})}
+													{planLabel(
+														{
+															trainingBlockName: s.routine.trainingBlockName,
+															deload: !!s.routine.temporaryOverrideKind,
+														},
+														tDeloads,
+													)}
 												</span>
 											) : null}
 										</div>

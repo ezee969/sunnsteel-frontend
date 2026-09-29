@@ -5,6 +5,7 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import type { RoutineWizardData } from '@/features/routines/wizard/types'
 import { computeWeeklyMuscleSets } from '@/features/routines/wizard/utils/routine-quality'
 import { buildRoutineRequest } from '@/features/routines/wizard/utils/routine-summary'
@@ -199,6 +200,9 @@ describe('versions name a change of set kinds (LIVE-12)', () => {
 			setup(['WORKING', 'WORKING', 'WORKING']),
 			setup(['WARMUP', 'WORKING', 'WORKING']),
 			'KG' as WeightUnit,
+			translatorFor('en', 'routines.versions'),
+			translatorFor('en', 'routines.date'),
+			translatorFor('en', 'routines.schedule'),
 		)
 		expect(JSON.stringify(result.days)).toContain(
 			'Bench Press: 3 working → 1 warm-up, 2 working sets',

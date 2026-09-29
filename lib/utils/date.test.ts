@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { describeDaysAway, nextScheduledDay } from './date'
+
+const en = translatorFor('en', 'routines.date')
+const es = translatorFor('es', 'routines.date')
 
 // 0=Sun .. 6=Sat. The upper/lower split trains Mon, Tue, Thu, Fri.
 const UPPER_LOWER = [
@@ -39,11 +44,17 @@ describe('nextScheduledDay', () => {
 
 describe('describeDaysAway', () => {
 	it('uses relative wording for today and tomorrow', () => {
-		expect(describeDaysAway(4, 0)).toBe('Today')
-		expect(describeDaysAway(5, 1)).toBe('Tomorrow')
+		expect(describeDaysAway(4, 0, en)).toBe('Today')
+		expect(describeDaysAway(5, 1, en)).toBe('Tomorrow')
 	})
 
 	it('names the weekday beyond tomorrow', () => {
-		expect(describeDaysAway(1, 2)).toBe('Monday')
+		expect(describeDaysAway(1, 2, en)).toBe('Monday')
+	})
+
+	it('says the same in Spanish (I18N-03)', () => {
+		expect(describeDaysAway(4, 0, es)).toBe('Hoy')
+		expect(describeDaysAway(5, 1, es)).toBe('Mañana')
+		expect(describeDaysAway(1, 2, es)).toBe('Lunes')
 	})
 })

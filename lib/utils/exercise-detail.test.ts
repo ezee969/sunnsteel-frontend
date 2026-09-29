@@ -1,7 +1,11 @@
 import type { Routine, RoutineExercise, RoutineSet } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { findRoutineUsages, formatSetScheme } from './exercise-detail'
+
+const enDate = translatorFor('en', 'routines.date')
 
 const fixed = (reps: number): RoutineSet =>
 	({ setNumber: 1, repType: 'FIXED', reps }) as RoutineSet
@@ -99,6 +103,7 @@ describe('findRoutineUsages', () => {
 				]),
 			],
 			'bench',
+			enDate,
 		)
 		expect(usages).toEqual([
 			{
@@ -118,6 +123,6 @@ describe('findRoutineUsages', () => {
 	})
 
 	it('returns nothing when no routine uses the exercise', () => {
-		expect(findRoutineUsages([], 'bench')).toEqual([])
+		expect(findRoutineUsages([], 'bench', enDate)).toEqual([])
 	})
 })

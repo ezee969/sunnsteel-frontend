@@ -14,6 +14,7 @@ import {
 	TRAINING_GOAL_VALUES,
 } from '@sunsteel/contracts'
 import { Compass, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -28,10 +29,10 @@ import {
 	describeClassification,
 	describeDiscoveredAuthor,
 	describeDiscoveredRoutine,
-	DISCOVERY_SCOPE_NOTE,
-	DISCOVERY_TRUNCATED_NOTE,
-	DURATION_BAND_OPTIONS,
-	DURATION_ESTIMATE_NOTE,
+discoveryScopeNote,
+	discoveryTruncatedNote,
+	durationBandOptions,
+	durationEstimateNote,
 	hasActiveFilters,
 } from '@/lib/utils/routine-discovery'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
@@ -51,7 +52,10 @@ const ANY = ''
  * from the prescription by `ROUT-10`'s rule rather than measured.
  */
 export function RoutineDiscovery() {
-	const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
+	const t = useTranslations('routines.discovery')
+	const tIdentity = useTranslations('routines.identity')
+	const tMuscles = useTranslations('routines.muscles')
+const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 	const query = useRoutineDiscovery(filters)
 
 	const routines = useMemo(
@@ -70,28 +74,28 @@ export function RoutineDiscovery() {
 		<div className="space-y-8">
 			<header className="space-y-2">
 				<h1 className="type-section flex items-center gap-2 text-foreground">
-					<Compass className="size-5 text-ink-3" aria-hidden /> Discover
-					Routines
+					<Compass className="size-5 text-ink-3" aria-hidden />{' '}
+						{t('title')}
 				</h1>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{DISCOVERY_SCOPE_NOTE}
+					{discoveryScopeNote(t)}
 				</p>
 			</header>
 
-			<section aria-label="Filters" className="space-y-4">
+			<section aria-label={t('filtersLabel')} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="discover-search">Search</Label>
+					<Label htmlFor="discover-search">{t('searchLabel')}</Label>
 					<Input
 						id="discover-search"
 						value={filters.q ?? ''}
-						placeholder="Name or description"
+						placeholder={t('searchPlaceholder')}
 						onChange={event => set('q', event.target.value || undefined)}
 					/>
 				</div>
 
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					<div className="space-y-2">
-						<Label htmlFor="discover-goal">Goal</Label>
+						<Label htmlFor="discover-goal">{t('goalLabel')}</Label>
 						<NativeSelect
 							id="discover-goal"
 							value={filters.goal ?? ANY}
@@ -99,17 +103,17 @@ export function RoutineDiscovery() {
 								set('goal', (event.target.value || undefined) as TrainingGoal)
 							}
 						>
-							<option value={ANY}>Any goal</option>
+							<option value={ANY}>{t('anyGoal')}</option>
 							{TRAINING_GOAL_VALUES.map(value => (
 								<option key={value} value={value}>
-									{getTrainingGoalLabel(value)}
+									{getTrainingGoalLabel(value, tIdentity)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="discover-experience">Experience</Label>
+						<Label htmlFor="discover-experience">{t('experienceLabel')}</Label>
 						<NativeSelect
 							id="discover-experience"
 							value={filters.experienceLevel ?? ANY}
@@ -120,17 +124,17 @@ export function RoutineDiscovery() {
 								)
 							}
 						>
-							<option value={ANY}>Any experience</option>
+							<option value={ANY}>{t('anyExperience')}</option>
 							{TRAINING_EXPERIENCE_LEVEL_VALUES.map(value => (
 								<option key={value} value={value}>
-									{getTrainingExperienceLabel(value)}
+									{getTrainingExperienceLabel(value, tIdentity)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="discover-days">Days a week</Label>
+						<Label htmlFor="discover-days">{t('daysLabel')}</Label>
 						<NativeSelect
 							id="discover-days"
 							value={filters.days ?? ANY}
@@ -141,11 +145,11 @@ export function RoutineDiscovery() {
 								)
 							}
 						>
-							<option value={ANY}>Any</option>
+							<option value={ANY}>{t('anyDays')}</option>
 							{Array.from({ length: ROUTINE_DAYS_MAX }, (_, i) => i + 1).map(
 								value => (
 									<option key={value} value={value}>
-										{value} {value === 1 ? 'day' : 'days'}
+										{t('daysOption', { days: value })}
 									</option>
 								),
 							)}
@@ -153,7 +157,7 @@ export function RoutineDiscovery() {
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="discover-muscle">Trains</Label>
+						<Label htmlFor="discover-muscle">{t('trainsLabel')}</Label>
 						<NativeSelect
 							id="discover-muscle"
 							value={filters.muscle ?? ANY}
@@ -161,17 +165,17 @@ export function RoutineDiscovery() {
 								set('muscle', (event.target.value || undefined) as MuscleGroup)
 							}
 						>
-							<option value={ANY}>Any muscle</option>
+							<option value={ANY}>{t('anyMuscle')}</option>
 							{MUSCLE_GROUPS.map(value => (
 								<option key={value} value={value}>
-									{getFriendlyMuscleName(value)}
+									{getFriendlyMuscleName(value, tMuscles)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="discover-duration">Session length</Label>
+						<Label htmlFor="discover-duration">{t('lengthLabel')}</Label>
 						<NativeSelect
 							id="discover-duration"
 							value={filters.duration ?? ANY}
@@ -182,8 +186,8 @@ export function RoutineDiscovery() {
 								)
 							}
 						>
-							<option value={ANY}>Any length</option>
-							{DURATION_BAND_OPTIONS.map(option => (
+							<option value={ANY}>{t('anyLength')}</option>
+							{durationBandOptions(t).map(option => (
 								<option key={option.value} value={option.value}>
 									{option.label}
 								</option>
@@ -194,7 +198,7 @@ export function RoutineDiscovery() {
 
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{DURATION_ESTIMATE_NOTE}
+						{durationEstimateNote(t)}
 					</p>
 					{narrowed ? (
 						<Button
@@ -203,13 +207,13 @@ export function RoutineDiscovery() {
 							size="sm"
 							onClick={() => setFilters({})}
 						>
-							Clear filters
-						</Button>
+							{t('clearFilters')}
+</Button>
 					) : null}
 				</div>
 			</section>
 
-			<section aria-label="Results" className="space-y-4">
+			<section aria-label={t('resultsLabel')} className="space-y-4">
 				{query.isLoading ? (
 					<div className="space-y-3" aria-busy="true">
 						<Skeleton className="h-16 w-full" />
@@ -231,19 +235,19 @@ export function RoutineDiscovery() {
 							className="mt-3"
 							onClick={() => void query.refetch()}
 						>
-							Try Again
-						</Button>
+							{t('tryAgain')}
+</Button>
 					</div>
 				) : routines.length ? (
 					<>
 						{truncated ? (
 							<p role="status" className="type-body-sm text-ink-2">
-								{DISCOVERY_TRUNCATED_NOTE}
+								{discoveryTruncatedNote(t)}
 							</p>
 						) : null}
 						<ul className="border-t border-rule-faint">
 							{routines.map(routine => {
-								const claims = describeClassification(routine)
+								const claims = describeClassification(routine, tIdentity)
 								return (
 									<li
 										key={routine.routineId}
@@ -262,8 +266,8 @@ export function RoutineDiscovery() {
 												</Link>
 											</h2>
 											<p className="type-body-sm text-ink-3">
-												by {describeDiscoveredAuthor(routine)}
-											</p>
+													{t('byAuthor', { author: describeDiscoveredAuthor(routine) })}
+</p>
 											{routine.description ? (
 												<p className="type-body-sm max-w-[68ch] text-ink-2">
 													{routine.description}
@@ -274,7 +278,7 @@ export function RoutineDiscovery() {
 											) : null}
 										</div>
 										<span className="type-data whitespace-nowrap text-ink-3">
-											{describeDiscoveredRoutine(routine)}
+											{describeDiscoveredRoutine(routine, t)}
 										</span>
 									</li>
 								)
@@ -290,15 +294,15 @@ export function RoutineDiscovery() {
 								{query.isFetchingNextPage ? (
 									<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 								) : null}
-								Show more
-							</Button>
+								{t('showMore')}
+</Button>
 						) : null}
 					</>
 				) : (
 					<p className="type-body-sm py-4 text-ink-3">
 						{narrowed
-							? 'No shared routine matches these filters yet. Try widening one.'
-							: 'Nobody you can see has shared a routine yet. When they do, it appears here.'}
+							? t('emptyFiltered')
+							: t('emptyAll')}
 					</p>
 				)}
 			</section>

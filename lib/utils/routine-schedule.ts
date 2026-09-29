@@ -9,6 +9,8 @@ import {
 	type SessionTrainingBlock,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { weekdayName } from './date'
 
 /**
@@ -127,9 +129,10 @@ export function startableDayToday<Day extends ScheduledDay>(
 export function routineDayTitle(
 	day: Pick<ScheduledDay, 'dayOfWeek' | 'name' | 'order'>,
 	style: 'short' | 'long' = 'long',
+	t: Translator<'routines.date'>,
 ): string {
 	if (day.dayOfWeek === null) return routineDayLabel(day)
-	const weekday = weekdayName(day.dayOfWeek, style)
+	const weekday = weekdayName(day.dayOfWeek, style, t)
 	const name = day.name?.trim()
 	return name ? `${weekday} · ${name}` : weekday
 }
@@ -140,24 +143,27 @@ export function describeRoutineSchedule(
 		restDays?: readonly number[]
 		rotationWeekdays?: readonly number[]
 	},
+	t: Translator<'routines.date'>,
+	tSchedule: Translator<'routines.schedule'>,
 ): string {
 	const days = orderedRoutineDays(routine)
 	if (isRotationRoutine(routine)) {
 		// SCHED-06: the weekdays a rotation trains on follow its days.
 		const weekdays = routine.rotationWeekdays?.length
-			? ` · ${routine.rotationWeekdays.map(day => weekdayName(day, 'short')).join(', ')}`
+			? ` · ${routine.rotationWeekdays.map(day => weekdayName(day, 'short', t)).join(', ')}`
 			: ''
 		return (
-			['Rotation', ...days.map(day => routineDayLabel(day))].join(' · ') +
-			weekdays
+			[tSchedule('rotation'), ...days.map(day => routineDayLabel(day))].join(
+				' · ',
+			) + weekdays
 		)
 	}
 	const training = days
-		.map(day => weekdayName(day.dayOfWeek ?? 0, 'short'))
+		.map(day => weekdayName(day.dayOfWeek ?? 0, 'short', t))
 		.join(' · ')
 	// SCHED-07: planned rest follows the training days.
 	const rest = routine.restDays?.length
-		? ` · Rest ${routine.restDays.map(day => weekdayName(day, 'short')).join(', ')}`
+		? ` · ${tSchedule('rest', { days: routine.restDays.map(day => weekdayName(day, 'short', t)).join(', ') })}`
 		: ''
 	return training + rest
 }
@@ -166,8 +172,9 @@ export function describeRoutineSchedule(
 export function describeRoutineFrequency(
 	routine: Pick<ScheduledRoutine, 'scheduleMode' | 'days'>,
 	formatDaysPerWeek: (days: number) => string,
+	t: Translator<'routines.schedule'>,
 ): string {
 	return isRotationRoutine(routine)
-		? `${routine.days.length}-day rotation`
+		? t('dayRotation', { count: routine.days.length })
 		: formatDaysPerWeek(routine.days.length)
 }

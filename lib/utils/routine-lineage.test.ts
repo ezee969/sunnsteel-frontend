@@ -1,11 +1,16 @@
 import type { RoutineLineage } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	describeLineageAuthor,
 	describeRoutineLineage,
 	lineageSourceHref,
 } from './routine-lineage'
+
+const en = translatorFor('en', 'routines.lineage')
+const es = translatorFor('es', 'routines.lineage')
 
 const visible: RoutineLineage = {
 	sourceRoutineId: 'source-1',
@@ -29,15 +34,21 @@ const hidden: RoutineLineage = {
 describe('routine lineage copy', () => {
 	it('names the original author when the viewer may see the source', () => {
 		expect(describeLineageAuthor(visible)).toBe('Ada Lovelace')
-		expect(describeRoutineLineage(visible)).toMatch(/Cloned from Ada Lovelace/)
+		expect(describeRoutineLineage(visible, en)).toMatch(/Cloned from Ada Lovelace/)
 	})
 
 	it('still says it is a clone when the source is hidden or gone', () => {
 		// Saying nothing would quietly present somebody else's programme as
 		// original work.
-		expect(describeRoutineLineage(hidden)).toMatch(/Cloned from another/i)
-		expect(describeRoutineLineage(hidden)).toMatch(/no longer available/i)
+		expect(describeRoutineLineage(hidden, en)).toMatch(/Cloned from another/i)
+		expect(describeRoutineLineage(hidden, en)).toMatch(/no longer available/i)
 		expect(describeLineageAuthor(hidden)).toBeNull()
+	})
+
+	it('says the same in Spanish, hidden or not (I18N-03)', () => {
+		expect(describeRoutineLineage(visible, es)).toMatch(/Clonada de Ada Lovelace/)
+		expect(describeRoutineLineage(hidden, es)).toMatch(/Clonada de la rutina de otro miembro/)
+		expect(describeRoutineLineage(hidden, es)).toMatch(/ya no está disponible/)
 	})
 
 	it('links to the source only when the viewer may open it', () => {

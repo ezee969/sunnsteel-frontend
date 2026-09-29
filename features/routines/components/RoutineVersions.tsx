@@ -6,6 +6,7 @@ import {
 	ROUTINE_VERSIONS_MAX,
 } from '@sunsteel/contracts'
 import { GitCompare, RefreshCw, RotateCcw, Save, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import {
@@ -65,6 +66,7 @@ function SaveVersionDialog({
 	onOpenChange: (open: boolean) => void
 	routineId: string
 }) {
+	const t = useTranslations('routines.versions')
 	const [name, setName] = useState('')
 	const create = useCreateRoutineVersion(routineId)
 	const { push } = useToast()
@@ -73,8 +75,10 @@ function SaveVersionDialog({
 		create.mutate(name.trim() || null, {
 			onSuccess: version => {
 				push({
-					title: 'Version saved',
-					description: `${versionTitle(version)} keeps the routine as it is now.`,
+					title: t('toastSavedTitle'),
+					description: t('toastSavedDescription', {
+						title: versionTitle(version, t),
+					}),
 					variant: 'success',
 				})
 				setName('')
@@ -82,7 +86,7 @@ function SaveVersionDialog({
 			},
 			onError: error =>
 				push({
-					title: 'Version not saved',
+					title: t('toastSaveFailedTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -92,10 +96,9 @@ function SaveVersionDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-md">
 				<DialogHeader>
-					<DialogTitle>Save a version</DialogTitle>
+					<DialogTitle>{t('saveDialogTitle')}</DialogTitle>
 					<DialogDescription>
-						Keeps a copy of every day, exercise, set, load and note as they are
-						now. Editing the routine later does not change it.
+						{t('saveDialogDescription')}
 					</DialogDescription>
 				</DialogHeader>
 				<form
@@ -106,17 +109,15 @@ function SaveVersionDialog({
 						save()
 					}}
 				>
-					<Label htmlFor="routine-version-name">Name (optional)</Label>
+					<Label htmlFor="routine-version-name">{t('nameLabel')}</Label>
 					<Input
 						id="routine-version-name"
 						value={name}
 						maxLength={ROUTINE_VERSION_NAME_MAX}
-						placeholder="e.g. Strength block"
+						placeholder={t('namePlaceholder')}
 						onChange={event => setName(event.target.value)}
 					/>
-					<p className="type-body-sm text-ink-3">
-						Without a name it is numbered.
-					</p>
+					<p className="type-body-sm text-ink-3">{t('unnamedHint')}</p>
 				</form>
 				<DialogFooter>
 					<Button
@@ -124,14 +125,14 @@ function SaveVersionDialog({
 						variant="outline"
 						onClick={() => onOpenChange(false)}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						type="submit"
 						form="save-routine-version"
 						disabled={create.isPending}
 					>
-						{create.isPending ? 'Saving…' : 'Save version'}
+						{create.isPending ? t('saving') : t('saveVersion')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -156,34 +157,47 @@ function CompareVersionDialog({
 	hasLiveSession: boolean
 	weightUnit: WeightUnit
 }) {
+	const t = useTranslations('routines.versions')
+	const tDate = useTranslations('routines.date')
+	const tSchedule = useTranslations('routines.schedule')
 	const restore = useRestoreRoutineVersion(routine.id)
 	const { push } = useToast()
-	const title = versionTitle(version)
+	const title = versionTitle(version, t)
 	const comparison = useMemo(
 		() =>
-			compareRoutineSetups(routineSetup(routine), version.setup, weightUnit),
-		[routine, version.setup, weightUnit],
+			compareRoutineSetups(
+				routineSetup(routine),
+				version.setup,
+				weightUnit,
+				t,
+				tDate,
+				tSchedule,
+			),
+		[routine, version.setup, weightUnit, t, tDate, tSchedule],
 	)
 	const blocked = restoreBlockedReason({
 		comparison,
 		versionCount,
 		max,
 		hasLiveSession,
+		t,
 	})
 
 	const onRestore = () =>
 		restore.mutate(version.id, {
 			onSuccess: ({ savedVersion }) => {
 				push({
-					title: `${title} restored`,
-					description: `The setup it replaced is saved as ${versionTitle(savedVersion)}.`,
+					title: t('toastRestoredTitle', { title }),
+					description: t('toastRestoredDescription', {
+						version: versionTitle(savedVersion, t),
+					}),
 					variant: 'success',
 				})
 				onClose()
 			},
 			onError: error =>
 				push({
-					title: 'Version not restored',
+					title: t('toastRestoreFailedTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -193,9 +207,9 @@ function CompareVersionDialog({
 		<Dialog open onOpenChange={open => !open && onClose()}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Compare {title}</DialogTitle>
+					<DialogTitle>{t('compareDialogTitle', { title })}</DialogTitle>
 					<DialogDescription>
-						What restoring it would change in the routine as it is now.
+						{t('compareDialogDescription')}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -204,14 +218,13 @@ function CompareVersionDialog({
 				{/* An identical version already says so above. */}
 				{comparison.isEmpty ? null : (
 					<p className="type-body-sm text-ink-3">
-						{blocked ??
-							'Restoring saves the current setup as a new version first, so you can undo it. Loads return to this version’s, undoing any automatic progression since.'}
+						{blocked ?? t('restoreDefaultNote')}
 					</p>
 				)}
 
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Close
+						{t('close')}
 					</Button>
 					<Button
 						type="button"
@@ -219,7 +232,7 @@ function CompareVersionDialog({
 						disabled={!!blocked || restore.isPending}
 					>
 						<RotateCcw aria-hidden />
-						{restore.isPending ? 'Restoring…' : 'Restore this version'}
+						{restore.isPending ? t('restoring') : t('restoreThisVersion')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -237,6 +250,7 @@ export function RoutineVersions({
 	hasLiveSession,
 	weightUnit,
 }: RoutineVersionsProps) {
+	const t = useTranslations('routines.versions')
 	const versions = useRoutineVersions(routine.id)
 	const remove = useDeleteRoutineVersion(routine.id)
 	const { push } = useToast()
@@ -252,15 +266,15 @@ export function RoutineVersions({
 		remove.mutate(version.id, {
 			onSuccess: () => {
 				push({
-					title: `${versionTitle(version)} deleted`,
-					description: 'The routine itself did not change.',
+					title: t('toastDeletedTitle', { title: versionTitle(version, t) }),
+					description: t('toastDeletedDescription'),
 					variant: 'success',
 				})
 				setDeleting(null)
 			},
 			onError: error =>
 				push({
-					title: 'Version not deleted',
+					title: t('toastDeleteFailedTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -271,11 +285,13 @@ export function RoutineVersions({
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div className="min-w-0 flex-1 basis-64">
 					<h2 id="routine-versions" className="type-section text-foreground">
-						Versions
+						{t('heading')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Save the routine as it is now to compare or restore it later.
-						{versions.data ? ` ${list.length} of ${max} kept.` : ''}
+						{t('description')}
+						{versions.data
+							? ` ${t('keptCount', { count: list.length, max })}`
+							: ''}
 					</p>
 				</div>
 				<Button
@@ -286,20 +302,22 @@ export function RoutineVersions({
 					disabled={!versions.data || full}
 				>
 					<Save aria-hidden />
-					Save version
+					{t('saveVersion')}
 				</Button>
 			</div>
 
 			{versions.isPending ? (
-				<div role="status" aria-label="Loading versions" className="space-y-2">
+				<div
+					role="status"
+					aria-label={t('loadingVersions')}
+					className="space-y-2"
+				>
 					<Skeleton className="h-12" />
 					<Skeleton className="h-12" />
 				</div>
 			) : versions.isError ? (
 				<div role="alert" className="space-y-2">
-					<p className="type-body-sm text-ink-2">
-						Versions could not be loaded.
-					</p>
+					<p className="type-body-sm text-ink-2">{t('loadError')}</p>
 					<Button
 						type="button"
 						variant="outline"
@@ -307,18 +325,15 @@ export function RoutineVersions({
 						onClick={() => void versions.refetch()}
 					>
 						<RefreshCw aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : list.length === 0 ? (
-				<p className="type-body-sm text-ink-3">
-					No versions yet. Saving one before a bigger change keeps the current
-					setup to come back to.
-				</p>
+				<p className="type-body-sm text-ink-3">{t('emptyState')}</p>
 			) : (
 				<ul>
 					{list.map(version => {
-						const origin = describeVersionOrigin(version)
+						const origin = describeVersionOrigin(version, t)
 						return (
 							<li
 								key={version.id}
@@ -326,11 +341,13 @@ export function RoutineVersions({
 							>
 								<div className="min-w-0 flex-1 basis-48">
 									<p className="type-panel text-foreground">
-										{versionTitle(version)}
+										{versionTitle(version, t)}
 									</p>
 									<p className="type-body-sm text-ink-3">
-										Saved {formatTimeAgo(version.createdAt)} ·{' '}
-										{describeSetupSize(version.setup)}
+										{t('savedAt', {
+											time: formatTimeAgo(version.createdAt),
+											size: describeSetupSize(version.setup, t),
+										})}
 									</p>
 									{origin ? (
 										<p className="type-body-sm text-ink-3">{origin}</p>
@@ -345,17 +362,19 @@ export function RoutineVersions({
 										onClick={() => setComparing(version)}
 									>
 										<GitCompare aria-hidden />
-										Compare
+										{t('compare')}
 									</Button>
 									<Button
 										type="button"
 										variant="destructive"
 										size="sm"
 										onClick={() => setDeleting(version)}
-										aria-label={`Delete ${versionTitle(version)}`}
+										aria-label={t('deleteAriaLabel', {
+											title: versionTitle(version, t),
+										})}
 									>
 										<Trash2 aria-hidden />
-										Delete
+										{t('deleteAction')}
 									</Button>
 								</div>
 							</li>
@@ -365,9 +384,7 @@ export function RoutineVersions({
 			)}
 
 			{full ? (
-				<p className="type-body-sm text-ink-3">
-					This routine keeps {max} versions. Delete one to save another.
-				</p>
+				<p className="type-body-sm text-ink-3">{t('fullNotice', { max })}</p>
 			) : null}
 
 			<SaveVersionDialog
@@ -395,15 +412,18 @@ export function RoutineVersions({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							Delete {deleting ? versionTitle(deleting) : 'version'}?
+							{t('deleteDialogTitle', {
+								title: deleting
+									? versionTitle(deleting, t)
+									: t('deleteFallbackTitle'),
+							})}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-							The routine itself does not change, but this version cannot be
-							recovered.
+							{t('deleteDialogDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={event => {
 								// Stay open until the deletion answers.
@@ -413,7 +433,7 @@ export function RoutineVersions({
 							disabled={remove.isPending}
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
-							{remove.isPending ? 'Deleting…' : 'Delete'}
+							{remove.isPending ? t('deleting') : t('deleteAction')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

@@ -6,66 +6,87 @@ import type {
 	TrainingIdentity,
 } from '@sunsteel/contracts'
 
-interface IdentityOption<T extends string> {
-	value: T
+import type { Translator } from '@/i18n/translator'
+
+type T = Translator<'routines.identity'>
+
+interface IdentityOption<V extends string> {
+	value: V
 	label: string
 }
 
-export const TRAINING_GOAL_OPTIONS: IdentityOption<TrainingGoal>[] = [
-	{ value: 'STRENGTH', label: 'Strength' },
-	{ value: 'MUSCLE_GROWTH', label: 'Muscle growth' },
-	{ value: 'FAT_LOSS', label: 'Fat loss' },
-	{ value: 'ENDURANCE', label: 'Endurance' },
-	{ value: 'GENERAL_FITNESS', label: 'General fitness' },
-	{ value: 'ATHLETIC_PERFORMANCE', label: 'Athletic performance' },
-	{ value: 'MOBILITY', label: 'Mobility' },
-]
+const GOAL_KEYS = {
+	STRENGTH: 'goalStrength',
+	MUSCLE_GROWTH: 'goalMuscleGrowth',
+	FAT_LOSS: 'goalFatLoss',
+	ENDURANCE: 'goalEndurance',
+	GENERAL_FITNESS: 'goalGeneralFitness',
+	ATHLETIC_PERFORMANCE: 'goalAthleticPerformance',
+	MOBILITY: 'goalMobility',
+} as const satisfies Record<TrainingGoal, string>
 
-export const TRAINING_EXPERIENCE_OPTIONS: IdentityOption<TrainingExperienceLevel>[] =
-	[
-		{ value: 'BEGINNER', label: 'Beginner' },
-		{ value: 'INTERMEDIATE', label: 'Intermediate' },
-		{ value: 'ADVANCED', label: 'Advanced' },
-	]
+const EXPERIENCE_KEYS = {
+	BEGINNER: 'experienceBeginner',
+	INTERMEDIATE: 'experienceIntermediate',
+	ADVANCED: 'experienceAdvanced',
+} as const satisfies Record<TrainingExperienceLevel, string>
 
-export const TRAINING_DISCIPLINE_OPTIONS: IdentityOption<TrainingDiscipline>[] =
-	[
-		{ value: 'BODYBUILDING', label: 'Bodybuilding' },
-		{ value: 'POWERLIFTING', label: 'Powerlifting' },
-		{ value: 'WEIGHTLIFTING', label: 'Weightlifting' },
-		{ value: 'CALISTHENICS', label: 'Calisthenics' },
-		{ value: 'STRONGMAN', label: 'Strongman' },
-		{ value: 'HYBRID_TRAINING', label: 'Hybrid training' },
-		{ value: 'GENERAL_STRENGTH', label: 'General strength' },
-	]
+const DISCIPLINE_KEYS = {
+	BODYBUILDING: 'disciplineBodybuilding',
+	POWERLIFTING: 'disciplinePowerlifting',
+	WEIGHTLIFTING: 'disciplineWeightlifting',
+	CALISTHENICS: 'disciplineCalisthenics',
+	STRONGMAN: 'disciplineStrongman',
+	HYBRID_TRAINING: 'disciplineHybridTraining',
+	GENERAL_STRENGTH: 'disciplineGeneralStrength',
+} as const satisfies Record<TrainingDiscipline, string>
 
-export const PREFERRED_TRAINING_STYLE_OPTIONS: IdentityOption<PreferredTrainingStyle>[] =
-	[
-		{ value: 'FULL_BODY', label: 'Full body' },
-		{ value: 'UPPER_LOWER', label: 'Upper / lower' },
-		{ value: 'PUSH_PULL_LEGS', label: 'Push / pull / legs' },
-		{ value: 'BODY_PART_SPLIT', label: 'Body-part split' },
-		{ value: 'CIRCUIT', label: 'Circuit' },
-	]
+const STYLE_KEYS = {
+	FULL_BODY: 'styleFullBody',
+	UPPER_LOWER: 'styleUpperLower',
+	PUSH_PULL_LEGS: 'stylePushPullLegs',
+	BODY_PART_SPLIT: 'styleBodyPartSplit',
+	CIRCUIT: 'styleCircuit',
+} as const satisfies Record<PreferredTrainingStyle, string>
 
-function getOptionLabel<T extends string>(
-	options: IdentityOption<T>[],
-	value: T,
-): string {
-	return options.find(option => option.value === value)?.label ?? value
+type Key = Parameters<T>[0]
+
+function options<V extends string>(
+	keys: Record<V, Key>,
+	t: T,
+): IdentityOption<V>[] {
+	return (Object.keys(keys) as V[]).map(value => ({
+		value,
+		label: t(keys[value]),
+	}))
 }
 
-export const getTrainingGoalLabel = (value: TrainingGoal) =>
-	getOptionLabel(TRAINING_GOAL_OPTIONS, value)
+export const trainingGoalOptions = (t: T) => options(GOAL_KEYS, t)
+export const trainingExperienceOptions = (t: T) => options(EXPERIENCE_KEYS, t)
+export const trainingDisciplineOptions = (t: T) => options(DISCIPLINE_KEYS, t)
+export const preferredTrainingStyleOptions = (t: T) => options(STYLE_KEYS, t)
 
-export const getTrainingExperienceLabel = (value: TrainingExperienceLevel) =>
-	getOptionLabel(TRAINING_EXPERIENCE_OPTIONS, value)
+const label = <V extends string>(
+	keys: Record<V, Key>,
+	value: V,
+	t: T,
+): string => (value in keys ? t(keys[value]) : value)
 
-export const getTrainingDisciplineLabel = (value: TrainingDiscipline) =>
-	getOptionLabel(TRAINING_DISCIPLINE_OPTIONS, value)
+export const getTrainingGoalLabel = (value: TrainingGoal, t: T) =>
+	label(GOAL_KEYS, value, t)
 
-export const getPreferredTrainingStyleLabel = (value: PreferredTrainingStyle) =>
-	getOptionLabel(PREFERRED_TRAINING_STYLE_OPTIONS, value)
+export const getTrainingExperienceLabel = (
+	value: TrainingExperienceLevel,
+	t: T,
+) => label(EXPERIENCE_KEYS, value, t)
+
+export const getTrainingDisciplineLabel = (value: TrainingDiscipline, t: T) =>
+	label(DISCIPLINE_KEYS, value, t)
+
+export const getPreferredTrainingStyleLabel = (
+	value: PreferredTrainingStyle,
+	t: T,
+) => label(STYLE_KEYS, value, t)
 
 export function hasTrainingIdentity(
 	identity: TrainingIdentity | null | undefined,

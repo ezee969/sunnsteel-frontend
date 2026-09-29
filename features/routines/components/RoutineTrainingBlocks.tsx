@@ -18,6 +18,7 @@ import {
 	RefreshCw,
 	Trash2,
 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import {
@@ -62,6 +63,7 @@ import {
 } from '@/lib/api/hooks/useRoutineTrainingBlocks'
 import { useRoutineVersions } from '@/lib/api/hooks/useRoutineVersions'
 import type { Routine } from '@/lib/api/types/routine.type'
+import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	describeTrainingBlockSource,
@@ -95,6 +97,8 @@ function TrainingBlockDialog({
 	versions: RoutineVersion[]
 	onClose: () => void
 }) {
+	const t = useTranslations('routines.trainingBlocks')
+	const tVersions = useTranslations('routines.versions')
 	const [name, setName] = useState(block?.name ?? '')
 	const [startDate, setStartDate] = useState(block?.startDate ?? '')
 	const [endDate, setEndDate] = useState(block?.endDate ?? '')
@@ -121,19 +125,20 @@ function TrainingBlockDialog({
 		const options = {
 			onSuccess: (saved: RoutineTrainingBlock) => {
 				push({
-					title: block ? 'Training block revised' : 'Training block added',
+					title: block ? t('toastRevisedTitle') : t('toastAddedTitle'),
 					description: block
-						? `${saved.name} is now revision ${saved.revision}.`
-						: `${saved.name} is stored without changing the routine.`,
+						? t('toastRevisedDescription', {
+								name: saved.name,
+								revision: saved.revision,
+							})
+						: t('toastAddedDescription', { name: saved.name }),
 					variant: 'success' as const,
 				})
 				onClose()
 			},
 			onError: (error: Error) =>
 				push({
-					title: block
-						? 'Training block not revised'
-						: 'Training block not added',
+					title: block ? t('toastNotRevised') : t('toastNotAdded'),
 					description: error.message,
 					variant: 'destructive' as const,
 				}),
@@ -147,13 +152,10 @@ function TrainingBlockDialog({
 			<DialogContent className="max-w-lg">
 				<DialogHeader>
 					<DialogTitle>
-						{block ? `Revise ${block.name}` : 'Add training block'}
+						{block ? t('reviseTitle', { name: block.name }) : t('addTitle')}
 					</DialogTitle>
 					<DialogDescription>
-						Choose the dates and copy a setup into this plan. While the block is
-						in force, the schedule, the dashboard and new workouts follow it,
-						and its loads progress on their own; the routine itself does not
-						change.
+						{t('dialogDescription')}
 					</DialogDescription>
 				</DialogHeader>
 				<form
@@ -165,18 +167,18 @@ function TrainingBlockDialog({
 					}}
 				>
 					<div className="space-y-2">
-						<Label htmlFor="training-block-name">Name</Label>
+						<Label htmlFor="training-block-name">{t('nameLabel')}</Label>
 						<Input
 							id="training-block-name"
 							value={name}
 							maxLength={ROUTINE_TRAINING_BLOCK_NAME_MAX}
-							placeholder="e.g. Accumulation"
+							placeholder={t('namePlaceholder')}
 							onChange={event => setName(event.target.value)}
 						/>
 					</div>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label htmlFor="training-block-start">Starts</Label>
+							<Label htmlFor="training-block-start">{t('startsLabel')}</Label>
 							<Input
 								id="training-block-start"
 								type="date"
@@ -186,7 +188,7 @@ function TrainingBlockDialog({
 							/>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="training-block-end">Ends</Label>
+							<Label htmlFor="training-block-end">{t('endsLabel')}</Label>
 							<Input
 								id="training-block-end"
 								type="date"
@@ -197,43 +199,46 @@ function TrainingBlockDialog({
 						</div>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="training-block-source">Setup source</Label>
+						<Label htmlFor="training-block-source">{t('sourceLabel')}</Label>
 						<Select value={source} onValueChange={setSource}>
 							<SelectTrigger id="training-block-source" className="w-full">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value={CURRENT_ROUTINE}>
-									Routine as it is now
+									{t('sourceCurrent')}
 								</SelectItem>
 								{versions.map(version => (
 									<SelectItem key={version.id} value={version.id}>
-										{versionTitle(version)}
+										{versionTitle(version, tVersions)}
 									</SelectItem>
 								))}
 							</SelectContent>
 						</Select>
 						<p className="type-body-sm text-ink-3">
-							The copied setup remains unchanged if its source changes or is
-							deleted.
+							{t('sourceHint')}
 						</p>
 					</div>
 					{block ? (
 						<p className="type-body-sm text-ink-3">
-							{trainingBlockChangeNote(block.state)}
+							{trainingBlockChangeNote(block.state, t)}
 						</p>
 					) : null}
 				</form>
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						type="submit"
 						form="routine-training-block-form"
 						disabled={!valid || isPending}
 					>
-						{isPending ? 'Saving…' : block ? 'Create revision' : 'Add block'}
+						{isPending
+							? t('saving')
+							: block
+								? t('createRevision')
+								: t('addBlock')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -252,6 +257,10 @@ function ReviewTrainingBlockDialog({
 	weightUnit: WeightUnit
 	onClose: () => void
 }) {
+	const t = useTranslations('routines.trainingBlocks')
+	const tVersions = useTranslations('routines.versions')
+	const tDate = useTranslations('routines.date')
+	const tSchedule = useTranslations('routines.schedule')
 	const revisions = useRoutineTrainingBlockRevisions(routine.id, block.id)
 	const [selectedId, setSelectedId] = useState(block.id)
 	const selected =
@@ -259,39 +268,49 @@ function ReviewTrainingBlockDialog({
 		block
 	const comparison = useMemo(
 		() =>
-			compareRoutineSetups(routineSetup(routine), selected.setup, weightUnit),
-		[routine, selected.setup, weightUnit],
+			compareRoutineSetups(
+				routineSetup(routine),
+				selected.setup,
+				weightUnit,
+				tVersions,
+				tDate,
+				tSchedule,
+			),
+		[routine, selected.setup, weightUnit, tVersions, tDate, tSchedule],
 	)
 
 	return (
 		<Dialog open onOpenChange={open => !open && onClose()}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Review {block.name}</DialogTitle>
+					<DialogTitle>{t('reviewTitle', { name: block.name })}</DialogTitle>
 					<DialogDescription>
-						Exact differences between this captured setup and the routine as it
-						is now.
+						{t('reviewDescription')}
 					</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-2">
 					<p className="type-body-sm text-ink-2">
-						Revision {selected.revision} · {describeSetupSize(selected.setup)}
+						{t('revisionSize', {
+							revision: selected.revision,
+							size: describeSetupSize(selected.setup, tVersions),
+						})}
 					</p>
 					<p className="type-body-sm text-ink-3">
-						{describeTrainingBlockSource(selected.source)} · saved{' '}
-						{formatTimeAgo(selected.createdAt)}
+						{t('sourceSaved', {
+							source: describeTrainingBlockSource(selected.source, t),
+							time: formatTimeAgo(selected.createdAt),
+						})}
 					</p>
 				</div>
 
 				{revisions.isError ? (
 					<p role="alert" className="type-body-sm text-destructive">
-						Revision history could not be loaded. The current setup is still
-						shown.
+						{t('historyLoadError')}
 					</p>
 				) : revisions.data && revisions.data.revisions.length > 1 ? (
 					<div className="space-y-2">
-						<p className="type-label text-ink-3">Revision history</p>
+						<p className="type-label text-ink-3">{t('revisionHistory')}</p>
 						<div className="flex flex-wrap gap-2">
 							{revisions.data.revisions.map(revision => (
 								<Button
@@ -303,7 +322,7 @@ function ReviewTrainingBlockDialog({
 									size="sm"
 									onClick={() => setSelectedId(revision.id)}
 								>
-									Revision {revision.revision}
+									{t('revisionButton', { revision: revision.revision })}
 								</Button>
 							))}
 						</div>
@@ -314,7 +333,7 @@ function ReviewTrainingBlockDialog({
 
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Close
+						{t('close')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -330,6 +349,9 @@ export function RoutineTrainingBlocks({
 	routine,
 	weightUnit,
 }: RoutineTrainingBlocksProps) {
+	const t = useTranslations('routines.trainingBlocks')
+	const tVersions = useTranslations('routines.versions')
+	const locale = useLocale() as Locale
 	const blocks = useRoutineTrainingBlocks(routine.id)
 	const versions = useRoutineVersions(routine.id)
 	const remove = useDeleteRoutineTrainingBlock(routine.id)
@@ -348,15 +370,15 @@ export function RoutineTrainingBlocks({
 		remove.mutate(block.id, {
 			onSuccess: () => {
 				push({
-					title: `${block.name} deleted`,
-					description: 'Its plan was removed. The routine did not change.',
+					title: t('toastDeletedTitle', { name: block.name }),
+					description: t('toastDeletedDescription'),
 					variant: 'success',
 				})
 				setDeleting(null)
 			},
 			onError: error =>
 				push({
-					title: 'Training block not deleted',
+					title: t('toastNotDeleted'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -370,12 +392,13 @@ export function RoutineTrainingBlocks({
 						id="routine-training-blocks"
 						className="type-section text-foreground"
 					>
-						Training blocks
+						{t('heading')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Plan dated setups without changing the editable routine, schedule or
-						sessions.
-						{blocks.data ? ` ${list.length} of ${max} planned.` : ''}
+						{t('description')}
+						{blocks.data
+							? ` ${t('plannedCount', { count: list.length, max })}`
+							: ''}
 					</p>
 				</div>
 				<Button
@@ -386,14 +409,14 @@ export function RoutineTrainingBlocks({
 					disabled={!blocks.data || full}
 				>
 					<Plus aria-hidden />
-					Add block
+					{t('addBlock')}
 				</Button>
 			</div>
 
 			{blocks.isPending ? (
 				<div
 					role="status"
-					aria-label="Loading training blocks"
+					aria-label={t('loading')}
 					className="space-y-2"
 				>
 					<Skeleton className="h-20" />
@@ -402,7 +425,7 @@ export function RoutineTrainingBlocks({
 			) : blocks.isError ? (
 				<div role="alert" className="space-y-2">
 					<p className="type-body-sm text-ink-2">
-						Training blocks could not be loaded.
+						{t('loadError')}
 					</p>
 					<Button
 						type="button"
@@ -411,13 +434,12 @@ export function RoutineTrainingBlocks({
 						onClick={() => void blocks.refetch()}
 					>
 						<RefreshCw aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : list.length === 0 ? (
 				<p className="type-body-sm text-ink-3">
-					No blocks yet. Add a dated copy of the current routine or a saved
-					version.
+					{t('emptyState')}
 				</p>
 			) : (
 				<ul>
@@ -431,17 +453,17 @@ export function RoutineTrainingBlocks({
 									<p className="type-panel text-foreground">{block.name}</p>
 									<Badge variant="outline">
 										<CalendarRange aria-hidden />
-										{trainingBlockStateLabel(block.state)}
+										{trainingBlockStateLabel(block.state, t)}
 									</Badge>
 								</div>
 								<p className="type-body-sm mt-1 text-ink-2">
-									{formatTrainingBlockRange(block.startDate, block.endDate)}
+									{formatTrainingBlockRange(block.startDate, block.endDate, locale)}
 								</p>
 								<p className="type-body-sm text-ink-3">
-									{describeSetupSize(block.setup)} ·{' '}
-									{describeTrainingBlockSource(block.source)}
+									{describeSetupSize(block.setup, tVersions)} ·{' '}
+									{describeTrainingBlockSource(block.source, t)}
 									{block.revisionCount > 1
-										? ` · revision ${block.revision}`
+										? ` · ${t('revisionSuffix', { revision: block.revision })}`
 										: ''}
 								</p>
 							</div>
@@ -453,7 +475,7 @@ export function RoutineTrainingBlocks({
 									onClick={() => setReviewing(block)}
 								>
 									<GitCompare aria-hidden />
-									Review
+									{t('review')}
 								</Button>
 								{/* PROG-11: a block that has started has training to compare. */}
 								{block.state !== 'FUTURE' ? (
@@ -475,7 +497,7 @@ export function RoutineTrainingBlocks({
 										onClick={() => setEditor(block)}
 									>
 										<Pencil aria-hidden />
-										Revise
+										{t('revise')}
 									</Button>
 								) : null}
 								{block.state === 'FUTURE' ? (
@@ -484,10 +506,10 @@ export function RoutineTrainingBlocks({
 										variant="destructive"
 										size="sm"
 										onClick={() => setDeleting(block)}
-										aria-label={`Delete ${block.name}`}
+										aria-label={t('deleteAria', { name: block.name })}
 									>
 										<Trash2 aria-hidden />
-										Delete
+										{t('deleteAction')}
 									</Button>
 								) : null}
 							</div>
@@ -497,10 +519,7 @@ export function RoutineTrainingBlocks({
 			)}
 
 			<p className="type-body-sm text-ink-3">
-				While a block is in force, the schedule, the dashboard and new workouts
-				use its setup, and progression raises its loads, not the routine’s.
-				Revising it starts again from the loads you set, and the routine resumes
-				as it was the day after the block ends.
+				{t('footnote')}
 			</p>
 
 			{editor ? (
@@ -538,15 +557,16 @@ export function RoutineTrainingBlocks({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							Delete {deleting?.name ?? 'training block'}?
+							{t('deleteDialogTitle', {
+								name: deleting?.name ?? t('deleteFallback'),
+							})}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-							This removes every revision of this future plan. The routine
-							itself does not change.
+							{t('deleteDialogDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={event => {
 								event.preventDefault()
@@ -555,7 +575,7 @@ export function RoutineTrainingBlocks({
 							disabled={remove.isPending}
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
-							{remove.isPending ? 'Deleting…' : 'Delete block'}
+							{remove.isPending ? t('deleting') : t('deleteBlock')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

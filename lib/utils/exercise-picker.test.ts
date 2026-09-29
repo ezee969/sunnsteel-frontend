@@ -1,11 +1,16 @@
 import type { Exercise } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	applyStarChange,
 	groupPickerExercises,
 	RECENT_EXERCISES_LIMIT,
 } from './exercise-picker'
+
+const en = translatorFor('en', 'routines.picker')
+const es = translatorFor('es', 'routines.picker')
 
 const exercise = (id: string): Exercise =>
 	({ id, name: id }) as unknown as Exercise
@@ -18,8 +23,19 @@ const trained = (exerciseId: string, day: number) => ({
 })
 
 describe('groupPickerExercises', () => {
-	it('keeps catalog order under one label without stars or history', () => {
-		const groups = groupPickerExercises(catalog, {})
+	it('labels the groups in Spanish (I18N-03)', () => {
+		expect(groupPickerExercises(catalog, { t: es })[0].label).toBe(
+			'Todos los ejercicios',
+		)
+		expect(
+			groupPickerExercises(catalog, { t: es, starred: ['a'] }).map(
+				group => group.label,
+			),
+		).toEqual(['Destacados', 'Otros ejercicios'])
+	})
+
+it('keeps catalog order under one label without stars or history', () => {
+		const groups = groupPickerExercises(catalog, { t: en })
 		expect(groups).toHaveLength(1)
 		expect(groups[0].label).toBe('All exercises')
 		expect(ids(groups[0].exercises)).toEqual(ids(catalog))
@@ -27,7 +43,8 @@ describe('groupPickerExercises', () => {
 
 	it('puts stars first, then unstarred recent exercises, each once', () => {
 		const groups = groupPickerExercises(catalog, {
-			starred: ['c', 'a'],
+t: en,
+starred: ['c', 'a'],
 			recent: [trained('a', 3), trained('d', 9), trained('b', 5)],
 		})
 		expect(groups.map(group => [group.key, ids(group.exercises)])).toEqual([
@@ -42,14 +59,15 @@ describe('groupPickerExercises', () => {
 		const recent = ['a', 'b', 'c', 'd', 'e', 'f'].map((id, index) =>
 			trained(id, 20 - index),
 		)
-		const groups = groupPickerExercises(catalog, { recent })
+		const groups = groupPickerExercises(catalog, { t: en, recent })
 		expect(ids(groups[0].exercises)).toHaveLength(RECENT_EXERCISES_LIMIT)
 		expect(ids(groups[1].exercises)).toEqual(['f', 'g', 'h'])
 	})
 
 	it('keeps a pending recent group while history loads', () => {
 		const groups = groupPickerExercises(catalog, {
-			starred: ['b'],
+t: en,
+starred: ['b'],
 			recentPending: true,
 		})
 		expect(
@@ -68,7 +86,8 @@ describe('groupPickerExercises', () => {
 
 	it('skips excluded and unknown exercises', () => {
 		const groups = groupPickerExercises(catalog, {
-			starred: ['missing', 'b'],
+t: en,
+starred: ['missing', 'b'],
 			recent: [trained('c', 1)],
 			exclude: new Set(['b', 'h']),
 		})

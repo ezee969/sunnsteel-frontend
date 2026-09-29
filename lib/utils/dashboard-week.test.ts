@@ -1,6 +1,8 @@
 import type { Routine, WorkoutSessionSummary } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	buildWeekStrip,
 	describeWeekStripToday,
@@ -10,6 +12,8 @@ import {
 } from './dashboard-week'
 import { scheduleDayState } from './schedule-month'
 import { buildScheduleWeek, localDateKey, startOfWeek } from './schedule-week'
+
+const enDate = translatorFor('en', 'routines.date')
 
 // Wednesday 16 Sep 2026, local time.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -70,7 +74,7 @@ const dayOf = (strip: ReturnType<typeof buildWeekStrip>, date: number) =>
 describe('weekly training strip', () => {
 	it('shows the week builder’s seven days with the month view’s state', () => {
 		const built = week([session('s-mon', at(14))])
-		const strip = buildWeekStrip(built)
+		const strip = buildWeekStrip(built, enDate)
 		expect(strip.map(day => day.weekday)).toEqual([
 			'Mon',
 			'Tue',
@@ -100,6 +104,7 @@ describe('weekly training strip', () => {
 	it('opens a day’s workout, else the schedule', () => {
 		const strip = buildWeekStrip(
 			week([session('s-mon', at(14)), session('s-tue', at(15), 'ABORTED')]),
+			enDate,
 		)
 		expect(dayOf(strip, 14).href).toBe('/workouts/history/s-mon')
 		expect(dayOf(strip, 14).label).toMatch(/Opens the workout\.$/)
@@ -139,7 +144,7 @@ describe('weekly training strip', () => {
 	})
 
 	it('lists only the states the week shows, in legend order', () => {
-		const strip = buildWeekStrip(week([session('s-mon', at(14))]))
+		const strip = buildWeekStrip(week([session('s-mon', at(14))]), enDate)
 		expect(weekStripStates(strip)).toEqual([
 			'COMPLETED',
 			'PLANNED',

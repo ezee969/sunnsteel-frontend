@@ -21,6 +21,7 @@ import {
 	RefreshCw,
 	Trash2,
 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -62,13 +63,14 @@ import {
 	useEndDeloadEarly,
 	useRoutineDeloads,
 } from '@/lib/api/hooks/useRoutineDeloads'
+import type { Locale } from '@/i18n/config'
 import type { Routine } from '@/lib/api/types/routine.type'
 import { parseSuggestedDeload } from '@/lib/utils/deload-suggestion'
 import {
-	DELOAD_DATE_PROBLEMS,
 	DELOAD_DEFAULT_DAYS,
 	DELOAD_LENGTHS,
 	deloadDateProblem,
+	deloadDateProblemMessage,
 	deloadEndDate,
 	deloadStateLabel,
 	describeDeloadLength,
@@ -88,11 +90,6 @@ interface RoutineDeloadsProps {
 	weightUnit: WeightUnit
 }
 
-const SET_MODE_LABELS: Record<DeloadSetMode, string> = {
-	HALF: 'First half of the sets',
-	ALL: 'Every set',
-}
-
 function DeloadDialog({
 	routine,
 	today,
@@ -109,6 +106,11 @@ function DeloadDialog({
 	initial?: { startDate: string; length: number } | null
 	onClose: () => void
 }) {
+	const t = useTranslations('routines.deloads')
+	const tVersions = useTranslations('routines.versions')
+	const tDate = useTranslations('routines.date')
+	const tSchedule = useTranslations('routines.schedule')
+	const locale = useLocale() as Locale
 	const [startDate, setStartDate] = useState(
 		() => initial?.startDate ?? firstFreeDate(today, existing),
 	)
@@ -148,9 +150,16 @@ function DeloadDialog({
 	const comparison = useMemo(
 		() =>
 			original && lighter
-				? compareRoutineSetups(original, lighter, weightUnit)
+					? compareRoutineSetups(
+							original,
+							lighter,
+							weightUnit,
+							tVersions,
+							tDate,
+							tSchedule,
+						)
 				: null,
-		[original, lighter, weightUnit],
+		[original, lighter, weightUnit, tVersions, tDate, tSchedule],
 	)
 	const valid = !!startDate && !problem && !!lighter
 
@@ -160,16 +169,20 @@ function DeloadDialog({
 			{
 				onSuccess: saved => {
 					push({
-						title:
-							saved.state === 'ACTIVE' ? 'Deload started' : 'Deload planned',
-						description: `${describeDeloadRange(saved)}. The routine and its blocks do not change.`,
+							title:
+								saved.state === 'ACTIVE'
+									? t('toastStartedTitle')
+									: t('toastPlannedTitle'),
+							description: t('toastSavedDescription', {
+								range: describeDeloadRange(saved, locale, t),
+							}),
 						variant: 'success',
 					})
 					onClose()
 				},
 				onError: error =>
 					push({
-						title: 'Deload not saved',
+						title: t('toastNotSaved'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -180,11 +193,9 @@ function DeloadDialog({
 		<Dialog open onOpenChange={open => !open && onClose()}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Plan a deload</DialogTitle>
+					<DialogTitle>{t('planDialogTitle')}</DialogTitle>
 					<DialogDescription>
-						For a few days, train a lighter copy of the plan in force. Loads
-						don&apos;t progress while it lasts, and the plan returns as it was
-						the day after it ends.
+						{t('planDialogDescription')}
 					</DialogDescription>
 				</DialogHeader>
 				<form
@@ -197,7 +208,7 @@ function DeloadDialog({
 				>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="space-y-2">
-							<Label htmlFor="deload-start">Starts</Label>
+							<Label htmlFor="deload-start">{t('startsLabel')}</Label>
 							<Input
 								id="deload-start"
 								type="date"
@@ -207,7 +218,7 @@ function DeloadDialog({
 							/>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="deload-length">Lasts</Label>
+							<Label htmlFor="deload-length">{t('lastsLabel')}</Label>
 							<Select
 								value={String(length)}
 								onValueChange={value => setLength(Number(value))}
@@ -218,14 +229,14 @@ function DeloadDialog({
 								<SelectContent>
 									{DELOAD_LENGTHS.map(days => (
 										<SelectItem key={days} value={String(days)}>
-											{describeDeloadLength(days)}
+											{describeDeloadLength(days, t)}
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="deload-load">Loads</Label>
+							<Label htmlFor="deload-load">{t('loadsLabel')}</Label>
 							<Select
 								value={String(loadReductionPercent)}
 								onValueChange={value =>
@@ -238,14 +249,16 @@ function DeloadDialog({
 								<SelectContent>
 									{DELOAD_LOAD_REDUCTIONS.map(percent => (
 										<SelectItem key={percent} value={String(percent)}>
-											{percent === 0 ? 'Keep the loads' : `${percent}% lighter`}
+											{percent === 0
+												? t('keepLoads')
+												: t('percentLighter', { percent })}
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="deload-sets">Sets</Label>
+							<Label htmlFor="deload-sets">{t('setsLabel')}</Label>
 							<Select
 								value={setMode}
 								onValueChange={value => setSetMode(value as DeloadSetMode)}
@@ -256,7 +269,7 @@ function DeloadDialog({
 								<SelectContent>
 									{(['HALF', 'ALL'] as const).map(mode => (
 										<SelectItem key={mode} value={mode}>
-											{SET_MODE_LABELS[mode]}
+											{mode === 'HALF' ? t('setModeHalf') : t('setModeAll')}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -266,25 +279,24 @@ function DeloadDialog({
 
 					{startDate ? (
 						<p className="type-body-sm text-ink-2">
-							{describeDeloadRange({ startDate, endDate })}
-							{plan
-								? ` · ${plan.trainingBlock ? `lightens the training block “${plan.trainingBlock.name}”` : 'lightens the routine'}`
-								: ''}
+								{describeDeloadRange({ startDate, endDate }, locale, t)}
+								{plan
+									? ` · ${plan.trainingBlock ? t('rangeLightensBlock', { name: plan.trainingBlock.name }) : t('rangeLightensRoutine')}`
+									: ''}
 						</p>
 					) : null}
 					<p className="type-body-sm text-ink-3">
-						Loads drop to the nearest step each exercise can load; one too light
-						to cut keeps its weight. Reps, RIR and rest stay the same.
+							{t('roundingNote')}
 					</p>
 
 					<div role="status" aria-live="polite" className="space-y-3">
 						{problem ? (
 							<p className="type-body-sm text-ink-2">
-								{DELOAD_DATE_PROBLEMS[problem]}
+								{deloadDateProblemMessage(problem, t)}
 							</p>
 						) : empty ? (
 							<p className="type-body-sm text-ink-2">
-								That plan has no exercises to deload yet.
+								{t('noExercises')}
 							</p>
 						) : original && !lighter ? (
 							<p className="type-body-sm text-ink-2">{DELOAD_NOT_LIGHTER}.</p>
@@ -293,14 +305,14 @@ function DeloadDialog({
 
 					{comparison ? (
 						<div className="space-y-2">
-							<p className="type-label text-ink-3">What changes</p>
+							<p className="type-label text-ink-3">{t('whatChanges')}</p>
 							<RoutineSetupComparison comparison={comparison} />
 						</div>
 					) : null}
 				</form>
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						type="submit"
@@ -308,10 +320,10 @@ function DeloadDialog({
 						disabled={!valid || create.isPending}
 					>
 						{create.isPending
-							? 'Saving…'
+							? t('saving')
 							: startDate === today
-								? 'Start deload'
-								: 'Plan deload'}
+								? t('startDeload')
+								: t('planDeload')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -328,26 +340,40 @@ function ReviewDeloadDialog({
 	weightUnit: WeightUnit
 	onClose: () => void
 }) {
+	const t = useTranslations('routines.deloads')
+	const tVersions = useTranslations('routines.versions')
+	const tDate = useTranslations('routines.date')
+	const tSchedule = useTranslations('routines.schedule')
+	const locale = useLocale() as Locale
 	const comparison = useMemo(
-		() => compareRoutineSetups(deload.originalSetup, deload.setup, weightUnit),
-		[deload, weightUnit],
+		() =>
+			compareRoutineSetups(
+				deload.originalSetup,
+				deload.setup,
+				weightUnit,
+				tVersions,
+				tDate,
+				tSchedule,
+			),
+		[deload, weightUnit, tVersions, tDate, tSchedule],
 	)
 	return (
 		<Dialog open onOpenChange={open => !open && onClose()}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Review deload</DialogTitle>
+					<DialogTitle>{t('reviewTitle')}</DialogTitle>
 					<DialogDescription>
-						How it differs from the prescription in force when it was planned.
+						{t('reviewDescription')}
 					</DialogDescription>
 				</DialogHeader>
 				<p className="type-body-sm text-ink-2">
-					{describeDeloadRange(deload)} · {describeDeloadOptions(deload)}
+					{describeDeloadRange(deload, locale, t)} ·{' '}
+					{describeDeloadOptions(deload, t)}
 				</p>
 				<RoutineSetupComparison comparison={comparison} />
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Close
+						{t('close')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -361,6 +387,8 @@ function ReviewDeloadDialog({
  * and progression waits; neither the routine nor the block changes.
  */
 export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
+	const t = useTranslations('routines.deloads')
+	const locale = useLocale() as Locale
 	const deloads = useRoutineDeloads(routine.id)
 	const endEarly = useEndDeloadEarly(routine.id)
 	const cancel = useCancelDeload(routine.id)
@@ -403,18 +431,20 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 		mutation.mutate(deload.id, {
 			onSuccess: () => {
 				push({
-					title: action === 'END' ? 'Deload ended' : 'Deload cancelled',
+						title:
+							action === 'END' ? t('toastEndedTitle') : t('toastCancelledTitle'),
 					description:
 						action === 'END'
-							? 'From today the plan trains as it was. Workouts already done stay as they are.'
-							: 'Its days were removed. The routine did not change.',
+							? t('toastEndedDescription')
+							: t('toastCancelledDescription'),
 					variant: 'success',
 				})
 				setConfirming(null)
 			},
 			onError: error =>
 				push({
-					title: action === 'END' ? 'Deload not ended' : 'Deload not cancelled',
+					title:
+							action === 'END' ? t('toastNotEnded') : t('toastNotCancelled'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -427,11 +457,10 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div className="min-w-0 flex-1 basis-64">
 					<h2 id="routine-deloads" className="type-section text-foreground">
-						Deloads
+						{t('heading')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Train lighter for up to {deloads.data?.maxDays ?? 14} days without
-						editing the routine or its blocks.
+						{t('description', { days: deloads.data?.maxDays ?? 14 })}
 					</p>
 				</div>
 				<Button
@@ -442,18 +471,18 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 					disabled={!deloads.data}
 				>
 					<Plus aria-hidden />
-					Plan deload
+					{t('planDeload')}
 				</Button>
 			</div>
 
 			{deloads.isPending ? (
-				<div role="status" aria-label="Loading deloads" className="space-y-2">
+				<div role="status" aria-label={t('loading')} className="space-y-2">
 					<Skeleton className="h-16" />
 				</div>
 			) : deloads.isError ? (
 				<div role="alert" className="space-y-2">
 					<p className="type-body-sm text-ink-2">
-						Deloads could not be loaded.
+						{t('loadError')}
 					</p>
 					<Button
 						type="button"
@@ -462,12 +491,12 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 						onClick={() => void deloads.refetch()}
 					>
 						<RefreshCw aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : list.length === 0 ? (
 				<p className="type-body-sm text-ink-3">
-					No deloads yet. Plan one when you need an easier week.
+					{t('emptyState')}
 				</p>
 			) : (
 				<ul>
@@ -479,20 +508,20 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 							<div className="min-w-0 flex-1 basis-64">
 								<div className="flex flex-wrap items-center gap-2">
 									<p className="type-panel text-foreground">
-										{describeDeloadRange(deload)}
-									</p>
+										{describeDeloadRange(deload, locale, t)}
+										</p>
 									<Badge variant="outline">
 										<CalendarRange aria-hidden />
 										{deload.endedEarlyAt
-											? 'Ended early'
-											: deloadStateLabel(deload.state)}
+												? t('endedEarly')
+												: deloadStateLabel(deload.state, t)}
 									</Badge>
 								</div>
 								<p className="type-body-sm mt-1 text-ink-2">
-									{describeDeloadOptions(deload)}
-								</p>
+									{describeDeloadOptions(deload, t)}
+									</p>
 								<p className="type-body-sm text-ink-3">
-									{describeDeloadSource(deload.source)}
+									{describeDeloadSource(deload.source, t)}
 								</p>
 							</div>
 							<div className="flex flex-wrap gap-2">
@@ -502,8 +531,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 									size="sm"
 									onClick={() => setReviewing(deload)}
 								>
-									<GitCompare aria-hidden />
-									Review
+										<GitCompare aria-hidden />
+										{t('review')}
 								</Button>
 								{deload.state === 'ACTIVE' ? (
 									<Button
@@ -512,8 +541,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 										size="sm"
 										onClick={() => setConfirming({ action: 'END', deload })}
 									>
-										<CircleStop aria-hidden />
-										End early
+											<CircleStop aria-hidden />
+											{t('endEarly')}
 									</Button>
 								) : null}
 								{deload.state === 'FUTURE' ? (
@@ -523,8 +552,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 										size="sm"
 										onClick={() => setConfirming({ action: 'CANCEL', deload })}
 									>
-										<Trash2 aria-hidden />
-										Cancel deload
+											<Trash2 aria-hidden />
+											{t('cancelDeload')}
 									</Button>
 								) : null}
 							</div>
@@ -562,18 +591,18 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							{confirming?.action === 'END'
-								? 'End this deload today?'
-								: 'Cancel this deload?'}
+								{confirming?.action === 'END'
+									? t('confirmEndTitle')
+									: t('confirmCancelTitle')}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-							{confirming?.action === 'END'
-								? 'From today the plan trains at its usual loads again. Workouts you already did during the deload stay as they are.'
-								: 'It has not started, so nothing was trained with it. Its lighter days are removed; the routine does not change.'}
+								{confirming?.action === 'END'
+									? t('confirmEndDescription')
+									: t('confirmCancelDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Keep it</AlertDialogCancel>
+						<AlertDialogCancel>{t('keepIt')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={event => {
 								event.preventDefault()
@@ -587,10 +616,10 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 							}
 						>
 							{confirmPending
-								? 'Saving…'
+								? t('saving')
 								: confirming?.action === 'END'
-									? 'End deload'
-									: 'Cancel deload'}
+									? t('endDeload')
+									: t('cancelDeload')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

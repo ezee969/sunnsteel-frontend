@@ -1,6 +1,7 @@
 'use client'
 
 import { Dumbbell, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -19,6 +20,7 @@ import { routineDayTitle } from '@/lib/utils/routine-schedule'
  */
 export function TodayActions() {
 	const router = useRouter()
+	const tDate = useTranslations('routines.date')
 	const { entries, active, isPending, error } = useTodaysWorkouts()
 	const startSession = useStartSession()
 	const [startingDayId, setStartingDayId] = useState<string | null>(null)
@@ -75,7 +77,7 @@ export function TodayActions() {
 			) : (
 				<ul>
 					{entries.map(({ routine, day, canStartToday }) => {
-						const target = `${routine.name} · ${routineDayTitle(day)}`
+						const target = `${routine.name} · ${routineDayTitle(day, 'long', tDate)}`
 						return (
 							<li
 								key={`${routine.id}:${day.id}`}

@@ -76,6 +76,9 @@ export function ExerciseSwapDialog({
 	onClose,
 }: ExerciseSwapDialogProps) {
 	const t = useTranslations('workout.exerciseSwap')
+	const tAlternatives = useTranslations('routines.alternatives')
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
 	const plan = deload
 		? t('planDeload')
 		: trainingBlockName
@@ -115,7 +118,7 @@ export function ExerciseSwapDialog({
 				.slice(0, SEARCH_LIMIT)
 				.map(exercise => ({
 					exercise,
-					reason: formatMuscleGroups(exercise.primaryMuscles),
+					reason: formatMuscleGroups(exercise.primaryMuscles, tMuscles),
 				}))
 		}
 		const prescribed = catalog.find(
@@ -127,9 +130,24 @@ export function ExerciseSwapDialog({
 			exclude: excluded,
 		}).map(alternative => ({
 			exercise: alternative.exercise,
-			reason: describeAlternative(alternative, gym?.name),
+			reason: describeAlternative(
+				alternative,
+				gym?.name,
+				tAlternatives,
+				tMuscles,
+				tEquipment,
+			),
 		}))
-	}, [exercises, search, excluded, target?.prescribed.id, gym])
+	}, [
+		exercises,
+		search,
+		excluded,
+		target?.prescribed.id,
+		gym,
+		tAlternatives,
+		tMuscles,
+		tEquipment,
+	])
 
 	const busy = substitute.isPending || revert.isPending
 	const isSwapped = !!target && target.performed.id !== target.prescribed.id

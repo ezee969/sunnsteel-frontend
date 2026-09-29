@@ -8,10 +8,11 @@ import {
 	type MuscleGroup,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 
 import type { EmptyStateCopy } from './empty-states'
-import { EQUIPMENT_LABELS } from './exercise-equipment'
+import { equipmentLabel } from './exercise-equipment'
 import { getFriendlyMuscleName } from './muscle-groups'
 
 /**
@@ -250,6 +251,8 @@ export interface CatalogOption<T extends string> {
 export function catalogFilterOptions(
 	exercises: readonly Exercise[],
 	selected: CatalogFilters,
+	t: Translator<'routines.muscles'>,
+	tEquip: Translator<'routines.equipment'>,
 ): {
 	muscles: CatalogOption<MuscleGroup>[]
 	equipment: CatalogOption<ExerciseEquipment>[]
@@ -273,10 +276,10 @@ export function catalogFilterOptions(
 	return {
 		muscles: MUSCLE_GROUPS.filter(value => muscles.has(value)).map(value => ({
 			value,
-			label: getFriendlyMuscleName(value),
+			label: getFriendlyMuscleName(value, t),
 		})),
 		equipment: EXERCISE_EQUIPMENT.filter(value => equipment.has(value)).map(
-			value => ({ value, label: EQUIPMENT_LABELS[value] }),
+			value => ({ value, label: equipmentLabel(value, tEquip) }),
 		),
 		patterns: MOVEMENT_PATTERNS.filter(value => patterns.has(value)).map(
 			value => ({ value, label: MOVEMENT_PATTERN_LABELS[value] }),

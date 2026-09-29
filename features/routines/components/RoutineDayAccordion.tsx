@@ -3,6 +3,7 @@
 import type { RoutineScheduleMode, WeightUnit } from '@sunsteel/contracts'
 import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
 import { Calendar, Loader2, Play, Repeat } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	Accordion,
@@ -57,6 +58,9 @@ export const RoutineDayAccordion = ({
 	startActingDayId,
 	onStartWorkout,
 }: RoutineDayAccordionProps) => {
+	const t = useTranslations('routines.card')
+	const tDate = useTranslations('routines.date')
+	const tFormat = useTranslations('routines.format')
 	const todayDow = getTodayDow()
 	// ROUT-11: a rotation marks its next day the way a weekly routine marks today.
 	const nextDayId = nextRotationDay({ ...routine, days })?.id
@@ -73,7 +77,7 @@ export const RoutineDayAccordion = ({
 				const isLoadingThisDay = isStarting && startActingDayId === day.id
 
 				// Check if this day can be started today
-				const dayValidation = validateRoutineDayDate(day)
+				const dayValidation = validateRoutineDayDate(day, todayDow, tDate)
 				const canStartToday = dayValidation.isValid
 				const isUnscheduled = !hasActiveSession && !canStartToday
 
@@ -93,17 +97,24 @@ export const RoutineDayAccordion = ({
 									<span className="flex items-center gap-2">
 										{isToday && <Calendar className="h-4 w-4" aria-hidden />}
 										{isNext && <Repeat className="h-4 w-4" aria-hidden />}
-										{routineDayTitle(day)}
+										{routineDayTitle(day, 'long', tDate)}
 										{isToday && (
-											<span className="type-body-sm text-ink-3">Today</span>
+											<span className="type-body-sm text-ink-3">
+												{tDate('today')}
+											</span>
 										)}
 										{isNext && (
-											<span className="type-body-sm text-ink-3">Next</span>
+											<span className="type-body-sm text-ink-3">
+												{t('next')}
+											</span>
 										)}
 									</span>
 									<span className="type-body-sm text-ink-3">
-										{formatExerciseCount(day.exercises?.length ?? 0)}
-										{isUnscheduled && ' · Not scheduled for today'}
+										{formatExerciseCount(
+											day.exercises?.length ?? 0,
+											tFormat,
+										)}
+										{isUnscheduled && ` · ${t('notScheduledSuffix')}`}
 									</span>
 								</span>
 							</AccordionTrigger>
@@ -120,7 +131,7 @@ export const RoutineDayAccordion = ({
 									) : (
 										<>
 											<Play className="h-4 w-4 mr-1" />
-											{hasActiveSession ? 'Resume' : 'Start'}
+											{hasActiveSession ? t('resume') : t('start')}
 										</>
 									)}
 								</Button>
@@ -142,7 +153,7 @@ export const RoutineDayAccordion = ({
 								</div>
 							) : (
 								<p className="type-body-sm text-ink-3">
-									No exercises configured for this day.
+									{t('noExercisesConfigured')}
 								</p>
 							)}
 						</AccordionContent>
