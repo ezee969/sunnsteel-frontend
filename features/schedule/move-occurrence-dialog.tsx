@@ -140,9 +140,11 @@ function MoveOccurrenceContent({
 				<DialogTitle>Reschedule {target}</DialogTitle>
 				<DialogDescription>
 					Planned for {describeShortDate(action.occurrenceDate, tDate)}
-					{moved ? `, now on ${describeShortDate(action.currentDate, tDate)}` : ''}.
-					Only this workout changes; the routine and the rest of your plan stay
-					as they are.
+					{moved
+						? `, now on ${describeShortDate(action.currentDate, tDate)}`
+						: ''}
+					. Only this workout changes; the routine and the rest of your plan
+					stay as they are.
 				</DialogDescription>
 			</DialogHeader>
 

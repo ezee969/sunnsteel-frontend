@@ -2,6 +2,7 @@
 
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -184,11 +185,17 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	// lead the rest of the catalog; a search shows plain matches.
 	const stars = useStarredExercises()
 	const trained = useTrainedExercises()
+	const t = useTranslations('routines.exerciseCard')
+	const tPicker = useTranslations('routines.picker')
+	const tAlternatives = useTranslations('routines.alternatives')
+	const tMuscles = useTranslations('routines.muscles')
+	const tEquipment = useTranslations('routines.equipment')
 	const pickerGroups = useMemo(
 		() =>
 			editSearchValue.trim()
 				? [{ key: 'matches', label: null, exercises: filteredExercises }]
 				: groupPickerExercises(filteredExercises, {
+						t: tPicker,
 						starred: stars.data?.items.map(item => item.exerciseId),
 						recent: trained.data,
 						recentPending: trained.isPending,
@@ -197,6 +204,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 			editSearchValue,
 			filteredExercises,
 			stars.data,
+			tPicker,
 			trained.data,
 			trained.isPending,
 		],
@@ -258,8 +266,8 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							<div className="p-3 border-b">
 								<input
 									type="text"
-									aria-label="Search exercises"
-									placeholder="Search exercises..."
+									aria-label={t('searchLabel')}
+									placeholder={t('searchPlaceholder')}
 									value={editSearchValue}
 									onChange={e => setEditSearchValue(e.target.value)}
 									className="w-full px-3 py-2 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
@@ -270,10 +278,10 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 								{showAlternatives && (
 									<>
 										<p className="type-label px-3 pb-1 pt-1 text-ink-3">
-											Alternatives
+											{t('alternatives')}
 										</p>
 										<ul
-											aria-label="Alternatives"
+											aria-label={t('alternatives')}
 											className="mb-2 space-y-1 border-b border-rule-faint pb-2"
 										>
 											{alternatives.map(alternative => (
@@ -289,7 +297,13 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 															{alternative.exercise.name}
 														</span>
 														<span className="type-body-sm block text-ink-3">
-															{describeAlternative(alternative, gym?.name)}
+															{describeAlternative(
+																alternative,
+																gym?.name,
+																tAlternatives,
+																tMuscles,
+																tEquipment,
+															)}
 														</span>
 													</button>
 												</li>
@@ -334,10 +348,12 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 																{ex.name}
 															</span>
 															<span className="text-xs text-muted-foreground">
-																{ex.primaryMuscles?.length
-																	? ex.primaryMuscles.join(', ')
-																	: 'Unknown'}{' '}
-																• {ex.equipment}
+																{t('musclesAndEquipment', {
+																	muscles: ex.primaryMuscles?.length
+																		? ex.primaryMuscles.join(', ')
+																		: t('unknown'),
+																	equipment: ex.equipment,
+																})}
 															</span>
 														</div>
 													</button>
@@ -347,7 +363,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 									))
 								) : (
 									<div className="py-6 text-center text-sm text-muted-foreground">
-										No exercises found
+										{t('noExercisesFound')}
 									</div>
 								)}
 							</div>

@@ -21,8 +21,8 @@ import {
 	RefreshCw,
 	Trash2,
 } from 'lucide-react'
-import { useLocale, useTranslations } from 'next-intl'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
@@ -57,13 +57,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
+import type { Locale } from '@/i18n/config'
 import {
 	useCancelDeload,
 	useCreateDeload,
 	useEndDeloadEarly,
 	useRoutineDeloads,
 } from '@/lib/api/hooks/useRoutineDeloads'
-import type { Locale } from '@/i18n/config'
 import type { Routine } from '@/lib/api/types/routine.type'
 import { parseSuggestedDeload } from '@/lib/utils/deload-suggestion'
 import {
@@ -150,14 +150,14 @@ function DeloadDialog({
 	const comparison = useMemo(
 		() =>
 			original && lighter
-					? compareRoutineSetups(
-							original,
-							lighter,
-							weightUnit,
-							tVersions,
-							tDate,
-							tSchedule,
-						)
+				? compareRoutineSetups(
+						original,
+						lighter,
+						weightUnit,
+						tVersions,
+						tDate,
+						tSchedule,
+					)
 				: null,
 		[original, lighter, weightUnit, tVersions, tDate, tSchedule],
 	)
@@ -169,13 +169,13 @@ function DeloadDialog({
 			{
 				onSuccess: saved => {
 					push({
-							title:
-								saved.state === 'ACTIVE'
-									? t('toastStartedTitle')
-									: t('toastPlannedTitle'),
-							description: t('toastSavedDescription', {
-								range: describeDeloadRange(saved, locale, t),
-							}),
+						title:
+							saved.state === 'ACTIVE'
+								? t('toastStartedTitle')
+								: t('toastPlannedTitle'),
+						description: t('toastSavedDescription', {
+							range: describeDeloadRange(saved, locale, t),
+						}),
 						variant: 'success',
 					})
 					onClose()
@@ -194,9 +194,7 @@ function DeloadDialog({
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{t('planDialogTitle')}</DialogTitle>
-					<DialogDescription>
-						{t('planDialogDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('planDialogDescription')}</DialogDescription>
 				</DialogHeader>
 				<form
 					id="routine-deload-form"
@@ -279,15 +277,13 @@ function DeloadDialog({
 
 					{startDate ? (
 						<p className="type-body-sm text-ink-2">
-								{describeDeloadRange({ startDate, endDate }, locale, t)}
-								{plan
-									? ` · ${plan.trainingBlock ? t('rangeLightensBlock', { name: plan.trainingBlock.name }) : t('rangeLightensRoutine')}`
-									: ''}
+							{describeDeloadRange({ startDate, endDate }, locale, t)}
+							{plan
+								? ` · ${plan.trainingBlock ? t('rangeLightensBlock', { name: plan.trainingBlock.name }) : t('rangeLightensRoutine')}`
+								: ''}
 						</p>
 					) : null}
-					<p className="type-body-sm text-ink-3">
-							{t('roundingNote')}
-					</p>
+					<p className="type-body-sm text-ink-3">{t('roundingNote')}</p>
 
 					<div role="status" aria-live="polite" className="space-y-3">
 						{problem ? (
@@ -295,9 +291,7 @@ function DeloadDialog({
 								{deloadDateProblemMessage(problem, t)}
 							</p>
 						) : empty ? (
-							<p className="type-body-sm text-ink-2">
-								{t('noExercises')}
-							</p>
+							<p className="type-body-sm text-ink-2">{t('noExercises')}</p>
 						) : original && !lighter ? (
 							<p className="type-body-sm text-ink-2">{DELOAD_NOT_LIGHTER}.</p>
 						) : null}
@@ -362,9 +356,7 @@ function ReviewDeloadDialog({
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{t('reviewTitle')}</DialogTitle>
-					<DialogDescription>
-						{t('reviewDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('reviewDescription')}</DialogDescription>
 				</DialogHeader>
 				<p className="type-body-sm text-ink-2">
 					{describeDeloadRange(deload, locale, t)} ·{' '}
@@ -431,8 +423,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 		mutation.mutate(deload.id, {
 			onSuccess: () => {
 				push({
-						title:
-							action === 'END' ? t('toastEndedTitle') : t('toastCancelledTitle'),
+					title:
+						action === 'END' ? t('toastEndedTitle') : t('toastCancelledTitle'),
 					description:
 						action === 'END'
 							? t('toastEndedDescription')
@@ -443,8 +435,7 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 			},
 			onError: error =>
 				push({
-					title:
-							action === 'END' ? t('toastNotEnded') : t('toastNotCancelled'),
+					title: action === 'END' ? t('toastNotEnded') : t('toastNotCancelled'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -481,9 +472,7 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 				</div>
 			) : deloads.isError ? (
 				<div role="alert" className="space-y-2">
-					<p className="type-body-sm text-ink-2">
-						{t('loadError')}
-					</p>
+					<p className="type-body-sm text-ink-2">{t('loadError')}</p>
 					<Button
 						type="button"
 						variant="outline"
@@ -495,9 +484,7 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 					</Button>
 				</div>
 			) : list.length === 0 ? (
-				<p className="type-body-sm text-ink-3">
-					{t('emptyState')}
-				</p>
+				<p className="type-body-sm text-ink-3">{t('emptyState')}</p>
 			) : (
 				<ul>
 					{list.map(deload => (
@@ -509,17 +496,17 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 								<div className="flex flex-wrap items-center gap-2">
 									<p className="type-panel text-foreground">
 										{describeDeloadRange(deload, locale, t)}
-										</p>
+									</p>
 									<Badge variant="outline">
 										<CalendarRange aria-hidden />
 										{deload.endedEarlyAt
-												? t('endedEarly')
-												: deloadStateLabel(deload.state, t)}
+											? t('endedEarly')
+											: deloadStateLabel(deload.state, t)}
 									</Badge>
 								</div>
 								<p className="type-body-sm mt-1 text-ink-2">
 									{describeDeloadOptions(deload, t)}
-									</p>
+								</p>
 								<p className="type-body-sm text-ink-3">
 									{describeDeloadSource(deload.source, t)}
 								</p>
@@ -531,8 +518,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 									size="sm"
 									onClick={() => setReviewing(deload)}
 								>
-										<GitCompare aria-hidden />
-										{t('review')}
+									<GitCompare aria-hidden />
+									{t('review')}
 								</Button>
 								{deload.state === 'ACTIVE' ? (
 									<Button
@@ -541,8 +528,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 										size="sm"
 										onClick={() => setConfirming({ action: 'END', deload })}
 									>
-											<CircleStop aria-hidden />
-											{t('endEarly')}
+										<CircleStop aria-hidden />
+										{t('endEarly')}
 									</Button>
 								) : null}
 								{deload.state === 'FUTURE' ? (
@@ -552,8 +539,8 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 										size="sm"
 										onClick={() => setConfirming({ action: 'CANCEL', deload })}
 									>
-											<Trash2 aria-hidden />
-											{t('cancelDeload')}
+										<Trash2 aria-hidden />
+										{t('cancelDeload')}
 									</Button>
 								) : null}
 							</div>
@@ -591,14 +578,14 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-								{confirming?.action === 'END'
-									? t('confirmEndTitle')
-									: t('confirmCancelTitle')}
+							{confirming?.action === 'END'
+								? t('confirmEndTitle')
+								: t('confirmCancelTitle')}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-								{confirming?.action === 'END'
-									? t('confirmEndDescription')
-									: t('confirmCancelDescription')}
+							{confirming?.action === 'END'
+								? t('confirmEndDescription')
+								: t('confirmCancelDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

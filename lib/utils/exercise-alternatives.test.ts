@@ -131,8 +131,12 @@ describe('describeAlternative', () => {
 			bench,
 			catalog,
 		)
-		expect(describeAlternative(nearIdentical, undefined, ...en)).toBe('Near-identical movement')
-		expect(describeAlternative(samePattern, undefined, ...en)).toBe('Same movement · Pecs')
+		expect(describeAlternative(nearIdentical, undefined, ...en)).toBe(
+			'Near-identical movement',
+		)
+		expect(describeAlternative(samePattern, undefined, ...en)).toBe(
+			'Same movement · Pecs',
+		)
 
 		const [, , machine] = findExerciseAlternatives(bench, catalog, {
 			availableEquipment: new Set(['barbell', 'bench', 'dumbbell']),

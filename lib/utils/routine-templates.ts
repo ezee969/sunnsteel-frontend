@@ -4,12 +4,12 @@ import type {
 	TrainingGoal,
 } from '@sunsteel/contracts'
 
-import type { Translator } from '@/i18n/translator'
 import type {
 	RoutineWizardData,
 	RoutineWizardDay,
 	RoutineWizardExercise,
 } from '@/features/routines/wizard/types'
+import type { Translator } from '@/i18n/translator'
 
 /**
  * ROUT-03: curated starter programmes that open in the routine wizard as an
@@ -59,7 +59,7 @@ export interface RoutineTemplate {
 	slug: string
 	/** Names the template through messages; the slug stays the address. */
 	key: TemplateKey
-goal: TrainingGoal
+	goal: TrainingGoal
 	experienceLevel: TrainingExperienceLevel
 	scheduleMode: RoutineScheduleMode
 	/** SCHED-06: the weekdays a rotation is placed on. */
@@ -86,7 +86,7 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 	{
 		slug: 'full-body-foundations',
 		key: 'fullBody',
-goal: 'GENERAL_FITNESS',
+		goal: 'GENERAL_FITNESS',
 		experienceLevel: 'BEGINNER',
 		scheduleMode: 'WEEKLY',
 		rotationWeekdays: [],
@@ -94,7 +94,7 @@ goal: 'GENERAL_FITNESS',
 			{
 				slot: 1,
 				key: 'fullBodyA',
-exercises: [
+				exercises: [
 					ex('Squat', 3, 5, 8),
 					ex('Bench Press', 3, 5, 8),
 					ex('Bent-over Row', 3, 8, 10),
@@ -104,7 +104,7 @@ exercises: [
 			{
 				slot: 3,
 				key: 'fullBodyB',
-exercises: [
+				exercises: [
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Overhead Press', 3, 6, 8),
 					ex('Lat Pulldown', 3, 8, 12),
@@ -114,7 +114,7 @@ exercises: [
 			{
 				slot: 5,
 				key: 'fullBodyC',
-exercises: [
+				exercises: [
 					ex('Leg Press', 3, 10, 12),
 					ex('Dumbbell Bench Press', 3, 8, 12, 'compound', true),
 					ex('Cable Row', 3, 10, 12),
@@ -126,7 +126,7 @@ exercises: [
 	{
 		slug: 'upper-lower',
 		key: 'upperLower',
-goal: 'MUSCLE_GROWTH',
+		goal: 'MUSCLE_GROWTH',
 		experienceLevel: 'INTERMEDIATE',
 		scheduleMode: 'WEEKLY',
 		rotationWeekdays: [],
@@ -134,7 +134,7 @@ goal: 'MUSCLE_GROWTH',
 			{
 				slot: 1,
 				key: 'upperA',
-exercises: [
+				exercises: [
 					ex('Bench Press', 4, 6, 8),
 					ex('Bent-over Row', 4, 6, 8),
 					ex('Overhead Press', 3, 8, 10),
@@ -146,7 +146,7 @@ exercises: [
 			{
 				slot: 2,
 				key: 'lowerA',
-exercises: [
+				exercises: [
 					ex('Squat', 4, 6, 8),
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Leg Press', 3, 10, 12),
@@ -157,7 +157,7 @@ exercises: [
 			{
 				slot: 4,
 				key: 'upperB',
-exercises: [
+				exercises: [
 					ex('Incline Dumbbell Press', 3, 8, 12, 'compound', true),
 					ex('Cable Row', 3, 10, 12),
 					ex('Dumbbell Shoulder Press', 3, 8, 12, 'compound', true),
@@ -169,7 +169,7 @@ exercises: [
 			{
 				slot: 5,
 				key: 'lowerB',
-exercises: [
+				exercises: [
 					ex('Deadlift', 3, 4, 6),
 					ex('Bulgarian Split Squat', 3, 8, 10, 'compound', true),
 					ex('Leg Extension', 3, 12, 15, 'isolation'),
@@ -182,7 +182,7 @@ exercises: [
 	{
 		slug: 'push-pull-legs',
 		key: 'pushPullLegs',
-goal: 'MUSCLE_GROWTH',
+		goal: 'MUSCLE_GROWTH',
 		experienceLevel: 'INTERMEDIATE',
 		scheduleMode: 'ROTATION',
 		rotationWeekdays: [1, 2, 3, 4, 5, 6],
@@ -190,7 +190,7 @@ goal: 'MUSCLE_GROWTH',
 			{
 				slot: 0,
 				key: 'push',
-exercises: [
+				exercises: [
 					ex('Bench Press', 4, 6, 8),
 					ex('Overhead Press', 3, 8, 10),
 					ex('Incline Dumbbell Press', 3, 10, 12, 'compound', true),
@@ -201,7 +201,7 @@ exercises: [
 			{
 				slot: 1,
 				key: 'pull',
-exercises: [
+				exercises: [
 					ex('Pull-ups', 4, 6, 10, 'bodyweight'),
 					ex('Bent-over Row', 3, 8, 10),
 					ex('Cable Row', 3, 10, 12),
@@ -212,7 +212,7 @@ exercises: [
 			{
 				slot: 2,
 				key: 'legs',
-exercises: [
+				exercises: [
 					ex('Squat', 4, 6, 8),
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Leg Press', 3, 10, 12),
@@ -242,10 +242,7 @@ export function templateText(template: RoutineTemplate, t: T) {
 export const templateDayName = (day: TemplateDay, t: T) => t(`days.${day.key}`)
 
 /** "12 exercises" */
-export function describeTemplateSize(
-	template: RoutineTemplate,
-	t: T,
-): string {
+export function describeTemplateSize(template: RoutineTemplate, t: T): string {
 	const exercises = template.days.reduce(
 		(total, day) => total + day.exercises.length,
 		0,

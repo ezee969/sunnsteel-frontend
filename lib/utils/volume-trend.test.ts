@@ -67,7 +67,9 @@ describe('volume trend presentation', () => {
 
 	it('uses friendly muscle names and falls back to the leading series', () => {
 		expect(getVolumeTrendSeries(data, 'muscle', tMuscles)[0].name).toBe('Pecs')
-		expect(getSelectedVolumeTrend(data, 'muscle', 'missing', tMuscles).name).toBe('Pecs')
+		expect(
+			getSelectedVolumeTrend(data, 'muscle', 'missing', tMuscles).name,
+		).toBe('Pecs')
 	})
 
 	it('scales visible bars against the selected peak', () => {

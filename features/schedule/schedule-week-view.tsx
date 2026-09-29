@@ -10,8 +10,8 @@ import {
 	SkipForward,
 	Undo2,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'

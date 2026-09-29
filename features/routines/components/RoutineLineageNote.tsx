@@ -2,8 +2,8 @@
 
 import type { RoutineLineage } from '@sunsteel/contracts'
 import { GitBranch } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import {
 	describeRoutineLineage,
@@ -23,7 +23,7 @@ export function RoutineLineageNote({
 }) {
 	const t = useTranslations('routines.lineage')
 	if (!lineage) return null
-const href = lineageSourceHref(lineage)
+	const href = lineageSourceHref(lineage)
 	const text = describeRoutineLineage(lineage, t)
 
 	return (
@@ -37,7 +37,7 @@ const href = lineageSourceHref(lineage)
 						className="text-primary underline-offset-4 hover:underline"
 					>
 						{t('viewOriginal')}
-</Link>
+					</Link>
 				) : null}
 			</span>
 		</p>

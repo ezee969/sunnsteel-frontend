@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
@@ -22,6 +23,7 @@ export const useWorkoutSessionManager = (
 	routine: Routine | undefined,
 ) => {
 	const router = useRouter()
+	const tDate = useTranslations('routines.date')
 	const { mutateAsync: startSession, isPending: isStarting } = useStartSession()
 
 	// Dialog states
@@ -69,7 +71,7 @@ export const useWorkoutSessionManager = (
 		// 2) Date validation: check if workout can be started today
 		const day = routine.days.find(d => d.id === routineDayId)
 		if (day) {
-			const validation = validateRoutineDayDate(day)
+			const validation = validateRoutineDayDate(day, todayDow, tDate)
 			if (!validation.isValid) {
 				setPendingDayId(routineDayId)
 				setDateValidationOpen(true)

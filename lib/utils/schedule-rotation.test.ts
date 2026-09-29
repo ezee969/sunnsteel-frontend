@@ -153,7 +153,9 @@ describe('rotation on training weekdays (SCHED-06)', () => {
 		expect(describeRoutineSchedule(ppl(), enDate, enSchedule)).toMatch(
 			/^Rotation · .* · Mon, Wed, Fri$/,
 		)
-		expect(describeRoutineSchedule(undated, enDate, enSchedule)).not.toMatch(/Mon/)
+		expect(describeRoutineSchedule(undated, enDate, enSchedule)).not.toMatch(
+			/Mon/,
+		)
 		const comparison = compareRoutineSetups(
 			routineSetup(ppl()),
 			routineSetup(undated),

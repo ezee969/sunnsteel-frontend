@@ -77,11 +77,14 @@ export function VolumeTrends({
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const series = useMemo(
 		() =>
-			data && scope !== 'overall' ? getVolumeTrendSeries(data, scope, tMuscles) : [],
+			data && scope !== 'overall'
+				? getVolumeTrendSeries(data, scope, tMuscles)
+				: [],
 		[data, scope, tMuscles],
 	)
 	const selection = useMemo(
-		() => (data ? getSelectedVolumeTrend(data, scope, selectedId, tMuscles) : null),
+		() =>
+			data ? getSelectedVolumeTrend(data, scope, selectedId, tMuscles) : null,
 		[data, scope, selectedId, tMuscles],
 	)
 	const summary = useMemo(

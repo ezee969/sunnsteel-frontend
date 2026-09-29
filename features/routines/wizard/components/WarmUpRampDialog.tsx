@@ -2,6 +2,7 @@
 
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Flame } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -30,9 +31,9 @@ import {
 	equipmentBasis,
 	isBarLoaded,
 	MAX_SETS_PER_EXERCISE,
-	PLATE_SET_LABELS,
 	PLATE_SETS,
 	type PlateSetChoice,
+	plateSetLabel,
 	saveEquipmentRequest,
 } from '@/lib/utils/warm-up-ramp'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -70,6 +71,7 @@ export function WarmUpRampDialog({
 	onApply,
 	warmUpsFollowLoad,
 }: WarmUpRampDialogProps) {
+	const t = useTranslations('routines.warmUp')
 	const [open, setOpen] = useState(false)
 	const lead = leadSetIndex(sets)
 	const workingWeightKg = lead >= 0 ? (sets[lead].weight ?? 0) : 0
@@ -86,16 +88,15 @@ export function WarmUpRampDialog({
 				variant="ghost"
 				className="h-10 w-full text-base"
 				disabled={room <= 0}
-				aria-label={`Add warm-up sets to ${exerciseName}`}
+				aria-label={t('addWarmUpSetsTo', { exercise: exerciseName })}
 				onClick={() => setOpen(true)}
 			>
 				<Flame className="mr-2 h-4 w-4" aria-hidden />
-				Add warm-up sets
+				{t('addWarmUpSets')}
 			</Button>
 			{room <= 0 ? (
 				<p className="type-body-sm -mt-2 mb-3 text-center text-ink-3">
-					An exercise holds at most {MAX_SETS_PER_EXERCISE} sets, so there is no
-					room for warm-ups.
+					{t('noRoom', { max: MAX_SETS_PER_EXERCISE })}
 				</p>
 			) : null}
 			{open ? (
@@ -145,6 +146,7 @@ function WarmUpRampPreview({
 		followLoad: boolean,
 	) => void
 }) {
+	const t = useTranslations('routines.warmUp')
 	const { push } = useToast()
 	const { data: locations = [] } = useTrainingLocations()
 	const save = useReplaceTrainingLocations()
@@ -186,6 +188,7 @@ function WarmUpRampPreview({
 		const request =
 			asks && remember
 				? saveEquipmentRequest({
+						t,
 						locations,
 						basis,
 						barWeightKg,
@@ -197,9 +200,9 @@ function WarmUpRampPreview({
 				await save.mutateAsync(request)
 			} catch (error) {
 				push({
-					title: 'Warm-ups added, but your gym was not saved',
+					title: t('gymNotSavedTitle'),
 					description:
-						error instanceof Error ? error.message : 'Try again in Settings.',
+						error instanceof Error ? error.message : t('tryAgainInSettings'),
 					variant: 'destructive',
 				})
 			}
@@ -212,18 +215,19 @@ function WarmUpRampPreview({
 
 	const saveLabel =
 		basis.kind === 'NO_PLATES'
-			? `Save these plates to ${basis.location.name}`
-			: 'Save as my gym'
+			? t('savePlatesTo', { gym: basis.location.name })
+			: t('saveAsMyGym')
 
 	return (
 		<Dialog open onOpenChange={next => !next && onClose()}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Warm-up sets</DialogTitle>
+					<DialogTitle>{t('dialogTitle')}</DialogTitle>
 					<DialogDescription>
-						A ramp up to {formatWeight(workingWeightKg, weightUnit)} for{' '}
-						{exerciseName}. Warm-ups never count toward volume, records or
-						progress.
+						{t('dialogDescription', {
+							weight: formatWeight(workingWeightKg, weightUnit),
+							exercise: exerciseName,
+						})}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -232,7 +236,7 @@ function WarmUpRampPreview({
 						<div className="grid gap-4 sm:grid-cols-2">
 							{basis.kind === 'NO_LOCATION' ? (
 								<div className="space-y-2">
-									<Label htmlFor="warm-up-bar">Bar</Label>
+									<Label htmlFor="warm-up-bar">{t('bar')}</Label>
 									<NativeSelect
 										id="warm-up-bar"
 										value={String(barWeightKg)}
@@ -249,7 +253,7 @@ function WarmUpRampPreview({
 								</div>
 							) : null}
 							<div className="space-y-2">
-								<Label htmlFor="warm-up-plates">Plates</Label>
+								<Label htmlFor="warm-up-plates">{t('plates')}</Label>
 								<NativeSelect
 									id="warm-up-plates"
 									value={plateSet}
@@ -259,20 +263,22 @@ function WarmUpRampPreview({
 								>
 									{(['STANDARD', 'LIGHT'] as const).map(choice => (
 										<option key={choice} value={choice}>
-											{PLATE_SET_LABELS[choice]}
+											{plateSetLabel(choice, t)}
 										</option>
 									))}
 								</NativeSelect>
 								<p className="type-body-sm text-ink-3">
-									{PLATE_SETS[weightUnit][plateSet]
-										.map(pair =>
-											formatWeight(pair.weightKg, weightUnit).replace(
-												/\s?(kg|lb)$/,
-												'',
-											),
-										)
-										.join(', ')}{' '}
-									{weightUnit === 'LB' ? 'lb' : 'kg'} pairs
+									{t('platePairs', {
+										list: PLATE_SETS[weightUnit][plateSet]
+											.map(pair =>
+												formatWeight(pair.weightKg, weightUnit).replace(
+													/\s?(kg|lb)$/,
+													'',
+												),
+											)
+											.join(', '),
+										unit: weightUnit === 'LB' ? 'lb' : 'kg',
+									})}
 								</p>
 							</div>
 						</div>
@@ -286,30 +292,31 @@ function WarmUpRampPreview({
 							plateSet,
 							incrementKg,
 							unit: weightUnit,
+							t,
 						})}
 					</p>
 
 					{ramp.sets.length > 0 ? (
-						<ol
-							aria-label="Warm-up sets to add"
-							className="border-y border-rule"
-						>
+						<ol aria-label={t('setsToAdd')} className="border-y border-rule">
 							{ramp.sets.map((set, index) => (
 								<li
 									key={index}
 									className="rule-row flex items-baseline justify-between gap-4 py-2"
 								>
 									<span className="type-label text-ink-3">
-										Warm-up {index + 1}
+										{t('setLabel', { number: index + 1 })}
 									</span>
 									<span className="flex flex-col items-end">
 										<span className="type-data text-foreground">
-											{formatWeight(set.weightKg, weightUnit)} × {set.reps}
+											{t('weightByReps', {
+												weight: formatWeight(set.weightKg, weightUnit),
+												reps: set.reps,
+											})}
 										</span>
 										{set.platesPerSide ? (
 											<span className="type-body-sm text-ink-3">
-												{describePlates(set.platesPerSide, weightUnit)}
-												{set.limited ? ' · closest you can load' : ''}
+												{describePlates(set.platesPerSide, weightUnit, t)}
+												{set.limited ? t('closestYouCanLoad') : ''}
 											</span>
 										) : null}
 									</span>
@@ -317,24 +324,19 @@ function WarmUpRampPreview({
 							))}
 						</ol>
 					) : (
-						<p className="type-body-sm text-ink-2">
-							The working load is too light for a ramp: every step would be at
-							or above it.
-						</p>
+						<p className="type-body-sm text-ink-2">{t('tooLight')}</p>
 					)}
 
 					{ramp.leftOut > 0 ? (
 						<p className="type-body-sm text-ink-3">
-							{ramp.leftOut === 1
-								? 'The lightest step is left out'
-								: `The ${ramp.leftOut} lightest steps are left out`}{' '}
-							to stay within {MAX_SETS_PER_EXERCISE} sets.
+							{t('leftOut', {
+								count: ramp.leftOut,
+								max: MAX_SETS_PER_EXERCISE,
+							})}
 						</p>
 					) : null}
 					{hasWarmUps ? (
-						<p className="type-body-sm text-ink-3">
-							These replace this exercise&apos;s current warm-ups.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('replacesCurrent')}</p>
 					) : null}
 
 					<div className="flex items-start gap-1">
@@ -350,12 +352,10 @@ function WarmUpRampPreview({
 						</label>
 						<div className="pt-3">
 							<Label htmlFor="warm-up-follow" className="cursor-pointer">
-								Follow the working weight
+								{t('followLabel')}
 							</Label>
 							<p className="type-body-sm text-ink-3">
-								{followLoad
-									? 'When progression raises the first working set, these warm-ups are recalculated with it.'
-									: 'These warm-ups keep the loads above until you change them.'}
+								{followLoad ? t('followOn') : t('followOff')}
 							</p>
 						</div>
 					</div>
@@ -381,7 +381,7 @@ function WarmUpRampPreview({
 
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={onClose}>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						type="button"
@@ -389,10 +389,8 @@ function WarmUpRampPreview({
 						onClick={apply}
 					>
 						{save.isPending
-							? 'Saving…'
-							: ramp.sets.length === 1
-								? 'Add 1 warm-up set'
-								: `Add ${ramp.sets.length} warm-up sets`}
+							? t('saving')
+							: t('addSets', { count: ramp.sets.length })}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

@@ -6,6 +6,7 @@ import {
 	type TrainingExperienceLevel,
 	type TrainingGoal,
 } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,28 +39,30 @@ interface RoutineBasicInfoProps {
 export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 	const { name, description, handleNameChange, handleDescriptionChange } =
 		useRoutineMetadataForm({ data, onUpdate })
+	const t = useTranslations('routines.basicInfo')
+	const tIdentity = useTranslations('routines.identity')
 
 	return (
 		<TooltipProvider>
 			<div className="space-y-6">
 				<div className="space-y-2">
 					<Label htmlFor="routine-name">
-						Routine Name <span className="text-ink-3">*</span>
+						{t('routineName')} <span className="text-ink-3">*</span>
 					</Label>
 					<Input
 						id="routine-name"
 						className="max-w-[var(--cluster-max)]"
-						placeholder="e.g., Push Pull Legs"
+						placeholder={t('namePlaceholder')}
 						value={name}
 						onChange={e => handleNameChange(e.target.value)}
 					/>
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="routine-description">Description</Label>
+					<Label htmlFor="routine-description">{t('description')}</Label>
 					<Textarea
 						id="routine-description"
-						placeholder="Describe your routine, goals, or any notes..."
+						placeholder={t('descriptionPlaceholder')}
 						value={description}
 						onChange={e => handleDescriptionChange(e.target.value)}
 						rows={4}
@@ -71,7 +74,7 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 				    alternative would be guessing a claim on the author's behalf. */}
 				<div className="grid gap-4 sm:grid-cols-2">
 					<div className="space-y-2">
-						<Label htmlFor="routine-goal">Goal</Label>
+						<Label htmlFor="routine-goal">{t('goal')}</Label>
 						<NativeSelect
 							id="routine-goal"
 							value={data.goal ?? ''}
@@ -81,17 +84,17 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 								})
 							}
 						>
-							<option value="">Not specified</option>
+							<option value="">{t('notSpecified')}</option>
 							{TRAINING_GOAL_VALUES.map(value => (
 								<option key={value} value={value}>
-									{getTrainingGoalLabel(value)}
+									{getTrainingGoalLabel(value, tIdentity)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="routine-experience">Experience level</Label>
+						<Label htmlFor="routine-experience">{t('experienceLevel')}</Label>
 						<NativeSelect
 							id="routine-experience"
 							value={data.experienceLevel ?? ''}
@@ -102,18 +105,17 @@ export function RoutineBasicInfo({ data, onUpdate }: RoutineBasicInfoProps) {
 								})
 							}
 						>
-							<option value="">Not specified</option>
+							<option value="">{t('notSpecified')}</option>
 							{TRAINING_EXPERIENCE_LEVEL_VALUES.map(value => (
 								<option key={value} value={value}>
-									{getTrainingExperienceLabel(value)}
+									{getTrainingExperienceLabel(value, tIdentity)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 				</div>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					These help other members find your routine if you share it. Leave them
-					unset and it still appears, just not under those filters.
+					{t('discoveryNote')}
 				</p>
 			</div>
 		</TooltipProvider>

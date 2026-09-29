@@ -64,7 +64,9 @@ describe('the warm-up ramp (LIVE-13)', () => {
 	it('loads each step heaviest plate first', () => {
 		const { sets } = ramp({ platePairs: PLATE_SETS.KG.LIGHT })
 		// 80 kg: 30 per side is 20 + 10, not 15 + 15.
-		expect(describePlates(sets[3].platesPerSide, 'KG', en)).toBe('20 + 10 per side')
+		expect(describePlates(sets[3].platesPerSide, 'KG', en)).toBe(
+			'20 + 10 per side',
+		)
 		expect(describePlates(ramp({}).sets[3].platesPerSide, 'KG', en)).toBe(
 			'25 + 5 per side',
 		)
@@ -152,8 +154,8 @@ describe('what the ramp is built from (LIVE-13)', () => {
 
 	it('saves a new gym, or plates into the one that had none', () => {
 		const created = saveEquipmentRequest({
-t: en,
-locations: [],
+			t: en,
+			locations: [],
 			basis: { kind: 'NO_LOCATION' },
 			barWeightKg: 15,
 			platePairs: PLATE_SETS.KG.LIGHT,
@@ -170,8 +172,8 @@ locations: [],
 		const other = location({ id: 'loc-2', name: 'Work', isDefault: false })
 		const bare = location({ availablePlatePairs: [] })
 		const filled = saveEquipmentRequest({
-t: en,
-locations: [bare, other],
+			t: en,
+			locations: [bare, other],
 			basis: equipmentBasis(bare),
 			barWeightKg: 20,
 			platePairs: standard,
@@ -186,8 +188,8 @@ locations: [bare, other],
 
 		expect(
 			saveEquipmentRequest({
-t: en,
-locations: [location()],
+				t: en,
+				locations: [location()],
 				basis: equipmentBasis(location()),
 				barWeightKg: 20,
 				platePairs: standard,

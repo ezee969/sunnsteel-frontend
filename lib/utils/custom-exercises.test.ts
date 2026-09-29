@@ -1,6 +1,6 @@
-import { translatorFor } from '@/i18n/translator'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 
 import {
@@ -116,11 +116,11 @@ describe('the custom exercise draft (EXER-06)', () => {
 		).toBe('name')
 		expect(
 			customExerciseDraftProblem({ ...valid(), primaryMuscles: [] }, all, en)
-?.field,
+				?.field,
 		).toBe('primaryMuscles')
 		expect(
 			customExerciseDraftProblem({ ...valid(), equipmentRequired: [] }, all, en)
-?.field,
+				?.field,
 		).toBe('equipmentRequired')
 		expect(customExerciseDraftProblem(valid(), all, en)).toBeNull()
 	})
@@ -134,7 +134,8 @@ describe('the custom exercise draft (EXER-06)', () => {
 				'You already have an exercise by that name, or the catalog does.',
 		})
 		expect(
-			customExerciseDraftProblem({ ...valid(), name: 'old press' }, all, en)?.field,
+			customExerciseDraftProblem({ ...valid(), name: 'old press' }, all, en)
+				?.field,
 		).toBe('name')
 		expect(
 			customExerciseDraftProblem(draftFromExercise(landmine), all, en, 'c1'),
@@ -159,8 +160,8 @@ describe('the custom exercise draft (EXER-06)', () => {
 		expect(
 			describeCustomExerciseError(
 				'NAME_TAKEN: you already have an exercise by that name, or the catalog does',
-en,
-),
+				en,
+			),
 		).toBe('You already have an exercise by that name, or the catalog does.')
 		expect(describeCustomExerciseError('', en)).toBe(
 			'The exercise was not saved. Try again in a moment.',

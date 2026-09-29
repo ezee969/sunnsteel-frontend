@@ -179,9 +179,7 @@ function compareExercise(
 		set => (set.kind ?? 'WORKING') !== 'WORKING',
 	)
 	if (anyNonWorking && fromKinds !== toKinds) {
-		changes.push(
-			t('exerciseSetsKind', { name, from: fromKinds, to: toKinds }),
-		)
+		changes.push(t('exerciseSetsKind', { name, from: fromKinds, to: toKinds }))
 	}
 	if (!sameLoads(current.sets, target.sets)) {
 		const from = loadsLabel(current.sets, unit, t)

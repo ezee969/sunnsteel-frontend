@@ -14,8 +14,8 @@ import {
 	TRAINING_GOAL_VALUES,
 } from '@sunsteel/contracts'
 import { Compass, Loader2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -29,7 +29,7 @@ import {
 	describeClassification,
 	describeDiscoveredAuthor,
 	describeDiscoveredRoutine,
-discoveryScopeNote,
+	discoveryScopeNote,
 	discoveryTruncatedNote,
 	durationBandOptions,
 	durationEstimateNote,
@@ -55,7 +55,7 @@ export function RoutineDiscovery() {
 	const t = useTranslations('routines.discovery')
 	const tIdentity = useTranslations('routines.identity')
 	const tMuscles = useTranslations('routines.muscles')
-const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
+	const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 	const query = useRoutineDiscovery(filters)
 
 	const routines = useMemo(
@@ -74,8 +74,7 @@ const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 		<div className="space-y-8">
 			<header className="space-y-2">
 				<h1 className="type-section flex items-center gap-2 text-foreground">
-					<Compass className="size-5 text-ink-3" aria-hidden />{' '}
-						{t('title')}
+					<Compass className="size-5 text-ink-3" aria-hidden /> {t('title')}
 				</h1>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
 					{discoveryScopeNote(t)}
@@ -208,7 +207,7 @@ const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 							onClick={() => setFilters({})}
 						>
 							{t('clearFilters')}
-</Button>
+						</Button>
 					) : null}
 				</div>
 			</section>
@@ -236,7 +235,7 @@ const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 							onClick={() => void query.refetch()}
 						>
 							{t('tryAgain')}
-</Button>
+						</Button>
 					</div>
 				) : routines.length ? (
 					<>
@@ -266,8 +265,10 @@ const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 												</Link>
 											</h2>
 											<p className="type-body-sm text-ink-3">
-													{t('byAuthor', { author: describeDiscoveredAuthor(routine) })}
-</p>
+												{t('byAuthor', {
+													author: describeDiscoveredAuthor(routine),
+												})}
+											</p>
 											{routine.description ? (
 												<p className="type-body-sm max-w-[68ch] text-ink-2">
 													{routine.description}
@@ -295,14 +296,12 @@ const [filters, setFilters] = useState<RoutineDiscoveryQuery>({})
 									<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 								) : null}
 								{t('showMore')}
-</Button>
+							</Button>
 						) : null}
 					</>
 				) : (
 					<p className="type-body-sm py-4 text-ink-3">
-						{narrowed
-							? t('emptyFiltered')
-							: t('emptyAll')}
+						{narrowed ? t('emptyFiltered') : t('emptyAll')}
 					</p>
 				)}
 			</section>

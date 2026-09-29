@@ -1,8 +1,8 @@
 'use client'
 
 import { Archive, ArchiveRestore, Loader2, Pencil, Trash2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import {
@@ -22,7 +22,7 @@ import {
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
 	customExerciseCopy,
-isArchivedExercise,
+	isArchivedExercise,
 } from '@/lib/utils/custom-exercises'
 
 import { CustomExerciseDialog } from './custom-exercise-dialog'
@@ -34,7 +34,7 @@ import { CustomExerciseDialog } from './custom-exercise-dialog'
  */
 export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 	const copy = customExerciseCopy(useTranslations('routines.customExercise'))
-const router = useRouter()
+	const router = useRouter()
 	const [editing, setEditing] = useState(false)
 	const [confirmingDelete, setConfirmingDelete] = useState(false)
 	const archive = useArchiveCustomExercise()
@@ -121,8 +121,8 @@ const router = useRouter()
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete {exercise.name}?</AlertDialogTitle>
 						<AlertDialogDescription>
-							{copy.deleteDescription} Nothing uses it now, so
-							nothing else changes.
+							{copy.deleteDescription} Nothing uses it now, so nothing else
+							changes.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

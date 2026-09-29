@@ -110,10 +110,7 @@ export const RoutineDayAccordion = ({
 										)}
 									</span>
 									<span className="type-body-sm text-ink-3">
-										{formatExerciseCount(
-											day.exercises?.length ?? 0,
-											tFormat,
-										)}
+										{formatExerciseCount(day.exercises?.length ?? 0, tFormat)}
 										{isUnscheduled && ` · ${t('notScheduledSuffix')}`}
 									</span>
 								</span>

@@ -19,13 +19,7 @@ export function useRoutineQualitySummary(
 	const tQuality = useTranslations('routines.quality')
 	return useMemo(
 		() =>
-			buildRoutineQualitySummary(
-				data,
-				exerciseMap,
-				locations,
-				tDate,
-				tQuality,
-			),
+			buildRoutineQualitySummary(data, exerciseMap, locations, tDate, tQuality),
 		[data, exerciseMap, locations, tDate, tQuality],
 	)
 }

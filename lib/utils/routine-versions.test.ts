@@ -242,14 +242,9 @@ describe('routine versions', () => {
 		expect(versionTitle({ number: 3, name: null }, esVersions)).toBe(
 			'Versión 3',
 		)
-		expect(describeSetupSize(current, esVersions)).toBe(
-			'2 días · 3 ejercicios',
-		)
+		expect(describeSetupSize(current, esVersions)).toBe('2 días · 3 ejercicios')
 		expect(
-			describeSetupSize(
-				{ ...current, days: [current.days[0]] },
-				esVersions,
-			),
+			describeSetupSize({ ...current, days: [current.days[0]] }, esVersions),
 		).toBe('1 día · 2 ejercicios')
 		expect(
 			describeVersionOrigin(
@@ -262,9 +257,7 @@ describe('routine versions', () => {
 			...current,
 			name: 'Upper Lower v1',
 		})
-		expect(comparisonEs.routine[0]).toBe(
-			'Nombre: Upper Lower → Upper Lower v1',
-		)
+		expect(comparisonEs.routine[0]).toBe('Nombre: Upper Lower → Upper Lower v1')
 		expect(
 			restoreBlockedReason({
 				comparison: comparisonEs,

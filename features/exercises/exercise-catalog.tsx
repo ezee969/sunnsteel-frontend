@@ -12,9 +12,9 @@ import {
 	UserRound,
 	X,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -168,9 +168,10 @@ function ExerciseRow({
 }) {
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
-	const primary = getFriendlyMuscleNames(exercise.primaryMuscles, tMuscles).join(
-		', ',
-	)
+	const primary = getFriendlyMuscleNames(
+		exercise.primaryMuscles,
+		tMuscles,
+	).join(', ')
 	const secondary = getFriendlyMuscleNames(
 		exercise.secondaryMuscles,
 		tMuscles,

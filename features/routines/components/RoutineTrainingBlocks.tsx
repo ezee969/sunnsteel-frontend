@@ -54,6 +54,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
 import { TrainingBlockComparisonDialog } from '@/features/routines/components/TrainingBlockComparison'
+import type { Locale } from '@/i18n/config'
 import {
 	useCreateRoutineTrainingBlock,
 	useDeleteRoutineTrainingBlock,
@@ -63,7 +64,6 @@ import {
 } from '@/lib/api/hooks/useRoutineTrainingBlocks'
 import { useRoutineVersions } from '@/lib/api/hooks/useRoutineVersions'
 import type { Routine } from '@/lib/api/types/routine.type'
-import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	describeTrainingBlockSource,
@@ -154,9 +154,7 @@ function TrainingBlockDialog({
 					<DialogTitle>
 						{block ? t('reviseTitle', { name: block.name }) : t('addTitle')}
 					</DialogTitle>
-					<DialogDescription>
-						{t('dialogDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('dialogDescription')}</DialogDescription>
 				</DialogHeader>
 				<form
 					id="routine-training-block-form"
@@ -215,9 +213,7 @@ function TrainingBlockDialog({
 								))}
 							</SelectContent>
 						</Select>
-						<p className="type-body-sm text-ink-3">
-							{t('sourceHint')}
-						</p>
+						<p className="type-body-sm text-ink-3">{t('sourceHint')}</p>
 					</div>
 					{block ? (
 						<p className="type-body-sm text-ink-3">
@@ -284,9 +280,7 @@ function ReviewTrainingBlockDialog({
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{t('reviewTitle', { name: block.name })}</DialogTitle>
-					<DialogDescription>
-						{t('reviewDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('reviewDescription')}</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-2">
@@ -414,19 +408,13 @@ export function RoutineTrainingBlocks({
 			</div>
 
 			{blocks.isPending ? (
-				<div
-					role="status"
-					aria-label={t('loading')}
-					className="space-y-2"
-				>
+				<div role="status" aria-label={t('loading')} className="space-y-2">
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 				</div>
 			) : blocks.isError ? (
 				<div role="alert" className="space-y-2">
-					<p className="type-body-sm text-ink-2">
-						{t('loadError')}
-					</p>
+					<p className="type-body-sm text-ink-2">{t('loadError')}</p>
 					<Button
 						type="button"
 						variant="outline"
@@ -438,9 +426,7 @@ export function RoutineTrainingBlocks({
 					</Button>
 				</div>
 			) : list.length === 0 ? (
-				<p className="type-body-sm text-ink-3">
-					{t('emptyState')}
-				</p>
+				<p className="type-body-sm text-ink-3">{t('emptyState')}</p>
 			) : (
 				<ul>
 					{list.map(block => (
@@ -457,7 +443,11 @@ export function RoutineTrainingBlocks({
 									</Badge>
 								</div>
 								<p className="type-body-sm mt-1 text-ink-2">
-									{formatTrainingBlockRange(block.startDate, block.endDate, locale)}
+									{formatTrainingBlockRange(
+										block.startDate,
+										block.endDate,
+										locale,
+									)}
 								</p>
 								<p className="type-body-sm text-ink-3">
 									{describeSetupSize(block.setup, tVersions)} ·{' '}
@@ -518,9 +508,7 @@ export function RoutineTrainingBlocks({
 				</ul>
 			)}
 
-			<p className="type-body-sm text-ink-3">
-				{t('footnote')}
-			</p>
+			<p className="type-body-sm text-ink-3">{t('footnote')}</p>
 
 			{editor ? (
 				<TrainingBlockDialog

@@ -1,6 +1,7 @@
 import type { TrainingLocationPreference } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
 
 import type { RoutineWizardData, RoutineWizardExercise } from '../types'
@@ -13,6 +14,11 @@ import {
 	findLikelyImbalances,
 	formatSetCount,
 } from './routine-quality'
+
+const enDate = translatorFor('en', 'routines.date')
+const esDate = translatorFor('es', 'routines.date')
+const enQuality = translatorFor('en', 'routines.quality')
+const esQuality = translatorFor('es', 'routines.quality')
 
 const exercise = (
 	id: string,
@@ -209,8 +215,13 @@ describe('equipment', () => {
 })
 
 describe('findLikelyImbalances', () => {
-	const flags = (data: RoutineWizardData) =>
-		findLikelyImbalances(data, catalog, computeWeeklyMuscleSets(data, catalog))
+	const flags = (data: RoutineWizardData, t: typeof enQuality = enQuality) =>
+		findLikelyImbalances(
+			data,
+			catalog,
+			computeWeeklyMuscleSets(data, catalog),
+			t,
+		)
 
 	it('flags a push-heavy upper-only routine with its evidence', () => {
 		const result = flags(
@@ -224,6 +235,24 @@ describe('findLikelyImbalances', () => {
 			title: 'More pressing than pulling',
 			evidence: '8 pressing sets and 3 pulling sets a week.',
 		})
+	})
+
+	it('states the same evidence in Spanish, without naming a cause', () => {
+		const result = flags(
+			routine([planned('bench', 4)], [planned('bench', 4), planned('row', 3)]),
+			esQuality,
+		)
+		expect(result[0].evidence).toBe(
+			'11 series de tren superior por semana y ninguna para las piernas.',
+		)
+		expect(result[1]).toMatchObject({
+			title: 'Más empuje que tracción',
+			evidence: '8 series de empuje y 3 series de tracción por semana.',
+		})
+		// The rule the copy carries: it states what was counted, never why.
+		for (const flag of result) {
+			expect(flag.evidence).not.toMatch(/porque|deber|ten[ée]s que|conviene/i)
+		}
 	})
 
 	it('flags quads outweighing hamstrings when there is no hinge', () => {
@@ -250,13 +279,28 @@ describe('findLikelyImbalances', () => {
 describe('buildRoutineQualitySummary', () => {
 	it('counts exercises without movement data and keeps day order', () => {
 		const data = routine([planned('custom', 2)], [planned('bench', 3)])
-		const summary = buildRoutineQualitySummary(data, catalog, undefined)
+		const summary = buildRoutineQualitySummary(
+			data,
+			catalog,
+			undefined,
+			enDate,
+			enQuality,
+		)
 		expect(summary.unclassifiedExercises).toBe(1)
 		expect(summary.durations.map(d => [d.slot, d.label])).toEqual([
 			[1, 'Monday'],
 			[2, 'Tuesday'],
 		])
 		expect(summary.equipmentCheck).toEqual({ status: 'no-location' })
+
+		const spanish = buildRoutineQualitySummary(
+			data,
+			catalog,
+			undefined,
+			esDate,
+			esQuality,
+		)
+		expect(spanish.durations.map(d => d.label)).toEqual(['Lunes', 'Martes'])
 	})
 
 	it('formats fractional set-equivalents with one decimal', () => {

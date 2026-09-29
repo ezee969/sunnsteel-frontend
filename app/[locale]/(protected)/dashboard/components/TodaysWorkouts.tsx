@@ -1,9 +1,9 @@
 'use client'
 
 import { Calendar, ChevronRight, Dumbbell, History, Repeat } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import ClassicalIcon from '@/components/icons/ClassicalIcon'

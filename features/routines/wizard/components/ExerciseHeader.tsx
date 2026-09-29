@@ -1,4 +1,5 @@
 import { ChevronsUpDown, Clock, Pencil, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,6 +48,8 @@ export function ExerciseHeader({
 	onRemoveButtonClick,
 	dragHandle,
 }: ExerciseHeaderProps) {
+	const t = useTranslations('routines.exerciseHeader')
+	const tMuscles = useTranslations('routines.muscles')
 	const plannedSets = exercise.sets.length
 
 	const restMinutes = Math.floor(exercise.restSeconds / 60)
@@ -60,7 +63,7 @@ export function ExerciseHeader({
 			)}
 			role="button"
 			tabIndex={0}
-			aria-label="Toggle exercise sets"
+			aria-label={t('toggleExerciseSets')}
 			aria-expanded={expanded}
 			aria-controls={controlsId}
 			onClick={onHeaderClick}
@@ -84,14 +87,19 @@ export function ExerciseHeader({
 									expanded ? 'text-base sm:text-base' : 'text-sm sm:text-base',
 								)}
 							>
-								{exerciseData?.name ?? 'Exercise'}
+								{exerciseData?.name ?? t('exerciseFallback')}
 							</h4>
 							{expanded && (
 								<p className="text-xs sm:text-sm text-muted-foreground break-words">
-									{exerciseData?.primaryMuscles
-										? formatMuscleGroups(exerciseData.primaryMuscles)
-										: 'Unknown'}{' '}
-									• {exerciseData?.equipment}
+									{t('musclesAndEquipment', {
+										muscles: exerciseData?.primaryMuscles
+											? formatMuscleGroups(
+													exerciseData.primaryMuscles,
+													tMuscles,
+												)
+											: t('unknown'),
+										equipment: exerciseData?.equipment ?? '',
+									})}
 								</p>
 							)}
 						</div>
@@ -115,7 +123,7 @@ export function ExerciseHeader({
 					<Button
 						variant="ghost"
 						size="sm"
-						aria-label="Toggle sets"
+						aria-label={t('toggleSets')}
 						aria-expanded={expanded}
 						aria-controls={controlsId}
 						onClick={onToggleButtonClick}
@@ -134,7 +142,7 @@ export function ExerciseHeader({
 					<Button
 						variant="ghost"
 						size="sm"
-						aria-label="Edit exercise"
+						aria-label={t('editExercise')}
 						onClick={onEditButtonClick}
 						className={cn(
 							'p-0 text-muted-foreground hover:text-primary',
@@ -146,7 +154,7 @@ export function ExerciseHeader({
 					<Button
 						variant="ghost"
 						size="sm"
-						aria-label="Remove exercise"
+						aria-label={t('removeExercise')}
 						onClick={onRemoveButtonClick}
 						className={cn(
 							'p-0 text-muted-foreground hover:text-destructive',

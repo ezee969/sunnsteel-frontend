@@ -390,7 +390,15 @@
 		"starred": "Starred",
 		"recent": "Recently trained",
 		"other": "Other exercises",
-		"all": "All exercises"
+		"all": "All exercises",
+		"addExercise": "Add Exercise",
+		"searchLabel": "Search exercises",
+		"searchPlaceholder": "Search exercises...",
+		"matching": "Matching exercises",
+		"yoursPrefix": "Yours · ",
+		"unknown": "Unknown",
+		"musclesAndEquipment": "{muscles} • {equipment}",
+		"exerciseFallback": "Exercise"
 	},
 	"lineage": {
 		"hidden": "Cloned from another member’s routine. The original is no longer available to you.",
@@ -407,7 +415,32 @@
 		"basisNoLocation": "No gym saved yet: {bar} and {plates}.",
 		"barOnly": "Bar only",
 		"perSide": "{list} per side",
-		"homeGym": "Home Gym"
+		"homeGym": "Home Gym",
+		"gymNotSavedTitle": "Warm-ups added, but your gym was not saved",
+		"tryAgainInSettings": "Try again in Settings.",
+		"savePlatesTo": "Save these plates to {gym}",
+		"saveAsMyGym": "Save as my gym",
+		"dialogTitle": "Warm-up sets",
+		"dialogDescription": "A ramp up to {weight} for {exercise}. Warm-ups never count toward volume, records or progress.",
+		"bar": "Bar",
+		"plates": "Plates",
+		"platePairs": "{list} {unit} pairs",
+		"setsToAdd": "Warm-up sets to add",
+		"setLabel": "Warm-up {number}",
+		"weightByReps": "{weight} × {reps}",
+		"closestYouCanLoad": " · closest you can load",
+		"tooLight": "The working load is too light for a ramp: every step would be at or above it.",
+		"leftOut": "{count, plural, one {The lightest step is left out} other {The # lightest steps are left out}} to stay within {max} sets.",
+		"replacesCurrent": "These replace this exercise's current warm-ups.",
+		"followLabel": "Follow the working weight",
+		"followOn": "When progression raises the first working set, these warm-ups are recalculated with it.",
+		"followOff": "These warm-ups keep the loads above until you change them.",
+		"cancel": "Cancel",
+		"saving": "Saving…",
+		"addSets": "{count, plural, one {Add 1 warm-up set} other {Add # warm-up sets}}",
+		"addWarmUpSets": "Add warm-up sets",
+		"addWarmUpSetsTo": "Add warm-up sets to {exercise}",
+		"noRoom": "An exercise holds at most {max} sets, so there is no room for warm-ups."
 	},
 	"templates": {
 		"size": "{count, plural, one {# exercise} other {# exercises}}",
@@ -441,7 +474,9 @@
 		"heading": "Start from a template",
 		"intro": "Each opens as a draft you can change before saving. Loads are left for you to fill in.",
 		"useTemplate": "Use template",
-		"useTemplateAria": "Use the {name} template"
+		"useTemplateAria": "Use the {name} template",
+		"couldNotOpen": "The {template} template could not be opened because the exercise catalog has no {missing}. Start from another template or build your own below.",
+		"startedFrom": "Started from the {template} template. Change anything before creating it; loads are yours to fill in."
 	},
 	"quality": {
 		"heading": "Quality Summary",
@@ -506,5 +541,35 @@
 		"atWeight": " @ {weight}",
 		"selectedDaysTitle": "Selected Training Days ({count})",
 		"selectAtLeastOne": "Select at least one training day to continue"
+	},
+	"basicInfo": {
+		"routineName": "Routine Name",
+		"namePlaceholder": "e.g., Push Pull Legs",
+		"description": "Description",
+		"descriptionPlaceholder": "Describe your routine, goals, or any notes...",
+		"goal": "Goal",
+		"experienceLevel": "Experience level",
+		"notSpecified": "Not specified",
+		"discoveryNote": "These help other members find your routine if you share it. Leave them unset and it still appears, just not under those filters."
+	},
+	"exerciseHeader": {
+		"toggleExerciseSets": "Toggle exercise sets",
+		"toggleSets": "Toggle sets",
+		"editExercise": "Edit exercise",
+		"removeExercise": "Remove exercise",
+		"exerciseFallback": "Exercise",
+		"unknown": "Unknown",
+		"musclesAndEquipment": "{muscles} • {equipment}"
+	},
+	"exerciseCard": {
+		"searchLabel": "Search exercises",
+		"searchPlaceholder": "Search exercises...",
+		"alternatives": "Alternatives",
+		"unknown": "Unknown",
+		"musclesAndEquipment": "{muscles} • {equipment}",
+		"noExercisesFound": "No exercises found"
+	},
+	"detail": {
+		"routineDays": "Routine Days"
 	}
 }

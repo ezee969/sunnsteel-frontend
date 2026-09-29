@@ -34,7 +34,7 @@ describe('groupPickerExercises', () => {
 		).toEqual(['Destacados', 'Otros ejercicios'])
 	})
 
-it('keeps catalog order under one label without stars or history', () => {
+	it('keeps catalog order under one label without stars or history', () => {
 		const groups = groupPickerExercises(catalog, { t: en })
 		expect(groups).toHaveLength(1)
 		expect(groups[0].label).toBe('All exercises')
@@ -43,8 +43,8 @@ it('keeps catalog order under one label without stars or history', () => {
 
 	it('puts stars first, then unstarred recent exercises, each once', () => {
 		const groups = groupPickerExercises(catalog, {
-t: en,
-starred: ['c', 'a'],
+			t: en,
+			starred: ['c', 'a'],
 			recent: [trained('a', 3), trained('d', 9), trained('b', 5)],
 		})
 		expect(groups.map(group => [group.key, ids(group.exercises)])).toEqual([
@@ -66,8 +66,8 @@ starred: ['c', 'a'],
 
 	it('keeps a pending recent group while history loads', () => {
 		const groups = groupPickerExercises(catalog, {
-t: en,
-starred: ['b'],
+			t: en,
+			starred: ['b'],
 			recentPending: true,
 		})
 		expect(
@@ -86,8 +86,8 @@ starred: ['b'],
 
 	it('skips excluded and unknown exercises', () => {
 		const groups = groupPickerExercises(catalog, {
-t: en,
-starred: ['missing', 'b'],
+			t: en,
+			starred: ['missing', 'b'],
 			recent: [trained('c', 1)],
 			exclude: new Set(['b', 'h']),
 		})

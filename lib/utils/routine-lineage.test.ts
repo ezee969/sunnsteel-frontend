@@ -34,7 +34,9 @@ const hidden: RoutineLineage = {
 describe('routine lineage copy', () => {
 	it('names the original author when the viewer may see the source', () => {
 		expect(describeLineageAuthor(visible)).toBe('Ada Lovelace')
-		expect(describeRoutineLineage(visible, en)).toMatch(/Cloned from Ada Lovelace/)
+		expect(describeRoutineLineage(visible, en)).toMatch(
+			/Cloned from Ada Lovelace/,
+		)
 	})
 
 	it('still says it is a clone when the source is hidden or gone', () => {
@@ -46,8 +48,12 @@ describe('routine lineage copy', () => {
 	})
 
 	it('says the same in Spanish, hidden or not (I18N-03)', () => {
-		expect(describeRoutineLineage(visible, es)).toMatch(/Clonada de Ada Lovelace/)
-		expect(describeRoutineLineage(hidden, es)).toMatch(/Clonada de la rutina de otro miembro/)
+		expect(describeRoutineLineage(visible, es)).toMatch(
+			/Clonada de la rutina de Ada Lovelace/,
+		)
+		expect(describeRoutineLineage(hidden, es)).toMatch(
+			/Clonada de la rutina de otro miembro/,
+		)
 		expect(describeRoutineLineage(hidden, es)).toMatch(/ya no está disponible/)
 	})
 

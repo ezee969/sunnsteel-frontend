@@ -5,7 +5,6 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { translatorFor } from '@/i18n/translator'
 import type { RoutineWizardData } from '@/features/routines/wizard/types'
 import { computeWeeklyMuscleSets } from '@/features/routines/wizard/utils/routine-quality'
 import { buildRoutineRequest } from '@/features/routines/wizard/utils/routine-summary'
@@ -14,6 +13,7 @@ import {
 	leadSetIndex,
 	syncLeadWeight,
 } from '@/features/routines/wizard/utils/set-kinds'
+import { translatorFor } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
 import type { RoutineExercise } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'

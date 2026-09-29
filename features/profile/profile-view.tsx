@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import {
 	FeaturedProfileItem,
 	PublicProfileAchievements,
@@ -25,6 +24,7 @@ import {
 	UserPlus,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -97,7 +97,7 @@ type ProfileViewProps = (
 
 export function ProfileView(props: ProfileViewProps) {
 	const tIdentity = useTranslations('routines.identity')
-const { push } = useToast()
+	const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
 	const profile = props.profile
 	const ownerProfile = props.variant === 'owner' ? props.profile : undefined
@@ -414,9 +414,9 @@ const { push } = useToast()
 										<dt className="type-label text-ink-3">Experience</dt>
 										<dd>
 											{getTrainingExperienceLabel(
-trainingIdentity.experienceLevel,
-tIdentity,
-)}
+												trainingIdentity.experienceLevel,
+												tIdentity,
+											)}
 										</dd>
 									</div>
 								) : null}
@@ -437,9 +437,9 @@ tIdentity,
 										<dt className="type-label text-ink-3">Preferred style</dt>
 										<dd>
 											{getPreferredTrainingStyleLabel(
-trainingIdentity.preferredStyle,
-tIdentity,
-)}
+												trainingIdentity.preferredStyle,
+												tIdentity,
+											)}
 										</dd>
 									</div>
 								) : null}

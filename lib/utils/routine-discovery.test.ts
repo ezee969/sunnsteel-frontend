@@ -12,7 +12,7 @@ import {
 	discoveryScopeNote,
 	durationBandLabel,
 	durationEstimateNote,
-hasActiveFilters,
+	hasActiveFilters,
 } from './routine-discovery'
 
 const en = translatorFor('en', 'routines.discovery')
@@ -70,9 +70,7 @@ describe('discovery scope copy', () => {
 describe('discovery copy in Spanish (I18N-03)', () => {
 	it('keeps the scope and estimate rules', () => {
 		expect(discoveryScopeNote(es)).toMatch(/decidieron compartir/i)
-		expect(discoveryScopeNote(es)).toMatch(
-			/no revela nada que fuera privado/i,
-		)
+		expect(discoveryScopeNote(es)).toMatch(/no revela nada que fuera privado/i)
 		expect(durationEstimateNote(es)).toMatch(/se estima/i)
 		expect(durationEstimateNote(es)).toMatch(/no se mide/i)
 	})
@@ -87,9 +85,7 @@ describe('discovery copy in Spanish (I18N-03)', () => {
 				es,
 			),
 		).toBe('1 día · 1 ejercicio · Rotación · ~62 min')
-		expect(describeClassification(routine(), esId)).toBe(
-			'Fuerza · Intermedio',
-		)
+		expect(describeClassification(routine(), esId)).toBe('Fuerza · Intermedio')
 	})
 })
 
@@ -104,8 +100,8 @@ describe('describing a discovered routine', () => {
 		expect(
 			describeDiscoveredRoutine(
 				routine({ dayCount: 1, exerciseCount: 1, scheduleMode: 'ROTATION' }),
-					en,
-				),
+				en,
+			),
 		).toBe('1 day · 1 exercise · Rotation · ~62 min')
 	})
 

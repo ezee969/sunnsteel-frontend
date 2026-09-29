@@ -37,7 +37,7 @@ import {
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
 	customExerciseCopy,
-type CustomExerciseDraft,
+	type CustomExerciseDraft,
 	customExerciseDraftProblem,
 	type CustomExerciseField,
 	customExerciseInput,
@@ -165,7 +165,7 @@ function CustomExerciseForm({
 
 	const problem = useMemo(
 		() => customExerciseDraftProblem(draft, exercises, tCustom, exercise?.id),
-[draft, exercises, exercise?.id, tCustom],
+		[draft, exercises, exercise?.id, tCustom],
 	)
 	const shownProblem = attempted ? problem : null
 	const problemFor = (field: CustomExerciseField) =>
@@ -198,9 +198,7 @@ function CustomExerciseForm({
 		>
 			<DialogHeader>
 				<DialogTitle>
-					{exercise
-						? copy.editTitle
-						: copy.createTitle}
+					{exercise ? copy.editTitle : copy.createTitle}
 				</DialogTitle>
 				<DialogDescription>
 					{copy.description}

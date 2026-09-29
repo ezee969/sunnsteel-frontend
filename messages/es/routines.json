@@ -390,7 +390,15 @@
 		"starred": "Destacados",
 		"recent": "Entrenados recientemente",
 		"other": "Otros ejercicios",
-		"all": "Todos los ejercicios"
+		"all": "Todos los ejercicios",
+		"addExercise": "Agregar ejercicio",
+		"searchLabel": "Buscar ejercicios",
+		"searchPlaceholder": "Buscar ejercicios...",
+		"matching": "Ejercicios que coinciden",
+		"yoursPrefix": "Tuyo · ",
+		"unknown": "Desconocido",
+		"musclesAndEquipment": "{muscles} • {equipment}",
+		"exerciseFallback": "Ejercicio"
 	},
 	"lineage": {
 		"hidden": "Clonada de la rutina de otro miembro. La original ya no está disponible para ti.",
@@ -407,7 +415,32 @@
 		"basisNoLocation": "Aún no hay gimnasio guardado: {bar} y {plates}.",
 		"barOnly": "Solo la barra",
 		"perSide": "{list} por lado",
-		"homeGym": "Gimnasio en casa"
+		"homeGym": "Gimnasio en casa",
+		"gymNotSavedTitle": "Se agregaron las entradas en calor, pero no se guardó tu gimnasio",
+		"tryAgainInSettings": "Prueba de nuevo en Ajustes.",
+		"savePlatesTo": "Guardar estos discos en {gym}",
+		"saveAsMyGym": "Guardar como mi gimnasio",
+		"dialogTitle": "Series de entrada en calor",
+		"dialogDescription": "Una progresión hasta {weight} para {exercise}. Las entradas en calor nunca cuentan para el volumen, los récords ni el progreso.",
+		"bar": "Barra",
+		"plates": "Discos",
+		"platePairs": "Pares de {list} {unit}",
+		"setsToAdd": "Series de entrada en calor por agregar",
+		"setLabel": "Entrada en calor {number}",
+		"weightByReps": "{weight} × {reps}",
+		"closestYouCanLoad": " · lo más cerca que puedes cargar",
+		"tooLight": "La carga de trabajo es demasiado liviana para una progresión: cada paso quedaría en ella o por encima.",
+		"leftOut": "{count, plural, one {Queda afuera el paso más liviano} other {Quedan afuera los # pasos más livianos}} para no pasar de {max} series.",
+		"replacesCurrent": "Reemplazan las entradas en calor actuales de este ejercicio.",
+		"followLabel": "Seguir el peso de trabajo",
+		"followOn": "Cuando la progresión sube la primera serie de trabajo, estas entradas en calor se recalculan con ella.",
+		"followOff": "Estas entradas en calor mantienen las cargas de arriba hasta que las cambies.",
+		"cancel": "Cancelar",
+		"saving": "Guardando…",
+		"addSets": "{count, plural, one {Agregar 1 serie de entrada en calor} other {Agregar # series de entrada en calor}}",
+		"addWarmUpSets": "Agregar entradas en calor",
+		"addWarmUpSetsTo": "Agregar entradas en calor a {exercise}",
+		"noRoom": "Un ejercicio tiene como máximo {max} series, así que no hay lugar para entradas en calor."
 	},
 	"templates": {
 		"size": "{count, plural, one {# ejercicio} other {# ejercicios}}",
@@ -441,13 +474,15 @@
 		"heading": "Empieza desde una plantilla",
 		"intro": "Cada una se abre como un borrador que puedes cambiar antes de guardar. Las cargas quedan para que las completes tú.",
 		"useTemplate": "Usar plantilla",
-		"useTemplateAria": "Usar la plantilla {name}"
+		"useTemplateAria": "Usar la plantilla {name}",
+		"couldNotOpen": "No se pudo abrir la plantilla {template} porque el catálogo de ejercicios no tiene {missing}. Empieza desde otra plantilla o arma la tuya abajo.",
+		"startedFrom": "Empezaste desde la plantilla {template}. Cambia lo que quieras antes de crearla; las cargas las completas tú."
 	},
 	"quality": {
 		"heading": "Resumen de calidad",
 		"headingNote": "Calculado a partir de las series que planificaste. Nada de esto te impide guardar.",
 		"loading": "Cargando los detalles de los ejercicios…",
-		"loadError": "No se pudieron cargar los detalles de los ejercicios, así que el resumen no está disponible. Igual podés guardar la rutina.",
+		"loadError": "No se pudieron cargar los detalles de los ejercicios, así que el resumen no está disponible. Igual puedes guardar la rutina.",
 		"musclesPerRotation": "Series por músculo por rotación",
 		"musclesWeekly": "Series semanales por músculo",
 		"musclesCaption": "Los músculos secundarios cuentan como media serie, igual que en Progreso.",
@@ -459,7 +494,7 @@
 		"durationCaption": "Aproximada: {secondsPerRep} s por repetición ({reps} repeticiones cuando no hay ninguna definida), tu descanso después de cada serie menos la última, y 1 min para preparar cada ejercicio. Las series de entrada en calor de la rutina están incluidas.",
 		"equipmentTitle": "Equipamiento",
 		"bodyweightOnly": "Solo peso corporal. No hace falta equipamiento.",
-		"equipmentNoLocation": "Agregá el equipamiento de tu gimnasio en <link>Ajustes</link> para comprobarlo acá.",
+		"equipmentNoLocation": "Agrega el equipamiento de tu gimnasio en <link>Ajustes</link> para comprobarlo aquí.",
 		"equipmentNothingListed": "{location} no tiene equipamiento listado en Ajustes.",
 		"equipmentAllListed": "Está todo listado en {location}.",
 		"equipmentMissing": "No está listado en {location}: {items}.",
@@ -491,9 +526,9 @@
 		"createRoutine": "Crear rutina",
 		"nextTitle": "¿Qué pasa después?",
 		"nextSaved": "• Tu rutina se guarda y queda en tu lista de rutinas",
-		"nextStart": "• Podés empezar entrenamientos desde esta rutina cuando quieras",
-		"nextEdit": "• Podés editarla o duplicarla más adelante",
-		"nextTrack": "• Seguí tu progreso a medida que completás entrenamientos"
+		"nextStart": "• Puedes empezar entrenamientos desde esta rutina cuando quieras",
+		"nextEdit": "• Puedes editarla o duplicarla más adelante",
+		"nextTrack": "• Sigue tu progreso a medida que completas entrenamientos"
 	},
 	"dayCard": {
 		"exerciseFallback": "Ejercicio",
@@ -505,6 +540,36 @@
 		"repsRange": "{min}-{max} repeticiones",
 		"atWeight": " con {weight}",
 		"selectedDaysTitle": "Días de entrenamiento elegidos ({count})",
-		"selectAtLeastOne": "Elegí al menos un día de entrenamiento para continuar"
+		"selectAtLeastOne": "Elige al menos un día de entrenamiento para continuar"
+	},
+	"basicInfo": {
+		"routineName": "Nombre de la rutina",
+		"namePlaceholder": "por ejemplo, Empuje Tracción Piernas",
+		"description": "Descripción",
+		"descriptionPlaceholder": "Describe tu rutina, tus objetivos o cualquier nota...",
+		"goal": "Objetivo",
+		"experienceLevel": "Nivel de experiencia",
+		"notSpecified": "Sin especificar",
+		"discoveryNote": "Ayudan a que otros miembros encuentren tu rutina si la compartes. Si los dejas sin definir, la rutina igual aparece, solo que no bajo esos filtros."
+	},
+	"exerciseHeader": {
+		"toggleExerciseSets": "Mostrar u ocultar las series del ejercicio",
+		"toggleSets": "Mostrar u ocultar las series",
+		"editExercise": "Editar el ejercicio",
+		"removeExercise": "Quitar el ejercicio",
+		"exerciseFallback": "Ejercicio",
+		"unknown": "Desconocido",
+		"musclesAndEquipment": "{muscles} • {equipment}"
+	},
+	"exerciseCard": {
+		"searchLabel": "Buscar ejercicios",
+		"searchPlaceholder": "Buscar ejercicios...",
+		"alternatives": "Alternativas",
+		"unknown": "Desconocido",
+		"musclesAndEquipment": "{muscles} • {equipment}",
+		"noExercisesFound": "No se encontraron ejercicios"
+	},
+	"detail": {
+		"routineDays": "Días de la rutina"
 	}
 }

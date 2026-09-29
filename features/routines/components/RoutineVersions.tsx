@@ -97,9 +97,7 @@ function SaveVersionDialog({
 			<DialogContent className="max-w-md">
 				<DialogHeader>
 					<DialogTitle>{t('saveDialogTitle')}</DialogTitle>
-					<DialogDescription>
-						{t('saveDialogDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('saveDialogDescription')}</DialogDescription>
 				</DialogHeader>
 				<form
 					id="save-routine-version"
@@ -208,9 +206,7 @@ function CompareVersionDialog({
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{t('compareDialogTitle', { title })}</DialogTitle>
-					<DialogDescription>
-						{t('compareDialogDescription')}
-					</DialogDescription>
+					<DialogDescription>{t('compareDialogDescription')}</DialogDescription>
 				</DialogHeader>
 
 				<RoutineSetupComparison comparison={comparison} />

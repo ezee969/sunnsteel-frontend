@@ -2,8 +2,8 @@
 
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'

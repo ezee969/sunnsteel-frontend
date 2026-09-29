@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,10 @@ export default function RoutineDetailsPage() {
 	const router = useRouter()
 	const routineId = params.id as string
 	const weightUnit = useWeightUnit()
+	const locale = useLocale()
+	const t = useTranslations('routines.detail')
+	const tDeloads = useTranslations('routines.deloads')
+	const tBlocks = useTranslations('routines.trainingBlocks')
 
 	// ROUT-04: the account rule caps each routine's own visibility.
 	const { user } = useUser()
@@ -138,17 +143,19 @@ export default function RoutineDetailsPage() {
 			{todayPlan && todayPlan.days.length > 0 && (
 				<div className="space-y-4">
 					<div className="space-y-1">
-						<h2 className="type-section text-foreground">Routine Days</h2>
+						<h2 className="type-section text-foreground">{t('routineDays')}</h2>
 						{todayPlan.temporaryOverride ? (
 							<p className="type-body-sm text-ink-2">
 								{describeDeloadInForce(
 									todayPlan.temporaryOverride,
 									todayPlan.trainingBlock?.name ?? null,
+									locale,
+									tDeloads,
 								)}
 							</p>
 						) : todayPlan.trainingBlock ? (
 							<p className="type-body-sm text-ink-2">
-								{describeBlockInForce(todayPlan.trainingBlock)}
+								{describeBlockInForce(todayPlan.trainingBlock, locale, tBlocks)}
 							</p>
 						) : null}
 					</div>

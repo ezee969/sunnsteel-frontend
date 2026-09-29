@@ -3,6 +3,7 @@
 import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Suspense, useEffect, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -73,6 +74,7 @@ export default function CreateRoutinePage() {
 
 function CreateRoutineWizard() {
 	const router = useRouter()
+	const tTemplates = useTranslations('routines.templates')
 	const [currentStep, setCurrentStep] = useState(1)
 	const [visitedSteps, setVisitedSteps] = useState(new Set([1])) // Track visited steps
 	const [routineData, setRoutineData] = useState<RoutineWizardData>(EMPTY_DRAFT)
@@ -88,7 +90,11 @@ function CreateRoutineWizard() {
 	useEffect(() => {
 		if (!template || !catalog || appliedTemplate === template.slug) return
 		// EXER-06: templates name catalog exercises, never a member's own.
-		const result = templateDraft(template, catalogExercises(catalog))
+		const result = templateDraft(
+			template,
+			catalogExercises(catalog),
+			tTemplates,
+		)
 		setAppliedTemplate(template.slug)
 		setCurrentStep(1)
 		setVisitedSteps(new Set([1]))
@@ -99,7 +105,7 @@ function CreateRoutineWizard() {
 			setMissingExercises(result.missing)
 			setRoutineData(EMPTY_DRAFT)
 		}
-	}, [template, catalog, appliedTemplate])
+	}, [template, catalog, appliedTemplate, tTemplates])
 	const templateLoading =
 		!!template && appliedTemplate !== template.slug && catalogLoading
 
@@ -154,14 +160,16 @@ function CreateRoutineWizard() {
 						{template && appliedTemplate === template.slug ? (
 							missingExercises.length ? (
 								<p role="status" className="type-body-sm text-ink-2">
-									The {template.name} template could not be opened because the
-									exercise catalog has no {missingExercises.join(', ')}. Start
-									from another template or build your own below.
+									{tTemplates('couldNotOpen', {
+										template: tTemplates(`${template.key}.name`),
+										missing: missingExercises.join(', '),
+									})}
 								</p>
 							) : (
 								<p role="status" className="type-body-sm text-ink-2">
-									Started from the {template.name} template. Change anything
-									before creating it; loads are yours to fill in.
+									{tTemplates('startedFrom', {
+										template: tTemplates(`${template.key}.name`),
+									})}
 								</p>
 							)
 						) : null}

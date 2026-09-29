@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import {
 	type PreferredTrainingStyle,
 	PROFILE_FAVORITE_EXERCISES_MAX,
@@ -12,6 +11,7 @@ import {
 	type TrainingIdentity,
 } from '@sunsteel/contracts'
 import { Loader2, Plus, Target, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -62,7 +62,7 @@ export function TrainingIdentitySettingsCard({
 	identity,
 }: TrainingIdentitySettingsCardProps) {
 	const tIdentity = useTranslations('routines.identity')
-const [draft, setDraft] = useState(() => cloneIdentity(identity))
+	const [draft, setDraft] = useState(() => cloneIdentity(identity))
 	const [exerciseSearch, setExerciseSearch] = useState('')
 	const exerciseQuery = useExercises()
 	const exercises = exerciseQuery.data ?? EMPTY_EXERCISES

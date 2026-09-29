@@ -15,9 +15,7 @@ export function RoutineSetupComparison({
 	} as const
 
 	if (comparison.isEmpty) {
-		return (
-			<p className="type-body-sm text-ink-2">{t('setupMatches')}</p>
-		)
+		return <p className="type-body-sm text-ink-2">{t('setupMatches')}</p>
 	}
 
 	return (
