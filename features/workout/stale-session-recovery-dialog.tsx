@@ -3,6 +3,7 @@
 import { formatDistanceToNowStrict } from 'date-fns'
 import { AlertTriangle, CheckCircle2, Play, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import {
@@ -15,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { dateFnsLocale } from '@/i18n/date-locale'
 import {
 	useFinishSession,
 	useSession,
@@ -33,6 +35,8 @@ interface StaleSessionRecoveryDialogProps {
 export function StaleSessionRecoveryDialog({
 	session,
 }: StaleSessionRecoveryDialogProps) {
+	const t = useTranslations('workout.staleSessionRecovery')
+	const locale = useLocale()
 	const router = useRouter()
 	const { push } = useToast()
 	const [nowMs, setNowMs] = useState(() => Date.now())
@@ -97,12 +101,10 @@ export function StaleSessionRecoveryDialog({
 					push({
 						title:
 							status === 'COMPLETED'
-								? 'Saved workout completed'
-								: 'Workout discarded',
+								? t('savedWorkoutCompletedTitle')
+								: t('workoutDiscardedTitle'),
 						description:
-							status === 'COMPLETED'
-								? 'Your completed sets were kept in your history.'
-								: 'The abandoned session will no longer block a new workout.',
+							status === 'COMPLETED' ? t('keptInHistory') : t('noLongerBlock'),
 					})
 					router.replace(
 						status === 'COMPLETED' && session?.id
@@ -112,11 +114,9 @@ export function StaleSessionRecoveryDialog({
 				},
 				onError: error => {
 					push({
-						title: 'Could not resolve workout',
+						title: t('couldNotResolveTitle'),
 						description:
-							error instanceof Error
-								? error.message
-								: 'Please check your connection and try again.',
+							error instanceof Error ? error.message : t('checkConnection'),
 					})
 				},
 			},
@@ -125,10 +125,10 @@ export function StaleSessionRecoveryDialog({
 
 	if (!recovery || !session) return null
 
-	const routineName = session.routine?.name ?? 'your workout'
+	const routineName = session.routine?.name ?? t('yourWorkout')
 	const lastActivity = formatDistanceToNowStrict(
 		new Date(recovery.lastActivityAt),
-		{ addSuffix: true },
+		{ addSuffix: true, locale: dateFnsLocale(locale) },
 	)
 	const hasDetailedSetLogs = Boolean(sessionDetails)
 	const hasSavedWork = recovery.completedSets > 0
@@ -144,7 +144,7 @@ export function StaleSessionRecoveryDialog({
 							className="h-5 w-5 text-warning-strong"
 							aria-hidden
 						/>
-						Recover your workout
+						{t('title')}
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>
 						<div className="space-y-3 text-left">
@@ -152,31 +152,28 @@ export function StaleSessionRecoveryDialog({
 								<span className="font-medium text-foreground">
 									{routineName}
 								</span>{' '}
-								has not had saved activity since {lastActivity}. Choose what to
-								do before starting another workout.
+								{t('hasNotHadActivity', { time: lastActivity })}
 							</p>
 							<div className="type-body-sm bg-surface-sunk p-3">
 								{hasDetailedSetLogs ? (
 									<span className="font-medium text-foreground">
-										{recovery.completedSets} of {recovery.totalSets} sets saved
+										{t('setsSaved', {
+											completed: recovery.completedSets,
+											total: recovery.totalSets,
+										})}
 									</span>
 								) : (
 									<span className="font-medium text-foreground">
 										{isFetchingDetails
-											? 'Checking saved sets…'
-											: 'Saved set count unavailable'}
+											? t('checkingSets')
+											: t('savedSetCountUnavailable')}
 									</span>
 								)}
 								{hasDetailedSetLogs && !hasSavedWork && (
-									<p className="mt-1">
-										There are no completed sets to add to workout history.
-									</p>
+									<p className="mt-1">{t('noCompletedSets')}</p>
 								)}
 								{hasDetailsError && (
-									<p className="mt-1">
-										Finishing will still keep any completed sets stored on the
-										server.
-									</p>
+									<p className="mt-1">{t('detailsErrorNote')}</p>
 								)}
 							</div>
 						</div>
@@ -189,7 +186,7 @@ export function StaleSessionRecoveryDialog({
 						disabled={isPending}
 					>
 						<Trash2 className="h-4 w-4" />
-						Discard
+						{t('discard')}
 					</Button>
 					<Button
 						variant="outline"
@@ -197,11 +194,11 @@ export function StaleSessionRecoveryDialog({
 						disabled={isPending || !canFinishSavedWork}
 					>
 						<CheckCircle2 className="h-4 w-4" />
-						Finish saved work
+						{t('finishSavedWork')}
 					</Button>
 					<Button variant="default" onClick={handleResume} disabled={isPending}>
 						<Play className="h-4 w-4" />
-						{resumeSession.isPending ? 'Resuming…' : 'Resume'}
+						{resumeSession.isPending ? t('resuming') : t('resume')}
 					</Button>
 				</AlertDialogFooter>
 			</AlertDialogContent>

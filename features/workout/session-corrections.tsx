@@ -7,6 +7,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 import { History, Loader2, PencilLine } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -27,7 +28,6 @@ import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import {
 	buildCorrectionRequest,
 	changedSets,
-	CORRECTION_EFFECTS,
 	type CorrectionDraftSet,
 	describeCorrectionWindow,
 	describeKeptProgression,
@@ -57,8 +57,10 @@ export function SessionCorrectionSummary({
 	onStart: () => void
 	editing: boolean
 }) {
+	const t = useTranslations('workout.corrections')
+	const locale = useLocale()
 	const note = correctionWindow
-		? describeCorrectionWindow(correctionWindow)
+		? describeCorrectionWindow(correctionWindow, t, locale)
 		: null
 	if (!note && corrections.length === 0) return null
 	return (
@@ -71,7 +73,7 @@ export function SessionCorrectionSummary({
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 			>
 				<History className="size-4 text-ink-3" aria-hidden />
-				Corrections
+				{t('heading')}
 			</h2>
 			{note ? (
 				<div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -79,23 +81,22 @@ export function SessionCorrectionSummary({
 					{correctionWindow?.correctableUntil && !editing ? (
 						<Button type="button" variant="outline" size="sm" onClick={onStart}>
 							<PencilLine className="size-4" aria-hidden />
-							Correct sets
+							{t('correctSets')}
 						</Button>
 					) : null}
 				</div>
 			) : null}
 			{corrections.length ? (
 				<ol
-					aria-label="Saved corrections"
+					aria-label={t('savedCorrectionsLabel')}
 					className="border-t border-rule-faint"
 				>
 					{[...corrections].reverse().map(correction => (
 						<li key={correction.id} className="rule-row space-y-1 py-3">
 							<p className="type-body-sm text-ink-3">
-								Corrected{' '}
-								<time dateTime={correction.createdAt}>
-									{formatTimeAgo(correction.createdAt)}
-								</time>
+								{t('correctedAgo', {
+									time: formatTimeAgo(correction.createdAt),
+								})}
 							</p>
 							<ul className="space-y-0.5">
 								{correction.changes.map(change => (
@@ -103,7 +104,7 @@ export function SessionCorrectionSummary({
 										key={`${correction.id}-${change.setLogId}`}
 										className="type-body-sm text-ink-2"
 									>
-										{describeSetCorrection(change, weightUnit)}
+										{describeSetCorrection(change, weightUnit, t)}
 									</li>
 								))}
 							</ul>
@@ -139,6 +140,7 @@ export function SessionCorrectionEditor({
 	weightUnit: WeightUnit
 	onDone: () => void
 }) {
+	const t = useTranslations('workout.corrections')
 	const { push } = useToast()
 	const correct = useCorrectSession(sessionId)
 	const logs = useMemo(
@@ -173,14 +175,15 @@ export function SessionCorrectionEditor({
 			draft,
 			logs,
 			weightUnit,
+			t,
 		)
 		setProblems(found)
 		if (found.length) return
 		const changes = changedSets(sets, logs)
 		if (changes.length === 0) {
 			push({
-				title: 'Nothing to correct',
-				description: 'Every set already reads that way.',
+				title: t('nothingToCorrectTitle'),
+				description: t('nothingToCorrectDescription'),
 			})
 			return
 		}
@@ -195,11 +198,12 @@ export function SessionCorrectionEditor({
 				onSuccess: result => {
 					setPending(null)
 					push({
-						title: 'Workout corrected',
+						title: t('workoutCorrectedTitle'),
 						description:
 							describeKeptProgression(
 								result.progressionKept.map(item => item.exerciseName),
-							) ?? 'Everything this workout fed has been recalculated.',
+								t,
+							) ?? t('everythingRecalculated'),
 						variant: 'success',
 					})
 					onDone()
@@ -207,7 +211,7 @@ export function SessionCorrectionEditor({
 				onError: error => {
 					setPending(null)
 					push({
-						title: 'Could not correct this workout',
+						title: t('couldNotCorrectTitle'),
 						description: error.message,
 						variant: 'destructive',
 					})
@@ -226,10 +230,10 @@ export function SessionCorrectionEditor({
 					id="correct-sets-heading"
 					className="type-section rule-heading pb-2 text-foreground"
 				>
-					Correct Sets
+					{t('correctSetsHeading')}
 				</h2>
 				<p className="type-body-sm mt-2 max-w-[68ch] text-ink-3">
-					Change what you actually did. Weights are in {unit}.
+					{t('weightsInUnit', { unit })}
 				</p>
 			</div>
 			<div className="border-y border-rule">
@@ -252,11 +256,11 @@ export function SessionCorrectionEditor({
 								className={`type-body-sm ${ROW} items-end text-ink-3`}
 								aria-hidden
 							>
-								<span>Set</span>
-								<span>Weight</span>
-								<span>Reps</span>
-								<span>RPE</span>
-								<span className="text-center">Done</span>
+								<span>{t('setCaption')}</span>
+								<span>{t('weightCaption')}</span>
+								<span>{t('repsCaption')}</span>
+								<span>{t('rpeCaption')}</span>
+								<span className="text-center">{t('doneCaption')}</span>
 							</div>
 							{[...group.performedSets]
 								.sort((a, b) => a.setNumber - b.setNumber)
@@ -276,7 +280,7 @@ export function SessionCorrectionEditor({
 													inputMode="decimal"
 													min="0"
 													step={weightUnit === 'LB' ? 1 : 0.5}
-													aria-label={`${label}: weight in ${unit}`}
+													aria-label={`${label}: ${t('weightCaption').toLowerCase()} (${unit})`}
 													aria-invalid={problem ? true : undefined}
 													aria-describedby={problem ? errorId : undefined}
 													value={row.weight}
@@ -290,7 +294,7 @@ export function SessionCorrectionEditor({
 													inputMode="numeric"
 													min="0"
 													step="1"
-													aria-label={`${label}: reps`}
+													aria-label={`${label}: ${t('repsCaption').toLowerCase()}`}
 													aria-invalid={problem ? true : undefined}
 													aria-describedby={problem ? errorId : undefined}
 													value={row.reps}
@@ -305,7 +309,7 @@ export function SessionCorrectionEditor({
 													min="0"
 													max="10"
 													step="0.5"
-													aria-label={`${label}: RPE, 0 to 10`}
+													aria-label={`${label}: RPE, 0-10`}
 													aria-invalid={problem ? true : undefined}
 													aria-describedby={problem ? errorId : undefined}
 													value={row.rpe}
@@ -320,7 +324,7 @@ export function SessionCorrectionEditor({
 														onCheckedChange={checked =>
 															update(log.id, { isCompleted: checked === true })
 														}
-														aria-label={`${label}: done`}
+														aria-label={`${label}: ${t('doneCaption').toLowerCase()}`}
 														className="size-5"
 													/>
 												</div>
@@ -342,10 +346,10 @@ export function SessionCorrectionEditor({
 			</div>
 			<div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
 				<Button type="button" variant="outline" onClick={onDone}>
-					Cancel
+					{t('cancel')}
 				</Button>
 				<Button type="button" onClick={review}>
-					Review correction
+					{t('reviewCorrection')}
 				</Button>
 			</div>
 
@@ -357,8 +361,8 @@ export function SessionCorrectionEditor({
 			>
 				<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 					<DialogHeader>
-						<DialogTitle>Save this correction?</DialogTitle>
-						<DialogDescription>{CORRECTION_EFFECTS}</DialogDescription>
+						<DialogTitle>{t('saveThisCorrectionTitle')}</DialogTitle>
+						<DialogDescription>{t('effects')}</DialogDescription>
 					</DialogHeader>
 					<ul className="space-y-1 border-t border-rule-faint pt-3">
 						{(pending ?? []).map(set => {
@@ -366,17 +370,21 @@ export function SessionCorrectionEditor({
 							if (!log) return null
 							return (
 								<li key={set.setLogId} className="type-body-sm text-ink-2">
-									{nameByLog.get(set.setLogId)}, set {log.setNumber}:{' '}
-									{describeSetValues(
-										{
-											weight: log.weight ?? null,
-											reps: log.reps ?? null,
-											rpe: log.rpe ?? null,
-											isCompleted: log.isCompleted,
-										},
-										weightUnit,
-									)}{' '}
-									→ {describeSetValues(set, weightUnit)}
+									{t('setCorrectionLine', {
+										exerciseName: nameByLog.get(set.setLogId) ?? '',
+										setNumber: log.setNumber,
+										before: describeSetValues(
+											{
+												weight: log.weight ?? null,
+												reps: log.reps ?? null,
+												rpe: log.rpe ?? null,
+												isCompleted: log.isCompleted,
+											},
+											weightUnit,
+											t,
+										),
+										after: describeSetValues(set, weightUnit, t),
+									})}
 								</li>
 							)
 						})}
@@ -388,13 +396,13 @@ export function SessionCorrectionEditor({
 							onClick={() => setPending(null)}
 							disabled={correct.isPending}
 						>
-							Keep editing
+							{t('keepEditing')}
 						</Button>
 						<Button type="button" onClick={save} disabled={correct.isPending}>
 							{correct.isPending ? (
 								<Loader2 className="size-4 animate-spin" aria-hidden />
 							) : null}
-							Save correction
+							{t('saveCorrection')}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

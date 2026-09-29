@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, CheckCircle, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import type { SessionProgressData } from '@/lib/utils/workout-session.types'
@@ -26,6 +27,7 @@ export const SessionActionCard = ({
 	onFinishAttempt,
 	onDiscardAttempt,
 }: SessionActionCardProps) => {
+	const t = useTranslations('workout.sessionActionCard')
 	const { percentage } = progressData
 	const isComplete = percentage === 100
 
@@ -35,7 +37,7 @@ export const SessionActionCard = ({
 		// and percentage it used to carry restated what the masthead already
 		// shows, so overall progress is now stated exactly once on this screen.
 		<section
-			aria-label="Session actions"
+			aria-label={t('actionsLabel')}
 			className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
 		>
 			{/* Completion Status */}
@@ -45,9 +47,7 @@ export const SessionActionCard = ({
 						className="h-4 w-4 shrink-0 text-warning-strong"
 						aria-hidden
 					/>
-					<p className="type-body-sm text-ink-2">
-						Complete all sets to finish the session
-					</p>
+					<p className="type-body-sm text-ink-2">{t('completeAllSets')}</p>
 				</div>
 			) : (
 				<span className="hidden sm:block" />
@@ -65,7 +65,7 @@ export const SessionActionCard = ({
 					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10"
 				>
 					<Trash2 className="mr-2 h-4 w-4" aria-hidden />
-					Discard
+					{t('discard')}
 				</Button>
 				<Button
 					type="button"
@@ -76,15 +76,15 @@ export const SessionActionCard = ({
 					{isFinishing ? (
 						<>
 							<AlertCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-							Finishing...
+							{t('finishing')}
 						</>
 					) : isComplete ? (
 						<>
 							<CheckCircle className="mr-2 h-4 w-4" aria-hidden />
-							Finish Session
+							{t('finishSession')}
 						</>
 					) : (
-						'Finish Session'
+						t('finishSession')
 					)}
 				</Button>
 			</div>

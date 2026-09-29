@@ -1,35 +1,41 @@
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { Ref } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Separator } from '@/components/ui/separator'
+import type { Translator } from '@/i18n/translator'
 import type { Routine } from '@/lib/api/types/routine.type'
 import type {
 	ListSessionsParams,
 	WorkoutSessionListStatus,
 } from '@/lib/api/types/workout.type'
 
-export const STATUS_OPTIONS: Array<{
+export function statusOptions(t: Translator<'workout.historyFilters'>): Array<{
 	label: string
 	value?: WorkoutSessionListStatus
-}> = [
-	{ label: 'All', value: undefined },
-	{ label: 'In Progress', value: 'IN_PROGRESS' },
-	{ label: 'Completed', value: 'COMPLETED' },
-	{ label: 'Aborted', value: 'ABORTED' },
-]
+}> {
+	return [
+		{ label: t('statusAll'), value: undefined },
+		{ label: t('statusInProgress'), value: 'IN_PROGRESS' },
+		{ label: t('statusCompleted'), value: 'COMPLETED' },
+		{ label: t('statusAborted'), value: 'ABORTED' },
+	]
+}
 
-export const SORT_OPTIONS: Array<{
+export function sortOptions(t: Translator<'workout.historyFilters'>): Array<{
 	label: string
 	value: NonNullable<ListSessionsParams['sort']>
-}> = [
-	{ label: 'Finished (newest)', value: 'finishedAt:desc' },
-	{ label: 'Finished (oldest)', value: 'finishedAt:asc' },
-	{ label: 'Started (newest)', value: 'startedAt:desc' },
-	{ label: 'Started (oldest)', value: 'startedAt:asc' },
-]
+}> {
+	return [
+		{ label: t('sortFinishedDesc'), value: 'finishedAt:desc' },
+		{ label: t('sortFinishedAsc'), value: 'finishedAt:asc' },
+		{ label: t('sortStartedDesc'), value: 'startedAt:desc' },
+		{ label: t('sortStartedAsc'), value: 'startedAt:asc' },
+	]
+}
 
 export interface WorkoutHistoryFiltersProps {
 	filters: {
@@ -66,6 +72,9 @@ export function WorkoutHistoryFilters({
 	routines,
 	actions: a,
 }: WorkoutHistoryFiltersProps) {
+	const t = useTranslations('workout.historyFilters')
+	const STATUS_OPTIONS = statusOptions(t)
+	const SORT_OPTIONS = sortOptions(t)
 	// Active Filter Chips
 	const chips: Array<{ key: string; label: string; onClear: () => void }> = []
 	if (f.status) {
@@ -73,26 +82,27 @@ export function WorkoutHistoryFilters({
 			STATUS_OPTIONS.find(o => o.value === f.status)?.label ?? f.status
 		chips.push({
 			key: 'status',
-			label: `Status: ${lbl}`,
+			label: t('chipStatus', { value: lbl }),
 			onClear: () => a.handleClearFilter('status'),
 		})
 	}
 	if (f.routineId) {
 		const name =
-			(routines ?? []).find(r => r.id === f.routineId)?.name ?? 'Unknown'
+			(routines ?? []).find(r => r.id === f.routineId)?.name ??
+			t('unknownRoutine')
 		chips.push({
 			key: 'routine',
-			label: `Routine: ${name}`,
+			label: t('chipRoutine', { value: name }),
 			onClear: () => a.handleClearFilter('routine'),
 		})
 	}
 	if (f.from || f.to) {
 		const label =
 			f.from && f.to
-				? `Date: ${f.from} → ${f.to}`
+				? t('chipDateRange', { from: f.from, to: f.to })
 				: f.from
-					? `From: ${f.from}`
-					: `To: ${f.to}`
+					? t('chipFrom', { value: f.from })
+					: t('chipTo', { value: f.to })
 		chips.push({
 			key: 'date',
 			label,
@@ -102,7 +112,7 @@ export function WorkoutHistoryFilters({
 	if (f.q) {
 		chips.push({
 			key: 'q',
-			label: `q: "${f.q}"`,
+			label: t('chipSearch', { value: f.q }),
 			onClear: () => a.handleClearFilter('q'),
 		})
 	}
@@ -110,7 +120,7 @@ export function WorkoutHistoryFilters({
 		const lbl = SORT_OPTIONS.find(o => o.value === f.sort)?.label ?? f.sort
 		chips.push({
 			key: 'sort',
-			label: `Sort: ${lbl}`,
+			label: t('chipSort', { value: lbl }),
 			onClear: () => a.handleClearFilter('sort'),
 		})
 	}
@@ -131,11 +141,11 @@ export function WorkoutHistoryFilters({
 						{/* Status */}
 						<div className="flex flex-col gap-1">
 							<label htmlFor="status" className="type-body-sm text-ink-3">
-								Status
+								{t('statusLabel')}
 							</label>
 							<NativeSelect
 								id="status"
-								aria-label="Filter by status"
+								aria-label={t('filterByStatusAria')}
 								value={f.status ?? ''}
 								onChange={e =>
 									a.handleChangeStatus(
@@ -155,15 +165,15 @@ export function WorkoutHistoryFilters({
 						{/* Routine */}
 						<div className="flex flex-col gap-1">
 							<label htmlFor="routine" className="type-body-sm text-ink-3">
-								Routine
+								{t('routineLabel')}
 							</label>
 							<NativeSelect
 								id="routine"
-								aria-label="Filter by routine"
+								aria-label={t('filterByRoutineAria')}
 								value={f.routineId}
 								onChange={e => a.handleChangeRoutine(e.target.value)}
 							>
-								<option value="">All</option>
+								<option value="">{t('allRoutines')}</option>
 								{(routines ?? []).map(r => (
 									<option key={r.id} value={r.id}>
 										{r.name}
@@ -175,7 +185,7 @@ export function WorkoutHistoryFilters({
 						{/* From */}
 						<div className="flex flex-col gap-1">
 							<label htmlFor="from" className="type-body-sm text-ink-3">
-								From
+								{t('fromLabel')}
 							</label>
 							<Input
 								id="from"
@@ -193,7 +203,7 @@ export function WorkoutHistoryFilters({
 						{/* To */}
 						<div className="flex flex-col gap-1">
 							<label htmlFor="to" className="type-body-sm text-ink-3">
-								To
+								{t('toLabel')}
 							</label>
 							<Input
 								id="to"
@@ -212,7 +222,7 @@ export function WorkoutHistoryFilters({
 									role="alert"
 									className="type-body-sm text-destructive"
 								>
-									From date must be before or equal to To date.
+									{t('dateOrderError')}
 								</span>
 							) : null}
 						</div>
@@ -220,11 +230,11 @@ export function WorkoutHistoryFilters({
 						{/* Search */}
 						<div className="flex flex-col gap-1 sm:col-span-2">
 							<label htmlFor="q" className="type-body-sm text-ink-3">
-								Search notes
+								{t('searchLabel')}
 							</label>
 							<Input
 								id="q"
-								placeholder="e.g., leg day, PR, soreness"
+								placeholder={t('searchPlaceholder')}
 								value={f.q}
 								onChange={e => f.setQ(e.target.value)}
 								onKeyDown={e => {
@@ -236,11 +246,11 @@ export function WorkoutHistoryFilters({
 						{/* Sort + Apply */}
 						<div className="flex flex-col gap-1">
 							<label htmlFor="sort" className="type-body-sm text-ink-3">
-								Sort
+								{t('sortLabel')}
 							</label>
 							<NativeSelect
 								id="sort"
-								aria-label="Sort order"
+								aria-label={t('sortOrderAria')}
 								value={f.sort}
 								onChange={e =>
 									a.handleChangeSort(
@@ -259,12 +269,12 @@ export function WorkoutHistoryFilters({
 						<div className="flex items-end">
 							<Button
 								onClick={a.handleApplyFilters}
-								aria-label="Apply filters"
+								aria-label={t('applyAria')}
 								className="w-full sm:w-auto"
 								disabled={f.isDateInvalid}
 								variant="default"
 							>
-								Apply
+								{t('apply')}
 							</Button>
 						</div>
 					</div>
@@ -285,7 +295,7 @@ export function WorkoutHistoryFilters({
 								type="button"
 								onClick={c.onClear}
 								className="rounded-none p-0.5 text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground"
-								aria-label={`Clear ${c.key} filter`}
+								aria-label={t('clearFilterAria', { key: c.key })}
 							>
 								<X className="h-3 w-3" aria-hidden="true" />
 							</button>
@@ -295,9 +305,9 @@ export function WorkoutHistoryFilters({
 						variant="ghost"
 						size="sm"
 						onClick={f.handleClearAll}
-						aria-label="Clear all filters"
+						aria-label={t('clearAllAria')}
 					>
-						Clear all
+						{t('clearAll')}
 					</Button>
 				</div>
 			)}

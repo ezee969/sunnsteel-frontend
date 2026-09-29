@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server'
+
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Mirrors the page's one resting state - the "No Active Workout" inscription
@@ -5,12 +7,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 // medallion cards and a recent-activity list the page no longer has (TD-38).
 // With a live session the page redirects into it, so there is nothing else to
 // mirror.
-export default function WorkoutsLoading() {
+export default async function WorkoutsLoading() {
+	const t = await getTranslations('workout.loading')
 	return (
 		<div
 			className="flex flex-col gap-6"
 			role="status"
-			aria-label="Loading workouts"
+			aria-label={t('workoutsAria')}
 		>
 			<div className="rule-heading pb-4">
 				<Skeleton className="h-7 w-64 max-w-full md:h-9 md:w-80" />

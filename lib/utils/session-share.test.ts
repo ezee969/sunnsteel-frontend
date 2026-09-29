@@ -1,6 +1,7 @@
 import type { SharedSessionRecap } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import {
 	describeShareFields,
 	getSharedSessionPath,
@@ -8,6 +9,9 @@ import {
 	sharedRecapToRecapView,
 	toggleShareField,
 } from '@/lib/utils/session-share'
+
+const en = translatorFor('en', 'workout.share')
+const es = translatorFor('es', 'workout.share')
 
 describe('session share links', () => {
 	it('builds a public route outside the authenticated shell', () => {
@@ -28,8 +32,14 @@ describe('session share links', () => {
 		expect(
 			toggleShareField(['duration', 'records'], 'duration', false),
 		).toEqual(['records'])
-		expect(describeShareFields(['duration', 'records'])).toBe(
+		expect(describeShareFields(['duration', 'records'], en)).toBe(
 			'Duration · Personal records',
+		)
+	})
+
+	it('says the same in Spanish (I18N-04)', () => {
+		expect(describeShareFields(['duration', 'records'], es)).toBe(
+			'Duración · Récords personales',
 		)
 	})
 })

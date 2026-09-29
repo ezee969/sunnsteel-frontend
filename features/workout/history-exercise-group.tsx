@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { cn } from '@/lib/utils'
@@ -34,6 +35,7 @@ export function HistoryExerciseGroup({
 	sessionNote,
 	sessionId,
 }: HistoryExerciseGroupProps) {
+	const t = useTranslations('workout.historyExerciseGroup')
 	const weightUnit = useWeightUnit()
 	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
 	const totalSets = group.plannedSets.length + group.extraSets.length
@@ -78,12 +80,12 @@ export function HistoryExerciseGroup({
 						</p>
 						{group.substitutedFrom ? (
 							<p className="type-body-sm text-ink-3">
-								Swapped from {group.substitutedFrom.name}
+								{t('swappedFrom', { name: group.substitutedFrom.name })}
 							</p>
 						) : null}
 					</div>
 					<span className="type-data shrink-0 text-ink-3">
-						{completedSets}/{totalSets} sets
+						{t('setsCount', { completed: completedSets, total: totalSets })}
 					</span>
 				</button>
 				{sessionId ? (
@@ -97,7 +99,7 @@ export function HistoryExerciseGroup({
 			</div>
 			{sessionNote ? (
 				<p className="type-body-sm mt-2 whitespace-pre-line pl-7 text-ink-2">
-					Your note: {sessionNote}
+					{t('yourNote', { note: sessionNote })}
 				</p>
 			) : null}
 
@@ -105,17 +107,17 @@ export function HistoryExerciseGroup({
 				<div id={panelId} className="mt-3 pl-7">
 					{hasWarmups ? (
 						<p className="type-body-sm mb-2 text-ink-3">
-							Warm-ups are not counted in volume, records or progress.
+							{t('warmupsNotCounted')}
 						</p>
 					) : null}
 					{/* Captions are Body small in sentence case (§5.3). */}
 					<div className="type-body-sm mb-1 hidden grid-cols-12 gap-2 border-b border-rule-faint pb-1 text-ink-3 sm:grid">
-						<div className="col-span-2">Set</div>
-						<div className="col-span-3">Planned</div>
-						<div className="col-span-2">Reps</div>
-						<div className="col-span-2">Weight</div>
-						<div className="col-span-2">RPE</div>
-						<div className="col-span-1 text-center">Done</div>
+						<div className="col-span-2">{t('setCaption')}</div>
+						<div className="col-span-3">{t('plannedCaption')}</div>
+						<div className="col-span-2">{t('repsCaption')}</div>
+						<div className="col-span-2">{t('weightCaption')}</div>
+						<div className="col-span-2">{t('rpeCaption')}</div>
+						<div className="col-span-1 text-center">{t('doneCaption')}</div>
 					</div>
 
 					<div>

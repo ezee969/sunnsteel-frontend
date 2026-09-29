@@ -54,7 +54,7 @@ export const useSessionManagement = ({
 }: UseSessionManagementProps): UseSessionManagementReturn => {
 	const router = useRouter()
 	const { push } = useToast()
-	const t = useTranslations('core.common')
+	const t = useTranslations('workout.sessionResolution')
 	const { mutate: finishSession, isPending: isFinishing } =
 		useFinishSession(sessionId)
 
@@ -77,7 +77,7 @@ export const useSessionManagement = ({
 	const executeFinish = useCallback(
 		(status: SessionStatus) => {
 			if (!status) return
-			const copy = getSessionResolutionCopy(status)
+			const copy = getSessionResolutionCopy(status, t)
 
 			finishSession(
 				{ status },
@@ -104,9 +104,7 @@ export const useSessionManagement = ({
 						push({
 							title: copy.errorTitle,
 							description:
-								error instanceof Error
-									? error.message
-									: t('connectionErrorFallback'),
+								error instanceof Error ? error.message : t('checkConnection'),
 						})
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)

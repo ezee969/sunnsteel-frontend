@@ -1,6 +1,8 @@
 import type { SetKind } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	describeRound,
 	nextSetAfter,
@@ -8,6 +10,9 @@ import {
 	roundStatus,
 	trainingSequence,
 } from './session-rounds'
+
+const en = translatorFor('en', 'workout.rounds')
+const es = translatorFor('es', 'workout.rounds')
 
 const slot = (
 	id: string,
@@ -77,12 +82,28 @@ describe('rounds in a workout (LIVE-14)', () => {
 		]
 		const status = roundStatus(day, 1)!
 		expect(status.label).toBe('Superset A2')
-		expect(describeRound(status)).toBe('Round 2 of 2')
+		expect(describeRound(status, en)).toBe('Round 2 of 2')
 		const done = [
 			slot('a', [W, W], true, [1, 2]),
 			slot('b', [W, W], false, [1, 2]),
 		]
-		expect(describeRound(roundStatus(done, 0)!)).toBe('All 2 rounds done')
+		expect(describeRound(roundStatus(done, 0)!, en)).toBe('All 2 rounds done')
 		expect(roundStatus([slot('x', [W])], 0)).toBeNull()
+	})
+
+	it('says the same in Spanish (I18N-04)', () => {
+		const day = [
+			slot('a', [U, W, W], true, [1, 2]),
+			slot('b', [W, W], false, [1]),
+		]
+		const status = roundStatus(day, 1)!
+		expect(describeRound(status, es)).toBe('Ronda 2 de 2')
+		const done = [
+			slot('a', [W, W], true, [1, 2]),
+			slot('b', [W, W], false, [1, 2]),
+		]
+		expect(describeRound(roundStatus(done, 0)!, es)).toBe(
+			'Se terminaron las 2 rondas',
+		)
 	})
 })

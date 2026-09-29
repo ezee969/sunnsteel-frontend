@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface SessionLoadingSkeletonProps {
@@ -21,11 +23,12 @@ export const SessionLoadingSkeleton = ({
 	exerciseCount = 3,
 	setsPerExercise = 3,
 }: SessionLoadingSkeletonProps) => {
+	const t = useTranslations('workout.sessionLoadingSkeleton')
 	return (
 		<div
 			data-testid="session-loading-skeleton"
 			className="min-h-screen bg-background"
-			aria-label="Loading session data"
+			aria-label={t('loadingAria')}
 			role="status"
 		>
 			{/* Masthead: back control, title and day on the left, figures right. */}

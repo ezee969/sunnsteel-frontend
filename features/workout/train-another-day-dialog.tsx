@@ -2,6 +2,7 @@
 
 import { CalendarCheck, Dumbbell, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -17,9 +18,9 @@ import { useToast } from '@/components/ui/toast'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import {
-	TRAIN_ANOTHER_DAY_DESCRIPTION,
-	TRAIN_ANOTHER_DAY_EMPTY,
 	trainableDays,
+	trainAnotherDayDescription,
+	trainAnotherDayEmpty,
 } from '@/lib/utils/train-another-day'
 
 /**
@@ -37,6 +38,7 @@ export function TrainAnotherDayDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
+	const t = useTranslations('workout.trainAnotherDay')
 	const router = useRouter()
 	const { push } = useToast()
 	const { data: routines, isLoading } = useRoutines()
@@ -64,7 +66,7 @@ export function TrainAnotherDayDialog({
 				onError: (error: unknown) => {
 					setStartingDayId(null)
 					push({
-						title: 'Could not start this workout',
+						title: t('couldNotStartTitle'),
 						// The hook types its error as unknown, as the others here do.
 						description: error instanceof Error ? error.message : String(error),
 						variant: 'destructive',
@@ -78,18 +80,18 @@ export function TrainAnotherDayDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-lg">
 				<DialogHeader>
-					<DialogTitle>Train another day</DialogTitle>
-					<DialogDescription>{TRAIN_ANOTHER_DAY_DESCRIPTION}</DialogDescription>
+					<DialogTitle>{t('title')}</DialogTitle>
+					<DialogDescription>{trainAnotherDayDescription(t)}</DialogDescription>
 				</DialogHeader>
 
 				{isLoading ? (
 					<p className="type-body-sm flex items-center gap-2 py-6 text-ink-3">
 						<Loader2 className="size-4 animate-spin" aria-hidden />
-						Loading your routines…
+						{t('loadingRoutines')}
 					</p>
 				) : days.length === 0 ? (
 					<p className="type-body-sm py-6 text-ink-3">
-						{TRAIN_ANOTHER_DAY_EMPTY}
+						{trainAnotherDayEmpty(t)}
 					</p>
 				) : (
 					<ScrollArea className="max-h-[60vh]">
@@ -103,22 +105,23 @@ export function TrainAnotherDayDialog({
 												{day.isToday ? (
 													<span className="type-body-sm inline-flex items-center gap-1 text-ink-3">
 														<CalendarCheck className="size-3.5" aria-hidden />
-														Today
+														{t('today')}
 													</span>
 												) : null}
 											</p>
 											<p className="type-body-sm truncate text-ink-3">
 												{day.routineName} ·{' '}
-												{day.exerciseCount === 1
-													? '1 exercise'
-													: `${day.exerciseCount} exercises`}
+												{t('exercisesCount', { count: day.exerciseCount })}
 											</p>
 										</div>
 										<Button
 											type="button"
 											variant="outline"
 											size="sm"
-											aria-label={`Start ${day.dayLabel} from ${day.routineName}`}
+											aria-label={t('startAria', {
+												day: day.dayLabel,
+												routine: day.routineName,
+											})}
 											disabled={start.isPending}
 											onClick={() => startDay(day.routineId, day.dayId)}
 										>
@@ -130,7 +133,7 @@ export function TrainAnotherDayDialog({
 											) : (
 												<Dumbbell className="mr-2 size-4" aria-hidden />
 											)}
-											Start
+											{t('start')}
 										</Button>
 									</div>
 								</li>

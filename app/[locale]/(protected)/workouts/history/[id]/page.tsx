@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
@@ -24,6 +25,8 @@ import { noteFor } from '@/lib/utils/session-notes'
 import { sessionRoutineTitle } from '@/lib/utils/session-prescription'
 
 export default function WorkoutDetailPage() {
+	const t = useTranslations('workout.historyDetailPage')
+	const tPrescription = useTranslations('workout.prescription')
 	const params = useParams()
 	const router = useRouter()
 	const id = params.id as string
@@ -51,7 +54,7 @@ export default function WorkoutDetailPage() {
 		return (
 			<div className="ledger-page py-6 md:py-8">
 				<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
-					Loading workout details...
+					{t('loadingDetails')}
 				</div>
 			</div>
 		)
@@ -61,7 +64,7 @@ export default function WorkoutDetailPage() {
 		return (
 			<div className="ledger-page py-6 md:py-8">
 				<div className="type-body-sm text-destructive" role="alert">
-					{String(error) || 'Failed to load workout details'}
+					{String(error) || t('failedToLoad')}
 				</div>
 			</div>
 		)
@@ -73,7 +76,9 @@ export default function WorkoutDetailPage() {
 		<div className="ledger-page space-y-8 py-6 md:py-8">
 			{/* Header */}
 			<HistorySessionHeader
-				title={session ? sessionRoutineTitle(session) : undefined}
+				title={
+					session ? sessionRoutineTitle(session, tPrescription) : undefined
+				}
 				metrics={metrics}
 				onBack={() => router.back()}
 				showSummary={!recap}
@@ -100,9 +105,7 @@ export default function WorkoutDetailPage() {
 						}
 						role={isRecapError ? 'alert' : 'status'}
 					>
-						{isRecapLoading
-							? 'Loading session recap...'
-							: 'The session recap is temporarily unavailable.'}
+						{isRecapLoading ? t('loadingRecap') : t('recapUnavailable')}
 					</div>
 				)
 			) : null}
@@ -129,7 +132,7 @@ export default function WorkoutDetailPage() {
 				// editor takes its place while a correction is being made.
 				<section aria-labelledby="history-exercises-heading">
 					<h2 id="history-exercises-heading" className="sr-only">
-						Exercises
+						{t('exercisesHeading')}
 					</h2>
 					{/* Rows rule themselves with `.rule-row`: a `divide-*` colour here
 				    greyed every completed row's success mark but the last's (TD-42). */}

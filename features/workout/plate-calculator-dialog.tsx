@@ -2,6 +2,7 @@
 
 import { Calculator, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -49,6 +50,7 @@ export const PlateCalculatorDialog = ({
 	open,
 	onOpenChange,
 }: PlateCalculatorDialogProps) => {
+	const t = useTranslations('workout.plateCalculator')
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const { data: locations, isLoading, error, refetch } = useTrainingLocations()
@@ -98,8 +100,8 @@ export const PlateCalculatorDialog = ({
 						variant="ghost"
 						size="icon"
 						className="size-11 md:size-10"
-						aria-label={`Calculate plates for ${exerciseName}`}
-						title="Plate calculator"
+						aria-label={t('triggerAria', { exercise: exerciseName })}
+						title={t('triggerTitle')}
 					>
 						<Calculator className="h-4 w-4" />
 					</Button>
@@ -107,17 +109,16 @@ export const PlateCalculatorDialog = ({
 			)}
 			<DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Plate Calculator</DialogTitle>
+					<DialogTitle>{t('title')}</DialogTitle>
 					<DialogDescription>
-						{exerciseName}: load the target using the equipment saved for this
-						location.
+						{t('description', { exercise: exerciseName })}
 					</DialogDescription>
 				</DialogHeader>
 
 				{isLoading ? (
 					<div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
 						<Loader2 className="h-4 w-4 animate-spin" />
-						Loading equipment…
+						{t('loadingEquipment')}
 					</div>
 				) : error ? (
 					<div className="type-body-sm mark border-l-destructive bg-surface-sunk p-4">
@@ -129,21 +130,21 @@ export const PlateCalculatorDialog = ({
 							className="mt-3"
 							onClick={() => refetch()}
 						>
-							Try Again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : !locations?.length ? (
 					<div className="space-y-4 rounded-md border border-dashed p-5 text-center">
 						<div>
-							<p className="font-medium">No equipment preferences saved</p>
+							<p className="font-medium">{t('noEquipmentTitle')}</p>
 							<p className="mt-1 text-sm text-muted-foreground">
-								Add a training location, bar and plate pairs first.
+								{t('noEquipmentDescription')}
 							</p>
 						</div>
 						<Button asChild variant="outline">
 							<Link href="/settings/training">
 								<Settings className="h-4 w-4" />
-								Open Settings
+								{t('openSettings')}
 							</Link>
 						</Button>
 					</div>
@@ -151,7 +152,9 @@ export const PlateCalculatorDialog = ({
 					<div className="space-y-5">
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="space-y-2">
-								<Label htmlFor="plate-calculator-location">Location</Label>
+								<Label htmlFor="plate-calculator-location">
+									{t('location')}
+								</Label>
 								<Select
 									value={selectedLocation?.id}
 									onValueChange={setSelectedLocationId}
@@ -166,7 +169,7 @@ export const PlateCalculatorDialog = ({
 										{locations.map(location => (
 											<SelectItem key={location.id} value={location.id}>
 												{location.name}
-												{location.isDefault ? ' (default)' : ''}
+												{location.isDefault ? t('defaultSuffix') : ''}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -174,7 +177,7 @@ export const PlateCalculatorDialog = ({
 							</div>
 							<div className="space-y-2">
 								<Label htmlFor="plate-calculator-target">
-									Target ({unitLabel})
+									{t('target', { unit: unitLabel })}
 								</Label>
 								<Input
 									id="plate-calculator-target"
@@ -194,7 +197,7 @@ export const PlateCalculatorDialog = ({
 								aria-live="polite"
 							>
 								<div className="flex items-center justify-between gap-3 text-sm">
-									<span className="text-muted-foreground">Bar</span>
+									<span className="text-muted-foreground">{t('bar')}</span>
 									<span className="font-medium">
 										{formatWeight(selectedLocation.barWeightKg)}
 									</span>
@@ -205,26 +208,35 @@ export const PlateCalculatorDialog = ({
 										<div className="mt-3 border-t pt-3">
 											<p className="text-sm font-semibold">
 												{loading.status === 'exact'
-													? `Load ${formatWeight(loading.loadedWeightKg)}`
+													? t('loadExact', {
+															weight: formatWeight(loading.loadedWeightKg),
+														})
 													: loading.status === 'short'
-														? `Closest available: ${formatWeight(loading.loadedWeightKg)}`
-														: `Bar alone loads ${formatWeight(loading.loadedWeightKg)}`}
+														? t('loadShort', {
+																weight: formatWeight(loading.loadedWeightKg),
+															})
+														: t('barAloneLoads', {
+																weight: formatWeight(loading.loadedWeightKg),
+															})}
 											</p>
 											{loading.status === 'short' ? (
 												<p className="type-body-sm mt-1 text-ink-2">
-													{formatWeight(loading.differenceKg)} below target
+													{t('belowTarget', {
+														weight: formatWeight(loading.differenceKg),
+													})}
 												</p>
 											) : loading.status === 'over' ? (
 												<p className="mt-1 text-xs text-destructive">
-													The saved bar is {formatWeight(loading.differenceKg)}
-													heavier than this target.
+													{t('overTarget', {
+														weight: formatWeight(loading.differenceKg),
+													})}
 												</p>
 											) : null}
 										</div>
 
 										<div className="mt-4 space-y-2">
 											<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-												Plates per side
+												{t('platesPerSide')}
 											</p>
 											{loading.platesPerSide.length ? (
 												loading.platesPerSide.map(plate => (
@@ -240,14 +252,14 @@ export const PlateCalculatorDialog = ({
 												))
 											) : (
 												<p className="text-sm text-muted-foreground">
-													No plates needed.
+													{t('noPlatesNeeded')}
 												</p>
 											)}
 										</div>
 									</>
 								) : (
 									<p className="mt-3 border-t pt-3 text-sm text-destructive">
-										Enter a valid target weight.
+										{t('enterValidTarget')}
 									</p>
 								)}
 							</div>

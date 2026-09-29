@@ -7,6 +7,8 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { landingDay, routineOn, startableDayToday } from './routine-schedule'
 import {
 	buildScheduleWeek,
@@ -15,6 +17,8 @@ import {
 	startOfWeek,
 } from './schedule-week'
 import { sessionRoutineTitle } from './session-prescription'
+
+const enWorkout = translatorFor('en', 'workout.prescription')
 
 // Wednesday 16 Sep 2026, local time.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -223,11 +227,14 @@ describe('deloads in the schedule (ROUT-16)', () => {
 
 	it('titles a deload workout so its lighter loads are expected', () => {
 		expect(
-			sessionRoutineTitle({
-				routine: { id: 'split', name: 'Split' },
-				trainingBlock: null,
-				temporaryOverride: { id: 'deload-1', kind: 'DELOAD' },
-			} as never),
+			sessionRoutineTitle(
+				{
+					routine: { id: 'split', name: 'Split' },
+					trainingBlock: null,
+					temporaryOverride: { id: 'deload-1', kind: 'DELOAD' },
+				} as never,
+				enWorkout,
+			),
 		).toBe('Split · Deload')
 	})
 })

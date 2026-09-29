@@ -12,6 +12,7 @@ import {
 	type MuscleGroup,
 } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useId, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -140,6 +141,7 @@ function CustomExerciseForm({
 	onClose: () => void
 	onSaved?: (exercise: Exercise) => void
 }) {
+	const tNotes = useTranslations('workout.notes')
 	const [draft, setDraft] = useState<CustomExerciseDraft>(() =>
 		exercise
 			? draftFromExercise(exercise)
@@ -328,7 +330,7 @@ function CustomExerciseForm({
 					/>
 					<p id={noteCountId} className="type-body-sm text-ink-3">
 						{CUSTOM_EXERCISE_COPY.noteHint}{' '}
-						{remainingCharacters(draft.note, CUSTOM_EXERCISE_NOTE_MAX)}
+						{remainingCharacters(draft.note, CUSTOM_EXERCISE_NOTE_MAX, tNotes)}
 					</p>
 				</div>
 

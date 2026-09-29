@@ -2,10 +2,12 @@
 
 import type { SharedSessionRecap } from '@sunsteel/contracts'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { SessionRecapContent } from '@/features/workout/session-recap'
+import { dateFormatter } from '@/i18n/date-locale'
 import { getSharedProfilePath } from '@/lib/utils/profile-sharing'
 import { sharedRecapToRecapView } from '@/lib/utils/session-share'
 
@@ -15,23 +17,26 @@ import { sharedRecapToRecapView } from '@/lib/utils/session-share'
  * profile, where profile privacy decides what else is visible.
  */
 export function SharedSessionView({ shared }: { shared: SharedSessionRecap }) {
+	const t = useTranslations('workout.sharedSessionView')
+	const locale = useLocale()
 	const { recap, sections } = sharedRecapToRecapView(shared)
 	const { owner } = shared
 	const ownerName = [owner.name, owner.lastName].filter(Boolean).join(' ')
 	const profilePath = getSharedProfilePath(owner.username)
-	const finishedOn = new Date(shared.endedAt).toLocaleDateString(undefined, {
-		dateStyle: 'long',
-	})
+	const finishedOn = dateFormatter(locale, { dateStyle: 'long' }).format(
+		new Date(shared.endedAt),
+	)
 
 	return (
 		<div className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
 			<header className="rule-heading space-y-3 pb-6">
-				<p className="type-label text-ink-3">Shared workout</p>
+				<p className="type-label text-ink-3">{t('sharedWorkout')}</p>
 				<h1 className="type-page corner-brackets inline-block text-foreground">
 					{shared.routineName}
 				</h1>
 				<p className="type-body-sm text-ink-3">
-					{shared.dayName ? `${shared.dayName} · ` : ''}Finished {finishedOn}
+					{shared.dayName ? `${shared.dayName} · ` : ''}
+					{t('finishedOn', { date: finishedOn })}
 				</p>
 				<Link
 					href={profilePath}
@@ -61,7 +66,7 @@ export function SharedSessionView({ shared }: { shared: SharedSessionRecap }) {
 
 			<section aria-labelledby="shared-recap-heading">
 				<h2 id="shared-recap-heading" className="sr-only">
-					Session recap
+					{t('sessionRecap')}
 				</h2>
 				<SessionRecapContent
 					recap={recap}
@@ -72,7 +77,9 @@ export function SharedSessionView({ shared }: { shared: SharedSessionRecap }) {
 
 			<div>
 				<Button asChild variant="outline">
-					<Link href={profilePath}>View {owner.name}’s profile</Link>
+					<Link href={profilePath}>
+						{t('viewProfile', { name: owner.name })}
+					</Link>
 				</Button>
 			</div>
 		</div>

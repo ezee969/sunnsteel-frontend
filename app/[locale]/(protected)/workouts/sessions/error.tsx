@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 
@@ -12,18 +14,19 @@ export default function WorkoutSessionError({
 	error,
 	reset,
 }: WorkoutSessionErrorProps) {
+	const t = useTranslations('workout.errors')
 	return (
 		<RouteError
-			title="Workout Session Error"
-			description="Something went wrong with your workout session. Your progress should be saved."
+			title={t('sessionErrorTitle')}
+			description={t('sessionErrorDescription')}
 			message={error.message}
 		>
-			<Button onClick={() => reset()}>Retry Session</Button>
+			<Button onClick={() => reset()}>{t('retrySession')}</Button>
 			<Button
 				variant="outline"
 				onClick={() => (window.location.href = '/workouts')}
 			>
-				Back to Workouts
+				{t('backToWorkouts')}
 			</Button>
 		</RouteError>
 	)

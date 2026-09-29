@@ -1,5 +1,8 @@
 import { routineDayLabel, type WeightUnit } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import {
@@ -70,24 +73,38 @@ export interface SessionMetrics {
 	notes?: string | null
 }
 
+const STATUS_KEYS = {
+	COMPLETED: 'statusCompleted',
+	ABORTED: 'statusAborted',
+	IN_PROGRESS: 'statusInProgress',
+} as const
+
 /**
  * Builds common session metrics for UI presentation.
  */
 export function buildSessionMetrics(
 	session: WorkoutSession | undefined,
 	weightUnit: WeightUnit,
+	t: Translator<'workout.metrics'>,
+	locale: Locale,
 ): SessionMetrics {
 	const completedSets = getCompletedSetsCount(session?.setLogs)
 	const totalVolume = calculateTotalVolume(session?.setLogs)
+	const statusKey = session?.status
+		? (STATUS_KEYS[session.status as keyof typeof STATUS_KEYS] ??
+			'statusUnknown')
+		: 'statusUnknown'
 
 	return {
-		statusLabel: session?.status ?? 'UNKNOWN',
+		statusLabel: t(statusKey),
 		dayLabel:
 			(session?.routineDay && routineDayLabel(session.routineDay)) ||
-			'Unknown Day',
+			t('unknownDay'),
 		dateLabel: session?.startedAt
-			? new Date(session.startedAt).toLocaleDateString()
-			: 'Unknown Date',
+			? dateFormatter(locale, { dateStyle: 'medium' }).format(
+					new Date(session.startedAt),
+				)
+			: t('unknownDate'),
 		durationLabel: session?.durationSec
 			? formatDuration(session.durationSec)
 			: '—',

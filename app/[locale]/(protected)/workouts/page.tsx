@@ -3,6 +3,7 @@
 import { ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
@@ -12,6 +13,7 @@ import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { useComponentPreloading } from '@/lib/utils/dynamic-imports'
 
 export default function WorkoutsIndexPage() {
+	const t = useTranslations('workout.page')
 	const router = useRouter()
 	const { preloadOnHover } = useComponentPreloading()
 	const { data: active, isLoading } = useActiveSession()
@@ -28,7 +30,7 @@ export default function WorkoutsIndexPage() {
 			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
 				<div className="type-body-sm flex items-center gap-2 text-ink-3">
 					<Loader2 className="h-5 w-5 animate-spin" />
-					<span>Loading your workouts...</span>
+					<span>{t('loadingWorkouts')}</span>
 				</div>
 			</div>
 		)
@@ -38,9 +40,7 @@ export default function WorkoutsIndexPage() {
 	if (active?.id) {
 		return (
 			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
-				<div className="type-body-sm text-ink-3">
-					Redirecting to your active session…
-				</div>
+				<div className="type-body-sm text-ink-3">{t('redirecting')}</div>
 			</div>
 		)
 	}
@@ -52,11 +52,10 @@ export default function WorkoutsIndexPage() {
 		<div className="flex flex-col gap-6">
 			<div className="rule-heading pb-4">
 				<h1 className="type-page corner-brackets inline-block text-foreground">
-					No Active Workout
+					{t('title')}
 				</h1>
 				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
-					You don&apos;t have a workout in progress right now. Pick a routine to
-					start training, or review your history.
+					{t('description')}
 				</p>
 			</div>
 
@@ -68,22 +67,22 @@ export default function WorkoutsIndexPage() {
 				    the owner's own instead. */}
 				<Button variant="default" onClick={() => setPickingDay(true)}>
 					<ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
-					Train another day
+					{t('trainAnotherDay')}
 				</Button>
 				<Button asChild variant="outline">
-					<Link href="/routines">Go to Routines</Link>
+					<Link href="/routines">{t('goToRoutines')}</Link>
 				</Button>
 				<Button asChild variant="outline">
 					<Link
 						href="/workouts/history"
 						{...preloadOnHover('workoutHistoryPage')}
 					>
-						View History
+						{t('viewHistory')}
 					</Link>
 				</Button>
 				<Button asChild variant="secondary">
 					<Link href="/dashboard">
-						Dashboard
+						{t('dashboard')}
 						<ChevronRight className="ml-2 h-4 w-4" />
 					</Link>
 				</Button>

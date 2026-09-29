@@ -7,6 +7,7 @@ import {
 	SESSION_SHARE_MAX_ACTIVE_LINKS,
 } from '@sunsteel/contracts'
 import { Copy, Link2Off, Share2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -32,7 +33,8 @@ import { copyTextToClipboard } from '@/lib/utils/profile-sharing'
 import {
 	describeShareFields,
 	getSharedSessionUrl,
-	SESSION_SHARE_FIELD_COPY,
+	sessionShareFieldDescription,
+	sessionShareFieldLabel,
 	toggleShareField,
 } from '@/lib/utils/session-share'
 
@@ -42,6 +44,7 @@ import {
  * opt-in; the previous-session comparison is never shared.
  */
 export function SessionShareButton({ sessionId }: { sessionId: string }) {
+	const t = useTranslations('workout.share')
 	const [open, setOpen] = useState(false)
 	const [fields, setFields] = useState<SessionShareField[]>(
 		SESSION_SHARE_DEFAULT_FIELDS,
@@ -59,14 +62,14 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 				getSharedSessionUrl(share.token, window.location.origin),
 			)
 			push({
-				title: 'Link copied',
-				description: 'Anyone with this link can see the parts you chose.',
+				title: t('linkCopiedTitle'),
+				description: t('linkCopiedDescription'),
 				variant: 'success',
 			})
 		} catch {
 			push({
-				title: 'Could not copy link',
-				description: 'Check your browser permissions and try again.',
+				title: t('couldNotCopyTitle'),
+				description: t('couldNotCopyDescription'),
 				variant: 'destructive',
 			})
 		}
@@ -77,7 +80,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 			onSuccess: share => void copyLink(share),
 			onError: error =>
 				push({
-					title: 'Could not create link',
+					title: t('couldNotCreateTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -88,13 +91,13 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 		revoke.mutate(share.id, {
 			onSuccess: () =>
 				push({
-					title: 'Link revoked',
-					description: 'It no longer opens this session.',
+					title: t('linkRevokedTitle'),
+					description: t('linkRevokedDescription'),
 					variant: 'success',
 				}),
 			onError: error =>
 				push({
-					title: 'Could not revoke link',
+					title: t('couldNotRevokeTitle'),
 					description: error.message,
 					variant: 'destructive',
 				}),
@@ -110,34 +113,32 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 				onClick={() => setOpen(true)}
 			>
 				<Share2 aria-hidden />
-				Share
+				{t('shareButton')}
 			</Button>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 					<DialogHeader>
-						<DialogTitle>Share this session</DialogTitle>
-						<DialogDescription>
-							Anyone with the link can see the parts you choose, even without an
-							account. You can revoke a link at any time.
-						</DialogDescription>
+						<DialogTitle>{t('dialogTitle')}</DialogTitle>
+						<DialogDescription>{t('dialogDescription')}</DialogDescription>
 					</DialogHeader>
 
 					<fieldset>
-						<legend className="type-label text-ink-3">Include</legend>
+						<legend className="type-label text-ink-3">
+							{t('includeLegend')}
+						</legend>
 						<div className="divide-y divide-rule">
 							{SESSION_SHARE_FIELDS.map(field => {
 								const id = `share-field-${field}`
+								const label = sessionShareFieldLabel(field, t)
 								return (
 									<div
 										key={field}
 										className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3 py-3"
 									>
 										<div className="space-y-1">
-											<Label htmlFor={id}>
-												{SESSION_SHARE_FIELD_COPY[field].label}
-											</Label>
+											<Label htmlFor={id}>{label}</Label>
 											<p className="type-body-sm text-ink-3">
-												{SESSION_SHARE_FIELD_COPY[field].description}
+												{sessionShareFieldDescription(field, t)}
 											</p>
 										</div>
 										<Label
@@ -152,7 +153,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 														toggleShareField(current, field, checked === true),
 													)
 												}
-												aria-label={SESSION_SHARE_FIELD_COPY[field].label}
+												aria-label={label}
 												className="size-5"
 											/>
 										</Label>
@@ -164,17 +165,19 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 
 					<section aria-labelledby="active-share-links" className="space-y-1">
 						<h3 id="active-share-links" className="type-panel text-foreground">
-							Active links
+							{t('activeLinksHeading')}
 						</h3>
 						{shares.isPending ? (
-							<p className="type-body-sm py-2 text-ink-3">Loading links…</p>
+							<p className="type-body-sm py-2 text-ink-3">
+								{t('loadingLinks')}
+							</p>
 						) : shares.isError ? (
 							<p role="alert" className="type-body-sm py-2 text-ink-3">
-								Could not load your links. Close and reopen to try again.
+								{t('loadLinksError')}
 							</p>
 						) : activeLinks.length === 0 ? (
 							<p className="type-body-sm py-2 text-ink-3">
-								No active links for this session.
+								{t('noActiveLinks')}
 							</p>
 						) : (
 							<ul>
@@ -185,10 +188,12 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 									>
 										<div className="min-w-0 flex-1 basis-40">
 											<p className="type-body-sm text-foreground">
-												{describeShareFields(share.fields)}
+												{describeShareFields(share.fields, t)}
 											</p>
 											<p className="type-body-sm text-ink-3">
-												Created {formatTimeAgo(share.createdAt)}
+												{t('createdAgo', {
+													time: formatTimeAgo(share.createdAt),
+												})}
 											</p>
 											{/* TRUST-04: the link is still active and still
 											    copyable, but it opens for nobody while the hide
@@ -207,7 +212,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 											onClick={() => void copyLink(share)}
 										>
 											<Copy aria-hidden />
-											Copy
+											{t('copy')}
 										</Button>
 										{/* A revoked link cannot be restored, so revoking is a
 										    destruction and wears the destructive outline
@@ -220,7 +225,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 											disabled={revoke.isPending}
 										>
 											<Link2Off aria-hidden />
-											Revoke
+											{t('revoke')}
 										</Button>
 									</li>
 								))}
@@ -228,8 +233,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 						)}
 						{atLimit ? (
 							<p className="type-body-sm text-ink-3">
-								This session has {SESSION_SHARE_MAX_ACTIVE_LINKS} active links.
-								Revoke one to create another.
+								{t('atLimit', { count: SESSION_SHARE_MAX_ACTIVE_LINKS })}
 							</p>
 						) : null}
 					</section>
@@ -240,14 +244,14 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 							variant="outline"
 							onClick={() => setOpen(false)}
 						>
-							Close
+							{t('close')}
 						</Button>
 						<Button
 							type="button"
 							onClick={onCreate}
 							disabled={fields.length === 0 || create.isPending || atLimit}
 						>
-							{create.isPending ? 'Creating…' : 'Create and copy link'}
+							{create.isPending ? t('creating') : t('createAndCopy')}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

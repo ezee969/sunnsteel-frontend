@@ -1,7 +1,8 @@
 'use client'
 
-import { SET_KIND_LABELS, type WeightUnit } from '@sunsteel/contracts'
+import type { WeightUnit } from '@sunsteel/contracts'
 import { Check, Minus } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import type { SetLog } from '@/lib/api/types/workout.type'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
@@ -28,6 +29,8 @@ export function SetComparisonRow({
 	performedSet,
 	weightUnit,
 }: SetComparisonRowProps) {
+	const t = useTranslations('workout.setComparisonRow')
+	const tKinds = useTranslations('workout.setKinds')
 	const isCompleted = Boolean(performedSet?.isCompleted)
 	// LIVE-12: the kind it was done as, else the one it was planned as.
 	const kind = performedSet?.kind ?? plannedSet?.kind ?? 'WORKING'
@@ -42,7 +45,7 @@ export function SetComparisonRow({
 				<Minus className="h-4 w-4" aria-hidden />
 			)}
 			<span className="sr-only">
-				{isCompleted ? 'Completed' : 'Not completed'}
+				{isCompleted ? t('completed') : t('notCompleted')}
 			</span>
 		</span>
 	)
@@ -51,24 +54,27 @@ export function SetComparisonRow({
 		<div className="rule-row grid grid-cols-3 gap-x-4 gap-y-2 py-3 sm:grid-cols-12 sm:items-center sm:gap-2 sm:py-2">
 			<div className="col-span-3 flex items-center justify-between sm:col-span-2">
 				<span className="type-label text-foreground">
-					Set {setNumber}
+					{t('setLabel', { number: setNumber })}
 					{kind !== 'WORKING' ? (
-						<span className="type-body-sm ml-2 text-ink-3">
-							{SET_KIND_LABELS[kind]}
-						</span>
+						<span className="type-body-sm ml-2 text-ink-3">{tKinds(kind)}</span>
 					) : null}
 				</span>
 				<span className="sm:hidden">{completion}</span>
 			</div>
 
 			<div className="col-span-3 sm:col-span-3">
-				<div className="type-body-sm text-ink-3 sm:hidden">Planned</div>
+				<div className="type-body-sm text-ink-3 sm:hidden">
+					{t('plannedCaption')}
+				</div>
 				<div className="type-data text-ink-2">
 					{!plannedSet
-						? 'Extra set'
+						? t('extraSet')
 						: plannedSet.repType === 'FIXED'
-							? `${plannedSet.reps} reps`
-							: `${plannedSet.minReps}-${plannedSet.maxReps} reps`}
+							? t('repsValue', { count: plannedSet.reps ?? 0 })
+							: t('repsRange', {
+									min: plannedSet.minReps ?? 0,
+									max: plannedSet.maxReps ?? 0,
+								})}
 					{plannedSet?.weight
 						? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit)}`
 						: null}
@@ -76,21 +82,27 @@ export function SetComparisonRow({
 			</div>
 
 			<div className="sm:col-span-2">
-				<div className="type-body-sm text-ink-3 sm:hidden">Reps</div>
+				<div className="type-body-sm text-ink-3 sm:hidden">
+					{t('repsCaption')}
+				</div>
 				<div className="type-data type-data-strong text-foreground">
 					{formatReps(performedSet?.reps)}
 				</div>
 			</div>
 
 			<div className="sm:col-span-2">
-				<div className="type-body-sm text-ink-3 sm:hidden">Weight</div>
+				<div className="type-body-sm text-ink-3 sm:hidden">
+					{t('weightCaption')}
+				</div>
 				<div className="type-data type-data-strong text-foreground">
 					{formatWeight(performedSet?.weight, weightUnit)}
 				</div>
 			</div>
 
 			<div className="sm:col-span-2">
-				<div className="type-body-sm text-ink-3 sm:hidden">RPE</div>
+				<div className="type-body-sm text-ink-3 sm:hidden">
+					{t('rpeCaption')}
+				</div>
 				<div className="type-data text-ink-2">
 					{performedSet?.rpe ? `${performedSet.rpe}/10` : '—'}
 				</div>

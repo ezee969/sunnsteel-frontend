@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -18,6 +19,7 @@ import type {
 import { hasActiveHistoryFilters } from '@/lib/utils/empty-states'
 
 function WorkoutHistoryContent() {
+	const t = useTranslations('workout.historyPage')
 	const { isMobile } = useSidebar()
 
 	const {
@@ -155,22 +157,20 @@ function WorkoutHistoryContent() {
 		<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
-				title={<>Training Archive</>}
-				subtitle={<>Browse and filter your sessions.</>}
+				title={<>{t('title')}</>}
+				subtitle={<>{t('subtitle')}</>}
 			/>
 			{/* §11.5 — the archive is a ruled ledger, so the panel that used to box
 			    the whole list is gone. The section heading and its rule carry the
 			    region instead. */}
 			<section>
-				<p className="type-body-sm text-ink-3">
-					Browse your past workout sessions with filters.
-				</p>
+				<p className="type-body-sm text-ink-3">{t('description')}</p>
 				{/* UX-03 and design system §20.2: the list is the page, so the page
 				    scrolls and this row stays pinned with the Filter control on it.
 				    `-top-3 sm:-top-6` cancels <main>'s padding and `-mx-4` this
 				    page's own, so rows pass under an opaque edge. */}
 				<div className="rule-heading sticky -top-3 z-10 -mx-4 flex items-center justify-between gap-3 bg-background px-4 pb-2 pt-2 sm:-top-6">
-					<h2 className="type-section text-foreground">Workout History</h2>
+					<h2 className="type-section text-foreground">{t('heading')}</h2>
 					<Button
 						variant="outline"
 						size="sm"
@@ -179,7 +179,7 @@ function WorkoutHistoryContent() {
 						aria-controls="workout-history-filters"
 						className="inline-flex h-11 shrink-0 items-center gap-1 sm:h-9"
 					>
-						<span>Filter</span>
+						<span>{t('filter')}</span>
 						<ChevronDown
 							className={`h-4 w-4 transition-transform duration-[var(--motion-base)] ease-standard ${
 								isFiltersOpen ? 'rotate-180' : ''
@@ -235,12 +235,13 @@ function WorkoutHistoryContent() {
 }
 
 export default function WorkoutHistoryPage() {
+	const t = useTranslations('workout.historyPage')
 	return (
 		<Suspense
 			fallback={
 				<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
 					<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
-						Loading workout history…
+						{t('loading')}
 					</div>
 				</div>
 			}

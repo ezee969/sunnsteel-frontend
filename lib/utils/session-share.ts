@@ -5,29 +5,20 @@ import type {
 } from '@sunsteel/contracts'
 import { SESSION_SHARE_FIELDS } from '@sunsteel/contracts'
 
-export const SESSION_SHARE_FIELD_COPY: Record<
-	SessionShareField,
-	{ label: string; description: string }
-> = {
-	duration: { label: 'Duration', description: 'How long the session took.' },
-	volume: { label: 'Volume', description: 'Total external load you moved.' },
-	completedSets: {
-		label: 'Completed sets',
-		description: 'How many sets you finished.',
-	},
-	records: {
-		label: 'Personal records',
-		description: 'Records set in this session, with their loads.',
-	},
-	progression: {
-		label: 'Progression changes',
-		description:
-			'Prescriptions that advanced afterwards, with old and new loads.',
-	},
-	notes: {
-		label: 'Session notes',
-		description: 'Your written notes, exactly as saved.',
-	},
+import type { Translator } from '@/i18n/translator'
+
+export function sessionShareFieldLabel(
+	field: SessionShareField,
+	t: Translator<'workout.share'>,
+): string {
+	return t(`fields.${field}.label`)
+}
+
+export function sessionShareFieldDescription(
+	field: SessionShareField,
+	t: Translator<'workout.share'>,
+): string {
+	return t(`fields.${field}.description`)
 }
 
 /** Recap regions `SessionRecapContent` can show or hide. */
@@ -64,8 +55,9 @@ export function toggleShareField(
 
 export function describeShareFields(
 	fields: readonly SessionShareField[],
+	t: Translator<'workout.share'>,
 ): string {
-	return fields.map(field => SESSION_SHARE_FIELD_COPY[field].label).join(' · ')
+	return fields.map(field => sessionShareFieldLabel(field, t)).join(' · ')
 }
 
 /**
