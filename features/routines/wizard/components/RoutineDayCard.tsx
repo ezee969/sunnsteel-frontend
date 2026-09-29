@@ -1,6 +1,7 @@
 'use client'
 
 import type { WeightUnit } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -35,12 +36,15 @@ export function RoutineDayCard({
 	exerciseMap,
 	weightUnit,
 }: RoutineDayCardProps) {
+	const t = useTranslations('routines.dayCard')
+	const tFormat = useTranslations('routines.format')
+	const tMuscles = useTranslations('routines.muscles')
 	return (
 		<Card className="border rounded-md p-3">
 			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
 				{label}
 				<Badge variant="outline">
-					{formatExerciseCount(day.exercises.length)}
+					{formatExerciseCount(day.exercises.length, tFormat)}
 				</Badge>
 			</h4>
 			<div className="space-y-3">
@@ -51,21 +55,27 @@ export function RoutineDayCard({
 						<div key={exerciseIndex} className="border rounded-md p-3">
 							<div className="flex items-start justify-between mb-2">
 								<div>
-									<h5 className="font-medium">{meta?.name ?? 'Exercise'}</h5>
+									<h5 className="font-medium">
+										{meta?.name ?? t('exerciseFallback')}
+									</h5>
 									<p className="text-xs text-muted-foreground">
-										{meta?.primaryMuscles
-											? formatMuscleGroups(meta.primaryMuscles)
-											: 'Unknown'}{' '}
-										• {meta?.equipment ?? 'Unknown'}
+										{t('musclesAndEquipment', {
+											muscles: meta?.primaryMuscles
+												? formatMuscleGroups(meta.primaryMuscles, tMuscles)
+												: t('unknown'),
+											equipment: meta?.equipment ?? t('unknown'),
+										})}
 									</p>
 									{exercise.note && (
 										<p className="text-xs text-muted-foreground mt-1 italic">
-											Note: {exercise.note}
+											{t('note', { note: exercise.note })}
 										</p>
 									)}
 								</div>
 								<div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">
-									<span>{formatTime(exercise.restSeconds)} rest</span>
+									<span>
+										{t('rest', { time: formatTime(exercise.restSeconds) })}
+									</span>
 								</div>
 							</div>
 
@@ -77,10 +87,15 @@ export function RoutineDayCard({
 										className="text-xs font-normal"
 									>
 										{set.repType === 'FIXED'
-											? `${set.reps ?? ''} reps`
-											: `${set.minReps ?? ''}-${set.maxReps ?? ''} reps`}
+											? t('repsFixed', { reps: set.reps ?? '' })
+											: t('repsRange', {
+													min: set.minReps ?? '',
+													max: set.maxReps ?? '',
+												})}
 										{set.weight
-											? ` @ ${formatWeight(set.weight, weightUnit)}`
+											? t('atWeight', {
+													weight: formatWeight(set.weight, weightUnit),
+												})
 											: ''}
 									</Badge>
 								))}

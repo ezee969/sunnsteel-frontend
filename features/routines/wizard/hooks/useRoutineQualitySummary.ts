@@ -1,4 +1,5 @@
 import type { TrainingLocationPreference } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import type { Exercise } from '@/lib/api/types'
@@ -14,8 +15,17 @@ export function useRoutineQualitySummary(
 	exerciseMap: Record<string, Exercise>,
 	locations: TrainingLocationPreference[] | undefined,
 ) {
+	const tDate = useTranslations('routines.date')
+	const tQuality = useTranslations('routines.quality')
 	return useMemo(
-		() => buildRoutineQualitySummary(data, exerciseMap, locations),
-		[data, exerciseMap, locations],
+		() =>
+			buildRoutineQualitySummary(
+				data,
+				exerciseMap,
+				locations,
+				tDate,
+				tQuality,
+			),
+		[data, exerciseMap, locations, tDate, tQuality],
 	)
 }

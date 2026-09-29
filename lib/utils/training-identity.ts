@@ -6,7 +6,7 @@ import type {
 	TrainingIdentity,
 } from '@sunsteel/contracts'
 
-import type { Translator } from '@/i18n/translator'
+import type { MessageKey, Translator } from '@/i18n/translator'
 
 type T = Translator<'routines.identity'>
 
@@ -49,16 +49,19 @@ const STYLE_KEYS = {
 	CIRCUIT: 'styleCircuit',
 } as const satisfies Record<PreferredTrainingStyle, string>
 
-type Key = Parameters<T>[0]
+type Key = MessageKey<'routines.identity'>
 
 function options<V extends string>(
 	keys: Record<V, Key>,
 	t: T,
 ): IdentityOption<V>[] {
-	return (Object.keys(keys) as V[]).map(value => ({
-		value,
-		label: t(keys[value]),
-	}))
+	return (Object.keys(keys) as V[]).map(value => {
+		// The lookup is widened to `Key` on purpose: `Record<V, Key>[V]` stays a
+		// deferred indexed access while V is a type parameter, and the
+		// translator's overloads cannot resolve one.
+		const key: Key = keys[value]
+		return { value, label: t(key) }
+	})
 }
 
 export const trainingGoalOptions = (t: T) => options(GOAL_KEYS, t)
@@ -70,7 +73,11 @@ const label = <V extends string>(
 	keys: Record<V, Key>,
 	value: V,
 	t: T,
-): string => (value in keys ? t(keys[value]) : value)
+): string => {
+	if (!(value in keys)) return value
+	const key: Key = keys[value]
+	return t(key)
+}
 
 export const getTrainingGoalLabel = (value: TrainingGoal, t: T) =>
 	label(GOAL_KEYS, value, t)

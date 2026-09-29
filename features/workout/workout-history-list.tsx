@@ -1,4 +1,3 @@
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import type { Ref } from 'react'

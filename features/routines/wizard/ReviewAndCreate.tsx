@@ -1,6 +1,7 @@
 'use client'
 
 import { CheckCircle, Loader2, Save } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	Accordion,
@@ -62,6 +63,8 @@ export function ReviewAndCreate({
 	} = useTrainingLocations()
 	const weightUnit = useWeightUnit()
 	const exerciseMap = useRoutineExercisesLookup(exercises)
+	const t = useTranslations('routines.review')
+	const tDate = useTranslations('routines.date')
 
 	const { submit, isLoading } = useRoutineSubmission({
 		data,
@@ -91,18 +94,20 @@ export function ReviewAndCreate({
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
 							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
-							Basic Information
+							{t('basicInformation')}
 						</span>
 					</AccordionTrigger>
 					<AccordionContent className="space-y-3 pl-1">
 						<div>
-							<p className="text-sm font-medium text-muted-foreground">Name</p>
+							<p className="text-sm font-medium text-muted-foreground">
+								{t('name')}
+							</p>
 							<p className="text-base">{data.name}</p>
 						</div>
 						{data.description && (
 							<div>
 								<p className="text-sm font-medium text-muted-foreground">
-									Description
+									{t('description')}
 								</p>
 								<p className="text-sm text-muted-foreground">
 									{data.description}
@@ -116,26 +121,39 @@ export function ReviewAndCreate({
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
 							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
-							Training Schedule
+							{t('trainingSchedule')}
 						</span>
 					</AccordionTrigger>
 					<AccordionContent className="pl-1">
 						<div className="flex flex-wrap gap-2 mb-2">
 							{data.days.map((day, index) => (
 								<Badge key={day.slot} variant="secondary">
-									{wizardDayTitle(data.scheduleMode, day, index)}
+									{wizardDayTitle(data.scheduleMode, day, index, tDate)}
 								</Badge>
 							))}
 						</div>
 						<p className="text-sm text-muted-foreground">
 							{data.scheduleMode === 'ROTATION'
-								? `${data.days.length}-day rotation: each day follows the last one you completed, ${data.rotationWeekdays.length > 0 ? `on ${data.rotationWeekdays.map(day => weekdayName(day, 'long')).join(', ')}` : 'on any weekday'}`
-								: `${data.trainingDays.length} training days per week`}
+								? t('rotationSummary', {
+										days: data.days.length,
+										when:
+											data.rotationWeekdays.length > 0
+												? t('rotationOnWeekdays', {
+														weekdays: data.rotationWeekdays
+															.map(day => weekdayName(day, 'long', tDate))
+															.join(', '),
+													})
+												: t('rotationAnyWeekday'),
+									})
+								: t('weeklySummary', { days: data.trainingDays.length })}
 						</p>
 						{data.scheduleMode === 'WEEKLY' && data.restDays.length > 0 ? (
 							<p className="text-sm text-muted-foreground">
-								Rest days:{' '}
-								{data.restDays.map(day => weekdayName(day, 'long')).join(', ')}
+								{t('restDays', {
+									weekdays: data.restDays
+										.map(day => weekdayName(day, 'long', tDate))
+										.join(', '),
+								})}
 							</p>
 						) : null}
 					</AccordionContent>
@@ -145,14 +163,14 @@ export function ReviewAndCreate({
 					<AccordionTrigger>
 						<span className="flex items-center gap-2 text-base">
 							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
-							Workout Details
+							{t('workoutDetails')}
 						</span>
 					</AccordionTrigger>
 					<AccordionContent className="space-y-4 pl-1">
 						{data.days.map((day, index) => (
 							<RoutineDayCard
 								key={day.slot}
-								label={wizardDayTitle(data.scheduleMode, day, index)}
+								label={wizardDayTitle(data.scheduleMode, day, index, tDate)}
 								day={day}
 								exerciseMap={exerciseMap}
 								weightUnit={weightUnit}
@@ -180,7 +198,7 @@ export function ReviewAndCreate({
 					{isLoading ? (
 						<>
 							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							{isEditing ? 'Updating...' : 'Creating...'}
+							{isEditing ? t('updating') : t('creating')}
 						</>
 					) : (
 						<>
@@ -189,21 +207,19 @@ export function ReviewAndCreate({
 							) : (
 								<CheckCircle className="mr-2 h-4 w-4" />
 							)}
-							{isEditing ? 'Update Routine' : 'Create Routine'}
+							{isEditing ? t('updateRoutine') : t('createRoutine')}
 						</>
 					)}
 				</Button>
 			</div>
 
 			<div className="bg-muted/50 p-4 rounded-md">
-				<h4 className="type-panel mb-2 text-foreground">What happens next?</h4>
+				<h4 className="type-panel mb-2 text-foreground">{t('nextTitle')}</h4>
 				<ul className="text-sm text-muted-foreground space-y-1">
-					<li>
-						• Your routine will be saved and available in your routines list
-					</li>
-					<li>• You can start workouts from this routine anytime</li>
-					<li>• You can edit or duplicate this routine later</li>
-					<li>• Track your progress as you complete workouts</li>
+					<li>{t('nextSaved')}</li>
+					<li>{t('nextStart')}</li>
+					<li>{t('nextEdit')}</li>
+					<li>{t('nextTrack')}</li>
 				</ul>
 			</div>
 		</div>

@@ -8,10 +8,11 @@ import {
 	type TrainingLocationPreference,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
 import {
 	defaultTrainingLocation,
-	EQUIPMENT_LABELS,
+	equipmentLabel,
 	normalizeLocationEquipment,
 } from '@/lib/utils/exercise-equipment'
 
@@ -109,7 +110,7 @@ const LOWER_PATTERNS = new Set<MovementPattern>([
 	'PLANTAR_FLEXION',
 ])
 
-export { EQUIPMENT_LABELS }
+export { equipmentLabel }
 
 const setReps = (set: RoutineSet): number => {
 	const reps =
@@ -210,15 +211,13 @@ export const checkEquipmentAtLocation = (
 export const formatSetCount = (sets: number): string =>
 	Number.isInteger(sets) ? String(sets) : sets.toFixed(1)
 
-const plural = (count: number, word: string) =>
-	`${formatSetCount(count)} ${word}${count === 1 ? '' : 's'}`
-
 export const findLikelyImbalances = (
 	data: RoutineWizardData,
 	exercises: ExerciseLookup,
 	muscleSets: MuscleSetCount[],
+	t: Translator<'routines.quality'>,
 ): RoutineImbalance[] => {
-	const period = data.scheduleMode === 'ROTATION' ? 'per rotation' : 'a week'
+	const period = data.scheduleMode === 'ROTATION' ? 'rotation' : 'week'
 	let upper = 0
 	let lower = 0
 	let push = 0
@@ -240,15 +239,15 @@ export const findLikelyImbalances = (
 	if (lower === 0 && upper >= MIN_BALANCE_SETS) {
 		imbalances.push({
 			kind: 'NO_LOWER_BODY',
-			title: 'No lower-body exercises',
-			evidence: `${plural(upper, 'upper-body set')} ${period} and none for the legs.`,
+			title: t('noLowerBodyTitle'),
+			evidence: t('noLowerBodyEvidence', { count: upper, period }),
 		})
 	}
 	if (upper === 0 && lower >= MIN_BALANCE_SETS) {
 		imbalances.push({
 			kind: 'NO_UPPER_BODY',
-			title: 'No upper-body exercises',
-			evidence: `${plural(lower, 'lower-body set')} ${period} and none for the upper body.`,
+			title: t('noUpperBodyTitle'),
+			evidence: t('noUpperBodyEvidence', { count: lower, period }),
 		})
 	}
 
@@ -259,11 +258,8 @@ export const findLikelyImbalances = (
 	) {
 		imbalances.push({
 			kind: 'PUSH_PULL',
-			title:
-				push > pull
-					? 'More pressing than pulling'
-					: 'More pulling than pressing',
-			evidence: `${plural(push, 'pressing set')} and ${plural(pull, 'pulling set')} ${period}.`,
+			title: push > pull ? t('morePressingTitle') : t('morePullingTitle'),
+			evidence: t('pushPullEvidence', { push, pull, period }),
 		})
 	}
 
@@ -278,9 +274,13 @@ export const findLikelyImbalances = (
 			kind: 'QUAD_HAMSTRING',
 			title:
 				quads > hamstrings
-					? 'Quads outweigh hamstrings'
-					: 'Hamstrings outweigh quads',
-			evidence: `Quads ${formatSetCount(quads)} and hamstrings ${formatSetCount(hamstrings)} ${period === 'a week' ? 'weekly set-equivalents' : 'set-equivalents per rotation'}.`,
+					? t('quadsOverHamstringsTitle')
+					: t('hamstringsOverQuadsTitle'),
+			evidence: t('quadHamstringEvidence', {
+				quads: formatSetCount(quads),
+				hamstrings: formatSetCount(hamstrings),
+				period,
+			}),
 		})
 	}
 
@@ -291,6 +291,8 @@ export const buildRoutineQualitySummary = (
 	data: RoutineWizardData,
 	exercises: ExerciseLookup,
 	locations: TrainingLocationPreference[] | undefined,
+	tDate: Translator<'routines.date'>,
+	tQuality: Translator<'routines.quality'>,
 ): RoutineQualitySummary => {
 	const muscleSets = computeWeeklyMuscleSets(data, exercises)
 	const equipment = computeRoutineEquipment(data, exercises)
@@ -308,12 +310,12 @@ export const buildRoutineQualitySummary = (
 		muscleSets,
 		durations: data.days.map((day, index) => ({
 			slot: day.slot,
-			label: wizardDayTitle(data.scheduleMode, day, index),
+			label: wizardDayTitle(data.scheduleMode, day, index, tDate),
 			seconds: estimateDaySeconds(day),
 		})),
 		equipment,
 		equipmentCheck: checkEquipmentAtLocation(equipment, locations),
-		imbalances: findLikelyImbalances(data, exercises, muscleSets),
+		imbalances: findLikelyImbalances(data, exercises, muscleSets, tQuality),
 		unclassifiedExercises,
 	}
 }

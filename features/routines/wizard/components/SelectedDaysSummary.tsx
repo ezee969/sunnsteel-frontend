@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { formatDaysPerWeek } from '@/lib/utils/routine-format'
@@ -14,38 +16,44 @@ interface SelectedDaysSummaryProps {
 export const SelectedDaysSummary = ({
 	trainingDays,
 	dayInfos,
-}: SelectedDaysSummaryProps) => (
-	<div className="bg-muted/50 p-3 md:p-4 rounded-md">
-		<h4 className="type-panel mb-2 text-foreground md:mb-3">
-			Selected Training Days ({formatDaysPerWeek(trainingDays.length)})
-		</h4>
-		<div className="relative min-h-[56px] md:min-h-[28px]">
-			<div
-				className={cn(
-					'absolute inset-0 flex items-center justify-center transition-opacity',
-					trainingDays.length === 0
-						? 'opacity-100'
-						: 'opacity-0 pointer-events-none',
-				)}
-			>
-				<p className="text-muted-foreground text-sm text-center">
-					Select at least one training day to continue
-				</p>
-			</div>
-			<div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 md:gap-2">
-				{dayInfos.map(day => (
-					<Badge
-						key={day.id}
-						variant="secondary"
-						className={cn(
-							'w-full text-center text-xs md:text-sm px-1 py-1 transition-opacity duration-[var(--motion-slow)] ease-standard',
-							trainingDays.includes(day.id) ? 'opacity-100' : 'opacity-0',
-						)}
-					>
-						{day.name}
-					</Badge>
-				))}
+}: SelectedDaysSummaryProps) => {
+	const t = useTranslations('routines.dayCard')
+	const tFormat = useTranslations('routines.format')
+	return (
+		<div className="bg-muted/50 p-3 md:p-4 rounded-md">
+			<h4 className="type-panel mb-2 text-foreground md:mb-3">
+				{t('selectedDaysTitle', {
+					count: formatDaysPerWeek(trainingDays.length, tFormat),
+				})}
+			</h4>
+			<div className="relative min-h-[56px] md:min-h-[28px]">
+				<div
+					className={cn(
+						'absolute inset-0 flex items-center justify-center transition-opacity',
+						trainingDays.length === 0
+							? 'opacity-100'
+							: 'opacity-0 pointer-events-none',
+					)}
+				>
+					<p className="text-muted-foreground text-sm text-center">
+						{t('selectAtLeastOne')}
+					</p>
+				</div>
+				<div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 md:gap-2">
+					{dayInfos.map(day => (
+						<Badge
+							key={day.id}
+							variant="secondary"
+							className={cn(
+								'w-full text-center text-xs md:text-sm px-1 py-1 transition-opacity duration-[var(--motion-slow)] ease-standard',
+								trainingDays.includes(day.id) ? 'opacity-100' : 'opacity-0',
+							)}
+						>
+							{day.name}
+						</Badge>
+					))}
+				</div>
 			</div>
 		</div>
-	</div>
-)
+	)
+}

@@ -4,6 +4,7 @@ import {
 	type RoutineScheduleMode,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import { routineDayTitle } from '@/lib/utils/routine-schedule'
 
 import type { RoutineWizardData, RoutineWizardDay } from '../types'
@@ -77,12 +78,17 @@ export function wizardDayTitle(
 	mode: RoutineScheduleMode,
 	day: Pick<RoutineWizardDay, 'slot' | 'name'>,
 	index: number,
+	t: Translator<'routines.date'>,
 ): string {
-	return routineDayTitle({
-		dayOfWeek: mode === 'ROTATION' ? null : day.slot,
-		name: day.name ?? null,
-		order: index,
-	})
+	return routineDayTitle(
+		{
+			dayOfWeek: mode === 'ROTATION' ? null : day.slot,
+			name: day.name ?? null,
+			order: index,
+		},
+		'long',
+		t,
+	)
 }
 
 /**
