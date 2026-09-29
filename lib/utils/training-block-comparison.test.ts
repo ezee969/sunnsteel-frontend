@@ -4,8 +4,10 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	BLOCK_COMPARISON_ACTION,
+	blockComparisonAction,
 	comparisonRows,
 	describeChange,
 	describeComparisonScope,
@@ -82,9 +84,12 @@ const comparison = (
 	...overrides,
 })
 
+const en = translatorFor('en', 'progress.blockComparison')
+const es = translatorFor('es', 'progress.blockComparison')
+
 describe('training-block comparison copy', () => {
 	it('names the two periods and says they are side by side, not ranked', () => {
-		expect(describeComparisonScope(comparison())).toBe(
+		expect(describeComparisonScope(comparison(), en)).toBe(
 			"Autumn (28 days) beside Summer (42 days). Only this routine's workouts count. The numbers are side by side, not ranked.",
 		)
 		expect(
@@ -95,26 +100,27 @@ describe('training-block comparison copy', () => {
 					current: period({ days: 10 }),
 					previous: period({ kind: 'BEFORE_BLOCK', name: null, days: 10 }),
 				}),
+				en,
 			),
 		).toBe(
 			"Autumn so far (10 days) beside the same number of days of the routine before it. Only this routine's workouts count. The numbers are side by side, not ranked. A period longer than a year is compared on its latest 365 days.",
 		)
-		expect(periodName(period({ name: null, days: 21 }))).toBe(
+		expect(periodName(period({ name: null, days: 21 }), en)).toBe(
 			'The 21 days before',
 		)
 	})
 
 	it('states changes as numbers with a direction, never a verdict', () => {
-		expect(describeChange(0.5)).toBe('up 0.5')
-		expect(describeChange(-2)).toBe('down 2')
-		expect(describeChange(0.04)).toBe('no change')
-		expect(describeChange(4.25, '%')).toBe('up 4.3%')
-		expect(describeWeeklyChange(0.5)).toBe('up 0.5 a week')
-		expect(describeWeeklyChange(0)).toBe('no change')
+		expect(describeChange(0.5, en, 'en')).toBe('up 0.5')
+		expect(describeChange(-2, en, 'en')).toBe('down 2')
+		expect(describeChange(0.04, en, 'en')).toBe('no change')
+		expect(describeChange(4.25, en, 'en', '%')).toBe('up 4.3%')
+		expect(describeWeeklyChange(0.5, en, 'en')).toBe('up 0.5 a week')
+		expect(describeWeeklyChange(0, en, 'en')).toBe('no change')
 	})
 
 	it('lays out every measure for both periods, per week where lengths differ', () => {
-		const rows = comparisonRows(comparison(), 'KG')
+		const rows = comparisonRows(comparison(), 'KG', en, 'en')
 		expect(rows.map(row => row.label)).toEqual([
 			'Workouts',
 			'Completed sets',
@@ -155,6 +161,8 @@ describe('training-block comparison copy', () => {
 				},
 			}),
 			'KG',
+			en,
+			'en',
 		)
 		expect(rows[0].current).toBe('14 workouts (1 ended early)')
 		expect(rows[3].change).toBe(
@@ -162,34 +170,63 @@ describe('training-block comparison copy', () => {
 		)
 		expect(rows[4].current).toBe('No sets with a rep target')
 		expect(rows[4].change).toBeNull()
-		expect(describeNoLifts()).toBe(
+		expect(describeNoLifts(en)).toBe(
 			'No lift with a loaded set was trained in both periods.',
 		)
 	})
 
 	it('states a lift in the viewer unit', () => {
 		const [lift] = comparison().lifts
-		expect(describeLift(lift, 'KG')).toBe(
+		expect(describeLift(lift, 'KG', en, 'en')).toBe(
 			'Best estimated 1RM 116.7 kg → 122.5 kg, up 5%',
 		)
-		expect(describeLift(lift, 'LB')).toMatch(/^Best estimated 1RM 257\.3 lb →/)
+		expect(describeLift(lift, 'LB', en, 'en')).toMatch(
+			/^Best estimated 1RM 257\.3 lb →/,
+		)
 	})
 
 	it('never ranks the periods or names a cause', () => {
 		const copy = [
-			BLOCK_COMPARISON_ACTION,
-			describeComparisonScope(comparison()),
-			...comparisonRows(comparison(), 'KG').flatMap(row => [
+			blockComparisonAction(en),
+			describeComparisonScope(comparison(), en),
+			...comparisonRows(comparison(), 'KG', en, 'en').flatMap(row => [
 				row.label,
 				row.previous,
 				row.current,
 				row.change ?? '',
 			]),
-			describeLift(comparison().lifts[0], 'KG'),
-			describeNoLifts(),
+			describeLift(comparison().lifts[0], 'KG', en, 'en'),
+			describeNoLifts(en),
 		].join(' ')
 		expect(copy).not.toMatch(
 			/better|worse|improv|declin|fatigue|recover|overtrain|should|\bneed\b|because|best block|winner/i,
+		)
+	})
+})
+
+describe('the same comparison in Spanish (I18N-05)', () => {
+	it('states the periods and every change without ranking them', () => {
+		expect(describeComparisonScope(comparison(), es)).toContain(
+			'sin clasificar',
+		)
+		expect(describeChange(0.5, es, 'es')).toBe('sube 0,5')
+		expect(describeWeeklyChange(0.5, es, 'es')).toBe('sube 0,5 por semana')
+		expect(describeChange(0.04, es, 'es')).toBe('sin cambios')
+		const copy = [
+			blockComparisonAction(es),
+			describeComparisonScope(comparison(), es),
+			...comparisonRows(comparison(), 'KG', es, 'es').flatMap(row => [
+				row.label,
+				row.previous,
+				row.current,
+				row.change ?? '',
+			]),
+			describeLift(comparison().lifts[0], 'KG', es, 'es'),
+			describeNoLifts(es),
+		].join(' ')
+		// No winner and no cause, in either language.
+		expect(copy).not.toMatch(
+			/mejor bloque|peor|gan[óo]|superior|porque|debido|deber[ií]as|mejor[óo]|empeor/i,
 		)
 	})
 })

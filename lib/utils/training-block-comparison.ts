@@ -5,6 +5,10 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
+
 import {
 	formatWeightAmount,
 	getWeightUnitLabel,
@@ -17,63 +21,97 @@ import {
  * and nothing suggests why a number moved.
  */
 
-export const BLOCK_COMPARISON_ACTION = 'Compare training'
+type T = Translator<'progress.blockComparison'>
 
-const decimal = (value: number, digits = 1) =>
-	new Intl.NumberFormat(undefined, {
+export const blockComparisonAction = (t: T) => t('action')
+
+const decimal = (value: number, locale: Locale, digits = 1) =>
+	new Intl.NumberFormat(intlLocale(locale), {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: digits,
 	}).format(value)
-
-const plural = (count: number, one: string, many = `${one}s`) =>
-	`${decimal(count)} ${count === 1 ? one : many}`
 
 const fromKey = (key: string) => {
 	const [year, month, day] = key.split('-').map(Number)
 	return new Date(year, month - 1, day)
 }
-const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	year: 'numeric',
-})
-const formatDate = (key: string) => DATE_FORMAT.format(fromKey(key))
+const formatDate = (key: string, locale: Locale) =>
+	new Intl.DateTimeFormat(intlLocale(locale), {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+	}).format(fromKey(key))
 
 /** The block's name, or "The 28 days before". */
-export function periodName(period: BlockComparisonPeriod): string {
-	return period.name ?? `The ${period.days} days before`
+export function periodName(period: BlockComparisonPeriod, t: T): string {
+	return period.name ?? t('periodBefore', { days: period.days })
 }
 
-export function periodDates(period: BlockComparisonPeriod): string {
-	return `${formatDate(period.startDate)} – ${formatDate(period.endDate)}`
+export function periodDates(
+	period: BlockComparisonPeriod,
+	t: T,
+	locale: Locale,
+): string {
+	return t('periodDates', {
+		start: formatDate(period.startDate, locale),
+		end: formatDate(period.endDate, locale),
+	})
 }
 
 export function describeComparisonScope(
 	comparison: TrainingBlockComparisonResponse,
+	t: T,
 ): string {
 	const current = comparison.current
 	const previous = comparison.previous
 	const scope = comparison.isRunning
-		? `${periodName(current)} so far (${plural(current.days, 'day')}) beside the same number of days of ${previous.kind === 'BEFORE_BLOCK' ? 'the routine before it' : periodName(previous)}.`
-		: `${periodName(current)} (${plural(current.days, 'day')}) beside ${previous.kind === 'BEFORE_BLOCK' ? 'the same number of days before it' : `${periodName(previous)} (${plural(previous.days, 'day')})`}.`
-	const truncated = comparison.truncated
-		? ' A period longer than a year is compared on its latest 365 days.'
-		: ''
-	return `${scope} Only this routine's workouts count. The numbers are side by side, not ranked.${truncated}`
+		? t('scopeRunning', {
+				name: periodName(current, t),
+				days: t('days', { count: current.days }),
+				previous:
+					previous.kind === 'BEFORE_BLOCK'
+						? t('previousRoutineBefore')
+						: periodName(previous, t),
+			})
+		: t('scopeFinished', {
+				name: periodName(current, t),
+				days: t('days', { count: current.days }),
+				previous:
+					previous.kind === 'BEFORE_BLOCK'
+						? t('previousSameDaysBefore')
+						: t('previousNamed', {
+								name: periodName(previous, t),
+								days: t('days', { count: previous.days }),
+							}),
+			})
+	return t('scope', {
+		scope,
+		truncated: comparison.truncated ? t('truncated') : '',
+	})
 }
 
 /** "up 0.5", "down 2", "no change", with an optional unit after the number. */
-export function describeChange(difference: number, unit = ''): string {
+export function describeChange(
+	difference: number,
+	t: T,
+	locale: Locale,
+	unit = '',
+): string {
 	const rounded = Math.round(difference * 10) / 10
-	if (rounded === 0) return 'no change'
-	const amount = `${decimal(Math.abs(rounded))}${unit}`
-	return rounded > 0 ? `up ${amount}` : `down ${amount}`
+	if (rounded === 0) return t('noChange')
+	const amount = `${decimal(Math.abs(rounded), locale)}${unit}`
+	return rounded > 0 ? t('changeUp', { amount }) : t('changeDown', { amount })
 }
 
 /** A per-week change: "up 0.5 a week", or plain "no change". */
-export function describeWeeklyChange(difference: number, unit = ''): string {
-	const change = describeChange(difference, unit)
-	return change === 'no change' ? change : `${change} a week`
+export function describeWeeklyChange(
+	difference: number,
+	t: T,
+	locale: Locale,
+	unit = '',
+): string {
+	const change = describeChange(difference, t, locale, unit)
+	return change === t('noChange') ? change : t('perWeek', { change })
 }
 
 export interface ComparisonRow {
@@ -83,16 +121,25 @@ export interface ComparisonRow {
 	change: string | null
 }
 
-function describeWorkouts(period: BlockComparisonPeriod): string {
+function describeWorkouts(
+	period: BlockComparisonPeriod,
+	t: T,
+	locale: Locale,
+): string {
 	const workouts =
 		period.plannedWorkouts === null
-			? plural(period.workouts, 'workout')
-			: `${period.workouts} of ${period.plannedWorkouts} planned`
+			? t('workoutsCount', { count: period.workouts })
+			: t('workoutsPlanned', {
+					done: period.workouts,
+					planned: period.plannedWorkouts,
+				})
 	const notes = [
-		period.endedEarly ? `${period.endedEarly} ended early` : null,
-		period.deloads ? `${period.deloads} on a deload` : null,
+		period.endedEarly ? t('endedEarly', { count: period.endedEarly }) : null,
+		period.deloads ? t('onDeload', { count: period.deloads }) : null,
 	].filter(Boolean)
-	return notes.length ? `${workouts} (${notes.join(', ')})` : workouts
+	return notes.length
+		? t('workoutsWithNotes', { workouts, notes: notes.join(', ') })
+		: workouts
 }
 
 const load = (kg: number, unit: WeightUnit, digits = 0) =>
@@ -101,32 +148,52 @@ const load = (kg: number, unit: WeightUnit, digits = 0) =>
 export function comparisonRows(
 	comparison: TrainingBlockComparisonResponse,
 	unit: WeightUnit,
+	t: T,
+	locale: Locale,
 ): ComparisonRow[] {
 	const { current, previous, effort } = comparison
 	const rows: ComparisonRow[] = [
 		{
-			label: 'Workouts',
-			previous: describeWorkouts(previous),
-			current: describeWorkouts(current),
+			label: t('rowWorkouts'),
+			previous: describeWorkouts(previous, t, locale),
+			current: describeWorkouts(current, t, locale),
 			change: describeWeeklyChange(
 				current.perWeek.workouts - previous.perWeek.workouts,
+				t,
+				locale,
 			),
 		},
 		{
-			label: 'Completed sets',
-			previous: `${previous.completedSets} (${decimal(previous.perWeek.completedSets)} a week)`,
-			current: `${current.completedSets} (${decimal(current.perWeek.completedSets)} a week)`,
+			label: t('rowCompletedSets'),
+			previous: t('valuePerWeek', {
+				total: previous.completedSets,
+				perWeek: decimal(previous.perWeek.completedSets, locale),
+			}),
+			current: t('valuePerWeek', {
+				total: current.completedSets,
+				perWeek: decimal(current.perWeek.completedSets, locale),
+			}),
 			change: describeWeeklyChange(
 				current.perWeek.completedSets - previous.perWeek.completedSets,
+				t,
+				locale,
 			),
 		},
 		{
-			label: 'External load',
-			previous: `${load(previous.volumeKg, unit)} (${load(previous.perWeek.volumeKg, unit)} a week)`,
-			current: `${load(current.volumeKg, unit)} (${load(current.perWeek.volumeKg, unit)} a week)`,
+			label: t('rowExternalLoad'),
+			previous: t('valuePerWeek', {
+				total: load(previous.volumeKg, unit),
+				perWeek: load(previous.perWeek.volumeKg, unit),
+			}),
+			current: t('valuePerWeek', {
+				total: load(current.volumeKg, unit),
+				perWeek: load(current.perWeek.volumeKg, unit),
+			}),
 			change: describeWeeklyChange(
 				Math.round(kilogramsToDisplayWeight(current.perWeek.volumeKg, unit)) -
 					Math.round(kilogramsToDisplayWeight(previous.perWeek.volumeKg, unit)),
+				t,
+				locale,
 				` ${getWeightUnitLabel(unit)}`,
 			),
 		},
@@ -134,32 +201,50 @@ export function comparisonRows(
 	rows.push(
 		effort.comparison
 			? {
-					label: 'Average RPE',
-					previous: `${decimal(effort.comparison.previous.averageRpe)} over ${plural(effort.comparison.previous.sets, 'set')}`,
-					current: `${decimal(effort.comparison.recent.averageRpe)} over ${plural(effort.comparison.recent.sets, 'set')}`,
-					change: `${describeChange(effort.comparison.difference)}, on the ${plural(effort.comparison.lifts, 'lift')} rated in both`,
+					label: t('rowAverageRpe'),
+					previous: t('rpeOverSets', {
+						rpe: decimal(effort.comparison.previous.averageRpe, locale),
+						sets: t('sets', { count: effort.comparison.previous.sets }),
+					}),
+					current: t('rpeOverSets', {
+						rpe: decimal(effort.comparison.recent.averageRpe, locale),
+						sets: t('sets', { count: effort.comparison.recent.sets }),
+					}),
+					change: t('rpeChange', {
+						change: describeChange(effort.comparison.difference, t, locale),
+						lifts: t('lifts', { count: effort.comparison.lifts }),
+					}),
 				}
 			: {
-					label: 'Average RPE',
-					previous: `${plural(effort.previousSets, 'set')} with RPE`,
-					current: `${plural(effort.recentSets, 'set')} with RPE`,
-					change:
-						'Comparing needs at least 10 RPE sets of the same lifts in each period.',
+					label: t('rowAverageRpe'),
+					previous: t('setsWithRpe', {
+						sets: t('sets', { count: effort.previousSets }),
+					}),
+					current: t('setsWithRpe', {
+						sets: t('sets', { count: effort.recentSets }),
+					}),
+					change: t('rpeNotComparable'),
 				},
 	)
 	const target = (period: BlockComparisonPeriod) =>
 		period.repTargets.targetedSets === 0
-			? 'No sets with a rep target'
-			: `${period.repTargets.shortSets} of ${period.repTargets.targetedSets} short (${period.repTargets.shortPercent}%)`
+			? t('noTargetedSets')
+			: t('targetShort', {
+					short: period.repTargets.shortSets,
+					targeted: period.repTargets.targetedSets,
+					percent: period.repTargets.shortPercent,
+				})
 	rows.push({
-		label: 'Sets short of their rep target',
+		label: t('rowRepTargets'),
 		previous: target(previous),
 		current: target(current),
 		change:
 			previous.repTargets.targetedSets && current.repTargets.targetedSets
 				? describeChange(
 						current.repTargets.shortPercent - previous.repTargets.shortPercent,
-						' points',
+						t,
+						locale,
+						t('points'),
 					)
 				: null,
 	})
@@ -169,13 +254,16 @@ export function comparisonRows(
 export function describeLift(
 	lift: BlockComparisonLift,
 	unit: WeightUnit,
+	t: T,
+	locale: Locale,
 ): string {
-	return (
-		`Best estimated 1RM ${load(lift.previous.estimated1rmKg, unit, 1)} → ` +
-		`${load(lift.current.estimated1rmKg, unit, 1)}, ${describeChange(lift.changePercent, '%')}`
-	)
+	return t('liftChange', {
+		previous: load(lift.previous.estimated1rmKg, unit, 1),
+		current: load(lift.current.estimated1rmKg, unit, 1),
+		change: describeChange(lift.changePercent, t, locale, '%'),
+	})
 }
 
-export function describeNoLifts(): string {
-	return 'No lift with a loaded set was trained in both periods.'
+export function describeNoLifts(t: T): string {
+	return t('noLifts')
 }

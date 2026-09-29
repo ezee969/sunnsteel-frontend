@@ -3,7 +3,7 @@
 import type { RoutineTrainingBlock, WeightUnit } from '@sunsteel/contracts'
 import { RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import { useTrainingBlockComparison } from '@/lib/api/hooks/useRoutineTrainingBlocks'
 import {
 	comparisonRows,
@@ -41,6 +42,8 @@ export function TrainingBlockComparisonDialog({
 	onClose: () => void
 }) {
 	const t = useTranslations('routines.listing')
+	const tCompare = useTranslations('progress.blockComparison')
+	const locale = useLocale() as Locale
 	const comparison = useTrainingBlockComparison(routineId, block.seriesId)
 	const data = comparison.data
 
@@ -50,7 +53,9 @@ export function TrainingBlockComparisonDialog({
 				<DialogHeader>
 					<DialogTitle>Compare {block.name}</DialogTitle>
 					<DialogDescription>
-						{data ? describeComparisonScope(data) : t('comparisonNote')}
+						{data
+							? describeComparisonScope(data, tCompare)
+							: t('comparisonNote')}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -95,29 +100,29 @@ export function TrainingBlockComparisonDialog({
 										{period === data.current ? t('thisBlock') : t('before')}
 									</dt>
 									<dd className="type-panel text-foreground">
-										{periodName(period)}
+										{periodName(period, tCompare)}
 									</dd>
 									<dd className="type-body-sm text-ink-3">
-										{periodDates(period)}
+										{periodDates(period, tCompare, locale)}
 									</dd>
 								</div>
 							))}
 						</dl>
 
 						<ul className="border-t border-rule-faint">
-							{comparisonRows(data, weightUnit).map(row => (
+							{comparisonRows(data, weightUnit, tCompare, locale).map(row => (
 								<li key={row.label} className="rule-row grid gap-1 py-3">
 									<h3 className="type-panel text-foreground">{row.label}</h3>
 									<div className="grid grid-cols-2 gap-3">
 										<p className="type-body-sm min-w-0 text-ink-2">
 											<span className="sr-only">
-												{periodName(data.previous)}:{' '}
+												{periodName(data.previous, tCompare)}:{' '}
 											</span>
 											{row.previous}
 										</p>
 										<p className="type-body-sm min-w-0 text-ink-2">
 											<span className="sr-only">
-												{periodName(data.current)}:{' '}
+												{periodName(data.current, tCompare)}:{' '}
 											</span>
 											{row.current}
 										</p>
@@ -140,7 +145,9 @@ export function TrainingBlockComparisonDialog({
 								Lifts trained in both
 							</h3>
 							{data.lifts.length === 0 ? (
-								<p className="type-body-sm text-ink-3">{describeNoLifts()}</p>
+								<p className="type-body-sm text-ink-3">
+									{describeNoLifts(tCompare)}
+								</p>
 							) : (
 								<ul className="border-t border-rule-faint">
 									{data.lifts.map(lift => (
@@ -154,7 +161,7 @@ export function TrainingBlockComparisonDialog({
 											>
 												{lift.exerciseName}
 											</Link>
-											: {describeLift(lift, weightUnit)}
+											: {describeLift(lift, weightUnit, tCompare, locale)}
 										</li>
 									))}
 								</ul>

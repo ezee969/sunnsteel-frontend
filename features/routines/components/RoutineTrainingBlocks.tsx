@@ -77,7 +77,7 @@ import {
 	routineSetup,
 	versionTitle,
 } from '@/lib/utils/routine-versions'
-import { BLOCK_COMPARISON_ACTION } from '@/lib/utils/training-block-comparison'
+import { blockComparisonAction } from '@/lib/utils/training-block-comparison'
 
 interface RoutineTrainingBlocksProps {
 	routine: Routine
@@ -346,6 +346,7 @@ export function RoutineTrainingBlocks({
 	weightUnit,
 }: RoutineTrainingBlocksProps) {
 	const t = useTranslations('routines.trainingBlocks')
+	const tCompare = useTranslations('progress.blockComparison')
 	const tVersions = useTranslations('routines.versions')
 	const locale = useLocale() as Locale
 	const blocks = useRoutineTrainingBlocks(routine.id)
@@ -478,7 +479,7 @@ export function RoutineTrainingBlocks({
 										onClick={() => setComparing(block)}
 									>
 										<Activity aria-hidden />
-										{BLOCK_COMPARISON_ACTION}
+										{blockComparisonAction(tCompare)}
 									</Button>
 								) : null}
 								{block.state !== 'COMPLETE' ? (
