@@ -385,5 +385,62 @@
 		"deleteDescription": "Deleting removes it for good. It is only possible while no routine or workout uses it.",
 		"inUse": "A routine or a workout uses this exercise, so it can be archived but not deleted.",
 		"editNote": "Changes apply from now on. Past workouts keep the muscles they were logged with."
+	},
+	"picker": {
+		"starred": "Starred",
+		"recent": "Recently trained",
+		"other": "Other exercises",
+		"all": "All exercises"
+	},
+	"lineage": {
+		"hidden": "Cloned from another member’s routine. The original is no longer available to you.",
+		"fromAuthor": "Cloned from {author}’s routine.",
+		"viewOriginal": "View the original"
+	},
+	"warmUp": {
+		"plateStandard": "Standard plates",
+		"plateLight": "Lighter plates only",
+		"basisRounded": "Rounded down to this exercise's {step} step.",
+		"basisBar": "{weight} bar",
+		"basisSaved": "{gym} · {bar} · your plates.",
+		"basisNoPlates": "{gym} · {bar} · no plates saved there, so {plates} are assumed.",
+		"basisNoLocation": "No gym saved yet: {bar} and {plates}.",
+		"barOnly": "Bar only",
+		"perSide": "{list} per side",
+		"homeGym": "Home Gym"
+	},
+	"templates": {
+		"size": "{count, plural, one {# exercise} other {# exercises}}",
+		"fullBody": {
+			"name": "Full Body Foundations",
+			"summary": "Monday, Wednesday, Friday · Beginner",
+			"description": "Three full-body sessions, each built around one squat or hinge, one press and one pull."
+		},
+		"upperLower": {
+			"name": "Upper / Lower",
+			"summary": "Monday, Tuesday, Thursday, Friday · Intermediate",
+			"description": "Two upper-body and two lower-body sessions, a heavier and a lighter version of each."
+		},
+		"pushPullLegs": {
+			"name": "Push / Pull / Legs",
+			"summary": "3-day rotation, Monday to Saturday · Intermediate",
+			"description": "Each day comes up twice a week; a missed day moves the rotation along rather than being skipped."
+		},
+		"days": {
+			"fullBodyA": "Full Body A",
+			"fullBodyB": "Full Body B",
+			"fullBodyC": "Full Body C",
+			"upperA": "Upper A",
+			"lowerA": "Lower A",
+			"upperB": "Upper B",
+			"lowerB": "Lower B",
+			"push": "Push",
+			"pull": "Pull",
+			"legs": "Legs"
+		},
+		"heading": "Start from a template",
+		"intro": "Each opens as a draft you can change before saving. Loads are left for you to fill in.",
+		"useTemplate": "Use template",
+		"useTemplateAria": "Use the {name} template"
 	}
 }

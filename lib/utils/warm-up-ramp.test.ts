@@ -1,6 +1,8 @@
 import type { TrainingLocationPreference } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	buildWarmUpRamp,
 	describeBasis,
@@ -10,6 +12,9 @@ import {
 	PLATE_SETS,
 	saveEquipmentRequest,
 } from './warm-up-ramp'
+
+const en = translatorFor('en', 'routines.warmUp')
+const es = translatorFor('es', 'routines.warmUp')
 
 const standard = PLATE_SETS.KG.STANDARD
 const ramp = (overrides: Partial<Parameters<typeof buildWarmUpRamp>[0]>) =>
@@ -33,7 +38,7 @@ describe('the warm-up ramp (LIVE-13)', () => {
 			[80, 2],
 		])
 		expect(sets[0].platesPerSide).toEqual([])
-		expect(describePlates(sets[1].platesPerSide, 'KG')).toBe('10 per side')
+		expect(describePlates(sets[1].platesPerSide, 'KG', en)).toBe('10 per side')
 		expect(sets.every(set => !set.limited)).toBe(true)
 	})
 
@@ -59,8 +64,8 @@ describe('the warm-up ramp (LIVE-13)', () => {
 	it('loads each step heaviest plate first', () => {
 		const { sets } = ramp({ platePairs: PLATE_SETS.KG.LIGHT })
 		// 80 kg: 30 per side is 20 + 10, not 15 + 15.
-		expect(describePlates(sets[3].platesPerSide, 'KG')).toBe('20 + 10 per side')
-		expect(describePlates(ramp({}).sets[3].platesPerSide, 'KG')).toBe(
+		expect(describePlates(sets[3].platesPerSide, 'KG', en)).toBe('20 + 10 per side')
+		expect(describePlates(ramp({}).sets[3].platesPerSide, 'KG', en)).toBe(
 			'25 + 5 per side',
 		)
 	})
@@ -121,6 +126,7 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				plateSet: 'STANDARD',
 				incrementKg: 2.5,
 				unit: 'KG',
+				t: en,
 			})
 		expect(words(equipmentBasis(location()))).toBe(
 			'Home Gym · 20 kg bar · your plates.',
@@ -139,13 +145,15 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				plateSet: 'STANDARD',
 				incrementKg: 2,
 				unit: 'KG',
+				t: en,
 			}),
 		).toBe("Rounded down to this exercise's 2 kg step.")
 	})
 
 	it('saves a new gym, or plates into the one that had none', () => {
 		const created = saveEquipmentRequest({
-			locations: [],
+t: en,
+locations: [],
 			basis: { kind: 'NO_LOCATION' },
 			barWeightKg: 15,
 			platePairs: PLATE_SETS.KG.LIGHT,
@@ -162,7 +170,8 @@ describe('what the ramp is built from (LIVE-13)', () => {
 		const other = location({ id: 'loc-2', name: 'Work', isDefault: false })
 		const bare = location({ availablePlatePairs: [] })
 		const filled = saveEquipmentRequest({
-			locations: [bare, other],
+t: en,
+locations: [bare, other],
 			basis: equipmentBasis(bare),
 			barWeightKg: 20,
 			platePairs: standard,
@@ -177,12 +186,37 @@ describe('what the ramp is built from (LIVE-13)', () => {
 
 		expect(
 			saveEquipmentRequest({
-				locations: [location()],
+t: en,
+locations: [location()],
 				basis: equipmentBasis(location()),
 				barWeightKg: 20,
 				platePairs: standard,
 			}),
 		).toBeNull()
+	})
+
+	it('says the same in Spanish (I18N-03)', () => {
+		expect(
+			describeBasis({
+				barLoaded: true,
+				basis: equipmentBasis(undefined),
+				barWeightKg: 20,
+				plateSet: 'STANDARD',
+				incrementKg: 2.5,
+				unit: 'KG',
+				t: es,
+			}),
+		).toBe('Aún no hay gimnasio guardado: barra de 20 kg y discos estándar.')
+		expect(describePlates([], 'KG', es)).toBe('Solo la barra')
+		expect(
+			saveEquipmentRequest({
+				t: es,
+				locations: [],
+				basis: { kind: 'NO_LOCATION' },
+				barWeightKg: 20,
+				platePairs: standard,
+			})?.locations[0].name,
+		).toBe('Gimnasio en casa')
 	})
 
 	it('offers pound plates in pounds', () => {
@@ -193,6 +227,7 @@ describe('what the ramp is built from (LIVE-13)', () => {
 					{ weightKg: PLATE_SETS.LB.STANDARD[4].weightKg, platesPerSide: 1 },
 				],
 				'LB',
+				en,
 			),
 		).toBe('45 + 5 per side')
 	})

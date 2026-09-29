@@ -6,6 +6,8 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import type { PlateLoadingItem } from './plate-calculator'
 import { formatWeight } from './weight-unit'
 
@@ -24,10 +26,10 @@ export {
 	type WarmUpSet,
 } from '@sunsteel/contracts'
 
-export const PLATE_SET_LABELS: Record<PlateSetChoice, string> = {
-	STANDARD: 'Standard plates',
-	LIGHT: 'Lighter plates only',
-}
+type T = Translator<'routines.warmUp'>
+
+export const plateSetLabel = (choice: PlateSetChoice, t: T): string =>
+	choice === 'STANDARD' ? t('plateStandard') : t('plateLight')
 
 /**
  * LIVE-13: warm-up sets generated in the routine builder from the exercise's
@@ -60,31 +62,33 @@ export function describeBasis(input: {
 	plateSet: PlateSetChoice
 	incrementKg: number
 	unit: WeightUnit
+	t: T
 }): string {
-	const { unit } = input
+	const { unit, t } = input
 	if (!input.barLoaded)
-		return `Rounded down to this exercise's ${formatWeight(input.incrementKg, unit)} step.`
-	const bar = `${formatWeight(input.barWeightKg, unit)} bar`
-	const plates = PLATE_SET_LABELS[input.plateSet].toLowerCase()
+		return t('basisRounded', { step: formatWeight(input.incrementKg, unit) })
+	const bar = t('basisBar', { weight: formatWeight(input.barWeightKg, unit) })
+	const plates = plateSetLabel(input.plateSet, t).toLowerCase()
 	if (input.basis.kind === 'SAVED')
-		return `${input.basis.location.name} · ${bar} · your plates.`
+		return t('basisSaved', { gym: input.basis.location.name, bar })
 	if (input.basis.kind === 'NO_PLATES')
-		return `${input.basis.location.name} · ${bar} · no plates saved there, so ${plates} are assumed.`
-	return `No gym saved yet: ${bar} and ${plates}.`
+		return t('basisNoPlates', { gym: input.basis.location.name, bar, plates })
+	return t('basisNoLocation', { bar, plates })
 }
 
 /** "20 + 5 per side", or "Bar only". */
 export function describePlates(
 	plates: readonly PlateLoadingItem[] | undefined,
 	unit: WeightUnit,
+	t: T,
 ): string {
-	if (!plates || plates.length === 0) return 'Bar only'
+	if (!plates || plates.length === 0) return t('barOnly')
 	const list = plates.flatMap(item =>
 		Array.from({ length: item.platesPerSide }, () =>
 			formatWeight(item.weightKg, unit).replace(/\s?(kg|lb)$/, ''),
 		),
 	)
-	return `${list.join(' + ')} per side`
+	return t('perSide', { list: list.join(' + ') })
 }
 
 /**
@@ -98,6 +102,7 @@ export function saveEquipmentRequest(input: {
 	basis: EquipmentBasis
 	barWeightKg: number
 	platePairs: readonly PlatePairInventory[]
+	t: T
 }): ReplaceTrainingLocationsRequest | null {
 	const keep = (location: TrainingLocationPreference) => ({
 		id: location.id,
@@ -125,7 +130,7 @@ export function saveEquipmentRequest(input: {
 	return {
 		locations: [
 			{
-				name: 'Home Gym',
+				name: input.t('homeGym'),
 				isDefault: true,
 				barWeightKg: round(input.barWeightKg),
 				availablePlatePairs: platePairs,

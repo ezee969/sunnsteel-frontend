@@ -1,10 +1,12 @@
 import { LayoutTemplate } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import {
 	describeTemplateSize,
 	ROUTINE_TEMPLATES,
+	templateText,
 } from '@/lib/utils/routine-templates'
 
 /**
@@ -16,45 +18,48 @@ export function StarterTemplates({
 }: {
 	headingLevel?: 'h2' | 'h3'
 }) {
+	const t = useTranslations('routines.templates')
 	const Heading = headingLevel
-	return (
+return (
 		<section aria-labelledby="starter-templates" className="space-y-2">
 			<div>
 				<Heading
 					id="starter-templates"
 					className="type-section text-foreground"
 				>
-					Start from a template
-				</Heading>
+					{t('heading')}
+</Heading>
 				<p className="type-body-sm mt-1 text-ink-3">
-					Each opens as a draft you can change before saving. Loads are left for
-					you to fill in.
-				</p>
+					{t('intro')}
+</p>
 			</div>
 			<ul>
-				{ROUTINE_TEMPLATES.map(template => (
-					<li
+				{ROUTINE_TEMPLATES.map(template => {
+					const text = templateText(template, t)
+					return (
+<li
 						key={template.slug}
 						className="rule-row flex flex-wrap items-center gap-3 py-3"
 					>
 						<div className="min-w-0 flex-1 basis-56 text-left">
-							<p className="type-panel text-foreground">{template.name}</p>
+							<p className="type-panel text-foreground">{text.name}</p>
 							<p className="type-body-sm text-ink-2">
-								{template.summary} · {describeTemplateSize(template)}
+								{text.summary} · {describeTemplateSize(template, t)}
 							</p>
-							<p className="type-body-sm text-ink-3">{template.description}</p>
+							<p className="type-body-sm text-ink-3">{text.description}</p>
 						</div>
 						<Button asChild variant="outline" size="sm">
 							<Link
 								href={`/routines/new?template=${template.slug}`}
-								aria-label={`Use the ${template.name} template`}
+								aria-label={t('useTemplateAria', { name: text.name })}
 							>
 								<LayoutTemplate aria-hidden />
-								Use template
-							</Link>
+								{t('useTemplate')}
+</Link>
 						</Button>
 					</li>
-				))}
+					)
+				})}
 			</ul>
 		</section>
 	)

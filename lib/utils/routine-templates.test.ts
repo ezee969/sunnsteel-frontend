@@ -1,12 +1,19 @@
 import { ROUTINE_DAYS_MAX } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	describeTemplateSize,
 	findRoutineTemplate,
 	ROUTINE_TEMPLATES,
+	templateDayName,
 	templateDraft,
+	templateText,
 } from './routine-templates'
+
+const en = translatorFor('en', 'routines.templates')
+const es = translatorFor('es', 'routines.templates')
 
 const names = [
 	...new Set(
@@ -24,10 +31,12 @@ describe('starter templates (ROUT-03)', () => {
 			'upper-lower',
 			'push-pull-legs',
 		])
-		expect(findRoutineTemplate('upper-lower')?.name).toBe('Upper / Lower')
+		expect(templateText(findRoutineTemplate('upper-lower')!, en).name).toBe(
+			'Upper / Lower',
+		)
 		expect(findRoutineTemplate('nope')).toBeNull()
 		expect(findRoutineTemplate(null)).toBeNull()
-		expect(describeTemplateSize(ROUTINE_TEMPLATES[0])).toBe('12 exercises')
+		expect(describeTemplateSize(ROUTINE_TEMPLATES[0], en)).toBe('12 exercises')
 	})
 
 	it('are valid routines: distinct slots, no repeated exercise in a day', () => {
@@ -42,7 +51,8 @@ describe('starter templates (ROUT-03)', () => {
 				for (const slot of slots) expect(slot).toBeGreaterThanOrEqual(0)
 			}
 			for (const day of template.days) {
-				expect(day.name.length).toBeLessThanOrEqual(40)
+				expect(templateDayName(day, en).length).toBeLessThanOrEqual(40)
+				expect(templateDayName(day, es).length).toBeLessThanOrEqual(40)
 				const exercises = day.exercises.map(e => e.name)
 				expect(new Set(exercises).size).toBe(exercises.length)
 				for (const e of day.exercises) {
@@ -53,7 +63,7 @@ describe('starter templates (ROUT-03)', () => {
 	})
 
 	it('opens as a complete draft with blank loads and double progression', () => {
-		const result = templateDraft(ROUTINE_TEMPLATES[2], catalog)
+		const result = templateDraft(ROUTINE_TEMPLATES[2], catalog, en)
 		expect(result.ok).toBe(true)
 		if (!result.ok) return
 		const { draft } = result
@@ -99,8 +109,23 @@ describe('starter templates (ROUT-03)', () => {
 		expect(new Set(ids).size).toBe(ids.length)
 	})
 
+	it('opens in the viewer’s language, keeping the catalog exercise names (I18N-03)', () => {
+		const result = templateDraft(ROUTINE_TEMPLATES[2], catalog, es)
+		if (!result.ok) throw new Error('expected a draft')
+		expect(result.draft.name).toBe('Empuje / tirón / piernas')
+		expect(result.draft.days.map(day => day.name)).toEqual([
+			'Empuje',
+			'Tirón',
+			'Piernas',
+		])
+		expect(result.draft.days[0].exercises[0].exerciseId).toBe(
+			catalog.find(c => c.name === 'Bench Press')!.id,
+		)
+		expect(describeTemplateSize(ROUTINE_TEMPLATES[0], es)).toBe('12 ejercicios')
+	})
+
 	it('keeps a weekly template on its weekdays', () => {
-		const result = templateDraft(ROUTINE_TEMPLATES[1], catalog)
+		const result = templateDraft(ROUTINE_TEMPLATES[1], catalog, en)
 		if (!result.ok) throw new Error('expected a draft')
 		expect(result.draft.scheduleMode).toBe('WEEKLY')
 		expect(result.draft.trainingDays).toEqual([1, 2, 4, 5])
@@ -110,6 +135,7 @@ describe('starter templates (ROUT-03)', () => {
 		const result = templateDraft(
 			ROUTINE_TEMPLATES[0],
 			catalog.filter(c => c.name !== 'Dead Bug' && c.name !== 'Squat'),
+			en,
 		)
 		expect(result).toEqual({ ok: false, missing: ['Squat', 'Dead Bug'] })
 	})

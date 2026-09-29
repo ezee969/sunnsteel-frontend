@@ -4,6 +4,7 @@ import type {
 	TrainingGoal,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import type {
 	RoutineWizardData,
 	RoutineWizardDay,
@@ -31,19 +32,34 @@ interface TemplateExercise {
 	dumbbell?: boolean
 }
 
+type T = Translator<'routines.templates'>
+
+type TemplateKey = 'fullBody' | 'upperLower' | 'pushPullLegs'
+type DayKey =
+	| 'fullBodyA'
+	| 'fullBodyB'
+	| 'fullBodyC'
+	| 'upperA'
+	| 'lowerA'
+	| 'upperB'
+	| 'lowerB'
+	| 'push'
+	| 'pull'
+	| 'legs'
+
 interface TemplateDay {
 	/** The weekday on a weekly template; its position on a rotation. */
 	slot: number
-	name: string
+	/** Names the day through messages, so a draft is in the viewer's language. */
+	key: DayKey
 	exercises: TemplateExercise[]
 }
 
 export interface RoutineTemplate {
 	slug: string
-	name: string
-	summary: string
-	description: string
-	goal: TrainingGoal
+	/** Names the template through messages; the slug stays the address. */
+	key: TemplateKey
+goal: TrainingGoal
 	experienceLevel: TrainingExperienceLevel
 	scheduleMode: RoutineScheduleMode
 	/** SCHED-06: the weekdays a rotation is placed on. */
@@ -69,19 +85,16 @@ const ex = (
 export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 	{
 		slug: 'full-body-foundations',
-		name: 'Full Body Foundations',
-		summary: 'Monday, Wednesday, Friday · Beginner',
-		description:
-			'Three full-body sessions, each built around one squat or hinge, one press and one pull.',
-		goal: 'GENERAL_FITNESS',
+		key: 'fullBody',
+goal: 'GENERAL_FITNESS',
 		experienceLevel: 'BEGINNER',
 		scheduleMode: 'WEEKLY',
 		rotationWeekdays: [],
 		days: [
 			{
 				slot: 1,
-				name: 'Full Body A',
-				exercises: [
+				key: 'fullBodyA',
+exercises: [
 					ex('Squat', 3, 5, 8),
 					ex('Bench Press', 3, 5, 8),
 					ex('Bent-over Row', 3, 8, 10),
@@ -90,8 +103,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 3,
-				name: 'Full Body B',
-				exercises: [
+				key: 'fullBodyB',
+exercises: [
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Overhead Press', 3, 6, 8),
 					ex('Lat Pulldown', 3, 8, 12),
@@ -100,8 +113,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 5,
-				name: 'Full Body C',
-				exercises: [
+				key: 'fullBodyC',
+exercises: [
 					ex('Leg Press', 3, 10, 12),
 					ex('Dumbbell Bench Press', 3, 8, 12, 'compound', true),
 					ex('Cable Row', 3, 10, 12),
@@ -112,19 +125,16 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 	},
 	{
 		slug: 'upper-lower',
-		name: 'Upper / Lower',
-		summary: 'Monday, Tuesday, Thursday, Friday · Intermediate',
-		description:
-			'Two upper-body and two lower-body sessions, a heavier and a lighter version of each.',
-		goal: 'MUSCLE_GROWTH',
+		key: 'upperLower',
+goal: 'MUSCLE_GROWTH',
 		experienceLevel: 'INTERMEDIATE',
 		scheduleMode: 'WEEKLY',
 		rotationWeekdays: [],
 		days: [
 			{
 				slot: 1,
-				name: 'Upper A',
-				exercises: [
+				key: 'upperA',
+exercises: [
 					ex('Bench Press', 4, 6, 8),
 					ex('Bent-over Row', 4, 6, 8),
 					ex('Overhead Press', 3, 8, 10),
@@ -135,8 +145,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 2,
-				name: 'Lower A',
-				exercises: [
+				key: 'lowerA',
+exercises: [
 					ex('Squat', 4, 6, 8),
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Leg Press', 3, 10, 12),
@@ -146,8 +156,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 4,
-				name: 'Upper B',
-				exercises: [
+				key: 'upperB',
+exercises: [
 					ex('Incline Dumbbell Press', 3, 8, 12, 'compound', true),
 					ex('Cable Row', 3, 10, 12),
 					ex('Dumbbell Shoulder Press', 3, 8, 12, 'compound', true),
@@ -158,8 +168,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 5,
-				name: 'Lower B',
-				exercises: [
+				key: 'lowerB',
+exercises: [
 					ex('Deadlift', 3, 4, 6),
 					ex('Bulgarian Split Squat', 3, 8, 10, 'compound', true),
 					ex('Leg Extension', 3, 12, 15, 'isolation'),
@@ -171,19 +181,16 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 	},
 	{
 		slug: 'push-pull-legs',
-		name: 'Push / Pull / Legs',
-		summary: '3-day rotation, Monday to Saturday · Intermediate',
-		description:
-			'Each day comes up twice a week; a missed day moves the rotation along rather than being skipped.',
-		goal: 'MUSCLE_GROWTH',
+		key: 'pushPullLegs',
+goal: 'MUSCLE_GROWTH',
 		experienceLevel: 'INTERMEDIATE',
 		scheduleMode: 'ROTATION',
 		rotationWeekdays: [1, 2, 3, 4, 5, 6],
 		days: [
 			{
 				slot: 0,
-				name: 'Push',
-				exercises: [
+				key: 'push',
+exercises: [
 					ex('Bench Press', 4, 6, 8),
 					ex('Overhead Press', 3, 8, 10),
 					ex('Incline Dumbbell Press', 3, 10, 12, 'compound', true),
@@ -193,8 +200,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 1,
-				name: 'Pull',
-				exercises: [
+				key: 'pull',
+exercises: [
 					ex('Pull-ups', 4, 6, 10, 'bodyweight'),
 					ex('Bent-over Row', 3, 8, 10),
 					ex('Cable Row', 3, 10, 12),
@@ -204,8 +211,8 @@ export const ROUTINE_TEMPLATES: readonly RoutineTemplate[] = [
 			},
 			{
 				slot: 2,
-				name: 'Legs',
-				exercises: [
+				key: 'legs',
+exercises: [
 					ex('Squat', 4, 6, 8),
 					ex('Romanian Deadlift', 3, 8, 10),
 					ex('Leg Press', 3, 10, 12),
@@ -223,13 +230,27 @@ export function findRoutineTemplate(
 	return ROUTINE_TEMPLATES.find(template => template.slug === slug) ?? null
 }
 
+/** The template's name, its one-line summary and what it is, in words. */
+export function templateText(template: RoutineTemplate, t: T) {
+	return {
+		name: t(`${template.key}.name`),
+		summary: t(`${template.key}.summary`),
+		description: t(`${template.key}.description`),
+	}
+}
+
+export const templateDayName = (day: TemplateDay, t: T) => t(`days.${day.key}`)
+
 /** "12 exercises" */
-export function describeTemplateSize(template: RoutineTemplate): string {
+export function describeTemplateSize(
+	template: RoutineTemplate,
+	t: T,
+): string {
 	const exercises = template.days.reduce(
 		(total, day) => total + day.exercises.length,
 		0,
 	)
-	return `${exercises} exercises`
+	return t('size', { count: exercises })
 }
 
 export type TemplateDraft =
@@ -247,6 +268,7 @@ const makeClientId = () =>
 export function templateDraft(
 	template: RoutineTemplate,
 	catalog: readonly { id: string; name: string }[],
+	t: T,
 ): TemplateDraft {
 	const byName = new Map(catalog.map(item => [item.name, item.id]))
 	const missing = [
@@ -262,7 +284,7 @@ export function templateDraft(
 
 	const days: RoutineWizardDay[] = template.days.map(day => ({
 		slot: day.slot,
-		name: day.name,
+		name: templateDayName(day, t),
 		exercises: day.exercises.map((exercise): RoutineWizardExercise => ({
 			clientId: makeClientId(),
 			exerciseId: byName.get(exercise.name)!,
@@ -283,8 +305,8 @@ export function templateDraft(
 	return {
 		ok: true,
 		draft: {
-			name: template.name,
-			description: template.description,
+			name: templateText(template, t).name,
+			description: templateText(template, t).description,
 			goal: template.goal,
 			experienceLevel: template.experienceLevel,
 			scheduleMode: template.scheduleMode,

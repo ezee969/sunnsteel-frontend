@@ -385,5 +385,62 @@
 		"deleteDescription": "Eliminarlo lo borra para siempre. Solo es posible mientras ninguna rutina ni entrenamiento lo use.",
 		"inUse": "Una rutina o un entrenamiento usa este ejercicio, así que se puede archivar pero no eliminar.",
 		"editNote": "Los cambios se aplican desde ahora. Los entrenamientos pasados conservan los músculos con los que se registraron."
+	},
+	"picker": {
+		"starred": "Destacados",
+		"recent": "Entrenados recientemente",
+		"other": "Otros ejercicios",
+		"all": "Todos los ejercicios"
+	},
+	"lineage": {
+		"hidden": "Clonada de la rutina de otro miembro. La original ya no está disponible para ti.",
+		"fromAuthor": "Clonada de la rutina de {author}.",
+		"viewOriginal": "Ver la original"
+	},
+	"warmUp": {
+		"plateStandard": "Discos estándar",
+		"plateLight": "Solo discos más ligeros",
+		"basisRounded": "Redondeado hacia abajo al paso de {step} de este ejercicio.",
+		"basisBar": "barra de {weight}",
+		"basisSaved": "{gym} · {bar} · tus discos.",
+		"basisNoPlates": "{gym} · {bar} · no hay discos guardados allí, así que se suponen {plates}.",
+		"basisNoLocation": "Aún no hay gimnasio guardado: {bar} y {plates}.",
+		"barOnly": "Solo la barra",
+		"perSide": "{list} por lado",
+		"homeGym": "Gimnasio en casa"
+	},
+	"templates": {
+		"size": "{count, plural, one {# ejercicio} other {# ejercicios}}",
+		"fullBody": {
+			"name": "Fundamentos de cuerpo completo",
+			"summary": "Lunes, miércoles, viernes · Principiante",
+			"description": "Tres sesiones de cuerpo completo, cada una con una sentadilla o bisagra, un press y un tirón."
+		},
+		"upperLower": {
+			"name": "Superior / inferior",
+			"summary": "Lunes, martes, jueves, viernes · Intermedio",
+			"description": "Dos sesiones de tren superior y dos de tren inferior, una versión más pesada y otra más ligera de cada una."
+		},
+		"pushPullLegs": {
+			"name": "Empuje / tirón / piernas",
+			"summary": "Rotación de 3 días, de lunes a sábado · Intermedio",
+			"description": "Cada día sale dos veces por semana; un día no realizado adelanta la rotación en lugar de omitirse."
+		},
+		"days": {
+			"fullBodyA": "Cuerpo completo A",
+			"fullBodyB": "Cuerpo completo B",
+			"fullBodyC": "Cuerpo completo C",
+			"upperA": "Superior A",
+			"lowerA": "Inferior A",
+			"upperB": "Superior B",
+			"lowerB": "Inferior B",
+			"push": "Empuje",
+			"pull": "Tirón",
+			"legs": "Piernas"
+		},
+		"heading": "Empieza desde una plantilla",
+		"intro": "Cada una se abre como un borrador que puedes cambiar antes de guardar. Las cargas quedan para que las completes tú.",
+		"useTemplate": "Usar plantilla",
+		"useTemplateAria": "Usar la plantilla {name}"
 	}
 }
