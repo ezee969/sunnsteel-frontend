@@ -2,19 +2,24 @@ import type { SharedRoutineSummary } from '@sunsteel/contracts'
 import { ROUTINE_VISIBILITY_VALUES } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	CLONE_ROUTINE_NOTE,
-	CLONE_ROUTINE_PRIVACY_NOTE,
+	cloneRoutineNote,
+	cloneRoutinePrivacyNote,
 	describeNoFeaturableRoutines,
 	describeRoutineSummary,
 	describeVisibilityCap,
 	effectiveRoutineVisibility,
 	parseProfileRoutineId,
 	profileRoutineHref,
-	ROUTINE_VISIBILITY_COPY,
-	ROUTINE_VISIBILITY_OPTIONS,
 	routineShareUrl,
+	routineVisibilityCopy,
+	routineVisibilityOptions,
 } from './routine-sharing'
+
+const en = translatorFor('en', 'routines.sharing')
+const es = translatorFor('es', 'routines.sharing')
 
 describe('the narrower of the two rules wins', () => {
 	it('lets a routine be as open as the account allows', () => {
@@ -35,20 +40,31 @@ describe('the narrower of the two rules wins', () => {
 
 describe('telling the owner when the account rule is capping them', () => {
 	it('says nothing when the routine setting is what applies', () => {
-		expect(describeVisibilityCap('PUBLIC', 'PUBLIC')).toBeNull()
-		expect(describeVisibilityCap('PUBLIC', 'PRIVATE')).toBeNull()
-		expect(describeVisibilityCap('FOLLOWERS', 'FOLLOWERS')).toBeNull()
+		expect(describeVisibilityCap('PUBLIC', 'PUBLIC', en)).toBeNull()
+		expect(describeVisibilityCap('PUBLIC', 'PRIVATE', en)).toBeNull()
+		expect(describeVisibilityCap('FOLLOWERS', 'FOLLOWERS', en)).toBeNull()
 	})
 
 	it('names who it actually reaches', () => {
-		const copy = describeVisibilityCap('FOLLOWERS', 'PUBLIC')
+		const copy = describeVisibilityCap('FOLLOWERS', 'PUBLIC', en)
 		expect(copy).toContain('followers')
 		// Where to change it is a link beside the sentence (UX-08).
 		expect(copy).not.toMatch(/Settings/)
 	})
 
+	it('says the same in Spanish, and still sends nobody to Settings', () => {
+		const copy = describeVisibilityCap('FOLLOWERS', 'PUBLIC', es)
+		expect(copy).toContain('seguidores')
+		expect(copy).not.toMatch(/Ajustes/)
+		expect(describeVisibilityCap('PRIVATE', 'PUBLIC', es)).toContain(
+			'nadie más',
+		)
+	})
+
 	it('says plainly that nobody else sees it when the account is private', () => {
-		expect(describeVisibilityCap('PRIVATE', 'PUBLIC')).toContain('nobody else')
+		expect(describeVisibilityCap('PRIVATE', 'PUBLIC', en)).toContain(
+			'nobody else',
+		)
 	})
 })
 
@@ -65,18 +81,21 @@ describe('share links', () => {
 
 describe('visibility copy', () => {
 	it('covers every value the contract defines', () => {
-		for (const value of ROUTINE_VISIBILITY_VALUES) {
-			expect(ROUTINE_VISIBILITY_COPY[value].label).toBeTruthy()
-			expect(ROUTINE_VISIBILITY_COPY[value].description).toBeTruthy()
+		for (const t of [en, es]) {
+			for (const value of ROUTINE_VISIBILITY_VALUES) {
+				expect(routineVisibilityCopy(value, t).label).toBeTruthy()
+				expect(routineVisibilityCopy(value, t).description).toBeTruthy()
+			}
+			expect(routineVisibilityOptions(t)).toHaveLength(
+				ROUTINE_VISIBILITY_VALUES.length,
+			)
 		}
-		expect(ROUTINE_VISIBILITY_OPTIONS).toHaveLength(
-			ROUTINE_VISIBILITY_VALUES.length,
-		)
 	})
 
 	it('never promises that a setting hides an existing link', () => {
 		// A link ignores visibility; only revoking withdraws it.
-		expect(ROUTINE_VISIBILITY_COPY.PRIVATE.description).toMatch(/link/i)
+		expect(routineVisibilityCopy('PRIVATE', en).description).toMatch(/link/i)
+		expect(routineVisibilityCopy('PRIVATE', es).description).toMatch(/enlace/i)
 	})
 })
 
@@ -95,8 +114,11 @@ const summary = (
 
 describe('a routine summary line', () => {
 	it('states days, exercises and how the routine is scheduled', () => {
-		expect(describeRoutineSummary(summary())).toBe(
+		expect(describeRoutineSummary(summary(), en)).toBe(
 			'4 days · 18 exercises · Weekly',
+		)
+		expect(describeRoutineSummary(summary(), es)).toBe(
+			'4 días · 18 ejercicios · Semanal',
 		)
 	})
 
@@ -104,21 +126,31 @@ describe('a routine summary line', () => {
 		expect(
 			describeRoutineSummary(
 				summary({ dayCount: 1, exerciseCount: 1, scheduleMode: 'ROTATION' }),
+				en,
 			),
 		).toBe('1 day · 1 exercise · Rotation')
+		expect(
+			describeRoutineSummary(
+				summary({ dayCount: 1, exerciseCount: 1, scheduleMode: 'ROTATION' }),
+				es,
+			),
+		).toBe('1 día · 1 ejercicio · Rotación')
 	})
 })
 
 describe('cloning copy', () => {
 	it('says the copy is independent and reaches nobody else', () => {
-		expect(CLONE_ROUTINE_NOTE).toMatch(/your own/i)
-		expect(CLONE_ROUTINE_NOTE).toMatch(/original is untouched/i)
+		expect(cloneRoutineNote(en)).toMatch(/your own/i)
+		expect(cloneRoutineNote(en)).toMatch(/original is untouched/i)
+		expect(cloneRoutineNote(es)).toMatch(/una rutina tuya/i)
+		expect(cloneRoutineNote(es)).toMatch(/original queda intacta/i)
 	})
 
 	it('says a clone starts private, whoever could see the original', () => {
 		// Inheriting PUBLIC would republish someone else's programme without
 		// anyone choosing to; the copy says so before it is made.
-		expect(CLONE_ROUTINE_PRIVACY_NOTE).toMatch(/private/i)
+		expect(cloneRoutinePrivacyNote(en)).toMatch(/private/i)
+		expect(cloneRoutinePrivacyNote(es)).toMatch(/privada/i)
 	})
 })
 
@@ -148,10 +180,14 @@ describe('why no routine can be featured', () => {
 	it('names the account rule first, because it outranks every routine', () => {
 		// Saying "no routine is shared yet" here would send the owner to change a
 		// per-routine setting that the account rule would go on capping.
-		const copy = describeNoFeaturableRoutines('PRIVATE', {
-			routines: 3,
-			shareable: 0,
-		})
+		const copy = describeNoFeaturableRoutines(
+			'PRIVATE',
+			{
+				routines: 3,
+				shareable: 0,
+			},
+			en,
+		)
 		expect(copy).toMatch(/keeps routines private/i)
 		expect(copy).toMatch(/Settings/)
 		expect(copy).not.toMatch(/No routine is shared yet/)
@@ -159,13 +195,17 @@ describe('why no routine can be featured', () => {
 
 	it('otherwise says which of the three things is actually missing', () => {
 		expect(
-			describeNoFeaturableRoutines('PUBLIC', { routines: 0, shareable: 0 }),
+			describeNoFeaturableRoutines('PUBLIC', { routines: 0, shareable: 0 }, en),
 		).toMatch(/Create a routine/)
 		expect(
-			describeNoFeaturableRoutines('PUBLIC', { routines: 2, shareable: 0 }),
+			describeNoFeaturableRoutines('PUBLIC', { routines: 2, shareable: 0 }, en),
 		).toMatch(/No routine is shared yet/)
 		expect(
-			describeNoFeaturableRoutines('FOLLOWERS', { routines: 2, shareable: 2 }),
+			describeNoFeaturableRoutines(
+				'FOLLOWERS',
+				{ routines: 2, shareable: 2 },
+				en,
+			),
 		).toMatch(/already featured/)
 	})
 })

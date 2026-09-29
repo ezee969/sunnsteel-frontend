@@ -1,6 +1,7 @@
 import type { FeaturedProfileItem, WeightUnit } from '@sunsteel/contracts'
 import { Bookmark } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -25,6 +26,7 @@ export function FeaturedAccomplishments({
 	isOwnProfile,
 	routineHref,
 }: FeaturedAccomplishmentsProps) {
+	const tSharing = useTranslations('routines.sharing')
 	if (!items.length && !isOwnProfile) return null
 
 	return (
@@ -91,7 +93,7 @@ export function FeaturedAccomplishments({
 										) : item.kind === 'ACHIEVEMENT' ? (
 											item.achievement.description
 										) : item.kind === 'ROUTINE' ? (
-											describeRoutineSummary(item.routine)
+											describeRoutineSummary(item.routine, tSharing)
 										) : (
 											item.rank.description
 										)}

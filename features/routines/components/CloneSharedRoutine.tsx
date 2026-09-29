@@ -3,13 +3,14 @@
 import type { CloneRoutineRequest } from '@sunsteel/contracts'
 import { Copy, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { useCloneRoutine } from '@/lib/api/hooks/useRoutineSharing'
 import {
-	CLONE_ROUTINE_NOTE,
-	CLONE_ROUTINE_PRIVACY_NOTE,
+	cloneRoutineNote,
+	cloneRoutinePrivacyNote,
 } from '@/lib/utils/routine-sharing'
 
 interface CloneSharedRoutineProps {
@@ -30,6 +31,7 @@ export function CloneSharedRoutine({
 }: CloneSharedRoutineProps) {
 	const router = useRouter()
 	const { push } = useToast()
+	const tSharing = useTranslations('routines.sharing')
 	const clone = useCloneRoutine()
 
 	const run = () => {
@@ -62,10 +64,10 @@ export function CloneSharedRoutine({
 				Make it yours
 			</h2>
 			<p className="type-body-sm max-w-[68ch] text-ink-2">
-				{CLONE_ROUTINE_NOTE}
+				{cloneRoutineNote(tSharing)}
 			</p>
 			<p className="type-body-sm max-w-[68ch] text-ink-3">
-				{CLONE_ROUTINE_PRIVACY_NOTE}
+				{cloneRoutinePrivacyNote(tSharing)}
 			</p>
 			<Button
 				type="button"

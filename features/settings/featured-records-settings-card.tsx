@@ -1,5 +1,4 @@
 'use client'
-
 import {
 	type EarnedAchievement,
 	FEATURED_PROFILE_ITEMS_MAX,
@@ -21,6 +20,7 @@ import {
 	Plus,
 	Trash2,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -152,6 +152,7 @@ export function FeaturedRecordsSettingsCard({
 	const routinesQuery = useRoutines()
 	const replaceItems = useReplaceFeaturedProfileItems()
 	const { push } = useToast()
+	const tSharing = useTranslations('routines.sharing')
 	const [drafts, setDrafts] = useState<FeaturedProfileSelection[]>([])
 
 	useEffect(() => {
@@ -539,6 +540,7 @@ export function FeaturedRecordsSettingsCard({
 											const cap = describeVisibilityCap(
 												accountRoutinesRule,
 												routine.visibility,
+												tSharing,
 											)
 											return (
 												<div
@@ -591,10 +593,14 @@ export function FeaturedRecordsSettingsCard({
 								</>
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
-									{describeNoFeaturableRoutines(accountRoutinesRule, {
-										routines: routines.length,
-										shareable: shareableRoutines.length,
-									})}
+									{describeNoFeaturableRoutines(
+										accountRoutinesRule,
+										{
+											routines: routines.length,
+											shareable: shareableRoutines.length,
+										},
+										tSharing,
+									)}
 								</p>
 							)}
 						</div>

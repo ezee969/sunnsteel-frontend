@@ -4,6 +4,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
 import { rankCrestTier } from '@/lib/utils/rank-identity'
 import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -67,6 +68,7 @@ function normalizeText(value: string): string {
 function featuredItemToAccomplishment(
 	item: FeaturedProfileItem,
 	weightUnit: WeightUnit,
+	tSharing: Translator<'routines.sharing'>,
 ): ProfileCardAccomplishment | null {
 	if (item.kind === 'RANK') return null
 	if (item.kind === 'ACHIEVEMENT') {
@@ -80,7 +82,7 @@ function featuredItemToAccomplishment(
 		return {
 			kind: 'Routine',
 			title: item.routine.name,
-			detail: describeRoutineSummary(item.routine),
+			detail: describeRoutineSummary(item.routine, tSharing),
 		}
 	}
 	return {
@@ -98,7 +100,10 @@ export function buildProfileCardModel({
 	featuredItems,
 	achievements,
 	weightUnit,
-}: ProfileCardSource): ProfileCardModel {
+	tSharing,
+}: ProfileCardSource & {
+	tSharing: Translator<'routines.sharing'>
+}): ProfileCardModel {
 	const featuredRank = featuredItems.find(item => item.kind === 'RANK')
 	const rank =
 		achievements?.rank ??
@@ -111,7 +116,7 @@ export function buildProfileCardModel({
 		profileUrl,
 		rank: rank ? { id: rank.id, title: rank.title } : null,
 		accomplishments: featuredItems
-			.map(item => featuredItemToAccomplishment(item, weightUnit))
+			.map(item => featuredItemToAccomplishment(item, weightUnit, tSharing))
 			.filter((item): item is ProfileCardAccomplishment => item !== null),
 	}
 }

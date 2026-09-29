@@ -97,6 +97,7 @@ type ProfileViewProps = (
 
 export function ProfileView(props: ProfileViewProps) {
 	const tIdentity = useTranslations('routines.identity')
+	const tSharing = useTranslations('routines.sharing')
 	const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
 	const profile = props.profile
@@ -230,6 +231,7 @@ export function ProfileView(props: ProfileViewProps) {
 			)
 			const result = await shareProfileCard(
 				buildProfileCardModel({
+					tSharing,
 					name: profileName,
 					lastName: profileLastName,
 					username: profileUsername,

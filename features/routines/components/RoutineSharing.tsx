@@ -2,6 +2,7 @@
 
 import type { ProfileVisibility, RoutineVisibility } from '@sunsteel/contracts'
 import { EyeOff, Link2, Share2, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -19,9 +20,9 @@ import {
 import { ROUTINE_HIDDEN_BY_MODERATION } from '@/lib/utils/moderation'
 import {
 	describeVisibilityCap,
-	ROUTINE_LINK_NOTE,
-	ROUTINE_VISIBILITY_OPTIONS,
+	routineLinkNote,
 	routineShareUrl,
+	routineVisibilityOptions,
 } from '@/lib/utils/routine-sharing'
 
 interface RoutineSharingProps {
@@ -46,26 +47,28 @@ export function RoutineSharing({
 	isHiddenByModeration,
 }: RoutineSharingProps) {
 	const { push } = useToast()
+	const t = useTranslations('routines.sharing')
+	const visibilityOptions = routineVisibilityOptions(t)
 	const shares = useRoutineShares(routineId)
 	const setVisibility = useSetRoutineVisibility(routineId)
 	const createShare = useCreateRoutineShare(routineId)
 	const revokeShare = useRevokeRoutineShare(routineId)
 	const [copiedId, setCopiedId] = useState<string | null>(null)
 
-	const cap = describeVisibilityCap(accountRoutinesRule, visibility)
+	const cap = describeVisibilityCap(accountRoutinesRule, visibility, t)
 	const origin = typeof window === 'undefined' ? '' : window.location.origin
 
 	const copy = async (shareId: string, token: string) => {
 		try {
 			await navigator.clipboard.writeText(routineShareUrl(origin, token))
 			setCopiedId(shareId)
-			push({ title: 'Link copied', variant: 'success' })
+			push({ title: t('linkCopied'), variant: 'success' })
 		} catch {
 			// Clipboard access can be refused outright; say so rather than
 			// pretending the copy worked.
 			push({
-				title: 'Could not copy the link',
-				description: 'Open it and copy from the address bar instead.',
+				title: t('couldNotCopy'),
+				description: t('couldNotCopyDetail'),
 				variant: 'destructive',
 			})
 		}
@@ -78,7 +81,7 @@ export function RoutineSharing({
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 			>
 				<Share2 className="h-4 w-4 text-ink-3" aria-hidden />
-				Sharing
+				{t('heading')}
 			</h2>
 
 			{/* TRUST-04: while a hide is in force, every control below describes
@@ -96,7 +99,7 @@ export function RoutineSharing({
 			) : null}
 
 			<div className="space-y-2 pt-1">
-				<Label htmlFor="routine-visibility">Who can find this routine</Label>
+				<Label htmlFor="routine-visibility">{t('whoCanFind')}</Label>
 				<NativeSelect
 					id="routine-visibility"
 					className="max-w-xs"
@@ -106,7 +109,7 @@ export function RoutineSharing({
 						setVisibility.mutate(event.target.value as RoutineVisibility)
 					}
 				>
-					{ROUTINE_VISIBILITY_OPTIONS.map(option => (
+					{visibilityOptions.map(option => (
 						<option key={option.value} value={option.value}>
 							{option.label}
 						</option>
@@ -114,9 +117,8 @@ export function RoutineSharing({
 				</NativeSelect>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
 					{
-						ROUTINE_VISIBILITY_OPTIONS.find(
-							option => option.value === visibility,
-						)?.description
+						visibilityOptions.find(option => option.value === visibility)
+							?.description
 					}
 				</p>
 				{cap ? (
@@ -129,15 +131,14 @@ export function RoutineSharing({
 				) : null}
 				{setVisibility.isError ? (
 					<p role="alert" className="type-body-sm text-ink-2">
-						That change was not saved. The setting above is still what the
-						server has.
+						{t('notSaved')}
 					</p>
 				) : null}
 			</div>
 
 			<div className="space-y-3 border-t border-rule pt-4">
 				<div className="flex flex-wrap items-center justify-between gap-2">
-					<p className="type-panel text-foreground">Private links</p>
+					<p className="type-panel text-foreground">{t('privateLinks')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -146,11 +147,11 @@ export function RoutineSharing({
 						onClick={() => createShare.mutate()}
 					>
 						<Link2 className="size-4" aria-hidden />
-						{createShare.isPending ? 'Creating…' : 'Create link'}
+						{createShare.isPending ? t('creating') : t('createLink')}
 					</Button>
 				</div>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{ROUTINE_LINK_NOTE}
+					{routineLinkNote(t)}
 				</p>
 
 				{shares.isPending ? (
@@ -172,7 +173,7 @@ export function RoutineSharing({
 										variant="outline"
 										onClick={() => void copy(share.id, share.token)}
 									>
-										{copiedId === share.id ? 'Copied' : 'Copy'}
+										{copiedId === share.id ? t('copied') : t('copy')}
 									</Button>
 									<Button
 										type="button"
@@ -182,17 +183,14 @@ export function RoutineSharing({
 										onClick={() => revokeShare.mutate(share.id)}
 									>
 										<Trash2 className="size-4" aria-hidden />
-										Revoke
+										{t('revoke')}
 									</Button>
 								</span>
 							</li>
 						))}
 					</ul>
 				) : (
-					<p className="type-body-sm text-ink-3">
-						No links yet. A link is the only way to show this routine to someone
-						without an account.
-					</p>
+					<p className="type-body-sm text-ink-3">{t('noLinks')}</p>
 				)}
 			</div>
 		</section>

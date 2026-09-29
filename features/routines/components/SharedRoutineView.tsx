@@ -12,7 +12,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import {
 	countSharedExercises,
 	describeSharedRoutineOwner,
-	SHARED_ROUTINE_NOTE,
+	sharedRoutineNote,
 } from '@/lib/utils/routine-sharing'
 import { setKindLabel } from '@/lib/utils/set-kind-label'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -25,6 +25,7 @@ import { formatWeight } from '@/lib/utils/weight-unit'
 export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 	const weightUnit = useWeightUnit()
 	const tKinds = useTranslations('workout.setKinds')
+	const tSharing = useTranslations('routines.sharing')
 	const { setup } = routine
 	const exerciseCount = countSharedExercises(routine)
 
@@ -62,7 +63,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 					{setup.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'}
 				</p>
 				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{SHARED_ROUTINE_NOTE}
+					{sharedRoutineNote(tSharing)}
 				</p>
 			</header>
 

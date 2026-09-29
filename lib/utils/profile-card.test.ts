@@ -1,6 +1,7 @@
 import type { FeaturedProfileItem } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import {
 	buildProfileCardModel,
 	getProfileCardFilename,
@@ -50,9 +51,12 @@ const featuredItems: FeaturedProfileItem[] = [
 	},
 ]
 
+const en = translatorFor('en', 'routines.sharing')
+
 describe('profile card', () => {
 	it('uses the public identity, current rank and selected non-rank accomplishments', () => {
 		const model = buildProfileCardModel({
+			tSharing: en,
 			name: '  Ada ',
 			lastName: ' Lovelace ',
 			username: 'ada_lifts',
@@ -90,6 +94,7 @@ describe('profile card', () => {
 
 	it('falls back to a selected rank when the achievement ledger is unavailable', () => {
 		const model = buildProfileCardModel({
+			tSharing: en,
 			name: '',
 			username: 'atlas',
 			profileUrl: 'https://sunnsteel.app/members/atlas',

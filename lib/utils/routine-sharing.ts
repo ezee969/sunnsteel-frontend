@@ -6,6 +6,8 @@ import type {
 } from '@sunsteel/contracts'
 import { ROUTINE_VISIBILITY_VALUES } from '@sunsteel/contracts'
 
+import type { MessageKey, Translator } from '@/i18n/translator'
+
 /**
  * ROUT-04 copy. The rule worth stating plainly is that **two settings apply
  * and the narrower wins**: the account-level `PROF-06` routines rule caps
@@ -13,27 +15,38 @@ import { ROUTINE_VISIBILITY_VALUES } from '@sunsteel/contracts'
  * public inside a followers-only account would believe they had published it.
  */
 
-export const ROUTINE_VISIBILITY_COPY: Record<
-	RoutineVisibility,
-	{ label: string; description: string }
-> = {
+type T = Translator<'routines.sharing'>
+type Key = MessageKey<'routines.sharing'>
+
+const VISIBILITY_KEYS = {
 	PRIVATE: {
-		label: 'Only me',
-		description: 'Nobody else can open this routine, even with a link removed.',
+		label: 'visibilityPrivateLabel',
+		description: 'visibilityPrivateDescription',
 	},
 	FOLLOWERS: {
-		label: 'Followers',
-		description: 'Members who follow you can find it on your profile.',
+		label: 'visibilityFollowersLabel',
+		description: 'visibilityFollowersDescription',
 	},
 	PUBLIC: {
-		label: 'Everyone',
-		description: 'Anyone can find it on your profile, signed in or not.',
+		label: 'visibilityPublicLabel',
+		description: 'visibilityPublicDescription',
 	},
+} as const satisfies Record<RoutineVisibility, { label: Key; description: Key }>
+
+export function routineVisibilityCopy(
+	value: RoutineVisibility,
+	t: T,
+): { label: string; description: string } {
+	const keys = VISIBILITY_KEYS[value]
+	return { label: t(keys.label), description: t(keys.description) }
 }
 
-export const ROUTINE_VISIBILITY_OPTIONS = ROUTINE_VISIBILITY_VALUES.map(
-	value => ({ value, ...ROUTINE_VISIBILITY_COPY[value] }),
-)
+export function routineVisibilityOptions(t: T) {
+	return ROUTINE_VISIBILITY_VALUES.map(value => ({
+		value,
+		...routineVisibilityCopy(value, t),
+	}))
+}
 
 /** The narrower of the two rules — what the owner is actually granting. */
 export function effectiveRoutineVisibility(
@@ -53,6 +66,7 @@ export function effectiveRoutineVisibility(
 export function describeVisibilityCap(
 	accountRoutinesRule: ProfileVisibility,
 	routineVisibility: RoutineVisibility,
+	t: T,
 ): string | null {
 	const effective = effectiveRoutineVisibility(
 		accountRoutinesRule,
@@ -62,18 +76,19 @@ export function describeVisibilityCap(
 
 	const reached =
 		effective === 'PRIVATE'
-			? 'nobody else'
-			: ROUTINE_VISIBILITY_COPY[effective].label.toLowerCase()
+			? t('capNobodyElse')
+			: routineVisibilityCopy(effective, t).label.toLowerCase()
 	// `ProfileVisibility` and `RoutineVisibility` carry the same three values,
 	// so the account rule reads out of the same copy table.
-	const accountLabel =
-		ROUTINE_VISIBILITY_COPY[accountRoutinesRule].label.toLowerCase()
-	return `Your profile shares routines with ${accountLabel}, so this reaches ${reached}.`
+	const account = routineVisibilityCopy(
+		accountRoutinesRule,
+		t,
+	).label.toLowerCase()
+	return t('cap', { account, reached })
 }
 
 /** A link works whatever the visibility says, which the owner should know. */
-export const ROUTINE_LINK_NOTE =
-	'A link opens the routine for anyone who has it, whatever the setting above says. Revoking it is permanent.'
+export const routineLinkNote = (t: T) => t('linkNote')
 
 export function routineShareUrl(origin: string, token: string): string {
 	return `${origin.replace(/\/$/, '')}/shared/routines/${token}`
@@ -97,8 +112,7 @@ export function describeSharedRoutineOwner(routine: SharedRoutine): string {
  * the owner's training, and the page says so rather than leaving a reader to
  * wonder whether they are seeing someone's logged sessions.
  */
-export const SHARED_ROUTINE_NOTE =
-	'This is the routine as it is programmed — days, exercises, sets and targets. It carries none of the owner’s workouts, records or notes.'
+export const sharedRoutineNote = (t: T) => t('sharedNote')
 
 // Routine cloning (ROUT-05) ---------------------------------------------------
 
@@ -107,21 +121,24 @@ export const SHARED_ROUTINE_NOTE =
  * copy is the reader's own from the moment it exists, and it carries the
  * programme rather than anything the original owner trained.
  */
-export const CLONE_ROUTINE_NOTE =
-	'Cloning saves this programme as a routine of your own. You can edit it freely; the original is untouched, and nothing you change reaches its owner.'
+export const cloneRoutineNote = (t: T) => t('cloneNote')
 
 /** A clone is private until its new owner decides otherwise. */
-export const CLONE_ROUTINE_PRIVACY_NOTE =
-	'Your copy starts private, whoever could see the original.'
+export const cloneRoutinePrivacyNote = (t: T) => t('clonePrivacyNote')
 
 /** One line summarising a routine nobody has opened yet. */
-export function describeRoutineSummary(routine: SharedRoutineSummary): string {
-	const days = `${routine.dayCount} ${routine.dayCount === 1 ? 'day' : 'days'}`
-	const exercises = `${routine.exerciseCount} ${
-		routine.exerciseCount === 1 ? 'exercise' : 'exercises'
-	}`
-	const mode = routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'
-	return `${days} · ${exercises} · ${mode}`
+export function describeRoutineSummary(
+	routine: SharedRoutineSummary,
+	t: T,
+): string {
+	return t('summary', {
+		days: t('summaryDays', { count: routine.dayCount }),
+		exercises: t('summaryExercises', { count: routine.exerciseCount }),
+		mode:
+			routine.scheduleMode === 'ROTATION'
+				? t('summaryRotation')
+				: t('summaryWeekly'),
+	})
 }
 
 /**
@@ -148,15 +165,10 @@ export function profileRoutineHref(identifier: string, routineId: string) {
 export function describeNoFeaturableRoutines(
 	accountRoutinesRule: ProfileVisibility,
 	counts: { routines: number; shareable: number },
+	t: T,
 ): string {
-	if (accountRoutinesRule === 'PRIVATE') {
-		return 'Your profile keeps routines private, so none can be featured. Change Routines under privacy in Settings first.'
-	}
-	if (counts.routines === 0) {
-		return 'Create a routine to share one from your profile.'
-	}
-	if (counts.shareable === 0) {
-		return 'No routine is shared yet. Open a routine and choose who can find it.'
-	}
-	return 'Every shared routine is already featured.'
+	if (accountRoutinesRule === 'PRIVATE') return t('noneAccountPrivate')
+	if (counts.routines === 0) return t('noneCreateOne')
+	if (counts.shareable === 0) return t('noneSharedYet')
+	return t('allFeatured')
 }
