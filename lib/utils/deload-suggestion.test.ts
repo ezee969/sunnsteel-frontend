@@ -5,15 +5,20 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	DELOAD_SUGGESTION_ACTION,
-	DELOAD_SUGGESTION_TITLE,
+	deloadSuggestionAction,
 	deloadSuggestionHref,
+	deloadSuggestionTitle,
 	describeSuggestionEvidence,
 	describeSuggestionPlan,
 	hasDeloadSuggestion,
 	parseSuggestedDeload,
 } from './deload-suggestion'
+
+const en = translatorFor('en', 'progress.deloadSuggestion')
+const es = translatorFor('es', 'progress.deloadSuggestion')
 
 const suggestion: DeloadSuggestion = {
 	routineId: 'upper-lower',
@@ -61,6 +66,8 @@ describe('deload suggestion copy', () => {
 		expect(
 			describeSuggestionEvidence(
 				evidence([true, true], [true, false]),
+				en,
+				'en',
 				signals,
 			),
 		).toBe(
@@ -69,6 +76,8 @@ describe('deload suggestion copy', () => {
 		expect(
 			describeSuggestionEvidence(
 				evidence([true, false], [false, false], [true, false]),
+				en,
+				'en',
 				signals,
 			),
 		).toBe(
@@ -78,30 +87,42 @@ describe('deload suggestion copy', () => {
 
 	it('names the signals without numbers until they load', () => {
 		expect(
-			describeSuggestionEvidence(evidence([true, true], [false, false])),
+			describeSuggestionEvidence(
+				evidence([true, true], [false, false]),
+				en,
+				'en',
+			),
 		).toBe('Marked today and a week ago: effort.')
 	})
 
 	it('describes the deload it would open and that nothing changes until it is saved', () => {
-		expect(describeSuggestionPlan(suggestion)).toMatch(
+		expect(describeSuggestionPlan(suggestion, en, 'en')).toMatch(
 			/^Sunnsteel can plan a deload for Upper \/ Lower from .+ to .+ \(7 days\), with loads 10% lighter and half the sets\. You can change it before saving; nothing changes unless you save it\.$/,
 		)
 		expect(
-			describeSuggestionPlan({
-				...suggestion,
-				trainingBlockName: 'Autumn',
-				lengthDays: 1,
-				setMode: 'ALL',
-				loadReductionPercent: 0,
-			}),
+			describeSuggestionPlan(
+				{
+					...suggestion,
+					trainingBlockName: 'Autumn',
+					lengthDays: 1,
+					setMode: 'ALL',
+					loadReductionPercent: 0,
+				},
+				en,
+				'en',
+			),
 		).toContain('Upper / Lower (Autumn)')
 		expect(
-			describeSuggestionPlan({
-				...suggestion,
-				lengthDays: 1,
-				setMode: 'ALL',
-				loadReductionPercent: 0,
-			}),
+			describeSuggestionPlan(
+				{
+					...suggestion,
+					lengthDays: 1,
+					setMode: 'ALL',
+					loadReductionPercent: 0,
+				},
+				en,
+				'en',
+			),
 		).toContain('(1 day), with loads unchanged and every set.')
 	})
 
@@ -135,16 +156,42 @@ describe('deload suggestion copy', () => {
 
 	it('never names a cause or tells the member what they need', () => {
 		const copy = [
-			DELOAD_SUGGESTION_TITLE,
-			DELOAD_SUGGESTION_ACTION,
+			deloadSuggestionTitle(en),
+			deloadSuggestionAction(en),
 			describeSuggestionEvidence(
 				evidence([true, true], [true, true], [true, true]),
+				en,
+				'en',
 				signals,
 			),
-			describeSuggestionPlan(suggestion),
+			describeSuggestionPlan(suggestion, en, 'en'),
 		].join(' ')
 		expect(copy).not.toMatch(
 			/fatigue|tired|recover|overtrain|overreach|sleep|stress|injur|\bshould\b|\bneed\b|\bmust\b|because/i,
+		)
+	})
+})
+
+describe('the suggestion in Spanish (I18N-04)', () => {
+	it('restates the evidence and the plan without naming a cause', () => {
+		const evidenceCopy = describeSuggestionEvidence(
+			evidence([true, true], [true, false]),
+			es,
+			'es',
+			signals,
+		)
+		expect(evidenceCopy).toContain('Marcado hoy y hace una semana')
+		expect(describeSuggestionPlan(suggestion, es, 'es')).toContain(
+			'nada cambia si no la guardas',
+		)
+		const copy = [
+			deloadSuggestionTitle(es),
+			deloadSuggestionAction(es),
+			evidenceCopy,
+			describeSuggestionPlan(suggestion, es, 'es'),
+		].join(' ')
+		expect(copy).not.toMatch(
+			/fatiga|cansad|recuper|sobreentren|sue[ñn]o|estr[ée]s|lesi[óo]n|deber[ií]as|necesitas|porque/i,
 		)
 	})
 })

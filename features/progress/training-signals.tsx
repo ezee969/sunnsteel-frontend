@@ -7,15 +7,18 @@ import type {
 } from '@sunsteel/contracts'
 import { Activity, AlertTriangle, CalendarRange, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
 import {
-	DELOAD_SUGGESTION_ACTION,
-	DELOAD_SUGGESTION_TITLE,
+	deloadSuggestionAction,
 	deloadSuggestionHref,
+	deloadSuggestionTitle,
 	describeSuggestionEvidence,
 	describeSuggestionPlan,
 	hasDeloadSuggestion,
@@ -28,16 +31,10 @@ import {
 	describeSignalsIntro,
 	describeSignalsRule,
 	describeWorkouts,
-	TRAINING_SIGNAL_MARKED_LABEL,
-	TRAINING_SIGNAL_TITLES,
-	TRAINING_SIGNALS_TITLE,
+	trainingSignalMarkedLabel,
+	trainingSignalsTitle,
+	trainingSignalTitles,
 } from '@/lib/utils/training-signals'
-
-const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-})
-const formatDate = (iso: string) => DATE_FORMATTER.format(new Date(iso))
 
 interface TrainingSignalsProps {
 	data?: TrainingSignalsResponse
@@ -63,6 +60,7 @@ function SignalRow({
 	marked: boolean
 	children: ReactNode
 }) {
+	const t = useTranslations('progress.signals')
 	return (
 		<li
 			className={cn(
@@ -78,7 +76,7 @@ function SignalRow({
 							className="size-3.5 shrink-0 text-warning-strong"
 							aria-hidden
 						/>
-						{TRAINING_SIGNAL_MARKED_LABEL}
+						{trainingSignalMarkedLabel(t)}
 					</span>
 				) : null}
 			</div>
@@ -100,44 +98,45 @@ export function TrainingSignals({
 	onRetry,
 	deloadSuggestion,
 }: TrainingSignalsProps) {
+	const t = useTranslations('progress.signals')
+	const tDeload = useTranslations('progress.deloadSuggestion')
+	const locale = useLocale() as Locale
+	const titles = trainingSignalTitles(t)
+	const formatDate = (iso: string) =>
+		new Intl.DateTimeFormat(intlLocale(locale), {
+			month: 'short',
+			day: 'numeric',
+		}).format(new Date(iso))
 	return (
 		<section aria-labelledby="training-signals" className="space-y-4">
 			<div className="rule-row flex items-start gap-2 pb-2">
 				<Activity className="mt-0.5 size-4 text-ink-3" aria-hidden />
 				<div>
 					<h2 id="training-signals" className="type-section text-foreground">
-						{TRAINING_SIGNALS_TITLE}
+						{trainingSignalsTitle(t)}
 					</h2>
 					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 						{data
-							? describeSignalsIntro(data.thresholds)
-							: 'Measures from your logged workouts over the last four weeks.'}
+							? describeSignalsIntro(data.thresholds, t)
+							: t('introFallback')}
 					</p>
 					{data ? (
 						<p className="type-body-sm mt-1 max-w-3xl text-ink-3">
-							{describeSignalsRule(data.thresholds)}
+							{describeSignalsRule(data.thresholds, t, locale)}
 						</p>
 					) : null}
 				</div>
 			</div>
 
 			{isPending ? (
-				<div
-					role="status"
-					aria-label="Loading training signals"
-					className="space-y-3"
-				>
+				<div role="status" aria-label={t('loading')} className="space-y-3">
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 				</div>
 			) : isError || !data ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">
-						Training signals are unavailable
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not read your recent workouts. Try again.
-					</p>
+					<p className="type-panel text-foreground">{t('unavailable')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -146,32 +145,25 @@ export function TrainingSignals({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : (
 				<ul className="border-t border-rule-faint">
-					<SignalRow
-						title={TRAINING_SIGNAL_TITLES.effort}
-						marked={data.effort.marked}
-					>
-						<p className="type-body-sm text-ink-2">{describeEffort(data)}</p>
-					</SignalRow>
-					<SignalRow
-						title={TRAINING_SIGNAL_TITLES.repTargets}
-						marked={data.repTargets.marked}
-					>
+					<SignalRow title={titles.effort} marked={data.effort.marked}>
 						<p className="type-body-sm text-ink-2">
-							{describeRepTargets(data)}
+							{describeEffort(data, t, locale)}
 						</p>
 					</SignalRow>
-					<SignalRow
-						title={TRAINING_SIGNAL_TITLES.declines}
-						marked={data.declines.marked}
-					>
+					<SignalRow title={titles.repTargets} marked={data.repTargets.marked}>
+						<p className="type-body-sm text-ink-2">
+							{describeRepTargets(data, t)}
+						</p>
+					</SignalRow>
+					<SignalRow title={titles.declines} marked={data.declines.marked}>
 						{data.declines.lifts.length === 0 ? (
 							<p className="type-body-sm text-ink-2">
-								{describeNoDeclines(data)}
+								{describeNoDeclines(data, t)}
 							</p>
 						) : (
 							<ul className="grid gap-2">
@@ -183,28 +175,36 @@ export function TrainingSignals({
 										>
 											{lift.exerciseName}
 										</Link>
-										: {describeDecline(lift, weightUnit, formatDate)}
+										: {describeDecline(lift, weightUnit, formatDate, t, locale)}
 									</li>
 								))}
 							</ul>
 						)}
 					</SignalRow>
-					<SignalRow
-						title={TRAINING_SIGNAL_TITLES.workouts}
-						marked={data.workouts.marked}
-					>
-						<p className="type-body-sm text-ink-2">{describeWorkouts(data)}</p>
+					<SignalRow title={titles.workouts} marked={data.workouts.marked}>
+						<p className="type-body-sm text-ink-2">
+							{describeWorkouts(data, t, locale)}
+						</p>
 					</SignalRow>
 					{hasDeloadSuggestion(deloadSuggestion) ? (
 						<li className="rule-row grid gap-2 py-4">
 							<h3 className="type-panel text-foreground">
-								{DELOAD_SUGGESTION_TITLE}
+								{deloadSuggestionTitle(tDeload)}
 							</h3>
 							<p className="type-body-sm text-ink-2">
-								{describeSuggestionEvidence(deloadSuggestion.evidence, data)}
+								{describeSuggestionEvidence(
+									deloadSuggestion.evidence,
+									tDeload,
+									locale,
+									data,
+								)}
 							</p>
 							<p className="type-body-sm text-ink-2">
-								{describeSuggestionPlan(deloadSuggestion.suggestion)}
+								{describeSuggestionPlan(
+									deloadSuggestion.suggestion,
+									tDeload,
+									locale,
+								)}
 							</p>
 							<div>
 								{/* Outline on purpose: a suggestion is never the page's primary action. */}
@@ -213,7 +213,7 @@ export function TrainingSignals({
 										href={deloadSuggestionHref(deloadSuggestion.suggestion)}
 									>
 										<CalendarRange className="size-4" aria-hidden />
-										{DELOAD_SUGGESTION_ACTION}
+										{deloadSuggestionAction(tDeload)}
 									</Link>
 								</Button>
 							</div>

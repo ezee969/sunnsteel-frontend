@@ -7,65 +7,83 @@ import {
 	type TrainingSignalsResponse,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
+
 /**
  * INTEL-02 copy. The suggestion restates the evidence PROG-10 already shows
  * and names the deload it would open; it never names a cause and never tells
  * the member what they need. Nothing happens until the deload is saved.
  */
 
-export const DELOAD_SUGGESTION_TITLE = 'Suggestion: a lighter week'
-export const DELOAD_SUGGESTION_ACTION = 'Plan this deload'
+type T = Translator<'progress.deloadSuggestion'>
 
-const decimal = (value: number) =>
-	new Intl.NumberFormat(undefined, {
+export const deloadSuggestionTitle = (t: T) => t('title')
+export const deloadSuggestionAction = (t: T) => t('action')
+
+const decimal = (value: number, locale: Locale) =>
+	new Intl.NumberFormat(intlLocale(locale), {
 		minimumFractionDigits: 1,
 		maximumFractionDigits: 1,
 	}).format(value)
 
-function joinList(items: string[]): string {
+function joinList(items: string[], t: T): string {
 	if (items.length <= 1) return items.join('')
-	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+	return t('joinLast', {
+		head: items.slice(0, -1).join(', '),
+		last: items[items.length - 1],
+	})
 }
 
 /** What each load signal shows today, with its number when it is loaded. */
 function describeSignal(
 	signal: DeloadSuggestionSignal,
+	t: T,
+	locale: Locale,
 	signals?: TrainingSignalsResponse,
 ): string {
 	if (signal === 'EFFORT') {
 		const comparison = signals?.effort.comparison
 		return comparison
-			? `effort (average RPE up ${decimal(comparison.difference)})`
-			: 'effort'
+			? t('signalEffortWith', {
+					value: decimal(comparison.difference, locale),
+				})
+			: t('signalEffort')
 	}
 	if (signal === 'REP_TARGETS') {
 		const targets = signals?.repTargets
 		return targets
-			? `rep targets (${targets.recent.shortPercent}% of sets short, against ${targets.previous.shortPercent}% before)`
-			: 'rep targets'
+			? t('signalRepTargetsWith', {
+					recent: targets.recent.shortPercent,
+					previous: targets.previous.shortPercent,
+				})
+			: t('signalRepTargets')
 	}
 	const lifts = signals?.declines.lifts.length
-	return lifts
-		? `declining lifts (${lifts} ${lifts === 1 ? 'lift' : 'lifts'})`
-		: 'declining lifts'
+	return lifts ? t('signalDeclinesWith', { count: lifts }) : t('signalDeclines')
 }
 
 /** "Marked today and a week ago: … Marked today: …" -- evidence, not a reason. */
 export function describeSuggestionEvidence(
 	evidence: readonly DeloadSuggestionEvidence[],
+	t: T,
+	locale: Locale,
 	signals?: TrainingSignalsResponse,
 ): string {
 	const both = evidence
 		.filter(entry => entry.markedNow && entry.markedEarlier)
-		.map(entry => describeSignal(entry.signal, signals))
+		.map(entry => describeSignal(entry.signal, t, locale, signals))
 	const today = evidence
 		.filter(entry => entry.markedNow && !entry.markedEarlier)
-		.map(entry => describeSignal(entry.signal, signals))
+		.map(entry => describeSignal(entry.signal, t, locale, signals))
 	const parts = []
-	if (both.length) parts.push(`Marked today and a week ago: ${joinList(both)}.`)
-	if (today.length) parts.push(`Marked today: ${joinList(today)}.`)
+	if (both.length) parts.push(t('markedBoth', { list: joinList(both, t) }))
+	if (today.length) parts.push(t('markedToday', { list: joinList(today, t) }))
 	const sentence = parts.join(' ')
-	return sentence.charAt(0).toUpperCase() + sentence.slice(1)
+	return (
+		sentence.charAt(0).toLocaleUpperCase(intlLocale(locale)) + sentence.slice(1)
+	)
 }
 
 const fromKey = (key: string) => {
@@ -73,30 +91,31 @@ const fromKey = (key: string) => {
 	return new Date(year, month - 1, day)
 }
 
-const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-})
+export const formatSuggestionDate = (key: string, locale: Locale) =>
+	new Intl.DateTimeFormat(intlLocale(locale), {
+		month: 'short',
+		day: 'numeric',
+	}).format(fromKey(key))
 
-export const formatSuggestionDate = (key: string) =>
-	DATE_FORMAT.format(fromKey(key))
-
-export function describeSuggestionPlan(suggestion: DeloadSuggestion): string {
-	const loads =
-		suggestion.loadReductionPercent === 0
-			? 'loads unchanged'
-			: `loads ${suggestion.loadReductionPercent}% lighter`
-	const sets = suggestion.setMode === 'HALF' ? 'half the sets' : 'every set'
-	const block = suggestion.trainingBlockName
-		? ` (${suggestion.trainingBlockName})`
-		: ''
-	const days = `${suggestion.lengthDays} ${suggestion.lengthDays === 1 ? 'day' : 'days'}`
-	return (
-		`Sunnsteel can plan a deload for ${suggestion.routineName}${block} from ` +
-		`${formatSuggestionDate(suggestion.startDate)} to ${formatSuggestionDate(suggestion.endDate)} ` +
-		`(${days}), with ${loads} and ${sets}. You can change it before saving; ` +
-		'nothing changes unless you save it.'
-	)
+export function describeSuggestionPlan(
+	suggestion: DeloadSuggestion,
+	t: T,
+	locale: Locale,
+): string {
+	return t('plan', {
+		routine: suggestion.routineName,
+		block: suggestion.trainingBlockName
+			? t('block', { name: suggestion.trainingBlockName })
+			: '',
+		start: formatSuggestionDate(suggestion.startDate, locale),
+		end: formatSuggestionDate(suggestion.endDate, locale),
+		days: t('days', { count: suggestion.lengthDays }),
+		loads:
+			suggestion.loadReductionPercent === 0
+				? t('loadsUnchanged')
+				: t('loadsLighter', { percent: suggestion.loadReductionPercent }),
+		sets: suggestion.setMode === 'HALF' ? t('setsHalf') : t('setsEvery'),
+	})
 }
 
 /** The routine page, with the Deloads dialog opening on these dates. */

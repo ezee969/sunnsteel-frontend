@@ -5,6 +5,10 @@ import type {
 	WorkoutPeriod,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
+import type { Translator } from '@/i18n/translator'
+
 import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
 /**
@@ -15,109 +19,146 @@ import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
 type Thresholds = TrainingSignalsResponse['thresholds']
 type Signals = TrainingSignalsResponse
+type T = Translator<'progress.signals'>
 
-const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six']
-const numberWord = (value: number) => NUMBER_WORDS[value] ?? String(value)
-const plural = (count: number, one: string, many = `${one}s`) =>
-	`${count} ${count === 1 ? one : many}`
-const decimal = (value: number) =>
-	new Intl.NumberFormat(undefined, {
+const numberWord = (value: number, t: T) => t('numberWord', { value })
+const decimal = (value: number, locale: Locale) =>
+	new Intl.NumberFormat(intlLocale(locale), {
 		minimumFractionDigits: 1,
 		maximumFractionDigits: 1,
 	}).format(value)
 
-export const TRAINING_SIGNALS_TITLE = 'Training signals'
-export const TRAINING_SIGNAL_MARKED_LABEL = 'Changed'
+export const trainingSignalsTitle = (t: T) => t('title')
+export const trainingSignalMarkedLabel = (t: T) => t('markedLabel')
 
-export const TRAINING_SIGNAL_TITLES = {
-	effort: 'Effort (RPE)',
-	repTargets: 'Rep targets',
-	declines: 'Declining lifts',
-	workouts: 'Workouts',
-} as const
-
-export function describePeriods(periodDays: number) {
+export function trainingSignalTitles(t: T) {
 	return {
-		recent: `the last ${periodDays} days`,
-		previous: `the ${periodDays} days before`,
+		effort: t('titleEffort'),
+		repTargets: t('titleRepTargets'),
+		declines: t('titleDeclines'),
+		workouts: t('titleWorkouts'),
+	} as const
+}
+
+export function describePeriods(periodDays: number, t: T) {
+	return {
+		recent: t('periodRecent', { days: periodDays }),
+		previous: t('periodPrevious', { days: periodDays }),
 	}
 }
 
-export function describeSignalsIntro(thresholds: Thresholds): string {
-	const { recent, previous } = describePeriods(thresholds.periodDays)
-	return `Four measures from your logged workouts, ${recent} beside ${previous}. They state what changed, not why.`
+export function describeSignalsIntro(thresholds: Thresholds, t: T): string {
+	const { recent, previous } = describePeriods(thresholds.periodDays, t)
+	return t('intro', { recent, previous })
 }
 
-export function describeSignalsRule(thresholds: Thresholds): string {
-	const falls = numberWord(thresholds.declineSessions - 1)
-	return (
-		`A measure is marked when average RPE rises ${decimal(thresholds.rpeRise)} or more, ` +
-		`the share of sets short of their rep target rises ${thresholds.shortPointsRise} points ` +
-		`(at least ${plural(thresholds.minShortSets, 'set')}), a lift's best estimated 1RM falls ` +
-		`in each of its last ${falls} sessions by ${decimal(thresholds.minDecline * 100)}% in total, ` +
-		`or you trained at least ${thresholds.workoutDrop} fewer times or ended more workouts early. ` +
-		`Deload workouts count only as workouts.`
-	)
+export function describeSignalsRule(
+	thresholds: Thresholds,
+	t: T,
+	locale: Locale,
+): string {
+	return t('rule', {
+		rpeRise: decimal(thresholds.rpeRise, locale),
+		shortPointsRise: thresholds.shortPointsRise,
+		minShortSets: t('sets', { count: thresholds.minShortSets }),
+		falls: numberWord(thresholds.declineSessions - 1, t),
+		minDecline: decimal(thresholds.minDecline * 100, locale),
+		workoutDrop: thresholds.workoutDrop,
+	})
 }
 
-function describeChange(difference: number): string {
-	if (difference > 0) return `up ${decimal(difference)}`
-	if (difference < 0) return `down ${decimal(-difference)}`
-	return 'no change'
+function describeChange(difference: number, t: T, locale: Locale): string {
+	if (difference > 0)
+		return t('changeUp', { value: decimal(difference, locale) })
+	if (difference < 0)
+		return t('changeDown', { value: decimal(-difference, locale) })
+	return t('changeNone')
 }
 
-export function describeEffort(signals: Signals): string {
+export function describeEffort(signals: Signals, t: T, locale: Locale): string {
 	const { effort, thresholds } = signals
-	const { recent, previous } = describePeriods(thresholds.periodDays)
+	const { recent, previous } = describePeriods(thresholds.periodDays, t)
 	if (!effort.comparison) {
-		return (
-			`Log RPE on at least ${thresholds.minRpeSets} sets of the same lifts in both periods to compare. ` +
-			`So far: ${effort.recentSets} in ${recent}, ${effort.previousSets} in ${previous}.`
-		)
+		return t('effortNeedMore', {
+			min: thresholds.minRpeSets,
+			recentSets: effort.recentSets,
+			previousSets: effort.previousSets,
+			recent,
+			previous,
+		})
 	}
 	const { comparison } = effort
-	return (
-		`Average RPE ${decimal(comparison.recent.averageRpe)} over ${plural(comparison.recent.sets, 'set')} in ${recent}, ` +
-		`${decimal(comparison.previous.averageRpe)} over ${plural(comparison.previous.sets, 'set')} in ${previous}, ` +
-		`${describeChange(comparison.difference)}. Counted on the ${plural(comparison.lifts, 'lift')} you logged with RPE in both.`
-	)
+	return t('effort', {
+		recentRpe: decimal(comparison.recent.averageRpe, locale),
+		recentSets: t('sets', { count: comparison.recent.sets }),
+		previousRpe: decimal(comparison.previous.averageRpe, locale),
+		previousSets: t('sets', { count: comparison.previous.sets }),
+		recent,
+		previous,
+		change: describeChange(comparison.difference, t, locale),
+		lifts: t('lifts', { count: comparison.lifts }),
+	})
 }
 
-export function describeRepTargets(signals: Signals): string {
+export function describeRepTargets(signals: Signals, t: T): string {
 	const { repTargets, thresholds } = signals
-	const { recent, previous } = describePeriods(thresholds.periodDays)
+	const { recent, previous } = describePeriods(thresholds.periodDays, t)
 	const now = repTargets.recent
 	const before = repTargets.previous
 	const recentPart =
 		now.targetedSets === 0
-			? `No sets had a rep target in ${recent}`
-			: `${now.shortSets} of ${plural(now.targetedSets, 'set')} fell short of their rep target in ${recent} (${now.shortPercent}%)`
+			? t('repTargetsNoneRecent', { recent })
+			: t('repTargetsRecent', {
+					short: now.shortSets,
+					sets: t('sets', { count: now.targetedSets }),
+					recent,
+					percent: now.shortPercent,
+				})
 	const previousPart =
 		before.targetedSets === 0
-			? `none had one in ${previous}`
+			? t('repTargetsNonePrevious', { previous })
 			: now.targetedSets === 0
-				? `${before.shortSets} of ${plural(before.targetedSets, 'set')} fell short in ${previous} (${before.shortPercent}%)`
-				: `${before.shortSets} of ${before.targetedSets} in ${previous} (${before.shortPercent}%)`
-	const sentence = `${recentPart}; ${previousPart}.`
-	const parts = [sentence]
+				? t('repTargetsPreviousFull', {
+						short: before.shortSets,
+						sets: t('sets', { count: before.targetedSets }),
+						previous,
+						percent: before.shortPercent,
+					})
+				: t('repTargetsPreviousShort', {
+						short: before.shortSets,
+						sets: before.targetedSets,
+						previous,
+						percent: before.shortPercent,
+					})
+	const parts = [
+		t('repTargetsSentence', { recent: recentPart, previous: previousPart }),
+	]
 	if (repTargets.mostOften.length > 0) {
 		parts.push(
-			`Most often: ${repTargets.mostOften
-				.map(lift => `${lift.exerciseName} (${lift.shortSets})`)
-				.join(', ')}.`,
+			t('repTargetsMostOften', {
+				list: repTargets.mostOften
+					.map(lift =>
+						t('repTargetsMostOftenItem', {
+							name: lift.exerciseName,
+							count: lift.shortSets,
+						}),
+					)
+					.join(', '),
+			}),
 		)
 	}
 	if (!repTargets.comparable) {
-		parts.push(
-			`Comparing needs at least ${thresholds.minTargetSets} sets with a rep target in each period.`,
-		)
+		parts.push(t('repTargetsNotComparable', { min: thresholds.minTargetSets }))
 	}
 	return parts.join(' ')
 }
 
-function joinList(items: string[]): string {
+function joinList(items: string[], t: T): string {
 	if (items.length <= 1) return items.join('')
-	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+	return t('joinLast', {
+		head: items.slice(0, -1).join(', '),
+		last: items[items.length - 1],
+	})
 }
 
 /** "Best estimated 1RM 116.7, 113.8, 110.8 kg on …, down 5.1% over …". */
@@ -125,49 +166,71 @@ export function describeDecline(
 	lift: DecliningLift,
 	unit: WeightUnit,
 	formatDate: (iso: string) => string,
+	t: T,
+	locale: Locale,
 ): string {
-	const values = lift.sessions
-		.map(session => formatWeightAmount(session.estimated1rmKg, unit, 1))
-		.join(', ')
-	const dates = joinList(
-		lift.sessions.map(session => formatDate(session.performedAt)),
-	)
-	return (
-		`Best estimated 1RM ${values} ${getWeightUnitLabel(unit)} on ${dates}, ` +
-		`down ${decimal(lift.declineRatio * 100)}% over its last ${numberWord(lift.sessions.length)} sessions.`
-	)
+	return t('decline', {
+		values: lift.sessions
+			.map(session => formatWeightAmount(session.estimated1rmKg, unit, 1))
+			.join(', '),
+		unit: getWeightUnitLabel(unit),
+		dates: joinList(
+			lift.sessions.map(session => formatDate(session.performedAt)),
+			t,
+		),
+		percent: decimal(lift.declineRatio * 100, locale),
+		sessions: numberWord(lift.sessions.length, t),
+	})
 }
 
-export function describeNoDeclines(signals: Signals): string {
+export function describeNoDeclines(signals: Signals, t: T): string {
 	const { declines, thresholds } = signals
 	if (declines.checkedLifts === 0) {
-		return `No lift has ${numberWord(thresholds.declineSessions)} sessions in the last ${thresholds.periodDays * 2} days to compare.`
+		return t('noDeclinesNoLifts', {
+			sessions: numberWord(thresholds.declineSessions, t),
+			days: thresholds.periodDays * 2,
+		})
 	}
-	return `No lift's best estimated 1RM fell in each of its last ${numberWord(thresholds.declineSessions - 1)} sessions.`
+	return t('noDeclines', {
+		sessions: numberWord(thresholds.declineSessions - 1, t),
+	})
 }
 
 function describeWorkoutPeriod(
 	period: WorkoutPeriod,
 	label: string,
 	noun: boolean,
+	t: T,
 ): string {
-	if (period.workouts === 0) return `no workouts in ${label}`
+	if (period.workouts === 0) return t('workoutsNone', { label })
 	const count = noun
-		? plural(period.workouts, 'workout')
+		? t('workoutsCount', { count: period.workouts })
 		: String(period.workouts)
 	const parts = [
-		`${count} in ${label}`,
+		t('workoutsIn', { count, label }),
 		period.endedEarly === 0
-			? 'none ended early'
-			: `${period.endedEarly} ended early`,
+			? t('endedEarlyNone')
+			: t('endedEarly', { count: period.endedEarly }),
 	]
-	if (period.deloads > 0) parts.push(`${period.deloads} on a deload`)
+	if (period.deloads > 0) parts.push(t('onDeload', { count: period.deloads }))
 	return parts.join(', ')
 }
 
-export function describeWorkouts(signals: Signals): string {
+export function describeWorkouts(
+	signals: Signals,
+	t: T,
+	locale: Locale,
+): string {
 	const { workouts, thresholds } = signals
-	const { recent, previous } = describePeriods(thresholds.periodDays)
-	const text = `${describeWorkoutPeriod(workouts.recent, recent, true)}; ${describeWorkoutPeriod(workouts.previous, previous, workouts.recent.workouts === 0)}.`
-	return text.charAt(0).toUpperCase() + text.slice(1)
+	const { recent, previous } = describePeriods(thresholds.periodDays, t)
+	const text = t('workoutsSentence', {
+		recent: describeWorkoutPeriod(workouts.recent, recent, true, t),
+		previous: describeWorkoutPeriod(
+			workouts.previous,
+			previous,
+			workouts.recent.workouts === 0,
+			t,
+		),
+	})
+	return text.charAt(0).toLocaleUpperCase(intlLocale(locale)) + text.slice(1)
 }
