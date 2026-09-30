@@ -29,6 +29,7 @@ export function FeaturedAccomplishments({
 }: FeaturedAccomplishmentsProps) {
 	const locale = useLocale() as Locale
 	const tSharing = useTranslations('routines.sharing')
+	const t = useTranslations('social.profile')
 	if (!items.length && !isOwnProfile) return null
 
 	return (
@@ -37,8 +38,7 @@ export function FeaturedAccomplishments({
 				id="featured-accomplishments"
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 			>
-				<Bookmark className="size-4 text-ink-3" aria-hidden /> Featured
-				Accomplishments
+				<Bookmark className="size-4 text-ink-3" aria-hidden /> {t('featured')}
 			</h2>
 			{items.length ? (
 				<div className="pt-1">
@@ -54,12 +54,12 @@ export function FeaturedAccomplishments({
 								<div className="min-w-0">
 									<p className="type-body-sm text-ink-3">
 										{item.kind === 'RECORD'
-											? 'Personal record'
+											? t('kindRecord')
 											: item.kind === 'ACHIEVEMENT'
-												? 'Achievement'
+												? t('kindAchievement')
 												: item.kind === 'ROUTINE'
-													? 'Routine'
-													: 'Renaissance rank'}
+													? t('kindRoutine')
+													: t('kindRank')}
 									</p>
 									<h3 className="type-panel text-foreground">
 										{item.kind === 'RECORD' ? (
@@ -82,27 +82,28 @@ export function FeaturedAccomplishments({
 										)}
 									</h3>
 									<p className="type-body-sm text-ink-2">
-										{item.kind === 'RECORD' ? (
-											<>
-												<span className="type-data">
-													{formatWeight(item.record.weight, weightUnit, locale)}
-												</span>{' '}
-												for {item.record.reps} reps · est. 1RM{' '}
-												<span className="type-data">
-													{formatWeight(
+										{item.kind === 'RECORD'
+											? t.rich('recordLine', {
+													weight: formatWeight(
+														item.record.weight,
+														weightUnit,
+														locale,
+													),
+													reps: item.record.reps,
+													e1rm: formatWeight(
 														item.record.estimated1rm,
 														weightUnit,
 														locale,
-													)}
-												</span>
-											</>
-										) : item.kind === 'ACHIEVEMENT' ? (
-											item.achievement.description
-										) : item.kind === 'ROUTINE' ? (
-											describeRoutineSummary(item.routine, tSharing)
-										) : (
-											item.rank.description
-										)}
+													),
+													data: chunks => (
+														<span className="type-data">{chunks}</span>
+													),
+												})
+											: item.kind === 'ACHIEVEMENT'
+												? item.achievement.description
+												: item.kind === 'ROUTINE'
+													? describeRoutineSummary(item.routine, tSharing)
+													: item.rank.description}
 									</p>
 								</div>
 							</div>
@@ -113,7 +114,7 @@ export function FeaturedAccomplishments({
 							) : item.kind === 'ACHIEVEMENT' ? (
 								<span className="type-body-sm whitespace-nowrap text-ink-3">
 									{item.achievement.backfilled
-										? 'Recognized from history'
+										? t('recognizedFromHistory')
 										: formatTimeAgo(item.achievement.unlockedAt, locale)}
 								</span>
 							) : null}
@@ -122,14 +123,16 @@ export function FeaturedAccomplishments({
 				</div>
 			) : (
 				<p className="type-body-sm py-3 text-ink-3">
-					Choose records, earned medals, a shared routine, or a reached rank in{' '}
-					<Link
-						href="/settings"
-						className="text-primary underline-offset-4 hover:underline"
-					>
-						Settings
-					</Link>{' '}
-					to build this profile ledger.
+					{t.rich('featuredEmpty', {
+						link: chunks => (
+							<Link
+								href="/settings"
+								className="text-primary underline-offset-4 hover:underline"
+							>
+								{chunks}
+							</Link>
+						),
+					})}
 				</p>
 			)}
 		</section>

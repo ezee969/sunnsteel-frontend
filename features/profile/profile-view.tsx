@@ -35,6 +35,7 @@ import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishm
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
 import type { Locale } from '@/i18n/config'
+import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	buildProfileCardModel,
@@ -100,6 +101,7 @@ export function ProfileView(props: ProfileViewProps) {
 	const locale = useLocale() as Locale
 	const tIdentity = useTranslations('routines.identity')
 	const tSharing = useTranslations('routines.sharing')
+	const t = useTranslations('social.profile')
 	const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
 	const profile = props.profile
@@ -138,6 +140,7 @@ export function ProfileView(props: ProfileViewProps) {
 		: publicUser!.achievements
 	const joinDateText = formatDistanceToNow(new Date(profileCreatedAt), {
 		addSuffix: true,
+		locale: dateFnsLocale(locale),
 	})
 
 	const canViewWorkoutHistory =
@@ -193,11 +196,19 @@ export function ProfileView(props: ProfileViewProps) {
 			bodyMetrics.weightKg != null ||
 			bodyMetrics.heightCm != null),
 	)
+	// One fixed decimal, as `toFixed(1)` read; only the decimal mark follows
+	// the language.
+	const oneDecimal = (value: number) =>
+		numberFormatter(locale, {
+			minimumFractionDigits: 1,
+			maximumFractionDigits: 1,
+			useGrouping: false,
+		}).format(value)
 	const volumeLabel =
 		totalVolume >= 1_000_000
-			? `${(totalVolume / 1_000_000).toFixed(1)}M`
+			? `${oneDecimal(totalVolume / 1_000_000)}M`
 			: totalVolume >= 1_000
-				? `${(totalVolume / 1_000).toFixed(1)}k`
+				? `${oneDecimal(totalVolume / 1_000)}k`
 				: formatWeightAmount(totalVolumeKg, weightUnit, locale, 1)
 	const isMutating = props.variant === 'member' && props.isMutating
 	const [isPreparingCard, setIsPreparingCard] = useState(false)
@@ -211,14 +222,14 @@ export function ProfileView(props: ProfileViewProps) {
 			const url = getSharedProfileUrl(profileUsername, window.location.origin)
 			await copyTextToClipboard(url)
 			push({
-				title: 'Profile link copied',
-				description: 'Anyone with the link can view this public profile.',
+				title: t('linkCopied'),
+				description: t('linkCopiedBody'),
 				variant: 'success',
 			})
 		} catch {
 			push({
-				title: 'Could not copy profile link',
-				description: 'Check your browser permissions and try again.',
+				title: t('copyFailed'),
+				description: t('copyFailedBody'),
 				variant: 'destructive',
 			})
 		}
@@ -245,19 +256,16 @@ export function ProfileView(props: ProfileViewProps) {
 				}),
 			)
 			push({
-				title:
-					result === 'shared' ? 'Profile card shared' : 'Profile card saved',
+				title: result === 'shared' ? t('cardShared') : t('cardSaved'),
 				description:
-					result === 'shared'
-						? 'The image is ready in your share destination.'
-						: 'The PNG was downloaded to this device.',
+					result === 'shared' ? t('cardSharedBody') : t('cardSavedBody'),
 				variant: 'success',
 			})
 		} catch (error) {
 			if (error instanceof DOMException && error.name === 'AbortError') return
 			push({
-				title: 'Could not create profile card',
-				description: 'Try again from this browser.',
+				title: t('cardFailed'),
+				description: t('cardFailedBody'),
 				variant: 'destructive',
 			})
 		} finally {
@@ -297,8 +305,8 @@ export function ProfileView(props: ProfileViewProps) {
 						</h1>
 						<p className="type-data text-ink-3">@{profileUsername}</p>
 						<p className="type-body-sm flex items-center gap-1.5 text-ink-3">
-							<CalendarDays className="h-4 w-4" aria-hidden /> Joined{' '}
-							{joinDateText}
+							<CalendarDays className="h-4 w-4" aria-hidden />{' '}
+							{t('joined', { when: joinDateText })}
 						</p>
 
 						{/* SOC-02: inside the authenticated shell the counts open the
@@ -308,12 +316,12 @@ export function ProfileView(props: ProfileViewProps) {
 						<div className="flex gap-5 pt-2">
 							<ProfileCount
 								count={followerCount}
-								label="Followers"
+								label={t('followers')}
 								href={props.relationshipHrefs?.followers}
 							/>
 							<ProfileCount
 								count={followingCount}
-								label="Following"
+								label={t('following')}
 								href={props.relationshipHrefs?.following}
 							/>
 						</div>
@@ -321,7 +329,8 @@ export function ProfileView(props: ProfileViewProps) {
 
 					<div className="flex flex-wrap gap-3">
 						<Button variant="outline" size="sm" onClick={onShareProfile}>
-							<Share2 className="mr-2 h-4 w-4" aria-hidden /> Share Profile
+							<Share2 className="mr-2 h-4 w-4" aria-hidden />{' '}
+							{t('shareProfile')}
 						</Button>
 						<Button
 							variant="outline"
@@ -330,7 +339,7 @@ export function ProfileView(props: ProfileViewProps) {
 							disabled={isPreparingCard}
 						>
 							<Share2 className="mr-2 h-4 w-4" aria-hidden />
-							{isPreparingCard ? 'Preparing Card…' : 'Share Profile Card'}
+							{isPreparingCard ? t('preparingCard') : t('shareCard')}
 						</Button>
 						{!isOwnProfile && followAction && (
 							<Button
@@ -342,12 +351,12 @@ export function ProfileView(props: ProfileViewProps) {
 								{isFollowedByMe ? (
 									<>
 										<UserMinus className="mr-2 h-4 w-4" aria-hidden />
-										{isMutating ? 'Unfollowing...' : 'Unfollow'}
+										{isMutating ? t('unfollowing') : t('unfollow')}
 									</>
 								) : (
 									<>
 										<UserPlus className="mr-2 h-4 w-4" aria-hidden />
-										{isMutating ? 'Following...' : 'Follow'}
+										{isMutating ? t('followingPending') : t('follow')}
 									</>
 								)}
 							</Button>
@@ -367,12 +376,10 @@ export function ProfileView(props: ProfileViewProps) {
 				<div className="space-y-8 lg:col-span-1 lg:border-r lg:border-rule-faint lg:pr-8">
 					<section className="space-y-3">
 						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
-							<User className="h-4 w-4 text-ink-3" aria-hidden /> About
+							<User className="h-4 w-4 text-ink-3" aria-hidden /> {t('about')}
 						</h2>
 						<p className="type-body-sm whitespace-pre-line text-ink-2">
-							{!canViewBiography
-								? 'Biography is private.'
-								: biography || 'No bio yet.'}
+							{!canViewBiography ? t('bioPrivate') : biography || t('noBio')}
 						</p>
 						<div className="type-body-sm flex items-start gap-2 text-ink-2">
 							<MapPin
@@ -381,8 +388,8 @@ export function ProfileView(props: ProfileViewProps) {
 							/>
 							<span>
 								{!canViewLocation
-									? 'Location is private.'
-									: location || 'No location added yet.'}
+									? t('locationPrivate')
+									: location || t('noLocation')}
 							</span>
 						</div>
 					</section>
@@ -390,21 +397,17 @@ export function ProfileView(props: ProfileViewProps) {
 					<section className="space-y-3">
 						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
 							<Target className="h-4 w-4 text-ink-3" aria-hidden />
-							Training Identity
+							{t('trainingIdentity')}
 						</h2>
 						{!canViewTrainingIdentity ? (
-							<p className="type-body-sm text-ink-3">
-								Training identity is private.
-							</p>
+							<p className="type-body-sm text-ink-3">{t('identityPrivate')}</p>
 						) : !hasTrainingIdentityContent || !trainingIdentity ? (
-							<p className="type-body-sm text-ink-3">
-								No training identity added yet.
-							</p>
+							<p className="type-body-sm text-ink-3">{t('noIdentity')}</p>
 						) : (
 							<dl className="type-body-sm space-y-4 text-foreground">
 								{trainingIdentity.goals.length > 0 ? (
 									<div className="space-y-2">
-										<dt className="type-label text-ink-3">Goals</dt>
+										<dt className="type-label text-ink-3">{t('goals')}</dt>
 										<dd className="flex flex-wrap gap-2">
 											{trainingIdentity.goals.map(goal => (
 												<Badge key={goal} variant="secondary">
@@ -416,7 +419,7 @@ export function ProfileView(props: ProfileViewProps) {
 								) : null}
 								{trainingIdentity.experienceLevel ? (
 									<div className="space-y-1">
-										<dt className="type-label text-ink-3">Experience</dt>
+										<dt className="type-label text-ink-3">{t('experience')}</dt>
 										<dd>
 											{getTrainingExperienceLabel(
 												trainingIdentity.experienceLevel,
@@ -427,7 +430,9 @@ export function ProfileView(props: ProfileViewProps) {
 								) : null}
 								{trainingIdentity.disciplines.length > 0 ? (
 									<div className="space-y-2">
-										<dt className="type-label text-ink-3">Disciplines</dt>
+										<dt className="type-label text-ink-3">
+											{t('disciplines')}
+										</dt>
 										<dd className="flex flex-wrap gap-2">
 											{trainingIdentity.disciplines.map(discipline => (
 												<Badge key={discipline} variant="outline">
@@ -439,7 +444,9 @@ export function ProfileView(props: ProfileViewProps) {
 								) : null}
 								{trainingIdentity.preferredStyle ? (
 									<div className="space-y-1">
-										<dt className="type-label text-ink-3">Preferred style</dt>
+										<dt className="type-label text-ink-3">
+											{t('preferredStyle')}
+										</dt>
 										<dd>
 											{getPreferredTrainingStyleLabel(
 												trainingIdentity.preferredStyle,
@@ -451,7 +458,7 @@ export function ProfileView(props: ProfileViewProps) {
 								{trainingIdentity.favoriteExercises.length > 0 ? (
 									<div className="space-y-2">
 										<dt className="type-label text-ink-3">
-											Favorite exercises
+											{t('favoriteExercises')}
 										</dt>
 										<dd>
 											<ul className="space-y-1 text-ink-2">
@@ -468,28 +475,28 @@ export function ProfileView(props: ProfileViewProps) {
 
 					<section className="space-y-3">
 						<h2 className="type-section rule-heading pb-2 text-foreground">
-							Body Metrics
+							{t('bodyMetrics')}
 						</h2>
 						{!canViewBodyMetrics ? (
 							<p className="type-body-sm text-ink-3">
-								Body metrics are private.
+								{t('bodyMetricsPrivate')}
 							</p>
 						) : !hasBodyMetrics ? (
-							<p className="type-body-sm text-ink-3">
-								No body metrics added yet.
-							</p>
+							<p className="type-body-sm text-ink-3">{t('noBodyMetrics')}</p>
 						) : (
 							<dl className="grid grid-cols-2 gap-x-4 gap-y-3">
-								<BodyMetric label="Age" value={bodyMetrics?.age} />
+								<BodyMetric label={t('age')} value={bodyMetrics?.age} />
 								<BodyMetric
-									label="Sex"
+									label={t('sex')}
 									value={
-										bodyMetrics?.sex ? bodyMetrics.sex.toLowerCase() : null
+										bodyMetrics?.sex
+											? t('sexValue', { sex: bodyMetrics.sex })
+											: null
 									}
 									capitalize
 								/>
 								<BodyMetric
-									label="Weight"
+									label={t('weight')}
 									value={
 										bodyMetrics?.weightKg == null
 											? null
@@ -497,7 +504,7 @@ export function ProfileView(props: ProfileViewProps) {
 									}
 								/>
 								<BodyMetric
-									label="Height"
+									label={t('height')}
 									value={
 										bodyMetrics?.heightCm == null
 											? null
@@ -531,7 +538,7 @@ export function ProfileView(props: ProfileViewProps) {
 						<div className="flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
 							<div className="flex items-center gap-2 text-ink-3">
 								<Dumbbell className="h-4 w-4 shrink-0" aria-hidden />
-								<span className="type-label">Workouts</span>
+								<span className="type-label">{t('workouts')}</span>
 							</div>
 							<span className="type-numeral text-foreground">
 								{canViewWorkoutHistory ? totalWorkouts : '—'}
@@ -539,8 +546,8 @@ export function ProfileView(props: ProfileViewProps) {
 							<span className="type-body-sm text-ink-3">
 								{canViewWorkoutHistory
 									? isOwnProfile
-										? `+${weeklyWorkouts} this week`
-										: 'Lifetime completed'
+										? t('thisWeek', { count: weeklyWorkouts })
+										: t('lifetime')
 									: ' '}
 							</span>
 						</div>
@@ -548,25 +555,27 @@ export function ProfileView(props: ProfileViewProps) {
 						<div className="flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
 							<div className="flex items-center gap-2 text-ink-3">
 								<Flame className="h-4 w-4 shrink-0" aria-hidden />
-								<span className="type-label">Streak</span>
+								<span className="type-label">{t('streak')}</span>
 							</div>
 							<div className="flex flex-wrap items-baseline gap-x-1.5">
 								<span className="type-numeral text-foreground">
 									{canViewWorkoutHistory ? currentStreak : '—'}
 								</span>
 								{canViewWorkoutHistory ? (
-									<span className="type-data text-ink-3">days</span>
+									<span className="type-data text-ink-3">{t('days')}</span>
 								) : null}
 							</div>
 							<span className="type-body-sm text-ink-3">
-								{canViewWorkoutHistory ? `Personal Best: ${bestStreak}` : ' '}
+								{canViewWorkoutHistory
+									? t('personalBest', { days: bestStreak })
+									: ' '}
 							</span>
 						</div>
 
 						<div className="col-span-2 flex flex-col gap-2 bg-background px-3 py-4 sm:px-4">
 							<div className="flex items-center gap-2 text-ink-3">
 								<Activity className="h-4 w-4 shrink-0" aria-hidden />
-								<span className="type-label">Volume Lifted Total</span>
+								<span className="type-label">{t('volumeTotal')}</span>
 							</div>
 							<div className="flex flex-wrap items-baseline gap-x-1.5">
 								<span className="type-numeral text-foreground">
@@ -587,16 +596,16 @@ export function ProfileView(props: ProfileViewProps) {
 					    rule 3), matching the dashboard and the session recap. */}
 					<section id="personal-records" className="scroll-mt-24">
 						<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
-							<Trophy className="h-4 w-4 text-honour" aria-hidden /> Personal
-							Records
+							<Trophy className="h-4 w-4 text-honour" aria-hidden />{' '}
+							{t('personalRecords')}
 						</h2>
 						{!canViewRecords || personalRecords.length === 0 ? (
 							<p className="type-body-sm py-3 text-ink-3">
 								{!canViewRecords
-									? 'Personal records are private.'
+									? t('recordsPrivate')
 									: isOwnProfile
-										? 'Log a few sets and your records will show up here.'
-										: 'No personal records yet.'}
+										? t('recordsEmptyOwn')
+										: t('recordsEmpty')}
 							</p>
 						) : (
 							<div className="pt-1">
@@ -610,17 +619,24 @@ export function ProfileView(props: ProfileViewProps) {
 												{record.exerciseName}
 											</h3>
 											<p className="type-body-sm text-ink-3">
-												<span className="type-data text-ink-2">
-													{formatWeight(record.weight, weightUnit, locale)}
-												</span>{' '}
-												for {record.reps} reps · est. 1RM{' '}
-												<span className="type-data text-ink-2">
-													{formatWeight(
+												{t.rich('recordLine', {
+													weight: formatWeight(
+														record.weight,
+														weightUnit,
+														locale,
+													),
+													reps: record.reps,
+													e1rm: formatWeight(
 														record.estimated1rm,
 														weightUnit,
 														locale,
-													)}
-												</span>
+													),
+													data: chunks => (
+														<span className="type-data text-ink-2">
+															{chunks}
+														</span>
+													),
+												})}
 											</p>
 										</div>
 										<span className="type-body-sm shrink-0 whitespace-nowrap text-ink-3">
@@ -635,14 +651,14 @@ export function ProfileView(props: ProfileViewProps) {
 					{props.bodyProgress !== undefined ? (
 						<section id="body-progress" className="scroll-mt-24">
 							<h2 className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground">
-								<Scale className="h-4 w-4 text-ink-3" aria-hidden /> Body
-								Progress
+								<Scale className="h-4 w-4 text-ink-3" aria-hidden />{' '}
+								{t('bodyProgress')}
 							</h2>
 							{canViewBodyProgress ? (
 								props.bodyProgress
 							) : (
 								<p className="type-body-sm py-3 text-ink-3">
-									Body progress is private.
+									{t('bodyProgressPrivate')}
 								</p>
 							)}
 						</section>
