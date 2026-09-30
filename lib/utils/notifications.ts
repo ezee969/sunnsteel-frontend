@@ -3,7 +3,11 @@ import type {
 	NotificationsResponse,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { trainingPartnerEncouragementLabel } from './training-partners'
+
+type T = Translator<'social.notifications'>
 
 export interface NotificationView {
 	title: string
@@ -11,31 +15,27 @@ export interface NotificationView {
 	href: string
 }
 
-const count = (n: number, one: string, many: string) =>
-	`${n} ${n === 1 ? one : many}`
-
 /** "2 new records and 1 load change" — what a finished session changed. */
 export const sessionProgressSummary = (
 	recordCount: number,
 	progressionCount: number,
-) => {
-	const parts = [
-		recordCount > 0 ? count(recordCount, 'new record', 'new records') : null,
-		progressionCount > 0
-			? count(progressionCount, 'load change', 'load changes')
-			: null,
-	].filter(Boolean)
-	return parts.join(' and ')
-}
+	t: T,
+) =>
+	t('progressSummary', {
+		records: recordCount,
+		changes: progressionCount,
+		both: recordCount > 0 && progressionCount > 0 ? 'yes' : 'no',
+	})
 
 /** NOTIF-01: the words and destination of one notification. */
 export function describeNotification(
 	notification: AppNotification,
+	t: T,
 ): NotificationView {
 	switch (notification.kind) {
 		case 'ACHIEVEMENT':
 			return {
-				title: `Achievement earned: ${notification.achievement.title}`,
+				title: t('achievementTitle', { title: notification.achievement.title }),
 				detail: notification.achievement.description || null,
 				href: '/achievements',
 			}
@@ -45,11 +45,15 @@ export function describeNotification(
 				? `${session.routineName} · ${session.dayName}`
 				: session.routineName
 			return {
-				title: `${name}: ${sessionProgressSummary(session.recordCount, session.progressionCount)}`,
-				detail:
-					session.progressionCount > 0
-						? 'Load changes apply from your next session of this day.'
-						: null,
+				title: t('sessionTitle', {
+					name,
+					summary: sessionProgressSummary(
+						session.recordCount,
+						session.progressionCount,
+						t,
+					),
+				}),
+				detail: session.progressionCount > 0 ? t('loadChangesApply') : null,
 				href: `/workouts/history/${session.id}`,
 			}
 		}
@@ -57,10 +61,10 @@ export function describeNotification(
 			const { actor } = notification
 			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
 			return {
-				title: `${name} started following you`,
+				title: t('followerTitle', { name }),
 				detail: actor.isFollowedByMe
-					? `@${actor.username} · you follow them too`
-					: `@${actor.username} · open their profile to follow back`,
+					? t('followerMutual', { username: actor.username })
+					: t('followerBack', { username: actor.username }),
 				href: `/profile/${actor.username}`,
 			}
 		}
@@ -72,8 +76,8 @@ export function describeNotification(
 			const { actor } = notification
 			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
 			return {
-				title: `${name} commented on your activity`,
-				detail: `@${actor.username} · open it to read the comment`,
+				title: t('commentTitle', { name }),
+				detail: t('commentDetail', { username: actor.username }),
 				href: '/activity?view=yours',
 			}
 		}
@@ -81,8 +85,13 @@ export function describeNotification(
 			const { actor } = notification
 			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
 			return {
-				title: `${name} sent encouragement: ${trainingPartnerEncouragementLabel(notification.encouragement.kind)}`,
-				detail: `@${actor.username} · from your training partner`,
+				title: t('encouragementTitle', {
+					name,
+					prompt: trainingPartnerEncouragementLabel(
+						notification.encouragement.kind,
+					),
+				}),
+				detail: t('encouragementDetail', { username: actor.username }),
 				href: `/profile/${actor.username}`,
 			}
 		}
@@ -93,8 +102,8 @@ export function describeNotification(
 				? `${session.routineName} · ${session.dayName}`
 				: session.routineName
 			return {
-				title: `${name} completed a workout`,
-				detail: `${workout} · shared by your training partner`,
+				title: t('partnerSessionTitle', { name }),
+				detail: t('partnerSessionDetail', { workout }),
 				href: `/profile/${actor.username}`,
 			}
 		}
@@ -102,8 +111,8 @@ export function describeNotification(
 			const { actor, achievement } = notification
 			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
 			return {
-				title: `${name} earned ${achievement.title}`,
-				detail: `@${actor.username} · shared by your training partner`,
+				title: t('partnerAchievementTitle', { name, title: achievement.title }),
+				detail: t('partnerAchievementDetail', { username: actor.username }),
 				href: `/profile/${actor.username}`,
 			}
 		}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -12,6 +13,7 @@ import {
 } from '@/lib/api/hooks/useNotifications'
 
 export default function NotificationsPage() {
+	const t = useTranslations('social.notifications')
 	const [now] = useState(() => new Date())
 	const notifications = useNotifications()
 	const markRead = useMarkNotificationsRead()
@@ -20,8 +22,8 @@ export default function NotificationsPage() {
 	return (
 		<div className="mx-auto flex max-w-4xl flex-col gap-6 sm:gap-8">
 			<HeroSection
-				title={<>Notifications</>}
-				subtitle={<>What changed for you, and what you can do today.</>}
+				title={<>{t('pageTitle')}</>}
+				subtitle={<>{t('pageSubtitle')}</>}
 			/>
 			<TodayActions />
 			<NotificationList
@@ -37,7 +39,7 @@ export default function NotificationsPage() {
 						{
 							onError: error =>
 								push({
-									title: 'Not marked read',
+									title: t('markFailed'),
 									description: error.message,
 									variant: 'destructive',
 								}),

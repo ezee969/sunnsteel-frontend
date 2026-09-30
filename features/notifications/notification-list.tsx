@@ -16,7 +16,7 @@ import {
 	UserPlus,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -50,7 +50,8 @@ function NotificationRow({
 	onOpen: (id: string) => void
 }) {
 	const locale = useLocale()
-	const view = describeNotification(notification)
+	const t = useTranslations('social.notifications')
+	const view = describeNotification(notification, t)
 	const Icon = KIND_ICON[notification.kind]
 	const unread = !notification.readAt
 	return (
@@ -77,7 +78,9 @@ function NotificationRow({
 					<span className="type-body-sm mt-1 block text-ink-3">
 						{/* Unread is a word, never colour alone (§4.3). */}
 						{unread ? (
-							<span className="type-label mr-2 text-foreground">New</span>
+							<span className="type-label mr-2 text-foreground">
+								{t('new')}
+							</span>
 						) : null}
 						<time dateTime={notification.createdAt}>
 							{formatTimeAgo(notification.createdAt, locale, now)}
@@ -103,6 +106,7 @@ function GroupedNotifications({
 	now: Date
 	onOpen: (id: string) => void
 }) {
+	const t = useTranslations('social.notifications')
 	const { unread, read } = splitByRead(notifications)
 	const fresh = useShowMore(unread, NEW_NOTIFICATIONS_SHOWN)
 	const earlier = useShowMore(read, EARLIER_NOTIFICATIONS_SHOWN)
@@ -111,7 +115,9 @@ function GroupedNotifications({
 		<>
 			{unread.length > 0 ? (
 				<div>
-					{titled ? <h3 className="type-label text-ink-3">New</h3> : null}
+					{titled ? (
+						<h3 className="type-label text-ink-3">{t('new')}</h3>
+					) : null}
 					<ul id="notifications-new">
 						{fresh.visible.map(notification => (
 							<NotificationRow
@@ -133,7 +139,7 @@ function GroupedNotifications({
 			{read.length > 0 ? (
 				<div>
 					{titled ? (
-						<h3 className="type-label pt-2 text-ink-3">Earlier</h3>
+						<h3 className="type-label pt-2 text-ink-3">{t('earlier')}</h3>
 					) : null}
 					<ul id="notifications-earlier">
 						{earlier.visible.map(notification => (
@@ -180,6 +186,7 @@ export function NotificationList({
 	onMarkAll: () => void
 	isMarking: boolean
 }) {
+	const t = useTranslations('social.notifications')
 	const unread = data?.unreadCount ?? 0
 	return (
 		<section aria-labelledby="notifications-updates" className="space-y-4">
@@ -189,11 +196,10 @@ export function NotificationList({
 						id="notifications-updates"
 						className="type-section text-foreground"
 					>
-						Updates
+						{t('updates')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3">
-						Achievements you earn, session progress and permitted updates from
-						other members from the last {NOTIFICATIONS_LOOKBACK_DAYS} days.
+						{t('updatesBody', { days: NOTIFICATIONS_LOOKBACK_DAYS })}
 					</p>
 				</div>
 				{data && data.notifications.length > 0 ? (
@@ -205,25 +211,21 @@ export function NotificationList({
 						disabled={unread === 0 || isMarking}
 					>
 						<CheckCheck className="size-4" aria-hidden />
-						Mark all read
+						{t('markAll')}
 					</Button>
 				) : null}
 			</div>
 
 			{isPending ? (
-				<div className="space-y-3" aria-label="Loading notifications">
+				<div className="space-y-3" aria-label={t('loading')}>
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 				</div>
 			) : isError ? (
 				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">
-						Notifications are unavailable
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load them. Try again.
-					</p>
+					<p className="type-panel text-foreground">{t('errorTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 					<Button
 						type="button"
 						variant="outline"
@@ -231,18 +233,15 @@ export function NotificationList({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : !data || data.notifications.length === 0 ? (
-				<EmptyModule
-					title="Nothing new yet"
-					description="Achievements, session progress and updates from other members will appear here."
-				/>
+				<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 			) : (
 				<>
 					<p className="sr-only" aria-live="polite">
-						{unread > 0 ? `${unread} unread` : 'All read'}
+						{unread > 0 ? t('unreadCount', { count: unread }) : t('allRead')}
 					</p>
 					<GroupedNotifications
 						notifications={data.notifications}
