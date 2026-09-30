@@ -1,11 +1,9 @@
 import type { AccountExportV1 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
-import {
-	ACCOUNT_EXPORT_CONTENTS,
-	ACCOUNT_EXPORT_NOTES,
-	accountExportFile,
-} from './account-export'
+import { translatorFor } from '@/i18n/translator'
+
+import { accountExportFile } from './account-export'
 
 const exported = {
 	format: 'sunnsteel-account-export',
@@ -29,8 +27,16 @@ describe('EXPORT-01 account export file', () => {
 	})
 
 	it('says what the file holds and what it leaves out, in plain terms', () => {
-		expect(ACCOUNT_EXPORT_CONTENTS).toMatch(/every workout with its sets/)
-		expect(ACCOUNT_EXPORT_NOTES).toMatch(/kilograms/)
-		expect(ACCOUNT_EXPORT_NOTES).toMatch(/username only/)
+		const t = translatorFor('en', 'settings.accountExport')
+		expect(t('contents')).toMatch(/every workout with its sets/)
+		expect(t('notes')).toMatch(/kilograms/)
+		expect(t('notes')).toMatch(/username only/)
+	})
+
+	it('says the same in Spanish', () => {
+		const t = translatorFor('es', 'settings.accountExport')
+		expect(t('contents')).toMatch(/cada entrenamiento con sus series/)
+		expect(t('notes')).toMatch(/kilogramos/)
+		expect(t('notes')).toMatch(/solo por su nombre de usuario/)
 	})
 })

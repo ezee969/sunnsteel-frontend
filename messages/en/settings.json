@@ -1,1 +1,194 @@
-{}
+{
+	"accountExport": {
+		"contents": "One JSON file with your profile and settings, every routine and its saved versions, every workout with its sets, your records, goals, gym equipment, schedule changes, starred exercises, who you follow and train with, and the comments, reactions and reports you made.",
+		"notes": "Weights are in kilograms, as Sunnsteel stores them. Other members appear by username only, and links you shared and devices you enabled are left out, because they work as keys.",
+		"title": "Download Your Data",
+		"downloadedTitle": "Your data was downloaded",
+		"downloadedDescription": "Check your downloads for the sunnsteel-….json file.",
+		"failedTitle": "Your data could not be downloaded",
+		"preparing": "Preparing your file…",
+		"download": "Download My Data"
+	},
+	"notificationPreferences": {
+		"categoryLabel": {
+			"REST_ALERT": "Rest alerts",
+			"TRAINING_REMINDER": "Training reminders",
+			"STREAK_AT_RISK": "Streak at risk",
+			"TRAINING_PARTNER_SESSION": "Partner workouts",
+			"TRAINING_PARTNER_ACHIEVEMENT": "Partner achievements"
+		},
+		"categoryDescription": {
+			"REST_ALERT": "When a rest period ends while Sunnsteel is closed or your screen is locked.",
+			"TRAINING_REMINDER": "Once on the days you are planned to train, at the time you choose below.",
+			"STREAK_AT_RISK": "On the last day a training run can still be continued. It replaces that day’s reminder rather than adding a second notification, and it states the dates rather than telling you to train.",
+			"TRAINING_PARTNER_SESSION": "When an active training partner completes one workout they currently share with you. Records and load changes do not create extra alerts.",
+			"TRAINING_PARTNER_ACHIEVEMENT": "When an active training partner earns a new achievement they currently share with you. Historical achievements are never replayed."
+		},
+		"quietHoursAny": "Notifications can arrive at any time.",
+		"quietHoursEmpty": "The window is empty, so nothing is silenced.",
+		"quietHoursOvernight": "Nothing is delivered between {start} and {end} the next morning.",
+		"quietHoursSameDay": "Nothing is delivered between {start} and {end}.",
+		"reminderOff": "No reminder is sent.",
+		"reminderOn": "Sent at {time} on the days you are planned to train, and not on the days you are not.",
+		"notice": {
+			"PUSH_UNAVAILABLE": "This server cannot send notifications, so none of these choices has any effect yet.",
+			"NO_DEVICE": "No device is set up to receive notifications yet, so these choices have nothing to apply to.",
+			"ALL_CATEGORIES_OFF": "Every category is off, so this device will receive nothing."
+		},
+		"timeZoneKnown": "Times are read in {timeZone}, registered by your device.",
+		"timeZoneUnknown": "Your time zone has not reached the server yet, so reminders stay off until it does.",
+		"title": "Notification controls",
+		"description": "What Sunnsteel may notify you about, and when it may not.",
+		"trainingAndRest": "Training and rest",
+		"partnerActivity": "Partner activity",
+		"partnerActivityNote": "Off by default. An alert is created only while the partnership, their activity grant and the event's sharing are all still active. Turning one on starts with new activity from that moment.",
+		"reminderTime": "Reminder time",
+		"reminderTimeNote": "Sunnsteel knows which days you train, not what hour, so this is the time you choose rather than a countdown to a session.",
+		"turnOff": "Turn off",
+		"quietHours": "Quiet hours",
+		"from": "From",
+		"to": "To",
+		"clear": "Clear",
+		"saveError": "That change was not saved. The values above are still what the server has."
+	},
+	"pushNotifications": {
+		"title": "Notifications",
+		"description": "Alerts this device can receive while Sunnsteel is closed.",
+		"enable": "Enable notifications",
+		"enabling": "Enabling…",
+		"turnOff": "Turn off on this device",
+		"turningOff": "Turning off…",
+		"note": "The only alert so far is the end of a rest period, and it names the lift that is up next. It cannot show a countdown: notifications have no ticking field on any platform."
+	},
+	"privacyCapNote": {
+		"changeUnderProfilePrivacy": "Change it under Profile Privacy",
+		"changeInSettings": "Change it in Settings"
+	},
+	"privacyOverview": {
+		"sectionLabel": {
+			"biography": "Biography",
+			"location": "Location",
+			"trainingIdentity": "Training identity",
+			"workoutHistory": "Workout history",
+			"records": "Personal records",
+			"bodyMetrics": "Body metrics",
+			"bodyProgress": "Body progress",
+			"routines": "Routines",
+			"achievements": "Achievements"
+		},
+		"audience": {
+			"PUBLIC": "Everyone",
+			"FOLLOWERS": "Followers",
+			"PRIVATE": "Only me"
+		},
+		"alwaysVisible": {
+			"name": "Name and avatar",
+			"username": "@username",
+			"joined": "Join date",
+			"counts": "Follower and following counts"
+		},
+		"surfaces": {
+			"PUBLIC": "Your public link /members/{username}, including visitors who are not signed in, and your profile inside Sunnsteel.",
+			"FOLLOWERS": "Your profile inside Sunnsteel, for signed-in members who follow you. Never on your public link.",
+			"PRIVATE": "Visible only to you when you open your own profile."
+		},
+		"discovery": {
+			"searchByName": "Search by name",
+			"searchByUsername": "Search by @username",
+			"contacts": "Contact matching",
+			"on": "On",
+			"off": "Off",
+			"contactsAllowed": "Allowed, not available yet"
+		},
+		"title": "Privacy Overview",
+		"description": "What other people can see right now, based on your saved settings. Your email is never shown to anyone.",
+		"alwaysShown": "Always shown: {items}",
+		"noSections": "No profile sections.",
+		"memberSearch": "Member search",
+		"searchNote": "Search controls who can find you. Anyone with your link can still open your profile and see what is allowed above.",
+		"savedForLater": "Saved for later: {rules}. Nothing from these sections is shown on profiles yet.",
+		"preview": "Preview public profile"
+	},
+	"profileDiscovery": {
+		"field": {
+			"discoverableByName": {
+				"label": "Find me by name",
+				"description": "Include your first or last name in member search."
+			},
+			"discoverableByUsername": {
+				"label": "Find me by @username",
+				"description": "Include your public @username in member search."
+			},
+			"discoverableByContacts": {
+				"label": "Future contact matching",
+				"description": "Allow future contact matching to suggest your account. Sunnsteel does not upload or match contacts today."
+			}
+		},
+		"updatedTitle": "Discovery updated",
+		"updatedDescription": "Your account discovery settings are now active.",
+		"failedTitle": "Could not update discovery",
+		"title": "Account Discovery",
+		"description": "Choose how other members can find your profile. What they can see after opening it is controlled by your profile privacy settings.",
+		"save": "Save Discovery"
+	},
+	"profilePrivacy": {
+		"field": {
+			"biography": "Controls the biography shown in the About section.",
+			"location": "Controls the location shown in the About section.",
+			"trainingIdentity": "Controls your goals, experience, disciplines, preferred style, and favorite exercises.",
+			"workoutHistory": "Controls your completed workout count, total volume, and streak summary, and caps who can see your workout and load-progression activity.",
+			"records": "Controls the personal records shown on your profile, and caps who can see your record activity.",
+			"bodyMetrics": "Controls age, sex, weight, and height. Your email is never shared.",
+			"bodyProgress": "Controls your weight trend and measurements over time on your profile. Separate from body metrics, which covers only your current weight.",
+			"routines": "Caps who can find and open the routines you share, and your shared-routine activity. Each routine also has its own setting.",
+			"achievements": "Controls your rank, earned milestones and comebacks on your profile, and caps your achievement, streak and comeback activity."
+		},
+		"updatedTitle": "Privacy updated",
+		"updatedDescription": "Your profile visibility settings are now active.",
+		"failedTitle": "Could not update privacy",
+		"title": "Profile Privacy",
+		"description": "Choose who can see each part of your profile. New accounts start private.",
+		"save": "Save Privacy"
+	},
+	"activitySharing": {
+		"updatedTitle": "Activity sharing updated",
+		"updatedDescription": "Each kind now reaches the audience shown.",
+		"failedTitle": "Could not update activity sharing",
+		"title": "Activity Sharing",
+		"description": "Who sees each kind of activity you generate by training. Nothing is posted by hand.",
+		"loadFailed": "Activity sharing could not be loaded.",
+		"retry": "Retry",
+		"loading": "Loading activity sharing",
+		"review": "Review each entry",
+		"save": "Save Sharing"
+	},
+	"blockedMembers": {
+		"title": "Blocked Members",
+		"description": "Blocking works both ways: neither of you appears in the other’s search, suggestions, follower lists or profile, and any follow between you is removed. {caveat}",
+		"loading": "Loading blocked members…",
+		"tryAgain": "Try Again",
+		"blockedLine": "@{username} · blocked {since}",
+		"unblockLabel": "Unblock {name}",
+		"unblockedTitle": "Member unblocked",
+		"unblockedDescription": "@{username} can find and follow you again.",
+		"unblockFailedTitle": "Could not unblock this member",
+		"unblock": "Unblock",
+		"empty": "You have not blocked anyone. You can block a member from their <link>profile</link>."
+	},
+	"display": {
+		"title": "Display",
+		"description": "Make Sunnsteel easier to read and to tap on this device, for example in a bright gym.",
+		"contrast": "Higher contrast",
+		"contrastNote": "Darker text in the light theme and brighter text in the dark one, stronger borders, and a thicker outline on the focused control.",
+		"systemContrast": "Your device already asks for more contrast, so it is on everywhere. Change it in your device's accessibility settings.",
+		"controls": "Larger controls",
+		"controlsNote": "Bigger buttons, fields and checkboxes everywhere. During a workout it also enlarges the set fields and the rest timer, and puts the less-used actions in one menu per exercise and per set. You can also switch it from the workout screen."
+	},
+	"motion": {
+		"title": "Motion",
+		"description": "Choose how much animation Sunnsteel uses on this device.",
+		"reduce": "Reduce motion",
+		"reduceNote": "Removes sliding, scaling, spinning and pulsing, and shortens fades. Nothing on screen is hidden. Applies immediately.",
+		"systemReduced": "Your device already asks for reduced motion, so it is on everywhere. Change it in your device's accessibility settings."
+	}
+}

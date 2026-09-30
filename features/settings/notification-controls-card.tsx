@@ -2,6 +2,7 @@
 
 import type { NotificationCategory } from '@sunsteel/contracts'
 import { SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -20,14 +21,14 @@ import {
 	useUpdateNotificationPreferences,
 } from '@/lib/api/hooks/useNotificationPreferences'
 import {
-	CATEGORY_DESCRIPTIONS,
-	CATEGORY_LABELS,
+	CATEGORY_DESCRIPTION_KEYS,
+	CATEGORY_LABEL_KEYS,
 	describeQuietHours,
 	describeReminder,
 	describeTimeZone,
 	formatMinuteOfDay,
 	parseMinuteOfDay,
-	PREFERENCES_NOTICE_COPY,
+	PREFERENCES_NOTICE_KEYS,
 	preferencesNotice,
 } from '@/lib/utils/notification-preferences'
 
@@ -52,6 +53,7 @@ const PARTNER_CATEGORIES = [
  * channel switch would be the category switch under another name.
  */
 export function NotificationControlsCard() {
+	const t = useTranslations('settings.notificationPreferences')
 	const { data, isPending } = useNotificationPreferences()
 	const update = useUpdateNotificationPreferences()
 
@@ -59,7 +61,7 @@ export function NotificationControlsCard() {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Notification controls</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					<Skeleton className="h-10" />
@@ -84,9 +86,9 @@ export function NotificationControlsCard() {
 				className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3"
 			>
 				<div className="space-y-1">
-					<Label htmlFor={id}>{CATEGORY_LABELS[category]}</Label>
+					<Label htmlFor={id}>{t(CATEGORY_LABEL_KEYS[category])}</Label>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{CATEGORY_DESCRIPTIONS[category]}
+						{t(CATEGORY_DESCRIPTION_KEYS[category])}
 					</p>
 				</div>
 				<Label
@@ -102,7 +104,7 @@ export function NotificationControlsCard() {
 								categories: { [category]: checked === true },
 							})
 						}
-						aria-label={CATEGORY_LABELS[category]}
+						aria-label={t(CATEGORY_LABEL_KEYS[category])}
 						className="size-5"
 					/>
 				</Label>
@@ -115,41 +117,36 @@ export function NotificationControlsCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<SlidersHorizontal className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Notification controls</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					What Sunnsteel may notify you about, and when it may not.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				{notice ? (
 					<p role="status" className="type-body-sm max-w-[68ch] text-ink-2">
-						{PREFERENCES_NOTICE_COPY[notice]}
+						{t(PREFERENCES_NOTICE_KEYS[notice])}
 					</p>
 				) : null}
 
 				<div className="space-y-3">
-					<p className="type-panel text-foreground">Training and rest</p>
+					<p className="type-panel text-foreground">{t('trainingAndRest')}</p>
 					{TRAINING_CATEGORIES.map(categoryRow)}
 				</div>
 
 				<div className="space-y-3 border-t border-rule pt-4">
 					<div className="space-y-1">
-						<p className="type-panel text-foreground">Partner activity</p>
+						<p className="type-panel text-foreground">{t('partnerActivity')}</p>
 						<p className="type-body-sm max-w-[68ch] text-ink-3">
-							Off by default. An alert is created only while the partnership,
-							their activity grant and the event&apos;s sharing are all still
-							active. Turning one on starts with new activity from that moment.
+							{t('partnerActivityNote')}
 						</p>
 					</div>
 					{PARTNER_CATEGORIES.map(categoryRow)}
 				</div>
 
 				<div className="space-y-2 border-t border-rule pt-4">
-					<Label htmlFor="reminder-time">Reminder time</Label>
+					<Label htmlFor="reminder-time">{t('reminderTime')}</Label>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						Sunnsteel knows which days you train, not what hour, so this is the
-						time you choose rather than a countdown to a session.
+						{t('reminderTimeNote')}
 					</p>
 					<div className="flex flex-wrap items-center gap-2">
 						<Input
@@ -176,21 +173,21 @@ export function NotificationControlsCard() {
 									update.mutate({ reminder: { minuteOfDay: null } })
 								}
 							>
-								Turn off
+								{t('turnOff')}
 							</Button>
 						) : null}
 					</div>
 					<p className="type-body-sm text-ink-3">
-						{describeReminder(reminderMinute)}
+						{describeReminder(t, reminderMinute)}
 					</p>
 					<p className="type-body-sm text-ink-3">
-						{describeTimeZone(preferences.timeZone)}
+						{describeTimeZone(t, preferences.timeZone)}
 					</p>
 				</div>
 
 				<div className="space-y-2 border-t border-rule pt-4">
 					<p id="quiet-hours" className="type-panel text-foreground">
-						Quiet hours
+						{t('quietHours')}
 					</p>
 					<div
 						role="group"
@@ -198,7 +195,7 @@ export function NotificationControlsCard() {
 						className="flex flex-wrap items-end gap-3"
 					>
 						<div className="space-y-1">
-							<Label htmlFor="quiet-start">From</Label>
+							<Label htmlFor="quiet-start">{t('from')}</Label>
 							<Input
 								id="quiet-start"
 								type="time"
@@ -220,7 +217,7 @@ export function NotificationControlsCard() {
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label htmlFor="quiet-end">To</Label>
+							<Label htmlFor="quiet-end">{t('to')}</Label>
 							<Input
 								id="quiet-end"
 								type="time"
@@ -250,19 +247,18 @@ export function NotificationControlsCard() {
 								disabled={update.isPending}
 								onClick={() => update.mutate({ quietHours: null })}
 							>
-								Clear
+								{t('clear')}
 							</Button>
 						) : null}
 					</div>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{describeQuietHours(quietHours)}
+						{describeQuietHours(t, quietHours)}
 					</p>
 				</div>
 
 				{update.isError ? (
 					<p role="alert" className="type-body-sm text-ink-2">
-						That change was not saved. The values above are still what the
-						server has.
+						{t('saveError')}
 					</p>
 				) : null}
 			</CardContent>

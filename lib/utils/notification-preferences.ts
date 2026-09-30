@@ -4,6 +4,11 @@ import type {
 	QuietHours,
 } from '@sunsteel/contracts'
 
+import type { MessageKey, Translator } from '@/i18n/translator'
+
+type Namespace = 'settings.notificationPreferences'
+type Key = MessageKey<Namespace>
+
 /**
  * NOTIF-05 copy and the conversions between a `<input type="time">` value and
  * the minutes-from-midnight the contract stores. Pure, because the wrapping
@@ -11,26 +16,22 @@ import type {
  * things that are easy to word wrongly.
  */
 
-export const CATEGORY_LABELS: Record<NotificationCategory, string> = {
-	REST_ALERT: 'Rest alerts',
-	TRAINING_REMINDER: 'Training reminders',
-	STREAK_AT_RISK: 'Streak at risk',
-	TRAINING_PARTNER_SESSION: 'Partner workouts',
-	TRAINING_PARTNER_ACHIEVEMENT: 'Partner achievements',
-}
+export const CATEGORY_LABEL_KEYS = {
+	REST_ALERT: 'categoryLabel.REST_ALERT',
+	TRAINING_REMINDER: 'categoryLabel.TRAINING_REMINDER',
+	STREAK_AT_RISK: 'categoryLabel.STREAK_AT_RISK',
+	TRAINING_PARTNER_SESSION: 'categoryLabel.TRAINING_PARTNER_SESSION',
+	TRAINING_PARTNER_ACHIEVEMENT: 'categoryLabel.TRAINING_PARTNER_ACHIEVEMENT',
+} as const satisfies Record<NotificationCategory, Key>
 
-export const CATEGORY_DESCRIPTIONS: Record<NotificationCategory, string> = {
-	REST_ALERT:
-		'When a rest period ends while Sunnsteel is closed or your screen is locked.',
-	TRAINING_REMINDER:
-		'Once on the days you are planned to train, at the time you choose below.',
-	STREAK_AT_RISK:
-		'On the last day a training run can still be continued. It replaces that day’s reminder rather than adding a second notification, and it states the dates rather than telling you to train.',
-	TRAINING_PARTNER_SESSION:
-		'When an active training partner completes one workout they currently share with you. Records and load changes do not create extra alerts.',
+export const CATEGORY_DESCRIPTION_KEYS = {
+	REST_ALERT: 'categoryDescription.REST_ALERT',
+	TRAINING_REMINDER: 'categoryDescription.TRAINING_REMINDER',
+	STREAK_AT_RISK: 'categoryDescription.STREAK_AT_RISK',
+	TRAINING_PARTNER_SESSION: 'categoryDescription.TRAINING_PARTNER_SESSION',
 	TRAINING_PARTNER_ACHIEVEMENT:
-		'When an active training partner earns a new achievement they currently share with you. Historical achievements are never replayed.',
-}
+		'categoryDescription.TRAINING_PARTNER_ACHIEVEMENT',
+} as const satisfies Record<NotificationCategory, Key>
 
 /** `1110` → `18:30`. Zero-padded so it round-trips through a time input. */
 export function formatMinuteOfDay(minuteOfDay: number): string {
@@ -54,23 +55,29 @@ export function parseMinuteOfDay(value: string): number | null {
  * — a window read as "22:00 to 07:00" on one day is the single most likely
  * thing to be misunderstood.
  */
-export function describeQuietHours(quietHours: QuietHours | null): string {
-	if (!quietHours) return 'Notifications can arrive at any time.'
+export function describeQuietHours(
+	t: Translator<Namespace>,
+	quietHours: QuietHours | null,
+): string {
+	if (!quietHours) return t('quietHoursAny')
 	if (quietHours.startMinute === quietHours.endMinute) {
-		return 'The window is empty, so nothing is silenced.'
+		return t('quietHoursEmpty')
 	}
 	const start = formatMinuteOfDay(quietHours.startMinute)
 	const end = formatMinuteOfDay(quietHours.endMinute)
 	const overnight = quietHours.startMinute > quietHours.endMinute
 	return overnight
-		? `Nothing is delivered between ${start} and ${end} the next morning.`
-		: `Nothing is delivered between ${start} and ${end}.`
+		? t('quietHoursOvernight', { start, end })
+		: t('quietHoursSameDay', { start, end })
 }
 
-export function describeReminder(minuteOfDay: number | null): string {
+export function describeReminder(
+	t: Translator<Namespace>,
+	minuteOfDay: number | null,
+): string {
 	return minuteOfDay === null
-		? 'No reminder is sent.'
-		: `Sent at ${formatMinuteOfDay(minuteOfDay)} on the days you are planned to train, and not on the days you are not.`
+		? t('reminderOff')
+		: t('reminderOn', { time: formatMinuteOfDay(minuteOfDay) })
 }
 
 export type PreferencesNotice =
@@ -92,24 +99,19 @@ export function preferencesNotice(
 		: null
 }
 
-export const PREFERENCES_NOTICE_COPY: Record<
-	Exclude<PreferencesNotice, null>,
-	string
-> = {
-	PUSH_UNAVAILABLE:
-		'This server cannot send notifications, so none of these choices has any effect yet.',
-	NO_DEVICE:
-		'No device is set up to receive notifications yet, so these choices have nothing to apply to.',
-	ALL_CATEGORIES_OFF:
-		'Every category is off, so this device will receive nothing.',
-}
+export const PREFERENCES_NOTICE_KEYS = {
+	PUSH_UNAVAILABLE: 'notice.PUSH_UNAVAILABLE',
+	NO_DEVICE: 'notice.NO_DEVICE',
+	ALL_CATEGORIES_OFF: 'notice.ALL_CATEGORIES_OFF',
+} as const satisfies Record<Exclude<PreferencesNotice, null>, Key>
 
 /**
  * The reminder needs a zone to know when the owner's day is. The device knows
  * it; the server only learns it when a device registers one.
  */
-export function describeTimeZone(timeZone: string | null): string {
-	return timeZone
-		? `Times are read in ${timeZone}, registered by your device.`
-		: 'Your time zone has not reached the server yet, so reminders stay off until it does.'
+export function describeTimeZone(
+	t: Translator<Namespace>,
+	timeZone: string | null,
+): string {
+	return timeZone ? t('timeZoneKnown', { timeZone }) : t('timeZoneUnknown')
 }

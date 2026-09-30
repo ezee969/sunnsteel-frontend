@@ -1,1 +1,194 @@
-{}
+{
+	"accountExport": {
+		"contents": "Un archivo JSON con tu perfil y ajustes, cada rutina y sus versiones guardadas, cada entrenamiento con sus series, tus récords, objetivos, equipamiento del gimnasio, cambios de calendario, ejercicios destacados, a quién sigues y con quién entrenas, y los comentarios, reacciones y denuncias que hiciste.",
+		"notes": "Los pesos están en kilogramos, tal como los guarda Sunnsteel. Los demás miembros aparecen solo por su nombre de usuario, y se omiten los enlaces que compartiste y los dispositivos que activaste, porque funcionan como llaves.",
+		"title": "Descargar tus datos",
+		"downloadedTitle": "Tus datos se descargaron",
+		"downloadedDescription": "Busca el archivo sunnsteel-….json en tus descargas.",
+		"failedTitle": "No se pudieron descargar tus datos",
+		"preparing": "Preparando tu archivo…",
+		"download": "Descargar mis datos"
+	},
+	"notificationPreferences": {
+		"categoryLabel": {
+			"REST_ALERT": "Alertas de descanso",
+			"TRAINING_REMINDER": "Recordatorios de entrenamiento",
+			"STREAK_AT_RISK": "Racha en riesgo",
+			"TRAINING_PARTNER_SESSION": "Entrenamientos de compañeros",
+			"TRAINING_PARTNER_ACHIEVEMENT": "Logros de compañeros"
+		},
+		"categoryDescription": {
+			"REST_ALERT": "Cuando termina un descanso mientras Sunnsteel está cerrado o tu pantalla está bloqueada.",
+			"TRAINING_REMINDER": "Una vez en los días en que tienes planificado entrenar, a la hora que elijas abajo.",
+			"STREAK_AT_RISK": "El último día en que aún se puede continuar una racha de entrenamiento. Reemplaza el recordatorio de ese día en lugar de agregar una segunda notificación, e indica las fechas en lugar de decirte que entrenes.",
+			"TRAINING_PARTNER_SESSION": "Cuando un compañero de entrenamiento activo completa un entrenamiento que comparte contigo en ese momento. Los récords y los cambios de carga no crean alertas adicionales.",
+			"TRAINING_PARTNER_ACHIEVEMENT": "Cuando un compañero de entrenamiento activo obtiene un logro nuevo que comparte contigo en ese momento. Los logros anteriores nunca se reenvían."
+		},
+		"quietHoursAny": "Las notificaciones pueden llegar a cualquier hora.",
+		"quietHoursEmpty": "La ventana está vacía, así que no se silencia nada.",
+		"quietHoursOvernight": "No se entrega nada entre {start} y {end} de la mañana siguiente.",
+		"quietHoursSameDay": "No se entrega nada entre {start} y {end}.",
+		"reminderOff": "No se envía ningún recordatorio.",
+		"reminderOn": "Se envía a las {time} los días en que tienes planificado entrenar, y no los días en que no.",
+		"notice": {
+			"PUSH_UNAVAILABLE": "Este servidor no puede enviar notificaciones, así que ninguna de estas opciones tiene efecto por ahora.",
+			"NO_DEVICE": "Aún no hay ningún dispositivo configurado para recibir notificaciones, así que estas opciones no tienen nada a lo que aplicarse.",
+			"ALL_CATEGORIES_OFF": "Todas las categorías están desactivadas, así que este dispositivo no recibirá nada."
+		},
+		"timeZoneKnown": "Las horas se interpretan en {timeZone}, registrada por tu dispositivo.",
+		"timeZoneUnknown": "Tu zona horaria aún no ha llegado al servidor, así que los recordatorios seguirán desactivados hasta que llegue.",
+		"title": "Controles de notificaciones",
+		"description": "Sobre qué puede notificarte Sunnsteel y cuándo no puede hacerlo.",
+		"trainingAndRest": "Entrenamiento y descanso",
+		"partnerActivity": "Actividad de compañeros",
+		"partnerActivityNote": "Desactivado de forma predeterminada. Solo se crea una alerta mientras la relación, su permiso de actividad y el uso compartido del evento sigan activos. Al activar una categoría, empieza con la actividad nueva desde ese momento.",
+		"reminderTime": "Hora del recordatorio",
+		"reminderTimeNote": "Sunnsteel sabe qué días entrenas, no a qué hora, así que esta es la hora que eliges y no una cuenta regresiva hasta una sesión.",
+		"turnOff": "Desactivar",
+		"quietHours": "Horas de silencio",
+		"from": "Desde",
+		"to": "Hasta",
+		"clear": "Borrar",
+		"saveError": "Ese cambio no se guardó. Los valores de arriba siguen siendo los que tiene el servidor."
+	},
+	"pushNotifications": {
+		"title": "Notificaciones",
+		"description": "Alertas que este dispositivo puede recibir mientras Sunnsteel está cerrado.",
+		"enable": "Activar notificaciones",
+		"enabling": "Activando…",
+		"turnOff": "Desactivar en este dispositivo",
+		"turningOff": "Desactivando…",
+		"note": "Por ahora, la única alerta es el fin de un descanso, y nombra el ejercicio que sigue. No puede mostrar una cuenta regresiva: las notificaciones no tienen un campo que avance en ninguna plataforma."
+	},
+	"privacyCapNote": {
+		"changeUnderProfilePrivacy": "Cámbialo en Privacidad del perfil",
+		"changeInSettings": "Cámbialo en Ajustes"
+	},
+	"privacyOverview": {
+		"sectionLabel": {
+			"biography": "Biografía",
+			"location": "Ubicación",
+			"trainingIdentity": "Identidad de entrenamiento",
+			"workoutHistory": "Historial de entrenamientos",
+			"records": "Récords personales",
+			"bodyMetrics": "Datos corporales",
+			"bodyProgress": "Progreso corporal",
+			"routines": "Rutinas",
+			"achievements": "Logros"
+		},
+		"audience": {
+			"PUBLIC": "Todos",
+			"FOLLOWERS": "Seguidores",
+			"PRIVATE": "Solo yo"
+		},
+		"alwaysVisible": {
+			"name": "Nombre y avatar",
+			"username": "@usuario",
+			"joined": "Fecha de registro",
+			"counts": "Cantidad de seguidores y de personas que sigues"
+		},
+		"surfaces": {
+			"PUBLIC": "Tu enlace público /members/{username}, incluidos los visitantes que no han iniciado sesión, y tu perfil dentro de Sunnsteel.",
+			"FOLLOWERS": "Tu perfil dentro de Sunnsteel, para los miembros con sesión iniciada que te siguen. Nunca en tu enlace público.",
+			"PRIVATE": "Visible solo para ti cuando abres tu propio perfil."
+		},
+		"discovery": {
+			"searchByName": "Búsqueda por nombre",
+			"searchByUsername": "Búsqueda por @usuario",
+			"contacts": "Coincidencia de contactos",
+			"on": "Activada",
+			"off": "Desactivada",
+			"contactsAllowed": "Permitida, aún no disponible"
+		},
+		"title": "Resumen de privacidad",
+		"description": "Lo que otras personas pueden ver ahora, según tus ajustes guardados. Tu correo nunca se muestra a nadie.",
+		"alwaysShown": "Siempre visible: {items}",
+		"noSections": "Sin secciones del perfil.",
+		"memberSearch": "Búsqueda de miembros",
+		"searchNote": "La búsqueda controla quién puede encontrarte. Cualquiera con tu enlace aún puede abrir tu perfil y ver lo permitido arriba.",
+		"savedForLater": "Guardado para después: {rules}. Nada de estas secciones se muestra aún en los perfiles.",
+		"preview": "Vista previa del perfil público"
+	},
+	"profileDiscovery": {
+		"field": {
+			"discoverableByName": {
+				"label": "Encontrarme por nombre",
+				"description": "Incluye tu nombre o apellido en la búsqueda de miembros."
+			},
+			"discoverableByUsername": {
+				"label": "Encontrarme por @usuario",
+				"description": "Incluye tu @usuario público en la búsqueda de miembros."
+			},
+			"discoverableByContacts": {
+				"label": "Futura coincidencia de contactos",
+				"description": "Permite que la futura coincidencia de contactos sugiera tu cuenta. Hoy Sunnsteel no sube ni compara contactos."
+			}
+		},
+		"updatedTitle": "Descubrimiento actualizado",
+		"updatedDescription": "Los ajustes de descubrimiento de tu cuenta ya están activos.",
+		"failedTitle": "No se pudo actualizar el descubrimiento",
+		"title": "Descubrimiento de la cuenta",
+		"description": "Elige cómo pueden encontrar tu perfil otros miembros. Lo que ven al abrirlo lo controlan tus ajustes de privacidad del perfil.",
+		"save": "Guardar descubrimiento"
+	},
+	"profilePrivacy": {
+		"field": {
+			"biography": "Controla la biografía que se muestra en la sección Acerca de.",
+			"location": "Controla la ubicación que se muestra en la sección Acerca de.",
+			"trainingIdentity": "Controla tus objetivos, experiencia, disciplinas, estilo preferido y ejercicios favoritos.",
+			"workoutHistory": "Controla el recuento de entrenamientos completados, el volumen total y el resumen de tu racha, y limita quién puede ver la actividad de tus entrenamientos y de progresión de carga.",
+			"records": "Controla los récords personales que se muestran en tu perfil y limita quién puede ver la actividad de tus récords.",
+			"bodyMetrics": "Controla edad, sexo, peso y estatura. Tu correo nunca se comparte.",
+			"bodyProgress": "Controla la tendencia de tu peso y tus medidas a lo largo del tiempo en tu perfil. Es independiente de los datos corporales, que abarcan solo tu peso actual.",
+			"routines": "Limita quién puede encontrar y abrir las rutinas que compartes, y la actividad de tus rutinas compartidas. Cada rutina también tiene su propio ajuste.",
+			"achievements": "Controla tu rango, los hitos obtenidos y los regresos en tu perfil, y limita la actividad de tus logros, rachas y regresos."
+		},
+		"updatedTitle": "Privacidad actualizada",
+		"updatedDescription": "Los ajustes de visibilidad de tu perfil ya están activos.",
+		"failedTitle": "No se pudo actualizar la privacidad",
+		"title": "Privacidad del perfil",
+		"description": "Elige quién puede ver cada parte de tu perfil. Las cuentas nuevas empiezan en privado.",
+		"save": "Guardar privacidad"
+	},
+	"activitySharing": {
+		"updatedTitle": "Uso compartido de actividad actualizado",
+		"updatedDescription": "Cada tipo ahora llega a la audiencia indicada.",
+		"failedTitle": "No se pudo actualizar el uso compartido de actividad",
+		"title": "Compartir actividad",
+		"description": "Quién ve cada tipo de actividad que generas al entrenar. Nada se publica a mano.",
+		"loadFailed": "No se pudo cargar el uso compartido de actividad.",
+		"retry": "Reintentar",
+		"loading": "Cargando el uso compartido de actividad",
+		"review": "Revisar cada entrada",
+		"save": "Guardar ajustes"
+	},
+	"blockedMembers": {
+		"title": "Miembros bloqueados",
+		"description": "Bloquear funciona en ambos sentidos: ninguno de los dos aparece en la búsqueda, las sugerencias, las listas de seguidores ni el perfil del otro, y se elimina cualquier seguimiento entre ambos. {caveat}",
+		"loading": "Cargando miembros bloqueados…",
+		"tryAgain": "Reintentar",
+		"blockedLine": "@{username} · bloqueado {since}",
+		"unblockLabel": "Desbloquear a {name}",
+		"unblockedTitle": "Miembro desbloqueado",
+		"unblockedDescription": "@{username} puede encontrarte y seguirte de nuevo.",
+		"unblockFailedTitle": "No se pudo desbloquear a este miembro",
+		"unblock": "Desbloquear",
+		"empty": "No has bloqueado a nadie. Puedes bloquear a un miembro desde su <link>perfil</link>."
+	},
+	"display": {
+		"title": "Pantalla",
+		"description": "Haz que Sunnsteel sea más fácil de leer y de tocar en este dispositivo, por ejemplo en un gimnasio muy iluminado.",
+		"contrast": "Mayor contraste",
+		"contrastNote": "Texto más oscuro en el tema claro y más brillante en el oscuro, bordes más marcados y un contorno más grueso en el control enfocado.",
+		"systemContrast": "Tu dispositivo ya pide más contraste, así que está activado en todas partes. Cámbialo en los ajustes de accesibilidad de tu dispositivo.",
+		"controls": "Controles más grandes",
+		"controlsNote": "Botones, campos y casillas más grandes en todas partes. Durante un entrenamiento también agranda los campos de las series y el temporizador de descanso, y reúne las acciones menos usadas en un menú por ejercicio y por serie. También puedes cambiarlo desde la pantalla del entrenamiento."
+	},
+	"motion": {
+		"title": "Movimiento",
+		"description": "Elige cuánta animación usa Sunnsteel en este dispositivo.",
+		"reduce": "Reducir movimiento",
+		"reduceNote": "Elimina los deslizamientos, escalados, giros y pulsos, y acorta los desvanecimientos. No se oculta nada de la pantalla. Se aplica de inmediato.",
+		"systemReduced": "Tu dispositivo ya pide reducir el movimiento, así que está activado en todas partes. Cámbialo en los ajustes de accesibilidad de tu dispositivo."
+	}
+}

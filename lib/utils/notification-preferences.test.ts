@@ -2,9 +2,11 @@ import type { NotificationPreferencesResponse } from '@sunsteel/contracts'
 import { NOTIFICATION_CATEGORIES } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	CATEGORY_DESCRIPTIONS,
-	CATEGORY_LABELS,
+	CATEGORY_DESCRIPTION_KEYS,
+	CATEGORY_LABEL_KEYS,
 	describeQuietHours,
 	describeReminder,
 	describeTimeZone,
@@ -12,6 +14,9 @@ import {
 	parseMinuteOfDay,
 	preferencesNotice,
 } from './notification-preferences'
+
+const t = translatorFor('en', 'settings.notificationPreferences')
+const tEs = translatorFor('es', 'settings.notificationPreferences')
 
 const response = (
 	overrides: Partial<NotificationPreferencesResponse> = {},
@@ -59,43 +64,43 @@ describe('minute-of-day conversion', () => {
 describe('quiet-hours copy', () => {
 	it('says plainly that an overnight window runs into the next morning', () => {
 		expect(
-			describeQuietHours({ startMinute: 22 * 60, endMinute: 7 * 60 }),
+			describeQuietHours(t, { startMinute: 22 * 60, endMinute: 7 * 60 }),
 		).toBe('Nothing is delivered between 22:00 and 07:00 the next morning.')
 	})
 
 	it('leaves a same-day window unqualified', () => {
 		expect(
-			describeQuietHours({ startMinute: 9 * 60, endMinute: 17 * 60 }),
+			describeQuietHours(t, { startMinute: 9 * 60, endMinute: 17 * 60 }),
 		).toBe('Nothing is delivered between 09:00 and 17:00.')
 	})
 
 	it('does not claim an empty window silences anything', () => {
-		expect(describeQuietHours({ startMinute: 600, endMinute: 600 })).toBe(
+		expect(describeQuietHours(t, { startMinute: 600, endMinute: 600 })).toBe(
 			'The window is empty, so nothing is silenced.',
 		)
 	})
 
 	it('says notifications can arrive at any time when there is no window', () => {
-		expect(describeQuietHours(null)).toMatch(/any time/)
+		expect(describeQuietHours(t, null)).toMatch(/any time/)
 	})
 })
 
 describe('reminder copy', () => {
 	it('states both halves of the rule: the time, and only on training days', () => {
-		const copy = describeReminder(18 * 60 + 30)
+		const copy = describeReminder(t, 18 * 60 + 30)
 		expect(copy).toContain('18:30')
 		expect(copy).toMatch(/planned to train/)
 		expect(copy).toMatch(/not on the days you are not/)
 	})
 
 	it('never implies a countdown to a session', () => {
-		expect(describeReminder(1110)).not.toMatch(
+		expect(describeReminder(t, 1110)).not.toMatch(
 			/before|countdown|minutes ahead/i,
 		)
 	})
 
 	it('says nothing is sent when it is off', () => {
-		expect(describeReminder(null)).toBe('No reminder is sent.')
+		expect(describeReminder(t, null)).toBe('No reminder is sent.')
 	})
 })
 
@@ -163,47 +168,90 @@ describe('the notice above the controls', () => {
 
 describe('time-zone copy', () => {
 	it('names the zone the times are read in', () => {
-		expect(describeTimeZone('Europe/Berlin')).toContain('Europe/Berlin')
+		expect(describeTimeZone(t, 'Europe/Berlin')).toContain('Europe/Berlin')
 	})
 
 	it('explains why reminders stay off without one', () => {
-		expect(describeTimeZone(null)).toMatch(/stay off/)
+		expect(describeTimeZone(t, null)).toMatch(/stay off/)
 	})
 })
 
 describe('the streak-at-risk category (NOTIF-06)', () => {
 	it('says it replaces the reminder rather than adding a push', () => {
-		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(/replaces/)
-		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(
+		expect(t(CATEGORY_DESCRIPTION_KEYS.STREAK_AT_RISK)).toMatch(/replaces/)
+		expect(t(CATEGORY_DESCRIPTION_KEYS.STREAK_AT_RISK)).toMatch(
 			/rather than adding a second/,
 		)
 	})
 
 	it('never promises to tell anyone to train', () => {
-		expect(CATEGORY_DESCRIPTIONS.STREAK_AT_RISK).toMatch(/states the dates/)
+		expect(t(CATEGORY_DESCRIPTION_KEYS.STREAK_AT_RISK)).toMatch(
+			/states the dates/,
+		)
 	})
 
 	it('is switchable like the others, so every category has copy', () => {
 		for (const category of NOTIFICATION_CATEGORIES) {
-			expect(CATEGORY_LABELS[category]).toBeTruthy()
-			expect(CATEGORY_DESCRIPTIONS[category]).toBeTruthy()
+			expect(t(CATEGORY_LABEL_KEYS[category])).toBeTruthy()
+			expect(t(CATEGORY_DESCRIPTION_KEYS[category])).toBeTruthy()
 		}
 	})
 })
 
 describe('partner activity alerts (NOTIF-07)', () => {
 	it('states the selected facts and both privacy boundaries', () => {
-		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+		expect(t(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_SESSION)).toMatch(
 			/active training partner/,
 		)
-		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+		expect(t(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_SESSION)).toMatch(
 			/currently share/,
 		)
-		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_SESSION).toMatch(
+		expect(t(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_SESSION)).toMatch(
 			/do not create extra alerts/,
 		)
-		expect(CATEGORY_DESCRIPTIONS.TRAINING_PARTNER_ACHIEVEMENT).toMatch(
+		expect(t(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_ACHIEVEMENT)).toMatch(
 			/Historical achievements are never replayed/,
 		)
+	})
+})
+
+describe('the same rules in Spanish', () => {
+	it('says plainly that an overnight window runs into the next morning', () => {
+		expect(
+			describeQuietHours(tEs, { startMinute: 22 * 60, endMinute: 7 * 60 }),
+		).toBe('No se entrega nada entre 22:00 y 07:00 de la mañana siguiente.')
+		expect(
+			describeQuietHours(tEs, { startMinute: 9 * 60, endMinute: 17 * 60 }),
+		).toBe('No se entrega nada entre 09:00 y 17:00.')
+		expect(describeQuietHours(tEs, { startMinute: 600, endMinute: 600 })).toBe(
+			'La ventana está vacía, así que no se silencia nada.',
+		)
+	})
+
+	it('states both halves of the reminder rule and never a countdown', () => {
+		const copy = describeReminder(tEs, 18 * 60 + 30)
+		expect(copy).toContain('18:30')
+		expect(copy).toMatch(/tienes planificado entrenar/)
+		expect(copy).toMatch(/no los días en que no/)
+		expect(copy).not.toMatch(/antes|cuenta regresiva|minutos de antelación/i)
+		expect(describeReminder(tEs, null)).toBe('No se envía ningún recordatorio.')
+	})
+
+	it('explains why reminders stay off without a time zone', () => {
+		expect(describeTimeZone(tEs, 'Europe/Berlin')).toContain('Europe/Berlin')
+		expect(describeTimeZone(tEs, null)).toMatch(/seguirán desactivados/)
+	})
+
+	it('keeps the streak copy honest and gives every category copy', () => {
+		const streak = tEs(CATEGORY_DESCRIPTION_KEYS.STREAK_AT_RISK)
+		expect(streak).toMatch(/Reemplaza/)
+		expect(streak).toMatch(/en lugar de agregar una segunda/)
+		expect(streak).toMatch(/indica las fechas/)
+		expect(tEs(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_ACHIEVEMENT)).toMatch(
+			/nunca se reenvían/,
+		)
+		for (const category of NOTIFICATION_CATEGORIES) {
+			expect(tEs(CATEGORY_LABEL_KEYS[category])).toBeTruthy()
+		}
 	})
 })

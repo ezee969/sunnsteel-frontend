@@ -9,6 +9,7 @@ import {
 } from '@sunsteel/contracts'
 import { Loader2, Rss } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -46,6 +47,7 @@ type Defaults = ActivitySharingSettings['defaults']
  * should be a deliberate act rather than a side effect of browsing a select.
  */
 export function ActivitySharingCard() {
+	const t = useTranslations('settings.activitySharing')
 	const sharing = useActivitySharing()
 	const update = useUpdateActivitySharing()
 	const { push } = useToast()
@@ -71,13 +73,13 @@ export function ActivitySharingCard() {
 			{
 				onSuccess: () =>
 					push({
-						title: 'Activity sharing updated',
-						description: 'Each kind now reaches the audience shown.',
+						title: t('updatedTitle'),
+						description: t('updatedDescription'),
 						variant: 'success',
 					}),
 				onError: error =>
 					push({
-						title: 'Could not update activity sharing',
+						title: t('failedTitle'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -90,12 +92,9 @@ export function ActivitySharingCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Rss className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Activity Sharing</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Who sees each kind of activity you generate by training. Nothing is
-					posted by hand.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				<div className="space-y-2">
@@ -110,20 +109,18 @@ export function ActivitySharingCard() {
 				{sharing.isPending || !draft ? (
 					sharing.isError ? (
 						<div role="alert" className="space-y-3">
-							<p className="type-body-sm text-ink-2">
-								Activity sharing could not be loaded.
-							</p>
+							<p className="type-body-sm text-ink-2">{t('loadFailed')}</p>
 							<Button
 								type="button"
 								variant="outline"
 								size="sm"
 								onClick={() => void sharing.refetch()}
 							>
-								Retry
+								{t('retry')}
 							</Button>
 						</div>
 					) : (
-						<div className="space-y-3" aria-label="Loading activity sharing">
+						<div className="space-y-3" aria-label={t('loading')}>
 							<Skeleton className="h-12" />
 							<Skeleton className="h-12" />
 							<Skeleton className="h-12" />
@@ -185,7 +182,7 @@ export function ActivitySharingCard() {
 
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<Button asChild variant="outline" size="sm">
-						<Link href="/activity?view=yours">Review each entry</Link>
+						<Link href="/activity?view=yours">{t('review')}</Link>
 					</Button>
 					<Button
 						type="button"
@@ -195,7 +192,7 @@ export function ActivitySharingCard() {
 						{update.isPending ? (
 							<Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
 						) : null}
-						Save Sharing
+						{t('save')}
 					</Button>
 				</div>
 			</CardContent>

@@ -2,6 +2,7 @@
 
 import { Loader2, ShieldBan } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -29,6 +30,7 @@ import {
  * would otherwise look like a failure.
  */
 export function BlockedMembersCard() {
+	const t = useTranslations('settings.blockedMembers')
 	const blocks = useBlockedMembers()
 	const unblock = useUnblockMember()
 	const { push } = useToast()
@@ -39,19 +41,17 @@ export function BlockedMembersCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<ShieldBan className="size-5 text-ink-3" aria-hidden />
-					<CardTitle>Blocked Members</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
 				<CardDescription>
-					Blocking works both ways: neither of you appears in the other’s
-					search, suggestions, follower lists or profile, and any follow between
-					you is removed. {BLOCK_LINK_CAVEAT}
+					{t('description', { caveat: BLOCK_LINK_CAVEAT })}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				{blocks.isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="size-4 animate-spin" aria-hidden />
-						Loading blocked members…
+						{t('loading')}
 					</div>
 				) : blocks.error ? (
 					<div
@@ -68,7 +68,7 @@ export function BlockedMembersCard() {
 							className="mt-3"
 							onClick={() => void blocks.refetch()}
 						>
-							Try Again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : items.length ? (
@@ -83,48 +83,56 @@ export function BlockedMembersCard() {
 										{blockedMemberName(block)}
 									</p>
 									<p className="type-body-sm text-ink-3">
-										@{block.member.username} · blocked{' '}
-										{describeBlockedSince(block)}
+										{t('blockedLine', {
+											username: block.member.username,
+											since: describeBlockedSince(block),
+										})}
 									</p>
 								</div>
 								<Button
 									type="button"
 									variant="outline"
 									size="sm"
-									aria-label={`Unblock ${blockedMemberName(block)}`}
+									aria-label={t('unblockLabel', {
+										name: blockedMemberName(block),
+									})}
 									disabled={unblock.isPending}
 									onClick={() =>
 										unblock.mutate(block.member.username, {
 											onSuccess: () =>
 												push({
-													title: 'Member unblocked',
-													description: `@${block.member.username} can find and follow you again.`,
+													title: t('unblockedTitle'),
+													description: t('unblockedDescription', {
+														username: block.member.username,
+													}),
 													variant: 'success',
 												}),
 											onError: error =>
 												push({
-													title: 'Could not unblock this member',
+													title: t('unblockFailedTitle'),
 													description: error.message,
 													variant: 'destructive',
 												}),
 										})
 									}
 								>
-									Unblock
+									{t('unblock')}
 								</Button>
 							</div>
 						))}
 					</div>
 				) : (
 					<p className="type-body-sm py-4 text-ink-3">
-						You have not blocked anyone. You can block a member from their{' '}
-						<Link
-							href="/search"
-							className="text-primary underline-offset-4 hover:underline"
-						>
-							profile
-						</Link>
-						.
+						{t.rich('empty', {
+							link: chunks => (
+								<Link
+									href="/search"
+									className="text-primary underline-offset-4 hover:underline"
+								>
+									{chunks}
+								</Link>
+							),
+						})}
 					</p>
 				)}
 			</CardContent>
