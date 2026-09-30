@@ -34,6 +34,7 @@ import { useToast } from '@/components/ui/toast'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -101,6 +102,9 @@ export function ProfileView(props: ProfileViewProps) {
 	const locale = useLocale() as Locale
 	const tIdentity = useTranslations('routines.identity')
 	const tSharing = useTranslations('routines.sharing')
+	const tExercises = useTranslations('catalog.exercises')
+	const tAchievements = useTranslations('catalog.achievements')
+	const tRanks = useTranslations('catalog.ranks')
 	const t = useTranslations('social.profile')
 	const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
@@ -245,6 +249,11 @@ export function ProfileView(props: ProfileViewProps) {
 			const result = await shareProfileCard(
 				buildProfileCardModel({
 					tSharing,
+					catalog: {
+						exercises: tExercises,
+						achievements: tAchievements,
+						ranks: tRanks,
+					},
 					locale,
 					name: profileName,
 					lastName: profileLastName,
@@ -463,7 +472,9 @@ export function ProfileView(props: ProfileViewProps) {
 										<dd>
 											<ul className="space-y-1 text-ink-2">
 												{trainingIdentity.favoriteExercises.map(exercise => (
-													<li key={exercise.id}>{exercise.name}</li>
+													<li key={exercise.id}>
+														{exerciseLabel(exercise.name, tExercises)}
+													</li>
 												))}
 											</ul>
 										</dd>
@@ -616,7 +627,7 @@ export function ProfileView(props: ProfileViewProps) {
 									>
 										<div className="min-w-0">
 											<h3 className="type-panel text-foreground">
-												{record.exerciseName}
+												{exerciseLabel(record.exerciseName, tExercises)}
 											</h3>
 											<p className="type-body-sm text-ink-3">
 												{t.rich('recordLine', {

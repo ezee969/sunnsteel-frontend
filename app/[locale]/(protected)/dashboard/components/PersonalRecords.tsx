@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { personalRecordSummary } from '@/lib/utils/dashboard-summaries'
@@ -26,6 +27,7 @@ export default function PersonalRecords() {
 	const locale = useLocale() as Locale
 	const tEmpty = useTranslations('planning.emptyStates')
 	const tSummaries = useTranslations('planning.dashboardSummaries')
+	const tExercises = useTranslations('catalog.exercises')
 	const { data } = useWorkoutProgress()
 	const weightUnit = useWeightUnit()
 	const records = data?.personalRecords ?? []
@@ -37,7 +39,11 @@ export default function PersonalRecords() {
 			icon={<Trophy className="h-4 w-4 text-ink-3" aria-hidden />}
 			collapsible
 			summary={personalRecordSummary(
-				records[0],
+				records[0]
+					? {
+							exerciseName: exerciseLabel(records[0].exerciseName, tExercises),
+						}
+					: undefined,
 				records[0]
 					? `${formatWeight(records[0].weight, weightUnit, locale)} × ${records[0].reps}`
 					: undefined,
@@ -50,7 +56,7 @@ export default function PersonalRecords() {
 				records.map((record, index) => (
 					<PersonalRecordItem
 						key={record.exerciseId}
-						exercise={record.exerciseName}
+						exercise={exerciseLabel(record.exerciseName, tExercises)}
 						timeAgo={formatTimeAgo(record.achievedAt, locale)}
 						weight={`${formatWeight(record.weight, weightUnit, locale)} × ${record.reps}`}
 						showSeparator={index < records.length - 1}

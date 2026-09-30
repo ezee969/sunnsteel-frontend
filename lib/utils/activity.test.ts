@@ -486,3 +486,22 @@ describe('the activity copy in Spanish', () => {
 		expect(describeCommentDelete(true, es)).toMatch(/no se puede deshacer/i)
 	})
 })
+
+describe('activity names catalog values in the viewer language (I18N-07)', () => {
+	const esCatalog = {
+		exercises: translatorFor('es', 'catalog.exercises'),
+		achievements: translatorFor('es', 'catalog.achievements'),
+	}
+	const enCatalog = {
+		exercises: translatorFor('en', 'catalog.exercises'),
+		achievements: translatorFor('en', 'catalog.achievements'),
+	}
+
+	it('translates a catalog exercise and leaves the English name alone', () => {
+		const entry = record('r', null)
+		const es = describeActivity(entry, 'KG', 'es', t, tComeback, esCatalog)
+		expect(es.title).toContain('Press de banca')
+		const en = describeActivity(entry, 'KG', 'en', t, tComeback, enCatalog)
+		expect(en.title).toBe('New best on Bench Press')
+	})
+})

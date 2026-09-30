@@ -182,6 +182,24 @@ export interface CatalogContext {
 	listedEquipment: ReadonlySet<ExerciseEquipment> | null
 	/** Starred exercise ids; required only while the starred filter is on. */
 	starredIds: ReadonlySet<string> | null
+	/**
+	 * I18N-07: the name as the member reads it. A search matches the stored
+	 * name and this label, so Spanish can be searched in Spanish.
+	 */
+	label?: (name: string) => string
+}
+
+const fold = (value: string) =>
+	value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('en-US')
+
+function matchesSearch(
+	name: string,
+	query: string,
+	label?: (name: string) => string,
+): boolean {
+	if (name.toLocaleLowerCase('en-US').includes(query)) return true
+	const shown = label?.(name)
+	return Boolean(shown && fold(shown).includes(fold(query)))
 }
 
 const byName = (a: Exercise, b: Exercise) =>
@@ -202,9 +220,7 @@ export function filterCatalog(
 	const q = filters.q.trim().toLocaleLowerCase('en-US')
 	const matches = exercises.filter(exercise => {
 		if (filters.mine ? !exercise.isCustom : exercise.archivedAt) return false
-		if (q && !exercise.name.toLocaleLowerCase('en-US').includes(q)) {
-			return false
-		}
+		if (q && !matchesSearch(exercise.name, q, context.label)) return false
 		if (
 			filters.muscle &&
 			!exercise.primaryMuscles.includes(filters.muscle) &&

@@ -35,6 +35,7 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
+import { achievementText, exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
@@ -108,6 +109,12 @@ function achievementSummary(
 			})
 }
 
+type CatalogT = {
+	exercises: Translator<'catalog.exercises'>
+	achievements: Translator<'catalog.achievements'>
+	ranks: Translator<'catalog.ranks'>
+}
+
 function selectedItemPresentation(
 	item: FeaturedProfileSelection,
 	recordsById: Map<string, PersonalRecordEntry>,
@@ -117,12 +124,15 @@ function selectedItemPresentation(
 	weightUnit: WeightUnit,
 	locale: Locale,
 	t: FeaturedT,
+	catalog: CatalogT,
 ) {
 	if (item.kind === 'RECORD') {
 		const record = recordsById.get(item.referenceId)
 		return {
 			kindLabel: t('kind.record'),
-			title: record?.exerciseName ?? t('missing.record'),
+			title: record
+				? exerciseLabel(record.exerciseName, catalog.exercises)
+				: t('missing.record'),
 			detail: record
 				? recordSummary(record, weightUnit, locale, t)
 				: t('stale'),
@@ -132,7 +142,9 @@ function selectedItemPresentation(
 		const achievement = achievementsById.get(item.referenceId)
 		return {
 			kindLabel: t('kind.achievement'),
-			title: achievement?.title ?? t('missing.achievement'),
+			title: achievement
+				? achievementText(achievement, catalog.achievements).title
+				: t('missing.achievement'),
 			detail: achievement
 				? achievementSummary(achievement, locale, t)
 				: t('stale'),
@@ -150,8 +162,8 @@ function selectedItemPresentation(
 	return {
 		rankId: rank?.id,
 		kindLabel: t('kind.rank'),
-		title: rank?.title ?? t('missing.rank'),
-		detail: rank?.description ?? t('stale'),
+		title: rank ? rankText(rank, catalog.ranks).title : t('missing.rank'),
+		detail: rank ? rankText(rank, catalog.ranks).description : t('stale'),
 	}
 }
 
@@ -172,6 +184,11 @@ export function FeaturedRecordsSettingsCard({
 	const replaceItems = useReplaceFeaturedProfileItems()
 	const { push } = useToast()
 	const tSharing = useTranslations('routines.sharing')
+	const catalog: CatalogT = {
+		exercises: useTranslations('catalog.exercises'),
+		achievements: useTranslations('catalog.achievements'),
+		ranks: useTranslations('catalog.ranks'),
+	}
 	const [drafts, setDrafts] = useState<FeaturedProfileSelection[]>([])
 
 	useEffect(() => {
@@ -333,6 +350,7 @@ export function FeaturedRecordsSettingsCard({
 											weightUnit,
 											locale,
 											t,
+											catalog,
 										)
 										return (
 											<div
@@ -443,7 +461,10 @@ export function FeaturedRecordsSettingsCard({
 										>
 											<div>
 												<p className="type-panel text-foreground">
-													{record.exerciseName}
+													{exerciseLabel(
+														record.exerciseName,
+														catalog.exercises,
+													)}
 												</p>
 												<p className="type-body-sm text-ink-3">
 													{recordSummary(record, weightUnit, locale, t)}
@@ -454,7 +475,10 @@ export function FeaturedRecordsSettingsCard({
 												variant="outline"
 												size="sm"
 												aria-label={t('featureItem', {
-													name: record.exerciseName,
+													name: exerciseLabel(
+														record.exerciseName,
+														catalog.exercises,
+													),
 												})}
 												disabled={slotsFull}
 												onClick={() =>
@@ -499,10 +523,16 @@ export function FeaturedRecordsSettingsCard({
 											>
 												<div className="min-w-0">
 													<p className="type-panel text-foreground">
-														{achievement.title}
+														{
+															achievementText(achievement, catalog.achievements)
+																.title
+														}
 													</p>
 													<p className="type-body-sm text-ink-2">
-														{achievement.description}
+														{
+															achievementText(achievement, catalog.achievements)
+																.description
+														}
 													</p>
 													<p className="type-body-sm text-ink-3">
 														{achievementSummary(achievement, locale, t)}
@@ -513,7 +543,10 @@ export function FeaturedRecordsSettingsCard({
 													variant="outline"
 													size="sm"
 													aria-label={t('featureItem', {
-														name: achievement.title,
+														name: achievementText(
+															achievement,
+															catalog.achievements,
+														).title,
 													})}
 													disabled={slotsFull}
 													onClick={() =>
@@ -650,10 +683,10 @@ export function FeaturedRecordsSettingsCard({
 													/>
 													<div className="min-w-0">
 														<p className="type-panel text-foreground">
-															{rank.title}
+															{rankText(rank, catalog.ranks).title}
 														</p>
 														<p className="type-body-sm text-ink-2">
-															{rank.description}
+															{rankText(rank, catalog.ranks).description}
 														</p>
 													</div>
 												</div>
@@ -662,7 +695,7 @@ export function FeaturedRecordsSettingsCard({
 													variant="outline"
 													size="sm"
 													aria-label={t('featureRankLabel', {
-														title: rank.title,
+														title: rankText(rank, catalog.ranks).title,
 													})}
 													disabled={slotsFull || hasSelectedRank}
 													onClick={() =>

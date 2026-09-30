@@ -10,6 +10,7 @@ import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
 	achievementCategoryLabel,
@@ -27,6 +28,10 @@ interface AchievementLedgerProps {
 function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('achievements.ledger')
+	const text = achievementText(
+		achievement,
+		useTranslations('catalog.achievements'),
+	)
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -34,10 +39,8 @@ function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 					<Check className="size-4 text-foreground" aria-hidden />
 				</span>
 				<div className="min-w-0">
-					<h4 className="type-panel text-foreground">{achievement.title}</h4>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{achievement.description}
-					</p>
+					<h4 className="type-panel text-foreground">{text.title}</h4>
+					<p className="type-body-sm mt-1 text-ink-3">{text.description}</p>
 				</div>
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
@@ -69,6 +72,7 @@ export function AchievementLedger({
 }: AchievementLedgerProps) {
 	const t = useTranslations('achievements.ledger')
 	const tCategories = useTranslations('achievements.categories')
+	const tCatalog = useTranslations('catalog.achievements')
 	const groups = groupAchievements(data?.achievements ?? [])
 
 	return (
@@ -145,7 +149,9 @@ export function AchievementLedger({
 								</>
 							}
 							// Items arrive highest threshold first.
-							summary={t('highest', { title: group.items[0].title })}
+							summary={t('highest', {
+								title: achievementText(group.items[0], tCatalog).title,
+							})}
 						>
 							<ul>
 								{group.items.map(achievement => (

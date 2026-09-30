@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
+import { achievementText, exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
@@ -28,6 +29,9 @@ export function FeaturedAccomplishments({
 	routineHref,
 }: FeaturedAccomplishmentsProps) {
 	const locale = useLocale() as Locale
+	const tExercises = useTranslations('catalog.exercises')
+	const tAchievements = useTranslations('catalog.achievements')
+	const tRanks = useTranslations('catalog.ranks')
 	const tSharing = useTranslations('routines.sharing')
 	const t = useTranslations('social.profile')
 	if (!items.length && !isOwnProfile) return null
@@ -63,9 +67,9 @@ export function FeaturedAccomplishments({
 									</p>
 									<h3 className="type-panel text-foreground">
 										{item.kind === 'RECORD' ? (
-											item.record.exerciseName
+											exerciseLabel(item.record.exerciseName, tExercises)
 										) : item.kind === 'ACHIEVEMENT' ? (
-											item.achievement.title
+											achievementText(item.achievement, tAchievements).title
 										) : item.kind === 'ROUTINE' ? (
 											routineHref ? (
 												<Link
@@ -78,7 +82,7 @@ export function FeaturedAccomplishments({
 												item.routine.name
 											)
 										) : (
-											item.rank.title
+											rankText(item.rank, tRanks).title
 										)}
 									</h3>
 									<p className="type-body-sm text-ink-2">
@@ -100,10 +104,11 @@ export function FeaturedAccomplishments({
 													),
 												})
 											: item.kind === 'ACHIEVEMENT'
-												? item.achievement.description
+												? achievementText(item.achievement, tAchievements)
+														.description
 												: item.kind === 'ROUTINE'
 													? describeRoutineSummary(item.routine, tSharing)
-													: item.rank.description}
+													: rankText(item.rank, tRanks).description}
 									</p>
 								</div>
 							</div>

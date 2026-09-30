@@ -208,3 +208,34 @@ describe('splitting updates into new and earlier (UX-09)', () => {
 		expect(EARLIER_NOTIFICATIONS_SHOWN).toBeGreaterThan(0)
 	})
 })
+
+describe('notifications name achievements in the viewer language (I18N-07)', () => {
+	const note: AppNotification = {
+		...base,
+		id: 'n-ach',
+		kind: 'ACHIEVEMENT',
+		achievement: {
+			id: 'sessions:10',
+			title: '10 Sessions',
+			description: 'Complete 10 sessions.',
+		},
+	}
+
+	it('reads the catalog text by id and passes unknown ids through', () => {
+		const spanish = describeNotification(
+			note,
+			es,
+			esPartners,
+			translatorFor('es', 'catalog.achievements'),
+		)
+		expect(spanish.title).toContain('10 sesiones')
+		expect(spanish.detail).toBe('Completa 10 sesiones de entrenamiento.')
+		const en = describeNotification(
+			achievement,
+			t,
+			tPartners,
+			translatorFor('en', 'catalog.achievements'),
+		)
+		expect(en.title).toBe('Achievement earned: 10 Sessions')
+	})
+})

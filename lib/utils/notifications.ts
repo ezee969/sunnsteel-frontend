@@ -3,6 +3,7 @@ import type {
 	NotificationsResponse,
 } from '@sunsteel/contracts'
 
+import { achievementText } from '@/i18n/catalog'
 import type { Translator } from '@/i18n/translator'
 
 import { trainingPartnerEncouragementLabel } from './training-partners'
@@ -33,12 +34,19 @@ export function describeNotification(
 	notification: AppNotification,
 	t: T,
 	tPartners: TPartners,
+	tAchievements?: Translator<'catalog.achievements'>,
 ): NotificationView {
+	const text = (value: { id: string; title: string; description?: string }) =>
+		tAchievements
+			? achievementText(value, tAchievements)
+			: { title: value.title, description: value.description ?? '' }
 	switch (notification.kind) {
 		case 'ACHIEVEMENT':
 			return {
-				title: t('achievementTitle', { title: notification.achievement.title }),
-				detail: notification.achievement.description || null,
+				title: t('achievementTitle', {
+					title: text(notification.achievement).title,
+				}),
+				detail: text(notification.achievement).description || null,
 				href: '/achievements',
 			}
 		case 'SESSION_PROGRESS': {
@@ -114,7 +122,10 @@ export function describeNotification(
 			const { actor, achievement } = notification
 			const name = [actor.name, actor.lastName].filter(Boolean).join(' ')
 			return {
-				title: t('partnerAchievementTitle', { name, title: achievement.title }),
+				title: t('partnerAchievementTitle', {
+					name,
+					title: text(achievement).title,
+				}),
 				detail: t('partnerAchievementDetail', { username: actor.username }),
 				href: `/profile/${actor.username}`,
 			}

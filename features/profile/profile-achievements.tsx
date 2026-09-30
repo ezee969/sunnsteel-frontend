@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
+import { achievementText, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
 	achievementCategoryLabel,
@@ -32,6 +33,10 @@ function MilestoneRow({
 }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('social.profileAchievements')
+	const text = achievementText(
+		achievement,
+		useTranslations('catalog.achievements'),
+	)
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -39,10 +44,8 @@ function MilestoneRow({
 					<Check className="size-4 text-foreground" aria-hidden />
 				</span>
 				<div className="min-w-0">
-					<h4 className="type-panel text-foreground">{achievement.title}</h4>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{achievement.description}
-					</p>
+					<h4 className="type-panel text-foreground">{text.title}</h4>
+					<p className="type-body-sm mt-1 text-ink-3">{text.description}</p>
 				</div>
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
@@ -116,6 +119,7 @@ export function ProfileAchievements({
 	isOwnProfile,
 }: ProfileAchievementsProps) {
 	const tCategories = useTranslations('achievements.categories')
+	const tRanks = useTranslations('catalog.ranks')
 	const t = useTranslations('social.profileAchievements')
 	const groups = groupAchievements(data?.achievements ?? [])
 	const comebacks = data?.comeback?.recognitions ?? []
@@ -147,10 +151,10 @@ export function ProfileAchievements({
 							<div>
 								<p className="type-body-sm text-ink-3">{t('currentRank')}</p>
 								<h3 className="type-panel text-foreground">
-									{data.rank.title}
+									{rankText(data.rank, tRanks).title}
 								</h3>
 								<p className="type-body-sm mt-1 text-ink-2">
-									{data.rank.description}
+									{rankText(data.rank, tRanks).description}
 								</p>
 							</div>
 						</div>

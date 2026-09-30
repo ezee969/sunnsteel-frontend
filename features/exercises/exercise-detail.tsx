@@ -14,6 +14,7 @@ import { ExercisePerformanceHistory } from '@/features/progress/exercise-perform
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import { useExercises } from '@/lib/api/hooks/useExercises'
@@ -447,6 +448,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 	const locale = useLocale() as Locale
 	const tMusclesPage = useTranslations('routines.muscles')
 	const t = useTranslations('catalog.exercisesUi')
+	const tExercises = useTranslations('catalog.exercises')
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
 	const exercise = catalog.data?.find(item => item.id === exerciseId)
@@ -516,12 +518,12 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 				<BackLink />
 				<StarToggle
 					exerciseId={exercise.id}
-					exerciseName={exercise.name}
+					exerciseName={exerciseLabel(exercise.name, tExercises)}
 					showLabel
 				/>
 			</div>
 			<HeroSection
-				title={<>{exercise.name}</>}
+				title={<>{exerciseLabel(exercise.name, tExercises)}</>}
 				subtitle={
 					primary ? <>{t('trains', { muscles: primary })}</> : undefined
 				}

@@ -4,6 +4,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import { achievementText, exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 import { rankCrestTier } from '@/lib/utils/rank-identity'
@@ -66,18 +67,27 @@ function normalizeText(value: string): string {
 	return value.replace(/\s+/g, ' ').trim()
 }
 
+/** The catalog translators the card's titles come through (I18N-07). */
+export interface ProfileCardCatalog {
+	exercises: Translator<'catalog.exercises'>
+	achievements: Translator<'catalog.achievements'>
+	ranks: Translator<'catalog.ranks'>
+}
+
 function featuredItemToAccomplishment(
 	item: FeaturedProfileItem,
 	weightUnit: WeightUnit,
 	tSharing: Translator<'routines.sharing'>,
 	locale: Locale,
+	catalog: ProfileCardCatalog,
 ): ProfileCardAccomplishment | null {
 	if (item.kind === 'RANK') return null
 	if (item.kind === 'ACHIEVEMENT') {
 		return {
 			kind: 'Achievement',
-			title: item.achievement.title,
-			detail: item.achievement.description,
+			title: achievementText(item.achievement, catalog.achievements).title,
+			detail: achievementText(item.achievement, catalog.achievements)
+				.description,
 		}
 	}
 	if (item.kind === 'ROUTINE') {
@@ -89,7 +99,7 @@ function featuredItemToAccomplishment(
 	}
 	return {
 		kind: 'Personal record',
-		title: item.record.exerciseName,
+		title: exerciseLabel(item.record.exerciseName, catalog.exercises),
 		detail: `${formatWeight(item.record.weight, weightUnit, locale)} for ${item.record.reps} reps · est. 1RM ${formatWeight(item.record.estimated1rm, weightUnit, locale)}`,
 	}
 }
@@ -104,9 +114,11 @@ export function buildProfileCardModel({
 	weightUnit,
 	tSharing,
 	locale,
+	catalog,
 }: ProfileCardSource & {
 	tSharing: Translator<'routines.sharing'>
 	locale: Locale
+	catalog: ProfileCardCatalog
 }): ProfileCardModel {
 	const featuredRank = featuredItems.find(item => item.kind === 'RANK')
 	const rank =
@@ -118,10 +130,18 @@ export function buildProfileCardModel({
 		displayName: displayName || username,
 		username,
 		profileUrl,
-		rank: rank ? { id: rank.id, title: rank.title } : null,
+		rank: rank
+			? { id: rank.id, title: rankText(rank, catalog.ranks).title }
+			: null,
 		accomplishments: featuredItems
 			.map(item =>
-				featuredItemToAccomplishment(item, weightUnit, tSharing, locale),
+				featuredItemToAccomplishment(
+					item,
+					weightUnit,
+					tSharing,
+					locale,
+					catalog,
+				),
 			)
 			.filter((item): item is ProfileCardAccomplishment => item !== null),
 	}

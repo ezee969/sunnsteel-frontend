@@ -17,6 +17,8 @@ const translators = (locale: 'en' | 'es'): MilestoneTranslators => ({
 	categories: translatorFor(locale, 'achievements.categories'),
 	progress: translatorFor(locale, 'achievements.progress'),
 	rank: translatorFor(locale, 'achievements.rank'),
+	catalogAchievements: translatorFor(locale, 'catalog.achievements'),
+	catalogRanks: translatorFor(locale, 'catalog.ranks'),
 })
 const en = translators('en')
 const tEmpty = translatorFor('en', 'planning.dashboardMilestones')

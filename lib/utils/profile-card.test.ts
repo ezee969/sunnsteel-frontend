@@ -52,11 +52,17 @@ const featuredItems: FeaturedProfileItem[] = [
 ]
 
 const en = translatorFor('en', 'routines.sharing')
+const catalogFor = (locale: 'en' | 'es') => ({
+	exercises: translatorFor(locale, 'catalog.exercises'),
+	achievements: translatorFor(locale, 'catalog.achievements'),
+	ranks: translatorFor(locale, 'catalog.ranks'),
+})
 
 describe('profile card', () => {
 	it('uses the public identity, current rank and selected non-rank accomplishments', () => {
 		const model = buildProfileCardModel({
 			tSharing: en,
+			catalog: catalogFor('en'),
 			locale: 'en',
 			name: '  Ada ',
 			lastName: ' Lovelace ',
@@ -96,6 +102,7 @@ describe('profile card', () => {
 	it('falls back to a selected rank when the achievement ledger is unavailable', () => {
 		const model = buildProfileCardModel({
 			tSharing: en,
+			catalog: catalogFor('en'),
 			locale: 'en',
 			name: '',
 			username: 'atlas',
