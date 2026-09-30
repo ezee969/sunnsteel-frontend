@@ -53,8 +53,16 @@ function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
 export default function UpcomingMilestones() {
 	const locale = useLocale() as Locale
 	const tSummaries = useTranslations('planning.dashboardSummaries')
+	const t = useTranslations('planning.dashboardMilestones')
+	const tCategories = useTranslations('achievements.categories')
+	const tProgress = useTranslations('achievements.progress')
+	const tRank = useTranslations('achievements.rank')
 	const { data, isPending, isError, refetch, isFetching } = useAchievements()
-	const milestones = buildUpcomingMilestones(locale, data)
+	const milestones = buildUpcomingMilestones(
+		locale,
+		{ categories: tCategories, progress: tProgress, rank: tRank },
+		data,
+	)
 
 	return (
 		<DashboardSection
@@ -66,7 +74,7 @@ export default function UpcomingMilestones() {
 			{isPending ? (
 				<div
 					role="status"
-					aria-label="Loading upcoming milestones"
+					aria-label={t('loadingAria')}
 					className="space-y-3 py-3"
 				>
 					<Skeleton className="h-14" />
@@ -74,9 +82,7 @@ export default function UpcomingMilestones() {
 				</div>
 			) : isError ? (
 				<div role="alert" className="space-y-3 py-3">
-					<p className="type-body-sm text-foreground">
-						Upcoming milestones could not be loaded.
-					</p>
+					<p className="type-body-sm text-foreground">{t('loadError')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -85,11 +91,11 @@ export default function UpcomingMilestones() {
 						disabled={isFetching}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Try again
+						{t('retry')}
 					</Button>
 				</div>
 			) : milestones.length === 0 ? (
-				<EmptyModule {...getUpcomingMilestonesEmptyState(data)} />
+				<EmptyModule {...getUpcomingMilestonesEmptyState(t, data)} />
 			) : (
 				<ul className="border-t border-rule-faint">
 					{milestones.map(milestone => (

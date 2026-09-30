@@ -4,7 +4,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Check, Medal, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
 import {
-	ACHIEVEMENT_CATEGORY_LABELS,
+	achievementCategoryLabel,
 	formatAchievementDate,
 	groupAchievements,
 } from '@/lib/utils/achievements'
@@ -26,6 +26,7 @@ interface AchievementLedgerProps {
 
 function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('achievements.ledger')
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -42,15 +43,17 @@ function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
 					{achievement.backfilled
-						? 'Recognized from history'
-						: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`}
+						? t('fromHistory')
+						: t('earnedOn', {
+								date: formatAchievementDate(achievement.unlockedAt, locale),
+							})}
 				</p>
 				{achievement.sourceSessionId ? (
 					<Link
 						href={`/workouts/history/${achievement.sourceSessionId}`}
 						className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
 					>
-						View session
+						{t('viewSession')}
 					</Link>
 				) : null}
 			</div>
@@ -64,6 +67,8 @@ export function AchievementLedger({
 	isError,
 	onRetry,
 }: AchievementLedgerProps) {
+	const t = useTranslations('achievements.ledger')
+	const tCategories = useTranslations('achievements.categories')
 	const groups = groupAchievements(data?.achievements ?? [])
 
 	return (
@@ -71,11 +76,9 @@ export function AchievementLedger({
 			<div className="rule-heading flex flex-wrap items-end justify-between gap-3 pb-4">
 				<div>
 					<h2 id="earned-achievements" className="type-section text-foreground">
-						Earned milestones
+						{t('title')}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3">
-						Verified from completed training, never manual claims.
-					</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('subtitle')}</p>
 				</div>
 				{data ? (
 					<p className="type-data text-ink-2">
@@ -85,19 +88,15 @@ export function AchievementLedger({
 			</div>
 
 			{isPending ? (
-				<div className="space-y-3" aria-label="Loading achievements">
+				<div className="space-y-3" aria-label={t('loadingAria')}>
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 				</div>
 			) : isError ? (
 				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">
-						Achievements are unavailable
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not verify your milestones. Try again.
-					</p>
+					<p className="type-panel text-foreground">{t('errorTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 					<Button
 						type="button"
 						variant="outline"
@@ -105,25 +104,21 @@ export function AchievementLedger({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : !data?.analyticsReady ? (
 				<div role="status" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">
-						Training history is preparing
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						Milestones will appear when your progress data is ready.
-					</p>
+					<p className="type-panel text-foreground">{t('preparingTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('preparingBody')}</p>
 				</div>
 			) : groups.length === 0 ? (
 				<EmptyModule
-					title="Your first milestone is ahead"
-					description="Complete a workout to begin earning verified session, set, volume, record, and streak milestones."
+					title={t('emptyTitle')}
+					description={t('emptyDescription')}
 					action={{
 						kind: 'link',
-						label: 'Choose a workout',
+						label: t('emptyAction'),
 						href: '/workouts',
 					}}
 				/>
@@ -142,15 +137,15 @@ export function AchievementLedger({
 							icon={<Medal className="size-4 text-ink-3" aria-hidden />}
 							title={
 								<>
-									{ACHIEVEMENT_CATEGORY_LABELS[group.category]}
+									{achievementCategoryLabel(group.category, tCategories)}
 									<span className="text-ink-3">
 										{' '}
-										· {group.items.length} earned
+										· {t('earnedCount', { count: group.items.length })}
 									</span>
 								</>
 							}
 							// Items arrive highest threshold first.
-							summary={`Highest: ${group.items[0].title}`}
+							summary={t('highest', { title: group.items[0].title })}
 						>
 							<ul>
 								{group.items.map(achievement => (

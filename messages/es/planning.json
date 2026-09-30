@@ -107,5 +107,17 @@
 		"emptyTitle": "Todavía no hay nada que decir",
 		"emptyDescription": "Los datos aparecen cuando tengas dos semanas de entrenamiento terminadas, o un levantamiento que siga tu control de estancamiento.",
 		"openProgress": "Abrir Progreso"
+	},
+	"dashboardMilestones": {
+		"noneTitle": "Aún no hay hitos",
+		"noneDescription": "Termina un entrenamiento y el próximo hito de cada categoría aparecerá aquí con su objetivo exacto.",
+		"browseRoutines": "Ver rutinas",
+		"allTitle": "Todos los hitos fijos están registrados",
+		"allDescription": "El catálogo de cada categoría está completo.",
+		"allDescriptionFinalRank": "El catálogo de cada categoría está completo y el camino de rangos renacentistas ha terminado.",
+		"openAchievements": "Abrir logros",
+		"loadingAria": "Cargando los próximos hitos",
+		"loadError": "No se pudieron cargar los próximos hitos.",
+		"retry": "Reintentar"
 	}
 }

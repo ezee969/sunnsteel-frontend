@@ -3,13 +3,13 @@ import type {
 	AchievementsResponse,
 } from '@sunsteel/contracts'
 import { Check, Flag } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
 import {
-	ACHIEVEMENT_CATEGORY_LABELS,
+	achievementCategoryLabel,
 	formatMilestoneProgressDetail,
 	formatMilestoneProgressEvidence,
 	orderMilestoneProgress,
@@ -26,6 +26,9 @@ function MilestoneProgressRow({
 	progress: AchievementCategoryProgress
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('achievements.milestones')
+	const tCategories = useTranslations('achievements.categories')
+	const tProgress = useTranslations('achievements.progress')
 	const isComplete = progress.nextMilestone === null
 
 	return (
@@ -40,19 +43,19 @@ function MilestoneProgressRow({
 				</span>
 				<div className="min-w-0">
 					<p className="type-body-sm text-ink-3">
-						{ACHIEVEMENT_CATEGORY_LABELS[progress.category]}
+						{achievementCategoryLabel(progress.category, tCategories)}
 					</p>
 					<h3 className="type-panel mt-1 text-foreground">
-						{progress.nextMilestone?.title ?? 'All milestones recorded'}
+						{progress.nextMilestone?.title ?? t('allRecorded')}
 					</h3>
 				</div>
 			</div>
 			<div className="pl-11 sm:max-w-md sm:pl-0 sm:text-right">
 				<p className="type-data text-foreground">
-					{formatMilestoneProgressEvidence(progress, locale)}
+					{formatMilestoneProgressEvidence(progress, locale, tProgress)}
 				</p>
 				<p className="type-body-sm mt-1 text-ink-3">
-					{formatMilestoneProgressDetail(progress, locale)}
+					{formatMilestoneProgressDetail(progress, locale, tProgress)}
 				</p>
 			</div>
 		</li>
@@ -60,9 +63,10 @@ function MilestoneProgressRow({
 }
 
 export function MilestoneProgress({ data, isPending }: MilestoneProgressProps) {
+	const t = useTranslations('achievements.milestones')
 	if (isPending) {
 		return (
-			<section aria-label="Loading milestone progress" className="space-y-4">
+			<section aria-label={t('loadingAria')} className="space-y-4">
 				<Skeleton className="h-16" />
 				<Skeleton className="h-44" />
 			</section>
@@ -78,18 +82,12 @@ export function MilestoneProgress({ data, isPending }: MilestoneProgressProps) {
 		<section aria-labelledby="next-milestones" className="space-y-4">
 			<div className="rule-heading pb-4">
 				<h2 id="next-milestones" className="type-panel text-foreground">
-					Next milestones
+					{t('title')}
 				</h2>
 				{/* UX-07: the safety guidance stays in view (ACH-04, design system
 				    §20.1); only how the list is ordered moves behind the control. */}
-				<Explanation
-					className="mt-1"
-					summary="Follow your plan, use appropriate loads, and keep recovery days."
-				>
-					<p>
-						One fixed next milestone in each category, with no deadline.
-						Categories stay in a stable order, not ranked by what is closest.
-					</p>
+				<Explanation className="mt-1" summary={t('summary')}>
+					<p>{t('explanation')}</p>
 				</Explanation>
 			</div>
 

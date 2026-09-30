@@ -22,6 +22,7 @@ import type { InfiniteData } from '@tanstack/react-query'
 import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
 import type { Locale } from '@/i18n/config'
 import { numberFormatter } from '@/i18n/date-locale'
+import { translatorFor } from '@/i18n/translator'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
 import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
@@ -190,7 +191,10 @@ export function describeActivity(
 		case 'COMEBACK':
 			return {
 				title: 'Came back to training',
-				detail: formatComebackEvidence(entry.comeback),
+				detail: formatComebackEvidence(
+					entry.comeback,
+					translatorFor(locale, 'achievements.comeback'),
+				),
 			}
 		case 'ROUTINE_SHARED':
 			return {

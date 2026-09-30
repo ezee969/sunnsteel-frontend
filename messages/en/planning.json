@@ -107,5 +107,17 @@
 		"emptyTitle": "Nothing to state yet",
 		"emptyDescription": "Facts appear once you have two finished training weeks, or a lift your plateau watch is following.",
 		"openProgress": "Open progress"
+	},
+	"dashboardMilestones": {
+		"noneTitle": "No milestones yet",
+		"noneDescription": "Finish a workout and the next milestone in each category appears here with its exact target.",
+		"browseRoutines": "Browse routines",
+		"allTitle": "Every fixed milestone is recorded",
+		"allDescription": "The catalog in each category is complete.",
+		"allDescriptionFinalRank": "The catalog in each category is complete and the Renaissance rank path is finished.",
+		"openAchievements": "Open achievements",
+		"loadingAria": "Loading upcoming milestones",
+		"loadError": "Upcoming milestones could not be loaded.",
+		"retry": "Try again"
 	}
 }

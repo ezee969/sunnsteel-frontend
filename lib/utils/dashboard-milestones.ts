@@ -4,9 +4,10 @@ import type {
 } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
+import type { Translator } from '@/i18n/translator'
 
 import {
-	ACHIEVEMENT_CATEGORY_LABELS,
+	achievementCategoryLabel,
 	formatMilestoneProgressDetail,
 	formatMilestoneProgressEvidence,
 	formatNextRankRequirements,
@@ -35,18 +36,25 @@ export interface UpcomingMilestone {
 	rankId?: RenaissanceRankId
 }
 
+/** The translators the rows are built from, one per message group. */
+export interface MilestoneTranslators {
+	categories: Translator<'achievements.categories'>
+	progress: Translator<'achievements.progress'>
+	rank: Translator<'achievements.rank'>
+}
+
 function buildRankMilestone(
 	rank: RenaissanceRankProgress,
-	locale: Locale,
+	t: MilestoneTranslators,
 ): UpcomingMilestone | null {
-	const detail = formatNextRankRequirements(rank, locale)
+	const detail = formatNextRankRequirements(rank, t.rank)
 	if (!rank.nextRank || !detail) return null
 	return {
 		key: 'RANK',
-		group: 'Renaissance rank',
+		group: t.rank('title'),
 		title: rank.nextRank.title,
 		rankId: rank.nextRank.id,
-		evidence: formatRankEvidence(rank, locale),
+		evidence: formatRankEvidence(rank, t.rank),
 		detail,
 	}
 }
@@ -58,19 +66,20 @@ function buildRankMilestone(
  */
 export function buildUpcomingMilestones(
 	locale: Locale,
+	t: MilestoneTranslators,
 	data?: AchievementsResponse,
 ): UpcomingMilestone[] {
 	if (!data?.analyticsReady) return []
 
-	const rank = data.rank ? buildRankMilestone(data.rank, locale) : null
+	const rank = data.rank ? buildRankMilestone(data.rank, t) : null
 	const categories = orderMilestoneProgress(data.milestoneProgress ?? [])
 		.filter(progress => progress.nextMilestone !== null)
 		.map(progress => ({
 			key: progress.category,
-			group: ACHIEVEMENT_CATEGORY_LABELS[progress.category],
+			group: achievementCategoryLabel(progress.category, t.categories),
 			title: progress.nextMilestone?.title ?? '',
-			evidence: formatMilestoneProgressEvidence(progress, locale),
-			detail: formatMilestoneProgressDetail(progress, locale),
+			evidence: formatMilestoneProgressEvidence(progress, locale, t.progress),
+			detail: formatMilestoneProgressDetail(progress, locale, t.progress),
 		}))
 
 	return rank ? [rank, ...categories] : categories
@@ -82,23 +91,27 @@ export function buildUpcomingMilestones(
  * fixed milestone already recorded — so they must not share one sentence.
  */
 export function getUpcomingMilestonesEmptyState(
+	t: Translator<'planning.dashboardMilestones'>,
 	data?: AchievementsResponse,
 ): EmptyStateCopy {
 	if (!data?.analyticsReady) {
 		return {
-			title: 'No milestones yet',
-			description:
-				'Finish a workout and the next milestone in each category appears here with its exact target.',
-			action: { kind: 'link', label: 'Browse routines', href: '/routines' },
+			title: t('noneTitle'),
+			description: t('noneDescription'),
+			action: { kind: 'link', label: t('browseRoutines'), href: '/routines' },
 		}
 	}
 
 	const atFinalRank = Boolean(data.rank && !data.rank.nextRank)
 	return {
-		title: 'Every fixed milestone is recorded',
+		title: t('allTitle'),
 		description: atFinalRank
-			? 'The catalog in each category is complete and the Renaissance rank path is finished.'
-			: 'The catalog in each category is complete.',
-		action: { kind: 'link', label: 'Open achievements', href: '/achievements' },
+			? t('allDescriptionFinalRank')
+			: t('allDescription'),
+		action: {
+			kind: 'link',
+			label: t('openAchievements'),
+			href: '/achievements',
+		},
 	}
 }

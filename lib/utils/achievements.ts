@@ -9,6 +9,7 @@ import type {
 
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
+import type { MessageKey, Translator } from '@/i18n/translator'
 
 export const ACHIEVEMENT_CATEGORY_ORDER: readonly AchievementCategory[] = [
 	'SESSIONS',
@@ -18,14 +19,24 @@ export const ACHIEVEMENT_CATEGORY_ORDER: readonly AchievementCategory[] = [
 	'STREAK_DAYS',
 ]
 
-export const ACHIEVEMENT_CATEGORY_LABELS: Record<AchievementCategory, string> =
-	{
-		SESSIONS: 'Sessions',
-		SETS: 'Completed sets',
-		VOLUME_KG: 'Training volume',
-		RECORDS: 'Personal records',
-		STREAK_DAYS: 'Training streaks',
-	}
+const CATEGORY_KEYS: Record<
+	AchievementCategory,
+	MessageKey<'achievements.categories'>
+> = {
+	SESSIONS: 'SESSIONS',
+	SETS: 'SETS',
+	VOLUME_KG: 'VOLUME_KG',
+	RECORDS: 'RECORDS',
+	STREAK_DAYS: 'STREAK_DAYS',
+}
+
+export function achievementCategoryLabel(
+	category: AchievementCategory,
+	t: Translator<'achievements.categories'>,
+): string {
+	const key: MessageKey<'achievements.categories'> = CATEGORY_KEYS[category]
+	return t(key)
+}
 
 export function groupAchievements(achievements: EarnedAchievement[]) {
 	return ACHIEVEMENT_CATEGORY_ORDER.flatMap(category => {
@@ -61,57 +72,71 @@ export function orderMilestoneProgress(
 const formatProgressNumber = (value: number, locale: Locale) =>
 	numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)
 
-const progressUnit = (category: AchievementCategory, value: number): string => {
+const progressUnit = (
+	category: AchievementCategory,
+	value: number,
+	t: Translator<'achievements.progress'>,
+): string => {
 	switch (category) {
 		case 'SESSIONS':
-			return value === 1 ? 'session' : 'sessions'
+			return t('unitSessions', { count: value })
 		case 'SETS':
-			return value === 1 ? 'set' : 'sets'
+			return t('unitSets', { count: value })
 		case 'VOLUME_KG':
-			return 'kg'
+			return t('unitKg')
 		case 'RECORDS':
-			return value === 1 ? 'exercise' : 'exercises'
+			return t('unitRecords', { count: value })
 		case 'STREAK_DAYS':
-			return value === 1 ? 'training day' : 'training days'
+			return t('unitStreakDays', { count: value })
 	}
 }
 
 export function formatMilestoneProgressEvidence(
 	progress: AchievementCategoryProgress,
 	locale: Locale,
+	t: Translator<'achievements.progress'>,
 ): string {
 	const current = formatProgressNumber(progress.currentValue, locale)
 	if (!progress.nextMilestone) {
-		return `${current} ${progressUnit(progress.category, progress.currentValue)} total`
+		return t('evidenceTotal', {
+			current,
+			unit: progressUnit(progress.category, progress.currentValue, t),
+		})
 	}
 
 	const target = formatProgressNumber(progress.nextMilestone.threshold, locale)
 	if (progress.category === 'STREAK_DAYS') {
-		return `Best ${current} / next ${target} training days`
+		return t('evidenceStreak', { current, target })
 	}
-	return `${current} / ${target} ${progressUnit(progress.category, progress.nextMilestone.threshold)}`
+	return t('evidenceRatio', {
+		current,
+		target,
+		unit: progressUnit(progress.category, progress.nextMilestone.threshold, t),
+	})
 }
 
 export function formatMilestoneProgressDetail(
 	progress: AchievementCategoryProgress,
 	locale: Locale,
+	t: Translator<'achievements.progress'>,
 ): string {
 	if (!progress.nextMilestone) {
-		return 'The five fixed milestones in this category are complete.'
+		return t('detailComplete')
 	}
 
 	const remaining = formatProgressNumber(progress.remaining, locale)
+	const values = { remaining, count: progress.remaining }
 	switch (progress.category) {
 		case 'SESSIONS':
-			return `${remaining} more ${progress.remaining === 1 ? 'session' : 'sessions'}, within your own schedule.`
+			return t('detailSessions', values)
 		case 'SETS':
-			return `${remaining} more completed ${progress.remaining === 1 ? 'set' : 'sets'} in planned training.`
+			return t('detailSets', values)
 		case 'VOLUME_KG':
-			return 'Cumulative completed-set history; there is no deadline and load should follow your plan.'
+			return t('detailVolume')
 		case 'RECORDS':
-			return `${remaining} more ${progress.remaining === 1 ? 'exercise record' : 'exercise records'} through normal training.`
+			return t('detailRecords', values)
 		case 'STREAK_DAYS':
-			return 'Uses your best recorded streak; recovery days between sessions are compatible.'
+			return t('detailStreak')
 	}
 }
 
@@ -128,36 +153,36 @@ export function formatComebackEvidence(
 		ComebackRecognition,
 		'inactiveDays' | 'activeDays' | 'windowDays'
 	>,
+	t: Translator<'achievements.comeback'>,
 ): string {
-	return `${comeback.inactiveDays} full days away · ${comeback.activeDays} active days in ${comeback.windowDays} days`
+	return t('evidence', {
+		inactiveDays: comeback.inactiveDays,
+		activeDays: comeback.activeDays,
+		windowDays: comeback.windowDays,
+	})
 }
-
-const countLabel = (
-	value: number,
-	locale: Locale,
-	singular: string,
-	plural: string,
-) =>
-	`${numberFormatter(locale, {}).format(value)} ${value === 1 ? singular : plural}`
 
 export function formatRankEvidence(
 	rank: RenaissanceRankProgress,
-	locale: Locale,
+	t: Translator<'achievements.rank'>,
 ): string {
-	return `${countLabel(rank.completedSessions, locale, 'session', 'sessions')} · ${countLabel(rank.activeWeeks, locale, 'active week', 'active weeks')}`
+	return t('evidence', {
+		sessions: rank.completedSessions,
+		weeks: rank.activeWeeks,
+	})
 }
 
 export function formatNextRankRequirements(
 	rank: RenaissanceRankProgress,
-	locale: Locale,
+	t: Translator<'achievements.rank'>,
 ): string | null {
 	if (!rank.nextRank) return null
 
 	const sessions = rank.sessionsRemaining
-		? `${countLabel(rank.sessionsRemaining, locale, 'more session', 'more sessions')}`
-		: 'Session requirement met'
+		? t('nextSessions', { count: rank.sessionsRemaining })
+		: t('nextSessionsMet')
 	const weeks = rank.activeWeeksRemaining
-		? `${countLabel(rank.activeWeeksRemaining, locale, 'more active week', 'more active weeks')}`
-		: 'Active-week requirement met'
-	return `${sessions} · ${weeks}`
+		? t('nextWeeks', { count: rank.activeWeeksRemaining })
+		: t('nextWeeksMet')
+	return t('nextJoin', { sessions, weeks })
 }
