@@ -128,6 +128,7 @@ export function SessionRecapContent({
 	notesAction,
 }: SessionRecapContentProps) {
 	const t = useTranslations('workout.recap')
+	const tChange = useTranslations('progress.progressionChange')
 	const locale = useLocale()
 	const viewerUnit = useWeightUnit()
 	const weightUnit = unitOverride ?? viewerUnit
@@ -290,13 +291,20 @@ export function SessionRecapContent({
 										{change.exerciseName}
 									</p>
 									<p className="type-body-sm mt-1 text-ink-3">
-										{getProgressionRuleExplanation(change, weightUnit)}
+										{getProgressionRuleExplanation(
+											change,
+											weightUnit,
+											tChange,
+											locale,
+										)}
 									</p>
 									<ul className="mt-2 space-y-1">
 										{change.sets.map(set => {
 											const presentation = getProgressionSetPresentation(
 												set,
 												weightUnit,
+												tChange,
+												locale,
 											)
 											return (
 												<li

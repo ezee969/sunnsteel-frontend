@@ -12,7 +12,7 @@ import {
 	RefreshCw,
 	TrendingUp,
 } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
@@ -65,6 +65,8 @@ function PerformanceSessionCard({
 	weightUnit: WeightUnit
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('progress.performanceHistory')
+	const tChange = useTranslations('progress.progressionChange')
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const prescriptionNotes = session.prescriptions.flatMap(prescription =>
 		prescription.note?.trim() ? [prescription.note.trim()] : [],
@@ -85,11 +87,13 @@ function PerformanceSessionCard({
 										session.status === 'COMPLETED' ? 'success' : 'outline'
 									}
 								>
-									{session.status === 'COMPLETED' ? 'Completed' : 'Aborted'}
+									{session.status === 'COMPLETED'
+										? t('completed')
+										: t('aborted')}
 								</Badge>
 							</span>
 							<span className="type-body-sm mt-1 block text-ink-3">
-								{session.dayName || 'Workout day'}
+								{session.dayName || t('workoutDay')}
 							</span>
 						</span>
 						<span className="type-body-sm space-y-1 text-ink-3 sm:text-right">
@@ -105,22 +109,22 @@ function PerformanceSessionCard({
 								<Clock3 className="size-4" aria-hidden />
 								{session.durationSec != null
 									? formatDuration(session.durationSec)
-									: 'Duration unavailable'}
+									: t('durationUnavailable')}
 							</span>
 						</span>
 					</span>
 				</AccordionTrigger>
 
 				<AccordionContent className="space-y-5 border-t border-rule-faint p-4 sm:p-5">
-					<section aria-label="Completed sets" className="space-y-2">
-						<p className="type-label text-ink-3">Completed sets</p>
+					<section aria-label={t('completedSets')} className="space-y-2">
+						<p className="type-label text-ink-3">{t('completedSets')}</p>
 						<div className="border-y border-rule-faint">
 							<div
 								aria-hidden
 								className="type-body-sm grid grid-cols-[3rem_minmax(0,1fr)_4rem] gap-3 py-2 text-ink-3"
 							>
-								<span>Set</span>
-								<span>Performance</span>
+								<span>{t('set')}</span>
+								<span>{t('performance')}</span>
 								<span className="text-right">RPE</span>
 							</div>
 							<ol className="divide-y divide-rule-faint">
@@ -133,7 +137,7 @@ function PerformanceSessionCard({
 										<span>
 											{set.weightKg != null && set.weightKg > 0
 												? `${formatWeightAmount(set.weightKg, weightUnit, locale, 2)} ${unitLabel} × ${set.reps}`
-												: `${set.reps} reps · bodyweight`}
+												: t('bodyweight', { reps: set.reps })}
 										</span>
 										<span className="text-right">{set.rpe ?? '—'}</span>
 									</li>
@@ -143,46 +147,55 @@ function PerformanceSessionCard({
 					</section>
 
 					<div className="grid gap-4 lg:grid-cols-2">
-						<section aria-label="Notes" className="space-y-2">
+						<section aria-label={t('notes')} className="space-y-2">
 							<div className="flex items-center gap-2">
 								<NotebookPen className="size-4 text-ink-3" aria-hidden />
-								<p className="type-label text-ink-3">Notes</p>
+								<p className="type-label text-ink-3">{t('notes')}</p>
 							</div>
 							<div className="space-y-2 bg-surface-sunk p-3">
 								<div>
-									<p className="type-body-sm text-ink-3">Session note</p>
+									<p className="type-body-sm text-ink-3">{t('sessionNote')}</p>
 									<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
-										{session.sessionNotes?.trim() || 'No session note.'}
+										{session.sessionNotes?.trim() || t('noSessionNote')}
 									</p>
 								</div>
 								<div className="border-t border-rule-faint pt-2">
-									<p className="type-body-sm text-ink-3">Prescription note</p>
+									<p className="type-body-sm text-ink-3">
+										{t('prescriptionNote')}
+									</p>
 									<p className="type-body-sm mt-1 whitespace-pre-wrap text-ink-2">
 										{prescriptionNotes.length
 											? prescriptionNotes.join('\n')
-											: 'No exercise note in this prescription.'}
+											: t('noPrescriptionNote')}
 									</p>
 								</div>
 							</div>
 						</section>
 
-						<section aria-label="Progression changes" className="space-y-2">
+						<section aria-label={t('progressionChanges')} className="space-y-2">
 							<div className="flex items-center gap-2">
 								<TrendingUp className="size-4 text-honour" aria-hidden />
-								<p className="type-label text-ink-3">Progression</p>
+								<p className="type-label text-ink-3">{t('progression')}</p>
 							</div>
 							{session.progressionChanges.length ? (
 								<div className="space-y-3 bg-surface-sunk p-3">
 									{session.progressionChanges.map(change => (
 										<div key={change.routineExerciseId}>
 											<p className="type-body-sm text-ink-2">
-												{getProgressionRuleExplanation(change, weightUnit)}
+												{getProgressionRuleExplanation(
+													change,
+													weightUnit,
+													tChange,
+													locale,
+												)}
 											</p>
 											<ul className="mt-2 space-y-1">
 												{change.sets.map(set => {
 													const row = getProgressionSetPresentation(
 														set,
 														weightUnit,
+														tChange,
+														locale,
 													)
 													return (
 														<li
@@ -204,7 +217,7 @@ function PerformanceSessionCard({
 								</div>
 							) : (
 								<p className="type-body-sm bg-surface-sunk p-3 text-ink-3">
-									No prescription change followed this session.
+									{t('noChange')}
 								</p>
 							)}
 						</section>
@@ -212,7 +225,7 @@ function PerformanceSessionCard({
 
 					<Button variant="link" className="h-auto p-0" asChild>
 						<a href={'/workouts/sessions/' + session.sessionId}>
-							Open session recap
+							{t('openRecap')}
 						</a>
 					</Button>
 				</AccordionContent>
@@ -221,15 +234,8 @@ function PerformanceSessionCard({
 	)
 }
 
-const DEFAULT_COPY = {
-	title: 'Performance history',
-	description: 'Select a session to review its sets, notes, and progression.',
-	emptyTitle: 'No sessions in this range',
-	emptyDescription: 'Choose a longer range to review earlier performances.',
-}
-
 export function ExercisePerformanceHistory({
-	copy = DEFAULT_COPY,
+	copy: copyProp,
 	sessions,
 	isPending,
 	isError,
@@ -239,6 +245,13 @@ export function ExercisePerformanceHistory({
 	onLoadMore,
 }: ExercisePerformanceHistoryProps) {
 	const weightUnit = useWeightUnit()
+	const t = useTranslations('progress.performanceHistory')
+	const copy = copyProp ?? {
+		title: t('title'),
+		description: t('description'),
+		emptyTitle: t('emptyTitle'),
+		emptyDescription: t('emptyDescription'),
+	}
 
 	// UX-04: the first five sessions, then "Show N more"; the server's
 	// "Load earlier sessions" follows once every loaded one is shown.
@@ -258,21 +271,17 @@ export function ExercisePerformanceHistory({
 			</div>
 
 			{isPending ? (
-				<div className="space-y-4" aria-label="Loading performance history">
+				<div className="space-y-4" aria-label={t('loading')}>
 					<Skeleton className="h-32" />
 					<Skeleton className="h-32" />
 				</div>
 			) : isError && sessions.length === 0 ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">
-						Performance history is unavailable
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load these sessions. Try again.
-					</p>
+					<p className="type-panel text-foreground">{t('errorTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 					<Button variant="outline" className="mt-3" onClick={onRetry}>
 						<RefreshCw aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : sessions.length === 0 ? (
@@ -306,11 +315,9 @@ export function ExercisePerformanceHistory({
 
 			{isError && sessions.length > 0 ? (
 				<div role="alert" className="flex flex-wrap items-center gap-3">
-					<p className="type-body-sm text-ink-3">
-						The next page could not be loaded.
-					</p>
+					<p className="type-body-sm text-ink-3">{t('nextPageError')}</p>
 					<Button size="sm" variant="outline" onClick={onLoadMore}>
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : null}
@@ -322,7 +329,7 @@ export function ExercisePerformanceHistory({
 					disabled={isFetchingNextPage}
 					onClick={onLoadMore}
 				>
-					{isFetchingNextPage ? 'Loading sessions…' : 'Load earlier sessions'}
+					{isFetchingNextPage ? t('loadingMore') : t('loadEarlier')}
 				</Button>
 			) : null}
 		</section>

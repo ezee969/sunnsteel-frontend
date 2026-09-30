@@ -2,7 +2,7 @@
 
 import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -33,14 +33,14 @@ import {
 	STRENGTH_RANGE_OPTIONS,
 } from '@/lib/utils/strength-trend'
 import {
-	formatWeightInput,
 	getWeightUnitLabel,
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
 function ProgressLoading() {
+	const t = useTranslations('progress.strength')
 	return (
-		<div className="space-y-6" aria-label="Loading progress">
+		<div className="space-y-6" aria-label={t('loading')}>
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Skeleton className="h-20" />
 				<Skeleton className="h-20" />
@@ -61,6 +61,7 @@ function ProgressLoading() {
  */
 export default function ProgressStrengthPage() {
 	const locale = useLocale() as Locale
+	const t = useTranslations('progress.strength')
 	const {
 		range,
 		setRange,
@@ -95,8 +96,9 @@ export default function ProgressStrengthPage() {
 	const performanceSessions =
 		history.data?.pages.flatMap(page => page.items) ?? []
 	const timelineItems = timeline.data?.pages.flatMap(page => page.items) ?? []
+	// No grouping: English reads as `String()` did; Spanish moves the decimal.
 	const formatMetric = (value: number) =>
-		`${formatWeightInput(value, weightUnit)} ${unitLabel}`
+		`${numberFormatter(locale, { maximumFractionDigits: 2, useGrouping: false }).format(kilogramsToDisplayWeight(value, weightUnit))} ${unitLabel}`
 	const formatDate = (value: string) =>
 		dateFormatter(locale, {
 			month: 'short',
@@ -112,7 +114,7 @@ export default function ProgressStrengthPage() {
 			>
 				<div className="min-w-0">
 					<label htmlFor="strength-exercise" className="type-label text-ink-3">
-						Exercise
+						{t('exercise')}
 					</label>
 					<Select
 						value={selectedExerciseId ?? ''}
@@ -122,9 +124,9 @@ export default function ProgressStrengthPage() {
 						<SelectTrigger
 							id="strength-exercise"
 							className="mt-2 w-full md:max-w-md"
-							aria-label="Exercise"
+							aria-label={t('exercise')}
 						>
-							<SelectValue placeholder="Choose an exercise" />
+							<SelectValue placeholder={t('chooseExercise')} />
 						</SelectTrigger>
 						<SelectContent>
 							{historyPage?.exercises.map(exercise => (
@@ -141,7 +143,7 @@ export default function ProgressStrengthPage() {
 
 				<div
 					role="group"
-					aria-label="Date range"
+					aria-label={t('dateRange')}
 					className="flex flex-wrap gap-1"
 				>
 					{STRENGTH_RANGE_OPTIONS.map(option => (
@@ -153,7 +155,7 @@ export default function ProgressStrengthPage() {
 							aria-pressed={range === option.value}
 							onClick={() => setRange(option.value)}
 						>
-							{option.value === 'ALL' ? 'All' : option.value}
+							{t(`range${option.value}`)}
 						</Button>
 					))}
 				</div>
@@ -163,30 +165,25 @@ export default function ProgressStrengthPage() {
 				<ProgressLoading />
 			) : history.isError && !history.data ? (
 				<div role="alert" className="border border-rule bg-surface p-6">
-					<h2 className="type-section text-foreground">
-						Progress is unavailable
-					</h2>
-					<p className="type-body-sm mt-2 text-ink-3">
-						We could not load your exercise history. Try again.
-					</p>
+					<h2 className="type-section text-foreground">{t('errorTitle')}</h2>
+					<p className="type-body-sm mt-2 text-ink-3">{t('errorBody')}</p>
 					<Button
 						className="mt-4"
 						variant="outline"
 						onClick={() => void history.refetch()}
 					>
 						<RefreshCw aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : !selectedPerformance ? (
 				<div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-rule bg-surface p-8 text-center">
 					<Dumbbell className="size-8 text-ink-3" aria-hidden />
 					<h2 className="type-section mt-4 text-foreground">
-						No exercise history yet
+						{t('emptyTitle')}
 					</h2>
 					<p className="type-body-sm mt-2 max-w-md text-ink-3">
-						Finish a session with at least one completed set to start building
-						your progress history.
+						{t('emptyBody')}
 					</p>
 				</div>
 			) : (
@@ -204,7 +201,7 @@ export default function ProgressStrengthPage() {
 								href={`/exercises/${selectedPerformance.exerciseId}`}
 								className="type-body-sm ml-auto shrink-0 text-primary underline-offset-4 hover:underline"
 							>
-								Exercise page
+								{t('exercisePage')}
 							</Link>
 						</div>
 					</section>
@@ -218,10 +215,10 @@ export default function ProgressStrengthPage() {
 						) : trend.isError ? (
 							<div role="alert" className="border border-rule bg-surface p-5">
 								<p className="type-panel text-foreground">
-									Strength trends are unavailable
+									{t('trendsErrorTitle')}
 								</p>
 								<p className="type-body-sm mt-1 text-ink-3">
-									Session history is still available below.
+									{t('trendsErrorBody')}
 								</p>
 								<Button
 									size="sm"
@@ -230,20 +227,20 @@ export default function ProgressStrengthPage() {
 									onClick={() => void trend.refetch()}
 								>
 									<RefreshCw aria-hidden />
-									Retry trends
+									{t('retryTrends')}
 								</Button>
 							</div>
 						) : current ? (
 							<>
 								<div className="grid gap-px bg-rule-faint sm:grid-cols-2">
 									<div className="bg-surface p-4 sm:p-5">
-										<p className="type-label text-ink-3">Current best set</p>
+										<p className="type-label text-ink-3">{t('currentBest')}</p>
 										<p className="type-data type-data-strong mt-2 text-foreground">
 											{formatMetric(current.weightKg)} × {current.reps}
 										</p>
 									</div>
 									<div className="bg-surface p-4 sm:p-5">
-										<p className="type-label text-ink-3">Estimated 1RM</p>
+										<p className="type-label text-ink-3">{t('estimated1rm')}</p>
 										<p className="type-data type-data-strong mt-2 text-foreground">
 											{formatMetric(current.estimated1rmKg)}
 										</p>
@@ -252,16 +249,15 @@ export default function ProgressStrengthPage() {
 
 								{trend.data?.baseline && trend.data.points.length === 0 ? (
 									<p role="status" className="type-body-sm text-ink-3">
-										Your best did not change in this range. The charts begin
-										with the record you carried into it.
+										{t('unchanged')}
 									</p>
 								) : null}
 
 								<div className="grid gap-6 lg:grid-cols-2">
 									<StrengthTrendChart
 										id="estimated-one-rep-max"
-										title="Estimated 1RM trend"
-										description="Estimated strength from each new best set."
+										title={t('e1rmTitle')}
+										description={t('e1rmDescription')}
 										points={displayPoints}
 										getValue={point =>
 											kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
@@ -275,8 +271,8 @@ export default function ProgressStrengthPage() {
 									/>
 									<StrengthTrendChart
 										id="best-set-load"
-										title="Best-set load trend"
-										description="Load carried by each new best set; repetitions remain in its detail."
+										title={t('loadTitle')}
+										description={t('loadDescription')}
 										points={displayPoints}
 										getValue={point =>
 											kilogramsToDisplayWeight(point.weightKg, weightUnit)
@@ -284,7 +280,9 @@ export default function ProgressStrengthPage() {
 										formatValue={value =>
 											`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
 										}
-										formatPointDetail={point => `${point.reps} reps`}
+										formatPointDetail={point =>
+											t('repsDetail', { reps: point.reps })
+										}
 									/>
 								</div>
 
@@ -298,7 +296,7 @@ export default function ProgressStrengthPage() {
 												id="record-changes"
 												className="type-section text-foreground"
 											>
-												Recent record changes
+												{t('recentChanges')}
 											</h2>
 										</div>
 										<ol className="divide-y divide-rule-faint border-y border-rule-faint">
@@ -314,7 +312,9 @@ export default function ProgressStrengthPage() {
 														{formatMetric(point.weightKg)} × {point.reps}
 													</span>
 													<span className="type-body-sm text-ink-3 sm:text-right">
-														Est. 1RM {formatMetric(point.estimated1rmKg)}
+														{t('est1rm', {
+															value: formatMetric(point.estimated1rmKg),
+														})}
 													</span>
 												</li>
 											))}
@@ -324,14 +324,14 @@ export default function ProgressStrengthPage() {
 
 								{trend.data?.truncated ? (
 									<p role="status" className="type-body-sm text-ink-3">
-										Showing the latest 500 record changes in this range.
+										{t('truncated')}
 									</p>
 								) : null}
 							</>
 						) : null
 					) : (
 						<p className="type-body-sm border border-dashed border-rule bg-surface p-4 text-ink-3">
-							This exercise has session history but no weighted strength trend.
+							{t('noTrend')}
 						</p>
 					)}
 
