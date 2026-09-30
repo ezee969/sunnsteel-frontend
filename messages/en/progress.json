@@ -147,7 +147,21 @@
 		"nothingLogged": "Nothing logged yet.",
 		"noMeasurements": "No body measurements yet.",
 		"deleteEntryOf": "Delete the entry of {date}",
-		"deleteDescription": "Everything you logged on {date} is removed. Your current weight becomes the latest weight you logged before it."
+		"deleteDescription": "Everything you logged on {date} is removed. Your current weight becomes the latest weight you logged before it.",
+		"noWeightInRange": "No weight logged in this range.",
+		"noOtherMeasurements": "No measurements besides weight yet.",
+		"unavailable": "Body progress is unavailable",
+		"tryAgain": "Try again",
+		"heading": "Body progress",
+		"intro": "Your weight and measurements over time. Who else sees them is your <link>body progress privacy setting</link>.",
+		"rangeLabel": "Body progress range",
+		"logButton": "Log measurements",
+		"deleteFailed": "The entry could not be deleted. Try again.",
+		"logOnProgress": "Log on Progress",
+		"range30D": "30D",
+		"range90D": "90D",
+		"range1Y": "1Y",
+		"rangeAll": "All"
 	},
 	"tabs": {
 		"overview": "Overview",

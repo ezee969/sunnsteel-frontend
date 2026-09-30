@@ -110,7 +110,7 @@ export const ExercisePickerDropdown = forwardRef<
 						{isLoading ? (
 							<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
 								<Loader2 className="h-4 w-4 animate-spin" />
-								Loading...
+								{t('loading')}
 							</div>
 						) : exercises.length > 0 ? (
 							groups.map(group => (
@@ -126,7 +126,7 @@ export const ExercisePickerDropdown = forwardRef<
 											className="type-body-sm flex items-center gap-2 px-3 py-2 text-ink-3"
 										>
 											<Loader2 className="size-4 animate-spin" aria-hidden />
-											Loading recent exercises…
+											{t('loadingRecent')}
 										</div>
 									) : null}
 									<ul aria-label={group.label ?? t('matching')}>
@@ -165,7 +165,7 @@ export const ExercisePickerDropdown = forwardRef<
 							))
 						) : (
 							<div className="py-6 text-center text-sm text-muted-foreground">
-								No exercises found
+								{t('noneFound')}
 							</div>
 						)}
 						{offerCreate ? (

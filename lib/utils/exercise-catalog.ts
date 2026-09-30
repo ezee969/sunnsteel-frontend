@@ -8,7 +8,7 @@ import {
 	type MuscleGroup,
 } from '@sunsteel/contracts'
 
-import type { Translator } from '@/i18n/translator'
+import type { MessageKey, Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 
 import type { EmptyStateCopy } from './empty-states'
@@ -21,35 +21,43 @@ import { getFriendlyMuscleName } from './muscle-groups'
  * Node test environment.
  */
 
-export const MOVEMENT_PATTERN_LABELS: Record<MovementPattern, string> = {
-	HORIZONTAL_PUSH: 'Horizontal push',
-	VERTICAL_PUSH: 'Vertical push',
-	HORIZONTAL_PULL: 'Horizontal pull',
-	VERTICAL_PULL: 'Vertical pull',
-	SQUAT: 'Squat',
-	HINGE: 'Hinge',
-	LUNGE: 'Lunge',
-	CHEST_FLY: 'Chest fly',
-	SHOULDER_ABDUCTION: 'Shoulder abduction',
-	SHOULDER_FLEXION: 'Front raise',
-	SHOULDER_HORIZONTAL_ABDUCTION: 'Rear-delt fly',
-	SHOULDER_EXTENSION: 'Shoulder extension',
-	SCAPULAR_ELEVATION: 'Shrug',
-	ELBOW_FLEXION: 'Elbow flexion',
-	ELBOW_EXTENSION: 'Elbow extension',
-	KNEE_EXTENSION: 'Knee extension',
-	KNEE_FLEXION: 'Knee flexion',
-	HIP_EXTENSION: 'Hip extension',
-	PLANTAR_FLEXION: 'Calf raise',
-	CORE_FLEXION: 'Core flexion',
-	CORE_ROTATION: 'Core rotation',
-	CORE_STABILITY: 'Core stability',
-}
+type UiT = Translator<'catalog.exercisesUi'>
 
-export const MECHANIC_LABELS: Record<ExerciseMechanic, string> = {
-	COMPOUND: 'Compound',
-	ISOLATION: 'Isolation',
-}
+export const MOVEMENT_PATTERN_KEYS = {
+	HORIZONTAL_PUSH: 'movement.HORIZONTAL_PUSH',
+	VERTICAL_PUSH: 'movement.VERTICAL_PUSH',
+	HORIZONTAL_PULL: 'movement.HORIZONTAL_PULL',
+	VERTICAL_PULL: 'movement.VERTICAL_PULL',
+	SQUAT: 'movement.SQUAT',
+	HINGE: 'movement.HINGE',
+	LUNGE: 'movement.LUNGE',
+	CHEST_FLY: 'movement.CHEST_FLY',
+	SHOULDER_ABDUCTION: 'movement.SHOULDER_ABDUCTION',
+	SHOULDER_FLEXION: 'movement.SHOULDER_FLEXION',
+	SHOULDER_HORIZONTAL_ABDUCTION: 'movement.SHOULDER_HORIZONTAL_ABDUCTION',
+	SHOULDER_EXTENSION: 'movement.SHOULDER_EXTENSION',
+	SCAPULAR_ELEVATION: 'movement.SCAPULAR_ELEVATION',
+	ELBOW_FLEXION: 'movement.ELBOW_FLEXION',
+	ELBOW_EXTENSION: 'movement.ELBOW_EXTENSION',
+	KNEE_EXTENSION: 'movement.KNEE_EXTENSION',
+	KNEE_FLEXION: 'movement.KNEE_FLEXION',
+	HIP_EXTENSION: 'movement.HIP_EXTENSION',
+	PLANTAR_FLEXION: 'movement.PLANTAR_FLEXION',
+	CORE_FLEXION: 'movement.CORE_FLEXION',
+	CORE_ROTATION: 'movement.CORE_ROTATION',
+	CORE_STABILITY: 'movement.CORE_STABILITY',
+} as const satisfies Record<MovementPattern, MessageKey<'catalog.exercisesUi'>>
+
+export const MECHANIC_KEYS = {
+	COMPOUND: 'mechanic.COMPOUND',
+	ISOLATION: 'mechanic.ISOLATION',
+} as const satisfies Record<ExerciseMechanic, MessageKey<'catalog.exercisesUi'>>
+
+export const movementPatternLabel = (t: UiT, pattern: MovementPattern) =>
+	t(MOVEMENT_PATTERN_KEYS[pattern])
+
+export const mechanicLabel = (t: UiT, mechanic: ExerciseMechanic) =>
+	t(MECHANIC_KEYS[mechanic])
 
 /** The equipment filter's extra value: "everything listed at my gym". */
 export const GYM_EQUIPMENT_FILTER = 'gym'
@@ -253,6 +261,7 @@ export function catalogFilterOptions(
 	selected: CatalogFilters,
 	t: Translator<'routines.muscles'>,
 	tEquip: Translator<'routines.equipment'>,
+	tUi: UiT,
 ): {
 	muscles: CatalogOption<MuscleGroup>[]
 	equipment: CatalogOption<ExerciseEquipment>[]
@@ -282,7 +291,7 @@ export function catalogFilterOptions(
 			value => ({ value, label: equipmentLabel(value, tEquip) }),
 		),
 		patterns: MOVEMENT_PATTERNS.filter(value => patterns.has(value)).map(
-			value => ({ value, label: MOVEMENT_PATTERN_LABELS[value] }),
+			value => ({ value, label: movementPatternLabel(tUi, value) }),
 		),
 	}
 }
@@ -292,25 +301,30 @@ export function catalogFilterOptions(
  * list is unknown, so filtering by it would hide every exercise.
  */
 export function getGymFilterUnavailableState(
+	t: UiT,
 	locationName: string | null,
 ): EmptyStateCopy {
 	return {
 		title: locationName
-			? `${locationName} lists no equipment`
-			: 'No training location yet',
-		description:
-			'List the equipment you train with on your default training location in Settings to filter by it.',
+			? t('gymTitleNamed', { name: locationName })
+			: t('gymTitleNone'),
+		description: t('gymDescription'),
 		action: {
 			kind: 'link',
-			label: 'Open Settings',
+			label: t('openSettings'),
 			href: '/settings/training',
 		},
 	}
 }
 
-export function formatCatalogCount(shown: number, total: number): string {
-	const noun = total === 1 ? 'exercise' : 'exercises'
-	return shown === total ? `${total} ${noun}` : `${shown} of ${total} ${noun}`
+export function formatCatalogCount(
+	t: UiT,
+	shown: number,
+	total: number,
+): string {
+	return shown === total
+		? t('countAll', { total })
+		: t('countSome', { shown, total })
 }
 
 /**
@@ -318,12 +332,14 @@ export function formatCatalogCount(shown: number, total: number): string {
  * unknown; the caller shows loading or error for that case instead.
  */
 export function getCatalogEmptyState({
+	t,
 	catalogSize,
 	filters,
 	hasTrainedExercises,
 	hasStarredExercises = null,
 	hasCustomExercises = null,
 }: {
+	t: UiT
 	catalogSize: number
 	filters: CatalogFilters
 	hasTrainedExercises: boolean | null
@@ -332,37 +348,34 @@ export function getCatalogEmptyState({
 }): EmptyStateCopy {
 	if (catalogSize === 0) {
 		return {
-			title: 'The catalog is empty',
-			description: 'No exercises are available yet.',
+			title: t('emptyCatalogTitle'),
+			description: t('emptyCatalogBody'),
 		}
 	}
 	if (filters.mine && hasCustomExercises === false) {
 		return {
-			title: 'No exercises of your own yet',
-			description:
-				'Create one for a movement the catalog does not have. Only you can see and use it.',
-			action: { kind: 'clear-filters', label: 'Show all exercises' },
+			title: t('emptyMineTitle'),
+			description: t('emptyMineBody'),
+			action: { kind: 'clear-filters', label: t('showAll') },
 		}
 	}
 	if (filters.starred && hasStarredExercises === false) {
 		return {
-			title: 'No starred exercises yet',
-			description:
-				'Star exercises here or on their pages to keep them at the top of your routine pickers.',
-			action: { kind: 'clear-filters', label: 'Show all exercises' },
+			title: t('emptyStarredTitle'),
+			description: t('emptyStarredBody'),
+			action: { kind: 'clear-filters', label: t('showAll') },
 		}
 	}
 	if (filters.trained && hasTrainedExercises === false) {
 		return {
-			title: 'No trained exercises yet',
-			description:
-				'Finish a session with at least one completed set and its exercises appear under this filter.',
-			action: { kind: 'clear-filters', label: 'Show all exercises' },
+			title: t('emptyTrainedTitle'),
+			description: t('emptyTrainedBody'),
+			action: { kind: 'clear-filters', label: t('showAll') },
 		}
 	}
 	return {
-		title: 'No exercises match these filters',
-		description: 'Clear them to browse the whole catalog.',
-		action: { kind: 'clear-filters', label: 'Clear filters' },
+		title: t('emptyNoMatchTitle'),
+		description: t('emptyNoMatchBody'),
+		action: { kind: 'clear-filters', label: t('clearFilters') },
 	}
 }

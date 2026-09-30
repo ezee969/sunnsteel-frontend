@@ -71,6 +71,7 @@ export default function TrainingInsights() {
 	const locale = useLocale() as Locale
 	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const tInsights = useTranslations('planning.dashboardInsights')
+	const tA = useTranslations('planning.dashboardActions')
 	const tPlateaus = useTranslations('planning.plateaus')
 	const weightUnit = useWeightUnit()
 	const plateaus = usePlateaus()
@@ -104,7 +105,7 @@ export default function TrainingInsights() {
 			{isPending ? (
 				<div
 					role="status"
-					aria-label="Loading training insights"
+					aria-label={tA('insightsLoading')}
 					className="space-y-3 py-3"
 				>
 					<Skeleton className="h-14" />
@@ -112,9 +113,7 @@ export default function TrainingInsights() {
 				</div>
 			) : isError ? (
 				<div role="alert" className="space-y-3 py-3">
-					<p className="type-body-sm text-foreground">
-						Training insights could not be loaded.
-					</p>
+					<p className="type-body-sm text-foreground">{tA('insightsFailed')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -123,7 +122,7 @@ export default function TrainingInsights() {
 						disabled={plateaus.isFetching || volume.isFetching}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Try again
+						{tA('tryAgain')}
 					</Button>
 				</div>
 			) : insights.length === 0 ? (

@@ -406,7 +406,10 @@
 		"yoursPrefix": "Tuyo · ",
 		"unknown": "Desconocido",
 		"musclesAndEquipment": "{muscles} • {equipment}",
-		"exerciseFallback": "Ejercicio"
+		"exerciseFallback": "Ejercicio",
+		"loading": "Cargando…",
+		"loadingRecent": "Cargando ejercicios recientes…",
+		"noneFound": "No se encontraron ejercicios"
 	},
 	"lineage": {
 		"hidden": "Clonada de la rutina de otro miembro. La original ya no está disponible para ti.",
@@ -779,7 +782,13 @@
 		"errorLoadingRoutine": "Error al cargar la rutina",
 		"errorLoadingRoutineBody": "No pudimos cargar los datos de la rutina. Revisa tu conexión e inténtalo de nuevo.",
 		"tryAgain": "Reintentar",
-		"editErrorBody": "No se pudo cargar ni guardar los cambios de la rutina. Tus datos deberían conservarse."
+		"editErrorBody": "No se pudo cargar ni guardar los cambios de la rutina. Tus datos deberían conservarse.",
+		"updateSubtitle": "Actualiza tu rutina de entrenamiento paso a paso",
+		"createSubtitle": "Crea tu rutina de entrenamiento personalizada paso a paso",
+		"dayNameOptional": "Nombre del día (opcional)",
+		"saving": "Guardando…",
+		"progressionDynamic": "Doble progresión dinámica",
+		"routineSummary": "Resumen de la rutina"
 	},
 	"listing": {
 		"pageTitle": "Rutinas",
@@ -810,6 +819,17 @@
 		"loadingComparison": "Cargando la comparación",
 		"comparisonFailed": "No pudimos leer los entrenamientos de estos periodos. Inténtalo de nuevo.",
 		"thisBlock": "Este bloque",
-		"before": "Antes"
+		"before": "Antes",
+		"deleteDescription": "Esta acción no se puede deshacer. Se eliminará de forma permanente tu rutina y todos los datos asociados.",
+		"deleting": "Eliminando…",
+		"hardReload": "Recarga completa",
+		"notFoundTitle": "Rutina no encontrada",
+		"filterEmptyTitle": "Ninguna rutina coincide con este filtro",
+		"filterEmptyBody": "Elige Todas las rutinas de entrenamiento para ver todas tus rutinas.",
+		"noRoutines": "No tienes rutinas",
+		"startFromTemplate": "Empieza desde una plantilla de abajo o crea la tuya.",
+		"tryAgain": "Reintentar",
+		"comparisonUnavailable": "La comparación no está disponible",
+		"liftsInBoth": "Ejercicios entrenados en ambos"
 	}
 }

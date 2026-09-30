@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import HeroSection from '@/components/layout/HeroSection'
 import { AchievementLedger } from '@/features/achievements/achievement-ledger'
 import { ComebackRecognition } from '@/features/achievements/comeback-recognition'
@@ -8,18 +10,12 @@ import { RenaissanceRank } from '@/features/achievements/renaissance-rank'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 
 export default function AchievementsPage() {
+	const t = useTranslations('achievements.page')
 	const achievements = useAchievements()
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
-			<HeroSection
-				title={<>Achievements</>}
-				subtitle={
-					<>
-						A record of training milestones verified from your completed work.
-					</>
-				}
-			/>
+			<HeroSection title={<>{t('title')}</>} subtitle={<>{t('subtitle')}</>} />
 			<RenaissanceRank
 				rank={achievements.data?.rank}
 				isPending={achievements.isPending}

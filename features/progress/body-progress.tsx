@@ -74,6 +74,13 @@ function RangeControl({
 	onChange: (range: BodyProgressRange) => void
 	label: string
 }) {
+	const tBody = useTranslations('progress.body')
+	const optionLabels = {
+		'30D': tBody('range30D'),
+		'90D': tBody('range90D'),
+		'1Y': tBody('range1Y'),
+		ALL: tBody('rangeAll'),
+	}
 	return (
 		<div role="group" aria-label={label} className="flex flex-wrap gap-1">
 			{BODY_PROGRESS_RANGE_OPTIONS.map(option => (
@@ -85,7 +92,7 @@ function RangeControl({
 					aria-pressed={range === option.value}
 					onClick={() => onChange(option.value)}
 				>
-					{option.label}
+					{optionLabels[option.value]}
 				</Button>
 			))}
 		</div>
@@ -241,7 +248,7 @@ function BodyWeightChart({
 				</div>
 			) : (
 				<p className="type-body-sm mt-4 border border-dashed border-rule bg-surface-sunk p-4 text-ink-3">
-					No weight logged in this range.
+					{tBody('noWeightInRange')}
 				</p>
 			)}
 		</div>
@@ -263,9 +270,7 @@ function MeasurementList({
 	)
 	if (recorded.length === 0) {
 		return (
-			<p className="type-body-sm text-ink-3">
-				No measurements besides weight yet.
-			</p>
+			<p className="type-body-sm text-ink-3">{tBody('noOtherMeasurements')}</p>
 		)
 	}
 	return (
@@ -319,9 +324,7 @@ function BodyProgressBody({
 	if (query.isError || !query.data) {
 		return (
 			<div role="alert" className="border border-rule bg-surface p-5">
-				<p className="type-panel text-foreground">
-					Body progress is unavailable
-				</p>
+				<p className="type-panel text-foreground">{tBody('unavailable')}</p>
 				<Button
 					type="button"
 					variant="outline"
@@ -329,7 +332,7 @@ function BodyProgressBody({
 					className="mt-3"
 					onClick={() => void query.refetch()}
 				>
-					Try again
+					{tBody('tryAgain')}
 				</Button>
 			</div>
 		)
@@ -637,17 +640,19 @@ export function BodyProgressSection({
 							id="body-progress-heading"
 							className="type-section text-foreground"
 						>
-							Body progress
+							{tBody('heading')}
 						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-							Your weight and measurements over time. Who else sees them is your{' '}
-							<Link
-								href="/settings/privacy#privacy-bodyProgress"
-								className="underline underline-offset-4"
-							>
-								body progress privacy setting
-							</Link>
-							.
+							{tBody.rich('intro', {
+								link: chunks => (
+									<Link
+										href="/settings/privacy#privacy-bodyProgress"
+										className="underline underline-offset-4"
+									>
+										{chunks}
+									</Link>
+								),
+							})}
 						</p>
 					</div>
 				</div>
@@ -655,10 +660,10 @@ export function BodyProgressSection({
 					<RangeControl
 						range={range}
 						onChange={setRange}
-						label="Body progress range"
+						label={tBody('rangeLabel')}
 					/>
 					<Button type="button" size="sm" onClick={openNew}>
-						Log measurements
+						{tBody('logButton')}
 					</Button>
 				</div>
 			</div>
@@ -711,7 +716,7 @@ export function BodyProgressSection({
 						</AlertDialogHeader>
 						{remove.isError ? (
 							<p role="alert" className="type-body-sm text-ink">
-								The entry could not be deleted. Try again.
+								{tBody('deleteFailed')}
 							</p>
 						) : null}
 						<AlertDialogFooter>
@@ -759,14 +764,14 @@ export function ProfileBodyProgress({
 				<RangeControl
 					range={range}
 					onChange={setRange}
-					label="Body progress range"
+					label={tBody('rangeLabel')}
 				/>
 				{source.kind === 'own' ? (
 					<Link
 						href="/progress/body"
 						className="type-body-sm text-ink-2 underline underline-offset-4"
 					>
-						Log on Progress
+						{tBody('logOnProgress')}
 					</Link>
 				) : null}
 			</div>

@@ -56,7 +56,11 @@ function ForgotPasswordContent() {
 
 				{isSuccess ? (
 					<>
-						<AuthNotice tone="success" title="Check your email" role="status">
+						<AuthNotice
+							tone="success"
+							title={t('checkEmailTitle')}
+							role="status"
+						>
 							{t('checkEmailBody', { email: variables?.email ?? '' })}
 						</AuthNotice>
 						<Button

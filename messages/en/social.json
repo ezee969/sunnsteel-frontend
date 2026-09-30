@@ -286,5 +286,20 @@
 		"pageTitle": "Notifications",
 		"pageSubtitle": "What changed for you, and what you can do today.",
 		"markFailed": "Not marked read"
+	},
+	"search": {
+		"title": "Search Users",
+		"prompt": "Type a name or @username in the top search bar to find profiles.",
+		"resultsTitle": "Search Results",
+		"showing": "Showing results for <hl>\"{query}\"</hl>",
+		"noneTitle": "No users found",
+		"noneBody": "We couldn't find any profiles matching \"{query}\". Try a different spelling, name or @username."
+	},
+	"activityPage": {
+		"title": "Activity",
+		"subtitle": "What members you follow did, and who sees what you did. Every entry comes from verified training; nothing is posted by hand.",
+		"viewsLabel": "Activity views",
+		"following": "Following",
+		"yours": "Yours"
 	}
 }

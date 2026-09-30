@@ -32,6 +32,7 @@ import { DashboardSection } from './DashboardSection'
  */
 export default function FollowingPreview() {
 	const t = useTranslations('planning.dashboardFollowing')
+	const tA = useTranslations('planning.dashboardActions')
 	const query = useActivityFeed()
 	const weightUnit = useWeightUnit()
 	const rows = useMemo(
@@ -51,7 +52,7 @@ export default function FollowingPreview() {
 			{query.isPending ? (
 				<div
 					role="status"
-					aria-label="Loading activity from members you follow"
+					aria-label={tA('followingLoading')}
 					className="space-y-3 py-3"
 				>
 					<Skeleton className="h-16" />
@@ -60,7 +61,7 @@ export default function FollowingPreview() {
 			) : query.isError ? (
 				<div role="alert" className="space-y-3 py-3">
 					<p className="type-body-sm text-foreground">
-						Activity from members you follow could not be loaded.
+						{tA('followingFailed')}
 					</p>
 					<Button
 						type="button"
@@ -70,7 +71,7 @@ export default function FollowingPreview() {
 						disabled={query.isFetching}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Try again
+						{tA('tryAgain')}
 					</Button>
 				</div>
 			) : rows.length === 0 ? (
@@ -84,7 +85,7 @@ export default function FollowingPreview() {
 			) : (
 				<>
 					<ul
-						aria-label="Recent activity from members you follow"
+						aria-label={tA('followingRecent')}
 						className="border-t border-rule-faint"
 					>
 						{rows.map(row => (
@@ -111,7 +112,7 @@ export default function FollowingPreview() {
 					</ul>
 					<div className="pt-4">
 						<Button asChild variant="outline" size="sm">
-							<Link href="/activity">See all activity</Link>
+							<Link href="/activity">{tA('seeAllActivity')}</Link>
 						</Button>
 					</div>
 				</>

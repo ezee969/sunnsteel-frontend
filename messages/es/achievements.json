@@ -76,5 +76,9 @@
 		"viewSession": "Ver sesión",
 		"earnedCount": "{count, plural, one {# obtenido} other {# obtenidos}}",
 		"highest": "Más alto: {title}"
+	},
+	"page": {
+		"title": "Logros",
+		"subtitle": "Un registro de hitos de entrenamiento verificados a partir de tu trabajo completado."
 	}
 }

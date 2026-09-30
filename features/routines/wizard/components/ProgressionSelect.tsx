@@ -51,7 +51,7 @@ export function ProgressionSelect({
 						{t('progressionDouble')}
 					</SelectItem>
 					<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
-						Dynamic Double Progression
+						{t('progressionDynamic')}
 					</SelectItem>
 				</SelectContent>
 			</Select>

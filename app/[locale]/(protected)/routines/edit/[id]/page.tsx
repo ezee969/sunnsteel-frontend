@@ -328,13 +328,11 @@ export default function EditRoutinePage() {
 						className="flex items-center gap-2"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						Back to Routines
+						{t('backToRoutines')}
 					</Button>
 				</div>
 				<h2 className="type-section text-foreground">{t('editRoutine')}</h2>
-				<p className="type-body-sm mt-1 text-ink-3">
-					Update your workout routine step by step
-				</p>
+				<p className="type-body-sm mt-1 text-ink-3">{t('updateSubtitle')}</p>
 			</div>
 
 			{/* Stepper: sticky on top for easier navigation on mobile */}

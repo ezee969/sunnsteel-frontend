@@ -90,6 +90,7 @@ describe('custom exercises in lists (EXER-06)', () => {
 	it('says so when the member has none of their own', () => {
 		expect(
 			getCatalogEmptyState({
+				t: translatorFor('en', 'catalog.exercisesUi'),
 				catalogSize: 1,
 				filters: { ...EMPTY_CATALOG_FILTERS, mine: true },
 				hasTrainedExercises: null,

@@ -406,7 +406,10 @@
 		"yoursPrefix": "Yours · ",
 		"unknown": "Unknown",
 		"musclesAndEquipment": "{muscles} • {equipment}",
-		"exerciseFallback": "Exercise"
+		"exerciseFallback": "Exercise",
+		"loading": "Loading...",
+		"loadingRecent": "Loading recent exercises…",
+		"noneFound": "No exercises found"
 	},
 	"lineage": {
 		"hidden": "Cloned from another member’s routine. The original is no longer available to you.",
@@ -779,7 +782,13 @@
 		"errorLoadingRoutine": "Error loading routine",
 		"errorLoadingRoutineBody": "We couldn't load the routine data. Please check your connection and try again.",
 		"tryAgain": "Try Again",
-		"editErrorBody": "Failed to load or save routine changes. Your data should be preserved."
+		"editErrorBody": "Failed to load or save routine changes. Your data should be preserved.",
+		"updateSubtitle": "Update your workout routine step by step",
+		"createSubtitle": "Build your custom workout routine step by step",
+		"dayNameOptional": "Day name (optional)",
+		"saving": "Saving...",
+		"progressionDynamic": "Dynamic Double Progression",
+		"routineSummary": "Routine Summary"
 	},
 	"listing": {
 		"pageTitle": "Routines",
@@ -810,6 +819,17 @@
 		"loadingComparison": "Loading comparison",
 		"comparisonFailed": "We could not read the workouts of these periods. Try again.",
 		"thisBlock": "This block",
-		"before": "Before"
+		"before": "Before",
+		"deleteDescription": "This action cannot be undone. This will permanently delete your routine and remove all associated data.",
+		"deleting": "Deleting...",
+		"hardReload": "Hard reload",
+		"notFoundTitle": "Routine not found",
+		"filterEmptyTitle": "No routines match this filter",
+		"filterEmptyBody": "Choose All Workout Routines to see every routine you have.",
+		"noRoutines": "You have no routines",
+		"startFromTemplate": "Start from a template below, or build your own.",
+		"tryAgain": "Try again",
+		"comparisonUnavailable": "The comparison is unavailable",
+		"liftsInBoth": "Lifts trained in both"
 	}
 }

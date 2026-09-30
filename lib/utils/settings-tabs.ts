@@ -1,3 +1,5 @@
+import type { MessageKey, Translator } from '@/i18n/translator'
+
 import type { HashRule, PageTab } from './page-tabs'
 
 /**
@@ -5,13 +7,22 @@ import type { HashRule, PageTab } from './page-tabs'
  * Profile is the bare route, so the header, the sidebar and every other
  * plain `/settings` link still open the profile form.
  */
-export const SETTINGS_TABS = [
-	{ href: '/settings', label: 'Profile' },
-	{ href: '/settings/training', label: 'Training' },
-	{ href: '/settings/privacy', label: 'Privacy' },
-	{ href: '/settings/notifications', label: 'Notifications' },
-	{ href: '/settings/account', label: 'Account' },
-] as const satisfies readonly PageTab[]
+const SETTINGS_TAB_KEYS: {
+	href: string
+	key: MessageKey<'settings.tabs'>
+}[] = [
+	{ href: '/settings', key: 'profile' },
+	{ href: '/settings/training', key: 'training' },
+	{ href: '/settings/privacy', key: 'privacy' },
+	{ href: '/settings/notifications', key: 'notifications' },
+	{ href: '/settings/account', key: 'account' },
+]
+
+export function settingsTabs(
+	t: Translator<'settings.tabs'>,
+): readonly PageTab[] {
+	return SETTINGS_TAB_KEYS.map(tab => ({ href: tab.href, label: t(tab.key) }))
+}
 
 export const SETTINGS_TRAINING_HREF = '/settings/training'
 export const SETTINGS_PRIVACY_HREF = '/settings/privacy'

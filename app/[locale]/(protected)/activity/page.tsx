@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Suspense } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -14,35 +15,30 @@ import { OwnActivity } from '@/features/activity/own-activity'
  * The two views are page tabs (design system §21): links that keep their
  * URLs, so Back returns to the other view.
  */
-const ACTIVITY_TABS = [
-	{ href: '/activity', label: 'Following' },
-	{ href: '/activity?view=yours', label: 'Yours' },
-] as const
 
 function ActivityViews() {
+	const t = useTranslations('social.activityPage')
 	const params = useSearchParams()
 	const yours = params.get('view') === 'yours'
 
+	const tabs = [
+		{ href: '/activity', label: t('following') },
+		{ href: '/activity?view=yours', label: t('yours') },
+	]
+
 	return (
 		<>
-			<PageTabs label="Activity views" tabs={ACTIVITY_TABS} />
+			<PageTabs label={t('viewsLabel')} tabs={tabs} />
 			{yours ? <OwnActivity /> : <ActivityFeed />}
 		</>
 	)
 }
 
 export default function ActivityPage() {
+	const t = useTranslations('social.activityPage')
 	return (
 		<div className="mx-auto flex max-w-4xl flex-col gap-6 sm:gap-8">
-			<HeroSection
-				title={<>Activity</>}
-				subtitle={
-					<>
-						What members you follow did, and who sees what you did. Every entry
-						comes from verified training; nothing is posted by hand.
-					</>
-				}
-			/>
+			<HeroSection title={<>{t('title')}</>} subtitle={<>{t('subtitle')}</>} />
 			<Suspense fallback={<Skeleton className="h-40" />}>
 				<ActivityViews />
 			</Suspense>

@@ -27,8 +27,8 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import {
-	MECHANIC_LABELS,
-	MOVEMENT_PATTERN_LABELS,
+	mechanicLabel,
+	movementPatternLabel,
 } from '@/lib/utils/exercise-catalog'
 import { findRoutineUsages } from '@/lib/utils/exercise-detail'
 import { equipmentLabel } from '@/lib/utils/exercise-equipment'
@@ -88,6 +88,7 @@ function RetryAlert({
 	description: string
 	onRetry: () => void
 }) {
+	const t = useTranslations('catalog.exercisesUi')
 	return (
 		<div role="alert" className="border border-rule bg-surface p-5">
 			<p className="type-panel text-foreground">{title}</p>
@@ -100,20 +101,21 @@ function RetryAlert({
 				onClick={onRetry}
 			>
 				<RefreshCw className="size-4" aria-hidden />
-				Retry
+				{t('retry')}
 			</Button>
 		</div>
 	)
 }
 
 function BackLink() {
+	const t = useTranslations('catalog.exercisesUi')
 	return (
 		<Link
 			href="/exercises"
 			className="type-body-sm inline-flex w-fit items-center gap-1 text-ink-3 underline-offset-4 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground hover:underline"
 		>
 			<ArrowLeft className="size-4" aria-hidden />
-			Exercises
+			{t('back')}
 		</Link>
 	)
 }
@@ -134,13 +136,14 @@ function Overview({
 	exercise: Exercise
 	lastTrained: ReactNode
 }) {
+	const t = useTranslations('catalog.exercisesUi')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
 	const movement = [
 		exercise.movementPattern
-			? MOVEMENT_PATTERN_LABELS[exercise.movementPattern]
+			? movementPatternLabel(t, exercise.movementPattern)
 			: null,
-		exercise.mechanic ? MECHANIC_LABELS[exercise.mechanic] : null,
+		exercise.mechanic ? mechanicLabel(t, exercise.mechanic) : null,
 	]
 		.filter(Boolean)
 		.join(' · ')
@@ -148,29 +151,30 @@ function Overview({
 
 	return (
 		<section aria-labelledby="exercise-overview">
-			<SectionHeading id="exercise-overview" title="Overview" />
+			<SectionHeading id="exercise-overview" title={t('overview')} />
 			<dl className="grid sm:grid-cols-2 sm:gap-x-8">
-				<Fact label="Primary muscles">
+				<Fact label={t('primaryMuscles')}>
 					{getFriendlyMuscleNames(exercise.primaryMuscles, tMuscles).join(
 						', ',
-					) || 'Not classified'}
+					) || t('notClassified')}
 				</Fact>
-				<Fact label="Secondary muscles">
-					{secondary.length ? secondary.join(', ') : 'None'}
+				<Fact label={t('secondaryMuscles')}>
+					{secondary.length ? secondary.join(', ') : t('none')}
 				</Fact>
-				<Fact label="Movement">{movement || 'Not classified'}</Fact>
-				<Fact label="Equipment">
+				<Fact label={t('colMovement')}>{movement || t('notClassified')}</Fact>
+				<Fact label={t('colEquipment')}>
 					{exercise.equipmentRequired
 						.map(item => equipmentLabel(item, tEquipment))
-						.join(', ') || 'Not listed'}
+						.join(', ') || t('notListed')}
 				</Fact>
-				<Fact label="Last trained">{lastTrained}</Fact>
+				<Fact label={t('colLastTrained')}>{lastTrained}</Fact>
 			</dl>
 		</section>
 	)
 }
 
 function RoutineUsages({ exerciseId }: { exerciseId: string }) {
+	const t = useTranslations('catalog.exercisesUi')
 	const routines = useRoutines()
 	const tDate = useTranslations('routines.date')
 	const tFormat = useTranslations('routines.format')
@@ -183,25 +187,33 @@ function RoutineUsages({ exerciseId }: { exerciseId: string }) {
 		<section aria-labelledby="exercise-routines" className="space-y-2">
 			<SectionHeading
 				id="exercise-routines"
-				title="In your routines"
-				description="Every routine day that currently programs this exercise, with its planned sets."
+				title={t('inRoutinesTitle')}
+				description={t('inRoutinesDescription')}
 			/>
 			{routines.isPending ? (
-				<div role="status" aria-label="Loading routines" className="space-y-3">
+				<div
+					role="status"
+					aria-label={t('loadingRoutines')}
+					className="space-y-3"
+				>
 					<Skeleton className="h-12" />
 					<Skeleton className="h-12" />
 				</div>
 			) : routines.isError ? (
 				<RetryAlert
-					title="Routines are unavailable"
-					description="We could not check which routines use this exercise. Try again."
+					title={t('routinesUnavailable')}
+					description={t('routinesUnavailableBody')}
 					onRetry={() => void routines.refetch()}
 				/>
 			) : usages.length === 0 ? (
 				<EmptyModule
-					title="Not in any routine"
-					description="Add it to a routine day in the routine builder to plan it into your week."
-					action={{ kind: 'link', label: 'Browse routines', href: '/routines' }}
+					title={t('notInRoutineTitle')}
+					description={t('notInRoutineBody')}
+					action={{
+						kind: 'link',
+						label: t('browseRoutines'),
+						href: '/routines',
+					}}
 				/>
 			) : (
 				<ul>
@@ -245,6 +257,7 @@ function BestPerformance({
 	hasStrengthTrend: boolean
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('catalog.exercisesUi')
 	const weightUnit = useWeightUnit()
 	const tPlateaus = useTranslations('planning.plateaus')
 	const unitLabel = getWeightUnitLabel(weightUnit)
@@ -267,50 +280,51 @@ function BestPerformance({
 		<section aria-labelledby="exercise-best" className="space-y-4">
 			<SectionHeading
 				id="exercise-best"
-				title="Your best"
-				description="Your best weighted set so far and the one-rep max it estimates, from your recorded bests."
+				title={t('bestTitle')}
+				description={t('bestDescription')}
 			/>
 			{!hasStrengthTrend ? (
 				<p className="type-body-sm border border-dashed border-rule bg-surface p-4 text-ink-3">
-					No weighted best set yet. Bodyweight sets appear under recent
-					performances; a best set needs external load.
+					{t('noWeightedBest')}
 				</p>
 			) : trend.isPending ? (
-				<div role="status" aria-label="Loading your best" className="space-y-4">
+				<div role="status" aria-label={t('loadingBest')} className="space-y-4">
 					<Skeleton className="h-20" />
 					<Skeleton className="h-64" />
 				</div>
 			) : trend.isError || !current ? (
 				<RetryAlert
-					title="Your best is unavailable"
-					description="We could not load your records for this exercise. Try again."
+					title={t('bestUnavailable')}
+					description={t('bestUnavailableBody')}
 					onRetry={() => void trend.refetch()}
 				/>
 			) : (
 				<>
 					<dl className="grid gap-px bg-rule-faint sm:grid-cols-2">
 						<div className="bg-surface p-4 sm:p-5">
-							<dt className="type-label text-ink-3">Best set</dt>
+							<dt className="type-label text-ink-3">{t('bestSet')}</dt>
 							<dd className="mt-2">
 								<span className="type-data type-data-strong text-foreground">
 									{formatMetric(current.weightKg)} × {current.reps}
 								</span>
 								<span className="type-body-sm mt-1 block text-ink-3">
-									Set on{' '}
-									<time dateTime={current.achievedAt}>
-										{formatDate(locale)(current.achievedAt)}
-									</time>
+									{t.rich('setOn', {
+										date: formatDate(locale)(current.achievedAt),
+										time: chunks => (
+											<time dateTime={current.achievedAt}>{chunks}</time>
+										),
+									})}
 								</span>
 							</dd>
 						</div>
 						<div className="bg-surface p-4 sm:p-5">
-							<dt className="type-label text-ink-3">Estimated 1RM</dt>
+							<dt className="type-label text-ink-3">{t('estimated1rm')}</dt>
 							<dd className="mt-2">
 								<span className="type-data type-data-strong text-foreground">
 									{formatMetric(current.estimated1rmKg)}
 								</span>
 								<span className="type-body-sm mt-1 block text-ink-3">
-									Estimated from that set
+									{t('estimatedFromSet')}
 								</span>
 							</dd>
 						</div>
@@ -326,32 +340,34 @@ function BestPerformance({
 								).headline
 							}{' '}
 							<span className="text-ink-3">
-								{
-									describePlateauCount(
+								{t.rich('plateauTail', {
+									since: describePlateauCount(
 										plateau,
 										plateaus.data.thresholds,
 										formatDate(locale),
 										tPlateaus,
-									).since
-								}
-								; closest since{' '}
-								<span className="type-data text-ink-2">
-									{formatPlateauSet(plateau.closest, weightUnit, locale)}
-								</span>{' '}
-								(
-								{describeClosestShare(
-									plateau.closestRatio,
-									tPlateaus,
-									tPlateaus('estimateBest'),
-								)}
-								).
+									).since,
+									set: chunks => (
+										<span className="type-data text-ink-2">{chunks}</span>
+									),
+									setText: formatPlateauSet(
+										plateau.closest,
+										weightUnit,
+										locale,
+									),
+									share: describeClosestShare(
+										plateau.closestRatio,
+										tPlateaus,
+										tPlateaus('estimateBest'),
+									),
+								})}
 							</span>
 						</p>
 					) : null}
 					<StrengthTrendChart
 						id="exercise-estimated-one-rep-max"
-						title="Estimated 1RM over time"
-						description="Each point is a new best set; its load and reps stay in the detail."
+						title={t('chartTitle')}
+						description={t('chartDescription')}
 						points={getStrengthDisplayPoints(trend.data)}
 						getValue={point =>
 							kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
@@ -365,7 +381,7 @@ function BestPerformance({
 					/>
 					{trend.data.truncated ? (
 						<p role="status" className="type-body-sm text-ink-3">
-							The chart shows your latest 500 record changes.
+							{t('chartTruncated')}
 						</p>
 					) : null}
 				</>
@@ -375,6 +391,7 @@ function BestPerformance({
 }
 
 function TrainingHistory({ exerciseId }: { exerciseId: string }) {
+	const t = useTranslations('catalog.exercisesUi')
 	const params = useMemo(() => ({ exerciseId }), [exerciseId])
 	const history = useExercisePerformanceHistory(params, 5)
 	const [timelineFilter, setTimelineFilter] =
@@ -385,12 +402,10 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 		<>
 			<ExercisePerformanceHistory
 				copy={{
-					title: 'Recent performances',
-					description:
-						'Every finished session with completed sets of this exercise, newest first. Open one for its sets, notes and progression.',
-					emptyTitle: 'No performances yet',
-					emptyDescription:
-						'Finish a session with a completed set of this exercise to see it here.',
+					title: t('recentTitle'),
+					description: t('recentDescription'),
+					emptyTitle: t('recentEmptyTitle'),
+					emptyDescription: t('recentEmptyDescription'),
 				}}
 				sessions={history.data?.pages.flatMap(page => page.items) ?? []}
 				isPending={history.isPending}
@@ -403,9 +418,8 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 			<ProgressTimeline
 				heading={{
 					id: 'exercise-progression',
-					title: 'Progression history',
-					description:
-						'New best sets and automatic prescription changes for this exercise, with the reason preserved from each session.',
+					title: t('progressionTitle'),
+					description: t('progressionDescription'),
 				}}
 				showExerciseName={false}
 				items={timeline.data?.pages.flatMap(page => page.items) ?? []}
@@ -432,6 +446,7 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 	const locale = useLocale() as Locale
 	const tMusclesPage = useTranslations('routines.muscles')
+	const t = useTranslations('catalog.exercisesUi')
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
 	const exercise = catalog.data?.find(item => item.id === exerciseId)
@@ -441,7 +456,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		return (
 			<div
 				role="status"
-				aria-label="Loading exercise"
+				aria-label={t('loadingExercise')}
 				className="mx-auto flex max-w-6xl flex-col gap-6"
 			>
 				<Skeleton className="h-24" />
@@ -455,10 +470,10 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		return (
 			<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
 				<BackLink />
-				<HeroSection title={<>Exercise</>} />
+				<HeroSection title={<>{t('exerciseTitle')}</>} />
 				<RetryAlert
-					title="The catalog is unavailable"
-					description="We could not load this exercise. Try again."
+					title={t('catalogUnavailable')}
+					description={t('exerciseLoadFailedBody')}
 					onRetry={() => void catalog.refetch()}
 				/>
 			</div>
@@ -469,13 +484,13 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		return (
 			<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
 				<BackLink />
-				<HeroSection title={<>Exercise not found</>} />
+				<HeroSection title={<>{t('notFoundTitle')}</>} />
 				<EmptyModule
-					title="This exercise is not available"
-					description="The link may be out of date. Browse the catalog to find the exercise you were looking for."
+					title={t('notAvailableTitle')}
+					description={t('notAvailableBody')}
 					action={{
 						kind: 'link',
-						label: 'Browse exercises',
+						label: t('browseExercises'),
 						href: '/exercises',
 					}}
 				/>
@@ -488,12 +503,12 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		tMusclesPage,
 	).join(', ')
 	const lastTrained = trained.isPending
-		? 'Checking your history…'
+		? t('checkingHistory')
 		: trained.isError
-			? 'Unavailable'
+			? t('unavailable')
 			: summary
 				? formatDate(locale)(summary.lastPerformedAt)
-				: 'Not trained yet'
+				: t('notTrainedYet')
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
@@ -507,27 +522,29 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 			</div>
 			<HeroSection
 				title={<>{exercise.name}</>}
-				subtitle={primary ? <>Trains {primary}</> : undefined}
+				subtitle={
+					primary ? <>{t('trains', { muscles: primary })}</> : undefined
+				}
 			/>
 			<Overview exercise={exercise} lastTrained={lastTrained} />
 			{exercise.isCustom ? <CustomExerciseActions exercise={exercise} /> : null}
 			<RoutineUsages exerciseId={exercise.id} />
 			{trained.isPending ? (
-				<div role="status" aria-label="Loading your training history">
+				<div role="status" aria-label={t('loadingHistory')}>
 					<Skeleton className="h-40" />
 				</div>
 			) : trained.isError ? (
 				<RetryAlert
-					title="Your training history is unavailable"
-					description="We could not check whether you have trained this exercise. Try again."
+					title={t('historyUnavailable')}
+					description={t('trainedCheckFailedBody')}
 					onRetry={() => void trained.refetch()}
 				/>
 			) : !summary ? (
 				<section aria-labelledby="exercise-training" className="space-y-2">
-					<SectionHeading id="exercise-training" title="Your training" />
+					<SectionHeading id="exercise-training" title={t('yourTraining')} />
 					<EmptyModule
-						title="You have not trained this exercise yet"
-						description="Finish a session with a completed set of it to see your best set, estimated 1RM, recent performances and progression here."
+						title={t('notTrainedTitle')}
+						description={t('notTrainedBody')}
 					/>
 				</section>
 			) : (

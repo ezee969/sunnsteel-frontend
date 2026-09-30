@@ -68,7 +68,7 @@ export function MemberRoutineView({
 				</p>
 				{!isGone ? (
 					<Button type="button" variant="outline" onClick={() => refetch()}>
-						Try again
+						{t('tryAgain')}
 					</Button>
 				) : null}
 			</div>

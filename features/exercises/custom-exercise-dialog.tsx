@@ -47,8 +47,8 @@ import {
 	toggleMuscle,
 } from '@/lib/utils/custom-exercises'
 import {
-	MECHANIC_LABELS,
-	MOVEMENT_PATTERN_LABELS,
+	mechanicLabel,
+	movementPatternLabel,
 } from '@/lib/utils/exercise-catalog'
 import { equipmentLabel } from '@/lib/utils/exercise-equipment'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
@@ -141,6 +141,7 @@ function CustomExerciseForm({
 	onClose: () => void
 	onSaved?: (exercise: Exercise) => void
 }) {
+	const t = useTranslations('catalog.exercisesUi')
 	const tNotes = useTranslations('workout.notes')
 	const tMuscles = useTranslations('routines.muscles')
 	const tCustom = useTranslations('routines.customExercise')
@@ -216,7 +217,7 @@ function CustomExerciseForm({
 			>
 				<div className="space-y-1">
 					<Label htmlFor={nameId} className="type-body-sm text-ink-3">
-						Name
+						{t('name')}
 					</Label>
 					<Input
 						id={nameId}
@@ -232,7 +233,7 @@ function CustomExerciseForm({
 				</div>
 
 				<CheckboxGroup<MuscleGroup>
-					legend="Primary muscles"
+					legend={t('primaryMuscles')}
 					values={MUSCLE_GROUPS}
 					selected={draft.primaryMuscles}
 					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
@@ -242,7 +243,7 @@ function CustomExerciseForm({
 					}
 				/>
 				<CheckboxGroup<MuscleGroup>
-					legend="Secondary muscles (optional, counted as half a set)"
+					legend={t('secondaryLegend')}
 					values={MUSCLE_GROUPS}
 					selected={draft.secondaryMuscles}
 					label={muscle => getFriendlyMuscleName(muscle, tMuscles)}
@@ -252,7 +253,7 @@ function CustomExerciseForm({
 					}
 				/>
 				<CheckboxGroup
-					legend="Equipment it needs"
+					legend={t('equipmentNeeded')}
 					values={EXERCISE_EQUIPMENT}
 					selected={draft.equipmentRequired}
 					label={value => equipmentLabel(value, tEquipment)}
@@ -268,7 +269,7 @@ function CustomExerciseForm({
 				<div className="grid gap-4 sm:grid-cols-2">
 					<div className="space-y-1">
 						<Label htmlFor={patternId} className="type-body-sm text-ink-3">
-							Movement pattern (optional)
+							{t('movementPatternOptional')}
 						</Label>
 						<NativeSelect
 							id={patternId}
@@ -281,17 +282,17 @@ function CustomExerciseForm({
 								}))
 							}
 						>
-							<option value="">Not specified</option>
+							<option value="">{t('notSpecified')}</option>
 							{MOVEMENT_PATTERNS.map(pattern => (
 								<option key={pattern} value={pattern}>
-									{MOVEMENT_PATTERN_LABELS[pattern]}
+									{movementPatternLabel(t, pattern)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 					<div className="space-y-1">
 						<Label htmlFor={mechanicId} className="type-body-sm text-ink-3">
-							Compound or isolation (optional)
+							{t('compoundOrIsolation')}
 						</Label>
 						<NativeSelect
 							id={mechanicId}
@@ -303,10 +304,10 @@ function CustomExerciseForm({
 								}))
 							}
 						>
-							<option value="">Not specified</option>
+							<option value="">{t('notSpecified')}</option>
 							{EXERCISE_MECHANICS.map(mechanic => (
 								<option key={mechanic} value={mechanic}>
-									{MECHANIC_LABELS[mechanic]}
+									{mechanicLabel(t, mechanic)}
 								</option>
 							))}
 						</NativeSelect>
@@ -315,7 +316,7 @@ function CustomExerciseForm({
 
 				<div className="space-y-1">
 					<Label htmlFor={noteId} className="type-body-sm text-ink-3">
-						Note (optional)
+						{t('noteOptional')}
 					</Label>
 					<Textarea
 						id={noteId}
@@ -349,13 +350,13 @@ function CustomExerciseForm({
 						onClick={onClose}
 						disabled={pending}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button type="submit" disabled={pending}>
 						{pending ? (
 							<Loader2 className="size-4 animate-spin" aria-hidden />
 						) : null}
-						{exercise ? 'Save changes' : 'Create exercise'}
+						{exercise ? t('saveChanges') : t('createExercise')}
 					</Button>
 				</DialogFooter>
 			</form>

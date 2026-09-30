@@ -40,6 +40,7 @@ export default function RoutineDetailsPage() {
 	const tDeloads = useTranslations('routines.deloads')
 	const tBlocks = useTranslations('routines.trainingBlocks')
 	const tListing = useTranslations('routines.listing')
+	const tBuilder = useTranslations('routines.builder')
 
 	// ROUT-04: the account rule caps each routine's own visibility.
 	const { user } = useUser()
@@ -114,11 +115,11 @@ export default function RoutineDetailsPage() {
 			<div className="ledger-page space-y-6 py-6 md:py-8">
 				<div className="rule-heading pb-4">
 					<h1 className="type-page corner-brackets inline-block text-foreground">
-						Routine not found
+						{tListing('notFoundTitle')}
 					</h1>
 				</div>
 				<Button onClick={() => router.push('/routines')}>
-					Back to Routines
+					{tBuilder('backToRoutines')}
 				</Button>
 			</div>
 		)

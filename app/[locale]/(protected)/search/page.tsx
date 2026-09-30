@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -9,6 +10,7 @@ import { FollowSuggestions } from '@/features/profile/follow-suggestions'
 import { useUserSearch } from '@/lib/api/hooks/useUserSearch'
 
 export default function SearchPage() {
+	const t = useTranslations('social.search')
 	const searchParams = useSearchParams()
 	const router = useRouter()
 	const query = searchParams.get('q') || ''
@@ -22,10 +24,10 @@ export default function SearchPage() {
 			<div className="mx-auto max-w-6xl">
 				<div className="rule-heading pb-4">
 					<h1 className="type-page corner-brackets inline-block text-foreground">
-						Search Users
+						{t('title')}
 					</h1>
 					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
-						Type a name or @username in the top search bar to find profiles.
+						{t('prompt')}
 					</p>
 				</div>
 				<div className="mt-8 max-w-3xl">
@@ -41,11 +43,15 @@ export default function SearchPage() {
 			    inscription (§11.11). */}
 			<div className="rule-heading pb-4">
 				<h1 className="type-page corner-brackets inline-block text-foreground">
-					Search Results
+					{t('resultsTitle')}
 				</h1>
 				<p className="type-body-sm mt-2 text-ink-3">
-					Showing results for{' '}
-					<span className="type-data text-foreground">&quot;{query}&quot;</span>
+					{t.rich('showing', {
+						query,
+						hl: chunks => (
+							<span className="type-data text-foreground">{chunks}</span>
+						),
+					})}
 				</p>
 			</div>
 
@@ -95,11 +101,8 @@ export default function SearchPage() {
 				// Final review 8: no dashed placeholder box. The message sits on the
 				// page grid under the inscription, at a readable measure.
 				<div className="max-w-[68ch] space-y-1">
-					<h2 className="type-panel text-foreground">No users found</h2>
-					<p className="type-body-sm text-ink-3">
-						We couldn&apos;t find any profiles matching &quot;{query}&quot;. Try
-						a different spelling, name or @username.
-					</p>
+					<h2 className="type-panel text-foreground">{t('noneTitle')}</h2>
+					<p className="type-body-sm text-ink-3">{t('noneBody', { query })}</p>
 				</div>
 			)}
 		</div>

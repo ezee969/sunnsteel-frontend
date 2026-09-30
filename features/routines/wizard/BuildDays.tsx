@@ -369,7 +369,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 									<CardContent className="p-4 sm:p-6">
 										<div className="mb-4 max-w-sm space-y-2">
 											<Label htmlFor={`day-name-${dayId}`}>
-												Day name (optional)
+												{t('dayNameOptional')}
 											</Label>
 											<Input
 												id={`day-name-${dayId}`}

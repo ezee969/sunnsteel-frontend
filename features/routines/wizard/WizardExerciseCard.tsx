@@ -314,7 +314,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 								{isExercisesLoading ? (
 									<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
 										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-										Loading...
+										{tPicker('loading')}
 									</div>
 								) : filteredExercises.length > 0 ? (
 									pickerGroups.map(group => (
@@ -333,7 +333,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 														className="size-4 animate-spin"
 														aria-hidden
 													/>
-													Loading recent exercises…
+													{tPicker('loadingRecent')}
 												</div>
 											) : null}
 											<div className="space-y-1">

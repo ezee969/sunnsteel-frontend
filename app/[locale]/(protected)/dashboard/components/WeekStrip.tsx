@@ -37,6 +37,7 @@ import { DashboardSection } from './DashboardSection'
 export default function WeekStrip() {
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
+	const tA = useTranslations('planning.dashboardActions')
 	const [now] = useState(() => new Date())
 	const weekStart = useMemo(() => startOfWeek(now), [now])
 	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
@@ -95,21 +96,20 @@ export default function WeekStrip() {
 					href={WEEK_STRIP_SCHEDULE_HREF}
 					className="type-body-sm text-ink-2 underline-offset-4 hover:underline"
 				>
-					Open schedule
+					{tA('openSchedule')}
 				</Link>
 			}
 			bodyClassName="pt-3"
 		>
 			{data.isPending ? (
-				<div role="status" aria-label="Loading this week">
+				<div role="status" aria-label={tA('weekLoading')}>
 					<Skeleton className="h-16 sm:h-20" />
 				</div>
 			) : data.isError || !week ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">This week is unavailable</p>
+					<p className="type-panel text-foreground">{tA('weekUnavailable')}</p>
 					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load your routines or sessions for this week. Try
-						again.
+						{tA('weekUnavailableBody')}
 					</p>
 					<Button
 						type="button"
@@ -119,7 +119,7 @@ export default function WeekStrip() {
 						onClick={data.refetch}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{tA('retry')}
 					</Button>
 				</div>
 			) : (
@@ -160,7 +160,7 @@ export default function WeekStrip() {
 					</ol>
 					{weekStripStates(days).length > 0 ? (
 						<ul
-							aria-label="Legend"
+							aria-label={tA('legend')}
 							className="type-body-sm mt-2 flex flex-wrap gap-x-4 gap-y-1 text-ink-3"
 						>
 							{weekStripStates(days).map(state => {

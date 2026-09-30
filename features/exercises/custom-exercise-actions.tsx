@@ -34,6 +34,7 @@ import { CustomExerciseDialog } from './custom-exercise-dialog'
  */
 export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 	const copy = customExerciseCopy(useTranslations('routines.customExercise'))
+	const t = useTranslations('catalog.exercisesUi')
 	const router = useRouter()
 	const [editing, setEditing] = useState(false)
 	const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -45,17 +46,15 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 		<section aria-labelledby="exercise-yours" className="space-y-3">
 			<div className="border-b border-rule pb-2">
 				<h2 id="exercise-yours" className="type-section text-foreground">
-					Your exercise
+					{t('yourExercise')}
 				</h2>
 				<p className="type-body-sm mt-1 text-ink-3">
-					{archived
-						? 'Archived. It is out of the catalog and the routine pickers; routines, workouts and records keep it.'
-						: 'Only you can see and use it.'}
+					{archived ? t('archivedNote') : t('onlyYou')}
 				</p>
 			</div>
 			{exercise.note ? (
 				<div className="space-y-1">
-					<p className="type-body-sm text-ink-3">Your note</p>
+					<p className="type-body-sm text-ink-3">{t('yourNote')}</p>
 					<p className="type-body-sm whitespace-pre-line bg-surface-sunk p-3 text-ink-2">
 						{exercise.note}
 					</p>
@@ -68,7 +67,7 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 					onClick={() => setEditing(true)}
 				>
 					<Pencil className="size-4" aria-hidden />
-					Edit
+					{t('edit')}
 				</Button>
 				<Button
 					type="button"
@@ -85,7 +84,7 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 					) : (
 						<Archive className="size-4" aria-hidden />
 					)}
-					{archived ? 'Restore' : 'Archive'}
+					{archived ? t('restore') : t('archive')}
 				</Button>
 				{exercise.inUse ? null : (
 					<Button
@@ -94,7 +93,7 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 						onClick={() => setConfirmingDelete(true)}
 					>
 						<Trash2 className="size-4" aria-hidden />
-						Delete
+						{t('delete')}
 					</Button>
 				)}
 			</div>
@@ -119,15 +118,16 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Delete {exercise.name}?</AlertDialogTitle>
+						<AlertDialogTitle>
+							{t('deleteQuestion', { name: exercise.name })}
+						</AlertDialogTitle>
 						<AlertDialogDescription>
-							{copy.deleteDescription} Nothing uses it now, so nothing else
-							changes.
+							{t('deleteBody', { description: copy.deleteDescription })}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel disabled={remove.isPending}>
-							Keep it
+							{t('keepIt')}
 						</AlertDialogCancel>
 						<Button
 							type="button"
@@ -143,7 +143,7 @@ export function CustomExerciseActions({ exercise }: { exercise: Exercise }) {
 							{remove.isPending ? (
 								<Loader2 className="size-4 animate-spin" aria-hidden />
 							) : null}
-							Delete exercise
+							{t('deleteExercise')}
 						</Button>
 					</AlertDialogFooter>
 				</AlertDialogContent>
