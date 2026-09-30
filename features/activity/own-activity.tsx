@@ -8,7 +8,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Loader2, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -22,13 +22,13 @@ import {
 } from '@/features/activity/activity-entry-list'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { MessageKey } from '@/i18n/translator'
 import {
 	useActivityPreview,
 	useOwnActivity,
 	useSetActivityEntryAudience,
 } from '@/lib/api/hooks/useActivity'
 import {
-	ACTIVITY_EVERYONE_NOTE,
 	activityCapSection,
 	AUDIENCE_LABELS,
 	AUDIENCE_OPTIONS,
@@ -42,20 +42,20 @@ type OwnView = 'manage' | ActivityPreviewAudience
 
 const DEFAULT_VALUE = 'DEFAULT'
 
-const PREVIEW_NOTES: Record<ActivityPreviewAudience, string> = {
-	FOLLOWERS:
-		'A member who follows you sees exactly this, in their feed and on your profile.',
-	PUBLIC:
-		'Any other signed-in member sees exactly this on your profile. It never reaches their feed, which shows only members they follow.',
-}
+const PREVIEW_NOTES = {
+	FOLLOWERS: 'previewFollowersNote',
+	PUBLIC: 'previewPublicNote',
+} as const satisfies Record<
+	ActivityPreviewAudience,
+	MessageKey<'social.activityUi'>
+>
 
 function PageError({ onRetry }: { onRetry: () => void }) {
+	const t = useTranslations('social.activityUi')
 	return (
 		<div role="alert" className="border border-rule bg-surface p-6">
-			<p className="type-panel text-foreground">Activity is unavailable</p>
-			<p className="type-body-sm mt-1 text-ink-3">
-				We could not load it. Try again.
-			</p>
+			<p className="type-panel text-foreground">{t('errorTitle')}</p>
+			<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 			<Button
 				type="button"
 				variant="outline"
@@ -63,7 +63,7 @@ function PageError({ onRetry }: { onRetry: () => void }) {
 				onClick={onRetry}
 			>
 				<RefreshCw className="size-4" aria-hidden />
-				Retry
+				{t('retry')}
 			</Button>
 		</div>
 	)
@@ -93,11 +93,14 @@ function OwnActivityRow({
 	weightUnit: WeightUnit
 }) {
 	const locale = useLocale()
+	const t = useTranslations('social.activityUi')
+	const tActivity = useTranslations('social.activity')
+	const tPrivacy = useTranslations('settings.privacyOverview')
 	const setAudience = useSetActivityEntryAudience()
 	const { push } = useToast()
 	const { sharing } = entry
 	const withdrawn = sharing.override === 'PRIVATE'
-	const cap = describeActivityCap(sharing)
+	const cap = describeActivityCap(sharing, tActivity, tPrivacy)
 	const selectId = `activity-audience-${entry.id}`
 
 	const onChange = (value: string) => {
@@ -108,7 +111,7 @@ function OwnActivityRow({
 			{
 				onError: error =>
 					push({
-						title: 'Sharing not changed',
+						title: t('sharingFailed'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -121,8 +124,8 @@ function OwnActivityRow({
 			<ActivityFact entry={entry} weightUnit={weightUnit}>
 				<p className="type-body-sm mt-1 text-ink-2">
 					{withdrawn
-						? 'Withdrawn. Only you can see this.'
-						: describeEffectiveAudience(sharing.effectiveAudience)}
+						? t('withdrawn')
+						: describeEffectiveAudience(sharing.effectiveAudience, tActivity)}
 					{' · '}
 					<time dateTime={entry.occurredAt} className="text-ink-3">
 						{formatTimeAgo(entry.occurredAt, locale)}
@@ -138,7 +141,7 @@ function OwnActivityRow({
 			</ActivityFact>
 			<div className="flex items-center gap-2 sm:justify-end">
 				<label htmlFor={selectId} className="sr-only">
-					Who can see this
+					{t('whoCanSee')}
 				</label>
 				<NativeSelect
 					id={selectId}
@@ -147,20 +150,22 @@ function OwnActivityRow({
 					onChange={event => onChange(event.target.value)}
 				>
 					<option value={DEFAULT_VALUE}>
-						Default: {AUDIENCE_LABELS[sharing.defaultAudience]}
+						{t('defaultOption', {
+							audience: tActivity(AUDIENCE_LABELS[sharing.defaultAudience]),
+						})}
 					</option>
 					{AUDIENCE_OPTIONS.map(audience => (
 						<option key={audience} value={audience}>
 							{audience === 'PRIVATE'
-								? 'Only me (withdraw)'
-								: AUDIENCE_LABELS[audience]}
+								? t('onlyMeWithdraw')
+								: tActivity(AUDIENCE_LABELS[audience])}
 						</option>
 					))}
 				</NativeSelect>
 				{setAudience.isPending ? (
 					<Loader2
 						className="size-4 shrink-0 animate-spin text-ink-3"
-						aria-label="Saving"
+						aria-label={t('saving')}
 					/>
 				) : null}
 			</div>
@@ -169,24 +174,20 @@ function OwnActivityRow({
 }
 
 function ManageList({ weightUnit }: { weightUnit: WeightUnit }) {
+	const t = useTranslations('social.activityUi')
 	const query = useOwnActivity()
 	const entries = useMemo(
 		() => query.data?.pages.flatMap(page => page.entries) ?? [],
 		[query.data],
 	)
-	if (query.isPending) return <LoadingRows label="Loading your activity" />
+	if (query.isPending) return <LoadingRows label={t('loadingYours')} />
 	if (query.isError) return <PageError onRetry={() => void query.refetch()} />
 	if (entries.length === 0) {
-		return (
-			<EmptyModule
-				title="No activity yet"
-				description="Finished workouts, new records, load progressions, achievements, streaks, comebacks and routines you share appear here, with who can see each one."
-			/>
-		)
+		return <EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 	}
 	return (
 		<>
-			<ul aria-label="Your activity" className="border-t border-rule-faint">
+			<ul aria-label={t('yourActivity')} className="border-t border-rule-faint">
 				{entries.map(entry => (
 					<OwnActivityRow
 						key={entry.id}
@@ -205,7 +206,7 @@ function ManageList({ weightUnit }: { weightUnit: WeightUnit }) {
 					{query.isFetchingNextPage ? (
 						<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 					) : null}
-					Show more
+					{t('showMore')}
 				</Button>
 			) : null}
 		</>
@@ -219,6 +220,9 @@ function AudiencePreview({
 	audience: ActivityPreviewAudience
 	weightUnit: WeightUnit
 }) {
+	const t = useTranslations('social.activityUi')
+	const tActivity = useTranslations('social.activity')
+	const audienceLabel = tActivity(PREVIEW_AUDIENCE_LABELS[audience])
 	const query = useActivityPreview(audience)
 	const entries = useMemo(
 		() => query.data?.pages.flatMap(page => page.entries) ?? [],
@@ -227,16 +231,16 @@ function AudiencePreview({
 	return (
 		<div className="space-y-4">
 			<p role="status" className="type-body-sm max-w-[68ch] text-ink-2">
-				{PREVIEW_NOTES[audience]}
+				{t(PREVIEW_NOTES[audience])}
 			</p>
 			{query.isPending ? (
-				<LoadingRows label="Loading preview" />
+				<LoadingRows label={t('loadingPreview')} />
 			) : query.isError ? (
 				<PageError onRetry={() => void query.refetch()} />
 			) : entries.length === 0 ? (
 				<EmptyModule
-					title="Nothing"
-					description={`${PREVIEW_AUDIENCE_LABELS[audience]} sees none of your activity.`}
+					title={t('nothing')}
+					description={t('seesNone', { audience: audienceLabel })}
 				/>
 			) : (
 				<>
@@ -244,7 +248,7 @@ function AudiencePreview({
 						entries={entries}
 						weightUnit={weightUnit}
 						showAuthor={false}
-						label={`Your activity as ${PREVIEW_AUDIENCE_LABELS[audience].toLowerCase()} sees it`}
+						label={t('asSeenBy', { audience: audienceLabel.toLowerCase() })}
 					/>
 					{query.hasNextPage ? (
 						<Button
@@ -256,7 +260,7 @@ function AudiencePreview({
 							{query.isFetchingNextPage ? (
 								<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 							) : null}
-							Show more
+							{t('showMore')}
 						</Button>
 					) : null}
 				</>
@@ -270,35 +274,42 @@ function AudiencePreview({
  * as a follower and as any other member would receive it.
  */
 export function OwnActivity() {
+	const t = useTranslations('social.activityUi')
+	const tActivity = useTranslations('social.activity')
 	const [view, setView] = useState<OwnView>('manage')
 	const weightUnit = useWeightUnit()
 	const options: { value: OwnView; label: string }[] = [
-		{ value: 'manage', label: 'Only me' },
-		{ value: 'FOLLOWERS', label: PREVIEW_AUDIENCE_LABELS.FOLLOWERS },
-		{ value: 'PUBLIC', label: PREVIEW_AUDIENCE_LABELS.PUBLIC },
+		{ value: 'manage', label: t('onlyMe') },
+		{
+			value: 'FOLLOWERS',
+			label: tActivity(PREVIEW_AUDIENCE_LABELS.FOLLOWERS),
+		},
+		{ value: 'PUBLIC', label: tActivity(PREVIEW_AUDIENCE_LABELS.PUBLIC) },
 	]
 	return (
 		<section aria-labelledby="activity-yours" className="space-y-4">
 			<div className="rule-heading pb-4">
 				<h2 id="activity-yours" className="type-section text-foreground">
-					Yours
+					{t('yours')}
 				</h2>
 				<p className="type-body-sm mt-1 max-w-[68ch] text-ink-3">
-					Choose who sees each entry, or withdraw one. Defaults for each kind
-					are in{' '}
-					<Link
-						href="/settings/privacy#activity-sharing"
-						className="text-foreground underline underline-offset-4"
-					>
-						Settings
-					</Link>
-					. {ACTIVITY_EVERYONE_NOTE}
+					{t.rich('yoursBody', {
+						note: tActivity('everyoneNote'),
+						link: chunks => (
+							<Link
+								href="/settings/privacy#activity-sharing"
+								className="text-foreground underline underline-offset-4"
+							>
+								{chunks}
+							</Link>
+						),
+					})}
 				</p>
 			</div>
 
 			<div className="space-y-2">
 				<p id="activity-view-as" className="type-label text-ink-3">
-					See it as
+					{t('seeItAs')}
 				</p>
 				<div
 					role="group"

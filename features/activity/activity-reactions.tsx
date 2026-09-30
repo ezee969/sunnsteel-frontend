@@ -5,6 +5,7 @@ import {
 	type ActivityReaction,
 	type ActivityReactionSummary,
 } from '@sunsteel/contracts'
+import { useTranslations } from 'next-intl'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,8 @@ export function ActivityReactions({
 	/** False on your own activity: there is nothing to acknowledge. */
 	canReact: boolean
 }) {
+	const t = useTranslations('social.activity')
+	const tUi = useTranslations('social.activityUi')
 	const setReaction = useSetActivityReaction()
 	const { push } = useToast()
 	const given = reactionsGiven(summary)
@@ -60,7 +63,7 @@ export function ActivityReactions({
 						/>
 						<span className="type-data">{count}</span>
 						<span className="sr-only">
-							{ACTIVITY_REACTION_LABELS[reaction]}
+							{t(ACTIVITY_REACTION_LABELS[reaction])}
 						</span>
 					</span>
 				))}
@@ -74,7 +77,7 @@ export function ActivityReactions({
 			{
 				onError: error =>
 					push({
-						title: 'Reaction not saved',
+						title: tUi('reactionFailed'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -85,7 +88,7 @@ export function ActivityReactions({
 	return (
 		<div
 			role="group"
-			aria-label="Reactions"
+			aria-label={tUi('reactions')}
 			className="mt-2 flex flex-wrap items-center gap-1"
 		>
 			{ACTIVITY_REACTIONS.map(reaction => {
@@ -105,7 +108,7 @@ export function ActivityReactions({
 								size="sm"
 								variant={chosen ? 'secondary' : 'ghost'}
 								aria-pressed={chosen}
-								aria-label={describeReactionAction(reaction, summary)}
+								aria-label={describeReactionAction(reaction, summary, t)}
 								disabled={setReaction.isPending}
 								onClick={() => choose(reaction)}
 							>
@@ -121,7 +124,7 @@ export function ActivityReactions({
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent sideOffset={6}>
-							{ACTIVITY_REACTION_LABELS[reaction]}
+							{t(ACTIVITY_REACTION_LABELS[reaction])}
 						</TooltipContent>
 					</Tooltip>
 				)

@@ -99,17 +99,26 @@ describe('the dashboard following preview is a bounded slice of the feed', () =>
 	})
 })
 
+const tActivity = translatorFor('en', 'social.activity')
+const esActivity = translatorFor('es', 'social.activity')
+
 describe('the preview empty states are the feed empty states', () => {
 	it('offers finding members to someone who follows nobody', () => {
-		expect(getFollowingPreviewEmptyState(0, describeEmptyFeed(0), en)).toEqual({
-			...describeEmptyFeed(0),
+		expect(
+			getFollowingPreviewEmptyState(0, describeEmptyFeed(0, tActivity), en),
+		).toEqual({
+			...describeEmptyFeed(0, tActivity),
 			action: { kind: 'link', href: '/search', label: 'Find members' },
 		})
 	})
 
 	it('offers nothing when the members followed share nothing', () => {
-		const state = getFollowingPreviewEmptyState(4, describeEmptyFeed(4), en)
-		expect(state).toEqual(describeEmptyFeed(4))
+		const state = getFollowingPreviewEmptyState(
+			4,
+			describeEmptyFeed(4, tActivity),
+			en,
+		)
+		expect(state).toEqual(describeEmptyFeed(4, tActivity))
 		expect(state.action).toBeUndefined()
 		expect(state.description).toContain('Everyone starts private')
 	})
@@ -119,7 +128,8 @@ describe('the preview copy in Spanish (I18N-04)', () => {
 	it('names the remainder as this workout\u2019s', () => {
 		expect(describeMoreFacts(2, es)).toBe('y 2 más de este entrenamiento')
 		expect(
-			getFollowingPreviewEmptyState(0, describeEmptyFeed(0), es).action,
+			getFollowingPreviewEmptyState(0, describeEmptyFeed(0, esActivity), es)
+				.action,
 		).toMatchObject({ href: '/search', label: 'Buscar miembros' })
 	})
 })

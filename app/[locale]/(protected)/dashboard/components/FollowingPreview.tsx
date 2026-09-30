@@ -32,6 +32,7 @@ import { DashboardSection } from './DashboardSection'
  */
 export default function FollowingPreview() {
 	const t = useTranslations('planning.dashboardFollowing')
+	const tActivity = useTranslations('social.activity')
 	const query = useActivityFeed()
 	const weightUnit = useWeightUnit()
 	const rows = useMemo(
@@ -77,7 +78,7 @@ export default function FollowingPreview() {
 				<EmptyModule
 					{...getFollowingPreviewEmptyState(
 						followedCount,
-						describeEmptyFeed(followedCount),
+						describeEmptyFeed(followedCount, tActivity),
 						t,
 					)}
 				/>

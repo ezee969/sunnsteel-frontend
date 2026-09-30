@@ -10,7 +10,7 @@ import {
 } from '@sunsteel/contracts'
 import { Flag, Loader2, MessageSquare, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import {
@@ -34,8 +34,6 @@ import {
 } from '@/lib/api/hooks/useActivity'
 import { useUser } from '@/lib/api/hooks/useUser'
 import {
-	ACTIVITY_COMMENT_PLACEHOLDER,
-	ACTIVITY_COMMENTS_EMPTY,
 	describeCommentBudgetSpent,
 	describeCommentDelete,
 } from '@/lib/utils/activity'
@@ -58,6 +56,7 @@ export function ActivityComments({
 	entryId: string
 	summary: ActivityCommentSummary
 }) {
+	const t = useTranslations('social.activityUi')
 	const [open, setOpen] = useState(false)
 
 	return (
@@ -71,8 +70,8 @@ export function ActivityComments({
 			>
 				<MessageSquare className="size-4" aria-hidden />
 				{summary.count === 0
-					? 'Comment'
-					: `${summary.count} ${summary.count === 1 ? 'comment' : 'comments'}`}
+					? t('comment')
+					: t('commentCount', { count: summary.count })}
 			</Button>
 			{open ? <CommentThread entryId={entryId} summary={summary} /> : null}
 		</div>
@@ -86,6 +85,8 @@ function CommentThread({
 	entryId: string
 	summary: ActivityCommentSummary
 }) {
+	const t = useTranslations('social.activityUi')
+	const tActivity = useTranslations('social.activity')
 	const comments = useActivityComments(entryId)
 	const create = useCreateActivityComment()
 	const { push } = useToast()
@@ -104,7 +105,7 @@ function CommentThread({
 				onSuccess: () => setBody(''),
 				onError: error =>
 					push({
-						title: 'Could not post this comment',
+						title: t('postFailed'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -117,7 +118,7 @@ function CommentThread({
 			{comments.isLoading ? (
 				<p className="type-body-sm flex items-center gap-2 py-2 text-ink-3">
 					<Loader2 className="size-3.5 animate-spin" aria-hidden />
-					Loading comments…
+					{t('loadingComments')}
 				</p>
 			) : comments.error ? (
 				<div role="alert" className="py-2">
@@ -131,7 +132,7 @@ function CommentThread({
 						className="mt-2"
 						onClick={() => void comments.refetch()}
 					>
-						Try Again
+						{t('tryAgain')}
 					</Button>
 				</div>
 			) : rows.length ? (
@@ -142,7 +143,7 @@ function CommentThread({
 				</ul>
 			) : (
 				<p className="type-body-sm py-2 text-ink-3">
-					{ACTIVITY_COMMENTS_EMPTY}
+					{tActivity('commentsEmpty')}
 				</p>
 			)}
 
@@ -154,17 +155,17 @@ function CommentThread({
 					disabled={comments.isFetchingNextPage}
 					onClick={() => void comments.fetchNextPage()}
 				>
-					{comments.isFetchingNextPage ? 'Loading…' : 'Older comments'}
+					{comments.isFetchingNextPage ? t('loadingShort') : t('olderComments')}
 				</Button>
 			) : null}
 
 			{live.canComment ? (
 				<div className="mt-2 space-y-2">
 					<Textarea
-						aria-label="Write a comment"
+						aria-label={t('writeComment')}
 						value={body}
 						maxLength={ACTIVITY_COMMENT_MAX_LENGTH}
-						placeholder={ACTIVITY_COMMENT_PLACEHOLDER}
+						placeholder={tActivity('commentPlaceholder')}
 						onChange={event => setBody(event.target.value)}
 					/>
 					<div className="flex items-center justify-between gap-2">
@@ -181,7 +182,7 @@ function CommentThread({
 							{create.isPending ? (
 								<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 							) : null}
-							Post comment
+							{t('postComment')}
 						</Button>
 					</div>
 				</div>
@@ -189,7 +190,7 @@ function CommentThread({
 				// The reason replaces the control: a composer that refuses on click
 				// reads as broken.
 				<p className="type-body-sm mt-2 text-ink-3">
-					{describeCommentBudgetSpent(ACTIVITY_COMMENTS_PER_DAY_MAX)}
+					{describeCommentBudgetSpent(ACTIVITY_COMMENTS_PER_DAY_MAX, tActivity)}
 				</p>
 			)}
 		</div>
@@ -198,6 +199,8 @@ function CommentThread({
 
 function CommentRow({ comment }: { comment: ActivityComment }) {
 	const locale = useLocale()
+	const t = useTranslations('social.activityUi')
+	const tActivity = useTranslations('social.activity')
 	const remove = useDeleteActivityComment()
 	const { push } = useToast()
 	const [reporting, setReporting] = useState(false)
@@ -232,23 +235,23 @@ function CommentRow({ comment }: { comment: ActivityComment }) {
 						type="button"
 						variant="ghost"
 						size="sm"
-						aria-label={`Delete comment by ${name}`}
+						aria-label={t('deleteBy', { name })}
 						disabled={remove.isPending}
 						onClick={() => setConfirming(true)}
 					>
 						<Trash2 className="size-3.5" aria-hidden />
-						Delete
+						{t('delete')}
 					</Button>
 				) : null}
 				<Button
 					type="button"
 					variant="ghost"
 					size="sm"
-					aria-label={`Report comment by ${name}`}
+					aria-label={t('reportBy', { name })}
 					onClick={() => setReporting(true)}
 				>
 					<Flag className="size-3.5" aria-hidden />
-					Report
+					{t('report')}
 				</Button>
 			</div>
 			{/* Deleting is permanent and may be removing somebody else's words —
@@ -257,26 +260,26 @@ function CommentRow({ comment }: { comment: ActivityComment }) {
 			<AlertDialog open={confirming} onOpenChange={setConfirming}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Delete this comment?</AlertDialogTitle>
+						<AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							{describeCommentDelete(isOwnComment)}
+							{describeCommentDelete(isOwnComment, tActivity)}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={() =>
 								remove.mutate(comment.id, {
 									onError: error =>
 										push({
-											title: 'Could not delete this comment',
+											title: t('deleteFailed'),
 											description: error.message,
 											variant: 'destructive',
 										}),
 								})
 							}
 						>
-							Delete
+							{t('delete')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

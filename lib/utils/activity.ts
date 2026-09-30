@@ -21,10 +21,9 @@ import type { InfiniteData } from '@tanstack/react-query'
 
 import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
 import type { Locale } from '@/i18n/config'
-import { numberFormatter } from '@/i18n/date-locale'
-import { translatorFor } from '@/i18n/translator'
+import type { MessageKey, Translator } from '@/i18n/translator'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
-import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
+import { PRIVACY_SECTION_LABEL_KEYS } from '@/lib/utils/privacy-overview'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import {
@@ -37,35 +36,33 @@ import {
 // line here names a verified fact; nothing is phrased as something a member
 // wrote.
 
-export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
-	SESSION_COMPLETED: 'Completed workouts',
-	PERSONAL_RECORD: 'Personal records',
-	PROGRESSION_CHANGED: 'Load progressions',
-	ACHIEVEMENT_UNLOCKED: 'Achievements',
-	STREAK_MILESTONE: 'Streak milestones',
-	COMEBACK: 'Comebacks',
-	ROUTINE_SHARED: 'Shared routines',
+type Key = MessageKey<'social.activity'>
+type T = Translator<'social.activity'>
+
+export const ACTIVITY_TYPE_LABELS: Record<ActivityType, Key> = {
+	SESSION_COMPLETED: 'typeSessionCompleted',
+	PERSONAL_RECORD: 'typePersonalRecord',
+	PROGRESSION_CHANGED: 'typeProgressionChanged',
+	ACHIEVEMENT_UNLOCKED: 'typeAchievementUnlocked',
+	STREAK_MILESTONE: 'typeStreakMilestone',
+	COMEBACK: 'typeComeback',
+	ROUTINE_SHARED: 'typeRoutineShared',
 }
 
-export const ACTIVITY_TYPE_DESCRIPTIONS: Record<ActivityType, string> = {
-	SESSION_COMPLETED:
-		'The routine and day you finished, with its sets, volume and duration.',
-	PERSONAL_RECORD: 'A new best set on an exercise, with its estimated 1RM.',
-	PROGRESSION_CHANGED:
-		'The next target load a finished session earned on an exercise.',
-	ACHIEVEMENT_UNLOCKED:
-		'A milestone you earned while training. Ones recognised from earlier history never appear.',
-	STREAK_MILESTONE: 'A training streak milestone you reached.',
-	COMEBACK:
-		'A return to training after 14 or more days away, once you have trained on three days of it.',
-	ROUTINE_SHARED:
-		'A routine you made visible to others. Its own visibility still decides who can open it.',
+export const ACTIVITY_TYPE_DESCRIPTIONS: Record<ActivityType, Key> = {
+	SESSION_COMPLETED: 'descSessionCompleted',
+	PERSONAL_RECORD: 'descPersonalRecord',
+	PROGRESSION_CHANGED: 'descProgressionChanged',
+	ACHIEVEMENT_UNLOCKED: 'descAchievementUnlocked',
+	STREAK_MILESTONE: 'descStreakMilestone',
+	COMEBACK: 'descComeback',
+	ROUTINE_SHARED: 'descRoutineShared',
 }
 
-export const AUDIENCE_LABELS: Record<ActivityAudience, string> = {
-	PRIVATE: 'Only me',
-	FOLLOWERS: 'Followers',
-	PUBLIC: 'Everyone',
+export const AUDIENCE_LABELS: Record<ActivityAudience, Key> = {
+	PRIVATE: 'audiencePrivate',
+	FOLLOWERS: 'audienceFollowers',
+	PUBLIC: 'audiencePublic',
 }
 
 export const AUDIENCE_OPTIONS: ActivityAudience[] = [
@@ -74,37 +71,20 @@ export const AUDIENCE_OPTIONS: ActivityAudience[] = [
 	'PUBLIC',
 ]
 
-export const PREVIEW_AUDIENCE_LABELS: Record<ActivityPreviewAudience, string> =
-	{
-		FOLLOWERS: 'A follower',
-		PUBLIC: 'Any other member',
-	}
+export const PREVIEW_AUDIENCE_LABELS: Record<ActivityPreviewAudience, Key> = {
+	FOLLOWERS: 'previewFollowers',
+	PUBLIC: 'previewPublic',
+}
 
-/** What the feed is, said once above it. */
-export const ACTIVITY_FEED_SCOPE_NOTE =
-	'What the members you follow did, generated from their verified training. Nobody writes these; each member chooses who sees each kind.'
-
-/** What "Everyone" reaches, because it is narrower than on a profile. */
-export const ACTIVITY_EVERYONE_NOTE =
-	'Everyone means any member signed in to Sunnsteel. Activity never appears on your public profile link.'
-
-/** Why nothing is shared until the owner says so. */
-export const ACTIVITY_DEFAULTS_NOTE =
-	'Every kind starts at Only me. A default applies to your past activity of that kind as well as new activity, except entries you set on their own. Your profile privacy is the upper bound: a kind can never reach further than the section it comes from.'
+// `feedScopeNote` says what the feed is, once above it; `everyoneNote` what
+// "Everyone" reaches, because it is narrower than on a profile; and
+// `defaultsNote` why nothing is shared until the owner says so.
 
 const ACTIVITY_RANK: Record<ProfileVisibility, number> = {
 	PRIVATE: 0,
 	FOLLOWERS: 1,
 	PUBLIC: 2,
 }
-
-const plural = (
-	count: number,
-	locale: Locale,
-	singular: string,
-	many = `${singular}s`,
-) =>
-	`${numberFormatter(locale, {}).format(count)} ${count === 1 ? singular : many}`
 
 /** Where an entry's link leads. The server already decided the viewer may open it. */
 export function activityHref(link: ActivityLink): string {
@@ -130,6 +110,7 @@ function describeProgression(
 	sets: { previousWeightKg: number; newWeightKg: number }[],
 	unit: WeightUnit,
 	locale: Locale,
+	t: T,
 ): string | null {
 	if (sets.length === 0) return null
 	const [first] = sets
@@ -139,10 +120,17 @@ function describeProgression(
 			set.newWeightKg === first.newWeightKg,
 	)
 	if (uniform) {
-		return `${formatWeight(first.previousWeightKg, unit, locale)} → ${formatWeight(first.newWeightKg, unit, locale)} on ${plural(sets.length, locale, 'set')}`
+		return t('progressionUniform', {
+			from: formatWeight(first.previousWeightKg, unit, locale),
+			to: formatWeight(first.newWeightKg, unit, locale),
+			sets: t('sets', { count: sets.length }),
+		})
 	}
 	const highest = Math.max(...sets.map(set => set.newWeightKg))
-	return `${plural(sets.length, locale, 'set')} progressed, up to ${formatWeight(highest, unit, locale)}`
+	return t('progressionMixed', {
+		sets: t('sets', { count: sets.length }),
+		top: formatWeight(highest, unit, locale),
+	})
 }
 
 /** The record an entry came from, named in the viewer's unit. */
@@ -150,56 +138,69 @@ export function describeActivity(
 	entry: ActivityEntry,
 	unit: WeightUnit,
 	locale: Locale,
+	t: T,
+	tComeback: Translator<'achievements.comeback'>,
 ): { title: string; detail: string | null } {
 	switch (entry.type) {
 		case 'SESSION_COMPLETED': {
 			const { session } = entry
-			const parts = [plural(session.completedSets, locale, 'set')]
+			const parts = [t('sets', { count: session.completedSets })]
 			if (session.volumeKg > 0) {
 				parts.push(
-					`${formatWeightAmount(session.volumeKg, unit, locale, 0)} ${getWeightUnitLabel(unit)} volume`,
+					t('volume', {
+						value: formatWeightAmount(session.volumeKg, unit, locale, 0),
+						unit: getWeightUnitLabel(unit),
+					}),
 				)
 			}
 			if (session.durationSec && session.durationSec > 0) {
 				parts.push(formatDuration(session.durationSec))
 			}
 			return {
-				title: `Completed ${session.routineName}${session.dayName ? ` · ${session.dayName}` : ''}`,
+				title: session.dayName
+					? t('sessionTitleDay', {
+							routine: session.routineName,
+							day: session.dayName,
+						})
+					: t('sessionTitle', { routine: session.routineName }),
 				detail: parts.join(' · '),
 			}
 		}
 		case 'PERSONAL_RECORD':
 			return {
-				title: `New best on ${entry.record.exerciseName}`,
-				detail: `${formatWeight(entry.record.weightKg, unit, locale)} × ${entry.record.reps} · est. 1RM ${formatWeight(entry.record.estimated1rmKg, unit, locale)}`,
+				title: t('recordTitle', { exercise: entry.record.exerciseName }),
+				detail: t('recordDetail', {
+					weight: formatWeight(entry.record.weightKg, unit, locale),
+					reps: entry.record.reps,
+					e1rm: formatWeight(entry.record.estimated1rmKg, unit, locale),
+				}),
 			}
 		case 'PROGRESSION_CHANGED':
 			return {
-				title: `Load progressed on ${entry.progression.exerciseName}`,
-				detail: describeProgression(entry.progression.sets, unit, locale),
+				title: t('progressionTitle', {
+					exercise: entry.progression.exerciseName,
+				}),
+				detail: describeProgression(entry.progression.sets, unit, locale, t),
 			}
 		case 'ACHIEVEMENT_UNLOCKED':
 			return {
-				title: `Earned ${entry.achievement.title}`,
+				title: t('achievementTitle', { title: entry.achievement.title }),
 				detail: entry.achievement.description,
 			}
 		case 'STREAK_MILESTONE':
 			return {
-				title: `Reached a ${entry.streak.streakDays}-day training streak`,
+				title: t('streakTitle', { days: entry.streak.streakDays }),
 				detail: entry.streak.title,
 			}
 		case 'COMEBACK':
 			return {
-				title: 'Came back to training',
-				detail: formatComebackEvidence(
-					entry.comeback,
-					translatorFor(locale, 'achievements.comeback'),
-				),
+				title: t('comebackTitle'),
+				detail: formatComebackEvidence(entry.comeback, tComeback),
 			}
 		case 'ROUTINE_SHARED':
 			return {
-				title: `Shared ${entry.routine.name}`,
-				detail: `${plural(entry.routine.dayCount, locale, 'day')} · ${plural(entry.routine.exerciseCount, locale, 'exercise')}`,
+				title: t('routineTitle', { name: entry.routine.name }),
+				detail: `${t('days', { count: entry.routine.dayCount })} · ${t('exercises', { count: entry.routine.exerciseCount })}`,
 			}
 	}
 }
@@ -241,16 +242,21 @@ export function groupActivity<Entry extends ActivityEntry>(
 }
 
 /** Who can see one of the owner's entries, in words. */
-export function describeEffectiveAudience(audience: ActivityAudience): string {
+export function describeEffectiveAudience(
+	audience: ActivityAudience,
+	t: T,
+): string {
 	switch (audience) {
 		case 'PRIVATE':
-			return 'Only you can see this'
+			return t('effectivePrivate')
 		case 'FOLLOWERS':
-			return 'Your followers can see this'
+			return t('effectiveFollowers')
 		case 'PUBLIC':
-			return 'Every member can see this'
+			return t('effectivePublic')
 	}
 }
+
+type TPrivacy = Translator<'settings.privacyOverview'>
 
 /**
  * Why an entry reaches fewer people than its owner chose, or null when the
@@ -259,17 +265,21 @@ export function describeEffectiveAudience(audience: ActivityAudience): string {
  */
 export function describeActivityCap(
 	sharing: ActivityEntrySharing,
+	t: T,
+	tPrivacy: TPrivacy,
 ): string | null {
 	if (!sharing.cappedBy) return null
 	if (sharing.cappedBy === 'ROUTINE') {
 		return sharing.effectiveAudience === 'PRIVATE'
-			? 'The routine itself is private now, so nobody else can see this.'
-			: 'The routine itself is visible to followers only, so this reaches followers only.'
+			? t('routineCapPrivate')
+			: t('routineCapFollowers')
 	}
 	return describeSectionCap(
 		sharing.section,
 		sharing.sectionRule,
 		sharing.override ?? sharing.defaultAudience,
+		t,
+		tPrivacy,
 	)
 }
 
@@ -281,13 +291,18 @@ export function describeSectionCap(
 	section: ActivitySection,
 	sectionRule: ProfileVisibility,
 	chosen: ActivityAudience,
+	t: T,
+	tPrivacy: TPrivacy,
 ): string | null {
 	if (ACTIVITY_RANK[sectionRule] >= ACTIVITY_RANK[chosen]) return null
+	const rule = t(AUDIENCE_LABELS[sectionRule])
 	const reached =
-		sectionRule === 'PRIVATE'
-			? 'nobody else'
-			: AUDIENCE_LABELS[sectionRule].toLowerCase()
-	return `Your ${PRIVACY_SECTION_LABELS[section].toLowerCase()} privacy is ${AUDIENCE_LABELS[sectionRule]}, so this reaches ${reached}.`
+		sectionRule === 'PRIVATE' ? t('nobodyElse') : rule.toLowerCase()
+	return t('sectionCap', {
+		section: tPrivacy(PRIVACY_SECTION_LABEL_KEYS[section]).toLowerCase(),
+		rule,
+		reached,
+	})
 }
 
 /**
@@ -324,11 +339,11 @@ export function applyEntrySharing(
 // Four acknowledgements, each with one of the classical icons the app already
 // ships. They say "this was work"; nothing counts, ranks or orders by them.
 
-export const ACTIVITY_REACTION_LABELS: Record<ActivityReaction, string> = {
-	STRENGTH: 'Strength',
-	DISCIPLINE: 'Discipline',
-	RESPECT: 'Respect',
-	INSPIRING: 'Inspiring',
+export const ACTIVITY_REACTION_LABELS: Record<ActivityReaction, Key> = {
+	STRENGTH: 'reactionStrength',
+	DISCIPLINE: 'reactionDiscipline',
+	RESPECT: 'reactionRespect',
+	INSPIRING: 'reactionInspiring',
 }
 
 export const ACTIVITY_REACTION_ICONS: Record<
@@ -354,13 +369,14 @@ export function reactionsGiven(
 export function describeReactionAction(
 	reaction: ActivityReaction,
 	summary: ActivityReactionSummary,
+	t: T,
 ): string {
-	const label = ACTIVITY_REACTION_LABELS[reaction]
+	const label = t(ACTIVITY_REACTION_LABELS[reaction])
 	const count = summary.counts[reaction]
 	if (summary.viewerReaction === reaction) {
-		return `${label}, ${count} in total. You chose this; choose it again to remove it.`
+		return t('reactionChosen', { label, count })
 	}
-	return count > 0 ? `${label}, ${count} in total` : label
+	return count > 0 ? t('reactionCount', { label, count }) : label
 }
 
 /**
@@ -415,43 +431,40 @@ export function applyEntryComments<
 	}
 }
 
-/** SOC-06 copy: what a comment surface says, and what it must not. */
-export const ACTIVITY_COMMENT_PLACEHOLDER = 'Say something about this.'
-
-/** An empty comment list says so plainly rather than rendering nothing. */
-export const ACTIVITY_COMMENTS_EMPTY = 'No comments yet.'
+// SOC-06 copy: what a comment surface says, and what it must not.
+// `commentPlaceholder`, and `commentsEmpty`: an empty comment list says so
+// plainly rather than rendering nothing.
 
 /**
  * The delete confirmation names whose comment it is, because the owner of the
  * activity may delete somebody else's and should be told that is what they are
  * doing.
  */
-export const describeCommentDelete = (isOwnComment: boolean): string =>
-	isOwnComment
-		? 'Delete your comment? It is removed for everyone and cannot be undone.'
-		: 'Delete this comment from your activity? It is removed for everyone and cannot be undone.'
+export const describeCommentDelete = (isOwnComment: boolean, t: T): string =>
+	isOwnComment ? t('deleteOwnComment') : t('deleteOtherComment')
 
 /**
  * Why the composer is absent. A control that is present but refuses on click
  * reads as broken, so the reason replaces it.
  */
-export const describeCommentBudgetSpent = (max: number): string =>
-	`You have written ${max} comments today. Each one frees up a day after you wrote it.`
+export const describeCommentBudgetSpent = (max: number, t: T): string =>
+	t('commentBudgetSpent', { max })
 
 /** An empty feed says which of the two reasons it is. */
-export function describeEmptyFeed(followedCount: number): {
+export function describeEmptyFeed(
+	followedCount: number,
+	t: T,
+): {
 	title: string
 	description: string
 } {
 	return followedCount === 0
 		? {
-				title: 'You are not following anyone yet',
-				description:
-					'Follow members to see what they train here, once they choose to share it.',
+				title: t('emptyNoFollowsTitle'),
+				description: t('emptyNoFollowsBody'),
 			}
 		: {
-				title: 'Nothing shared with you yet',
-				description:
-					'The members you follow have not shared any activity with you. Everyone starts private.',
+				title: t('emptyNothingTitle'),
+				description: t('emptyNothingBody'),
 			}
 }

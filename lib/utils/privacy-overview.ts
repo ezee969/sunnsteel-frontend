@@ -21,25 +21,6 @@ export const PRIVACY_SECTION_LABEL_KEYS = {
 	achievements: 'sectionLabel.achievements',
 } as const satisfies Record<keyof ProfilePrivacySettings, MessageKey<Namespace>>
 
-/**
- * The English names, kept only for `lib/utils/activity.ts`, which still words
- * its own copy in English (I18N social pass) and reads them from here.
- */
-export const PRIVACY_SECTION_LABELS: Record<
-	keyof ProfilePrivacySettings,
-	string
-> = {
-	biography: 'Biography',
-	location: 'Location',
-	trainingIdentity: 'Training identity',
-	workoutHistory: 'Workout history',
-	records: 'Personal records',
-	bodyMetrics: 'Body metrics',
-	bodyProgress: 'Body progress',
-	routines: 'Routines',
-	achievements: 'Achievements',
-}
-
 export const PRIVACY_AUDIENCE_KEYS = {
 	PUBLIC: 'audience.PUBLIC',
 	FOLLOWERS: 'audience.FOLLOWERS',

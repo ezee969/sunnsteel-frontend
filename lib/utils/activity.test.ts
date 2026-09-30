@@ -10,11 +10,10 @@ import { ACTIVITY_REACTIONS, ACTIVITY_TYPES } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import { buildActivityParams } from '@/lib/api/services/activityService'
 
 import {
-	ACTIVITY_DEFAULTS_NOTE,
-	ACTIVITY_EVERYONE_NOTE,
 	ACTIVITY_REACTION_ICONS,
 	ACTIVITY_REACTION_LABELS,
 	ACTIVITY_TYPE_DESCRIPTIONS,
@@ -34,6 +33,15 @@ import {
 	groupActivity,
 	reactionsGiven,
 } from './activity'
+
+const t = translatorFor('en', 'social.activity')
+const es = translatorFor('es', 'social.activity')
+const tComeback = translatorFor('en', 'achievements.comeback')
+const esComeback = translatorFor('es', 'achievements.comeback')
+const tPrivacy = translatorFor('en', 'settings.privacyOverview')
+const esPrivacy = translatorFor('es', 'settings.privacyOverview')
+const ACTIVITY_DEFAULTS_NOTE = t('defaultsNote')
+const ACTIVITY_EVERYONE_NOTE = t('everyoneNote')
 
 const author = {
 	username: 'lee',
@@ -95,13 +103,13 @@ const record = (
 
 describe('activity copy names the record, in the viewer unit', () => {
 	it('names a session by routine and day, with its evidence', () => {
-		const view = describeActivity(session('s', null), 'KG', 'en')
+		const view = describeActivity(session('s', null), 'KG', 'en', t, tComeback)
 		expect(view.title).toBe('Completed Upper / Lower · Monday')
 		expect(view.detail).toBe('18 sets · 4,320 kg volume · 1h 5m')
 	})
 
 	it('converts a record to pounds rather than relabelling kilograms', () => {
-		const view = describeActivity(record('r', null), 'LB', 'en')
+		const view = describeActivity(record('r', null), 'LB', 'en', t, tComeback)
 		expect(view.title).toBe('New best on Bench Press')
 		expect(view.detail).toContain('lb × 5')
 		expect(view.detail).not.toContain('100 lb')
@@ -133,6 +141,8 @@ describe('activity copy names the record, in the viewer unit', () => {
 				]),
 				'KG',
 				'en',
+				t,
+				tComeback,
 			).detail,
 		).toBe('80 kg → 82.5 kg on 2 sets')
 		expect(
@@ -143,6 +153,8 @@ describe('activity copy names the record, in the viewer unit', () => {
 				]),
 				'KG',
 				'en',
+				t,
+				tComeback,
 			).detail,
 		).toBe('2 sets progressed, up to 82.5 kg')
 	})
@@ -162,14 +174,16 @@ describe('activity copy names the record, in the viewer unit', () => {
 			},
 			'KG',
 			'en',
+			t,
+			tComeback,
 		)
 		expect(view.detail).toBe('21 full days away · 3 active days in 9 days')
 	})
 
 	it('has a label and a description for every activity type', () => {
 		for (const type of ACTIVITY_TYPES) {
-			expect(ACTIVITY_TYPE_LABELS[type]).toBeTruthy()
-			expect(ACTIVITY_TYPE_DESCRIPTIONS[type]).toBeTruthy()
+			expect(t(ACTIVITY_TYPE_LABELS[type])).toBeTruthy()
+			expect(t(ACTIVITY_TYPE_DESCRIPTIONS[type])).toBeTruthy()
 		}
 	})
 })
@@ -238,9 +252,13 @@ describe('telling the owner what actually applies', () => {
 	})
 
 	it('is silent when the choice took effect', () => {
-		expect(describeActivityCap(sharing({}))).toBeNull()
-		expect(describeSectionCap('records', 'FOLLOWERS', 'FOLLOWERS')).toBeNull()
-		expect(describeSectionCap('records', 'PUBLIC', 'FOLLOWERS')).toBeNull()
+		expect(describeActivityCap(sharing({}), t, tPrivacy)).toBeNull()
+		expect(
+			describeSectionCap('records', 'FOLLOWERS', 'FOLLOWERS', t, tPrivacy),
+		).toBeNull()
+		expect(
+			describeSectionCap('records', 'PUBLIC', 'FOLLOWERS', t, tPrivacy),
+		).toBeNull()
 	})
 
 	it('names the section and where to change it when the section narrows it', () => {
@@ -251,13 +269,15 @@ describe('telling the owner what actually applies', () => {
 					effectiveAudience: 'FOLLOWERS',
 					cappedBy: 'SECTION',
 				}),
+				t,
+				tPrivacy,
 			),
 		).toBe(
 			'Your personal records privacy is Followers, so this reaches followers.',
 		)
-		expect(describeSectionCap('workoutHistory', 'PRIVATE', 'PUBLIC')).toContain(
-			'reaches nobody else',
-		)
+		expect(
+			describeSectionCap('workoutHistory', 'PRIVATE', 'PUBLIC', t, tPrivacy),
+		).toContain('reaches nobody else')
 	})
 
 	it('links a section cap to its setting, and a routine cap to nothing', () => {
@@ -284,6 +304,8 @@ describe('telling the owner what actually applies', () => {
 					effectiveAudience: 'PRIVATE',
 					cappedBy: 'ROUTINE',
 				}),
+				t,
+				tPrivacy,
 			),
 		).toBe('The routine itself is private now, so nobody else can see this.')
 	})
@@ -328,18 +350,22 @@ describe('themed reactions', () => {
 
 	it('names every reaction and gives it one of the classical icons', () => {
 		for (const reaction of ACTIVITY_REACTIONS) {
-			expect(ACTIVITY_REACTION_LABELS[reaction]).toBeTruthy()
+			expect(t(ACTIVITY_REACTION_LABELS[reaction])).toBeTruthy()
 			expect(ACTIVITY_REACTION_ICONS[reaction]).toBeTruthy()
 		}
 	})
 
 	it('says what pressing the control does, including undoing your own', () => {
-		expect(describeReactionAction('STRENGTH', summary())).toBe('Strength')
-		expect(describeReactionAction('STRENGTH', summary({ STRENGTH: 3 }))).toBe(
-			'Strength, 3 in total',
-		)
+		expect(describeReactionAction('STRENGTH', summary(), t)).toBe('Strength')
 		expect(
-			describeReactionAction('STRENGTH', summary({ STRENGTH: 3 }, 'STRENGTH')),
+			describeReactionAction('STRENGTH', summary({ STRENGTH: 3 }), t),
+		).toBe('Strength, 3 in total')
+		expect(
+			describeReactionAction(
+				'STRENGTH',
+				summary({ STRENGTH: 3 }, 'STRENGTH'),
+				t,
+			),
 		).toBe(
 			'Strength, 3 in total. You chose this; choose it again to remove it.',
 		)
@@ -359,8 +385,10 @@ describe('themed reactions', () => {
 
 describe('an empty feed says which empty it is', () => {
 	it('distinguishes following nobody from nothing shared', () => {
-		expect(describeEmptyFeed(0).title).toBe('You are not following anyone yet')
-		expect(describeEmptyFeed(3).title).toBe('Nothing shared with you yet')
+		expect(describeEmptyFeed(0, t).title).toBe(
+			'You are not following anyone yet',
+		)
+		expect(describeEmptyFeed(3, t).title).toBe('Nothing shared with you yet')
 	})
 })
 
@@ -380,14 +408,14 @@ describe('SOC-06 comment copy and cache patching', () => {
 	it('names whose comment is being deleted, because two people may', () => {
 		// The owner of an activity may delete somebody else's words from it, and
 		// a confirmation that did not say so would read as deleting your own.
-		expect(describeCommentDelete(true)).toMatch(/your comment/i)
-		expect(describeCommentDelete(false)).toMatch(/from your activity/i)
-		expect(describeCommentDelete(true)).toMatch(/cannot be undone/i)
-		expect(describeCommentDelete(false)).toMatch(/cannot be undone/i)
+		expect(describeCommentDelete(true, t)).toMatch(/your comment/i)
+		expect(describeCommentDelete(false, t)).toMatch(/from your activity/i)
+		expect(describeCommentDelete(true, t)).toMatch(/cannot be undone/i)
+		expect(describeCommentDelete(false, t)).toMatch(/cannot be undone/i)
 	})
 
 	it('explains the spent budget rather than leaving a control that refuses', () => {
-		const copy = describeCommentBudgetSpent(100)
+		const copy = describeCommentBudgetSpent(100, t)
 		expect(copy).toMatch(/100/)
 		expect(copy).toMatch(/today/i)
 	})
@@ -427,5 +455,34 @@ describe('SOC-06 comment copy and cache patching', () => {
 			summary: { count: 9, canComment: false },
 		})
 		expect(patched.pages[0].entries[0].comments.count).toBe(2)
+	})
+})
+
+describe('the activity copy in Spanish', () => {
+	it('names the session and its evidence with a decimal comma', () => {
+		const view = describeActivity(
+			session('s', null),
+			'KG',
+			'es',
+			es,
+			esComeback,
+		)
+		expect(view.title).toBe('Completó Upper / Lower · Monday')
+		expect(view.detail).toBe('18 series · 4320 kg de volumen · 1h 5m')
+	})
+
+	it('states the section cap in Spanish', () => {
+		expect(
+			describeSectionCap('workoutHistory', 'PRIVATE', 'PUBLIC', es, esPrivacy),
+		).toContain('llega a nadie más')
+	})
+
+	it('keeps the same promises about defaults and reach', () => {
+		expect(es('defaultsNote')).toContain('Solo yo')
+		expect(es('defaultsNote')).toContain('actividad pasada')
+		expect(es('everyoneNote')).toContain('sesión iniciada')
+		expect(describeCommentDelete(true, es)).toMatch(/tu comentario/i)
+		expect(describeCommentDelete(false, es)).toMatch(/de tu actividad/i)
+		expect(describeCommentDelete(true, es)).toMatch(/no se puede deshacer/i)
 	})
 })

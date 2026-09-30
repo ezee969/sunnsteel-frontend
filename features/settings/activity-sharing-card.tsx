@@ -30,8 +30,6 @@ import {
 	useUpdateActivitySharing,
 } from '@/lib/api/hooks/useActivity'
 import {
-	ACTIVITY_DEFAULTS_NOTE,
-	ACTIVITY_EVERYONE_NOTE,
 	ACTIVITY_TYPE_DESCRIPTIONS,
 	ACTIVITY_TYPE_LABELS,
 	AUDIENCE_LABELS,
@@ -48,6 +46,8 @@ type Defaults = ActivitySharingSettings['defaults']
  */
 export function ActivitySharingCard() {
 	const t = useTranslations('settings.activitySharing')
+	const tActivity = useTranslations('social.activity')
+	const tPrivacy = useTranslations('settings.privacyOverview')
 	const sharing = useActivitySharing()
 	const update = useUpdateActivitySharing()
 	const { push } = useToast()
@@ -99,10 +99,10 @@ export function ActivitySharingCard() {
 			<CardContent className="space-y-6">
 				<div className="space-y-2">
 					<p className="type-body-sm max-w-[68ch] text-ink-2">
-						{ACTIVITY_DEFAULTS_NOTE}
+						{tActivity('defaultsNote')}
 					</p>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{ACTIVITY_EVERYONE_NOTE}
+						{tActivity('everyoneNote')}
 					</p>
 				</div>
 
@@ -134,6 +134,8 @@ export function ActivitySharingCard() {
 								section,
 								sharing.data!.sections[section],
 								draft[type],
+								tActivity,
+								tPrivacy,
 							)
 							const id = `activity-default-${type}`
 							return (
@@ -142,9 +144,11 @@ export function ActivitySharingCard() {
 									className="grid gap-3 py-4 first:pt-0 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-start"
 								>
 									<div className="space-y-1">
-										<Label htmlFor={id}>{ACTIVITY_TYPE_LABELS[type]}</Label>
+										<Label htmlFor={id}>
+											{tActivity(ACTIVITY_TYPE_LABELS[type])}
+										</Label>
 										<p className="type-body-sm text-ink-3">
-											{ACTIVITY_TYPE_DESCRIPTIONS[type]}
+											{tActivity(ACTIVITY_TYPE_DESCRIPTIONS[type])}
 										</p>
 										{cap ? (
 											<PrivacyCapNote
@@ -170,7 +174,7 @@ export function ActivitySharingCard() {
 									>
 										{AUDIENCE_OPTIONS.map(audience => (
 											<option key={audience} value={audience}>
-												{AUDIENCE_LABELS[audience]}
+												{tActivity(AUDIENCE_LABELS[audience])}
 											</option>
 										))}
 									</NativeSelect>

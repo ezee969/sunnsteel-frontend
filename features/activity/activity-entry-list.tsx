@@ -16,7 +16,7 @@ import {
 	Trophy,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -67,8 +67,16 @@ export function ActivityFact({
 	children?: ReactNode
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('social.activity')
+	const tComeback = useTranslations('achievements.comeback')
 	const Icon = ACTIVITY_ICONS[entry.type]
-	const { title, detail } = describeActivity(entry, weightUnit, locale)
+	const { title, detail } = describeActivity(
+		entry,
+		weightUnit,
+		locale,
+		t,
+		tComeback,
+	)
 	return (
 		<div className="flex min-w-0 gap-3">
 			<Icon className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
