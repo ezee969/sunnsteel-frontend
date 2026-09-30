@@ -14,7 +14,13 @@ describe('locale resolution (I18N-01)', () => {
 	})
 
 	it('ignores a cookie it does not support', () => {
-		expect(resolveLocale({ cookie: 'fr', acceptLanguage: 'es' })).toBe('en')
+		expect(
+			resolveLocale({
+				cookie: 'fr',
+				acceptLanguage: 'de',
+				detectBrowser: true,
+			}),
+		).toBe('en')
 		expect(
 			resolveLocale({
 				cookie: 'ES',
@@ -24,8 +30,11 @@ describe('locale resolution (I18N-01)', () => {
 		).toBe('es')
 	})
 
-	it('does not follow the browser until detection is turned on', () => {
-		expect(resolveLocale({ acceptLanguage: 'es-AR,es;q=0.9' })).toBe('en')
+	it('follows the browser by default, and not when detection is off', () => {
+		expect(resolveLocale({ acceptLanguage: 'es-AR,es;q=0.9' })).toBe('es')
+		expect(
+			resolveLocale({ acceptLanguage: 'es-AR,es;q=0.9', detectBrowser: false }),
+		).toBe('en')
 		expect(
 			resolveLocale({ acceptLanguage: 'es-AR,es;q=0.9', detectBrowser: true }),
 		).toBe('es')

@@ -14,17 +14,16 @@ export const DEFAULT_LOCALE: Locale = 'en'
 /**
  * Mirrors the chosen language so a signed-out page and the first paint can use
  * it before any account is read. `I18N-02` writes it from the account's stored
- * choice; until then only a hand-set cookie selects Spanish.
+ * choice (`i18n/locale-cookie.ts`).
  */
 export const LOCALE_COOKIE = 'ss-locale'
 
 /**
- * Whether a browser asking for Spanish gets it without choosing it. Off until
- * `I18N-03` to `I18N-05` have translated every page: a Spanish browser would
- * otherwise meet half an app in each language. Turn it on in the same change
- * that ships the last of them.
+ * Whether a browser asking for Spanish gets it without choosing it. On since
+ * I18N-02 closed: every page is translated, so a Spanish browser meets one
+ * language. A stored account language (the cookie) still wins.
  */
-export const DETECT_BROWSER_LOCALE = false
+export const DETECT_BROWSER_LOCALE = true
 
 export function isLocale(value: unknown): value is Locale {
 	return typeof value === 'string' && LOCALES.includes(value as Locale)
