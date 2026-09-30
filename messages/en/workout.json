@@ -475,7 +475,8 @@
 		"noExercisesTitle": "No Exercises Found",
 		"noExercisesBody": "This workout session doesn’t have any exercises to log.",
 		"couldNotRemoveSetTitle": "Could not remove the set",
-		"tryAgain": "Try again."
+		"tryAgain": "Try again.",
+		"nextSetFallback": "Your next set"
 	},
 	"errors": {
 		"workoutsFailedTitle": "Failed to load workouts",

@@ -475,7 +475,8 @@
 		"noExercisesTitle": "No se encontraron ejercicios",
 		"noExercisesBody": "Esta sesión de entrenamiento no tiene ejercicios para registrar.",
 		"couldNotRemoveSetTitle": "No se pudo quitar la serie",
-		"tryAgain": "Inténtalo de nuevo."
+		"tryAgain": "Inténtalo de nuevo.",
+		"nextSetFallback": "Tu próxima serie"
 	},
 	"errors": {
 		"workoutsFailedTitle": "No se pudieron cargar los entrenamientos",

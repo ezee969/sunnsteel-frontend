@@ -116,7 +116,7 @@ export default function ActiveSessionPage() {
 		idParam,
 		(pushSubscriptions?.subscriptions.length ?? 0) > 0,
 	)
-	const restingExerciseRef = useRef<string>('Your next set')
+	const restingExerciseRef = useRef<string>(t('nextSetFallback'))
 	useEffect(() => {
 		if (restTimer.deadline === null) {
 			restAlert.cancel()
