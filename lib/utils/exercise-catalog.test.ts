@@ -14,6 +14,7 @@ import {
 	getCatalogEmptyState,
 	getGymFilterUnavailableState,
 	hasActiveCatalogFilters,
+	matchesExerciseName,
 	parseCatalogFilters,
 	serializeCatalogFilters,
 } from './exercise-catalog'
@@ -356,5 +357,26 @@ describe('catalog copy in Spanish', () => {
 				hasTrainedExercises: false,
 			}).title,
 		).toBe('Aún no hay ejercicios entrenados')
+	})
+})
+
+describe('matchesExerciseName (I18N-07)', () => {
+	const label = (name: string) =>
+		name === 'Bench Press' ? 'Press de banca' : name
+
+	it('finds an exercise by its stored name or its shown label', () => {
+		expect(matchesExerciseName('Bench Press', 'bench', label)).toBe(true)
+		expect(matchesExerciseName('Bench Press', 'press de banca', label)).toBe(
+			true,
+		)
+		expect(matchesExerciseName('Bench Press', 'sentadilla', label)).toBe(false)
+	})
+
+	it('ignores case and accents, and an empty query matches everything', () => {
+		const accented = () => 'Elevación lateral'
+		expect(matchesExerciseName('Lateral Raise', 'ELEVACION', accented)).toBe(
+			true,
+		)
+		expect(matchesExerciseName('Lateral Raise', '  ', accented)).toBe(true)
 	})
 })

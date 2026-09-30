@@ -29,6 +29,7 @@ import {
 	describeAlternative,
 	findExerciseAlternatives,
 } from '@/lib/utils/exercise-alternatives'
+import { matchesExerciseName } from '@/lib/utils/exercise-catalog'
 import {
 	defaultTrainingLocation,
 	listedEquipmentAt,
@@ -81,6 +82,7 @@ export function ExerciseSwapDialog({
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
 	const tEx = useTranslations('catalog.exercises')
+	const label = useMemo(() => (name: string) => exerciseLabel(name, tEx), [tEx])
 	const plan = deload
 		? t('planDeload')
 		: trainingBlockName
@@ -115,7 +117,7 @@ export function ExerciseSwapDialog({
 				.filter(
 					exercise =>
 						!excluded.has(exercise.id) &&
-						exercise.name.toLowerCase().includes(search),
+						matchesExerciseName(exercise.name, search, label),
 				)
 				.slice(0, SEARCH_LIMIT)
 				.map(exercise => ({
@@ -141,6 +143,7 @@ export function ExerciseSwapDialog({
 			),
 		}))
 	}, [
+		label,
 		exercises,
 		search,
 		excluded,

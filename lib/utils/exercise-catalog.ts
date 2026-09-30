@@ -192,11 +192,19 @@ export interface CatalogContext {
 const fold = (value: string) =>
 	value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('en-US')
 
-function matchesSearch(
+/**
+ * I18N-07: whether an exercise name matches a search, by its stored name or
+ * by the label it is shown with, ignoring case and accents -- so "press de
+ * banca" and "Bench press" find the same catalog exercise. Every picker uses
+ * it, not just the catalog.
+ */
+export function matchesExerciseName(
 	name: string,
 	query: string,
 	label?: (name: string) => string,
 ): boolean {
+	query = query.trim().toLocaleLowerCase('en-US')
+	if (!query) return true
 	if (name.toLocaleLowerCase('en-US').includes(query)) return true
 	const shown = label?.(name)
 	return Boolean(shown && fold(shown).includes(fold(query)))
@@ -220,7 +228,7 @@ export function filterCatalog(
 	const q = filters.q.trim().toLocaleLowerCase('en-US')
 	const matches = exercises.filter(exercise => {
 		if (filters.mine ? !exercise.isCustom : exercise.archivedAt) return false
-		if (q && !matchesSearch(exercise.name, q, context.label)) return false
+		if (q && !matchesExerciseName(exercise.name, q, context.label)) return false
 		if (
 			filters.muscle &&
 			!exercise.primaryMuscles.includes(filters.muscle) &&

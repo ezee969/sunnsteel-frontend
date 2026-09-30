@@ -16,6 +16,7 @@ import {
 	describeAlternative,
 	findExerciseAlternatives,
 } from '@/lib/utils/exercise-alternatives'
+import { matchesExerciseName } from '@/lib/utils/exercise-catalog'
 import {
 	defaultTrainingLocation,
 	listedEquipmentAt,
@@ -150,6 +151,9 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		onRemoveExercise,
 	})
 
+	const tEx = useTranslations('catalog.exercises')
+	const label = useMemo(() => (name: string) => exerciseLabel(name, tEx), [tEx])
+
 	// Filter exercises for edit dropdown
 	const filteredExercises = useMemo(() => {
 		// EXER-06: an archived exercise is never offered.
@@ -158,11 +162,11 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 		const search = editSearchValue.toLowerCase()
 		return pickable.filter(
 			ex =>
-				ex.name.toLowerCase().includes(search) ||
+				matchesExerciseName(ex.name, search, label) ||
 				ex.primaryMuscles?.some(m => m.toLowerCase().includes(search)) ||
 				ex.equipment?.toLowerCase().includes(search),
 		)
-	}, [exercises, editSearchValue])
+	}, [exercises, editSearchValue, label])
 
 	// EXER-05: offered at the top of the change dropdown, ranked by the
 	// equipment the default gym lists. Never applied without a choice.
@@ -191,7 +195,6 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	const tAlternatives = useTranslations('routines.alternatives')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
-	const tEx = useTranslations('catalog.exercises')
 	const pickerGroups = useMemo(
 		() =>
 			editSearchValue.trim()

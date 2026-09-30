@@ -1,9 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Exercise } from '@/lib/api/types'
 import { pickableExercises } from '@/lib/utils/custom-exercises'
+import { matchesExerciseName } from '@/lib/utils/exercise-catalog'
 
 interface UseRoutineDaySelectionParams {
 	exercises?: Exercise[]
@@ -35,6 +38,8 @@ export function useRoutineDaySelection({
 	exercises = [],
 	trainingDays,
 }: UseRoutineDaySelectionParams) {
+	const tEx = useTranslations('catalog.exercises')
+	const label = useMemo(() => (name: string) => exerciseLabel(name, tEx), [tEx])
 	const [selectedDay, setSelectedDay] = useState(0)
 	const [isPickerOpen, setPickerOpen] = useState(false)
 	const [searchValue, setSearchValue] = useState('')
@@ -82,13 +87,13 @@ export function useRoutineDaySelection({
 		if (!searchLower) return pickable
 
 		return pickable.filter(exercise => {
-			if (exercise.name.toLowerCase().includes(searchLower)) return true
+			if (matchesExerciseName(exercise.name, searchLower, label)) return true
 			if (exercise.equipment.toLowerCase().includes(searchLower)) return true
 			return exercise.primaryMuscles.some(muscle =>
 				muscle.toLowerCase().includes(searchLower),
 			)
 		})
-	}, [exercises, searchValue])
+	}, [exercises, searchValue, label])
 
 	return {
 		selectedDay,
