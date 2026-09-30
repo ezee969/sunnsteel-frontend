@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
@@ -131,6 +132,7 @@ export function SessionComparison({
 }: SessionComparisonProps) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.sessionComparison')
+	const tEx = useTranslations('catalog.exercises')
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const latest = data?.latestSession ?? null
@@ -375,7 +377,7 @@ export function SessionComparison({
 										<AccordionTrigger className="rounded-none px-0 hover:no-underline">
 											<span className="min-w-0">
 												<span className="block truncate text-foreground">
-													{exercise.exerciseName}
+													{exerciseLabel(exercise.exerciseName, tEx)}
 												</span>
 												<span className="type-body-sm mt-1 block text-ink-3">
 													{t('exerciseCounts', {

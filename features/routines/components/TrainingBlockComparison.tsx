@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { useTrainingBlockComparison } from '@/lib/api/hooks/useRoutineTrainingBlocks'
 import {
@@ -43,6 +44,7 @@ export function TrainingBlockComparisonDialog({
 }) {
 	const t = useTranslations('routines.listing')
 	const tCompare = useTranslations('progress.blockComparison')
+	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
 	const comparison = useTrainingBlockComparison(routineId, block.seriesId)
 	const data = comparison.data
@@ -159,7 +161,7 @@ export function TrainingBlockComparisonDialog({
 												href={`/exercises/${lift.exerciseId}`}
 												className="text-foreground underline-offset-4 hover:underline"
 											>
-												{lift.exerciseName}
+												{exerciseLabel(lift.exerciseName, tEx)}
 											</Link>
 											: {describeLift(lift, weightUnit, tCompare, locale)}
 										</li>

@@ -13,6 +13,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { numberFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
@@ -56,9 +57,10 @@ function formatGoalValue(
 function getGoalName(
 	goal: PersonalGoalProgress,
 	t: Translator<'progress.goals'>,
+	tEx: Translator<'catalog.exercises'>,
 ): string {
 	return goal.type === 'EXERCISE_ESTIMATED_1RM' && goal.exercise
-		? t('exerciseName', { exercise: goal.exercise.name })
+		? t('exerciseName', { exercise: exerciseLabel(goal.exercise.name, tEx) })
 		: getMeasurableGoalLabel(goal.type, t)
 }
 
@@ -80,6 +82,7 @@ function GoalRow({
 }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.goals')
+	const tEx = useTranslations('catalog.exercises')
 	const current =
 		goal.currentValue === null
 			? null
@@ -110,7 +113,7 @@ function GoalRow({
 						<Target className="size-4 shrink-0 text-ink-3" aria-hidden />
 					)}
 					<h3 className="type-panel truncate text-foreground">
-						{getGoalName(goal, t)}
+						{getGoalName(goal, t, tEx)}
 					</h3>
 				</div>
 				<p className="type-body-sm mt-1 text-ink-3">
@@ -145,7 +148,9 @@ function GoalRow({
 					{goal.progressPercent !== null ? (
 						<Progress
 							value={goal.progressPercent}
-							aria-label={t('progressLabel', { goal: getGoalName(goal, t) })}
+							aria-label={t('progressLabel', {
+								goal: getGoalName(goal, t, tEx),
+							})}
 							className={
 								goal.achieved
 									? '[&_[data-slot=progress-indicator]]:bg-success-strong'

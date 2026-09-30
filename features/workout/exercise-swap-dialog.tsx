@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import { exerciseLabel } from '@/i18n/catalog'
 import { useExercises } from '@/lib/api/hooks'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import {
@@ -79,6 +80,7 @@ export function ExerciseSwapDialog({
 	const tAlternatives = useTranslations('routines.alternatives')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
+	const tEx = useTranslations('catalog.exercises')
 	const plan = deload
 		? t('planDeload')
 		: trainingBlockName
@@ -163,7 +165,9 @@ export function ExerciseSwapDialog({
 			{
 				onSuccess: result => {
 					push({
-						title: t('swappedToTitle', { exercise: exercise.name }),
+						title: t('swappedToTitle', {
+							exercise: exerciseLabel(exercise.name, tEx),
+						}),
 						description: !applyToRoutine
 							? t('onlySessionChanged')
 							: result.routineUpdated
@@ -188,7 +192,9 @@ export function ExerciseSwapDialog({
 		revert.mutate(target.routineExerciseId, {
 			onSuccess: () => {
 				push({
-					title: t('backToTitle', { exercise: target.prescribed.name }),
+					title: t('backToTitle', {
+						exercise: exerciseLabel(target.prescribed.name, tEx),
+					}),
 					variant: 'success',
 				})
 				onClose()
@@ -214,7 +220,9 @@ export function ExerciseSwapDialog({
 					<DialogTitle>{t('dialogTitle')}</DialogTitle>
 					<DialogDescription>
 						{target
-							? t('dialogDescription', { exercise: target.performed.name })
+							? t('dialogDescription', {
+									exercise: exerciseLabel(target.performed.name, tEx),
+								})
 							: null}
 					</DialogDescription>
 				</DialogHeader>
@@ -230,7 +238,9 @@ export function ExerciseSwapDialog({
 							aria-hidden
 						/>
 						<p className="type-body-sm text-ink">
-							{t('completedSetsWarning', { exercise: target.performed.name })}
+							{t('completedSetsWarning', {
+								exercise: exerciseLabel(target.performed.name, tEx),
+							})}
 						</p>
 					</div>
 				) : target ? (
@@ -238,7 +248,9 @@ export function ExerciseSwapDialog({
 						{isSwapped && (
 							<div className="flex items-center justify-between gap-3 border-b border-rule-faint pb-3">
 								<p className="type-body-sm text-ink-2">
-									{t('swappedFrom', { name: target.prescribed.name })}
+									{t('swappedFrom', {
+										name: exerciseLabel(target.prescribed.name, tEx),
+									})}
 								</p>
 								<Button
 									type="button"
@@ -290,7 +302,7 @@ export function ExerciseSwapDialog({
 												className="w-full px-2 py-2.5 text-left transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface disabled:text-ink-3"
 											>
 												<span className="block text-sm font-medium text-foreground">
-													{exercise.name}
+													{exerciseLabel(exercise.name, tEx)}
 												</span>
 												{reason ? (
 													<span className="type-body-sm block text-ink-3">

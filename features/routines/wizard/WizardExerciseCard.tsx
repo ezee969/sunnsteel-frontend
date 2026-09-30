@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { exerciseLabel } from '@/i18n/catalog'
 import { useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
@@ -190,6 +191,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	const tAlternatives = useTranslations('routines.alternatives')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
+	const tEx = useTranslations('catalog.exercises')
 	const pickerGroups = useMemo(
 		() =>
 			editSearchValue.trim()
@@ -294,7 +296,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 														className="w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
 													>
 														<span className="block text-sm font-medium">
-															{alternative.exercise.name}
+															{exerciseLabel(alternative.exercise.name, tEx)}
 														</span>
 														<span className="type-body-sm block text-ink-3">
 															{describeAlternative(
@@ -345,7 +347,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 													>
 														<div className="flex flex-col items-start">
 															<span className="text-sm font-medium">
-																{ex.name}
+																{exerciseLabel(ex.name, tEx)}
 															</span>
 															<span className="text-xs text-muted-foreground">
 																{t('musclesAndEquipment', {
@@ -404,7 +406,11 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							setsExpanded={setsExpanded}
 							onToggleSets={toggleSetsExpanded}
 							onAddSet={handleAddSet}
-							exerciseName={exerciseData?.name ?? 'this exercise'}
+							exerciseName={
+								exerciseData?.name
+									? exerciseLabel(exerciseData.name, tEx)
+									: 'this exercise'
+							}
 							equipmentRequired={exerciseData?.equipmentRequired}
 							onReplaceWarmUps={(warmUps, followLoad) =>
 								onReplaceWarmUps(exerciseIndex, warmUps, followLoad)

@@ -24,6 +24,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import { dateFormatter } from '@/i18n/date-locale'
 import {
 	getProgressionRuleExplanation,
@@ -129,6 +130,7 @@ export function SessionRecapContent({
 }: SessionRecapContentProps) {
 	const t = useTranslations('workout.recap')
 	const tChange = useTranslations('progress.progressionChange')
+	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale()
 	const viewerUnit = useWeightUnit()
 	const weightUnit = unitOverride ?? viewerUnit
@@ -250,7 +252,7 @@ export function SessionRecapContent({
 									className="bg-surface-sunk p-3"
 								>
 									<p className="type-panel text-foreground">
-										{record.exerciseName}
+										{exerciseLabel(record.exerciseName, tEx)}
 									</p>
 									<p className="type-body-sm text-ink-3">
 										{t('recordCaption', {
@@ -288,7 +290,7 @@ export function SessionRecapContent({
 									className="bg-surface-sunk p-3"
 								>
 									<p className="type-panel text-foreground">
-										{change.exerciseName}
+										{exerciseLabel(change.exerciseName, tEx)}
 									</p>
 									<p className="type-body-sm mt-1 text-ink-3">
 										{getProgressionRuleExplanation(
@@ -347,7 +349,9 @@ export function SessionRecapContent({
 						<ul className="space-y-2" aria-label={t('exerciseNotesAria')}>
 							{recap.exerciseNotes.map(item => (
 								<li key={item.routineExerciseId} className="type-body-sm">
-									<span className="text-foreground">{item.exerciseName}</span>
+									<span className="text-foreground">
+										{exerciseLabel(item.exerciseName, tEx)}
+									</span>
 									<span className="whitespace-pre-line text-ink-2">
 										{' '}
 										{item.note}

@@ -20,6 +20,7 @@ import { ProgressTab } from '@/features/progress/progress-tab'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import {
@@ -62,6 +63,7 @@ function ProgressLoading() {
 export default function ProgressStrengthPage() {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.strength')
+	const tEx = useTranslations('catalog.exercises')
 	const {
 		range,
 		setRange,
@@ -134,7 +136,7 @@ export default function ProgressStrengthPage() {
 									key={exercise.exerciseId}
 									value={exercise.exerciseId}
 								>
-									{exercise.exerciseName}
+									{exerciseLabel(exercise.exerciseName, tEx)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -195,7 +197,7 @@ export default function ProgressStrengthPage() {
 								id="current-strength"
 								className="type-section text-foreground"
 							>
-								{selectedPerformance.exerciseName}
+								{exerciseLabel(selectedPerformance.exerciseName, tEx)}
 							</h2>
 							<Link
 								href={`/exercises/${selectedPerformance.exerciseId}`}
