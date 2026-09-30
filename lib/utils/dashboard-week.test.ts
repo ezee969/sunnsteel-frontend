@@ -14,6 +14,11 @@ import { scheduleDayState } from './schedule-month'
 import { buildScheduleWeek, localDateKey, startOfWeek } from './schedule-week'
 
 const enDate = translatorFor('en', 'routines.date')
+const enStrip = translatorFor('en', 'planning.weekStrip')
+const enMonth = translatorFor('en', 'planning.scheduleMonth')
+const esDate = translatorFor('es', 'routines.date')
+const esStrip = translatorFor('es', 'planning.weekStrip')
+const esMonth = translatorFor('es', 'planning.scheduleMonth')
 
 // Wednesday 16 Sep 2026, local time.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -74,7 +79,7 @@ const dayOf = (strip: ReturnType<typeof buildWeekStrip>, date: number) =>
 describe('weekly training strip', () => {
 	it('shows the week builder’s seven days with the month view’s state', () => {
 		const built = week([session('s-mon', at(14))])
-		const strip = buildWeekStrip(built, enDate, 'en')
+		const strip = buildWeekStrip(built, enDate, 'en', enStrip, enMonth)
 		expect(strip.map(day => day.weekday)).toEqual([
 			'Mon',
 			'Tue',
@@ -106,6 +111,8 @@ describe('weekly training strip', () => {
 			week([session('s-mon', at(14)), session('s-tue', at(15), 'ABORTED')]),
 			enDate,
 			'en',
+			enStrip,
+			enMonth,
 		)
 		expect(dayOf(strip, 14).href).toBe('/workouts/history/s-mon')
 		expect(dayOf(strip, 14).label).toMatch(/Opens the workout\.$/)
@@ -145,7 +152,13 @@ describe('weekly training strip', () => {
 	})
 
 	it('lists only the states the week shows, in legend order', () => {
-		const strip = buildWeekStrip(week([session('s-mon', at(14))]), enDate, 'en')
+		const strip = buildWeekStrip(
+			week([session('s-mon', at(14))]),
+			enDate,
+			'en',
+			enStrip,
+			enMonth,
+		)
 		expect(weekStripStates(strip)).toEqual([
 			'COMPLETED',
 			'PLANNED',
@@ -156,39 +169,78 @@ describe('weekly training strip', () => {
 
 	it('states today from the today read, and nothing when today has nothing', () => {
 		expect(
-			describeWeekStripToday({
-				hasActiveSession: true,
-				remaining: 2,
-				trainedToday: false,
-			}),
+			describeWeekStripToday(
+				{
+					hasActiveSession: true,
+					remaining: 2,
+					trainedToday: false,
+				},
+				enStrip,
+			),
 		).toBe('Today: a workout is in progress.')
 		expect(
-			describeWeekStripToday({
-				hasActiveSession: false,
-				remaining: 1,
-				trainedToday: true,
-			}),
+			describeWeekStripToday(
+				{
+					hasActiveSession: false,
+					remaining: 1,
+					trainedToday: true,
+				},
+				enStrip,
+			),
 		).toBe('Today: 1 workout left to train.')
 		expect(
-			describeWeekStripToday({
-				hasActiveSession: false,
-				remaining: 2,
-				trainedToday: false,
-			}),
+			describeWeekStripToday(
+				{
+					hasActiveSession: false,
+					remaining: 2,
+					trainedToday: false,
+				},
+				enStrip,
+			),
 		).toBe('Today: 2 workouts left to train.')
 		expect(
-			describeWeekStripToday({
-				hasActiveSession: false,
-				remaining: 0,
-				trainedToday: true,
-			}),
+			describeWeekStripToday(
+				{
+					hasActiveSession: false,
+					remaining: 0,
+					trainedToday: true,
+				},
+				enStrip,
+			),
 		).toBe('Today: trained.')
 		expect(
-			describeWeekStripToday({
-				hasActiveSession: false,
-				remaining: 0,
-				trainedToday: false,
-			}),
+			describeWeekStripToday(
+				{
+					hasActiveSession: false,
+					remaining: 0,
+					trainedToday: false,
+				},
+				enStrip,
+			),
 		).toBeNull()
+	})
+
+	it('reads the same in Spanish', () => {
+		const strip = buildWeekStrip(
+			week([session('s-mon', at(14))]),
+			esDate,
+			'es',
+			esStrip,
+			esMonth,
+		)
+		expect(dayOf(strip, 14).label).toMatch(/Abre el entrenamiento\.$/)
+		expect(dayOf(strip, 16).label).toMatch(/Abre el calendario\.$/)
+		expect(
+			describeWeekStripToday(
+				{ hasActiveSession: false, remaining: 2, trainedToday: false },
+				esStrip,
+			),
+		).toBe('Hoy: quedan 2 entrenamientos por hacer.')
+		expect(
+			describeWeekStripToday(
+				{ hasActiveSession: false, remaining: 1, trainedToday: false },
+				esStrip,
+			),
+		).toBe('Hoy: queda 1 entrenamiento por hacer.')
 	})
 })

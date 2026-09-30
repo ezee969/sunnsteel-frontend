@@ -18,8 +18,11 @@ import {
 	weekStripStates,
 } from '@/lib/utils/dashboard-week'
 import {
+	describeMonthTotals,
+	scheduleStatusLabel,
+} from '@/lib/utils/schedule-month'
+import {
 	buildScheduleWeek,
-	describeScheduleTotals,
 	scheduleWeekRange,
 	startOfWeek,
 } from '@/lib/utils/schedule-week'
@@ -37,6 +40,8 @@ import { DashboardSection } from './DashboardSection'
 export default function WeekStrip() {
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
+	const t = useTranslations('planning.weekStrip')
+	const tMonth = useTranslations('planning.scheduleMonth')
 	const [now] = useState(() => new Date())
 	const weekStart = useMemo(() => startOfWeek(now), [now])
 	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
@@ -66,16 +71,19 @@ export default function WeekStrip() {
 		now,
 	])
 	const days = useMemo(
-		() => (week ? buildWeekStrip(week, tDate, locale) : []),
-		[week, tDate, locale],
+		() => (week ? buildWeekStrip(week, tDate, locale, t, tMonth) : []),
+		[week, tDate, locale, t, tMonth],
 	)
 	const todayLine = today.isPending
 		? null
-		: describeWeekStripToday({
-				hasActiveSession: today.active?.status === 'IN_PROGRESS',
-				remaining: today.entries.length,
-				trainedToday: Boolean(today.completedToday),
-			})
+		: describeWeekStripToday(
+				{
+					hasActiveSession: today.active?.status === 'IN_PROGRESS',
+					remaining: today.entries.length,
+					trainedToday: Boolean(today.completedToday),
+				},
+				t,
+			)
 
 	return (
 		<DashboardSection
@@ -84,7 +92,7 @@ export default function WeekStrip() {
 			description={
 				<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
 					{week
-						? [describeScheduleTotals(week.totals), todayLine]
+						? [describeMonthTotals(week.totals, tMonth), todayLine]
 								.filter(Boolean)
 								.join(' · ')
 						: ' '}
@@ -95,22 +103,19 @@ export default function WeekStrip() {
 					href={WEEK_STRIP_SCHEDULE_HREF}
 					className="type-body-sm text-ink-2 underline-offset-4 hover:underline"
 				>
-					Open schedule
+					{t('openSchedule')}
 				</Link>
 			}
 			bodyClassName="pt-3"
 		>
 			{data.isPending ? (
-				<div role="status" aria-label="Loading this week">
+				<div role="status" aria-label={t('loadingAria')}>
 					<Skeleton className="h-16 sm:h-20" />
 				</div>
 			) : data.isError || !week ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">This week is unavailable</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load your routines or sessions for this week. Try
-						again.
-					</p>
+					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -119,7 +124,7 @@ export default function WeekStrip() {
 						onClick={data.refetch}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : (
@@ -160,16 +165,16 @@ export default function WeekStrip() {
 					</ol>
 					{weekStripStates(days).length > 0 ? (
 						<ul
-							aria-label="Legend"
+							aria-label={t('legend')}
 							className="type-body-sm mt-2 flex flex-wrap gap-x-4 gap-y-1 text-ink-3"
 						>
 							{weekStripStates(days).map(state => {
 								if (state === 'EMPTY') return null
-								const { Icon, label, tone } = SCHEDULE_STATUS[state]
+								const { Icon, tone } = SCHEDULE_STATUS[state]
 								return (
 									<li key={state} className="flex items-center gap-1.5">
 										<Icon className={cn('size-4', tone)} aria-hidden />
-										{label}
+										{scheduleStatusLabel(state, tMonth)}
 									</li>
 								)
 							})}

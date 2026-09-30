@@ -69,6 +69,7 @@ function MoveOccurrenceContent({
 }) {
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
+	const t = useTranslations('planning.scheduleMove')
 	const { action, target } = request
 	// The day it sits on now is left out: a disabled button takes the sunk
 	// fill and reads as selected, and the description already names it.
@@ -95,13 +96,15 @@ function MoveOccurrenceContent({
 			{
 				onSuccess: () => {
 					push({
-						title: `Moved to ${describeShortDate(toDate, tDate, locale)}`,
-						description: `${target} now falls on that day.`,
+						title: t('movedTitle', {
+							date: describeShortDate(toDate, tDate, locale),
+						}),
+						description: t('movedBody', { target }),
 						variant: 'success',
 					})
 					onClose()
 				},
-				onError: fail('Workout not moved'),
+				onError: fail(t('moveFailed')),
 			},
 		)
 
@@ -111,13 +114,13 @@ function MoveOccurrenceContent({
 			{
 				onSuccess: () => {
 					push({
-						title: 'Workout skipped',
-						description: `${target} reads as skipped, not as missed. You can undo it.`,
+						title: t('skippedTitle'),
+						description: t('skippedBody', { target }),
 						variant: 'success',
 					})
 					onClose()
 				},
-				onError: fail('Workout not skipped'),
+				onError: fail(t('skipFailed')),
 			},
 		)
 
@@ -126,27 +129,40 @@ function MoveOccurrenceContent({
 		undo.mutate(action.overrideId, {
 			onSuccess: () => {
 				push({
-					title: 'Move undone',
-					description: `${target} is back on ${describeShortDate(action.occurrenceDate, tDate, locale)}.`,
+					title: t('undoneTitle'),
+					description: t('undoneBody', {
+						target,
+						date: describeShortDate(action.occurrenceDate, tDate, locale),
+					}),
 					variant: 'success',
 				})
 				onClose()
 			},
-			onError: fail('Move not undone'),
+			onError: fail(t('undoFailed')),
 		})
 	}
 
 	return (
 		<DialogContent className="max-w-md">
 			<DialogHeader>
-				<DialogTitle>Reschedule {target}</DialogTitle>
+				<DialogTitle>{t('title', { target })}</DialogTitle>
 				<DialogDescription>
-					Planned for {describeShortDate(action.occurrenceDate, tDate, locale)}
 					{moved
-						? `, now on ${describeShortDate(action.currentDate, tDate, locale)}`
-						: ''}
-					. Only this workout changes; the routine and the rest of your plan
-					stay as they are.
+						? t('descriptionMoved', {
+								planned: describeShortDate(
+									action.occurrenceDate,
+									tDate,
+									locale,
+								),
+								current: describeShortDate(action.currentDate, tDate, locale),
+							})
+						: t('description', {
+								planned: describeShortDate(
+									action.occurrenceDate,
+									tDate,
+									locale,
+								),
+							})}
 				</DialogDescription>
 			</DialogHeader>
 
@@ -159,7 +175,9 @@ function MoveOccurrenceContent({
 						onClick={() => moveTo(postponeTo)}
 						disabled={busy}
 					>
-						Postpone to {describeShortDate(postponeTo, tDate, locale)}
+						{t('postpone', {
+							date: describeShortDate(postponeTo, tDate, locale),
+						})}
 					</Button>
 				) : null}
 				<Button
@@ -170,14 +188,14 @@ function MoveOccurrenceContent({
 					disabled={busy}
 				>
 					<SkipForward className="size-4" aria-hidden />
-					Skip this workout
+					{t('skip')}
 				</Button>
 			</div>
 
 			{targets.length > 0 ? (
 				<div>
 					<p id="move-targets-label" className="type-body-sm mb-2 text-ink-3">
-						Or move it to
+						{t('moveTo')}
 					</p>
 					<div
 						role="group"
@@ -203,8 +221,7 @@ function MoveOccurrenceContent({
 				</div>
 			) : (
 				<p className="type-body-sm text-ink-3">
-					No free day within {SCHEDULE_MOVE_MAX_DAYS} days of it: every other
-					one has passed or already has a workout of this routine.
+					{t('noFreeDay', { days: SCHEDULE_MOVE_MAX_DAYS })}
 				</p>
 			)}
 
@@ -216,19 +233,20 @@ function MoveOccurrenceContent({
 						onClick={onPutBack}
 						disabled={busy}
 					>
-						Put back on{' '}
-						{describeShortDate(action.occurrenceDate, tDate, locale)}
+						{t('putBack', {
+							date: describeShortDate(action.occurrenceDate, tDate, locale),
+						})}
 					</Button>
 				) : null}
 				<Button type="button" variant="outline" onClick={onClose}>
-					Cancel
+					{t('cancel')}
 				</Button>
 				<Button
 					type="button"
 					onClick={() => selected && moveTo(selected)}
 					disabled={!selected || busy}
 				>
-					{move.isPending ? 'Moving…' : 'Move'}
+					{move.isPending ? t('moving') : t('move')}
 				</Button>
 			</DialogFooter>
 		</DialogContent>

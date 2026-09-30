@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n/config'
-import { type Translator, translatorFor } from '@/i18n/translator'
+import type { Translator } from '@/i18n/translator'
 
 import { weekdayName } from './date'
 import {
@@ -52,24 +52,29 @@ export function weekStripHref(day: Pick<ScheduleDay, 'entries'>): string {
 
 export function buildWeekStrip(
 	week: ScheduleWeek,
-	t: Translator<'routines.date'>,
+	tDate: Translator<'routines.date'>,
 	locale: Locale,
+	t: Translator<'planning.weekStrip'>,
+	tMonth: Translator<'planning.scheduleMonth'>,
 ): WeekStripDay[] {
 	return week.days.map(day => {
 		const href = weekStripHref(day)
 		const destination = href.startsWith('/workouts/sessions/')
-			? 'Opens the workout in progress.'
+			? t('opensInProgress')
 			: href.startsWith('/workouts/history/')
-				? 'Opens the workout.'
-				: 'Opens the schedule.'
+				? t('opensWorkout')
+				: t('opensSchedule')
 		return {
 			date: day.date,
-			weekday: weekdayName(day.dayOfWeek, 'short', t),
+			weekday: weekdayName(day.dayOfWeek, 'short', tDate),
 			dayOfMonth: Number(day.date.slice(8)),
 			isToday: day.isToday,
 			state: scheduleDayState(day),
 			href,
-			label: `${describeMonthCell(day, locale, translatorFor(locale, 'planning.scheduleMonth'))}. ${destination}`,
+			label: t('dayLabel', {
+				cell: describeMonthCell(day, locale, tMonth),
+				destination,
+			}),
 		}
 	})
 }
@@ -94,19 +99,20 @@ export function weekStripStates(days: WeekStripDay[]): ScheduleDayState[] {
  * Today's line comes from `useTodaysWorkouts`, the read the Today's Workouts
  * card above uses, so the two never disagree about what is left to train.
  */
-export function describeWeekStripToday({
-	hasActiveSession,
-	remaining,
-	trainedToday,
-}: {
-	hasActiveSession: boolean
-	remaining: number
-	trainedToday: boolean
-}): string | null {
-	if (hasActiveSession) return 'Today: a workout is in progress.'
-	if (remaining > 0) {
-		return `Today: ${remaining} ${remaining === 1 ? 'workout' : 'workouts'} left to train.`
-	}
-	if (trainedToday) return 'Today: trained.'
+export function describeWeekStripToday(
+	{
+		hasActiveSession,
+		remaining,
+		trainedToday,
+	}: {
+		hasActiveSession: boolean
+		remaining: number
+		trainedToday: boolean
+	},
+	t: Translator<'planning.weekStrip'>,
+): string | null {
+	if (hasActiveSession) return t('todayInProgress')
+	if (remaining > 0) return t('todayLeft', { count: remaining })
+	if (trainedToday) return t('todayTrained')
 	return null
 }

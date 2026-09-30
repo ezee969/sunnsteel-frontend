@@ -5,15 +5,22 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { buildScheduleMonth, startOfMonth } from './schedule-month'
+import { translatorFor } from '@/i18n/translator'
+
+import {
+	buildScheduleMonth,
+	describeMonthTotals,
+	startOfMonth,
+} from './schedule-month'
 import {
 	buildScheduleWeek,
-	describeScheduleTotals,
 	localDateKey,
 	moveTargets,
 	scheduleMoveAction,
 	startOfWeek,
 } from './schedule-week'
+
+const tMonth = translatorFor('en', 'planning.scheduleMonth')
 
 // Wednesday 16 Sep 2026. The split trains Monday, Wednesday and Friday.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -90,7 +97,7 @@ describe('moving one planned workout (SCHED-04)', () => {
 		expect(entriesOn(week, 17)).toEqual(['PLANNED:Lower<2026-09-16'])
 		expect(entriesOn(week, 18)).toEqual(['PLANNED:Full'])
 		expect(week.totals).toMatchObject({ planned: 2, notLogged: 1, moved: 1 })
-		expect(describeScheduleTotals(week.totals)).toMatch(/1 moved$/)
+		expect(describeMonthTotals(week.totals, tMonth)).toMatch(/1 moved$/)
 
 		const thursday = week.days.find(d => d.date === '2026-09-17')!
 		expect(thursday.entries[0]).toMatchObject({

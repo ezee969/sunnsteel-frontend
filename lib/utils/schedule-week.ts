@@ -676,22 +676,6 @@ export function rotationStartAction(
 		: null
 }
 
-/** "2 completed · 1 ended early · 3 planned · 1 not logged", zeros omitted. */
-export function describeScheduleTotals(totals: ScheduleWeek['totals']): string {
-	const parts = [
-		totals.completed ? `${totals.completed} completed` : null,
-		totals.aborted ? `${totals.aborted} ended early` : null,
-		totals.planned ? `${totals.planned} planned` : null,
-		totals.notLogged ? `${totals.notLogged} not logged` : null,
-		totals.rest
-			? `${totals.rest} rest ${totals.rest === 1 ? 'day' : 'days'}`
-			: null,
-		totals.moved ? `${totals.moved} moved` : null,
-		totals.skipped ? `${totals.skipped} skipped` : null,
-	].filter(Boolean)
-	return parts.length ? parts.join(' · ') : 'Nothing planned or logged'
-}
-
 const WEEK_FORMAT = (locale: Locale) =>
 	dateFormatter(locale, { day: 'numeric', month: 'short', year: 'numeric' })
 const DAY_FORMAT = (locale: Locale) =>
@@ -706,16 +690,17 @@ export function describeWeek(
 	weekStart: string,
 	now: Date,
 	locale: Locale,
+	t: Translator<'planning.scheduleWeek'>,
 ): string {
 	const current = localDateKey(startOfWeek(now))
-	if (weekStart === current) return 'This week'
+	if (weekStart === current) return t('thisWeek')
 	if (weekStart === localDateKey(addDays(fromKey(current), -7))) {
-		return 'Last week'
+		return t('lastWeek')
 	}
 	if (weekStart === localDateKey(addDays(fromKey(current), 7))) {
-		return 'Next week'
+		return t('nextWeek')
 	}
-	return `Week of ${WEEK_FORMAT(locale).format(fromKey(weekStart))}`
+	return t('weekOf', { date: WEEK_FORMAT(locale).format(fromKey(weekStart)) })
 }
 
 /** "Thu 17 Sep" */
