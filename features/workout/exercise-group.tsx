@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { MAX_EXTRA_SETS } from '@/lib/utils/session-progress.utils'
 import { comparablePrevious } from '@/lib/utils/session-substitutions'
@@ -85,7 +86,7 @@ interface ExerciseGroupProps {
  */
 export const ExerciseGroup = ({
 	exerciseId,
-	exerciseName,
+	exerciseName: rawExerciseName,
 	sets,
 	isCollapsed,
 	onToggleCollapse,
@@ -104,6 +105,8 @@ export const ExerciseGroup = ({
 	upNext,
 }: ExerciseGroupProps) => {
 	const t = useTranslations('workout.exerciseGroup')
+	const tEx = useTranslations('catalog.exercises')
+	const exerciseName = exerciseLabel(rawExerciseName, tEx)
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
 	const required = sets.filter(set => requiredToFinish(set.kind))
@@ -184,7 +187,9 @@ export const ExerciseGroup = ({
 							) : null}
 							{substitutedFrom ? (
 								<p className="type-body-sm line-clamp-1 text-ink-3">
-									{t('swappedFrom', { name: substitutedFrom })}
+									{t('swappedFrom', {
+										name: exerciseLabel(substitutedFrom, tEx),
+									})}
 								</p>
 							) : null}
 							{instruction ? (

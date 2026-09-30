@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import { cn } from '@/lib/utils'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
@@ -38,6 +39,7 @@ export function HistoryExerciseGroup({
 	const t = useTranslations('workout.historyExerciseGroup')
 	const weightUnit = useWeightUnit()
 	const tMuscles = useTranslations('routines.muscles')
+	const tEx = useTranslations('catalog.exercises')
 	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
 	const totalSets = group.plannedSets.length + group.extraSets.length
 	const completedSets =
@@ -73,7 +75,7 @@ export function HistoryExerciseGroup({
 					)}
 					<div className="min-w-0 flex-1">
 						<h3 className="type-panel text-foreground">
-							{group.exercise.name}
+							{exerciseLabel(group.exercise.name, tEx)}
 						</h3>
 						<p className="type-body-sm mt-0.5 text-ink-3">
 							{formatMuscleGroups(group.exercise.primaryMuscles, tMuscles)}
@@ -81,7 +83,9 @@ export function HistoryExerciseGroup({
 						</p>
 						{group.substitutedFrom ? (
 							<p className="type-body-sm text-ink-3">
-								{t('swappedFrom', { name: group.substitutedFrom.name })}
+								{t('swappedFrom', {
+									name: exerciseLabel(group.substitutedFrom.name, tEx),
+								})}
 							</p>
 						) : null}
 					</div>
@@ -93,7 +97,7 @@ export function HistoryExerciseGroup({
 					<ExerciseNoteButton
 						sessionId={sessionId}
 						routineExerciseId={group.routineExerciseId}
-						exerciseName={group.exercise.name}
+						exerciseName={exerciseLabel(group.exercise.name, tEx)}
 						note={sessionNote ?? null}
 					/>
 				) : null}

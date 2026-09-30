@@ -9,6 +9,7 @@ import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
 	countSharedExercises,
@@ -28,6 +29,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 	const weightUnit = useWeightUnit()
 	const tKinds = useTranslations('workout.setKinds')
 	const tSharing = useTranslations('routines.sharing')
+	const tEx = useTranslations('catalog.exercises')
 	const { setup } = routine
 	const exerciseCount = countSharedExercises(routine)
 
@@ -99,7 +101,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 											</p>
 										) : null}
 										<h3 className="type-panel text-foreground">
-											{exercise.exercise.name}
+											{exerciseLabel(exercise.exercise.name, tEx)}
 										</h3>
 										<p className="type-body-sm mt-0.5 text-ink-3">
 											{exercise.sets.length}{' '}

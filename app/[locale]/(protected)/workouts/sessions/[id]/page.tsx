@@ -22,6 +22,7 @@ import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
+import { exerciseLabel } from '@/i18n/catalog'
 import { usePushSubscriptions } from '@/lib/api/hooks/usePushNotifications'
 import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import {
@@ -76,6 +77,7 @@ export default function ActiveSessionPage() {
 	const t = useTranslations('workout.sessionPage')
 	const tRounds = useTranslations('workout.rounds')
 	const tPrescription = useTranslations('workout.prescription')
+	const tEx = useTranslations('catalog.exercises')
 	const params = useParams<{ id: string | string[] }>()
 	const router = useRouter()
 	const idParam = Array.isArray(params.id) ? params.id[0] : params.id
@@ -362,8 +364,10 @@ export default function ActiveSessionPage() {
 									const just = { exerciseId: group.exerciseId, setNumber }
 									const next = nextSetAfter(roundSlots, just)
 									setLastCompleted(just)
-									restingExerciseRef.current =
-										next?.exerciseName ?? group.exerciseName
+									restingExerciseRef.current = exerciseLabel(
+										next?.exerciseName ?? group.exerciseName,
+										tEx,
+									)
 									restTimer.start(group.restSeconds)
 									if (status && next && next.exerciseId !== group.exerciseId) {
 										if (isCollapsed(next.exerciseId))

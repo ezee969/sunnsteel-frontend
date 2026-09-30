@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { intlLocale } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
@@ -100,6 +101,7 @@ export function TrainingSignals({
 }: TrainingSignalsProps) {
 	const t = useTranslations('progress.signals')
 	const tDeload = useTranslations('progress.deloadSuggestion')
+	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
 	const titles = trainingSignalTitles(t)
 	const formatDate = (iso: string) =>
@@ -173,7 +175,7 @@ export function TrainingSignals({
 											href={`/exercises/${lift.exerciseId}`}
 											className="text-foreground underline-offset-4 hover:underline"
 										>
-											{lift.exerciseName}
+											{exerciseLabel(lift.exerciseName, tEx)}
 										</Link>
 										: {describeDecline(lift, weightUnit, formatDate, t, locale)}
 									</li>

@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
@@ -41,6 +42,7 @@ export function RoutineDayCard({
 	const t = useTranslations('routines.dayCard')
 	const tFormat = useTranslations('routines.format')
 	const tMuscles = useTranslations('routines.muscles')
+	const tEx = useTranslations('catalog.exercises')
 	return (
 		<Card className="border rounded-md p-3">
 			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
@@ -58,7 +60,9 @@ export function RoutineDayCard({
 							<div className="flex items-start justify-between mb-2">
 								<div>
 									<h5 className="font-medium">
-										{meta?.name ?? t('exerciseFallback')}
+										{meta?.name
+											? exerciseLabel(meta.name, tEx)
+											: t('exerciseFallback')}
 									</h5>
 									<p className="text-xs text-muted-foreground">
 										{t('musclesAndEquipment', {

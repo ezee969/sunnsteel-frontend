@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import type { MessageKey } from '@/i18n/translator'
@@ -87,12 +88,15 @@ function RecordTimelineItem({
 }) {
 	const locale = useLocale() as Locale
 	const tTimeline = useTranslations('progress.timeline')
+	const tEx = useTranslations('catalog.exercises')
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_8rem]">
 			<div className="flex flex-wrap items-center gap-2">
 				<Badge variant="outline">{tTimeline('badgeRecord')}</Badge>
 				{showExerciseName ? (
-					<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+					<h3 className="type-panel text-foreground">
+						{exerciseLabel(item.exerciseName, tEx)}
+					</h3>
 				) : null}
 			</div>
 			<TimelineContext item={item} />
@@ -135,12 +139,15 @@ function ProgressionTimelineItem({
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.timeline')
 	const tChange = useTranslations('progress.progressionChange')
+	const tEx = useTranslations('catalog.exercises')
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_9rem]">
 			<div className="flex flex-wrap items-center gap-2">
 				<Badge variant="outline">{t('badgeProgression')}</Badge>
 				{showExerciseName ? (
-					<h3 className="type-panel text-foreground">{item.exerciseName}</h3>
+					<h3 className="type-panel text-foreground">
+						{exerciseLabel(item.exerciseName, tEx)}
+					</h3>
 				) : null}
 			</div>
 			<TimelineContext item={item} />

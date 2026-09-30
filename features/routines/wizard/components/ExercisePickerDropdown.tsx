@@ -8,6 +8,7 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CustomExerciseDialog } from '@/features/exercises/custom-exercise-dialog'
+import { exerciseLabel } from '@/i18n/catalog'
 import { useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
 import type { Exercise } from '@/lib/api/types'
@@ -48,6 +49,7 @@ export const ExercisePickerDropdown = forwardRef<
 	const [createName, setCreateName] = useState<string | null>(null)
 	const t = useTranslations('routines.picker')
 	const tMuscles = useTranslations('routines.muscles')
+	const tEx = useTranslations('catalog.exercises')
 	const query = searchValue.trim()
 	const offerCreate =
 		query.length > 0 &&
@@ -142,7 +144,7 @@ export const ExercisePickerDropdown = forwardRef<
 												>
 													<div className="flex flex-col items-start text-left">
 														<span className="text-sm font-medium whitespace-normal break-words">
-															{exercise.name}
+															{exerciseLabel(exercise.name, tEx)}
 														</span>
 														<span className="text-xs text-muted-foreground whitespace-normal">
 															{exercise.isCustom ? t('yoursPrefix') : null}

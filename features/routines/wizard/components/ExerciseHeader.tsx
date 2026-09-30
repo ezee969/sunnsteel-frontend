@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CardHeader } from '@/components/ui/card'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Exercise } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
@@ -50,6 +51,7 @@ export function ExerciseHeader({
 }: ExerciseHeaderProps) {
 	const t = useTranslations('routines.exerciseHeader')
 	const tMuscles = useTranslations('routines.muscles')
+	const tEx = useTranslations('catalog.exercises')
 	const plannedSets = exercise.sets.length
 
 	const restMinutes = Math.floor(exercise.restSeconds / 60)
@@ -87,7 +89,9 @@ export function ExerciseHeader({
 									expanded ? 'text-base sm:text-base' : 'text-sm sm:text-base',
 								)}
 							>
-								{exerciseData?.name ?? t('exerciseFallback')}
+								{exerciseData?.name
+									? exerciseLabel(exerciseData.name, tEx)
+									: t('exerciseFallback')}
 							</h4>
 							{expanded && (
 								<p className="text-xs sm:text-sm text-muted-foreground break-words">

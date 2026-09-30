@@ -12,6 +12,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { setKindLabel } from '@/lib/utils/set-kind-label'
 import { formatTime } from '@/lib/utils/time'
@@ -60,6 +61,7 @@ export const ExerciseCard = ({
 	const locale = useLocale() as Locale
 	const t = useTranslations('routines.setRow')
 	const tKinds = useTranslations('workout.setKinds')
+	const tEx = useTranslations('catalog.exercises')
 	return (
 		<div className="py-4">
 			{/* ROUT-12: its place in a superset or circuit. */}
@@ -69,7 +71,9 @@ export const ExerciseCard = ({
 			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
 				<div className="flex min-w-0 items-center gap-2">
 					<h4 className="type-panel text-foreground">
-						{exercise.exercise?.name || t('unknownExercise')}
+						{exercise.exercise?.name
+							? exerciseLabel(exercise.exercise.name, tEx)
+							: t('unknownExercise')}
 					</h4>
 					{exercise.note && (
 						<Dialog>

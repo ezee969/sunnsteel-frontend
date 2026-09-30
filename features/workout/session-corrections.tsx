@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
+import { exerciseLabel } from '@/i18n/catalog'
 import { useCorrectSession } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
@@ -141,6 +142,7 @@ export function SessionCorrectionEditor({
 	onDone: () => void
 }) {
 	const t = useTranslations('workout.corrections')
+	const tEx = useTranslations('catalog.exercises')
 	const { push } = useToast()
 	const correct = useCorrectSession(sessionId)
 	const logs = useMemo(
@@ -163,9 +165,9 @@ export function SessionCorrectionEditor({
 		const names = new Map<string, string>()
 		for (const group of groups)
 			for (const log of group.performedSets)
-				names.set(log.id, group.exercise.name)
+				names.set(log.id, exerciseLabel(group.exercise.name, tEx))
 		return names
-	}, [groups])
+	}, [groups, tEx])
 
 	const update = (id: string, patch: Partial<CorrectionDraftSet>) =>
 		setDraft(current => ({ ...current, [id]: { ...current[id], ...patch } }))
@@ -201,7 +203,9 @@ export function SessionCorrectionEditor({
 						title: t('workoutCorrectedTitle'),
 						description:
 							describeKeptProgression(
-								result.progressionKept.map(item => item.exerciseName),
+								result.progressionKept.map(item =>
+									exerciseLabel(item.exerciseName, tEx),
+								),
 								t,
 							) ?? t('everythingRecalculated'),
 						variant: 'success',
@@ -250,7 +254,7 @@ export function SessionCorrectionEditor({
 								id={`correct-${group.routineExerciseId}`}
 								className="type-panel text-foreground"
 							>
-								{group.exercise.name}
+								{exerciseLabel(group.exercise.name, tEx)}
 							</h3>
 							<div
 								className={`type-body-sm ${ROW} items-end text-ink-3`}
@@ -268,7 +272,7 @@ export function SessionCorrectionEditor({
 									const row = draft[log.id]
 									const problem = problemFor(log.id)
 									const errorId = `correct-${log.id}-error`
-									const label = `${group.exercise.name}, set ${log.setNumber}`
+									const label = `${exerciseLabel(group.exercise.name, tEx)}, set ${log.setNumber}`
 									return (
 										<div key={log.id} className="space-y-1">
 											<div className={`${ROW} items-center`}>

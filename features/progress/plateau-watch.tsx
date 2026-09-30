@@ -13,6 +13,7 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import {
@@ -115,6 +116,7 @@ function PlateauRow({
 }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('planning.plateaus')
+	const tEx = useTranslations('catalog.exercises')
 	const count = describePlateauCount(plateau, thresholds, formatDate(locale), t)
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
@@ -124,7 +126,7 @@ function PlateauRow({
 						href={`/exercises/${plateau.exerciseId}`}
 						className="underline-offset-4 hover:underline"
 					>
-						{plateau.exerciseName}
+						{exerciseLabel(plateau.exerciseName, tEx)}
 					</Link>
 				</h3>
 				<p className="type-body-sm mt-0.5 text-ink-2">
