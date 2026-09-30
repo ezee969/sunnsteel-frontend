@@ -17,8 +17,11 @@ Quick Workout problems are not duplicated here.
 
 ## Active debt
 
+**`TD-57` is open**: the password-reset email goes through Supabase's default
+sender, which reaches only the project's own team and cannot be translated. It
+waits on the owner (a domain and an SMTP provider), then on a small code step.
 `TD-56`, the double reload and splash after a deploy, was recorded and closed
-on 2026-09-27. There are no open entries. `TD-54` and `TD-55`, both from the owner's
+on 2026-09-27. `TD-54` and `TD-55`, both from the owner's
 mobile-density review, were recorded and closed on 2026-09-27. Their product-side companions are the `UX-*` items in the
 roadmap's [Page density and long lists](product-roadmap.md#page-density-and-long-lists)
 section. `TD-53`, the sweep's training-partner test depending on local data,
@@ -38,6 +41,84 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-57"></a>
+
+### TD-57 — Auth email goes through Supabase's default sender — OPEN, waits on the owner
+
+**Impact.** Two problems, one cause.
+
+- **The password-reset email (`FIX-11`) reaches almost nobody.** Supabase's
+  default email service sends only to addresses that are members of the
+  project's organization, and at about two messages an hour; any other address
+  fails with "Email address not authorized". So "Forgot password" works for the
+  owner and silently fails for every other member. The app's confirmation
+  deliberately never says whether an address has an account, so the member
+  sees nothing wrong -- the email just never arrives.
+- **It is always English (`I18N-06`).** The default sender also locks the
+  templates: they cannot be edited at all, so the reset email cannot follow the
+  account's language, and it is the one piece of `I18N-06` not delivered.
+
+**Evidence.** On 2026-09-30 the owner opened Authentication › Emails ›
+Reset Password in the Supabase dashboard (project `sunnsteel-supabase-v2`,
+production) and it read "Set up custom SMTP to edit templates. Emails will be
+sent using the default templates" (screenshot in the session). Supabase
+documents both limits in
+[Send emails with custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp):
+pre-authorized addresses only, a rate limit of two an hour, and no delivery
+guarantee, "intended for non-production use cases". Not measured against a
+non-member address yet.
+
+**Direction.** In this order; the first three are the owner's, because they
+are accounts, DNS and credentials:
+
+1. **A domain the product owns** for the sender. Without one no provider will
+   send to arbitrary addresses (`sunnsteel-frontend.vercel.app` cannot be
+   verified as a sender).
+2. **An email provider with SMTP** -- Resend is the simplest (3,000 a month
+   free); Brevo or Postmark also work -- with that domain verified through its
+   DNS records.
+3. **Supabase › Authentication › Emails › SMTP Settings**: the provider's host,
+   port, user and password (its API key) and a sender such as
+   `no-reply@<domain>`. Then Authentication › Rate Limits, which starts at 30 an
+   hour with custom SMTP.
+4. **The template**, which becomes editable once SMTP is on. Subject (whether a
+   subject may branch was not confirmed, so it is bilingual):
+   `Restablece tu contraseña · Reset your password`. Body -- the `and` keeps an
+   account without a stored language on English instead of failing the
+   render, and `{{ .ConfirmationURL }}` must stay as it is, since the
+   `/auth/callback` flow depends on it
+   ([Customizing emails by language](https://supabase.com/docs/guides/troubleshooting/customizing-emails-by-language-KZ_38Q)):
+
+   ```html
+   {{ if and .Data.locale (eq .Data.locale "es") }}
+   <h2>Restablece tu contraseña</h2>
+   <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta de Sunnsteel.</p>
+   <p><a href="{{ .ConfirmationURL }}">Elegir una contraseña nueva</a></p>
+   <p>Si no la pediste, puedes ignorar este correo: tu contraseña no cambia.</p>
+   {{ else }}
+   <h2>Reset your password</h2>
+   <p>We received a request to reset the password for your Sunnsteel account.</p>
+   <p><a href="{{ .ConfirmationURL }}">Choose a new password</a></p>
+   <p>If you didn't ask for this, you can ignore this email; your password stays the same.</p>
+   {{ end }}
+   ```
+
+5. **Code (agent):** a template reads only Supabase's own `user_metadata`
+   (`.Data`), and the account's language lives only in the backend's
+   `User.locale` (`I18N-02`). `PUT /users/preferences/locale` must also write
+   `user_metadata.locale` through the service-role admin API
+   (`auth.admin.updateUserById`), and a one-off backfill must copy it for the
+   accounts that already chose a language. An account on "Match this device"
+   stores none and keeps the English email: a reset request cannot carry the
+   browser's language. Nothing waits on the owner here except that it is only
+   worth shipping once step 4 can read it.
+
+**Closure criteria.** A reset requested for an address outside the Supabase
+organization arrives; an account whose language is Español receives the
+Spanish email and one on English or "Match this device" the English one; the
+backfill has run in production; the `I18N-06` row no longer lists the reset
+email as left out and `FIX-11` no longer points here.
 
 <a id="td-54"></a>
 
@@ -1026,6 +1107,13 @@ written in Spanish and kept frozen as a historical record. It must not be used a
 a list of active debt.
 
 ## Document history
+
+- **2026-09-30 (revision 32):** Recorded `TD-57`: the password-reset email
+  goes through Supabase's default sender, so it reaches only members of the
+  project's organization and its template cannot be edited or translated. The
+  owner's steps (a domain, an SMTP provider, Supabase's SMTP settings and the
+  bilingual template) and the code step that copies the account's language
+  into Supabase are written out in the entry.
 
 - **2026-09-27 (revision 31):** Closed `TD-54` with `UX-01`: /routines keeps
   its filter and Create Routine on one pinned row, and its list no longer
