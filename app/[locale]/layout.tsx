@@ -175,7 +175,9 @@ export default async function RootLayout({
 	// Lets next-intl read the language from the segment rather than from the
 	// request, which is what keeps the page static.
 	setRequestLocale(locale)
-	const messages = (await getMessages()) as Messages
+	// The language is passed rather than read back from the request, so a
+	// dynamically rendered page cannot fall back to English.
+	const messages = (await getMessages({ locale })) as Messages
 	// `lang` is the page's language on the first byte, so screen readers
 	// pronounce it right. It said "es" over English text until I18N-01.
 	return (

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
 	config,
+	LOCALE_HEADER,
 	localePrefixOf,
 	middleware,
 	PROTECTED_PREFIXES,
@@ -75,6 +76,23 @@ describe('the middleware', () => {
 		expect(res.headers.get('x-middleware-rewrite')).toBe(
 			'https://sunnsteel.test/es/login',
 		)
+	})
+
+	it('hands next-intl the language, so a dynamic page renders in it', async () => {
+		// Without this header a signed-in page, rendered per request, read its
+		// messages in English under `lang="es"`.
+		const res = await middleware(
+			request('/dashboard', { ss_session: '1', 'ss-locale': 'es' }),
+		)
+		expect(
+			res.headers.get(`x-middleware-request-${LOCALE_HEADER.toLowerCase()}`),
+		).toBe('es')
+		const english = await middleware(request('/login'))
+		expect(
+			english.headers.get(
+				`x-middleware-request-${LOCALE_HEADER.toLowerCase()}`,
+			),
+		).toBe('en')
 	})
 
 	it('sends the root to the dashboard or to Login by the session marker', async () => {

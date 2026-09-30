@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/i18n/config'
 
+/** next-intl's own request header for the locale (`HEADER_LOCALE_NAME`). */
+export const LOCALE_HEADER = 'X-NEXT-INTL-LOCALE'
+
 export const PROTECTED_PREFIXES = [
 	'/dashboard',
 	'/workouts',
@@ -70,7 +73,13 @@ export async function middleware(request: NextRequest) {
 	})
 	const url = request.nextUrl.clone()
 	url.pathname = `/${locale}${path}`
-	return NextResponse.rewrite(url)
+	// next-intl reads the language of a dynamically rendered page from this
+	// header, which its own middleware would set; without it every signed-in
+	// page rendered its messages in English under `lang="es"`. The static
+	// pages never needed it, because the build calls `setRequestLocale`.
+	const headers = new Headers(request.headers)
+	headers.set(LOCALE_HEADER, locale)
+	return NextResponse.rewrite(url, { request: { headers } })
 }
 
 /**
