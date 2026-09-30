@@ -88,7 +88,11 @@ export function ReportQueue() {
 		<div className="flex flex-col gap-4">
 			<p className="type-body-sm text-ink-3">{tModeration('accessNote')}</p>
 
-			<div role="group" aria-label={t('statusGroup')} className="flex gap-1">
+			<div
+				role="group"
+				aria-label={t('statusGroup')}
+				className="flex flex-wrap gap-1"
+			>
 				{STATUS_TABS.map(option => (
 					<Button
 						key={option}

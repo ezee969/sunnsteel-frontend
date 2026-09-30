@@ -1,12 +1,16 @@
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
+
 /**
- * Formats an ISO date string to a localized time string
- * @param iso - ISO date string or null/undefined
- * @returns Formatted time string or em dash if no date provided
+ * An ISO instant as a clock time in the app's language (`09:01 PM`, `21:01`),
+ * or an em dash when there is none. It used the device's locale, so a Spanish
+ * session on an English phone printed "PM".
  */
-export const formatTime = (iso?: string | null): string => {
+export const formatTime = (iso: string | null | undefined, locale: Locale) => {
 	if (!iso) return '—'
-	const d = new Date(iso)
-	return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	return dateFormatter(locale, { hour: '2-digit', minute: '2-digit' }).format(
+		new Date(iso),
+	)
 }
 
 /**

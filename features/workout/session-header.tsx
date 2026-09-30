@@ -1,10 +1,11 @@
 'use client'
 
 import { ArrowLeft, ZoomIn, ZoomOut } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
+import type { Locale } from '@/i18n/config'
 import { formatDuration, formatTime } from '@/lib/utils/time-format.utils'
 import type { SessionProgressData } from '@/lib/utils/workout-session.types'
 
@@ -27,6 +28,7 @@ export const SessionHeader = ({
 	onNavigateBack,
 }: SessionHeaderProps) => {
 	const t = useTranslations('workout.sessionHeader')
+	const locale = useLocale() as Locale
 	const { completedSets, totalSets, percentage } = progressData
 	// LIVE-18: the gym is where larger controls are needed, so the switch is
 	// here as well as in Settings. It is the same device choice, not a mode.
@@ -135,7 +137,9 @@ export const SessionHeader = ({
 					</div>
 					<div className="text-right">
 						<p className="type-label text-ink-3">{t('started')}</p>
-						<p className="type-data text-foreground">{formatTime(startedAt)}</p>
+						<p className="type-data text-foreground">
+							{formatTime(startedAt, locale)}
+						</p>
 					</div>
 				</div>
 			</div>

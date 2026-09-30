@@ -9,6 +9,7 @@ import {
 import { REGRESSION_WIDTHS, THEMES } from './capture-targets'
 import { discoverIds, type Ids } from './discover-ids'
 import { expect, test as base } from './fixtures'
+import { msg, msgPrefix, seedLocale } from './locale'
 import { BASE_URL, findActiveSessionId, STATE_PATH } from './preconditions'
 import { seedTheme } from './theme'
 
@@ -104,6 +105,7 @@ test.beforeAll(async ({ browser }) => {
 })
 
 async function prepare(page: Page, width: number, theme: Theme) {
+	await seedLocale(page)
 	await seedTheme(page, theme)
 	await page.setViewportSize({ width, height: VIEWPORT_HEIGHT })
 }
@@ -115,7 +117,7 @@ async function prepare(page: Page, width: number, theme: Theme) {
  */
 async function settle(page: Page) {
 	await expect(
-		page.getByText('Preparing Your Journey'),
+		page.getByText(msg('core.splash.preparingJourney')),
 		'the mobile splash never cleared',
 	).toHaveCount(0, { timeout: 15_000 })
 	// The content layer fades in over 500ms as the splash leaves.
@@ -252,7 +254,10 @@ async function tabTo(
 
 function sidebarNav(page: Page) {
 	return page.locator('nav', {
-		has: page.getByRole('link', { name: 'Dashboard', exact: true }),
+		has: page.getByRole('link', {
+			name: msg('shell.nav.dashboard'),
+			exact: true,
+		}),
 	})
 }
 
@@ -265,11 +270,17 @@ function sidebarPanel(page: Page) {
 }
 
 async function openDrawer(page: Page) {
-	await page.getByRole('button', { name: 'Toggle Menu' }).click()
+	await page
+		.getByRole('button', { name: msg('shell.header.toggleMenu') })
+		.click()
 	await expect
-		.poll(async () => (await sidebarLink(page, 'Dashboard').boundingBox())?.x, {
-			message: 'the drawer did not slide into view',
-		})
+		.poll(
+			async () =>
+				(await sidebarLink(page, msg('shell.nav.dashboard')).boundingBox())?.x,
+			{
+				message: 'the drawer did not slide into view',
+			},
+		)
 		.toBeGreaterThanOrEqual(0)
 }
 
@@ -277,7 +288,10 @@ async function expectDrawerClosed(page: Page) {
 	await expect
 		.poll(
 			async () => {
-				const rect = await sidebarLink(page, 'Dashboard').boundingBox()
+				const rect = await sidebarLink(
+					page,
+					msg('shell.nav.dashboard'),
+				).boundingBox()
 				return rect ? rect.x + rect.width : 0
 			},
 			{ message: 'the drawer is still on screen' },
@@ -583,14 +597,14 @@ for (const route of ROUTES) {
 // ---------------------------------------------------------------------------
 
 const NAV_TARGETS: Array<[string, RegExp]> = [
-	['Routines', /\/routines$/],
-	['History', /\/workouts\/history$/],
-	['Progress', /\/progress$/],
-	['Exercises', /\/exercises$/],
-	['Discover', /\/routines\/discover$/],
-	['Activity', /\/activity$/],
-	['Settings', /\/settings$/],
-	['Dashboard', /\/dashboard$/],
+	[msg('shell.nav.routines'), /\/routines$/],
+	[msg('shell.nav.history'), /\/workouts\/history$/],
+	[msg('shell.nav.progress'), /\/progress$/],
+	[msg('shell.nav.exercises'), /\/exercises$/],
+	[msg('shell.nav.discover'), /\/routines\/discover$/],
+	[msg('shell.nav.activity'), /\/activity$/],
+	[msg('shell.nav.settings'), /\/settings$/],
+	[msg('shell.nav.dashboard'), /\/dashboard$/],
 ]
 
 for (const width of REGRESSION_WIDTHS) {
@@ -616,8 +630,12 @@ for (const width of REGRESSION_WIDTHS) {
 		}
 
 		// A destination reached through a dropdown rather than the sidebar.
-		await page.getByRole('button', { name: 'Account menu' }).click()
-		await page.getByRole('menuitem', { name: 'Profile' }).click()
+		await page
+			.getByRole('button', { name: msg('shell.header.accountMenu') })
+			.click()
+		await page
+			.getByRole('menuitem', { name: msg('shell.header.profile') })
+			.click()
 		await expect(page).toHaveURL(/\/profile$/)
 	})
 
@@ -626,7 +644,9 @@ for (const width of REGRESSION_WIDTHS) {
 			await prepare(page, width, 'light')
 			await load(page, '/dashboard')
 
-			const toggle = page.getByRole('button', { name: 'Toggle Menu' })
+			const toggle = page.getByRole('button', {
+				name: msg('shell.header.toggleMenu'),
+			})
 			await expect(toggle).toBeVisible()
 			const t = await box(toggle, 'menu button')
 			expect.soft(t.width, 'menu button width').toBeGreaterThanOrEqual(44)
@@ -641,7 +661,7 @@ for (const width of REGRESSION_WIDTHS) {
 			await expect(page.locator('.bg-scrim')).toBeVisible()
 			await expectWithinViewport(
 				page,
-				sidebarLink(page, 'Settings'),
+				sidebarLink(page, msg('shell.nav.settings')),
 				'Settings',
 			)
 
@@ -654,7 +674,9 @@ for (const width of REGRESSION_WIDTHS) {
 			await prepare(page, width, 'light')
 			await load(page, '/dashboard')
 			await openDrawer(page)
-			const close = page.getByRole('button', { name: 'Close navigation' })
+			const close = page.getByRole('button', {
+				name: msg('shell.nav.closeNavigation'),
+			})
 			await expect(
 				close,
 				'the open drawer has no visible "Close navigation" control (TD-36)',
@@ -668,7 +690,7 @@ for (const width of REGRESSION_WIDTHS) {
 			await load(page, '/dashboard')
 
 			await expect(
-				page.getByRole('button', { name: 'Toggle Menu' }),
+				page.getByRole('button', { name: msg('shell.header.toggleMenu') }),
 			).toHaveCount(0)
 			await expectWithinViewport(page, sidebarPanel(page), 'sidebar')
 
@@ -685,9 +707,13 @@ for (const width of REGRESSION_WIDTHS) {
 			}
 
 			await expectColumns(256)
-			await page.getByRole('button', { name: 'Collapse sidebar' }).click()
+			await page
+				.getByRole('button', { name: msg('shell.header.collapseSidebar') })
+				.click()
 			await expectColumns(80)
-			await page.getByRole('button', { name: 'Expand sidebar' }).click()
+			await page
+				.getByRole('button', { name: msg('shell.header.expandSidebar') })
+				.click()
 			await expectColumns(256)
 		})
 	}
@@ -696,7 +722,9 @@ for (const width of REGRESSION_WIDTHS) {
 		await prepare(page, width, 'light')
 		await load(page, '/routines')
 
-		const actions = page.getByRole('button', { name: 'Routine actions' })
+		const actions = page.getByRole('button', {
+			name: msg('routines.card.routineActions'),
+		})
 		const routines = await actions.count()
 		expect(routines, 'needs at least one routine').toBeGreaterThan(0)
 
@@ -704,7 +732,9 @@ for (const width of REGRESSION_WIDTHS) {
 		// Nothing here ever presses Delete.
 		for (const dismiss of ['Escape', 'Cancel'] as const) {
 			await actions.first().click()
-			await page.getByRole('menuitem', { name: 'Delete' }).click()
+			await page
+				.getByRole('menuitem', { name: msg('routines.card.delete') })
+				.click()
 			const dialog = page.getByRole('alertdialog')
 			await expect(dialog).toBeVisible()
 			await expect(
@@ -718,7 +748,10 @@ for (const width of REGRESSION_WIDTHS) {
 				.toBe(true)
 
 			if (dismiss === 'Escape') await page.keyboard.press('Escape')
-			else await dialog.getByRole('button', { name: 'Cancel' }).click()
+			else
+				await dialog
+					.getByRole('button', { name: msg('routines.listing.cancel') })
+					.click()
 			await expect(dialog, `did not close on ${dismiss}`).toHaveCount(0)
 		}
 
@@ -731,7 +764,9 @@ for (const width of REGRESSION_WIDTHS) {
 		await load(page, `/workouts/sessions/${ids.history}`)
 
 		const trigger = page
-			.getByRole('button', { name: /^Calculate plates for / })
+			.getByRole('button', {
+				name: msgPrefix('workout.plateCalculator.triggerAria'),
+			})
 			.first()
 		await expect(
 			trigger,
@@ -762,21 +797,25 @@ for (const width of REGRESSION_WIDTHS) {
 
 		await checkMenu(
 			page,
-			page.getByRole('button', { name: 'Account menu' }),
+			page.getByRole('button', { name: msg('shell.header.accountMenu') }),
 			'account menu',
 		)
 		await checkMenu(
 			page,
-			page.getByRole('button', { name: 'Routine actions' }).first(),
+			page
+				.getByRole('button', { name: msg('routines.card.routineActions') })
+				.first(),
 			'routine actions menu',
 		)
 
 		// The header search suggestions are a custom panel, not a Radix menu.
-		const search = page.getByPlaceholder('Search by name or @username...')
+		const search = page.getByPlaceholder(msg('shell.search.placeholder'))
 		await search.fill('ez')
-		const panel = page
-			.locator('div.top-full')
-			.filter({ hasText: /Top Results|No users found/ })
+		const panel = page.locator('div.top-full').filter({
+			hasText: new RegExp(
+				`${msg('shell.search.topResults')}|${msgPrefix('shell.search.noUsers').source.slice(1)}`,
+			),
+		})
 		await expect(panel, 'search suggestions did not open').toBeVisible({
 			timeout: 10_000,
 		})
@@ -805,7 +844,7 @@ for (const width of REGRESSION_WIDTHS) {
 		await load(page, '/routines')
 
 		const row = page
-			.getByRole('button', { name: 'Routine actions' })
+			.getByRole('button', { name: msg('routines.card.routineActions') })
 			.first()
 			.locator('xpath=ancestor::div[contains(@class, "rule-row")][1]')
 		await expectHoverState(page, row, 'background-color', 'routine row')
@@ -813,7 +852,7 @@ for (const width of REGRESSION_WIDTHS) {
 		if (mobile) await openDrawer(page)
 		await expectHoverState(
 			page,
-			sidebarLink(page, 'History'),
+			sidebarLink(page, msg('shell.nav.history')),
 			'background-color',
 			'sidebar item',
 		)
@@ -824,7 +863,10 @@ for (const width of REGRESSION_WIDTHS) {
 			await prepare(page, width, theme)
 			await load(page, '/routines')
 
-			const toTrigger = await tabTo(page, '[aria-label="Account menu"]')
+			const toTrigger = await tabTo(
+				page,
+				`[aria-label="${msg('shell.header.accountMenu')}"]`,
+			)
 			expect(toTrigger.reached, 'Tab never reached the account menu').toBe(true)
 			expect
 				.soft(
@@ -833,7 +875,9 @@ for (const width of REGRESSION_WIDTHS) {
 				)
 				.toEqual([])
 
-			const trigger = page.getByRole('button', { name: 'Account menu' })
+			const trigger = page.getByRole('button', {
+				name: msg('shell.header.accountMenu'),
+			})
 			const ring = await expectFocusIndicator(trigger, 'account menu trigger')
 			await trigger.evaluate(element => (element as HTMLElement).blur())
 			expect
@@ -863,7 +907,7 @@ for (const width of REGRESSION_WIDTHS) {
 			// A text field: the header search sits before the account menu.
 			const toField = await tabTo(
 				page,
-				'input[placeholder^="Search by name"]',
+				`input[placeholder="${msg('shell.search.placeholder')}"]`,
 				{
 					backwards: true,
 					max: 6,
@@ -873,7 +917,7 @@ for (const width of REGRESSION_WIDTHS) {
 				true,
 			)
 			await expectFocusIndicator(
-				page.getByPlaceholder('Search by name or @username...'),
+				page.getByPlaceholder(msg('shell.search.placeholder')),
 				'search field',
 			)
 		})
@@ -899,7 +943,7 @@ test('an old Settings link opens its tab', async ({ page }) => {
 	await load(page, '/settings#training-partners')
 	await expect(page).toHaveURL(/\/settings\/privacy#training-partners$/)
 	await expect(
-		page.getByRole('heading', { name: 'Training Partners' }),
+		page.getByRole('heading', { name: msg('settings.trainingPartners.title') }),
 	).toBeInViewport()
 })
 
@@ -935,24 +979,34 @@ test('training partners request and cancel', async ({ page }) => {
 			`seeded member (${PARTNER_CANDIDATES.join(', ')}), so there is nobody ` +
 			'to send one to. Remove one in Settings, or re-seed.',
 	)
-	const pending = `@${member} · request sent`
+	const pending = msg('settings.trainingPartners.pendingLine.sent', {
+		username: member ?? '',
+	})
 
 	await load(page, `/profile/${member}`)
 	// Enabled, not just visible: the button reads "Add" while the list loads.
-	const add = page.getByRole('button', { name: 'Add Training Partner' })
+	const add = page.getByRole('button', {
+		name: msg('settings.trainingPartners.action.add'),
+	})
 	await expect(add).toBeEnabled()
 	let requestCreated = false
 	try {
 		await add.click()
 		requestCreated = true
-		await expect(page.getByText('Request sent')).toBeVisible()
 		await expect(
-			page.getByRole('button', { name: 'Request Pending' }),
+			page.getByText(msg('social.partnerAction.requestSent')),
+		).toBeVisible()
+		await expect(
+			page.getByRole('button', {
+				name: msg('settings.trainingPartners.action.pending'),
+			}),
 		).toBeDisabled()
 
 		await load(page, '/settings/privacy#training-partners')
 		await expect(
-			page.getByRole('heading', { name: 'Training Partners' }),
+			page.getByRole('heading', {
+				name: msg('settings.trainingPartners.title'),
+			}),
 		).toBeVisible()
 		await expect(page.getByText(pending)).toBeVisible()
 	} finally {
@@ -964,7 +1018,9 @@ test('training partners request and cancel', async ({ page }) => {
 			const cancel = page
 				.locator('.rule-row')
 				.filter({ hasText: pending })
-				.getByRole('button', { name: 'Cancel Request' })
+				.getByRole('button', {
+					name: msg('settings.trainingPartners.cancelRequest'),
+				})
 			if (await cancel.isVisible()) {
 				await cancel.click()
 				await expect(cancel).toHaveCount(0)
@@ -984,7 +1040,9 @@ test('profile card downloads a complete PNG', async ({ page }) => {
 	await load(page, '/profile')
 
 	const downloadPromise = page.waitForEvent('download')
-	await page.getByRole('button', { name: 'Share Profile Card' }).click()
+	await page
+		.getByRole('button', { name: msg('social.profile.shareCard') })
+		.click()
 	const download = await downloadPromise
 	expect(download.suggestedFilename()).toMatch(
 		/^sunnsteel-[a-z0-9_-]+-profile-card\.png$/,
@@ -999,7 +1057,7 @@ test('profile card downloads a complete PNG', async ({ page }) => {
 	)
 	expect(png.readUInt32BE(16)).toBe(1200)
 	expect(png.readUInt32BE(20)).toBe(1500)
-	await expect(page.getByText('Profile card saved')).toBeVisible()
+	await expect(page.getByText(msg('social.profile.cardSaved'))).toBeVisible()
 })
 
 test('profile card uses native file sharing when available', async ({
@@ -1024,8 +1082,10 @@ test('profile card uses native file sharing when available', async ({
 	await prepare(page, 390, 'light')
 	await load(page, '/profile')
 
-	await page.getByRole('button', { name: 'Share Profile Card' }).click()
-	await expect(page.getByText('Profile card shared')).toBeVisible()
+	await page
+		.getByRole('button', { name: msg('social.profile.shareCard') })
+		.click()
+	await expect(page.getByText(msg('social.profile.cardShared'))).toBeVisible()
 	await expect
 		.poll(() =>
 			page.evaluate(

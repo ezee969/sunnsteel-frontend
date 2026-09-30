@@ -55,14 +55,16 @@ export const SessionActionCard = ({
 
 			{/* Finish is the region's one filled control, in ink (§4.3 rule 1);
 			    Discard destroys data, so it is the destructive outline (rule 5).
-			    Sized to their labels rather than stretched across the column. */}
+			    Sized to their labels rather than stretched across the column.
+			    Their padding narrows below `sm`, where the pair ran past a 320
+			    screen in Spanish (1px as they are, 9px in gym mode). */}
 			<div className="flex gap-2">
 				<Button
 					type="button"
 					variant="outline"
 					onClick={onDiscardAttempt}
 					disabled={isFinishing}
-					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10"
+					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
 				>
 					<Trash2 className="mr-2 h-4 w-4" aria-hidden />
 					{t('discard')}
@@ -71,7 +73,7 @@ export const SessionActionCard = ({
 					type="button"
 					onClick={onFinishAttempt}
 					disabled={isFinishing}
-					className="type-button h-11 flex-1 rounded-sm bg-primary text-primary-foreground shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover sm:flex-none md:h-10"
+					className="type-button h-11 flex-1 rounded-sm bg-primary text-primary-foreground shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover sm:flex-none md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
 				>
 					{isFinishing ? (
 						<>

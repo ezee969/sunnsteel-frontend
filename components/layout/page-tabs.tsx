@@ -84,6 +84,8 @@ export function PageTabs({
 					))}
 				</NativeSelect>
 			</div>
+			{/* Between md and lg the sidebar leaves 512-768px, where Settings'
+			    five Spanish tabs ran 8px wide: the tabs narrow there. */}
 			<ul className="hidden gap-1 sm:flex">
 				{tabs.map(tab => {
 					const isCurrent = tab.href === current
@@ -94,7 +96,7 @@ export function PageTabs({
 								scroll={false}
 								aria-current={isCurrent ? 'page' : undefined}
 								className={cn(
-									'type-button -mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-3 outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:min-h-10',
+									'type-button -mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-3 outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:min-h-10 md:max-lg:px-2.5',
 									isCurrent
 										? 'border-foreground text-foreground'
 										: 'border-transparent text-ink-2 hover:text-foreground',
