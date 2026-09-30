@@ -2730,5 +2730,5 @@ it again without addressing the original decision.
 - **2026-09-28 (revision 182):** Shipped `I18N-01` and released its claim. Every page moved under `app/[locale]/` so each language builds statically.
 - **2026-09-28 (revision 183):** Claimed `I18N-03` to `I18N-05` as one pass over the whole frontend, split by area rather than by page, since most components serve both signed-in and public pages. The shared rules and glossary are in [docs/reference/i18n.md](../reference/i18n.md).
 - **2026-09-28 (revision 184):** Claimed `I18N-02`, the account's language.
-- **2026-09-30 (revision 186):** `I18N-06`: the export's `omitted` list in the account's language. `I18N-07`: Spanish search in every exercise picker.
 - **2026-09-30 (revision 185):** Shipped `I18N-02` to `I18N-05` and released their claims; recorded what `I18N-06` and `I18N-07` delivered (push text; frontend catalog labels) and what they still owe.
+- **2026-09-30 (revision 186):** `I18N-06`: the export's `omitted` list in the account's language. `I18N-07`: Spanish search in every exercise picker.
