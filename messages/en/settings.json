@@ -443,5 +443,17 @@
 		"pounds": "Pounds (lb)",
 		"height": "Height (cm)",
 		"save": "Save Changes"
+	},
+	"tabs": {
+		"profile": "Profile",
+		"training": "Training",
+		"privacy": "Privacy",
+		"notifications": "Notifications",
+		"account": "Account"
+	},
+	"page": {
+		"title": "Settings",
+		"subtitle": "Manage your profile, training setup, privacy, notifications and account.",
+		"sectionsLabel": "Settings sections"
 	}
 }

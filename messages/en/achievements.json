@@ -76,5 +76,9 @@
 		"viewSession": "View session",
 		"earnedCount": "{count} earned",
 		"highest": "Highest: {title}"
+	},
+	"page": {
+		"title": "Achievements",
+		"subtitle": "A record of training milestones verified from your completed work."
 	}
 }

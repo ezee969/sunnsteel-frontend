@@ -443,5 +443,17 @@
 		"pounds": "Libras (lb)",
 		"height": "Estatura (cm)",
 		"save": "Guardar cambios"
+	},
+	"tabs": {
+		"profile": "Perfil",
+		"training": "Entrenamiento",
+		"privacy": "Privacidad",
+		"notifications": "Notificaciones",
+		"account": "Cuenta"
+	},
+	"page": {
+		"title": "Ajustes",
+		"subtitle": "Administra tu perfil, tu configuración de entrenamiento, la privacidad, las notificaciones y la cuenta.",
+		"sectionsLabel": "Secciones de Ajustes"
 	}
 }

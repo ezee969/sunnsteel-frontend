@@ -72,7 +72,7 @@ export function TrainingBlockComparisonDialog({
 				) : comparison.isError || !data ? (
 					<div role="alert" className="border border-rule bg-surface p-5">
 						<p className="type-panel text-foreground">
-							The comparison is unavailable
+							{t('comparisonUnavailable')}
 						</p>
 						<p className="type-body-sm mt-1 text-ink-3">
 							{comparison.error?.message ?? t('comparisonFailed')}
@@ -142,7 +142,7 @@ export function TrainingBlockComparisonDialog({
 								id="block-comparison-lifts"
 								className="type-panel text-foreground"
 							>
-								Lifts trained in both
+								{t('liftsInBoth')}
 							</h3>
 							{data.lifts.length === 0 ? (
 								<p className="type-body-sm text-ink-3">

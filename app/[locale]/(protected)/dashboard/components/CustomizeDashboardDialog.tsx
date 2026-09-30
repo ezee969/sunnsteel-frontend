@@ -48,6 +48,7 @@ export function CustomizeDashboardDialog({
 	onOpenChange: (open: boolean) => void
 }) {
 	const t = useTranslations('planning.dashboardLayout')
+	const tA = useTranslations('planning.dashboardActions')
 	const saved = normalizeDashboardLayout(layout)
 	const [draft, setDraft] = useState(saved)
 	const [announcement, setAnnouncement] = useState('')
@@ -95,12 +96,8 @@ export function CustomizeDashboardDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle>Customize dashboard</DialogTitle>
-					<DialogDescription>
-						Choose the order of your dashboard and which sections it shows.
-						Today&apos;s Workouts always comes first. Your choice is saved to
-						your account.
-					</DialogDescription>
+					<DialogTitle>{tA('customizeTitle')}</DialogTitle>
+					<DialogDescription>{tA('customizeDescription')}</DialogDescription>
 				</DialogHeader>
 
 				<div>
@@ -186,10 +183,10 @@ export function CustomizeDashboardDialog({
 						disabled={sameDashboardLayout(draft, DEFAULT_DASHBOARD_LAYOUT)}
 						onClick={() => {
 							setDraft(DEFAULT_DASHBOARD_LAYOUT.map(entry => ({ ...entry })))
-							setAnnouncement('Default order restored, every section shown.')
+							setAnnouncement(tA('resetAnnouncement'))
 						}}
 					>
-						Reset to default
+						{tA('reset')}
 					</Button>
 				</div>
 

@@ -48,6 +48,7 @@ export default function TodaysWorkouts() {
 	const router = useRouter()
 	const tDate = useTranslations('routines.date')
 	const tPrimary = useTranslations('planning.dashboardPrimary')
+	const tA = useTranslations('planning.dashboardActions')
 	const tDeloads = useTranslations('routines.deloads')
 	const { preloadOnHover } = useComponentPreloading()
 	const { mutateAsync: startSession, isPending } = useStartSession()
@@ -84,7 +85,7 @@ export default function TodaysWorkouts() {
 		return (
 			<Card>
 				<CardContent className="flex min-h-32 items-center justify-center">
-					<ClassicalLoader size="md" label="Loading today’s workouts" />
+					<ClassicalLoader size="md" label={tA('todayLoading')} />
 				</CardContent>
 			</Card>
 		)
@@ -92,7 +93,9 @@ export default function TodaysWorkouts() {
 
 	if (error) {
 		return (
-			<p className="type-body-sm text-destructive">Error: {error.message}</p>
+			<p className="type-body-sm text-destructive">
+				{tA('todayError', { message: error.message })}
+			</p>
 		)
 	}
 
@@ -136,19 +139,19 @@ export default function TodaysWorkouts() {
 							{...preloadOnHover('activeWorkoutSession')}
 						>
 							<Dumbbell aria-hidden />
-							Resume workout
+							{tA('resume')}
 						</Button>
 					) : action.kind === 'REVIEW' ? (
 						<Button asChild>
 							<Link href={`/workouts/history/${action.sessionId}`}>
 								<History aria-hidden />
-								Review session
+								{tA('reviewSession')}
 							</Link>
 						</Button>
 					) : action.kind === 'PICK_DAY' ? (
 						<Button type="button" onClick={() => setPickingDay(true)}>
 							<Dumbbell aria-hidden />
-							Train another day
+							{tA('trainAnotherDay')}
 						</Button>
 					) : action.kind === 'BROWSE' ? (
 						<Button asChild>
@@ -161,7 +164,7 @@ export default function TodaysWorkouts() {
 										'text-primary-foreground',
 									)}
 								/>
-								Browse Routines
+								{tA('browseRoutines')}
 							</Link>
 						</Button>
 					) : null}
@@ -218,7 +221,7 @@ export default function TodaysWorkouts() {
 											) : null}
 											{isActiveForThis ? (
 												<p className="type-body-sm mt-1 text-ink-3">
-													In progress
+													{tA('inProgress')}
 												</p>
 											) : null}
 										</div>
@@ -233,18 +236,20 @@ export default function TodaysWorkouts() {
 													type="button"
 													className="w-full sm:w-auto"
 													variant={isPrimary ? 'default' : 'outline'}
-													aria-label={`Start ${routine.name}`}
+													aria-label={tA('startLabel', { name: routine.name })}
 													onClick={() => handleStart(routine.id, day.id)}
 													disabled={isPending || !canStartToday}
 													title={
 														!canStartToday
-															? `This workout is not scheduled for ${weekdayName(todayDow, 'long', tDate)}`
+															? tA('notScheduled', {
+																	day: weekdayName(todayDow, 'long', tDate),
+																})
 															: undefined
 													}
 													{...preloadOnHover('activeWorkoutSession')}
 												>
 													<Dumbbell aria-hidden />
-													Start
+													{tA('start')}
 												</Button>
 											)}
 											<Button
@@ -254,9 +259,11 @@ export default function TodaysWorkouts() {
 											>
 												<Link
 													href={`/routines/${routine.id}`}
-													aria-label={`${routine.name} details`}
+													aria-label={tA('detailsLabel', {
+														name: routine.name,
+													})}
 												>
-													Details
+													{tA('details')}
 													<ChevronRight aria-hidden />
 												</Link>
 											</Button>
@@ -276,23 +283,23 @@ export default function TodaysWorkouts() {
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Active workout in progress</AlertDialogTitle>
+						<AlertDialogTitle>{tA('conflictTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							You already have an active session
-							{active?.routine?.name ? ` for "${active.routine.name}"` : ''}.
-							You can resume it now. Starting another workout is not supported
-							while a session is in progress.
+							{tA('conflictBody', {
+								named: active?.routine?.name ? 'yes' : 'no',
+								routine: active?.routine?.name ?? '',
+							})}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Close</AlertDialogCancel>
+						<AlertDialogCancel>{tA('close')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={() => {
 								setActiveConflictOpen(false)
 								if (active?.id) router.push(`/workouts/sessions/${active.id}`)
 							}}
 						>
-							Go to Active Session
+							{tA('goToActive')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

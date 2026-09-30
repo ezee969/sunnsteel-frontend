@@ -44,8 +44,8 @@ import {
 	getGymFilterUnavailableState,
 	GYM_EQUIPMENT_FILTER,
 	hasActiveCatalogFilters,
-	MECHANIC_LABELS,
-	MOVEMENT_PATTERN_LABELS,
+	mechanicLabel,
+	movementPatternLabel,
 } from '@/lib/utils/exercise-catalog'
 import {
 	defaultTrainingLocation,
@@ -81,6 +81,7 @@ function RowsSkeleton({ label }: { label: string }) {
 }
 
 export function ExerciseCatalogSkeleton() {
+	const t = useTranslations('catalog.exercisesUi')
 	return (
 		<div className="space-y-6">
 			<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -88,7 +89,7 @@ export function ExerciseCatalogSkeleton() {
 					<Skeleton key={index} className="h-16" />
 				))}
 			</div>
-			<RowsSkeleton label="Loading exercises" />
+			<RowsSkeleton label={t('loadingExercises')} />
 		</div>
 	)
 }
@@ -102,6 +103,7 @@ function RetryAlert({
 	description: string
 	onRetry: () => void
 }) {
+	const t = useTranslations('catalog.exercisesUi')
 	return (
 		<div role="alert" className="mt-3 border border-rule bg-surface p-6">
 			<p className="type-panel text-foreground">{title}</p>
@@ -113,7 +115,7 @@ function RetryAlert({
 				onClick={onRetry}
 			>
 				<RefreshCw className="size-4" aria-hidden />
-				Retry
+				{t('retry')}
 			</Button>
 		</div>
 	)
@@ -169,6 +171,7 @@ function ExerciseRow({
 	historyKnown: boolean
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('catalog.exercisesUi')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
 	const primary = getFriendlyMuscleNames(
@@ -181,9 +184,9 @@ function ExerciseRow({
 	).join(', ')
 	const movement = [
 		exercise.movementPattern
-			? MOVEMENT_PATTERN_LABELS[exercise.movementPattern]
+			? movementPatternLabel(t, exercise.movementPattern)
 			: null,
-		exercise.mechanic ? MECHANIC_LABELS[exercise.mechanic] : null,
+		exercise.mechanic ? mechanicLabel(t, exercise.mechanic) : null,
 	]
 		.filter(Boolean)
 		.join(' · ')
@@ -210,15 +213,18 @@ function ExerciseRow({
 					</h3>
 					{isCustomExercise(exercise) ? (
 						<p className="type-body-sm text-ink-3">
-							Yours
-							{isArchivedExercise(exercise) ? ' · Archived' : null}
+							{t('yoursRow', {
+								archived: isArchivedExercise(exercise) ? 'yes' : 'no',
+							})}
 						</p>
 					) : null}
 					<p className="type-body-sm mt-0.5 text-ink-2">
-						<span className="sr-only">Muscles: </span>
-						{primary || 'Not classified'}
+						<span className="sr-only">{t('musclesSr')}</span>
+						{primary || t('notClassified')}
 						{secondary ? (
-							<span className="text-ink-3"> · also {secondary}</span>
+							<span className="text-ink-3">
+								{t('alsoMuscles', { muscles: secondary })}
+							</span>
 						) : null}
 					</p>
 				</div>
@@ -227,15 +233,15 @@ function ExerciseRow({
 			    own ledger column, and the middots drop out. */}
 			<p className="type-body-sm mt-1 text-ink-3 lg:contents">
 				<span className="lg:text-ink-2">
-					<span className="sr-only">Movement: </span>
-					{movement || 'Not classified'}
+					<span className="sr-only">{t('movementSr')}</span>
+					{movement || t('notClassified')}
 				</span>
 				<span aria-hidden className="lg:hidden">
 					{' · '}
 				</span>
 				<span className="lg:text-ink-2">
-					<span className="sr-only">Equipment: </span>
-					{equipment || 'Not listed'}
+					<span className="sr-only">{t('equipmentSr')}</span>
+					{equipment || t('notListed')}
 				</span>
 				{lastTrainedAt ? (
 					<>
@@ -243,7 +249,7 @@ function ExerciseRow({
 							{' · '}
 						</span>
 						<span className="lg:text-right">
-							<span className="lg:sr-only">Last trained </span>
+							<span className="lg:sr-only">{t('lastTrainedSr')}</span>
 							<time
 								dateTime={lastTrainedAt}
 								className="type-data whitespace-nowrap text-ink-2"
@@ -257,7 +263,7 @@ function ExerciseRow({
 						{historyKnown ? (
 							<>
 								<span aria-hidden>—</span>
-								<span className="sr-only">Not trained yet</span>
+								<span className="sr-only">{t('notTrainedYet')}</span>
 							</>
 						) : null}
 					</span>
@@ -270,6 +276,7 @@ function ExerciseRow({
 export function ExerciseCatalog() {
 	const { filters, setQuery, update, clear } = useCatalogFilters()
 	const router = useRouter()
+	const t = useTranslations('catalog.exercisesUi')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
 	const [creating, setCreating] = useState(false)
@@ -303,8 +310,8 @@ export function ExerciseCatalog() {
 	const gym = defaultTrainingLocation(locations.data)
 	const listedEquipment = useMemo(() => listedEquipmentAt(gym), [gym])
 	const options = useMemo(
-		() => catalogFilterOptions(exercises, filters, tMuscles, tEquipment),
-		[exercises, filters, tMuscles, tEquipment],
+		() => catalogFilterOptions(exercises, filters, tMuscles, tEquipment, t),
+		[exercises, filters, tMuscles, tEquipment, t],
 	)
 	const results = useMemo(
 		() =>
@@ -333,52 +340,55 @@ export function ExerciseCatalog() {
 	let body: ReactNode
 	let showCount = false
 	if (catalog.isPending) {
-		body = <RowsSkeleton label="Loading exercises" />
+		body = <RowsSkeleton label={t('loadingExercises')} />
 	} else if (catalog.isError) {
 		body = (
 			<RetryAlert
-				title="The catalog is unavailable"
-				description="We could not load the exercise catalog. Try again."
+				title={t('catalogUnavailable')}
+				description={t('catalogUnavailableBody')}
 				onRetry={() => void catalog.refetch()}
 			/>
 		)
 	} else if (filters.trained && trained.isPending) {
-		body = <RowsSkeleton label="Loading your training history" />
+		body = <RowsSkeleton label={t('loadingHistory')} />
 	} else if (filters.trained && trained.isError) {
 		body = (
 			<RetryAlert
-				title="Your training history is unavailable"
-				description="We could not check which exercises you have trained. Try again, or turn off Trained by me."
+				title={t('historyUnavailable')}
+				description={t('historyUnavailableBody')}
 				onRetry={() => void trained.refetch()}
 			/>
 		)
 	} else if (filters.starred && stars.isPending) {
-		body = <RowsSkeleton label="Loading your starred exercises" />
+		body = <RowsSkeleton label={t('loadingStars')} />
 	} else if (filters.starred && stars.isError) {
 		body = (
 			<RetryAlert
-				title="Your stars are unavailable"
-				description="We could not load your starred exercises. Try again, or turn off Starred."
+				title={t('starsUnavailable')}
+				description={t('starsUnavailableBody')}
 				onRetry={() => void stars.refetch()}
 			/>
 		)
 	} else if (usesGym && locations.isPending) {
-		body = <RowsSkeleton label="Loading your training locations" />
+		body = <RowsSkeleton label={t('loadingLocations')} />
 	} else if (usesGym && locations.isError) {
 		body = (
 			<RetryAlert
-				title="Your training locations are unavailable"
-				description="We could not read the equipment listed at your gym. Try again."
+				title={t('locationsUnavailable')}
+				description={t('locationsUnavailableBody')}
 				onRetry={() => void locations.refetch()}
 			/>
 		)
 	} else if (usesGym && !listedEquipment) {
-		body = <EmptyModule {...getGymFilterUnavailableState(gym?.name ?? null)} />
+		body = (
+			<EmptyModule {...getGymFilterUnavailableState(t, gym?.name ?? null)} />
+		)
 	} else if (results.length === 0) {
 		showCount = exercises.length > 0
 		body = (
 			<EmptyModule
 				{...getCatalogEmptyState({
+					t,
 					catalogSize: exercises.length,
 					filters,
 					hasTrainedExercises: trainedIds ? trainedIds.size > 0 : null,
@@ -396,10 +406,10 @@ export function ExerciseCatalog() {
 					aria-hidden
 					className={`type-label hidden py-2 text-ink-3 lg:grid ${ROW_GRID}`}
 				>
-					<span>Exercise</span>
-					<span>Movement</span>
-					<span>Equipment</span>
-					<span className="text-right">Last trained</span>
+					<span>{t('colExercise')}</span>
+					<span>{t('colMovement')}</span>
+					<span>{t('colEquipment')}</span>
+					<span className="text-right">{t('colLastTrained')}</span>
 				</div>
 				<ul className="border-t border-rule-faint lg:border-t-0">
 					{results.map(exercise => (
@@ -425,11 +435,11 @@ export function ExerciseCatalog() {
 			    shows, as before. */}
 			<div
 				role="search"
-				aria-label="Search exercises"
+				aria-label={t('searchRegion')}
 				className="sticky -top-3 z-10 -mx-3 -mb-3 flex items-end gap-2 bg-background px-3 py-2 sm:-top-6 sm:-mx-6 sm:-mb-5 sm:px-6 lg:static lg:m-0 lg:p-0"
 			>
 				<div className="flex min-w-0 flex-1 flex-col gap-1">
-					<Label htmlFor="exercise-search">Search</Label>
+					<Label htmlFor="exercise-search">{t('search')}</Label>
 					<div className="relative">
 						<Search
 							className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3"
@@ -439,7 +449,7 @@ export function ExerciseCatalog() {
 							id="exercise-search"
 							type="search"
 							autoComplete="off"
-							placeholder="Exercise name"
+							placeholder={t('searchPlaceholder')}
 							className="pl-9"
 							value={filters.q}
 							onChange={event => setQuery(event.target.value)}
@@ -455,10 +465,12 @@ export function ExerciseCatalog() {
 					className="h-11 shrink-0 lg:hidden"
 				>
 					<SlidersHorizontal className="size-4" aria-hidden />
-					{filterCount > 0 ? `Filters (${filterCount})` : 'Filters'}
+					{filterCount > 0
+						? t('filtersCount', { count: filterCount })
+						: t('filters')}
 				</Button>
 			</div>
-			<section aria-label="Filter exercises" className="space-y-3">
+			<section aria-label={t('filterRegion')} className="space-y-3">
 				<div
 					id="exercise-filters"
 					className={`space-y-3 ${filtersOpen ? 'block' : 'hidden'} lg:block`}
@@ -466,8 +478,8 @@ export function ExerciseCatalog() {
 					<div className="grid gap-3 sm:grid-cols-3">
 						<FilterSelect<MuscleGroup>
 							id="exercise-muscle"
-							label="Muscle"
-							anyLabel="Any muscle"
+							label={t('muscle')}
+							anyLabel={t('anyMuscle')}
 							value={filters.muscle}
 							options={options.muscles}
 							disabled={!catalog.data}
@@ -475,8 +487,8 @@ export function ExerciseCatalog() {
 						/>
 						<FilterSelect<CatalogEquipmentFilter>
 							id="exercise-equipment"
-							label="Equipment"
-							anyLabel="Any equipment"
+							label={t('colEquipment')}
+							anyLabel={t('anyEquipment')}
 							value={filters.equipment}
 							options={options.equipment}
 							disabled={!catalog.data}
@@ -484,14 +496,14 @@ export function ExerciseCatalog() {
 						>
 							{listedEquipment || usesGym ? (
 								<option value={GYM_EQUIPMENT_FILTER}>
-									{gym ? `Listed at ${gym.name}` : 'Listed at your gym'}
+									{gym ? t('listedAt', { name: gym.name }) : t('listedAtGym')}
 								</option>
 							) : null}
 						</FilterSelect>
 						<FilterSelect<MovementPattern>
 							id="exercise-pattern"
-							label="Movement"
-							anyLabel="Any movement"
+							label={t('colMovement')}
+							anyLabel={t('anyMovement')}
 							value={filters.pattern}
 							options={options.patterns}
 							disabled={!catalog.data}
@@ -511,7 +523,7 @@ export function ExerciseCatalog() {
 							) : (
 								<History className="size-4" aria-hidden />
 							)}
-							Trained by me
+							{t('trainedByMe')}
 						</Button>
 						<Button
 							type="button"
@@ -525,7 +537,7 @@ export function ExerciseCatalog() {
 							) : (
 								<Star className="size-4" aria-hidden />
 							)}
-							Starred
+							{t('starred')}
 						</Button>
 						<Button
 							type="button"
@@ -539,24 +551,24 @@ export function ExerciseCatalog() {
 							) : (
 								<UserRound className="size-4" aria-hidden />
 							)}
-							Yours
+							{t('yours')}
 						</Button>
 						{trained.isError && !filters.trained ? (
 							<p className="type-body-sm text-ink-3">
-								Training history is unavailable.{' '}
+								{t('historyInline')}{' '}
 								<button
 									type="button"
 									className="text-primary underline-offset-4 hover:underline"
 									onClick={() => void trained.refetch()}
 								>
-									Retry
+									{t('retry')}
 								</button>
 							</p>
 						) : null}
 						{hasActiveFilters ? (
 							<Button type="button" size="sm" variant="ghost" onClick={clear}>
 								<X className="size-4" aria-hidden />
-								Clear filters
+								{t('clearFilters')}
 							</Button>
 						) : null}
 					</div>
@@ -569,11 +581,13 @@ export function ExerciseCatalog() {
 						id="exercise-catalog-heading"
 						className="type-section text-foreground"
 					>
-						Catalog
+						{t('catalogHeading')}
 					</h2>
 					<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
 						<p role="status" className="type-body-sm text-ink-3">
-							{showCount ? formatCatalogCount(results.length, viewTotal) : null}
+							{showCount
+								? formatCatalogCount(t, results.length, viewTotal)
+								: null}
 						</p>
 						<Button
 							type="button"
@@ -582,7 +596,7 @@ export function ExerciseCatalog() {
 							onClick={() => setCreating(true)}
 						>
 							<Plus className="size-4" aria-hidden />
-							New exercise
+							{t('newExercise')}
 						</Button>
 					</div>
 				</div>

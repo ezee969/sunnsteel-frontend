@@ -16,7 +16,7 @@ export default function RoutinesError({ error, reset }: RoutinesErrorProps) {
 		<RouteError title={t('loadFailed')} message={error.message}>
 			<Button onClick={() => reset()}>{t('retry')}</Button>
 			<Button variant="outline" onClick={() => window.location.reload()}>
-				Hard reload
+				{t('hardReload')}
 			</Button>
 		</RouteError>
 	)

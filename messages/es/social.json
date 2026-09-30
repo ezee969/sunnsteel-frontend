@@ -410,5 +410,20 @@
 		"currentRank": "Rango renacentista actual",
 		"comebacks": "Regresos",
 		"truncated": "Muestra los regresos detectados en las 500 sesiones completadas más recientes."
+	},
+	"search": {
+		"title": "Buscar miembros",
+		"prompt": "Escribe un nombre o @usuario en la barra de búsqueda superior para encontrar perfiles.",
+		"resultsTitle": "Resultados de búsqueda",
+		"showing": "Mostrando resultados para <hl>\"{query}\"</hl>",
+		"noneTitle": "No se encontraron miembros",
+		"noneBody": "No encontramos perfiles que coincidan con \"{query}\". Prueba con otra ortografía, otro nombre u otro @usuario."
+	},
+	"activityPage": {
+		"title": "Actividad",
+		"subtitle": "Lo que hicieron los miembros que sigues y quién ve lo que hiciste. Cada entrada proviene de entrenamientos verificados; nada se publica a mano.",
+		"viewsLabel": "Vistas de actividad",
+		"following": "Siguiendo",
+		"yours": "Tuyas"
 	}
 }

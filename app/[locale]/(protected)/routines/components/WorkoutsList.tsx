@@ -125,8 +125,7 @@ export default function WorkoutsList({
 					<AlertDialogHeader>
 						<AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							This action cannot be undone. This will permanently delete your
-							routine and remove all associated data.
+							{t('deleteDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -139,7 +138,7 @@ export default function WorkoutsList({
 							{isDeleting ? (
 								<>
 									<Loader2 className="h-4 w-4 animate-spin mr-2" />
-									Deleting...
+									{t('deleting')}
 								</>
 							) : (
 								t('delete')

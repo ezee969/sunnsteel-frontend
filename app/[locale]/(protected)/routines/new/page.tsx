@@ -250,9 +250,7 @@ function CreateRoutineWizard() {
 				<h2 className="type-section text-foreground">
 					{t('createNewRoutine')}
 				</h2>
-				<p className="type-body-sm mt-1 text-ink-3">
-					Build your custom workout routine step by step
-				</p>
+				<p className="type-body-sm mt-1 text-ink-3">{t('createSubtitle')}</p>
 			</div>
 
 			<div className="mb-4 border-b border-rule bg-background sm:mb-8">

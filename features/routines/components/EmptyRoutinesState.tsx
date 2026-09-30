@@ -1,5 +1,6 @@
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { StarterTemplates } from '@/features/routines/components/StarterTemplates'
@@ -18,6 +19,7 @@ export function EmptyRoutinesState({
 }: {
 	filtered?: boolean
 }) {
+	const t = useTranslations('routines.listing')
 	const { preloadOnHover } = useComponentPreloading()
 	// A filter that matches nothing is not an account without routines, so it
 	// neither says so nor offers the templates.
@@ -25,26 +27,20 @@ export function EmptyRoutinesState({
 		return (
 			<div className="flex flex-col items-center rounded-sm border border-dashed border-rule p-8 text-center">
 				<h3 className="type-section mb-1 text-foreground">
-					No routines match this filter
+					{t('filterEmptyTitle')}
 				</h3>
-				<p className="type-body-sm text-ink-3">
-					Choose All Workout Routines to see every routine you have.
-				</p>
+				<p className="type-body-sm text-ink-3">{t('filterEmptyBody')}</p>
 			</div>
 		)
 	}
 	return (
 		<div className="flex flex-col items-center rounded-sm border border-dashed border-rule p-8 text-center">
-			<h3 className="type-section mb-1 text-foreground">
-				You have no routines
-			</h3>
-			<p className="type-body-sm mb-4 text-ink-3">
-				Start from a template below, or build your own.
-			</p>
+			<h3 className="type-section mb-1 text-foreground">{t('noRoutines')}</h3>
+			<p className="type-body-sm mb-4 text-ink-3">{t('startFromTemplate')}</p>
 			<Button asChild variant="default">
 				<Link href="/routines/new" {...preloadOnHover('newRoutinePage')}>
 					<PlusCircle className="mr-2 h-4 w-4" />
-					Create Routine
+					{t('createRoutine')}
 				</Link>
 			</Button>
 			<div className="mt-8 w-full max-w-2xl">

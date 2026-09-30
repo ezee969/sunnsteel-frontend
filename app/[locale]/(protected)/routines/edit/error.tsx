@@ -27,7 +27,7 @@ export default function RoutineEditError({
 				variant="outline"
 				onClick={() => (window.location.href = '/routines')}
 			>
-				Back to Routines
+				{tBuilder('backToRoutines')}
 			</Button>
 		</RouteError>
 	)

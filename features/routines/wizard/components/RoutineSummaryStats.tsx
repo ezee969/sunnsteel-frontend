@@ -17,7 +17,7 @@ export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 	return (
 		<div className="rounded-md border bg-card text-card-foreground p-4">
 			<h3 className="type-panel mb-3 text-center text-foreground">
-				Routine Summary
+				{t('routineSummary')}
 			</h3>
 			<div className="flex justify-around text-center">
 				<div>

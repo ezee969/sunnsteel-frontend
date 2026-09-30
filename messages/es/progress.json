@@ -147,7 +147,21 @@
 		"nothingLogged": "Todavía no hay nada registrado.",
 		"noMeasurements": "Todavía no hay medidas corporales.",
 		"deleteEntryOf": "Eliminar la entrada del {date}",
-		"deleteDescription": "Se elimina todo lo que registraste el {date}. Tu peso actual pasa a ser el último que registraste antes de esa fecha."
+		"deleteDescription": "Se elimina todo lo que registraste el {date}. Tu peso actual pasa a ser el último que registraste antes de esa fecha.",
+		"noWeightInRange": "No hay peso registrado en este período.",
+		"noOtherMeasurements": "Aún no hay medidas además del peso.",
+		"unavailable": "El progreso corporal no está disponible",
+		"tryAgain": "Reintentar",
+		"heading": "Progreso corporal",
+		"intro": "Tu peso y tus medidas a lo largo del tiempo. Quién más los ve lo define tu <link>ajuste de privacidad del progreso corporal</link>.",
+		"rangeLabel": "Período del progreso corporal",
+		"logButton": "Registrar medidas",
+		"deleteFailed": "No se pudo eliminar el registro. Inténtalo de nuevo.",
+		"logOnProgress": "Registrar en Progreso",
+		"range30D": "30D",
+		"range90D": "90D",
+		"range1Y": "1A",
+		"rangeAll": "Todo"
 	},
 	"tabs": {
 		"overview": "Resumen",

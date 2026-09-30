@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import { activeTabHref, tabForHash } from './page-tabs'
 import { privacySettingHref } from './settings-anchor'
-import { SETTINGS_HASH_RULES, SETTINGS_TABS } from './settings-tabs'
+import { SETTINGS_HASH_RULES, settingsTabs } from './settings-tabs'
+
+const SETTINGS_TABS = settingsTabs(translatorFor('en', 'settings.tabs'))
 
 describe('Settings tabs (UX-12)', () => {
 	it('keeps the bare route as the Profile tab', () => {
@@ -11,6 +15,18 @@ describe('Settings tabs (UX-12)', () => {
 		expect(activeTabHref(SETTINGS_TABS, '/settings/account')).toBe(
 			'/settings/account',
 		)
+	})
+
+	it('names the tabs in Spanish', () => {
+		expect(
+			settingsTabs(translatorFor('es', 'settings.tabs')).map(tab => tab.label),
+		).toEqual([
+			'Perfil',
+			'Entrenamiento',
+			'Privacidad',
+			'Notificaciones',
+			'Cuenta',
+		])
 	})
 
 	it('sends every moved card to a tab that exists', () => {

@@ -19,6 +19,8 @@ import {
 
 const enMuscles = translatorFor('en', 'routines.muscles')
 const enEquipment = translatorFor('en', 'routines.equipment')
+const enUi = translatorFor('en', 'catalog.exercisesUi')
+const esUi = translatorFor('es', 'catalog.exercisesUi')
 
 const exercise = (id: string, overrides: Partial<Exercise> = {}): Exercise => ({
 	id,
@@ -213,6 +215,7 @@ describe('catalogFilterOptions', () => {
 			EMPTY_CATALOG_FILTERS,
 			enMuscles,
 			enEquipment,
+			enUi,
 		)
 		expect(options.muscles.map(option => option.label)).toEqual([
 			'Pecs',
@@ -239,6 +242,7 @@ describe('catalogFilterOptions', () => {
 			{ ...EMPTY_CATALOG_FILTERS, pattern: 'SQUAT' },
 			enMuscles,
 			enEquipment,
+			enUi,
 		)
 		expect(options.patterns.map(option => option.value)).toContain('SQUAT')
 	})
@@ -246,17 +250,17 @@ describe('catalogFilterOptions', () => {
 
 describe('catalog copy', () => {
 	it('counts shown against total', () => {
-		expect(formatCatalogCount(80, 80)).toBe('80 exercises')
-		expect(formatCatalogCount(3, 80)).toBe('3 of 80 exercises')
-		expect(formatCatalogCount(1, 1)).toBe('1 exercise')
+		expect(formatCatalogCount(enUi, 80, 80)).toBe('80 exercises')
+		expect(formatCatalogCount(enUi, 3, 80)).toBe('3 of 80 exercises')
+		expect(formatCatalogCount(enUi, 1, 1)).toBe('1 exercise')
 	})
 
 	it('explains when the gym filter has no equipment to compare', () => {
-		expect(getGymFilterUnavailableState('Home Gym')).toMatchObject({
+		expect(getGymFilterUnavailableState(enUi, 'Home Gym')).toMatchObject({
 			title: 'Home Gym lists no equipment',
 			action: { kind: 'link', href: '/settings/training' },
 		})
-		expect(getGymFilterUnavailableState(null).title).toBe(
+		expect(getGymFilterUnavailableState(enUi, null).title).toBe(
 			'No training location yet',
 		)
 	})
@@ -264,6 +268,7 @@ describe('catalog copy', () => {
 	it('explains why the list is empty', () => {
 		expect(
 			getCatalogEmptyState({
+				t: enUi,
 				catalogSize: 0,
 				filters: EMPTY_CATALOG_FILTERS,
 				hasTrainedExercises: null,
@@ -271,6 +276,7 @@ describe('catalog copy', () => {
 		).toBe('The catalog is empty')
 		expect(
 			getCatalogEmptyState({
+				t: enUi,
 				catalogSize: 80,
 				filters: { ...EMPTY_CATALOG_FILTERS, trained: true },
 				hasTrainedExercises: false,
@@ -278,6 +284,7 @@ describe('catalog copy', () => {
 		).toBe('No trained exercises yet')
 		expect(
 			getCatalogEmptyState({
+				t: enUi,
 				catalogSize: 80,
 				filters: { ...EMPTY_CATALOG_FILTERS, starred: true },
 				hasTrainedExercises: null,
@@ -286,6 +293,7 @@ describe('catalog copy', () => {
 		).toBe('No starred exercises yet')
 		expect(
 			getCatalogEmptyState({
+				t: enUi,
 				catalogSize: 80,
 				filters: { ...EMPTY_CATALOG_FILTERS, trained: true, q: 'zzz' },
 				hasTrainedExercises: true,
@@ -311,5 +319,24 @@ describe('the phone filter toggle count (UX-05)', () => {
 				mine: true,
 			}),
 		).toBe(3)
+	})
+})
+
+describe('catalog copy in Spanish', () => {
+	it('counts, names the gym and explains an empty list', () => {
+		expect(formatCatalogCount(esUi, 80, 80)).toBe('80 ejercicios')
+		expect(formatCatalogCount(esUi, 3, 80)).toBe('3 de 80 ejercicios')
+		expect(formatCatalogCount(esUi, 1, 1)).toBe('1 ejercicio')
+		expect(getGymFilterUnavailableState(esUi, null).title).toBe(
+			'Aún no hay lugar de entrenamiento',
+		)
+		expect(
+			getCatalogEmptyState({
+				t: esUi,
+				catalogSize: 80,
+				filters: { ...EMPTY_CATALOG_FILTERS, trained: true },
+				hasTrainedExercises: false,
+			}).title,
+		).toBe('Aún no hay ejercicios entrenados')
 	})
 })
