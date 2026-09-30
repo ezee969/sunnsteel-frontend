@@ -4,11 +4,11 @@ import type {
 } from '@sunsteel/contracts'
 
 export const STRENGTH_RANGE_OPTIONS = [
-	{ value: '30D', label: '30 days' },
-	{ value: '90D', label: '90 days' },
-	{ value: '6M', label: '6 months' },
-	{ value: '1Y', label: '1 year' },
-	{ value: 'ALL', label: 'All time' },
+	{ value: '30D' },
+	{ value: '90D' },
+	{ value: '6M' },
+	{ value: '1Y' },
+	{ value: 'ALL' },
 ] as const
 
 export type StrengthRange = (typeof STRENGTH_RANGE_OPTIONS)[number]['value']
