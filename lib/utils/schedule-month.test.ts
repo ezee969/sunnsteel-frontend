@@ -1,16 +1,22 @@
 import type { Routine, WorkoutSessionSummary } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	addMonths,
 	buildScheduleMonth,
 	describeConsistency,
 	describeMonth,
 	describeMonthCell,
+	describeMonthTotals,
 	scheduleDayState,
 	scheduleMonthRange,
 	startOfMonth,
 } from './schedule-month'
+
+const t = translatorFor('en', 'planning.scheduleMonth')
+const es = translatorFor('es', 'planning.scheduleMonth')
 
 // Wednesday 16 Sep 2026, local time.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -102,27 +108,36 @@ describe('schedule month', () => {
 		expect(month.includesToday).toBe(true)
 		expect(month.trainedDays).toBe(1)
 		expect(month.countedDays).toBe(16)
-		expect(describeConsistency(month)).toBe('Trained on 1 of 16 days so far')
+		expect(describeConsistency(month, t)).toBe('Trained on 1 of 16 days so far')
+		expect(describeConsistency(month, es)).toBe(
+			'Has entrenado 1 de 16 días hasta ahora',
+		)
 	})
 
 	it('describes months, cells and consistency in plain words', () => {
-		expect(describeMonth('2026-09-01', NOW, 'en')).toBe('This month')
-		expect(describeMonth('2026-08-01', NOW, 'en')).toBe('Last month')
-		expect(describeMonth('2026-10-01', NOW, 'en')).toBe('Next month')
-		expect(describeMonth('2026-05-01', NOW, 'en')).toMatch(/2026/)
+		expect(describeMonth('2026-09-01', NOW, 'en', t)).toBe('This month')
+		expect(describeMonth('2026-08-01', NOW, 'en', t)).toBe('Last month')
+		expect(describeMonth('2026-10-01', NOW, 'en', t)).toBe('Next month')
+		expect(describeMonth('2026-05-01', NOW, 'en', t)).toMatch(/2026/)
 		expect(
-			describeConsistency({
-				trainedDays: 0,
-				countedDays: 0,
-				includesToday: false,
-			}),
+			describeConsistency(
+				{
+					trainedDays: 0,
+					countedDays: 0,
+					includesToday: false,
+				},
+				t,
+			),
 		).toBeNull()
 		expect(
-			describeConsistency({
-				trainedDays: 12,
-				countedDays: 30,
-				includesToday: false,
-			}),
+			describeConsistency(
+				{
+					trainedDays: 12,
+					countedDays: 30,
+					includesToday: false,
+				},
+				t,
+			),
 		).toBe('Trained on 12 of 30 days')
 		expect(
 			scheduleDayState({
@@ -161,6 +176,7 @@ describe('schedule month', () => {
 				],
 			},
 			'en',
+			t,
 		)
 		expect(label).toMatch(/16/)
 		expect(label).toMatch(/, today: 2 planned, 1 rest day$/)
@@ -168,7 +184,57 @@ describe('schedule month', () => {
 			describeMonthCell(
 				{ date: '2026-09-10', isToday: false, entries: [] },
 				'en',
+				t,
 			),
 		).toMatch(/: nothing planned$/)
+	})
+	it('reads the same rules in Spanish', () => {
+		const entries = [
+			{
+				kind: 'PLANNED',
+				routineId: 'a',
+				routineDayId: 'd',
+				routineName: 'A',
+				dayName: 'Wed',
+			},
+			{
+				kind: 'PLANNED',
+				routineId: 'b',
+				routineDayId: 'e',
+				routineName: 'B',
+				dayName: 'Wed',
+			},
+			{ kind: 'REST', routineId: 'c', routineName: 'C', dayName: null },
+		] as const
+		expect(
+			describeMonthCell(
+				{ date: '2026-09-16', isToday: true, entries: [...entries] },
+				'es',
+				es,
+			),
+		).toMatch(/, hoy: 2 planificados, 1 día de descanso$/)
+		expect(
+			describeMonthCell(
+				{ date: '2026-09-10', isToday: false, entries: [] },
+				'es',
+				es,
+			),
+		).toMatch(/: nada planificado$/)
+		expect(describeMonth('2026-08-01', NOW, 'es', es)).toBe('Mes pasado')
+		const totals = {
+			completed: 3,
+			aborted: 0,
+			planned: 1,
+			notLogged: 2,
+			rest: 1,
+			moved: 0,
+			skipped: 1,
+		}
+		expect(describeMonthTotals(totals, t)).toBe(
+			'3 completed · 1 planned · 2 not logged · 1 rest day · 1 skipped',
+		)
+		expect(describeMonthTotals(totals, es)).toBe(
+			'3 completados · 1 planificado · 2 sin registrar · 1 día de descanso · 1 omitido',
+		)
 	})
 })

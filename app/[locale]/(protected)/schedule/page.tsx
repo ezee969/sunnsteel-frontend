@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -42,6 +43,7 @@ const fromKey = (key: string) => {
 }
 
 export default function SchedulePage() {
+	const t = useTranslations('planning.schedulePage')
 	const [now] = useState(() => new Date())
 	const [view, setView] = useState<ScheduleView>('week')
 	const [weekStart, setWeekStart] = useState(() => startOfWeek(now))
@@ -119,13 +121,13 @@ export default function SchedulePage() {
 		try {
 			await skipOccurrence.mutateAsync({ routineId, date })
 			push({
-				title: 'Marked skipped',
-				description: `${target} reads as skipped, not as not logged.`,
+				title: t('skippedTitle'),
+				description: t('skippedBody', { target }),
 				variant: 'success',
 			})
 		} catch (error) {
 			push({
-				title: 'Not marked skipped',
+				title: t('skipFailed'),
 				description: error instanceof Error ? error.message : undefined,
 				variant: 'destructive',
 			})
@@ -156,13 +158,13 @@ export default function SchedulePage() {
 			await undoMove.mutateAsync(overrideId)
 			push({
 				// SCHED-05: undoes a move or a skip alike.
-				title: 'Change undone',
-				description: `${target} is back on its planned day.`,
+				title: t('undoneTitle'),
+				description: t('undoneBody', { target }),
 				variant: 'success',
 			})
 		} catch (error) {
 			push({
-				title: 'Change not undone',
+				title: t('undoFailed'),
 				description: error instanceof Error ? error.message : undefined,
 				variant: 'destructive',
 			})
@@ -189,16 +191,8 @@ export default function SchedulePage() {
 
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
-			<HeroSection
-				title={<>Schedule</>}
-				subtitle={
-					<>
-						Your planned routine days beside the workouts you logged, by week or
-						by month.
-					</>
-				}
-			/>
-			<div role="group" aria-label="Schedule view" className="flex gap-1">
+			<HeroSection title={t('title')} subtitle={t('subtitle')} />
+			<div role="group" aria-label={t('viewGroup')} className="flex gap-1">
 				{(['week', 'month'] as const).map(option => (
 					<Button
 						key={option}
@@ -208,7 +202,7 @@ export default function SchedulePage() {
 						aria-pressed={view === option}
 						onClick={() => setView(option)}
 					>
-						{option === 'week' ? 'Week' : 'Month'}
+						{option === 'week' ? t('week') : t('month')}
 					</Button>
 				))}
 			</div>

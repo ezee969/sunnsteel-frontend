@@ -1,10 +1,11 @@
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
 import {
 	useWorkoutProgress,
 	useWorkoutStats,
@@ -27,6 +28,7 @@ const TOTAL_SESSIONS_MILESTONE = 50
 
 function StatsOverviewBody() {
 	const locale = useLocale() as Locale
+	const t = useTranslations('planning.dashboardStats')
 	const weightUnit = useWeightUnit()
 	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
 	const { data: progress } = useWorkoutProgress()
@@ -37,7 +39,7 @@ function StatsOverviewBody() {
 	if (isPending) {
 		return (
 			<div className="flex min-h-40 items-center justify-center">
-				<ClassicalLoader label="Loading workout statistics" />
+				<ClassicalLoader label={t('loading')} />
 			</div>
 		)
 	}
@@ -48,11 +50,9 @@ function StatsOverviewBody() {
 				role="alert"
 				className="space-y-3 rounded-sm border border-rule bg-surface p-4"
 			>
-				<p className="type-body-sm text-foreground">
-					Workout statistics could not be loaded.
-				</p>
+				<p className="type-body-sm text-foreground">{t('loadError')}</p>
 				<Button onClick={() => refetch()} disabled={isFetching}>
-					Try again
+					{t('retry')}
 				</Button>
 			</div>
 		)
@@ -105,14 +105,18 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Weekly Workouts"
+				title={t('weeklyTitle')}
 				value={String(weeklyWorkoutsCount)}
 				unit={`/ ${WEEKLY_MILESTONE}`}
-				subtitle="Workouts completed this week"
+				subtitle={t('weeklySubtitle')}
 				progress={weeklyWorkoutsProgress}
-				progressText={`${weeklyWorkoutsProgress}% of milestone`}
+				progressText={t('weeklyProgress', {
+					percent: weeklyWorkoutsProgress,
+				})}
 				additionalText={
-					weeklyWorkoutsCount >= WEEKLY_MILESTONE ? 'Milestone met' : 'Active'
+					weeklyWorkoutsCount >= WEEKLY_MILESTONE
+						? t('milestoneMet')
+						: t('active')
 				}
 			/>
 			<StatCard
@@ -123,13 +127,15 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Active Days"
+				title={t('activeDaysTitle')}
 				value={String(activeDaysThisWeek)}
 				unit="/ 7"
-				subtitle="Active training days this week"
+				subtitle={t('activeDaysSubtitle')}
 				progress={activeDaysProgress}
-				progressText={`${activeDaysThisWeek} days active`}
-				additionalText={activeDaysThisWeek >= 3 ? 'Consistent' : 'Resting'}
+				progressText={t('activeDaysProgress', { count: activeDaysThisWeek })}
+				additionalText={
+					activeDaysThisWeek >= 3 ? t('consistent') : t('resting')
+				}
 			/>
 			<StatCard
 				icon={
@@ -139,16 +145,16 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Total Workouts"
+				title={t('totalTitle')}
 				value={String(totalCompleted)}
-				subtitle="Total completed training sessions"
+				subtitle={t('totalSubtitle')}
 				progress={totalCompleted}
 				progressMax={Math.max(TOTAL_SESSIONS_MILESTONE, totalCompleted)}
-				progressText={`Milestone: ${TOTAL_SESSIONS_MILESTONE} sessions`}
+				progressText={t('totalProgress', { count: TOTAL_SESSIONS_MILESTONE })}
 				additionalText={
 					sessionsToMilestone > 0
-						? `${sessionsToMilestone} to go`
-						: 'Milestone met'
+						? t('toGo', { count: sessionsToMilestone })
+						: t('milestoneMet')
 				}
 			/>
 			<StatCard
@@ -159,12 +165,12 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Completion Rate"
+				title={t('rateTitle')}
 				value={`${completionRate}%`}
-				subtitle="Percentage of completed workouts"
+				subtitle={t('rateSubtitle')}
 				progress={completionRate}
-				progressText="Across all training sessions"
-				additionalText={completionRate >= 90 ? 'Excellent' : 'On Track'}
+				progressText={t('rateProgress')}
+				additionalText={completionRate >= 90 ? t('excellent') : t('onTrack')}
 			/>
 			<StatCard
 				icon={
@@ -174,14 +180,14 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Current Streak"
+				title={t('streakTitle')}
 				value={String(currentStreak)}
-				unit="days"
-				subtitle="Training days without a long gap"
+				unit={t('streakUnit')}
+				subtitle={t('streakSubtitle')}
 				progress={currentStreak}
 				progressMax={Math.max(bestStreak, currentStreak, 1)}
-				progressText={`Best: ${bestStreak} days`}
-				additionalText={currentStreak > 0 ? 'Active' : 'Resting'}
+				progressText={t('streakBest', { count: bestStreak })}
+				additionalText={currentStreak > 0 ? t('active') : t('resting')}
 			/>
 			<StatCard
 				icon={
@@ -191,14 +197,21 @@ function StatsOverviewBody() {
 						aria-hidden
 					/>
 				}
-				title="Total Volume"
-				value={compactVolume.toFixed(1)}
+				title={t('volumeTitle')}
+				value={numberFormatter(locale, {
+					minimumFractionDigits: 1,
+					maximumFractionDigits: 1,
+					useGrouping: false,
+				}).format(compactVolume)}
 				unit={compactVolumeUnit}
-				subtitle="Lifetime weight moved"
+				subtitle={t('volumeSubtitle')}
 				progress={compactVolume}
 				progressMax={Math.max(100, Math.ceil(compactVolume / 50) * 50)}
-				progressText={`${formatWeightAmount(totalVolumeKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)} lifted`}
-				additionalText={compactVolume >= 100 ? 'Heavy' : 'Building'}
+				progressText={t('volumeProgress', {
+					amount: formatWeightAmount(totalVolumeKg, weightUnit, locale),
+					unit: getWeightUnitLabel(weightUnit),
+				})}
+				additionalText={compactVolume >= 100 ? t('heavy') : t('building')}
 			/>
 		</div>
 	)

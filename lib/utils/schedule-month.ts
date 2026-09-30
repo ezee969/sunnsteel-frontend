@@ -1,5 +1,6 @@
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
+import type { MessageKey, Translator } from '@/i18n/translator'
 
 import {
 	addDays,
@@ -150,15 +151,18 @@ const fromKey = (key: string) => {
 	return new Date(year, month - 1, day || 1)
 }
 
+type ScheduleMonthTranslator = Translator<'planning.scheduleMonth'>
+
 export function describeMonth(
 	monthStart: string,
 	now: Date,
 	locale: Locale,
+	t: ScheduleMonthTranslator,
 ): string {
 	const current = startOfMonth(now)
-	if (monthStart === localDateKey(current)) return 'This month'
-	if (monthStart === localDateKey(addMonths(current, -1))) return 'Last month'
-	if (monthStart === localDateKey(addMonths(current, 1))) return 'Next month'
+	if (monthStart === localDateKey(current)) return t('thisMonth')
+	if (monthStart === localDateKey(addMonths(current, -1))) return t('lastMonth')
+	if (monthStart === localDateKey(addMonths(current, 1))) return t('nextMonth')
 	return MONTH_FORMAT(locale).format(fromKey(monthStart))
 }
 
@@ -168,40 +172,96 @@ export const formatMonth = (monthStart: string, locale: Locale) =>
 /** "Trained on 9 of 15 days so far"; null for a month that has not begun. */
 export function describeConsistency(
 	month: Pick<ScheduleMonth, 'trainedDays' | 'countedDays' | 'includesToday'>,
+	t: ScheduleMonthTranslator,
 ): string | null {
 	if (month.countedDays === 0) return null
-	const days = month.countedDays === 1 ? 'day' : 'days'
-	return `Trained on ${month.trainedDays} of ${month.countedDays} ${days}${
-		month.includesToday ? ' so far' : ''
-	}`
+	return t(month.includesToday ? 'consistencySoFar' : 'consistency', {
+		trained: month.trainedDays,
+		counted: month.countedDays,
+	})
 }
 
-const STATE_WORDS: Record<Exclude<ScheduleDayState, 'EMPTY'>, string> = {
-	COMPLETED: 'completed',
-	IN_PROGRESS: 'in progress',
-	ABORTED: 'ended early',
-	NOT_LOGGED: 'not logged',
-	PLANNED: 'planned',
-	REST: 'rest day',
-	MOVED: 'moved',
-	SKIPPED: 'skipped',
+type CountedState = Exclude<ScheduleDayState, 'EMPTY'>
+
+const CELL_KEYS: Record<CountedState, MessageKey<'planning.scheduleMonth'>> = {
+	COMPLETED: 'cell.COMPLETED',
+	IN_PROGRESS: 'cell.IN_PROGRESS',
+	ABORTED: 'cell.ABORTED',
+	NOT_LOGGED: 'cell.NOT_LOGGED',
+	PLANNED: 'cell.PLANNED',
+	REST: 'cell.REST',
+	MOVED: 'cell.MOVED',
+	SKIPPED: 'cell.SKIPPED',
+}
+
+const STATUS_KEYS: Record<
+	CountedState,
+	MessageKey<'planning.scheduleMonth'>
+> = {
+	COMPLETED: 'status.COMPLETED',
+	IN_PROGRESS: 'status.IN_PROGRESS',
+	ABORTED: 'status.ABORTED',
+	NOT_LOGGED: 'status.NOT_LOGGED',
+	PLANNED: 'status.PLANNED',
+	REST: 'status.REST',
+	MOVED: 'status.MOVED',
+	SKIPPED: 'status.SKIPPED',
+}
+
+const TOTAL_KEYS: Record<
+	keyof ScheduleWeek['totals'],
+	MessageKey<'planning.scheduleMonth'>
+> = {
+	completed: 'total.COMPLETED',
+	aborted: 'total.ABORTED',
+	planned: 'total.PLANNED',
+	notLogged: 'total.NOT_LOGGED',
+	rest: 'total.REST',
+	moved: 'total.MOVED',
+	skipped: 'total.SKIPPED',
+}
+
+/** A state's name as the legend prints it: "Not logged". */
+export function scheduleStatusLabel(
+	state: CountedState,
+	t: ScheduleMonthTranslator,
+): string {
+	const key: MessageKey<'planning.scheduleMonth'> = STATUS_KEYS[state]
+	return t(key)
+}
+
+/** The month's totals in one line: "3 completed · 1 planned". */
+export function describeMonthTotals(
+	totals: ScheduleWeek['totals'],
+	t: ScheduleMonthTranslator,
+): string {
+	const parts = (Object.keys(TOTAL_KEYS) as (keyof typeof TOTAL_KEYS)[])
+		.filter(name => totals[name])
+		.map(name => {
+			const key: MessageKey<'planning.scheduleMonth'> = TOTAL_KEYS[name]
+			return t(key, { count: totals[name] })
+		})
+	return parts.length ? parts.join(' · ') : t('totalsEmpty')
 }
 
 /** A cell's accessible name: "Tuesday 15 September, today: 1 completed, 1 planned". */
 export function describeMonthCell(
 	cell: Pick<ScheduleMonthCell, 'date' | 'isToday' | 'entries'>,
 	locale: Locale,
+	t: ScheduleMonthTranslator,
 ): string {
-	const counts = new Map<string, number>()
+	const counts = new Map<ScheduleDayState, number>()
 	for (const entry of cell.entries) {
-		const word = STATE_WORDS[entryState(entry) as keyof typeof STATE_WORDS]
-		counts.set(word, (counts.get(word) ?? 0) + 1)
+		const state = entryState(entry)
+		counts.set(state, (counts.get(state) ?? 0) + 1)
 	}
-	const parts = PRECEDENCE.map(
-		state => STATE_WORDS[state as keyof typeof STATE_WORDS],
-	)
-		.filter(word => counts.has(word))
-		.map(word => `${counts.get(word)} ${word}`)
-	const date = `${CELL_FORMAT(locale).format(fromKey(cell.date))}${cell.isToday ? ', today' : ''}`
-	return `${date}: ${parts.length ? parts.join(', ') : 'nothing planned'}`
+	const parts = PRECEDENCE.filter(state => counts.has(state)).map(state => {
+		const key: MessageKey<'planning.scheduleMonth'> =
+			CELL_KEYS[state as CountedState]
+		return t(key, { count: counts.get(state) ?? 0 })
+	})
+	return t(cell.isToday ? 'cellLabelToday' : 'cellLabel', {
+		date: CELL_FORMAT(locale).format(fromKey(cell.date)),
+		parts: parts.length ? parts.join(', ') : t('nothingPlanned'),
+	})
 }

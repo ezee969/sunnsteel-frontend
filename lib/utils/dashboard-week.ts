@@ -1,5 +1,5 @@
 import type { Locale } from '@/i18n/config'
-import type { Translator } from '@/i18n/translator'
+import { type Translator, translatorFor } from '@/i18n/translator'
 
 import { weekdayName } from './date'
 import {
@@ -69,7 +69,7 @@ export function buildWeekStrip(
 			isToday: day.isToday,
 			state: scheduleDayState(day),
 			href,
-			label: `${describeMonthCell(day, locale)}. ${destination}`,
+			label: `${describeMonthCell(day, locale, translatorFor(locale, 'planning.scheduleMonth'))}. ${destination}`,
 		}
 	})
 }
