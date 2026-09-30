@@ -5,6 +5,15 @@ import {
 	TrainingPartnership,
 } from '@sunsteel/contracts'
 
+import type { MessageKey, Translator } from '@/i18n/translator'
+
+type Namespace = 'settings.trainingPartners'
+
+/**
+ * The English wording, kept only for `lib/utils/notifications.ts`, which still
+ * words its own copy in English (I18N social pass) and reads it from here.
+ * Settings and profiles read the message keys below through a translator.
+ */
 export const TRAINING_PARTNER_ENCOURAGEMENT_LABELS = {
 	READY_TO_TRAIN: 'Ready to train',
 	STRONG_SESSION: 'Strong session',
@@ -12,49 +21,30 @@ export const TRAINING_PARTNER_ENCOURAGEMENT_LABELS = {
 	KEEP_GOING: 'Keep going',
 } as const satisfies Record<TrainingPartnerEncouragementKind, string>
 
-export const TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS =
-	TRAINING_PARTNER_ENCOURAGEMENT_KINDS.map(kind => ({
-		kind,
-		label: TRAINING_PARTNER_ENCOURAGEMENT_LABELS[kind],
-	}))
-
 export const trainingPartnerEncouragementLabel = (
 	kind: TrainingPartnerEncouragementKind,
 ) => TRAINING_PARTNER_ENCOURAGEMENT_LABELS[kind]
 
-export const TRAINING_PARTNER_PERMISSION_FIELDS: Array<{
-	key: keyof TrainingPartnerPermissions
-	label: string
-	description: string
-}> = [
-	{
-		key: 'schedule',
-		label: 'Schedule',
-		description: 'Share dates, planned workout counts and whether you trained.',
-	},
-	{
-		key: 'progress',
-		label: 'Progress',
-		description:
-			'Share follower-level workout totals, records and achievements; never body metrics.',
-	},
-	{
-		key: 'activity',
-		label: 'Activity',
-		description: 'Share activity whose audience already allows followers.',
-	},
-	{
-		key: 'routines',
-		label: 'Routines',
-		description:
-			'Share routines whose own visibility already allows followers.',
-	},
-	{
-		key: 'encouragement',
-		label: 'Encouragement',
-		description: 'Allow four fixed, private prompts from this partner.',
-	},
-]
+const ENCOURAGEMENT_KEYS = {
+	READY_TO_TRAIN: 'encouragement.READY_TO_TRAIN',
+	STRONG_SESSION: 'encouragement.STRONG_SESSION',
+	GOOD_WORK: 'encouragement.GOOD_WORK',
+	KEEP_GOING: 'encouragement.KEEP_GOING',
+} as const satisfies Record<
+	TrainingPartnerEncouragementKind,
+	MessageKey<Namespace>
+>
+
+export const trainingPartnerEncouragementOptions = (t: Translator<Namespace>) =>
+	TRAINING_PARTNER_ENCOURAGEMENT_KINDS.map(kind => ({
+		kind,
+		label: t(ENCOURAGEMENT_KEYS[kind]),
+	}))
+
+/** The four things a partner can be shown; the copy is `permission.<key>`. */
+export const TRAINING_PARTNER_PERMISSION_KEYS: Array<
+	keyof TrainingPartnerPermissions
+> = ['schedule', 'progress', 'activity', 'routines', 'encouragement']
 
 export function findTrainingPartnership(
 	items: TrainingPartnership[],
@@ -64,15 +54,10 @@ export function findTrainingPartnership(
 }
 
 export function trainingPartnerActionLabel(
+	t: Translator<Namespace>,
 	partnership: TrainingPartnership | undefined,
-):
-	| 'Add Training Partner'
-	| 'Accept Partner Request'
-	| 'Request Pending'
-	| 'Training Partner' {
-	if (!partnership) return 'Add Training Partner'
-	if (partnership.status === 'ACTIVE') return 'Training Partner'
-	return partnership.requestedByMe
-		? 'Request Pending'
-		: 'Accept Partner Request'
+): string {
+	if (!partnership) return t('action.add')
+	if (partnership.status === 'ACTIVE') return t('action.active')
+	return partnership.requestedByMe ? t('action.pending') : t('action.accept')
 }

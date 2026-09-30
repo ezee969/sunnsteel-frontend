@@ -4,7 +4,11 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { formatWeightInput, parseWeightInput } from './weight-unit'
+
+type Namespace = 'settings.trainingLocations'
 
 const roundCanonicalWeight = (value: number) =>
 	Math.round(value * 10000) / 10000
@@ -31,9 +35,13 @@ const nextDraftKey = (prefix: string) => `${prefix}-${++draftSequence}`
 export const createTrainingLocationDraft = (
 	weightUnit: WeightUnit,
 	index: number,
+	t: Translator<Namespace>,
 ): TrainingLocationDraft => ({
 	key: nextDraftKey('location'),
-	name: index === 0 ? 'Home Gym' : `Gym ${index + 1}`,
+	name:
+		index === 0
+			? t('defaultName.first')
+			: t('defaultName.other', { number: index + 1 }),
 	isDefault: index === 0,
 	barWeight: formatWeightInput(20, weightUnit),
 	availablePlatePairs: [],
@@ -89,11 +97,12 @@ export const convertTrainingLocationDrafts = (
 export const buildTrainingLocationsRequest = (
 	drafts: TrainingLocationDraft[],
 	weightUnit: WeightUnit,
+	t: Translator<Namespace>,
 ): ReplaceTrainingLocationsRequest => {
 	if (drafts.length > 0) {
 		const defaultCount = drafts.filter(location => location.isDefault).length
 		if (defaultCount !== 1) {
-			throw new Error('Choose exactly one default training location.')
+			throw new Error(t('error.chooseDefault'))
 		}
 	}
 
@@ -102,9 +111,9 @@ export const buildTrainingLocationsRequest = (
 		locations: drafts.map(location => {
 			const name = location.name.trim()
 			const normalizedName = name.toLocaleLowerCase('en-US')
-			if (!name) throw new Error('Every training location needs a name.')
+			if (!name) throw new Error(t('error.nameRequired'))
 			if (names.has(normalizedName)) {
-				throw new Error('Training location names must be unique.')
+				throw new Error(t('error.nameUnique'))
 			}
 			names.add(normalizedName)
 
@@ -113,7 +122,7 @@ export const buildTrainingLocationsRequest = (
 				? roundCanonicalWeight(parsedBarWeight)
 				: parsedBarWeight
 			if (!barWeightKg || barWeightKg < 0.5 || barWeightKg > 100) {
-				throw new Error(`Enter a valid bar weight for ${name}.`)
+				throw new Error(t('error.barWeight', { name }))
 			}
 
 			const plateWeights = new Set<number>()
@@ -124,13 +133,13 @@ export const buildTrainingLocationsRequest = (
 					: parsedWeight
 				const pairCount = Number(plate.pairCount)
 				if (!weightKg || weightKg < 0.05 || weightKg > 100) {
-					throw new Error(`Enter valid plate weights for ${name}.`)
+					throw new Error(t('error.plateWeight', { name }))
 				}
 				if (!Number.isInteger(pairCount) || pairCount < 1 || pairCount > 20) {
-					throw new Error(`Plate pair counts for ${name} must be from 1 to 20.`)
+					throw new Error(t('error.pairCount', { name }))
 				}
 				if (plateWeights.has(weightKg)) {
-					throw new Error(`Plate weights for ${name} must be unique.`)
+					throw new Error(t('error.plateUnique', { name }))
 				}
 				plateWeights.add(weightKg)
 				return { weightKg, pairCount }

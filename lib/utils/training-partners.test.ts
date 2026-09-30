@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	findTrainingPartnership,
-	TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS,
 	trainingPartnerActionLabel,
 	trainingPartnerEncouragementLabel,
+	trainingPartnerEncouragementOptions,
 } from './training-partners'
+
+const t = translatorFor('en', 'settings.trainingPartners')
+const tEs = translatorFor('es', 'settings.trainingPartners')
 
 const relationship = (overrides: Record<string, unknown> = {}) => ({
 	id: 'partnership-1',
@@ -44,23 +49,47 @@ describe('training-partner presentation', () => {
 	})
 
 	it('names each request state without implying access before acceptance', () => {
-		expect(trainingPartnerActionLabel(undefined)).toBe('Add Training Partner')
-		expect(trainingPartnerActionLabel(relationship())).toBe('Request Pending')
-		expect(
-			trainingPartnerActionLabel(relationship({ requestedByMe: false })),
-		).toBe('Accept Partner Request')
-		expect(trainingPartnerActionLabel(relationship({ status: 'ACTIVE' }))).toBe(
-			'Training Partner',
+		expect(trainingPartnerActionLabel(t, undefined)).toBe(
+			'Add Training Partner',
 		)
+		expect(trainingPartnerActionLabel(t, relationship())).toBe(
+			'Request Pending',
+		)
+		expect(
+			trainingPartnerActionLabel(t, relationship({ requestedByMe: false })),
+		).toBe('Accept Partner Request')
+		expect(
+			trainingPartnerActionLabel(t, relationship({ status: 'ACTIVE' })),
+		).toBe('Training Partner')
 	})
 
 	it('offers only the four fixed encouragement prompts', () => {
-		expect(TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS).toEqual([
+		expect(trainingPartnerEncouragementOptions(t)).toEqual([
 			{ kind: 'READY_TO_TRAIN', label: 'Ready to train' },
 			{ kind: 'STRONG_SESSION', label: 'Strong session' },
 			{ kind: 'GOOD_WORK', label: 'Good work' },
 			{ kind: 'KEEP_GOING', label: 'Keep going' },
 		])
 		expect(trainingPartnerEncouragementLabel('GOOD_WORK')).toBe('Good work')
+	})
+
+	it('says the same in Spanish', () => {
+		expect(trainingPartnerActionLabel(tEs, undefined)).toBe(
+			'Agregar compañero de entrenamiento',
+		)
+		expect(trainingPartnerActionLabel(tEs, relationship())).toBe(
+			'Solicitud pendiente',
+		)
+		expect(
+			trainingPartnerActionLabel(tEs, relationship({ requestedByMe: false })),
+		).toBe('Aceptar solicitud de compañero')
+		expect(
+			trainingPartnerEncouragementOptions(tEs).map(option => option.label),
+		).toEqual([
+			'Listo para entrenar',
+			'Gran sesión',
+			'Buen trabajo',
+			'Sigue así',
+		])
 	})
 })

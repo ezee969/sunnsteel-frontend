@@ -62,6 +62,7 @@ export function TrainingIdentitySettingsCard({
 	identity,
 }: TrainingIdentitySettingsCardProps) {
 	const tIdentity = useTranslations('routines.identity')
+	const t = useTranslations('settings.trainingIdentity')
 	const [draft, setDraft] = useState(() => cloneIdentity(identity))
 	const [exerciseSearch, setExerciseSearch] = useState('')
 	const exerciseQuery = useExercises()
@@ -163,14 +164,14 @@ export function TrainingIdentitySettingsCard({
 			{
 				onSuccess: () => {
 					push({
-						title: 'Training identity updated',
-						description: 'Your training preferences are now saved.',
+						title: t('savedTitle'),
+						description: t('savedDescription'),
 						variant: 'success',
 					})
 				},
 				onError: error => {
 					push({
-						title: 'Could not update training identity',
+						title: t('failedTitle'),
 						description: error.message,
 						variant: 'destructive',
 					})
@@ -184,12 +185,9 @@ export function TrainingIdentitySettingsCard({
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Target className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Training Identity</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Describe how you train. These are profile signals, not measurable
-					goals or prescriptions.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-7">
 				<div
@@ -198,7 +196,7 @@ export function TrainingIdentitySettingsCard({
 					aria-labelledby="training-goals-label"
 				>
 					<div className="flex items-baseline justify-between gap-3">
-						<Label id="training-goals-label">Goals</Label>
+						<Label id="training-goals-label">{t('goals')}</Label>
 						<span className="type-data text-xs text-ink-3">
 							{draft.goals.length}/{PROFILE_TRAINING_GOALS_MAX}
 						</span>
@@ -232,7 +230,7 @@ export function TrainingIdentitySettingsCard({
 
 				<div className="grid gap-5 lg:grid-cols-2">
 					<div className="space-y-2">
-						<Label htmlFor="training-experience">Experience level</Label>
+						<Label htmlFor="training-experience">{t('experience')}</Label>
 						<Select
 							value={draft.experienceLevel ?? 'NOT_SET'}
 							onValueChange={value =>
@@ -249,7 +247,7 @@ export function TrainingIdentitySettingsCard({
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="NOT_SET">Not set</SelectItem>
+								<SelectItem value="NOT_SET">{t('notSet')}</SelectItem>
 								{trainingExperienceOptions(tIdentity).map(option => (
 									<SelectItem key={option.value} value={option.value}>
 										{option.label}
@@ -260,7 +258,9 @@ export function TrainingIdentitySettingsCard({
 					</div>
 
 					<div className="space-y-2">
-						<Label htmlFor="preferred-training-style">Preferred style</Label>
+						<Label htmlFor="preferred-training-style">
+							{t('preferredStyle')}
+						</Label>
 						<Select
 							value={draft.preferredStyle ?? 'NOT_SET'}
 							onValueChange={value =>
@@ -277,7 +277,7 @@ export function TrainingIdentitySettingsCard({
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="NOT_SET">Not set</SelectItem>
+								<SelectItem value="NOT_SET">{t('notSet')}</SelectItem>
 								{preferredTrainingStyleOptions(tIdentity).map(option => (
 									<SelectItem key={option.value} value={option.value}>
 										{option.label}
@@ -294,7 +294,7 @@ export function TrainingIdentitySettingsCard({
 					aria-labelledby="training-disciplines-label"
 				>
 					<div className="flex items-baseline justify-between gap-3">
-						<Label id="training-disciplines-label">Disciplines</Label>
+						<Label id="training-disciplines-label">{t('disciplines')}</Label>
 						<span className="type-data text-xs text-ink-3">
 							{draft.disciplines.length}/{PROFILE_TRAINING_DISCIPLINES_MAX}
 						</span>
@@ -328,7 +328,7 @@ export function TrainingIdentitySettingsCard({
 
 				<div className="space-y-3">
 					<div className="flex items-baseline justify-between gap-3">
-						<Label htmlFor="favorite-exercise-search">Favorite exercises</Label>
+						<Label htmlFor="favorite-exercise-search">{t('favorites')}</Label>
 						<span className="type-data text-xs text-ink-3">
 							{draft.favoriteExercises.length}/{PROFILE_FAVORITE_EXERCISES_MAX}
 						</span>
@@ -345,7 +345,7 @@ export function TrainingIdentitySettingsCard({
 									<button
 										type="button"
 										onClick={() => removeFavoriteExercise(exercise.id)}
-										aria-label={`Remove ${exercise.name}`}
+										aria-label={t('remove', { name: exercise.name })}
 										className="text-ink-3 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 									>
 										<X className="h-3.5 w-3.5" aria-hidden />
@@ -354,18 +354,14 @@ export function TrainingIdentitySettingsCard({
 							))}
 						</div>
 					) : (
-						<p className="type-body-sm text-ink-3">
-							No favorite exercises selected.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('noFavorites')}</p>
 					)}
 					<Input
 						id="favorite-exercise-search"
 						value={exerciseSearch}
 						onChange={event => setExerciseSearch(event.target.value)}
 						placeholder={
-							favoriteLimitReached
-								? 'Favorite exercise limit reached'
-								: 'Search the exercise catalog'
+							favoriteLimitReached ? t('limitReached') : t('searchPlaceholder')
 						}
 						disabled={favoriteLimitReached}
 					/>
@@ -373,7 +369,7 @@ export function TrainingIdentitySettingsCard({
 						<div className="max-h-56 space-y-1 overflow-y-auto border border-rule bg-surface p-2">
 							{exerciseQuery.isLoading ? (
 								<p className="type-body-sm p-3 text-ink-3">
-									Loading exercises...
+									{t('loadingExercises')}
 								</p>
 							) : exerciseResults.length > 0 ? (
 								exerciseResults.map(exercise => (
@@ -389,9 +385,7 @@ export function TrainingIdentitySettingsCard({
 									</Button>
 								))
 							) : (
-								<p className="type-body-sm p-3 text-ink-3">
-									No exercises found.
-								</p>
+								<p className="type-body-sm p-3 text-ink-3">{t('noResults')}</p>
 							)}
 						</div>
 					) : null}
@@ -406,7 +400,7 @@ export function TrainingIdentitySettingsCard({
 						{updateUser.isPending ? (
 							<Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
 						) : null}
-						Save Training Identity
+						{t('save')}
 					</Button>
 				</div>
 			</CardContent>

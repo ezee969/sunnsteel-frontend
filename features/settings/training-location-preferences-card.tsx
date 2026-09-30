@@ -2,6 +2,7 @@
 
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Loader2, MapPin, Plus, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,7 @@ interface TrainingLocationPreferencesCardProps {
 export const TrainingLocationPreferencesCard = ({
 	weightUnit,
 }: TrainingLocationPreferencesCardProps) => {
+	const t = useTranslations('settings.trainingLocations')
 	const { data: locations, isLoading, error, refetch } = useTrainingLocations()
 	const replaceLocations = useReplaceTrainingLocations()
 	const { push } = useToast()
@@ -74,7 +76,7 @@ export const TrainingLocationPreferencesCard = ({
 	const addLocation = () => {
 		setDrafts(current => [
 			...current,
-			createTrainingLocationDraft(weightUnit, current.length),
+			createTrainingLocationDraft(weightUnit, current.length, t),
 		])
 		setFormError(null)
 	}
@@ -108,13 +110,13 @@ export const TrainingLocationPreferencesCard = ({
 
 	const save = () => {
 		try {
-			const request = buildTrainingLocationsRequest(drafts, weightUnit)
+			const request = buildTrainingLocationsRequest(drafts, weightUnit, t)
 			setFormError(null)
 			replaceLocations.mutate(request, {
 				onSuccess: () => {
 					push({
-						title: 'Equipment preferences saved',
-						description: 'Your training locations are ready for workouts.',
+						title: t('savedTitle'),
+						description: t('savedDescription'),
 						variant: 'success',
 					})
 				},
@@ -126,7 +128,7 @@ export const TrainingLocationPreferencesCard = ({
 			setFormError(
 				validationError instanceof Error
 					? validationError.message
-					: 'Check the training-location fields and try again.',
+					: t('error.fallback'),
 			)
 		}
 	}
@@ -137,12 +139,9 @@ export const TrainingLocationPreferencesCard = ({
 				<div className="space-y-1.5">
 					<CardTitle className="flex items-center gap-2">
 						<MapPin className="h-4 w-4 text-ink-3" aria-hidden />
-						Training Locations
+						{t('title')}
 					</CardTitle>
-					<CardDescription>
-						Save the bar, plate pairs and equipment available at each gym.
-						Weights follow your account unit and are stored canonically in kg.
-					</CardDescription>
+					<CardDescription>{t('description')}</CardDescription>
 				</div>
 				<Button
 					type="button"
@@ -151,14 +150,14 @@ export const TrainingLocationPreferencesCard = ({
 					disabled={isLoading || drafts.length >= 10}
 				>
 					<Plus className="mr-2 h-4 w-4" />
-					Add Location
+					{t('add')}
 				</Button>
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="h-4 w-4 animate-spin" />
-						Loading equipment preferences…
+						{t('loading')}
 					</div>
 				) : error ? (
 					<div className="rounded-sm border border-destructive bg-surface p-4">
@@ -170,19 +169,15 @@ export const TrainingLocationPreferencesCard = ({
 							className="mt-3"
 							onClick={() => refetch()}
 						>
-							Try Again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : (
 					<>
 						{drafts.length === 0 ? (
 							<div className="rounded-sm border border-dashed border-rule p-6 text-center">
-								<p className="type-panel text-foreground">
-									No training locations saved
-								</p>
-								<p className="type-body-sm mt-1 text-ink-3">
-									Add the gym or home setup you train with most often.
-								</p>
+								<p className="type-panel text-foreground">{t('emptyTitle')}</p>
+								<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
 							</div>
 						) : null}
 
@@ -194,7 +189,7 @@ export const TrainingLocationPreferencesCard = ({
 								<div className="flex flex-wrap items-end gap-3">
 									<div className="min-w-48 flex-1 space-y-2">
 										<Label htmlFor={`location-${location.key}`}>
-											Location Name
+											{t('locationName')}
 										</Label>
 										<Input
 											id={`location-${location.key}`}
@@ -210,7 +205,7 @@ export const TrainingLocationPreferencesCard = ({
 									</div>
 									<div className="space-y-2">
 										<Label htmlFor={`bar-${location.key}`}>
-											Bar Weight ({getWeightUnitLabel(weightUnit)})
+											{t('barWeight', { unit: getWeightUnitLabel(weightUnit) })}
 										</Label>
 										<Input
 											id={`bar-${location.key}`}
@@ -236,13 +231,17 @@ export const TrainingLocationPreferencesCard = ({
 											checked={location.isDefault}
 											onChange={() => makeDefault(location.key)}
 										/>
-										Default
+										{t('default')}
 									</label>
 									<Button
 										type="button"
 										variant="ghost"
 										size="icon"
-										aria-label={`Remove ${location.name || `location ${locationIndex + 1}`}`}
+										aria-label={t('removeLocation', {
+											name:
+												location.name ||
+												t('locationFallback', { number: locationIndex + 1 }),
+										})}
 										onClick={() => removeLocation(location.key)}
 									>
 										<Trash2 className="h-4 w-4 text-destructive" />
@@ -251,12 +250,12 @@ export const TrainingLocationPreferencesCard = ({
 
 								<div className="space-y-2">
 									<Label htmlFor={`equipment-${location.key}`}>
-										Available Equipment
+										{t('equipment')}
 									</Label>
 									<Input
 										id={`equipment-${location.key}`}
 										value={location.equipment}
-										placeholder="barbell, rack, bench, dumbbells"
+										placeholder={t('equipmentPlaceholder')}
 										onChange={event =>
 											updateLocation(location.key, current => ({
 												...current,
@@ -265,7 +264,7 @@ export const TrainingLocationPreferencesCard = ({
 										}
 									/>
 									<p className="type-body-sm text-ink-3">
-										Separate equipment with commas.
+										{t('equipmentHint')}
 									</p>
 								</div>
 
@@ -273,10 +272,10 @@ export const TrainingLocationPreferencesCard = ({
 									<div className="flex items-center justify-between gap-3">
 										<div>
 											<p className="type-panel text-foreground">
-												Available Plate Pairs
+												{t('platePairs')}
 											</p>
 											<p className="type-body-sm text-ink-3">
-												Enter the weight of one plate and how many pairs exist.
+												{t('platePairsHint')}
 											</p>
 										</div>
 										<Button
@@ -295,7 +294,7 @@ export const TrainingLocationPreferencesCard = ({
 											}
 										>
 											<Plus className="mr-2 h-4 w-4" />
-											Add Plate
+											{t('addPlate')}
 										</Button>
 									</div>
 
@@ -306,7 +305,7 @@ export const TrainingLocationPreferencesCard = ({
 										>
 											<div className="space-y-2">
 												<Label htmlFor={`plate-weight-${plate.key}`}>
-													Plate ({getWeightUnitLabel(weightUnit)})
+													{t('plate', { unit: getWeightUnitLabel(weightUnit) })}
 												</Label>
 												<Input
 													id={`plate-weight-${plate.key}`}
@@ -333,7 +332,7 @@ export const TrainingLocationPreferencesCard = ({
 											</div>
 											<div className="space-y-2">
 												<Label htmlFor={`plate-count-${plate.key}`}>
-													Pairs
+													{t('pairs')}
 												</Label>
 												<Input
 													id={`plate-count-${plate.key}`}
@@ -363,7 +362,7 @@ export const TrainingLocationPreferencesCard = ({
 												type="button"
 												variant="ghost"
 												size="icon"
-												aria-label="Remove plate"
+												aria-label={t('removePlate')}
 												onClick={() =>
 													updateLocation(location.key, current => ({
 														...current,
@@ -398,7 +397,7 @@ export const TrainingLocationPreferencesCard = ({
 								{replaceLocations.isPending ? (
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 								) : null}
-								Save Equipment
+								{t('save')}
 							</Button>
 						</div>
 					</>

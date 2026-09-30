@@ -46,6 +46,7 @@ export function DeleteAccountCard({
 	profile: { username: string; isModerator: boolean }
 }) {
 	const t = useTranslations('core.accountDeletion')
+	const tCard = useTranslations('settings.deleteAccount')
 	const [open, setOpen] = useState(false)
 	const [typed, setTyped] = useState('')
 	const remove = useDeleteAccount()
@@ -67,12 +68,9 @@ export function DeleteAccountCard({
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Trash2 className="size-5 text-ink-3" aria-hidden />
-					<CardTitle>Delete Account</CardTitle>
+					<CardTitle>{tCard('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Delete your account and everything in it. It happens at once and
-					cannot be undone.
-				</CardDescription>
+				<CardDescription>{tCard('description')}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				{blocked ? (
@@ -83,7 +81,7 @@ export function DeleteAccountCard({
 						variant="destructive"
 						onClick={() => setOpen(true)}
 					>
-						Delete Account…
+						{tCard('open')}
 					</Button>
 				)}
 			</CardContent>
@@ -91,9 +89,9 @@ export function DeleteAccountCard({
 			<AlertDialog open={open} onOpenChange={onOpenChange}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Delete your account?</AlertDialogTitle>
+						<AlertDialogTitle>{tCard('dialogTitle')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							This deletes all of the following at once. It cannot be undone.
+							{tCard('dialogDescription')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 
@@ -148,7 +146,7 @@ export function DeleteAccountCard({
 
 						<AlertDialogFooter className="pt-2">
 							<AlertDialogCancel disabled={remove.isPending}>
-								Cancel
+								{tCard('cancel')}
 							</AlertDialogCancel>
 							<Button
 								type="submit"
@@ -158,10 +156,10 @@ export function DeleteAccountCard({
 								{remove.isPending ? (
 									<>
 										<Loader2 className="size-4 animate-spin" aria-hidden />
-										Deleting…
+										{tCard('deleting')}
 									</>
 								) : (
-									'Delete Account'
+									tCard('confirm')
 								)}
 							</Button>
 						</AlertDialogFooter>

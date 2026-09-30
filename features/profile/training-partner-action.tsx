@@ -3,6 +3,7 @@
 import type { UserSearchResponse } from '@sunsteel/contracts'
 import { Handshake, HeartHandshake, Loader2, UserRoundPlus } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -21,8 +22,8 @@ import {
 } from '@/lib/api/hooks/useTrainingPartners'
 import {
 	findTrainingPartnership,
-	TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS,
 	trainingPartnerActionLabel,
+	trainingPartnerEncouragementOptions,
 } from '@/lib/utils/training-partners'
 
 export function TrainingPartnerAction({
@@ -30,6 +31,7 @@ export function TrainingPartnerAction({
 }: {
 	member: UserSearchResponse
 }) {
+	const tPartners = useTranslations('settings.trainingPartners')
 	const partnerships = useTrainingPartners()
 	const request = useRequestTrainingPartner()
 	const accept = useAcceptTrainingPartner()
@@ -39,7 +41,7 @@ export function TrainingPartnerAction({
 		partnerships.data?.items ?? [],
 		member.id,
 	)
-	const label = trainingPartnerActionLabel(partnership)
+	const label = trainingPartnerActionLabel(tPartners, partnership)
 	const pending = request.isPending || accept.isPending
 	if (partnerships.isError) {
 		return (
@@ -72,7 +74,7 @@ export function TrainingPartnerAction({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>Choose a prompt</DropdownMenuLabel>
-							{TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS.map(option => (
+							{trainingPartnerEncouragementOptions(tPartners).map(option => (
 								<DropdownMenuItem
 									key={option.kind}
 									onSelect={() =>
