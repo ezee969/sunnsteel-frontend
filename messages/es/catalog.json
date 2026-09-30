@@ -128,5 +128,11 @@
 			"title": "Laureado",
 			"description": "Una práctica de entrenamiento duradera, anotada en el registro."
 		}
+	},
+	"starToggle": {
+		"star": "Marcar {name} con estrella",
+		"unstar": "Quitar la estrella de {name}",
+		"starLabel": "Marcar",
+		"starredLabel": "Con estrella"
 	}
 }

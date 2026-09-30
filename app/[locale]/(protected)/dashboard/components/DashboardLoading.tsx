@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl'
+
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { cn } from '@/lib/utils'
 
@@ -11,6 +13,7 @@ export default function DashboardLoading({
 }: {
 	className?: string
 }) {
+	const t = useTranslations('planning.dashboardPage')
 	return (
 		<div
 			className={cn(
@@ -21,8 +24,8 @@ export default function DashboardLoading({
 			aria-live="polite"
 			aria-busy="true"
 		>
-			<ClassicalLoader size="lg" label="Loading your dashboard" />
-			<span className="sr-only">Loading your dashboard…</span>
+			<ClassicalLoader size="lg" label={t('loadingLabel')} />
+			<span className="sr-only">{t('loadingStatus')}</span>
 		</div>
 	)
 }

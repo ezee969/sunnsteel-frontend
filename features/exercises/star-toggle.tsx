@@ -1,6 +1,7 @@
 'use client'
 
 import { Star } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -26,12 +27,13 @@ export function StarToggle({
 	showLabel?: boolean
 	className?: string
 }) {
+	const t = useTranslations('catalog.starToggle')
 	const stars = useStarredExercises()
 	const toggle = useToggleExerciseStar()
 	const starred = Boolean(
 		stars.data?.items.some(item => item.exerciseId === exerciseId),
 	)
-	const label = `${starred ? 'Unstar' : 'Star'} ${exerciseName}`
+	const label = t(starred ? 'unstar' : 'star', { name: exerciseName })
 
 	return (
 		<Button
@@ -52,7 +54,7 @@ export function StarToggle({
 					starred ? 'fill-current text-foreground' : 'text-ink-3',
 				)}
 			/>
-			{showLabel ? (starred ? 'Starred' : 'Star') : null}
+			{showLabel ? (starred ? t('starredLabel') : t('starLabel')) : null}
 		</Button>
 	)
 }

@@ -1,1 +1,80 @@
-{}
+{
+	"categories": {
+		"SESSIONS": "Sessions",
+		"SETS": "Completed sets",
+		"VOLUME_KG": "Training volume",
+		"RECORDS": "Personal records",
+		"STREAK_DAYS": "Training streaks"
+	},
+	"progress": {
+		"unitSessions": "{count, plural, one {session} other {sessions}}",
+		"unitSets": "{count, plural, one {set} other {sets}}",
+		"unitKg": "kg",
+		"unitRecords": "{count, plural, one {exercise} other {exercises}}",
+		"unitStreakDays": "{count, plural, one {training day} other {training days}}",
+		"evidenceTotal": "{current} {unit} total",
+		"evidenceStreak": "Best {current} / next {target} training days",
+		"evidenceRatio": "{current} / {target} {unit}",
+		"detailComplete": "The five fixed milestones in this category are complete.",
+		"detailSessions": "{remaining} more {count, plural, one {session} other {sessions}}, within your own schedule.",
+		"detailSets": "{remaining} more completed {count, plural, one {set} other {sets}} in planned training.",
+		"detailVolume": "Cumulative completed-set history; there is no deadline and load should follow your plan.",
+		"detailRecords": "{remaining} more {count, plural, one {exercise record} other {exercise records}} through normal training.",
+		"detailStreak": "Uses your best recorded streak; recovery days between sessions are compatible."
+	},
+	"rank": {
+		"evidence": "{sessions, plural, one {# session} other {# sessions}} · {weeks, plural, one {# active week} other {# active weeks}}",
+		"nextSessions": "{count, plural, one {# more session} other {# more sessions}}",
+		"nextSessionsMet": "Session requirement met",
+		"nextWeeks": "{count, plural, one {# more active week} other {# more active weeks}}",
+		"nextWeeksMet": "Active-week requirement met",
+		"nextJoin": "{sessions} · {weeks}",
+		"loadingAria": "Loading Renaissance rank",
+		"title": "Renaissance rank",
+		"summary": "Earned through completed sessions and active training weeks, never weight moved.",
+		"definition": "An active week has at least one completed session.",
+		"current": "Current rank",
+		"next": "Next rank",
+		"ladder": "Rank ladder",
+		"highest": "Highest rank reached",
+		"highestBody": "Your participation has completed the Renaissance rank path."
+	},
+	"comeback": {
+		"evidence": "{inactiveDays} full days away · {activeDays} active days in {windowDays} days",
+		"recorded": "Comeback recorded",
+		"recognized": "Recognized {date}",
+		"viewSession": "View session",
+		"loadingAria": "Loading comeback recognition",
+		"title": "Comeback recognition",
+		"summary": "Time away does not erase the work of returning.",
+		"rule": "A comeback is recorded after {minimumInactiveDays} full days without a completed workout, then {requiredActiveDays} separate training days within {windowDays} days of returning. Sessions on the same day count once.",
+		"truncated": "Shows comebacks detected in your 500 most recent completed sessions.",
+		"emptyTitle": "No comeback recorded yet",
+		"emptyBody": "If time away happens, returning steadily can earn one. An uninterrupted streak is not the only form of consistency."
+	},
+	"milestones": {
+		"loadingAria": "Loading milestone progress",
+		"allRecorded": "All milestones recorded",
+		"title": "Next milestones",
+		"summary": "Follow your plan, use appropriate loads, and keep recovery days.",
+		"explanation": "One fixed next milestone in each category, with no deadline. Categories stay in a stable order, not ranked by what is closest."
+	},
+	"ledger": {
+		"title": "Earned milestones",
+		"subtitle": "Verified from completed training, never manual claims.",
+		"loadingAria": "Loading achievements",
+		"errorTitle": "Achievements are unavailable",
+		"errorBody": "We could not verify your milestones. Try again.",
+		"retry": "Retry",
+		"preparingTitle": "Training history is preparing",
+		"preparingBody": "Milestones will appear when your progress data is ready.",
+		"emptyTitle": "Your first milestone is ahead",
+		"emptyDescription": "Complete a workout to begin earning verified session, set, volume, record, and streak milestones.",
+		"emptyAction": "Choose a workout",
+		"fromHistory": "Recognized from history",
+		"earnedOn": "Earned {date}",
+		"viewSession": "View session",
+		"earnedCount": "{count} earned",
+		"highest": "Highest: {title}"
+	}
+}

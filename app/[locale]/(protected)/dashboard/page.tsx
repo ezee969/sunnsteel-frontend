@@ -2,6 +2,7 @@
 
 import type { DashboardSectionId } from '@sunsteel/contracts'
 import { SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -37,6 +38,7 @@ const SECTIONS: Record<DashboardSectionId, () => React.JSX.Element> = {
 }
 
 export default function Dashboard() {
+	const t = useTranslations('planning.dashboardPage')
 	const { isLoading, user, progress } = useDashboardData()
 
 	const name = user?.name?.trim()
@@ -45,10 +47,7 @@ export default function Dashboard() {
 	return (
 		<div className="flex flex-col gap-6 sm:gap-8">
 			{/* Classical Hero — static, so it paints immediately */}
-			<HeroSection
-				title={<>Forge Your Path</>}
-				subtitle={<>Strength • Discipline • Craft</>}
-			/>
+			<HeroSection title={t('heroTitle')} subtitle={t('heroSubtitle')} />
 
 			{/*
 			 * Everything below is gated on one readiness flag so the dashboard
@@ -57,15 +56,13 @@ export default function Dashboard() {
 			 */}
 			{progress.bootstrapError ? (
 				<div role="alert" className="flex flex-col items-start gap-3">
-					<p className="type-body-sm text-foreground">
-						Unable to prepare your workout progress. Please try again.
-					</p>
+					<p className="type-body-sm text-foreground">{t('bootstrapError')}</p>
 					<Button
 						onClick={() => {
 							void progress.retryBootstrap().catch(() => undefined)
 						}}
 					>
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : isLoading ? (
@@ -82,11 +79,9 @@ export default function Dashboard() {
 						    competing with it (§5.3 — Cinzel appears at most twice, and
 						    the inline font-family override went with the old rank). */}
 							<p className="type-panel text-foreground">
-								{name ? `Welcome back, ${name}!` : 'Welcome back!'}
+								{name ? t('welcomeNamed', { name }) : t('welcome')}
 							</p>
-							<p className="type-body-sm text-ink-3">
-								Track your fitness journey and achieve your goals.
-							</p>
+							<p className="type-body-sm text-ink-3">{t('tagline')}</p>
 						</div>
 						<Button
 							type="button"
@@ -95,7 +90,7 @@ export default function Dashboard() {
 							onClick={() => setCustomizing(true)}
 						>
 							<SlidersHorizontal className="size-4" aria-hidden />
-							Customize
+							{t('customize')}
 						</Button>
 					</div>
 

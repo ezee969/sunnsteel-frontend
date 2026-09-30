@@ -6,8 +6,10 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
-	ACHIEVEMENT_CATEGORY_LABELS,
+	achievementCategoryLabel,
 	formatAchievementDate,
 	formatComebackEvidence,
 	formatMilestoneProgressDetail,
@@ -18,6 +20,15 @@ import {
 	hasVisibleProfileAchievements,
 	orderMilestoneProgress,
 } from './achievements'
+
+const tCategories = translatorFor('en', 'achievements.categories')
+const tProgress = translatorFor('en', 'achievements.progress')
+const tComeback = translatorFor('en', 'achievements.comeback')
+const tRank = translatorFor('en', 'achievements.rank')
+const esProgress = translatorFor('es', 'achievements.progress')
+const esComeback = translatorFor('es', 'achievements.comeback')
+const esRank = translatorFor('es', 'achievements.rank')
+const esCategories = translatorFor('es', 'achievements.categories')
 
 const earned = (
 	id: string,
@@ -79,12 +90,34 @@ describe('achievement presentation', () => {
 	})
 
 	it('keeps readable labels for every category', () => {
-		expect(Object.values(ACHIEVEMENT_CATEGORY_LABELS)).toEqual([
+		const categories = [
+			'SESSIONS',
+			'SETS',
+			'VOLUME_KG',
+			'RECORDS',
+			'STREAK_DAYS',
+		] as const
+		expect(
+			categories.map(category =>
+				achievementCategoryLabel(category, tCategories),
+			),
+		).toEqual([
 			'Sessions',
 			'Completed sets',
 			'Training volume',
 			'Personal records',
 			'Training streaks',
+		])
+		expect(
+			categories.map(category =>
+				achievementCategoryLabel(category, esCategories),
+			),
+		).toEqual([
+			'Sesiones',
+			'Series completadas',
+			'Volumen de entrenamiento',
+			'Récords personales',
+			'Rachas de entrenamiento',
 		])
 	})
 
@@ -105,8 +138,11 @@ describe('achievement presentation', () => {
 			windowDays: 12,
 		} satisfies ComebackRecognition
 
-		expect(formatComebackEvidence(comeback)).toBe(
+		expect(formatComebackEvidence(comeback, tComeback)).toBe(
 			'18 full days away · 3 active days in 12 days',
+		)
+		expect(formatComebackEvidence(comeback, esComeback)).toBe(
+			'18 días completos sin entrenar · 3 días activos en 12 días',
 		)
 	})
 
@@ -151,10 +187,10 @@ describe('achievement presentation', () => {
 			remaining: 15,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(progress, 'en')).toBe(
+		expect(formatMilestoneProgressEvidence(progress, 'en', tProgress)).toBe(
 			'10 / 25 sessions',
 		)
-		expect(formatMilestoneProgressDetail(progress, 'en')).toBe(
+		expect(formatMilestoneProgressDetail(progress, 'en', tProgress)).toBe(
 			'15 more sessions, within your own schedule.',
 		)
 	})
@@ -185,16 +221,16 @@ describe('achievement presentation', () => {
 			remaining: 2,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(volume, 'en')).toBe(
+		expect(formatMilestoneProgressEvidence(volume, 'en', tProgress)).toBe(
 			'49,250.5 / 50,000 kg',
 		)
-		expect(formatMilestoneProgressDetail(volume, 'en')).toContain(
+		expect(formatMilestoneProgressDetail(volume, 'en', tProgress)).toContain(
 			'load should follow your plan',
 		)
-		expect(formatMilestoneProgressEvidence(streak, 'en')).toBe(
+		expect(formatMilestoneProgressEvidence(streak, 'en', tProgress)).toBe(
 			'Best 3 / next 5 training days',
 		)
-		expect(formatMilestoneProgressDetail(streak, 'en')).toContain(
+		expect(formatMilestoneProgressDetail(streak, 'en', tProgress)).toContain(
 			'recovery days between sessions are compatible',
 		)
 	})
@@ -207,10 +243,10 @@ describe('achievement presentation', () => {
 			remaining: 0,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(progress, 'en')).toBe(
+		expect(formatMilestoneProgressEvidence(progress, 'en', tProgress)).toBe(
 			'56 exercises total',
 		)
-		expect(formatMilestoneProgressDetail(progress, 'en')).toBe(
+		expect(formatMilestoneProgressDetail(progress, 'en', tProgress)).toBe(
 			'The five fixed milestones in this category are complete.',
 		)
 	})
@@ -237,8 +273,8 @@ describe('achievement presentation', () => {
 			activeWeeksRemaining: 1,
 		} satisfies RenaissanceRankProgress
 
-		expect(formatRankEvidence(rank, 'en')).toBe('10 sessions · 7 active weeks')
-		expect(formatNextRankRequirements(rank, 'en')).toBe(
+		expect(formatRankEvidence(rank, tRank)).toBe('10 sessions · 7 active weeks')
+		expect(formatNextRankRequirements(rank, tRank)).toBe(
 			'5 more sessions · 1 more active week',
 		)
 	})
@@ -259,6 +295,72 @@ describe('achievement presentation', () => {
 			activeWeeksRemaining: 0,
 		} satisfies RenaissanceRankProgress
 
-		expect(formatNextRankRequirements(rank, 'en')).toBeNull()
+		expect(formatNextRankRequirements(rank, tRank)).toBeNull()
+	})
+
+	it('reads the same rules in Spanish', () => {
+		const progress = {
+			category: 'SESSIONS',
+			currentValue: 10,
+			nextMilestone: {
+				id: 'sessions:25',
+				category: 'SESSIONS',
+				threshold: 25,
+				title: '25 Sessions',
+				description: 'Complete 25 training sessions.',
+			},
+			remaining: 1,
+		} satisfies AchievementCategoryProgress
+		const volume = {
+			category: 'VOLUME_KG',
+			currentValue: 49_250.5,
+			nextMilestone: {
+				id: 'volume_kg:50000',
+				category: 'VOLUME_KG',
+				threshold: 50_000,
+				title: '50,000 kg Moved',
+				description: 'Accumulate 50,000 kg of external-load volume.',
+			},
+			remaining: 749.5,
+		} satisfies AchievementCategoryProgress
+		const rank = {
+			currentRank: {
+				id: 'APPRENTICE',
+				title: 'Apprentice',
+				description: 'Learning the craft through regular practice.',
+				minimumSessions: 5,
+				minimumActiveWeeks: 3,
+			},
+			nextRank: {
+				id: 'ARTISAN',
+				title: 'Artisan',
+				description: 'Building a dependable training practice.',
+				minimumSessions: 15,
+				minimumActiveWeeks: 8,
+			},
+			completedSessions: 10,
+			activeWeeks: 7,
+			sessionsRemaining: 1,
+			activeWeeksRemaining: 0,
+		} satisfies RenaissanceRankProgress
+
+		expect(formatMilestoneProgressEvidence(progress, 'es', esProgress)).toBe(
+			'10 / 25 sesiones',
+		)
+		expect(formatMilestoneProgressDetail(progress, 'es', esProgress)).toBe(
+			'1 sesión más, a tu propio ritmo.',
+		)
+		expect(formatMilestoneProgressEvidence(volume, 'es', esProgress)).toBe(
+			'49.250,5 / 50.000 kg',
+		)
+		expect(formatMilestoneProgressDetail(volume, 'es', esProgress)).toContain(
+			'la carga debe seguir tu plan',
+		)
+		expect(formatRankEvidence(rank, esRank)).toBe(
+			'10 sesiones · 7 semanas activas',
+		)
+		expect(formatNextRankRequirements(rank, esRank)).toBe(
+			'1 sesión más · Requisito de semanas activas cumplido',
+		)
 	})
 })

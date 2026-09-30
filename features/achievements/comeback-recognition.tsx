@@ -4,7 +4,7 @@ import type {
 } from '@sunsteel/contracts'
 import { RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,6 +21,7 @@ interface ComebackRecognitionProps {
 
 function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('achievements.comeback')
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -28,21 +29,23 @@ function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 					<RotateCcw className="size-4 text-ink-3" aria-hidden />
 				</span>
 				<div className="min-w-0">
-					<h3 className="type-panel text-foreground">Comeback recorded</h3>
+					<h3 className="type-panel text-foreground">{t('recorded')}</h3>
 					<p className="type-data mt-1 text-foreground">
-						{formatComebackEvidence(comeback)}
+						{formatComebackEvidence(comeback, t)}
 					</p>
 				</div>
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
-					Recognized {formatAchievementDate(comeback.recognizedAt, locale)}
+					{t('recognized', {
+						date: formatAchievementDate(comeback.recognizedAt, locale),
+					})}
 				</p>
 				<Link
 					href={`/workouts/history/${comeback.sourceSessionId}`}
 					className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
 				>
-					View session
+					{t('viewSession')}
 				</Link>
 			</div>
 		</li>
@@ -53,9 +56,10 @@ export function ComebackRecognition({
 	data,
 	isPending,
 }: ComebackRecognitionProps) {
+	const t = useTranslations('achievements.comeback')
 	if (isPending) {
 		return (
-			<section aria-label="Loading comeback recognition" className="space-y-4">
+			<section aria-label={t('loadingAria')} className="space-y-4">
 				<Skeleton className="h-16" />
 				<Skeleton className="h-24" />
 			</section>
@@ -68,17 +72,15 @@ export function ComebackRecognition({
 		<section aria-labelledby="comeback-recognition" className="space-y-4">
 			<div className="rule-heading pb-4">
 				<h2 id="comeback-recognition" className="type-panel text-foreground">
-					Comeback recognition
+					{t('title')}
 				</h2>
-				<Explanation
-					className="mt-1"
-					summary="Time away does not erase the work of returning."
-				>
+				<Explanation className="mt-1" summary={t('summary')}>
 					<p>
-						A comeback is recorded after {data.minimumInactiveDays} full days
-						without a completed workout, then {data.requiredActiveDays} separate
-						training days within {data.windowDays} days of returning. Sessions
-						on the same day count once.
+						{t('rule', {
+							minimumInactiveDays: data.minimumInactiveDays,
+							requiredActiveDays: data.requiredActiveDays,
+							windowDays: data.windowDays,
+						})}
 					</p>
 				</Explanation>
 			</div>
@@ -91,10 +93,7 @@ export function ComebackRecognition({
 						))}
 					</ul>
 					{data.historyTruncated ? (
-						<p className="type-body-sm text-ink-3">
-							Shows comebacks detected in your 500 most recent completed
-							sessions.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('truncated')}</p>
 					) : null}
 				</>
 			) : (
@@ -104,12 +103,9 @@ export function ComebackRecognition({
 							<RotateCcw className="size-4 text-ink-3" aria-hidden />
 						</span>
 						<div>
-							<h3 className="type-panel text-foreground">
-								No comeback recorded yet
-							</h3>
+							<h3 className="type-panel text-foreground">{t('emptyTitle')}</h3>
 							<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-								If time away happens, returning steadily can earn one. An
-								uninterrupted streak is not the only form of consistency.
+								{t('emptyBody')}
 							</p>
 						</div>
 					</div>

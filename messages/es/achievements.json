@@ -1,1 +1,80 @@
-{}
+{
+	"categories": {
+		"SESSIONS": "Sesiones",
+		"SETS": "Series completadas",
+		"VOLUME_KG": "Volumen de entrenamiento",
+		"RECORDS": "Récords personales",
+		"STREAK_DAYS": "Rachas de entrenamiento"
+	},
+	"progress": {
+		"unitSessions": "{count, plural, one {sesión} other {sesiones}}",
+		"unitSets": "{count, plural, one {serie} other {series}}",
+		"unitKg": "kg",
+		"unitRecords": "{count, plural, one {ejercicio} other {ejercicios}}",
+		"unitStreakDays": "{count, plural, one {día de entrenamiento} other {días de entrenamiento}}",
+		"evidenceTotal": "{current} {unit} en total",
+		"evidenceStreak": "Mejor racha {current} / siguiente {target} días de entrenamiento",
+		"evidenceRatio": "{current} / {target} {unit}",
+		"detailComplete": "Los cinco hitos fijos de esta categoría están completos.",
+		"detailSessions": "{remaining} {count, plural, one {sesión más} other {sesiones más}}, a tu propio ritmo.",
+		"detailSets": "{remaining} {count, plural, one {serie completada más} other {series completadas más}} en entrenamiento planificado.",
+		"detailVolume": "Historial acumulado de series completadas; no hay plazo y la carga debe seguir tu plan.",
+		"detailRecords": "{remaining} {count, plural, one {récord de ejercicio más} other {récords de ejercicio más}} con el entrenamiento habitual.",
+		"detailStreak": "Usa tu mejor racha registrada; los días de recuperación entre sesiones son compatibles."
+	},
+	"rank": {
+		"evidence": "{sessions, plural, one {# sesión} other {# sesiones}} · {weeks, plural, one {# semana activa} other {# semanas activas}}",
+		"nextSessions": "{count, plural, one {# sesión más} other {# sesiones más}}",
+		"nextSessionsMet": "Requisito de sesiones cumplido",
+		"nextWeeks": "{count, plural, one {# semana activa más} other {# semanas activas más}}",
+		"nextWeeksMet": "Requisito de semanas activas cumplido",
+		"nextJoin": "{sessions} · {weeks}",
+		"loadingAria": "Cargando el rango renacentista",
+		"title": "Rango renacentista",
+		"summary": "Se obtiene con sesiones completadas y semanas de entrenamiento activas, nunca por el peso movido.",
+		"definition": "Una semana activa tiene al menos una sesión completada.",
+		"current": "Rango actual",
+		"next": "Siguiente rango",
+		"ladder": "Escala de rangos",
+		"highest": "Rango más alto alcanzado",
+		"highestBody": "Tu participación ha completado el camino de rangos renacentistas."
+	},
+	"comeback": {
+		"evidence": "{inactiveDays, plural, one {# día completo} other {# días completos}} sin entrenar · {activeDays, plural, one {# día activo} other {# días activos}} en {windowDays, plural, one {# día} other {# días}}",
+		"recorded": "Regreso registrado",
+		"recognized": "Reconocido el {date}",
+		"viewSession": "Ver sesión",
+		"loadingAria": "Cargando el reconocimiento de regreso",
+		"title": "Reconocimiento de regreso",
+		"summary": "El tiempo sin entrenar no borra el esfuerzo de volver.",
+		"rule": "Un regreso se registra tras {minimumInactiveDays} días completos sin un entrenamiento completado y luego {requiredActiveDays} días de entrenamiento distintos dentro de los {windowDays} días posteriores a volver. Las sesiones del mismo día cuentan una sola vez.",
+		"truncated": "Muestra los regresos detectados en tus 500 sesiones completadas más recientes.",
+		"emptyTitle": "Aún no hay ningún regreso registrado",
+		"emptyBody": "Si pasas un tiempo sin entrenar, volver con constancia puede lograr uno. Una racha ininterrumpida no es la única forma de constancia."
+	},
+	"milestones": {
+		"loadingAria": "Cargando el progreso de hitos",
+		"allRecorded": "Todos los hitos registrados",
+		"title": "Próximos hitos",
+		"summary": "Sigue tu plan, usa cargas adecuadas y respeta los días de recuperación.",
+		"explanation": "Un próximo hito fijo en cada categoría, sin plazo. Las categorías mantienen un orden estable, no se ordenan por cuál está más cerca."
+	},
+	"ledger": {
+		"title": "Hitos obtenidos",
+		"subtitle": "Verificados a partir del entrenamiento completado, nunca por declaración manual.",
+		"loadingAria": "Cargando logros",
+		"errorTitle": "Los logros no están disponibles",
+		"errorBody": "No pudimos verificar tus hitos. Inténtalo de nuevo.",
+		"retry": "Reintentar",
+		"preparingTitle": "Se está preparando tu historial de entrenamiento",
+		"preparingBody": "Los hitos aparecerán cuando los datos de tu progreso estén listos.",
+		"emptyTitle": "Tu primer hito está por llegar",
+		"emptyDescription": "Completa un entrenamiento para empezar a obtener hitos verificados de sesiones, series, volumen, récords y rachas.",
+		"emptyAction": "Elegir un entrenamiento",
+		"fromHistory": "Reconocido a partir del historial",
+		"earnedOn": "Obtenido el {date}",
+		"viewSession": "Ver sesión",
+		"earnedCount": "{count, plural, one {# obtenido} other {# obtenidos}}",
+		"highest": "Más alto: {title}"
+	}
+}

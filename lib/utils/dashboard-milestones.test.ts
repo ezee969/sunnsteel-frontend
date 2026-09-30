@@ -5,10 +5,22 @@ import type {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	buildUpcomingMilestones,
 	getUpcomingMilestonesEmptyState,
+	type MilestoneTranslators,
 } from './dashboard-milestones'
+
+const translators = (locale: 'en' | 'es'): MilestoneTranslators => ({
+	categories: translatorFor(locale, 'achievements.categories'),
+	progress: translatorFor(locale, 'achievements.progress'),
+	rank: translatorFor(locale, 'achievements.rank'),
+})
+const en = translators('en')
+const tEmpty = translatorFor('en', 'planning.dashboardMilestones')
+const esEmpty = translatorFor('es', 'planning.dashboardMilestones')
 
 const rank: RenaissanceRankProgress = {
 	currentRank: {
@@ -70,7 +82,7 @@ const response = (
 
 describe('upcoming milestones (DASH-09)', () => {
 	it('places the next rank first, then the categories in catalog order', () => {
-		const milestones = buildUpcomingMilestones('en', response())
+		const milestones = buildUpcomingMilestones('en', en, response())
 
 		expect(milestones.map(item => item.key)).toEqual([
 			'RANK',
@@ -81,7 +93,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('states the rank with its current standing and exact requirements', () => {
-		const [next] = buildUpcomingMilestones('en', response())
+		const [next] = buildUpcomingMilestones('en', en, response())
 
 		expect(next).toEqual({
 			key: 'RANK',
@@ -94,7 +106,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('carries a crest only on the rank row (ACH-09)', () => {
-		const milestones = buildUpcomingMilestones('en', response())
+		const milestones = buildUpcomingMilestones('en', en, response())
 
 		expect(
 			milestones.filter(item => item.rankId).map(item => item.key),
@@ -102,7 +114,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('states exact current and target values, never a percentage', () => {
-		const milestones = buildUpcomingMilestones('en', response())
+		const milestones = buildUpcomingMilestones('en', en, response())
 		const sessions = milestones.find(item => item.key === 'SESSIONS')
 
 		expect(sessions?.evidence).toBe('18 / 25 sessions')
@@ -115,6 +127,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	it('leaves out a category whose fixed catalog is complete', () => {
 		const milestones = buildUpcomingMilestones(
 			'en',
+			en,
 			response({
 				milestoneProgress: [
 					progress('SESSIONS', 500, null, 0),
@@ -129,6 +142,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	it('omits the rank once the ladder is finished', () => {
 		const milestones = buildUpcomingMilestones(
 			'en',
+			en,
 			response({
 				rank: {
 					...rank,
@@ -143,16 +157,16 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('shows nothing until the analytics projection is ready', () => {
-		expect(buildUpcomingMilestones('en', undefined)).toEqual([])
+		expect(buildUpcomingMilestones('en', en, undefined)).toEqual([])
 		expect(
-			buildUpcomingMilestones('en', response({ analyticsReady: false })),
+			buildUpcomingMilestones('en', en, response({ analyticsReady: false })),
 		).toEqual([])
 	})
 })
 
 describe('upcoming milestones empty state', () => {
 	it('points at routines before anything is verified', () => {
-		expect(getUpcomingMilestonesEmptyState(undefined)).toEqual({
+		expect(getUpcomingMilestonesEmptyState(tEmpty, undefined)).toEqual({
 			title: 'No milestones yet',
 			description:
 				'Finish a workout and the next milestone in each category appears here with its exact target.',
@@ -163,15 +177,45 @@ describe('upcoming milestones empty state', () => {
 	it('claims the finished rank path only when the rank says so', () => {
 		const completed = response({ milestoneProgress: [] })
 
-		expect(getUpcomingMilestonesEmptyState(completed).description).toBe(
+		expect(getUpcomingMilestonesEmptyState(tEmpty, completed).description).toBe(
 			'The catalog in each category is complete.',
 		)
 		expect(
 			getUpcomingMilestonesEmptyState(
+				tEmpty,
 				response({ milestoneProgress: [], rank: { ...rank, nextRank: null } }),
 			).description,
 		).toBe(
 			'The catalog in each category is complete and the Renaissance rank path is finished.',
 		)
+	})
+})
+
+describe('upcoming milestones in Spanish', () => {
+	it('names the rank and states exact values', () => {
+		const milestones = buildUpcomingMilestones(
+			'es',
+			translators('es'),
+			response(),
+		)
+
+		expect(milestones[0]).toMatchObject({
+			key: 'RANK',
+			group: 'Rango renacentista',
+			evidence: '18 sesiones · 9 semanas activas',
+			detail: '7 sesiones más · 5 semanas activas más',
+		})
+		expect(milestones[1].evidence).toBe('18 / 25 sesiones')
+		expect(
+			milestones.some(item => `${item.evidence}${item.detail}`.includes('%')),
+		).toBe(false)
+	})
+
+	it('points at routines before anything is verified', () => {
+		expect(getUpcomingMilestonesEmptyState(esEmpty, undefined).action).toEqual({
+			kind: 'link',
+			label: 'Ver rutinas',
+			href: '/routines',
+		})
 	})
 })

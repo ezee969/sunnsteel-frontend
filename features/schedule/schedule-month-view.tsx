@@ -1,26 +1,34 @@
 'use client'
 
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
 import {
 	describeConsistency,
 	describeMonth,
 	describeMonthCell,
+	describeMonthTotals,
 	formatMonth,
 	type ScheduleMonth,
 	type ScheduleMonthCell,
+	scheduleStatusLabel,
 } from '@/lib/utils/schedule-month'
-import { describeScheduleTotals } from '@/lib/utils/schedule-week'
 
 import { SCHEDULE_STATUS } from './schedule-status'
 
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+// 1 January 2024 was a Monday: seven days from it are the Monday-first columns.
+const weekdayLabels = (locale: Locale) =>
+	Array.from({ length: 7 }, (_, index) =>
+		dateFormatter(locale, { weekday: 'short' }).format(
+			new Date(2024, 0, 1 + index),
+		),
+	)
 
 interface ScheduleMonthViewProps {
 	month?: ScheduleMonth
@@ -89,10 +97,11 @@ export function ScheduleMonthView({
 	footer,
 }: ScheduleMonthViewProps) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('planning.scheduleMonth')
 	const monthLabel = month
-		? describeMonth(month.monthStart, now, locale)
-		: 'This month'
-	const consistency = month ? describeConsistency(month) : null
+		? describeMonth(month.monthStart, now, locale, t)
+		: t('thisMonth')
+	const consistency = month ? describeConsistency(month, t) : null
 	return (
 		<section aria-labelledby={headingId} className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
@@ -104,7 +113,7 @@ export function ScheduleMonthView({
 						{month
 							? [
 									heading ? formatMonth(month.monthStart, locale) : null,
-									describeScheduleTotals(month.totals),
+									describeMonthTotals(month.totals, t),
 								]
 									.filter(Boolean)
 									.join(' · ')
@@ -116,7 +125,7 @@ export function ScheduleMonthView({
 				</div>
 				<div
 					role="group"
-					aria-label="Month"
+					aria-label={t('monthGroup')}
 					className="flex items-center gap-1"
 				>
 					<Button
@@ -124,7 +133,7 @@ export function ScheduleMonthView({
 						variant="ghost"
 						size="icon"
 						className="size-11 sm:size-9"
-						aria-label="Previous month"
+						aria-label={t('previousMonth')}
 						onClick={onPrevious}
 					>
 						<ChevronLeft className="size-4" aria-hidden />
@@ -136,14 +145,14 @@ export function ScheduleMonthView({
 						disabled={isCurrentMonth}
 						onClick={onToday}
 					>
-						This month
+						{t('thisMonth')}
 					</Button>
 					<Button
 						type="button"
 						variant="ghost"
 						size="icon"
 						className="size-11 sm:size-9"
-						aria-label="Next month"
+						aria-label={t('followingMonth')}
 						onClick={onNext}
 					>
 						<ChevronRight className="size-4" aria-hidden />
@@ -152,28 +161,30 @@ export function ScheduleMonthView({
 			</div>
 
 			<ul
-				aria-label="Legend"
+				aria-label={t('legend')}
 				className="type-body-sm flex flex-wrap gap-x-4 gap-y-1 text-ink-3"
 			>
-				{Object.values(SCHEDULE_STATUS).map(({ Icon, label, tone }) => (
-					<li key={label} className="flex items-center gap-1.5">
-						<Icon className={cn('size-4', tone)} aria-hidden />
-						{label}
-					</li>
-				))}
+				{(Object.keys(SCHEDULE_STATUS) as (keyof typeof SCHEDULE_STATUS)[]).map(
+					state => {
+						const { Icon, tone } = SCHEDULE_STATUS[state]
+						return (
+							<li key={state} className="flex items-center gap-1.5">
+								<Icon className={cn('size-4', tone)} aria-hidden />
+								{scheduleStatusLabel(state, t)}
+							</li>
+						)
+					},
+				)}
 			</ul>
 
 			{isPending ? (
-				<div role="status" aria-label="Loading month">
+				<div role="status" aria-label={t('loading')}>
 					<Skeleton className="h-72" />
 				</div>
 			) : isError || !month ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">Month is unavailable</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load your routines or sessions for this month. Try
-						again.
-					</p>
+					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -182,7 +193,7 @@ export function ScheduleMonthView({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : (
@@ -192,7 +203,7 @@ export function ScheduleMonthView({
 					</caption>
 					<thead>
 						<tr>
-							{WEEKDAYS.map(day => (
+							{weekdayLabels(locale).map(day => (
 								<th
 									key={day}
 									scope="col"
@@ -216,7 +227,7 @@ export function ScheduleMonthView({
 											<button
 												type="button"
 												className="block w-full transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-												aria-label={describeMonthCell(cell, locale)}
+												aria-label={describeMonthCell(cell, locale, t)}
 												onClick={() => onSelectDay(cell.date)}
 											>
 												<CellContent cell={cell} />
@@ -226,7 +237,7 @@ export function ScheduleMonthView({
 												<CellContent cell={cell} />
 												{cell.inMonth ? (
 													<span className="sr-only">
-														{describeMonthCell(cell, locale)}
+														{describeMonthCell(cell, locale, t)}
 													</span>
 												) : null}
 											</>

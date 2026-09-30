@@ -128,5 +128,11 @@
 			"title": "Laureate",
 			"description": "A lasting training practice recorded in the ledger."
 		}
+	},
+	"starToggle": {
+		"star": "Star {name}",
+		"unstar": "Unstar {name}",
+		"starLabel": "Star",
+		"starredLabel": "Starred"
 	}
 }

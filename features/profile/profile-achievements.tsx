@@ -5,12 +5,12 @@ import type {
 } from '@sunsteel/contracts'
 import { Award, Check, Medal, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
 import type { Locale } from '@/i18n/config'
 import {
-	ACHIEVEMENT_CATEGORY_LABELS,
+	achievementCategoryLabel,
 	formatAchievementDate,
 	formatComebackEvidence,
 	groupAchievements,
@@ -71,6 +71,7 @@ function ComebackRow({
 	isOwnProfile: boolean
 }) {
 	const locale = useLocale() as Locale
+	const tComeback = useTranslations('achievements.comeback')
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -80,7 +81,7 @@ function ComebackRow({
 				<div className="min-w-0">
 					<h4 className="type-panel text-foreground">Comeback recorded</h4>
 					<p className="type-data mt-1 text-foreground">
-						{formatComebackEvidence(comeback)}
+						{formatComebackEvidence(comeback, tComeback)}
 					</p>
 				</div>
 			</div>
@@ -106,6 +107,7 @@ export function ProfileAchievements({
 	canView,
 	isOwnProfile,
 }: ProfileAchievementsProps) {
+	const tCategories = useTranslations('achievements.categories')
 	const groups = groupAchievements(data?.achievements ?? [])
 	const comebacks = data?.comeback?.recognitions ?? []
 
@@ -162,7 +164,7 @@ export function ProfileAchievements({
 											id={`profile-achievement-${group.category}`}
 											className="type-panel text-foreground"
 										>
-											{ACHIEVEMENT_CATEGORY_LABELS[group.category]}
+											{achievementCategoryLabel(group.category, tCategories)}
 										</h3>
 									</div>
 									<ul>
