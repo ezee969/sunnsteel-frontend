@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { useExercises, useStarredExercises } from '@/lib/api/hooks/useExercises'
@@ -174,6 +175,7 @@ function ExerciseRow({
 	const t = useTranslations('catalog.exercisesUi')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
+	const tExercises = useTranslations('catalog.exercises')
 	const primary = getFriendlyMuscleNames(
 		exercise.primaryMuscles,
 		tMuscles,
@@ -199,7 +201,7 @@ function ExerciseRow({
 			<div className="flex min-w-0 items-start gap-1">
 				<StarToggle
 					exerciseId={exercise.id}
-					exerciseName={exercise.name}
+					exerciseName={exerciseLabel(exercise.name, tExercises)}
 					className="-ml-2.5 -mt-2"
 				/>
 				<div className="min-w-0">
@@ -208,7 +210,7 @@ function ExerciseRow({
 							href={`/exercises/${exercise.id}`}
 							className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 						>
-							{exercise.name}
+							{exerciseLabel(exercise.name, tExercises)}
 						</Link>
 					</h3>
 					{isCustomExercise(exercise) ? (
@@ -279,6 +281,7 @@ export function ExerciseCatalog() {
 	const t = useTranslations('catalog.exercisesUi')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
+	const tExercises = useTranslations('catalog.exercises')
 	const [creating, setCreating] = useState(false)
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
@@ -319,8 +322,9 @@ export function ExerciseCatalog() {
 				trainedIds,
 				listedEquipment,
 				starredIds,
+				label: name => exerciseLabel(name, tExercises),
 			}),
-		[exercises, filters, listedEquipment, starredIds, trainedIds],
+		[exercises, filters, listedEquipment, starredIds, trainedIds, tExercises],
 	)
 	// EXER-06: the count is of what the current view can hold.
 	const customCount = useMemo(

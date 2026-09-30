@@ -1,6 +1,7 @@
 import type { Exercise } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { exerciseLabel } from '@/i18n/catalog'
 import { translatorFor } from '@/i18n/translator'
 
 import {
@@ -106,6 +107,23 @@ describe('catalog filter URL state', () => {
 })
 
 describe('filterCatalog', () => {
+	it('also matches the translated name, without accents or case', () => {
+		const es = translatorFor('es', 'catalog.exercises')
+		const label = (name: string) => exerciseLabel(name, es)
+		const search = (q: string) =>
+			names(
+				filterCatalog(
+					catalog,
+					{ ...EMPTY_CATALOG_FILTERS, q },
+					{ ...none, label },
+				),
+			)
+		expect(search('flexion')).toEqual(['Push-ups'])
+		expect(search('PRESS DE BANCA')).toEqual(['Bench Press'])
+		// The stored name still matches.
+		expect(search('push')).toEqual(['Push-ups'])
+	})
+
 	it('lists everything alphabetically without filters', () => {
 		expect(names(filterCatalog(catalog, EMPTY_CATALOG_FILTERS, none))).toEqual([
 			'Bench Press',

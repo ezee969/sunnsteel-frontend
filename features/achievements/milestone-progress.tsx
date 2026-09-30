@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
+import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
 	achievementCategoryLabel,
@@ -29,6 +30,7 @@ function MilestoneProgressRow({
 	const t = useTranslations('achievements.milestones')
 	const tCategories = useTranslations('achievements.categories')
 	const tProgress = useTranslations('achievements.progress')
+	const tCatalog = useTranslations('catalog.achievements')
 	const isComplete = progress.nextMilestone === null
 
 	return (
@@ -46,7 +48,9 @@ function MilestoneProgressRow({
 						{achievementCategoryLabel(progress.category, tCategories)}
 					</p>
 					<h3 className="type-panel mt-1 text-foreground">
-						{progress.nextMilestone?.title ?? t('allRecorded')}
+						{progress.nextMilestone
+							? achievementText(progress.nextMilestone, tCatalog).title
+							: t('allRecorded')}
 					</h3>
 				</div>
 			</div>

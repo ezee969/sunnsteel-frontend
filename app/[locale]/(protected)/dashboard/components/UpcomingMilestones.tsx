@@ -57,10 +57,18 @@ export default function UpcomingMilestones() {
 	const tCategories = useTranslations('achievements.categories')
 	const tProgress = useTranslations('achievements.progress')
 	const tRank = useTranslations('achievements.rank')
+	const tCatalogAchievements = useTranslations('catalog.achievements')
+	const tCatalogRanks = useTranslations('catalog.ranks')
 	const { data, isPending, isError, refetch, isFetching } = useAchievements()
 	const milestones = buildUpcomingMilestones(
 		locale,
-		{ categories: tCategories, progress: tProgress, rank: tRank },
+		{
+			categories: tCategories,
+			progress: tProgress,
+			rank: tRank,
+			catalogAchievements: tCatalogAchievements,
+			catalogRanks: tCatalogRanks,
+		},
 		data,
 	)
 

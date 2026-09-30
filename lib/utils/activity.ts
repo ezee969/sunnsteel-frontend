@@ -20,6 +20,7 @@ import { ACTIVITY_REACTIONS } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
 import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
+import { achievementText, exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { MessageKey, Translator } from '@/i18n/translator'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
@@ -134,13 +135,30 @@ function describeProgression(
 }
 
 /** The record an entry came from, named in the viewer's unit. */
+/** Catalog translators for the exercise and achievement names (I18N-07). */
+export interface ActivityCatalog {
+	exercises: Translator<'catalog.exercises'>
+	achievements: Translator<'catalog.achievements'>
+}
+
 export function describeActivity(
 	entry: ActivityEntry,
 	unit: WeightUnit,
 	locale: Locale,
 	t: T,
 	tComeback: Translator<'achievements.comeback'>,
+	catalog?: ActivityCatalog,
 ): { title: string; detail: string | null } {
+	const exercise = (name: string) =>
+		catalog ? exerciseLabel(name, catalog.exercises) : name
+	const achievement = (value: {
+		id: string
+		title: string
+		description: string
+	}) =>
+		catalog
+			? achievementText(value, catalog.achievements)
+			: { title: value.title, description: value.description }
 	switch (entry.type) {
 		case 'SESSION_COMPLETED': {
 			const { session } = entry
@@ -168,7 +186,9 @@ export function describeActivity(
 		}
 		case 'PERSONAL_RECORD':
 			return {
-				title: t('recordTitle', { exercise: entry.record.exerciseName }),
+				title: t('recordTitle', {
+					exercise: exercise(entry.record.exerciseName),
+				}),
 				detail: t('recordDetail', {
 					weight: formatWeight(entry.record.weightKg, unit, locale),
 					reps: entry.record.reps,
@@ -178,14 +198,16 @@ export function describeActivity(
 		case 'PROGRESSION_CHANGED':
 			return {
 				title: t('progressionTitle', {
-					exercise: entry.progression.exerciseName,
+					exercise: exercise(entry.progression.exerciseName),
 				}),
 				detail: describeProgression(entry.progression.sets, unit, locale, t),
 			}
 		case 'ACHIEVEMENT_UNLOCKED':
 			return {
-				title: t('achievementTitle', { title: entry.achievement.title }),
-				detail: entry.achievement.description,
+				title: t('achievementTitle', {
+					title: achievement(entry.achievement).title,
+				}),
+				detail: achievement(entry.achievement).description,
 			}
 		case 'STREAK_MILESTONE':
 			return {

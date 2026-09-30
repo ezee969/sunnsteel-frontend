@@ -69,6 +69,10 @@ export function ActivityFact({
 	const locale = useLocale() as Locale
 	const t = useTranslations('social.activity')
 	const tComeback = useTranslations('achievements.comeback')
+	const catalog = {
+		exercises: useTranslations('catalog.exercises'),
+		achievements: useTranslations('catalog.achievements'),
+	}
 	const Icon = ACTIVITY_ICONS[entry.type]
 	const { title, detail } = describeActivity(
 		entry,
@@ -76,6 +80,7 @@ export function ActivityFact({
 		locale,
 		t,
 		tComeback,
+		catalog,
 	)
 	return (
 		<div className="flex min-w-0 gap-3">

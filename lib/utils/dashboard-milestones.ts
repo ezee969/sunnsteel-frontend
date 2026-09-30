@@ -3,6 +3,7 @@ import type {
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
 
+import { achievementText, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
@@ -40,6 +41,8 @@ export interface UpcomingMilestone {
 export interface MilestoneTranslators {
 	categories: Translator<'achievements.categories'>
 	progress: Translator<'achievements.progress'>
+	catalogAchievements: Translator<'catalog.achievements'>
+	catalogRanks: Translator<'catalog.ranks'>
 	rank: Translator<'achievements.rank'>
 }
 
@@ -52,7 +55,7 @@ function buildRankMilestone(
 	return {
 		key: 'RANK',
 		group: t.rank('title'),
-		title: rank.nextRank.title,
+		title: rankText(rank.nextRank, t.catalogRanks).title,
 		rankId: rank.nextRank.id,
 		evidence: formatRankEvidence(rank, t.rank),
 		detail,
@@ -77,7 +80,9 @@ export function buildUpcomingMilestones(
 		.map(progress => ({
 			key: progress.category,
 			group: achievementCategoryLabel(progress.category, t.categories),
-			title: progress.nextMilestone?.title ?? '',
+			title: progress.nextMilestone
+				? achievementText(progress.nextMilestone, t.catalogAchievements).title
+				: '',
 			evidence: formatMilestoneProgressEvidence(progress, locale, t.progress),
 			detail: formatMilestoneProgressDetail(progress, locale, t.progress),
 		}))

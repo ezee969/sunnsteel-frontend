@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RankCrest } from '@/features/achievements/rank-crest'
+import { rankText } from '@/i18n/catalog'
 import {
 	formatNextRankRequirements,
 	formatRankEvidence,
@@ -16,6 +17,7 @@ interface RenaissanceRankProps {
 
 export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 	const t = useTranslations('achievements.rank')
+	const tRanks = useTranslations('catalog.ranks')
 	if (isPending) {
 		return (
 			<section aria-label={t('loadingAria')} className="space-y-4">
@@ -47,11 +49,11 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 					<div className="mt-2 flex items-center gap-3">
 						<RankCrest rankId={rank.currentRank.id} className="size-10" />
 						<h3 className="type-panel text-foreground">
-							{rank.currentRank.title}
+							{rankText(rank.currentRank, tRanks).title}
 						</h3>
 					</div>
 					<p className="type-body-sm mt-2 text-ink-2">
-						{rank.currentRank.description}
+						{rankText(rank.currentRank, tRanks).description}
 					</p>
 					<p className="type-data mt-3 text-foreground">
 						{formatRankEvidence(rank, t)}
@@ -69,11 +71,11 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 									className="size-10"
 								/>
 								<h3 className="type-panel text-foreground">
-									{rank.nextRank.title}
+									{rankText(rank.nextRank, tRanks).title}
 								</h3>
 							</div>
 							<p className="type-body-sm mt-2 text-ink-2">
-								{rank.nextRank.description}
+								{rankText(rank.nextRank, tRanks).description}
 							</p>
 							<p className="type-data mt-3 text-foreground">
 								{nextRequirements}

@@ -52,7 +52,8 @@ function NotificationRow({
 	const locale = useLocale()
 	const t = useTranslations('social.notifications')
 	const tPartners = useTranslations('settings.trainingPartners')
-	const view = describeNotification(notification, t, tPartners)
+	const tAchievements = useTranslations('catalog.achievements')
+	const view = describeNotification(notification, t, tPartners, tAchievements)
 	const Icon = KIND_ICON[notification.kind]
 	const unread = !notification.readAt
 	return (

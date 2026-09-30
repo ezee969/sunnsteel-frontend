@@ -8,6 +8,7 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { usePlateaus, useVolumeTrend } from '@/lib/api/hooks/useWorkoutSession'
@@ -42,6 +43,7 @@ const formatDate = (locale: Locale) => (iso: string) =>
 	DATE_FORMATTER(locale).format(new Date(iso))
 
 function InsightRow({ insight }: { insight: DashboardInsight }) {
+	const tExercises = useTranslations('catalog.exercises')
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
 			<div className="min-w-0">
@@ -51,7 +53,7 @@ function InsightRow({ insight }: { insight: DashboardInsight }) {
 						href={insight.href}
 						className="underline-offset-4 hover:underline"
 					>
-						{insight.subject}
+						{exerciseLabel(insight.subject, tExercises)}
 					</Link>
 				</h3>
 				<p className="type-body-sm mt-0.5 text-ink-2">{insight.statement}</p>
