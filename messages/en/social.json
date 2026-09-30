@@ -396,5 +396,19 @@
 		"yours": "Yours",
 		"yoursBody": "Choose who sees each entry, or withdraw one. Defaults for each kind are in <link>Settings</link>. {note}",
 		"seeItAs": "See it as"
+	},
+	"profileAchievements": {
+		"recognizedFromHistory": "Recognized from history",
+		"earned": "Earned {date}",
+		"viewSession": "View session",
+		"comebackRecorded": "Comeback recorded",
+		"recognized": "Recognized {date}",
+		"title": "Achievements",
+		"private": "Achievements are private.",
+		"emptyOwn": "Complete training to begin your verified achievement ledger.",
+		"empty": "No verified achievements yet.",
+		"currentRank": "Current Renaissance rank",
+		"comebacks": "Comebacks",
+		"truncated": "Shows comebacks detected in the 500 most recent completed sessions."
 	}
 }

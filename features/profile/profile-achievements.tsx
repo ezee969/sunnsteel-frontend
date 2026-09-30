@@ -31,6 +31,7 @@ function MilestoneRow({
 	isOwnProfile: boolean
 }) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('social.profileAchievements')
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -47,15 +48,17 @@ function MilestoneRow({
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
 					{achievement.backfilled
-						? 'Recognized from history'
-						: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`}
+						? t('recognizedFromHistory')
+						: t('earned', {
+								date: formatAchievementDate(achievement.unlockedAt, locale),
+							})}
 				</p>
 				{isOwnProfile && achievement.sourceSessionId ? (
 					<Link
 						href={`/workouts/history/${achievement.sourceSessionId}`}
 						className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
 					>
-						View session
+						{t('viewSession')}
 					</Link>
 				) : null}
 			</div>
@@ -72,6 +75,7 @@ function ComebackRow({
 }) {
 	const locale = useLocale() as Locale
 	const tComeback = useTranslations('achievements.comeback')
+	const t = useTranslations('social.profileAchievements')
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -79,7 +83,9 @@ function ComebackRow({
 					<RotateCcw className="size-4 text-ink-3" aria-hidden />
 				</span>
 				<div className="min-w-0">
-					<h4 className="type-panel text-foreground">Comeback recorded</h4>
+					<h4 className="type-panel text-foreground">
+						{t('comebackRecorded')}
+					</h4>
 					<p className="type-data mt-1 text-foreground">
 						{formatComebackEvidence(comeback, tComeback)}
 					</p>
@@ -87,14 +93,16 @@ function ComebackRow({
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
-					Recognized {formatAchievementDate(comeback.recognizedAt, locale)}
+					{t('recognized', {
+						date: formatAchievementDate(comeback.recognizedAt, locale),
+					})}
 				</p>
 				{isOwnProfile ? (
 					<Link
 						href={`/workouts/history/${comeback.sourceSessionId}`}
 						className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
 					>
-						View session
+						{t('viewSession')}
 					</Link>
 				) : null}
 			</div>
@@ -108,6 +116,7 @@ export function ProfileAchievements({
 	isOwnProfile,
 }: ProfileAchievementsProps) {
 	const tCategories = useTranslations('achievements.categories')
+	const t = useTranslations('social.profileAchievements')
 	const groups = groupAchievements(data?.achievements ?? [])
 	const comebacks = data?.comeback?.recognitions ?? []
 
@@ -121,16 +130,14 @@ export function ProfileAchievements({
 				id="profile-achievements"
 				className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 			>
-				<Award className="size-4 text-ink-3" aria-hidden /> Achievements
+				<Award className="size-4 text-ink-3" aria-hidden /> {t('title')}
 			</h2>
 
 			{!canView ? (
-				<p className="type-body-sm text-ink-3">Achievements are private.</p>
+				<p className="type-body-sm text-ink-3">{t('private')}</p>
 			) : !hasVisibleProfileAchievements(data) ? (
 				<p className="type-body-sm text-ink-3">
-					{isOwnProfile
-						? 'Complete training to begin your verified achievement ledger.'
-						: 'No verified achievements yet.'}
+					{isOwnProfile ? t('emptyOwn') : t('empty')}
 				</p>
 			) : (
 				<>
@@ -138,9 +145,7 @@ export function ProfileAchievements({
 						<div className="rule-row flex gap-3 py-4">
 							<RankCrest rankId={data.rank.id} className="mt-0.5 size-8" />
 							<div>
-								<p className="type-body-sm text-ink-3">
-									Current Renaissance rank
-								</p>
+								<p className="type-body-sm text-ink-3">{t('currentRank')}</p>
 								<h3 className="type-panel text-foreground">
 									{data.rank.title}
 								</h3>
@@ -189,7 +194,7 @@ export function ProfileAchievements({
 									id="profile-comebacks"
 									className="type-panel text-foreground"
 								>
-									Comebacks
+									{t('comebacks')}
 								</h3>
 							</div>
 							<ul>
@@ -202,10 +207,7 @@ export function ProfileAchievements({
 								))}
 							</ul>
 							{data?.comeback?.historyTruncated ? (
-								<p className="type-body-sm pt-3 text-ink-3">
-									Shows comebacks detected in the 500 most recent completed
-									sessions.
-								</p>
+								<p className="type-body-sm pt-3 text-ink-3">{t('truncated')}</p>
 							) : null}
 						</section>
 					) : null}
