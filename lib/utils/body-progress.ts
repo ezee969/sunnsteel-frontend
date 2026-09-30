@@ -10,6 +10,10 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
+import type { MessageKey, Translator } from '@/i18n/translator'
+
 import {
 	formatWeightInput,
 	getWeightUnitLabel,
@@ -32,12 +36,32 @@ export const BODY_LENGTH_FIELDS = BODY_MEASUREMENT_FIELDS.filter(
 	field => field.key !== 'weightKg',
 )
 
-export function bodyFieldLabel(field: BodyMeasurementField): string {
-	return BODY_MEASUREMENT_FIELDS.find(entry => entry.key === field)!.label
+/**
+ * PROG-12: contracts names the fields in English, so the label a member reads
+ * is looked up from the stable key instead (rule 9 of docs/reference/i18n.md).
+ */
+const FIELD_KEYS = {
+	weightKg: 'fieldWeightKg',
+	waistCm: 'fieldWaistCm',
+	hipsCm: 'fieldHipsCm',
+	chestCm: 'fieldChestCm',
+	armCm: 'fieldArmCm',
+	thighCm: 'fieldThighCm',
+	bodyFatPercent: 'fieldBodyFatPercent',
+} as const satisfies Record<BodyMeasurementField, MessageKey<'progress.body'>>
+
+export function bodyFieldLabel(
+	field: BodyMeasurementField,
+	t: Translator<'progress.body'>,
+): string {
+	return t(FIELD_KEYS[field])
 }
 
+// `undefined` matches `formatWeightAmount`: every number in the app follows
+// the device's format today. Hard-coding 'en-US' here made body values the
+// one exception.
 const oneDecimal = (value: number) =>
-	new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value)
+	new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value)
 
 /** Weight in the account's unit, lengths in cm and body fat in %. */
 export function formatBodyValue(
@@ -57,32 +81,36 @@ export function formatBodyChange(
 	field: BodyMeasurementField,
 	change: number,
 	unit: WeightUnit,
+	t: Translator<'progress.body'>,
 ): string {
 	const shown =
 		field === 'weightKg' ? kilogramsToDisplayWeight(change, unit) : change
-	if (Math.abs(shown) < 0.05) return 'No change'
+	if (Math.abs(shown) < 0.05) return t('noChange')
 	const sign = shown > 0 ? '+' : '-'
 	return `${sign}${formatBodyValue(field, Math.abs(change), unit)}`
 }
 
-const DAY_FORMAT = new Intl.DateTimeFormat('en-US', {
-	month: 'short',
-	day: 'numeric',
-	year: 'numeric',
-	timeZone: 'UTC',
-})
-
-export function formatBodyDate(date: string): string {
-	return DAY_FORMAT.format(new Date(`${date}T12:00:00Z`))
+export function formatBodyDate(date: string, locale: Locale): string {
+	return new Intl.DateTimeFormat(intlLocale(locale), {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+		timeZone: 'UTC',
+	}).format(new Date(`${date}T12:00:00Z`))
 }
 
 /** "−1.5 kg since Sep 1, 2026", or null when the range holds no change. */
 export function describeBodyChange(
 	summary: BodyFieldSummary,
 	unit: WeightUnit,
+	t: Translator<'progress.body'>,
+	locale: Locale,
 ): string | null {
 	if (summary.change === null || summary.changeSince === null) return null
-	return `${formatBodyChange(summary.field, summary.change, unit)} since ${formatBodyDate(summary.changeSince)}`
+	return t('changeSince', {
+		change: formatBodyChange(summary.field, summary.change, unit, t),
+		date: formatBodyDate(summary.changeSince, locale),
+	})
 }
 
 export interface BodyWeightPoint {
@@ -155,16 +183,20 @@ export function describeBodyWeightGoal(
 	goals: MeasurableGoal[] | undefined,
 	latestKg: number | null,
 	unit: WeightUnit,
+	t: Translator<'progress.body'>,
 ): BodyWeightGoalContext | null {
 	const goal = goals?.find(entry => entry.type === 'BODY_WEIGHT')
 	if (!goal) return null
 	const atMost = goal.direction === 'AT_MOST'
-	const target = `Goal: ${atMost ? 'at most' : 'at least'} ${formatBodyValue('weightKg', goal.targetValue, unit)}`
+	const value = formatBodyValue('weightKg', goal.targetValue, unit)
+	const target = atMost
+		? t('goalAtMost', { value })
+		: t('goalAtLeast', { value })
 	if (latestKg === null) {
 		return {
 			targetKg: goal.targetValue,
 			target,
-			gap: 'Log a weight to compare',
+			gap: t('logAWeight'),
 			reached: false,
 		}
 	}
@@ -176,8 +208,10 @@ export function describeBodyWeightGoal(
 		targetKg: goal.targetValue,
 		target,
 		gap: reached
-			? 'Goal reached'
-			: `${formatBodyValue('weightKg', remaining, unit)} to go`,
+			? t('goalReached')
+			: t('toGo', {
+					value: formatBodyValue('weightKg', remaining, unit),
+				}),
 		reached,
 	}
 }
@@ -231,14 +265,15 @@ export function bodyEntryRequest(
 	draft: BodyEntryDraft,
 	unit: WeightUnit,
 	today: string,
+	t: Translator<'progress.body'>,
 ): BodyEntryResult {
 	if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(draft.date)) {
-		return { request: null, problem: 'Choose a date', field: 'date' }
+		return { request: null, problem: t('chooseADate'), field: 'date' }
 	}
 	if (draft.date > today) {
 		return {
 			request: null,
-			problem: 'An entry cannot be dated in the future',
+			problem: t('notInTheFuture'),
 			field: 'date',
 		}
 	}
@@ -275,12 +310,16 @@ export function bodyEntryRequest(
 export function describeBodyEntry(
 	entry: BodyMeasurement,
 	unit: WeightUnit,
+	t: Translator<'progress.body'>,
 ): string {
 	return BODY_MEASUREMENT_FIELDS.filter(field => entry[field.key] !== null)
 		.map(field =>
 			field.key === 'weightKg'
 				? formatBodyValue(field.key, entry[field.key]!, unit)
-				: `${field.label} ${formatBodyValue(field.key, entry[field.key]!, unit)}`,
+				: t('entryField', {
+						label: bodyFieldLabel(field.key, t),
+						value: formatBodyValue(field.key, entry[field.key]!, unit),
+					}),
 		)
 		.join(' · ')
 }

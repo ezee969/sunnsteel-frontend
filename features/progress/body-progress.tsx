@@ -9,6 +9,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Loader2, Pencil, Scale, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -34,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import {
 	type BodyProgressSource,
 	useBodyProgress,
@@ -105,9 +107,16 @@ function BodyWeightChart({
 	goals?: MeasurableGoal[]
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
+	const tBody = useTranslations('progress.body')
 	const points = bodyWeightPoints(data.entries)
 	const weight = data.summary.find(entry => entry.field === 'weightKg')
-	const goal = describeBodyWeightGoal(goals, weight?.latest ?? null, weightUnit)
+	const goal = describeBodyWeightGoal(
+		goals,
+		weight?.latest ?? null,
+		weightUnit,
+		tBody,
+	)
 	const chart = getBodyWeightChart(
 		points,
 		goal?.targetKg ?? null,
@@ -115,14 +124,16 @@ function BodyWeightChart({
 		CHART_HEIGHT,
 		CHART_PADDING,
 	)
-	const change = weight ? describeBodyChange(weight, weightUnit) : null
+	const change = weight
+		? describeBodyChange(weight, weightUnit, tBody, locale)
+		: null
 
 	return (
 		<div className="min-w-0">
 			<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
 				<div>
 					<p id={`${id}-title`} className="type-body-sm text-ink-3">
-						Weight
+						{tBody('weight')}
 					</p>
 					<p className="type-data type-data-strong text-foreground">
 						{weight?.latest != null
@@ -134,8 +145,8 @@ function BodyWeightChart({
 					<p>
 						{change ??
 							(weight?.latest != null
-								? 'No change in this range'
-								: 'No weight yet')}
+								? tBody('noChangeInRange')
+								: tBody('noWeightYet'))}
 					</p>
 					{goal ? (
 						<p>
@@ -195,23 +206,34 @@ function BodyWeightChart({
 								className="text-foreground"
 							>
 								<title>
-									{formatBodyDate(point.date)} ·{' '}
-									{formatBodyValue('weightKg', point.weightKg, weightUnit)}
+									{tBody('chartPoint', {
+										date: formatBodyDate(point.date, locale),
+										value: formatBodyValue(
+											'weightKg',
+											point.weightKg,
+											weightUnit,
+										),
+									})}
 								</title>
 							</circle>
 						))}
 					</svg>
 					<p id={`${id}-summary`} className="sr-only">
-						{points.length} weight {points.length === 1 ? 'entry' : 'entries'}{' '}
-						in this range{change ? `, ${change}` : ''}.
+						{tBody('chartSummary', {
+							count: points.length,
+							change: change ? tBody('chartSummaryChange', { change }) : '',
+						})}
 					</p>
 					<div className="type-body-sm mt-1 flex justify-between text-ink-3">
-						<span>{formatBodyDate(points[0].date)}</span>
-						<span>{formatBodyDate(points[points.length - 1].date)}</span>
+						<span>{formatBodyDate(points[0].date, locale)}</span>
+						<span>
+							{formatBodyDate(points[points.length - 1].date, locale)}
+						</span>
 					</div>
 					{goal ? (
 						<p className="type-body-sm mt-1 text-ink-3">
-							<span aria-hidden>- - </span>Dashed line: your goal
+							<span aria-hidden>- - </span>
+							{tBody('dashedLine')}
 						</p>
 					) : null}
 				</div>
@@ -232,6 +254,8 @@ function MeasurementList({
 	data: BodyProgressResponse
 	weightUnit: WeightUnit
 }) {
+	const tBody = useTranslations('progress.body')
+	const locale = useLocale() as Locale
 	const recorded = data.summary.filter(
 		entry => entry.field !== 'weightKg' && entry.latest !== null,
 	)
@@ -250,15 +274,17 @@ function MeasurementList({
 					className="rule-row flex items-baseline justify-between gap-4 py-2"
 				>
 					<dt className="type-body-sm text-ink-2">
-						{bodyFieldLabel(entry.field)}
+						{bodyFieldLabel(entry.field, tBody)}
 					</dt>
 					<dd className="text-right">
 						<span className="type-data text-foreground">
 							{formatBodyValue(entry.field, entry.latest!, weightUnit)}
 						</span>
 						<span className="type-body-sm block text-ink-3">
-							{describeBodyChange(entry, weightUnit) ??
-								`On ${formatBodyDate(entry.latestDate!)}`}
+							{describeBodyChange(entry, weightUnit, tBody, locale) ??
+								tBody('onDate', {
+									date: formatBodyDate(entry.latestDate!, locale),
+								})}
 						</span>
 					</dd>
 				</div>
@@ -280,13 +306,10 @@ function BodyProgressBody({
 	weightUnit: WeightUnit
 	emptyCopy: React.ReactNode
 }) {
+	const tBody = useTranslations('progress.body')
 	if (query.isPending) {
 		return (
-			<div
-				role="status"
-				aria-label="Loading body progress"
-				className="space-y-3"
-			>
+			<div role="status" aria-label={tBody('loading')} className="space-y-3">
 				<Skeleton className="h-40" />
 			</div>
 		)
@@ -320,7 +343,7 @@ function BodyProgressBody({
 				weightUnit={weightUnit}
 			/>
 			<div className="min-w-0">
-				<h3 className="type-body-sm text-ink-3">Measurements</h3>
+				<h3 className="type-body-sm text-ink-3">{tBody('measurements')}</h3>
 				<div className="mt-1">
 					<MeasurementList data={query.data} weightUnit={weightUnit} />
 				</div>
@@ -376,6 +399,7 @@ function BodyEntryDialog({
 	editing: boolean
 	weightUnit: WeightUnit
 }) {
+	const tBody = useTranslations('progress.body')
 	const baseId = useId()
 	const [draft, setDraft] = useState(initial)
 	const [problem, setProblem] = useState<{
@@ -391,7 +415,7 @@ function BodyEntryDialog({
 
 	const submit = (event: React.FormEvent) => {
 		event.preventDefault()
-		const result = bodyEntryRequest(draft, weightUnit, today)
+		const result = bodyEntryRequest(draft, weightUnit, today, tBody)
 		if (result.problem !== null) {
 			setProblem({ message: result.problem, field: result.field })
 			return
@@ -408,12 +432,9 @@ function BodyEntryDialog({
 			<DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>
-						{editing ? 'Edit measurements' : 'Log measurements'}
+						{editing ? tBody('editMeasurements') : tBody('logMeasurements')}
 					</DialogTitle>
-					<DialogDescription>
-						Fill in what you measured; leave the rest empty. One entry per day,
-						so logging a day again updates it.
-					</DialogDescription>
+					<DialogDescription>{tBody('dialogDescription')}</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={submit} className="space-y-5" noValidate>
 					<div className="space-y-1">
@@ -456,8 +477,8 @@ function BodyEntryDialog({
 									id={`${baseId}-${field.key}`}
 									label={
 										field.key === 'bodyFatPercent'
-											? 'Body fat (%)'
-											: field.label
+											? tBody('bodyFatLabel')
+											: bodyFieldLabel(field.key, tBody)
 									}
 									value={draft[field.key]}
 									onChange={set(field.key)}
@@ -474,8 +495,7 @@ function BodyEntryDialog({
 					) : null}
 					{upsert.isError ? (
 						<p role="alert" className="type-body-sm text-ink">
-							{upsert.error.message ||
-								'This entry could not be saved. Try again.'}
+							{upsert.error.message || tBody('saveFailed')}
 						</p>
 					) : null}
 					<DialogFooter>
@@ -510,13 +530,15 @@ function EntryList({
 	onEdit: (entry: BodyMeasurement) => void
 	onDelete: (entry: BodyMeasurement) => void
 }) {
+	const tBody = useTranslations('progress.body')
+	const locale = useLocale() as Locale
 	const newestFirst = [...entries].reverse()
 	// UX-04: the latest five entries, then "Show N more" (§20.2).
 	const shownEntries = useShowMore(newestFirst, 5)
 	if (entries.length === 0) return null
 	return (
 		<div>
-			<h3 className="type-body-sm text-ink-3">Entries in this range</h3>
+			<h3 className="type-body-sm text-ink-3">{tBody('entriesInRange')}</h3>
 			<ul id="body-progress-entries" className="mt-1">
 				{shownEntries.visible.map(entry => (
 					<li
@@ -525,10 +547,10 @@ function EntryList({
 					>
 						<div className="min-w-0">
 							<p className="type-body-sm text-foreground">
-								{formatBodyDate(entry.date)}
+								{formatBodyDate(entry.date, locale)}
 							</p>
 							<p className="type-body-sm break-words text-ink-3">
-								{describeBodyEntry(entry, weightUnit)}
+								{describeBodyEntry(entry, weightUnit, tBody)}
 							</p>
 						</div>
 						<div className="flex shrink-0 gap-1">
@@ -536,7 +558,9 @@ function EntryList({
 								type="button"
 								variant="ghost"
 								size="icon"
-								aria-label={`Edit the entry of ${formatBodyDate(entry.date)}`}
+								aria-label={tBody('editEntryOf', {
+									date: formatBodyDate(entry.date, locale),
+								})}
 								onClick={() => onEdit(entry)}
 							>
 								<Pencil className="size-4" aria-hidden />
@@ -545,7 +569,9 @@ function EntryList({
 								type="button"
 								variant="ghost"
 								size="icon"
-								aria-label={`Delete the entry of ${formatBodyDate(entry.date)}`}
+								aria-label={tBody('deleteEntryOf', {
+									date: formatBodyDate(entry.date, locale),
+								})}
 								onClick={() => onDelete(entry)}
 							>
 								<Trash2 className="size-4" aria-hidden />
@@ -575,6 +601,8 @@ export function BodyProgressSection({
 	weightUnit: WeightUnit
 	goals?: MeasurableGoal[]
 }) {
+	const tBody = useTranslations('progress.body')
+	const locale = useLocale() as Locale
 	const [range, setRange] = useState<BodyProgressRange>('90D')
 	const query = useBodyProgress({ kind: 'own' }, range)
 	const remove = useDeleteBodyMeasurement()
@@ -669,10 +697,12 @@ export function BodyProgressSection({
 				>
 					<AlertDialogContent>
 						<AlertDialogHeader>
-							<AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+							<AlertDialogTitle>{tBody('deleteTitle')}</AlertDialogTitle>
 							<AlertDialogDescription>
 								{deleting
-									? `Everything you logged on ${formatBodyDate(deleting.date)} is removed. Your current weight becomes the latest weight you logged before it.`
+									? tBody('deleteDescription', {
+											date: formatBodyDate(deleting.date, locale),
+										})
 									: null}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
@@ -682,7 +712,7 @@ export function BodyProgressSection({
 							</p>
 						) : null}
 						<AlertDialogFooter>
-							<AlertDialogCancel>Keep it</AlertDialogCancel>
+							<AlertDialogCancel>{tBody('keepIt')}</AlertDialogCancel>
 							<AlertDialogAction
 								onClick={event => {
 									event.preventDefault()
@@ -694,7 +724,7 @@ export function BodyProgressSection({
 								disabled={remove.isPending}
 								className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 							>
-								{remove.isPending ? 'Deleting…' : 'Delete entry'}
+								{remove.isPending ? tBody('deleting') : tBody('deleteEntry')}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
@@ -716,6 +746,7 @@ export function ProfileBodyProgress({
 	source: BodyProgressSource
 	weightUnit: WeightUnit
 }) {
+	const tBody = useTranslations('progress.body')
 	const [range, setRange] = useState<BodyProgressRange>('90D')
 	const query = useBodyProgress(source, range)
 	const id = useId().replace(/:/g, '')
@@ -742,8 +773,8 @@ export function ProfileBodyProgress({
 				weightUnit={weightUnit}
 				emptyCopy={
 					source.kind === 'own'
-						? 'Nothing logged yet.'
-						: 'No body measurements yet.'
+						? tBody('nothingLogged')
+						: tBody('noMeasurements')
 				}
 			/>
 		</div>

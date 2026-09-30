@@ -1,3 +1,5 @@
+import type { MessageKey, Translator } from '@/i18n/translator'
+
 import type { HashRule, PageTab } from './page-tabs'
 
 /**
@@ -5,13 +7,22 @@ import type { HashRule, PageTab } from './page-tabs'
  * bare route, so every existing link to `/progress` still lands somewhere
  * that makes sense.
  */
-export const PROGRESS_TABS = [
-	{ href: '/progress', label: 'Overview' },
-	{ href: '/progress/strength', label: 'Strength' },
-	{ href: '/progress/load', label: 'Load' },
-	{ href: '/progress/workouts', label: 'Workouts' },
-	{ href: '/progress/body', label: 'Body' },
-] as const satisfies readonly PageTab[]
+const PROGRESS_TAB_KEYS = [
+	{ href: '/progress', key: 'overview' },
+	{ href: '/progress/strength', key: 'strength' },
+	{ href: '/progress/load', key: 'load' },
+	{ href: '/progress/workouts', key: 'workouts' },
+	{ href: '/progress/body', key: 'body' },
+] as const satisfies readonly {
+	href: string
+	key: MessageKey<'progress.tabs'>
+}[]
+
+export function progressTabs(
+	t: Translator<'progress.tabs'>,
+): readonly PageTab[] {
+	return PROGRESS_TAB_KEYS.map(tab => ({ href: tab.href, label: t(tab.key) }))
+}
 
 /**
  * Where each section that left the single Progress page now lives, by the

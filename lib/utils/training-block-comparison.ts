@@ -121,11 +121,7 @@ export interface ComparisonRow {
 	change: string | null
 }
 
-function describeWorkouts(
-	period: BlockComparisonPeriod,
-	t: T,
-	locale: Locale,
-): string {
+function describeWorkouts(period: BlockComparisonPeriod, t: T): string {
 	const workouts =
 		period.plannedWorkouts === null
 			? t('workoutsCount', { count: period.workouts })
@@ -155,8 +151,8 @@ export function comparisonRows(
 	const rows: ComparisonRow[] = [
 		{
 			label: t('rowWorkouts'),
-			previous: describeWorkouts(previous, t, locale),
-			current: describeWorkouts(current, t, locale),
+			previous: describeWorkouts(previous, t),
+			current: describeWorkouts(current, t),
 			change: describeWeeklyChange(
 				current.perWeek.workouts - previous.perWeek.workouts,
 				t,

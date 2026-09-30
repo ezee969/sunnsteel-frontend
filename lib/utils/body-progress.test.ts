@@ -1,8 +1,11 @@
 import type { BodyMeasurement, MeasurableGoal } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	bodyEntryRequest,
+	bodyFieldLabel,
 	bodyWeightPoints,
 	describeBodyChange,
 	describeBodyEntry,
@@ -42,6 +45,9 @@ const goal = (
 	updatedAt: '2026-01-01T00:00:00.000Z',
 })
 
+const en = translatorFor('en', 'progress.body')
+const es = translatorFor('es', 'progress.body')
+
 describe('body progress wording', () => {
 	it("shows weight in the account's unit and lengths in cm", () => {
 		expect(formatBodyValue('weightKg', 80, 'KG')).toBe('80 kg')
@@ -51,9 +57,9 @@ describe('body progress wording', () => {
 	})
 
 	it('signs a change and calls a rounded-away one no change', () => {
-		expect(formatBodyChange('weightKg', -1.5, 'KG')).toBe('-1.5 kg')
-		expect(formatBodyChange('waistCm', 2, 'KG')).toBe('+2 cm')
-		expect(formatBodyChange('weightKg', 0.01, 'LB')).toBe('No change')
+		expect(formatBodyChange('weightKg', -1.5, 'KG', en)).toBe('-1.5 kg')
+		expect(formatBodyChange('waistCm', 2, 'KG', en)).toBe('+2 cm')
+		expect(formatBodyChange('weightKg', 0.01, 'LB', en)).toBe('No change')
 		expect(
 			describeBodyChange(
 				{
@@ -64,6 +70,8 @@ describe('body progress wording', () => {
 					changeSince: '2026-09-01',
 				},
 				'KG',
+				en,
+				'en',
 			),
 		).toBe('-1.5 kg since Sep 1, 2026')
 		expect(
@@ -76,6 +84,8 @@ describe('body progress wording', () => {
 					changeSince: null,
 				},
 				'KG',
+				en,
+				'en',
 			),
 		).toBeNull()
 	})
@@ -85,6 +95,7 @@ describe('body progress wording', () => {
 			describeBodyEntry(
 				entry('2026-09-01', { weightKg: 80, waistCm: 90 }),
 				'KG',
+				en,
 			),
 		).toBe('80 kg · Waist 90 cm')
 	})
@@ -124,24 +135,24 @@ describe('the weight chart', () => {
 describe('the body-weight goal', () => {
 	it('reads an at-most goal as the weight still to lose', () => {
 		expect(
-			describeBodyWeightGoal([goal(75, 'AT_MOST')], 78.5, 'KG'),
+			describeBodyWeightGoal([goal(75, 'AT_MOST')], 78.5, 'KG', en),
 		).toMatchObject({
 			target: 'Goal: at most 75 kg',
 			gap: '3.5 kg to go',
 			reached: false,
 		})
-		expect(describeBodyWeightGoal([goal(75, 'AT_MOST')], 74, 'KG')?.gap).toBe(
-			'Goal reached',
-		)
+		expect(
+			describeBodyWeightGoal([goal(75, 'AT_MOST')], 74, 'KG', en)?.gap,
+		).toBe('Goal reached')
 	})
 
 	it('reads an at-least goal the other way, and nothing without a goal', () => {
-		expect(describeBodyWeightGoal([goal(85, 'AT_LEAST')], 80, 'KG')?.gap).toBe(
-			'5 kg to go',
-		)
-		expect(describeBodyWeightGoal([], 80, 'KG')).toBeNull()
 		expect(
-			describeBodyWeightGoal([goal(85, 'AT_LEAST')], null, 'KG')?.gap,
+			describeBodyWeightGoal([goal(85, 'AT_LEAST')], 80, 'KG', en)?.gap,
+		).toBe('5 kg to go')
+		expect(describeBodyWeightGoal([], 80, 'KG', en)).toBeNull()
+		expect(
+			describeBodyWeightGoal([goal(85, 'AT_LEAST')], null, 'KG', en)?.gap,
 		).toBe('Log a weight to compare')
 	})
 })
@@ -153,7 +164,7 @@ describe('the entry form', () => {
 			weightKg: '176.37',
 			waistCm: '84',
 		}
-		const result = bodyEntryRequest(draft, 'LB', '2026-09-27')
+		const result = bodyEntryRequest(draft, 'LB', '2026-09-27', en)
 		expect(result.problem).toBeNull()
 		expect(result.request?.weightKg).toBeCloseTo(80, 2)
 		expect(result.request).toMatchObject({
@@ -178,7 +189,7 @@ describe('the entry form', () => {
 	it('refuses what the server would, naming the field', () => {
 		const today = '2026-09-27'
 		expect(
-			bodyEntryRequest(emptyBodyEntryDraft('2026-09-20'), 'KG', today),
+			bodyEntryRequest(emptyBodyEntryDraft('2026-09-20'), 'KG', today, en),
 		).toMatchObject({
 			problem: 'Add at least one measurement',
 			field: null,
@@ -188,6 +199,7 @@ describe('the entry form', () => {
 				{ ...emptyBodyEntryDraft('2026-09-20'), weightKg: '5' },
 				'LB',
 				today,
+				en,
 			),
 		).toMatchObject({
 			problem: 'Weight must be between 44.1 lb and 2,204.6 lb',
@@ -198,6 +210,7 @@ describe('the entry form', () => {
 				{ ...emptyBodyEntryDraft('2026-09-20'), waistCm: 'abc' },
 				'KG',
 				today,
+				en,
 			),
 		).toMatchObject({ problem: 'Waist must be a number', field: 'waistCm' })
 		expect(
@@ -205,7 +218,23 @@ describe('the entry form', () => {
 				{ ...emptyBodyEntryDraft('2026-09-30'), waistCm: '80' },
 				'KG',
 				today,
+				en,
 			),
 		).toMatchObject({ field: 'date' })
+	})
+})
+
+describe('the same body copy in Spanish (I18N-05)', () => {
+	it('names every field and agrees the entry count', () => {
+		expect(bodyFieldLabel('waistCm', es)).toBe('Cintura')
+		expect(bodyFieldLabel('bodyFatPercent', es)).toBe('Grasa corporal')
+		expect(
+			describeBodyEntry(
+				entry('2026-09-01', { weightKg: 80, waistCm: 90 }),
+				'KG',
+				es,
+			),
+		).toBe('80 kg · Cintura 90 cm')
+		expect(formatBodyChange('weightKg', 0, 'KG', es)).toBe('Sin cambios')
 	})
 })

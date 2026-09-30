@@ -3,6 +3,8 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Translator } from '@/i18n/translator'
+
 import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
 function performanceLabel(
@@ -15,15 +17,17 @@ function performanceLabel(
 export function getRecordTimelineExplanation(
 	item: ProgressTimelinePersonalRecordItem,
 	unit: WeightUnit,
+	t: Translator<'progress.timeline'>,
 ): string {
 	if (!item.previous || item.reason === 'FIRST_RECORDED_BEST') {
-		return 'This was the first recorded best set for this exercise.'
+		return t('firstBest')
 	}
 	if (item.reason === 'HEAVIER_LOAD') {
-		return `The load moved beyond the previous best of ${performanceLabel(item.previous, unit)}.`
+		return t('heavierLoad', {
+			previous: performanceLabel(item.previous, unit),
+		})
 	}
-	const addedReps = item.current.reps - item.previous.reps
-	return `The same best load was completed for ${addedReps} more ${addedReps === 1 ? 'rep' : 'reps'} than before.`
+	return t('moreReps', { count: item.current.reps - item.previous.reps })
 }
 
 export function getRecordTimelinePerformanceLabel(
