@@ -2,7 +2,7 @@
 
 import type { VolumeTrendResponse } from '@sunsteel/contracts'
 import { BarChart3, RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import {
 	getSelectedVolumeTrend,
 	getVolumeBarPercent,
@@ -70,6 +71,7 @@ export function VolumeTrends({
 	onWeeksChange,
 	onRetry,
 }: VolumeTrendsProps) {
+	const locale = useLocale() as Locale
 	const tMuscles = useTranslations('routines.muscles')
 	const [scope, setScope] = useState<VolumeTrendScope>('overall')
 	const [selectedId, setSelectedId] = useState<string>()
@@ -92,7 +94,7 @@ export function VolumeTrends({
 		[selection],
 	)
 	const formatVolume = (valueKg: number) =>
-		`${formatWeightAmount(valueKg, weightUnit)} ${unitLabel}`
+		`${formatWeightAmount(valueKg, weightUnit, locale)} ${unitLabel}`
 	const formatCompactVolume = (valueKg: number) =>
 		`${COMPACT_FORMATTER.format(
 			kilogramsToDisplayWeight(valueKg, weightUnit),

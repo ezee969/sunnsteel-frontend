@@ -1,10 +1,11 @@
 'use client'
 
 import { Trophy } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { personalRecordSummary } from '@/lib/utils/dashboard-summaries'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -22,6 +23,7 @@ import PersonalRecordItem from './PersonalRecordItem'
  * out of sync.
  */
 export default function PersonalRecords() {
+	const locale = useLocale() as Locale
 	const tEmpty = useTranslations('planning.emptyStates')
 	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const { data } = useWorkoutProgress()
@@ -37,7 +39,7 @@ export default function PersonalRecords() {
 			summary={personalRecordSummary(
 				records[0],
 				records[0]
-					? `${formatWeight(records[0].weight, weightUnit)} × ${records[0].reps}`
+					? `${formatWeight(records[0].weight, weightUnit, locale)} × ${records[0].reps}`
 					: undefined,
 				tSummaries,
 			)}
@@ -50,7 +52,7 @@ export default function PersonalRecords() {
 						key={record.exerciseId}
 						exercise={record.exerciseName}
 						timeAgo={formatTimeAgo(record.achievedAt)}
-						weight={`${formatWeight(record.weight, weightUnit)} × ${record.reps}`}
+						weight={`${formatWeight(record.weight, weightUnit, locale)} × ${record.reps}`}
 						showSeparator={index < records.length - 1}
 					/>
 				))

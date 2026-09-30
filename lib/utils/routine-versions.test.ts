@@ -38,6 +38,7 @@ const compare = (
 		enDate,
 		enSchedule,
 		enFormat,
+		'en',
 	)
 
 const compareEs = (
@@ -53,6 +54,7 @@ const compareEs = (
 		esDate,
 		esSchedule,
 		esFormat,
+		'es',
 	)
 
 const exercise = (

@@ -7,13 +7,14 @@ import type {
 } from '@sunsteel/contracts'
 import { CalendarClock, History, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import {
 	getRecordTimelineExplanation,
 	getRecordTimelinePerformanceLabel,
@@ -76,6 +77,7 @@ function RecordTimelineItem({
 	weightUnit: WeightUnit
 	showExerciseName: boolean
 }) {
+	const locale = useLocale() as Locale
 	const tTimeline = useTranslations('progress.timeline')
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_8rem]">
@@ -95,7 +97,12 @@ function RecordTimelineItem({
 				</p>
 				<p className="type-body-sm text-ink-3">
 					Estimated 1RM{' '}
-					{formatWeightAmount(item.current.estimated1rmKg, weightUnit, 2)}{' '}
+					{formatWeightAmount(
+						item.current.estimated1rmKg,
+						weightUnit,
+						locale,
+						2,
+					)}{' '}
 					{getWeightUnitLabel(weightUnit)}
 				</p>
 			</div>

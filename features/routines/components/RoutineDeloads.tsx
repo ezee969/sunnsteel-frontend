@@ -159,6 +159,7 @@ function DeloadDialog({
 						tDate,
 						tSchedule,
 						tFormat,
+						locale,
 					)
 				: null,
 		[original, lighter, weightUnit, tVersions, tDate, tSchedule, tFormat],
@@ -352,6 +353,7 @@ function ReviewDeloadDialog({
 				tDate,
 				tSchedule,
 				tFormat,
+				locale,
 			),
 		[deload, weightUnit, tVersions, tDate, tSchedule, tFormat],
 	)

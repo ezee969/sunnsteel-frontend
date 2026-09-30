@@ -20,6 +20,7 @@ import { ACTIVITY_REACTIONS } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
 import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
+import type { Locale } from '@/i18n/config'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
 import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
@@ -121,6 +122,7 @@ export function activityHref(link: ActivityLink): string {
 function describeProgression(
 	sets: { previousWeightKg: number; newWeightKg: number }[],
 	unit: WeightUnit,
+	locale: Locale,
 ): string | null {
 	if (sets.length === 0) return null
 	const [first] = sets
@@ -130,16 +132,17 @@ function describeProgression(
 			set.newWeightKg === first.newWeightKg,
 	)
 	if (uniform) {
-		return `${formatWeight(first.previousWeightKg, unit)} → ${formatWeight(first.newWeightKg, unit)} on ${plural(sets.length, 'set')}`
+		return `${formatWeight(first.previousWeightKg, unit, locale)} → ${formatWeight(first.newWeightKg, unit, locale)} on ${plural(sets.length, 'set')}`
 	}
 	const highest = Math.max(...sets.map(set => set.newWeightKg))
-	return `${plural(sets.length, 'set')} progressed, up to ${formatWeight(highest, unit)}`
+	return `${plural(sets.length, 'set')} progressed, up to ${formatWeight(highest, unit, locale)}`
 }
 
 /** The record an entry came from, named in the viewer's unit. */
 export function describeActivity(
 	entry: ActivityEntry,
 	unit: WeightUnit,
+	locale: Locale,
 ): { title: string; detail: string | null } {
 	switch (entry.type) {
 		case 'SESSION_COMPLETED': {
@@ -147,7 +150,7 @@ export function describeActivity(
 			const parts = [plural(session.completedSets, 'set')]
 			if (session.volumeKg > 0) {
 				parts.push(
-					`${formatWeightAmount(session.volumeKg, unit, 0)} ${getWeightUnitLabel(unit)} volume`,
+					`${formatWeightAmount(session.volumeKg, unit, locale, 0)} ${getWeightUnitLabel(unit)} volume`,
 				)
 			}
 			if (session.durationSec && session.durationSec > 0) {
@@ -161,12 +164,12 @@ export function describeActivity(
 		case 'PERSONAL_RECORD':
 			return {
 				title: `New best on ${entry.record.exerciseName}`,
-				detail: `${formatWeight(entry.record.weightKg, unit)} × ${entry.record.reps} · est. 1RM ${formatWeight(entry.record.estimated1rmKg, unit)}`,
+				detail: `${formatWeight(entry.record.weightKg, unit, locale)} × ${entry.record.reps} · est. 1RM ${formatWeight(entry.record.estimated1rmKg, unit, locale)}`,
 			}
 		case 'PROGRESSION_CHANGED':
 			return {
 				title: `Load progressed on ${entry.progression.exerciseName}`,
-				detail: describeProgression(entry.progression.sets, unit),
+				detail: describeProgression(entry.progression.sets, unit, locale),
 			}
 		case 'ACHIEVEMENT_UNLOCKED':
 			return {

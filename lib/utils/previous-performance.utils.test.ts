@@ -56,27 +56,39 @@ describe('isSetPerformanceImproved', () => {
 
 describe('formatPreviousPerformance', () => {
 	it('displays a logged weight in the selected unit', () => {
-		expect(formatPreviousPerformance(previous, 'KG', en)).toBe('8 reps · 80 kg')
-		expect(formatPreviousPerformance(previous, 'LB', en)).toBe(
+		expect(formatPreviousPerformance(previous, 'KG', en, 'en')).toBe(
+			'8 reps · 80 kg',
+		)
+		expect(formatPreviousPerformance(previous, 'LB', en, 'en')).toBe(
 			'8 reps · 176.37 lb',
 		)
 	})
 
 	it('does not invent a weight for bodyweight sets', () => {
 		expect(
-			formatPreviousPerformance({ ...previous, weight: null }, 'LB', en),
+			formatPreviousPerformance({ ...previous, weight: null }, 'LB', en, 'en'),
 		).toBe('8 reps')
 		expect(
-			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG', en),
+			formatPreviousPerformance(
+				{ ...previous, reps: 1, weight: 0 },
+				'KG',
+				en,
+				'en',
+			),
 		).toBe('1 rep')
 	})
 
 	it('says the same in Spanish, singular and plural (I18N-04)', () => {
-		expect(formatPreviousPerformance(previous, 'KG', es)).toBe(
+		expect(formatPreviousPerformance(previous, 'KG', es, 'en')).toBe(
 			'8 repeticiones · 80 kg',
 		)
 		expect(
-			formatPreviousPerformance({ ...previous, reps: 1, weight: 0 }, 'KG', es),
+			formatPreviousPerformance(
+				{ ...previous, reps: 1, weight: 0 },
+				'KG',
+				es,
+				'en',
+			),
 		).toBe('1 repetición')
 	})
 })

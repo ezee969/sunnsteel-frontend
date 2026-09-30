@@ -164,6 +164,7 @@ describe('rotation on training weekdays (SCHED-06)', () => {
 			enDate,
 			enSchedule,
 			translatorFor('en', 'routines.format'),
+			'en',
 		)
 		expect(comparison.routine[0]).toMatch(/^Schedule: .*Mon, Wed, Fri → /)
 	})

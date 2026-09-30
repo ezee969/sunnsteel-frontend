@@ -6,6 +6,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import type { PlateLoadingItem } from './plate-calculator'
@@ -63,11 +64,16 @@ export function describeBasis(input: {
 	incrementKg: number
 	unit: WeightUnit
 	t: T
+	locale: Locale
 }): string {
-	const { unit, t } = input
+	const { unit, t, locale } = input
 	if (!input.barLoaded)
-		return t('basisRounded', { step: formatWeight(input.incrementKg, unit) })
-	const bar = t('basisBar', { weight: formatWeight(input.barWeightKg, unit) })
+		return t('basisRounded', {
+			step: formatWeight(input.incrementKg, unit, locale),
+		})
+	const bar = t('basisBar', {
+		weight: formatWeight(input.barWeightKg, unit, locale),
+	})
 	const plates = plateSetLabel(input.plateSet, t).toLowerCase()
 	if (input.basis.kind === 'SAVED')
 		return t('basisSaved', { gym: input.basis.location.name, bar })
@@ -81,11 +87,12 @@ export function describePlates(
 	plates: readonly PlateLoadingItem[] | undefined,
 	unit: WeightUnit,
 	t: T,
+	locale: Locale,
 ): string {
 	if (!plates || plates.length === 0) return t('barOnly')
 	const list = plates.flatMap(item =>
 		Array.from({ length: item.platesPerSide }, () =>
-			formatWeight(item.weightKg, unit).replace(/\s?(kg|lb)$/, ''),
+			formatWeight(item.weightKg, unit, locale).replace(/\s?(kg|lb)$/, ''),
 		),
 	)
 	return t('perSide', { list: list.join(' + ') })

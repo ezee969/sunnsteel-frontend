@@ -20,12 +20,12 @@ const record = (
 
 describe('personal record celebration copy', () => {
 	it('does not create a notification without earned records', () => {
-		expect(buildPersonalRecordCelebration([], 'KG', en)).toBeNull()
+		expect(buildPersonalRecordCelebration([], 'KG', en, 'en')).toBeNull()
 	})
 
 	it('describes one rep record without a weight unit', () => {
 		expect(
-			buildPersonalRecordCelebration([record('REPS', 12)], 'LB', en),
+			buildPersonalRecordCelebration([record('REPS', 12)], 'LB', en, 'en'),
 		).toEqual({
 			title: 'New rep record',
 			description: 'Bench Press · Reps 12',
@@ -40,7 +40,7 @@ describe('personal record celebration copy', () => {
 			record('ESTIMATED_1RM', 126.7),
 		]
 
-		expect(buildPersonalRecordCelebration(records, 'LB', en)).toEqual({
+		expect(buildPersonalRecordCelebration(records, 'LB', en, 'en')).toEqual({
 			title: '4 new personal records',
 			description:
 				'Bench Press · Weight 220.46 lb · Reps 8 · Volume 1763.7 lb · Est. 1RM 279.33 lb',
@@ -49,14 +49,14 @@ describe('personal record celebration copy', () => {
 
 	it('says the same in Spanish (I18N-03)', () => {
 		expect(
-			buildPersonalRecordCelebration([record('REPS', 12)], 'LB', es),
+			buildPersonalRecordCelebration([record('REPS', 12)], 'LB', es, 'en'),
 		).toEqual({
 			title: 'Nuevo récord de repeticiones',
 			description: 'Bench Press · Reps 12',
 		})
 
 		const records = [record('WEIGHT', 100), record('REPS', 8)]
-		expect(buildPersonalRecordCelebration(records, 'LB', es)?.title).toBe(
+		expect(buildPersonalRecordCelebration(records, 'LB', es, 'en')?.title).toBe(
 			'2 récords personales nuevos',
 		)
 	})

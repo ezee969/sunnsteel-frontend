@@ -1,5 +1,6 @@
 import type { WeightUnit } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { areCanonicalWeightsEqual, formatWeight } from '@/lib/utils/weight-unit'
@@ -28,6 +29,7 @@ export function formatPreviousPerformance(
 	previous: PreviousSetPerformance,
 	weightUnit: WeightUnit,
 	t: Translator<'workout.previousPerformance'>,
+	locale: Locale,
 ): string {
 	const reps = t('repsValue', { count: previous.reps })
 	const weight =
@@ -35,6 +37,6 @@ export function formatPreviousPerformance(
 		previous.weight === undefined ||
 		previous.weight === 0
 			? ''
-			: ` · ${formatWeight(previous.weight, weightUnit)}`
+			: ` · ${formatWeight(previous.weight, weightUnit, locale)}`
 	return `${reps}${weight}`
 }

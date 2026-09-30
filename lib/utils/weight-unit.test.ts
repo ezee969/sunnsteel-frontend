@@ -53,9 +53,9 @@ describe('weight-unit conversion boundary', () => {
 	})
 
 	it('formats values with the selected unit and preserves empty weight', () => {
-		expect(formatWeight(100, 'LB')).toBe('220.46 lb')
-		expect(formatWeight(100, 'KG')).toBe('100 kg')
-		expect(formatWeight(0, 'LB')).toBe('—')
+		expect(formatWeight(100, 'LB', 'en')).toBe('220.46 lb')
+		expect(formatWeight(100, 'KG', 'en')).toBe('100 kg')
+		expect(formatWeight(0, 'LB', 'en')).toBe('—')
 		expect(getWeightUnitLabel('LB')).toBe('lb')
 	})
 

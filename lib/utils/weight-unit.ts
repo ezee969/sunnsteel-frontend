@@ -1,5 +1,8 @@
 import type { WeightUnit } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
+
 export const POUNDS_PER_KILOGRAM = 2.2046226218
 export const WEIGHT_EQUALITY_TOLERANCE_KG = 0.0025
 
@@ -64,20 +67,33 @@ export function areCanonicalWeightsEqual(
 export function formatWeight(
 	weightKg: number | null | undefined,
 	unit: WeightUnit,
+	locale: Locale,
 ): string {
 	if (!weightKg) return '—'
-	return `${formatWeightInput(weightKg, unit)} ${getWeightUnitLabel(unit)}`
+	// `useGrouping: false` keeps this exactly as it read before the language
+	// reached it -- `String(1763.7)`, never `1,763.7`. Only the decimal mark
+	// moves, which is the whole point: 1763,7 in Spanish.
+	const value = numberFormatter(locale, {
+		maximumFractionDigits: INPUT_DECIMALS,
+		useGrouping: false,
+	}).format(kilogramsToDisplayWeight(weightKg, unit))
+	return `${value} ${getWeightUnitLabel(unit)}`
 }
 
+/**
+ * The number a member reads, in the language they chose. `formatWeightInput`
+ * above stays unlocalised on purpose: it fills a text field that
+ * `parseWeightInput` reads back, so its decimal point is machine syntax
+ * rather than copy.
+ */
 export function formatWeightAmount(
 	weightKg: number,
 	unit: WeightUnit,
+	locale: Locale,
 	maximumFractionDigits = 2,
 ): string {
 	const value = kilogramsToDisplayWeight(weightKg, unit)
-	return new Intl.NumberFormat(undefined, {
-		maximumFractionDigits,
-	}).format(value)
+	return numberFormatter(locale, { maximumFractionDigits }).format(value)
 }
 
 export function stepCanonicalWeight(

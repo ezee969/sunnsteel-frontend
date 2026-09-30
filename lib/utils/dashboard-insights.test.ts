@@ -89,10 +89,16 @@ const sources = {
 	formatDate,
 	t: enInsights,
 	tPlateaus: enPlateaus,
+	locale: 'en' as const,
 }
 
 /** The same sources read in Spanish, for the copy rules that must hold there. */
-const spanishSources = { ...sources, t: esInsights, tPlateaus: esPlateaus }
+const spanishSources = {
+	...sources,
+	t: esInsights,
+	tPlateaus: esPlateaus,
+	locale: 'es' as const,
+}
 
 describe('dashboard insights (DASH-07)', () => {
 	it('keeps a fixed order and never ranks the facts', () => {

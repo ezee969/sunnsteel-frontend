@@ -12,6 +12,7 @@ import {
 	RefreshCw,
 	TrendingUp,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
@@ -24,6 +25,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import {
 	getProgressionRuleExplanation,
 	getProgressionSetPresentation,
@@ -60,6 +62,7 @@ function PerformanceSessionCard({
 	session: ExercisePerformanceSession
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const prescriptionNotes = session.prescriptions.flatMap(prescription =>
 		prescription.note?.trim() ? [prescription.note.trim()] : [],
@@ -125,7 +128,7 @@ function PerformanceSessionCard({
 										<span>{set.setNumber}</span>
 										<span>
 											{set.weightKg != null && set.weightKg > 0
-												? `${formatWeightAmount(set.weightKg, weightUnit, 2)} ${unitLabel} × ${set.reps}`
+												? `${formatWeightAmount(set.weightKg, weightUnit, locale, 2)} ${unitLabel} × ${set.reps}`
 												: `${set.reps} reps · bodyweight`}
 										</span>
 										<span className="text-right">{set.rpe ?? '—'}</span>

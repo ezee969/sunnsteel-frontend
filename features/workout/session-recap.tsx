@@ -149,7 +149,7 @@ export function SessionRecapContent({
 				key="volume"
 				icon={<Weight className="size-5 shrink-0 text-ink-3" aria-hidden />}
 				label={t('volume')}
-				value={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
+				value={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, locale, 1)} ${unitLabel}`}
 			/>
 		) : null,
 		show.completedSets ? (
@@ -203,12 +203,13 @@ export function SessionRecapContent({
 								/>
 								<ComparisonMetric
 									label={t('volume')}
-									current={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
-									previous={`${formatWeightAmount(previous.totalVolumeKg, weightUnit, 1)} ${unitLabel}`}
+									current={`${formatWeightAmount(recap.totalVolumeKg, weightUnit, locale, 1)} ${unitLabel}`}
+									previous={`${formatWeightAmount(previous.totalVolumeKg, weightUnit, locale, 1)} ${unitLabel}`}
 									change={formatRecapWeightDelta(
 										previous.volumeDeltaKg,
 										weightUnit,
 										t,
+										locale,
 									)}
 								/>
 								<ComparisonMetric
@@ -257,7 +258,7 @@ export function SessionRecapContent({
 										})}
 									</p>
 									<p className="type-data type-data-strong mt-1 text-foreground">
-										{formatRecapRecordValue(record, weightUnit, t)}
+										{formatRecapRecordValue(record, weightUnit, t, locale)}
 									</p>
 								</li>
 							))}

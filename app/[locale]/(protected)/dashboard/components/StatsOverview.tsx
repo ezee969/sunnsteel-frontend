@@ -1,7 +1,10 @@
+import { useLocale } from 'next-intl'
+
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { Button } from '@/components/ui/button'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import {
 	useWorkoutProgress,
 	useWorkoutStats,
@@ -23,6 +26,7 @@ const WEEKLY_MILESTONE = 4
 const TOTAL_SESSIONS_MILESTONE = 50
 
 function StatsOverviewBody() {
+	const locale = useLocale() as Locale
 	const weightUnit = useWeightUnit()
 	const { data, isPending, isError, refetch, isFetching } = useWorkoutStats()
 	const { data: progress } = useWorkoutProgress()
@@ -193,7 +197,7 @@ function StatsOverviewBody() {
 				subtitle="Lifetime weight moved"
 				progress={compactVolume}
 				progressMax={Math.max(100, Math.ceil(compactVolume / 50) * 50)}
-				progressText={`${formatWeightAmount(totalVolumeKg, weightUnit)} ${getWeightUnitLabel(weightUnit)} lifted`}
+				progressText={`${formatWeightAmount(totalVolumeKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)} lifted`}
 				additionalText={compactVolume >= 100 ? 'Heavy' : 'Building'}
 			/>
 		</div>

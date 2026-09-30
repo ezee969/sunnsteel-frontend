@@ -171,7 +171,9 @@ export function describeDecline(
 ): string {
 	return t('decline', {
 		values: lift.sessions
-			.map(session => formatWeightAmount(session.estimated1rmKg, unit, 1))
+			.map(session =>
+				formatWeightAmount(session.estimated1rmKg, unit, locale, 1),
+			)
 			.join(', '),
 		unit: getWeightUnitLabel(unit),
 		dates: joinList(

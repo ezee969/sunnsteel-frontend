@@ -24,7 +24,7 @@ import {
 	UserPlus,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -34,6 +34,7 @@ import { useToast } from '@/components/ui/toast'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
+import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	buildProfileCardModel,
@@ -96,6 +97,7 @@ type ProfileViewProps = (
 }
 
 export function ProfileView(props: ProfileViewProps) {
+	const locale = useLocale() as Locale
 	const tIdentity = useTranslations('routines.identity')
 	const tSharing = useTranslations('routines.sharing')
 	const { push } = useToast()
@@ -196,7 +198,7 @@ export function ProfileView(props: ProfileViewProps) {
 			? `${(totalVolume / 1_000_000).toFixed(1)}M`
 			: totalVolume >= 1_000
 				? `${(totalVolume / 1_000).toFixed(1)}k`
-				: formatWeightAmount(totalVolumeKg, weightUnit, 1)
+				: formatWeightAmount(totalVolumeKg, weightUnit, locale, 1)
 	const isMutating = props.variant === 'member' && props.isMutating
 	const [isPreparingCard, setIsPreparingCard] = useState(false)
 
@@ -232,6 +234,7 @@ export function ProfileView(props: ProfileViewProps) {
 			const result = await shareProfileCard(
 				buildProfileCardModel({
 					tSharing,
+					locale,
 					name: profileName,
 					lastName: profileLastName,
 					username: profileUsername,
@@ -490,7 +493,7 @@ export function ProfileView(props: ProfileViewProps) {
 									value={
 										bodyMetrics?.weightKg == null
 											? null
-											: formatWeight(bodyMetrics.weightKg, weightUnit)
+											: formatWeight(bodyMetrics.weightKg, weightUnit, locale)
 									}
 								/>
 								<BodyMetric
@@ -608,11 +611,15 @@ export function ProfileView(props: ProfileViewProps) {
 											</h3>
 											<p className="type-body-sm text-ink-3">
 												<span className="type-data text-ink-2">
-													{formatWeight(record.weight, weightUnit)}
+													{formatWeight(record.weight, weightUnit, locale)}
 												</span>{' '}
 												for {record.reps} reps · est. 1RM{' '}
 												<span className="type-data text-ink-2">
-													{formatWeight(record.estimated1rm, weightUnit)}
+													{formatWeight(
+														record.estimated1rm,
+														weightUnit,
+														locale,
+													)}
 												</span>
 											</p>
 										</div>

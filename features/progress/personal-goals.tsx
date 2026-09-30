@@ -8,10 +8,12 @@ import type {
 } from '@sunsteel/contracts'
 import { CheckCircle2, RefreshCw, Target } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import { getMeasurableGoalLabel } from '@/lib/utils/measurable-goals'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -32,12 +34,13 @@ function formatGoalValue(
 	type: MeasurableGoalType,
 	weightUnit: WeightUnit,
 ): string {
+	const locale = useLocale() as Locale
 	if (
 		type === 'WEEKLY_VOLUME' ||
 		type === 'EXERCISE_ESTIMATED_1RM' ||
 		type === 'BODY_WEIGHT'
 	) {
-		return `${formatWeightAmount(value, weightUnit, 1)} ${getWeightUnitLabel(weightUnit)}`
+		return `${formatWeightAmount(value, weightUnit, locale, 1)} ${getWeightUnitLabel(weightUnit)}`
 	}
 	const formatted = NUMBER_FORMATTER.format(value)
 	return type === 'WEEKLY_SESSIONS'

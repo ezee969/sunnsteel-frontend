@@ -2,7 +2,7 @@
 
 import { Calculator, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { calculatePlateLoading } from '@/lib/utils/plate-calculator'
 import {
@@ -50,6 +51,7 @@ export const PlateCalculatorDialog = ({
 	open,
 	onOpenChange,
 }: PlateCalculatorDialogProps) => {
+	const locale = useLocale() as Locale
 	const t = useTranslations('workout.plateCalculator')
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
@@ -80,7 +82,7 @@ export const PlateCalculatorDialog = ({
 	)
 
 	const formatWeight = (weightKg: number) =>
-		`${formatWeightAmount(weightKg, weightUnit)} ${unitLabel}`
+		`${formatWeightAmount(weightKg, weightUnit, locale)} ${unitLabel}`
 
 	const handleOpenChange = (next: boolean) => {
 		if (controlled) onOpenChange?.(next)

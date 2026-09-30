@@ -10,6 +10,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import { describeSetScheme } from './exercise-detail'
@@ -102,10 +103,11 @@ function loadsLabel(
 	sets: readonly RoutineSet[],
 	unit: WeightUnit,
 	t: Translator<'routines.versions'>,
+	locale: Locale,
 ): string {
 	const loads = unique(
 		sets.map(set =>
-			set.weight ? formatWeight(set.weight, unit) : t('noLoad'),
+			set.weight ? formatWeight(set.weight, unit, locale) : t('noLoad'),
 		),
 	)
 	return loads.length ? loads.join(', ') : t('noLoad')
@@ -174,6 +176,7 @@ function compareExercise(
 	unit: WeightUnit,
 	t: Translator<'routines.versions'>,
 	tFormat: Translator<'routines.format'>,
+	locale: Locale,
 ): string[] {
 	const name = target.exercise.name
 	const changes: string[] = []
@@ -192,8 +195,8 @@ function compareExercise(
 		changes.push(t('exerciseSetsKind', { name, from: fromKinds, to: toKinds }))
 	}
 	if (!sameLoads(current.sets, target.sets)) {
-		const from = loadsLabel(current.sets, unit, t)
-		const to = loadsLabel(target.sets, unit, t)
+		const from = loadsLabel(current.sets, unit, t, locale)
+		const to = loadsLabel(target.sets, unit, t, locale)
 		changes.push(
 			from === to
 				? t('exerciseLoadsPerSet', { name })
@@ -232,8 +235,8 @@ function compareExercise(
 		changes.push(
 			t('exerciseLoadStepChange', {
 				name,
-				from: formatWeight(current.minWeightIncrement, unit),
-				to: formatWeight(target.minWeightIncrement, unit),
+				from: formatWeight(current.minWeightIncrement, unit, locale),
+				to: formatWeight(target.minWeightIncrement, unit, locale),
 			}),
 		)
 	}
@@ -279,6 +282,7 @@ function compareDay(
 	unit: WeightUnit,
 	t: Translator<'routines.versions'>,
 	tFormat: Translator<'routines.format'>,
+	locale: Locale,
 ): string[] {
 	const changes: string[] = []
 	const fromName = current.name?.trim() || null
@@ -296,7 +300,7 @@ function compareDay(
 	for (const pair of pairs) {
 		if (pair.current && pair.target) {
 			changes.push(
-				...compareExercise(pair.current, pair.target, unit, t, tFormat),
+				...compareExercise(pair.current, pair.target, unit, t, tFormat, locale),
 			)
 		} else if (pair.target) {
 			changes.push(
@@ -342,6 +346,7 @@ export function compareRoutineSetups(
 	tDate: Translator<'routines.date'>,
 	tSchedule: Translator<'routines.schedule'>,
 	tFormat: Translator<'routines.format'>,
+	locale: Locale,
 ): SetupComparison {
 	const routine: string[] = []
 	if (current.name.trim() !== target.name.trim()) {
@@ -392,7 +397,7 @@ export function compareRoutineSetups(
 			})
 			continue
 		}
-		const changes = compareDay(before, day, unit, t, tFormat)
+		const changes = compareDay(before, day, unit, t, tFormat, locale)
 		if (changes.length) {
 			days.push({
 				title: routineDayTitle(day, 'long', tDate),

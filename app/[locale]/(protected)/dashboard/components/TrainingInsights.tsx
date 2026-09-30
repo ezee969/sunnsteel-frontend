@@ -2,12 +2,13 @@
 
 import { Gauge, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { usePlateaus, useVolumeTrend } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	buildDashboardInsights,
@@ -63,6 +64,7 @@ function InsightRow({ insight }: { insight: DashboardInsight }) {
  * not decide which of them matters most.
  */
 export default function TrainingInsights() {
+	const locale = useLocale() as Locale
 	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const tInsights = useTranslations('planning.dashboardInsights')
 	const tPlateaus = useTranslations('planning.plateaus')
@@ -80,6 +82,7 @@ export default function TrainingInsights() {
 		formatDate,
 		t: tInsights,
 		tPlateaus,
+		locale,
 	})
 
 	const retry = () => {

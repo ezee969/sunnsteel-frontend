@@ -20,7 +20,7 @@ import {
 	Plus,
 	Trash2,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -35,6 +35,7 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
+import type { Locale } from '@/i18n/config'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	useFeaturedProfileItems,
@@ -82,7 +83,8 @@ function routineSummary(routine: Routine) {
 }
 
 function recordSummary(record: PersonalRecordEntry, weightUnit: WeightUnit) {
-	return `${formatWeight(record.weight, weightUnit)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit)}`
+	const locale = useLocale() as Locale
+	return `${formatWeight(record.weight, weightUnit, locale)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit, locale)}`
 }
 
 function achievementSummary(achievement: EarnedAchievement) {

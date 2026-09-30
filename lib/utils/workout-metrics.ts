@@ -17,8 +17,9 @@ import {
 export function formatWeight(
 	weight: number | null | undefined,
 	weightUnit: WeightUnit,
+	locale: Locale,
 ): string {
-	return formatWeightForUnit(weight, weightUnit)
+	return formatWeightForUnit(weight, weightUnit, locale)
 }
 
 /**
@@ -109,7 +110,7 @@ export function buildSessionMetrics(
 			? formatDuration(session.durationSec)
 			: '—',
 		completedSets,
-		totalVolumeLabel: `${formatWeightAmount(totalVolume, weightUnit, 1)} ${getWeightUnitLabel(weightUnit)}`,
+		totalVolumeLabel: `${formatWeightAmount(totalVolume, weightUnit, locale, 1)} ${getWeightUnitLabel(weightUnit)}`,
 		notes: session?.notes ?? null,
 	}
 }

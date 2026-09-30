@@ -17,11 +17,12 @@ import {
 	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { buildPersonalRecordCelebration } from '@/lib/utils/personal-record-celebration'
 import { setSaveState } from '@/lib/utils/save-status-store'
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
@@ -626,6 +627,7 @@ export const useUpsertSetLog = (id: string) => {
 	const { push } = useToast()
 	const weightUnit = useWeightUnit()
 	const t = useTranslations('core.personalRecordCelebration')
+	const locale = useLocale() as Locale
 	return useMutation({
 		// Serialize all set-log writes for this session. Editing reps/weight fires a
 		// debounced upsert (carrying the current isCompleted), and the completion
@@ -750,6 +752,7 @@ export const useUpsertSetLog = (id: string) => {
 				res.earnedRecords,
 				weightUnit,
 				t,
+				locale,
 			)
 			if (celebration) {
 				push({ ...celebration, variant: 'success', duration: 6000 })

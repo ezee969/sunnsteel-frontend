@@ -8,6 +8,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import type { EmptyStateCopy } from './empty-states'
@@ -36,12 +37,20 @@ export function describePlateauRule(thresholds: Thresholds, t: T): string {
 	})
 }
 
-export function formatPlateauSet(set: PlateauSet, unit: WeightUnit): string {
-	return `${formatWeightAmount(set.weightKg, unit, 2)} ${getWeightUnitLabel(unit)} × ${set.reps}`
+export function formatPlateauSet(
+	set: PlateauSet,
+	unit: WeightUnit,
+	locale: Locale,
+): string {
+	return `${formatWeightAmount(set.weightKg, unit, locale, 2)} ${getWeightUnitLabel(unit)} × ${set.reps}`
 }
 
-export function formatEstimate(set: PlateauSet, unit: WeightUnit): string {
-	return `${formatWeightAmount(set.estimated1rmKg, unit, 1)} ${getWeightUnitLabel(unit)}`
+export function formatEstimate(
+	set: PlateauSet,
+	unit: WeightUnit,
+	locale: Locale,
+): string {
+	return `${formatWeightAmount(set.estimated1rmKg, unit, locale, 1)} ${getWeightUnitLabel(unit)}`
 }
 
 /** "No new best in 5 sessions" plus where the count started. */

@@ -1,9 +1,10 @@
 import type { FeaturedProfileItem, WeightUnit } from '@sunsteel/contracts'
 import { Bookmark } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
+import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -26,6 +27,7 @@ export function FeaturedAccomplishments({
 	isOwnProfile,
 	routineHref,
 }: FeaturedAccomplishmentsProps) {
+	const locale = useLocale() as Locale
 	const tSharing = useTranslations('routines.sharing')
 	if (!items.length && !isOwnProfile) return null
 
@@ -83,11 +85,15 @@ export function FeaturedAccomplishments({
 										{item.kind === 'RECORD' ? (
 											<>
 												<span className="type-data">
-													{formatWeight(item.record.weight, weightUnit)}
+													{formatWeight(item.record.weight, weightUnit, locale)}
 												</span>{' '}
 												for {item.record.reps} reps · est. 1RM{' '}
 												<span className="type-data">
-													{formatWeight(item.record.estimated1rm, weightUnit)}
+													{formatWeight(
+														item.record.estimated1rm,
+														weightUnit,
+														locale,
+													)}
 												</span>
 											</>
 										) : item.kind === 'ACHIEVEMENT' ? (

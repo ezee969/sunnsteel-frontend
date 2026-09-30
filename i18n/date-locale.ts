@@ -46,3 +46,23 @@ export function dateFormatter(
 	}
 	return formatter
 }
+
+const numberFormatters = new Map<string, Intl.NumberFormat>()
+
+/**
+ * The `Intl.NumberFormat` sibling of `dateFormatter`. A number a member reads
+ * follows the language they chose, not the device's: Spanish writes 116,7
+ * where English writes 116.7 (rule 8 of docs/reference/i18n.md).
+ */
+export function numberFormatter(
+	locale: Locale,
+	options: Intl.NumberFormatOptions,
+): Intl.NumberFormat {
+	const key = `${locale}|${JSON.stringify(options)}`
+	let formatter = numberFormatters.get(key)
+	if (!formatter) {
+		formatter = new Intl.NumberFormat(intlLocale(locale), options)
+		numberFormatters.set(key, formatter)
+	}
+	return formatter
+}

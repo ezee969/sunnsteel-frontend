@@ -2,7 +2,7 @@
 
 import { type SetKind, type WeightUnit } from '@sunsteel/contracts'
 import { Clock, FileText } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import type { Locale } from '@/i18n/config'
 import { setKindLabel } from '@/lib/utils/set-kind-label'
 import { formatTime } from '@/lib/utils/time'
 import { formatWeight } from '@/lib/utils/weight-unit'
@@ -56,6 +57,7 @@ export const ExerciseCard = ({
 	weightUnit,
 	groupLabel,
 }: ExerciseCardProps) => {
+	const locale = useLocale() as Locale
 	const t = useTranslations('routines.setRow')
 	const tKinds = useTranslations('workout.setKinds')
 	return (
@@ -150,7 +152,7 @@ export const ExerciseCard = ({
 									<span className="type-data text-foreground">
 										{repDisplay}
 										{set.weight
-											? ` @ ${formatWeight(set.weight, weightUnit)}`
+											? ` @ ${formatWeight(set.weight, weightUnit, locale)}`
 											: ''}
 										{set.rpe && ` (RPE ${set.rpe})`}
 										{set.rir !== null &&

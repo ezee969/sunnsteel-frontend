@@ -2,8 +2,9 @@
 
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Check, Minus } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
+import type { Locale } from '@/i18n/config'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import { formatWeight as formatPlannedWeight } from '@/lib/utils/weight-unit'
@@ -29,6 +30,7 @@ export function SetComparisonRow({
 	performedSet,
 	weightUnit,
 }: SetComparisonRowProps) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('workout.setComparisonRow')
 	const tKinds = useTranslations('workout.setKinds')
 	const isCompleted = Boolean(performedSet?.isCompleted)
@@ -76,7 +78,7 @@ export function SetComparisonRow({
 									max: plannedSet.maxReps ?? 0,
 								})}
 					{plannedSet?.weight
-						? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit)}`
+						? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit, locale)}`
 						: null}
 				</div>
 			</div>
@@ -95,7 +97,7 @@ export function SetComparisonRow({
 					{t('weightCaption')}
 				</div>
 				<div className="type-data type-data-strong text-foreground">
-					{formatWeight(performedSet?.weight, weightUnit)}
+					{formatWeight(performedSet?.weight, weightUnit, locale)}
 				</div>
 			</div>
 

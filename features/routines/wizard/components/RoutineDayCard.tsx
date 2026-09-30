@@ -1,10 +1,11 @@
 'use client'
 
 import type { WeightUnit } from '@sunsteel/contracts'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import type { Locale } from '@/i18n/config'
 import type { Exercise } from '@/lib/api/types'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
 import { formatExerciseCount } from '@/lib/utils/routine-format'
@@ -36,6 +37,7 @@ export function RoutineDayCard({
 	exerciseMap,
 	weightUnit,
 }: RoutineDayCardProps) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('routines.dayCard')
 	const tFormat = useTranslations('routines.format')
 	const tMuscles = useTranslations('routines.muscles')
@@ -94,7 +96,7 @@ export function RoutineDayCard({
 												})}
 										{set.weight
 											? t('atWeight', {
-													weight: formatWeight(set.weight, weightUnit),
+													weight: formatWeight(set.weight, weightUnit, locale),
 												})
 											: ''}
 									</Badge>

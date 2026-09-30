@@ -38,7 +38,9 @@ describe('the warm-up ramp (LIVE-13)', () => {
 			[80, 2],
 		])
 		expect(sets[0].platesPerSide).toEqual([])
-		expect(describePlates(sets[1].platesPerSide, 'KG', en)).toBe('10 per side')
+		expect(describePlates(sets[1].platesPerSide, 'KG', en, 'en')).toBe(
+			'10 per side',
+		)
 		expect(sets.every(set => !set.limited)).toBe(true)
 	})
 
@@ -64,10 +66,10 @@ describe('the warm-up ramp (LIVE-13)', () => {
 	it('loads each step heaviest plate first', () => {
 		const { sets } = ramp({ platePairs: PLATE_SETS.KG.LIGHT })
 		// 80 kg: 30 per side is 20 + 10, not 15 + 15.
-		expect(describePlates(sets[3].platesPerSide, 'KG', en)).toBe(
+		expect(describePlates(sets[3].platesPerSide, 'KG', en, 'en')).toBe(
 			'20 + 10 per side',
 		)
-		expect(describePlates(ramp({}).sets[3].platesPerSide, 'KG', en)).toBe(
+		expect(describePlates(ramp({}).sets[3].platesPerSide, 'KG', en, 'en')).toBe(
 			'25 + 5 per side',
 		)
 	})
@@ -129,6 +131,7 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				incrementKg: 2.5,
 				unit: 'KG',
 				t: en,
+				locale: 'en',
 			})
 		expect(words(equipmentBasis(location()))).toBe(
 			'Home Gym · 20 kg bar · your plates.',
@@ -148,6 +151,7 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				incrementKg: 2,
 				unit: 'KG',
 				t: en,
+				locale: 'en',
 			}),
 		).toBe("Rounded down to this exercise's 2 kg step.")
 	})
@@ -207,9 +211,10 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				incrementKg: 2.5,
 				unit: 'KG',
 				t: es,
+				locale: 'en',
 			}),
 		).toBe('Aún no hay gimnasio guardado: barra de 20 kg y discos estándar.')
-		expect(describePlates([], 'KG', es)).toBe('Solo la barra')
+		expect(describePlates([], 'KG', es, 'en')).toBe('Solo la barra')
 		expect(
 			saveEquipmentRequest({
 				t: es,
@@ -230,6 +235,7 @@ describe('what the ramp is built from (LIVE-13)', () => {
 				],
 				'LB',
 				en,
+				'en',
 			),
 		).toBe('45 + 5 per side')
 	})

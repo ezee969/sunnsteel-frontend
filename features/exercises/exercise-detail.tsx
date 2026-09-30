@@ -3,7 +3,7 @@
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -14,6 +14,7 @@ import { ExercisePerformanceHistory } from '@/features/progress/exercise-perform
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
@@ -242,6 +243,7 @@ function BestPerformance({
 	exerciseId: string
 	hasStrengthTrend: boolean
 }) {
+	const locale = useLocale() as Locale
 	const weightUnit = useWeightUnit()
 	const tPlateaus = useTranslations('planning.plateaus')
 	const unitLabel = getWeightUnitLabel(weightUnit)
@@ -333,7 +335,7 @@ function BestPerformance({
 								}
 								; closest since{' '}
 								<span className="type-data text-ink-2">
-									{formatPlateauSet(plateau.closest, weightUnit)}
+									{formatPlateauSet(plateau.closest, weightUnit, locale)}
 								</span>{' '}
 								(
 								{describeClosestShare(

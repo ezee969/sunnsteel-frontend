@@ -57,6 +57,7 @@ describe('profile card', () => {
 	it('uses the public identity, current rank and selected non-rank accomplishments', () => {
 		const model = buildProfileCardModel({
 			tSharing: en,
+			locale: 'en',
 			name: '  Ada ',
 			lastName: ' Lovelace ',
 			username: 'ada_lifts',
@@ -95,6 +96,7 @@ describe('profile card', () => {
 	it('falls back to a selected rank when the achievement ledger is unavailable', () => {
 		const model = buildProfileCardModel({
 			tSharing: en,
+			locale: 'en',
 			name: '',
 			username: 'atlas',
 			profileUrl: 'https://sunnsteel.app/members/atlas',

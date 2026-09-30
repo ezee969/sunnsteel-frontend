@@ -6,9 +6,10 @@ import {
 	type SharedRoutine,
 } from '@sunsteel/contracts'
 import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import {
 	countSharedExercises,
 	describeSharedRoutineOwner,
@@ -23,6 +24,7 @@ import { formatWeight } from '@/lib/utils/weight-unit'
  * says so rather than leaving a reader to wonder what they are seeing.
  */
 export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
+	const locale = useLocale() as Locale
 	const weightUnit = useWeightUnit()
 	const tKinds = useTranslations('workout.setKinds')
 	const tSharing = useTranslations('routines.sharing')
@@ -41,7 +43,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 				? `${setKindLabel(set.kind, tKinds)} · `
 				: ''
 		return set.weight
-			? `${kind}${reps} · ${formatWeight(set.weight, weightUnit)}`
+			? `${kind}${reps} · ${formatWeight(set.weight, weightUnit, locale)}`
 			: `${kind}${reps}`
 	}
 

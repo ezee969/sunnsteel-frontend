@@ -83,8 +83,8 @@ describe('plateau copy', () => {
 	})
 
 	it('formats sets in the account unit and never rounds a ratio up to 100%', () => {
-		expect(formatPlateauSet(plateau().best, 'KG')).toBe('100 kg × 5')
-		expect(formatPlateauSet(plateau().best, 'LB')).toBe('220.46 lb × 5')
+		expect(formatPlateauSet(plateau().best, 'KG', 'en')).toBe('100 kg × 5')
+		expect(formatPlateauSet(plateau().best, 'LB', 'en')).toBe('220.46 lb × 5')
 		expect(describeClosestShare(0.975, en)).toBe('97% of that estimate')
 		expect(describeClosestShare(0.999, en)).toBe('99% of that estimate')
 		expect(describeClosestShare(1, en)).toBe('matched that estimate')

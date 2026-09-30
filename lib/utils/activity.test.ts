@@ -95,13 +95,13 @@ const record = (
 
 describe('activity copy names the record, in the viewer unit', () => {
 	it('names a session by routine and day, with its evidence', () => {
-		const view = describeActivity(session('s', null), 'KG')
+		const view = describeActivity(session('s', null), 'KG', 'en')
 		expect(view.title).toBe('Completed Upper / Lower · Monday')
 		expect(view.detail).toBe('18 sets · 4,320 kg volume · 1h 5m')
 	})
 
 	it('converts a record to pounds rather than relabelling kilograms', () => {
-		const view = describeActivity(record('r', null), 'LB')
+		const view = describeActivity(record('r', null), 'LB', 'en')
 		expect(view.title).toBe('New best on Bench Press')
 		expect(view.detail).toContain('lb × 5')
 		expect(view.detail).not.toContain('100 lb')
@@ -132,6 +132,7 @@ describe('activity copy names the record, in the viewer unit', () => {
 					{ previousWeightKg: 80, newWeightKg: 82.5 },
 				]),
 				'KG',
+				'en',
 			).detail,
 		).toBe('80 kg → 82.5 kg on 2 sets')
 		expect(
@@ -141,6 +142,7 @@ describe('activity copy names the record, in the viewer unit', () => {
 					{ previousWeightKg: 75, newWeightKg: 77.5 },
 				]),
 				'KG',
+				'en',
 			).detail,
 		).toBe('2 sets progressed, up to 82.5 kg')
 	})
@@ -159,6 +161,7 @@ describe('activity copy names the record, in the viewer unit', () => {
 				},
 			},
 			'KG',
+			'en',
 		)
 		expect(view.detail).toBe('21 full days away · 3 active days in 9 days')
 	})

@@ -7,7 +7,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { ChevronDown, X } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -24,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
 import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
+import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import {
 	formatPreviousPerformance,
@@ -105,6 +106,7 @@ export const SetLogInput = ({
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
+	const locale = useLocale() as Locale
 	const t = useTranslations('workout.setLogInput')
 	const tKinds = useTranslations('workout.setKinds')
 	const {
@@ -195,7 +197,7 @@ export const SetLogInput = ({
 		previousPerformance !== undefined &&
 		!holds(previousPerformance)
 	const previousText = previousPerformance
-		? formatPreviousPerformance(previousPerformance, weightUnit, tPrev)
+		? formatPreviousPerformance(previousPerformance, weightUnit, tPrev, locale)
 		: ''
 
 	return (
@@ -351,7 +353,7 @@ export const SetLogInput = ({
 						{isExtra
 							? t('noTarget')
 							: t('targetWeight', {
-									value: formatWeight(plannedWeight, weightUnit),
+									value: formatWeight(plannedWeight, weightUnit, locale),
 								})}
 					</span>
 				</div>

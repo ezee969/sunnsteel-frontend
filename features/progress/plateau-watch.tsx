@@ -7,12 +7,13 @@ import type {
 } from '@sunsteel/contracts'
 import { Gauge, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import {
 	describeClosestShare,
 	describePlateauCount,
@@ -111,6 +112,7 @@ function PlateauRow({
 	thresholds: PlateausResponse['thresholds']
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('planning.plateaus')
 	const count = describePlateauCount(plateau, thresholds, formatDate, t)
 	return (
@@ -133,11 +135,11 @@ function PlateauRow({
 					<dt className="inline">Best </dt>
 					<dd className="inline">
 						<span className="type-data text-ink-2">
-							{formatPlateauSet(plateau.best, weightUnit)}
+							{formatPlateauSet(plateau.best, weightUnit, locale)}
 						</span>{' '}
 						· est. 1RM{' '}
 						<span className="type-data text-ink-2">
-							{formatEstimate(plateau.best, weightUnit)}
+							{formatEstimate(plateau.best, weightUnit, locale)}
 						</span>
 					</dd>
 				</div>
@@ -145,7 +147,7 @@ function PlateauRow({
 					<dt className="inline">Closest since </dt>
 					<dd className="inline">
 						<span className="type-data text-ink-2">
-							{formatPlateauSet(plateau.closest, weightUnit)}
+							{formatPlateauSet(plateau.closest, weightUnit, locale)}
 						</span>{' '}
 						· {describeClosestShare(plateau.closestRatio, t)}
 					</dd>

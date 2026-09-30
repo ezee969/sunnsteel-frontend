@@ -253,6 +253,7 @@ function ReviewTrainingBlockDialog({
 	weightUnit: WeightUnit
 	onClose: () => void
 }) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('routines.trainingBlocks')
 	const tVersions = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
@@ -273,6 +274,7 @@ function ReviewTrainingBlockDialog({
 				tDate,
 				tSchedule,
 				tFormat,
+				locale,
 			),
 		[routine, selected.setup, weightUnit, tVersions, tDate, tSchedule, tFormat],
 	)

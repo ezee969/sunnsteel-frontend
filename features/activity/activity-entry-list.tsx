@@ -16,11 +16,13 @@ import {
 	Trophy,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ActivityComments } from '@/features/activity/activity-comments'
 import { ActivityReactions } from '@/features/activity/activity-reactions'
+import type { Locale } from '@/i18n/config'
 import {
 	activityHref,
 	describeActivity,
@@ -64,8 +66,9 @@ export function ActivityFact({
 	discussion?: boolean
 	children?: ReactNode
 }) {
+	const locale = useLocale() as Locale
 	const Icon = ACTIVITY_ICONS[entry.type]
-	const { title, detail } = describeActivity(entry, weightUnit)
+	const { title, detail } = describeActivity(entry, weightUnit, locale)
 	return (
 		<div className="flex min-w-0 gap-3">
 			<Icon className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />

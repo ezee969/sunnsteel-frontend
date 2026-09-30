@@ -4,6 +4,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import { formatWeight } from './weight-unit'
@@ -39,16 +40,18 @@ const singleRecordTitle = (kind: PersonalRecordKind, t: Translated): string => {
 function formatRecordValue(
 	record: EarnedPersonalRecord,
 	weightUnit: WeightUnit,
+	locale: Locale,
 ): string {
 	return record.kind === 'REPS'
 		? String(record.value)
-		: formatWeight(record.value, weightUnit)
+		: formatWeight(record.value, weightUnit, locale)
 }
 
 export function buildPersonalRecordCelebration(
 	records: EarnedPersonalRecord[],
 	weightUnit: WeightUnit,
 	t: Translated,
+	locale: Locale,
 ): { title: string; description: string } | null {
 	if (records.length === 0) return null
 
@@ -59,7 +62,7 @@ export function buildPersonalRecordCelebration(
 	const details = records
 		.map(
 			record =>
-				`${kindLabel(record.kind, t)} ${formatRecordValue(record, weightUnit)}`,
+				`${kindLabel(record.kind, t)} ${formatRecordValue(record, weightUnit, locale)}`,
 		)
 		.join(' · ')
 

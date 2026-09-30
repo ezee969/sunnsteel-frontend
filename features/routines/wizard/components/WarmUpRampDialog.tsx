@@ -2,7 +2,7 @@
 
 import type { WeightUnit } from '@sunsteel/contracts'
 import { Flame } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { useToast } from '@/components/ui/toast'
+import type { Locale } from '@/i18n/config'
 import {
 	useReplaceTrainingLocations,
 	useTrainingLocations,
@@ -146,6 +147,7 @@ function WarmUpRampPreview({
 		followLoad: boolean,
 	) => void
 }) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('routines.warmUp')
 	const { push } = useToast()
 	const { data: locations = [] } = useTrainingLocations()
@@ -225,7 +227,7 @@ function WarmUpRampPreview({
 					<DialogTitle>{t('dialogTitle')}</DialogTitle>
 					<DialogDescription>
 						{t('dialogDescription', {
-							weight: formatWeight(workingWeightKg, weightUnit),
+							weight: formatWeight(workingWeightKg, weightUnit, locale),
 							exercise: exerciseName,
 						})}
 					</DialogDescription>
@@ -246,7 +248,7 @@ function WarmUpRampPreview({
 									>
 										{barChoices.map(kg => (
 											<option key={kg} value={String(kg)}>
-												{formatWeight(kg, weightUnit)}
+												{formatWeight(kg, weightUnit, locale)}
 											</option>
 										))}
 									</NativeSelect>
@@ -271,7 +273,7 @@ function WarmUpRampPreview({
 									{t('platePairs', {
 										list: PLATE_SETS[weightUnit][plateSet]
 											.map(pair =>
-												formatWeight(pair.weightKg, weightUnit).replace(
+												formatWeight(pair.weightKg, weightUnit, locale).replace(
 													/\s?(kg|lb)$/,
 													'',
 												),
@@ -293,6 +295,7 @@ function WarmUpRampPreview({
 							incrementKg,
 							unit: weightUnit,
 							t,
+							locale,
 						})}
 					</p>
 
@@ -309,13 +312,18 @@ function WarmUpRampPreview({
 									<span className="flex flex-col items-end">
 										<span className="type-data text-foreground">
 											{t('weightByReps', {
-												weight: formatWeight(set.weightKg, weightUnit),
+												weight: formatWeight(set.weightKg, weightUnit, locale),
 												reps: set.reps,
 											})}
 										</span>
 										{set.platesPerSide ? (
 											<span className="type-body-sm text-ink-3">
-												{describePlates(set.platesPerSide, weightUnit, t)}
+												{describePlates(
+													set.platesPerSide,
+													weightUnit,
+													t,
+													locale,
+												)}
 												{set.limited ? t('closestYouCanLoad') : ''}
 											</span>
 										) : null}

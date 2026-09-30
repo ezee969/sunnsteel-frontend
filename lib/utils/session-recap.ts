@@ -4,6 +4,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import { formatDuration } from './time-format.utils'
@@ -20,9 +21,10 @@ export function formatRecapRecordValue(
 	record: SessionRecapRecord,
 	weightUnit: WeightUnit,
 	t: Translator<'workout.recap'>,
+	locale: Locale,
 ): string {
 	if (record.kind === 'REPS') return t('repsValue', { count: record.value })
-	return `${formatWeightAmount(record.value, weightUnit, 1)} ${getWeightUnitLabel(weightUnit)}`
+	return `${formatWeightAmount(record.value, weightUnit, locale, 1)} ${getWeightUnitLabel(weightUnit)}`
 }
 
 export function formatRecapDurationDelta(
@@ -37,11 +39,13 @@ export function formatRecapWeightDelta(
 	deltaKg: number,
 	weightUnit: WeightUnit,
 	t: Translator<'workout.recap'>,
+	locale: Locale,
 ): string {
 	if (deltaKg === 0) return t('noChange')
 	return `${deltaKg > 0 ? '+' : '−'}${formatWeightAmount(
 		Math.abs(deltaKg),
 		weightUnit,
+		locale,
 		1,
 	)} ${getWeightUnitLabel(weightUnit)}`
 }

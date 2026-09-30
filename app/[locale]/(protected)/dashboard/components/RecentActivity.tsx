@@ -2,11 +2,12 @@
 
 import { Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ClassicalIcon } from '@/components/icons/ClassicalIcon'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useWorkoutProgress } from '@/lib/api/hooks/useWorkoutSession'
 import { recentActivitySummary } from '@/lib/utils/dashboard-summaries'
@@ -22,6 +23,7 @@ import { DashboardSection } from './DashboardSection'
  * The last few finished sessions, with the volume each one actually moved.
  */
 export default function RecentActivity() {
+	const locale = useLocale() as Locale
 	const tEmpty = useTranslations('planning.emptyStates')
 	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const router = useRouter()
@@ -70,7 +72,7 @@ export default function RecentActivity() {
 							time={formatTimeAgo(entry.endedAt ?? entry.startedAt)}
 							badges={[
 								`${entry.completedSets} sets`,
-								`${formatWeightAmount(entry.totalVolumeKg, weightUnit)} ${getWeightUnitLabel(weightUnit)}`,
+								`${formatWeightAmount(entry.totalVolumeKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)}`,
 								...(entry.durationSec
 									? [formatDuration(entry.durationSec)]
 									: []),

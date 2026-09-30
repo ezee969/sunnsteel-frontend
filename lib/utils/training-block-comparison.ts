@@ -138,8 +138,8 @@ function describeWorkouts(period: BlockComparisonPeriod, t: T): string {
 		: workouts
 }
 
-const load = (kg: number, unit: WeightUnit, digits = 0) =>
-	`${formatWeightAmount(kg, unit, digits)} ${getWeightUnitLabel(unit)}`
+const load = (kg: number, unit: WeightUnit, locale: Locale, digits = 0) =>
+	`${formatWeightAmount(kg, unit, locale, digits)} ${getWeightUnitLabel(unit)}`
 
 export function comparisonRows(
 	comparison: TrainingBlockComparisonResponse,
@@ -178,12 +178,12 @@ export function comparisonRows(
 		{
 			label: t('rowExternalLoad'),
 			previous: t('valuePerWeek', {
-				total: load(previous.volumeKg, unit),
-				perWeek: load(previous.perWeek.volumeKg, unit),
+				total: load(previous.volumeKg, unit, locale),
+				perWeek: load(previous.perWeek.volumeKg, unit, locale),
 			}),
 			current: t('valuePerWeek', {
-				total: load(current.volumeKg, unit),
-				perWeek: load(current.perWeek.volumeKg, unit),
+				total: load(current.volumeKg, unit, locale),
+				perWeek: load(current.perWeek.volumeKg, unit, locale),
 			}),
 			change: describeWeeklyChange(
 				Math.round(kilogramsToDisplayWeight(current.perWeek.volumeKg, unit)) -
@@ -254,8 +254,8 @@ export function describeLift(
 	locale: Locale,
 ): string {
 	return t('liftChange', {
-		previous: load(lift.previous.estimated1rmKg, unit, 1),
-		current: load(lift.current.estimated1rmKg, unit, 1),
+		previous: load(lift.previous.estimated1rmKg, unit, locale, 1),
+		current: load(lift.current.estimated1rmKg, unit, locale, 1),
 		change: describeChange(lift.changePercent, t, locale, '%'),
 	})
 }

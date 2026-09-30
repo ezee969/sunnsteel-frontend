@@ -6,6 +6,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import type { EmptyStateCopy } from './empty-states'
@@ -50,25 +51,32 @@ const formatWeekTotals = (
 	unit: WeightUnit,
 	formatWeek: (weekStart: string) => string,
 	t: T,
+	locale: Locale,
 ) =>
 	t('weekTotals', {
 		week: formatWeek(point.weekStart),
 		sets: t('sets', { count: point.completedSets }),
-		volume: formatWeightAmount(point.volumeKg, unit, 0),
+		volume: formatWeightAmount(point.volumeKg, unit, locale, 0),
 		unit: getWeightUnitLabel(unit),
 	})
 
-const describeBest = (plateau: ExercisePlateau, unit: WeightUnit, t: T) =>
+const describeBest = (
+	plateau: ExercisePlateau,
+	unit: WeightUnit,
+	t: T,
+	locale: Locale,
+) =>
 	t('best', {
-		set: formatPlateauSet(plateau.best, unit),
-		estimate: formatEstimate(plateau.best, unit),
+		set: formatPlateauSet(plateau.best, unit, locale),
+		estimate: formatEstimate(plateau.best, unit, locale),
 	})
 
 const describeClosestSince = (
 	plateau: ExercisePlateau,
 	unit: WeightUnit,
 	t: T,
-) => t('closestSince', { set: formatPlateauSet(plateau.closest, unit) })
+	locale: Locale,
+) => t('closestSince', { set: formatPlateauSet(plateau.closest, unit, locale) })
 
 /**
  * The last two *finished* weeks. The current week is partial by definition, so
@@ -79,6 +87,7 @@ function buildWeekComparison(
 	unit: WeightUnit,
 	formatWeek: (weekStart: string) => string,
 	t: T,
+	locale: Locale,
 ): DashboardInsight | null {
 	if (!volume) return null
 
@@ -105,8 +114,14 @@ function buildWeekComparison(
 		href: '/progress/load',
 		statement,
 		evidence: t('weekEvidence', {
-			previous: formatWeekTotals(previousCompleteWeek, unit, formatWeek, t),
-			latest: formatWeekTotals(latestCompleteWeek, unit, formatWeek, t),
+			previous: formatWeekTotals(
+				previousCompleteWeek,
+				unit,
+				formatWeek,
+				t,
+				locale,
+			),
+			latest: formatWeekTotals(latestCompleteWeek, unit, formatWeek, t, locale),
 		}),
 	}
 }
@@ -127,6 +142,7 @@ function buildClosestInsight(
 	unit: WeightUnit,
 	t: T,
 	tPlateaus: Translator<'planning.plateaus'>,
+	locale: Locale,
 ): DashboardInsight {
 	return {
 		key: 'CLOSEST_TO_BEST',
@@ -141,8 +157,8 @@ function buildClosestInsight(
 			),
 		}),
 		evidence: t('closestEvidence', {
-			best: describeBest(plateau, unit, t),
-			closest: describeClosestSince(plateau, unit, t),
+			best: describeBest(plateau, unit, t, locale),
+			closest: describeClosestSince(plateau, unit, t, locale),
 		}),
 	}
 }
@@ -155,11 +171,12 @@ function buildLongestPlateauInsight(
 	includeClosestShare: boolean,
 	t: T,
 	tPlateaus: Translator<'planning.plateaus'>,
+	locale: Locale,
 ): DashboardInsight {
 	const count = describePlateauCount(plateau, thresholds, formatDate, tPlateaus)
 	const closest = includeClosestShare
 		? t('longestEvidenceExtra', {
-				closest: describeClosestSince(plateau, unit, t),
+				closest: describeClosestSince(plateau, unit, t, locale),
 				share: describeClosestShare(
 					plateau.closestRatio,
 					tPlateaus,
@@ -176,7 +193,7 @@ function buildLongestPlateauInsight(
 			headline: count.headline,
 			since: count.since,
 		}),
-		evidence: `${describeBest(plateau, unit, t)}${closest}`,
+		evidence: `${describeBest(plateau, unit, t, locale)}${closest}`,
 	}
 }
 
@@ -189,6 +206,7 @@ export interface DashboardInsightSources {
 	formatDate: (iso: string) => string
 	t: T
 	tPlateaus: Translator<'planning.plateaus'>
+	locale: Locale
 }
 
 /**
@@ -205,10 +223,17 @@ export function buildDashboardInsights({
 	formatDate,
 	t,
 	tPlateaus,
+	locale,
 }: DashboardInsightSources): DashboardInsight[] {
 	const insights: DashboardInsight[] = []
 
-	const weekComparison = buildWeekComparison(volume, weightUnit, formatWeek, t)
+	const weekComparison = buildWeekComparison(
+		volume,
+		weightUnit,
+		formatWeek,
+		t,
+		locale,
+	)
 	if (weekComparison) insights.push(weekComparison)
 
 	const list = plateaus?.plateaus ?? []
@@ -217,7 +242,9 @@ export function buildDashboardInsights({
 	const sameLift = longest !== null && longest === closest
 
 	if (closest && !sameLift) {
-		insights.push(buildClosestInsight(closest, weightUnit, t, tPlateaus))
+		insights.push(
+			buildClosestInsight(closest, weightUnit, t, tPlateaus, locale),
+		)
 	}
 	if (longest && plateaus) {
 		insights.push(
@@ -229,6 +256,7 @@ export function buildDashboardInsights({
 				sameLift,
 				t,
 				tPlateaus,
+				locale,
 			),
 		)
 	}

@@ -6,7 +6,7 @@ import {
 	ROUTINE_VERSIONS_MAX,
 } from '@sunsteel/contracts'
 import { GitCompare, RefreshCw, RotateCcw, Save, Trash2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import {
@@ -33,6 +33,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
+import type { Locale } from '@/i18n/config'
 import {
 	useCreateRoutineVersion,
 	useDeleteRoutineVersion,
@@ -155,6 +156,7 @@ function CompareVersionDialog({
 	hasLiveSession: boolean
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
 	const t = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
 	const tSchedule = useTranslations('routines.schedule')
@@ -172,6 +174,7 @@ function CompareVersionDialog({
 				tDate,
 				tSchedule,
 				tFormat,
+				locale,
 			),
 		[routine, version.setup, weightUnit, t, tDate, tSchedule, tFormat],
 	)

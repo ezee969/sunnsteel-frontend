@@ -4,6 +4,7 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 import { rankCrestTier } from '@/lib/utils/rank-identity'
 import { describeRoutineSummary } from '@/lib/utils/routine-sharing'
@@ -69,6 +70,7 @@ function featuredItemToAccomplishment(
 	item: FeaturedProfileItem,
 	weightUnit: WeightUnit,
 	tSharing: Translator<'routines.sharing'>,
+	locale: Locale,
 ): ProfileCardAccomplishment | null {
 	if (item.kind === 'RANK') return null
 	if (item.kind === 'ACHIEVEMENT') {
@@ -88,7 +90,7 @@ function featuredItemToAccomplishment(
 	return {
 		kind: 'Personal record',
 		title: item.record.exerciseName,
-		detail: `${formatWeight(item.record.weight, weightUnit)} for ${item.record.reps} reps · est. 1RM ${formatWeight(item.record.estimated1rm, weightUnit)}`,
+		detail: `${formatWeight(item.record.weight, weightUnit, locale)} for ${item.record.reps} reps · est. 1RM ${formatWeight(item.record.estimated1rm, weightUnit, locale)}`,
 	}
 }
 
@@ -101,8 +103,10 @@ export function buildProfileCardModel({
 	achievements,
 	weightUnit,
 	tSharing,
+	locale,
 }: ProfileCardSource & {
 	tSharing: Translator<'routines.sharing'>
+	locale: Locale
 }): ProfileCardModel {
 	const featuredRank = featuredItems.find(item => item.kind === 'RANK')
 	const rank =
@@ -116,7 +120,9 @@ export function buildProfileCardModel({
 		profileUrl,
 		rank: rank ? { id: rank.id, title: rank.title } : null,
 		accomplishments: featuredItems
-			.map(item => featuredItemToAccomplishment(item, weightUnit, tSharing))
+			.map(item =>
+				featuredItemToAccomplishment(item, weightUnit, tSharing, locale),
+			)
 			.filter((item): item is ProfileCardAccomplishment => item !== null),
 	}
 }

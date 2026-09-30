@@ -7,6 +7,7 @@ import type {
 } from '@sunsteel/contracts'
 import { GitCompareArrows, NotebookPen, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { useMemo } from 'react'
 
 import {
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { buildSessionExerciseComparisons } from '@/lib/utils/session-comparison'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
@@ -94,10 +96,11 @@ function formatSignedNumber(value: number, format: (value: number) => string) {
 }
 
 function formatSet(set: SessionComparisonSet | null, weightUnit: WeightUnit) {
+	const locale = useLocale() as Locale
 	if (!set) return 'Not completed'
 	const performance =
 		set.weightKg != null && set.weightKg > 0
-			? `${formatWeightAmount(set.weightKg, weightUnit)} ${getWeightUnitLabel(weightUnit)} × ${set.reps}`
+			? `${formatWeightAmount(set.weightKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)} × ${set.reps}`
 			: `${set.reps} reps · bodyweight`
 	return set.rpe != null ? `${performance} · RPE ${set.rpe}` : performance
 }
@@ -110,6 +113,7 @@ export function SessionComparison({
 	onRoutineDayChange,
 	onRetry,
 }: SessionComparisonProps) {
+	const locale = useLocale() as Locale
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const latest = data?.latestSession ?? null
@@ -121,7 +125,7 @@ export function SessionComparison({
 	const selectedValue =
 		selectedRoutineDayId ?? data?.selectedRoutineDay?.routineDayId ?? ''
 	const formatVolume = (valueKg: number) =>
-		`${formatWeightAmount(valueKg, weightUnit)} ${unitLabel}`
+		`${formatWeightAmount(valueKg, weightUnit, locale)} ${unitLabel}`
 
 	return (
 		<section aria-labelledby="session-comparison" className="space-y-4">
