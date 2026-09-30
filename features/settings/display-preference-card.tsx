@@ -1,6 +1,7 @@
 'use client'
 
 import { Eye } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	Card,
@@ -19,6 +20,7 @@ import { useDisplayPreference } from '@/hooks/use-display-preference'
  * setting, which this choice can add to but never turn off.
  */
 export function DisplayPreferenceCard() {
+	const t = useTranslations('settings.display')
 	const {
 		contrast,
 		systemMoreContrast,
@@ -32,21 +34,15 @@ export function DisplayPreferenceCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Eye className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Display</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Make Sunnsteel easier to read and to tap on this device, for example
-					in a bright gym.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-3">
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3">
 					<div className="space-y-1">
-						<Label htmlFor="display-contrast">Higher contrast</Label>
-						<p className="type-body-sm text-ink-3">
-							Darker text in the light theme and brighter text in the dark one,
-							stronger borders, and a thicker outline on the focused control.
-						</p>
+						<Label htmlFor="display-contrast">{t('contrast')}</Label>
+						<p className="type-body-sm text-ink-3">{t('contrastNote')}</p>
 					</div>
 					<Label
 						htmlFor="display-contrast"
@@ -59,26 +55,20 @@ export function DisplayPreferenceCard() {
 							onCheckedChange={checked =>
 								setContrast(checked === true ? 'more' : 'system')
 							}
-							aria-label="Higher contrast"
+							aria-label={t('contrast')}
 							className="size-5"
 						/>
 					</Label>
 				</div>
 				{systemMoreContrast ? (
 					<p className="type-body-sm text-ink-3" role="status">
-						Your device already asks for more contrast, so it is on everywhere.
-						Change it in your device&apos;s accessibility settings.
+						{t('systemContrast')}
 					</p>
 				) : null}
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3 border-t border-rule-faint pt-3">
 					<div className="space-y-1">
-						<Label htmlFor="display-controls">Larger controls</Label>
-						<p className="type-body-sm text-ink-3">
-							Bigger buttons, fields and checkboxes everywhere. During a workout
-							it also enlarges the set fields and the rest timer, and puts the
-							less-used actions in one menu per exercise and per set. You can
-							also switch it from the workout screen.
-						</p>
+						<Label htmlFor="display-controls">{t('controls')}</Label>
+						<p className="type-body-sm text-ink-3">{t('controlsNote')}</p>
 					</div>
 					<Label
 						htmlFor="display-controls"
@@ -90,7 +80,7 @@ export function DisplayPreferenceCard() {
 							onCheckedChange={checked =>
 								setControlSize(checked === true ? 'large' : 'standard')
 							}
-							aria-label="Larger controls"
+							aria-label={t('controls')}
 							className="size-5"
 						/>
 					</Label>

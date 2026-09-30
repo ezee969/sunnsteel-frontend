@@ -7,6 +7,7 @@ import {
 } from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import React, { useEffect, useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -67,6 +68,8 @@ interface SettingsFormData {
  * link to a card that moved is sent to its tab before anything renders.
  */
 export default function SettingsProfilePage() {
+	const t = useTranslations('settings.profilePage')
+	const tUsername = useTranslations('settings.username')
 	const forwarding = useHashForward(SETTINGS_HASH_RULES)
 	const { user } = useUser()
 	// The saved unit, not the form's unsaved choice: featured records are
@@ -149,11 +152,11 @@ export default function SettingsProfilePage() {
 			const file = event.target.files[0]
 
 			if (file.size > 2 * 1024 * 1024) {
-				throw new Error('Image size must be less than 2MB.')
+				throw new Error(t('imageTooLarge'))
 			}
 
 			if (!file.type.startsWith('image/')) {
-				throw new Error('Please upload a valid image file.')
+				throw new Error(t('imageInvalid'))
 			}
 
 			const reader = new FileReader()
@@ -168,8 +171,8 @@ export default function SettingsProfilePage() {
 		} catch (error: unknown) {
 			logger.error('Error selecting image:', error)
 			push({
-				title: 'Error',
-				description: (error as Error).message || 'Error selecting image.',
+				title: t('errorTitle'),
+				description: (error as Error).message || t('selectFallback'),
 				variant: 'destructive',
 			})
 		}
@@ -180,15 +183,15 @@ export default function SettingsProfilePage() {
 			onSuccess: profile => {
 				setAvatarUrl(profile.avatarUrl || '')
 				push({
-					title: 'Avatar Updated',
-					description: 'Your new profile picture has been saved.',
+					title: t('avatarUpdatedTitle'),
+					description: t('avatarUpdatedDescription'),
 					variant: 'success',
 				})
 			},
 			onError: error => {
 				logger.error('Error uploading avatar:', error)
 				push({
-					title: 'Your photo was not changed',
+					title: t('photoNotChanged'),
 					description: error.message,
 					variant: 'destructive',
 				})
@@ -198,10 +201,13 @@ export default function SettingsProfilePage() {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		const usernameError = getUsernameValidationError(formData.username)
+		const usernameError = getUsernameValidationError(
+			formData.username,
+			tUsername,
+		)
 		if (usernameError) {
 			push({
-				title: 'Choose another username',
+				title: t('chooseUsername'),
 				description: usernameError,
 				variant: 'destructive',
 			})
@@ -231,15 +237,15 @@ export default function SettingsProfilePage() {
 			{
 				onSuccess: () => {
 					push({
-						title: 'Success',
-						description: 'Profile saved successfully.',
+						title: t('successTitle'),
+						description: t('profileSaved'),
 						variant: 'success',
 					})
 				},
 				onError: err => {
 					push({
-						title: 'Error',
-						description: 'Error saving profile: ' + err.message,
+						title: t('errorTitle'),
+						description: t('saveError', { message: err.message }),
 						variant: 'destructive',
 					})
 				},
@@ -249,15 +255,15 @@ export default function SettingsProfilePage() {
 
 	if (forwarding) return null
 
-	const usernameError = getUsernameValidationError(formData.username)
+	const usernameError = getUsernameValidationError(formData.username, tUsername)
 
 	return (
 		<SettingsTab>
 			<div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
 				<Card>
 					<CardHeader>
-						<CardTitle>Profile Picture</CardTitle>
-						<CardDescription>Update your avatar</CardDescription>
+						<CardTitle>{t('pictureTitle')}</CardTitle>
+						<CardDescription>{t('pictureDescription')}</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-col items-center gap-4">
 						<div className="relative group">
@@ -287,22 +293,20 @@ export default function SettingsProfilePage() {
 							/>
 						</div>
 						<p className="type-body-sm text-center text-ink-3">
-							Click the image to upload a new avatar.
+							{t('clickToUpload')}
 						</p>
 					</CardContent>
 				</Card>
 
 				<Card>
 					<CardHeader>
-						<CardTitle>Personal Information</CardTitle>
-						<CardDescription>
-							Update your personal details here.
-						</CardDescription>
+						<CardTitle>{t('personalTitle')}</CardTitle>
+						<CardDescription>{t('personalDescription')}</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={handleSubmit} className="space-y-4">
 							<div className="space-y-2">
-								<Label htmlFor="username">Username</Label>
+								<Label htmlFor="username">{t('username')}</Label>
 								<div className="relative max-w-[var(--field-max)]">
 									<span
 										className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
@@ -331,14 +335,13 @@ export default function SettingsProfilePage() {
 										usernameError ? 'text-destructive' : 'text-ink-3'
 									}`}
 								>
-									{usernameError ||
-										'Your public handle. Letters are saved in lowercase.'}
+									{usernameError || t('usernameHelp')}
 								</p>
 							</div>
 
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div className="space-y-2">
-									<Label htmlFor="name">First Name</Label>
+									<Label htmlFor="name">{t('firstName')}</Label>
 									<Input
 										id="name"
 										name="name"
@@ -348,7 +351,7 @@ export default function SettingsProfilePage() {
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="lastName">Last Name</Label>
+									<Label htmlFor="lastName">{t('lastName')}</Label>
 									<Input
 										id="lastName"
 										name="lastName"
@@ -359,7 +362,7 @@ export default function SettingsProfilePage() {
 							</div>
 
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="email">{t('email')}</Label>
 								<Input
 									id="email"
 									type="email"
@@ -371,7 +374,7 @@ export default function SettingsProfilePage() {
 
 							<div className="space-y-2">
 								<div className="flex items-baseline justify-between gap-3">
-									<Label htmlFor="location">Location</Label>
+									<Label htmlFor="location">{t('location')}</Label>
 									<span className="type-data text-xs text-ink-3">
 										{formData.location.length}/{PROFILE_LOCATION_MAX_LENGTH}
 									</span>
@@ -382,24 +385,26 @@ export default function SettingsProfilePage() {
 									value={formData.location}
 									onChange={handleInputChange}
 									maxLength={PROFILE_LOCATION_MAX_LENGTH}
-									placeholder="City, country"
+									placeholder={t('locationPlaceholder')}
 									autoComplete="address-level2"
 								/>
 								<p className="type-body-sm text-ink-3">
-									Optional. Control who sees it under{' '}
-									<Link
-										href={privacySettingHref('location')}
-										className="text-foreground underline underline-offset-4"
-									>
-										Profile Privacy
-									</Link>
-									.
+									{t.rich('locationHint', {
+										link: chunks => (
+											<Link
+												href={privacySettingHref('location')}
+												className="text-foreground underline underline-offset-4"
+											>
+												{chunks}
+											</Link>
+										),
+									})}
 								</p>
 							</div>
 
 							<div className="space-y-2">
 								<div className="flex items-baseline justify-between gap-3">
-									<Label htmlFor="bio">Biography</Label>
+									<Label htmlFor="bio">{t('biography')}</Label>
 									<span className="type-data text-xs text-ink-3">
 										{formData.bio.length}/{PROFILE_BIO_MAX_LENGTH}
 									</span>
@@ -410,17 +415,15 @@ export default function SettingsProfilePage() {
 									value={formData.bio}
 									onChange={handleInputChange}
 									maxLength={PROFILE_BIO_MAX_LENGTH}
-									placeholder="Tell people about your training."
+									placeholder={t('bioPlaceholder')}
 									className="min-h-28 resize-y"
 								/>
-								<p className="type-body-sm text-ink-3">
-									Optional. Line breaks are preserved on your profile.
-								</p>
+								<p className="type-body-sm text-ink-3">{t('bioHint')}</p>
 							</div>
 
 							<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 								<div className="space-y-2">
-									<Label htmlFor="age">Age</Label>
+									<Label htmlFor="age">{t('age')}</Label>
 									<Input
 										id="age"
 										name="age"
@@ -434,17 +437,17 @@ export default function SettingsProfilePage() {
 								</div>
 
 								<div className="space-y-2">
-									<Label htmlFor="sex">Sex</Label>
+									<Label htmlFor="sex">{t('sex')}</Label>
 									<Select
 										value={formData.sex}
 										onValueChange={val => handleSelectChange(val, 'sex')}
 									>
 										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Select sex" />
+											<SelectValue placeholder={t('sexPlaceholder')} />
 										</SelectTrigger>
 										<SelectContent>
-											<SelectItem value="MALE">Male</SelectItem>
-											<SelectItem value="FEMALE">Female</SelectItem>
+											<SelectItem value="MALE">{t('male')}</SelectItem>
+											<SelectItem value="FEMALE">{t('female')}</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
@@ -453,7 +456,9 @@ export default function SettingsProfilePage() {
 							<div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
 								<div className="space-y-2">
 									<Label htmlFor="weight">
-										Weight ({formData.weightUnit === 'LB' ? 'lb' : 'kg'})
+										{t('weight', {
+											unit: formData.weightUnit === 'LB' ? 'lb' : 'kg',
+										})}
 									</Label>
 									<Input
 										id="weight"
@@ -466,7 +471,7 @@ export default function SettingsProfilePage() {
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="weightUnit">Weight Unit</Label>
+									<Label htmlFor="weightUnit">{t('weightUnit')}</Label>
 									<Select
 										value={formData.weightUnit}
 										onValueChange={value =>
@@ -474,16 +479,16 @@ export default function SettingsProfilePage() {
 										}
 									>
 										<SelectTrigger id="weightUnit" className="w-full">
-											<SelectValue aria-label="Weight unit" />
+											<SelectValue aria-label={t('weightUnitAria')} />
 										</SelectTrigger>
 										<SelectContent>
-											<SelectItem value="KG">Kilograms (kg)</SelectItem>
-											<SelectItem value="LB">Pounds (lb)</SelectItem>
+											<SelectItem value="KG">{t('kilograms')}</SelectItem>
+											<SelectItem value="LB">{t('pounds')}</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="height">Height (cm)</Label>
+									<Label htmlFor="height">{t('height')}</Label>
 									<Input
 										id="height"
 										name="height"
@@ -507,7 +512,7 @@ export default function SettingsProfilePage() {
 									{updateUserMutation.isPending ? (
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 									) : null}
-									Save Changes
+									{t('save')}
 								</Button>
 							</div>
 						</form>

@@ -3,6 +3,7 @@
 import type { ProfilePrivacySettings } from '@sunsteel/contracts'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { privacySettingHref } from '@/lib/utils/settings-anchor'
 
@@ -27,6 +28,7 @@ export function PrivacyCapNote({
 	className,
 	role,
 }: PrivacyCapNoteProps) {
+	const t = useTranslations('settings.privacyCapNote')
 	const pathname = usePathname()
 	const href = section ? privacySettingHref(section) : null
 	// On Settings › Privacy itself the link is a same-page fragment, so the
@@ -43,13 +45,13 @@ export function PrivacyCapNote({
 					{' '}
 					{samePage ? (
 						<a href={`#${fragment}`} className={LINK_CLASS}>
-							Change it under Profile Privacy
+							{t('changeUnderProfilePrivacy')}
 						</a>
 					) : (
 						<Link href={href} className={LINK_CLASS}>
 							{inSettings
-								? 'Change it under Profile Privacy'
-								: 'Change it in Settings'}
+								? t('changeUnderProfilePrivacy')
+								: t('changeInSettings')}
 						</Link>
 					)}
 					.

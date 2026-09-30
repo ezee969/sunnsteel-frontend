@@ -3,6 +3,7 @@
 import type { ProfileVisibility, UserProfile } from '@sunsteel/contracts'
 import { Eye, Globe, Lock, Users } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -13,7 +14,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import {
-	ALWAYS_VISIBLE_PROFILE_ITEMS,
+	alwaysVisibleProfileItems,
 	getDiscoverySummary,
 	getPendingPrivacyRules,
 	getPrivacyAudienceGroups,
@@ -39,24 +40,23 @@ type PrivacyOverviewCardProps = {
  * by an icon plus a text label, never by colour (§4.3 rule 8).
  */
 export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
+	const t = useTranslations('settings.privacyOverview')
 	const groups = getPrivacyAudienceGroups(
+		t,
 		profile.privacySettings,
 		profile.username,
 	)
-	const pendingRules = getPendingPrivacyRules(profile.privacySettings)
-	const discovery = getDiscoverySummary(profile.discoverySettings)
+	const pendingRules = getPendingPrivacyRules(t, profile.privacySettings)
+	const discovery = getDiscoverySummary(t, profile.discoverySettings)
 
 	return (
 		<Card>
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Eye className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Privacy Overview</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					What other people can see right now, based on your saved settings.
-					Your email is never shown to anyone.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				<div className="divide-y divide-rule">
@@ -79,13 +79,15 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 								<p className="type-body-sm text-ink-3">{group.surfaces}</p>
 								{group.audience === 'PUBLIC' ? (
 									<p className="type-body-sm text-ink-2">
-										Always shown: {ALWAYS_VISIBLE_PROFILE_ITEMS.join(' · ')}
+										{t('alwaysShown', {
+											items: alwaysVisibleProfileItems(t).join(' · '),
+										})}
 									</p>
 								) : null}
 								<p className="type-body-sm text-foreground">
 									{group.sections.length > 0
 										? group.sections.join(' · ')
-										: 'No profile sections.'}
+										: t('noSections')}
 								</p>
 							</section>
 						)
@@ -100,7 +102,7 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 						id="privacy-overview-discovery"
 						className="type-panel text-foreground"
 					>
-						Member search
+						{t('memberSearch')}
 					</h3>
 					<dl className="type-body-sm grid max-w-[480px] grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-1">
 						{discovery.map(item => (
@@ -110,18 +112,15 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 							</div>
 						))}
 					</dl>
-					<p className="type-body-sm text-ink-3">
-						Search controls who can find you. Anyone with your link can still
-						open your profile and see what is allowed above.
-					</p>
+					<p className="type-body-sm text-ink-3">{t('searchNote')}</p>
 				</section>
 
 				<p className="type-body-sm text-ink-3">
-					Saved for later:{' '}
-					{pendingRules
-						.map(rule => `${rule.label} (${rule.audience})`)
-						.join(' · ')}
-					. Nothing from these sections is shown on profiles yet.
+					{t('savedForLater', {
+						rules: pendingRules
+							.map(rule => `${rule.label} (${rule.audience})`)
+							.join(' · '),
+					})}
 				</p>
 
 				<div>
@@ -131,7 +130,7 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Preview public profile
+							{t('preview')}
 						</Link>
 					</Button>
 				</div>

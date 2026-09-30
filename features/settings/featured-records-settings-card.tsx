@@ -36,6 +36,7 @@ import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import type { Locale } from '@/i18n/config'
+import type { Translator } from '@/i18n/translator'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	useFeaturedProfileItems,
@@ -70,30 +71,41 @@ const EMPTY_RECORDS: PersonalRecordEntry[] = []
 const EMPTY_ACHIEVEMENTS: EarnedAchievement[] = []
 const EMPTY_ROUTINES: Routine[] = []
 
+type FeaturedT = Translator<'settings.featuredItems'>
+
 /** One routine's days and exercises, for a row nobody has opened yet. */
-function routineSummary(routine: Routine) {
+function routineSummary(routine: Routine, t: FeaturedT) {
 	const days = routine.days?.length ?? 0
 	const exercises = (routine.days ?? []).reduce(
 		(total, day) => total + (day.exercises?.length ?? 0),
 		0,
 	)
-	return `${days} ${days === 1 ? 'day' : 'days'} · ${exercises} ${
-		exercises === 1 ? 'exercise' : 'exercises'
-	} · ${routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'}`
+	return t('summary', { days, exercises, mode: routine.scheduleMode })
 }
 
 function recordSummary(
 	record: PersonalRecordEntry,
 	weightUnit: WeightUnit,
 	locale: Locale,
+	t: FeaturedT,
 ) {
-	return `${formatWeight(record.weight, weightUnit, locale)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit, locale)}`
+	return t('recordSummary', {
+		weight: formatWeight(record.weight, weightUnit, locale),
+		reps: record.reps,
+		estimated: formatWeight(record.estimated1rm, weightUnit, locale),
+	})
 }
 
-function achievementSummary(achievement: EarnedAchievement, locale: Locale) {
+function achievementSummary(
+	achievement: EarnedAchievement,
+	locale: Locale,
+	t: FeaturedT,
+) {
 	return achievement.backfilled
-		? 'Recognized from history'
-		: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`
+		? t('recognized')
+		: t('earned', {
+				date: formatAchievementDate(achievement.unlockedAt, locale),
+			})
 }
 
 function selectedItemPresentation(
@@ -104,43 +116,42 @@ function selectedItemPresentation(
 	routinesById: Map<string, Routine>,
 	weightUnit: WeightUnit,
 	locale: Locale,
+	t: FeaturedT,
 ) {
 	if (item.kind === 'RECORD') {
 		const record = recordsById.get(item.referenceId)
 		return {
-			kindLabel: 'Personal record',
-			title: record?.exerciseName ?? 'Record no longer available',
+			kindLabel: t('kind.record'),
+			title: record?.exerciseName ?? t('missing.record'),
 			detail: record
-				? recordSummary(record, weightUnit, locale)
-				: 'Remove this stale reference before saving.',
+				? recordSummary(record, weightUnit, locale, t)
+				: t('stale'),
 		}
 	}
 	if (item.kind === 'ACHIEVEMENT') {
 		const achievement = achievementsById.get(item.referenceId)
 		return {
-			kindLabel: 'Achievement',
-			title: achievement?.title ?? 'Achievement no longer available',
+			kindLabel: t('kind.achievement'),
+			title: achievement?.title ?? t('missing.achievement'),
 			detail: achievement
-				? achievementSummary(achievement, locale)
-				: 'Remove this stale reference before saving.',
+				? achievementSummary(achievement, locale, t)
+				: t('stale'),
 		}
 	}
 	if (item.kind === 'ROUTINE') {
 		const routine = routinesById.get(item.referenceId)
 		return {
-			kindLabel: 'Routine',
-			title: routine?.name ?? 'Routine no longer shareable',
-			detail: routine
-				? routineSummary(routine)
-				: 'Remove this stale reference before saving.',
+			kindLabel: t('kind.routine'),
+			title: routine?.name ?? t('missing.routine'),
+			detail: routine ? routineSummary(routine, t) : t('stale'),
 		}
 	}
 	const rank = ranksById.get(item.referenceId)
 	return {
 		rankId: rank?.id,
-		kindLabel: 'Renaissance rank',
-		title: rank?.title ?? 'Rank no longer available',
-		detail: rank?.description ?? 'Remove this stale reference before saving.',
+		kindLabel: t('kind.rank'),
+		title: rank?.title ?? t('missing.rank'),
+		detail: rank?.description ?? t('stale'),
 	}
 }
 
@@ -153,6 +164,7 @@ export function FeaturedRecordsSettingsCard({
 	accountRoutinesRule,
 }: FeaturedRecordsSettingsCardProps) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('settings.featuredItems')
 	const selectionsQuery = useFeaturedProfileItems()
 	const profileQuery = usePublicUser(username)
 	const achievementsQuery = useAchievements()
@@ -250,14 +262,14 @@ export function FeaturedRecordsSettingsCard({
 		replaceItems.mutate(buildFeaturedProfileRequest(drafts), {
 			onSuccess: () => {
 				push({
-					title: 'Featured accomplishments saved',
-					description: 'Your profile now uses this accomplishment order.',
+					title: t('savedTitle'),
+					description: t('savedDescription'),
 					variant: 'success',
 				})
 			},
 			onError: mutationError => {
 				push({
-					title: 'Could not save featured accomplishments',
+					title: t('failedTitle'),
 					description: mutationError.message,
 					variant: 'destructive',
 				})
@@ -270,21 +282,17 @@ export function FeaturedRecordsSettingsCard({
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Bookmark className="size-5 text-ink-3" aria-hidden />
-					<CardTitle>Featured Accomplishments</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
 				<CardDescription>
-					Choose and order up to {FEATURED_PROFILE_ITEMS_MAX} current records,
-					earned medals, shared routines, and one reached rank title. Records
-					follow your Personal Records privacy setting; medals and rank follow
-					Achievements; each routine follows its own sharing setting under your
-					Routines privacy.
+					{t('description', { max: FEATURED_PROFILE_ITEMS_MAX })}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-5">
 				{isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="size-4 animate-spin" aria-hidden />
-						Loading featured accomplishments…
+						{t('loading')}
 					</div>
 				) : error ? (
 					<div
@@ -304,14 +312,14 @@ export function FeaturedRecordsSettingsCard({
 								void routinesQuery.refetch()
 							}}
 						>
-							Try Again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : (
 					<>
 						<div>
 							<p className="type-label border-b border-rule pb-2 text-ink-3">
-								Profile order
+								{t('profileOrder')}
 							</p>
 							{drafts.length ? (
 								<div>
@@ -324,6 +332,7 @@ export function FeaturedRecordsSettingsCard({
 											routinesById,
 											weightUnit,
 											locale,
+											t,
 										)
 										return (
 											<div
@@ -354,7 +363,9 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Move ${presentation.title} up`}
+														aria-label={t('moveUp', {
+															title: presentation.title,
+														})}
 														disabled={index === 0}
 														onClick={() =>
 															setDrafts(current =>
@@ -372,7 +383,9 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Move ${presentation.title} down`}
+														aria-label={t('moveDown', {
+															title: presentation.title,
+														})}
 														disabled={index === drafts.length - 1}
 														onClick={() =>
 															setDrafts(current =>
@@ -390,7 +403,9 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="ghost"
 														size="icon"
-														aria-label={`Remove ${presentation.title}`}
+														aria-label={t('remove', {
+															title: presentation.title,
+														})}
 														onClick={() =>
 															setDrafts(current =>
 																removeFeaturedProfileItem(
@@ -411,16 +426,14 @@ export function FeaturedRecordsSettingsCard({
 									})}
 								</div>
 							) : (
-								<p className="type-body-sm py-4 text-ink-3">
-									No featured accomplishments yet.
-								</p>
+								<p className="type-body-sm py-4 text-ink-3">{t('none')}</p>
 							)}
 						</div>
 
 						{availableRecords.length ? (
 							<div>
 								<p className="type-label border-b border-rule pb-2 text-ink-3">
-									Available records
+									{t('availableRecords')}
 								</p>
 								<div id="featured-choices-records">
 									{shownRecords.visible.map(record => (
@@ -433,14 +446,16 @@ export function FeaturedRecordsSettingsCard({
 													{record.exerciseName}
 												</p>
 												<p className="type-body-sm text-ink-3">
-													{recordSummary(record, weightUnit, locale)}
+													{recordSummary(record, weightUnit, locale, t)}
 												</p>
 											</div>
 											<Button
 												type="button"
 												variant="outline"
 												size="sm"
-												aria-label={`Feature ${record.exerciseName}`}
+												aria-label={t('featureItem', {
+													name: record.exerciseName,
+												})}
 												disabled={slotsFull}
 												onClick={() =>
 													setDrafts(current =>
@@ -452,7 +467,8 @@ export function FeaturedRecordsSettingsCard({
 													)
 												}
 											>
-												<Plus className="size-4" aria-hidden /> Feature{' '}
+												<Plus className="size-4" aria-hidden />{' '}
+												{t('feature')}{' '}
 											</Button>{' '}
 										</div>
 									))}
@@ -465,15 +481,13 @@ export function FeaturedRecordsSettingsCard({
 								/>
 							</div>
 						) : records.length === 0 ? (
-							<p className="type-body-sm text-ink-3">
-								Complete logged sets to establish records you can feature.
-							</p>
+							<p className="type-body-sm text-ink-3">{t('noRecords')}</p>
 						) : null}
 
 						<div>
 							<div className="flex items-center gap-2 border-b border-rule pb-2">
 								<Medal className="size-4 text-ink-3" aria-hidden />
-								<p className="type-label text-ink-3">Earned medals</p>
+								<p className="type-label text-ink-3">{t('earnedMedals')}</p>
 							</div>
 							{availableAchievements.length ? (
 								<>
@@ -491,14 +505,16 @@ export function FeaturedRecordsSettingsCard({
 														{achievement.description}
 													</p>
 													<p className="type-body-sm text-ink-3">
-														{achievementSummary(achievement, locale)}
+														{achievementSummary(achievement, locale, t)}
 													</p>
 												</div>
 												<Button
 													type="button"
 													variant="outline"
 													size="sm"
-													aria-label={`Feature ${achievement.title}`}
+													aria-label={t('featureItem', {
+														name: achievement.title,
+													})}
 													disabled={slotsFull}
 													onClick={() =>
 														setDrafts(current =>
@@ -510,7 +526,8 @@ export function FeaturedRecordsSettingsCard({
 														)
 													}
 												>
-													<Plus className="size-4" aria-hidden /> Feature{' '}
+													<Plus className="size-4" aria-hidden />{' '}
+													{t('feature')}{' '}
 												</Button>{' '}
 											</div>
 										))}
@@ -524,14 +541,11 @@ export function FeaturedRecordsSettingsCard({
 								</>
 							) : achievementsQuery.data?.analyticsReady ? (
 								<p className="type-body-sm py-4 text-ink-3">
-									{achievements.length
-										? 'Every earned medal is already featured.'
-										: 'Complete workouts to earn verified medals you can feature.'}
+									{achievements.length ? t('allMedalsFeatured') : t('noMedals')}
 								</p>
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
-									Training history is preparing. Medals will appear when your
-									progress data is ready.
+									{t('medalsPreparing')}
 								</p>
 							)}
 						</div>
@@ -539,7 +553,7 @@ export function FeaturedRecordsSettingsCard({
 						<div>
 							<div className="flex items-center gap-2 border-b border-rule pb-2">
 								<Dumbbell className="size-4 text-ink-3" aria-hidden />
-								<p className="type-label text-ink-3">Shared routines</p>
+								<p className="type-label text-ink-3">{t('sharedRoutines')}</p>
 							</div>
 							{availableRoutines.length ? (
 								<>
@@ -560,7 +574,7 @@ export function FeaturedRecordsSettingsCard({
 															{routine.name}
 														</p>
 														<p className="type-body-sm text-ink-3">
-															{routineSummary(routine)}
+															{routineSummary(routine, t)}
 														</p>
 														{cap ? (
 															<PrivacyCapNote
@@ -574,7 +588,9 @@ export function FeaturedRecordsSettingsCard({
 														type="button"
 														variant="outline"
 														size="sm"
-														aria-label={`Feature ${routine.name}`}
+														aria-label={t('featureItem', {
+															name: routine.name,
+														})}
 														disabled={slotsFull}
 														onClick={() =>
 															setDrafts(current =>
@@ -586,7 +602,8 @@ export function FeaturedRecordsSettingsCard({
 															)
 														}
 													>
-														<Plus className="size-4" aria-hidden /> Feature
+														<Plus className="size-4" aria-hidden />{' '}
+														{t('feature')}
 													</Button>{' '}
 												</div>
 											)
@@ -616,7 +633,7 @@ export function FeaturedRecordsSettingsCard({
 						<div>
 							<div className="flex items-center gap-2 border-b border-rule pb-2">
 								<Award className="size-4 text-ink-3" aria-hidden />
-								<p className="type-label text-ink-3">Reached ranks</p>
+								<p className="type-label text-ink-3">{t('reachedRanks')}</p>
 							</div>
 							{availableRanks.length ? (
 								<>
@@ -644,7 +661,9 @@ export function FeaturedRecordsSettingsCard({
 													type="button"
 													variant="outline"
 													size="sm"
-													aria-label={`Feature ${rank.title} rank`}
+													aria-label={t('featureRankLabel', {
+														title: rank.title,
+													})}
 													disabled={slotsFull || hasSelectedRank}
 													onClick={() =>
 														setDrafts(current =>
@@ -652,8 +671,8 @@ export function FeaturedRecordsSettingsCard({
 														)
 													}
 												>
-													<Plus className="size-4" aria-hidden /> Feature
-													rank{' '}
+													<Plus className="size-4" aria-hidden />{' '}
+													{t('featureRank')}{' '}
 												</Button>{' '}
 											</div>
 										))}
@@ -668,20 +687,23 @@ export function FeaturedRecordsSettingsCard({
 							) : (
 								<p className="type-body-sm py-4 text-ink-3">
 									{hasSelectedRank
-										? 'Your reached rank title is already featured.'
-										: 'Ranks will appear when your progress data is ready.'}
+										? t('rankAlreadyFeatured')
+										: t('ranksPreparing')}
 								</p>
 							)}
 							{hasSelectedRank && availableRanks.length ? (
 								<p className="type-body-sm pt-2 text-ink-3">
-									Remove the featured rank before choosing another title.
+									{t('removeRankFirst')}
 								</p>
 							) : null}
 						</div>
 
 						<div className="flex flex-wrap items-center justify-between gap-3 pt-2">
 							<p className="type-body-sm text-ink-3">
-								{drafts.length}/{FEATURED_PROFILE_ITEMS_MAX} slots used
+								{t('slotsUsed', {
+									used: drafts.length,
+									max: FEATURED_PROFILE_ITEMS_MAX,
+								})}
 							</p>
 							<Button
 								type="button"
@@ -691,7 +713,7 @@ export function FeaturedRecordsSettingsCard({
 								{replaceItems.isPending ? (
 									<Loader2 className="size-4 animate-spin" aria-hidden />
 								) : null}
-								Save Featured Items
+								{t('save')}
 							</Button>
 						</div>
 					</>

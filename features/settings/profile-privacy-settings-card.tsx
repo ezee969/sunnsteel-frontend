@@ -5,6 +5,7 @@ import type {
 	ProfileVisibility,
 } from '@sunsteel/contracts'
 import { Loader2, ShieldCheck } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -25,66 +26,27 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
 import { useUpdateProfilePrivacy } from '@/lib/api/hooks/useUpdateProfilePrivacy'
-import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
+import {
+	PRIVACY_AUDIENCE_KEYS,
+	PRIVACY_SECTION_LABEL_KEYS,
+} from '@/lib/utils/privacy-overview'
 
-interface PrivacyField {
-	key: keyof ProfilePrivacySettings
-	description: string
-}
-
-const PRIVACY_FIELDS: PrivacyField[] = [
-	{
-		key: 'biography',
-		description: 'Controls the biography shown in the About section.',
-	},
-	{
-		key: 'location',
-		description: 'Controls the location shown in the About section.',
-	},
-	{
-		key: 'trainingIdentity',
-		description:
-			'Controls your goals, experience, disciplines, preferred style, and favorite exercises.',
-	},
-	{
-		key: 'workoutHistory',
-		description:
-			'Controls your completed workout count, total volume, and streak summary, and caps who can see your workout and load-progression activity.',
-	},
-	{
-		key: 'records',
-		description:
-			'Controls the personal records shown on your profile, and caps who can see your record activity.',
-	},
-	{
-		key: 'bodyMetrics',
-		description:
-			'Controls age, sex, weight, and height. Your email is never shared.',
-	},
-	{
-		key: 'bodyProgress',
-		description:
-			'Controls your weight trend and measurements over time on your profile. Separate from body metrics, which covers only your current weight.',
-	},
-	{
-		key: 'routines',
-		description:
-			'Caps who can find and open the routines you share, and your shared-routine activity. Each routine also has its own setting.',
-	},
-	{
-		key: 'achievements',
-		description:
-			'Controls your rank, earned milestones and comebacks on your profile, and caps your achievement, streak and comeback activity.',
-	},
+const PRIVACY_FIELDS: Array<keyof ProfilePrivacySettings> = [
+	'biography',
+	'location',
+	'trainingIdentity',
+	'workoutHistory',
+	'records',
+	'bodyMetrics',
+	'bodyProgress',
+	'routines',
+	'achievements',
 ]
 
-const VISIBILITY_OPTIONS: Array<{
-	value: ProfileVisibility
-	label: string
-}> = [
-	{ value: 'PRIVATE', label: 'Only me' },
-	{ value: 'FOLLOWERS', label: 'Followers' },
-	{ value: 'PUBLIC', label: 'Everyone' },
+const VISIBILITY_OPTIONS: ProfileVisibility[] = [
+	'PRIVATE',
+	'FOLLOWERS',
+	'PUBLIC',
 ]
 
 interface ProfilePrivacySettingsCardProps {
@@ -94,6 +56,8 @@ interface ProfilePrivacySettingsCardProps {
 export function ProfilePrivacySettingsCard({
 	settings,
 }: ProfilePrivacySettingsCardProps) {
+	const t = useTranslations('settings.profilePrivacy')
+	const tOverview = useTranslations('settings.privacyOverview')
 	const [draft, setDraft] = useState(settings)
 	const updatePrivacy = useUpdateProfilePrivacy()
 	const { push } = useToast()
@@ -102,22 +66,20 @@ export function ProfilePrivacySettingsCard({
 		setDraft(settings)
 	}, [settings])
 
-	const hasChanges = PRIVACY_FIELDS.some(
-		field => draft[field.key] !== settings[field.key],
-	)
+	const hasChanges = PRIVACY_FIELDS.some(key => draft[key] !== settings[key])
 
 	const handleSave = () => {
 		updatePrivacy.mutate(draft, {
 			onSuccess: () => {
 				push({
-					title: 'Privacy updated',
-					description: 'Your profile visibility settings are now active.',
+					title: t('updatedTitle'),
+					description: t('updatedDescription'),
 					variant: 'success',
 				})
 			},
 			onError: error => {
 				push({
-					title: 'Could not update privacy',
+					title: t('failedTitle'),
 					description: error.message,
 					variant: 'destructive',
 				})
@@ -130,42 +92,39 @@ export function ProfilePrivacySettingsCard({
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<ShieldCheck className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Profile Privacy</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Choose who can see each part of your profile. New accounts start
-					private.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				<div className="divide-y divide-rule">
-					{PRIVACY_FIELDS.map(field => (
+					{PRIVACY_FIELDS.map(key => (
 						<div
-							key={field.key}
+							key={key}
 							className="grid gap-3 py-4 first:pt-0 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-center"
 						>
 							<div className="space-y-1">
-								<Label htmlFor={`privacy-${field.key}`}>
-									{PRIVACY_SECTION_LABELS[field.key]}
+								<Label htmlFor={`privacy-${key}`}>
+									{tOverview(PRIVACY_SECTION_LABEL_KEYS[key])}
 								</Label>
-								<p className="type-body-sm text-ink-3">{field.description}</p>
+								<p className="type-body-sm text-ink-3">{t(`field.${key}`)}</p>
 							</div>
 							<Select
-								value={draft[field.key]}
+								value={draft[key]}
 								onValueChange={value =>
 									setDraft(previous => ({
 										...previous,
-										[field.key]: value as ProfileVisibility,
+										[key]: value as ProfileVisibility,
 									}))
 								}
 							>
-								<SelectTrigger id={`privacy-${field.key}`} className="w-full">
+								<SelectTrigger id={`privacy-${key}`} className="w-full">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									{VISIBILITY_OPTIONS.map(option => (
-										<SelectItem key={option.value} value={option.value}>
-											{option.label}
+										<SelectItem key={option} value={option}>
+											{tOverview(PRIVACY_AUDIENCE_KEYS[option])}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -183,7 +142,7 @@ export function ProfilePrivacySettingsCard({
 						{updatePrivacy.isPending ? (
 							<Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
 						) : null}
-						Save Privacy
+						{t('save')}
 					</Button>
 				</div>
 			</CardContent>

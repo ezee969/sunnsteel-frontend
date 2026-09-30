@@ -1,6 +1,7 @@
 'use client'
 
 import { Accessibility } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
 	Card,
@@ -19,6 +20,7 @@ import { useMotionPreference } from '@/hooks/use-motion-preference'
  * pages. It can add reduction but never re-enables motion the OS reduced.
  */
 export function MotionPreferenceCard() {
+	const t = useTranslations('settings.motion')
 	const { preference, systemReduced, setPreference } = useMotionPreference()
 	const id = 'motion-reduce'
 
@@ -27,20 +29,15 @@ export function MotionPreferenceCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<Accessibility className="h-5 w-5 text-primary" aria-hidden />
-					<CardTitle>Motion</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Choose how much animation Sunnsteel uses on this device.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-3">
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3">
 					<div className="space-y-1">
-						<Label htmlFor={id}>Reduce motion</Label>
-						<p className="type-body-sm text-ink-3">
-							Removes sliding, scaling, spinning and pulsing, and shortens
-							fades. Nothing on screen is hidden. Applies immediately.
-						</p>
+						<Label htmlFor={id}>{t('reduce')}</Label>
+						<p className="type-body-sm text-ink-3">{t('reduceNote')}</p>
 					</div>
 					<Label
 						htmlFor={id}
@@ -53,15 +50,14 @@ export function MotionPreferenceCard() {
 							onCheckedChange={checked =>
 								setPreference(checked === true ? 'reduce' : 'system')
 							}
-							aria-label="Reduce motion"
+							aria-label={t('reduce')}
 							className="size-5"
 						/>
 					</Label>
 				</div>
 				{systemReduced ? (
 					<p className="type-body-sm text-ink-3" role="status">
-						Your device already asks for reduced motion, so it is on everywhere.
-						Change it in your device&apos;s accessibility settings.
+						{t('systemReduced')}
 					</p>
 				) : null}
 			</CardContent>

@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	buildTrainingLocationsRequest,
 	convertTrainingLocationDrafts,
 	type TrainingLocationDraft,
 } from './training-location-preferences'
+
+const t = translatorFor('en', 'settings.trainingLocations')
+const tEs = translatorFor('es', 'settings.trainingLocations')
 
 const draft: TrainingLocationDraft = {
 	key: 'draft',
@@ -17,7 +22,7 @@ const draft: TrainingLocationDraft = {
 
 describe('training location preferences', () => {
 	it('converts display values while preserving canonical kilograms', () => {
-		const request = buildTrainingLocationsRequest([draft], 'LB')
+		const request = buildTrainingLocationsRequest([draft], 'LB', t)
 
 		expect(request.locations[0]).toMatchObject({
 			name: 'Home Gym',
@@ -36,7 +41,7 @@ describe('training location preferences', () => {
 
 	it('rejects missing defaults and duplicate plate weights', () => {
 		expect(() =>
-			buildTrainingLocationsRequest([{ ...draft, isDefault: false }], 'LB'),
+			buildTrainingLocationsRequest([{ ...draft, isDefault: false }], 'LB', t),
 		).toThrow('Choose exactly one default')
 
 		expect(() =>
@@ -51,7 +56,26 @@ describe('training location preferences', () => {
 					},
 				],
 				'LB',
+				t,
 			),
 		).toThrow('must be unique')
+	})
+
+	it('reports the same problems in Spanish', () => {
+		expect(() =>
+			buildTrainingLocationsRequest(
+				[{ ...draft, isDefault: false }],
+				'LB',
+				tEs,
+			),
+		).toThrow('Elige exactamente un lugar de entrenamiento predeterminado.')
+
+		expect(() =>
+			buildTrainingLocationsRequest([{ ...draft, name: ' ' }], 'LB', tEs),
+		).toThrow('Cada lugar de entrenamiento necesita un nombre.')
+
+		expect(() =>
+			buildTrainingLocationsRequest([{ ...draft, barWeight: '' }], 'LB', tEs),
+		).toThrow('Ingresa un peso de barra válido para Home Gym.')
 	})
 })

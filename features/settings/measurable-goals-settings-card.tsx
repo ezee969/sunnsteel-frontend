@@ -62,6 +62,7 @@ export function MeasurableGoalsSettingsCard({
 	weightUnit,
 }: MeasurableGoalsSettingsCardProps) {
 	const tGoals = useTranslations('progress.goals')
+	const t = useTranslations('settings.measurableGoals')
 	const goalsQuery = useMeasurableGoals()
 	const replaceGoals = useReplaceMeasurableGoals()
 	const exercisesQuery = useExercises()
@@ -128,19 +129,15 @@ export function MeasurableGoalsSettingsCard({
 			replaceGoals.mutate(request, {
 				onSuccess: () => {
 					push({
-						title: 'Measurable goals saved',
-						description: 'Your private progress targets are up to date.',
+						title: t('savedTitle'),
+						description: t('savedDescription'),
 						variant: 'success',
 					})
 				},
 				onError: error => setFormError(error.message),
 			})
 		} catch (error) {
-			setFormError(
-				error instanceof Error
-					? error.message
-					: 'Check the goal fields and try again.',
-			)
+			setFormError(error instanceof Error ? error.message : t('fallbackError'))
 		}
 	}
 
@@ -150,13 +147,9 @@ export function MeasurableGoalsSettingsCard({
 				<div className="space-y-1.5">
 					<CardTitle className="flex items-center gap-2">
 						<Target className="size-4 text-ink-3" aria-hidden />
-						Measurable Goals
+						{t('title')}
 					</CardTitle>
-					<CardDescription>
-						Set private targets that update from your training data.
-						Weight-based goals follow your account unit and are stored
-						canonically in kg.
-					</CardDescription>
+					<CardDescription>{t('description')}</CardDescription>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<Select
@@ -166,9 +159,9 @@ export function MeasurableGoalsSettingsCard({
 					>
 						<SelectTrigger
 							className="w-full sm:w-52"
-							aria-label="New goal type"
+							aria-label={t('newGoalType')}
 						>
-							<SelectValue placeholder="Goal type" />
+							<SelectValue placeholder={t('goalTypePlaceholder')} />
 						</SelectTrigger>
 						<SelectContent>
 							{addOptions.map(type => (
@@ -185,7 +178,7 @@ export function MeasurableGoalsSettingsCard({
 						disabled={!canAdd || goalsQuery.isLoading}
 					>
 						<Plus className="size-4" aria-hidden />
-						Add Goal
+						{t('add')}
 					</Button>
 				</div>
 			</CardHeader>
@@ -194,7 +187,7 @@ export function MeasurableGoalsSettingsCard({
 				{goalsQuery.isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="size-4 animate-spin" aria-hidden />
-						Loading measurable goals…
+						{t('loading')}
 					</div>
 				) : goalsQuery.error ? (
 					<div
@@ -211,19 +204,15 @@ export function MeasurableGoalsSettingsCard({
 							className="mt-3"
 							onClick={() => void goalsQuery.refetch()}
 						>
-							Try Again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : (
 					<>
 						{drafts.length === 0 ? (
 							<div className="border border-dashed border-rule p-6 text-center">
-								<p className="type-panel text-foreground">
-									No measurable goals yet
-								</p>
-								<p className="type-body-sm mt-1 text-ink-3">
-									Add a target to track it automatically on Progress.
-								</p>
+								<p className="type-panel text-foreground">{t('emptyTitle')}</p>
+								<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
 							</div>
 						) : null}
 
@@ -232,8 +221,8 @@ export function MeasurableGoalsSettingsCard({
 								const unit = isWeightGoal(draft.type)
 									? getWeightUnitLabel(weightUnit)
 									: draft.type === 'WEEKLY_SESSIONS'
-										? 'sessions'
-										: 'days'
+										? t('unitSessions')
+										: t('unitDays')
 								return (
 									<div
 										key={draft.key}
@@ -244,7 +233,7 @@ export function MeasurableGoalsSettingsCard({
 												htmlFor={`goal-type-${draft.key}`}
 												className="type-body-sm text-ink-3"
 											>
-												Goal
+												{t('goal')}
 											</label>
 											<Select
 												value={draft.type}
@@ -280,7 +269,7 @@ export function MeasurableGoalsSettingsCard({
 													htmlFor={`goal-exercise-${draft.key}`}
 													className="type-body-sm text-ink-3"
 												>
-													Exercise
+													{t('exercise')}
 												</label>
 												<Select
 													value={draft.exerciseId}
@@ -296,7 +285,7 @@ export function MeasurableGoalsSettingsCard({
 														id={`goal-exercise-${draft.key}`}
 														className="w-full"
 													>
-														<SelectValue placeholder="Choose exercise" />
+														<SelectValue placeholder={t('chooseExercise')} />
 													</SelectTrigger>
 													<SelectContent>
 														{exercisesQuery.data?.map(exercise => (
@@ -313,7 +302,7 @@ export function MeasurableGoalsSettingsCard({
 													htmlFor={`goal-direction-${draft.key}`}
 													className="type-body-sm text-ink-3"
 												>
-													Direction
+													{t('direction')}
 												</label>
 												<Select
 													value={draft.direction}
@@ -331,15 +320,20 @@ export function MeasurableGoalsSettingsCard({
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
-														<SelectItem value="AT_LEAST">At least</SelectItem>
-														<SelectItem value="AT_MOST">At most</SelectItem>
+														<SelectItem value="AT_LEAST">
+															{t('atLeast')}
+														</SelectItem>
+														<SelectItem value="AT_MOST">
+															{t('atMost')}
+														</SelectItem>
 													</SelectContent>
 												</Select>
 											</div>
 										) : (
 											<div className="type-body-sm flex items-end text-ink-3 xl:pb-2">
-												{getMeasurableGoalLabel(draft.type, tGoals)} updates
-												automatically.
+												{t('updatesAutomatically', {
+													goal: getMeasurableGoalLabel(draft.type, tGoals),
+												})}
 											</div>
 										)}
 
@@ -348,7 +342,7 @@ export function MeasurableGoalsSettingsCard({
 												htmlFor={`goal-target-${draft.key}`}
 												className="type-body-sm text-ink-3"
 											>
-												Target ({unit})
+												{t('target', { unit })}
 											</label>
 											<Input
 												id={`goal-target-${draft.key}`}
@@ -380,7 +374,10 @@ export function MeasurableGoalsSettingsCard({
 											type="button"
 											variant="ghost"
 											size="icon"
-											aria-label={`Remove ${getMeasurableGoalLabel(draft.type, tGoals)} goal ${index + 1}`}
+											aria-label={t('removeGoal', {
+												goal: getMeasurableGoalLabel(draft.type, tGoals),
+												number: index + 1,
+											})}
 											onClick={() => {
 												setDrafts(current =>
 													current.filter(goal => goal.key !== draft.key),
@@ -403,7 +400,10 @@ export function MeasurableGoalsSettingsCard({
 
 						<div className="flex flex-wrap items-center justify-between gap-3 pt-2">
 							<p className="type-body-sm text-ink-3">
-								{drafts.length}/{MEASURABLE_GOALS_MAX} private goals
+								{t('count', {
+									count: drafts.length,
+									max: MEASURABLE_GOALS_MAX,
+								})}
 							</p>
 							<Button
 								type="button"
@@ -413,7 +413,7 @@ export function MeasurableGoalsSettingsCard({
 								{replaceGoals.isPending ? (
 									<Loader2 className="size-4 animate-spin" aria-hidden />
 								) : null}
-								Save Goals
+								{t('save')}
 							</Button>
 						</div>
 					</>

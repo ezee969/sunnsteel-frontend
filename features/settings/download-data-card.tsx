@@ -1,6 +1,7 @@
 'use client'
 
 import { Download, FileJson, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -12,16 +13,13 @@ import {
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { useExportAccount } from '@/lib/api/hooks/useExportAccount'
-import {
-	ACCOUNT_EXPORT_CONTENTS,
-	ACCOUNT_EXPORT_NOTES,
-} from '@/lib/utils/account-export'
 
 /**
  * EXPORT-01. Sits directly above Delete Account, because downloading is the
  * step someone leaving should take first -- the deletion dialog points here.
  */
 export function DownloadDataCard() {
+	const t = useTranslations('settings.accountExport')
 	const exportAccount = useExportAccount()
 	const { push } = useToast()
 
@@ -30,12 +28,12 @@ export function DownloadDataCard() {
 			<CardHeader>
 				<div className="flex items-center gap-2">
 					<FileJson className="size-5 text-ink-3" aria-hidden />
-					<CardTitle>Download Your Data</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>{ACCOUNT_EXPORT_CONTENTS}</CardDescription>
+				<CardDescription>{t('contents')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<p className="type-body-sm text-ink-3">{ACCOUNT_EXPORT_NOTES}</p>
+				<p className="type-body-sm text-ink-3">{t('notes')}</p>
 				<Button
 					type="button"
 					variant="outline"
@@ -44,14 +42,13 @@ export function DownloadDataCard() {
 						exportAccount.mutate(undefined, {
 							onSuccess: () =>
 								push({
-									title: 'Your data was downloaded',
-									description:
-										'Check your downloads for the sunnsteel-….json file.',
+									title: t('downloadedTitle'),
+									description: t('downloadedDescription'),
 									variant: 'success',
 								}),
 							onError: error =>
 								push({
-									title: 'Your data could not be downloaded',
+									title: t('failedTitle'),
 									description: error.message,
 									variant: 'destructive',
 								}),
@@ -61,12 +58,12 @@ export function DownloadDataCard() {
 					{exportAccount.isPending ? (
 						<>
 							<Loader2 className="size-4 animate-spin" aria-hidden />
-							Preparing your file…
+							{t('preparing')}
 						</>
 					) : (
 						<>
 							<Download className="size-4" aria-hidden />
-							Download My Data
+							{t('download')}
 						</>
 					)}
 				</Button>

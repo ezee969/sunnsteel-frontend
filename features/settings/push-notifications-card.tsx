@@ -1,6 +1,7 @@
 'use client'
 
 import { Bell, BellOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -22,6 +23,7 @@ import { usePushNotifications } from '@/lib/api/hooks/usePushNotifications'
  * outcome — especially on iOS, where the app has to be installed first.
  */
 export function PushNotificationsCard() {
+	const t = useTranslations('settings.pushNotifications')
 	const push = usePushNotifications()
 	const isEnabled = push.availability === 'ENABLED'
 
@@ -34,11 +36,9 @@ export function PushNotificationsCard() {
 					) : (
 						<BellOff className="h-5 w-5 text-ink-3" aria-hidden />
 					)}
-					<CardTitle>Notifications</CardTitle>
+					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					Alerts this device can receive while Sunnsteel is closed.
-				</CardDescription>
+				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-3">
 				<div className="space-y-1">
@@ -54,7 +54,7 @@ export function PushNotificationsCard() {
 						onClick={() => void push.enable()}
 						disabled={push.isPending}
 					>
-						{push.isPending ? 'Enabling…' : 'Enable notifications'}
+						{push.isPending ? t('enabling') : t('enable')}
 					</Button>
 				) : null}
 
@@ -65,7 +65,7 @@ export function PushNotificationsCard() {
 						onClick={() => void push.disable()}
 						disabled={push.isPending}
 					>
-						{push.isPending ? 'Turning off…' : 'Turn off on this device'}
+						{push.isPending ? t('turningOff') : t('turnOff')}
 					</Button>
 				) : null}
 
@@ -75,11 +75,7 @@ export function PushNotificationsCard() {
 					</p>
 				) : null}
 
-				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					The only alert so far is the end of a rest period, and it names the
-					lift that is up next. It cannot show a countdown: notifications have
-					no ticking field on any platform.
-				</p>
+				<p className="type-body-sm max-w-[68ch] text-ink-3">{t('note')}</p>
 			</CardContent>
 		</Card>
 	)

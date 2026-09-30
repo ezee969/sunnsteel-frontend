@@ -22,8 +22,8 @@ import {
 } from '@/lib/api/hooks/useTrainingPartners'
 import {
 	findTrainingPartnership,
-	TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS,
 	trainingPartnerActionLabel,
+	trainingPartnerEncouragementOptions,
 } from '@/lib/utils/training-partners'
 
 export function TrainingPartnerAction({
@@ -32,6 +32,7 @@ export function TrainingPartnerAction({
 	member: UserSearchResponse
 }) {
 	const t = useTranslations('social.partnerAction')
+	const tPartners = useTranslations('settings.trainingPartners')
 	const partnerships = useTrainingPartners()
 	const request = useRequestTrainingPartner()
 	const accept = useAcceptTrainingPartner()
@@ -41,7 +42,7 @@ export function TrainingPartnerAction({
 		partnerships.data?.items ?? [],
 		member.id,
 	)
-	const label = trainingPartnerActionLabel(partnership)
+	const label = trainingPartnerActionLabel(tPartners, partnership)
 	const pending = request.isPending || accept.isPending
 	if (partnerships.isError) {
 		return (
@@ -74,7 +75,7 @@ export function TrainingPartnerAction({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuLabel>{t('choosePrompt')}</DropdownMenuLabel>
-							{TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS.map(option => (
+							{trainingPartnerEncouragementOptions(tPartners).map(option => (
 								<DropdownMenuItem
 									key={option.kind}
 									onSelect={() =>
