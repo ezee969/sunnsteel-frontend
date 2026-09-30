@@ -282,5 +282,17 @@
 		"backgroundAlt": "Training background",
 		"tagline": "Forge Your Legacy",
 		"preparingJourney": "Preparing Your Journey"
+	},
+	"language": {
+		"title": "Language",
+		"description": "Saved to your account, so every device and your push notifications use it.",
+		"label": "App language",
+		"device": "Match this device",
+		"saving": "Saving",
+		"failed": "Language not changed",
+		"name": {
+			"en": "English",
+			"es": "Español"
+		}
 	}
 }

@@ -282,5 +282,17 @@
 		"backgroundAlt": "Fondo de entrenamiento",
 		"tagline": "Forja tu legado",
 		"preparingJourney": "Preparando tu camino"
+	},
+	"language": {
+		"title": "Idioma",
+		"description": "Se guarda en tu cuenta, así que todos tus dispositivos y tus notificaciones push lo usan.",
+		"label": "Idioma de la app",
+		"device": "Igual que este dispositivo",
+		"saving": "Guardando",
+		"failed": "No se cambió el idioma",
+		"name": {
+			"en": "English",
+			"es": "Español"
+		}
 	}
 }

@@ -21,6 +21,7 @@ import {
 	TrainingPartnership,
 	TrainingPartnershipsResponse,
 	UpdateDashboardLayoutRequest,
+	UpdateLocaleRequest,
 	UpdateProfileDiscoveryRequest,
 	UpdateProfilePrivacyRequest,
 	UpdateProfileRequest,
@@ -66,6 +67,15 @@ export const userService = {
 		data: UpdateDashboardLayoutRequest,
 	): Promise<UserProfile> {
 		return httpClient.request<UserProfile>('/users/preferences/dashboard', {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		})
+	},
+
+	/** I18N-02: the account's language, or null to follow each device. */
+	async updateLocale(data: UpdateLocaleRequest): Promise<UserProfile> {
+		return httpClient.request<UserProfile>('/users/preferences/locale', {
 			method: 'PUT',
 			body: JSON.stringify(data),
 			secure: true,
