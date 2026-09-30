@@ -3,6 +3,7 @@
 import type { RelationshipMember } from '@sunsteel/contracts'
 import { UserMinus, UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ export function RelationshipMemberRow({
 	caption,
 	isSelf = false,
 }: RelationshipMemberRowProps) {
+	const t = useTranslations('social.relationships')
 	const toggle = useRelationshipFollowToggle()
 	const { push } = useToast()
 	const fullName = [member.name, member.lastName].filter(Boolean).join(' ')
@@ -36,9 +38,9 @@ export function RelationshipMemberRow({
 				onError: () =>
 					push({
 						title: isFollowed
-							? `Could not unfollow ${member.name}`
-							: `Could not follow ${member.name}`,
-						description: 'Check your connection and try again.',
+							? t('unfollowFailed', { name: member.name })
+							: t('followFailed', { name: member.name }),
+						description: t('checkConnection'),
 						variant: 'destructive',
 					}),
 			},
@@ -73,7 +75,7 @@ export function RelationshipMemberRow({
 				</span>
 			</Link>
 			{isSelf ? (
-				<span className="type-body-sm shrink-0 text-ink-3">You</span>
+				<span className="type-body-sm shrink-0 text-ink-3">{t('you')}</span>
 			) : (
 				<Button
 					type="button"
@@ -82,16 +84,20 @@ export function RelationshipMemberRow({
 					className="shrink-0"
 					onClick={onToggle}
 					disabled={toggle.isPending}
-					aria-label={`${isFollowed ? 'Unfollow' : 'Follow'} ${fullName}`}
+					aria-label={
+						isFollowed
+							? t('unfollowName', { name: fullName })
+							: t('followName', { name: fullName })
+					}
 				>
 					{isFollowed ? <UserMinus aria-hidden /> : <UserPlus aria-hidden />}
 					{toggle.isPending
 						? isFollowed
-							? 'Unfollowing...'
-							: 'Following...'
+							? t('unfollowing')
+							: t('followingPending')
 						: isFollowed
-							? 'Unfollow'
-							: 'Follow'}
+							? t('unfollow')
+							: t('follow')}
 				</Button>
 			)}
 		</li>
@@ -99,8 +105,9 @@ export function RelationshipMemberRow({
 }
 
 export function RelationshipRowsLoading({ rows = 5 }: { rows?: number }) {
+	const t = useTranslations('social.relationships')
 	return (
-		<ul aria-busy="true" aria-label="Loading members">
+		<ul aria-busy="true" aria-label={t('loadingMembers')}>
 			{Array.from({ length: rows }).map((_, index) => (
 				<li key={index} className="rule-row flex items-center gap-3 py-3">
 					<Skeleton className="h-10 w-10 shrink-0 rounded-full" />

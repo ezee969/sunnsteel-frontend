@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 
 import { MemberActivity } from '@/features/profile/member-activity'
@@ -34,6 +35,7 @@ function getRelationshipHrefs(username: string) {
 }
 
 export default function ProfilePage() {
+	const t = useTranslations('social.profilePage')
 	const params = useParams<{ userId?: string[] }>()
 	const segments = Array.isArray(params?.userId) ? params.userId : []
 	const routeIdentifier = segments[0]
@@ -72,7 +74,7 @@ export default function ProfilePage() {
 	const unfollowMutation = useUnfollowUser(targetUserId, routeIdentifier || '')
 
 	if (isUnknownSubpath) {
-		return <ProfileNotFound title="Page not found" />
+		return <ProfileNotFound title={t('pageNotFound')} />
 	}
 
 	if (isViewerLoading || isPublicLoading) {
@@ -82,9 +84,7 @@ export default function ProfilePage() {
 	if (!viewer) {
 		return (
 			<div className="flex h-full items-center justify-center">
-				<p className="text-muted-foreground">
-					User not found or not authenticated.
-				</p>
+				<p className="text-muted-foreground">{t('notAuthenticated')}</p>
 			</div>
 		)
 	}
@@ -127,7 +127,7 @@ export default function ProfilePage() {
 	}
 
 	if (!publicUser) {
-		return <ProfileNotFound title="User not found" />
+		return <ProfileNotFound title={t('userNotFound')} />
 	}
 
 	if (profileRoutineId) {
@@ -200,12 +200,11 @@ function OwnRoutineRedirect({ routineId }: { routineId: string }) {
 }
 
 function ProfileNotFound({ title }: { title: string }) {
+	const t = useTranslations('social.profilePage')
 	return (
 		<div className="flex h-[60vh] flex-col items-center justify-center gap-2 px-4 text-center">
 			<h1 className="type-section text-foreground">{title}</h1>
-			<p className="type-body-sm text-ink-3">
-				Check the username and try again.
-			</p>
+			<p className="type-body-sm text-ink-3">{t('checkUsername')}</p>
 		</div>
 	)
 }

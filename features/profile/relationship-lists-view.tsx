@@ -4,6 +4,7 @@ import type { RelationshipListKind } from '@sunsteel/contracts'
 import { RELATIONSHIP_LIST_KINDS } from '@sunsteel/contracts'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { PageTabs } from '@/components/layout/page-tabs'
 import { Button } from '@/components/ui/button'
@@ -40,10 +41,11 @@ export function RelationshipListsView({
 	isOwn,
 	profileHref,
 }: RelationshipListsViewProps) {
+	const t = useTranslations('social.relationships')
 	const list = useRelationshipList(profile.username, kind)
 	const items = list.data?.pages.flatMap(page => page.items) ?? []
 	const fullName = [profile.name, profile.lastName].filter(Boolean).join(' ')
-	const label = getRelationshipListLabel(kind)
+	const label = getRelationshipListLabel(kind, t)
 	const counts: Partial<Record<RelationshipListKind, number>> = {
 		followers: profile.followerCount,
 		following: profile.followingCount,
@@ -55,7 +57,7 @@ export function RelationshipListsView({
 				<div>
 					<Button asChild variant="ghost" size="sm" className="-ml-3">
 						<Link href={profileHref}>
-							<ArrowLeft aria-hidden /> Profile
+							<ArrowLeft aria-hidden /> {t('profile')}
 						</Link>
 					</Button>
 				</div>
@@ -67,10 +69,10 @@ export function RelationshipListsView({
 
 			{/* Route tabs (design system §21): each list has its own URL. */}
 			<PageTabs
-				label="Connections"
+				label={t('connections')}
 				tabs={RELATIONSHIP_LIST_KINDS.map(option => ({
 					href: getRelationshipListHref(profile.username, option),
-					label: getRelationshipListLabel(option),
+					label: getRelationshipListLabel(option, t),
 					count: counts[option],
 				}))}
 			/>
@@ -78,7 +80,7 @@ export function RelationshipListsView({
 			<section aria-label={label} className="space-y-3">
 				{kind === 'mutuals' ? (
 					<p className="type-body-sm text-ink-3">
-						{getMutualsDescription({ isOwn, name: profile.name })}
+						{getMutualsDescription({ isOwn, name: profile.name }, t)}
 					</p>
 				) : null}
 
@@ -87,26 +89,28 @@ export function RelationshipListsView({
 				) : list.isError && items.length === 0 ? (
 					<div role="alert" className="space-y-3 py-3">
 						<p className="type-panel text-foreground">
-							Could not load {label.toLowerCase()}
+							{t('loadFailed', { kind })}
 						</p>
-						<p className="type-body-sm text-ink-3">
-							Check your connection and try again.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('checkConnection')}</p>
 						<Button
 							type="button"
 							variant="outline"
 							size="sm"
 							onClick={() => void list.refetch()}
 						>
-							Try again
+							{t('tryAgain')}
 						</Button>
 					</div>
 				) : items.length === 0 ? (
 					<p className="type-body-sm py-3 text-ink-3">
-						{getRelationshipEmptyMessage(kind, {
-							isOwn,
-							name: profile.name,
-						})}
+						{getRelationshipEmptyMessage(
+							kind,
+							{
+								isOwn,
+								name: profile.name,
+							},
+							t,
+						)}
 					</p>
 				) : (
 					<>
@@ -118,7 +122,7 @@ export function RelationshipListsView({
 									isSelf={member.id === viewerId}
 									caption={
 										member.followsMe && member.id !== viewerId
-											? 'Follows you'
+											? t('followsYou')
 											: undefined
 									}
 								/>
@@ -126,7 +130,7 @@ export function RelationshipListsView({
 						</ul>
 						{list.isFetchNextPageError ? (
 							<p role="alert" className="type-body-sm text-ink-3">
-								Could not load more members. Try again.
+								{t('loadMoreFailed')}
 							</p>
 						) : null}
 						{list.hasNextPage ? (
@@ -137,7 +141,7 @@ export function RelationshipListsView({
 									onClick={() => void list.fetchNextPage()}
 									disabled={list.isFetchingNextPage}
 								>
-									{list.isFetchingNextPage ? 'Loading…' : 'Load more'}
+									{list.isFetchingNextPage ? t('loading') : t('loadMore')}
 								</Button>
 							</div>
 						) : null}

@@ -8,14 +8,24 @@ import type {
 import { RELATIONSHIP_LIST_KINDS } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
-const RELATIONSHIP_LIST_LABELS: Record<RelationshipListKind, string> = {
-	followers: 'Followers',
-	following: 'Following',
-	mutuals: 'Mutuals',
+import type { MessageKey, Translator } from '@/i18n/translator'
+
+type T = Translator<'social.relationships'>
+
+const RELATIONSHIP_LIST_LABELS: Record<
+	RelationshipListKind,
+	MessageKey<'social.relationships'>
+> = {
+	followers: 'followers',
+	following: 'following',
+	mutuals: 'mutuals',
 }
 
-export function getRelationshipListLabel(kind: RelationshipListKind): string {
-	return RELATIONSHIP_LIST_LABELS[kind]
+export function getRelationshipListLabel(
+	kind: RelationshipListKind,
+	t: T,
+): string {
+	return t(RELATIONSHIP_LIST_LABELS[kind])
 }
 
 /** Reads the optional second `/profile/<identifier>/<kind>` segment. */
@@ -47,39 +57,37 @@ export function getRelationshipListApiPath(
 export function getRelationshipEmptyMessage(
 	kind: RelationshipListKind,
 	{ isOwn, name }: { isOwn: boolean; name: string },
+	t: T,
 ): string {
 	if (kind === 'followers') {
-		return isOwn ? 'No one follows you yet.' : `No one follows ${name} yet.`
+		return isOwn ? t('emptyFollowersOwn') : t('emptyFollowers', { name })
 	}
 	if (kind === 'following') {
-		return isOwn
-			? 'You are not following anyone yet.'
-			: `${name} is not following anyone yet.`
+		return isOwn ? t('emptyFollowingOwn') : t('emptyFollowing', { name })
 	}
-	return isOwn
-		? 'No mutual follows yet. Members you follow back will show up here.'
-		: `None of the people you follow follow ${name}.`
+	return isOwn ? t('emptyMutualsOwn') : t('emptyMutuals', { name })
 }
 
 /** One line that says who a mutuals list contains, since it is viewer-relative. */
-export function getMutualsDescription({
-	isOwn,
-	name,
-}: {
-	isOwn: boolean
-	name: string
-}): string {
-	return isOwn
-		? 'Members who follow you and whom you follow back.'
-		: `People you follow who also follow ${name}.`
+export function getMutualsDescription(
+	{
+		isOwn,
+		name,
+	}: {
+		isOwn: boolean
+		name: string
+	},
+	t: T,
+): string {
+	return isOwn ? t('mutualsOwn') : t('mutualsOther', { name })
 }
 
 export function getFollowSuggestionReason(
 	suggestion: Pick<FollowSuggestion, 'reason' | 'mutualCount'>,
+	t: T,
 ): string {
-	if (suggestion.reason === 'FOLLOWS_YOU') return 'Follows you'
-	const count = suggestion.mutualCount
-	return `Followed by ${count} ${count === 1 ? 'person' : 'people'} you follow`
+	if (suggestion.reason === 'FOLLOWS_YOU') return t('followsYou')
+	return t('followedBy', { count: suggestion.mutualCount })
 }
 
 /**

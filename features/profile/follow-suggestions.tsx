@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Button } from '@/components/ui/button'
 import {
 	RelationshipMemberRow,
@@ -9,6 +11,7 @@ import { useFollowSuggestions } from '@/lib/api/hooks/useRelationships'
 import { getFollowSuggestionReason } from '@/lib/utils/relationships'
 
 export function FollowSuggestions() {
+	const t = useTranslations('social.relationships')
 	const suggestions = useFollowSuggestions()
 	const items = suggestions.data?.items ?? []
 
@@ -18,14 +21,14 @@ export function FollowSuggestions() {
 				id="follow-suggestions-heading"
 				className="type-section rule-heading pb-2 text-foreground"
 			>
-				People you may know
+				{t('suggestionsTitle')}
 			</h2>
 			{suggestions.isPending ? (
 				<RelationshipRowsLoading rows={3} />
 			) : suggestions.isError && items.length === 0 ? (
 				<div role="alert" className="space-y-3 py-3">
 					<p className="type-body-sm text-ink-3">
-						Suggestions are unavailable right now.
+						{t('suggestionsUnavailable')}
 					</p>
 					<Button
 						type="button"
@@ -33,21 +36,18 @@ export function FollowSuggestions() {
 						size="sm"
 						onClick={() => void suggestions.refetch()}
 					>
-						Try again
+						{t('tryAgain')}
 					</Button>
 				</div>
 			) : items.length === 0 ? (
-				<p className="type-body-sm py-3 text-ink-3">
-					No suggestions yet. Once you follow a few members, people they follow
-					will appear here.
-				</p>
+				<p className="type-body-sm py-3 text-ink-3">{t('suggestionsEmpty')}</p>
 			) : (
 				<ul>
 					{items.map(suggestion => (
 						<RelationshipMemberRow
 							key={suggestion.id}
 							member={suggestion}
-							caption={getFollowSuggestionReason(suggestion)}
+							caption={getFollowSuggestionReason(suggestion, t)}
 						/>
 					))}
 				</ul>

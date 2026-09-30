@@ -5,6 +5,7 @@ import type {
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
 import {
 	getFollowSuggestionReason,
 	getRelationshipEmptyMessage,
@@ -48,35 +49,70 @@ describe('relationship routes', () => {
 	})
 })
 
+const t = translatorFor('en', 'social.relationships')
+const es = translatorFor('es', 'social.relationships')
+
 describe('relationship copy', () => {
 	it('distinguishes your own lists from a member’s', () => {
 		expect(
-			getRelationshipEmptyMessage('followers', { isOwn: true, name: 'Ana' }),
+			getRelationshipEmptyMessage('followers', { isOwn: true, name: 'Ana' }, t),
 		).toBe('No one follows you yet.')
 		expect(
-			getRelationshipEmptyMessage('following', { isOwn: false, name: 'Ana' }),
+			getRelationshipEmptyMessage(
+				'following',
+				{ isOwn: false, name: 'Ana' },
+				t,
+			),
 		).toBe('Ana is not following anyone yet.')
 		expect(
-			getRelationshipEmptyMessage('mutuals', { isOwn: false, name: 'Ana' }),
+			getRelationshipEmptyMessage('mutuals', { isOwn: false, name: 'Ana' }, t),
 		).toBe('None of the people you follow follow Ana.')
 	})
 
 	it('explains why a member is suggested with correct pluralisation', () => {
 		expect(
-			getFollowSuggestionReason({ reason: 'FOLLOWS_YOU', mutualCount: 3 }),
+			getFollowSuggestionReason({ reason: 'FOLLOWS_YOU', mutualCount: 3 }, t),
 		).toBe('Follows you')
 		expect(
-			getFollowSuggestionReason({
-				reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW',
-				mutualCount: 1,
-			}),
+			getFollowSuggestionReason(
+				{
+					reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW',
+					mutualCount: 1,
+				},
+				t,
+			),
 		).toBe('Followed by 1 person you follow')
 		expect(
-			getFollowSuggestionReason({
-				reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW',
-				mutualCount: 4,
-			}),
+			getFollowSuggestionReason(
+				{
+					reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW',
+					mutualCount: 4,
+				},
+				t,
+			),
 		).toBe('Followed by 4 people you follow')
+	})
+
+	it('reads in Spanish, with the same plural rule', () => {
+		expect(
+			getRelationshipEmptyMessage(
+				'following',
+				{ isOwn: false, name: 'Ana' },
+				es,
+			),
+		).toBe('Ana todavía no sigue a nadie.')
+		expect(
+			getFollowSuggestionReason(
+				{ reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW', mutualCount: 1 },
+				es,
+			),
+		).toBe('Lo sigue 1 persona que sigues')
+		expect(
+			getFollowSuggestionReason(
+				{ reason: 'FOLLOWED_BY_PEOPLE_YOU_FOLLOW', mutualCount: 4 },
+				es,
+			),
+		).toBe('Lo siguen 4 personas que sigues')
 	})
 })
 
