@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
 import type { Exercise } from '@/lib/api/types/exercise.type'
 import { describeCustomExerciseError } from '@/lib/utils/custom-exercises'
@@ -44,6 +45,7 @@ export const useStarredExercises = () => {
  * a failure restores the previous list and says so.
  */
 export const useToggleExerciseStar = () => {
+	const errorText = useApiErrorMessage()
 	const queryClient = useQueryClient()
 	const { push } = useToast()
 	const t = useTranslations('core.exercisesHook')
@@ -80,7 +82,7 @@ export const useToggleExerciseStar = () => {
 			}
 			push({
 				title: t('starNotSavedTitle'),
-				description: error.message || t('tryAgainMoment'),
+				description: errorText(error) || t('tryAgainMoment'),
 			})
 		},
 		onSuccess: data => {

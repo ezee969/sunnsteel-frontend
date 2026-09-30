@@ -46,7 +46,12 @@ import {
 	WorkoutProgressQuery,
 } from '../types/workout-progress.type'
 import { WorkoutStats, WorkoutStatsQuery } from '../types/workout-stats.type'
-import { httpClient, requestWithMeta } from './httpClient'
+import {
+	errorBodyDetails,
+	httpClient,
+	HttpError,
+	requestWithMeta,
+} from './httpClient'
 
 const WORKOUTS_API_URL = '/workouts'
 
@@ -231,10 +236,13 @@ export const workoutService = {
 			},
 		)
 		if (!res.ok) {
-			const serverMsg = (res.data as { message?: string })?.message
-			const msg = serverMsg || `Request failed with status: ${res.status}`
-			// Throw with status prefix so callers can branch on 4xx without parsing
-			throw new Error(`STATUS:${res.status}:${msg}`)
+			const details = errorBodyDetails(res.data)
+			throw new HttpError(
+				details.message || `Request failed with status: ${res.status}`,
+				res.status,
+				details.code,
+				details.params,
+			)
 		}
 		return res.data as WorkoutSession
 	},

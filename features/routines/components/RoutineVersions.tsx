@@ -33,6 +33,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	useCreateRoutineVersion,
@@ -67,6 +68,7 @@ function SaveVersionDialog({
 	onOpenChange: (open: boolean) => void
 	routineId: string
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.versions')
 	const [name, setName] = useState('')
 	const create = useCreateRoutineVersion(routineId)
@@ -88,7 +90,7 @@ function SaveVersionDialog({
 			onError: error =>
 				push({
 					title: t('toastSaveFailedTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})
@@ -156,6 +158,7 @@ function CompareVersionDialog({
 	hasLiveSession: boolean
 	weightUnit: WeightUnit
 }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const t = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
@@ -201,7 +204,7 @@ function CompareVersionDialog({
 			onError: error =>
 				push({
 					title: t('toastRestoreFailedTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})
@@ -251,6 +254,7 @@ export function RoutineVersions({
 	hasLiveSession,
 	weightUnit,
 }: RoutineVersionsProps) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale()
 	const t = useTranslations('routines.versions')
 	const versions = useRoutineVersions(routine.id)
@@ -277,7 +281,7 @@ export function RoutineVersions({
 			onError: error =>
 				push({
 					title: t('toastDeleteFailedTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { exerciseLabel } from '@/i18n/catalog'
 import { useExercises } from '@/lib/api/hooks'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
@@ -77,6 +78,7 @@ export function ExerciseSwapDialog({
 	otherExerciseIds,
 	onClose,
 }: ExerciseSwapDialogProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.exerciseSwap')
 	const tAlternatives = useTranslations('routines.alternatives')
 	const tMuscles = useTranslations('routines.muscles')
@@ -183,7 +185,7 @@ export function ExerciseSwapDialog({
 				onError: error =>
 					push({
 						title: t('couldNotSwapTitle'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},
@@ -205,7 +207,7 @@ export function ExerciseSwapDialog({
 			onError: error =>
 				push({
 					title: t('couldNotSwitchBackTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

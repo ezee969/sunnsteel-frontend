@@ -13,6 +13,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useBlockedMembers,
 	useUnblockMember,
@@ -26,6 +27,7 @@ import { blockedMemberName, describeBlockedSince } from '@/lib/utils/moderation'
  * would otherwise look like a failure.
  */
 export function BlockedMembersCard() {
+	const errorText = useApiErrorMessage()
 	const tModeration = useTranslations('social.moderation')
 	const locale = useLocale()
 	const t = useTranslations('settings.blockedMembers')
@@ -57,7 +59,7 @@ export function BlockedMembersCard() {
 						className="border border-destructive bg-surface p-4"
 					>
 						<p className="type-body-sm text-destructive">
-							{blocks.error.message}
+							{errorText(blocks.error)}
 						</p>
 						<Button
 							type="button"
@@ -108,7 +110,7 @@ export function BlockedMembersCard() {
 											onError: error =>
 												push({
 													title: t('unblockFailedTitle'),
-													description: error.message,
+													description: errorText(error),
 													variant: 'destructive',
 												}),
 										})

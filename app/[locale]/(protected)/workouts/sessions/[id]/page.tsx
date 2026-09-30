@@ -18,6 +18,7 @@ import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
 import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapDialog } from '@/features/workout/session-recap'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
@@ -74,6 +75,7 @@ const BACK_BUTTON_CLASS =
  * @returns The React element tree for the active session UI.
  */
 export default function ActiveSessionPage() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.sessionPage')
 	const tRounds = useTranslations('workout.rounds')
 	const tPrescription = useTranslations('workout.prescription')
@@ -172,13 +174,13 @@ export default function ActiveSessionPage() {
 						push({
 							title: t('couldNotRemoveSetTitle'),
 							description:
-								error instanceof Error ? error.message : t('tryAgain'),
+								error instanceof Error ? errorText(error) : t('tryAgain'),
 							variant: 'destructive',
 						}),
 				},
 			)
 		},
-		[deleteSetLog, push, t],
+		[deleteSetLog, errorText, push, t],
 	)
 
 	const handleBack = useCallback(() => {
@@ -238,7 +240,7 @@ export default function ActiveSessionPage() {
 				<div className="ledger-page space-y-4 py-16 text-center">
 					<h1 className="type-page text-destructive">{t('errorTitle')}</h1>
 					<p className="text-ink-2">
-						{error.message || t('failedToLoadSession')}
+						{errorText(error) || t('failedToLoadSession')}
 					</p>
 					<button onClick={handleBack} className={BACK_BUTTON_CLASS}>
 						{t('goBack')}

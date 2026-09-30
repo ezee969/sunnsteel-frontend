@@ -17,6 +17,7 @@ import { EmptyRoutinesState } from '@/features/routines/components/EmptyRoutines
 import { RoutineCard } from '@/features/routines/components/RoutineCard'
 import { RoutinesSkeletonList } from '@/features/routines/components/RoutinesSkeletonList'
 import { useRoutineListActions } from '@/features/routines/hooks/useRoutineListActions'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { Routine } from '@/lib/api/types/routine.type'
 
@@ -42,6 +43,7 @@ export default function WorkoutsList({
 	error,
 	filtered = false,
 }: WorkoutsListProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.listing')
 	const {
 		isDeleteDialogOpen,
@@ -68,7 +70,7 @@ export default function WorkoutsList({
 
 	if (error) {
 		return (
-			<p className="type-body-sm text-destructive">Error: {error.message}</p>
+			<p className="type-body-sm text-destructive">Error: {errorText(error)}</p>
 		)
 	}
 

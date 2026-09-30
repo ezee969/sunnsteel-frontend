@@ -25,6 +25,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useUpdateProfilePrivacy } from '@/lib/api/hooks/useUpdateProfilePrivacy'
 import {
 	PRIVACY_AUDIENCE_KEYS,
@@ -56,6 +57,7 @@ interface ProfilePrivacySettingsCardProps {
 export function ProfilePrivacySettingsCard({
 	settings,
 }: ProfilePrivacySettingsCardProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.profilePrivacy')
 	const tOverview = useTranslations('settings.privacyOverview')
 	const [draft, setDraft] = useState(settings)
@@ -80,7 +82,7 @@ export function ProfilePrivacySettingsCard({
 			onError: error => {
 				push({
 					title: t('failedTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				})
 			},

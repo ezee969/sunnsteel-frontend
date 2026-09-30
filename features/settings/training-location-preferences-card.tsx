@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useReplaceTrainingLocations,
 	useTrainingLocations,
@@ -37,6 +38,7 @@ interface TrainingLocationPreferencesCardProps {
 export const TrainingLocationPreferencesCard = ({
 	weightUnit,
 }: TrainingLocationPreferencesCardProps) => {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.trainingLocations')
 	const { data: locations, isLoading, error, refetch } = useTrainingLocations()
 	const replaceLocations = useReplaceTrainingLocations()
@@ -121,7 +123,7 @@ export const TrainingLocationPreferencesCard = ({
 					})
 				},
 				onError: mutationError => {
-					setFormError(mutationError.message)
+					setFormError(errorText(mutationError))
 				},
 			})
 		} catch (validationError) {
@@ -161,7 +163,7 @@ export const TrainingLocationPreferencesCard = ({
 					</div>
 				) : error ? (
 					<div className="rounded-sm border border-destructive bg-surface p-4">
-						<p className="type-body-sm text-destructive">{error.message}</p>
+						<p className="type-body-sm text-destructive">{errorText(error)}</p>
 						<Button
 							type="button"
 							variant="outline"

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { exerciseLabel } from '@/i18n/catalog'
 import { useCorrectSession } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -141,6 +142,7 @@ export function SessionCorrectionEditor({
 	weightUnit: WeightUnit
 	onDone: () => void
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.corrections')
 	const tEx = useTranslations('catalog.exercises')
 	const { push } = useToast()
@@ -216,7 +218,7 @@ export function SessionCorrectionEditor({
 					setPending(null)
 					push({
 						title: t('couldNotCorrectTitle'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					})
 				},

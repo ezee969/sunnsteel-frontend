@@ -20,6 +20,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useUpdateSessionNotes } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	exerciseNoteLabel,
@@ -114,6 +115,7 @@ function NoteDialog({
 }
 
 function useSaveNote(sessionId: string) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.notes')
 	const { push } = useToast()
 	const save = useUpdateSessionNotes(sessionId)
@@ -123,7 +125,7 @@ function useSaveNote(sessionId: string) {
 			onError: error =>
 				push({
 					title: t('couldNotSaveTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

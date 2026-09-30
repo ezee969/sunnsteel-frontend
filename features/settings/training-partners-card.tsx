@@ -23,6 +23,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useAcceptTrainingPartner,
 	useRemoveTrainingPartner,
@@ -37,6 +38,7 @@ const memberName = (partnership: TrainingPartnership) =>
 		.join(' ')
 
 export function TrainingPartnersCard() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.trainingPartners')
 	const partnerships = useTrainingPartners()
 	const items = partnerships.data?.items ?? []
@@ -66,7 +68,7 @@ export function TrainingPartnersCard() {
 						className="border border-destructive bg-surface p-4"
 					>
 						<p className="type-body-sm text-destructive">
-							{partnerships.error.message}
+							{errorText(partnerships.error)}
 						</p>
 						<Button
 							type="button"
@@ -144,6 +146,7 @@ function PendingPartnerRow({
 }: {
 	partnership: TrainingPartnership
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.trainingPartners')
 	const accept = useAcceptTrainingPartner()
 	const remove = useRemoveTrainingPartner()
@@ -183,7 +186,8 @@ function PendingPartnerRow({
 										}),
 										variant: 'success',
 									}),
-								onError: error => showError(push, t('errorTitle'), error),
+								onError: error =>
+									showError(push, t('errorTitle'), errorText(error)),
 							})
 						}
 					>
@@ -197,7 +201,8 @@ function PendingPartnerRow({
 					disabled={busy}
 					onClick={() =>
 						remove.mutate(partnership.id, {
-							onError: error => showError(push, t('errorTitle'), error),
+							onError: error =>
+								showError(push, t('errorTitle'), errorText(error)),
 						})
 					}
 				>
@@ -213,6 +218,7 @@ function ActivePartnerRow({
 }: {
 	partnership: TrainingPartnership
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.trainingPartners')
 	const [draft, setDraft] = useState(partnership.permissionsGrantedByMe)
 	const update = useUpdateTrainingPartnerPermissions()
@@ -239,7 +245,7 @@ function ActivePartnerRow({
 						}),
 						variant: 'success',
 					}),
-				onError: error => showError(push, t('errorTitle'), error),
+				onError: error => showError(push, t('errorTitle'), errorText(error)),
 			},
 		)
 	}
@@ -313,7 +319,8 @@ function ActivePartnerRow({
 									}),
 									variant: 'success',
 								}),
-							onError: error => showError(push, t('errorTitle'), error),
+							onError: error =>
+								showError(push, t('errorTitle'), errorText(error)),
 						})
 					}
 				>
@@ -338,10 +345,6 @@ function ActivePartnerRow({
 
 type ToastPush = ReturnType<typeof useToast>['push']
 
-function showError(push: ToastPush, title: string, error: Error) {
-	push({
-		title,
-		description: error.message,
-		variant: 'destructive',
-	})
+function showError(push: ToastPush, title: string, description: string) {
+	push({ title, description, variant: 'destructive' })
 }

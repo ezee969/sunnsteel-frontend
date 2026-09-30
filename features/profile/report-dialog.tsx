@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useReportMember } from '@/lib/api/hooks/useModeration'
 import {
 	REPORT_REASON_OPTIONS,
@@ -45,6 +46,7 @@ export function ReportDialog({
 	subjectKind,
 	subjectId,
 }: ReportDialogProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.report')
 	const tModeration = useTranslations('social.moderation')
 	const { push } = useToast()
@@ -68,7 +70,7 @@ export function ReportDialog({
 				onError: error => {
 					push({
 						title: t('failed'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					})
 				},

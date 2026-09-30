@@ -18,6 +18,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	useReplaceTrainingLocations,
@@ -147,6 +148,7 @@ function WarmUpRampPreview({
 		followLoad: boolean,
 	) => void
 }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const t = useTranslations('routines.warmUp')
 	const { push } = useToast()
@@ -204,7 +206,7 @@ function WarmUpRampPreview({
 				push({
 					title: t('gymNotSavedTitle'),
 					description:
-						error instanceof Error ? error.message : t('tryAgainInSettings'),
+						error instanceof Error ? errorText(error) : t('tryAgainInSettings'),
 					variant: 'destructive',
 				})
 			}

@@ -35,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	type BodyProgressSource,
@@ -404,6 +405,7 @@ function BodyEntryDialog({
 	editing: boolean
 	weightUnit: WeightUnit
 }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const tBody = useTranslations('progress.body')
 	const baseId = useId()
@@ -501,7 +503,7 @@ function BodyEntryDialog({
 					) : null}
 					{upsert.isError ? (
 						<p role="alert" className="type-body-sm text-ink">
-							{upsert.error.message || tBody('saveFailed')}
+							{errorText(upsert.error) || tBody('saveFailed')}
 						</p>
 					) : null}
 					<DialogFooter>

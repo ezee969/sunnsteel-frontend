@@ -35,6 +35,7 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { achievementText, exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
@@ -175,6 +176,7 @@ export function FeaturedRecordsSettingsCard({
 	weightUnit,
 	accountRoutinesRule,
 }: FeaturedRecordsSettingsCardProps) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const t = useTranslations('settings.featuredItems')
 	const selectionsQuery = useFeaturedProfileItems()
@@ -287,7 +289,7 @@ export function FeaturedRecordsSettingsCard({
 			onError: mutationError => {
 				push({
 					title: t('failedTitle'),
-					description: mutationError.message,
+					description: errorText(mutationError),
 					variant: 'destructive',
 				})
 			},
@@ -316,7 +318,7 @@ export function FeaturedRecordsSettingsCard({
 						role="alert"
 						className="border border-destructive bg-surface p-4"
 					>
-						<p className="type-body-sm text-destructive">{error.message}</p>
+						<p className="type-body-sm text-destructive">{errorText(error)}</p>
 						<Button
 							type="button"
 							variant="outline"

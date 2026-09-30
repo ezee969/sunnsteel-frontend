@@ -21,6 +21,7 @@ import {
 	ActivityFact,
 } from '@/features/activity/activity-entry-list'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { MessageKey } from '@/i18n/translator'
 import {
@@ -92,6 +93,7 @@ function OwnActivityRow({
 	entry: OwnActivityEntry
 	weightUnit: WeightUnit
 }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale()
 	const t = useTranslations('social.activityUi')
 	const tActivity = useTranslations('social.activity')
@@ -112,7 +114,7 @@ function OwnActivityRow({
 				onError: error =>
 					push({
 						title: t('sharingFailed'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},

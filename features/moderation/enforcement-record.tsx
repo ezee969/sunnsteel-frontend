@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useModerationHistory } from '@/lib/api/hooks/useModeration'
 import {
 	describeModerationAction,
@@ -17,6 +18,7 @@ import {
  * above the `HIDE_SUBJECT` one, which stays exactly as it was written.
  */
 export function EnforcementRecord() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.moderationPage')
 	const tModeration = useTranslations('social.moderation')
 	const locale = useLocale()
@@ -35,7 +37,7 @@ export function EnforcementRecord() {
 			) : history.error ? (
 				<div role="alert" className="border border-destructive bg-surface p-4">
 					<p className="type-body-sm text-destructive">
-						{history.error.message}
+						{errorText(history.error)}
 					</p>
 					<Button
 						type="button"

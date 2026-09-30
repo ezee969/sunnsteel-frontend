@@ -27,6 +27,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import {
 	useMeasurableGoals,
@@ -61,6 +62,7 @@ const NON_EXERCISE_TYPES = new Set<MeasurableGoalType>([
 export function MeasurableGoalsSettingsCard({
 	weightUnit,
 }: MeasurableGoalsSettingsCardProps) {
+	const errorText = useApiErrorMessage()
 	const tGoals = useTranslations('progress.goals')
 	const t = useTranslations('settings.measurableGoals')
 	const goalsQuery = useMeasurableGoals()
@@ -134,7 +136,7 @@ export function MeasurableGoalsSettingsCard({
 						variant: 'success',
 					})
 				},
-				onError: error => setFormError(error.message),
+				onError: error => setFormError(errorText(error)),
 			})
 		} catch (error) {
 			setFormError(error instanceof Error ? error.message : t('fallbackError'))
@@ -195,7 +197,7 @@ export function MeasurableGoalsSettingsCard({
 						className="border border-destructive bg-surface p-4"
 					>
 						<p className="type-body-sm text-destructive">
-							{goalsQuery.error.message}
+							{errorText(goalsQuery.error)}
 						</p>
 						<Button
 							type="button"

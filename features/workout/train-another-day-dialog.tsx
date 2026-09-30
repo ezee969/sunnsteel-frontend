@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import {
@@ -38,6 +39,7 @@ export function TrainAnotherDayDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.trainAnotherDay')
 	const router = useRouter()
 	const { push } = useToast()
@@ -68,7 +70,8 @@ export function TrainAnotherDayDialog({
 					push({
 						title: t('couldNotStartTitle'),
 						// The hook types its error as unknown, as the others here do.
-						description: error instanceof Error ? error.message : String(error),
+						description:
+							error instanceof Error ? errorText(error) : String(error),
 						variant: 'destructive',
 					})
 				},

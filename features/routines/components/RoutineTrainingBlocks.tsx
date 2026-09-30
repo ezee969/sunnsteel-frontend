@@ -54,6 +54,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
 import { TrainingBlockComparisonDialog } from '@/features/routines/components/TrainingBlockComparison'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	useCreateRoutineTrainingBlock,
@@ -97,6 +98,7 @@ function TrainingBlockDialog({
 	versions: RoutineVersion[]
 	onClose: () => void
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.trainingBlocks')
 	const tVersions = useTranslations('routines.versions')
 	const [name, setName] = useState(block?.name ?? '')
@@ -139,7 +141,7 @@ function TrainingBlockDialog({
 			onError: (error: Error) =>
 				push({
 					title: block ? t('toastNotRevised') : t('toastNotAdded'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive' as const,
 				}),
 		}
@@ -356,6 +358,7 @@ export function RoutineTrainingBlocks({
 	routine,
 	weightUnit,
 }: RoutineTrainingBlocksProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.trainingBlocks')
 	const tCompare = useTranslations('progress.blockComparison')
 	const tVersions = useTranslations('routines.versions')
@@ -387,7 +390,7 @@ export function RoutineTrainingBlocks({
 			onError: error =>
 				push({
 					title: t('toastNotDeleted'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

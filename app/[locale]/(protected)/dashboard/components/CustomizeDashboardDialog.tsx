@@ -20,6 +20,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useUpdateDashboardLayout } from '@/lib/api/hooks/useUpdateDashboardLayout'
 import {
 	dashboardSectionLabel,
@@ -47,6 +48,7 @@ export function CustomizeDashboardDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('planning.dashboardLayout')
 	const tA = useTranslations('planning.dashboardActions')
 	const saved = normalizeDashboardLayout(layout)
@@ -192,7 +194,7 @@ export function CustomizeDashboardDialog({
 
 				{update.isError ? (
 					<p role="alert" className="type-body-sm text-ink">
-						{update.error.message ||
+						{errorText(update.error) ||
 							'Your dashboard could not be saved. Try again.'}
 					</p>
 				) : null}

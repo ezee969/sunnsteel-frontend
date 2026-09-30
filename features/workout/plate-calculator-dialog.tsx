@@ -23,6 +23,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
@@ -51,6 +52,7 @@ export const PlateCalculatorDialog = ({
 	open,
 	onOpenChange,
 }: PlateCalculatorDialogProps) => {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const t = useTranslations('workout.plateCalculator')
 	const weightUnit = useWeightUnit()
@@ -124,7 +126,7 @@ export const PlateCalculatorDialog = ({
 					</div>
 				) : error ? (
 					<div className="type-body-sm mark border-l-destructive bg-surface-sunk p-4">
-						<p className="text-destructive">{error.message}</p>
+						<p className="text-destructive">{errorText(error)}</p>
 						<Button
 							type="button"
 							variant="outline"

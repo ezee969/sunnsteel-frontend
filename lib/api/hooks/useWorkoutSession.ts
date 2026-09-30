@@ -21,8 +21,10 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { HttpError } from '@/lib/api/services/httpClient'
 import { buildPersonalRecordCelebration } from '@/lib/utils/personal-record-celebration'
 import { setSaveState } from '@/lib/utils/save-status-store'
 // Temporary auth abstraction: migrate from legacy auth-provider to Supabase auth.
@@ -554,6 +556,7 @@ export const useStartSession = () => {
 	const qc = useQueryClient()
 	const { push } = useToast()
 	const t = useTranslations('core.workoutSession')
+	const errorText = useApiErrorMessage()
 	return useMutation({
 		mutationFn: (data: StartWorkoutRequest): Promise<StartedSession> =>
 			startSessionOnce(
@@ -583,19 +586,13 @@ export const useStartSession = () => {
 			}
 		},
 		onError: (err: unknown) => {
-			// Map backend 4xx errors to friendly messages
-			const msg = err instanceof Error ? err.message : String(err)
-			// Expected format: STATUS:<code>:<message>
-			const m = msg.startsWith('STATUS:') ? msg.split(':') : []
-			const code = m.length >= 3 ? Number(m[1]) : NaN
-			const serverMessage = m.length >= 3 ? m.slice(2).join(':') : msg
-
-			if (!Number.isNaN(code) && code >= 400 && code < 500) {
-				let friendly = serverMessage
-				if (code === 404) {
-					friendly = t('routineNotFound')
-				}
-				push({ title: t('cannotStartSessionTitle'), description: friendly })
+			// A refusal says why, in the member's language (I18N-06).
+			if (err instanceof HttpError && err.status >= 400 && err.status < 500) {
+				push({
+					title: t('cannotStartSessionTitle'),
+					description:
+						err.status === 404 ? t('routineNotFound') : errorText(err),
+				})
 				return
 			}
 			// Fallback

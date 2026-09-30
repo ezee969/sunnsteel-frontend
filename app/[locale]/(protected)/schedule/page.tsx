@@ -14,6 +14,7 @@ import {
 import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { ScheduleWeekView } from '@/features/schedule/schedule-week-view'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useSkipOccurrence,
 	useUndoMove,
@@ -43,6 +44,7 @@ const fromKey = (key: string) => {
 }
 
 export default function SchedulePage() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('planning.schedulePage')
 	const [now] = useState(() => new Date())
 	const [view, setView] = useState<ScheduleView>('week')
@@ -128,7 +130,7 @@ export default function SchedulePage() {
 		} catch (error) {
 			push({
 				title: t('skipFailed'),
-				description: error instanceof Error ? error.message : undefined,
+				description: error instanceof Error ? errorText(error) : undefined,
 				variant: 'destructive',
 			})
 		} finally {
@@ -165,7 +167,7 @@ export default function SchedulePage() {
 		} catch (error) {
 			push({
 				title: t('undoFailed'),
-				description: error instanceof Error ? error.message : undefined,
+				description: error instanceof Error ? errorText(error) : undefined,
 				variant: 'destructive',
 			})
 		} finally {

@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useFinishSession } from '@/lib/api/hooks'
 import type { RoutineDay } from '@/lib/api/types/routine.type'
 import type { SetLog, WorkoutSessionRecap } from '@/lib/api/types/workout.type'
@@ -52,6 +53,7 @@ export const useSessionManagement = ({
 	day,
 	setLogs,
 }: UseSessionManagementProps): UseSessionManagementReturn => {
+	const errorText = useApiErrorMessage()
 	const router = useRouter()
 	const { push } = useToast()
 	const t = useTranslations('workout.sessionResolution')
@@ -104,7 +106,9 @@ export const useSessionManagement = ({
 						push({
 							title: copy.errorTitle,
 							description:
-								error instanceof Error ? error.message : t('checkConnection'),
+								error instanceof Error
+									? errorText(error)
+									: t('checkConnection'),
 						})
 						// Reset confirmation state on error
 						setIsConfirmingFinish(false)
@@ -113,7 +117,7 @@ export const useSessionManagement = ({
 				},
 			)
 		},
-		[finishSession, push, router, t],
+		[errorText, finishSession, push, router, t],
 	)
 
 	/**

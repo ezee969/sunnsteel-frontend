@@ -26,6 +26,7 @@ import {
 	RoutineWizardData,
 } from '@/features/routines/wizard/types'
 import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 
 const BuildDays = dynamic(
 	() => import('@/features/routines/wizard/BuildDays').then(m => m.BuildDays),
@@ -89,6 +90,7 @@ const mapProgressionScheme = (
 }
 
 export default function EditRoutinePage() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.builder')
 	const STEPS = useMemo(
 		() =>
@@ -257,7 +259,7 @@ export default function EditRoutinePage() {
 						{t('errorLoadingRoutine')}
 					</h3>
 					<p className="text-muted-foreground max-w-md mx-auto">
-						{error.message || t('errorLoadingRoutineBody')}
+						{errorText(error) || t('errorLoadingRoutineBody')}
 					</p>
 					<div className="flex justify-center gap-3 mt-4">
 						<Button variant="outline" onClick={() => router.push('/routines')}>

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useDeleteAccount } from '@/lib/api/hooks/useDeleteAccount'
 import {
 	accountDeletionExportFirst,
@@ -45,6 +46,7 @@ export function DeleteAccountCard({
 }: {
 	profile: { username: string; isModerator: boolean }
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('core.accountDeletion')
 	const tCard = useTranslations('settings.deleteAccount')
 	const [open, setOpen] = useState(false)
@@ -140,7 +142,7 @@ export function DeleteAccountCard({
 								role="alert"
 								className="type-body-sm text-destructive"
 							>
-								{remove.error.message}
+								{errorText(remove.error)}
 							</p>
 						) : null}
 

@@ -57,6 +57,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	useCancelDeload,
@@ -106,6 +107,7 @@ function DeloadDialog({
 	initial?: { startDate: string; length: number } | null
 	onClose: () => void
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.deloads')
 	const tVersions = useTranslations('routines.versions')
 	const tDate = useTranslations('routines.date')
@@ -195,7 +197,7 @@ function DeloadDialog({
 				onError: error =>
 					push({
 						title: t('toastNotSaved'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},
@@ -394,6 +396,7 @@ function ReviewDeloadDialog({
  * and progression waits; neither the routine nor the block changes.
  */
 export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.deloads')
 	const locale = useLocale() as Locale
 	const deloads = useRoutineDeloads(routine.id)
@@ -451,7 +454,7 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 			onError: error =>
 				push({
 					title: action === 'END' ? t('toastNotEnded') : t('toastNotCancelled'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

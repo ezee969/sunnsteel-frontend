@@ -12,6 +12,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useExportAccount } from '@/lib/api/hooks/useExportAccount'
 
 /**
@@ -19,6 +20,7 @@ import { useExportAccount } from '@/lib/api/hooks/useExportAccount'
  * step someone leaving should take first -- the deletion dialog points here.
  */
 export function DownloadDataCard() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.accountExport')
 	const exportAccount = useExportAccount()
 	const { push } = useToast()
@@ -49,7 +51,7 @@ export function DownloadDataCard() {
 							onError: error =>
 								push({
 									title: t('failedTitle'),
-									description: error.message,
+									description: errorText(error),
 									variant: 'destructive',
 								}),
 						})

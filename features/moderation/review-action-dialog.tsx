@@ -21,6 +21,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { MessageKey } from '@/i18n/translator'
 import {
 	useDismissReport,
@@ -73,6 +74,7 @@ export function ReviewActionDialog({
 	action,
 	report,
 }: ReviewActionDialogProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.reviewAction')
 	const tModeration = useTranslations('social.moderation')
 	const { push } = useToast()
@@ -116,7 +118,7 @@ export function ReviewActionDialog({
 				onError: error =>
 					push({
 						title: t('failed'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},

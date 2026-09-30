@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useCloneRoutine } from '@/lib/api/hooks/useRoutineSharing'
 import {
 	cloneRoutineNote,
@@ -29,6 +30,7 @@ export function CloneSharedRoutine({
 	source,
 	routineName,
 }: CloneSharedRoutineProps) {
+	const errorText = useApiErrorMessage()
 	const router = useRouter()
 	const { push } = useToast()
 	const tSharing = useTranslations('routines.sharing')
@@ -49,7 +51,7 @@ export function CloneSharedRoutine({
 			onError: error => {
 				push({
 					title: tSharing('couldNotClone'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				})
 			},

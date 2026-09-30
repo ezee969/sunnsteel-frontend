@@ -7,12 +7,14 @@ import HeroSection from '@/components/layout/HeroSection'
 import { useToast } from '@/components/ui/toast'
 import { NotificationList } from '@/features/notifications/notification-list'
 import { TodayActions } from '@/features/notifications/today-actions'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useMarkNotificationsRead,
 	useNotifications,
 } from '@/lib/api/hooks/useNotifications'
 
 export default function NotificationsPage() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.notifications')
 	const [now] = useState(() => new Date())
 	const notifications = useNotifications()
@@ -40,7 +42,7 @@ export default function NotificationsPage() {
 							onError: error =>
 								push({
 									title: t('markFailed'),
-									description: error.message,
+									description: errorText(error),
 									variant: 'destructive',
 								}),
 						},

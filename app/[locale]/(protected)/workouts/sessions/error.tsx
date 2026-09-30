@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 
 interface WorkoutSessionErrorProps {
 	error: Error & { digest?: string }
@@ -14,12 +15,13 @@ export default function WorkoutSessionError({
 	error,
 	reset,
 }: WorkoutSessionErrorProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.errors')
 	return (
 		<RouteError
 			title={t('sessionErrorTitle')}
 			description={t('sessionErrorDescription')}
-			message={error.message}
+			message={errorText(error)}
 		>
 			<Button onClick={() => reset()}>{t('retrySession')}</Button>
 			<Button

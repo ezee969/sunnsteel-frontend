@@ -1,5 +1,6 @@
 import type { StartWorkoutRequest, WorkoutSession } from '@sunsteel/contracts'
 
+import { HttpError } from '@/lib/api/services/httpClient'
 import { logger } from '@/lib/utils/logger'
 
 export type StartedSession = WorkoutSession & { _reused?: boolean }
@@ -87,10 +88,16 @@ async function attempt(
 	// 2) Start a new one. The backend enforces uniqueness, and some deployments
 	// answer 201 with an empty body, so a throw here is not yet a failure.
 	let started: WorkoutSession | undefined
+	let refusal: HttpError | undefined
 	try {
 		started = await deps.startSession(data)
 	} catch (error) {
 		logger.debug('[start-session] start threw, will poll active', error)
+		// I18N-06: a 4xx is the server saying no, and why. Keep it, so a start
+		// refused during a deload or a block reaches the member as that reason
+		// rather than as "could not be started".
+		if (error instanceof HttpError && error.status >= 400 && error.status < 500)
+			refusal = error
 	}
 	if (started?.id) return started
 
@@ -103,6 +110,7 @@ async function attempt(
 	const fallback = await deps.getActiveSession()
 	if (fallback?.id) return fallback
 
+	if (refusal) throw refusal
 	throw new Error(
 		'The session could not be started, and no active session could be found ' +
 			'afterwards.',

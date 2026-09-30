@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/card'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { TrainAnotherDayDialog } from '@/features/workout/train-another-day-dialog'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
 import { cn } from '@/lib/utils'
 import {
@@ -45,6 +46,7 @@ import {
 import { useTodaysWorkouts } from '../hooks/useTodaysWorkouts'
 
 export default function TodaysWorkouts() {
+	const errorText = useApiErrorMessage()
 	const router = useRouter()
 	const tDate = useTranslations('routines.date')
 	const tPrimary = useTranslations('planning.dashboardPrimary')
@@ -94,7 +96,7 @@ export default function TodaysWorkouts() {
 	if (error) {
 		return (
 			<p className="type-body-sm text-destructive">
-				{tA('todayError', { message: error.message })}
+				{tA('todayError', { message: errorText(error) })}
 			</p>
 		)
 	}

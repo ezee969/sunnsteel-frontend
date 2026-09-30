@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useRoutineDiscovery } from '@/lib/api/hooks/useRoutineDiscovery'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import {
@@ -52,6 +53,7 @@ const ANY = ''
  * from the prescription by `ROUT-10`'s rule rather than measured.
  */
 export function RoutineDiscovery() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.discovery')
 	const tIdentity = useTranslations('routines.identity')
 	const tMuscles = useTranslations('routines.muscles')
@@ -225,7 +227,7 @@ export function RoutineDiscovery() {
 						className="border border-destructive bg-surface p-4"
 					>
 						<p className="type-body-sm text-destructive">
-							{query.error.message}
+							{errorText(query.error)}
 						</p>
 						<Button
 							type="button"

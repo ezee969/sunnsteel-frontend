@@ -1,3 +1,5 @@
+import type { ApiErrorParams } from '@sunsteel/contracts'
+
 import { PUBLIC_ENV } from '@/lib/config/env'
 import { supabase } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
@@ -18,11 +20,43 @@ interface ApiRequestConfig extends RequestInit {
  */
 export class HttpError extends Error {
 	readonly status: number
+	/**
+	 * I18N-06: the refusal's stable code and the values its sentence names,
+	 * when the server sent them, so the client can say it in the member's
+	 * language. `message` stays the server's English.
+	 */
+	readonly code?: string
+	readonly params?: ApiErrorParams
 
-	constructor(message: string, status: number) {
+	constructor(
+		message: string,
+		status: number,
+		code?: string,
+		params?: ApiErrorParams,
+	) {
 		super(message)
 		this.name = 'HttpError'
 		this.status = status
+		this.code = code
+		this.params = params
+	}
+}
+
+/** The code and params of an error body, when it carries them. */
+export function errorBodyDetails(body: unknown): {
+	message?: string
+	code?: string
+	params?: ApiErrorParams
+} {
+	if (!body || typeof body !== 'object') return {}
+	const { message, code, params } = body as Record<string, unknown>
+	return {
+		message: typeof message === 'string' ? message : undefined,
+		code: typeof code === 'string' ? code : undefined,
+		params:
+			params && typeof params === 'object'
+				? (params as ApiErrorParams)
+				: undefined,
 	}
 }
 
@@ -101,12 +135,11 @@ export const httpClient = {
 
 		if (!response.ok) {
 			let errorMessage = `Request failed with status: ${response.status}`
+			let details: ReturnType<typeof errorBodyDetails> = {}
 
 			try {
-				const parsed = raw ? JSON.parse(raw) : undefined
-				if (parsed && typeof parsed.message === 'string') {
-					errorMessage = parsed.message
-				}
+				details = errorBodyDetails(raw ? JSON.parse(raw) : undefined)
+				if (details.message) errorMessage = details.message
 			} catch {}
 
 			logger.error('[http] <-', response.status, method, url, {
@@ -114,7 +147,12 @@ export const httpClient = {
 				contentLength: response.headers.get('content-length'),
 				rawPreview: raw?.slice(0, 200),
 			})
-			throw new HttpError(errorMessage, response.status)
+			throw new HttpError(
+				errorMessage,
+				response.status,
+				details.code,
+				details.params,
+			)
 		}
 
 		if (response.status === 204 || !raw || raw.trim().length === 0) {

@@ -1,6 +1,8 @@
 import type { StartWorkoutRequest, WorkoutSession } from '@sunsteel/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { HttpError } from '@/lib/api/services/httpClient'
+
 import {
 	resetInFlightStart,
 	type StartSessionDeps,
@@ -114,6 +116,37 @@ describe('startSessionOnce', () => {
 		// The in-flight slot must be clear, or the button stays dead until reload.
 		await expect(startSessionOnce(deps(), REQUEST)).resolves.toMatchObject({
 			id: 'new-1',
+		})
+	})
+
+	it("passes the server's refusal on, so it can be said in the member's language", async () => {
+		// I18N-06: a start refused during a deload used to end as "could not be
+		// started", because the 409 was swallowed while polling.
+		const refusal = new HttpError('deload', 409, 'SESSION_DELOAD_IN_FORCE', {
+			endDate: '2026-10-05',
+		})
+		const d = deps({
+			getActiveSession: vi.fn().mockResolvedValue(null),
+			startSession: vi.fn().mockRejectedValue(refusal),
+		})
+		await expect(startSessionOnce(d, REQUEST)).rejects.toBe(refusal)
+	})
+
+	it('still prefers a session the refused start created anyway', async () => {
+		const getActiveSession = vi
+			.fn()
+			.mockResolvedValueOnce(null)
+			.mockResolvedValue(session('recovered-2'))
+		const d = deps({
+			getActiveSession,
+			startSession: vi
+				.fn()
+				.mockRejectedValue(
+					new HttpError('conflict', 409, 'SESSION_ALREADY_ACTIVE'),
+				),
+		})
+		await expect(startSessionOnce(d, REQUEST)).resolves.toMatchObject({
+			id: 'recovered-2',
 		})
 	})
 })

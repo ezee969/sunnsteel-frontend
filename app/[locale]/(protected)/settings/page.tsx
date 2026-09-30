@@ -34,6 +34,7 @@ import { useToast } from '@/components/ui/toast'
 import { FeaturedRecordsSettingsCard } from '@/features/settings/featured-records-settings-card'
 import { SettingsTab } from '@/features/settings/settings-tab'
 import { TrainingIdentitySettingsCard } from '@/features/settings/training-identity-settings-card'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useHashForward } from '@/hooks/use-hash-forward'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
@@ -68,6 +69,7 @@ interface SettingsFormData {
  * link to a card that moved is sent to its tab before anything renders.
  */
 export default function SettingsProfilePage() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.profilePage')
 	const tUsername = useTranslations('settings.username')
 	const forwarding = useHashForward(SETTINGS_HASH_RULES)
@@ -192,7 +194,7 @@ export default function SettingsProfilePage() {
 				logger.error('Error uploading avatar:', error)
 				push({
 					title: t('photoNotChanged'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				})
 			},
@@ -245,7 +247,7 @@ export default function SettingsProfilePage() {
 				onError: err => {
 					push({
 						title: t('errorTitle'),
-						description: t('saveError', { message: err.message }),
+						description: t('saveError', { message: errorText(err) }),
 						variant: 'destructive',
 					})
 				},

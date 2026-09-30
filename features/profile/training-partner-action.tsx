@@ -14,6 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useAcceptTrainingPartner,
 	useRequestTrainingPartner,
@@ -31,6 +32,7 @@ export function TrainingPartnerAction({
 }: {
 	member: UserSearchResponse
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.partnerAction')
 	const tPartners = useTranslations('settings.trainingPartners')
 	const partnerships = useTrainingPartners()
@@ -94,7 +96,7 @@ export function TrainingPartnerAction({
 												onError: error =>
 													push({
 														title: t('encouragementFailed'),
-														description: error.message,
+														description: errorText(error),
 														variant: 'destructive',
 													}),
 											},
@@ -132,7 +134,7 @@ export function TrainingPartnerAction({
 			onError: error =>
 				push({
 					title: t('updateFailed'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { dateFnsLocale } from '@/i18n/date-locale'
 import {
 	useFinishSession,
@@ -35,6 +36,7 @@ interface StaleSessionRecoveryDialogProps {
 export function StaleSessionRecoveryDialog({
 	session,
 }: StaleSessionRecoveryDialogProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.staleSessionRecovery')
 	const locale = useLocale()
 	const router = useRouter()
@@ -116,7 +118,7 @@ export function StaleSessionRecoveryDialog({
 					push({
 						title: t('couldNotResolveTitle'),
 						description:
-							error instanceof Error ? error.message : t('checkConnection'),
+							error instanceof Error ? errorText(error) : t('checkConnection'),
 					})
 				},
 			},

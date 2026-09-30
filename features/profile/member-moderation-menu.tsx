@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useBlockMember, useUnblockMember } from '@/lib/api/hooks/useModeration'
 
 /**
@@ -38,6 +39,7 @@ export function MemberModerationMenu({
 }: {
 	profile: PublicUserProfile
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.memberModeration')
 	const tModeration = useTranslations('social.moderation')
 	const router = useRouter()
@@ -68,7 +70,7 @@ export function MemberModerationMenu({
 			onError: error => {
 				push({
 					title: isBlocked ? t('unblockFailed') : t('blockFailed'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				})
 			},

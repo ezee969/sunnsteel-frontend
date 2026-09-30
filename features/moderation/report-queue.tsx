@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { ReviewActionDialog } from '@/features/moderation/review-action-dialog'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useModerationQueue,
 	useRecordSubjectView,
@@ -44,6 +45,7 @@ const STATUS_TABS: ReportStatus[] = ['OPEN', 'ACTIONED', 'DISMISSED']
  * reviewer stays where they are rather than opening it unlogged.
  */
 export function ReportQueue() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.moderationPage')
 	const tModeration = useTranslations('social.moderation')
 	const locale = useLocale()
@@ -74,7 +76,7 @@ export function ReportQueue() {
 					setOpening(null)
 					push({
 						title: t('openFailedTitle'),
-						description: t('openFailedBody', { message: error.message }),
+						description: t('openFailedBody', { message: errorText(error) }),
 						variant: 'destructive',
 					})
 				},
@@ -111,7 +113,9 @@ export function ReportQueue() {
 				</div>
 			) : queue.error ? (
 				<div role="alert" className="border border-destructive bg-surface p-4">
-					<p className="type-body-sm text-destructive">{queue.error.message}</p>
+					<p className="type-body-sm text-destructive">
+						{errorText(queue.error)}
+					</p>
 					<Button
 						type="button"
 						variant="outline"

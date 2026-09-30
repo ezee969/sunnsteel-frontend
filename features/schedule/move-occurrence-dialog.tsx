@@ -15,6 +15,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
 	useMoveOccurrence,
@@ -67,6 +68,7 @@ function MoveOccurrenceContent({
 	request: MoveRequest
 	onClose: () => void
 }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
 	const t = useTranslations('planning.scheduleMove')
@@ -84,7 +86,7 @@ function MoveOccurrenceContent({
 	const moved = action.currentDate !== action.occurrenceDate
 
 	const fail = (title: string) => (error: Error) =>
-		push({ title, description: error.message, variant: 'destructive' })
+		push({ title, description: errorText(error), variant: 'destructive' })
 
 	const moveTo = (toDate: string) =>
 		move.mutate(

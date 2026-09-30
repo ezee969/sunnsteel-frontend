@@ -15,6 +15,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useSetActivityReaction } from '@/lib/api/hooks/useActivity'
 import { cn } from '@/lib/utils'
 import {
@@ -44,6 +45,7 @@ export function ActivityReactions({
 	/** False on your own activity: there is nothing to acknowledge. */
 	canReact: boolean
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.activity')
 	const tUi = useTranslations('social.activityUi')
 	const setReaction = useSetActivityReaction()
@@ -78,7 +80,7 @@ export function ActivityReactions({
 				onError: error =>
 					push({
 						title: tUi('reactionFailed'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},

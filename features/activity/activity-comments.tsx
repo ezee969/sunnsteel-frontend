@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useActivityComments,
 	useCreateActivityComment,
@@ -85,6 +86,7 @@ function CommentThread({
 	entryId: string
 	summary: ActivityCommentSummary
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('social.activityUi')
 	const tActivity = useTranslations('social.activity')
 	const comments = useActivityComments(entryId)
@@ -106,7 +108,7 @@ function CommentThread({
 				onError: error =>
 					push({
 						title: t('postFailed'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},
@@ -123,7 +125,7 @@ function CommentThread({
 			) : comments.error ? (
 				<div role="alert" className="py-2">
 					<p className="type-body-sm text-destructive">
-						{comments.error.message}
+						{errorText(comments.error)}
 					</p>
 					<Button
 						type="button"
@@ -198,6 +200,7 @@ function CommentThread({
 }
 
 function CommentRow({ comment }: { comment: ActivityComment }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale()
 	const t = useTranslations('social.activityUi')
 	const tActivity = useTranslations('social.activity')
@@ -273,7 +276,7 @@ function CommentRow({ comment }: { comment: ActivityComment }) {
 									onError: error =>
 										push({
 											title: t('deleteFailed'),
-											description: error.message,
+											description: errorText(error),
 											variant: 'destructive',
 										}),
 								})

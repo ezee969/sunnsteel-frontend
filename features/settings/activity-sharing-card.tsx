@@ -25,6 +25,7 @@ import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useActivitySharing,
 	useUpdateActivitySharing,
@@ -45,6 +46,7 @@ type Defaults = ActivitySharingSettings['defaults']
  * should be a deliberate act rather than a side effect of browsing a select.
  */
 export function ActivitySharingCard() {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.activitySharing')
 	const tActivity = useTranslations('social.activity')
 	const tPrivacy = useTranslations('settings.privacyOverview')
@@ -80,7 +82,7 @@ export function ActivitySharingCard() {
 				onError: error =>
 					push({
 						title: t('failedTitle'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					}),
 			},

@@ -33,6 +33,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import type { Exercise } from '@/lib/api/types'
@@ -61,6 +62,7 @@ const cloneIdentity = (identity: TrainingIdentity): TrainingIdentity => ({
 export function TrainingIdentitySettingsCard({
 	identity,
 }: TrainingIdentitySettingsCardProps) {
+	const errorText = useApiErrorMessage()
 	const tIdentity = useTranslations('routines.identity')
 	const t = useTranslations('settings.trainingIdentity')
 	const [draft, setDraft] = useState(() => cloneIdentity(identity))
@@ -172,7 +174,7 @@ export function TrainingIdentitySettingsCard({
 				onError: error => {
 					push({
 						title: t('failedTitle'),
-						description: error.message,
+						description: errorText(error),
 						variant: 'destructive',
 					})
 				},

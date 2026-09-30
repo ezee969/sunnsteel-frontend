@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useCreateSessionShare,
 	useRevokeSessionShare,
@@ -43,6 +44,7 @@ import {
  * opt-in; the previous-session comparison is never shared.
  */
 export function SessionShareButton({ sessionId }: { sessionId: string }) {
+	const errorText = useApiErrorMessage()
 	const locale = useLocale()
 	const t = useTranslations('workout.share')
 	const tModeration = useTranslations('social.moderation')
@@ -82,7 +84,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 			onError: error =>
 				push({
 					title: t('couldNotCreateTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})
@@ -99,7 +101,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 			onError: error =>
 				push({
 					title: t('couldNotRevokeTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

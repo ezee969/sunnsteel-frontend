@@ -14,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { isLocale, LOCALES } from '@/i18n/config'
 import { useUpdateLocale } from '@/lib/api/hooks/useUpdateLocale'
 
@@ -30,6 +31,7 @@ export function LanguagePreferenceCard({
 }: {
 	locale: AppLocale | null | undefined
 }) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('core.language')
 	const { push } = useToast()
 	const update = useUpdateLocale()
@@ -40,7 +42,7 @@ export function LanguagePreferenceCard({
 			onError: error =>
 				push({
 					title: t('failed'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				}),
 		})

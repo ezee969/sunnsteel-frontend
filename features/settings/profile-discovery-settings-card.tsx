@@ -16,6 +16,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useUpdateProfileDiscovery } from '@/lib/api/hooks/useUpdateProfileDiscovery'
 
 const DISCOVERY_FIELDS: Array<keyof ProfileDiscoverySettings> = [
@@ -31,6 +32,7 @@ interface ProfileDiscoverySettingsCardProps {
 export function ProfileDiscoverySettingsCard({
 	settings,
 }: ProfileDiscoverySettingsCardProps) {
+	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.profileDiscovery')
 	const [draft, setDraft] = useState(settings)
 	const updateDiscovery = useUpdateProfileDiscovery()
@@ -54,7 +56,7 @@ export function ProfileDiscoverySettingsCard({
 			onError: error => {
 				push({
 					title: t('failedTitle'),
-					description: error.message,
+					description: errorText(error),
 					variant: 'destructive',
 				})
 			},
