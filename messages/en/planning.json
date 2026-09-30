@@ -69,7 +69,20 @@
 		"nothingToCheckDescription": "Plateau watch needs a lift with a loaded best set that you trained in the last {span}.",
 		"noPlateausTitle": "No plateaus right now",
 		"noPlateausDescription": "{count, plural, one {None of the # lift you trained in the last {span} has gone {minSessions} sessions without a new best.} other {None of the # lifts you trained in the last {span} has gone {minSessions} sessions without a new best.}}",
-		"estimateBest": "the best estimate"
+		"estimateBest": "the best estimate",
+		"heading": "Plateau watch",
+		"fallbackDescription": "Lifts you keep training without a new best set.",
+		"sensitivityLabel": "Sessions without a new best",
+		"notSaved": "Not saved. The list still uses {sessions} sessions.",
+		"saving": "Saving and updating the list…",
+		"saved": "Saved to your account.",
+		"loading": "Loading plateau watch",
+		"errorTitle": "Plateau watch is unavailable",
+		"errorBody": "We could not compare your recent sessions with your bests. Try again.",
+		"retry": "Retry",
+		"best": "Best ",
+		"closestSince": "Closest since ",
+		"estimated1rmShort": "est. 1RM"
 	},
 	"dashboardInsights": {
 		"sets": "{count, plural, one {# set} other {# sets}}",

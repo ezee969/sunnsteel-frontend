@@ -56,6 +56,7 @@ export function MuscleGroupHeatmap({
 	onRetry,
 }: MuscleGroupHeatmapProps) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('progress.muscles')
 	const tMuscles = useTranslations('routines.muscles')
 	const formatSets = (value: number) => NUMBER_FORMATTER(locale).format(value)
 	const formatWeek = (value: string) =>
@@ -73,15 +74,14 @@ export function MuscleGroupHeatmap({
 							id="muscle-distribution"
 							className="type-section text-foreground"
 						>
-							Muscle distribution
+							{t('heading')}
 						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-							Weekly completed-set emphasis across primary and secondary
-							muscles.
+							{t('description')}
 						</p>
 					</div>
 				</div>
-				<div role="group" aria-label="Heatmap range" className="flex gap-1">
+				<div role="group" aria-label={t('rangeLabel')} className="flex gap-1">
 					{MUSCLE_HEATMAP_WEEK_OPTIONS.map(option => (
 						<Button
 							key={option}
@@ -91,25 +91,21 @@ export function MuscleGroupHeatmap({
 							aria-pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
-							{option}W
+							{t('weekOption', { weeks: option })}
 						</Button>
 					))}
 				</div>
 			</div>
 			<div id="progress-muscles-body" className="space-y-4">
 				{isPending ? (
-					<div className="space-y-3" aria-label="Loading muscle distribution">
+					<div className="space-y-3" aria-label={t('loading')}>
 						<Skeleton className="h-20" />
 						<Skeleton className="h-96" />
 					</div>
 				) : isError || !data ? (
 					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">
-							Muscle distribution is unavailable
-						</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							We could not load the weekly training map. Try again.
-						</p>
+						<p className="type-panel text-foreground">{t('errorTitle')}</p>
+						<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -117,15 +113,13 @@ export function MuscleGroupHeatmap({
 							onClick={onRetry}
 						>
 							<RefreshCw aria-hidden />
-							Retry map
+							{t('retry')}
 						</Button>
 					</div>
 				) : data.peakWeightedSets === 0 ? (
 					<div className="border border-dashed border-rule bg-surface p-6 text-center">
-						<p className="type-panel text-foreground">No completed sets yet</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							Finish a workout to start mapping your weekly muscle distribution.
-						</p>
+						<p className="type-panel text-foreground">{t('emptyTitle')}</p>
+						<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
 					</div>
 				) : (
 					<>
@@ -133,13 +127,17 @@ export function MuscleGroupHeatmap({
 							{topMuscles.map((row, index) => (
 								<div key={row.muscle} className="bg-surface p-4">
 									<p className="type-label text-ink-3">
-										{index === 0 ? 'Most trained' : `Rank ${index + 1}`}
+										{index === 0
+											? t('mostTrained')
+											: t('rank', { position: index + 1 })}
 									</p>
 									<p className="type-panel mt-1 text-foreground">
 										{getFriendlyMuscleName(row.muscle, tMuscles)}
 									</p>
 									<p className="type-data mt-1 text-ink-3">
-										{formatSets(row.totalWeightedSets)} weighted sets
+										{t('weightedSets', {
+											sets: formatSets(row.totalWeightedSets),
+										})}
 									</p>
 								</div>
 							))}
@@ -148,7 +146,7 @@ export function MuscleGroupHeatmap({
 						<div className="max-w-full overflow-x-auto border border-rule bg-surface">
 							<table
 								className="w-full min-w-[44rem] border-collapse"
-								aria-label="Weekly muscle-group training distribution"
+								aria-label={t('tableLabel')}
 							>
 								<thead>
 									<tr className="border-b border-rule">
@@ -156,7 +154,7 @@ export function MuscleGroupHeatmap({
 											scope="col"
 											className="type-label sticky left-0 z-10 min-w-32 bg-surface px-3 py-3 text-left text-ink-3"
 										>
-											Muscle
+											{t('muscleColumn')}
 										</th>
 										{data.weeks.map(week => (
 											<th
@@ -169,7 +167,7 @@ export function MuscleGroupHeatmap({
 												</time>
 												{week.isCurrentWeek ? (
 													<span className="mt-1 block text-honour">
-														Current
+														{t('currentWeek')}
 													</span>
 												) : null}
 											</th>
@@ -197,7 +195,14 @@ export function MuscleGroupHeatmap({
 													>
 														<span
 															className="type-data flex min-h-9 items-center justify-center gap-1.5 bg-surface-sunk px-2 text-foreground"
-															title={`${getFriendlyMuscleName(row.muscle, tMuscles)}, week of ${formatWeek(data.weeks[index].weekStart)}: ${formatSets(value)} weighted sets`}
+															title={t('cellTitle', {
+																muscle: getFriendlyMuscleName(
+																	row.muscle,
+																	tMuscles,
+																),
+																week: formatWeek(data.weeks[index].weekStart),
+																sets: formatSets(value),
+															})}
 														>
 															<span
 																className={cn(
@@ -220,7 +225,7 @@ export function MuscleGroupHeatmap({
 											scope="row"
 											className="type-label sticky left-0 z-10 bg-surface px-3 py-3 text-left text-ink-3"
 										>
-											Assigned total
+											{t('assignedTotal')}
 										</th>
 										{data.weeks.map(week => (
 											<td
@@ -236,15 +241,12 @@ export function MuscleGroupHeatmap({
 						</div>
 
 						<div className="type-body-sm flex flex-wrap items-center justify-between gap-3 text-ink-3">
-							<p className="max-w-3xl">
-								Each completed set contributes 1 to primary muscles and 0.5 to
-								secondary muscles. The current week is still in progress.
-							</p>
+							<p className="max-w-3xl">{t('note')}</p>
 							<div
 								className="flex items-center gap-1"
-								aria-label="Heatmap intensity, less to more"
+								aria-label={t('intensityLabel')}
 							>
-								<span className="mr-1">Less</span>
+								<span className="mr-1">{t('less')}</span>
 								{CELL_LEVEL_CLASSES.slice(1).map(className => (
 									<span
 										key={className}
@@ -252,7 +254,7 @@ export function MuscleGroupHeatmap({
 										aria-hidden
 									/>
 								))}
-								<span className="ml-1">More</span>
+								<span className="ml-1">{t('more')}</span>
 							</div>
 						</div>
 					</>

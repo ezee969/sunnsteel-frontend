@@ -6,6 +6,8 @@ import type {
 	WeightUnit,
 } from '@sunsteel/contracts'
 
+import type { MessageKey, Translator } from '@/i18n/translator'
+
 import {
 	displayWeightToKilograms,
 	formatWeightInput,
@@ -21,16 +23,18 @@ export interface MeasurableGoalDraft {
 	exerciseId: string
 }
 
-export const MEASURABLE_GOAL_OPTIONS: ReadonlyArray<{
-	value: MeasurableGoalType
-	label: string
-}> = [
-	{ value: 'WEEKLY_SESSIONS', label: 'Weekly sessions' },
-	{ value: 'WEEKLY_VOLUME', label: 'Weekly load volume' },
-	{ value: 'STREAK_DAYS', label: 'Training streak' },
-	{ value: 'EXERCISE_ESTIMATED_1RM', label: 'Exercise strength' },
-	{ value: 'BODY_WEIGHT', label: 'Body weight' },
-]
+const GOAL_TYPE_KEYS = {
+	WEEKLY_SESSIONS: 'typeWeeklySessions',
+	WEEKLY_VOLUME: 'typeWeeklyVolume',
+	STREAK_DAYS: 'typeStreakDays',
+	EXERCISE_ESTIMATED_1RM: 'typeExerciseEstimated1rm',
+	BODY_WEIGHT: 'typeBodyWeight',
+} as const satisfies Record<MeasurableGoalType, MessageKey<'progress.goals'>>
+
+/** The order the types are offered in; their names come from the language. */
+export const MEASURABLE_GOAL_TYPES = Object.keys(
+	GOAL_TYPE_KEYS,
+) as MeasurableGoalType[]
 
 const WEIGHT_GOAL_TYPES = new Set<MeasurableGoalType>([
 	'WEEKLY_VOLUME',
@@ -55,10 +59,11 @@ export function isWeightGoal(type: MeasurableGoalType): boolean {
 	return WEIGHT_GOAL_TYPES.has(type)
 }
 
-export function getMeasurableGoalLabel(type: MeasurableGoalType): string {
-	return (
-		MEASURABLE_GOAL_OPTIONS.find(option => option.value === type)?.label ?? type
-	)
+export function getMeasurableGoalLabel(
+	type: MeasurableGoalType,
+	t: Translator<'progress.goals'>,
+): string {
+	return t(GOAL_TYPE_KEYS[type])
 }
 
 export function createMeasurableGoalDraft(
@@ -108,6 +113,7 @@ export function convertMeasurableGoalDrafts(
 export function buildMeasurableGoalsRequest(
 	drafts: MeasurableGoalDraft[],
 	weightUnit: WeightUnit,
+	t: Translator<'progress.goals'>,
 ): { goals: MeasurableGoalInput[] } {
 	const keys = new Set<string>()
 	return {
@@ -115,7 +121,7 @@ export function buildMeasurableGoalsRequest(
 			const parsed = Number.parseFloat(draft.target.trim())
 			if (!Number.isFinite(parsed)) {
 				throw new Error(
-					`Enter a target for ${getMeasurableGoalLabel(draft.type)}.`,
+					t('enterTarget', { goal: getMeasurableGoalLabel(draft.type, t) }),
 				)
 			}
 			const targetValue = isWeightGoal(draft.type)
@@ -128,15 +134,15 @@ export function buildMeasurableGoalsRequest(
 				(limits.integer && !Number.isInteger(targetValue))
 			) {
 				throw new Error(
-					`Check the target for ${getMeasurableGoalLabel(draft.type)}.`,
+					t('checkTarget', { goal: getMeasurableGoalLabel(draft.type, t) }),
 				)
 			}
 			if (draft.type === 'EXERCISE_ESTIMATED_1RM' && !draft.exerciseId) {
-				throw new Error('Choose an exercise for every strength goal.')
+				throw new Error(t('chooseExercise'))
 			}
 			const key = `${draft.type}:${draft.exerciseId}`
 			if (keys.has(key)) {
-				throw new Error('Each measurable goal must be unique.')
+				throw new Error(t('mustBeUnique'))
 			}
 			keys.add(key)
 			return {

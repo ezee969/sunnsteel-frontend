@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
@@ -19,6 +20,7 @@ import { localDateKey } from '@/lib/utils/schedule-week'
  * and the footer opens the full schedule.
  */
 export function ConsistencyCalendar() {
+	const t = useTranslations('progress.consistency')
 	const [now] = useState(() => new Date())
 	const [monthStart, setMonthStart] = useState(() => startOfMonth(now))
 	const range = useMemo(() => scheduleMonthRange(monthStart), [monthStart])
@@ -54,7 +56,7 @@ export function ConsistencyCalendar() {
 			isPending={data.isPending}
 			isError={data.isError}
 			headingId="consistency-calendar"
-			heading="Consistency"
+			heading={t('heading')}
 			isCurrentMonth={
 				localDateKey(monthStart) === localDateKey(startOfMonth(now))
 			}
@@ -64,13 +66,12 @@ export function ConsistencyCalendar() {
 			onRetry={data.refetch}
 			footer={
 				<p className="type-body-sm text-ink-3">
-					Planned days follow your routines as they are now; past days without a
-					workout read &ldquo;Not logged&rdquo;.{' '}
+					{t('footer')}{' '}
 					<Link
 						href="/schedule"
 						className="text-primary underline-offset-4 hover:underline"
 					>
-						Open schedule
+						{t('openSchedule')}
 					</Link>
 				</p>
 			}

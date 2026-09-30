@@ -67,7 +67,7 @@ function PlateauSensitivity({
 	return (
 		<div className="space-y-1.5">
 			<p id="plateau-sensitivity" className="type-body-sm text-ink-3">
-				Sessions without a new best
+				{t('sensitivityLabel')}
 			</p>
 			<div
 				role="group"
@@ -93,13 +93,11 @@ function PlateauSensitivity({
 			</div>
 			{saveFailed ? (
 				<p role="alert" className="type-body-sm text-ink-2">
-					Not saved. The list still uses {current} sessions.
+					{t('notSaved', { sessions: current })}
 				</p>
 			) : (
 				<p aria-live="polite" className="type-body-sm text-ink-3">
-					{saving !== undefined
-						? 'Saving and updating the list…'
-						: 'Saved to your account.'}
+					{saving !== undefined ? t('saving') : t('saved')}
 				</p>
 			)}
 		</div>
@@ -135,19 +133,19 @@ function PlateauRow({
 			</div>
 			<dl className="type-body-sm grid gap-1 text-ink-3 lg:text-right">
 				<div>
-					<dt className="inline">Best </dt>
+					<dt className="inline">{t('best')}</dt>
 					<dd className="inline">
 						<span className="type-data text-ink-2">
 							{formatPlateauSet(plateau.best, weightUnit, locale)}
 						</span>{' '}
-						· est. 1RM{' '}
+						· {t('estimated1rmShort')}{' '}
 						<span className="type-data text-ink-2">
 							{formatEstimate(plateau.best, weightUnit, locale)}
 						</span>
 					</dd>
 				</div>
 				<div>
-					<dt className="inline">Closest since </dt>
+					<dt className="inline">{t('closestSince')}</dt>
 					<dd className="inline">
 						<span className="type-data text-ink-2">
 							{formatPlateauSet(plateau.closest, weightUnit, locale)}
@@ -190,12 +188,12 @@ export function PlateauWatch({
 					<Gauge className="mt-0.5 size-4 text-ink-3" aria-hidden />
 					<div>
 						<h2 id="plateau-watch" className="type-section text-foreground">
-							Plateau watch
+							{t('heading')}
 						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
 							{data
 								? describePlateauRule(data.thresholds, t)
-								: 'Lifts you keep training without a new best set.'}
+								: t('fallbackDescription')}
 						</p>
 					</div>
 				</div>
@@ -210,23 +208,14 @@ export function PlateauWatch({
 			</div>
 
 			{isPending ? (
-				<div
-					role="status"
-					aria-label="Loading plateau watch"
-					className="space-y-3"
-				>
+				<div role="status" aria-label={t('loading')} className="space-y-3">
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 				</div>
 			) : isError || !data ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">
-						Plateau watch is unavailable
-					</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not compare your recent sessions with your bests. Try
-						again.
-					</p>
+					<p className="type-panel text-foreground">{t('errorTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -235,7 +224,7 @@ export function PlateauWatch({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : data.plateaus.length === 0 ? (

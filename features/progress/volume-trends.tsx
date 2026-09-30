@@ -16,7 +16,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
-import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
+import { dateFormatter, intlLocale, numberFormatter } from '@/i18n/date-locale'
+import type { MessageKey } from '@/i18n/translator'
 import {
 	getSelectedVolumeTrend,
 	getVolumeBarPercent,
@@ -32,12 +33,14 @@ import {
 	kilogramsToDisplayWeight,
 } from '@/lib/utils/weight-unit'
 
-const SCOPE_OPTIONS: Array<{ value: VolumeTrendScope; label: string }> = [
-	{ value: 'overall', label: 'Total' },
-	{ value: 'muscle', label: 'Muscle' },
-	{ value: 'routine', label: 'Routine' },
-	{ value: 'exercise', label: 'Exercise' },
-]
+const SCOPE_KEYS = {
+	overall: 'scopeOverall',
+	muscle: 'scopeMuscle',
+	routine: 'scopeRoutine',
+	exercise: 'scopeExercise',
+} as const satisfies Record<VolumeTrendScope, MessageKey<'progress.volume'>>
+
+const SCOPE_OPTIONS = Object.keys(SCOPE_KEYS) as VolumeTrendScope[]
 
 const WEEK_FORMATTER = (locale: Locale) =>
 	dateFormatter(locale, {
@@ -73,6 +76,7 @@ export function VolumeTrends({
 	onRetry,
 }: VolumeTrendsProps) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('progress.volume')
 	const tMuscles = useTranslations('routines.muscles')
 	const [scope, setScope] = useState<VolumeTrendScope>('overall')
 	const [selectedId, setSelectedId] = useState<string>()
@@ -103,6 +107,8 @@ export function VolumeTrends({
 			kilogramsToDisplayWeight(valueKg, weightUnit),
 		)} ${unitLabel}`
 	const hasCompletedWork = data?.overall.some(point => point.completedSets > 0)
+	// The scope's own name, lower-cased for the two sentences that name it.
+	const scopeLabel = t(SCOPE_KEYS[scope]).toLocaleLowerCase(intlLocale(locale))
 
 	return (
 		<section aria-labelledby="volume-trends" className="space-y-4">
@@ -111,15 +117,14 @@ export function VolumeTrends({
 					<BarChart3 className="mt-0.5 size-4 text-honour" aria-hidden />
 					<div>
 						<h2 id="volume-trends" className="type-section text-foreground">
-							Load volume
+							{t('heading')}
 						</h2>
 						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-							Compare external-load volume by week, muscle, routine, or
-							exercise.
+							{t('description')}
 						</p>
 					</div>
 				</div>
-				<div role="group" aria-label="Volume range" className="flex gap-1">
+				<div role="group" aria-label={t('rangeLabel')} className="flex gap-1">
 					{VOLUME_TREND_WEEK_OPTIONS.map(option => (
 						<Button
 							key={option}
@@ -129,25 +134,21 @@ export function VolumeTrends({
 							aria-pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
-							{option}W
+							{t('weekOption', { weeks: option })}
 						</Button>
 					))}
 				</div>
 			</div>
 			<div id="progress-volume-body" className="space-y-4">
 				{isPending ? (
-					<div className="space-y-3" aria-label="Loading load volume">
+					<div className="space-y-3" aria-label={t('loading')}>
 						<Skeleton className="h-20" />
 						<Skeleton className="h-72" />
 					</div>
 				) : isError || !data ? (
 					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">
-							Load volume is unavailable
-						</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							We could not load your weekly volume. Try again.
-						</p>
+						<p className="type-panel text-foreground">{t('errorTitle')}</p>
+						<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
 						<Button
 							variant="outline"
 							size="sm"
@@ -155,34 +156,32 @@ export function VolumeTrends({
 							onClick={onRetry}
 						>
 							<RefreshCw aria-hidden />
-							Retry volume
+							{t('retry')}
 						</Button>
 					</div>
 				) : !hasCompletedWork ? (
 					<div className="border border-dashed border-rule bg-surface p-6 text-center">
-						<p className="type-panel text-foreground">No completed work yet</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							Finish a workout to start comparing weekly load volume.
-						</p>
+						<p className="type-panel text-foreground">{t('emptyTitle')}</p>
+						<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
 					</div>
 				) : (
 					<>
 						<div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
 							<div
 								role="group"
-								aria-label="Volume breakdown"
+								aria-label={t('breakdownLabel')}
 								className="flex flex-wrap gap-1"
 							>
 								{SCOPE_OPTIONS.map(option => (
 									<Button
-										key={option.value}
+										key={option}
 										type="button"
 										size="sm"
-										variant={scope === option.value ? 'secondary' : 'ghost'}
-										aria-pressed={scope === option.value}
-										onClick={() => setScope(option.value)}
+										variant={scope === option ? 'secondary' : 'ghost'}
+										aria-pressed={scope === option}
+										onClick={() => setScope(option)}
 									>
-										{option.label}
+										{t(SCOPE_KEYS[option])}
 									</Button>
 								))}
 							</div>
@@ -193,10 +192,7 @@ export function VolumeTrends({
 										htmlFor="volume-series"
 										className="type-label text-ink-3"
 									>
-										{
-											SCOPE_OPTIONS.find(option => option.value === scope)
-												?.label
-										}
+										{t(SCOPE_KEYS[scope])}
 									</label>
 									<Select
 										value={selection?.id ?? ''}
@@ -204,7 +200,11 @@ export function VolumeTrends({
 										disabled={series.length === 0}
 									>
 										<SelectTrigger id="volume-series" className="mt-2 w-full">
-											<SelectValue placeholder={`No ${scope} data`} />
+											<SelectValue
+												placeholder={t('seriesPlaceholder', {
+													scope: scopeLabel,
+												})}
+											/>
 										</SelectTrigger>
 										<SelectContent>
 											{series.map(item => (
@@ -221,7 +221,7 @@ export function VolumeTrends({
 						{scope !== 'overall' && series.length === 0 ? (
 							<div className="border border-dashed border-rule bg-surface p-5 text-center">
 								<p className="type-body-sm text-ink-3">
-									No {scope} volume is available in this range.
+									{t('seriesEmpty', { scope: scopeLabel })}
 								</p>
 							</div>
 						) : null}
@@ -230,36 +230,39 @@ export function VolumeTrends({
 							<>
 								<div className="grid gap-px bg-rule-faint sm:grid-cols-3">
 									<div className="bg-surface p-4">
-										<p className="type-label text-ink-3">Selected range</p>
+										<p className="type-label text-ink-3">
+											{t('selectedRange')}
+										</p>
 										<p className="type-data type-data-strong mt-1 text-foreground">
 											{formatVolume(summary.totalVolumeKg)}
 										</p>
 									</div>
 									<div className="bg-surface p-4">
 										<p className="type-label text-ink-3">
-											{scope === 'muscle'
-												? 'Set equivalents'
-												: 'Completed sets'}
+											{t('setsLabel', { scope })}
 										</p>
 										<p className="type-data type-data-strong mt-1 text-foreground">
 											{SET_FORMATTER(locale).format(summary.completedSets)}
 										</p>
 									</div>
 									<div className="bg-surface p-4">
-										<p className="type-label text-ink-3">Latest full week</p>
+										<p className="type-label text-ink-3">
+											{t('latestFullWeek')}
+										</p>
 										<p className="type-data type-data-strong mt-1 text-foreground">
 											{summary.latestCompleteWeek
 												? formatVolume(summary.latestCompleteWeek.volumeKg)
-												: 'Not available'}
+												: t('notAvailable')}
 										</p>
 										{summary.changePercent !== null ? (
 											<p className="type-label mt-1 text-ink-3">
-												{summary.changePercent >= 0 ? '+' : ''}
-												{Math.round(summary.changePercent)}% vs prior full week
+												{t('changeVsPrior', {
+													change: `${summary.changePercent >= 0 ? '+' : ''}${Math.round(summary.changePercent)}`,
+												})}
 											</p>
 										) : summary.previousCompleteWeek ? (
 											<p className="type-label mt-1 text-ink-3">
-												Prior full week had no load volume
+												{t('priorWeekEmpty')}
 											</p>
 										) : null}
 									</div>
@@ -271,7 +274,7 @@ export function VolumeTrends({
 											{selection.name}
 										</h3>
 										<p className="type-label text-ink-3">
-											Weekly {unitLabel} × reps
+											{t('chartUnit', { unit: unitLabel })}
 										</p>
 									</div>
 									<ol
@@ -279,13 +282,21 @@ export function VolumeTrends({
 										style={{
 											minWidth: `${Math.max(selection.points.length * 72, 320)}px`,
 										}}
-										aria-label={`${selection.name} weekly load volume`}
+										aria-label={t('chartLabel', { name: selection.name })}
 									>
 										{selection.points.map(point => (
 											<li
 												key={point.weekStart}
 												className="grid min-w-0 flex-1 grid-rows-[auto_1fr_auto] gap-2 text-center"
-												aria-label={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER(locale).format(point.completedSets)} ${scope === 'muscle' ? 'set equivalents' : 'completed sets'}${point.isCurrentWeek ? ', current partial week' : ''}`}
+												aria-label={t('pointLabel', {
+													week: formatWeek(point.weekStart),
+													volume: formatVolume(point.volumeKg),
+													sets: SET_FORMATTER(locale).format(
+														point.completedSets,
+													),
+													noun: t('setsNoun', { scope }),
+													partial: point.isCurrentWeek ? 'yes' : 'no',
+												})}
 											>
 												<span className="type-label truncate text-ink-3">
 													{formatCompactVolume(point.volumeKg)}
@@ -296,7 +307,14 @@ export function VolumeTrends({
 														style={{
 															height: `${getVolumeBarPercent(point.volumeKg, selection.points)}%`,
 														}}
-														title={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER(locale).format(point.completedSets)} completed sets${point.isCurrentWeek ? ', current partial week' : ''}`}
+														title={t('pointTitle', {
+															week: formatWeek(point.weekStart),
+															volume: formatVolume(point.volumeKg),
+															sets: SET_FORMATTER(locale).format(
+																point.completedSets,
+															),
+															partial: point.isCurrentWeek ? 'yes' : 'no',
+														})}
 													/>
 												</div>
 												<time
@@ -305,7 +323,9 @@ export function VolumeTrends({
 												>
 													{formatWeek(point.weekStart)}
 													{point.isCurrentWeek ? (
-														<span className="block text-honour">Current</span>
+														<span className="block text-honour">
+															{t('currentWeek')}
+														</span>
 													) : null}
 												</time>
 											</li>
@@ -315,13 +335,7 @@ export function VolumeTrends({
 							</>
 						) : null}
 
-						<p className="type-body-sm text-ink-3">
-							Volume is external load × repetitions, so it is a workload signal,
-							not a strength score. Bodyweight sets remain in the set count but
-							add zero load volume. Muscle volume uses the same 1.0 primary /
-							0.5 secondary weighting as the distribution map; the current week
-							is partial.
-						</p>
+						<p className="type-body-sm text-ink-3">{t('note')}</p>
 					</>
 				)}
 			</div>

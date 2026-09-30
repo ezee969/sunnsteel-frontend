@@ -7,6 +7,7 @@ import {
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { Loader2, Plus, Target, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -37,7 +38,7 @@ import {
 	createMeasurableGoalDraft,
 	getMeasurableGoalLabel,
 	isWeightGoal,
-	MEASURABLE_GOAL_OPTIONS,
+	MEASURABLE_GOAL_TYPES,
 	type MeasurableGoalDraft,
 	measurableGoalsToDrafts,
 } from '@/lib/utils/measurable-goals'
@@ -60,6 +61,7 @@ const NON_EXERCISE_TYPES = new Set<MeasurableGoalType>([
 export function MeasurableGoalsSettingsCard({
 	weightUnit,
 }: MeasurableGoalsSettingsCardProps) {
+	const tGoals = useTranslations('progress.goals')
 	const goalsQuery = useMeasurableGoals()
 	const replaceGoals = useReplaceMeasurableGoals()
 	const exercisesQuery = useExercises()
@@ -93,14 +95,11 @@ export function MeasurableGoalsSettingsCard({
 			),
 		[drafts],
 	)
-	const addOptions = MEASURABLE_GOAL_OPTIONS.filter(
-		option =>
-			option.value === 'EXERCISE_ESTIMATED_1RM' ||
-			!usedNonExerciseTypes.has(option.value),
+	const addOptions = MEASURABLE_GOAL_TYPES.filter(
+		type =>
+			type === 'EXERCISE_ESTIMATED_1RM' || !usedNonExerciseTypes.has(type),
 	)
-	const selectedAddType = addOptions.some(option => option.value === newType)
-		? newType
-		: addOptions[0]?.value
+	const selectedAddType = addOptions.includes(newType) ? newType : addOptions[0]
 	const canAdd = drafts.length < MEASURABLE_GOALS_MAX && !!selectedAddType
 
 	const updateDraft = (
@@ -124,7 +123,7 @@ export function MeasurableGoalsSettingsCard({
 
 	const save = () => {
 		try {
-			const request = buildMeasurableGoalsRequest(drafts, weightUnit)
+			const request = buildMeasurableGoalsRequest(drafts, weightUnit, tGoals)
 			setFormError(null)
 			replaceGoals.mutate(request, {
 				onSuccess: () => {
@@ -172,9 +171,9 @@ export function MeasurableGoalsSettingsCard({
 							<SelectValue placeholder="Goal type" />
 						</SelectTrigger>
 						<SelectContent>
-							{addOptions.map(option => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
+							{addOptions.map(type => (
+								<SelectItem key={type} value={type}>
+									{getMeasurableGoalLabel(type, tGoals)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -266,9 +265,9 @@ export function MeasurableGoalsSettingsCard({
 													<SelectValue />
 												</SelectTrigger>
 												<SelectContent>
-													{MEASURABLE_GOAL_OPTIONS.map(option => (
-														<SelectItem key={option.value} value={option.value}>
-															{option.label}
+													{MEASURABLE_GOAL_TYPES.map(type => (
+														<SelectItem key={type} value={type}>
+															{getMeasurableGoalLabel(type, tGoals)}
 														</SelectItem>
 													))}
 												</SelectContent>
@@ -339,7 +338,7 @@ export function MeasurableGoalsSettingsCard({
 											</div>
 										) : (
 											<div className="type-body-sm flex items-end text-ink-3 xl:pb-2">
-												{getMeasurableGoalLabel(draft.type)} updates
+												{getMeasurableGoalLabel(draft.type, tGoals)} updates
 												automatically.
 											</div>
 										)}
@@ -381,7 +380,7 @@ export function MeasurableGoalsSettingsCard({
 											type="button"
 											variant="ghost"
 											size="icon"
-											aria-label={`Remove ${getMeasurableGoalLabel(draft.type)} goal ${index + 1}`}
+											aria-label={`Remove ${getMeasurableGoalLabel(draft.type, tGoals)} goal ${index + 1}`}
 											onClick={() => {
 												setDrafts(current =>
 													current.filter(goal => goal.key !== draft.key),

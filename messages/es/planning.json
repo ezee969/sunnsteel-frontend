@@ -69,7 +69,20 @@
 		"nothingToCheckDescription": "El control de estancamiento necesita un ejercicio con una mejor serie cargada que hayas entrenado en {span}.",
 		"noPlateausTitle": "Ningún estancamiento por ahora",
 		"noPlateausDescription": "{count, plural, one {Ninguno de los # ejercicio que entrenaste en {span} lleva {minSessions} sesiones sin una nueva mejor marca.} other {Ninguno de los # ejercicios que entrenaste en {span} lleva {minSessions} sesiones sin una nueva mejor marca.}}",
-		"estimateBest": "la mejor estimación"
+		"estimateBest": "la mejor estimación",
+		"heading": "Control de estancamiento",
+		"fallbackDescription": "Ejercicios que sigues entrenando sin una nueva mejor serie.",
+		"sensitivityLabel": "Sesiones sin una nueva mejor marca",
+		"notSaved": "No se guardó. La lista sigue usando {sessions} sesiones.",
+		"saving": "Guardando y actualizando la lista…",
+		"saved": "Guardado en tu cuenta.",
+		"loading": "Cargando el control de estancamiento",
+		"errorTitle": "El control de estancamiento no está disponible",
+		"errorBody": "No pudimos comparar tus sesiones recientes con tus mejores marcas. Inténtalo de nuevo.",
+		"retry": "Reintentar",
+		"best": "Mejor ",
+		"closestSince": "Lo más cerca desde entonces ",
+		"estimated1rmShort": "1RM est."
 	},
 	"dashboardInsights": {
 		"sets": "{count, plural, one {# serie} other {# series}}",

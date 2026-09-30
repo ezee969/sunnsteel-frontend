@@ -1,7 +1,7 @@
 'use client'
 
 import { TrendingUp } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -42,6 +42,7 @@ export function StrengthTrendChart({
 	formatPointDetail,
 }: StrengthTrendChartProps) {
 	const locale = useLocale() as Locale
+	const t = useTranslations('progress.strengthChart')
 	const coordinates = getStrengthChartCoordinates(
 		points,
 		point => Date.parse(point.plottedAt),
@@ -74,7 +75,7 @@ export function StrengthTrendChart({
 						</p>
 						<p className="type-label text-ink-3">
 							{delta === null
-								? 'First record'
+								? t('firstRecord')
 								: `${delta >= 0 ? '+' : ''}${formatValue(delta)}`}
 						</p>
 					</div>
@@ -126,7 +127,7 @@ export function StrengthTrendChart({
 								}
 							>
 								<title>
-									{point.isBaseline ? 'Starting best: ' : ''}
+									{point.isBaseline ? t('startingBest') : ''}
 									{formatDate(locale)(point.achievedAt)} ·{' '}
 									{formatValue(getValue(point))}
 									{formatPointDetail ? ` · ${formatPointDetail(point)}` : ''}
@@ -142,9 +143,7 @@ export function StrengthTrendChart({
 			) : (
 				<div className="mt-6 flex min-h-48 flex-col items-center justify-center border border-dashed border-rule bg-surface-sunk p-6 text-center">
 					<TrendingUp className="size-6 text-ink-3" aria-hidden />
-					<p className="type-body-sm mt-3 text-ink-2">
-						No record changes in this range.
-					</p>
+					<p className="type-body-sm mt-3 text-ink-2">{t('empty')}</p>
 				</div>
 			)}
 		</section>
