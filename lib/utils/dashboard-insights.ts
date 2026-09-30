@@ -7,6 +7,7 @@ import type {
 } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 
 import type { EmptyStateCopy } from './empty-states'
@@ -42,9 +43,8 @@ export interface DashboardInsight {
 
 type T = Translator<'planning.dashboardInsights'>
 
-const SET_FORMATTER = new Intl.NumberFormat('en-US', {
-	maximumFractionDigits: 1,
-})
+const setFormatter = (locale: Locale) =>
+	numberFormatter(locale, { maximumFractionDigits: 1 })
 
 const formatWeekTotals = (
 	point: VolumeTrendPoint,
@@ -100,10 +100,10 @@ function buildWeekComparison(
 	const previous = previousCompleteWeek.completedSets
 	const statement =
 		latest === previous
-			? t('weekHeld', { sets: SET_FORMATTER.format(latest) })
+			? t('weekHeld', { sets: setFormatter(locale).format(latest) })
 			: t('weekChanged', {
-					from: SET_FORMATTER.format(previous),
-					to: SET_FORMATTER.format(latest),
+					from: setFormatter(locale).format(previous),
+					to: setFormatter(locale).format(latest),
 				})
 
 	return {

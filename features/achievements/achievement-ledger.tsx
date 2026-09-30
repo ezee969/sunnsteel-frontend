@@ -4,11 +4,13 @@ import type {
 } from '@sunsteel/contracts'
 import { Check, Medal, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
@@ -23,6 +25,7 @@ interface AchievementLedgerProps {
 }
 
 function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
+	const locale = useLocale() as Locale
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -40,7 +43,7 @@ function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 				<p className="type-body-sm text-ink-3">
 					{achievement.backfilled
 						? 'Recognized from history'
-						: `Earned ${formatAchievementDate(achievement.unlockedAt)}`}
+						: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`}
 				</p>
 				{achievement.sourceSessionId ? (
 					<Link

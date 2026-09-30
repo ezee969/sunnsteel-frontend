@@ -4,9 +4,11 @@ import type {
 } from '@sunsteel/contracts'
 import { RotateCcw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import {
 	formatAchievementDate,
 	formatComebackEvidence,
@@ -18,6 +20,7 @@ interface ComebackRecognitionProps {
 }
 
 function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
+	const locale = useLocale() as Locale
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -33,7 +36,7 @@ function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
-					Recognized {formatAchievementDate(comeback.recognizedAt)}
+					Recognized {formatAchievementDate(comeback.recognizedAt, locale)}
 				</p>
 				<Link
 					href={`/workouts/history/${comeback.sourceSessionId}`}

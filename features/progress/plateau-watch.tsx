@@ -14,6 +14,7 @@ import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import {
 	describeClosestShare,
 	describePlateauCount,
@@ -25,12 +26,14 @@ import {
 	PLATEAU_SESSION_OPTIONS,
 } from '@/lib/utils/plateaus'
 
-const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	year: 'numeric',
-})
-const formatDate = (iso: string) => DATE_FORMATTER.format(new Date(iso))
+const DATE_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+	})
+const formatDate = (locale: Locale) => (iso: string) =>
+	DATE_FORMATTER(locale).format(new Date(iso))
 
 interface PlateauWatchProps {
 	data?: PlateausResponse
@@ -114,7 +117,7 @@ function PlateauRow({
 }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('planning.plateaus')
-	const count = describePlateauCount(plateau, thresholds, formatDate, t)
+	const count = describePlateauCount(plateau, thresholds, formatDate(locale), t)
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
 			<div className="min-w-0">

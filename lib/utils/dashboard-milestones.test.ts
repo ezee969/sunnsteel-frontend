@@ -70,7 +70,7 @@ const response = (
 
 describe('upcoming milestones (DASH-09)', () => {
 	it('places the next rank first, then the categories in catalog order', () => {
-		const milestones = buildUpcomingMilestones(response())
+		const milestones = buildUpcomingMilestones('en', response())
 
 		expect(milestones.map(item => item.key)).toEqual([
 			'RANK',
@@ -81,7 +81,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('states the rank with its current standing and exact requirements', () => {
-		const [next] = buildUpcomingMilestones(response())
+		const [next] = buildUpcomingMilestones('en', response())
 
 		expect(next).toEqual({
 			key: 'RANK',
@@ -94,7 +94,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('carries a crest only on the rank row (ACH-09)', () => {
-		const milestones = buildUpcomingMilestones(response())
+		const milestones = buildUpcomingMilestones('en', response())
 
 		expect(
 			milestones.filter(item => item.rankId).map(item => item.key),
@@ -102,7 +102,7 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('states exact current and target values, never a percentage', () => {
-		const milestones = buildUpcomingMilestones(response())
+		const milestones = buildUpcomingMilestones('en', response())
 		const sessions = milestones.find(item => item.key === 'SESSIONS')
 
 		expect(sessions?.evidence).toBe('18 / 25 sessions')
@@ -114,6 +114,7 @@ describe('upcoming milestones (DASH-09)', () => {
 
 	it('leaves out a category whose fixed catalog is complete', () => {
 		const milestones = buildUpcomingMilestones(
+			'en',
 			response({
 				milestoneProgress: [
 					progress('SESSIONS', 500, null, 0),
@@ -127,6 +128,7 @@ describe('upcoming milestones (DASH-09)', () => {
 
 	it('omits the rank once the ladder is finished', () => {
 		const milestones = buildUpcomingMilestones(
+			'en',
 			response({
 				rank: {
 					...rank,
@@ -141,9 +143,9 @@ describe('upcoming milestones (DASH-09)', () => {
 	})
 
 	it('shows nothing until the analytics projection is ready', () => {
-		expect(buildUpcomingMilestones(undefined)).toEqual([])
+		expect(buildUpcomingMilestones('en', undefined)).toEqual([])
 		expect(
-			buildUpcomingMilestones(response({ analyticsReady: false })),
+			buildUpcomingMilestones('en', response({ analyticsReady: false })),
 		).toEqual([])
 	})
 })

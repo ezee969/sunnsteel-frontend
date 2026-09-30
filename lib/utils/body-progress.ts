@@ -11,7 +11,7 @@ import {
 } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
-import { intlLocale } from '@/i18n/date-locale'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import type { MessageKey, Translator } from '@/i18n/translator'
 
 import {
@@ -57,23 +57,23 @@ export function bodyFieldLabel(
 	return t(FIELD_KEYS[field])
 }
 
-// `undefined` matches `formatWeightAmount`: every number in the app follows
-// the device's format today. Hard-coding 'en-US' here made body values the
-// one exception.
-const oneDecimal = (value: number) =>
-	new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value)
+// Body values read in the app's language, like every other number:
+// `1,5 cm` in Spanish, `1.5 cm` in English.
+const oneDecimal = (value: number, locale: Locale) =>
+	numberFormatter(locale, { maximumFractionDigits: 1 }).format(value)
 
 /** Weight in the account's unit, lengths in cm and body fat in %. */
 export function formatBodyValue(
 	field: BodyMeasurementField,
 	value: number,
 	unit: WeightUnit,
+	locale: Locale,
 ): string {
 	if (field === 'weightKg') {
-		return `${oneDecimal(kilogramsToDisplayWeight(value, unit))} ${getWeightUnitLabel(unit)}`
+		return `${oneDecimal(kilogramsToDisplayWeight(value, unit), locale)} ${getWeightUnitLabel(unit)}`
 	}
-	if (field === 'bodyFatPercent') return `${oneDecimal(value)}%`
-	return `${oneDecimal(value)} cm`
+	if (field === 'bodyFatPercent') return `${oneDecimal(value, locale)}%`
+	return `${oneDecimal(value, locale)} cm`
 }
 
 /** A signed change; a change that rounds to nothing says so. */
@@ -82,16 +82,17 @@ export function formatBodyChange(
 	change: number,
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
+	locale: Locale,
 ): string {
 	const shown =
 		field === 'weightKg' ? kilogramsToDisplayWeight(change, unit) : change
 	if (Math.abs(shown) < 0.05) return t('noChange')
 	const sign = shown > 0 ? '+' : '-'
-	return `${sign}${formatBodyValue(field, Math.abs(change), unit)}`
+	return `${sign}${formatBodyValue(field, Math.abs(change), unit, locale)}`
 }
 
 export function formatBodyDate(date: string, locale: Locale): string {
-	return new Intl.DateTimeFormat(intlLocale(locale), {
+	return dateFormatter(locale, {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
@@ -108,7 +109,7 @@ export function describeBodyChange(
 ): string | null {
 	if (summary.change === null || summary.changeSince === null) return null
 	return t('changeSince', {
-		change: formatBodyChange(summary.field, summary.change, unit, t),
+		change: formatBodyChange(summary.field, summary.change, unit, t, locale),
 		date: formatBodyDate(summary.changeSince, locale),
 	})
 }
@@ -184,11 +185,12 @@ export function describeBodyWeightGoal(
 	latestKg: number | null,
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
+	locale: Locale,
 ): BodyWeightGoalContext | null {
 	const goal = goals?.find(entry => entry.type === 'BODY_WEIGHT')
 	if (!goal) return null
 	const atMost = goal.direction === 'AT_MOST'
-	const value = formatBodyValue('weightKg', goal.targetValue, unit)
+	const value = formatBodyValue('weightKg', goal.targetValue, unit, locale)
 	const target = atMost
 		? t('goalAtMost', { value })
 		: t('goalAtLeast', { value })
@@ -210,7 +212,7 @@ export function describeBodyWeightGoal(
 		gap: reached
 			? t('goalReached')
 			: t('toGo', {
-					value: formatBodyValue('weightKg', remaining, unit),
+					value: formatBodyValue('weightKg', remaining, unit, locale),
 				}),
 		reached,
 	}
@@ -266,6 +268,7 @@ export function bodyEntryRequest(
 	unit: WeightUnit,
 	today: string,
 	t: Translator<'progress.body'>,
+	locale: Locale,
 ): BodyEntryResult {
 	if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(draft.date)) {
 		return { request: null, problem: t('chooseADate'), field: 'date' }
@@ -299,7 +302,7 @@ export function bodyEntryRequest(
 	if (problem) {
 		const message =
 			problem.field === 'weightKg'
-				? `Weight must be between ${formatBodyValue('weightKg', 20, unit)} and ${formatBodyValue('weightKg', 1000, unit)}`
+				? `Weight must be between ${formatBodyValue('weightKg', 20, unit, locale)} and ${formatBodyValue('weightKg', 1000, unit, locale)}`
 				: problem.message
 		return { request: null, problem: message, field: problem.field }
 	}
@@ -311,14 +314,15 @@ export function describeBodyEntry(
 	entry: BodyMeasurement,
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
+	locale: Locale,
 ): string {
 	return BODY_MEASUREMENT_FIELDS.filter(field => entry[field.key] !== null)
 		.map(field =>
 			field.key === 'weightKg'
-				? formatBodyValue(field.key, entry[field.key]!, unit)
+				? formatBodyValue(field.key, entry[field.key]!, unit, locale)
 				: t('entryField', {
 						label: bodyFieldLabel(field.key, t),
-						value: formatBodyValue(field.key, entry[field.key]!, unit),
+						value: formatBodyValue(field.key, entry[field.key]!, unit, locale),
 					}),
 		)
 		.join(' · ')

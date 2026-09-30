@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -23,6 +23,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import { useExercises, useStarredExercises } from '@/lib/api/hooks/useExercises'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { useTrainedExercises } from '@/lib/api/hooks/useWorkoutSession'
@@ -61,8 +63,8 @@ import { useCatalogFilters } from './use-catalog-filters'
 const ROW_GRID =
 	'lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_7.5rem] lg:gap-6'
 
-const formatDate = (value: string) =>
-	new Intl.DateTimeFormat(undefined, {
+const formatDate = (locale: Locale) => (value: string) =>
+	dateFormatter(locale, {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
@@ -166,6 +168,7 @@ function ExerciseRow({
 	lastTrainedAt: string | undefined
 	historyKnown: boolean
 }) {
+	const locale = useLocale() as Locale
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
 	const primary = getFriendlyMuscleNames(
@@ -245,7 +248,7 @@ function ExerciseRow({
 								dateTime={lastTrainedAt}
 								className="type-data whitespace-nowrap text-ink-2"
 							>
-								{formatDate(lastTrainedAt)}
+								{formatDate(locale)(lastTrainedAt)}
 							</time>
 						</span>
 					</>

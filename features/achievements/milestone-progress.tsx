@@ -3,9 +3,11 @@ import type {
 	AchievementsResponse,
 } from '@sunsteel/contracts'
 import { Check, Flag } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatMilestoneProgressDetail,
@@ -23,6 +25,7 @@ function MilestoneProgressRow({
 }: {
 	progress: AchievementCategoryProgress
 }) {
+	const locale = useLocale() as Locale
 	const isComplete = progress.nextMilestone === null
 
 	return (
@@ -46,10 +49,10 @@ function MilestoneProgressRow({
 			</div>
 			<div className="pl-11 sm:max-w-md sm:pl-0 sm:text-right">
 				<p className="type-data text-foreground">
-					{formatMilestoneProgressEvidence(progress)}
+					{formatMilestoneProgressEvidence(progress, locale)}
 				</p>
 				<p className="type-body-sm mt-1 text-ink-3">
-					{formatMilestoneProgressDetail(progress)}
+					{formatMilestoneProgressDetail(progress, locale)}
 				</p>
 			</div>
 		</li>

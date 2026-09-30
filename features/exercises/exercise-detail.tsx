@@ -15,6 +15,7 @@ import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
@@ -50,8 +51,8 @@ import {
 import { CustomExerciseActions } from './custom-exercise-actions'
 import { StarToggle } from './star-toggle'
 
-const formatDate = (value: string) =>
-	new Intl.DateTimeFormat(undefined, {
+const formatDate = (locale: Locale) => (value: string) =>
+	dateFormatter(locale, {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
@@ -297,7 +298,7 @@ function BestPerformance({
 								<span className="type-body-sm mt-1 block text-ink-3">
 									Set on{' '}
 									<time dateTime={current.achievedAt}>
-										{formatDate(current.achievedAt)}
+										{formatDate(locale)(current.achievedAt)}
 									</time>
 								</span>
 							</dd>
@@ -320,7 +321,7 @@ function BestPerformance({
 								describePlateauCount(
 									plateau,
 									plateaus.data.thresholds,
-									formatDate,
+									formatDate(locale),
 									tPlateaus,
 								).headline
 							}{' '}
@@ -329,7 +330,7 @@ function BestPerformance({
 									describePlateauCount(
 										plateau,
 										plateaus.data.thresholds,
-										formatDate,
+										formatDate(locale),
 										tPlateaus,
 									).since
 								}
@@ -356,7 +357,7 @@ function BestPerformance({
 							kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
 						}
 						formatValue={value =>
-							`${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
+							`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
 						}
 						formatPointDetail={point =>
 							`${formatMetric(point.weightKg)} × ${point.reps}`
@@ -429,6 +430,7 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
  * an untrained exercise never requests a history it does not have.
  */
 export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
+	const locale = useLocale() as Locale
 	const tMusclesPage = useTranslations('routines.muscles')
 	const catalog = useExercises()
 	const trained = useTrainedExercises()
@@ -490,7 +492,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 		: trained.isError
 			? 'Unavailable'
 			: summary
-				? formatDate(summary.lastPerformedAt)
+				? formatDate(locale)(summary.lastPerformedAt)
 				: 'Not trained yet'
 
 	return (

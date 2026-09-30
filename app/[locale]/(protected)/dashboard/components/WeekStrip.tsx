@@ -2,13 +2,14 @@
 
 import { CalendarDays, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SCHEDULE_STATUS } from '@/features/schedule/schedule-status'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
 	buildWeekStrip,
@@ -34,6 +35,7 @@ import { DashboardSection } from './DashboardSection'
  * filled action.
  */
 export default function WeekStrip() {
+	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
 	const [now] = useState(() => new Date())
 	const weekStart = useMemo(() => startOfWeek(now), [now])
@@ -64,8 +66,8 @@ export default function WeekStrip() {
 		now,
 	])
 	const days = useMemo(
-		() => (week ? buildWeekStrip(week, tDate) : []),
-		[week, tDate],
+		() => (week ? buildWeekStrip(week, tDate, locale) : []),
+		[week, tDate, locale],
 	)
 	const todayLine = today.isPending
 		? null

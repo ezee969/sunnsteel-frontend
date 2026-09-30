@@ -1,3 +1,6 @@
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
+
 import {
 	addDays,
 	buildScheduleWeek,
@@ -137,31 +140,30 @@ export function buildScheduleMonth({
 	}
 }
 
-const MONTH_FORMAT = new Intl.DateTimeFormat(undefined, {
-	month: 'long',
-	year: 'numeric',
-})
-const CELL_FORMAT = new Intl.DateTimeFormat(undefined, {
-	weekday: 'long',
-	day: 'numeric',
-	month: 'long',
-})
+const MONTH_FORMAT = (locale: Locale) =>
+	dateFormatter(locale, { month: 'long', year: 'numeric' })
+const CELL_FORMAT = (locale: Locale) =>
+	dateFormatter(locale, { weekday: 'long', day: 'numeric', month: 'long' })
 
 const fromKey = (key: string) => {
 	const [year, month, day] = key.split('-').map(Number)
 	return new Date(year, month - 1, day || 1)
 }
 
-export function describeMonth(monthStart: string, now: Date): string {
+export function describeMonth(
+	monthStart: string,
+	now: Date,
+	locale: Locale,
+): string {
 	const current = startOfMonth(now)
 	if (monthStart === localDateKey(current)) return 'This month'
 	if (monthStart === localDateKey(addMonths(current, -1))) return 'Last month'
 	if (monthStart === localDateKey(addMonths(current, 1))) return 'Next month'
-	return MONTH_FORMAT.format(fromKey(monthStart))
+	return MONTH_FORMAT(locale).format(fromKey(monthStart))
 }
 
-export const formatMonth = (monthStart: string) =>
-	MONTH_FORMAT.format(fromKey(monthStart))
+export const formatMonth = (monthStart: string, locale: Locale) =>
+	MONTH_FORMAT(locale).format(fromKey(monthStart))
 
 /** "Trained on 9 of 15 days so far"; null for a month that has not begun. */
 export function describeConsistency(
@@ -188,6 +190,7 @@ const STATE_WORDS: Record<Exclude<ScheduleDayState, 'EMPTY'>, string> = {
 /** A cell's accessible name: "Tuesday 15 September, today: 1 completed, 1 planned". */
 export function describeMonthCell(
 	cell: Pick<ScheduleMonthCell, 'date' | 'isToday' | 'entries'>,
+	locale: Locale,
 ): string {
 	const counts = new Map<string, number>()
 	for (const entry of cell.entries) {
@@ -199,6 +202,6 @@ export function describeMonthCell(
 	)
 		.filter(word => counts.has(word))
 		.map(word => `${counts.get(word)} ${word}`)
-	const date = `${CELL_FORMAT.format(fromKey(cell.date))}${cell.isToday ? ', today' : ''}`
+	const date = `${CELL_FORMAT(locale).format(fromKey(cell.date))}${cell.isToday ? ', today' : ''}`
 	return `${date}: ${parts.length ? parts.join(', ') : 'nothing planned'}`
 }

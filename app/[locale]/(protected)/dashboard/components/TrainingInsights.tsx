@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import { usePlateaus, useVolumeTrend } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	buildDashboardInsights,
@@ -20,22 +21,25 @@ import { trainingInsightsSummary } from '@/lib/utils/dashboard-summaries'
 
 import { DashboardSection } from './DashboardSection'
 
-const WEEK_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	// The rollup's week starts are calendar dates, so they are read in UTC to
-	// stop a negative offset showing the Sunday before the Monday.
-	timeZone: 'UTC',
-})
-const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	year: 'numeric',
-})
+const WEEK_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		month: 'short',
+		day: 'numeric',
+		// The rollup's week starts are calendar dates, so they are read in UTC to
+		// stop a negative offset showing the Sunday before the Monday.
+		timeZone: 'UTC',
+	})
+const DATE_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+	})
 
-const formatWeek = (weekStart: string) =>
-	WEEK_FORMATTER.format(new Date(`${weekStart}T00:00:00.000Z`))
-const formatDate = (iso: string) => DATE_FORMATTER.format(new Date(iso))
+const formatWeek = (locale: Locale) => (weekStart: string) =>
+	WEEK_FORMATTER(locale).format(new Date(`${weekStart}T00:00:00.000Z`))
+const formatDate = (locale: Locale) => (iso: string) =>
+	DATE_FORMATTER(locale).format(new Date(iso))
 
 function InsightRow({ insight }: { insight: DashboardInsight }) {
 	return (
@@ -78,8 +82,8 @@ export default function TrainingInsights() {
 		plateaus: plateaus.data,
 		volume: volume.data,
 		weightUnit,
-		formatWeek,
-		formatDate,
+		formatWeek: formatWeek(locale),
+		formatDate: formatDate(locale),
 		t: tInsights,
 		tPlateaus,
 		locale,

@@ -27,14 +27,16 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import { buildSessionExerciseComparisons } from '@/lib/utils/session-comparison'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
-const SESSION_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	dateStyle: 'medium',
-	timeStyle: 'short',
-})
+const SESSION_DATE_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		dateStyle: 'medium',
+		timeStyle: 'short',
+	})
 
 interface SessionComparisonProps {
 	data?: SessionComparisonResponse
@@ -95,8 +97,11 @@ function formatSignedNumber(value: number, format: (value: number) => string) {
 	return `${value > 0 ? '+' : '−'}${format(Math.abs(value))}`
 }
 
-function formatSet(set: SessionComparisonSet | null, weightUnit: WeightUnit) {
-	const locale = useLocale() as Locale
+function formatSet(
+	set: SessionComparisonSet | null,
+	weightUnit: WeightUnit,
+	locale: Locale,
+) {
 	if (!set) return 'Not completed'
 	const performance =
 		set.weightKg != null && set.weightKg > 0
@@ -210,7 +215,9 @@ export function SessionComparison({
 								<p className="type-body-sm mt-1 text-ink-3">
 									{latest.dayName || 'Workout day'} ·{' '}
 									<time dateTime={latest.endedAt}>
-										{SESSION_DATE_FORMATTER.format(new Date(latest.endedAt))}
+										{SESSION_DATE_FORMATTER(locale).format(
+											new Date(latest.endedAt),
+										)}
 									</time>
 								</p>
 								<Button variant="link" className="mt-2 h-auto p-0" asChild>
@@ -229,7 +236,7 @@ export function SessionComparison({
 										<p className="type-body-sm mt-1 text-ink-3">
 											{previous.dayName || 'Workout day'} ·{' '}
 											<time dateTime={previous.endedAt}>
-												{SESSION_DATE_FORMATTER.format(
+												{SESSION_DATE_FORMATTER(locale).format(
 													new Date(previous.endedAt),
 												)}
 											</time>
@@ -387,7 +394,7 @@ export function SessionComparison({
 																	Latest
 																</p>
 																<p className="type-data text-foreground">
-																	{formatSet(set.latest, weightUnit)}
+																	{formatSet(set.latest, weightUnit, locale)}
 																</p>
 															</div>
 															<div>
@@ -396,7 +403,11 @@ export function SessionComparison({
 																</p>
 																<p className="type-data text-ink-2">
 																	{previous
-																		? formatSet(set.previous, weightUnit)
+																		? formatSet(
+																				set.previous,
+																				weightUnit,
+																				locale,
+																			)
 																		: 'Not available'}
 																</p>
 															</div>

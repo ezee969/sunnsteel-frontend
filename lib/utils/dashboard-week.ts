@@ -1,3 +1,4 @@
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import { weekdayName } from './date'
@@ -52,6 +53,7 @@ export function weekStripHref(day: Pick<ScheduleDay, 'entries'>): string {
 export function buildWeekStrip(
 	week: ScheduleWeek,
 	t: Translator<'routines.date'>,
+	locale: Locale,
 ): WeekStripDay[] {
 	return week.days.map(day => {
 		const href = weekStripHref(day)
@@ -67,7 +69,7 @@ export function buildWeekStrip(
 			isToday: day.isToday,
 			state: scheduleDayState(day),
 			href,
-			label: `${describeMonthCell(day)}. ${destination}`,
+			label: `${describeMonthCell(day, locale)}. ${destination}`,
 		}
 	})
 }

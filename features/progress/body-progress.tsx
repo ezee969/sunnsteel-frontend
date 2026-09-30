@@ -116,6 +116,7 @@ function BodyWeightChart({
 		weight?.latest ?? null,
 		weightUnit,
 		tBody,
+		locale,
 	)
 	const chart = getBodyWeightChart(
 		points,
@@ -137,7 +138,7 @@ function BodyWeightChart({
 					</p>
 					<p className="type-data type-data-strong text-foreground">
 						{weight?.latest != null
-							? formatBodyValue('weightKg', weight.latest, weightUnit)
+							? formatBodyValue('weightKg', weight.latest, weightUnit, locale)
 							: '—'}
 					</p>
 				</div>
@@ -212,6 +213,7 @@ function BodyWeightChart({
 											'weightKg',
 											point.weightKg,
 											weightUnit,
+											locale,
 										),
 									})}
 								</title>
@@ -278,7 +280,7 @@ function MeasurementList({
 					</dt>
 					<dd className="text-right">
 						<span className="type-data text-foreground">
-							{formatBodyValue(entry.field, entry.latest!, weightUnit)}
+							{formatBodyValue(entry.field, entry.latest!, weightUnit, locale)}
 						</span>
 						<span className="type-body-sm block text-ink-3">
 							{describeBodyChange(entry, weightUnit, tBody, locale) ??
@@ -399,6 +401,7 @@ function BodyEntryDialog({
 	editing: boolean
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
 	const tBody = useTranslations('progress.body')
 	const baseId = useId()
 	const [draft, setDraft] = useState(initial)
@@ -415,7 +418,7 @@ function BodyEntryDialog({
 
 	const submit = (event: React.FormEvent) => {
 		event.preventDefault()
-		const result = bodyEntryRequest(draft, weightUnit, today, tBody)
+		const result = bodyEntryRequest(draft, weightUnit, today, tBody, locale)
 		if (result.problem !== null) {
 			setProblem({ message: result.problem, field: result.field })
 			return
@@ -550,7 +553,7 @@ function EntryList({
 								{formatBodyDate(entry.date, locale)}
 							</p>
 							<p className="type-body-sm break-words text-ink-3">
-								{describeBodyEntry(entry, weightUnit, tBody)}
+								{describeBodyEntry(entry, weightUnit, tBody, locale)}
 							</p>
 						</div>
 						<div className="flex shrink-0 gap-1">

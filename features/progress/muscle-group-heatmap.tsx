@@ -2,11 +2,13 @@
 
 import type { MuscleGroupHeatmapResponse } from '@sunsteel/contracts'
 import { Activity, RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import {
@@ -25,14 +27,16 @@ const CELL_LEVEL_CLASSES = [
 	'bg-honour',
 ] as const
 
-const NUMBER_FORMATTER = new Intl.NumberFormat(undefined, {
-	maximumFractionDigits: 1,
-})
-const WEEK_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	timeZone: 'UTC',
-})
+const NUMBER_FORMATTER = (locale: Locale) =>
+	numberFormatter(locale, {
+		maximumFractionDigits: 1,
+	})
+const WEEK_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		month: 'short',
+		day: 'numeric',
+		timeZone: 'UTC',
+	})
 
 interface MuscleGroupHeatmapProps {
 	data?: MuscleGroupHeatmapResponse
@@ -43,10 +47,6 @@ interface MuscleGroupHeatmapProps {
 	onRetry: () => void
 }
 
-const formatSets = (value: number) => NUMBER_FORMATTER.format(value)
-const formatWeek = (value: string) =>
-	WEEK_FORMATTER.format(new Date(`${value}T00:00:00.000Z`))
-
 export function MuscleGroupHeatmap({
 	data,
 	weeks,
@@ -55,7 +55,11 @@ export function MuscleGroupHeatmap({
 	onWeeksChange,
 	onRetry,
 }: MuscleGroupHeatmapProps) {
+	const locale = useLocale() as Locale
 	const tMuscles = useTranslations('routines.muscles')
+	const formatSets = (value: number) => NUMBER_FORMATTER(locale).format(value)
+	const formatWeek = (value: string) =>
+		WEEK_FORMATTER(locale).format(new Date(`${value}T00:00:00.000Z`))
 	const rows = useMemo(() => (data ? buildMuscleHeatmapRows(data) : []), [data])
 	const topMuscles = useMemo(() => getTopMuscleHeatmapRows(rows), [rows])
 

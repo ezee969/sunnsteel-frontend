@@ -200,10 +200,10 @@ describe('schedule week', () => {
 	})
 
 	it('names the week relative to today', () => {
-		expect(describeWeek('2026-09-14', NOW)).toBe('This week')
-		expect(describeWeek('2026-09-07', NOW)).toBe('Last week')
-		expect(describeWeek('2026-09-21', NOW)).toBe('Next week')
-		expect(describeWeek('2026-08-31', NOW)).toMatch(/^Week of /)
+		expect(describeWeek('2026-09-14', NOW, 'en')).toBe('This week')
+		expect(describeWeek('2026-09-07', NOW, 'en')).toBe('Last week')
+		expect(describeWeek('2026-09-21', NOW, 'en')).toBe('Next week')
+		expect(describeWeek('2026-08-31', NOW, 'en')).toMatch(/^Week of /)
 		expect(
 			describeScheduleTotals({
 				completed: 0,

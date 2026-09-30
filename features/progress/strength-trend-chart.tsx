@@ -1,7 +1,10 @@
 'use client'
 
 import { TrendingUp } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import type { StrengthDisplayPoint } from '@/lib/utils/strength-trend'
 import {
 	getStrengthChartCoordinates,
@@ -22,13 +25,12 @@ interface StrengthTrendChartProps {
 	formatPointDetail?: (point: StrengthDisplayPoint) => string
 }
 
-function formatDate(value: string) {
-	return new Intl.DateTimeFormat(undefined, {
+const formatDate = (locale: Locale) => (value: string) =>
+	dateFormatter(locale, {
 		month: 'short',
 		day: 'numeric',
 		year: 'numeric',
 	}).format(new Date(value))
-}
 
 export function StrengthTrendChart({
 	id,
@@ -39,6 +41,7 @@ export function StrengthTrendChart({
 	formatValue,
 	formatPointDetail,
 }: StrengthTrendChartProps) {
+	const locale = useLocale() as Locale
 	const coordinates = getStrengthChartCoordinates(
 		points,
 		point => Date.parse(point.plottedAt),
@@ -124,7 +127,7 @@ export function StrengthTrendChart({
 							>
 								<title>
 									{point.isBaseline ? 'Starting best: ' : ''}
-									{formatDate(point.achievedAt)} ·{' '}
+									{formatDate(locale)(point.achievedAt)} ·{' '}
 									{formatValue(getValue(point))}
 									{formatPointDetail ? ` · ${formatPointDetail(point)}` : ''}
 								</title>
@@ -132,8 +135,8 @@ export function StrengthTrendChart({
 						))}
 					</svg>
 					<div className="type-label mt-2 flex justify-between text-ink-3">
-						<span>{firstDate ? formatDate(firstDate) : ''}</span>
-						<span>{lastDate ? formatDate(lastDate) : ''}</span>
+						<span>{firstDate ? formatDate(locale)(firstDate) : ''}</span>
+						<span>{lastDate ? formatDate(locale)(lastDate) : ''}</span>
 					</div>
 				</div>
 			) : (

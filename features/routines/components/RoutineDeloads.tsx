@@ -162,7 +162,16 @@ function DeloadDialog({
 						locale,
 					)
 				: null,
-		[original, lighter, weightUnit, tVersions, tDate, tSchedule, tFormat],
+		[
+			original,
+			lighter,
+			weightUnit,
+			tVersions,
+			tDate,
+			tSchedule,
+			tFormat,
+			locale,
+		],
 	)
 	const valid = !!startDate && !problem && !!lighter
 
@@ -355,7 +364,7 @@ function ReviewDeloadDialog({
 				tFormat,
 				locale,
 			),
-		[deload, weightUnit, tVersions, tDate, tSchedule, tFormat],
+		[deload, weightUnit, tVersions, tDate, tSchedule, tFormat, locale],
 	)
 	return (
 		<Dialog open onOpenChange={open => !open && onClose()}>

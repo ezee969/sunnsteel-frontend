@@ -11,11 +11,12 @@ import {
 	Undo2,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
 	describeScheduleDay,
@@ -195,12 +196,13 @@ function EntryRow({
 	pendingKey,
 	...actionProps
 }: { entry: ScheduleEntry } & Omit<ActionProps, 'target'> & MoveProps) {
+	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
 	const status = entryStatus(entry)
 	const { Icon, tone } = status
 	const label =
 		entry.kind === 'MOVED'
-			? `Moved to ${describeShortDate(entry.toDate, tDate)}`
+			? `Moved to ${describeShortDate(entry.toDate, tDate, locale)}`
 			: status.label
 	const movedFrom =
 		(entry.kind === 'PLANNED' || entry.kind === 'NOT_LOGGED') && entry.movedFrom
@@ -231,7 +233,7 @@ function EntryRow({
 				) : null}
 				{movedFrom ? (
 					<span className="type-body-sm ml-2 text-ink-3">
-						· moved from {describeShortDate(movedFrom, tDate)}
+						· moved from {describeShortDate(movedFrom, tDate, locale)}
 					</span>
 				) : null}
 			</span>
@@ -269,13 +271,14 @@ export function ScheduleWeekView({
 	onToday,
 	onRetry,
 }: ScheduleWeekViewProps) {
+	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
 	return (
 		<section aria-labelledby="schedule-week" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div>
 					<h2 id="schedule-week" className="type-section text-foreground">
-						{week ? describeWeek(week.weekStart, now) : 'This week'}
+						{week ? describeWeek(week.weekStart, now, locale) : 'This week'}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
 						{week ? describeScheduleTotals(week.totals) : ' '}
@@ -401,7 +404,7 @@ export function ScheduleWeekView({
 
 					<ol className="border-t border-rule">
 						{week.days.map(day => {
-							const { weekday, date } = describeScheduleDay(day, tDate)
+							const { weekday, date } = describeScheduleDay(day, tDate, locale)
 							return (
 								<li
 									key={day.date}

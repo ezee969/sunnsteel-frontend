@@ -2,6 +2,7 @@
 
 import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,8 @@ import { ProgressTab } from '@/features/progress/progress-tab'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
 import { StrengthTrendChart } from '@/features/progress/strength-trend-chart'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
@@ -57,6 +60,7 @@ function ProgressLoading() {
  * all lifts.
  */
 export default function ProgressStrengthPage() {
+	const locale = useLocale() as Locale
 	const {
 		range,
 		setRange,
@@ -94,7 +98,7 @@ export default function ProgressStrengthPage() {
 	const formatMetric = (value: number) =>
 		`${formatWeightInput(value, weightUnit)} ${unitLabel}`
 	const formatDate = (value: string) =>
-		new Intl.DateTimeFormat(undefined, {
+		dateFormatter(locale, {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric',
@@ -263,7 +267,7 @@ export default function ProgressStrengthPage() {
 											kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
 										}
 										formatValue={value =>
-											`${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
+											`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
 										}
 										formatPointDetail={point =>
 											`${formatMetric(point.weightKg)} × ${point.reps}`
@@ -278,7 +282,7 @@ export default function ProgressStrengthPage() {
 											kilogramsToDisplayWeight(point.weightKg, weightUnit)
 										}
 										formatValue={value =>
-											`${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
+											`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
 										}
 										formatPointDetail={point => `${point.reps} reps`}
 									/>

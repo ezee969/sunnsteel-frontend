@@ -176,7 +176,7 @@ function CompareVersionDialog({
 				tFormat,
 				locale,
 			),
-		[routine, version.setup, weightUnit, t, tDate, tSchedule, tFormat],
+		[routine, version.setup, weightUnit, t, tDate, tSchedule, tFormat, locale],
 	)
 	const blocked = restoreBlockedReason({
 		comparison,

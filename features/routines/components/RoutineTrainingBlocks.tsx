@@ -276,7 +276,16 @@ function ReviewTrainingBlockDialog({
 				tFormat,
 				locale,
 			),
-		[routine, selected.setup, weightUnit, tVersions, tDate, tSchedule, tFormat],
+		[
+			routine,
+			selected.setup,
+			weightUnit,
+			tVersions,
+			tDate,
+			tSchedule,
+			tFormat,
+			locale,
+		],
 	)
 
 	return (

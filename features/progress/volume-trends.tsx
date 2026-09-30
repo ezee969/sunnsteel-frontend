@@ -16,6 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import {
 	getSelectedVolumeTrend,
 	getVolumeBarPercent,
@@ -38,18 +39,21 @@ const SCOPE_OPTIONS: Array<{ value: VolumeTrendScope; label: string }> = [
 	{ value: 'exercise', label: 'Exercise' },
 ]
 
-const WEEK_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	month: 'short',
-	day: 'numeric',
-	timeZone: 'UTC',
-})
-const SET_FORMATTER = new Intl.NumberFormat(undefined, {
-	maximumFractionDigits: 1,
-})
-const COMPACT_FORMATTER = new Intl.NumberFormat(undefined, {
-	notation: 'compact',
-	maximumFractionDigits: 1,
-})
+const WEEK_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		month: 'short',
+		day: 'numeric',
+		timeZone: 'UTC',
+	})
+const SET_FORMATTER = (locale: Locale) =>
+	numberFormatter(locale, {
+		maximumFractionDigits: 1,
+	})
+const COMPACT_FORMATTER = (locale: Locale) =>
+	numberFormatter(locale, {
+		notation: 'compact',
+		maximumFractionDigits: 1,
+	})
 
 interface VolumeTrendsProps {
 	data?: VolumeTrendResponse
@@ -59,9 +63,6 @@ interface VolumeTrendsProps {
 	onWeeksChange: (weeks: VolumeTrendWeeks) => void
 	onRetry: () => void
 }
-
-const formatWeek = (value: string) =>
-	WEEK_FORMATTER.format(new Date(`${value}T00:00:00.000Z`))
 
 export function VolumeTrends({
 	data,
@@ -93,10 +94,12 @@ export function VolumeTrends({
 		() => (selection ? getVolumeTrendSummary(selection.points) : null),
 		[selection],
 	)
+	const formatWeek = (value: string) =>
+		WEEK_FORMATTER(locale).format(new Date(`${value}T00:00:00.000Z`))
 	const formatVolume = (valueKg: number) =>
 		`${formatWeightAmount(valueKg, weightUnit, locale)} ${unitLabel}`
 	const formatCompactVolume = (valueKg: number) =>
-		`${COMPACT_FORMATTER.format(
+		`${COMPACT_FORMATTER(locale).format(
 			kilogramsToDisplayWeight(valueKg, weightUnit),
 		)} ${unitLabel}`
 	const hasCompletedWork = data?.overall.some(point => point.completedSets > 0)
@@ -239,7 +242,7 @@ export function VolumeTrends({
 												: 'Completed sets'}
 										</p>
 										<p className="type-data type-data-strong mt-1 text-foreground">
-											{SET_FORMATTER.format(summary.completedSets)}
+											{SET_FORMATTER(locale).format(summary.completedSets)}
 										</p>
 									</div>
 									<div className="bg-surface p-4">
@@ -282,7 +285,7 @@ export function VolumeTrends({
 											<li
 												key={point.weekStart}
 												className="grid min-w-0 flex-1 grid-rows-[auto_1fr_auto] gap-2 text-center"
-												aria-label={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER.format(point.completedSets)} ${scope === 'muscle' ? 'set equivalents' : 'completed sets'}${point.isCurrentWeek ? ', current partial week' : ''}`}
+												aria-label={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER(locale).format(point.completedSets)} ${scope === 'muscle' ? 'set equivalents' : 'completed sets'}${point.isCurrentWeek ? ', current partial week' : ''}`}
 											>
 												<span className="type-label truncate text-ink-3">
 													{formatCompactVolume(point.volumeKg)}
@@ -293,7 +296,7 @@ export function VolumeTrends({
 														style={{
 															height: `${getVolumeBarPercent(point.volumeKg, selection.points)}%`,
 														}}
-														title={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER.format(point.completedSets)} completed sets${point.isCurrentWeek ? ', current partial week' : ''}`}
+														title={`${formatWeek(point.weekStart)}: ${formatVolume(point.volumeKg)}, ${SET_FORMATTER(locale).format(point.completedSets)} completed sets${point.isCurrentWeek ? ', current partial week' : ''}`}
 													/>
 												</div>
 												<time

@@ -8,6 +8,8 @@ import {
 	type WorkoutSessionSummary,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 
 import { weekdayName } from './date'
@@ -690,22 +692,21 @@ export function describeScheduleTotals(totals: ScheduleWeek['totals']): string {
 	return parts.length ? parts.join(' · ') : 'Nothing planned or logged'
 }
 
-const WEEK_FORMAT = new Intl.DateTimeFormat(undefined, {
-	day: 'numeric',
-	month: 'short',
-	year: 'numeric',
-})
-const DAY_FORMAT = new Intl.DateTimeFormat(undefined, {
-	day: 'numeric',
-	month: 'short',
-})
+const WEEK_FORMAT = (locale: Locale) =>
+	dateFormatter(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+const DAY_FORMAT = (locale: Locale) =>
+	dateFormatter(locale, { day: 'numeric', month: 'short' })
 
 const fromKey = (key: string) => {
 	const [year, month, day] = key.split('-').map(Number)
 	return new Date(year, month - 1, day)
 }
 
-export function describeWeek(weekStart: string, now: Date): string {
+export function describeWeek(
+	weekStart: string,
+	now: Date,
+	locale: Locale,
+): string {
 	const current = localDateKey(startOfWeek(now))
 	if (weekStart === current) return 'This week'
 	if (weekStart === localDateKey(addDays(fromKey(current), -7))) {
@@ -714,15 +715,16 @@ export function describeWeek(weekStart: string, now: Date): string {
 	if (weekStart === localDateKey(addDays(fromKey(current), 7))) {
 		return 'Next week'
 	}
-	return `Week of ${WEEK_FORMAT.format(fromKey(weekStart))}`
+	return `Week of ${WEEK_FORMAT(locale).format(fromKey(weekStart))}`
 }
 
 /** "Thu 17 Sep" */
 export const describeShortDate = (
 	key: string,
 	t: Translator<'routines.date'>,
+	locale: Locale,
 ) =>
-	`${weekdayName(fromKey(key).getDay(), 'short', t)} ${DAY_FORMAT.format(fromKey(key))}`
+	`${weekdayName(fromKey(key).getDay(), 'short', t)} ${DAY_FORMAT(locale).format(fromKey(key))}`
 
 export type ScheduleMoveAction =
 	| {
@@ -854,7 +856,8 @@ export const postponeTarget = (
 export const describeScheduleDay = (
 	day: ScheduleDay,
 	t: Translator<'routines.date'>,
+	locale: Locale,
 ) => ({
 	weekday: weekdayName(day.dayOfWeek, 'long', t),
-	date: DAY_FORMAT.format(fromKey(day.date)),
+	date: DAY_FORMAT(locale).format(fromKey(day.date)),
 })

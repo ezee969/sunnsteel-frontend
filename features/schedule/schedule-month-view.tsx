@@ -1,10 +1,12 @@
 'use client'
 
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
 	describeConsistency,
@@ -86,7 +88,10 @@ export function ScheduleMonthView({
 	onSelectDay,
 	footer,
 }: ScheduleMonthViewProps) {
-	const monthLabel = month ? describeMonth(month.monthStart, now) : 'This month'
+	const locale = useLocale() as Locale
+	const monthLabel = month
+		? describeMonth(month.monthStart, now, locale)
+		: 'This month'
 	const consistency = month ? describeConsistency(month) : null
 	return (
 		<section aria-labelledby={headingId} className="space-y-4">
@@ -98,7 +103,7 @@ export function ScheduleMonthView({
 					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
 						{month
 							? [
-									heading ? formatMonth(month.monthStart) : null,
+									heading ? formatMonth(month.monthStart, locale) : null,
 									describeScheduleTotals(month.totals),
 								]
 									.filter(Boolean)
@@ -182,7 +187,9 @@ export function ScheduleMonthView({
 				</div>
 			) : (
 				<table className="w-full table-fixed border-collapse">
-					<caption className="sr-only">{formatMonth(month.monthStart)}</caption>
+					<caption className="sr-only">
+						{formatMonth(month.monthStart, locale)}
+					</caption>
 					<thead>
 						<tr>
 							{WEEKDAYS.map(day => (
@@ -209,7 +216,7 @@ export function ScheduleMonthView({
 											<button
 												type="button"
 												className="block w-full transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-												aria-label={describeMonthCell(cell)}
+												aria-label={describeMonthCell(cell, locale)}
 												onClick={() => onSelectDay(cell.date)}
 											>
 												<CellContent cell={cell} />
@@ -219,7 +226,7 @@ export function ScheduleMonthView({
 												<CellContent cell={cell} />
 												{cell.inMonth ? (
 													<span className="sr-only">
-														{describeMonthCell(cell)}
+														{describeMonthCell(cell, locale)}
 													</span>
 												) : null}
 											</>

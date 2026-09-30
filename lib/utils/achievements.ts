@@ -7,6 +7,9 @@ import type {
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
+
 export const ACHIEVEMENT_CATEGORY_ORDER: readonly AchievementCategory[] = [
 	'SESSIONS',
 	'SETS',
@@ -53,8 +56,10 @@ export function orderMilestoneProgress(
 	})
 }
 
-const formatProgressNumber = (value: number) =>
-	value.toLocaleString('en-US', { maximumFractionDigits: 2 })
+// The app's language, not the device's and not a hard-coded 'en-US':
+// `49.250,5` in Spanish, `49,250.5` in English.
+const formatProgressNumber = (value: number, locale: Locale) =>
+	numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)
 
 const progressUnit = (category: AchievementCategory, value: number): string => {
 	switch (category) {
@@ -73,13 +78,14 @@ const progressUnit = (category: AchievementCategory, value: number): string => {
 
 export function formatMilestoneProgressEvidence(
 	progress: AchievementCategoryProgress,
+	locale: Locale,
 ): string {
-	const current = formatProgressNumber(progress.currentValue)
+	const current = formatProgressNumber(progress.currentValue, locale)
 	if (!progress.nextMilestone) {
 		return `${current} ${progressUnit(progress.category, progress.currentValue)} total`
 	}
 
-	const target = formatProgressNumber(progress.nextMilestone.threshold)
+	const target = formatProgressNumber(progress.nextMilestone.threshold, locale)
 	if (progress.category === 'STREAK_DAYS') {
 		return `Best ${current} / next ${target} training days`
 	}
@@ -88,12 +94,13 @@ export function formatMilestoneProgressEvidence(
 
 export function formatMilestoneProgressDetail(
 	progress: AchievementCategoryProgress,
+	locale: Locale,
 ): string {
 	if (!progress.nextMilestone) {
 		return 'The five fixed milestones in this category are complete.'
 	}
 
-	const remaining = formatProgressNumber(progress.remaining)
+	const remaining = formatProgressNumber(progress.remaining, locale)
 	switch (progress.category) {
 		case 'SESSIONS':
 			return `${remaining} more ${progress.remaining === 1 ? 'session' : 'sessions'}, within your own schedule.`
@@ -108,8 +115,8 @@ export function formatMilestoneProgressDetail(
 	}
 }
 
-export function formatAchievementDate(value: string): string {
-	return new Intl.DateTimeFormat(undefined, {
+export function formatAchievementDate(value: string, locale: Locale): string {
+	return dateFormatter(locale, {
 		day: 'numeric',
 		month: 'short',
 		year: 'numeric',
@@ -125,23 +132,32 @@ export function formatComebackEvidence(
 	return `${comeback.inactiveDays} full days away · ${comeback.activeDays} active days in ${comeback.windowDays} days`
 }
 
-const countLabel = (value: number, singular: string, plural: string) =>
-	`${value.toLocaleString()} ${value === 1 ? singular : plural}`
+const countLabel = (
+	value: number,
+	locale: Locale,
+	singular: string,
+	plural: string,
+) =>
+	`${numberFormatter(locale, {}).format(value)} ${value === 1 ? singular : plural}`
 
-export function formatRankEvidence(rank: RenaissanceRankProgress): string {
-	return `${countLabel(rank.completedSessions, 'session', 'sessions')} · ${countLabel(rank.activeWeeks, 'active week', 'active weeks')}`
+export function formatRankEvidence(
+	rank: RenaissanceRankProgress,
+	locale: Locale,
+): string {
+	return `${countLabel(rank.completedSessions, locale, 'session', 'sessions')} · ${countLabel(rank.activeWeeks, locale, 'active week', 'active weeks')}`
 }
 
 export function formatNextRankRequirements(
 	rank: RenaissanceRankProgress,
+	locale: Locale,
 ): string | null {
 	if (!rank.nextRank) return null
 
 	const sessions = rank.sessionsRemaining
-		? `${countLabel(rank.sessionsRemaining, 'more session', 'more sessions')}`
+		? `${countLabel(rank.sessionsRemaining, locale, 'more session', 'more sessions')}`
 		: 'Session requirement met'
 	const weeks = rank.activeWeeksRemaining
-		? `${countLabel(rank.activeWeeksRemaining, 'more active week', 'more active weeks')}`
+		? `${countLabel(rank.activeWeeksRemaining, locale, 'more active week', 'more active weeks')}`
 		: 'Active-week requirement met'
 	return `${sessions} · ${weeks}`
 }

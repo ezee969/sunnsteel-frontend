@@ -89,7 +89,9 @@ describe('achievement presentation', () => {
 	})
 
 	it('formats an earned date without exposing a time', () => {
-		expect(formatAchievementDate('2026-09-14T10:00:00.000Z')).not.toContain(':')
+		expect(
+			formatAchievementDate('2026-09-14T10:00:00.000Z', 'en'),
+		).not.toContain(':')
 	})
 
 	it('states comeback evidence without rewarding same-day volume', () => {
@@ -149,8 +151,10 @@ describe('achievement presentation', () => {
 			remaining: 15,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(progress)).toBe('10 / 25 sessions')
-		expect(formatMilestoneProgressDetail(progress)).toBe(
+		expect(formatMilestoneProgressEvidence(progress, 'en')).toBe(
+			'10 / 25 sessions',
+		)
+		expect(formatMilestoneProgressDetail(progress, 'en')).toBe(
 			'15 more sessions, within your own schedule.',
 		)
 	})
@@ -181,14 +185,16 @@ describe('achievement presentation', () => {
 			remaining: 2,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(volume)).toBe('49,250.5 / 50,000 kg')
-		expect(formatMilestoneProgressDetail(volume)).toContain(
+		expect(formatMilestoneProgressEvidence(volume, 'en')).toBe(
+			'49,250.5 / 50,000 kg',
+		)
+		expect(formatMilestoneProgressDetail(volume, 'en')).toContain(
 			'load should follow your plan',
 		)
-		expect(formatMilestoneProgressEvidence(streak)).toBe(
+		expect(formatMilestoneProgressEvidence(streak, 'en')).toBe(
 			'Best 3 / next 5 training days',
 		)
-		expect(formatMilestoneProgressDetail(streak)).toContain(
+		expect(formatMilestoneProgressDetail(streak, 'en')).toContain(
 			'recovery days between sessions are compatible',
 		)
 	})
@@ -201,8 +207,10 @@ describe('achievement presentation', () => {
 			remaining: 0,
 		} satisfies AchievementCategoryProgress
 
-		expect(formatMilestoneProgressEvidence(progress)).toBe('56 exercises total')
-		expect(formatMilestoneProgressDetail(progress)).toBe(
+		expect(formatMilestoneProgressEvidence(progress, 'en')).toBe(
+			'56 exercises total',
+		)
+		expect(formatMilestoneProgressDetail(progress, 'en')).toBe(
 			'The five fixed milestones in this category are complete.',
 		)
 	})
@@ -229,8 +237,8 @@ describe('achievement presentation', () => {
 			activeWeeksRemaining: 1,
 		} satisfies RenaissanceRankProgress
 
-		expect(formatRankEvidence(rank)).toBe('10 sessions · 7 active weeks')
-		expect(formatNextRankRequirements(rank)).toBe(
+		expect(formatRankEvidence(rank, 'en')).toBe('10 sessions · 7 active weeks')
+		expect(formatNextRankRequirements(rank, 'en')).toBe(
 			'5 more sessions · 1 more active week',
 		)
 	})
@@ -251,6 +259,6 @@ describe('achievement presentation', () => {
 			activeWeeksRemaining: 0,
 		} satisfies RenaissanceRankProgress
 
-		expect(formatNextRankRequirements(rank)).toBeNull()
+		expect(formatNextRankRequirements(rank, 'en')).toBeNull()
 	})
 })

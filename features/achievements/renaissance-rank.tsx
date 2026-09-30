@@ -1,8 +1,10 @@
 import type { RenaissanceRankProgress } from '@sunsteel/contracts'
+import { useLocale } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RankCrest } from '@/features/achievements/rank-crest'
+import type { Locale } from '@/i18n/config'
 import {
 	formatNextRankRequirements,
 	formatRankEvidence,
@@ -14,6 +16,7 @@ interface RenaissanceRankProps {
 }
 
 export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
+	const locale = useLocale() as Locale
 	if (isPending) {
 		return (
 			<section aria-label="Loading Renaissance rank" className="space-y-4">
@@ -25,7 +28,7 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 
 	if (!rank) return null
 
-	const nextRequirements = formatNextRankRequirements(rank)
+	const nextRequirements = formatNextRankRequirements(rank, locale)
 
 	return (
 		<section aria-labelledby="renaissance-rank" className="space-y-4">
@@ -55,7 +58,7 @@ export function RenaissanceRank({ rank, isPending }: RenaissanceRankProps) {
 						{rank.currentRank.description}
 					</p>
 					<p className="type-data mt-3 text-foreground">
-						{formatRankEvidence(rank)}
+						{formatRankEvidence(rank, locale)}
 					</p>
 				</div>
 

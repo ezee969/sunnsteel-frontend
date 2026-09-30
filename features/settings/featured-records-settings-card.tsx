@@ -82,15 +82,18 @@ function routineSummary(routine: Routine) {
 	} · ${routine.scheduleMode === 'ROTATION' ? 'Rotation' : 'Weekly'}`
 }
 
-function recordSummary(record: PersonalRecordEntry, weightUnit: WeightUnit) {
-	const locale = useLocale() as Locale
+function recordSummary(
+	record: PersonalRecordEntry,
+	weightUnit: WeightUnit,
+	locale: Locale,
+) {
 	return `${formatWeight(record.weight, weightUnit, locale)} × ${record.reps} · est. 1RM ${formatWeight(record.estimated1rm, weightUnit, locale)}`
 }
 
-function achievementSummary(achievement: EarnedAchievement) {
+function achievementSummary(achievement: EarnedAchievement, locale: Locale) {
 	return achievement.backfilled
 		? 'Recognized from history'
-		: `Earned ${formatAchievementDate(achievement.unlockedAt)}`
+		: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`
 }
 
 function selectedItemPresentation(
@@ -100,6 +103,7 @@ function selectedItemPresentation(
 	ranksById: Map<string, RenaissanceRankDefinition>,
 	routinesById: Map<string, Routine>,
 	weightUnit: WeightUnit,
+	locale: Locale,
 ) {
 	if (item.kind === 'RECORD') {
 		const record = recordsById.get(item.referenceId)
@@ -107,7 +111,7 @@ function selectedItemPresentation(
 			kindLabel: 'Personal record',
 			title: record?.exerciseName ?? 'Record no longer available',
 			detail: record
-				? recordSummary(record, weightUnit)
+				? recordSummary(record, weightUnit, locale)
 				: 'Remove this stale reference before saving.',
 		}
 	}
@@ -117,7 +121,7 @@ function selectedItemPresentation(
 			kindLabel: 'Achievement',
 			title: achievement?.title ?? 'Achievement no longer available',
 			detail: achievement
-				? achievementSummary(achievement)
+				? achievementSummary(achievement, locale)
 				: 'Remove this stale reference before saving.',
 		}
 	}
@@ -148,6 +152,7 @@ export function FeaturedRecordsSettingsCard({
 	weightUnit,
 	accountRoutinesRule,
 }: FeaturedRecordsSettingsCardProps) {
+	const locale = useLocale() as Locale
 	const selectionsQuery = useFeaturedProfileItems()
 	const profileQuery = usePublicUser(username)
 	const achievementsQuery = useAchievements()
@@ -318,6 +323,7 @@ export function FeaturedRecordsSettingsCard({
 											ranksById,
 											routinesById,
 											weightUnit,
+											locale,
 										)
 										return (
 											<div
@@ -427,7 +433,7 @@ export function FeaturedRecordsSettingsCard({
 													{record.exerciseName}
 												</p>
 												<p className="type-body-sm text-ink-3">
-													{recordSummary(record, weightUnit)}
+													{recordSummary(record, weightUnit, locale)}
 												</p>
 											</div>
 											<Button
@@ -485,7 +491,7 @@ export function FeaturedRecordsSettingsCard({
 														{achievement.description}
 													</p>
 													<p className="type-body-sm text-ink-3">
-														{achievementSummary(achievement)}
+														{achievementSummary(achievement, locale)}
 													</p>
 												</div>
 												<Button

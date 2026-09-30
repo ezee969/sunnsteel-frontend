@@ -106,10 +106,10 @@ describe('schedule month', () => {
 	})
 
 	it('describes months, cells and consistency in plain words', () => {
-		expect(describeMonth('2026-09-01', NOW)).toBe('This month')
-		expect(describeMonth('2026-08-01', NOW)).toBe('Last month')
-		expect(describeMonth('2026-10-01', NOW)).toBe('Next month')
-		expect(describeMonth('2026-05-01', NOW)).toMatch(/2026/)
+		expect(describeMonth('2026-09-01', NOW, 'en')).toBe('This month')
+		expect(describeMonth('2026-08-01', NOW, 'en')).toBe('Last month')
+		expect(describeMonth('2026-10-01', NOW, 'en')).toBe('Next month')
+		expect(describeMonth('2026-05-01', NOW, 'en')).toMatch(/2026/)
 		expect(
 			describeConsistency({
 				trainedDays: 0,
@@ -138,31 +138,37 @@ describe('schedule month', () => {
 				],
 			}),
 		).toBe('PLANNED')
-		const label = describeMonthCell({
-			date: '2026-09-16',
-			isToday: true,
-			entries: [
-				{
-					kind: 'PLANNED',
-					routineId: 'a',
-					routineDayId: 'd',
-					routineName: 'A',
-					dayName: 'Wed',
-				},
-				{
-					kind: 'PLANNED',
-					routineId: 'b',
-					routineDayId: 'e',
-					routineName: 'B',
-					dayName: 'Wed',
-				},
-				{ kind: 'REST', routineId: 'c', routineName: 'C', dayName: null },
-			],
-		})
+		const label = describeMonthCell(
+			{
+				date: '2026-09-16',
+				isToday: true,
+				entries: [
+					{
+						kind: 'PLANNED',
+						routineId: 'a',
+						routineDayId: 'd',
+						routineName: 'A',
+						dayName: 'Wed',
+					},
+					{
+						kind: 'PLANNED',
+						routineId: 'b',
+						routineDayId: 'e',
+						routineName: 'B',
+						dayName: 'Wed',
+					},
+					{ kind: 'REST', routineId: 'c', routineName: 'C', dayName: null },
+				],
+			},
+			'en',
+		)
 		expect(label).toMatch(/16/)
 		expect(label).toMatch(/, today: 2 planned, 1 rest day$/)
 		expect(
-			describeMonthCell({ date: '2026-09-10', isToday: false, entries: [] }),
+			describeMonthCell(
+				{ date: '2026-09-10', isToday: false, entries: [] },
+				'en',
+			),
 		).toMatch(/: nothing planned$/)
 	})
 })

@@ -1,12 +1,13 @@
 'use client'
 
 import { Flag, RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RankCrest } from '@/features/achievements/rank-crest'
+import type { Locale } from '@/i18n/config'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
 	buildUpcomingMilestones,
@@ -50,9 +51,10 @@ function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
  * rules, and the dashboard does not get its own version of them.
  */
 export default function UpcomingMilestones() {
+	const locale = useLocale() as Locale
 	const tSummaries = useTranslations('planning.dashboardSummaries')
 	const { data, isPending, isError, refetch, isFetching } = useAchievements()
-	const milestones = buildUpcomingMilestones(data)
+	const milestones = buildUpcomingMilestones(locale, data)
 
 	return (
 		<DashboardSection

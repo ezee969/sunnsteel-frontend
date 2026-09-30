@@ -21,6 +21,7 @@ import type { InfiniteData } from '@tanstack/react-query'
 
 import type { ClassicalIconName } from '@/components/icons/ClassicalIcon'
 import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
 import { formatComebackEvidence } from '@/lib/utils/achievements'
 import { PRIVACY_SECTION_LABELS } from '@/lib/utils/privacy-overview'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
@@ -96,8 +97,13 @@ const ACTIVITY_RANK: Record<ProfileVisibility, number> = {
 	PUBLIC: 2,
 }
 
-const plural = (count: number, singular: string, many = `${singular}s`) =>
-	`${count.toLocaleString()} ${count === 1 ? singular : many}`
+const plural = (
+	count: number,
+	locale: Locale,
+	singular: string,
+	many = `${singular}s`,
+) =>
+	`${numberFormatter(locale, {}).format(count)} ${count === 1 ? singular : many}`
 
 /** Where an entry's link leads. The server already decided the viewer may open it. */
 export function activityHref(link: ActivityLink): string {
@@ -132,10 +138,10 @@ function describeProgression(
 			set.newWeightKg === first.newWeightKg,
 	)
 	if (uniform) {
-		return `${formatWeight(first.previousWeightKg, unit, locale)} → ${formatWeight(first.newWeightKg, unit, locale)} on ${plural(sets.length, 'set')}`
+		return `${formatWeight(first.previousWeightKg, unit, locale)} → ${formatWeight(first.newWeightKg, unit, locale)} on ${plural(sets.length, locale, 'set')}`
 	}
 	const highest = Math.max(...sets.map(set => set.newWeightKg))
-	return `${plural(sets.length, 'set')} progressed, up to ${formatWeight(highest, unit, locale)}`
+	return `${plural(sets.length, locale, 'set')} progressed, up to ${formatWeight(highest, unit, locale)}`
 }
 
 /** The record an entry came from, named in the viewer's unit. */
@@ -147,7 +153,7 @@ export function describeActivity(
 	switch (entry.type) {
 		case 'SESSION_COMPLETED': {
 			const { session } = entry
-			const parts = [plural(session.completedSets, 'set')]
+			const parts = [plural(session.completedSets, locale, 'set')]
 			if (session.volumeKg > 0) {
 				parts.push(
 					`${formatWeightAmount(session.volumeKg, unit, locale, 0)} ${getWeightUnitLabel(unit)} volume`,
@@ -189,7 +195,7 @@ export function describeActivity(
 		case 'ROUTINE_SHARED':
 			return {
 				title: `Shared ${entry.routine.name}`,
-				detail: `${plural(entry.routine.dayCount, 'day')} · ${plural(entry.routine.exerciseCount, 'exercise')}`,
+				detail: `${plural(entry.routine.dayCount, locale, 'day')} · ${plural(entry.routine.exerciseCount, locale, 'exercise')}`,
 			}
 	}
 }

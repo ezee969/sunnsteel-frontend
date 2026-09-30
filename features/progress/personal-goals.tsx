@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
 import { getMeasurableGoalLabel } from '@/lib/utils/measurable-goals'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -25,16 +26,17 @@ interface PersonalGoalsProps {
 	onRetry: () => void
 }
 
-const NUMBER_FORMATTER = new Intl.NumberFormat(undefined, {
-	maximumFractionDigits: 1,
-})
+const NUMBER_FORMATTER = (locale: Locale) =>
+	numberFormatter(locale, {
+		maximumFractionDigits: 1,
+	})
 
 function formatGoalValue(
 	value: number,
 	type: MeasurableGoalType,
 	weightUnit: WeightUnit,
+	locale: Locale,
 ): string {
-	const locale = useLocale() as Locale
 	if (
 		type === 'WEEKLY_VOLUME' ||
 		type === 'EXERCISE_ESTIMATED_1RM' ||
@@ -42,7 +44,7 @@ function formatGoalValue(
 	) {
 		return `${formatWeightAmount(value, weightUnit, locale, 1)} ${getWeightUnitLabel(weightUnit)}`
 	}
-	const formatted = NUMBER_FORMATTER.format(value)
+	const formatted = NUMBER_FORMATTER(locale).format(value)
 	return type === 'WEEKLY_SESSIONS'
 		? `${formatted} ${value === 1 ? 'session' : 'sessions'}`
 		: `${formatted} ${value === 1 ? 'day' : 'days'}`
@@ -67,15 +69,21 @@ function GoalRow({
 	goal: PersonalGoalProgress
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale() as Locale
 	const current =
 		goal.currentValue === null
 			? null
-			: formatGoalValue(goal.currentValue, goal.type, weightUnit)
-	const target = formatGoalValue(goal.targetValue, goal.type, weightUnit)
+			: formatGoalValue(goal.currentValue, goal.type, weightUnit, locale)
+	const target = formatGoalValue(
+		goal.targetValue,
+		goal.type,
+		weightUnit,
+		locale,
+	)
 	const remaining =
 		goal.remainingValue === null
 			? null
-			: formatGoalValue(goal.remainingValue, goal.type, weightUnit)
+			: formatGoalValue(goal.remainingValue, goal.type, weightUnit, locale)
 	const direction = goal.direction === 'AT_MOST' ? 'at most' : 'at least'
 
 	return (

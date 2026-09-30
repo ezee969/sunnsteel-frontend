@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import {
 	getProgressionRuleExplanation,
 	getProgressionSetPresentation,
@@ -33,10 +34,11 @@ import {
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
-const PERFORMANCE_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	dateStyle: 'medium',
-	timeStyle: 'short',
-})
+const PERFORMANCE_DATE_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		dateStyle: 'medium',
+		timeStyle: 'short',
+	})
 
 interface ExercisePerformanceHistoryProps {
 	/** Defaults to the Progress page's range-bound copy. */
@@ -94,7 +96,9 @@ function PerformanceSessionCard({
 							<span className="flex items-center gap-2 sm:justify-end">
 								<CalendarDays className="size-4" aria-hidden />
 								<time dateTime={session.endedAt}>
-									{PERFORMANCE_DATE_FORMATTER.format(new Date(session.endedAt))}
+									{PERFORMANCE_DATE_FORMATTER(locale).format(
+										new Date(session.endedAt),
+									)}
 								</time>
 							</span>
 							<span className="flex items-center gap-2 sm:justify-end">

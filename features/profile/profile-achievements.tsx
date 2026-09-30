@@ -5,8 +5,10 @@ import type {
 } from '@sunsteel/contracts'
 import { Award, Check, Medal, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
+import type { Locale } from '@/i18n/config'
 import {
 	ACHIEVEMENT_CATEGORY_LABELS,
 	formatAchievementDate,
@@ -28,6 +30,7 @@ function MilestoneRow({
 	achievement: EarnedAchievement
 	isOwnProfile: boolean
 }) {
+	const locale = useLocale() as Locale
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -45,7 +48,7 @@ function MilestoneRow({
 				<p className="type-body-sm text-ink-3">
 					{achievement.backfilled
 						? 'Recognized from history'
-						: `Earned ${formatAchievementDate(achievement.unlockedAt)}`}
+						: `Earned ${formatAchievementDate(achievement.unlockedAt, locale)}`}
 				</p>
 				{isOwnProfile && achievement.sourceSessionId ? (
 					<Link
@@ -67,6 +70,7 @@ function ComebackRow({
 	comeback: ComebackRecognition
 	isOwnProfile: boolean
 }) {
+	const locale = useLocale() as Locale
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -82,7 +86,7 @@ function ComebackRow({
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
 				<p className="type-body-sm text-ink-3">
-					Recognized {formatAchievementDate(comeback.recognizedAt)}
+					Recognized {formatAchievementDate(comeback.recognizedAt, locale)}
 				</p>
 				{isOwnProfile ? (
 					<Link

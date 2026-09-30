@@ -74,7 +74,7 @@ const dayOf = (strip: ReturnType<typeof buildWeekStrip>, date: number) =>
 describe('weekly training strip', () => {
 	it('shows the week builder’s seven days with the month view’s state', () => {
 		const built = week([session('s-mon', at(14))])
-		const strip = buildWeekStrip(built, enDate)
+		const strip = buildWeekStrip(built, enDate, 'en')
 		expect(strip.map(day => day.weekday)).toEqual([
 			'Mon',
 			'Tue',
@@ -105,6 +105,7 @@ describe('weekly training strip', () => {
 		const strip = buildWeekStrip(
 			week([session('s-mon', at(14)), session('s-tue', at(15), 'ABORTED')]),
 			enDate,
+			'en',
 		)
 		expect(dayOf(strip, 14).href).toBe('/workouts/history/s-mon')
 		expect(dayOf(strip, 14).label).toMatch(/Opens the workout\.$/)
@@ -144,7 +145,7 @@ describe('weekly training strip', () => {
 	})
 
 	it('lists only the states the week shows, in legend order', () => {
-		const strip = buildWeekStrip(week([session('s-mon', at(14))]), enDate)
+		const strip = buildWeekStrip(week([session('s-mon', at(14))]), enDate, 'en')
 		expect(weekStripStates(strip)).toEqual([
 			'COMPLETED',
 			'PLANNED',

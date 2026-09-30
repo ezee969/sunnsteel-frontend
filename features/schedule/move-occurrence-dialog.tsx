@@ -2,7 +2,7 @@
 
 import { SCHEDULE_MOVE_MAX_DAYS } from '@sunsteel/contracts'
 import { SkipForward } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
+import type { Locale } from '@/i18n/config'
 import {
 	useMoveOccurrence,
 	useSkipOccurrence,
@@ -66,6 +67,7 @@ function MoveOccurrenceContent({
 	request: MoveRequest
 	onClose: () => void
 }) {
+	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
 	const { action, target } = request
 	// The day it sits on now is left out: a disabled button takes the sunk
@@ -93,7 +95,7 @@ function MoveOccurrenceContent({
 			{
 				onSuccess: () => {
 					push({
-						title: `Moved to ${describeShortDate(toDate, tDate)}`,
+						title: `Moved to ${describeShortDate(toDate, tDate, locale)}`,
 						description: `${target} now falls on that day.`,
 						variant: 'success',
 					})
@@ -125,7 +127,7 @@ function MoveOccurrenceContent({
 			onSuccess: () => {
 				push({
 					title: 'Move undone',
-					description: `${target} is back on ${describeShortDate(action.occurrenceDate, tDate)}.`,
+					description: `${target} is back on ${describeShortDate(action.occurrenceDate, tDate, locale)}.`,
 					variant: 'success',
 				})
 				onClose()
@@ -139,9 +141,9 @@ function MoveOccurrenceContent({
 			<DialogHeader>
 				<DialogTitle>Reschedule {target}</DialogTitle>
 				<DialogDescription>
-					Planned for {describeShortDate(action.occurrenceDate, tDate)}
+					Planned for {describeShortDate(action.occurrenceDate, tDate, locale)}
 					{moved
-						? `, now on ${describeShortDate(action.currentDate, tDate)}`
+						? `, now on ${describeShortDate(action.currentDate, tDate, locale)}`
 						: ''}
 					. Only this workout changes; the routine and the rest of your plan
 					stay as they are.
@@ -157,7 +159,7 @@ function MoveOccurrenceContent({
 						onClick={() => moveTo(postponeTo)}
 						disabled={busy}
 					>
-						Postpone to {describeShortDate(postponeTo, tDate)}
+						Postpone to {describeShortDate(postponeTo, tDate, locale)}
 					</Button>
 				) : null}
 				<Button
@@ -193,7 +195,7 @@ function MoveOccurrenceContent({
 									aria-pressed={isOn}
 									onClick={() => setSelected(date)}
 								>
-									{describeShortDate(date, tDate)}
+									{describeShortDate(date, tDate, locale)}
 								</Button>
 							)
 						})}
@@ -214,7 +216,8 @@ function MoveOccurrenceContent({
 						onClick={onPutBack}
 						disabled={busy}
 					>
-						Put back on {describeShortDate(action.occurrenceDate, tDate)}
+						Put back on{' '}
+						{describeShortDate(action.occurrenceDate, tDate, locale)}
 					</Button>
 				) : null}
 				<Button type="button" variant="outline" onClick={onClose}>

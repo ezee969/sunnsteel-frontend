@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import {
 	getRecordTimelineExplanation,
 	getRecordTimelinePerformanceLabel,
@@ -25,10 +26,11 @@ import {
 } from '@/lib/utils/progression-change'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
-const TIMELINE_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-	dateStyle: 'medium',
-	timeStyle: 'short',
-})
+const TIMELINE_DATE_FORMATTER = (locale: Locale) =>
+	dateFormatter(locale, {
+		dateStyle: 'medium',
+		timeStyle: 'short',
+	})
 
 type TimelineFilter = ProgressTimelineEventType | undefined
 
@@ -55,6 +57,7 @@ interface ProgressTimelineProps {
 }
 
 function TimelineContext({ item }: { item: ProgressTimelineItem }) {
+	const locale = useLocale() as Locale
 	return (
 		<div className="type-body-sm flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-3">
 			<span>{item.session.routineName}</span>
@@ -62,7 +65,7 @@ function TimelineContext({ item }: { item: ProgressTimelineItem }) {
 			<span>{item.session.dayName || 'Workout day'}</span>
 			<span aria-hidden>·</span>
 			<time dateTime={item.occurredAt}>
-				{TIMELINE_DATE_FORMATTER.format(new Date(item.occurredAt))}
+				{TIMELINE_DATE_FORMATTER(locale).format(new Date(item.occurredAt))}
 			</time>
 		</div>
 	)
