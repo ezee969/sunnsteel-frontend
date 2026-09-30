@@ -1,9 +1,11 @@
 import type { Routine, WorkoutSessionSummary } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
+import { describeMonthTotals } from './schedule-month'
 import {
 	buildScheduleWeek,
-	describeScheduleTotals,
 	describeWeek,
 	localDateKey,
 	rotationStartAction,
@@ -11,6 +13,11 @@ import {
 	scheduleWeekRange,
 	startOfWeek,
 } from './schedule-week'
+
+const tMonth = translatorFor('en', 'planning.scheduleMonth')
+const tWeek = translatorFor('en', 'planning.scheduleWeek')
+const esWeek = translatorFor('es', 'planning.scheduleWeek')
+const esMonth = translatorFor('es', 'planning.scheduleMonth')
 
 // Wednesday 16 Sep 2026, local time.
 const NOW = new Date(2026, 8, 16, 12, 0)
@@ -98,7 +105,7 @@ describe('schedule week', () => {
 			moved: 0,
 			skipped: 0,
 		})
-		expect(describeScheduleTotals(week.totals)).toBe(
+		expect(describeMonthTotals(week.totals, tMonth)).toBe(
 			'1 completed · 1 ended early · 1 planned · 1 not logged',
 		)
 	})
@@ -192,7 +199,7 @@ describe('schedule week', () => {
 			moved: 0,
 			skipped: 0,
 		})
-		expect(describeScheduleTotals(week.totals)).toBe(
+		expect(describeMonthTotals(week.totals, tMonth)).toBe(
 			'1 completed · 1 planned · 3 rest days',
 		)
 		const today = week.days.find(d => d.isToday)!
@@ -200,21 +207,44 @@ describe('schedule week', () => {
 	})
 
 	it('names the week relative to today', () => {
-		expect(describeWeek('2026-09-14', NOW, 'en')).toBe('This week')
-		expect(describeWeek('2026-09-07', NOW, 'en')).toBe('Last week')
-		expect(describeWeek('2026-09-21', NOW, 'en')).toBe('Next week')
-		expect(describeWeek('2026-08-31', NOW, 'en')).toMatch(/^Week of /)
+		expect(describeWeek('2026-09-14', NOW, 'en', tWeek)).toBe('This week')
+		expect(describeWeek('2026-09-07', NOW, 'en', tWeek)).toBe('Last week')
+		expect(describeWeek('2026-09-21', NOW, 'en', tWeek)).toBe('Next week')
+		expect(describeWeek('2026-08-31', NOW, 'en', tWeek)).toMatch(/^Week of /)
+		expect(describeWeek('2026-09-07', NOW, 'es', esWeek)).toBe(
+			'La semana pasada',
+		)
+		expect(describeWeek('2026-08-31', NOW, 'es', esWeek)).toMatch(
+			/^Semana del /,
+		)
 		expect(
-			describeScheduleTotals({
-				completed: 0,
-				aborted: 0,
-				planned: 0,
-				notLogged: 0,
-				rest: 0,
-				moved: 0,
-				skipped: 0,
-			}),
+			describeMonthTotals(
+				{
+					completed: 0,
+					aborted: 0,
+					planned: 0,
+					notLogged: 0,
+					rest: 0,
+					moved: 0,
+					skipped: 0,
+				},
+				tMonth,
+			),
 		).toBe('Nothing planned or logged')
+		expect(
+			describeMonthTotals(
+				{
+					completed: 0,
+					aborted: 0,
+					planned: 0,
+					notLogged: 0,
+					rest: 0,
+					moved: 0,
+					skipped: 0,
+				},
+				esMonth,
+			),
+		).toBe('Nada planificado ni registrado')
 	})
 
 	it("starts only today's planned days and the current rotation, and resumes the live session", () => {

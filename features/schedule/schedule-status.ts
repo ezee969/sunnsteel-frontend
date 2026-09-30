@@ -10,8 +10,9 @@ import {
 } from 'lucide-react'
 
 /**
- * How each schedule state reads, shared by the week and month views. A status
- * is a glyph plus words, never colour alone (§4.3 rule 8). Only a completed
+ * How each schedule state looks, shared by the week and month views and the
+ * dashboard strip; its words come from `scheduleStatusLabel`. A status is a
+ * glyph plus words, never colour alone (§4.3 rule 8). Only a completed
  * session uses `success` — it is the one thing done as planned. "Not logged"
  * is neutral on purpose: the app cannot know why a day passed.
  */
@@ -24,16 +25,16 @@ export const SCHEDULE_STATUS: Record<
 	| 'REST'
 	| 'MOVED'
 	| 'SKIPPED',
-	{ Icon: typeof CheckCircle2; label: string; tone: string }
+	{ Icon: typeof CheckCircle2; tone: string }
 > = {
-	COMPLETED: { Icon: CheckCircle2, label: 'Completed', tone: 'text-success' },
-	IN_PROGRESS: { Icon: PlayCircle, label: 'In progress', tone: 'text-ink-2' },
-	ABORTED: { Icon: CircleSlash, label: 'Ended early', tone: 'text-ink-3' },
-	NOT_LOGGED: { Icon: CircleDashed, label: 'Not logged', tone: 'text-ink-3' },
-	PLANNED: { Icon: CalendarClock, label: 'Planned', tone: 'text-ink-3' },
-	REST: { Icon: Moon, label: 'Rest day', tone: 'text-ink-3' },
+	COMPLETED: { Icon: CheckCircle2, tone: 'text-success' },
+	IN_PROGRESS: { Icon: PlayCircle, tone: 'text-ink-2' },
+	ABORTED: { Icon: CircleSlash, tone: 'text-ink-3' },
+	NOT_LOGGED: { Icon: CircleDashed, tone: 'text-ink-3' },
+	PLANNED: { Icon: CalendarClock, tone: 'text-ink-3' },
+	REST: { Icon: Moon, tone: 'text-ink-3' },
 	// SCHED-04: the planned date of a workout moved elsewhere; neutral.
-	MOVED: { Icon: MoveRight, label: 'Moved', tone: 'text-ink-3' },
+	MOVED: { Icon: MoveRight, tone: 'text-ink-3' },
 	// SCHED-05: skipped on purpose — neutral, and never "not logged".
-	SKIPPED: { Icon: SkipForward, label: 'Skipped', tone: 'text-ink-3' },
+	SKIPPED: { Icon: SkipForward, tone: 'text-ink-3' },
 }

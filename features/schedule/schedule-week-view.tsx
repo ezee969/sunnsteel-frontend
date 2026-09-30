@@ -19,8 +19,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
+	describeMonthTotals,
+	scheduleStatusLabel,
+} from '@/lib/utils/schedule-month'
+import {
 	describeScheduleDay,
-	describeScheduleTotals,
 	describeShortDate,
 	describeWeek,
 	rotationStartAction,
@@ -61,13 +64,8 @@ interface ScheduleWeekViewProps {
 	onRetry: () => void
 }
 
-const ENTRY_STATUS: Record<
-	string,
-	(typeof SCHEDULE_STATUS)[keyof typeof SCHEDULE_STATUS]
-> = SCHEDULE_STATUS
-
-const entryStatus = (entry: ScheduleEntry) =>
-	ENTRY_STATUS[entry.kind === 'SESSION' ? entry.status : entry.kind]
+const entryState = (entry: ScheduleEntry): keyof typeof SCHEDULE_STATUS =>
+	entry.kind === 'SESSION' ? entry.status : entry.kind
 
 const entryHref = (entry: ScheduleEntry) => {
 	if (entry.kind !== 'SESSION') return `/routines/${entry.routineId}`
@@ -86,15 +84,16 @@ interface ActionProps {
 
 /** Repeated row controls are outline, never the region's primary (§4.3). */
 function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
+	const t = useTranslations('planning.scheduleWeek')
 	if (!action) return null
 	if (action.kind === 'RESUME') {
 		return (
 			<Button asChild size="sm" variant="outline" className="shrink-0">
 				<Link
 					href={`/workouts/sessions/${action.sessionId}`}
-					aria-label={`Resume ${target}`}
+					aria-label={t('resumeAria', { target })}
 				>
-					Resume
+					{t('resume')}
 				</Link>
 			</Button>
 		)
@@ -105,14 +104,14 @@ function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
 			size="sm"
 			variant="outline"
 			className="shrink-0"
-			aria-label={`Start ${target}`}
+			aria-label={t('startAria', { target })}
 			disabled={startingDayId !== null}
 			onClick={() => onStart(action.routineId, action.routineDayId)}
 		>
 			{startingDayId === action.routineDayId ? (
 				<Loader2 className="size-4 animate-spin" aria-hidden />
 			) : null}
-			Start
+			{t('start')}
 		</Button>
 	)
 }
@@ -138,6 +137,7 @@ function MoveControl({
 	onSkip,
 	pendingKey,
 }: MoveProps & { target: string }) {
+	const t = useTranslations('planning.scheduleWeek')
 	if (!moveAction) return null
 	if (moveAction.kind === 'UNDO' || moveAction.kind === 'SKIP') {
 		const key =
@@ -153,8 +153,8 @@ function MoveControl({
 				className="shrink-0"
 				aria-label={
 					moveAction.kind === 'UNDO'
-						? `Undo the change to ${target}`
-						: `Mark ${target} skipped`
+						? t('undoAria', { target })
+						: t('markSkippedAria', { target })
 				}
 				disabled={pendingKey !== null}
 				onClick={() =>
@@ -168,7 +168,7 @@ function MoveControl({
 				) : (
 					<Icon className="size-4" aria-hidden />
 				)}
-				{moveAction.kind === 'UNDO' ? 'Undo' : 'Mark skipped'}
+				{moveAction.kind === 'UNDO' ? t('undo') : t('markSkipped')}
 			</Button>
 		)
 	}
@@ -178,11 +178,11 @@ function MoveControl({
 			size="sm"
 			variant="ghost"
 			className="shrink-0"
-			aria-label={`Reschedule ${target}`}
+			aria-label={t('rescheduleAria', { target })}
 			onClick={() => onMove(moveAction, target)}
 		>
 			<CalendarSync className="size-4" aria-hidden />
-			Reschedule
+			{t('reschedule')}
 		</Button>
 	)
 }
@@ -198,12 +198,14 @@ function EntryRow({
 }: { entry: ScheduleEntry } & Omit<ActionProps, 'target'> & MoveProps) {
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
-	const status = entryStatus(entry)
-	const { Icon, tone } = status
+	const t = useTranslations('planning.scheduleWeek')
+	const tMonth = useTranslations('planning.scheduleMonth')
+	const state = entryState(entry)
+	const { Icon, tone } = SCHEDULE_STATUS[state]
 	const label =
 		entry.kind === 'MOVED'
-			? `Moved to ${describeShortDate(entry.toDate, tDate, locale)}`
-			: status.label
+			? t('movedTo', { date: describeShortDate(entry.toDate, tDate, locale) })
+			: scheduleStatusLabel(state, tMonth)
 	const movedFrom =
 		(entry.kind === 'PLANNED' || entry.kind === 'NOT_LOGGED') && entry.movedFrom
 			? entry.movedFrom
@@ -229,11 +231,16 @@ function EntryRow({
 					</span>
 				) : null}
 				{entry.deload ? (
-					<span className="type-body-sm ml-2 text-ink-3">· Deload</span>
+					<span className="type-body-sm ml-2 text-ink-3">
+						· {t('deloadTag')}
+					</span>
 				) : null}
 				{movedFrom ? (
 					<span className="type-body-sm ml-2 text-ink-3">
-						· moved from {describeShortDate(movedFrom, tDate, locale)}
+						·{' '}
+						{t('movedFrom', {
+							date: describeShortDate(movedFrom, tDate, locale),
+						})}
 					</span>
 				) : null}
 			</span>
@@ -273,24 +280,32 @@ export function ScheduleWeekView({
 }: ScheduleWeekViewProps) {
 	const locale = useLocale() as Locale
 	const tDate = useTranslations('routines.date')
+	const t = useTranslations('planning.scheduleWeek')
+	const tMonth = useTranslations('planning.scheduleMonth')
 	return (
 		<section aria-labelledby="schedule-week" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
 				<div>
 					<h2 id="schedule-week" className="type-section text-foreground">
-						{week ? describeWeek(week.weekStart, now, locale) : 'This week'}
+						{week
+							? describeWeek(week.weekStart, now, locale, t)
+							: t('thisWeek')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
-						{week ? describeScheduleTotals(week.totals) : ' '}
+						{week ? describeMonthTotals(week.totals, tMonth) : ' '}
 					</p>
 				</div>
-				<div role="group" aria-label="Week" className="flex items-center gap-1">
+				<div
+					role="group"
+					aria-label={t('weekGroup')}
+					className="flex items-center gap-1"
+				>
 					<Button
 						type="button"
 						variant="ghost"
 						size="icon"
 						className="size-11 sm:size-9"
-						aria-label="Previous week"
+						aria-label={t('previousWeek')}
 						onClick={onPrevious}
 					>
 						<ChevronLeft className="size-4" aria-hidden />
@@ -302,14 +317,14 @@ export function ScheduleWeekView({
 						disabled={isCurrentWeek}
 						onClick={onToday}
 					>
-						This week
+						{t('thisWeek')}
 					</Button>
 					<Button
 						type="button"
 						variant="ghost"
 						size="icon"
 						className="size-11 sm:size-9"
-						aria-label="Next week"
+						aria-label={t('followingWeek')}
 						onClick={onNext}
 					>
 						<ChevronRight className="size-4" aria-hidden />
@@ -317,36 +332,23 @@ export function ScheduleWeekView({
 				</div>
 			</div>
 
-			<Explanation summary="Planned days follow your routines as they are now.">
-				<p>
-					Each routine plans from the day it was created, or from the training
-					block in force on that date, which is named beside its days.
-				</p>
-				<p>
-					Rotation days have no date: the next one is shown below, and their
-					sessions appear on the day you trained.
-				</p>
-				<p>Rest days come from each weekly routine&apos;s planned rest.</p>
-				<p>
-					Reschedule postpones, moves or skips one planned workout without
-					changing the routine, and a day that passed can still be marked
-					skipped.
-				</p>
+			<Explanation summary={t('explanationSummary')}>
+				<p>{t('explanation1')}</p>
+				<p>{t('explanation2')}</p>
+				<p>{t('explanation3')}</p>
+				<p>{t('explanation4')}</p>
 			</Explanation>
 
 			{isPending ? (
-				<div role="status" aria-label="Loading schedule" className="space-y-3">
+				<div role="status" aria-label={t('loading')} className="space-y-3">
 					<Skeleton className="h-14" />
 					<Skeleton className="h-14" />
 					<Skeleton className="h-14" />
 				</div>
 			) : isError || !week ? (
 				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">Schedule is unavailable</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						We could not load your routines or sessions for this week. Try
-						again.
-					</p>
+					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
+					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
 					<Button
 						type="button"
 						size="sm"
@@ -355,13 +357,13 @@ export function ScheduleWeekView({
 						onClick={onRetry}
 					>
 						<RefreshCw className="size-4" aria-hidden />
-						Retry
+						{t('retry')}
 					</Button>
 				</div>
 			) : (
 				<>
 					{week.rotations.length > 0 ? (
-						<ul aria-label="Rotations" className="space-y-1">
+						<ul aria-label={t('rotations')} className="space-y-1">
 							{week.rotations.map(rotation => (
 								<li
 									key={rotation.routineId}
@@ -369,23 +371,30 @@ export function ScheduleWeekView({
 								>
 									<Repeat className="mt-0.5 size-4 shrink-0" aria-hidden />
 									<span className="min-w-0 flex-1">
-										<Link
-											href={`/routines/${rotation.routineId}`}
-											className="text-foreground underline-offset-4 hover:underline"
-										>
-											{rotation.routineName}
-										</Link>{' '}
-										· next in rotation:{' '}
-										<span className="text-ink-2">{rotation.nextDayName}</span>
-										{rotation.trainingBlockName || rotation.deload
-											? ` (${[
-													rotation.trainingBlockName,
-													rotation.deload ? 'deload' : null,
-												]
-													.filter(Boolean)
-													.join(', ')})`
-											: ''}
-										, any day
+										{t.rich('rotationLine', {
+											routineName: rotation.routineName,
+											nextName: rotation.nextDayName,
+											routine: chunks => (
+												<Link
+													href={`/routines/${rotation.routineId}`}
+													className="text-foreground underline-offset-4 hover:underline"
+												>
+													{chunks}
+												</Link>
+											),
+											next: chunks => (
+												<span className="text-ink-2">{chunks}</span>
+											),
+											extra:
+												rotation.trainingBlockName || rotation.deload
+													? ` (${[
+															rotation.trainingBlockName,
+															rotation.deload ? t('deloadLower') : null,
+														]
+															.filter(Boolean)
+															.join(', ')})`
+													: '',
+										})}
 									</span>
 									<EntryAction
 										action={rotationStartAction(
@@ -417,8 +426,7 @@ export function ScheduleWeekView({
 									<div>
 										<p className="type-panel text-foreground">{weekday}</p>
 										<p className="type-body-sm text-ink-3">
-											{date}
-											{day.isToday ? ' · Today' : ''}
+											{day.isToday ? t('dateToday', { date }) : date}
 										</p>
 									</div>
 									{day.entries.length > 0 ? (
@@ -448,7 +456,7 @@ export function ScheduleWeekView({
 										</ul>
 									) : (
 										<p className="type-body-sm py-1 text-ink-3">
-											Nothing planned
+											{t('nothingPlanned')}
 										</p>
 									)}
 								</li>
