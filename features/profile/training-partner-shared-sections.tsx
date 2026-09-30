@@ -2,6 +2,7 @@
 
 import { CalendarDays, Check, Dumbbell, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useMemberRoutines } from '@/lib/api/hooks/useRoutineSharing'
@@ -19,6 +20,7 @@ export function TrainingPartnerSharedSections({
 	memberId: string
 	identifier: string
 }) {
+	const t = useTranslations('social.partnerShared')
 	const partnerships = useTrainingPartners()
 	const partnership = findTrainingPartnership(
 		partnerships.data?.items ?? [],
@@ -46,13 +48,13 @@ export function TrainingPartnerSharedSections({
 						className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 					>
 						<CalendarDays className="size-4 text-ink-3" aria-hidden />
-						Shared Schedule
+						{t('schedule')}
 					</h2>
 					{schedule.isPending ? (
-						<LoadingLabel label="Loading shared schedule…" />
+						<LoadingLabel label={t('loadingSchedule')} />
 					) : schedule.isError ? (
 						<RetryRow
-							label="The shared schedule could not be loaded."
+							label={t('scheduleFailed')}
 							onRetry={() => void schedule.refetch()}
 						/>
 					) : (
@@ -66,8 +68,10 @@ export function TrainingPartnerSharedSections({
 										<p className="type-data text-foreground">{day.date}</p>
 										<p className="type-body-sm text-ink-3">
 											{day.plannedWorkoutCount === 0
-												? 'No workout planned'
-												: `${day.plannedWorkoutCount} workout${day.plannedWorkoutCount === 1 ? '' : 's'} planned`}
+												? t('noWorkout')
+												: t('workoutsPlanned', {
+														count: day.plannedWorkoutCount,
+													})}
 										</p>
 									</div>
 									<span className="type-body-sm flex items-center gap-1.5 text-ink-2">
@@ -77,13 +81,12 @@ export function TrainingPartnerSharedSections({
 												aria-hidden
 											/>
 										) : null}
-										{day.trained ? 'Trained' : 'Not trained'}
+										{day.trained ? t('trained') : t('notTrained')}
 									</span>
 								</div>
 							))}
 							<p className="type-body-sm pt-3 text-ink-3">
-								Dates use {schedule.data?.timeZone}. Routine names and
-								prescriptions are not part of schedule access.
+								{t('timeZoneNote', { timeZone: schedule.data?.timeZone ?? '' })}
 							</p>
 						</div>
 					)}
@@ -96,14 +99,14 @@ export function TrainingPartnerSharedSections({
 						id="partner-routines-heading"
 						className="type-section rule-heading flex items-center gap-2 pb-2 text-foreground"
 					>
-						<Dumbbell className="size-4 text-ink-3" aria-hidden /> Shared
-						Routines
+						<Dumbbell className="size-4 text-ink-3" aria-hidden />{' '}
+						{t('routines')}
 					</h2>
 					{routines.isPending ? (
-						<LoadingLabel label="Loading shared routines…" />
+						<LoadingLabel label={t('loadingRoutines')} />
 					) : routines.isError ? (
 						<RetryRow
-							label="Shared routines could not be loaded."
+							label={t('routinesFailed')}
 							onRetry={() => void routines.refetch()}
 						/>
 					) : routines.data?.routines.length ? (
@@ -116,17 +119,16 @@ export function TrainingPartnerSharedSections({
 								>
 									<span className="type-panel block">{routine.name}</span>
 									<span className="type-body-sm text-ink-3">
-										{routine.dayCount} day{routine.dayCount === 1 ? '' : 's'} ·{' '}
-										{routine.exerciseCount} exercise
-										{routine.exerciseCount === 1 ? '' : 's'}
+										{t('routineCounts', {
+											days: routine.dayCount,
+											exercises: routine.exerciseCount,
+										})}
 									</span>
 								</Link>
 							))}
 						</div>
 					) : (
-						<p className="type-body-sm py-3 text-ink-3">
-							No routines are shared with you.
-						</p>
+						<p className="type-body-sm py-3 text-ink-3">{t('noRoutines')}</p>
 					)}
 				</section>
 			) : null}
@@ -143,11 +145,12 @@ function LoadingLabel({ label }: { label: string }) {
 }
 
 function RetryRow({ label, onRetry }: { label: string; onRetry: () => void }) {
+	const t = useTranslations('social.partnerShared')
 	return (
 		<div className="flex flex-wrap items-center gap-3 py-3">
 			<p className="type-body-sm text-ink-3">{label}</p>
 			<Button type="button" variant="outline" size="sm" onClick={onRetry}>
-				Retry
+				{t('retry')}
 			</Button>
 		</div>
 	)

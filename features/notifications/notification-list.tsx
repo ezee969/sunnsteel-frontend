@@ -16,6 +16,7 @@ import {
 	UserPlus,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
@@ -48,6 +49,7 @@ function NotificationRow({
 	now: Date
 	onOpen: (id: string) => void
 }) {
+	const locale = useLocale()
 	const view = describeNotification(notification)
 	const Icon = KIND_ICON[notification.kind]
 	const unread = !notification.readAt
@@ -78,7 +80,7 @@ function NotificationRow({
 							<span className="type-label mr-2 text-foreground">New</span>
 						) : null}
 						<time dateTime={notification.createdAt}>
-							{formatTimeAgo(notification.createdAt, now)}
+							{formatTimeAgo(notification.createdAt, locale, now)}
 						</time>
 					</span>
 				</span>

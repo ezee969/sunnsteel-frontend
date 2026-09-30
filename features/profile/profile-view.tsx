@@ -624,7 +624,7 @@ export function ProfileView(props: ProfileViewProps) {
 											</p>
 										</div>
 										<span className="type-body-sm shrink-0 whitespace-nowrap text-ink-3">
-											{formatTimeAgo(record.achievedAt)}
+											{formatTimeAgo(record.achievedAt, locale)}
 										</span>
 									</div>
 								))}

@@ -8,6 +8,7 @@ import type {
 } from '@sunsteel/contracts'
 import { Loader2, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
@@ -91,6 +92,7 @@ function OwnActivityRow({
 	entry: OwnActivityEntry
 	weightUnit: WeightUnit
 }) {
+	const locale = useLocale()
 	const setAudience = useSetActivityEntryAudience()
 	const { push } = useToast()
 	const { sharing } = entry
@@ -123,7 +125,7 @@ function OwnActivityRow({
 						: describeEffectiveAudience(sharing.effectiveAudience)}
 					{' · '}
 					<time dateTime={entry.occurredAt} className="text-ink-3">
-						{formatTimeAgo(entry.occurredAt)}
+						{formatTimeAgo(entry.occurredAt, locale)}
 					</time>
 				</p>
 				{cap ? (

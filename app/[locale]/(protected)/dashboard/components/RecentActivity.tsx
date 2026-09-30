@@ -45,7 +45,7 @@ export default function RecentActivity() {
 			summary={recentActivitySummary(
 				entries[0],
 				entries[0]
-					? formatTimeAgo(entries[0].endedAt ?? entries[0].startedAt)
+					? formatTimeAgo(entries[0].endedAt ?? entries[0].startedAt, locale)
 					: undefined,
 				tSummaries,
 			)}
@@ -69,7 +69,7 @@ export default function RecentActivity() {
 								/>
 							}
 							title={`${entry.routineName} — ${entry.dayName}`}
-							time={formatTimeAgo(entry.endedAt ?? entry.startedAt)}
+							time={formatTimeAgo(entry.endedAt ?? entry.startedAt, locale)}
 							badges={[
 								`${entry.completedSets} sets`,
 								`${formatWeightAmount(entry.totalVolumeKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)}`,

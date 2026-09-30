@@ -108,13 +108,13 @@ export function FeaturedAccomplishments({
 							</div>
 							{item.kind === 'RECORD' ? (
 								<span className="type-body-sm whitespace-nowrap text-ink-3">
-									{formatTimeAgo(item.record.achievedAt)}
+									{formatTimeAgo(item.record.achievedAt, locale)}
 								</span>
 							) : item.kind === 'ACHIEVEMENT' ? (
 								<span className="type-body-sm whitespace-nowrap text-ink-3">
 									{item.achievement.backfilled
 										? 'Recognized from history'
-										: formatTimeAgo(item.achievement.unlockedAt)}
+										: formatTimeAgo(item.achievement.unlockedAt, locale)}
 								</span>
 							) : null}
 						</div>

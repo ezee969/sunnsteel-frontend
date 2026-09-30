@@ -152,5 +152,42 @@
 		"notAuthenticated": "User not found or not authenticated.",
 		"userNotFound": "User not found",
 		"checkUsername": "Check the username and try again."
+	},
+	"partnerAction": {
+		"unavailable": "Partner Status Unavailable",
+		"sendEncouragement": "Send Encouragement",
+		"choosePrompt": "Choose a prompt",
+		"encouragementSent": "Encouragement sent",
+		"encouragementSentBody": "“{prompt}” was sent to @{username}.",
+		"encouragementFailed": "Could not send encouragement",
+		"partnerAdded": "Training partner added",
+		"requestSent": "Request sent",
+		"partnerAddedBody": "You and @{username} can now choose what to share.",
+		"requestSentBody": "@{username} must accept before either of you shares anything.",
+		"updateFailed": "Could not update training partners"
+	},
+	"partnerShared": {
+		"schedule": "Shared Schedule",
+		"loadingSchedule": "Loading shared schedule…",
+		"scheduleFailed": "The shared schedule could not be loaded.",
+		"noWorkout": "No workout planned",
+		"workoutsPlanned": "{count, plural, one {# workout planned} other {# workouts planned}}",
+		"trained": "Trained",
+		"notTrained": "Not trained",
+		"timeZoneNote": "Dates use {timeZone}. Routine names and prescriptions are not part of schedule access.",
+		"routines": "Shared Routines",
+		"loadingRoutines": "Loading shared routines…",
+		"routinesFailed": "Shared routines could not be loaded.",
+		"routineCounts": "{days, plural, one {# day} other {# days}} · {exercises, plural, one {# exercise} other {# exercises}}",
+		"noRoutines": "No routines are shared with you.",
+		"retry": "Retry"
+	},
+	"memberActivity": {
+		"title": "Activity",
+		"loading": "Loading activity",
+		"failed": "Activity could not be loaded.",
+		"retry": "Retry",
+		"empty": "No activity you can see yet.",
+		"showMore": "Show more"
 	}
 }

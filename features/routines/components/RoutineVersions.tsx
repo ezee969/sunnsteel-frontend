@@ -251,6 +251,7 @@ export function RoutineVersions({
 	hasLiveSession,
 	weightUnit,
 }: RoutineVersionsProps) {
+	const locale = useLocale()
 	const t = useTranslations('routines.versions')
 	const versions = useRoutineVersions(routine.id)
 	const remove = useDeleteRoutineVersion(routine.id)
@@ -346,7 +347,7 @@ export function RoutineVersions({
 									</p>
 									<p className="type-body-sm text-ink-3">
 										{t('savedAt', {
-											time: formatTimeAgo(version.createdAt),
+											time: formatTimeAgo(version.createdAt, locale),
 											size: describeSetupSize(version.setup, t),
 										})}
 									</p>

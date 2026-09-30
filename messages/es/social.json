@@ -152,5 +152,42 @@
 		"notAuthenticated": "Usuario no encontrado o sin sesión iniciada.",
 		"userNotFound": "Usuario no encontrado",
 		"checkUsername": "Revisa el nombre de usuario y vuelve a intentarlo."
+	},
+	"partnerAction": {
+		"unavailable": "Estado de compañero no disponible",
+		"sendEncouragement": "Enviar ánimo",
+		"choosePrompt": "Elige un mensaje",
+		"encouragementSent": "Ánimo enviado",
+		"encouragementSentBody": "Se envió “{prompt}” a @{username}.",
+		"encouragementFailed": "No se pudo enviar el ánimo",
+		"partnerAdded": "Compañero de entrenamiento añadido",
+		"requestSent": "Solicitud enviada",
+		"partnerAddedBody": "Tú y @{username} ya pueden elegir qué compartir.",
+		"requestSentBody": "@{username} tiene que aceptar antes de que cualquiera de los dos comparta algo.",
+		"updateFailed": "No se pudieron actualizar los compañeros de entrenamiento"
+	},
+	"partnerShared": {
+		"schedule": "Calendario compartido",
+		"loadingSchedule": "Cargando el calendario compartido…",
+		"scheduleFailed": "No se pudo cargar el calendario compartido.",
+		"noWorkout": "Sin entrenamiento planificado",
+		"workoutsPlanned": "{count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}}",
+		"trained": "Entrenó",
+		"notTrained": "No entrenó",
+		"timeZoneNote": "Las fechas usan {timeZone}. Los nombres de las rutinas y las prescripciones no forman parte del acceso al calendario.",
+		"routines": "Rutinas compartidas",
+		"loadingRoutines": "Cargando las rutinas compartidas…",
+		"routinesFailed": "No se pudieron cargar las rutinas compartidas.",
+		"routineCounts": "{days, plural, one {# día} other {# días}} · {exercises, plural, one {# ejercicio} other {# ejercicios}}",
+		"noRoutines": "No hay rutinas compartidas contigo.",
+		"retry": "Reintentar"
+	},
+	"memberActivity": {
+		"title": "Actividad",
+		"loading": "Cargando la actividad",
+		"failed": "No se pudo cargar la actividad.",
+		"retry": "Reintentar",
+		"empty": "Todavía no hay actividad que puedas ver.",
+		"showMore": "Mostrar más"
 	}
 }

@@ -10,6 +10,7 @@ import {
 } from '@sunsteel/contracts'
 import { Flag, Loader2, MessageSquare, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { useState } from 'react'
 
 import {
@@ -196,6 +197,7 @@ function CommentThread({
 }
 
 function CommentRow({ comment }: { comment: ActivityComment }) {
+	const locale = useLocale()
 	const remove = useDeleteActivityComment()
 	const { push } = useToast()
 	const [reporting, setReporting] = useState(false)
@@ -218,7 +220,7 @@ function CommentRow({ comment }: { comment: ActivityComment }) {
 					{name}
 				</Link>
 				<span className="type-body-sm text-ink-3">
-					{formatTimeAgo(comment.createdAt)}
+					{formatTimeAgo(comment.createdAt, locale)}
 				</span>
 			</div>
 			<p className="type-body-sm whitespace-pre-wrap text-ink-2">

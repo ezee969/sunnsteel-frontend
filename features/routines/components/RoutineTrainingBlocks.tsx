@@ -306,7 +306,7 @@ function ReviewTrainingBlockDialog({
 					<p className="type-body-sm text-ink-3">
 						{t('sourceSaved', {
 							source: describeTrainingBlockSource(selected.source, t),
-							time: formatTimeAgo(selected.createdAt),
+							time: formatTimeAgo(selected.createdAt, locale),
 						})}
 					</p>
 				</div>

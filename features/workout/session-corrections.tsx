@@ -95,7 +95,7 @@ export function SessionCorrectionSummary({
 						<li key={correction.id} className="rule-row space-y-1 py-3">
 							<p className="type-body-sm text-ink-3">
 								{t('correctedAgo', {
-									time: formatTimeAgo(correction.createdAt),
+									time: formatTimeAgo(correction.createdAt, locale),
 								})}
 							</p>
 							<ul className="space-y-0.5">

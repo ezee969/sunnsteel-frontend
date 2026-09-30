@@ -1,3 +1,5 @@
+import type { Locale } from '@/i18n/config'
+import { intlLocale } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 
 export const getTodayDow = (): number => {
@@ -118,6 +120,7 @@ export const validateRoutineDayDate = (
  */
 export const formatTimeAgo = (
 	value: string | Date,
+	locale: Locale,
 	now: Date = new Date(),
 ): string => {
 	const date = typeof value === 'string' ? new Date(value) : value
@@ -133,7 +136,9 @@ export const formatTimeAgo = (
 		['minute', 60],
 	]
 
-	const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+	const formatter = new Intl.RelativeTimeFormat(intlLocale(locale), {
+		numeric: 'auto',
+	})
 	for (const [unit, secondsPerUnit] of units) {
 		if (Math.abs(seconds) >= secondsPerUnit) {
 			return formatter.format(Math.round(seconds / secondsPerUnit), unit)

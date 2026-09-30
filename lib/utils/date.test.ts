@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
 
-import { describeDaysAway, nextScheduledDay } from './date'
+import { describeDaysAway, formatTimeAgo, nextScheduledDay } from './date'
 
 const en = translatorFor('en', 'routines.date')
 const es = translatorFor('es', 'routines.date')
@@ -56,5 +56,21 @@ describe('describeDaysAway', () => {
 		expect(describeDaysAway(4, 0, es)).toBe('Hoy')
 		expect(describeDaysAway(5, 1, es)).toBe('Mañana')
 		expect(describeDaysAway(1, 2, es)).toBe('Lunes')
+	})
+})
+
+describe('formatTimeAgo', () => {
+	const now = new Date('2026-09-30T12:00:00.000Z')
+
+	it('follows the app language, not the device', () => {
+		expect(formatTimeAgo('2026-09-28T12:00:00.000Z', 'en', now)).toBe(
+			'2 days ago',
+		)
+		expect(formatTimeAgo('2026-09-28T12:00:00.000Z', 'es', now)).toBe(
+			'anteayer',
+		)
+		expect(formatTimeAgo('2026-09-30T09:00:00.000Z', 'es', now)).toBe(
+			'hace 3 horas',
+		)
 	})
 })

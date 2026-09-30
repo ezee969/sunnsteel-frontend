@@ -103,6 +103,7 @@ export function ActivityFact({
 }
 
 export function AuthorHeader({ entry }: { entry: ActivityEntry }) {
+	const locale = useLocale()
 	const { author } = entry
 	const name = describeAuthor(author)
 	return (
@@ -135,7 +136,7 @@ export function AuthorHeader({ entry }: { entry: ActivityEntry }) {
 				dateTime={entry.occurredAt}
 				className="type-body-sm shrink-0 whitespace-nowrap text-ink-3"
 			>
-				{formatTimeAgo(entry.occurredAt)}
+				{formatTimeAgo(entry.occurredAt, locale)}
 			</time>
 		</div>
 	)
@@ -164,6 +165,7 @@ export function ActivityEntryList({
 	/** SOC-05: whether these entries may be reacted to (never your own). */
 	canReact?: boolean
 }) {
+	const locale = useLocale()
 	const groups = groupActivity(entries)
 	return (
 		<ul
@@ -179,7 +181,7 @@ export function ActivityEntryList({
 							dateTime={group.entries[0].occurredAt}
 							className="type-body-sm block text-ink-3"
 						>
-							{formatTimeAgo(group.entries[0].occurredAt)}
+							{formatTimeAgo(group.entries[0].occurredAt, locale)}
 						</time>
 					)}
 					<ul className="space-y-3">

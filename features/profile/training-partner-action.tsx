@@ -3,6 +3,7 @@
 import type { UserSearchResponse } from '@sunsteel/contracts'
 import { Handshake, HeartHandshake, Loader2, UserRoundPlus } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -30,6 +31,7 @@ export function TrainingPartnerAction({
 }: {
 	member: UserSearchResponse
 }) {
+	const t = useTranslations('social.partnerAction')
 	const partnerships = useTrainingPartners()
 	const request = useRequestTrainingPartner()
 	const accept = useAcceptTrainingPartner()
@@ -45,7 +47,7 @@ export function TrainingPartnerAction({
 		return (
 			<Button type="button" variant="outline" size="sm" disabled>
 				<Handshake className="mr-2 size-4" aria-hidden />
-				Partner Status Unavailable
+				{t('unavailable')}
 			</Button>
 		)
 	}
@@ -67,11 +69,11 @@ export function TrainingPartnerAction({
 								) : (
 									<HeartHandshake className="size-4" aria-hidden />
 								)}
-								Send Encouragement
+								{t('sendEncouragement')}
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuLabel>Choose a prompt</DropdownMenuLabel>
+							<DropdownMenuLabel>{t('choosePrompt')}</DropdownMenuLabel>
 							{TRAINING_PARTNER_ENCOURAGEMENT_OPTIONS.map(option => (
 								<DropdownMenuItem
 									key={option.kind}
@@ -81,13 +83,16 @@ export function TrainingPartnerAction({
 											{
 												onSuccess: () =>
 													push({
-														title: 'Encouragement sent',
-														description: `“${option.label}” was sent to @${member.username}.`,
+														title: t('encouragementSent'),
+														description: t('encouragementSentBody', {
+															prompt: option.label,
+															username: member.username,
+														}),
 														variant: 'success',
 													}),
 												onError: error =>
 													push({
-														title: 'Could not send encouragement',
+														title: t('encouragementFailed'),
 														description: error.message,
 														variant: 'destructive',
 													}),
@@ -117,15 +122,15 @@ export function TrainingPartnerAction({
 		mutation.mutate(variable, {
 			onSuccess: () =>
 				push({
-					title: partnership ? 'Training partner added' : 'Request sent',
+					title: partnership ? t('partnerAdded') : t('requestSent'),
 					description: partnership
-						? `You and @${member.username} can now choose what to share.`
-						: `@${member.username} must accept before either of you shares anything.`,
+						? t('partnerAddedBody', { username: member.username })
+						: t('requestSentBody', { username: member.username }),
 					variant: 'success',
 				}),
 			onError: error =>
 				push({
-					title: 'Could not update training partners',
+					title: t('updateFailed'),
 					description: error.message,
 					variant: 'destructive',
 				}),

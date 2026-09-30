@@ -51,7 +51,7 @@ export default function PersonalRecords() {
 					<PersonalRecordItem
 						key={record.exerciseId}
 						exercise={record.exerciseName}
-						timeAgo={formatTimeAgo(record.achievedAt)}
+						timeAgo={formatTimeAgo(record.achievedAt, locale)}
 						weight={`${formatWeight(record.weight, weightUnit, locale)} × ${record.reps}`}
 						showSeparator={index < records.length - 1}
 					/>

@@ -7,7 +7,7 @@ import {
 	SESSION_SHARE_MAX_ACTIVE_LINKS,
 } from '@sunsteel/contracts'
 import { Copy, Link2Off, Share2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,7 @@ import {
  * opt-in; the previous-session comparison is never shared.
  */
 export function SessionShareButton({ sessionId }: { sessionId: string }) {
+	const locale = useLocale()
 	const t = useTranslations('workout.share')
 	const tModeration = useTranslations('social.moderation')
 	const [open, setOpen] = useState(false)
@@ -192,7 +193,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 											</p>
 											<p className="type-body-sm text-ink-3">
 												{t('createdAgo', {
-													time: formatTimeAgo(share.createdAt),
+													time: formatTimeAgo(share.createdAt, locale),
 												})}
 											</p>
 											{/* TRUST-04: the link is still active and still
