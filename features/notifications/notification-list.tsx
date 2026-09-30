@@ -51,7 +51,8 @@ function NotificationRow({
 }) {
 	const locale = useLocale()
 	const t = useTranslations('social.notifications')
-	const view = describeNotification(notification, t)
+	const tPartners = useTranslations('settings.trainingPartners')
+	const view = describeNotification(notification, t, tPartners)
 	const Icon = KIND_ICON[notification.kind]
 	const unread = !notification.readAt
 	return (

@@ -9,22 +9,6 @@ import type { MessageKey, Translator } from '@/i18n/translator'
 
 type Namespace = 'settings.trainingPartners'
 
-/**
- * The English wording, kept only for `lib/utils/notifications.ts`, which still
- * words its own copy in English (I18N social pass) and reads it from here.
- * Settings and profiles read the message keys below through a translator.
- */
-export const TRAINING_PARTNER_ENCOURAGEMENT_LABELS = {
-	READY_TO_TRAIN: 'Ready to train',
-	STRONG_SESSION: 'Strong session',
-	GOOD_WORK: 'Good work',
-	KEEP_GOING: 'Keep going',
-} as const satisfies Record<TrainingPartnerEncouragementKind, string>
-
-export const trainingPartnerEncouragementLabel = (
-	kind: TrainingPartnerEncouragementKind,
-) => TRAINING_PARTNER_ENCOURAGEMENT_LABELS[kind]
-
 const ENCOURAGEMENT_KEYS = {
 	READY_TO_TRAIN: 'encouragement.READY_TO_TRAIN',
 	STRONG_SESSION: 'encouragement.STRONG_SESSION',
@@ -34,6 +18,11 @@ const ENCOURAGEMENT_KEYS = {
 	TrainingPartnerEncouragementKind,
 	MessageKey<Namespace>
 >
+
+export const trainingPartnerEncouragementLabel = (
+	kind: TrainingPartnerEncouragementKind,
+	t: Translator<Namespace>,
+) => t(ENCOURAGEMENT_KEYS[kind])
 
 export const trainingPartnerEncouragementOptions = (t: Translator<Namespace>) =>
 	TRAINING_PARTNER_ENCOURAGEMENT_KINDS.map(kind => ({

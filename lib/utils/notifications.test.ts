@@ -105,20 +105,22 @@ const partnerAchievement: AppNotification = {
 
 const t = translatorFor('en', 'social.notifications')
 const es = translatorFor('es', 'social.notifications')
+const tPartners = translatorFor('en', 'settings.trainingPartners')
+const esPartners = translatorFor('es', 'settings.trainingPartners')
 
 describe('notifications (NOTIF-01)', () => {
 	it('names what each notification announces and where it leads', () => {
-		expect(describeNotification(achievement, t)).toEqual({
+		expect(describeNotification(achievement, t, tPartners)).toEqual({
 			title: 'Achievement earned: 10 Sessions',
 			detail: 'Complete 10 sessions.',
 			href: '/achievements',
 		})
-		expect(describeNotification(progress, t)).toEqual({
+		expect(describeNotification(progress, t, tPartners)).toEqual({
 			title: 'Upper / Lower · Upper: 2 new records and 1 load change',
 			detail: 'Load changes apply from your next session of this day.',
 			href: '/workouts/history/s1',
 		})
-		expect(describeNotification(follower, t)).toEqual({
+		expect(describeNotification(follower, t, tPartners)).toEqual({
 			title: 'Marta Ruiz started following you',
 			detail: '@marta · open their profile to follow back',
 			href: '/profile/marta',
@@ -130,19 +132,20 @@ describe('notifications (NOTIF-01)', () => {
 					actor: { ...follower.actor, lastName: null, isFollowedByMe: true },
 				} as AppNotification,
 				t,
+				tPartners,
 			).detail,
 		).toBe('@marta · you follow them too')
-		expect(describeNotification(encouragement, t)).toEqual({
+		expect(describeNotification(encouragement, t, tPartners)).toEqual({
 			title: 'Cassia sent encouragement: Good work',
 			detail: '@cassia · from your training partner',
 			href: '/profile/cassia',
 		})
-		expect(describeNotification(partnerSession, t)).toEqual({
+		expect(describeNotification(partnerSession, t, tPartners)).toEqual({
 			title: 'Cassia Stone completed a workout',
 			detail: 'Upper / Lower · Lower · shared by your training partner',
 			href: '/profile/cassia',
 		})
-		expect(describeNotification(partnerAchievement, t)).toEqual({
+		expect(describeNotification(partnerAchievement, t, tPartners)).toEqual({
 			title: 'Cassia earned Ten sessions',
 			detail: '@cassia · shared by your training partner',
 			href: '/profile/cassia',
@@ -159,7 +162,7 @@ describe('notifications (NOTIF-01)', () => {
 		expect(sessionProgressSummary(2, 1, es)).toBe(
 			'2 récords nuevos y 1 cambio de carga',
 		)
-		expect(describeNotification(follower, es).title).toBe(
+		expect(describeNotification(follower, es, esPartners).title).toBe(
 			'Marta Ruiz empezó a seguirte',
 		)
 	})

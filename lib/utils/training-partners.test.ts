@@ -70,7 +70,7 @@ describe('training-partner presentation', () => {
 			{ kind: 'GOOD_WORK', label: 'Good work' },
 			{ kind: 'KEEP_GOING', label: 'Keep going' },
 		])
-		expect(trainingPartnerEncouragementLabel('GOOD_WORK')).toBe('Good work')
+		expect(trainingPartnerEncouragementLabel('GOOD_WORK', t)).toBe('Good work')
 	})
 
 	it('says the same in Spanish', () => {

@@ -8,6 +8,7 @@ import type { Translator } from '@/i18n/translator'
 import { trainingPartnerEncouragementLabel } from './training-partners'
 
 type T = Translator<'social.notifications'>
+type TPartners = Translator<'settings.trainingPartners'>
 
 export interface NotificationView {
 	title: string
@@ -31,6 +32,7 @@ export const sessionProgressSummary = (
 export function describeNotification(
 	notification: AppNotification,
 	t: T,
+	tPartners: TPartners,
 ): NotificationView {
 	switch (notification.kind) {
 		case 'ACHIEVEMENT':
@@ -89,6 +91,7 @@ export function describeNotification(
 					name,
 					prompt: trainingPartnerEncouragementLabel(
 						notification.encouragement.kind,
+						tPartners,
 					),
 				}),
 				detail: t('encouragementDetail', { username: actor.username }),
