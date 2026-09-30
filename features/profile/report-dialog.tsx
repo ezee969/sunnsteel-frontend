@@ -3,6 +3,7 @@
 import type { ReportReason, ReportSubjectKind } from '@sunsteel/contracts'
 import { REPORT_DETAILS_MAX_LENGTH } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,6 @@ import { useToast } from '@/components/ui/toast'
 import { useReportMember } from '@/lib/api/hooks/useModeration'
 import {
 	REPORT_REASON_OPTIONS,
-	REPORT_RECEIPT,
 	REPORT_SUBJECT_LABELS,
 } from '@/lib/utils/moderation'
 
@@ -45,6 +45,8 @@ export function ReportDialog({
 	subjectKind,
 	subjectId,
 }: ReportDialogProps) {
+	const t = useTranslations('social.report')
+	const tModeration = useTranslations('social.moderation')
 	const { push } = useToast()
 	const report = useReportMember()
 	const [reason, setReason] = useState<ReportReason>('SPAM')
@@ -58,14 +60,14 @@ export function ReportDialog({
 					onOpenChange(false)
 					setDetails('')
 					push({
-						title: 'Report recorded',
-						description: REPORT_RECEIPT,
+						title: t('recorded'),
+						description: tModeration('reportReceipt'),
 						variant: 'success',
 					})
 				},
 				onError: error => {
 					push({
-						title: 'Could not file this report',
+						title: t('failed'),
 						description: error.message,
 						variant: 'destructive',
 					})
@@ -78,13 +80,17 @@ export function ReportDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Report {REPORT_SUBJECT_LABELS[subjectKind]}</DialogTitle>
-					<DialogDescription>{REPORT_RECEIPT}</DialogDescription>
+					<DialogTitle>
+						{t('title', {
+							subject: tModeration(REPORT_SUBJECT_LABELS[subjectKind]),
+						})}
+					</DialogTitle>
+					<DialogDescription>{tModeration('reportReceipt')}</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="report-reason">Reason</Label>
+						<Label htmlFor="report-reason">{t('reason')}</Label>
 						<NativeSelect
 							id="report-reason"
 							value={reason}
@@ -92,19 +98,19 @@ export function ReportDialog({
 						>
 							{REPORT_REASON_OPTIONS.map(option => (
 								<option key={option.value} value={option.value}>
-									{option.label}
+									{tModeration(option.label)}
 								</option>
 							))}
 						</NativeSelect>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="report-details">Anything else (optional)</Label>
+						<Label htmlFor="report-details">{t('details')}</Label>
 						<Textarea
 							id="report-details"
 							value={details}
 							maxLength={REPORT_DETAILS_MAX_LENGTH}
 							onChange={event => setDetails(event.target.value)}
-							placeholder="What should a reviewer know?"
+							placeholder={t('detailsPlaceholder')}
 						/>
 						<p className="type-body-sm text-ink-3">
 							{details.length}/{REPORT_DETAILS_MAX_LENGTH}
@@ -118,13 +124,13 @@ export function ReportDialog({
 						variant="outline"
 						onClick={() => onOpenChange(false)}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button type="button" onClick={submit} disabled={report.isPending}>
 						{report.isPending ? (
 							<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
 						) : null}
-						Send report
+						{t('send')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

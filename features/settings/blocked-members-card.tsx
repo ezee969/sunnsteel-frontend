@@ -2,6 +2,7 @@
 
 import { Loader2, ShieldBan } from 'lucide-react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -16,11 +17,7 @@ import {
 	useBlockedMembers,
 	useUnblockMember,
 } from '@/lib/api/hooks/useModeration'
-import {
-	BLOCK_LINK_CAVEAT,
-	blockedMemberName,
-	describeBlockedSince,
-} from '@/lib/utils/moderation'
+import { blockedMemberName, describeBlockedSince } from '@/lib/utils/moderation'
 
 /**
  * PROF-10: the one place the whole block list is visible. It repeats what a
@@ -29,6 +26,8 @@ import {
  * would otherwise look like a failure.
  */
 export function BlockedMembersCard() {
+	const tModeration = useTranslations('social.moderation')
+	const locale = useLocale()
 	const blocks = useBlockedMembers()
 	const unblock = useUnblockMember()
 	const { push } = useToast()
@@ -44,7 +43,7 @@ export function BlockedMembersCard() {
 				<CardDescription>
 					Blocking works both ways: neither of you appears in the other’s
 					search, suggestions, follower lists or profile, and any follow between
-					you is removed. {BLOCK_LINK_CAVEAT}
+					you is removed. {tModeration('blockLinkCaveat')}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -84,7 +83,7 @@ export function BlockedMembersCard() {
 									</p>
 									<p className="type-body-sm text-ink-3">
 										@{block.member.username} · blocked{' '}
-										{describeBlockedSince(block)}
+										{describeBlockedSince(block, locale)}
 									</p>
 								</div>
 								<Button

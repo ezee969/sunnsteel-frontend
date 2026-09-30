@@ -3,6 +3,7 @@
 import type { PublicUserProfile } from '@sunsteel/contracts'
 import { Flag, MoreHorizontal, ShieldBan, ShieldCheck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import {
@@ -25,11 +26,6 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
 import { useBlockMember, useUnblockMember } from '@/lib/api/hooks/useModeration'
-import {
-	BLOCK_EXPLANATION,
-	BLOCK_LINK_CAVEAT,
-	UNBLOCK_EXPLANATION,
-} from '@/lib/utils/moderation'
 
 /**
  * PROF-10 on a member profile. Blocking is destructive enough to confirm and
@@ -42,6 +38,8 @@ export function MemberModerationMenu({
 }: {
 	profile: PublicUserProfile
 }) {
+	const t = useTranslations('social.memberModeration')
+	const tModeration = useTranslations('social.moderation')
 	const router = useRouter()
 	const { push } = useToast()
 	const block = useBlockMember()
@@ -57,10 +55,10 @@ export function MemberModerationMenu({
 			onSuccess: () => {
 				setConfirming(false)
 				push({
-					title: isBlocked ? 'Member unblocked' : 'Member blocked',
+					title: isBlocked ? t('unblocked') : t('blocked'),
 					description: isBlocked
-						? `@${handle} can find and follow you again.`
-						: `You and @${handle} no longer see each other.`,
+						? t('unblockedBody', { handle })
+						: t('blockedBody', { handle }),
 					variant: 'success',
 				})
 				// A blocked profile answers 404 from here on, so staying on it
@@ -69,9 +67,7 @@ export function MemberModerationMenu({
 			},
 			onError: error => {
 				push({
-					title: isBlocked
-						? 'Could not unblock this member'
-						: 'Could not block this member',
+					title: isBlocked ? t('unblockFailed') : t('blockFailed'),
 					description: error.message,
 					variant: 'destructive',
 				})
@@ -83,7 +79,7 @@ export function MemberModerationMenu({
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="outline" size="sm" aria-label="More actions">
+					<Button variant="outline" size="sm" aria-label={t('moreActions')}>
 						<MoreHorizontal className="h-4 w-4" aria-hidden />
 					</Button>
 				</DropdownMenuTrigger>
@@ -91,16 +87,17 @@ export function MemberModerationMenu({
 					<DropdownMenuItem onSelect={() => setConfirming(true)}>
 						{isBlocked ? (
 							<>
-								<ShieldCheck className="mr-2 h-4 w-4" aria-hidden /> Unblock
+								<ShieldCheck className="mr-2 h-4 w-4" aria-hidden />{' '}
+								{t('unblock')}
 							</>
 						) : (
 							<>
-								<ShieldBan className="mr-2 h-4 w-4" aria-hidden /> Block
+								<ShieldBan className="mr-2 h-4 w-4" aria-hidden /> {t('block')}
 							</>
 						)}
 					</DropdownMenuItem>
 					<DropdownMenuItem onSelect={() => setReporting(true)}>
-						<Flag className="mr-2 h-4 w-4" aria-hidden /> Report
+						<Flag className="mr-2 h-4 w-4" aria-hidden /> {t('report')}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -109,17 +106,23 @@ export function MemberModerationMenu({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							{isBlocked ? `Unblock @${handle}?` : `Block @${handle}?`}
+							{isBlocked
+								? t('unblockTitle', { handle })
+								: t('blockTitle', { handle })}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
-							{isBlocked ? UNBLOCK_EXPLANATION : BLOCK_EXPLANATION}
+							{isBlocked
+								? tModeration('unblockExplanation')
+								: tModeration('blockExplanation')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					{!isBlocked ? (
-						<p className="type-body-sm text-ink-3">{BLOCK_LINK_CAVEAT}</p>
+						<p className="type-body-sm text-ink-3">
+							{tModeration('blockLinkCaveat')}
+						</p>
 					) : null}
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={event => {
 								event.preventDefault()
@@ -127,7 +130,7 @@ export function MemberModerationMenu({
 							}}
 							disabled={block.isPending || unblock.isPending}
 						>
-							{isBlocked ? 'Unblock' : 'Block'}
+							{isBlocked ? t('unblock') : t('block')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

@@ -1,12 +1,12 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useModerationHistory } from '@/lib/api/hooks/useModeration'
 import {
 	describeModerationAction,
-	MODERATION_RECORD_NOTE,
 	REPORT_SUBJECT_HEADINGS,
 } from '@/lib/utils/moderation'
 
@@ -17,17 +17,20 @@ import {
  * above the `HIDE_SUBJECT` one, which stays exactly as it was written.
  */
 export function EnforcementRecord() {
+	const t = useTranslations('social.moderationPage')
+	const tModeration = useTranslations('social.moderation')
+	const locale = useLocale()
 	const history = useModerationHistory()
 	const actions = (history.data?.pages ?? []).flatMap(page => page.actions)
 
 	return (
 		<div className="flex flex-col gap-4">
-			<p className="type-body-sm text-ink-3">{MODERATION_RECORD_NOTE}</p>
+			<p className="type-body-sm text-ink-3">{tModeration('recordNote')}</p>
 
 			{history.isLoading ? (
 				<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 					<Loader2 className="size-4 animate-spin" aria-hidden />
-					Loading the record…
+					{t('loadingRecord')}
 				</div>
 			) : history.error ? (
 				<div role="alert" className="border border-destructive bg-surface p-4">
@@ -41,7 +44,7 @@ export function EnforcementRecord() {
 						className="mt-3"
 						onClick={() => void history.refetch()}
 					>
-						Try Again
+						{t('tryAgain')}
 					</Button>
 				</div>
 			) : actions.length ? (
@@ -49,11 +52,15 @@ export function EnforcementRecord() {
 					{actions.map(action => (
 						<div key={action.id} className="rule-row flex flex-col gap-1 py-3">
 							<p className="type-panel text-foreground">
-								{describeModerationAction(action)}
+								{describeModerationAction(action, tModeration, locale)}
 							</p>
 							<p className="type-body-sm text-ink-3">
-								{REPORT_SUBJECT_HEADINGS[action.subjectKind]} ·{' '}
-								{action.subjectId}
+								{t('recordSubject', {
+									kind: tModeration(
+										REPORT_SUBJECT_HEADINGS[action.subjectKind],
+									),
+									id: action.subjectId,
+								})}
 							</p>
 							{action.note ? (
 								<p className="type-body-sm text-ink-2">{action.note}</p>
@@ -62,9 +69,7 @@ export function EnforcementRecord() {
 					))}
 				</div>
 			) : (
-				<p className="type-body-sm py-4 text-ink-3">
-					Nothing has been recorded yet.
-				</p>
+				<p className="type-body-sm py-4 text-ink-3">{t('nothingRecorded')}</p>
 			)}
 
 			{history.hasNextPage ? (
@@ -76,7 +81,7 @@ export function EnforcementRecord() {
 					disabled={history.isFetchingNextPage}
 					onClick={() => void history.fetchNextPage()}
 				>
-					{history.isFetchingNextPage ? 'Loading…' : 'Load more'}
+					{history.isFetchingNextPage ? t('loading') : t('loadMore')}
 				</Button>
 			) : null}
 		</div>

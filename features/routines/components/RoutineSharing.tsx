@@ -17,7 +17,6 @@ import {
 	useRoutineShares,
 	useSetRoutineVisibility,
 } from '@/lib/api/hooks/useRoutineSharing'
-import { ROUTINE_HIDDEN_BY_MODERATION } from '@/lib/utils/moderation'
 import {
 	describeVisibilityCap,
 	routineLinkNote,
@@ -48,6 +47,7 @@ export function RoutineSharing({
 }: RoutineSharingProps) {
 	const { push } = useToast()
 	const t = useTranslations('routines.sharing')
+	const tModeration = useTranslations('social.moderation')
 	const visibilityOptions = routineVisibilityOptions(t)
 	const shares = useRoutineShares(routineId)
 	const setVisibility = useSetRoutineVisibility(routineId)
@@ -94,7 +94,7 @@ export function RoutineSharing({
 					className="type-body-sm flex max-w-[68ch] items-start gap-2 border border-rule bg-surface p-3 text-ink-2"
 				>
 					<EyeOff className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
-					{ROUTINE_HIDDEN_BY_MODERATION}
+					{tModeration('routineHidden')}
 				</p>
 			) : null}
 

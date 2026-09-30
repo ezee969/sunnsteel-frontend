@@ -28,7 +28,6 @@ import {
 	useSessionShares,
 } from '@/lib/api/hooks/useSessionShares'
 import { formatTimeAgo } from '@/lib/utils/date'
-import { SESSION_SHARE_HIDDEN_BY_MODERATION } from '@/lib/utils/moderation'
 import { copyTextToClipboard } from '@/lib/utils/profile-sharing'
 import {
 	describeShareFields,
@@ -45,6 +44,7 @@ import {
  */
 export function SessionShareButton({ sessionId }: { sessionId: string }) {
 	const t = useTranslations('workout.share')
+	const tModeration = useTranslations('social.moderation')
 	const [open, setOpen] = useState(false)
 	const [fields, setFields] = useState<SessionShareField[]>(
 		SESSION_SHARE_DEFAULT_FIELDS,
@@ -201,7 +201,7 @@ export function SessionShareButton({ sessionId }: { sessionId: string }) {
 											    read that as the link being broken. */}
 											{share.isHiddenByModeration ? (
 												<p className="type-body-sm text-ink-2">
-													{SESSION_SHARE_HIDDEN_BY_MODERATION}
+													{tModeration('sessionShareHidden')}
 												</p>
 											) : null}
 										</div>

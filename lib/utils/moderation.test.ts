@@ -10,30 +10,38 @@ import {
 } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { translatorFor } from '@/i18n/translator'
+
 import {
 	availableReviewActions,
-	BLOCK_EXPLANATION,
-	BLOCK_LINK_CAVEAT,
 	blockedMemberName,
+	describeModerationAction,
 	describeOtherReports,
+	describeReportFiled,
 	describeReportSubject,
-	MODERATION_ACCESS_NOTE,
 	MODERATION_ACTION_LABELS,
-	MODERATION_HIDE_EXPLANATION,
-	MODERATION_QUEUE_SCOPE,
-	MODERATION_RECORD_NOTE,
-	MODERATION_WITHHELD_ACTIONS_NOTE,
-	MODERATION_WITHHELD_NOTE,
 	moderationSubjectHref,
 	REPORT_REASON_LABELS,
 	REPORT_REASON_OPTIONS,
-	REPORT_RECEIPT,
 	REPORT_STATUS_LABELS,
 	reportSubjectOwner,
-	ROUTINE_HIDDEN_BY_MODERATION,
-	SESSION_SHARE_HIDDEN_BY_MODERATION,
-	UNBLOCK_EXPLANATION,
 } from './moderation'
+
+const t = translatorFor('en', 'social.moderation')
+const es = translatorFor('es', 'social.moderation')
+
+const BLOCK_EXPLANATION = t('blockExplanation')
+const BLOCK_LINK_CAVEAT = t('blockLinkCaveat')
+const UNBLOCK_EXPLANATION = t('unblockExplanation')
+const REPORT_RECEIPT = t('reportReceipt')
+const MODERATION_ACCESS_NOTE = t('accessNote')
+const MODERATION_WITHHELD_NOTE = t('withheldNote')
+const MODERATION_WITHHELD_ACTIONS_NOTE = t('withheldActionsNote')
+const MODERATION_QUEUE_SCOPE = t('queueScope')
+const MODERATION_HIDE_EXPLANATION = t('hideExplanation')
+const MODERATION_RECORD_NOTE = t('recordNote')
+const ROUTINE_HIDDEN_BY_MODERATION = t('routineHidden')
+const SESSION_SHARE_HIDDEN_BY_MODERATION = t('sessionShareHidden')
 
 const block = (
 	overrides: Partial<BlockedMember['member']> = {},
@@ -78,7 +86,7 @@ describe('reporting copy', () => {
 
 	it('labels every reason the contract defines, in contract order', () => {
 		for (const reason of REPORT_REASONS) {
-			expect(REPORT_REASON_LABELS[reason]).toBeTruthy()
+			expect(t(REPORT_REASON_LABELS[reason])).toBeTruthy()
 		}
 		expect(REPORT_REASON_OPTIONS.map(option => option.value)).toEqual([
 			...REPORT_REASONS,
@@ -142,19 +150,21 @@ describe('the review queue never fills in what it may not show', () => {
 		// would be the bypass the whole design exists to avoid.
 		const described = describeReportSubject(
 			subject({ isWithheld: true, title: null, owner: null }),
+			t,
 		)
 		expect(described).toMatch(/not visible to you/i)
 		expect(described).not.toMatch(/Upper/)
 	})
 
 	it('says a missing subject is gone rather than withheld', () => {
-		expect(describeReportSubject(subject({ isMissing: true }))).toMatch(
+		expect(describeReportSubject(subject({ isMissing: true }), t)).toMatch(
 			/no longer exists/i,
 		)
 	})
 
 	it('names a readable subject', () => {
-		expect(describeReportSubject(subject())).toBe('Routine · Upper / Lower')
+		expect(describeReportSubject(subject(), t)).toBe('Routine · Upper / Lower')
+		expect(describeReportSubject(subject(), es)).toBe('Rutina · Upper / Lower')
 	})
 
 	it('offers no link for a subject the reviewer cannot open', () => {
@@ -264,31 +274,38 @@ describe('review copy states the powers honestly', () => {
 		// Two reports can name one subject, so a restore through one leaves the
 		// other resolved while the content is visible again. `subject.isHidden`
 		// is the live fact; the status is only what was decided.
-		expect(REPORT_STATUS_LABELS.ACTIONED).not.toMatch(/hidden/i)
+		expect(t(REPORT_STATUS_LABELS.ACTIONED)).not.toMatch(/hidden/i)
+		expect(es(REPORT_STATUS_LABELS.ACTIONED)).not.toMatch(/ocult/i)
 	})
 
 	it('labels every status and action kind the contract defines', () => {
 		for (const status of REPORT_STATUSES) {
-			expect(REPORT_STATUS_LABELS[status]).toBeTruthy()
+			expect(t(REPORT_STATUS_LABELS[status])).toBeTruthy()
 		}
 		for (const kind of MODERATION_ACTION_KINDS) {
-			expect(MODERATION_ACTION_LABELS[kind]).toBeTruthy()
+			expect(t(MODERATION_ACTION_LABELS[kind])).toBeTruthy()
 		}
 	})
 
 	it('names reading as an action of its own in the record', () => {
-		expect(MODERATION_ACTION_LABELS.VIEW_SUBJECT).toMatch(/opened/i)
+		expect(t(MODERATION_ACTION_LABELS.VIEW_SUBJECT)).toMatch(/opened/i)
 	})
 })
 
 describe('other open reports are stated, not badged', () => {
 	it('says nothing when there are none', () => {
-		expect(describeOtherReports(0)).toBeNull()
+		expect(describeOtherReports(0, t)).toBeNull()
 	})
 
 	it('agrees in number', () => {
-		expect(describeOtherReports(1)).toMatch(/^1 other report/)
-		expect(describeOtherReports(3)).toMatch(/^3 other reports/)
+		expect(describeOtherReports(1, t)).toMatch(/^1 other report/)
+		expect(describeOtherReports(3, t)).toMatch(/^3 other reports/)
+		expect(describeOtherReports(1, es)).toBe(
+			'Hay 1 denuncia más sobre esto todavía abierta',
+		)
+		expect(describeOtherReports(3, es)).toBe(
+			'Hay 3 denuncias más sobre esto todavía abiertas',
+		)
 	})
 })
 
@@ -299,6 +316,78 @@ describe('the PROF-10 receipt has not drifted into a timetable', () => {
 		expect(REPORT_RECEIPT).toMatch(/will not get an update/i)
 		expect(REPORT_RECEIPT).not.toMatch(
 			/within|hours|days|soon|shortly|as soon as|promptly/i,
+		)
+	})
+})
+
+describe('the Spanish copy keeps the same promises', () => {
+	it('says the block runs both ways and what it cannot withdraw', () => {
+		expect(es('blockExplanation')).toMatch(/ambos sentidos/i)
+		expect(es('blockExplanation')).toMatch(/seguimiento/i)
+		expect(es('blockLinkCaveat')).toMatch(/enlace/i)
+		expect(es('blockLinkCaveat')).toMatch(/revoca/i)
+		expect(es('unblockExplanation')).toMatch(/no se restauran/i)
+	})
+
+	it('confirms a report without promising an update or a timetable', () => {
+		const receipt = es('reportReceipt')
+		expect(receipt).toMatch(/registrada/i)
+		expect(receipt).toMatch(/no recibirás novedades/i)
+		expect(receipt).not.toMatch(
+			/en un plazo|dentro de|horas|días|pronto|en breve|lo antes posible|enseguida|revisaremos/i,
+		)
+	})
+
+	it('states the reviewer powers honestly', () => {
+		expect(es('accessNote')).toMatch(/mismas reglas de privacidad/i)
+		expect(es('withheldNote')).not.toMatch(/descart|ocult/i)
+		expect(es('withheldActionsNote')).toMatch(/descartar/i)
+		expect(es('queueScope')).toMatch(/registrado/i)
+		expect(es('hideExplanation')).toMatch(/propietario lo conserva/i)
+		expect(es('hideExplanation')).toMatch(/no se elimina nada/i)
+		expect(es('hideExplanation')).toMatch(/restaurarlo/i)
+		expect(es('recordNote')).toMatch(/no se puede editar/i)
+		expect(es('routineHidden')).toMatch(/nadie más/i)
+		expect(es('routineHidden')).toMatch(/enlace/i)
+		expect(es('routineHidden')).toMatch(/no cambió/i)
+		expect(es('sessionShareHidden')).toMatch(/no se revocó/i)
+	})
+
+	it('names a withheld subject by its kind alone', () => {
+		const described = describeReportSubject(
+			subject({ isWithheld: true, title: null, owner: null }),
+			es,
+		)
+		expect(described).toBe('Rutina · no visible para ti')
+	})
+
+	it('dates the filing and the record in the reader language', () => {
+		expect(describeReportFiled(report(), t, 'en')).toBe(
+			'Filed Sep 20, 2026 by Rep',
+		)
+		expect(describeReportFiled(report(), es, 'es')).toMatch(
+			/^Hecha el 20 sept?\.? 2026 por Rep$/,
+		)
+		const action = {
+			id: 'a-1',
+			kind: 'HIDE_SUBJECT',
+			subjectKind: 'ROUTINE',
+			subjectId: 'routine-1',
+			note: null,
+			createdAt: '2026-09-20T10:00:00.000Z',
+			moderator: {
+				id: 'mod',
+				username: 'mod',
+				name: 'Mo',
+				lastName: 'D',
+				avatarUrl: null,
+			},
+		} as unknown as Parameters<typeof describeModerationAction>[0]
+		expect(describeModerationAction(action, t, 'en')).toMatch(
+			/^Hid the content · Mo D · Sep 20, 2026/,
+		)
+		expect(describeModerationAction(action, es, 'es')).toMatch(
+			/^Ocultó el contenido · Mo D · 20 sept?/,
 		)
 	})
 })

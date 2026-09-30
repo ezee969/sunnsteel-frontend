@@ -6,6 +6,7 @@ import type {
 } from '@sunsteel/contracts'
 import { MODERATION_NOTE_MAX_LENGTH } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -20,16 +21,13 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast'
+import type { MessageKey } from '@/i18n/translator'
 import {
 	useDismissReport,
 	useHideReportedContent,
 	useRestoreReportedContent,
 } from '@/lib/api/hooks/useModeration'
-import {
-	describeReportSubject,
-	MODERATION_HIDE_EXPLANATION,
-	MODERATION_RESTORE_EXPLANATION,
-} from '@/lib/utils/moderation'
+import { describeReportSubject } from '@/lib/utils/moderation'
 
 type ReviewAction = Exclude<ModerationActionKind, 'VIEW_SUBJECT'>
 
@@ -40,28 +38,26 @@ interface ReviewActionDialogProps {
 	report: ModerationReport
 }
 
+type ReviewKey = MessageKey<'social.reviewAction'>
+
 const COPY: Record<
 	ReviewAction,
-	{ title: string; description: string; confirm: string; done: string }
+	{ title: ReviewKey; confirm: ReviewKey; done: ReviewKey }
 > = {
 	DISMISS_REPORT: {
-		title: 'Dismiss this report',
-		description:
-			'The report leaves the queue and nothing happens to the content. The reporter is not told either way, which is what they were told when they filed it.',
-		confirm: 'Dismiss report',
-		done: 'Report dismissed',
+		title: 'dismissTitle',
+		confirm: 'dismissConfirm',
+		done: 'dismissDone',
 	},
 	HIDE_SUBJECT: {
-		title: 'Hide this content',
-		description: MODERATION_HIDE_EXPLANATION,
-		confirm: 'Hide content',
-		done: 'Content hidden',
+		title: 'hideTitle',
+		confirm: 'hideConfirm',
+		done: 'hideDone',
 	},
 	RESTORE_SUBJECT: {
-		title: 'Restore this content',
-		description: MODERATION_RESTORE_EXPLANATION,
-		confirm: 'Restore content',
-		done: 'Content restored',
+		title: 'restoreTitle',
+		confirm: 'restoreConfirm',
+		done: 'restoreDone',
 	},
 }
 
@@ -77,6 +73,8 @@ export function ReviewActionDialog({
 	action,
 	report,
 }: ReviewActionDialogProps) {
+	const t = useTranslations('social.reviewAction')
+	const tModeration = useTranslations('social.moderation')
 	const { push } = useToast()
 	const dismiss = useDismissReport()
 	const hide = useHideReportedContent()
@@ -89,7 +87,18 @@ export function ReviewActionDialog({
 			: action === 'HIDE_SUBJECT'
 				? hide
 				: restore
-	const copy = COPY[action]
+	const keys = COPY[action]
+	const copy = {
+		title: t(keys.title),
+		description:
+			action === 'DISMISS_REPORT'
+				? t('dismissDescription')
+				: action === 'HIDE_SUBJECT'
+					? tModeration('hideExplanation')
+					: tModeration('restoreExplanation'),
+		confirm: t(keys.confirm),
+		done: t(keys.done),
+	}
 
 	const submit = () => {
 		mutation.mutate(
@@ -100,13 +109,13 @@ export function ReviewActionDialog({
 					setNote('')
 					push({
 						title: copy.done,
-						description: 'The action was recorded and cannot be edited.',
+						description: t('recorded'),
 						variant: 'success',
 					})
 				},
 				onError: error =>
 					push({
-						title: 'Could not complete this action',
+						title: t('failed'),
 						description: error.message,
 						variant: 'destructive',
 					}),
@@ -124,22 +133,22 @@ export function ReviewActionDialog({
 
 				<div className="space-y-4">
 					<p className="type-body-sm text-ink-3">
-						{describeReportSubject(report.subject)}
+						{describeReportSubject(report.subject, tModeration)}
 					</p>
 					<div className="space-y-2">
-						<Label htmlFor="moderation-note">
-							Note for the record (optional)
-						</Label>
+						<Label htmlFor="moderation-note">{t('noteLabel')}</Label>
 						<Textarea
 							id="moderation-note"
 							value={note}
 							maxLength={MODERATION_NOTE_MAX_LENGTH}
 							onChange={event => setNote(event.target.value)}
-							placeholder="Why you decided this."
+							placeholder={t('notePlaceholder')}
 						/>
 						<p className="type-body-sm text-ink-3">
-							{note.length}/{MODERATION_NOTE_MAX_LENGTH} · Kept in the record.
-							Neither the reporter nor the owner is shown it.
+							{t('noteCounter', {
+								length: note.length,
+								max: MODERATION_NOTE_MAX_LENGTH,
+							})}
 						</p>
 					</div>
 				</div>
@@ -150,7 +159,7 @@ export function ReviewActionDialog({
 						variant="outline"
 						onClick={() => onOpenChange(false)}
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button type="button" onClick={submit} disabled={mutation.isPending}>
 						{mutation.isPending ? (

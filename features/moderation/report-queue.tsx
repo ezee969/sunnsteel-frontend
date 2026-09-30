@@ -7,6 +7,7 @@ import type {
 } from '@sunsteel/contracts'
 import { EyeOff, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,10 +22,6 @@ import {
 	describeOtherReports,
 	describeReportFiled,
 	describeReportSubject,
-	MODERATION_ACCESS_NOTE,
-	MODERATION_MISSING_NOTE,
-	MODERATION_WITHHELD_ACTIONS_NOTE,
-	MODERATION_WITHHELD_NOTE,
 	moderationSubjectHref,
 	REPORT_REASON_LABELS,
 	REPORT_STATUS_LABELS,
@@ -47,6 +44,9 @@ const STATUS_TABS: ReportStatus[] = ['OPEN', 'ACTIONED', 'DISMISSED']
  * reviewer stays where they are rather than opening it unlogged.
  */
 export function ReportQueue() {
+	const t = useTranslations('social.moderationPage')
+	const tModeration = useTranslations('social.moderation')
+	const locale = useLocale()
 	const router = useRouter()
 	const { push } = useToast()
 	const [status, setStatus] = useState<ReportStatus>('OPEN')
@@ -73,8 +73,8 @@ export function ReportQueue() {
 				onError: error => {
 					setOpening(null)
 					push({
-						title: 'Could not open this',
-						description: `${error.message} Opening reported content is recorded, so it was not opened.`,
+						title: t('openFailedTitle'),
+						description: t('openFailedBody', { message: error.message }),
 						variant: 'destructive',
 					})
 				},
@@ -84,9 +84,9 @@ export function ReportQueue() {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<p className="type-body-sm text-ink-3">{MODERATION_ACCESS_NOTE}</p>
+			<p className="type-body-sm text-ink-3">{tModeration('accessNote')}</p>
 
-			<div role="group" aria-label="Report status" className="flex gap-1">
+			<div role="group" aria-label={t('statusGroup')} className="flex gap-1">
 				{STATUS_TABS.map(option => (
 					<Button
 						key={option}
@@ -96,8 +96,10 @@ export function ReportQueue() {
 						aria-pressed={status === option}
 						onClick={() => setStatus(option)}
 					>
-						{REPORT_STATUS_LABELS[option]}
-						{option === 'OPEN' && openCount > 0 ? ` (${openCount})` : ''}
+						{t('statusTab', {
+							label: tModeration(REPORT_STATUS_LABELS[option]),
+							count: option === 'OPEN' ? openCount : 0,
+						})}
 					</Button>
 				))}
 			</div>
@@ -105,7 +107,7 @@ export function ReportQueue() {
 			{queue.isLoading ? (
 				<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 					<Loader2 className="size-4 animate-spin" aria-hidden />
-					Loading reports…
+					{t('loadingReports')}
 				</div>
 			) : queue.error ? (
 				<div role="alert" className="border border-destructive bg-surface p-4">
@@ -117,7 +119,7 @@ export function ReportQueue() {
 						className="mt-3"
 						onClick={() => void queue.refetch()}
 					>
-						Try Again
+						{t('tryAgain')}
 					</Button>
 				</div>
 			) : reports.length ? (
@@ -125,7 +127,10 @@ export function ReportQueue() {
 					{reports.map(report => {
 						const actions = availableReviewActions(report)
 						const owner = reportSubjectOwner(report.subject)
-						const others = describeOtherReports(report.otherOpenReports)
+						const others = describeOtherReports(
+							report.otherOpenReports,
+							tModeration,
+						)
 						return (
 							<article
 								key={report.id}
@@ -133,22 +138,28 @@ export function ReportQueue() {
 							>
 								<div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
 									<p className="type-panel text-foreground">
-										{describeReportSubject(report.subject)}
+										{describeReportSubject(report.subject, tModeration)}
 									</p>
 									{report.subject.isHidden ? (
 										<span className="type-body-sm inline-flex items-center gap-1 text-ink-3">
 											<EyeOff className="size-3.5" aria-hidden />
-											Hidden
+											{t('hidden')}
 										</span>
 									) : null}
 								</div>
 
 								<p className="type-body-sm text-ink-2">
-									{REPORT_REASON_LABELS[report.reason]}
-									{owner ? ` · ${owner}` : ''}
+									{owner
+										? t('reasonWithOwner', {
+												reason: tModeration(
+													REPORT_REASON_LABELS[report.reason],
+												),
+												owner,
+											})
+										: tModeration(REPORT_REASON_LABELS[report.reason])}
 								</p>
 								<p className="type-body-sm text-ink-3">
-									{describeReportFiled(report)}
+									{describeReportFiled(report, tModeration, locale)}
 								</p>
 								{report.details ? (
 									<p className="type-body-sm text-ink-2">{report.details}</p>
@@ -158,13 +169,13 @@ export function ReportQueue() {
 								) : null}
 								{report.subject.isMissing ? (
 									<p className="type-body-sm text-ink-3">
-										{MODERATION_MISSING_NOTE}
+										{tModeration('missingNote')}
 									</p>
 								) : report.subject.isWithheld ? (
 									<p className="type-body-sm text-ink-3">
-										{MODERATION_WITHHELD_NOTE}
+										{tModeration('withheldNote')}
 										{actions.canDismiss || actions.canHide
-											? ` ${MODERATION_WITHHELD_ACTIONS_NOTE}`
+											? ` ${tModeration('withheldActionsNote')}`
 											: ''}
 									</p>
 								) : null}
@@ -184,7 +195,7 @@ export function ReportQueue() {
 													aria-hidden
 												/>
 											) : null}
-											Open content
+											{t('openContent')}
 										</Button>
 									) : null}
 									{actions.canDismiss ? (
@@ -196,7 +207,7 @@ export function ReportQueue() {
 												setPending({ action: 'DISMISS_REPORT', report })
 											}
 										>
-											Dismiss
+											{t('dismiss')}
 										</Button>
 									) : null}
 									{actions.canHide ? (
@@ -208,7 +219,7 @@ export function ReportQueue() {
 												setPending({ action: 'HIDE_SUBJECT', report })
 											}
 										>
-											Hide content
+											{t('hideContent')}
 										</Button>
 									) : null}
 									{actions.canRestore ? (
@@ -220,7 +231,7 @@ export function ReportQueue() {
 												setPending({ action: 'RESTORE_SUBJECT', report })
 											}
 										>
-											Restore content
+											{t('restoreContent')}
 										</Button>
 									) : null}
 								</div>
@@ -230,9 +241,7 @@ export function ReportQueue() {
 				</div>
 			) : (
 				<p className="type-body-sm py-4 text-ink-3">
-					{status === 'OPEN'
-						? 'No reports are waiting. Nothing here needs a decision.'
-						: 'No reports in this state.'}
+					{status === 'OPEN' ? t('noneWaiting') : t('noneInState')}
 				</p>
 			)}
 
@@ -245,7 +254,7 @@ export function ReportQueue() {
 					disabled={queue.isFetchingNextPage}
 					onClick={() => void queue.fetchNextPage()}
 				>
-					{queue.isFetchingNextPage ? 'Loading…' : 'Load more'}
+					{queue.isFetchingNextPage ? t('loading') : t('loadMore')}
 				</Button>
 			) : null}
 

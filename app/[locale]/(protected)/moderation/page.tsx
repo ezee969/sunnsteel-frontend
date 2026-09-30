@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
@@ -8,7 +9,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EnforcementRecord } from '@/features/moderation/enforcement-record'
 import { ReportQueue } from '@/features/moderation/report-queue'
 import { useUser } from '@/lib/api/hooks/useUser'
-import { MODERATION_QUEUE_SCOPE } from '@/lib/utils/moderation'
 
 type ModerationView = 'queue' | 'record'
 
@@ -18,6 +18,8 @@ type ModerationView = 'queue' | 'record'
  * regardless, so this is presentation rather than the control.
  */
 export default function ModerationPage() {
+	const t = useTranslations('social.moderationPage')
+	const tModeration = useTranslations('social.moderation')
 	const { user, isLoading } = useUser()
 	const [view, setView] = useState<ModerationView>('queue')
 
@@ -25,7 +27,7 @@ export default function ModerationPage() {
 	if (!user?.isModerator) {
 		return (
 			<div className="mx-auto max-w-4xl">
-				<p className="type-body-sm text-ink-3">Page not found.</p>
+				<p className="type-body-sm text-ink-3">{t('notFound')}</p>
 			</div>
 		)
 	}
@@ -33,10 +35,10 @@ export default function ModerationPage() {
 	return (
 		<div className="mx-auto flex max-w-4xl flex-col gap-6 sm:gap-8">
 			<HeroSection
-				title={<>Moderation</>}
-				subtitle={<>{MODERATION_QUEUE_SCOPE}</>}
+				title={<>{t('title')}</>}
+				subtitle={<>{tModeration('queueScope')}</>}
 			/>
-			<div role="group" aria-label="Moderation view" className="flex gap-1">
+			<div role="group" aria-label={t('viewGroup')} className="flex gap-1">
 				{(['queue', 'record'] as const).map(option => (
 					<Button
 						key={option}
@@ -46,7 +48,7 @@ export default function ModerationPage() {
 						aria-pressed={view === option}
 						onClick={() => setView(option)}
 					>
-						{option === 'queue' ? 'Reports' : 'Record'}
+						{option === 'queue' ? t('reports') : t('record')}
 					</Button>
 				))}
 			</div>
