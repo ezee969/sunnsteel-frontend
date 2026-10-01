@@ -316,7 +316,7 @@ once already (CL-07), and is **not** taken here.
 | Section heading | Cinzel 600 | 16 | 18 | 1.25 | 0.06em | UPPER |
 | Panel / item title | Oswald 600 | 15 | 16 | 1.30 | 0.02em | Sentence |
 | Body | Source Sans 3 400 | 15 | 15 | 1.60 | 0 | Sentence |
-| Body small | Source Sans 3 400 | 13 | 13 | 1.45 | 0 | Sentence |
+| Body small | Source Sans 3 400 | 14 | 14 | 1.50 | 0 | Sentence |
 | Label | Oswald 500 | **12** | 12 | 1.30 | **0.06em** | UPPER |
 | Button | Oswald 600 | 14 | 14 | 1 | 0.04em | UPPER |
 | Numeral, large | Bebas Neue 400 | 40 | 52 | 0.95 | 0.02em | — |
@@ -342,7 +342,7 @@ scale is therefore now **scoped**, not just sized:
   inside a repeated row.
 - **Inside a repeated row**, captions are Body small in `--ink-3`, sentence case,
   untracked. A set's "Target: 3-5" is body small, not a micro-cap.
-- **Data** is Space Mono wherever a number is the point. It is monospaced,
+- **Data** is Space Mono wherever a number stands alone (§23.3: a number inside a sentence takes the sentence's face). It is monospaced,
   therefore tabular by construction: weights, volumes, durations and timers stop
   reflowing as digits change.
 - **Large numerals** are Bebas, and only where a number is the headline of its
@@ -1641,6 +1641,36 @@ sentence case.
   labels of dialogs and states those pages did not show.
 - **Not changed:** page tabs (§21) stay `type-button`, because a tab row is
   navigation read as a set of labels; filled controls; `type-label`.
+
+### 23.3 Rhythm, measure and one number face (UX-16)
+
+- **Body small is 14px at 1.5**, up from 13 at 1.45. It is the most used rank
+  in the app (658 call sites, against 72 `text-sm`): almost every
+  explanation, caption and row detail is set in it. Source Sans 3 has a lower
+  x-height than the condensed Oswald it replaced (§23.1), roughly 6.3px
+  against 7.5px at 13px, so the captions read smaller after UX-14 than
+  before it. At 14px they are back near Oswald's apparent size with
+  Source Sans's open shapes.
+- **A paragraph stops at 70 characters** (`p.type-body-sm`, `max-width:
+  70ch`). A centred or right-aligned paragraph, its own or its ancestor's,
+  including a responsive `lg:text-right`, keeps its alignment inside the
+  measure through `margin-inline: auto` or `margin-left: auto`, so empty
+  states stay centred. Below `md` no column is wider than the measure, so the
+  rule only shortens desktop lines.
+- **A number inside a sentence takes the sentence's face.** An inline
+  `span.type-data` or `span.type-data-strong` inside a Body small run
+  inherits the family and size and keeps tabular figures (strong is 600).
+  §5.3's "Data is Space Mono wherever a number is the point" is narrowed to
+  data that stands alone: set fields, timers, durations, ledger columns and
+  data lines. "Best 180 kg × 12 · est. 1RM 252 kg" no longer switches face
+  three times in one line.
+- **Not changed:** the region rhythm (§6: 32 / 48 / 64) and ruled lists.
+  Measured at 390, the dashboard already separates its sections by 32px, as
+  §6 says; the density came from small type, long lines and mixed faces, not
+  from the gaps, and ruled lists stay the default because they are what
+  makes a long list scannable. The "16px body below `md`" the roadmap
+  carried from `UX-14` was already true: unranked text inherits the
+  browser's 16px, and the text that read small was Body small.
 
 ---
 

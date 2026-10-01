@@ -375,13 +375,46 @@
     text-transform: uppercase;
   }
   /* The caption rank inside a repeated row: sentence case, untracked. */
+  /* UX-16 (§23.3): 14px, up from 13. Source Sans 3 sets a lower x-height than
+     the condensed Oswald it replaced (UX-14), so at 13px the captions that
+     carry most of the app's explanations read smaller than before. */
   .type-body-sm {
     font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
-    font-size: 0.8125rem;
-    line-height: 1.45;
+    font-size: 0.875rem;
+    line-height: 1.5;
     letter-spacing: 0;
     text-transform: none;
+  }
+  /* A paragraph stops at a readable measure. Centred and right-aligned ones
+     keep their alignment inside it rather than drifting left of the text
+     they belong to. */
+  p.type-body-sm {
+    max-width: 70ch;
+  }
+  /* Attribute selectors so a responsive `lg:text-right` counts too; below
+     that breakpoint a column is narrower than the measure, so the margin has
+     nothing to move. */
+  [class*='text-center'] p.type-body-sm,
+  p.type-body-sm[class*='text-center'] {
+    margin-inline: auto;
+  }
+  [class*='text-right'] p.type-body-sm,
+  p.type-body-sm[class*='text-right'] {
+    margin-left: auto;
+  }
+  /* One number face per line: a number inside a sentence takes the sentence's
+     face, with tabular figures, instead of switching to Space Mono mid-line.
+     Data that stands alone (set fields, timers, columns) keeps Space Mono. */
+  .type-body-sm span.type-data,
+  .type-body-sm span.type-data-strong {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-body-sm span.type-data-strong {
+    font-weight: 600;
   }
   .type-data {
     font-family: var(--font-space-mono), ui-monospace, monospace;
