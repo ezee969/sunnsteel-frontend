@@ -20,7 +20,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useDisplayPreference } from '@/hooks/use-display-preference'
+import { useCompactWorkout } from '@/hooks/use-compact-workout'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
@@ -118,7 +118,8 @@ export const ExerciseGroup = ({
 	const weightUnit = useWeightUnit()
 	// LIVE-18: under larger controls the swap, plate calculator and note move
 	// into one More menu, so the header keeps the exercise and one control.
-	const { largeControls } = useDisplayPreference()
+	// UX-21: one menu per exercise on a phone, as under larger controls.
+	const grouped = useCompactWorkout()
 	const [openTool, setOpenTool] = useState<'plates' | 'note' | null>(null)
 	const nextWeightedSet =
 		sets.find(
@@ -207,7 +208,7 @@ export const ExerciseGroup = ({
 				</Button>
 
 				<div className="flex shrink-0 items-center gap-3">
-					{largeControls ? (
+					{grouped ? (
 						<>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>

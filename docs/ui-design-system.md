@@ -1754,6 +1754,25 @@ sentence case.
 - **Translated on the way:** the builder's "Set N", its kind label, "Rest",
   "Weight", "Note" and the day-name placeholders were English literals.
 
+### 23.7 A phone groups the workout screen's actions (UX-21)
+
+- **Below `sm` the workout screen uses gym mode's grouping** (§22.4) whatever
+  the larger-controls setting: each exercise's swap, plate calculator and
+  note sit in one **More for <exercise>** menu, and each set's "Same as set
+  N", "Use last time" and Remove sit in its **Set N** menu beside its kind.
+  `useCompactWorkout` is true under larger controls or at a phone's width
+  (`(max-width: 639.98px)`, so it follows a rotation or a resize).
+- **Larger controls keeps deciding sizes, and only sizes.** The 56px fields,
+  the 32px tick and the large rest controls still come from the
+  `large-controls:` variant; a phone without the setting gets the grouping at
+  the standard sizes, with every control still at least 44px (§22.3).
+- **Why:** a phone's set row had three fill and remove buttons under every
+  set, and an exercise header three icon buttons beside a name that then
+  wrapped; the actions are the same, they are one tap further away, and the
+  fields a set is logged with keep the width.
+- The regression sweep's plate-calculator dialog case opens the calculator
+  from the menu below 640.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

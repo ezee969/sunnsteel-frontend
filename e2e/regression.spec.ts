@@ -763,11 +763,20 @@ for (const width of REGRESSION_WIDTHS) {
 		await prepare(page, width, 'light')
 		await load(page, `/workouts/sessions/${ids.history}`)
 
-		const trigger = page
-			.getByRole('button', {
-				name: msgPrefix('workout.plateCalculator.triggerAria'),
-			})
-			.first()
+		// UX-21: below `sm` the calculator sits in the exercise's own menu, as
+		// in gym mode, so the dialog is opened from there.
+		const grouped = width < 640
+		const trigger = grouped
+			? page
+					.getByRole('button', {
+						name: msgPrefix('workout.exerciseGroup.moreForAria'),
+					})
+					.first()
+			: page
+					.getByRole('button', {
+						name: msgPrefix('workout.plateCalculator.triggerAria'),
+					})
+					.first()
 		await expect(
 			trigger,
 			'the discovered session has no weighted exercise to open the plate calculator on',
@@ -775,6 +784,13 @@ for (const width of REGRESSION_WIDTHS) {
 
 		for (const dismiss of ['Escape', 'outside click'] as const) {
 			await trigger.click()
+			if (grouped) {
+				await page
+					.getByRole('menuitem', {
+						name: msg('workout.exerciseGroup.calculatePlates'),
+					})
+					.click()
+			}
 			const dialog = page.getByRole('dialog')
 			await expect(dialog).toBeVisible()
 			await expect(page.locator('[data-slot="dialog-overlay"]')).toBeVisible()

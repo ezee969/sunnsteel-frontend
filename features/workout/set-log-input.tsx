@@ -22,7 +22,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { useDisplayPreference } from '@/hooks/use-display-preference'
+import { useCompactWorkout } from '@/hooks/use-compact-workout'
 import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
 import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
@@ -141,9 +141,10 @@ export const SetLogInput = ({
 	const tSaveStatus = useTranslations('core.saveStatus')
 	const tPrev = useTranslations('workout.previousPerformance')
 	const statusText = saveStateLabel(saveState, tSaveStatus)
-	// LIVE-18: under larger controls the row keeps only its fields and its
-	// tick; the fills and Remove move into the set's own menu.
-	const { largeControls } = useDisplayPreference()
+	// LIVE-18/UX-21: under larger controls, and always on a phone, the row
+	// keeps only its fields and its tick; the fills and Remove move into the
+	// set's own menu.
+	const grouped = useCompactWorkout()
 	// a11y review 7: the invalid field and its message are linked, so a screen
 	// reader user editing one of several repeated rows hears which one failed.
 	const errorId = `set-${routineExerciseId}-${setNumber}-error`
@@ -227,7 +228,7 @@ export const SetLogInput = ({
 							<button
 								type="button"
 								aria-label={
-									largeControls
+									grouped
 										? t('setKindMenuMoreAria', {
 												number: setNumber,
 												kind: tKinds(kind),
@@ -260,7 +261,7 @@ export const SetLogInput = ({
 									</DropdownMenuRadioItem>
 								))}
 							</DropdownMenuRadioGroup>
-							{largeControls &&
+							{grouped &&
 							((canFillAbove && setAbove) ||
 								(canFillPrevious && previousPerformance) ||
 								onRemove) ? (
@@ -426,7 +427,7 @@ export const SetLogInput = ({
 				</div>
 			) : null}
 
-			{!largeControls && (canFillAbove || canFillPrevious || onRemove) ? (
+			{!grouped && (canFillAbove || canFillPrevious || onRemove) ? (
 				<div className="mt-1 flex flex-wrap items-center gap-x-1">
 					{canFillAbove && setAbove ? (
 						<Button
