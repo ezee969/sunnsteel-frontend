@@ -82,6 +82,8 @@ else until it merges, so claims live here, on `main`.
 | UX-15   | `IN_PROGRESS` | Claude | `claude/ux-15`    | 2026-10-01 | FE           |
 | UX-16   | `IN_PROGRESS` | Claude | `claude/ux-16`    | 2026-10-01 | FE           |
 | UX-20   | `IN_PROGRESS` | Claude | `claude/ux-18`    | 2026-10-01 | FE           |
+| UX-21   | `IN_PROGRESS` | Claude | `claude/ux-18`    | 2026-10-01 | FE           |
+| UX-22   | `IN_PROGRESS` | Claude | `claude/ux-18`    | 2026-10-01 | FE           |
 | ACH-11  | `IN_PROGRESS` | Claude (session 8dfebf) | `claude/ach-11-8dfebf` | 2026-10-01 | FE |
 
 ## Current product snapshot
@@ -671,8 +673,8 @@ languages, and Spanish runs longer.
 | UX-18 | `QUEUED`      | S    | Inline glossary                  | RPE, RIR, 1RM and estimated 1RM, deload, training block, rotation, double progression and the set kinds read as defined terms that open a short definition inline, on tap or keyboard (the `Explanation` pattern; there is no Popover primitive). One source of definitions in both languages. | UX-17 |
 | UX-19 | `QUEUED`      | S    | A dashboard that grows with the account | While the account has never customized its layout and has fewer than three completed workouts, the default dashboard is Today's Workouts, This Week and a Getting started list (pick a template, finish a first workout, set the unit and gym); the other sections join the default as they have something to show. A customized layout is never changed, and nothing new is stored. | DASH-05, ROUT-03 |
 | UX-20 | `IN_PROGRESS` | M    | Advanced options folded          | The routine builder shows sets, reps and load per exercise, with progression, RIR, rest, set kinds, warm-up ramps and "Do in rounds with next" under More options, open when the exercise already uses any. The routine page shows its days first and folds Sharing, Training blocks, Deloads and Versions into one Planning and sharing group, open when the routine uses any of them. | UX-01 |
-| UX-21 | `QUEUED`      | S    | Compact set rows on a phone      | Below `sm` the workout screen uses gym mode's grouping (one menu per exercise and per set, last time on one line) whatever the larger-controls setting, which keeps deciding only sizes. | LIVE-18 |
-| UX-22 | `QUEUED`      | M    | Phone bottom navigation          | Below `md` a bottom bar with Today (dashboard), Train (workouts, routines, schedule), Progress (progress, history, achievements), Community (activity, discover, notifications) and More replaces the twelve-entry drawer, with start or resume within thumb reach; the desktop sidebar groups its entries under the same four headings. Absorbs `NAV-04`. | UX-14 |
+| UX-21 | `IN_PROGRESS` | S    | Compact set rows on a phone      | Below `sm` the workout screen uses gym mode's grouping (one menu per exercise and per set, last time on one line) whatever the larger-controls setting, which keeps deciding only sizes. | LIVE-18 |
+| UX-22 | `IN_PROGRESS` | M    | Phone bottom navigation          | Below `md` a bottom bar with Today (dashboard), Train (workouts, routines, schedule), Progress (progress, history, achievements), Community (activity, discover, notifications) and More replaces the twelve-entry drawer, with start or resume within thumb reach; the desktop sidebar groups its entries under the same four headings. Absorbs `NAV-04`. | UX-14 |
 
 ### Notifications and retention
 
@@ -2813,3 +2815,4 @@ it again without addressing the original decision.
 - **2026-10-01 (revision 198):** Shipped `DASH-11`, `NOTIF-09`, `NOTIF-10` and `ACH-10` and released their claims. Removed `PROF-11` at the owner's request. Recorded that `ACH-11`'s first comps were rejected and the design restarts with a design plugin.
 - **2026-10-01 (revision 199):** Moved the `ACH-11` claim to a new session (`claude/ach-11-8dfebf`) and set it in progress: comps in a design tool first, no code before the owner approves them.
 - **2026-10-01 (revision 200):** Claimed `UX-20`. `UX-15` to `UX-18` and now `UX-20` stack on one branch, `claude/ux-18`, rebased onto `main`; they still reach `main` together after the group's final sweep.
+- **2026-10-01 (revision 201):** Claimed `UX-21` and `UX-22` on the same stacked branch as `UX-15` to `UX-20`.
