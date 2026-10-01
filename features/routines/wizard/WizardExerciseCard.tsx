@@ -38,6 +38,10 @@ export interface WizardExerciseCardProps {
 	exerciseData?: Exercise
 	expanded: boolean
 	onToggleExpand: (exerciseIndex: number) => void
+	/** UX-20: the exercise's "More options" are shown. */
+	advanced: boolean
+	/** Null while options in use keep them open. */
+	onToggleAdvanced: (() => void) | null
 	onRemoveExercise: (exerciseIndex: number) => void
 	onUpdateExercise: (exerciseIndex: number, newExerciseId: string) => void
 	onUpdateRestTime: (exerciseIndex: number, timeStr: string) => void
@@ -96,6 +100,8 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	exerciseData,
 	expanded,
 	onToggleExpand,
+	advanced,
+	onToggleAdvanced,
 	onRemoveExercise,
 	onUpdateExercise,
 	onUpdateRestTime,
@@ -399,9 +405,17 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							onUpdateRestTime={onUpdateRestTime}
 							onUpdateNote={onUpdateNote}
 							onUpdateProgressionScheme={onUpdateProgressionScheme}
+							advanced={advanced}
+							onToggleAdvanced={onToggleAdvanced}
+							exerciseName={
+								exerciseData?.name
+									? exerciseLabel(exerciseData.name, tEx)
+									: t('thisExercise')
+							}
 						/>
 
 						<SetListSection
+							advanced={advanced}
 							weightUnit={weightUnit}
 							exercise={exercise}
 							exerciseIndex={exerciseIndex}
@@ -412,7 +426,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							exerciseName={
 								exerciseData?.name
 									? exerciseLabel(exerciseData.name, tEx)
-									: 'this exercise'
+									: t('thisExercise')
 							}
 							equipmentRequired={exerciseData?.equipmentRequired}
 							onReplaceWarmUps={(warmUps, followLoad) =>

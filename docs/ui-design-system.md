@@ -1728,6 +1728,32 @@ sentence case.
   kinds in contracts' `countsAsWork` and `countsForProgression`), and never
   what it does for the member; a test refuses words of benefit or advice.
 
+### 23.6 Advanced options folded (UX-20)
+
+- **The builder's exercise card leads with sets, reps and load.** Its
+  progression scheme and weight step, rest, each set's kind and RIR, the
+  warm-up ramp and "Do in rounds with next" sit under a ghost **More
+  options** control beside the note, with a caption naming what it holds.
+  Folded, a set row drops its kind and RIR tracks for a five-track grid
+  (`SET_ROW_COLUMNS_SIMPLE`) under matching headings, so nothing shifts
+  column.
+- **An option in use never folds.** A set that is not a working set, a
+  generated warm-up or a link to the next exercise keeps the options shown,
+  and the control is not offered (`usesAdvancedOptions`): a folded row can
+  never hide a kind or a superset the routine has. The progression scheme,
+  rest and RIR always hold a value, so having one is not using it; the
+  values are kept and saved whether or not they show.
+- **The routine page shows its days first** and folds Sharing, Training
+  blocks, Deloads and Versions into one **Planning and sharing** group (a
+  §20.1 `CollapsibleSection`, remembered per device and per routine). It
+  opens with the page when the routine uses any of it: anyone else can find
+  it, it has a training block or a deload, or moderation hid it
+  (`planningInUse`). Closed, it keeps one line: who finds the routine and how
+  many blocks and deloads it has. Its body stays mounted, so a suggested
+  deload (`INTEL-02`) still opens its dialog.
+- **Translated on the way:** the builder's "Set N", its kind label, "Rest",
+  "Weight", "Note" and the day-name placeholders were English literals.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

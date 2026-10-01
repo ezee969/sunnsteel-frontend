@@ -581,7 +581,8 @@
 		"alternatives": "Alternatives",
 		"unknown": "Unknown",
 		"musclesAndEquipment": "{muscles} • {equipment}",
-		"noExercisesFound": "No exercises found"
+		"noExercisesFound": "No exercises found",
+		"thisExercise": "this exercise"
 	},
 	"detail": {
 		"routineDays": "Routine Days",
@@ -602,7 +603,9 @@
 		"ok": "OK",
 		"confirmDayTitle": "Confirm Workout Day",
 		"confirmDayBody": "This workout is scheduled for a different day of the week. Are you sure you want to start it today?",
-		"startAnyway": "Start anyway"
+		"startAnyway": "Start anyway",
+		"planningTitle": "Planning and sharing",
+		"planningSummary": "Found by: {visibility} · {blocks, plural, =0 {no training blocks} one {# training block} other {# training blocks}} · {deloads, plural, =0 {no deloads} one {# deload} other {# deloads}}"
 	},
 	"setRow": {
 		"removeSet": "Remove set",
@@ -630,7 +633,9 @@
 		"exerciseNote": "Exercise Note",
 		"warmUpsFollow": "Warm-ups follow the working weight",
 		"min": "Min",
-		"max": "Max"
+		"max": "Max",
+		"setNumber": "Set {number}",
+		"kindAria": "Set {number} kind"
 	},
 	"presets": {
 		"dayPush": "Push",
@@ -793,7 +798,16 @@
 		"saving": "Saving...",
 		"progressionDynamic": "Dynamic Double Progression",
 		"routineSummary": "Routine Summary",
-		"progression": "Progression"
+		"progression": "Progression",
+		"moreOptions": "More options",
+		"fewerOptions": "Fewer options",
+		"moreOptionsAria": "More options for {exercise}",
+		"fewerOptionsAria": "Fewer options for {exercise}",
+		"moreOptionsCaption": "Progression, rest, RIR, set kinds, warm-ups and supersets",
+		"restLabel": "Rest",
+		"dayNamePlaceholderRotation": "e.g. Push or Upper A",
+		"dayNamePlaceholderWeekly": "e.g. Push, or leave the weekday",
+		"noteLabel": "Note"
 	},
 	"listing": {
 		"pageTitle": "Routines",

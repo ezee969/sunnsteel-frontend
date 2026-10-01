@@ -10,12 +10,13 @@ import {
 import { AnimatePresence, Reorder, useDragControls } from 'framer-motion'
 import { GripVertical, Link2, Unlink2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import type { Exercise } from '@/lib/api/types'
 
 import type { RoutineWizardData } from '../types'
+import { usesAdvancedOptions } from '../utils/advanced-options'
 import {
 	WizardExerciseCard,
 	type WizardExerciseCardProps,
@@ -264,6 +265,11 @@ function ReorderableExerciseRow({
 }: ReorderableExerciseRowProps) {
 	const t = useTranslations('routines.builder')
 	const dragControls = useDragControls()
+	// UX-20 (§23.6): folded unless the exercise already uses a folded option,
+	// and never foldable while it does.
+	const inUse = usesAdvancedOptions(exercise)
+	const [opened, setOpened] = useState(false)
+	const advanced = inUse || opened
 
 	return (
 		<Reorder.Item
@@ -295,6 +301,8 @@ function ReorderableExerciseRow({
 					exerciseData={exerciseData}
 					expanded={expanded}
 					onToggleExpand={() => onToggleExpand()}
+					advanced={advanced}
+					onToggleAdvanced={inUse ? null : () => setOpened(open => !open)}
 					onRemoveExercise={onRemoveExercise}
 					onUpdateExercise={onUpdateExercise}
 					onUpdateRestTime={onUpdateRestTime}
@@ -330,7 +338,7 @@ function ReorderableExerciseRow({
 						</button>
 					}
 				/>
-				{linkControl}
+				{advanced ? linkControl : null}
 			</div>
 		</Reorder.Item>
 	)

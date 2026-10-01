@@ -1,7 +1,9 @@
 import type { WeightUnit } from '@sunsteel/contracts'
+import { ChevronDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formatTime, isValidTimeFormat, parseTime } from '@/lib/utils/time'
@@ -25,6 +27,11 @@ interface ExerciseConfigSectionProps {
 		exerciseIndex: number,
 		scheme: ProgressionScheme,
 	) => void
+	/** UX-20: progression and rest show with the exercise's "More options". */
+	advanced: boolean
+	/** Null while options in use keep them open (`usesAdvancedOptions`). */
+	onToggleAdvanced: (() => void) | null
+	exerciseName: string
 }
 
 /**
@@ -53,6 +60,9 @@ export function ExerciseConfigSection({
 	onUpdateRestTime,
 	onUpdateNote,
 	onUpdateProgressionScheme,
+	advanced,
+	onToggleAdvanced,
+	exerciseName,
 }: ExerciseConfigSectionProps) {
 	const t = useTranslations('routines.builder')
 	// Local state for rest time input: allow free typing (digits and ":")
@@ -70,30 +80,60 @@ export function ExerciseConfigSection({
 
 	return (
 		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-md space-y-2 sm:space-y-3">
-			<RestTimeExerciseConfig
-				restInput={restInput}
-				setRestInput={setRestInput}
-				exerciseIndex={exerciseIndex}
-				onUpdateRestTime={onUpdateRestTime}
-				formatTime={formatTime}
-				parseTime={parseTime}
-				isValidTimeFormat={isValidTimeFormat}
-				restSeconds={exercise.restSeconds}
-				setRestFocused={setRestFocused}
-			/>
-
 			<ExerciseNoteRow
 				note={exercise.note}
 				onSave={note => onUpdateNote(exerciseIndex, note)}
 			/>
 
-			<ProgressionSelect
-				progressionScheme={exercise.progressionScheme}
-				exerciseIndex={exerciseIndex}
-				onUpdateProgressionScheme={onUpdateProgressionScheme}
-			/>
+			{/* UX-20 (§23.6): sets, reps and load first; the rest one tap away,
+			    and kept open while the exercise uses any of it. */}
+			{onToggleAdvanced ? (
+				<div className="flex flex-wrap items-center gap-x-2">
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						aria-expanded={advanced}
+						aria-label={t(advanced ? 'fewerOptionsAria' : 'moreOptionsAria', {
+							exercise: exerciseName,
+						})}
+						onClick={onToggleAdvanced}
+						className="-ml-3 h-11 sm:h-9"
+					>
+						{t(advanced ? 'fewerOptions' : 'moreOptions')}
+						<ChevronDown aria-hidden className={advanced ? 'rotate-180' : ''} />
+					</Button>
+					{advanced ? null : (
+						<span className="type-body-sm text-ink-3">
+							{t('moreOptionsCaption')}
+						</span>
+					)}
+				</div>
+			) : null}
 
-			{requiresWeightIncrementField(exercise.progressionScheme) && (
+			{advanced ? (
+				<RestTimeExerciseConfig
+					restInput={restInput}
+					setRestInput={setRestInput}
+					exerciseIndex={exerciseIndex}
+					onUpdateRestTime={onUpdateRestTime}
+					formatTime={formatTime}
+					parseTime={parseTime}
+					isValidTimeFormat={isValidTimeFormat}
+					restSeconds={exercise.restSeconds}
+					setRestFocused={setRestFocused}
+				/>
+			) : null}
+
+			{advanced ? (
+				<ProgressionSelect
+					progressionScheme={exercise.progressionScheme}
+					exerciseIndex={exerciseIndex}
+					onUpdateProgressionScheme={onUpdateProgressionScheme}
+				/>
+			) : null}
+
+			{advanced && requiresWeightIncrementField(exercise.progressionScheme) && (
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Label className="text-sm font-medium text-muted-foreground">

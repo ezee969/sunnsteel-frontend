@@ -54,7 +54,7 @@ export function ExerciseNoteRow({
 				<div className="flex items-center gap-2 shrink-0">
 					<StickyNote className="h-4 w-4 text-muted-foreground" />
 					<Label className="text-sm font-medium text-muted-foreground">
-						Note
+						{t('noteLabel')}
 					</Label>
 				</div>
 			)}

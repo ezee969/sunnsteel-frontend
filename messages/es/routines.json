@@ -581,7 +581,8 @@
 		"alternatives": "Alternativas",
 		"unknown": "Desconocido",
 		"musclesAndEquipment": "{muscles} • {equipment}",
-		"noExercisesFound": "No se encontraron ejercicios"
+		"noExercisesFound": "No se encontraron ejercicios",
+		"thisExercise": "este ejercicio"
 	},
 	"detail": {
 		"routineDays": "Días de la rutina",
@@ -602,7 +603,9 @@
 		"ok": "Aceptar",
 		"confirmDayTitle": "Confirma el día de entrenamiento",
 		"confirmDayBody": "Este entrenamiento está planificado para otro día de la semana. ¿Seguro que quieres empezarlo hoy?",
-		"startAnyway": "Empezar igual"
+		"startAnyway": "Empezar igual",
+		"planningTitle": "Planificación y compartir",
+		"planningSummary": "La encuentra: {visibility} · {blocks, plural, =0 {sin bloques de entrenamiento} one {# bloque de entrenamiento} other {# bloques de entrenamiento}} · {deloads, plural, =0 {sin descargas} one {# descarga} other {# descargas}}"
 	},
 	"setRow": {
 		"removeSet": "Quitar la serie",
@@ -630,7 +633,9 @@
 		"exerciseNote": "Nota del ejercicio",
 		"warmUpsFollow": "El calentamiento sigue el peso de trabajo",
 		"min": "Mín",
-		"max": "Máx"
+		"max": "Máx",
+		"setNumber": "Serie {number}",
+		"kindAria": "Tipo de la serie {number}"
 	},
 	"presets": {
 		"dayPush": "Empuje",
@@ -793,7 +798,16 @@
 		"saving": "Guardando…",
 		"progressionDynamic": "Doble progresión dinámica",
 		"routineSummary": "Resumen de la rutina",
-		"progression": "Progresión"
+		"progression": "Progresión",
+		"moreOptions": "Más opciones",
+		"fewerOptions": "Menos opciones",
+		"moreOptionsAria": "Más opciones para {exercise}",
+		"fewerOptionsAria": "Menos opciones para {exercise}",
+		"moreOptionsCaption": "Progresión, descanso, RIR, tipos de serie, calentamientos y superseries",
+		"restLabel": "Descanso",
+		"dayNamePlaceholderRotation": "p. ej. Empuje o Torso A",
+		"dayNamePlaceholderWeekly": "p. ej. Empuje, o deja el día de la semana",
+		"noteLabel": "Nota"
 	},
 	"listing": {
 		"pageTitle": "Rutinas",

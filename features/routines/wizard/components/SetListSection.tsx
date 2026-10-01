@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 
 import type { RoutineWizardExercise, SetField } from '../types'
 import { isWeightLocked } from '../utils/set-kinds'
-import { SET_ROW_COLUMNS, SetRow } from './SetRow'
+import { SET_ROW_COLUMNS, SET_ROW_COLUMNS_SIMPLE, SetRow } from './SetRow'
 import { WarmUpRampDialog } from './WarmUpRampDialog'
 
 interface SetListSectionProps {
@@ -26,6 +26,8 @@ interface SetListSectionProps {
 		followLoad: boolean,
 	) => void
 	onSetWarmUpsFollowLoad: (followLoad: boolean) => void
+	/** UX-20: the exercise's "More options" are shown. */
+	advanced: boolean
 	registerSetRowRef: (setIndex: number, node: HTMLDivElement | null) => void
 	onUpdateSet: (
 		exerciseIndex: number,
@@ -85,6 +87,7 @@ export function SetListSection({
 	equipmentRequired,
 	onReplaceWarmUps,
 	onSetWarmUpsFollowLoad,
+	advanced,
 	registerSetRowRef,
 	onUpdateSet,
 	onValidateMinMaxReps,
@@ -120,10 +123,12 @@ export function SetListSection({
 				<div id={`sets-list-${tabIndex}-${exerciseIndex}`}>
 					{/* TD-50: headings only over the one-line row, on its columns. */}
 					<div
-						className={`hidden lg:grid gap-2 text-xs font-medium text-muted-foreground mb-2 ${SET_ROW_COLUMNS}`}
+						className={`hidden lg:grid gap-2 text-xs font-medium text-muted-foreground mb-2 ${
+							advanced ? SET_ROW_COLUMNS : SET_ROW_COLUMNS_SIMPLE
+						}`}
 					>
 						<div>{t('columnSet')}</div>
-						<div>{t('columnKind')}</div>
+						{advanced ? <div>{t('columnKind')}</div> : null}
 						<div>{t('columnType')}</div>
 						<div>{t('columnReps')}</div>
 						<div>
@@ -131,7 +136,7 @@ export function SetListSection({
 								unit: weightUnit === 'LB' ? 'lb' : 'kg',
 							})}
 						</div>
-						<div>{t('columnRir')}</div>
+						{advanced ? <div>{t('columnRir')}</div> : null}
 						<div />
 					</div>
 
@@ -163,6 +168,7 @@ export function SetListSection({
 										exercise.progressionScheme,
 										exercise.warmUpsFollowLoad,
 									)}
+									advanced={advanced}
 								/>
 							</div>
 						))}
@@ -179,15 +185,17 @@ export function SetListSection({
 							<Plus className="h-4 w-4 mr-2" />
 							{t('addSet')}
 						</Button>
-						<WarmUpRampDialog
-							exerciseName={exerciseName}
-							sets={exercise.sets}
-							equipmentRequired={equipmentRequired}
-							incrementKg={exercise.minWeightIncrement}
-							weightUnit={weightUnit}
-							onApply={onReplaceWarmUps}
-							warmUpsFollowLoad={exercise.warmUpsFollowLoad}
-						/>
+						{advanced ? (
+							<WarmUpRampDialog
+								exerciseName={exerciseName}
+								sets={exercise.sets}
+								equipmentRequired={equipmentRequired}
+								incrementKg={exercise.minWeightIncrement}
+								weightUnit={weightUnit}
+								onApply={onReplaceWarmUps}
+								warmUpsFollowLoad={exercise.warmUpsFollowLoad}
+							/>
+						) : null}
 						{/* LIVE-20: only generated warm-ups know their share, so only
 						    they can follow; hand-written ones keep their loads. */}
 						{exercise.sets.some(

@@ -378,8 +378,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 												maxLength={ROUTINE_DAY_NAME_MAX}
 												placeholder={
 													data.scheduleMode === 'ROTATION'
-														? 'e.g. Push or Upper A'
-														: 'e.g. Push, or leave the weekday'
+														? t('dayNamePlaceholderRotation')
+														: t('dayNamePlaceholderWeekly')
 												}
 												onChange={event =>
 													onUpdate(

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
@@ -26,6 +27,10 @@ import { useUser } from '@/lib/api/hooks/useUser'
 import { useActiveSession } from '@/lib/api/hooks/useWorkoutSession'
 import { logger } from '@/lib/utils/logger'
 import { describeDeloadInForce } from '@/lib/utils/routine-deloads'
+import {
+	describePlanningSummary,
+	planningInUse,
+} from '@/lib/utils/routine-planning'
 import { routineOn } from '@/lib/utils/routine-schedule'
 import { describeBlockInForce } from '@/lib/utils/routine-training-blocks'
 import { localDateKey } from '@/lib/utils/schedule-week'
@@ -41,6 +46,7 @@ export default function RoutineDetailsPage() {
 	const tBlocks = useTranslations('routines.trainingBlocks')
 	const tListing = useTranslations('routines.listing')
 	const tBuilder = useTranslations('routines.builder')
+	const tSharing = useTranslations('routines.sharing')
 
 	// ROUT-04: the account rule caps each routine's own visibility.
 	const { user } = useUser()
@@ -179,22 +185,33 @@ export default function RoutineDetailsPage() {
 				</div>
 			)}
 
-			<RoutineSharing
-				routineId={routine.id}
-				visibility={routine.visibility}
-				accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
-				isHiddenByModeration={routine.isHiddenByModeration ?? false}
-			/>
+			{/* UX-20 (§23.6): the days first; sharing and the planning tools in
+			    one group, open while the routine uses any of them. The group's
+			    body stays mounted, so a suggested deload still opens its dialog. */}
+			<CollapsibleSection
+				id={`routine-planning-${routine.id}`}
+				title={t('planningTitle')}
+				summary={describePlanningSummary(routine, t, tSharing)}
+				defaultOpen={planningInUse(routine)}
+				bodyClassName="space-y-8"
+			>
+				<RoutineSharing
+					routineId={routine.id}
+					visibility={routine.visibility}
+					accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
+					isHiddenByModeration={routine.isHiddenByModeration ?? false}
+				/>
 
-			<RoutineTrainingBlocks routine={routine} weightUnit={weightUnit} />
+				<RoutineTrainingBlocks routine={routine} weightUnit={weightUnit} />
 
-			<RoutineDeloads routine={routine} weightUnit={weightUnit} />
+				<RoutineDeloads routine={routine} weightUnit={weightUnit} />
 
-			<RoutineVersions
-				routine={routine}
-				hasLiveSession={activeSession?.routineId === routine.id}
-				weightUnit={weightUnit}
-			/>
+				<RoutineVersions
+					routine={routine}
+					hasLiveSession={activeSession?.routineId === routine.id}
+					weightUnit={weightUnit}
+				/>
+			</CollapsibleSection>
 
 			{/* Dialogs */}
 			<WorkoutDialogs

@@ -23,11 +23,20 @@ import type { ProgressionScheme, RoutineSet, SetField } from '../types'
  * [SetListSection](./SetListSection.tsx) so both grids line up. Each track has
  * the floor its content needs -- the widest kind ("Optional"), a rep range of
  * two-digit fields, a five-character load, a two-digit RIR -- and numeric
- * tracks stop at `--field-max` (§10.2). Below `lg` the budget is too small
+ * tracks stop at `--field-max` (§10.2). The set track is 4.5rem since UX-20
+ * translated its "Set 1" badge, because "Serie 10" needs it. Below `lg` the
+ * budget is too small
  * for one line (the shell leaves 306px at 768), so a row takes two.
  */
 export const SET_ROW_COLUMNS =
-	'lg:grid-cols-[3.5rem_minmax(6.25rem,1fr)_minmax(5.25rem,1fr)_minmax(6.75rem,1.5fr)_minmax(4.5rem,var(--field-max))_3.25rem_2rem]'
+	'lg:grid-cols-[4.5rem_minmax(6.25rem,1fr)_minmax(5.25rem,1fr)_minmax(6.75rem,1.5fr)_minmax(4.5rem,var(--field-max))_3.25rem_2rem]'
+
+/**
+ * UX-20: the same row without its kind and RIR tracks, while an exercise's
+ * "More options" are folded (set, rep type, reps, load, remove).
+ */
+export const SET_ROW_COLUMNS_SIMPLE =
+	'lg:grid-cols-[4.5rem_minmax(5.25rem,1fr)_minmax(6.75rem,1.5fr)_minmax(4.5rem,var(--field-max))_2rem]'
 
 interface SetRowProps {
 	weightUnit: WeightUnit
@@ -63,6 +72,12 @@ interface SetRowProps {
 	disableRemove: boolean
 	/** LIVE-12: the load follows the exercise's first working set. */
 	weightLocked: boolean
+	/**
+	 * UX-20: the kind and RIR fields show only with the exercise's "More
+	 * options". They cannot fold while a set is not a working set
+	 * (`usesAdvancedOptions`), so a folded row never hides a kind in use.
+	 */
+	advanced: boolean
 }
 
 /**
@@ -98,9 +113,11 @@ export function SetRow({
 	isRemoving,
 	disableRemove,
 	weightLocked,
+	advanced,
 }: SetRowProps) {
 	const t = useTranslations('routines.setRow')
 	const tKinds = useTranslations('workout.setKinds')
+	const tBuilder = useTranslations('routines.builder')
 	const {
 		minInput,
 		maxInput,
@@ -133,11 +150,15 @@ export function SetRow({
 			    two lines -- the set, its kind, its rep type and remove, then its
 			    fields -- and from `lg` one line under the column headings. */}
 			<div
-				className={`flex flex-col gap-2 sm:grid sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center ${SET_ROW_COLUMNS}`}
+				className={`flex flex-col gap-2 sm:grid sm:items-center ${
+					advanced
+						? `sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] ${SET_ROW_COLUMNS}`
+						: `sm:grid-cols-[auto_minmax(0,1fr)_auto] ${SET_ROW_COLUMNS_SIMPLE}`
+				}`}
 			>
 				<div className="flex items-center justify-between gap-2 sm:contents">
 					<Badge variant="outline" className="w-fit text-xs px-2 py-1">
-						Set {set.setNumber}
+						{t('setNumber', { number: set.setNumber })}
 					</Badge>
 
 					<Button
@@ -155,7 +176,9 @@ export function SetRow({
 				{/* LIVE-12: the kind and the rep type wrap onto two lines in a
 				    narrow card rather than pushing the rep type off its edge. */}
 				<div className="flex w-full min-w-0 flex-wrap gap-2 sm:contents">
-					<div className="min-w-[104px] flex-1 sm:min-w-0">
+					<div
+						className={`min-w-[104px] flex-1 sm:min-w-0 ${advanced ? '' : 'hidden'}`}
+					>
 						<Select
 							value={set.kind ?? 'WORKING'}
 							onValueChange={value =>
@@ -163,7 +186,7 @@ export function SetRow({
 							}
 						>
 							<SelectTrigger
-								aria-label={`Set ${set.setNumber} kind`}
+								aria-label={t('kindAria', { number: set.setNumber })}
 								className="w-full h-9 sm:h-8"
 							>
 								<SelectValue className="truncate" />
@@ -338,7 +361,9 @@ export function SetRow({
 						{/* Weight Column */}
 						<div className="space-y-1 lg:min-w-0">
 							<Label className="lg:hidden">
-								Weight ({weightUnit === 'LB' ? 'lb' : 'kg'})
+								{tBuilder('columnWeight', {
+									unit: weightUnit === 'LB' ? 'lb' : 'kg',
+								})}
 							</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button
@@ -382,7 +407,7 @@ export function SetRow({
 						</div>
 
 						{/* RIR Column */}
-						<div className="space-y-1 lg:min-w-0">
+						<div className={`space-y-1 lg:min-w-0 ${advanced ? '' : 'hidden'}`}>
 							<Label className="lg:hidden">{t('rir')}</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button
@@ -436,7 +461,9 @@ export function SetRow({
 				</div>
 
 				{/* Desktop-only delete button */}
-				<div className="hidden sm:flex sm:col-start-4 sm:row-start-1 justify-end lg:col-start-auto lg:row-start-auto">
+				<div
+					className={`hidden sm:flex ${advanced ? 'sm:col-start-4' : 'sm:col-start-3'} sm:row-start-1 justify-end lg:col-start-auto lg:row-start-auto`}
+				>
 					<Button
 						variant="ghost"
 						size="sm"
