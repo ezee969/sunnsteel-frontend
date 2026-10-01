@@ -4,6 +4,7 @@ import type { NotificationCategory } from '@sunsteel/contracts'
 import { SlidersHorizontal } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -136,9 +137,9 @@ export function NotificationControlsCard() {
 				<div className="space-y-3 border-t border-rule pt-4">
 					<div className="space-y-1">
 						<p className="type-panel text-foreground">{t('partnerActivity')}</p>
-						<p className="type-body-sm max-w-[68ch] text-ink-3">
-							{t('partnerActivityNote')}
-						</p>
+						<Explanation summary={t('partnerActivityNoteSummary')}>
+							<p>{t('partnerActivityNote')}</p>
+						</Explanation>
 					</div>
 					{PARTNER_CATEGORIES.map(categoryRow)}
 				</div>

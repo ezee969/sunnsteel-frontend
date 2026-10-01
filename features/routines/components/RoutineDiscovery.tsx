@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -78,9 +79,12 @@ export function RoutineDiscovery() {
 				<h1 className="type-section flex items-center gap-2 text-foreground">
 					<Compass className="size-5 text-ink-3" aria-hidden /> {t('title')}
 				</h1>
-				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{discoveryScopeNote(t)}
-				</p>
+				{/* UX-17 (§23.4): one line shown; the scope and the estimate rule are
+				    one tap away. */}
+				<Explanation summary={t('scopeSummary')}>
+					<p>{discoveryScopeNote(t)}</p>
+					<p>{durationEstimateNote(t)}</p>
+				</Explanation>
 			</header>
 
 			<section aria-label={t('filtersLabel')} className="space-y-4">
@@ -197,11 +201,8 @@ export function RoutineDiscovery() {
 					</div>
 				</div>
 
-				<div className="flex flex-wrap items-center justify-between gap-3">
-					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{durationEstimateNote(t)}
-					</p>
-					{narrowed ? (
+				{narrowed ? (
+					<div className="flex justify-end">
 						<Button
 							type="button"
 							variant="outline"
@@ -210,8 +211,8 @@ export function RoutineDiscovery() {
 						>
 							{t('clearFilters')}
 						</Button>
-					) : null}
-				</div>
+					</div>
+				) : null}
 			</section>
 
 			<section aria-label={t('resultsLabel')} className="space-y-4">

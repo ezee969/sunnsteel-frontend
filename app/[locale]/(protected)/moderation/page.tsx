@@ -37,6 +37,7 @@ export default function ModerationPage() {
 			<HeroSection
 				title={<>{t('title')}</>}
 				subtitle={<>{tModeration('queueScope')}</>}
+				subtitleOnPhone
 			/>
 			<div role="group" aria-label={t('viewGroup')} className="flex gap-1">
 				{(['queue', 'record'] as const).map(option => (

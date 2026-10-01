@@ -3,6 +3,7 @@
 import { Bell, BellOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -75,7 +76,9 @@ export function PushNotificationsCard() {
 					</p>
 				) : null}
 
-				<p className="type-body-sm max-w-[68ch] text-ink-3">{t('note')}</p>
+				<Explanation summary={t('noteSummary')}>
+					<p>{t('note')}</p>
+				</Explanation>
 			</CardContent>
 		</Card>
 	)

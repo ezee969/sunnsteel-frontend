@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	Accordion,
@@ -45,6 +46,8 @@ interface ExercisePerformanceHistoryProps {
 	copy?: {
 		title: string
 		description: string
+		/** UX-17: the rest of the description, behind "How this works". */
+		detail?: string
 		emptyTitle: string
 		emptyDescription: string
 	}
@@ -266,7 +269,13 @@ export function ExercisePerformanceHistory({
 					<h2 id="performance-history" className="type-section text-foreground">
 						{copy.title}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3">{copy.description}</p>
+					{copy.detail ? (
+						<Explanation summary={copy.description} className="mt-1">
+							<p>{copy.detail}</p>
+						</Explanation>
+					) : (
+						<p className="type-body-sm mt-1 text-ink-3">{copy.description}</p>
+					)}
 				</div>
 			</div>
 

@@ -8,6 +8,7 @@ import {
 import { exerciseGroupLabel, exerciseGroupPosition } from '@sunsteel/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
@@ -68,9 +69,10 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 						? tSharing('summaryRotation')
 						: tSharing('summaryWeekly')}
 				</p>
-				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{sharedRoutineNote(tSharing)}
-				</p>
+				{/* UX-17 (§23.4): one line shown, the full statement one tap away. */}
+				<Explanation summary={tSharing('sharedNoteSummary')}>
+					<p>{sharedRoutineNote(tSharing)}</p>
+				</Explanation>
 			</header>
 
 			{setup.days.map(day => (

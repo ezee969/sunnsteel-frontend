@@ -52,6 +52,18 @@ export function describeSignalsIntro(thresholds: Thresholds, t: T): string {
 	return t('intro', { recent, previous })
 }
 
+/**
+ * UX-17: the one line shown under the heading. The full intro and the rule
+ * sit behind "How this works".
+ */
+export function describeSignalsIntroSummary(
+	thresholds: Thresholds,
+	t: T,
+): string {
+	const { recent, previous } = describePeriods(thresholds.periodDays, t)
+	return t('introSummary', { recent, previous })
+}
+
 export function describeSignalsRule(
 	thresholds: Thresholds,
 	t: T,
@@ -73,6 +85,59 @@ function describeChange(difference: number, t: T, locale: Locale): string {
 	if (difference < 0)
 		return t('changeDown', { value: decimal(-difference, locale) })
 	return t('changeNone')
+}
+
+const headline = (figure: string, change: string | null, t: T) =>
+	change === null ? figure : t('headlineJoin', { figure, change })
+
+/** "7.6, up 0.1": the number a row leads with, or null when there is none. */
+export function describeEffortHeadline(
+	signals: Signals,
+	t: T,
+	locale: Locale,
+): string | null {
+	const { comparison } = signals.effort
+	if (!comparison) return null
+	return headline(
+		decimal(comparison.recent.averageRpe, locale),
+		describeChange(comparison.difference, t, locale),
+		t,
+	)
+}
+
+/** "15% short of target, up 10 points". */
+export function describeRepTargetsHeadline(
+	signals: Signals,
+	t: T,
+): string | null {
+	const { recent, previous, comparable } = signals.repTargets
+	if (recent.targetedSets === 0) return null
+	const figure = t('headlineRepTargets', { percent: recent.shortPercent })
+	if (!comparable || previous.targetedSets === 0) return figure
+	const points = recent.shortPercent - previous.shortPercent
+	if (points > 0)
+		return headline(figure, t('headlinePointsUp', { value: points }), t)
+	if (points < 0)
+		return headline(figure, t('headlinePointsDown', { value: -points }), t)
+	return headline(figure, t('changeNone'), t)
+}
+
+/** "1 lift": how many lifts are declining. */
+export function describeDeclinesHeadline(signals: Signals, t: T): string {
+	return t('lifts', { count: signals.declines.lifts.length })
+}
+
+/** "5 workouts, down 3". */
+export function describeWorkoutsHeadline(signals: Signals, t: T): string {
+	const { recent, previous } = signals.workouts
+	const difference = recent.workouts - previous.workouts
+	const change =
+		difference > 0
+			? t('changeUp', { value: String(difference) })
+			: difference < 0
+				? t('changeDown', { value: String(-difference) })
+				: t('changeNone')
+	return headline(t('workoutsCount', { count: recent.workouts }), change, t)
 }
 
 export function describeEffort(signals: Signals, t: T, locale: Locale): string {

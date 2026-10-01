@@ -23,15 +23,10 @@ import {
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { RankCrest } from '@/features/achievements/rank-crest'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
@@ -303,9 +298,11 @@ export function FeaturedRecordsSettingsCard({
 					<Bookmark className="size-5 text-ink-3" aria-hidden />
 					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					{t('description', { max: FEATURED_PROFILE_ITEMS_MAX })}
-				</CardDescription>
+				<Explanation
+					summary={t('descriptionSummary', { max: FEATURED_PROFILE_ITEMS_MAX })}
+				>
+					<p>{t('description', { max: FEATURED_PROFILE_ITEMS_MAX })}</p>
+				</Explanation>
 			</CardHeader>
 			<CardContent className="space-y-5">
 				{isLoading ? (

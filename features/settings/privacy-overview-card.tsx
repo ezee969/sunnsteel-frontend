@@ -5,14 +5,9 @@ import { Eye, Globe, Lock, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
 	alwaysVisibleProfileItems,
 	getDiscoverySummary,
@@ -56,7 +51,10 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 					<Eye className="h-5 w-5 text-primary" aria-hidden />
 					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>{t('description')}</CardDescription>
+				{/* UX-17 (§23.4): one line shown, the full text one tap away. */}
+				<Explanation summary={t('descriptionSummary')}>
+					<p>{t('description')}</p>
+				</Explanation>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				<div className="divide-y divide-rule">
@@ -112,7 +110,9 @@ export function PrivacyOverviewCard({ profile }: PrivacyOverviewCardProps) {
 							</div>
 						))}
 					</dl>
-					<p className="type-body-sm text-ink-3">{t('searchNote')}</p>
+					<Explanation summary={t('searchNoteSummary')}>
+						<p>{t('searchNote')}</p>
+					</Explanation>
 				</section>
 
 				<p className="type-body-sm text-ink-3">

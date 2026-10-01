@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { exerciseLabel } from '@/i18n/catalog'
@@ -26,12 +27,17 @@ import {
 } from '@/lib/utils/deload-suggestion'
 import {
 	describeDecline,
+	describeDeclinesHeadline,
 	describeEffort,
+	describeEffortHeadline,
 	describeNoDeclines,
 	describeRepTargets,
+	describeRepTargetsHeadline,
 	describeSignalsIntro,
+	describeSignalsIntroSummary,
 	describeSignalsRule,
 	describeWorkouts,
+	describeWorkoutsHeadline,
 	trainingSignalMarkedLabel,
 	trainingSignalsTitle,
 	trainingSignalTitles,
@@ -54,10 +60,13 @@ interface TrainingSignalsProps {
  */
 function SignalRow({
 	title,
+	headline,
 	marked,
 	children,
 }: {
 	title: string
+	/** UX-17: the number the row leads with, on the title's line. */
+	headline?: string | null
 	marked: boolean
 	children: ReactNode
 }) {
@@ -71,6 +80,9 @@ function SignalRow({
 		>
 			<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
 				<h3 className="type-panel text-foreground">{title}</h3>
+				{headline ? (
+					<span className="type-body-sm text-foreground">{headline}</span>
+				) : null}
 				{marked ? (
 					<span className="type-body-sm inline-flex items-center gap-1 text-ink-2">
 						<AlertTriangle
@@ -117,16 +129,20 @@ export function TrainingSignals({
 					<h2 id="training-signals" className="type-section text-foreground">
 						{trainingSignalsTitle(t)}
 					</h2>
-					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-						{data
-							? describeSignalsIntro(data.thresholds, t)
-							: t('introFallback')}
-					</p>
+					{/* UX-17 (§23.4): one line shown, the intro and the rule one tap away. */}
 					{data ? (
-						<p className="type-body-sm mt-1 max-w-3xl text-ink-3">
-							{describeSignalsRule(data.thresholds, t, locale)}
+						<Explanation
+							summary={describeSignalsIntroSummary(data.thresholds, t)}
+							className="mt-1"
+						>
+							<p>{describeSignalsIntro(data.thresholds, t)}</p>
+							<p>{describeSignalsRule(data.thresholds, t, locale)}</p>
+						</Explanation>
+					) : (
+						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
+							{t('introFallback')}
 						</p>
-					) : null}
+					)}
 				</div>
 			</div>
 
@@ -152,17 +168,29 @@ export function TrainingSignals({
 				</div>
 			) : (
 				<ul className="border-t border-rule-faint">
-					<SignalRow title={titles.effort} marked={data.effort.marked}>
+					<SignalRow
+						title={titles.effort}
+						headline={describeEffortHeadline(data, t, locale)}
+						marked={data.effort.marked}
+					>
 						<p className="type-body-sm text-ink-2">
 							{describeEffort(data, t, locale)}
 						</p>
 					</SignalRow>
-					<SignalRow title={titles.repTargets} marked={data.repTargets.marked}>
+					<SignalRow
+						title={titles.repTargets}
+						headline={describeRepTargetsHeadline(data, t)}
+						marked={data.repTargets.marked}
+					>
 						<p className="type-body-sm text-ink-2">
 							{describeRepTargets(data, t)}
 						</p>
 					</SignalRow>
-					<SignalRow title={titles.declines} marked={data.declines.marked}>
+					<SignalRow
+						title={titles.declines}
+						headline={describeDeclinesHeadline(data, t)}
+						marked={data.declines.marked}
+					>
 						{data.declines.lifts.length === 0 ? (
 							<p className="type-body-sm text-ink-2">
 								{describeNoDeclines(data, t)}
@@ -183,7 +211,11 @@ export function TrainingSignals({
 							</ul>
 						)}
 					</SignalRow>
-					<SignalRow title={titles.workouts} marked={data.workouts.marked}>
+					<SignalRow
+						title={titles.workouts}
+						headline={describeWorkoutsHeadline(data, t)}
+						marked={data.workouts.marked}
+					>
 						<p className="type-body-sm text-ink-2">
 							{describeWorkouts(data, t, locale)}
 						</p>

@@ -4,14 +4,9 @@ import { Loader2, ShieldBan } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/components/ui/toast'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
@@ -43,9 +38,11 @@ export function BlockedMembersCard() {
 					<ShieldBan className="size-5 text-ink-3" aria-hidden />
 					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>
-					{t('description', { caveat: tModeration('blockLinkCaveat') })}
-				</CardDescription>
+				{/* The caveat is the one thing a block does not do, so it is the line
+				    that stays visible; how blocking works moves behind the control. */}
+				<Explanation summary={tModeration('blockLinkCaveat')}>
+					<p>{t('description')}</p>
+				</Explanation>
 			</CardHeader>
 			<CardContent>
 				{blocks.isLoading ? (

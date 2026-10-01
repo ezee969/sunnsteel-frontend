@@ -3,6 +3,7 @@
 import { Accessibility } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import {
 	Card,
 	CardContent,
@@ -37,7 +38,9 @@ export function MotionPreferenceCard() {
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3">
 					<div className="space-y-1">
 						<Label htmlFor={id}>{t('reduce')}</Label>
-						<p className="type-body-sm text-ink-3">{t('reduceNote')}</p>
+						<Explanation summary={t('reduceNoteSummary')}>
+							<p>{t('reduceNote')}</p>
+						</Explanation>
 					</div>
 					<Label
 						htmlFor={id}

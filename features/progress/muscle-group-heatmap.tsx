@@ -5,6 +5,7 @@ import { Activity, RefreshCw } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Locale } from '@/i18n/config'
@@ -241,7 +242,9 @@ export function MuscleGroupHeatmap({
 						</div>
 
 						<div className="type-body-sm flex flex-wrap items-center justify-between gap-3 text-ink-3">
-							<p className="max-w-3xl">{t('note')}</p>
+							<Explanation summary={t('noteSummary')}>
+								<p>{t('note')}</p>
+							</Explanation>
 							<div
 								className="flex items-center gap-1"
 								aria-label={t('intensityLabel')}

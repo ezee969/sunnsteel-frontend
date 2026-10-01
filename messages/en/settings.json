@@ -2,6 +2,7 @@
 	"accountExport": {
 		"contents": "One JSON file with your profile and settings, every routine and its saved versions, every workout with its sets, your records, goals, gym equipment, schedule changes, starred exercises, who you follow and train with, and the comments, reactions and reports you made.",
 		"notes": "Weights are in kilograms, as Sunnsteel stores them. Other members appear by username only, and links you shared and devices you enabled are left out, because they work as keys.",
+		"notesSummary": "Weights in kilograms; members by username only; shared links and devices left out.",
 		"title": "Download Your Data",
 		"downloadedTitle": "Your data was downloaded",
 		"downloadedDescription": "Check your downloads for the sunnsteel-….json file.",
@@ -42,6 +43,7 @@
 		"trainingAndRest": "Training and rest",
 		"partnerActivity": "Partner activity",
 		"partnerActivityNote": "Off by default. An alert is created only while the partnership, their activity grant and the event's sharing are all still active. Turning one on starts with new activity from that moment.",
+		"partnerActivityNoteSummary": "Off by default. An alert needs active sharing, and starts from the moment you turn it on.",
 		"reminderTime": "Reminder time",
 		"reminderTimeNote": "Sunnsteel knows which days you train, not what hour, so this is the time you choose rather than a countdown to a session.",
 		"turnOff": "Turn off",
@@ -58,7 +60,8 @@
 		"enabling": "Enabling…",
 		"turnOff": "Turn off on this device",
 		"turningOff": "Turning off…",
-		"note": "The only alert so far is the end of a rest period, and it names the lift that is up next. It cannot show a countdown: notifications have no ticking field on any platform."
+		"note": "The only alert so far is the end of a rest period, and it names the lift that is up next. It cannot show a countdown: notifications have no ticking field on any platform.",
+		"noteSummary": "The only alert so far is the end of a rest period, and it shows no countdown."
 	},
 	"privacyCapNote": {
 		"changeUnderProfilePrivacy": "Change it under Profile Privacy",
@@ -103,10 +106,12 @@
 		},
 		"title": "Privacy Overview",
 		"description": "What other people can see right now, based on your saved settings. Your email is never shown to anyone.",
+		"descriptionSummary": "What others can see now, from your saved settings. Your email is never shown.",
 		"alwaysShown": "Always shown: {items}",
 		"noSections": "No profile sections.",
 		"memberSearch": "Member search",
 		"searchNote": "Search controls who can find you. Anyone with your link can still open your profile and see what is allowed above.",
+		"searchNoteSummary": "Search decides who can find you; anyone with your link can still open your profile.",
 		"savedForLater": "Saved for later: {rules}. Nothing from these sections is shown on profiles yet.",
 		"preview": "Preview public profile"
 	},
@@ -130,6 +135,7 @@
 		"failedTitle": "Could not update discovery",
 		"title": "Account Discovery",
 		"description": "Choose how other members can find your profile. What they can see after opening it is controlled by your profile privacy settings.",
+		"descriptionSummary": "Choose how members can find you. Profile privacy still decides what they see.",
 		"save": "Save discovery"
 	},
 	"profilePrivacy": {
@@ -166,7 +172,7 @@
 	},
 	"blockedMembers": {
 		"title": "Blocked Members",
-		"description": "Blocking works both ways: neither of you appears in the other’s search, suggestions, follower lists or profile, and any follow between you is removed. {caveat}",
+		"description": "Blocking works both ways: neither of you appears in the other’s search, suggestions, follower lists or profile, and any follow between you is removed.",
 		"loading": "Loading blocked members…",
 		"tryAgain": "Try again",
 		"blockedLine": "@{username} · blocked {since}",
@@ -182,15 +188,18 @@
 		"description": "Make Sunnsteel easier to read and to tap on this device, for example in a bright gym.",
 		"contrast": "Higher contrast",
 		"contrastNote": "Darker text in the light theme and brighter text in the dark one, stronger borders, and a thicker outline on the focused control.",
+		"contrastNoteSummary": "Stronger text contrast, bolder borders and a thicker focus outline.",
 		"systemContrast": "Your device already asks for more contrast, so it is on everywhere. Change it in your device's accessibility settings.",
 		"controls": "Larger controls",
-		"controlsNote": "Bigger buttons, fields and checkboxes everywhere. During a workout it also enlarges the set fields and the rest timer, and puts the less-used actions in one menu per exercise and per set. You can also switch it from the workout screen."
+		"controlsNote": "Bigger buttons, fields and checkboxes everywhere. During a workout it also enlarges the set fields and the rest timer, and puts the less-used actions in one menu per exercise and per set. You can also switch it from the workout screen.",
+		"controlsNoteSummary": "Bigger buttons, fields and checkboxes everywhere, including during a workout."
 	},
 	"motion": {
 		"title": "Motion",
 		"description": "Choose how much animation Sunnsteel uses on this device.",
 		"reduce": "Reduce motion",
 		"reduceNote": "Removes sliding, scaling, spinning and pulsing, and shortens fades. Nothing on screen is hidden. Applies immediately.",
+		"reduceNoteSummary": "Removes sliding, scaling, spinning and pulsing, and shortens fades.",
 		"systemReduced": "Your device already asks for reduced motion, so it is on everywhere. Change it in your device's accessibility settings."
 	},
 	"trainingPartners": {
@@ -230,6 +239,7 @@
 		},
 		"title": "Training Partners",
 		"description": "A request shares nothing by itself. After acceptance, each of you chooses independently what the other may see. Private profile rules still stay private.",
+		"descriptionSummary": "A request shares nothing. Once accepted, each of you picks what the other sees.",
 		"loading": "Loading training partners…",
 		"tryAgain": "Try again",
 		"requests": "Requests",
@@ -275,6 +285,7 @@
 		"savedDescription": "Your training locations are ready for workouts.",
 		"title": "Training Locations",
 		"description": "Save the bar, plate pairs and equipment available at each gym. Weights follow your account unit and are stored canonically in kg.",
+		"descriptionSummary": "Save the bar, plates and equipment available at each gym.",
 		"add": "Add location",
 		"loading": "Loading equipment preferences…",
 		"tryAgain": "Try again",
@@ -312,6 +323,7 @@
 		"fallbackError": "Check the goal fields and try again.",
 		"title": "Measurable Goals",
 		"description": "Set private targets that update from your training data. Weight-based goals follow your account unit and are stored canonically in kg.",
+		"descriptionSummary": "Set private targets that update from your training data.",
 		"newGoalType": "New goal type",
 		"goalTypePlaceholder": "Goal type",
 		"add": "Add goal",
@@ -376,6 +388,7 @@
 		"failedTitle": "Could not save featured accomplishments",
 		"title": "Featured Accomplishments",
 		"description": "Choose and order up to {max} current records, earned medals, shared routines, and one reached rank title. Records follow your Personal Records privacy setting; medals and rank follow Achievements; each routine follows its own sharing setting under your Routines privacy.",
+		"descriptionSummary": "Pick up to {max} records, medals, routines and a rank. Your privacy settings still apply.",
 		"loading": "Loading featured accomplishments…",
 		"tryAgain": "Try again",
 		"profileOrder": "Profile order",

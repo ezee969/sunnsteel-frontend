@@ -265,6 +265,7 @@
 		"new": "Nuevas",
 		"earlier": "Anteriores",
 		"updates": "Novedades",
+		"updatesSummary": "Tus logros, tu progreso y las novedades de miembros de los últimos {days} días.",
 		"updatesBody": "Los logros que obtienes, el progreso de tus sesiones y las novedades permitidas de otros miembros de los últimos {days} días.",
 		"markAll": "Marcar todo como leído",
 		"loading": "Cargando notificaciones",
@@ -304,8 +305,10 @@
 		"audiencePublic": "Todos",
 		"previewFollowers": "Un seguidor",
 		"previewPublic": "Cualquier otro miembro",
+		"feedScopeSummary": "Lo que hicieron los miembros que sigues, según su entrenamiento verificado.",
 		"feedScopeNote": "Lo que hicieron los miembros que sigues, generado a partir de su entrenamiento verificado. Nadie escribe estas entradas; cada miembro elige quién ve cada tipo.",
 		"everyoneNote": "Todos significa cualquier miembro con sesión iniciada en Sunnsteel. La actividad nunca aparece en el enlace público de tu perfil.",
+		"defaultsSummary": "Un valor predeterminado también se aplica a tu actividad pasada, salvo entradas con ajuste propio.",
 		"defaultsNote": "Cada tipo empieza en Solo yo. Una configuración predeterminada se aplica a tu actividad pasada de ese tipo y a la nueva, salvo a las entradas que configuraste por separado. La privacidad de tu perfil es el límite: un tipo nunca llega más lejos que la sección de la que viene.",
 		"sets": "{count, plural, one {# serie} other {# series}}",
 		"days": "{count, plural, one {# día} other {# días}}",
@@ -391,7 +394,7 @@
 		"asSeenBy": "Tu actividad tal como la ve {audience}",
 		"onlyMe": "Solo yo",
 		"yours": "Tuya",
-		"yoursBody": "Elige quién ve cada entrada o retira alguna. Los valores predeterminados de cada tipo están en <link>Ajustes</link>. {note}",
+		"yoursSummary": "Elige quién ve cada entrada o retira alguna. Los valores predeterminados están en <link>Ajustes</link>.",
 		"seeItAs": "Verla como"
 	},
 	"profileAchievements": {

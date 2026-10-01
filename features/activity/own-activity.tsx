@@ -12,6 +12,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -294,9 +295,9 @@ export function OwnActivity() {
 				<h2 id="activity-yours" className="type-section text-foreground">
 					{t('yours')}
 				</h2>
-				<p className="type-body-sm mt-1 max-w-[68ch] text-ink-3">
-					{t.rich('yoursBody', {
-						note: tActivity('everyoneNote'),
+				{/* UX-17 (§23.4): one line shown, who "Everyone" reaches one tap away. */}
+				<Explanation
+					summary={t.rich('yoursSummary', {
 						link: chunks => (
 							<Link
 								href="/settings/privacy#activity-sharing"
@@ -306,7 +307,10 @@ export function OwnActivity() {
 							</Link>
 						),
 					})}
-				</p>
+					className="mt-1"
+				>
+					<p>{tActivity('everyoneNote')}</p>
+				</Explanation>
 			</div>
 
 			<div className="space-y-2">

@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -99,15 +100,6 @@ export function ActivitySharingCard() {
 				<CardDescription>{t('description')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
-				<div className="space-y-2">
-					<p className="type-body-sm max-w-[68ch] text-ink-2">
-						{tActivity('defaultsNote')}
-					</p>
-					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{tActivity('everyoneNote')}
-					</p>
-				</div>
-
 				{sharing.isPending || !draft ? (
 					sharing.isError ? (
 						<div role="alert" className="space-y-3">
@@ -185,6 +177,14 @@ export function ActivitySharingCard() {
 						})}
 					</div>
 				)}
+
+				{/* UX-17 (§23.4): a default also reaches past activity, which is why
+				    saving is one step, so that line stays next to Save; the rest of
+				    the notes are one tap away. */}
+				<Explanation summary={tActivity('defaultsSummary')}>
+					<p>{tActivity('defaultsNote')}</p>
+					<p>{tActivity('everyoneNote')}</p>
+				</Explanation>
 
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<Button asChild variant="outline" size="sm">

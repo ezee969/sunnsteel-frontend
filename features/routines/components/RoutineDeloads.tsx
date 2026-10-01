@@ -25,6 +25,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -468,9 +469,15 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 					<h2 id="routine-deloads" className="type-section text-foreground">
 						{t('heading')}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{t('description', { days: deloads.data?.maxDays ?? 14 })}
-					</p>
+					{/* UX-17 (§23.4): one line shown, the full sentence one tap away. */}
+					<Explanation
+						className="mt-1"
+						summary={t('descriptionSummary', {
+							days: deloads.data?.maxDays ?? 14,
+						})}
+					>
+						<p>{t('description', { days: deloads.data?.maxDays ?? 14 })}</p>
+					</Explanation>
 				</div>
 				<Button
 					type="button"

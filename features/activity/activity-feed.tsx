@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ActivityEntryList } from '@/features/activity/activity-entry-list'
@@ -30,9 +31,10 @@ export function ActivityFeed() {
 				<h2 id="activity-following" className="type-section text-foreground">
 					{t('following')}
 				</h2>
-				<p className="type-body-sm mt-1 max-w-[68ch] text-ink-3">
-					{tActivity('feedScopeNote')}
-				</p>
+				{/* UX-17 (§23.4): one line shown, the full scope one tap away. */}
+				<Explanation summary={tActivity('feedScopeSummary')} className="mt-1">
+					<p>{tActivity('feedScopeNote')}</p>
+				</Explanation>
 			</div>
 
 			{query.isPending ? (

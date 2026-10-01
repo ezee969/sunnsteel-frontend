@@ -1672,6 +1672,31 @@ sentence case.
   carried from `UX-14` was already true: unranked text inherits the
   browser's 16px, and the text that read small was Body small.
 
+### 23.4 A copy budget (UX-17)
+
+- **A section's description is one line on a phone: about 90 characters in
+  English, about 110 in Spanish.** The rest of what it says goes behind
+  §20.3's "How this works" (`Explanation`): the summary stays visible, the
+  full text opens on a tap. Nothing a page stated is deleted, and the long
+  text is moved unchanged rather than rewritten; a new summary is written
+  only where no existing short line fits, and it must be a true statement on
+  its own, never a teaser.
+- **What never folds:** warnings and their marks, errors, unsaved states,
+  privacy caps, notices that something of the member's is hidden, and any
+  sentence a control depends on to be understood before it is used (that a
+  private setting does not revoke an existing link, that an activity
+  default reaches past entries). §20.1 already says this for sections; it
+  applies to sentences too.
+- **Mastheads:** a subtitle that describes the page hides below `sm`
+  (`HeroSection`), where it cost two or three lines before anything the page
+  holds. A subtitle that states a fact or a rule of its own keeps showing
+  (`subtitleOnPhone`): the Moderation queue's scope and the muscles an
+  exercise trains.
+- **A test holds the summaries to the budget** in both languages, so a
+  later edit cannot let one grow back into a paragraph.
+- **Out of scope:** dialog descriptions, empty states and toasts, which a
+  member reads when they asked for them.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

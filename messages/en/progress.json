@@ -39,6 +39,11 @@
 		"onDeload": "{count} on a deload",
 		"workoutsSentence": "{recent}; {previous}.",
 		"introFallback": "Measures from your logged workouts over the last four weeks.",
+		"introSummary": "Four measures from your logged workouts, {recent} beside {previous}.",
+		"headlineRepTargets": "{percent}% short of target",
+		"headlinePointsUp": "{value, plural, one {up # point} other {up # points}}",
+		"headlinePointsDown": "{value, plural, one {down # point} other {down # points}}",
+		"headlineJoin": "{figure}, {change}",
 		"loading": "Loading training signals",
 		"unavailable": "Training signals are unavailable",
 		"unavailableBody": "We could not read your recent workouts. Try again.",
@@ -154,6 +159,7 @@
 		"tryAgain": "Try again",
 		"heading": "Body progress",
 		"intro": "Your weight and measurements over time. Who else sees them is your <link>body progress privacy setting</link>.",
+		"introSummary": "Your weight and measurements over time.",
 		"rangeLabel": "Body progress range",
 		"logButton": "Log measurements",
 		"deleteFailed": "The entry could not be deleted. Try again.",
@@ -186,6 +192,7 @@
 		"badgeProgression": "Progression",
 		"title": "Record & progression timeline",
 		"description": "See when your best sets and automatic prescriptions changed, with the reason preserved from that session.",
+		"descriptionSummary": "See when your best sets and automatic prescriptions changed.",
 		"loading": "Loading progress timeline",
 		"errorTitle": "Timeline is unavailable",
 		"errorBody": "We could not load your records and prescription changes. Try again.",
@@ -232,6 +239,7 @@
 		"cellTitle": "{muscle}, week of {week}: {sets} weighted sets",
 		"assignedTotal": "Assigned total",
 		"note": "Each completed set contributes 1 to primary muscles and 0.5 to secondary muscles. The current week is still in progress.",
+		"noteSummary": "A completed set counts 1 for primary muscles and 0.5 for secondary muscles.",
 		"intensityLabel": "Heatmap intensity, less to more",
 		"less": "Less",
 		"more": "More"
@@ -266,7 +274,8 @@
 		"pointLabel": "{week}: {volume}, {sets} {noun}{partial, select, yes {, current partial week} other {}}",
 		"pointTitle": "{week}: {volume}, {sets} completed sets{partial, select, yes {, current partial week} other {}}",
 		"currentWeek": "Current",
-		"note": "Volume is external load × repetitions, so it is a workload signal, not a strength score. Bodyweight sets remain in the set count but add zero load volume. Muscle volume uses the same 1.0 primary / 0.5 secondary weighting as the distribution map; the current week is partial."
+		"note": "Volume is external load × repetitions, so it is a workload signal, not a strength score. Bodyweight sets remain in the set count but add zero load volume. Muscle volume uses the same 1.0 primary / 0.5 secondary weighting as the distribution map; the current week is partial.",
+		"noteSummary": "Volume is external load × repetitions: a workload signal, not a strength score."
 	},
 	"goals": {
 		"typeWeeklySessions": "Weekly sessions",

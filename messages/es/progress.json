@@ -39,6 +39,11 @@
 		"onDeload": "{count} en descarga",
 		"workoutsSentence": "{recent}; {previous}.",
 		"introFallback": "Medidas de tus entrenamientos registrados en las últimas cuatro semanas.",
+		"introSummary": "Cuatro medidas de tus entrenamientos registrados, {recent} junto a {previous}.",
+		"headlineRepTargets": "{percent}% por debajo del objetivo",
+		"headlinePointsUp": "{value, plural, one {sube # punto} other {sube # puntos}}",
+		"headlinePointsDown": "{value, plural, one {baja # punto} other {baja # puntos}}",
+		"headlineJoin": "{figure}; {change}",
 		"loading": "Cargando las señales de entrenamiento",
 		"unavailable": "Las señales de entrenamiento no están disponibles",
 		"unavailableBody": "No pudimos leer tus entrenamientos recientes. Inténtalo de nuevo.",
@@ -154,6 +159,7 @@
 		"tryAgain": "Reintentar",
 		"heading": "Progreso corporal",
 		"intro": "Tu peso y tus medidas a lo largo del tiempo. Quién más los ve lo define tu <link>ajuste de privacidad del progreso corporal</link>.",
+		"introSummary": "Tu peso y tus medidas a lo largo del tiempo.",
 		"rangeLabel": "Período del progreso corporal",
 		"logButton": "Registrar medidas",
 		"deleteFailed": "No se pudo eliminar el registro. Inténtalo de nuevo.",
@@ -186,6 +192,7 @@
 		"badgeProgression": "Progresión",
 		"title": "Récords y progresión",
 		"description": "Mira cuándo cambiaron tus mejores series y las prescripciones automáticas, con el motivo guardado de esa sesión.",
+		"descriptionSummary": "Mira cuándo cambiaron tus mejores series y las prescripciones automáticas.",
 		"loading": "Cargando la línea de tiempo",
 		"errorTitle": "La línea de tiempo no está disponible",
 		"errorBody": "No pudimos cargar tus récords ni los cambios de prescripción. Vuelve a intentarlo.",
@@ -232,6 +239,7 @@
 		"cellTitle": "{muscle}, semana del {week}: {sets} series ponderadas",
 		"assignedTotal": "Total asignado",
 		"note": "Cada serie completada aporta 1 a los músculos primarios y 0,5 a los secundarios. La semana actual sigue en curso.",
+		"noteSummary": "Una serie completada cuenta 1 para los músculos primarios y 0,5 para los secundarios.",
 		"intensityLabel": "Intensidad del mapa, de menos a más",
 		"less": "Menos",
 		"more": "Más"
@@ -266,7 +274,8 @@
 		"pointLabel": "{week}: {volume}, {sets} {noun}{partial, select, yes {, semana actual parcial} other {}}",
 		"pointTitle": "{week}: {volume}, {sets} series completadas{partial, select, yes {, semana actual parcial} other {}}",
 		"currentWeek": "Actual",
-		"note": "El volumen es carga externa × repeticiones, así que es una señal de carga de trabajo, no una puntuación de fuerza. Las series con peso corporal siguen contando en el número de series pero aportan cero volumen de carga. El volumen por músculo usa la misma ponderación 1,0 primario / 0,5 secundario que el mapa de distribución; la semana actual es parcial."
+		"note": "El volumen es carga externa × repeticiones, así que es una señal de carga de trabajo, no una puntuación de fuerza. Las series con peso corporal siguen contando en el número de series pero aportan cero volumen de carga. El volumen por músculo usa la misma ponderación 1,0 primario / 0,5 secundario que el mapa de distribución; la semana actual es parcial.",
+		"noteSummary": "El volumen es carga externa × repeticiones: una señal de carga de trabajo, no de fuerza."
 	},
 	"goals": {
 		"typeWeeklySessions": "Sesiones por semana",

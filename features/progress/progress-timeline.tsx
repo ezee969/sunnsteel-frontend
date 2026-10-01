@@ -9,6 +9,7 @@ import { CalendarClock, History, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,7 +48,14 @@ const FILTERS: ReadonlyArray<{
 
 interface ProgressTimelineProps {
 	/** Defaults to the global Progress feed's heading. */
-	heading?: { id: string; title: string; description: string }
+	heading?: {
+		id: string
+		title: string
+		/** The one line shown. */
+		description: string
+		/** UX-17: the full text, one tap away; omit when the line says it all. */
+		detail?: string
+	}
 	/** Off on a single exercise's page, where every event is that exercise. */
 	showExerciseName?: boolean
 	items: ProgressTimelineItem[]
@@ -214,7 +222,8 @@ export function ProgressTimeline({
 	const heading = headingProp ?? {
 		id: 'progress-timeline',
 		title: t('title'),
-		description: t('description'),
+		description: t('descriptionSummary'),
+		detail: t('description'),
 	}
 
 	// UX-04: the first five events, then "Show N more"; the server's
@@ -230,9 +239,15 @@ export function ProgressTimeline({
 					<h2 id={heading.id} className="type-section text-foreground">
 						{heading.title}
 					</h2>
-					<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-						{heading.description}
-					</p>
+					{heading.detail ? (
+						<Explanation summary={heading.description} className="mt-1">
+							<p>{heading.detail}</p>
+						</Explanation>
+					) : (
+						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
+							{heading.description}
+						</p>
+					)}
 				</div>
 			</div>
 

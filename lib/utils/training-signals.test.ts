@@ -5,12 +5,17 @@ import { translatorFor } from '@/i18n/translator'
 
 import {
 	describeDecline,
+	describeDeclinesHeadline,
 	describeEffort,
+	describeEffortHeadline,
 	describeNoDeclines,
 	describeRepTargets,
+	describeRepTargetsHeadline,
 	describeSignalsIntro,
+	describeSignalsIntroSummary,
 	describeSignalsRule,
 	describeWorkouts,
+	describeWorkoutsHeadline,
 	trainingSignalMarkedLabel,
 	trainingSignalsTitle,
 	trainingSignalTitles,
@@ -117,6 +122,49 @@ describe('training signal copy', () => {
 		expect(describeSignalsIntro(thresholds, en)).toBe(
 			'Four measures from your logged workouts, the last 14 days beside the 14 days before. They state what changed, not why.',
 		)
+	})
+
+	it('keeps one line of the intro for a phone and the rest behind the toggle', () => {
+		const summary = describeSignalsIntroSummary(thresholds, en)
+		expect(summary).toBe(
+			'Four measures from your logged workouts, the last 14 days beside the 14 days before.',
+		)
+		expect(summary.length).toBeLessThanOrEqual(90)
+		expect(describeSignalsIntro(thresholds, en)).toContain(summary)
+		expect(
+			describeSignalsIntroSummary(thresholds, es).length,
+		).toBeLessThanOrEqual(110)
+	})
+
+	it('leads each row with its number and its change', () => {
+		expect(describeEffortHeadline(signals(), en, 'en')).toBe('8.4, up 0.6')
+		expect(describeRepTargetsHeadline(signals(), en)).toBe(
+			'15% short of target, up 10 points',
+		)
+		expect(describeDeclinesHeadline(signals(), en)).toBe('1 lift')
+		expect(describeWorkoutsHeadline(signals(), en)).toBe('5 workouts, down 3')
+	})
+
+	it('has no headline for a measure with nothing to compare', () => {
+		const empty = signals({
+			effort: {
+				comparison: null,
+				recentSets: 0,
+				previousSets: 0,
+				marked: false,
+			},
+			repTargets: {
+				recent: { shortSets: 0, targetedSets: 0, shortPercent: 0 },
+				previous: { shortSets: 0, targetedSets: 0, shortPercent: 0 },
+				comparable: false,
+				mostOften: [],
+				marked: false,
+			},
+			declines: { checkedLifts: 0, lifts: [], marked: false },
+		})
+		expect(describeEffortHeadline(empty, en, 'en')).toBeNull()
+		expect(describeRepTargetsHeadline(empty, en)).toBeNull()
+		expect(describeDeclinesHeadline(empty, en)).toBe('0 lifts')
 	})
 
 	it('prints every threshold that marks a signal', () => {
@@ -260,6 +308,11 @@ describe('training signal copy', () => {
 			trainingSignalMarkedLabel(en),
 			...Object.values(trainingSignalTitles(en)),
 			describeSignalsIntro(thresholds, en),
+			describeSignalsIntroSummary(thresholds, en),
+			describeEffortHeadline(signals(), en, 'en') ?? '',
+			describeRepTargetsHeadline(signals(), en) ?? '',
+			describeDeclinesHeadline(signals(), en),
+			describeWorkoutsHeadline(signals(), en),
 			describeSignalsRule(thresholds, en, 'en'),
 			describeEffort(signals(), en, 'en'),
 			describeEffort(empty, en, 'en'),
@@ -285,6 +338,13 @@ describe('the same signals in Spanish (I18N-04)', () => {
 			'5 entrenamientos en los últimos 14 días, 1 terminaron antes de tiempo, 1 en descarga; 8 en los 14 días anteriores, ninguno terminó antes de tiempo.',
 		)
 		expect(describeNoDeclines(signals(), es)).toContain('dos sesiones')
+		expect(describeEffortHeadline(signals(), es, 'es')).toBe('8,4; sube 0,6')
+		expect(describeRepTargetsHeadline(signals(), es)).toBe(
+			'15% por debajo del objetivo; sube 10 puntos',
+		)
+		expect(describeWorkoutsHeadline(signals(), es)).toBe(
+			'5 entrenamientos; baja 3',
+		)
 	})
 
 	it('names no cause and gives no advice in Spanish either', () => {
@@ -293,6 +353,11 @@ describe('the same signals in Spanish (I18N-04)', () => {
 			trainingSignalMarkedLabel(es),
 			...Object.values(trainingSignalTitles(es)),
 			describeSignalsIntro(thresholds, es),
+			describeSignalsIntroSummary(thresholds, es),
+			describeEffortHeadline(signals(), es, 'es') ?? '',
+			describeRepTargetsHeadline(signals(), es) ?? '',
+			describeDeclinesHeadline(signals(), es),
+			describeWorkoutsHeadline(signals(), es),
 			describeSignalsRule(thresholds, es, 'es'),
 			describeEffort(signals(), es, 'es'),
 			describeRepTargets(signals(), es),

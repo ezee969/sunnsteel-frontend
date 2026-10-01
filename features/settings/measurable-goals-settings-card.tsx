@@ -10,14 +10,9 @@ import { Loader2, Plus, Target, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
 	Select,
@@ -151,7 +146,9 @@ export function MeasurableGoalsSettingsCard({
 						<Target className="size-4 text-ink-3" aria-hidden />
 						{t('title')}
 					</CardTitle>
-					<CardDescription>{t('description')}</CardDescription>
+					<Explanation summary={t('descriptionSummary')}>
+						<p>{t('description')}</p>
+					</Explanation>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<Select

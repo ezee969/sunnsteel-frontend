@@ -3,6 +3,7 @@
 import { Download, FileJson, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -35,7 +36,9 @@ export function DownloadDataCard() {
 				<CardDescription>{t('contents')}</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<p className="type-body-sm text-ink-3">{t('notes')}</p>
+				<Explanation summary={t('notesSummary')}>
+					<p>{t('notes')}</p>
+				</Explanation>
 				<Button
 					type="button"
 					variant="outline"

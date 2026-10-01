@@ -404,7 +404,8 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 			<ExercisePerformanceHistory
 				copy={{
 					title: t('recentTitle'),
-					description: t('recentDescription'),
+					description: t('recentSummary'),
+					detail: t('recentDescription'),
 					emptyTitle: t('recentEmptyTitle'),
 					emptyDescription: t('recentEmptyDescription'),
 				}}
@@ -420,7 +421,8 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 				heading={{
 					id: 'exercise-progression',
 					title: t('progressionTitle'),
-					description: t('progressionDescription'),
+					description: t('progressionSummary'),
+					detail: t('progressionDescription'),
 				}}
 				showExerciseName={false}
 				items={timeline.data?.pages.flatMap(page => page.items) ?? []}
@@ -527,6 +529,7 @@ export function ExerciseDetail({ exerciseId }: { exerciseId: string }) {
 				subtitle={
 					primary ? <>{t('trains', { muscles: primary })}</> : undefined
 				}
+				subtitleOnPhone
 			/>
 			<Overview exercise={exercise} lastTrained={lastTrained} />
 			{exercise.isCustom ? <CustomExerciseActions exercise={exercise} /> : null}

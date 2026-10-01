@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	AlertDialog,
@@ -644,18 +645,21 @@ export function BodyProgressSection({
 						>
 							{tBody('heading')}
 						</h2>
-						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-							{tBody.rich('intro', {
-								link: chunks => (
-									<Link
-										href="/settings/privacy#privacy-bodyProgress"
-										className="underline underline-offset-4"
-									>
-										{chunks}
-									</Link>
-								),
-							})}
-						</p>
+						{/* UX-17 (§23.4): one line shown, the privacy pointer one tap away. */}
+						<Explanation summary={tBody('introSummary')} className="mt-1">
+							<p>
+								{tBody.rich('intro', {
+									link: chunks => (
+										<Link
+											href="/settings/privacy#privacy-bodyProgress"
+											className="underline underline-offset-4"
+										>
+											{chunks}
+										</Link>
+									),
+								})}
+							</p>
+						</Explanation>
 					</div>
 				</div>
 				<div className="flex flex-wrap items-center gap-3">

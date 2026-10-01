@@ -21,6 +21,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -405,12 +406,18 @@ export function RoutineTrainingBlocks({
 					>
 						{t('heading')}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{t('description')}
-						{blocks.data
-							? ` ${t('plannedCount', { count: list.length, max })}`
-							: ''}
-					</p>
+					{/* UX-17 (§23.4): one line shown, the rest one tap away. */}
+					<Explanation
+						className="mt-1"
+						summary={`${t('descriptionSummary')}${
+							blocks.data
+								? ` ${t('plannedCount', { count: list.length, max })}`
+								: ''
+						}`}
+					>
+						<p>{t('description')}</p>
+						<p>{t('footnote')}</p>
+					</Explanation>
 				</div>
 				<Button
 					type="button"
@@ -524,8 +531,6 @@ export function RoutineTrainingBlocks({
 					))}
 				</ul>
 			)}
-
-			<p className="type-body-sm text-ink-3">{t('footnote')}</p>
 
 			{editor ? (
 				<TrainingBlockDialog

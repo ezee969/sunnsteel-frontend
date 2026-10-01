@@ -5,14 +5,9 @@ import { Loader2, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
@@ -70,7 +65,9 @@ export function ProfileDiscoverySettingsCard({
 					<Search className="h-5 w-5 text-primary" aria-hidden />
 					<CardTitle>{t('title')}</CardTitle>
 				</div>
-				<CardDescription>{t('description')}</CardDescription>
+				<Explanation summary={t('descriptionSummary')}>
+					<p>{t('description')}</p>
+				</Explanation>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				<div className="divide-y divide-rule">

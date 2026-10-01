@@ -5,14 +5,9 @@ import { Loader2, MapPin, Plus, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
@@ -143,7 +138,9 @@ export const TrainingLocationPreferencesCard = ({
 						<MapPin className="h-4 w-4 text-ink-3" aria-hidden />
 						{t('title')}
 					</CardTitle>
-					<CardDescription>{t('description')}</CardDescription>
+					<Explanation summary={t('descriptionSummary')}>
+						<p>{t('description')}</p>
+					</Explanation>
 				</div>
 				<Button
 					type="button"

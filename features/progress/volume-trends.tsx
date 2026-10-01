@@ -5,6 +5,7 @@ import { BarChart3, RefreshCw } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import {
 	Select,
@@ -335,7 +336,9 @@ export function VolumeTrends({
 							</>
 						) : null}
 
-						<p className="type-body-sm text-ink-3">{t('note')}</p>
+						<Explanation summary={t('noteSummary')}>
+							<p>{t('note')}</p>
+						</Explanation>
 					</>
 				)}
 			</div>

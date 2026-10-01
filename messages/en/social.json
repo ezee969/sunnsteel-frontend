@@ -265,6 +265,7 @@
 		"new": "New",
 		"earlier": "Earlier",
 		"updates": "Updates",
+		"updatesSummary": "Your achievements, progress and member updates from the last {days} days.",
 		"updatesBody": "Achievements you earn, session progress and permitted updates from other members from the last {days} days.",
 		"markAll": "Mark all read",
 		"loading": "Loading notifications",
@@ -304,8 +305,10 @@
 		"audiencePublic": "Everyone",
 		"previewFollowers": "A follower",
 		"previewPublic": "Any other member",
+		"feedScopeSummary": "What the members you follow did, from their verified training.",
 		"feedScopeNote": "What the members you follow did, generated from their verified training. Nobody writes these; each member chooses who sees each kind.",
 		"everyoneNote": "Everyone means any member signed in to Sunnsteel. Activity never appears on your public profile link.",
+		"defaultsSummary": "A default applies to past activity too, except entries you set on their own.",
 		"defaultsNote": "Every kind starts at Only me. A default applies to your past activity of that kind as well as new activity, except entries you set on their own. Your profile privacy is the upper bound: a kind can never reach further than the section it comes from.",
 		"sets": "{count, plural, one {# set} other {# sets}}",
 		"days": "{count, plural, one {# day} other {# days}}",
@@ -391,7 +394,7 @@
 		"asSeenBy": "Your activity as {audience} sees it",
 		"onlyMe": "Only me",
 		"yours": "Yours",
-		"yoursBody": "Choose who sees each entry, or withdraw one. Defaults for each kind are in <link>Settings</link>. {note}",
+		"yoursSummary": "Choose who sees each entry, or withdraw one. Defaults are in <link>Settings</link>.",
 		"seeItAs": "See it as"
 	},
 	"profileAchievements": {

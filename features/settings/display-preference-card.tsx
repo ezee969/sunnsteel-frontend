@@ -3,6 +3,7 @@
 import { Eye } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { Explanation } from '@/components/layout/explanation'
 import {
 	Card,
 	CardContent,
@@ -42,7 +43,9 @@ export function DisplayPreferenceCard() {
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3">
 					<div className="space-y-1">
 						<Label htmlFor="display-contrast">{t('contrast')}</Label>
-						<p className="type-body-sm text-ink-3">{t('contrastNote')}</p>
+						<Explanation summary={t('contrastNoteSummary')}>
+							<p>{t('contrastNote')}</p>
+						</Explanation>
 					</div>
 					<Label
 						htmlFor="display-contrast"
@@ -68,7 +71,9 @@ export function DisplayPreferenceCard() {
 				<div className="grid min-h-14 grid-cols-[minmax(0,1fr)_44px] items-center gap-3 border-t border-rule-faint pt-3">
 					<div className="space-y-1">
 						<Label htmlFor="display-controls">{t('controls')}</Label>
-						<p className="type-body-sm text-ink-3">{t('controlsNote')}</p>
+						<Explanation summary={t('controlsNoteSummary')}>
+							<p>{t('controlsNote')}</p>
+						</Explanation>
 					</div>
 					<Label
 						htmlFor="display-controls"

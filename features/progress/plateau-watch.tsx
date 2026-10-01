@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -192,11 +193,16 @@ export function PlateauWatch({
 						<h2 id="plateau-watch" className="type-section text-foreground">
 							{t('heading')}
 						</h2>
-						<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
-							{data
-								? describePlateauRule(data.thresholds, t)
-								: t('fallbackDescription')}
-						</p>
+						{/* UX-17 (§23.4): one line shown, the rule one tap away. */}
+						{data ? (
+							<Explanation summary={t('fallbackDescription')} className="mt-1">
+								<p>{describePlateauRule(data.thresholds, t)}</p>
+							</Explanation>
+						) : (
+							<p className="type-body-sm mt-1 max-w-2xl text-ink-3">
+								{t('fallbackDescription')}
+							</p>
+						)}
 					</div>
 				</div>
 				{data ? (

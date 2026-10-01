@@ -6,14 +6,9 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
+import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import {
 	Select,
@@ -54,7 +49,9 @@ export function TrainingPartnersCard() {
 						<h2 className="type-panel">{t('title')}</h2>
 					</CardTitle>
 				</div>
-				<CardDescription>{t('description')}</CardDescription>
+				<Explanation summary={t('descriptionSummary')}>
+					<p>{t('description')}</p>
+				</Explanation>
 			</CardHeader>
 			<CardContent className="space-y-6">
 				{partnerships.isPending ? (

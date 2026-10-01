@@ -3,6 +3,12 @@ import { ReactNode } from 'react'
 export interface HeroSectionProps {
 	title: ReactNode
 	subtitle?: ReactNode
+	/**
+	 * UX-17 (§23.4): a subtitle that describes the page hides below `sm`,
+	 * where it costs two or three lines before anything the page holds. Pass
+	 * this when the subtitle states a fact or a rule of its own instead.
+	 */
+	subtitleOnPhone?: boolean
 	sectionClassName?: string
 	innerClassName?: string
 }
@@ -26,6 +32,7 @@ export interface HeroSectionProps {
 export const HeroSection = ({
 	title,
 	subtitle,
+	subtitleOnPhone = false,
 	sectionClassName = '',
 	innerClassName = '',
 }: HeroSectionProps) => {
@@ -36,7 +43,9 @@ export const HeroSection = ({
 					{title}
 				</h1>
 				{subtitle ? (
-					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
+					<p
+						className={`mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base ${subtitleOnPhone ? '' : 'max-sm:hidden'}`}
+					>
 						{subtitle}
 					</p>
 				) : null}
