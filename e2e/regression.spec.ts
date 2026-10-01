@@ -800,6 +800,20 @@ for (const width of REGRESSION_WIDTHS) {
 			page.getByRole('button', { name: msg('shell.header.accountMenu') }),
 			'account menu',
 		)
+		// NOTIF-10: from 768 the bell opens the latest updates; below it, the
+		// bell stays a link to the page.
+		const bell = { name: msgPrefix('shell.indicators.bell') }
+		if (width > MOBILE_MAX) {
+			await checkMenu(
+				page,
+				page.locator('header').getByRole('button', bell),
+				'notification menu',
+			)
+		} else {
+			await expect(
+				page.locator('header').getByRole('link', bell),
+			).toHaveAttribute('href', '/notifications')
+		}
 		await checkMenu(
 			page,
 			page

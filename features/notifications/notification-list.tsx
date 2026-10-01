@@ -42,6 +42,59 @@ const KIND_ICON = {
 	TRAINING_PARTNER_ACHIEVEMENT: Medal,
 } as const
 
+/** A notification worded and linked the one way (NOTIF-01). */
+export function useDescribeNotification() {
+	const t = useTranslations('social.notifications')
+	const tPartners = useTranslations('settings.trainingPartners')
+	const tAchievements = useTranslations('catalog.achievements')
+	return (notification: AppNotification) =>
+		describeNotification(notification, t, tPartners, tAchievements)
+}
+
+/**
+ * One notification's icon, wording, "New" and time, as the page row and the
+ * NOTIF-10 menu both show it. The caller supplies the link around it.
+ */
+export function NotificationSummary({
+	notification,
+	now,
+}: {
+	notification: AppNotification
+	now: Date
+}) {
+	const locale = useLocale()
+	const t = useTranslations('social.notifications')
+	const view = useDescribeNotification()(notification)
+	const Icon = KIND_ICON[notification.kind]
+	const unread = !notification.readAt
+	return (
+		<>
+			<span className="mt-0.5 flex size-8 shrink-0 items-center justify-center border border-rule bg-surface">
+				<Icon className="size-4 text-foreground" aria-hidden />
+			</span>
+			<span className="min-w-0 flex-1">
+				<span className="type-panel block text-foreground underline-offset-4 group-hover:underline">
+					{view.title}
+				</span>
+				{view.detail ? (
+					<span className="type-body-sm mt-1 block text-ink-3">
+						{view.detail}
+					</span>
+				) : null}
+				<span className="type-body-sm mt-1 block text-ink-3">
+					{/* Unread is a word, never colour alone (§4.3). */}
+					{unread ? (
+						<span className="type-label mr-2 text-foreground">{t('new')}</span>
+					) : null}
+					<time dateTime={notification.createdAt}>
+						{formatTimeAgo(notification.createdAt, locale, now)}
+					</time>
+				</span>
+			</span>
+		</>
+	)
+}
+
 function NotificationRow({
 	notification,
 	now,
@@ -51,12 +104,7 @@ function NotificationRow({
 	now: Date
 	onOpen: (id: string) => void
 }) {
-	const locale = useLocale()
-	const t = useTranslations('social.notifications')
-	const tPartners = useTranslations('settings.trainingPartners')
-	const tAchievements = useTranslations('catalog.achievements')
-	const view = describeNotification(notification, t, tPartners, tAchievements)
-	const Icon = KIND_ICON[notification.kind]
+	const view = useDescribeNotification()(notification)
 	const unread = !notification.readAt
 	return (
 		<li className="rule-row py-4">
@@ -67,30 +115,7 @@ function NotificationRow({
 				}}
 				className="group flex min-w-0 gap-3"
 			>
-				<span className="mt-0.5 flex size-8 shrink-0 items-center justify-center border border-rule bg-surface">
-					<Icon className="size-4 text-foreground" aria-hidden />
-				</span>
-				<span className="min-w-0 flex-1">
-					<span className="type-panel block text-foreground underline-offset-4 group-hover:underline">
-						{view.title}
-					</span>
-					{view.detail ? (
-						<span className="type-body-sm mt-1 block text-ink-3">
-							{view.detail}
-						</span>
-					) : null}
-					<span className="type-body-sm mt-1 block text-ink-3">
-						{/* Unread is a word, never colour alone (§4.3). */}
-						{unread ? (
-							<span className="type-label mr-2 text-foreground">
-								{t('new')}
-							</span>
-						) : null}
-						<time dateTime={notification.createdAt}>
-							{formatTimeAgo(notification.createdAt, locale, now)}
-						</time>
-					</span>
-				</span>
+				<NotificationSummary notification={notification} now={now} />
 			</Link>
 		</li>
 	)

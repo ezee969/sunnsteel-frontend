@@ -95,7 +95,7 @@ export default function Header({
 				</div>
 			</div>
 			<div className="flex items-center gap-2 shrink-0">
-				<NotificationBell />
+				<NotificationBell menu={!isMobile} />
 				<ModeToggle />
 				<UserDropdown />
 			</div>

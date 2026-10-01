@@ -289,7 +289,8 @@
 		"listEnd": "Nothing older: updates are kept for {days} days.",
 		"loadOlder": "Load older updates",
 		"loadingOlder": "Loading older updates…",
-		"olderError": "Older updates could not be loaded."
+		"olderError": "Older updates could not be loaded.",
+		"seeAll": "See all notifications"
 	},
 	"activity": {
 		"typeSessionCompleted": "Completed workouts",
