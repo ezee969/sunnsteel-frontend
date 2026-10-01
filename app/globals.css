@@ -141,7 +141,7 @@
   --rank-artisan: oklch(0.5 0.115 248);
   --rank-maestro: oklch(0.47 0.155 274);
   --rank-virtuoso: oklch(0.48 0.15 308);
-  --rank-laureate: oklch(0.47 0.16 342);
+  --rank-laureate: oklch(0.36 0.12 318);
 
   --sidebar: oklch(0.935 0.012 88);
   --sidebar-foreground: oklch(0.235 0.014 62);
@@ -202,7 +202,7 @@
   --rank-artisan: oklch(0.74 0.105 248);
   --rank-maestro: oklch(0.7 0.135 274);
   --rank-virtuoso: oklch(0.72 0.135 308);
-  --rank-laureate: oklch(0.72 0.14 342);
+  --rank-laureate: oklch(0.66 0.1 316);
 
   --sidebar: oklch(0.155 0.01 70);
   --sidebar-foreground: oklch(0.94 0.01 88);
@@ -236,6 +236,10 @@
   --input: oklch(0.58 0.014 84);
   --sidebar-border: oklch(0.58 0.014 84);
   --rule-faint: oklch(0.685 0.01 86);
+  /* ACH-11 (§22.2): the three light rank pigments under 4.5:1 as marks. */
+  --rank-initiate: oklch(0.485 0.02 240);
+  --rank-apprentice: oklch(0.475 0.08 203);
+  --rank-artisan: oklch(0.485 0.115 248);
 }
 :root.dark[data-contrast='more'] {
   --ink-2: oklch(0.85 0.01 84);
@@ -264,6 +268,10 @@
     --input: oklch(0.58 0.014 84);
     --sidebar-border: oklch(0.58 0.014 84);
     --rule-faint: oklch(0.685 0.01 86);
+    /* ACH-11 (§22.2): the three light rank pigments under 4.5:1 as marks. */
+    --rank-initiate: oklch(0.485 0.02 240);
+    --rank-apprentice: oklch(0.475 0.08 203);
+    --rank-artisan: oklch(0.485 0.115 248);
   }
   :root.dark {
     --ink-2: oklch(0.85 0.01 84);
@@ -506,7 +514,9 @@
 
 
   /* The one classical device the direction keeps: gold brackets, one pair per
-     screen, on the page inscription rather than around a photograph. */
+     screen, on the page inscription rather than around a photograph. A
+     rank-decorated profile header sets --corner-bracket to the rank pigment
+     (ACH-11, §24.3). */
   .corner-brackets {
     position: relative;
   }
@@ -516,7 +526,7 @@
     position: absolute;
     width: 0.5rem;
     height: 0.5rem;
-    border-color: var(--honour-strong);
+    border-color: var(--corner-bracket, var(--honour-strong));
     border-style: solid;
     pointer-events: none;
   }
@@ -686,4 +696,202 @@
   --tw-exit-translate-y: 0 !important;
   transition-property: color, background-color, border-color,
     text-decoration-color, fill, stroke, opacity !important;
+}
+
+/* ACH-11 (design system §24): the rank decoration of the profile header.
+   The generated pieces draw in placeholder colours, mapped here to tokens:
+   #010101 the holder's rank pigment, #020202 the ground the ornament is cut
+   into, #030303 shading. Tiles are luminance masks painted in the pigment.
+   `.rank-deco` sits on the header section; it sets --rank-pigment, --rank-cut
+   --rank-draw and the ground opacities for the rank it shows
+   (lib/utils/rank-decoration.ts). */
+.rank-deco {
+  --rank-shade: var(--foreground);
+  --rank-field: 0.1;
+  --rank-field-strong: 0.15;
+  --rank-ground-opacity: var(--rank-ground-day);
+}
+.dark .rank-deco {
+  --rank-shade: var(--surface-sunk);
+  --rank-field: 0.14;
+  --rank-field-strong: 0.2;
+  --rank-ground-opacity: var(--rank-ground-night);
+}
+.rank-deco [fill='#010101'] {
+  fill: var(--rank-pigment);
+}
+.rank-deco [stroke='#010101'] {
+  stroke: var(--rank-pigment);
+}
+.rank-deco [fill='#020202'] {
+  fill: var(--rank-cut);
+}
+.rank-deco [stroke='#020202'] {
+  stroke: var(--rank-cut);
+}
+.rank-deco [fill='#030303'] {
+  fill: var(--rank-shade);
+}
+.rank-deco [stroke='#030303'] {
+  stroke: var(--rank-shade);
+}
+.rank-deco .field2 {
+  fill-opacity: var(--rank-field-strong);
+}
+.rank-deco-paint {
+  background-color: var(--rank-pigment);
+  mask-mode: luminance;
+}
+.rank-deco-field {
+  background-color: color-mix(
+    in oklab,
+    var(--rank-pigment) calc(var(--rank-field) * 100%),
+    transparent
+  );
+}
+.rank-deco-band {
+  border-color: color-mix(
+    in oklab,
+    var(--rank-pigment) calc(var(--rank-field) * 100%),
+    transparent
+  );
+}
+.rank-deco-line {
+  border-color: var(--rank-pigment);
+}
+.rank-deco-base {
+  background-color: var(--rank-cut);
+}
+.rank-deco-ground {
+  opacity: var(--rank-ground-opacity);
+}
+.rank-deco-piece {
+  position: absolute;
+  overflow: visible;
+}
+.rank-deco .spin {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Entrance, once each time the header mounts: the frame draws in from the
+   left (the rule draw, longer for a richer rank), the corners and the head
+   appear as it passes, the portrait ornament turns into place, and the
+   festoons, aureole and ground come last. Text never moves. */
+@keyframes rank-deco-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes rank-deco-appear {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rank-deco-settle {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg);
+  }
+}
+@keyframes rank-deco-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rank-deco-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes rank-deco-twinkle {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes rank-deco-roll {
+  to {
+    mask-position: var(--rank-roll) 0;
+  }
+}
+.rank-deco[data-playing] [data-part='frame'] {
+  animation: rank-deco-draw var(--rank-draw) var(--ease-standard) both;
+}
+.rank-deco[data-playing] [data-part='corners'],
+.rank-deco[data-playing] [data-part='head'] {
+  animation: rank-deco-appear var(--motion-slow) var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.5);
+}
+.rank-deco[data-playing] [data-part='ring'] {
+  animation: rank-deco-settle calc(var(--rank-draw) + 120ms)
+    var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.25);
+}
+.rank-deco[data-playing] [data-part='garland'] {
+  animation: rank-deco-draw 640ms var(--ease-standard) both;
+  animation-delay: var(--rank-draw);
+}
+.rank-deco[data-playing] [data-part='aureole'],
+.rank-deco[data-playing] [data-part='ground'] {
+  animation: rank-deco-appear 600ms var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.8);
+}
+/* Ambient, only while the header is on screen: every rank moves two motifs
+   at one tempo (§24.4). Off screen the rules do not apply at all, so nothing
+   runs there; the entrance is never held back by visibility. */
+.rank-deco[data-inview] .spin {
+  animation: rank-deco-turn 160s linear infinite;
+}
+.rank-deco[data-inview] .breathe {
+  animation: rank-deco-breathe 8s ease-in-out infinite;
+}
+.rank-deco[data-inview] .rank-deco-twinkle {
+  animation: rank-deco-twinkle 9s ease-in-out infinite;
+}
+.rank-deco[data-inview] .rank-deco-twinkle-late {
+  animation: rank-deco-twinkle 9s ease-in-out -4.5s infinite;
+}
+.rank-deco[data-inview] .rank-deco-roll {
+  animation: rank-deco-roll 7s linear infinite;
+}
+/* Reduced motion from either source: the finished decoration, at once. The
+   two blocks change together, like the reduced-motion pair above. */
+@media (prefers-reduced-motion: reduce) {
+  .rank-deco *,
+  .rank-deco *::before {
+    animation: none !important;
+  }
+}
+:root[data-motion='reduce'] .rank-deco * {
+  animation: none !important;
+}
+/* Higher contrast (§24.5): the ground pattern, every field tint and the
+   aureole go, leaving the text column on the plain ground. */
+:root[data-contrast='more'] .rank-deco {
+  --rank-field: 0;
+  --rank-field-strong: 0;
+}
+:root[data-contrast='more'] .rank-deco [data-part='ground'],
+:root[data-contrast='more'] .rank-deco [data-part='aureole'] {
+  display: none;
+}
+@media (prefers-contrast: more) {
+  .rank-deco {
+    --rank-field: 0 !important;
+    --rank-field-strong: 0 !important;
+  }
+  .rank-deco [data-part='ground'],
+  .rank-deco [data-part='aureole'] {
+    display: none;
+  }
+}
+/* A browser that cannot read a tile as a luminance mask would paint the whole
+   tile; it shows the decoration without its bands and grounds instead. */
+@supports not (mask-mode: luminance) {
+  .rank-deco-paint {
+    display: none;
+  }
 }

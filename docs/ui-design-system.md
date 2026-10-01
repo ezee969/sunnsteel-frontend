@@ -1211,10 +1211,17 @@ taste.
 | `--rank-artisan` | Azurite | `oklch(0.5 0.115 248)` | `oklch(0.74 0.105 248)` |
 | `--rank-maestro` | Ultramarine | `oklch(0.47 0.155 274)` | `oklch(0.7 0.135 274)` |
 | `--rank-virtuoso` | Folium | `oklch(0.48 0.15 308)` | `oklch(0.72 0.135 308)` |
-| `--rank-laureate` | Tyrian purple | `oklch(0.47 0.16 342)` | `oklch(0.72 0.14 342)` |
+| `--rank-laureate` | Tyrian purple | `oklch(0.36 0.12 318)` | `oklch(0.66 0.1 316)` |
 
 They follow §11.1: declared in `:root` and `.dark`, aliased in `@theme inline`
-as `--color-rank-*`, consumed as `text-rank-*` on the crest only.
+as `--color-rank-*`, consumed as `text-rank-*` on the crest and, since §24, in
+the profile header's decoration.
+
+**Laureate was revalued on 2026-10-01** (`ACH-11`, the owner's call). The first
+value, `oklch(0.47 0.16 342)` / `oklch(0.72 0.14 342)`, read as pink, above all
+in Night. The rank moved toward violet and became darker and less saturated,
+closer to the dense, nearly black purple of the historical pigment. Under
+higher contrast three light values change as well; §22.2 lists them.
 
 ### 19.2 Rules
 
@@ -1222,7 +1229,8 @@ as `--color-rank-*`, consumed as `text-rank-*` on the crest only.
    beside it stays `--foreground`. The values clear 3:1, not 4.5:1, on
    purpose.
 2. **A rank colour means that rank and nothing else.** Never completion, a
-   record, risk, decoration or a fill behind content. Ranks never borrow
+   record, risk, decoration or a fill behind content. The one exception is the
+   holder's own profile header, which §24 decorates. Ranks never borrow
    `honour`, `success`, `warning-strong` or `destructive`, and no other role
    borrows a rank token. This retires the `text-honour` the `/achievements`
    rank title carried: a rank is earned by attendance, not by doing better than
@@ -1279,9 +1287,10 @@ and `--surface-sunk`; marks target 3:1.
 | `rank-artisan` | 4.33 | 7.83 | `ink-3` 0.129 / 0.152 |
 | `rank-maestro` | 5.18 | 6.56 | `ink-3` 0.166 / 0.157 |
 | `rank-virtuoso` | 5.11 | 6.86 | `ink-3` 0.157 / 0.163 |
-| `rank-laureate` | 5.43 | 6.76 | `destructive` 0.132 / 0.129 |
+| `rank-laureate` | 8.37 | 5.52 | `ink-3` 0.173 / 0.108 |
 
-Two accepted trade-offs. Adjacent ranks sit 0.065–0.092 ΔEok apart, and under
+The Laureate row carries the 2026-10-01 value, which is 0.218 / 0.152 from
+`destructive`. Two accepted trade-offs. Adjacent ranks sit 0.065–0.126 ΔEok apart, and under
 simulated colour-vision deficiency the blue-violet steps converge (as low as
 0.019); the silhouette and the printed name carry the order, which is why rule 3
 exists. Initiate is a near-neutral cool grey — the unpigmented starting rank —
@@ -1479,6 +1488,15 @@ already clears the target. The ratios were **measured in the browser** on
 | `warning-strong` | `oklch(0.5 0.13 52)` | 4.55 | unchanged | 8.06 | 4.5 |
 | `rule`, `border`, `input`, `sidebar-border` | `oklch(0.58 0.014 84)` | 3.10 | `oklch(0.51 0.012 72)` | 3.12 | 3 |
 | `rule-faint` | `oklch(0.685 0.01 86)` | 2.06 | `oklch(0.415 0.01 72)` | 2.08 | 2 |
+| `rank-initiate` | `oklch(0.485 0.02 240)` | 4.63* | unchanged | 8.38* | 4.5 |
+| `rank-apprentice` | `oklch(0.475 0.08 203)` | 4.67* | unchanged | 8.92* | 4.5 |
+| `rank-artisan` | `oklch(0.485 0.115 248)` | 4.63* | unchanged | 7.83* | 4.5 |
+
+\* `ACH-11` added the three rank rows on 2026-10-01. They are **computed** with
+the §4.4 method, not yet measured in the browser like the rows above them. The
+other three ranks already clear 4.5:1 in both themes (in light, Maestro 5.18,
+Virtuoso 5.11 and Laureate 8.37) and keep their values. Neighbouring ranks stay
+0.066–0.126 ΔEok apart.
 
 - Text roles reach WCAG AAA (7:1). Marks reach 4.5:1. Rules reach 3:1, the
   non-text minimum, so every field and control edge is visible in a bright
@@ -1593,3 +1611,127 @@ labels (`type-label`) and buttons (`type-button`).
 - **Not changed:** Cinzel, Bebas Neue and Space Mono, and the generated
   profile card (`profile-card.ts`), which draws its own type on a canvas and
   keeps Oswald as part of the image.
+
+---
+
+## 24. Amendment — rank decoration (2026-10-01)
+
+Owner-approved for `ACH-11` on 2026-10-01, outside an implementation batch as
+§17 requires. The approval was given against two references. The comps sit in
+Figma (file `JH3yVonO0CbWpG9qCbCG5M`, frame "ACH-11 approval board"). The
+motion was approved on a live prototype. A member's rank dresses their own
+profile header. Each rank borrows one Renaissance decorative art and is richer
+than the rank below it, so a Laureate's profile is the richest in the product
+and an Initiate's is modest but already its own. A first set of hand-drawn comps
+was rejected as too basic; the ornament is now generated vector of illustration
+quality (§24.6).
+
+### 24.1 Where a rank may decorate
+
+- **Only the profile header**, on the authenticated `/profile/<identifier>`
+  and the signed-out `/members/<identifier>`. Never search results,
+  relationship lists, the activity feed, the dashboard, `/achievements` or
+  Settings; there the rank stays the §19 crest beside its name.
+- **Only the rank the member holds**, never the next one.
+- **Only when the viewer may see the rank.** A visitor that the member's
+  Rank privacy row (`ACH-10`) does not admit gets the neutral header (§11.11),
+  and so does an account with no rank yet. The decoration can therefore never
+  reveal a hidden rank. The owner always sees their own.
+- This is the one place where §19.2 rule 2 lets a rank colour decorate, and
+  the one place §4.3 rule 6 bends. Even here **no accent becomes a gradient,
+  and no text sits on a pigment fill**. Text sits on a neutral ground
+  (`background`, `surface` or `surface-sunk`), and pigment reaches the ground
+  only as the two flat tints of §24.3.
+
+### 24.2 The six treatments
+
+| Rank | Art | Frame | Corners and head | Ground | Portrait |
+| --- | --- | --- | --- | --- | --- |
+| Initiate | Silverpoint | The double rule under the header in pigment, a hairline fleuron at its centre | — | — | A hairline ring with four compass points |
+| Apprentice | The workshop | The double rule, with a running-dog (Vitruvian scroll) band on it and a boss at each end | — | — | A twisted copper cord |
+| Artisan | Intarsia and strapwork | The header becomes a framed panel on `surface`: an outer and an inner rule | Interlaced eight-point knots with a palla; a bead-and-reel band along the foot | A lozenge diaper | A pearl ring with four palle |
+| Maestro | The master's laurels | Framed panel | Acanthus scrolls flowering from rosettes; the Florentine giglio in a cartouche at the head | The giglio, sown | A laurel wreath tied with a ribbon |
+| Virtuoso | The starry vault (Scrovegni) | Framed panel on `surface-sunk`, with rinceau bands at head and foot | Star blocks; a star in a radiant ring held by acanthus | Eight-point stars | A closed wreath under a star |
+| Laureate | The illuminated page | A full border of rinceaux on a pigment field, all four sides | Flowering medallions; the crown in a laurelled cartouche; festoons of laurel and berries under the head | A pomegranate brocade | A radiant aureole behind a crowned wreath, with ribbons |
+
+Below a 600px header width each treatment uses its compact pieces: smaller
+corners, thinner bands and no festoons. The header reads as one region in both
+cases. It keeps one filled primary action, and its controls do not change.
+
+### 24.3 Colour
+
+- **Only the holder's rank token and its flat tints.** The tints are:
+  - the **field**: the pigment at 10% in Day and 14% in Night (15% and 20%
+    inside a cartouche or medallion), behind border bands and cartouches;
+  - the **ground pattern**: pigment marks at a single opacity per rank.
+- Ornament is **cut into its ground**. Its highlights and veins take the
+  ground token beneath it, and its shading takes `ink` in Day and
+  `surface-sunk` in Night at about 30%.
+- Nothing borrows `honour`, `success`, `warning-strong` or `destructive`.
+- **The name's corner brackets** (§11.2 `.corner-brackets`) take the rank
+  pigment on a decorated header, so the name is framed by its own rank. They
+  keep `honour-strong` on the neutral header.
+- **Text does not change.** The name, the rank name, the handle, the join date
+  and the counts keep their ink roles in every theme. The §19 crest stays
+  beside the rank name, so neither the crest nor the decoration ever carries
+  the rank alone.
+
+### 24.4 Motion — the third signature
+
+§9.1 keeps two signatures, each used once. The rank decoration is the third,
+and it is used only in the profile header.
+
+1. **Entrance**, once each time the header mounts:
+   - the frame draws in from the left: 240ms at Initiate, matching the rule
+     draw, rising to 600ms at Laureate, `ease-standard`;
+   - the corners and the head appear at `--motion-slow` as it passes;
+   - the portrait ornament settles, turning 14° into place;
+   - festoons, the aureole and the ground pattern come last.
+   The whole entrance finishes within about 1.3s at the top rank. **Text never
+   moves**: it is there from the first frame, as §9.1 requires of content.
+2. **Ambient**, only while the header is on screen. **Every rank gets the same
+   amount**: two motifs at one tempo. The ladder is carried by the design, not
+   by how much moves.
+
+   | Rank | Motif 1 | Motif 2 |
+   | --- | --- | --- |
+   | Initiate | The compass ring turns | The fleuron breathes |
+   | Apprentice | The copper cord turns | The waves roll along the band |
+   | Artisan | The pearl ring turns | The corner knots turn |
+   | Maestro | The pearl ring inside the wreath turns | The corner rosettes turn |
+   | Virtuoso | Stars of the vault breathe | The medallion's rays turn |
+   | Laureate | The aureole turns and breathes | The corner flowers turn |
+
+   The tempo is shared by every rank:
+   - a turning piece makes one revolution every 160s;
+   - breathing and twinkling run 8–9s per cycle;
+   - the waves roll one period every 7s.
+
+   Ambient motion pauses when the header leaves the screen. It changes opacity
+   and rotation only. There is no glow, no gradient, no transform on hover and
+   no scale.
+3. **Reduced motion**, from either source (§9.3, `A11Y-01`): no entrance and
+   no ambient. The finished decoration is simply there.
+
+### 24.5 Higher contrast
+
+Under higher contrast (§22) the ground pattern, every field tint and the
+aureole are removed, leaving the whole text column on the plain neutral ground.
+The ornament stays, as a mark. The light rank values that do not reach the
+§22.2 mark target take the values listed there.
+
+### 24.6 Assets are generated
+
+The ornament is drawn by `scripts/generate-rank-decoration.mjs` from curves:
+- leaves with lit and shaded halves and a cut midrib;
+- multi-lobed acanthus;
+- tapered stems and scrolls, rosettes and flowers;
+- interlace, garlands and the aureole.
+
+It writes one JSON module per rank under
+`features/profile/rank-decoration/generated/`. The page loads only the module of
+the rank it shows. **Never hand-edit a generated file.** Change the generator
+and run `npm run rank-decoration:generate`. The colours in it are placeholders
+that the stylesheet maps to tokens, so a token change never needs a
+regeneration. Repeating pieces (bands and grounds) are tiles drawn as CSS
+masks in the pigment.

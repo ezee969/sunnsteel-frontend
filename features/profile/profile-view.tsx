@@ -35,14 +35,22 @@ import { RankCrest } from '@/features/achievements/rank-crest'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
+import {
+	RankHeaderDecoration,
+	RankPortraitOrnament,
+	useRankDecorationAssets,
+	useRankDecorationMotion,
+} from '@/features/profile/rank-decoration/rank-decoration'
 import { exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
+import { cn } from '@/lib/utils'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
 } from '@/lib/utils/profile-sharing'
+import { rankDecoration } from '@/lib/utils/rank-decoration'
 import { profileRoutineHref } from '@/lib/utils/routine-sharing'
 import {
 	getPreferredTrainingStyleLabel,
@@ -95,6 +103,31 @@ type ProfileViewProps = (
 	bodyProgress?: React.ReactNode
 }
 
+/**
+ * ACH-11 (§24.2): the room each rank's frame and portrait ornament take. The
+ * frame answers to the header's own width (its compact pieces sit below
+ * 600px), the portrait to the avatar, which grows at `sm`. A decorated header
+ * puts the portrait beside the text only from 860px of its own width: below
+ * that the frame and the ornament leave the text column too narrow, so it
+ * stacks as it does on a phone.
+ */
+const RANK_HEADER_PADDING = [
+	'pb-8',
+	'pb-11',
+	'px-[22px] pt-[26px] pb-9 @min-[600px]:px-[34px] @min-[600px]:pt-[34px] @min-[600px]:pb-11',
+	'px-[22px] pt-10 pb-10 @min-[600px]:px-11 @min-[600px]:pt-[60px] @min-[600px]:pb-[50px]',
+	'px-[22px] pt-[66px] pb-[46px] @min-[600px]:px-[46px] @min-[600px]:pt-20 @min-[600px]:pb-[58px]',
+	'px-[30px] pt-[70px] pb-[50px] @min-[600px]:px-[60px] @min-[600px]:pt-[92px] @min-[600px]:pb-[66px]',
+] as const
+const RANK_PORTRAIT_MARGIN = [
+	'm-[5px] sm:m-1.5',
+	'm-2 sm:m-2.5',
+	'm-3 sm:m-3.5',
+	'mx-5 mt-5 mb-8 sm:mx-6 sm:mt-6 @min-[860px]:mb-0',
+	'mx-6 mt-7 mb-8 sm:mx-7 sm:mt-7 @min-[860px]:mb-0',
+	'mx-9 mt-10 mb-10 sm:mx-[46px] sm:mt-[46px] @min-[860px]:mb-0',
+] as const
+
 export function ProfileView(props: ProfileViewProps) {
 	const locale = useLocale() as Locale
 	const tIdentity = useTranslations('routines.identity')
@@ -127,6 +160,14 @@ export function ProfileView(props: ProfileViewProps) {
 	const headerRank = isOwnProfile
 		? (props.achievements?.rank ?? null)
 		: (publicUser!.rank ?? null)
+	/**
+	 * ACH-11 (§24): the rank dresses the header only when the header shows it,
+	 * so a rank the viewer may not see never decorates anything.
+	 */
+	const decoration = rankDecoration(headerRank)
+	const decorationAssets = useRankDecorationAssets(decoration?.slug)
+	const headerRef = React.useRef<HTMLElement>(null)
+	useRankDecorationMotion(headerRef, decorationAssets !== null)
 	/**
 	 * PROF-08. Your own featured routine opens its real page, with the editing
 	 * and sharing controls; somebody else's opens the read-only view under
@@ -245,19 +286,51 @@ export function ProfileView(props: ProfileViewProps) {
 			    profile opens like every other page - an inscription over the double
 			    rule (§11.11) - with the portrait at a measured size, which also
 			    gives the first 390px viewport back to content. */}
-			<section className="rule-heading pb-6">
-				<div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-					<Avatar className="h-20 w-20 shrink-0 border border-rule sm:h-24 sm:w-24">
-						<AvatarImage
-							src={profileAvatar || ''}
-							alt={profileName}
-							className="object-cover"
-						/>
-						<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
-							{profileName.charAt(0)}
-							{profileLastName?.charAt(0)}
-						</AvatarFallback>
-					</Avatar>
+			<section
+				ref={headerRef}
+				className={cn(
+					decoration ? 'rank-deco relative @container' : 'rule-heading pb-6',
+				)}
+				style={decoration?.style}
+				data-rank-tier={decoration?.tier}
+			>
+				{decoration && decorationAssets ? (
+					<RankHeaderDecoration
+						decoration={decoration}
+						assets={decorationAssets}
+					/>
+				) : null}
+				<div
+					className={cn(
+						'flex flex-col gap-5',
+						decoration
+							? cn(
+									'relative @min-[860px]:flex-row @min-[860px]:items-end',
+									RANK_HEADER_PADDING[decoration.tier],
+								)
+							: 'sm:flex-row sm:items-end',
+					)}
+				>
+					<div
+						className={cn(
+							'relative h-20 w-20 shrink-0 sm:h-24 sm:w-24',
+							decoration && RANK_PORTRAIT_MARGIN[decoration.tier],
+						)}
+					>
+						<RankPortraitOrnament assets={decorationAssets} layer="behind" />
+						<Avatar className="h-full w-full border border-rule">
+							<AvatarImage
+								src={profileAvatar || ''}
+								alt={profileName}
+								className="object-cover"
+							/>
+							<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
+								{profileName.charAt(0)}
+								{profileLastName?.charAt(0)}
+							</AvatarFallback>
+						</Avatar>
+						<RankPortraitOrnament assets={decorationAssets} layer="front" />
+					</div>
 
 					<div className="min-w-0 flex-1 space-y-1">
 						{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a

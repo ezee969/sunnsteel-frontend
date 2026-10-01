@@ -15,6 +15,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
+    "rank-decoration:generate": "node scripts/generate-rank-decoration.mjs",
     "lock:check": "node scripts/check-lockfile.mjs",
     "lock:repair": "node scripts/check-lockfile.mjs --repair",
     "postinstall": "node scripts/check-lockfile.mjs --postinstall",
