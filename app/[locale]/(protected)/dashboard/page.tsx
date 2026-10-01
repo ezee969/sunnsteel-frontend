@@ -11,6 +11,7 @@ import { dashboardRows } from '@/lib/utils/dashboard-layout'
 
 import { CustomizeDashboardDialog } from './components/CustomizeDashboardDialog'
 import DashboardLoading from './components/DashboardLoading'
+import DashboardRank from './components/DashboardRank'
 import FollowingPreview from './components/FollowingPreview'
 import PersonalRecords from './components/PersonalRecords'
 import RecentActivity from './components/RecentActivity'
@@ -96,6 +97,10 @@ export default function Dashboard() {
 							{t('customize')}
 						</Button>
 					</div>
+
+					{/* DASH-11: the rank is part of the masthead, not a DASH-05 section,
+					    so it is never hidden or moved. */}
+					<DashboardRank />
 
 					{/* Today's Workouts - dynamic based on device weekday and user routines */}
 					<div className="max-w-3xl">

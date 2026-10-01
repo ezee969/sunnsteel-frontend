@@ -1,9 +1,6 @@
-import type {
-	AchievementsResponse,
-	RenaissanceRankProgress,
-} from '@sunsteel/contracts'
+import type { AchievementsResponse } from '@sunsteel/contracts'
 
-import { achievementText, rankText } from '@/i18n/catalog'
+import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
@@ -11,18 +8,16 @@ import {
 	achievementCategoryLabel,
 	formatMilestoneProgressDetail,
 	formatMilestoneProgressEvidence,
-	formatNextRankRequirements,
-	formatRankEvidence,
 	orderMilestoneProgress,
 } from './achievements'
 import type { EmptyStateCopy } from './empty-states'
-import type { RenaissanceRankId } from './rank-identity'
 
 /**
- * DASH-09 places what `ACH-02` and `ACH-04` already compute and adds no
- * calculation of its own. It keeps the ACH-04 rules on the dashboard too:
- * exact values, the stable catalog order, and no percentages, deadlines or
- * ranking by what is closest.
+ * DASH-09 places what `ACH-04` already computes and adds no calculation of its
+ * own. It keeps the ACH-04 rules on the dashboard too: exact values, the
+ * stable catalog order, and no percentages, deadlines or ranking by what is
+ * closest. The next rank lives in the dashboard masthead since `DASH-11`, so
+ * it is not repeated here.
  */
 export interface UpcomingMilestone {
 	key: string
@@ -33,8 +28,6 @@ export interface UpcomingMilestone {
 	evidence: string
 	/** What remains, stated without a deadline. */
 	detail: string
-	/** The next rank's stable ID, so the row can draw its crest (ACH-09). */
-	rankId?: RenaissanceRankId
 }
 
 /** The translators the rows are built from, one per message group. */
@@ -42,30 +35,12 @@ export interface MilestoneTranslators {
 	categories: Translator<'achievements.categories'>
 	progress: Translator<'achievements.progress'>
 	catalogAchievements: Translator<'catalog.achievements'>
-	catalogRanks: Translator<'catalog.ranks'>
-	rank: Translator<'achievements.rank'>
-}
-
-function buildRankMilestone(
-	rank: RenaissanceRankProgress,
-	t: MilestoneTranslators,
-): UpcomingMilestone | null {
-	const detail = formatNextRankRequirements(rank, t.rank)
-	if (!rank.nextRank || !detail) return null
-	return {
-		key: 'RANK',
-		group: t.rank('title'),
-		title: rankText(rank.nextRank, t.catalogRanks).title,
-		rankId: rank.nextRank.id,
-		evidence: formatRankEvidence(rank, t.rank),
-		detail,
-	}
 }
 
 /**
- * The next rank first, then one next milestone per category in catalog order.
- * A category whose five fixed milestones are all recorded has nothing upcoming
- * and is left out; `/achievements` remains the place that states it is done.
+ * One next milestone per category in catalog order. A category whose five
+ * fixed milestones are all recorded has nothing upcoming and is left out;
+ * `/achievements` remains the place that states it is done.
  */
 export function buildUpcomingMilestones(
 	locale: Locale,
@@ -74,8 +49,7 @@ export function buildUpcomingMilestones(
 ): UpcomingMilestone[] {
 	if (!data?.analyticsReady) return []
 
-	const rank = data.rank ? buildRankMilestone(data.rank, t) : null
-	const categories = orderMilestoneProgress(data.milestoneProgress ?? [])
+	return orderMilestoneProgress(data.milestoneProgress ?? [])
 		.filter(progress => progress.nextMilestone !== null)
 		.map(progress => ({
 			key: progress.category,
@@ -86,8 +60,6 @@ export function buildUpcomingMilestones(
 			evidence: formatMilestoneProgressEvidence(progress, locale, t.progress),
 			detail: formatMilestoneProgressDetail(progress, locale, t.progress),
 		}))
-
-	return rank ? [rank, ...categories] : categories
 }
 
 /**
@@ -107,12 +79,9 @@ export function getUpcomingMilestonesEmptyState(
 		}
 	}
 
-	const atFinalRank = Boolean(data.rank && !data.rank.nextRank)
 	return {
 		title: t('allTitle'),
-		description: atFinalRank
-			? t('allDescriptionFinalRank')
-			: t('allDescription'),
+		description: t('allDescription'),
 		action: {
 			kind: 'link',
 			label: t('openAchievements'),

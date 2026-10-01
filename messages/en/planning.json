@@ -114,7 +114,6 @@
 		"browseRoutines": "Browse routines",
 		"allTitle": "Every fixed milestone is recorded",
 		"allDescription": "The catalog in each category is complete.",
-		"allDescriptionFinalRank": "The catalog in each category is complete and the Renaissance rank path is finished.",
 		"openAchievements": "Open achievements",
 		"loadingAria": "Loading upcoming milestones",
 		"loadError": "Upcoming milestones could not be loaded.",
@@ -192,6 +191,14 @@
 		"customize": "Customize",
 		"loadingLabel": "Loading your dashboard",
 		"loadingStatus": "Loading your dashboard…"
+	},
+	"dashboardRank": {
+		"heading": "Your rank",
+		"next": "Next rank: {title}",
+		"open": "Open achievements",
+		"loadingAria": "Loading your rank",
+		"loadError": "Your rank could not be loaded.",
+		"retry": "Try again"
 	},
 	"dashboardStats": {
 		"loading": "Loading workout statistics",

@@ -114,7 +114,6 @@
 		"browseRoutines": "Ver rutinas",
 		"allTitle": "Todos los hitos fijos están registrados",
 		"allDescription": "El catálogo de cada categoría está completo.",
-		"allDescriptionFinalRank": "El catálogo de cada categoría está completo y el camino de rangos renacentistas ha terminado.",
 		"openAchievements": "Abrir logros",
 		"loadingAria": "Cargando los próximos hitos",
 		"loadError": "No se pudieron cargar los próximos hitos.",
@@ -192,6 +191,14 @@
 		"customize": "Personalizar",
 		"loadingLabel": "Cargando tu inicio",
 		"loadingStatus": "Cargando tu inicio…"
+	},
+	"dashboardRank": {
+		"heading": "Tu rango",
+		"next": "Siguiente rango: {title}",
+		"open": "Abrir logros",
+		"loadingAria": "Cargando tu rango",
+		"loadError": "No se pudo cargar tu rango.",
+		"retry": "Reintentar"
 	},
 	"dashboardStats": {
 		"loading": "Cargando estadísticas de entrenamiento",

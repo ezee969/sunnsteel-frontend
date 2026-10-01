@@ -251,11 +251,12 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'DASH-09',
 			'DASH-08',
 			'DASH-05',
+			'DASH-11',
 			'CORE-03',
 		],
 		ready: ['Weekly Workouts', 'Total Workouts', 'Total Volume'],
 		caption:
-			"Today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks, the next milestones and a few updates from members you follow.",
+			"The member's rank and what the next one needs, today's workout with one adaptive primary action, weekly stats and records, then the facts behind the last two finished weeks, the next milestones and a few updates from members you follow.",
 	},
 	{
 		slug: 'dashboard-customize',

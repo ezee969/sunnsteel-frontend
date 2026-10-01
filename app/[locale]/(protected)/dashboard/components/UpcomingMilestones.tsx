@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { RankCrest } from '@/features/achievements/rank-crest'
 import type { Locale } from '@/i18n/config'
 import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import {
@@ -21,20 +20,9 @@ import { DashboardSection } from './DashboardSection'
 function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
 	return (
 		<li className="rule-row grid gap-2 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-6">
-			<div className="flex min-w-0 gap-3">
-				{milestone.rankId ? (
-					<RankCrest
-						rankId={milestone.rankId}
-						reached={false}
-						className="mt-0.5"
-					/>
-				) : null}
-				<div className="min-w-0">
-					<p className="type-body-sm text-ink-3">{milestone.group}</p>
-					<h3 className="type-panel mt-0.5 text-foreground">
-						{milestone.title}
-					</h3>
-				</div>
+			<div className="min-w-0">
+				<p className="type-body-sm text-ink-3">{milestone.group}</p>
+				<h3 className="type-panel mt-0.5 text-foreground">{milestone.title}</h3>
 			</div>
 			<div className="lg:text-right">
 				<p className="type-data text-ink-2">{milestone.evidence}</p>
@@ -45,8 +33,7 @@ function MilestoneRow({ milestone }: { milestone: UpcomingMilestone }) {
 }
 
 /**
- * DASH-09. The next Renaissance rank and one next milestone per category, in
- * the catalog order `/achievements` uses. Nothing here is ranked by how close
+ * DASH-09. One next milestone per category, in the catalog order `/achievements` uses. Nothing here is ranked by how close
  * it is, carries a deadline or states a percentage — those are the ACH-04
  * rules, and the dashboard does not get its own version of them.
  */
@@ -56,18 +43,14 @@ export default function UpcomingMilestones() {
 	const t = useTranslations('planning.dashboardMilestones')
 	const tCategories = useTranslations('achievements.categories')
 	const tProgress = useTranslations('achievements.progress')
-	const tRank = useTranslations('achievements.rank')
 	const tCatalogAchievements = useTranslations('catalog.achievements')
-	const tCatalogRanks = useTranslations('catalog.ranks')
 	const { data, isPending, isError, refetch, isFetching } = useAchievements()
 	const milestones = buildUpcomingMilestones(
 		locale,
 		{
 			categories: tCategories,
 			progress: tProgress,
-			rank: tRank,
 			catalogAchievements: tCatalogAchievements,
-			catalogRanks: tCatalogRanks,
 		},
 		data,
 	)
