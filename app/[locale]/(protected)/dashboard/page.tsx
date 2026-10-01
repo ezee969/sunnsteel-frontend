@@ -13,6 +13,7 @@ import { CustomizeDashboardDialog } from './components/CustomizeDashboardDialog'
 import DashboardLoading from './components/DashboardLoading'
 import DashboardRank from './components/DashboardRank'
 import FollowingPreview from './components/FollowingPreview'
+import GettingStarted from './components/GettingStarted'
 import PersonalRecords from './components/PersonalRecords'
 import RecentActivity from './components/RecentActivity'
 import StatsOverview from './components/StatsOverview'
@@ -40,7 +41,8 @@ const SECTIONS: Record<DashboardSectionId, () => React.JSX.Element> = {
 
 export default function Dashboard() {
 	const t = useTranslations('planning.dashboardPage')
-	const { isLoading, user, progress } = useDashboardData()
+	const { isLoading, user, progress, gettingStarted, layout, steps } =
+		useDashboardData()
 
 	const name = user?.name?.trim()
 	const [customizing, setCustomizing] = useState(false)
@@ -106,14 +108,24 @@ export default function Dashboard() {
 						<TodaysWorkouts />
 					</div>
 
+					{/* UX-19: a new account's three first steps, under the one
+					    primary action rather than competing with it. */}
+					{steps ? (
+						<div className="max-w-3xl">
+							<GettingStarted steps={steps} />
+						</div>
+					) : null}
+
 					{/*
 					 * DASH-05: the member's order, with hidden sections left out.
+					 * UX-19: a getting-started account's default also leaves out
+					 * the sections that have nothing to show yet.
 					 * Recent Activity and Personal Records share a row from `lg`
 					 * only when both are shown and adjacent. Every section below
 					 * the readiness gate owns its own skeleton, so a slow read
 					 * never holds the dashboard back.
 					 */}
-					{dashboardRows(user?.dashboardLayout).map(row => {
+					{dashboardRows(layout).map(row => {
 						if (row.kind === 'pair') {
 							const [First, Second] = row.ids.map(id => SECTIONS[id])
 							return (
@@ -134,6 +146,7 @@ export default function Dashboard() {
 			{customizing ? (
 				<CustomizeDashboardDialog
 					layout={user?.dashboardLayout}
+					gettingStarted={gettingStarted}
 					open
 					onOpenChange={open => !open && setCustomizing(false)}
 				/>

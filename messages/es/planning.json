@@ -332,6 +332,26 @@
 		"close": "Cerrar",
 		"goToActive": "Ir a la sesión activa",
 		"insightsLoading": "Cargando análisis de entrenamiento",
-		"insightsFailed": "No se pudo cargar el análisis de entrenamiento."
+		"insightsFailed": "No se pudo cargar el análisis de entrenamiento.",
+		"gettingStartedNote": "Mientras empiezas, cada sección se suma a tu inicio cuando tiene algo que mostrar. Si guardas un cambio aquí, queda exactamente lo que elijas."
+	},
+	"gettingStarted": {
+		"title": "Primeros pasos",
+		"progress": "{done} de {total} hechos",
+		"done": "Hecho",
+		"steps": {
+			"routine": {
+				"title": "Elige una rutina",
+				"detail": "Empieza desde una plantilla o crea la tuya."
+			},
+			"workout": {
+				"title": "Termina tu primer entrenamiento",
+				"detail": "Empiézalo desde la tarjeta de arriba o desde cualquier rutina."
+			},
+			"gym": {
+				"title": "Configura tu gimnasio",
+				"detail": "Su barra y sus discos, para que las cargas se redondeen a lo que puedes levantar. Los pesos se muestran en {unit}; <link>cambia la unidad</link>."
+			}
+		}
 	}
 }

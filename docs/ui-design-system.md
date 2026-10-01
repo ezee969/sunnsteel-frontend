@@ -1803,6 +1803,31 @@ sentence case.
   drawer, and the workout screen, which has no bottom bar, keeps a way in.
 - Absorbs `NAV-04`: start or resume is Train, within thumb reach.
 
+### 23.9 A dashboard that grows with the account (UX-19)
+
+- **Getting started** is a never-customized layout (the server stores a
+  layout equal to the default as null, so the default is exactly that) with
+  fewer than three finished workouts. A customized layout is never trimmed,
+  and nothing new is stored: the rule lives in `lib/utils/dashboard-growth.ts`
+  and reads only what the dashboard's readiness gate already holds.
+- **What shows:** the masthead and rank, Today's Workouts, a Getting started
+  list, This Week, and each other section once it has something to show —
+  Training Stats and Upcoming Milestones after a first finished workout,
+  Recent Activity and Personal Records once they hold a row, From Members
+  You Follow once the account follows someone. Training Insights waits for
+  the third workout, because a plateau needs three sessions of one lift and
+  the weekly comparison two complete weeks. The full default returns by
+  itself at the third workout.
+- **Getting started** is three steps read from the account's own data (a
+  routine, a first finished workout, a saved gym), ruled like a section and
+  never a filled control — the one primary stays in Today's Workouts. A done
+  step keeps its row in `ink-3` with a check; the list leaves once all three
+  are done. It is not a DASH-05 section and cannot be moved or hidden. The
+  gym read joins the readiness gate only for such an account, so the list
+  never arrives after the page.
+- **Customize** still lists the stored layout, every section shown, because
+  that is what saving keeps, and says in one line why the page shows fewer.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

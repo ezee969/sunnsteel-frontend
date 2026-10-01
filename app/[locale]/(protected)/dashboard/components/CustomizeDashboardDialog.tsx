@@ -41,10 +41,17 @@ import {
  */
 export function CustomizeDashboardDialog({
 	layout,
+	gettingStarted = false,
 	open,
 	onOpenChange,
 }: {
 	layout: DashboardLayout | undefined
+	/**
+	 * UX-19: the page is leaving out empty sections for a new account. The
+	 * list still shows the stored layout -- every section shown -- because
+	 * that is what saving keeps, so the dialog says why the page shows fewer.
+	 */
+	gettingStarted?: boolean
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
@@ -101,6 +108,9 @@ export function CustomizeDashboardDialog({
 					<DialogTitle>{tA('customizeTitle')}</DialogTitle>
 					<DialogDescription>{tA('customizeDescription')}</DialogDescription>
 				</DialogHeader>
+				{gettingStarted ? (
+					<p className="type-body-sm text-ink-3">{tA('gettingStartedNote')}</p>
+				) : null}
 
 				<div>
 					<p className="type-body-sm text-ink-3">

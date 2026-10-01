@@ -332,6 +332,26 @@
 		"close": "Close",
 		"goToActive": "Go to active session",
 		"insightsLoading": "Loading training insights",
-		"insightsFailed": "Training insights could not be loaded."
+		"insightsFailed": "Training insights could not be loaded.",
+		"gettingStartedNote": "While you are getting started, sections join your dashboard once they have something to show. Saving a change here keeps exactly what you choose."
+	},
+	"gettingStarted": {
+		"title": "Getting started",
+		"progress": "{done} of {total} done",
+		"done": "Done",
+		"steps": {
+			"routine": {
+				"title": "Choose a routine",
+				"detail": "Start from a template or build your own."
+			},
+			"workout": {
+				"title": "Finish your first workout",
+				"detail": "Start one from the card above or from any routine."
+			},
+			"gym": {
+				"title": "Set up your gym",
+				"detail": "Its bar and plates, so loads round to what you can lift. Weights show in {unit}; <link>change the unit</link>."
+			}
+		}
 	}
 }

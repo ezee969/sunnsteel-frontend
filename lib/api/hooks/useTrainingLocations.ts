@@ -8,10 +8,11 @@ import { userService } from '@/lib/api/services/userService'
 
 const trainingLocationsKey = ['user', 'training-locations'] as const
 
-export const useTrainingLocations = () =>
+export const useTrainingLocations = ({ enabled = true } = {}) =>
 	useQuery<TrainingLocationPreference[], Error>({
 		queryKey: trainingLocationsKey,
 		queryFn: userService.getTrainingLocations,
+		enabled,
 	})
 
 export const useReplaceTrainingLocations = () => {
