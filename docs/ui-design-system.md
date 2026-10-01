@@ -1692,6 +1692,15 @@ sentence case.
   holds. A subtitle that states a fact or a rule of its own keeps showing
   (`subtitleOnPhone`): the Moderation queue's scope and the muscles an
   exercise trains.
+- **Unless the summary would only restate it.** A description already
+  close to one line (up to about 115 characters) stands as it is: a summary
+  that repeats it behind a toggle that repeats it again costs a control and
+  says nothing. The Privacy overview's two lines, the Notifications
+  updates line and the record and progression timeline's line (on Progress
+  and on an exercise page) are kept whole for that reason.
+- **The dashboard keeps its inscription and greeting** and loses the
+  tagline under the greeting ("Track your fitness journey and achieve your
+  goals"), which stated nothing about the member's training.
 - **A test holds the summaries to the budget** in both languages, so a
   later edit cannot let one grow back into a paragraph.
 - **Out of scope:** dialog descriptions, empty states and toasts, which a

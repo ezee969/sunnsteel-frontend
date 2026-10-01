@@ -265,7 +265,6 @@
 		"new": "Nuevas",
 		"earlier": "Anteriores",
 		"updates": "Novedades",
-		"updatesSummary": "Tus logros, tu progreso y las novedades de miembros de los últimos {days} días.",
 		"updatesBody": "Los logros que obtienes, el progreso de tus sesiones y las novedades permitidas de otros miembros de los últimos {days} días.",
 		"markAll": "Marcar todo como leído",
 		"loading": "Cargando notificaciones",

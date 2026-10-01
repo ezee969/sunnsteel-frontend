@@ -21,15 +21,12 @@ const SUMMARIES: Record<string, Record<string, string | number>> = {
 		previous: 'the 14 days before',
 	},
 	'progress.body.introSummary': {},
-	'progress.timeline.descriptionSummary': {},
 	'progress.muscles.noteSummary': {},
 	'progress.volume.noteSummary': {},
 	'routines.trainingBlocks.descriptionSummary': {},
 	'routines.deloads.descriptionSummary': { days: 14 },
 	'routines.discovery.scopeSummary': {},
 	'routines.sharing.sharedNoteSummary': {},
-	'settings.privacyOverview.descriptionSummary': {},
-	'settings.privacyOverview.searchNoteSummary': {},
 	'settings.profileDiscovery.descriptionSummary': {},
 	'settings.trainingPartners.descriptionSummary': {},
 	'settings.trainingLocations.descriptionSummary': {},
@@ -44,9 +41,7 @@ const SUMMARIES: Record<string, Record<string, string | number>> = {
 	'social.activity.feedScopeSummary': {},
 	'social.activity.defaultsSummary': {},
 	'social.activityUi.yoursSummary': {},
-	'social.notifications.updatesSummary': { days: 30 },
 	'catalog.exercisesUi.recentSummary': {},
-	'catalog.exercisesUi.progressionSummary': {},
 }
 
 type Tree = { [key: string]: string | Tree }

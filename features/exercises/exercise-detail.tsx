@@ -421,8 +421,7 @@ function TrainingHistory({ exerciseId }: { exerciseId: string }) {
 				heading={{
 					id: 'exercise-progression',
 					title: t('progressionTitle'),
-					description: t('progressionSummary'),
-					detail: t('progressionDescription'),
+					description: t('progressionDescription'),
 				}}
 				showExerciseName={false}
 				items={timeline.data?.pages.flatMap(page => page.items) ?? []}

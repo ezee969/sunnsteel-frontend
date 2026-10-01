@@ -106,12 +106,10 @@
 		},
 		"title": "Resumen de privacidad",
 		"description": "Lo que otras personas pueden ver ahora, según tus ajustes guardados. Tu correo nunca se muestra a nadie.",
-		"descriptionSummary": "Lo que otras personas ven ahora, según tus ajustes guardados. Tu correo nunca se muestra.",
 		"alwaysShown": "Siempre visible: {items}",
 		"noSections": "Sin secciones del perfil.",
 		"memberSearch": "Búsqueda de miembros",
 		"searchNote": "La búsqueda controla quién puede encontrarte. Cualquiera con tu enlace aún puede abrir tu perfil y ver lo permitido arriba.",
-		"searchNoteSummary": "La búsqueda decide quién puede encontrarte; con tu enlace aún pueden abrir tu perfil.",
 		"savedForLater": "Guardado para después: {rules}. Nada de estas secciones se muestra aún en los perfiles.",
 		"preview": "Vista previa del perfil público"
 	},

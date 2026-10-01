@@ -265,7 +265,6 @@
 		"new": "New",
 		"earlier": "Earlier",
 		"updates": "Updates",
-		"updatesSummary": "Your achievements, progress and member updates from the last {days} days.",
 		"updatesBody": "Achievements you earn, session progress and permitted updates from other members from the last {days} days.",
 		"markAll": "Mark all read",
 		"loading": "Loading notifications",

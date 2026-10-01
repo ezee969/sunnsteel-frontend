@@ -20,7 +20,6 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
-import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -297,13 +296,10 @@ export function NotificationList({
 					>
 						{t('updates')}
 					</h2>
-					{/* UX-17 (§23.4): one line shown, the full scope one tap away. */}
-					<Explanation
-						summary={t('updatesSummary', { days: NOTIFICATIONS_LOOKBACK_DAYS })}
-						className="mt-1"
-					>
-						<p>{t('updatesBody', { days: NOTIFICATIONS_LOOKBACK_DAYS })}</p>
-					</Explanation>
+					{/* UX-17 (§23.4): short enough to stand as it is. */}
+					<p className="type-body-sm mt-1 text-ink-3">
+						{t('updatesBody', { days: NOTIFICATIONS_LOOKBACK_DAYS })}
+					</p>
 				</div>
 				{data && data.notifications.length > 0 ? (
 					<Button

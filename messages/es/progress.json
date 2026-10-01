@@ -192,7 +192,6 @@
 		"badgeProgression": "Progresión",
 		"title": "Récords y progresión",
 		"description": "Mira cuándo cambiaron tus mejores series y las prescripciones automáticas, con el motivo guardado de esa sesión.",
-		"descriptionSummary": "Mira cuándo cambiaron tus mejores series y las prescripciones automáticas.",
 		"loading": "Cargando la línea de tiempo",
 		"errorTitle": "La línea de tiempo no está disponible",
 		"errorBody": "No pudimos cargar tus récords ni los cambios de prescripción. Vuelve a intentarlo.",

@@ -85,7 +85,6 @@ export default function Dashboard() {
 							<p className="type-panel text-foreground">
 								{name ? t('welcomeNamed', { name }) : t('welcome')}
 							</p>
-							<p className="type-body-sm text-ink-3">{t('tagline')}</p>
 						</div>
 						<Button
 							type="button"

@@ -222,8 +222,8 @@ export function ProgressTimeline({
 	const heading = headingProp ?? {
 		id: 'progress-timeline',
 		title: t('title'),
-		description: t('descriptionSummary'),
-		detail: t('description'),
+		// UX-17 (§23.4): short enough to stand as it is.
+		description: t('description'),
 	}
 
 	// UX-04: the first five events, then "Show N more"; the server's

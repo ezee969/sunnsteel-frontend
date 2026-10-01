@@ -192,7 +192,6 @@
 		"badgeProgression": "Progression",
 		"title": "Record & progression timeline",
 		"description": "See when your best sets and automatic prescriptions changed, with the reason preserved from that session.",
-		"descriptionSummary": "See when your best sets and automatic prescriptions changed.",
 		"loading": "Loading progress timeline",
 		"errorTitle": "Timeline is unavailable",
 		"errorBody": "We could not load your records and prescription changes. Try again.",

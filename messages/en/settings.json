@@ -106,12 +106,10 @@
 		},
 		"title": "Privacy Overview",
 		"description": "What other people can see right now, based on your saved settings. Your email is never shown to anyone.",
-		"descriptionSummary": "What others can see now, from your saved settings. Your email is never shown.",
 		"alwaysShown": "Always shown: {items}",
 		"noSections": "No profile sections.",
 		"memberSearch": "Member search",
 		"searchNote": "Search controls who can find you. Anyone with your link can still open your profile and see what is allowed above.",
-		"searchNoteSummary": "Search decides who can find you; anyone with your link can still open your profile.",
 		"savedForLater": "Saved for later: {rules}. Nothing from these sections is shown on profiles yet.",
 		"preview": "Preview public profile"
 	},
