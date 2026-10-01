@@ -44,6 +44,7 @@ import {
 import { useNotifications } from '@/lib/api/hooks/useNotifications'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { cn } from '@/lib/utils'
+import { orderByGroup } from '@/lib/utils/nav-groups'
 import { buildNavigationIndicators } from '@/lib/utils/navigation-indicators'
 
 type NavLabelKey =
@@ -207,9 +208,14 @@ export default function Sidebar({
 	// The active marker is positioned from this list's own index, so the
 	// moderation row has to be part of the list the rows render from rather
 	// than spliced in afterwards.
-	const navItems = user?.isModerator
-		? [...SIDEBAR_NAV_ITEMS, MODERATION_NAV_ITEM]
-		: SIDEBAR_NAV_ITEMS
+	// UX-22 (§23.8): in the bottom bar's four groups, each after its heading.
+	const rows = orderByGroup(
+		user?.isModerator
+			? [...SIDEBAR_NAV_ITEMS, MODERATION_NAV_ITEM]
+			: SIDEBAR_NAV_ITEMS,
+	)
+	const navItems = rows.map(row => row.item)
+	const tGroups = useTranslations('shell.nav.groups')
 	const indicators = buildNavigationIndicators(
 		{
 			unreadNotifications: notifications.data?.unreadCount,
@@ -222,6 +228,14 @@ export default function Sidebar({
 	// -1 when the active route is not in this list (Settings), which hides the
 	// marker rather than parking it on the wrong row.
 	const activeIndex = navItems.findIndex(item => item.id === activeNav)
+	// Every group but the first opens with a heading row of its own height, so
+	// the marker counts the headings above the active row as well.
+	const headingsAbove =
+		activeIndex < 0
+			? 0
+			: rows
+					.slice(0, activeIndex + 1)
+					.filter(row => row.firstInGroup && row.group !== 'today').length
 
 	const handleDisabledClick = (label: string) => {
 		push({
@@ -316,6 +330,8 @@ export default function Sidebar({
 					style={
 						{
 							'--nav-pitch': isMobile ? '3.25rem' : '2.75rem',
+							// A heading row is h-7 plus the grid's 8px gap.
+							'--nav-heading-pitch': '2.25rem',
 						} as CSSProperties
 					}
 				>
@@ -334,11 +350,11 @@ export default function Sidebar({
 								isMobile ? 'h-11' : 'h-9',
 							)}
 							style={{
-								transform: `translateY(calc(${activeIndex} * var(--nav-pitch)))`,
+								transform: `translateY(calc(${activeIndex} * var(--nav-pitch) + ${headingsAbove} * var(--nav-heading-pitch)))`,
 							}}
 						/>
 					)}
-					{navItems.map(item => {
+					{rows.map(({ item, group, firstInGroup }) => {
 						const label = t(item.labelKey)
 						const isCollapsed = !isSidebarOpen && !isMobile
 						const showTooltip = isCollapsed
@@ -463,7 +479,28 @@ export default function Sidebar({
 							</Button>
 						)
 
-						return (
+						const heading =
+							firstInGroup && group !== 'today' ? (
+								isCollapsed ? (
+									<div
+										key={`${group}-heading`}
+										aria-hidden
+										className="flex h-7 items-end justify-center pb-1"
+									>
+										<span className="h-px w-6 bg-rule" />
+									</div>
+								) : (
+									<p
+										key={`${group}-heading`}
+										className="type-label flex h-7 items-end px-3 pb-1 text-ink-3"
+									>
+										{tGroups(group)}
+									</p>
+								)
+							) : null
+
+						return [
+							heading,
 							<div key={item.id}>
 								{showTooltip ? (
 									<Tooltip>
@@ -475,8 +512,8 @@ export default function Sidebar({
 								) : (
 									control
 								)}
-							</div>
-						)
+							</div>,
+						]
 					})}
 					<Separator className="my-4" />
 					<Button

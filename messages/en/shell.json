@@ -17,7 +17,13 @@
 		"comingSoonTitle": "{label} - Coming Soon",
 		"comingSoonBody": "We are working hard on bringing this feature to Sunnsteel. Stay tuned!",
 		"soon": "Soon",
-		"userAvatar": "User avatar"
+		"userAvatar": "User avatar",
+		"groups": {
+			"train": "Train",
+			"progress": "Progress",
+			"community": "Community",
+			"more": "More"
+		}
 	},
 	"indicators": {
 		"notifications": "Notifications, {count} unread",
@@ -77,5 +83,16 @@
 	"theme": {
 		"toLight": "Switch to light theme",
 		"toDark": "Switch to dark theme"
+	},
+	"bottomNav": {
+		"label": "Main",
+		"today": "Today",
+		"train": "Train",
+		"progress": "Progress",
+		"community": "Community",
+		"more": "More",
+		"moreAria": "More: every page",
+		"trainPlanned": "Train, {count, plural, one {# workout} other {# workouts}} planned today",
+		"communityUnread": "Community, {count} unread notifications"
 	}
 }

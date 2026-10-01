@@ -1773,6 +1773,36 @@ sentence case.
 - The regression sweep's plate-calculator dialog case opens the calculator
   from the menu below 640.
 
+### 23.8 The phone's bottom navigation (UX-22)
+
+- **Below `md` a bottom bar carries the main navigation:** Today
+  (`/dashboard`), Train (`/workouts`, which resumes a workout in progress),
+  Progress (`/progress`), Community (`/activity`) and More, which opens the
+  drawer that still lists every page. The groups are the owner's
+  (2026-09-30) and live once, in `NAV_GROUPS` (`lib/utils/nav-groups.ts`):
+  Train holds Workouts, Routines and Schedule; Progress holds Progress,
+  History and Achievements; Community holds Activity, Discover and
+  Notifications; More holds Exercises, Moderation and Settings, and any page
+  without an entry of its own.
+- **It is the shell column's last row, not a layer.** `<main>` scrolls above
+  it, so it never covers content and no page needs bottom padding for it; it
+  carries the device's bottom safe area. Toasts sit above it below `md`. It
+  steps aside on the workout screen, whose bottom belongs to the rest timer.
+- **The active group** is ink over a 2px `honour-strong` top rule with its
+  glyph in honour, the same mark the sidebar uses; a page inside a group
+  marks the group (`aria-current="true"`). Train carries the count of
+  workouts planned today and Community the unread notifications, on the
+  glyph as in the collapsed sidebar, with the exact number in the link's
+  name. Each item is at least 56px tall.
+- **The sidebar and the drawer group their entries under the same headings**
+  (Train, Progress, Community, More; Today's one entry needs none), as
+  `type-label` rows of a fixed height. The sliding marker counts the heading
+  rows above the active entry (`--nav-heading-pitch`), and a collapsed
+  sidebar draws each heading as a short rule of the same height.
+- **The header's menu button stays** below `md`: More and it open the same
+  drawer, and the workout screen, which has no bottom bar, keeps a way in.
+- Absorbs `NAV-04`: start or resume is Train, within thumb reach.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

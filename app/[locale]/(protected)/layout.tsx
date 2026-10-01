@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TopProgressBar } from '@/components/ui/top-progress-bar'
 import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialLoadAnimation'
+import { BottomNav } from '@/features/shell/components/BottomNav'
 import Header from '@/features/shell/components/Header'
 import Sidebar from '@/features/shell/components/Sidebar'
 import { LocaleSync } from '@/features/shell/locale-sync'
@@ -255,6 +256,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 							<div className={cn('h-full')}>{children}</div>
 						</Suspense>
 					</main>
+					{/* UX-22 (§23.8): the phone's main navigation, the column's last row
+					    so it never covers the page. The workout screen keeps its rest
+					    timer at the bottom instead, so the bar steps aside there. */}
+					{isOnSessionPage ? null : (
+						<BottomNav
+							activeNav={activeNav}
+							isMoreOpen={isMobileMenuOpen}
+							onOpenMore={() => setIsMobileMenuOpen(true)}
+							onNavigateStart={() => setIsNavActive(true)}
+						/>
+					)}
 				</div>
 			</div>
 		</div>

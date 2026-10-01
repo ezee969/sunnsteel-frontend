@@ -17,7 +17,13 @@
 		"comingSoonTitle": "{label}: muy pronto",
 		"comingSoonBody": "Estamos trabajando para traer esta función a Sunnsteel.",
 		"soon": "Pronto",
-		"userAvatar": "Foto de perfil"
+		"userAvatar": "Foto de perfil",
+		"groups": {
+			"train": "Entrenar",
+			"progress": "Progreso",
+			"community": "Comunidad",
+			"more": "Más"
+		}
 	},
 	"indicators": {
 		"notifications": "Notificaciones, {count} sin leer",
@@ -77,5 +83,16 @@
 	"theme": {
 		"toLight": "Cambiar al tema claro",
 		"toDark": "Cambiar al tema oscuro"
+	},
+	"bottomNav": {
+		"label": "Principal",
+		"today": "Hoy",
+		"train": "Entrenar",
+		"progress": "Progreso",
+		"community": "Comunidad",
+		"more": "Más",
+		"moreAria": "Más: todas las páginas",
+		"trainPlanned": "Entrenar, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy",
+		"communityUnread": "Comunidad, {count} notificaciones sin leer"
 	}
 }
