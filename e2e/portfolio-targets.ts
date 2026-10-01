@@ -522,11 +522,11 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'member-profile',
 		route: '/members/:username',
-		features: ['PROF-12', 'PROF-04', 'PROF-05', 'PROF-06', 'PROF-11'],
+		features: ['PROF-12', 'PROF-04', 'PROF-05', 'PROF-06', 'ACH-10'],
 		signedOut: true,
-		ready: [/@/, /Workouts|Sessions|Volume/, 'Share Profile Card'],
+		ready: [/@/, /Workouts|Sessions|Volume/, 'Share Profile'],
 		caption:
-			'The public member profile as a signed-out visitor sees it, with a branded image card ready to share or download.',
+			"The public member profile as a signed-out visitor sees it, with the member's rank under their name.",
 	},
 	{
 		slug: 'settings-display',

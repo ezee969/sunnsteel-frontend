@@ -195,18 +195,10 @@
 		"linkCopiedBody": "Anyone with the link can view this public profile.",
 		"copyFailed": "Could not copy profile link",
 		"copyFailedBody": "Check your browser permissions and try again.",
-		"cardShared": "Profile card shared",
-		"cardSaved": "Profile card saved",
-		"cardSharedBody": "The image is ready in your share destination.",
-		"cardSavedBody": "The PNG was downloaded to this device.",
-		"cardFailed": "Could not create profile card",
-		"cardFailedBody": "Try again from this browser.",
 		"joined": "Joined {when}",
 		"followers": "Followers",
 		"following": "Following",
 		"shareProfile": "Share Profile",
-		"preparingCard": "Preparing Card…",
-		"shareCard": "Share Profile Card",
 		"unfollowing": "Unfollowing...",
 		"unfollow": "Unfollow",
 		"followingPending": "Following...",
@@ -252,8 +244,7 @@
 		"kindRoutine": "Routine",
 		"kindRank": "Renaissance rank",
 		"recognizedFromHistory": "Recognized from history",
-		"featuredEmpty": "Choose records, earned medals, a shared routine, or a reached rank in <link>Settings</link> to build this profile ledger.",
-		"rankCaption": "Renaissance rank"
+		"featuredEmpty": "Choose records, earned medals, a shared routine, or a reached rank in <link>Settings</link> to build this profile ledger."
 	},
 	"notifications": {
 		"progressSummary": "{records, plural, =0 {} one {# new record} other {# new records}}{both, select, yes { and } other {}}{changes, plural, =0 {} one {# load change} other {# load changes}}",

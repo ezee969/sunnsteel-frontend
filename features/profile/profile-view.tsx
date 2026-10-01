@@ -25,7 +25,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -39,10 +39,6 @@ import { exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { formatTimeAgo } from '@/lib/utils/date'
-import {
-	buildProfileCardModel,
-	shareProfileCard,
-} from '@/lib/utils/profile-card'
 import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
@@ -102,9 +98,7 @@ type ProfileViewProps = (
 export function ProfileView(props: ProfileViewProps) {
 	const locale = useLocale() as Locale
 	const tIdentity = useTranslations('routines.identity')
-	const tSharing = useTranslations('routines.sharing')
 	const tExercises = useTranslations('catalog.exercises')
-	const tAchievements = useTranslations('catalog.achievements')
 	const tRanks = useTranslations('catalog.ranks')
 	const t = useTranslations('social.profile')
 	const { push } = useToast()
@@ -220,7 +214,6 @@ export function ProfileView(props: ProfileViewProps) {
 				? `${oneDecimal(totalVolume / 1_000)}k`
 				: formatWeightAmount(totalVolumeKg, weightUnit, locale, 1)
 	const isMutating = props.variant === 'member' && props.isMutating
-	const [isPreparingCard, setIsPreparingCard] = useState(false)
 
 	const onFollowToggle = () => {
 		followAction?.()
@@ -241,52 +234,6 @@ export function ProfileView(props: ProfileViewProps) {
 				description: t('copyFailedBody'),
 				variant: 'destructive',
 			})
-		}
-	}
-
-	const onShareProfileCard = async () => {
-		setIsPreparingCard(true)
-		try {
-			const profileUrl = getSharedProfileUrl(
-				profileUsername,
-				window.location.origin,
-			)
-			const result = await shareProfileCard(
-				buildProfileCardModel({
-					tSharing,
-					catalog: {
-						exercises: tExercises,
-						achievements: tAchievements,
-						ranks: tRanks,
-					},
-					locale,
-					name: profileName,
-					lastName: profileLastName,
-					username: profileUsername,
-					profileUrl,
-					featuredItems,
-					achievements,
-					weightUnit,
-					showRank: ownerProfile
-						? ownerProfile.privacySettings.rank === 'PUBLIC'
-						: true,
-				}),
-			)
-			push({
-				title: result === 'shared' ? t('cardShared') : t('cardSaved'),
-				description:
-					result === 'shared' ? t('cardSharedBody') : t('cardSavedBody'),
-				variant: 'success',
-			})
-		} catch (error) {
-			if (error instanceof DOMException && error.name === 'AbortError') return
-			push({
-				title: t('cardFailed'),
-				description: t('cardFailedBody'),
-				variant: 'destructive',
-			})
-		} finally {
-			setIsPreparingCard(false)
 		}
 	}
 
@@ -338,9 +285,6 @@ export function ProfileView(props: ProfileViewProps) {
 										{rankText(headerRank, tRanks).title}
 									</span>
 								)}
-								<span className="type-body-sm text-ink-3">
-									{t('rankCaption')}
-								</span>
 							</p>
 						) : null}
 						<p className="type-data text-ink-3">@{profileUsername}</p>
@@ -371,15 +315,6 @@ export function ProfileView(props: ProfileViewProps) {
 						<Button variant="outline" size="sm" onClick={onShareProfile}>
 							<Share2 className="mr-2 h-4 w-4" aria-hidden />{' '}
 							{t('shareProfile')}
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={onShareProfileCard}
-							disabled={isPreparingCard}
-						>
-							<Share2 className="mr-2 h-4 w-4" aria-hidden />
-							{isPreparingCard ? t('preparingCard') : t('shareCard')}
 						</Button>
 						{!isOwnProfile && followAction && (
 							<Button

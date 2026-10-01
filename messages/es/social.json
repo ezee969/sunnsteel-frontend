@@ -195,18 +195,10 @@
 		"linkCopiedBody": "Cualquiera con el enlace puede ver este perfil público.",
 		"copyFailed": "No se pudo copiar el enlace del perfil",
 		"copyFailedBody": "Revisa los permisos del navegador y vuelve a intentarlo.",
-		"cardShared": "Tarjeta del perfil compartida",
-		"cardSaved": "Tarjeta del perfil guardada",
-		"cardSharedBody": "La imagen está lista en el destino que elegiste.",
-		"cardSavedBody": "El PNG se descargó en este dispositivo.",
-		"cardFailed": "No se pudo crear la tarjeta del perfil",
-		"cardFailedBody": "Vuelve a intentarlo desde este navegador.",
 		"joined": "Se unió {when}",
 		"followers": "Seguidores",
 		"following": "Siguiendo",
 		"shareProfile": "Compartir perfil",
-		"preparingCard": "Preparando la tarjeta…",
-		"shareCard": "Compartir tarjeta del perfil",
 		"unfollowing": "Dejando de seguir...",
 		"unfollow": "Dejar de seguir",
 		"followingPending": "Siguiendo...",
@@ -252,8 +244,7 @@
 		"kindRoutine": "Rutina",
 		"kindRank": "Rango renacentista",
 		"recognizedFromHistory": "Reconocido por el historial",
-		"featuredEmpty": "Elige récords, medallas obtenidas, una rutina compartida o un rango alcanzado en <link>Ajustes</link> para armar este registro del perfil.",
-		"rankCaption": "Rango renacentista"
+		"featuredEmpty": "Elige récords, medallas obtenidas, una rutina compartida o un rango alcanzado en <link>Ajustes</link> para armar este registro del perfil."
 	},
 	"notifications": {
 		"progressSummary": "{records, plural, =0 {} one {# récord nuevo} other {# récords nuevos}}{both, select, yes { y } other {}}{changes, plural, =0 {} one {# cambio de carga} other {# cambios de carga}}",
