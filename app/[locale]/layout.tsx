@@ -1,7 +1,13 @@
 import '../globals.css'
 
 import type { Metadata } from 'next'
-import { Bebas_Neue, Cinzel, Oswald, Space_Mono } from 'next/font/google'
+import {
+	Bebas_Neue,
+	Cinzel,
+	Oswald,
+	Source_Sans_3,
+	Space_Mono,
+} from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { hasLocale } from 'next-intl'
 import {
@@ -25,6 +31,16 @@ const oswald = Oswald({
 	variable: '--font-oswald',
 	subsets: ['latin'],
 	weight: ['400', '500', '600', '700'],
+	display: 'swap',
+})
+
+// UX-14 (design system §23): the body face. Oswald is a condensed display
+// face, and set as running text it made every paragraph read cramped; it stays
+// for item titles, labels and buttons. One variable file covers every weight
+// the body uses, so no weight is ever synthesised.
+const sourceSans = Source_Sans_3({
+	variable: '--font-source-sans',
+	subsets: ['latin'],
 	display: 'swap',
 })
 
@@ -194,7 +210,7 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body
-				className={`${oswald.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
+				className={`${oswald.variable} ${sourceSans.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
 				suppressHydrationWarning
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>

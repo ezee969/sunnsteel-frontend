@@ -291,7 +291,8 @@ one agreed to within 0.02 last time, but agreement is checked, not assumed.
 
 ## 5. Typography
 
-Four faces, four jobs. No new font payload.
+Five faces, five jobs. The fifth, the body face, was added by §23 (UX-14,
+2026-09-30); until then this read "four faces, four jobs, no new font payload".
 
 ### 5.1 Loaded weights — a constraint, not a preference
 
@@ -299,7 +300,8 @@ Four faces, four jobs. No new font payload.
 | --- | --- | --- |
 | Cinzel | **600 only** | Page and section inscriptions; wordmark (§18) |
 | Bebas Neue | **400 only** | Large numerals only |
-| Oswald | 400, 500, 600, 700 | Body, labels, item titles, buttons |
+| Source Sans 3 | Variable (one file) | Body, body small (§23) |
+| Oswald | 400, 500, 600, 700 | Labels, item titles, buttons |
 | Space Mono | **400, 700 only** | All data: weights, reps, dates, durations, timers |
 
 Asking for an absent weight synthesises or falls back silently. Every value below
@@ -313,8 +315,8 @@ once already (CL-07), and is **not** taken here.
 | Page title | Cinzel 600 | 24 | 32 | 1.20 | 0.045em | UPPER |
 | Section heading | Cinzel 600 | 16 | 18 | 1.25 | 0.06em | UPPER |
 | Panel / item title | Oswald 600 | 15 | 16 | 1.30 | 0.02em | Sentence |
-| Body | Oswald 400 | 15 | 15 | 1.60 | 0 | Sentence |
-| Body small | Oswald 400 | 13 | 13 | 1.45 | 0 | Sentence |
+| Body | Source Sans 3 400 | 15 | 15 | 1.60 | 0 | Sentence |
+| Body small | Source Sans 3 400 | 13 | 13 | 1.45 | 0 | Sentence |
 | Label | Oswald 500 | **12** | 12 | 1.30 | **0.06em** | UPPER |
 | Button | Oswald 600 | 14 | 14 | 1 | 0.04em | UPPER |
 | Numeral, large | Bebas Neue 400 | 40 | 52 | 0.95 | 0.02em | — |
@@ -1552,3 +1554,42 @@ screen does under Larger controls.
 - The regression sweep has two more routes, `session-display` and
   `dashboard-display`: the same pages with both preferences seeded before
   the app runs.
+
+## 23. Amendment — legibility (2026-09-30)
+
+Owner-approved on 2026-09-30 as the first of the `UX-14` to `UX-17` group in
+the roadmap's Legibility and learning curve section. The owner's review: the
+app reads as condensed, especially on a phone, and a new member meets
+everything at once. This section collects the group's rules; each later item
+adds its own subsection.
+
+### 23.1 The body face (UX-14)
+
+**Body and body small are Source Sans 3**, loaded through `next/font` as one
+variable file (`--font-source-sans`) and exposed as `--font-sans`, so every
+unranked run of text and every input inherits it. Oswald keeps the jobs it
+does well at small sizes and short lengths: item titles (`type-panel`),
+labels (`type-label`) and buttons (`type-button`).
+
+- **Why:** Oswald is a condensed display face. As running text it set every
+  paragraph tight and tall, which is most of what "condensed" meant in the
+  review. Source Sans 3 is a humanist sans with open counters that sits beside
+  Cinzel and Oswald without competing with either.
+- **Chosen from screenshots.** Source Sans 3 and IBM Plex Sans were compared
+  with the current face on the dashboard, Progress and Schedule at 390 and
+  1440, in both themes, on the owner's account. Plex is wider: Plateau
+  watch's rule paragraph ran four lines at 390 where Source Sans 3 and Oswald
+  both ran three, and the page moved further down.
+- **Payload.** One variable file, the first face added since CL-07: 28.8 kB
+  for the Latin range a page downloads (the other ranges load only when a
+  character needs them), measured from the production build. It is a
+  deliberate font-payload decision, taken once; no other weight or face is
+  added with it.
+- **Sizes and line heights are unchanged** (§5.2). Source Sans 3 sets wider
+  than Oswald at the same size, so a row that sat a text column beside a
+  control must let the text wrap inside its own column (`min-w-0 flex-1`)
+  rather than letting the control drop to a line of its own; the dashboard
+  greeting was the one case found.
+- **Not changed:** Cinzel, Bebas Neue and Space Mono, and the generated
+  profile card (`profile-card.ts`), which draws its own type on a canvas and
+  keeps Oswald as part of the image.

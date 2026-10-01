@@ -72,8 +72,11 @@ export default function Dashboard() {
 				// to fade and rise on every visit, which delays perceived load and is
 				// the exact trope the plan forbids.
 				<div className="flex flex-col gap-8 sm:gap-12">
-					<div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-						<div className="flex flex-col gap-1">
+					{/* The greeting wraps inside its own column so Customize keeps its
+					    place beside it on a phone, rather than dropping to a row of
+					    its own under the wider body face (UX-14). */}
+					<div className="flex items-start justify-between gap-x-4 sm:gap-x-6">
+						<div className="flex min-w-0 flex-1 flex-col gap-1">
 							{/* The masthead above already carries the page rank, so the
 						    greeting is a panel title rather than a second inscription
 						    competing with it (§5.3 — Cinzel appears at most twice, and

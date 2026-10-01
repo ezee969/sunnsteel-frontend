@@ -19,7 +19,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-oswald);
+  --font-sans: var(--font-source-sans);
   --font-mono: var(--font-space-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -297,10 +297,11 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* `font-sans` is Oswald, the body face (§5.2). It must be set here: next/font
-     declares `--font-oswald` on <body>, while preflight sets the family on
-     <html>, where the variable does not exist - so unranked text used to fall
-     back to the system UI font (TD-39). Inputs inherit it via preflight. */
+  /* `font-sans` is Source Sans 3, the body face (§5.2, amended by §23). It must
+     be set here: next/font declares its variables on <body>, while preflight
+     sets the family on <html>, where the variable does not exist - so unranked
+     text used to fall back to the system UI font (TD-39). Inputs inherit it
+     via preflight. */
   body {
     @apply bg-background font-sans text-foreground transition-colors;
     transition-duration: var(--motion-slow);
@@ -367,7 +368,7 @@
   }
   /* The caption rank inside a repeated row: sentence case, untracked. */
   .type-body-sm {
-    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
     font-size: 0.8125rem;
     line-height: 1.45;
