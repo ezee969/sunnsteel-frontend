@@ -333,7 +333,15 @@
 		"goToActive": "Go to active session",
 		"insightsLoading": "Loading training insights",
 		"insightsFailed": "Training insights could not be loaded.",
-		"gettingStartedNote": "While you are getting started, sections join your dashboard once they have something to show. Saving a change here keeps exactly what you choose."
+		"gettingStartedNote": "While you are getting started, sections join your dashboard once they have something to show. Saving a change here keeps exactly what you choose.",
+		"hidden": "Hidden",
+		"moveUp": "Move {section} up",
+		"moveDown": "Move {section} down",
+		"showSection": "Show {section}",
+		"show": "Show",
+		"saveFailed": "Your dashboard could not be saved. Try again.",
+		"cancel": "Cancel",
+		"save": "Save"
 	},
 	"gettingStarted": {
 		"title": "Getting started",

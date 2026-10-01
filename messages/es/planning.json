@@ -333,7 +333,15 @@
 		"goToActive": "Ir a la sesión activa",
 		"insightsLoading": "Cargando análisis de entrenamiento",
 		"insightsFailed": "No se pudo cargar el análisis de entrenamiento.",
-		"gettingStartedNote": "Mientras empiezas, cada sección se suma a tu inicio cuando tiene algo que mostrar. Si guardas un cambio aquí, queda exactamente lo que elijas."
+		"gettingStartedNote": "Mientras empiezas, cada sección se suma a tu inicio cuando tiene algo que mostrar. Si guardas un cambio aquí, queda exactamente lo que elijas.",
+		"hidden": "Oculta",
+		"moveUp": "Subir {section}",
+		"moveDown": "Bajar {section}",
+		"showSection": "Mostrar {section}",
+		"show": "Mostrar",
+		"saveFailed": "No se pudo guardar tu inicio. Inténtalo de nuevo.",
+		"cancel": "Cancelar",
+		"save": "Guardar"
 	},
 	"gettingStarted": {
 		"title": "Primeros pasos",

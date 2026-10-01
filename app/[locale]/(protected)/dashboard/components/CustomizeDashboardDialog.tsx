@@ -131,7 +131,7 @@ export function CustomizeDashboardDialog({
 											{label}
 										</p>
 										{entry.hidden ? (
-											<p className="type-body-sm text-ink-3">Hidden</p>
+											<p className="type-body-sm text-ink-3">{tA('hidden')}</p>
 										) : null}
 									</div>
 									<div className="flex gap-1">
@@ -140,7 +140,7 @@ export function CustomizeDashboardDialog({
 											variant="ghost"
 											size="icon"
 											data-move="-1"
-											aria-label={`Move ${label} up`}
+											aria-label={tA('moveUp', { section: label })}
 											disabled={index === 0}
 											onClick={() => move(index, -1)}
 										>
@@ -151,7 +151,7 @@ export function CustomizeDashboardDialog({
 											variant="ghost"
 											size="icon"
 											data-move="1"
-											aria-label={`Move ${label} down`}
+											aria-label={tA('moveDown', { section: label })}
 											disabled={index === draft.length - 1}
 											onClick={() => move(index, 1)}
 										>
@@ -171,13 +171,13 @@ export function CustomizeDashboardDialog({
 													),
 												)
 											}
-											aria-label={`Show ${label}`}
+											aria-label={tA('showSection', { section: label })}
 										/>
 										<Label
 											htmlFor={showId}
 											className="type-body-sm font-normal text-ink-2"
 										>
-											Show
+											{tA('show')}
 										</Label>
 									</div>
 								</li>
@@ -204,8 +204,7 @@ export function CustomizeDashboardDialog({
 
 				{update.isError ? (
 					<p role="alert" className="type-body-sm text-ink">
-						{errorText(update.error) ||
-							'Your dashboard could not be saved. Try again.'}
+						{errorText(update.error) || tA('saveFailed')}
 					</p>
 				) : null}
 
@@ -215,7 +214,7 @@ export function CustomizeDashboardDialog({
 						variant="outline"
 						onClick={() => onOpenChange(false)}
 					>
-						Cancel
+						{tA('cancel')}
 					</Button>
 					<Button
 						type="button"
@@ -225,7 +224,7 @@ export function CustomizeDashboardDialog({
 						{update.isPending ? (
 							<Loader2 className="size-4 animate-spin" aria-hidden />
 						) : null}
-						Save
+						{tA('save')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
