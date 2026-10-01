@@ -9,10 +9,13 @@ import { translatorFor } from '@/i18n/translator'
 import {
 	describeNotification,
 	EARLIER_NOTIFICATIONS_SHOWN,
+	flattenNotificationPages,
 	markReadInCache,
+	markReadInPages,
 	NEW_NOTIFICATIONS_SHOWN,
 	sessionProgressSummary,
 	splitByRead,
+	withUnreadCount,
 } from './notifications'
 
 const base = { createdAt: '2026-09-14T19:00:00.000Z', readAt: null }
@@ -175,6 +178,7 @@ describe('notifications (NOTIF-01)', () => {
 				{ ...follower, readAt: '2026-09-13T08:00:00.000Z' },
 			],
 			unreadCount: 2,
+			nextCursor: null,
 		}
 		const now = new Date('2026-09-15T12:00:00.000Z')
 		const one = markReadInCache(data, ['n1', 'n3'], now)
@@ -187,6 +191,62 @@ describe('notifications (NOTIF-01)', () => {
 		const all = markReadInCache(data, undefined, now)
 		expect(all.unreadCount).toBe(0)
 		expect(all.notifications.every(n => n.readAt)).toBe(true)
+	})
+})
+
+describe('notification pages (NOTIF-09)', () => {
+	const now = new Date('2026-09-15T12:00:00.000Z')
+	const page = (
+		notifications: AppNotification[],
+		unreadCount: number,
+		nextCursor: string | null,
+	): NotificationsResponse => ({ notifications, unreadCount, nextCursor })
+	// The account has five unread; two of them are loaded, one on each page.
+	const pages = {
+		pages: [
+			page([achievement, { ...progress, readAt: now.toISOString() }], 5, 'c1'),
+			page([{ ...follower, id: 'n4' }], 5, null),
+		],
+		pageParams: [null, 'c1'],
+	}
+
+	it('reads the loaded pages as one list with the account count and the last cursor', () => {
+		const flat = flattenNotificationPages(pages)
+		expect(flat.notifications.map(n => n.id)).toEqual(['n1', 'n2', 'n4'])
+		expect(flat.unreadCount).toBe(5)
+		expect(flat.nextCursor).toBeNull()
+		expect(
+			flattenNotificationPages({ pages: [pages.pages[0]], pageParams: [null] })
+				.nextCursor,
+		).toBe('c1')
+	})
+
+	it('shows a row a refetch moved across a page boundary once', () => {
+		const moved = {
+			pages: [pages.pages[0], page([achievement], 5, null)],
+			pageParams: [null, 'c1'],
+		}
+		expect(flattenNotificationPages(moved).notifications).toHaveLength(2)
+	})
+
+	it('marks read across every page and lowers the count by what it marked', () => {
+		const one = markReadInPages(pages, ['n4'], now)
+		expect(one.pages.map(p => p.unreadCount)).toEqual([4, 4])
+		expect(one.pages[1].notifications[0].readAt).toBe(now.toISOString())
+		expect(one.pages[0].notifications[0].readAt).toBeNull()
+		expect(one.pageParams).toEqual(pages.pageParams)
+
+		const all = markReadInPages(pages, undefined, now)
+		expect(all.pages.map(p => p.unreadCount)).toEqual([0, 0])
+		expect(all.pages.every(p => p.notifications.every(n => n.readAt))).toBe(
+			true,
+		)
+	})
+
+	it('gives every page the count the server answered', () => {
+		expect(withUnreadCount(pages, 2).pages.map(p => p.unreadCount)).toEqual([
+			2, 2,
+		])
 	})
 })
 

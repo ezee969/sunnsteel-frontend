@@ -3,6 +3,7 @@
 import {
 	type AppNotification,
 	NOTIFICATIONS_LOOKBACK_DAYS,
+	NOTIFICATIONS_RETENTION_DAYS,
 	type NotificationsResponse,
 } from '@sunsteel/contracts'
 import {
@@ -22,6 +23,7 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useLoadMoreOnScroll } from '@/hooks/use-load-more-on-scroll'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	describeNotification,
@@ -103,16 +105,22 @@ function GroupedNotifications({
 	notifications,
 	now,
 	onOpen,
+	pagination,
 }: {
 	notifications: readonly AppNotification[]
 	now: Date
 	onOpen: (id: string) => void
+	pagination?: NotificationPagination
 }) {
 	const t = useTranslations('social.notifications')
 	const { unread, read } = splitByRead(notifications)
 	const fresh = useShowMore(unread, NEW_NOTIFICATIONS_SHOWN)
 	const earlier = useShowMore(read, EARLIER_NOTIFICATIONS_SHOWN)
 	const titled = unread.length > 0 && read.length > 0
+	// NOTIF-09: older pages load only once nothing already loaded is folded
+	// behind "Show N more", so the two never compete for the same scroll.
+	const showingAllLoaded =
+		earlier.expanded || read.length <= earlier.visible.length
 	return (
 		<>
 			{unread.length > 0 ? (
@@ -161,7 +169,68 @@ function GroupedNotifications({
 					/>
 				</div>
 			) : null}
+			{pagination ? (
+				<OlderNotifications
+					pagination={pagination}
+					autoLoad={showingAllLoaded}
+				/>
+			) : null}
 		</>
+	)
+}
+
+export interface NotificationPagination {
+	hasNextPage: boolean
+	isFetchingNextPage: boolean
+	isFetchNextPageError: boolean
+	fetchNextPage: () => void
+}
+
+/**
+ * NOTIF-09: the next page loads as the end of the list comes into view, and
+ * the same control is a button for keyboards and anyone the observer misses.
+ * The list has an end -- what the server keeps -- and says so.
+ */
+function OlderNotifications({
+	pagination,
+	autoLoad,
+}: {
+	pagination: NotificationPagination
+	autoLoad: boolean
+}) {
+	const t = useTranslations('social.notifications')
+	const { hasNextPage, isFetchingNextPage, isFetchNextPageError } = pagination
+	const sentinel = useLoadMoreOnScroll<HTMLDivElement>({
+		enabled:
+			autoLoad && hasNextPage && !isFetchingNextPage && !isFetchNextPageError,
+		onLoadMore: pagination.fetchNextPage,
+	})
+
+	if (!hasNextPage) {
+		return (
+			<p className="type-body-sm pt-2 text-ink-3">
+				{t('listEnd', { days: NOTIFICATIONS_RETENTION_DAYS })}
+			</p>
+		)
+	}
+
+	return (
+		<div ref={sentinel} className="flex flex-col items-start gap-2 pt-2">
+			{isFetchNextPageError ? (
+				<p role="alert" className="type-body-sm text-foreground">
+					{t('olderError')}
+				</p>
+			) : null}
+			<Button
+				type="button"
+				variant="outline"
+				size="sm"
+				onClick={pagination.fetchNextPage}
+				disabled={isFetchingNextPage}
+			>
+				{isFetchingNextPage ? t('loadingOlder') : t('loadOlder')}
+			</Button>
+		</div>
 	)
 }
 
@@ -178,6 +247,7 @@ export function NotificationList({
 	onOpen,
 	onMarkAll,
 	isMarking,
+	pagination,
 }: {
 	data?: NotificationsResponse
 	isPending: boolean
@@ -187,6 +257,7 @@ export function NotificationList({
 	onOpen: (id: string) => void
 	onMarkAll: () => void
 	isMarking: boolean
+	pagination?: NotificationPagination
 }) {
 	const t = useTranslations('social.notifications')
 	const unread = data?.unreadCount ?? 0
@@ -249,6 +320,7 @@ export function NotificationList({
 						notifications={data.notifications}
 						now={now}
 						onOpen={onOpen}
+						pagination={pagination}
 					/>
 				</>
 			)}

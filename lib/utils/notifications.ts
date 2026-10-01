@@ -153,8 +153,76 @@ export function markReadInCache(
 		return { ...notification, readAt }
 	})
 	return {
+		...data,
 		notifications,
 		unreadCount: ids ? Math.max(0, data.unreadCount - marked) : 0,
+	}
+}
+
+/** The pages of the notification list as TanStack Query keeps them. */
+export interface NotificationPages {
+	pages: NotificationsResponse[]
+	pageParams: unknown[]
+}
+
+/**
+ * NOTIF-09: the loaded pages read as one list. The unread count is the
+ * account's, so the first page's is current; a row a refetch moved across a
+ * page boundary appears once.
+ */
+export function flattenNotificationPages(
+	data: NotificationPages,
+): NotificationsResponse {
+	const seen = new Set<string>()
+	const notifications = data.pages.flatMap(page =>
+		page.notifications.filter(notification => {
+			if (seen.has(notification.id)) return false
+			seen.add(notification.id)
+			return true
+		}),
+	)
+	return {
+		notifications,
+		unreadCount: data.pages[0]?.unreadCount ?? 0,
+		nextCursor: data.pages.at(-1)?.nextCursor ?? null,
+	}
+}
+
+/**
+ * `markReadInCache` across every loaded page. The count drops by what was
+ * marked on all of them together, and every page then carries it.
+ */
+export function markReadInPages<T extends NotificationPages>(
+	data: T,
+	ids: readonly string[] | undefined,
+	now: Date,
+): T {
+	const before = data.pages[0]?.unreadCount ?? 0
+	const willMark = new Set(
+		data.pages.flatMap(page =>
+			page.notifications
+				.filter(n => !n.readAt && (!ids || ids.includes(n.id)))
+				.map(n => n.id),
+		),
+	)
+	const unreadCount = ids ? Math.max(0, before - willMark.size) : 0
+	return {
+		...data,
+		pages: data.pages.map(page => ({
+			...markReadInCache(page, ids, now),
+			unreadCount,
+		})),
+	}
+}
+
+/** Every loaded page takes the count the server answered. */
+export function withUnreadCount<T extends NotificationPages>(
+	data: T,
+	unreadCount: number,
+): T {
+	return {
+		...data,
+		pages: data.pages.map(page => ({ ...page, unreadCount })),
 	}
 }
 

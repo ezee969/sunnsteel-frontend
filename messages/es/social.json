@@ -285,7 +285,11 @@
 		"allRead": "Todo leído",
 		"pageTitle": "Notificaciones",
 		"pageSubtitle": "Qué cambió para ti y qué puedes hacer hoy.",
-		"markFailed": "No se marcó como leído"
+		"markFailed": "No se marcó como leído",
+		"listEnd": "No hay nada más antiguo: las novedades se guardan {days} días.",
+		"loadOlder": "Cargar novedades anteriores",
+		"loadingOlder": "Cargando novedades anteriores…",
+		"olderError": "No se pudieron cargar las novedades anteriores."
 	},
 	"activity": {
 		"typeSessionCompleted": "Entrenamientos completados",

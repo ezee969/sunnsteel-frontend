@@ -285,7 +285,11 @@
 		"allRead": "All read",
 		"pageTitle": "Notifications",
 		"pageSubtitle": "What changed for you, and what you can do today.",
-		"markFailed": "Not marked read"
+		"markFailed": "Not marked read",
+		"listEnd": "Nothing older: updates are kept for {days} days.",
+		"loadOlder": "Load older updates",
+		"loadingOlder": "Loading older updates…",
+		"olderError": "Older updates could not be loaded."
 	},
 	"activity": {
 		"typeSessionCompleted": "Completed workouts",

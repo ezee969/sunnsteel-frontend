@@ -49,6 +49,12 @@ export default function NotificationsPage() {
 					)
 				}
 				isMarking={markRead.isPending}
+				pagination={{
+					hasNextPage: notifications.hasNextPage,
+					isFetchingNextPage: notifications.isFetchingNextPage,
+					isFetchNextPageError: notifications.isFetchNextPageError,
+					fetchNextPage: () => void notifications.fetchNextPage(),
+				}}
 			/>
 		</div>
 	)
