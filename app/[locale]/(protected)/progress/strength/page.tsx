@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { GlossaryLine } from '@/components/layout/glossary-line'
 import { Button } from '@/components/ui/button'
 import {
 	Select,
@@ -110,6 +111,7 @@ export default function ProgressStrengthPage() {
 
 	return (
 		<ProgressTab>
+			<GlossaryLine terms={['estimated1rm']} />
 			<section
 				id="progress-exercise"
 				className="rule-heading grid gap-4 pb-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"

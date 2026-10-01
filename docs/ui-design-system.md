@@ -1697,6 +1697,28 @@ sentence case.
 - **Out of scope:** dialog descriptions, empty states and toasts, which a
   member reads when they asked for them.
 
+### 23.5 Terms defined in place (UX-18)
+
+- **A screen that uses training terms carries one "Terms:" line**
+  (`GlossaryLine`): each term is a text button with a dotted underline, and
+  its definition opens under the whole line, one at a time, on a tap or the
+  keyboard, never on hover. Tapping the open term closes it.
+- **Why a line, not the term where it appears.** The terms sit in cells too
+  narrow to hold a sentence: the RPE field of a set row and the RIR
+  column of the builder are a few characters wide. A definition opened inside them
+  would wrap to one word per line, so the line sits at the width of its
+  section instead, once per screen, never once per row.
+- **Where:** the workout screen (RPE, RIR, set kinds), the builder's day
+  (RIR, progression, set kinds), the routine page (rotation for a rotation,
+  training block, deload), Progress › Overview (estimated 1RM, RPE, deload)
+  and Progress › Strength (estimated 1RM).
+- **One source of definitions:** `core.glossary` in every language, keyed
+  by `GLOSSARY_TERMS` (`lib/utils/glossary.ts`). A definition states what a
+  thing is and how the app treats it, checked against the code it describes
+  (the progression rule in the backend's `progression-changes.ts`, the set
+  kinds in contracts' `countsAsWork` and `countsForProgression`), and never
+  what it does for the member; a test refuses words of benefit or advice.
+
 ---
 
 ## 24. Amendment — rank decoration (2026-10-01)

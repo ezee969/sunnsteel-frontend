@@ -383,7 +383,7 @@ export function SetRow({
 
 						{/* RIR Column */}
 						<div className="space-y-1 lg:min-w-0">
-							<Label className="lg:hidden">RIR</Label>
+							<Label className="lg:hidden">{t('rir')}</Label>
 							<div className="flex items-center gap-2 w-full">
 								<Button
 									type="button"

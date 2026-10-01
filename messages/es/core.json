@@ -443,5 +443,40 @@
 		"GOAL_DUPLICATE": "Objetivo medible repetido",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Los objetivos de fuerza necesitan un ejercicio",
 		"BODY_ENTRY_IN_FUTURE": "Un registro no puede tener una fecha futura"
+	},
+	"glossary": {
+		"label": "Términos:",
+		"rpe": {
+			"term": "RPE",
+			"definition": "El RPE (esfuerzo percibido) es qué tan dura se sintió una serie, en una escala de 10. Un 10 significa que no podrías haber hecho otra repetición."
+		},
+		"rir": {
+			"term": "RIR",
+			"definition": "El RIR (repeticiones en reserva) es cuántas repeticiones más podrías haber hecho. RIR 2 significa que paraste dos repeticiones antes de no poder hacer otra."
+		},
+		"estimated1rm": {
+			"term": "1RM est.",
+			"definition": "El 1RM estimado (máximo de una repetición) es la repetición única más pesada que sugiere una serie, calculada con su peso y sus repeticiones. Es una estimación, no un levantamiento que probaste."
+		},
+		"progression": {
+			"term": "Progresión",
+			"definition": "La progresión doble sube el peso de todas las series de trabajo según el incremento del ejercicio cuando todas llegan al máximo de su objetivo de repeticiones. La progresión doble dinámica lo hace serie por serie: cada serie que llega a su objetivo sube por su cuenta."
+		},
+		"setKinds": {
+			"term": "Tipos de serie",
+			"definition": "Las series de calentamiento nunca cuentan para el volumen, los récords ni el progreso. Las de trabajo, las descendentes y las opcionales cuentan cuando las haces, pero solo las de trabajo y las opcionales hacen avanzar tus cargas, y un entrenamiento puede terminar sin sus calentamientos ni sus series opcionales."
+		},
+		"deload": {
+			"term": "Descarga",
+			"definition": "Una descarga es un período planificado de hasta dos semanas con cargas más livianas o menos series. Las cargas no progresan durante ella y la rutina queda tal como estaba."
+		},
+		"trainingBlock": {
+			"term": "Bloque de entrenamiento",
+			"definition": "Un bloque de entrenamiento es una fase con fechas de una rutina, con su propia configuración. Mientras está vigente tus entrenamientos lo siguen; la rutina vuelve al día siguiente de que termina."
+		},
+		"rotation": {
+			"term": "Rotación",
+			"definition": "Una rotación sigue sus días en orden en lugar de días fijos de la semana. El siguiente día es el que viene después del último que terminaste."
+		}
 	}
 }

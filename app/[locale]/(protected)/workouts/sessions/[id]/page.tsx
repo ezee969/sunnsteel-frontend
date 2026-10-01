@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { GlossaryLine } from '@/components/layout/glossary-line'
 import { useToast } from '@/components/ui/toast'
 import { ExerciseGroup } from '@/features/workout/exercise-group'
 import {
@@ -309,6 +310,9 @@ export default function ActiveSessionPage() {
 					onDiscardAttempt={() => handleFinishAttempt('ABORTED')}
 					onNavigateBack={handleBack}
 				/>
+
+				{/* UX-18: the terms the set rows use, defined one tap away. */}
+				<GlossaryLine terms={['rpe', 'rir', 'setKinds']} />
 
 				{/* Exercise Groups */}
 				{previousPerformanceError ? (

@@ -792,7 +792,8 @@
 		"dayNameOptional": "Nombre del día (opcional)",
 		"saving": "Guardando…",
 		"progressionDynamic": "Doble progresión dinámica",
-		"routineSummary": "Resumen de la rutina"
+		"routineSummary": "Resumen de la rutina",
+		"progression": "Progresión"
 	},
 	"listing": {
 		"pageTitle": "Rutinas",

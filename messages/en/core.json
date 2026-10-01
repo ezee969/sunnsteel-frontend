@@ -443,5 +443,40 @@
 		"GOAL_DUPLICATE": "Duplicate measurable goal",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Strength goals require an exercise",
 		"BODY_ENTRY_IN_FUTURE": "An entry cannot be dated in the future"
+	},
+	"glossary": {
+		"label": "Terms:",
+		"rpe": {
+			"term": "RPE",
+			"definition": "RPE (rate of perceived exertion) is how hard a set felt, on a scale of 10. A 10 means you could not have done another rep."
+		},
+		"rir": {
+			"term": "RIR",
+			"definition": "RIR (reps in reserve) is how many more reps you could have done. RIR 2 means you stopped two reps before you could not do another."
+		},
+		"estimated1rm": {
+			"term": "Est. 1RM",
+			"definition": "An estimated 1RM (one-rep max) is the heaviest single rep a set suggests, worked out from its weight and reps. It is an estimate, not a lift you tested."
+		},
+		"progression": {
+			"term": "Progression",
+			"definition": "Double progression raises the weight of every working set by the exercise’s step once all of them reach the top of their rep target. Dynamic double progression does it set by set: each set that reaches its target goes up on its own."
+		},
+		"setKinds": {
+			"term": "Set kinds",
+			"definition": "Warm-up sets never count toward volume, records or progress. Working, drop and optional sets count when you do them, but only working and optional sets move your loads forward, and a workout can finish without its warm-ups or optional sets."
+		},
+		"deload": {
+			"term": "Deload",
+			"definition": "A deload is a planned stretch of up to two weeks with lighter loads or fewer sets. Loads do not progress during it, and the routine stays exactly as it was."
+		},
+		"trainingBlock": {
+			"term": "Training block",
+			"definition": "A training block is a dated phase of a routine with its own setup. While it is in force your workouts follow it; the routine resumes the day after it ends."
+		},
+		"rotation": {
+			"term": "Rotation",
+			"definition": "A rotation runs its days in order instead of on fixed weekdays. The next day is the one after the last you finished."
+		}
 	}
 }

@@ -792,7 +792,8 @@
 		"dayNameOptional": "Day name (optional)",
 		"saving": "Saving...",
 		"progressionDynamic": "Dynamic Double Progression",
-		"routineSummary": "Routine Summary"
+		"routineSummary": "Routine Summary",
+		"progression": "Progression"
 	},
 	"listing": {
 		"pageTitle": "Routines",

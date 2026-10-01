@@ -4,6 +4,7 @@ import { ROUTINE_DAY_NAME_MAX } from '@sunsteel/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { GlossaryLine } from '@/components/layout/glossary-line'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -387,6 +388,10 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 												}
 											/>
 										</div>
+										<GlossaryLine
+											terms={['rir', 'progression', 'setKinds']}
+											className="mb-3"
+										/>
 										<ExerciseList
 											weightUnit={weightUnit}
 											tabIndex={tabIndex}

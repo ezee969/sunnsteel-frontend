@@ -3,6 +3,7 @@
 import { ArrowLeft, Check, Edit, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { GlossaryLine } from '@/components/layout/glossary-line'
 import { Button } from '@/components/ui/button'
 import type { Routine } from '@/lib/api/types/routine.type'
 
@@ -55,6 +56,14 @@ export const RoutineHeader = ({
 							? t('rotationDays', { days: daysPerWeek })
 							: t('daysPerWeek', { days: daysPerWeek })}
 					</p>
+					<GlossaryLine
+						className="mt-1"
+						terms={
+							routine.scheduleMode === 'ROTATION'
+								? ['rotation', 'trainingBlock', 'deload']
+								: ['trainingBlock', 'deload']
+						}
+					/>
 					{routine.description && (
 						<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
 							{routine.description}

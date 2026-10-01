@@ -1,5 +1,6 @@
 'use client'
 
+import { GlossaryLine } from '@/components/layout/glossary-line'
 import { PersonalGoals } from '@/features/progress/personal-goals'
 import { PlateauWatch } from '@/features/progress/plateau-watch'
 import { ProgressTab } from '@/features/progress/progress-tab'
@@ -34,6 +35,7 @@ export default function ProgressOverviewPage() {
 
 	return (
 		<ProgressTab>
+			<GlossaryLine terms={['estimated1rm', 'rpe', 'deload']} />
 			<PersonalGoals
 				data={personalGoals.data}
 				weightUnit={weightUnit}
