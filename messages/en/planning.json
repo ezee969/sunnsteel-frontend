@@ -321,7 +321,7 @@
 		"resume": "Resume workout",
 		"reviewSession": "Review session",
 		"trainAnotherDay": "Train another day",
-		"browseRoutines": "Browse Routines",
+		"browseRoutines": "Browse routines",
 		"inProgress": "In progress",
 		"startLabel": "Start {name}",
 		"notScheduled": "This workout is not scheduled for {day}",
@@ -331,7 +331,7 @@
 		"conflictTitle": "Active workout in progress",
 		"conflictBody": "You already have an active session{named, select, yes { for \"{routine}\"} other {}}. You can resume it now. Starting another workout is not supported while a session is in progress.",
 		"close": "Close",
-		"goToActive": "Go to Active Session",
+		"goToActive": "Go to active session",
 		"insightsLoading": "Loading training insights",
 		"insightsFailed": "Training insights could not be loaded."
 	}

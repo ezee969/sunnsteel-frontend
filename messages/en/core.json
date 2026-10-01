@@ -101,7 +101,7 @@
 		"description": "Pick the password you'll use to sign in from now on.",
 		"passwordUpdatedTitle": "Password updated",
 		"passwordUpdatedBody": "You're signed in with your new password.",
-		"goToDashboard": "Go to Dashboard",
+		"goToDashboard": "Go to dashboard",
 		"linkCantBeUsedTitle": "This link can't be used",
 		"linkCantBeUsedBody": "Reset links expire and work only once, and this page opens only from one. Request a new link to continue.",
 		"requestNewLink": "Request a new link",

@@ -50,17 +50,17 @@ describe('training-partner presentation', () => {
 
 	it('names each request state without implying access before acceptance', () => {
 		expect(trainingPartnerActionLabel(t, undefined)).toBe(
-			'Add Training Partner',
+			'Add training partner',
 		)
 		expect(trainingPartnerActionLabel(t, relationship())).toBe(
-			'Request Pending',
+			'Request pending',
 		)
 		expect(
 			trainingPartnerActionLabel(t, relationship({ requestedByMe: false })),
-		).toBe('Accept Partner Request')
+		).toBe('Accept partner request')
 		expect(
 			trainingPartnerActionLabel(t, relationship({ status: 'ACTIVE' })),
-		).toBe('Training Partner')
+		).toBe('Training partner')
 	})
 
 	it('offers only the four fixed encouragement prompts', () => {

@@ -171,7 +171,7 @@
 		"gymTitleNamed": "{name} no tiene equipamiento listado",
 		"gymTitleNone": "Aún no hay lugar de entrenamiento",
 		"gymDescription": "Lista el equipamiento con el que entrenas en tu lugar de entrenamiento predeterminado, en Ajustes, para filtrar por él.",
-		"openSettings": "Abrir Ajustes",
+		"openSettings": "Abrir ajustes",
 		"countAll": "{total, plural, one {# ejercicio} other {# ejercicios}}",
 		"countSome": "{shown} de {total, plural, one {# ejercicio} other {# ejercicios}}",
 		"emptyCatalogTitle": "El catálogo está vacío",

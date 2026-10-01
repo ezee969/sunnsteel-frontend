@@ -194,10 +194,10 @@
 		"title": "Plate Calculator",
 		"description": "{exercise}: load the target using the equipment saved for this location.",
 		"loadingEquipment": "Loading equipment…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"noEquipmentTitle": "No equipment preferences saved",
 		"noEquipmentDescription": "Add a training location, bar and plate pairs first.",
-		"openSettings": "Open Settings",
+		"openSettings": "Open settings",
 		"location": "Location",
 		"defaultSuffix": " (default)",
 		"target": "Target ({unit})",
@@ -442,8 +442,8 @@
 		"title": "No Active Workout",
 		"description": "You don’t have a workout in progress right now. Pick a routine to start training, or review your history.",
 		"trainAnotherDay": "Train another day",
-		"goToRoutines": "Go to Routines",
-		"viewHistory": "View History",
+		"goToRoutines": "Go to routines",
+		"viewHistory": "View history",
 		"dashboard": "Dashboard"
 	},
 	"historyPage": {
@@ -464,7 +464,7 @@
 	"sessionPage": {
 		"errorTitle": "Error Loading Session",
 		"failedToLoadSession": "Failed to load workout session",
-		"goBack": "Go Back",
+		"goBack": "Go back",
 		"sessionNotFoundTitle": "Session Not Found",
 		"sessionNotFoundBody": "The workout session you’re looking for doesn’t exist or has been deleted.",
 		"dayNotFoundTitle": "Day Not Found",
@@ -484,8 +484,8 @@
 		"hardReload": "Hard reload",
 		"sessionErrorTitle": "Workout Session Error",
 		"sessionErrorDescription": "Something went wrong with your workout session. Your progress should be saved.",
-		"retrySession": "Retry Session",
-		"backToWorkouts": "Back to Workouts"
+		"retrySession": "Retry session",
+		"backToWorkouts": "Back to workouts"
 	},
 	"loading": {
 		"workoutsAria": "Loading workouts"

@@ -197,7 +197,7 @@
 		"tryAgain": "Reintentar",
 		"noEquipmentTitle": "No hay preferencias de equipo guardadas",
 		"noEquipmentDescription": "Agrega primero un lugar de entrenamiento, una barra y pares de discos.",
-		"openSettings": "Abrir Ajustes",
+		"openSettings": "Abrir ajustes",
 		"location": "Lugar",
 		"defaultSuffix": " (predeterminado)",
 		"target": "Objetivo ({unit})",
@@ -442,7 +442,7 @@
 		"title": "Sin entrenamiento en curso",
 		"description": "No tienes un entrenamiento en curso en este momento. Elige una rutina para empezar a entrenar, o revisa tu historial.",
 		"trainAnotherDay": "Entrenar otro día",
-		"goToRoutines": "Ir a Rutinas",
+		"goToRoutines": "Ir a rutinas",
 		"viewHistory": "Ver historial",
 		"dashboard": "Inicio"
 	},
@@ -485,7 +485,7 @@
 		"sessionErrorTitle": "Error en la sesión de entrenamiento",
 		"sessionErrorDescription": "Algo salió mal con tu sesión de entrenamiento. Tu progreso debería estar guardado.",
 		"retrySession": "Reintentar sesión",
-		"backToWorkouts": "Volver a Entrenamientos"
+		"backToWorkouts": "Volver a entrenamientos"
 	},
 	"loading": {
 		"workoutsAria": "Cargando entrenamientos"

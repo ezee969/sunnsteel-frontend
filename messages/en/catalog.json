@@ -171,7 +171,7 @@
 		"gymTitleNamed": "{name} lists no equipment",
 		"gymTitleNone": "No training location yet",
 		"gymDescription": "List the equipment you train with on your default training location in Settings to filter by it.",
-		"openSettings": "Open Settings",
+		"openSettings": "Open settings",
 		"countAll": "{total, plural, one {# exercise} other {# exercises}}",
 		"countSome": "{shown} of {total, plural, one {# exercise} other {# exercises}}",
 		"emptyCatalogTitle": "The catalog is empty",

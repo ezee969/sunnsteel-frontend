@@ -7,7 +7,7 @@
 		"downloadedDescription": "Check your downloads for the sunnsteel-….json file.",
 		"failedTitle": "Your data could not be downloaded",
 		"preparing": "Preparing your file…",
-		"download": "Download My Data"
+		"download": "Download my data"
 	},
 	"notificationPreferences": {
 		"categoryLabel": {
@@ -130,7 +130,7 @@
 		"failedTitle": "Could not update discovery",
 		"title": "Account Discovery",
 		"description": "Choose how other members can find your profile. What they can see after opening it is controlled by your profile privacy settings.",
-		"save": "Save Discovery"
+		"save": "Save discovery"
 	},
 	"profilePrivacy": {
 		"field": {
@@ -150,7 +150,7 @@
 		"failedTitle": "Could not update privacy",
 		"title": "Profile Privacy",
 		"description": "Choose who can see each part of your profile. New accounts start private, except the rank, which starts at Everyone.",
-		"save": "Save Privacy"
+		"save": "Save privacy"
 	},
 	"activitySharing": {
 		"updatedTitle": "Activity sharing updated",
@@ -162,13 +162,13 @@
 		"retry": "Retry",
 		"loading": "Loading activity sharing",
 		"review": "Review each entry",
-		"save": "Save Sharing"
+		"save": "Save sharing"
 	},
 	"blockedMembers": {
 		"title": "Blocked Members",
 		"description": "Blocking works both ways: neither of you appears in the other’s search, suggestions, follower lists or profile, and any follow between you is removed. {caveat}",
 		"loading": "Loading blocked members…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"blockedLine": "@{username} · blocked {since}",
 		"unblockLabel": "Unblock {name}",
 		"unblockedTitle": "Member unblocked",
@@ -223,15 +223,15 @@
 			}
 		},
 		"action": {
-			"add": "Add Training Partner",
-			"accept": "Accept Partner Request",
-			"pending": "Request Pending",
-			"active": "Training Partner"
+			"add": "Add training partner",
+			"accept": "Accept partner request",
+			"pending": "Request pending",
+			"active": "Training partner"
 		},
 		"title": "Training Partners",
 		"description": "A request shares nothing by itself. After acceptance, each of you chooses independently what the other may see. Private profile rules still stay private.",
 		"loading": "Loading training partners…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"requests": "Requests",
 		"activePartners": "Active Partners",
 		"empty": "No training partners yet. Open another member’s <link>profile</link> to send a request.",
@@ -240,20 +240,20 @@
 			"received": "@{username} · wants to partner"
 		},
 		"accept": "Accept",
-		"cancelRequest": "Cancel Request",
+		"cancelRequest": "Cancel request",
 		"decline": "Decline",
 		"addedTitle": "Training partner added",
 		"addedDescription": "Choose what @{username} may see.",
 		"accessUpdatedTitle": "Partner access updated",
 		"accessUpdatedDescription": "Your choices for @{username} are active.",
 		"activeLine": "@{username} · their access to your data",
-		"viewProfile": "View Profile",
-		"keepPrivate": "Keep Private",
+		"viewProfile": "View profile",
+		"keepPrivate": "Keep private",
 		"share": "Share",
 		"endedTitle": "Training partnership ended",
 		"endedDescription": "All partner access between you and @{username} was removed.",
-		"end": "End Partnership",
-		"save": "Save Access",
+		"end": "End partnership",
+		"save": "Save access",
 		"errorTitle": "Could not update training partners"
 	},
 	"trainingLocations": {
@@ -275,9 +275,9 @@
 		"savedDescription": "Your training locations are ready for workouts.",
 		"title": "Training Locations",
 		"description": "Save the bar, plate pairs and equipment available at each gym. Weights follow your account unit and are stored canonically in kg.",
-		"add": "Add Location",
+		"add": "Add location",
 		"loading": "Loading equipment preferences…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"emptyTitle": "No training locations saved",
 		"emptyBody": "Add the gym or home setup you train with most often.",
 		"locationName": "Location Name",
@@ -290,11 +290,11 @@
 		"equipmentHint": "Separate equipment with commas.",
 		"platePairs": "Available Plate Pairs",
 		"platePairsHint": "Enter the weight of one plate and how many pairs exist.",
-		"addPlate": "Add Plate",
+		"addPlate": "Add plate",
 		"plate": "Plate ({unit})",
 		"pairs": "Pairs",
 		"removePlate": "Remove plate",
-		"save": "Save Equipment"
+		"save": "Save equipment"
 	},
 	"deleteAccount": {
 		"title": "Delete Account",
@@ -314,9 +314,9 @@
 		"description": "Set private targets that update from your training data. Weight-based goals follow your account unit and are stored canonically in kg.",
 		"newGoalType": "New goal type",
 		"goalTypePlaceholder": "Goal type",
-		"add": "Add Goal",
+		"add": "Add goal",
 		"loading": "Loading measurable goals…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"emptyTitle": "No measurable goals yet",
 		"emptyBody": "Add a target to track it automatically on Progress.",
 		"unitSessions": "sessions",
@@ -331,7 +331,7 @@
 		"target": "Target ({unit})",
 		"removeGoal": "Remove {goal} goal {number}",
 		"count": "{count}/{max} private goals",
-		"save": "Save Goals"
+		"save": "Save goals"
 	},
 	"trainingIdentity": {
 		"savedTitle": "Training identity updated",
@@ -351,7 +351,7 @@
 		"searchPlaceholder": "Search the exercise catalog",
 		"loadingExercises": "Loading exercises...",
 		"noResults": "No exercises found.",
-		"save": "Save Training Identity"
+		"save": "Save training identity"
 	},
 	"featuredItems": {
 		"summary": "{days, plural, one {# day} other {# days}} · {exercises, plural, one {# exercise} other {# exercises}} · {mode, select, ROTATION {Rotation} other {Weekly}}",
@@ -377,7 +377,7 @@
 		"title": "Featured Accomplishments",
 		"description": "Choose and order up to {max} current records, earned medals, shared routines, and one reached rank title. Records follow your Personal Records privacy setting; medals and rank follow Achievements; each routine follows its own sharing setting under your Routines privacy.",
 		"loading": "Loading featured accomplishments…",
-		"tryAgain": "Try Again",
+		"tryAgain": "Try again",
 		"profileOrder": "Profile order",
 		"none": "No featured accomplishments yet.",
 		"moveUp": "Move {title} up",
@@ -399,7 +399,7 @@
 		"ranksPreparing": "Ranks will appear when your progress data is ready.",
 		"removeRankFirst": "Remove the featured rank before choosing another title.",
 		"slotsUsed": "{used}/{max} slots used",
-		"save": "Save Featured Items"
+		"save": "Save featured items"
 	},
 	"username": {
 		"invalid": "Use 3–30 letters, numbers, underscores or hyphens, starting and ending with a letter or number.",
@@ -444,7 +444,7 @@
 		"kilograms": "Kilograms (kg)",
 		"pounds": "Pounds (lb)",
 		"height": "Height (cm)",
-		"save": "Save Changes"
+		"save": "Save changes"
 	},
 	"tabs": {
 		"profile": "Profile",

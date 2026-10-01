@@ -567,7 +567,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 				.getByRole('heading', { name: 'Download Your Data' })
 				.scrollIntoViewIfNeeded()
 		},
-		ready: ['Download Your Data', 'Download My Data'],
+		ready: ['Download Your Data', 'Download my data'],
 		caption:
 			'Download everything you own as one versioned JSON file, directly above account deletion.',
 	},

@@ -582,7 +582,7 @@
 	},
 	"detail": {
 		"routineDays": "Días de la rutina",
-		"backToRoutines": "Volver a Rutinas",
+		"backToRoutines": "Volver a rutinas",
 		"rotationDays": "Rotación de {days} días",
 		"daysPerWeek": "{days, plural, one {# día por semana} other {# días por semana}}",
 		"unfavorite": "Quitar de favoritas",
@@ -774,7 +774,7 @@
 		"designSubtitle": "Arma los días, elige la progresión, traza tu camino.",
 		"refineTitle": "Afina tu programa",
 		"refineSubtitle": "Ajusta días, progresiones y detalles.",
-		"backToRoutines": "Volver a Rutinas",
+		"backToRoutines": "Volver a rutinas",
 		"createNewRoutine": "Crear una rutina nueva",
 		"editRoutine": "Editar la rutina",
 		"loadingRoutineData": "Cargando los datos de la rutina",

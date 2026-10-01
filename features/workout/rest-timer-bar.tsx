@@ -86,7 +86,7 @@ export const RestTimerBar = ({
 						aria-label={t('addSecondsAria', {
 							seconds: REST_TIMER_EXTEND_SECONDS,
 						})}
-						className="type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
+						className="h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
 					>
 						<Plus className="mr-1 h-4 w-4" aria-hidden />
 						{t('secondsShort', { seconds: REST_TIMER_EXTEND_SECONDS })}
@@ -99,7 +99,7 @@ export const RestTimerBar = ({
 						size="sm"
 						onClick={onDismiss}
 						aria-label={isOver ? t('dismissAria') : t('skipAria')}
-						className={`type-button h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
+						className={`h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
 							isOver
 								? 'border-success bg-transparent text-success hover:bg-success/10'
 								: 'border-rule bg-transparent text-foreground hover:bg-muted'

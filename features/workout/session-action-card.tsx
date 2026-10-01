@@ -64,7 +64,7 @@ export const SessionActionCard = ({
 					variant="outline"
 					onClick={onDiscardAttempt}
 					disabled={isFinishing}
-					className="type-button h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
+					className="h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
 				>
 					<Trash2 className="mr-2 h-4 w-4" aria-hidden />
 					{t('discard')}

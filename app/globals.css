@@ -428,6 +428,18 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
+  /* UX-15 (§23.2): every control that is not a filled action -- outline,
+     secondary, ghost, link and the destructive outline. Sentence case and
+     untracked, so the one filled primary in a region is the only uppercase
+     control and stands out without a new colour. */
+  .type-action {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: none;
+  }
 
   @media (min-width: 768px) {
     .type-page {

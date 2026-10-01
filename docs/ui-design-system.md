@@ -647,7 +647,10 @@ The double rule appears **once per page**, under the page inscription.
 ### 11.4 Buttons
 
 Phase 7. Heights 36 / 40 / 44 (sm / default / lg), radius 2px, label Oswald 600
-14 uppercase 0.04em, press stays `translate-y-[1px]`.
+14, press stays `translate-y-[1px]`. Since §23.2 (UX-15) only the filled
+variants, `default` and `destructiveSolid`, are uppercase at 0.04em
+(`type-button`); every other variant is sentence case at 0.01em
+(`type-action`).
 
 | Variant | Treatment | Change from today |
 | --- | --- | --- |
@@ -1611,6 +1614,33 @@ labels (`type-label`) and buttons (`type-button`).
 - **Not changed:** Cinzel, Bebas Neue and Space Mono, and the generated
   profile card (`profile-card.ts`), which draws its own type on a canvas and
   keeps Oswald as part of the image.
+
+### 23.2 Fewer capitals (UX-15)
+
+**Uppercase belongs to Cinzel inscriptions, short region labels
+(`type-label`) and filled actions.** A control that is not filled reads in
+sentence case.
+
+- **Two button ranks.** `type-button` (Oswald 600, 14px, 0.04em, uppercase)
+  stays on `default` and `destructiveSolid`. The new `type-action` (Oswald
+  600, 14px, 0.01em, sentence case) is on `outline`, `secondary`, `ghost`,
+  `link` and the destructive outline. The `Button` primitive sets the rank by
+  variant, so a call site never picks one; the workout screen's rest-timer
+  controls and Discard, which set `type-button` by hand on outline buttons,
+  no longer do.
+- **Why:** a screen such as the routine page carried six to eight uppercase
+  controls side by side, so the region's one filled primary (§4.3 rule 1)
+  had nothing left to stand out against. Casing now does that job without a
+  new colour or weight.
+- **The strings follow.** Uppercase had hidden Title Case labels. Every
+  English label a non-filled control can show is sentence case ("Try again",
+  "Add goal", "View history"), and the Spanish labels that capitalised a page
+  name ("Abrir Ajustes", "Volver a Rutinas") follow suit. Headings, catalog
+  names and page names in running text are unchanged. Found by reading the
+  computed `text-transform` of every control on 26 signed-in pages, plus the
+  labels of dialogs and states those pages did not show.
+- **Not changed:** page tabs (§21) stay `type-button`, because a tab row is
+  navigation read as a set of labels; filled controls; `type-label`.
 
 ---
 

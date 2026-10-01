@@ -5,27 +5,32 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-	"type-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm shrink-0 outline-none transition-colors duration-[var(--motion-fast)] ease-standard disabled:pointer-events-none disabled:text-ink-3 disabled:bg-surface-sunk [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-destructive active:translate-y-[1px]",
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm shrink-0 outline-none transition-colors duration-[var(--motion-fast)] ease-standard disabled:pointer-events-none disabled:text-ink-3 disabled:bg-surface-sunk [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-destructive active:translate-y-[1px]",
 	{
 		variants: {
+			// UX-15 (§23.2): only the filled variants are uppercase
+			// (`type-button`); every other control reads in sentence case
+			// (`type-action`), so the one primary per region stands out.
 			variant: {
 				// The one primary control per region (v1.0 §4.3 rule 1). Ink, not
 				// crimson: Phase 4 put crimson here and Phase 5 read the result as
 				// "a page full of errors or destructive controls".
-				default: 'bg-primary text-primary-foreground hover:bg-primary-hover',
+				default:
+					'type-button bg-primary text-primary-foreground hover:bg-primary-hover',
 				// §4.3 rule 5 and §11.4: destructive is an outline by default,
 				// because most destructive controls sit beside a primary and a
 				// second fill makes them look alike. It fills only when the control
 				// destroys data, via `variant="destructiveSolid"`.
 				destructive:
-					'border border-destructive bg-transparent text-destructive hover:bg-destructive/10',
+					'type-action border border-destructive bg-transparent text-destructive hover:bg-destructive/10',
 				destructiveSolid:
-					'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-				outline: 'border border-rule bg-transparent hover:bg-surface',
-				secondary: 'border border-rule bg-surface hover:bg-muted',
+					'type-button bg-destructive text-destructive-foreground hover:bg-destructive/90',
+				outline:
+					'type-action border border-rule bg-transparent hover:bg-surface',
+				secondary: 'type-action border border-rule bg-surface hover:bg-muted',
 				ghost:
-					'text-ink-2 hover:text-foreground hover:underline hover:underline-offset-4',
-				link: 'text-primary underline-offset-4 hover:underline',
+					'type-action text-ink-2 hover:text-foreground hover:underline hover:underline-offset-4',
+				link: 'type-action text-primary underline-offset-4 hover:underline',
 			},
 			// A11Y-02 (§22): the device's larger-controls choice lifts every size
 			// to at least 44px and the default to 48px, whatever a call site sets.
