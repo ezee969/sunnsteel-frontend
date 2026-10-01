@@ -31,10 +31,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { RankCrest } from '@/features/achievements/rank-crest'
 import { FeaturedAccomplishments } from '@/features/profile/featured-accomplishments'
 import { MemberModerationMenu } from '@/features/profile/member-moderation-menu'
 import { ProfileAchievements } from '@/features/profile/profile-achievements'
-import { exerciseLabel } from '@/i18n/catalog'
+import { exerciseLabel, rankText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -128,6 +129,10 @@ export function ProfileView(props: ProfileViewProps) {
 		: publicUser!.featuredItems
 	const canViewAchievements =
 		isOwnProfile || publicUser!.viewerAccess.achievements
+	/** ACH-10: present only when the rank rule lets this viewer see it. */
+	const headerRank = isOwnProfile
+		? (props.achievements?.rank ?? null)
+		: (publicUser!.rank ?? null)
 	/**
 	 * PROF-08. Your own featured routine opens its real page, with the editing
 	 * and sharing controls; somebody else's opens the read-only view under
@@ -262,6 +267,9 @@ export function ProfileView(props: ProfileViewProps) {
 					featuredItems,
 					achievements,
 					weightUnit,
+					showRank: ownerProfile
+						? ownerProfile.privacySettings.rank === 'PUBLIC'
+						: true,
 				}),
 			)
 			push({
@@ -307,11 +315,34 @@ export function ProfileView(props: ProfileViewProps) {
 					<div className="min-w-0 flex-1 space-y-1">
 						{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
 							membership, plan or tier, so no badge rendered here can be backed by
-							real account state. Titles and ranks are owned by ACH-02/ACH-03; do
-							not re-add one ad hoc. */}
+							real account state. The one mark beside the name is the ACH-10 rank
+							below, read under its own privacy rule; do not add another ad hoc. */}
 						<h1 className="type-page corner-brackets inline-block text-foreground">
 							{profileName} {profileLastName}
 						</h1>
+						{/* ACH-10: the rank is the first thing after the name, under its
+						    own privacy rule. The crest never stands without the name
+						    (§19.2), and your own links to how it is earned. */}
+						{headerRank ? (
+							<p className="flex items-center gap-2 pt-1">
+								<RankCrest rankId={headerRank.id} className="size-7" />
+								{isOwnProfile ? (
+									<Link
+										href="/achievements"
+										className="type-panel text-foreground underline-offset-4 hover:underline"
+									>
+										{rankText(headerRank, tRanks).title}
+									</Link>
+								) : (
+									<span className="type-panel text-foreground">
+										{rankText(headerRank, tRanks).title}
+									</span>
+								)}
+								<span className="type-body-sm text-ink-3">
+									{t('rankCaption')}
+								</span>
+							</p>
+						) : null}
 						<p className="type-data text-ink-3">@{profileUsername}</p>
 						<p className="type-body-sm flex items-center gap-1.5 text-ink-3">
 							<CalendarDays className="h-4 w-4" aria-hidden />{' '}

@@ -19,6 +19,7 @@ export const PRIVACY_SECTION_LABEL_KEYS = {
 	bodyProgress: 'sectionLabel.bodyProgress',
 	routines: 'sectionLabel.routines',
 	achievements: 'sectionLabel.achievements',
+	rank: 'sectionLabel.rank',
 } as const satisfies Record<keyof ProfilePrivacySettings, MessageKey<Namespace>>
 
 export const PRIVACY_AUDIENCE_KEYS = {
@@ -38,6 +39,7 @@ const LIVE_SECTIONS: Array<keyof ProfilePrivacySettings> = [
 	'records',
 	'bodyMetrics',
 	'bodyProgress',
+	'rank',
 ]
 const PENDING_SECTIONS: Array<keyof ProfilePrivacySettings> = [
 	'routines',

@@ -252,7 +252,8 @@
 		"kindRoutine": "Rutina",
 		"kindRank": "Rango renacentista",
 		"recognizedFromHistory": "Reconocido por el historial",
-		"featuredEmpty": "Elige récords, medallas obtenidas, una rutina compartida o un rango alcanzado en <link>Ajustes</link> para armar este registro del perfil."
+		"featuredEmpty": "Elige récords, medallas obtenidas, una rutina compartida o un rango alcanzado en <link>Ajustes</link> para armar este registro del perfil.",
+		"rankCaption": "Rango renacentista"
 	},
 	"notifications": {
 		"progressSummary": "{records, plural, =0 {} one {# récord nuevo} other {# récords nuevos}}{both, select, yes { y } other {}}{changes, plural, =0 {} one {# cambio de carga} other {# cambios de carga}}",

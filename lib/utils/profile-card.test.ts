@@ -116,6 +116,23 @@ describe('profile card', () => {
 		expect(model.accomplishments).toEqual([])
 	})
 
+	it('leaves the rank off a card unless the rank is shown to everyone (ACH-10)', () => {
+		const model = buildProfileCardModel({
+			tSharing: en,
+			catalog: catalogFor('en'),
+			locale: 'en',
+			name: '',
+			username: 'atlas',
+			profileUrl: 'https://sunnsteel.app/members/atlas',
+			featuredItems: featuredItems.slice(0, 1),
+			weightUnit: 'LB',
+			showRank: false,
+		})
+
+		expect(model.rank).toBeNull()
+		expect(model.accomplishments).toEqual([])
+	})
+
 	it('creates a portable, predictable PNG filename', () => {
 		expect(getProfileCardFilename('Ada Lifts!')).toBe(
 			'sunnsteel-ada-lifts-profile-card.png',

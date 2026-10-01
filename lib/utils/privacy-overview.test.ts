@@ -21,13 +21,14 @@ const privacy: ProfilePrivacySettings = {
 	bodyProgress: 'FOLLOWERS',
 	routines: 'PUBLIC',
 	achievements: 'FOLLOWERS',
+	rank: 'PUBLIC',
 }
 
 describe('privacy overview', () => {
 	it('groups the rendered sections by audience in a stable order', () => {
 		const groups = getPrivacyAudienceGroups(t, privacy, 'atlas_lifts')
 		expect(groups.map(group => [group.title, group.sections])).toEqual([
-			['Everyone', ['Biography', 'Training identity']],
+			['Everyone', ['Biography', 'Training identity', 'Rank']],
 			['Followers', ['Location', 'Personal records', 'Body progress']],
 			['Only me', ['Workout history', 'Body metrics']],
 		])
@@ -59,7 +60,7 @@ describe('privacy overview', () => {
 	it('says the same in Spanish, in the same order', () => {
 		const groups = getPrivacyAudienceGroups(tEs, privacy, 'atlas_lifts')
 		expect(groups.map(group => [group.title, group.sections])).toEqual([
-			['Todos', ['Biografía', 'Identidad de entrenamiento']],
+			['Todos', ['Biografía', 'Identidad de entrenamiento', 'Rango']],
 			['Seguidores', ['Ubicación', 'Récords personales', 'Progreso corporal']],
 			['Solo yo', ['Historial de entrenamientos', 'Datos corporales']],
 		])

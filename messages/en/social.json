@@ -252,7 +252,8 @@
 		"kindRoutine": "Routine",
 		"kindRank": "Renaissance rank",
 		"recognizedFromHistory": "Recognized from history",
-		"featuredEmpty": "Choose records, earned medals, a shared routine, or a reached rank in <link>Settings</link> to build this profile ledger."
+		"featuredEmpty": "Choose records, earned medals, a shared routine, or a reached rank in <link>Settings</link> to build this profile ledger.",
+		"rankCaption": "Renaissance rank"
 	},
 	"notifications": {
 		"progressSummary": "{records, plural, =0 {} one {# new record} other {# new records}}{both, select, yes { and } other {}}{changes, plural, =0 {} one {# load change} other {# load changes}}",

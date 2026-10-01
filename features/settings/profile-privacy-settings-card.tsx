@@ -41,6 +41,7 @@ const PRIVACY_FIELDS: Array<keyof ProfilePrivacySettings> = [
 	'bodyMetrics',
 	'bodyProgress',
 	'routines',
+	'rank',
 	'achievements',
 ]
 

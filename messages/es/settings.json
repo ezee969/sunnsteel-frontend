@@ -74,7 +74,8 @@
 			"bodyMetrics": "Datos corporales",
 			"bodyProgress": "Progreso corporal",
 			"routines": "Rutinas",
-			"achievements": "Logros"
+			"achievements": "Logros",
+			"rank": "Rango"
 		},
 		"audience": {
 			"PUBLIC": "Todos",
@@ -141,13 +142,14 @@
 			"bodyMetrics": "Controla edad, sexo, peso y estatura. Tu correo nunca se comparte.",
 			"bodyProgress": "Controla la tendencia de tu peso y tus medidas a lo largo del tiempo en tu perfil. Es independiente de los datos corporales, que abarcan solo tu peso actual.",
 			"routines": "Limita quién puede encontrar y abrir las rutinas que compartes, y la actividad de tus rutinas compartidas. Cada rutina también tiene su propio ajuste.",
-			"achievements": "Controla tu rango, los hitos obtenidos y los regresos en tu perfil, y limita la actividad de tus logros, rachas y regresos."
+			"rank": "Controla el rango renacentista que aparece junto a tu nombre, en tu sección de logros, en un rango destacado y en tu tarjeta de perfil. Empieza en Todos.",
+			"achievements": "Controla los hitos obtenidos y los regresos en tu perfil, y limita la actividad de tus logros, rachas y regresos. Tu rango tiene su propio ajuste."
 		},
 		"updatedTitle": "Privacidad actualizada",
 		"updatedDescription": "Los ajustes de visibilidad de tu perfil ya están activos.",
 		"failedTitle": "No se pudo actualizar la privacidad",
 		"title": "Privacidad del perfil",
-		"description": "Elige quién puede ver cada parte de tu perfil. Las cuentas nuevas empiezan en privado.",
+		"description": "Elige quién puede ver cada parte de tu perfil. Las cuentas nuevas empiezan en privado, salvo el rango, que empieza en Todos.",
 		"save": "Guardar privacidad"
 	},
 	"activitySharing": {

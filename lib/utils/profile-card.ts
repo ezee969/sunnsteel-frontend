@@ -37,6 +37,11 @@ interface ProfileCardSource {
 	featuredItems: FeaturedProfileItem[]
 	achievements?: PublicProfileAchievements
 	weightUnit: WeightUnit
+	/**
+	 * ACH-10: a card is an image that can travel anywhere, so it carries the
+	 * rank only when the rank rule is Everyone. Defaults to true.
+	 */
+	showRank?: boolean
 }
 
 interface ProfileCardPalette {
@@ -112,6 +117,7 @@ export function buildProfileCardModel({
 	featuredItems,
 	achievements,
 	weightUnit,
+	showRank = true,
 	tSharing,
 	locale,
 	catalog,
@@ -121,9 +127,10 @@ export function buildProfileCardModel({
 	catalog: ProfileCardCatalog
 }): ProfileCardModel {
 	const featuredRank = featuredItems.find(item => item.kind === 'RANK')
-	const rank =
-		achievements?.rank ??
-		(featuredRank?.kind === 'RANK' ? featuredRank.rank : null)
+	const rank = !showRank
+		? null
+		: (achievements?.rank ??
+			(featuredRank?.kind === 'RANK' ? featuredRank.rank : null))
 	const displayName = normalizeText([name, lastName].filter(Boolean).join(' '))
 
 	return {

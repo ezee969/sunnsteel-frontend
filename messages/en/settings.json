@@ -74,7 +74,8 @@
 			"bodyMetrics": "Body metrics",
 			"bodyProgress": "Body progress",
 			"routines": "Routines",
-			"achievements": "Achievements"
+			"achievements": "Achievements",
+			"rank": "Rank"
 		},
 		"audience": {
 			"PUBLIC": "Everyone",
@@ -141,13 +142,14 @@
 			"bodyMetrics": "Controls age, sex, weight, and height. Your email is never shared.",
 			"bodyProgress": "Controls your weight trend and measurements over time on your profile. Separate from body metrics, which covers only your current weight.",
 			"routines": "Caps who can find and open the routines you share, and your shared-routine activity. Each routine also has its own setting.",
-			"achievements": "Controls your rank, earned milestones and comebacks on your profile, and caps your achievement, streak and comeback activity."
+			"rank": "Controls the Renaissance rank shown beside your name, in your Achievements section, on a featured rank and on your profile card. Starts at Everyone.",
+			"achievements": "Controls your earned milestones and comebacks on your profile, and caps your achievement, streak and comeback activity. Your rank has its own setting."
 		},
 		"updatedTitle": "Privacy updated",
 		"updatedDescription": "Your profile visibility settings are now active.",
 		"failedTitle": "Could not update privacy",
 		"title": "Profile Privacy",
-		"description": "Choose who can see each part of your profile. New accounts start private.",
+		"description": "Choose who can see each part of your profile. New accounts start private, except the rank, which starts at Everyone.",
 		"save": "Save Privacy"
 	},
 	"activitySharing": {
