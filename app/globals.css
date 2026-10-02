@@ -591,6 +591,17 @@
     bottom: -0.25rem;
     border-width: 0 1px 1px 0;
   }
+  /* v1.1: on an inscription the closing bracket follows the last word
+     rather than the box's corner. A heading that wraps keeps its box at the
+     column's width, so a box-corner bracket floated far right of the text it
+     closes. Inline, with a negative right margin, it costs no line width.
+     The splash lockup, a box rather than a line, keeps the corner. */
+  h1.corner-brackets::after {
+    position: static;
+    display: inline-block;
+    vertical-align: -0.3em;
+    margin-right: -0.5rem;
+  }
 
   /* §5.4: a live duration's string length changes as it ticks, which shifts its
      neighbours. Reserve the slot. */
