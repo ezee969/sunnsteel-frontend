@@ -2007,3 +2007,191 @@ other, and the stat band was the largest object on a phone.
 - **Not changed:** the rank masthead, the ruled lists below the band and
   Customize. Recent Activity and Personal Records keep sharing a row from
   `lg`.
+
+---
+
+## 26. Amendment — v1.1 "Ledger and Craft" (2026-10-02)
+
+Owner-directed on 2026-10-02 as a presentation-only redesign: the same
+application, routes, controls, data and behaviour, composed and moving more
+deliberately. The owner explicitly authorised evolving this LOCKED system for
+it; this section is that evolution, recorded once rather than scattered as
+exceptions. **Everything §1–§25 says still holds unless a subsection below
+names the rule it supersedes.** The coverage record, before/after evidence and
+verification live in [ui-redesign-v1.1.md](ui-redesign-v1.1.md).
+
+The direction in one line: **a contemporary training ledger with Renaissance
+craft** — disciplined structure, strong inscriptions, precise numbers, elegant
+rules, ceremony only where something was earned. Three expressions of one
+system, made by composition and emphasis, never by a second palette:
+
+| Expression | Where | Emphasis |
+| --- | --- | --- |
+| **Train** | Live workout, Today's Workouts, Schedule | The current set, actual values, save state, the next action. Glanceable at arm's length |
+| **Review and plan** | Progress, History, Exercises, Routine pages and the builder | Legible evidence, aligned columns, clear ranks, controls grouped with what they change |
+| **Identity** | Profile header, Achievements | The §24 decoration and the §19 crests. Unchanged |
+
+### 26.0 How the decisions were tested
+
+Every change below was checked against three external references, and their
+advice was taken, adapted or declined on the record (the per-surface log is in
+[ui-redesign-v1.1.md §4](ui-redesign-v1.1.md)):
+
+- **Frontend Design** (Anthropic): spend boldness in one place and keep the
+  rest quiet; avoid the templated tells — a tracked uppercase eyebrow over
+  every heading, monospace used for small labels and for numbers inside
+  sentences, labels that add nothing, numbering on content that is not a
+  sequence, scattered entrance effects. Sunnsteel's one bold place is the
+  inscription (Cinzel with its corner brackets) and, on identity surfaces, the
+  §24 decoration. Its rules and zero radii are the brief's own identity and
+  stay, though the skill names them as a common default.
+- **UI/UX Pro Max**: 44px targets with 8px between them, contrast, a visible
+  active state in navigation, focus never hidden by sticky UI (WCAG 2.4.11),
+  charts that never separate series by hue alone, errors beside their field.
+  Its default for a fitness product — vibrant orange and electric blue,
+  block-based, neumorphic — is declined: the owner's brief rules out neon
+  fitness dashboards.
+- **Web Interface Guidelines** (Vercel): decorative icons `aria-hidden`,
+  balanced wraps on headings, tabular figures in number columns,
+  `overscroll-behavior: contain` in overlays, `touch-action: manipulation` on
+  the tab bar, no `transition: all`, a visible focus replacement wherever an
+  outline is removed.
+
+### 26.1 Retained without change
+
+The Stone and Night palettes and every contrast figure (§4, §22.2); the five
+faces and the scale (§5, §23); radii (§7); tonal elevation and the one shadow
+(§8); the motion tokens and both signatures (§9); ruled lists as the default
+(§11.5); the inputs' boundary and 16px rule (§11.6); the colour roles (§4.3);
+long content, page tabs, display preferences, legibility, rank decoration and
+the dashboard hierarchy (§20–§25). They were reviewed against the 2026-10-02
+captures and serve the product; v1.1 does not re-open them.
+
+### 26.2 The running head (supersedes the topbar title in §11.10)
+
+The topbar's page title was a third Cinzel inscription on every screen —
+`type-section` in the chrome, above the page's own `type-page` masthead and
+its section headings — and on most pages it repeated the masthead word for
+word ("ROUTINES" over "ROUTINES"). §5.3 allows Cinzel twice per screen.
+
+- **The topbar title is a running head**, as a printed book carries its
+  chapter at the top of each page: `type-panel` (Oswald 600, 15/16px) in the
+  page's own case, in `--ink-2`. It still names the page, at every width from
+  `sm`, with the same text; it no longer competes with the masthead. A tracked
+  uppercase label was tried first and rejected: it is the eyebrow device
+  Frontend Design names as a template tell, and it shouted in the chrome.
+- **Inscriptions balance their lines** (`text-wrap: balance` on `type-page`
+  and `type-section`), so a wrapped masthead never leaves one word alone.
+- **A rank's evidence is a sentence** ("45 sessions · 13 active weeks"), so on
+  the dashboard it takes Body small with tabular figures rather than Space
+  Mono (§23.3).
+- The page masthead (`HeroSection`) and the live workout's masthead stay the
+  only inscription at page rank.
+
+### 26.3 One gutter (refines §6 and §10)
+
+The shell's `<main>` padded its content 12px on a phone while the topbar
+padded its controls 16px, so every page's left edge sat 4px inside the
+chrome's. §6 already names 16.
+
+- **`<main>` carries `--shell-gutter`**: 16px below `sm`, 24px from it. The
+  content's edge now continues the topbar's and the bottom bar's.
+- **Pinned rows use two utilities instead of hand-cancelled margins**:
+  `.shell-pin` (sticky, its top cancelling the gutter) and `.shell-bleed`
+  (side margins cancelled, the gutter restored as padding), so a row pinned at
+  the top of `<main>` meets the topbar with no strip of scrolled content above
+  or beside it, whatever the gutter is. They replace the literal
+  `-top-3 sm:-top-6 -mx-3 sm:-mx-6` pairs, which had to change in step with the
+  shell by hand.
+- **`.ledger-page` inside the shell drops its own side padding below `md`.** It
+  was added to the shell's, which gave the workout screen, a routine page and
+  a history detail a 28px phone gutter where every other page had 12. From
+  `md` it keeps its §10 padding.
+- **The workout masthead pins flush**: it is sticky with `.shell-pin` and
+  `.shell-bleed`, so sets scrolled beneath it no longer show in a band above
+  and beside it.
+
+### 26.4 Mastheads that reach the work sooner
+
+A phone's first screen is the measure (§23.4). Nothing is removed below; each
+change is spacing, framing or wrapping.
+
+- **The masthead group.** On the dashboard, the greeting and the rank sit
+  closer to the inscription than the regions below do (12px below `sm`,
+  instead of the 24px and 32px region gaps), so the three read as one masthead
+  and Today's Workouts rises. Regions keep §6's 32px.
+- **The live workout's title wraps to two lines below `lg`** rather than
+  clamping to one, as §11.11 already requires of an inscription; the day name
+  keeps its own line. Its stats row and controls are unchanged.
+- **The builder is unboxed below `sm`.** The step body was a bordered,
+  24px-padded panel inside the page's own gutter, so a set row had 48px less
+  than the screen. Below `sm` the panel loses its box and padding and keeps
+  its heading rule; from `sm` it is the §11.5 `panel` it was. Every heading,
+  the stepper and the step's own title stay.
+
+### 26.5 Editable reads as editable (enforces §11.7 and §11.12)
+
+§11.7 says the set row's Reps, Weight and RPE are **bounded fields**; the
+implementation drew them borderless on the row's well, so a typed "60" and
+the "Target: 60 kg" beneath it differed only by size. The §11.12 test — tell
+an editable value from a read-only one without reading the label — failed on
+the screen where it matters most.
+
+- **Each set field is a bounded cell:** `--surface` fill and a 1px
+  `--rule-faint` edge on the row's `--surface-sunk` well (`--rule` under higher
+  contrast, as before). The value is Space Mono in `--foreground`; the target
+  under it stays Body small `--ink-3`. Field sizes, the 16px rule, gym mode's
+  56px/20px and every column width are unchanged.
+- **On wide screens the set row stops growing.** From `md` the fields sit in a
+  data cluster capped at `--cluster-max`, as §10.2 requires, instead of three
+  numbers floating in 300px columns at 1440. The tick stays at the row's end.
+
+### 26.6 Navigation continuity
+
+- **One marker, everywhere navigation has one.** The sidebar's marker already
+  slides (§9.1). The phone's bottom bar now has one 2px `honour-strong` rule
+  that slides between groups the same way (200ms `standard`, transform only),
+  instead of a top border on each item that blinked. Page tabs (§21) get one
+  2px ink underline that slides to the current tab when the route changes.
+  Each marker appears in place on first paint; reduced motion makes it jump.
+- **The active-session banner is a status band**, not a translucent tinted
+  box with its own radius: an opaque `--surface` band ruled below, flush
+  under the topbar, with the same words and its one Resume (44px below `md`).
+  It is the region's one filled control, as before.
+- **The topbar on a phone:** its four controls keep their 44px targets but
+  stop spending 64px of gaps around the search field, which clipped its own
+  placeholder at 390. The field ends its placeholder with an ellipsis rather
+  than a cut letter.
+
+### 26.7 Overlays with long content
+
+- **A dialog whose body scrolls keeps its actions in view.** The completion
+  recap ran past a phone's screen, with Continue only after scrolling. Its
+  footer is pinned to the dialog's bottom edge (`sticky`, on `--popover`, a
+  1px `--rule` above it); the body scrolls under it exactly as before.
+- Below `sm` the recap's headline figures are one ruled line each, label
+  and value on one baseline, and each comparison reads as two lines (label
+  and value, then last time and change) instead of four stacked lines. The
+  same content serves the history detail. From `sm` both are unchanged.
+- **The workout masthead's captions are sentence case** (Body small
+  `--ink-3`), and the day name under the title is Body small `--ink-2`
+  rather than tracked capitals: the busiest screen in the app no longer has
+  five uppercase micro-labels around its figures.
+
+### 26.8 Rows that wrap well
+
+- **A schedule entry's title owns its line.** The routine and day name are
+  one line that may wrap; status, block, deload and move notes follow as a
+  second, quieter line; the row's actions sit under the text below `sm`
+  instead of squeezing it into a 160px column beside them.
+
+### 26.9 Validation
+
+- Matched before/after captures at 390 and 1440 in both themes for every
+  changed route, plus 639/640, 767/768, 1023/1024 and 1279/1280 on the shell.
+- No horizontal document overflow at any captured width; no new console
+  errors.
+- Every changed control keeps its handler, label, order and visibility rule:
+  checked by diff (§9 of the coverage record) and in the browser.
+- Reduced motion from both sources, higher contrast, larger controls and
+  Spanish on the changed screens.

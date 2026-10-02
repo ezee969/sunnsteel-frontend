@@ -62,12 +62,16 @@ export function BottomNav({
 	const count = (group: NavGroupId) =>
 		group === 'train' ? planned : group === 'community' ? unread : 0
 
+	// v1.1 §26.6 / motion §8: the active group's 2px rule is ONE element that
+	// slides between the five equal slots, as the sidebar's marker does,
+	// rather than a border on each item that blinked from one to the next.
+	const groups = [...LINK_GROUPS, 'more'] as const
+	const activeIndex = groups.indexOf(activeGroup as (typeof groups)[number])
+
 	const itemClass = (active: boolean) =>
 		cn(
-			'relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border-t-2 px-1 text-xs font-medium outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-			active
-				? 'border-honour-strong text-foreground'
-				: 'border-transparent text-ink-3 hover:text-foreground',
+			'relative flex min-h-14 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 border-t-2 border-transparent px-1 text-xs font-medium outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+			active ? 'text-foreground' : 'text-ink-3 hover:text-foreground',
 		)
 
 	const glyph = (group: NavGroupId, active: boolean) => {
@@ -94,8 +98,15 @@ export function BottomNav({
 	return (
 		<nav
 			aria-label={t('label')}
-			className="flex shrink-0 border-t border-rule bg-background pb-[env(safe-area-inset-bottom)] md:hidden"
+			className="relative flex shrink-0 border-t border-rule bg-background pb-[env(safe-area-inset-bottom)] md:hidden"
 		>
+			{activeIndex >= 0 ? (
+				<span
+					aria-hidden
+					className="pointer-events-none absolute left-0 top-0 h-0.5 w-1/5 bg-honour-strong transition-transform duration-[var(--motion-base)] ease-standard"
+					style={{ transform: `translateX(${activeIndex * 100}%)` }}
+				/>
+			) : null}
 			{LINK_GROUPS.map(group => {
 				const active = activeGroup === group
 				const n = count(group)

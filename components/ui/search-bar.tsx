@@ -73,13 +73,19 @@ export function SearchBar() {
 				<Input
 					type="text"
 					placeholder={t('placeholder')}
-					className="w-full pl-9 pr-10"
+					// v1.1 §26.6: a field too narrow for its placeholder ends it with
+					// an ellipsis rather than a cut letter; the right padding still
+					// clears the spinner.
+					className="w-full text-ellipsis pl-9 pr-9"
 					value={query}
 					onChange={e => setQuery(e.target.value)}
 					onFocus={() => setIsFocused(true)}
 				/>
 				{isLoading && (
-					<Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-ink-3" />
+					<Loader2
+						aria-hidden
+						className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-ink-3"
+					/>
 				)}
 			</form>
 

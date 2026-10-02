@@ -225,28 +225,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 					{!isOnSessionPage &&
 						pathname !== '/dashboard' &&
 						activeSession?.id && (
-							<div className="px-3 sm:px-6 mt-2">
-								<div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
-									<div className="flex items-center gap-2 text-sm">
-										<Dumbbell className="h-3 w-3" />
-										<span>{t('layout.activeSessionBanner')}</span>
-									</div>
-									<Button
-										asChild
-										size="sm"
-										variant="default"
-										aria-label={t('layout.resumeLabel')}
-									>
-										<Link href={`/workouts/sessions/${activeSession.id}`}>
-											{t('layout.resume')}
-										</Link>
-									</Button>
-								</div>
+							// v1.1 §26.6: a status band under the topbar, ruled and opaque
+							// like the chrome it hangs from. It was a translucent tinted box
+							// with its own radius, inset from both edges.
+							<div className="flex items-center justify-between gap-3 border-b border-rule bg-surface px-4 py-2 sm:px-6">
+								<p className="type-body-sm flex min-w-0 items-center gap-2 text-foreground">
+									<Dumbbell
+										className="size-4 shrink-0 text-ink-2"
+										aria-hidden
+									/>
+									<span>{t('layout.activeSessionBanner')}</span>
+								</p>
+								<Button
+									asChild
+									size="sm"
+									variant="default"
+									className="h-11 shrink-0 md:h-9"
+									aria-label={t('layout.resumeLabel')}
+								>
+									<Link href={`/workouts/sessions/${activeSession.id}`}>
+										{t('layout.resume')}
+									</Link>
+								</Button>
 							</div>
 						)}
 
-					{/* Content */}
-					<main className="flex-1 overflow-auto p-3 sm:p-6">
+					{/* Content. v1.1 §26.3: `shell-main` pads by --shell-gutter, the
+					    topbar's own 16px edge on a phone, so pinned rows inside can
+					    cancel it with `shell-pin` / `shell-bleed`. */}
+					<main className="shell-main flex-1 overflow-auto">
 						<Suspense
 							fallback={
 								<div className="w-full max-w-lg space-y-3 p-6">

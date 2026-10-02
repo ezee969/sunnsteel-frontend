@@ -44,7 +44,7 @@ export default function RoutinesPage() {
 			    page is the one scroll. Create Routine matches the select's
 			    height (44px until `md`) so the two line up. */}
 			<div className="flex flex-col gap-4">
-				<div className="sticky -top-3 z-10 -mx-3 -my-2 flex items-center gap-2 bg-background px-3 py-2 sm:-top-6 sm:-mx-6 sm:px-6">
+				<div className="shell-pin shell-bleed z-10 -my-2 flex items-center gap-2 bg-background py-2">
 					<WorkoutFilters
 						activeFilter={activeFilter}
 						onFilterChange={setActiveFilter}

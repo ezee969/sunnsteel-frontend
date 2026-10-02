@@ -356,6 +356,12 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
+  /* v1.1: an inscription that wraps balances its lines rather than leaving
+     one word alone on the last (§11.11 wraps the masthead below `lg`). */
+  .type-page,
+  .type-section {
+    text-wrap: balance;
+  }
   .type-panel {
     font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
@@ -610,6 +616,39 @@
   @media (min-width: 1280px) {
     .ledger-page {
       padding-inline: 3rem;
+    }
+  }
+
+  /* v1.1 §26.3: one gutter. The protected shell's <main> pads its content by
+     --shell-gutter, 16px on a phone (the topbar's own edge) and 24px from
+     `sm`. A row pinned at the top of <main> cancels it with these two rather
+     than with literal negative margins that had to follow the shell by hand:
+     `.shell-pin` sticks flush under the topbar, `.shell-bleed` reaches the
+     column's edges and restores the gutter inside. Outside the shell the
+     variable is unset and both fall back to nothing. */
+  .shell-main {
+    --shell-gutter: 1rem;
+    padding: var(--shell-gutter);
+  }
+  @media (min-width: 640px) {
+    .shell-main {
+      --shell-gutter: 1.5rem;
+    }
+  }
+  .shell-pin {
+    position: sticky;
+    top: calc(-1 * var(--shell-gutter, 0px));
+  }
+  .shell-bleed {
+    margin-inline: calc(-1 * var(--shell-gutter, 0px));
+    padding-inline: var(--shell-gutter, 0px);
+  }
+  /* `.ledger-page` was added to the shell's gutter, which gave the workout
+     screen, a routine page and a history detail a 28px phone gutter where
+     every other page had the shell's alone. */
+  @media (max-width: 767.98px) {
+    .shell-main .ledger-page {
+      padding-inline: 0;
     }
   }
 }

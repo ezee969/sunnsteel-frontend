@@ -63,8 +63,8 @@ export function WizardNavigation({
 	const showNextButton = currentStep < totalSteps
 
 	return (
-		<div className="sticky bottom-0 z-20 mt-6 border-t border-rule bg-background">
-			<div className="py-3 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+		<div className="sticky bottom-[calc(-1*var(--shell-gutter,0px))] z-20 mt-6 border-t border-rule bg-background">
+			<div className="flex items-center justify-between py-3 sm:px-6 lg:px-8">
 				<Button
 					variant="outline"
 					onClick={onPrevious}

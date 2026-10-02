@@ -154,7 +154,7 @@ function WorkoutHistoryContent() {
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
+		<div className="mx-auto max-w-3xl pb-4 sm:p-4 xl:max-w-[var(--content-max)]">
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
 				title={<>{t('title')}</>}
@@ -167,9 +167,10 @@ function WorkoutHistoryContent() {
 				<p className="type-body-sm text-ink-3">{t('description')}</p>
 				{/* UX-03 and design system §20.2: the list is the page, so the page
 				    scrolls and this row stays pinned with the Filter control on it.
-				    `-top-3 sm:-top-6` cancels <main>'s padding and `-mx-4` this
-				    page's own, so rows pass under an opaque edge. */}
-				<div className="rule-heading sticky -top-3 z-10 -mx-4 flex items-center justify-between gap-3 bg-background px-4 pb-2 pt-2 sm:-top-6">
+				    `shell-pin` cancels <main>'s gutter; below `sm` `shell-bleed`
+				    reaches its edges, and from `sm` `-mx-4` cancels this page's
+				    own padding, so rows pass under an opaque edge (§26.3). */}
+				<div className="rule-heading shell-pin shell-bleed z-10 flex items-center justify-between gap-3 bg-background pb-2 pt-2 sm:-mx-4 sm:px-4">
 					<h2 className="type-section text-foreground">{t('heading')}</h2>
 					<Button
 						variant="outline"
@@ -239,7 +240,7 @@ export default function WorkoutHistoryPage() {
 	return (
 		<Suspense
 			fallback={
-				<div className="mx-auto max-w-3xl p-4 xl:max-w-[var(--content-max)]">
+				<div className="mx-auto max-w-3xl pb-4 sm:p-4 xl:max-w-[var(--content-max)]">
 					<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
 						{t('loading')}
 					</div>

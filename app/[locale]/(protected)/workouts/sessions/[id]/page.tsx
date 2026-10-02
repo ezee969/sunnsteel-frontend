@@ -65,6 +65,14 @@ import type {
  */
 const SHELL_CLASS = 'min-h-screen bg-background'
 
+/**
+ * WCAG 2.4.11 (v1.1): a field or exercise brought into view -- by Tab, or by
+ * the round's scroll to the next exercise -- lands clear of the pinned
+ * masthead above it and the rest bar below it, instead of under them.
+ */
+const SCROLL_CLEAR_CLASS =
+	'[&_input]:scroll-mt-52 [&_section]:scroll-mt-52 [&_input]:scroll-mb-28 lg:[&_input]:scroll-mt-32 lg:[&_section]:scroll-mt-32'
+
 const BACK_BUTTON_CLASS =
 	'type-button inline-flex h-10 items-center rounded-sm bg-primary px-6 text-primary-foreground transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover'
 
@@ -294,7 +302,9 @@ export default function ActiveSessionPage() {
 			{/* The rest bar is fixed, so it would sit on top of the last set and
 			    the finish action. Reserve room for it only while it is shown. */}
 			<div
-				className={`ledger-page space-y-8 py-6 md:py-8 ${
+				// v1.1 §26.4: a phone reaches the first set sooner; the regions keep
+				// their order and their rules.
+				className={`ledger-page space-y-6 py-4 md:space-y-8 md:py-8 ${SCROLL_CLEAR_CLASS} ${
 					restTimer.remaining !== null ? 'pb-28' : ''
 				}`}
 			>
@@ -326,7 +336,10 @@ export default function ActiveSessionPage() {
 
 				{/* Rows rule themselves with `.rule-row` (§11.5). A `divide-*` colour
 				    here repainted every row's `.mark` edge but the last's (TD-42). */}
-				<div className="border-y border-rule">
+				{/* v1.1 §26.5 / §10.2: from `md` the exercises are one column at a
+				    reading width -- header, sets and rules aligned -- instead of
+				    three numbers floating in 300px columns at 1440. */}
+				<div className="border-y border-rule md:max-w-3xl">
 					{groupedLogs.map((group, groupIndex) => {
 						const status = roundStatus(roundSlots, groupIndex)
 						const completedSets = group.sets.filter(

@@ -43,15 +43,18 @@ export default function Header({
 		// not blurred - nothing in v1.0 is translucent. The framing OrnateCorners
 		// are retired; the brackets now sit on the page inscription instead, one
 		// pair per screen (§11.11).
-		<header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-rule bg-background px-4 md:h-16">
+		// v1.1 §26.6: below `sm` the row spends its width on the search field
+		// rather than on gaps -- 64px of them clipped the field's own
+		// placeholder at 390. Every control keeps its 44px target.
+		<header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-rule bg-background px-4 sm:gap-4 md:h-16">
 			{isMobile ? (
 				<Button
 					variant="ghost"
 					size="icon"
 					onClick={() => setIsMobileMenuOpen(true)}
-					className="mr-1 size-11 md:size-10"
+					className="-ml-2 size-11 sm:mr-1 md:size-10"
 				>
-					<Menu className="h-5 w-5" />
+					<Menu className="h-5 w-5" aria-hidden />
 					<span className="sr-only">{t('toggleMenu')}</span>
 				</Button>
 			) : (
@@ -70,6 +73,7 @@ export default function Header({
 				>
 					{/* Motion spec §2.3: one chevron rotated, not two glyphs swapped. */}
 					<ChevronLeft
+						aria-hidden
 						className={cn(
 							'h-5 w-5 transition-transform duration-[var(--motion-base)] ease-standard',
 							!isSidebarOpen && 'rotate-180',
@@ -77,7 +81,7 @@ export default function Header({
 					/>
 				</Button>
 			)}
-			<div className="flex-1 min-w-0 mr-4 flex items-center justify-between">
+			<div className="flex min-w-0 flex-1 items-center justify-between sm:mr-4">
 				{/* Sized to content, not to a fixed 192px: that width was set for
 				    Bebas, and Cinzel at the same size is wider - it truncated even
 				    "Routines". Capped, but still shrinkable - pinning it with
@@ -87,14 +91,17 @@ export default function Header({
 				    clips the pseudo-elements, so they rendered as nothing at all -
 				    and §11.11 allows one pair per screen, which the page masthead
 				    already carries. */}
-				<p className="type-section mr-4 hidden min-w-0 max-w-[18rem] truncate text-foreground sm:block">
+				{/* v1.1 §26.2: a running head, as a printed book carries its chapter
+				    at the top of the page -- quiet, in the page's own case. It was a third Cinzel inscription above
+				    the page's own masthead, usually the same word (§5.3 allows two). */}
+				<p className="type-panel mr-4 hidden min-w-0 max-w-[18rem] truncate text-ink-2 sm:block">
 					{title}
 				</p>
-				<div className="flex-1 max-w-sm ml-auto sm:ml-0">
+				<div className="min-w-0 flex-1 sm:ml-0 sm:max-w-sm">
 					<SearchBar />
 				</div>
 			</div>
-			<div className="flex items-center gap-2 shrink-0">
+			<div className="-mr-2 flex shrink-0 items-center sm:mr-0 sm:gap-2">
 				<NotificationBell menu={!isMobile} />
 				<ModeToggle />
 				<UserDropdown />
@@ -143,13 +150,13 @@ function UserDropdown() {
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
 					<Link href="/profile" className="cursor-pointer">
-						<User className="mr-2 h-4 w-4" />
+						<User className="mr-2 h-4 w-4" aria-hidden />
 						{t('profile')}
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuItem asChild>
 					<Link href="/settings" className="cursor-pointer">
-						<Settings className="mr-2 h-4 w-4" />
+						<Settings className="mr-2 h-4 w-4" aria-hidden />
 						{t('settings')}
 					</Link>
 				</DropdownMenuItem>

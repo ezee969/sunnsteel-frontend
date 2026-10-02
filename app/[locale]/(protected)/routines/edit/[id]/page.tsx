@@ -338,7 +338,7 @@ export default function EditRoutinePage() {
 			</div>
 
 			{/* Stepper: sticky on top for easier navigation on mobile */}
-			<div className="sticky top-0 z-20 mb-4 border-b border-rule bg-background sm:mb-8">
+			<div className="shell-pin z-20 mb-4 border-b border-rule bg-background sm:mb-8">
 				<div className="py-2">
 					<Stepper
 						steps={STEPS}

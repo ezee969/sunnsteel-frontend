@@ -73,7 +73,10 @@ const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
  * the weight column at 320.
  */
 const FIELD_CLASS =
-	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border-0 bg-transparent px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
+	// v1.1 §26.5: a bounded cell on the row's well -- `--surface` with a
+	// faint edge -- so a typed value reads as entered and the target under it
+	// as read-only (§11.7, §11.12). Sizes are unchanged.
+	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border border-rule-faint bg-surface px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
 	// A11Y-02 / LIVE-18 (§22): gym mode's taller fields and larger digits, and
 	// under higher contrast a visible boundary instead of the well's tone alone.
 	'large-controls:h-14 large-controls:text-xl large-controls:placeholder:text-base contrast-more:border contrast-more:border-rule'

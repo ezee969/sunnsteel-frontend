@@ -35,7 +35,7 @@ export const SessionLoadingSkeleton = ({
 			{showHeader && (
 				<div
 					data-testid="header-skeleton"
-					className="rule-heading sticky top-0 z-20 bg-background"
+					className="rule-heading shell-pin shell-bleed z-20 bg-background"
 				>
 					<div className="ledger-page py-3">
 						<div className="flex items-center justify-between gap-4">

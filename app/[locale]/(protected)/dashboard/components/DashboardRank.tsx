@@ -72,9 +72,13 @@ export default function DashboardRank() {
 				<div className="flex min-w-0 flex-1 items-center gap-4">
 					<RankCrest rankId={rank.rankId} className="size-12" />
 					<div className="min-w-0">
-						<p className="type-label text-ink-3">{tRank('current')}</p>
+						<p className="type-body-sm text-ink-3">{tRank('current')}</p>
 						<p className="type-panel mt-0.5 text-foreground">{rank.title}</p>
-						<p className="type-data mt-0.5 text-ink-2">{rank.evidence}</p>
+						{/* v1.1 / §23.3: the evidence is a sentence, so it takes the
+						    sentence's face with tabular figures, not Space Mono. */}
+						<p className="type-body-sm mt-0.5 tabular-nums text-ink-2">
+							{rank.evidence}
+						</p>
 					</div>
 				</div>
 
@@ -86,7 +90,7 @@ export default function DashboardRank() {
 								<p className="type-body-sm text-ink-3">
 									{t('next', { title: rank.next.title })}
 								</p>
-								<p className="type-data mt-0.5 text-foreground">
+								<p className="type-body-sm mt-0.5 tabular-nums text-foreground">
 									{rank.next.requirements}
 								</p>
 							</div>

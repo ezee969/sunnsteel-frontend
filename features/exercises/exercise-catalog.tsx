@@ -440,7 +440,7 @@ export function ExerciseCatalog() {
 			<div
 				role="search"
 				aria-label={t('searchRegion')}
-				className="sticky -top-3 z-10 -mx-3 -mb-3 flex items-end gap-2 bg-background px-3 py-2 sm:-top-6 sm:-mx-6 sm:-mb-5 sm:px-6 lg:static lg:m-0 lg:p-0"
+				className="shell-pin shell-bleed z-10 -mb-3 flex items-end gap-2 bg-background py-2 sm:-mb-5 lg:static lg:m-0 lg:p-0"
 			>
 				<div className="flex min-w-0 flex-1 flex-col gap-1">
 					<Label htmlFor="exercise-search">{t('search')}</Label>

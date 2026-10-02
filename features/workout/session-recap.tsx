@@ -89,15 +89,19 @@ function ComparisonMetric({
 		// §5.3 — captions inside a repeated item are Body small in sentence case.
 		// The tracked uppercase micro-cap this had is the region-caption rank, and
 		// three of them in a row is the "visual chatter" QA 10 flagged.
-		<div className="bg-surface-sunk p-3">
+		// v1.1 §26.7: below `sm` the four lines pair up -- the label beside
+		// today's value, last time beside the change -- instead of stacking.
+		<div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 bg-surface-sunk p-3 sm:block">
 			<p className="type-body-sm text-ink-3">{label}</p>
-			<p className="type-data type-data-strong mt-2 text-foreground">
+			<p className="type-data type-data-strong text-right text-foreground sm:mt-2 sm:text-left">
 				{current}
 			</p>
 			<p className="type-body-sm text-ink-3">
 				{t('previousValue', { value: previous })}
 			</p>
-			<p className="type-data mt-1 text-ink-2">{change}</p>
+			<p className="type-data text-right text-ink-2 sm:mt-1 sm:text-left">
+				{change}
+			</p>
 		</div>
 	)
 }
@@ -112,11 +116,15 @@ function HeadlineMetric({
 	value: ReactNode
 }) {
 	return (
-		<div className="flex items-center gap-3 bg-surface-sunk p-3">
+		// v1.1 §26.7: one ruled line per figure below `sm`, label and value on
+		// the same baseline; the panel it was from `sm`.
+		<div className="flex items-center gap-3 bg-surface-sunk px-3 py-2 sm:py-3">
 			{icon}
-			<div className="min-w-0">
+			<div className="flex min-w-0 flex-1 items-baseline justify-between gap-3 sm:block">
 				<p className="type-body-sm text-ink-3">{label}</p>
-				<p className="type-data type-data-strong text-foreground">{value}</p>
+				<p className="type-data type-data-strong text-right text-foreground sm:text-left">
+					{value}
+				</p>
 			</div>
 		</div>
 	)
@@ -404,7 +412,11 @@ export function SessionRecapDialog({
 							</DialogDescription>
 						</DialogHeader>
 						<SessionRecapContent recap={recap} />
-						<DialogFooter>
+						{/* v1.1 §26.7: the body scrolls under a footer pinned to the
+						    dialog's bottom edge, so Continue is in view from the start.
+						    `-bottom-6` cancels the panel's padding, as `shell-pin`
+						    cancels <main>'s. */}
+						<DialogFooter className="sticky -bottom-6 -mx-6 -mb-6 border-t border-rule bg-popover px-6 py-4">
 							<Button onClick={onContinue} className="w-full sm:w-auto">
 								{t('continueToDashboard')}
 							</Button>

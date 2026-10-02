@@ -42,7 +42,9 @@ export const SessionHeader = ({
 		// The page inscription. This is the one double rule on the screen
 		// (design system §11.2) — nothing else below it uses one. Opaque, not
 		// translucent: nothing in v0.1 is glass.
-		<div className="rule-heading sticky top-0 z-20 bg-background">
+		// v1.1 §26.3: pinned flush under the topbar and across <main>'s whole
+		// width, so sets scrolled beneath it never show above or beside it.
+		<div className="rule-heading shell-pin shell-bleed z-20 bg-background">
 			<div className="ledger-page py-3">
 				<div className="flex items-center justify-between gap-4">
 					{/* Left side - Navigation and title */}
@@ -59,10 +61,12 @@ export const SessionHeader = ({
 						<div className="min-w-0">
 							{/* The one classical device the direction keeps: gold brackets,
 							    one pair per screen, on the inscription. */}
-							<h1 className="corner-brackets type-section line-clamp-1 text-foreground">
+							{/* §11.11 / v1.1 §26.4: the inscription wraps to two lines
+							    below `lg` rather than clamping beside the progress figure. */}
+							<h1 className="corner-brackets type-section line-clamp-2 text-foreground lg:line-clamp-1">
 								{routineName}
 							</h1>
-							<p className="type-label mt-1 text-ink-3">{dayName}</p>
+							<p className="type-body-sm text-ink-2">{dayName}</p>
 						</div>
 					</div>
 
@@ -70,12 +74,12 @@ export const SessionHeader = ({
 					    figures are the scannable rank rather than their captions. */}
 					<div className="flex shrink-0 items-center gap-6">
 						<div className="hidden text-right sm:block">
-							<p className="type-label text-ink-3">{t('elapsed')}</p>
+							<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
 							<p className="type-data text-foreground">{duration}</p>
 						</div>
 
 						<div className="hidden text-right sm:block">
-							<p className="type-label text-ink-3">{t('sets')}</p>
+							<p className="type-body-sm text-ink-3">{t('sets')}</p>
 							<p className="type-data text-foreground">
 								{completedSets}/{totalSets}
 							</p>
@@ -85,7 +89,7 @@ export const SessionHeader = ({
 						    Completion is "done, as planned", so it is --success, not
 						    gold (§4.3 rule 2). */}
 						<div className="text-right">
-							<p className="type-label text-ink-3">
+							<p className="type-body-sm text-ink-3">
 								{isComplete ? t('complete') : t('progress')}
 							</p>
 							<p
@@ -126,17 +130,17 @@ export const SessionHeader = ({
 				{/* Mobile stats row */}
 				<div className="mt-3 flex items-center justify-between border-t border-rule-faint pt-2 sm:hidden">
 					<div>
-						<p className="type-label text-ink-3">{t('elapsed')}</p>
+						<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
 						<p className="type-data text-foreground">{duration}</p>
 					</div>
 					<div>
-						<p className="type-label text-ink-3">{t('sets')}</p>
+						<p className="type-body-sm text-ink-3">{t('sets')}</p>
 						<p className="type-data text-foreground">
 							{completedSets}/{totalSets}
 						</p>
 					</div>
 					<div className="text-right">
-						<p className="type-label text-ink-3">{t('started')}</p>
+						<p className="type-body-sm text-ink-3">{t('started')}</p>
 						<p className="type-data text-foreground">
 							{formatTime(startedAt, locale)}
 						</p>
