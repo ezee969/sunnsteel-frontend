@@ -731,7 +731,11 @@
 		"couldNotClone": "No se pudo clonar esta rutina",
 		"makeItYours": "Házla tuya",
 		"cloneAria": "Clonar {name}",
-		"cloneThisRoutine": "Clonar esta rutina"
+		"cloneThisRoutine": "Clonar esta rutina",
+		"sharedBy": "Compartida por {name}",
+		"exerciseLine": "{sets, plural, one {# serie} other {# series}} · {seconds} s de descanso{progression, select, on { · progresión activa} other {}}",
+		"setRepsFixed": "{reps} reps",
+		"setRepsRange": "{min}–{max} reps"
 	},
 	"builder": {
 		"review": "Revisar",
@@ -804,6 +808,7 @@
 		"moreOptionsAria": "Más opciones para {exercise}",
 		"fewerOptionsAria": "Menos opciones para {exercise}",
 		"moreOptionsCaption": "Progresión, descanso, RIR, tipos de serie, calentamientos y superseries",
+		"dayWorkout": "Entrenamiento {day}",
 		"restLabel": "Descanso",
 		"dayNamePlaceholderRotation": "p. ej. Empuje o Torso A",
 		"dayNamePlaceholderWeekly": "p. ej. Empuje, o deja el día de la semana",

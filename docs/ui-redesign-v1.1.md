@@ -151,16 +151,18 @@ tab underline's measured position, which affects only its own transform.
   needs the reseed procedure, which mutates the database. No slug or route
   changed, so `e2e/portfolio-targets.ts` needed no edit.
 
-## 7. Recorded, not changed (outside this scope)
+## 7. Translation defects found during the redesign, fixed at the owner's request
 
-- `SharedRoutineView` writes "Shared by", "day(s)", "exercise(s)" and "reps"
-  as English literals, so they stay English in Spanish (seen on
-  `/shared/routines/[token]` at 320).
+Found by the Spanish captures and fixed on 2026-10-02 after the owner asked
+for them (they are copy, outside the presentation scope). Every English
+string reads exactly as before except the search placeholder's ellipsis.
 
-- The search placeholder ends in `...` rather than `…` (`shell.search.placeholder`).
-- The builder's day card title concatenates an English " Workout" onto the
-  day name (`BuildDays.tsx`), so Spanish reads "Upper A - Horizontal Workout".
-- `/routines/discover` sets its `h1` ("Discover Routines") at section rank
-  with an icon rather than as the page inscription the other pages carry.
-  Left as it is: promoting it changes the page's composition beyond the
-  observed problems, and it reads correctly under the running head.
+- `SharedRoutineView` wrote "Shared by", "day(s)", "exercise(s)", "set(s)",
+  "s rest", "progression on" and "reps" as English literals. They are now
+  `routines.sharing.sharedBy`, `exerciseLine`, `setRepsFixed`,
+  `setRepsRange` and the existing `summary`/`summaryDays`/`summaryExercises`.
+- The builder's day card appended an English " Workout" to the day name; it
+  is `routines.builder.dayWorkout` ("Entrenamiento {day}").
+- The search placeholder ended in `...`; it is `…` in both languages.
+- Still recorded: `/routines/discover` sets its `h1` at section rank rather
+  than as the page inscription (a composition choice, left as it is).

@@ -731,7 +731,11 @@
 		"couldNotClone": "Could not clone this routine",
 		"makeItYours": "Make it yours",
 		"cloneAria": "Clone {name}",
-		"cloneThisRoutine": "Clone this routine"
+		"cloneThisRoutine": "Clone this routine",
+		"sharedBy": "Shared by {name}",
+		"exerciseLine": "{sets, plural, one {# set} other {# sets}} · {seconds}s rest{progression, select, on { · progression on} other {}}",
+		"setRepsFixed": "{reps} reps",
+		"setRepsRange": "{min}–{max} reps"
 	},
 	"builder": {
 		"review": "Review",
@@ -804,6 +808,7 @@
 		"moreOptionsAria": "More options for {exercise}",
 		"fewerOptionsAria": "Fewer options for {exercise}",
 		"moreOptionsCaption": "Progression, rest, RIR, set kinds, warm-ups and supersets",
+		"dayWorkout": "{day} Workout",
 		"restLabel": "Rest",
 		"dayNamePlaceholderRotation": "e.g. Push or Upper A",
 		"dayNamePlaceholderWeekly": "e.g. Push, or leave the weekday",

@@ -352,7 +352,9 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 							>
 								<Card>
 									<CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
-										<CardTitle>{labelFor(dayId, tabIndex)} Workout</CardTitle>
+										<CardTitle>
+											{t('dayWorkout', { day: labelFor(dayId, tabIndex) })}
+										</CardTitle>
 										<ExercisePickerDropdown
 											ref={dropdownRef}
 											isOpen={isPickerOpen}

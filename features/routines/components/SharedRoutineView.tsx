@@ -37,8 +37,11 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 	const describeSet = (set: RoutineSet) => {
 		const reps =
 			set.repType === 'RANGE'
-				? `${set.minReps ?? '?'}–${set.maxReps ?? '?'} reps`
-				: `${set.reps ?? '?'} reps`
+				? tSharing('setRepsRange', {
+						min: set.minReps ?? '?',
+						max: set.maxReps ?? '?',
+					})
+				: tSharing('setRepsFixed', { reps: set.reps ?? '?' })
 		// A shared routine carries its target loads: without them a program is
 		// not something a reader can actually follow.
 		const kind =
@@ -57,7 +60,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 			    a member sends out now open the same way. */}
 			<header className="rule-heading space-y-2 pb-6">
 				<p className="type-body-sm text-ink-3">
-					Shared by {describeSharedRoutineOwner(routine)}
+					{tSharing('sharedBy', { name: describeSharedRoutineOwner(routine) })}
 				</p>
 				<h1 className="type-page corner-brackets inline-block text-foreground">
 					{setup.name}
@@ -68,11 +71,14 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 					</p>
 				) : null}
 				<p className="type-data text-ink-3">
-					{setup.days.length} {setup.days.length === 1 ? 'day' : 'days'} ·{' '}
-					{exerciseCount} {exerciseCount === 1 ? 'exercise' : 'exercises'} ·{' '}
-					{setup.scheduleMode === 'ROTATION'
-						? tSharing('summaryRotation')
-						: tSharing('summaryWeekly')}
+					{tSharing('summary', {
+						days: tSharing('summaryDays', { count: setup.days.length }),
+						exercises: tSharing('summaryExercises', { count: exerciseCount }),
+						mode:
+							setup.scheduleMode === 'ROTATION'
+								? tSharing('summaryRotation')
+								: tSharing('summaryWeekly'),
+					})}
 				</p>
 				{/* UX-17 (§23.4): one line shown, the full statement one tap away. */}
 				<Explanation summary={tSharing('sharedNoteSummary')}>
@@ -111,12 +117,12 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 											{exerciseLabel(exercise.exercise.name, tEx)}
 										</h3>
 										<p className="type-body-sm mt-0.5 text-ink-3">
-											{exercise.sets.length}{' '}
-											{exercise.sets.length === 1 ? 'set' : 'sets'} ·{' '}
-											{exercise.restSeconds}s rest
-											{exercise.progressionScheme !== 'NONE'
-												? ' · progression on'
-												: ''}
+											{tSharing('exerciseLine', {
+												sets: exercise.sets.length,
+												seconds: exercise.restSeconds,
+												progression:
+													exercise.progressionScheme !== 'NONE' ? 'on' : 'off',
+											})}
 										</p>
 										{exercise.note ? (
 											<p className="type-body-sm mt-1 text-ink-2">

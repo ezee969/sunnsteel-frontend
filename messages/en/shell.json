@@ -74,7 +74,7 @@
 		"resume": "Resume"
 	},
 	"search": {
-		"placeholder": "Search by name or @username...",
+		"placeholder": "Search by name or @username…",
 		"topResults": "Top Results",
 		"viewAll": "View all results for \"{query}\"",
 		"noUsers": "No users found for \"{query}\""

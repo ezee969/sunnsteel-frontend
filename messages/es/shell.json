@@ -74,7 +74,7 @@
 		"resume": "Retomar"
 	},
 	"search": {
-		"placeholder": "Busca por nombre o @usuario...",
+		"placeholder": "Busca por nombre o @usuario…",
 		"topResults": "Resultados",
 		"viewAll": "Ver todos los resultados de \"{query}\"",
 		"noUsers": "No hay usuarios para \"{query}\""
