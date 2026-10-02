@@ -117,7 +117,10 @@ const RANK_HEADER_PADDING = [
 	'px-[22px] pt-[26px] pb-9 @min-[600px]:px-[34px] @min-[600px]:pt-[34px] @min-[600px]:pb-11',
 	'px-[22px] pt-10 pb-10 @min-[600px]:px-11 @min-[600px]:pt-[60px] @min-[600px]:pb-[50px]',
 	'px-[22px] pt-[66px] pb-[46px] @min-[600px]:px-[46px] @min-[600px]:pt-20 @min-[600px]:pb-[58px]',
-	'px-[30px] pt-[70px] pb-[50px] @min-[600px]:px-[60px] @min-[600px]:pt-[92px] @min-[600px]:pb-[66px]',
+	// v1.1: below 600px Laureate's border band reaches 28px in, so a 30px
+	// inset put the name's bracket on the inner rule; 42px gives it the room
+	// the other ranks have.
+	'px-[42px] pt-[70px] pb-[50px] @min-[600px]:px-[60px] @min-[600px]:pt-[92px] @min-[600px]:pb-[66px]',
 ] as const
 /**
  * v1.1: the Artisan knots and Maestro scrolls are large enough to reach the
