@@ -30,7 +30,9 @@ export function SharedSessionView({ shared }: { shared: SharedSessionRecap }) {
 	return (
 		<div className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
 			<header className="rule-heading space-y-3 pb-6">
-				<p className="type-label text-ink-3">{t('sharedWorkout')}</p>
+				{/* v1.1: the attribution is a quiet sentence-case line, as on a
+				    shared routine, rather than a tracked-capital eyebrow. */}
+				<p className="type-body-sm text-ink-3">{t('sharedWorkout')}</p>
 				<h1 className="type-page corner-brackets inline-block text-foreground">
 					{shared.routineName}
 				</h1>

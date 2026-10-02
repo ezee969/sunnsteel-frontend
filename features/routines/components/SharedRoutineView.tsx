@@ -52,11 +52,16 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 
 	return (
 		<article className="space-y-8">
-			<header className="space-y-2">
+			{/* v1.1: the routine's name is the page's inscription, over its
+			    double rule, as a shared workout's is -- the two standalone pages
+			    a member sends out now open the same way. */}
+			<header className="rule-heading space-y-2 pb-6">
 				<p className="type-body-sm text-ink-3">
 					Shared by {describeSharedRoutineOwner(routine)}
 				</p>
-				<h1 className="type-section text-foreground">{setup.name}</h1>
+				<h1 className="type-page corner-brackets inline-block text-foreground">
+					{setup.name}
+				</h1>
 				{setup.description ? (
 					<p className="type-body-sm max-w-[68ch] text-ink-2">
 						{setup.description}
