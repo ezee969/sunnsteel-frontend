@@ -1958,3 +1958,52 @@ and run `npm run rank-decoration:generate`. The colours in it are placeholders
 that the stylesheet maps to tokens, so a token change never needs a
 regeneration. Repeating pieces (bands and grounds) are tiles drawn as CSS
 masks in the pigment.
+
+---
+
+## 25. Amendment — dashboard hierarchy (2026-10-02)
+
+Owner-approved for `DASH-06` on 2026-10-02 from before and after captures of
+the owner's dashboard at 390 and 1440. It closes group 17 (legibility and
+learning curve): every number on the dashboard had the same weight as every
+other, and the stat band was the largest object on a phone.
+
+### 25.1 One primary, once
+
+- **Today's Workouts is the dashboard's one boxed piece and its one filled
+  action** (§4.3 rule 1, §11.5). The shell's global "Active workout session
+  in progress" banner is not shown on `/dashboard`, because the card already
+  resumes the session: on a phone the two put two filled Resume controls in
+  one screen.
+
+### 25.2 The stat band is one row of lifetime numbers
+
+- **Three numbers until `xl`, four from it:** finished workouts, the
+  current streak (with the best beside it), the share of started workouts
+  that were finished, and lifetime volume. Each is a `type-label`, a
+  `type-numeral` and one `type-body-sm` line saying what it counts. Below
+  `xl` the volume is one line under the row rather than a fourth column,
+  because the shell leaves the column too narrow for its numeral and unit (at
+  1024 the unit dropped to a line of its own; §10.2: a value is never clipped
+  to fit a column count).
+- **The week is not in it.** Workouts this week and active days restated
+  This Week, which already states the week (§11.8: progress is stated once
+  per screen).
+- **No bars and no grades.** The milestone bars measured against shared app
+  constants (FIX-08), which Upcoming Milestones states exactly, and the words
+  under each number ("Heavy", "On track", "Resting", "Excellent") graded the
+  member, which nothing else on the dashboard does.
+- **Numbers follow the language** (`numberFormatter`), grouped: lifetime
+  volume reads "150,603 t", never "150603.0".
+- Measured on the owner's account: the band went from 451px to 171px at 390
+  and from 370px to 132px at 1440.
+
+### 25.3 Ruled bands, not boxes
+
+- **The stat band and This Week's days are ruled bands**: a rule above and
+  below and a `rule-faint` hairline between cells, with no box around each
+  cell and no rule at either end. Today keeps its inset ring in This Week,
+  with its accessible name.
+- **Not changed:** the rank masthead, the ruled lists below the band and
+  Customize. Recent Activity and Personal Records keep sharing a row from
+  `lg`.

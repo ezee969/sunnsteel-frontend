@@ -129,16 +129,16 @@ export default function WeekStrip() {
 				</div>
 			) : (
 				<>
-					<ol className="grid grid-cols-7 border-l border-t border-rule-faint">
+					{/* DASH-06 (§25.3): a ruled band like the stat row below it --
+					    rules above and below, a hairline between days, no box
+					    around each day or at the ends. */}
+					<ol className="grid grid-cols-7 divide-x divide-rule-faint border-y border-rule">
 						{days.map(day => {
 							const status =
 								day.state === 'EMPTY' ? null : SCHEDULE_STATUS[day.state]
 							const Icon = status?.Icon
 							return (
-								<li
-									key={day.date}
-									className="border-b border-r border-rule-faint"
-								>
+								<li key={day.date}>
 									<Link
 										href={day.href}
 										aria-label={day.label}

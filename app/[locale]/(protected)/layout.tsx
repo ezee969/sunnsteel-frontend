@@ -220,26 +220,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 						setIsMobileMenuOpen={setIsMobileMenuOpen}
 						onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 					/>
-					{!isOnSessionPage && activeSession?.id && (
-						<div className="px-3 sm:px-6 mt-2">
-							<div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
-								<div className="flex items-center gap-2 text-sm">
-									<Dumbbell className="h-3 w-3" />
-									<span>{t('layout.activeSessionBanner')}</span>
+					{/* DASH-06: the dashboard's Today's Workouts card already resumes
+					    the session, so the banner would be a second filled Resume. */}
+					{!isOnSessionPage &&
+						pathname !== '/dashboard' &&
+						activeSession?.id && (
+							<div className="px-3 sm:px-6 mt-2">
+								<div className="rounded-md border bg-primary/5 p-1 sm:p-2 flex items-center justify-between">
+									<div className="flex items-center gap-2 text-sm">
+										<Dumbbell className="h-3 w-3" />
+										<span>{t('layout.activeSessionBanner')}</span>
+									</div>
+									<Button
+										asChild
+										size="sm"
+										variant="default"
+										aria-label={t('layout.resumeLabel')}
+									>
+										<Link href={`/workouts/sessions/${activeSession.id}`}>
+											{t('layout.resume')}
+										</Link>
+									</Button>
 								</div>
-								<Button
-									asChild
-									size="sm"
-									variant="default"
-									aria-label={t('layout.resumeLabel')}
-								>
-									<Link href={`/workouts/sessions/${activeSession.id}`}>
-										{t('layout.resume')}
-									</Link>
-								</Button>
 							</div>
-						</div>
-					)}
+						)}
 
 					{/* Content */}
 					<main className="flex-1 overflow-auto p-3 sm:p-6">
