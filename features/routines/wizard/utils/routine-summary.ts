@@ -2,16 +2,6 @@ import { CreateRoutineRequest } from '@/lib/api/types'
 
 import type { RoutineWizardData } from '../types'
 
-export const DAYS_OF_WEEK = [
-	'Sunday',
-	'Monday',
-	'Tuesday',
-	'Wednesday',
-	'Thursday',
-	'Friday',
-	'Saturday',
-] as const
-
 export interface RoutineTotals {
 	trainingDays: number
 	totalExercises: number
