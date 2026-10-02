@@ -412,3 +412,53 @@ Added to the §15 gates of the design system for any Phase 10 change:
 7. **`npm run verify` with the dev server stopped** (§15 gate 5), and the dev
    server confirmed answering 200 before any screenshot comparison (Known
    Risks).
+
+---
+
+## 8. Amendment — v1.1 navigation continuity (2026-10-02)
+
+Part of the owner-directed v1.1 redesign ([design system §26](ui-design-system.md#26-amendment--v11-ledger-and-craft-2026-10-02)).
+**Nothing above is superseded:** the tokens, the allow-list, both signatures,
+the overlay table and the prohibitions stand. v1.1 adds two markers to the
+family §2.3 already defines (the sidebar's), applies one existing token to a
+layout change, and removes nothing. No keyframe is added; §4's inventory of
+four is unchanged.
+
+The test every row passed, from the three references the redesign used:
+Frontend Design (motion answers a person's action and shows what changed; no
+scattered entrances), UI/UX Pro Max (motion conveys meaning and spatial
+continuity; exits faster than entries; respect reduced motion) and the Web
+Interface Guidelines (transform and opacity only, explicit properties,
+interruptible, reduced motion honoured).
+
+### 8.1 Inventory
+
+| Motion | Trigger | What it tells the member | Element / property | Duration / easing | Entry & exit | Repeats | Interrupted | Reduced motion (OS or `data-motion`) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Bottom-bar marker** (new) | The active group changes (route change) | Where am I, and where I came from | One 2px `honour-strong` bar, `transform: translateX` in 100% steps of a fifth of the bar | 200ms `standard` | Appears in place on first paint; no exit (it always marks a group) | Once per route change; never on re-render, refetch or count change | A new route mid-slide retargets from the current position (CSS transition) | Instant position (transform drops out of the transition list) |
+| **Page-tab underline** (new) | The current tab changes; the bar does not remount (§21.1) | Which tab I moved to, from which | One 2px ink bar, `transform: translateX() scaleX()` from the measured link box | 200ms `standard` | Until it is measured, the current link draws its own underline, so the mark is there from the first frame | Once per tab change; re-measured (without animating from zero) on a resize | Retargets mid-slide | Instant position |
+| Sidebar marker | Route change | Where am I | Unchanged (§2.3) | 200ms `standard` | — | — | — | Instant |
+| Recap footer | None — it is pinned, not animated | Continue is always in reach | `position: sticky` only | — | Enters with the dialog (§2.5) | — | — | — |
+| Header search placeholder | None | — | `text-overflow: ellipsis` only | — | — | — | — | — |
+
+### 8.2 Rules the two new markers keep
+
+- **One element, translated** (§2.3): never a border on each item, which can
+  only blink between items, not travel.
+- **No measurement in render.** The tab underline reads `offsetLeft` and
+  `offsetWidth` in a layout effect and a `ResizeObserver`, after commit, and
+  writes one inline transform. The bottom bar needs no measurement: its five
+  slots are equal.
+- **No `will-change`** (§4): a 200ms slide does not justify a permanent layer.
+- **Information never waits for motion.** `aria-current` and the current
+  colour change at once; the marker is the only thing that travels.
+
+### 8.3 Verified
+
+Measured in the browser on 2026-10-02 against the dev server: the bottom-bar
+marker was caught mid-slide at 60ms (`translateX(94.7px)` of 156) and settled
+at 200ms with `transition-property: transform…`; the tab underline was caught
+mid-slide and settled exactly on the current link's box on four tabs (rects
+equal to the pixel); browser Back restored the previous tab and its marker;
+under reduced motion the marker's computed `transition-property` is the
+colour-and-opacity list only, so it jumps.

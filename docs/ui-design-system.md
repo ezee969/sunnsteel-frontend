@@ -1,4 +1,4 @@
-# Sunnsteel Design System — v1.0 · LOCKED
+# Sunnsteel Design System — v1.0 · LOCKED, amended to v1.1 (§26)
 
 Phase 6 of [ui-restyle-plan.md](ui-restyle-plan.md). Supersedes v0.1, which was
 provisional. v0.1's history — how four exploration directions were consolidated,

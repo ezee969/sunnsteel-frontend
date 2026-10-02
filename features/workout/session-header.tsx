@@ -61,9 +61,10 @@ export const SessionHeader = ({
 						<div className="min-w-0">
 							{/* The one classical device the direction keeps: gold brackets,
 							    one pair per screen, on the inscription. */}
-							{/* §11.11 / v1.1 §26.4: the inscription wraps to two lines
-							    below `lg` rather than clamping beside the progress figure. */}
-							<h1 className="corner-brackets type-section line-clamp-2 text-foreground lg:line-clamp-1">
+							{/* §11.11 / v1.1 §26.4: the inscription wraps -- three lines on
+							    a phone, two to `lg` -- rather than clamping beside the
+							    progress figure. */}
+							<h1 className="corner-brackets type-section line-clamp-3 text-foreground sm:line-clamp-2 lg:line-clamp-1">
 								{routineName}
 							</h1>
 							<p className="type-body-sm text-ink-2">{dayName}</p>
