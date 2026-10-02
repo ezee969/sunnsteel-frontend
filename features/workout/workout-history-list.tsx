@@ -179,8 +179,11 @@ export function WorkoutHistoryList({
 
 									{/* §10.1 — at `xl` the ledger opens: duration and volume become
 					    right-aligned mono columns rather than left-aligned pairs. */}
-									<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4 xl:mt-0">
-										<div>
+									<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4 sm:gap-y-2 xl:mt-0">
+										{/* v1.1 §26.8: below `sm` a date-time takes a whole line,
+										    caption and value on one baseline, instead of wrapping inside
+										    half a row. */}
+										<div className="col-span-2 flex items-baseline justify-between gap-3 sm:col-span-1 sm:block">
 											<div className="type-body-sm text-ink-3">
 												{t('started')}
 											</div>
@@ -188,7 +191,7 @@ export function WorkoutHistoryList({
 												{dateTime(s.startedAt)}
 											</div>
 										</div>
-										<div>
+										<div className="col-span-2 flex items-baseline justify-between gap-3 sm:col-span-1 sm:block">
 											<div className="type-body-sm text-ink-3">
 												{t('ended')}
 											</div>

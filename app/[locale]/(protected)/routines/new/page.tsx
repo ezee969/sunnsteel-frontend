@@ -227,7 +227,7 @@ function CreateRoutineWizard() {
 	}
 
 	return (
-		<div className="container mx-auto py-8">
+		<div className="container mx-auto sm:py-8">
 			{/* Classical Hero */}
 			<HeroSection
 				sectionClassName="mb-4 sm:mb-6"
@@ -265,16 +265,21 @@ function CreateRoutineWizard() {
 			</div>
 
 			{/* Main Content */}
-			<Card className="overflow-hidden">
-				<CardHeader className="border-b border-rule-faint pb-4">
-					<CardTitle className="type-section text-foreground">
+			{/* v1.1 §26.4: below `sm` the step body loses its box and padding
+			    and keeps its heading rule, so a set row gets the screen's width
+			    rather than 48px less; from `sm` it is the §11.5 panel. The title
+			    is `type-panel` as it always rendered (a second rank here lost to
+			    it in the cascade). */}
+			<Card className="overflow-hidden max-sm:gap-4 max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:py-0">
+				<CardHeader className="border-b border-rule-faint pb-4 max-sm:px-0 max-sm:pb-2">
+					<CardTitle className="text-foreground">
 						{STEPS[currentStep - 1].title}
 					</CardTitle>
 					<CardDescription className="hidden sm:block">
 						{STEPS[currentStep - 1].description}
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="p-6">{renderCurrentStep()}</CardContent>
+				<CardContent className="px-0 sm:p-6">{renderCurrentStep()}</CardContent>
 			</Card>
 
 			{/* Sticky bottom navigation */}

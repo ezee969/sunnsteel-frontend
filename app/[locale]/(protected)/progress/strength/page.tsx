@@ -236,14 +236,16 @@ export default function ProgressStrengthPage() {
 							</div>
 						) : current ? (
 							<>
-								<div className="grid gap-px bg-rule-faint sm:grid-cols-2">
-									<div className="bg-surface p-4 sm:p-5">
+								{/* v1.1 §26.4: the two figures side by side at every width,
+								    so the chart rises on a phone. */}
+								<div className="grid grid-cols-2 gap-px bg-rule-faint">
+									<div className="bg-surface p-3 sm:p-5">
 										<p className="type-label text-ink-3">{t('currentBest')}</p>
 										<p className="type-data type-data-strong mt-2 text-foreground">
 											{formatMetric(current.weightKg)} × {current.reps}
 										</p>
 									</div>
-									<div className="bg-surface p-4 sm:p-5">
+									<div className="bg-surface p-3 sm:p-5">
 										<p className="type-label text-ink-3">{t('estimated1rm')}</p>
 										<p className="type-data type-data-strong mt-2 text-foreground">
 											{formatMetric(current.estimated1rmKg)}

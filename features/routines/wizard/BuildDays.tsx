@@ -238,32 +238,30 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 					<span className="text-destructive ml-1">*</span>
 				</h3>
 
-				{/* Overall Stats  */}
-				<div className="grid grid-cols-3 gap-2 mb-4 sm:gap-4">
-					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
-						<div className="text-base font-bold leading-none text-primary sm:text-xl">
+				{/* Overall Stats. v1.1: a ruled band, as the dashboard's (§25.3) --
+				    a rule above and below, hairlines between -- rather than three
+				    translucent boxed tiles with bold primary numbers. */}
+				<dl className="mb-4 grid grid-cols-3 border-y border-rule">
+					<div className="flex flex-col-reverse px-2 py-2 text-center sm:py-3">
+						<dt className="type-label text-ink-3">{t('statExercises')}</dt>
+						<dd className="mb-1 type-data type-data-strong text-base text-foreground">
 							{selectedDayExercisesCount}
-						</div>
-						<div className="type-label mt-1 text-ink-3">
-							{t('statExercises')}
-						</div>
+						</dd>
 					</div>
-					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
-						<div className="text-base font-bold leading-none text-primary sm:text-xl">
+					<div className="flex flex-col-reverse border-l border-rule-faint px-2 py-2 text-center sm:py-3">
+						<dt className="type-label text-ink-3">{t('statSets')}</dt>
+						<dd className="mb-1 type-data type-data-strong text-base text-foreground">
 							{selectedDaySetsCount}
-						</div>
-						<div className="type-label mt-1 text-ink-3">{t('statSets')}</div>
+						</dd>
 					</div>
-					<div className="rounded-md border bg-muted/20 p-2 text-center sm:p-3">
-						<div className="text-base font-bold leading-none text-primary sm:text-xl">
+					<div className="flex flex-col-reverse border-l border-rule-faint px-2 py-2 text-center sm:py-3">
+						<dt className="type-label text-ink-3">{t('statDaysReady')}</dt>
+						<dd className="mb-1 type-data type-data-strong text-base text-foreground">
 							{data.days.filter(day => day.exercises.length > 0).length}/
 							{data.days.length}
-						</div>
-						<div className="type-label mt-1 text-ink-3">
-							{t('statDaysReady')}
-						</div>
+						</dd>
 					</div>
-				</div>
+				</dl>
 
 				{/* Day Tabs */}
 				<Tabs

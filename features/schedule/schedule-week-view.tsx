@@ -214,17 +214,21 @@ function EntryRow({
 		? `${entry.routineName} · ${entry.dayName}`
 		: entry.routineName
 	return (
-		<li className="flex flex-wrap items-start gap-x-2 gap-y-1 py-1">
+		// v1.1 §26.8: the routine and day own the first line, status and notes
+		// follow as a quieter second line, and below `sm` the actions sit under
+		// the text (aligned past the glyph) instead of squeezing it into a
+		// 160px column beside them.
+		<li className="flex flex-wrap items-start gap-x-2 gap-y-1 py-1.5">
 			<Icon className={cn('mt-0.5 size-4 shrink-0', tone)} aria-hidden />
-			<span className="min-w-0 flex-1 basis-40">
+			<span className="min-w-0 flex-1 basis-[calc(100%-1.5rem)] sm:basis-40">
 				<Link
 					href={entryHref(entry)}
-					className="type-body-sm text-foreground underline-offset-4 hover:underline"
+					className="type-body-sm block w-fit text-foreground underline-offset-4 hover:underline"
 				>
 					{entry.routineName}
 					{entry.dayName ? ` · ${entry.dayName}` : ''}
 				</Link>
-				<span className={cn('type-body-sm ml-2', tone)}>{label}</span>
+				<span className={cn('type-body-sm', tone)}>{label}</span>
 				{entry.trainingBlockName ? (
 					<span className="type-body-sm ml-2 text-ink-3">
 						· {entry.trainingBlockName}
@@ -244,7 +248,7 @@ function EntryRow({
 					</span>
 				) : null}
 			</span>
-			<span className="flex shrink-0 gap-1">
+			<span className="flex shrink-0 gap-1 max-sm:-ml-2 max-sm:pl-6">
 				<EntryAction target={target} {...actionProps} />
 				<MoveControl
 					moveAction={moveAction}
