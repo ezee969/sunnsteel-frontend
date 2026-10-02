@@ -60,7 +60,10 @@ export const RestTimerBar = ({
 				/>
 			</div>
 
-			<div className="ledger-page flex items-center gap-3 py-3">
+			{/* The bar is fixed, outside <main>'s gutter, so below `md` it keeps
+			    its own 16px inset (v1.1 §26.3 drops `.ledger-page`'s phone
+			    padding only for content that sits inside the gutter). */}
+			<div className="ledger-page flex items-center gap-3 py-3 max-md:px-4">
 				<div className="flex flex-col">
 					<span className="type-label text-ink-3">
 						{isOver ? t('restOver') : t('resting')}
