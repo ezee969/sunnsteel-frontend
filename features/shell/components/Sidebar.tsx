@@ -326,17 +326,20 @@ export default function Sidebar({
 			</div>
 			<ScrollArea className="flex-1 py-4">
 				<nav
-					className="relative grid gap-2 px-2"
+					className={cn('relative grid px-2', isMobile ? 'gap-1' : 'gap-2')}
 					style={
 						{
-							'--nav-pitch': isMobile ? '3.25rem' : '2.75rem',
-							// A heading row is h-7 plus the grid's 8px gap.
-							'--nav-heading-pitch': '2.25rem',
+							// The drawer's rows sit 4px apart rather than 8 and its
+							// headings are h-6, so the group headings (UX-22) still
+							// leave Settings on screen without scrolling.
+							'--nav-pitch': isMobile ? '3rem' : '2.75rem',
+							// A heading row is its height plus the grid's gap.
+							'--nav-heading-pitch': isMobile ? '1.75rem' : '2.25rem',
 						} as CSSProperties
 					}
 				>
 					{/* Motion spec §2.3: ONE marker, translated. Rows are a uniform
-					    pitch (item height + the 8px grid gap), so the offset is exact
+					    pitch (item height + the grid gap), so the offset is exact
 					    and needs no measurement. Hidden when the active route is not
 					    in this list - Settings lives in the footer and keeps its own
 					    mark. `aria-hidden`: the active item is already conveyed by
@@ -492,7 +495,10 @@ export default function Sidebar({
 								) : (
 									<p
 										key={`${group}-heading`}
-										className="type-label flex h-7 items-end px-3 pb-1 text-ink-3"
+										className={cn(
+											'type-label flex items-end px-3 pb-1 text-ink-3',
+											isMobile ? 'h-6' : 'h-7',
+										)}
 									>
 										{tGroups(group)}
 									</p>

@@ -1799,6 +1799,9 @@ sentence case.
   `type-label` rows of a fixed height. The sliding marker counts the heading
   rows above the active entry (`--nav-heading-pitch`), and a collapsed
   sidebar draws each heading as a short rule of the same height.
+  In the drawer the rows sit 4px apart rather than 8 and a heading is 24px
+  rather than 28, so the three headings still leave Settings on screen
+  without scrolling; each row stays 44px tall.
 - **The header's menu button stays** below `md`: More and it open the same
   drawer, and the workout screen, which has no bottom bar, keeps a way in.
 - Absorbs `NAV-04`: start or resume is Train, within thumb reach.
