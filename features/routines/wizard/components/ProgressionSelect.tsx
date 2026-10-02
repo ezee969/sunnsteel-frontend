@@ -41,9 +41,14 @@ export function ProgressionSelect({
 				<SelectTrigger
 					aria-label={t('progressionScheme')}
 					size="sm"
-					className="w-32 sm:w-40 max-w-[60vw] h-9 truncate"
+					className="w-32 sm:w-56 max-w-[60vw] h-9"
 				>
-					<SelectValue className="truncate" />
+					{/* Wrapped so the primitive's flex rule on a direct select-value
+					    child does not apply: a flex box cannot end in an ellipsis,
+					    and "Double Progression" was cut mid-letter at 390. */}
+					<span className="block min-w-0 truncate">
+						<SelectValue />
+					</span>
 				</SelectTrigger>
 				<SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-none">
 					<SelectItem value="NONE">{t('progressionNone')}</SelectItem>
