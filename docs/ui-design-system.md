@@ -1800,8 +1800,12 @@ sentence case.
   rows above the active entry (`--nav-heading-pitch`), and a collapsed
   sidebar draws each heading as a short rule of the same height.
   In the drawer the rows sit 4px apart rather than 8 and a heading is 24px
-  rather than 28, so the three headings still leave Settings on screen
-  without scrolling; each row stays 44px tall.
+  rather than 28; each row stays 44px tall.
+- **Settings is pinned under the list**, in the column's footer, and the list
+  scrolls above it, so a short window (a small notebook at 650px, a phone in
+  landscape) never pushes Settings out of reach. The profile row that sat in
+  the footer is gone: it linked to Settings too, and the header's avatar
+  already opens the profile menu (2026-10-02, owner's call).
 - **The header's menu button stays** below `md`: More and it open the same
   drawer, and the workout screen, which has no bottom bar, keeps a way in.
 - Absorbs `NAV-04`: start or resume is Train, within thumb reach.

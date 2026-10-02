@@ -31,10 +31,8 @@ import {
 	ClassicalIcon,
 	ClassicalIconName,
 } from '@/components/icons/ClassicalIcon'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import {
 	Tooltip,
@@ -324,204 +322,214 @@ export default function Sidebar({
 					</Button>
 				)}
 			</div>
-			<ScrollArea className="flex-1 py-4">
-				<nav
-					className={cn('relative grid px-2', isMobile ? 'gap-1' : 'gap-2')}
-					style={
-						{
-							// The drawer's rows sit 4px apart rather than 8 and its
-							// headings are h-6, so the group headings (UX-22) still
-							// leave Settings on screen without scrolling.
-							'--nav-pitch': isMobile ? '3rem' : '2.75rem',
-							// A heading row is its height plus the grid's gap.
-							'--nav-heading-pitch': isMobile ? '1.75rem' : '2.25rem',
-						} as CSSProperties
-					}
-				>
-					{/* Motion spec §2.3: ONE marker, translated. Rows are a uniform
+			{/* One navigation landmark holds the scrolling list and the pinned
+			    Settings below it. */}
+			<nav className="flex min-h-0 flex-1 flex-col">
+				<ScrollArea className="min-h-0 flex-1 py-4">
+					<div
+						className={cn('relative grid px-2', isMobile ? 'gap-1' : 'gap-2')}
+						style={
+							{
+								// The drawer's rows sit 4px apart rather than 8 and its
+								// headings are h-6, so the group headings (UX-22) still
+								// leave Settings on screen without scrolling.
+								'--nav-pitch': isMobile ? '3rem' : '2.75rem',
+								// A heading row is its height plus the grid's gap.
+								'--nav-heading-pitch': isMobile ? '1.75rem' : '2.25rem',
+							} as CSSProperties
+						}
+					>
+						{/* Motion spec §2.3: ONE marker, translated. Rows are a uniform
 					    pitch (item height + the grid gap), so the offset is exact
 					    and needs no measurement. Hidden when the active route is not
 					    in this list - Settings lives in the footer and keeps its own
 					    mark. `aria-hidden`: the active item is already conveyed by
 					    `aria-current` on the link. */}
-					{activeIndex >= 0 && (
-						<span
-							aria-hidden
-							className={cn(
-								'pointer-events-none absolute left-2 z-10 w-[3px] bg-honour-strong',
-								'transition-transform duration-[var(--motion-base)] ease-standard',
-								isMobile ? 'h-11' : 'h-9',
-							)}
-							style={{
-								transform: `translateY(calc(${activeIndex} * var(--nav-pitch) + ${headingsAbove} * var(--nav-heading-pitch)))`,
-							}}
-						/>
-					)}
-					{rows.map(({ item, group, firstInGroup }) => {
-						const label = t(item.labelKey)
-						const isCollapsed = !isSidebarOpen && !isMobile
-						const showTooltip = isCollapsed
-						const isActive = activeNav === item.id
-						const indicator =
-							item.id === 'notifications'
-								? indicators.notifications
-								: item.id === 'schedule'
-									? indicators.schedule
-									: null
-						const ItemIcon =
-							item.id === 'notifications' && indicator ? BellDot : item.icon
-						const itemClassName = cn(
-							// §11.10: active is a 3px honour mark plus ink text, never
-							// a filled slab - that inversion was the heaviest object
-							// on every screen. Hover and active differ by colour, not
-							// geometry, so both carry the same 3px left border.
-							'mark group relative w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
-							isMobile ? 'h-11' : 'h-9',
-							isCollapsed ? 'justify-center' : 'justify-start',
-							isActive
-								? 'bg-surface font-semibold text-foreground'
-								: 'text-ink-2 hover:bg-surface hover:text-foreground',
-							item.disabled &&
-								'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
-						)
-						const iconClassName = cn(
-							'size-5 shrink-0 transition-colors',
-							isActive
-								? 'text-honour-strong'
-								: 'text-ink-3 group-hover:text-foreground',
-						)
-						const icon = item.classicalName ? (
-							<ClassicalIcon
-								name={item.classicalName}
+						{activeIndex >= 0 && (
+							<span
 								aria-hidden
-								className={iconClassName}
+								className={cn(
+									'pointer-events-none absolute left-2 z-10 w-[3px] bg-honour-strong',
+									'transition-transform duration-[var(--motion-base)] ease-standard',
+									isMobile ? 'h-11' : 'h-9',
+								)}
+								style={{
+									transform: `translateY(calc(${activeIndex} * var(--nav-pitch) + ${headingsAbove} * var(--nav-heading-pitch)))`,
+								}}
 							/>
-						) : (
-							<ItemIcon className={iconClassName} aria-hidden />
-						)
-						const inner = (
-							<>
-								{/* Collapsed, the count belongs to the glyph: pinned to the
+						)}
+						{rows.map(({ item, group, firstInGroup }) => {
+							const label = t(item.labelKey)
+							const isCollapsed = !isSidebarOpen && !isMobile
+							const showTooltip = isCollapsed
+							const isActive = activeNav === item.id
+							const indicator =
+								item.id === 'notifications'
+									? indicators.notifications
+									: item.id === 'schedule'
+										? indicators.schedule
+										: null
+							const ItemIcon =
+								item.id === 'notifications' && indicator ? BellDot : item.icon
+							const itemClassName = cn(
+								// §11.10: active is a 3px honour mark plus ink text, never
+								// a filled slab - that inversion was the heaviest object
+								// on every screen. Hover and active differ by colour, not
+								// geometry, so both carry the same 3px left border.
+								'mark group relative w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
+								isMobile ? 'h-11' : 'h-9',
+								isCollapsed ? 'justify-center' : 'justify-start',
+								isActive
+									? 'bg-surface font-semibold text-foreground'
+									: 'text-ink-2 hover:bg-surface hover:text-foreground',
+								item.disabled &&
+									'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
+							)
+							const iconClassName = cn(
+								'size-5 shrink-0 transition-colors',
+								isActive
+									? 'text-honour-strong'
+									: 'text-ink-3 group-hover:text-foreground',
+							)
+							const icon = item.classicalName ? (
+								<ClassicalIcon
+									name={item.classicalName}
+									aria-hidden
+									className={iconClassName}
+								/>
+							) : (
+								<ItemIcon className={iconClassName} aria-hidden />
+							)
+							const inner = (
+								<>
+									{/* Collapsed, the count belongs to the glyph: pinned to the
 								    icon's top-right as a superscript. It used to be
 								    `absolute right-1`, which parked it against the column's
 								    right rule with nothing to attach it to - it read as a
 								    stray character rather than as this item's count. The
 								    exact number stays in the link's `aria-label`. */}
-								{indicator && isCollapsed ? (
-									<span className="relative flex shrink-0 items-center justify-center">
-										{icon}
+									{indicator && isCollapsed ? (
+										<span className="relative flex shrink-0 items-center justify-center">
+											{icon}
+											<span
+												aria-hidden
+												className="type-data pointer-events-none absolute -right-3 -top-1.5 text-[11px] leading-none text-ink-2"
+											>
+												{indicator.compactText}
+											</span>
+										</span>
+									) : (
+										icon
+									)}
+									<span
+										className={cn(
+											'truncate',
+											isCollapsed && 'w-0 overflow-hidden opacity-0',
+										)}
+									>
+										{label}
+									</span>
+									{indicator && !isCollapsed && (
 										<span
 											aria-hidden
-											className="type-data pointer-events-none absolute -right-3 -top-1.5 text-[11px] leading-none text-ink-2"
+											className="type-data ml-auto shrink-0 text-ink-2"
 										>
 											{indicator.compactText}
 										</span>
-									</span>
-								) : (
-									icon
-								)}
-								<span
-									className={cn(
-										'truncate',
-										isCollapsed && 'w-0 overflow-hidden opacity-0',
 									)}
-								>
-									{label}
-								</span>
-								{indicator && !isCollapsed && (
-									<span
-										aria-hidden
-										className="type-data ml-auto shrink-0 text-ink-2"
-									>
-										{indicator.compactText}
-									</span>
-								)}
-								{item.disabled && !isCollapsed && (
-									<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
-										{t('soon')}
-									</span>
-								)}
-							</>
-						)
+									{item.disabled && !isCollapsed && (
+										<span className="type-label ml-auto shrink-0 text-[10px] text-ink-3">
+											{t('soon')}
+										</span>
+									)}
+								</>
+							)
 
-						// a11y review 2: an enabled item is ONE anchor (Button asChild ->
-						// Link) with `aria-current` on the active one. It used to be a
-						// real <button> nested inside the <a>, two tab stops for one
-						// destination. Disabled items stay a button that explains itself
-						// with a toast - same handler, now on the control rather than on a
-						// wrapping div.
-						const control = item.disabled ? (
-							<Button
-								type="button"
-								variant="ghost"
-								aria-disabled
-								className={itemClassName}
-								onClick={() => handleDisabledClick(label)}
-							>
-								{inner}
-							</Button>
-						) : (
-							<Button asChild variant="ghost" className={itemClassName}>
-								<Link
-									href={item.href}
-									aria-label={indicator?.accessibleLabel ?? label}
-									aria-current={isActive ? 'page' : undefined}
-									onClick={() => {
-										// Set active nav immediately for consistent visual state
-										setActiveNav(item.id)
-										// Close mobile sidebar after navigation
-										if (isMobile) {
-											setIsMobileMenuOpen(false)
-										}
-										// Signal navigation start for global feedback
-										onNavigateStart?.()
-									}}
+							// a11y review 2: an enabled item is ONE anchor (Button asChild ->
+							// Link) with `aria-current` on the active one. It used to be a
+							// real <button> nested inside the <a>, two tab stops for one
+							// destination. Disabled items stay a button that explains itself
+							// with a toast - same handler, now on the control rather than on a
+							// wrapping div.
+							const control = item.disabled ? (
+								<Button
+									type="button"
+									variant="ghost"
+									aria-disabled
+									className={itemClassName}
+									onClick={() => handleDisabledClick(label)}
 								>
 									{inner}
-								</Link>
-							</Button>
-						)
-
-						const heading =
-							firstInGroup && group !== 'today' ? (
-								isCollapsed ? (
-									<div
-										key={`${group}-heading`}
-										aria-hidden
-										className="flex h-7 items-end justify-center pb-1"
+								</Button>
+							) : (
+								<Button asChild variant="ghost" className={itemClassName}>
+									<Link
+										href={item.href}
+										aria-label={indicator?.accessibleLabel ?? label}
+										aria-current={isActive ? 'page' : undefined}
+										onClick={() => {
+											// Set active nav immediately for consistent visual state
+											setActiveNav(item.id)
+											// Close mobile sidebar after navigation
+											if (isMobile) {
+												setIsMobileMenuOpen(false)
+											}
+											// Signal navigation start for global feedback
+											onNavigateStart?.()
+										}}
 									>
-										<span className="h-px w-6 bg-rule" />
-									</div>
-								) : (
-									<p
-										key={`${group}-heading`}
-										className={cn(
-											'type-label flex items-end px-3 pb-1 text-ink-3',
-											isMobile ? 'h-6' : 'h-7',
-										)}
-									>
-										{tGroups(group)}
-									</p>
-								)
-							) : null
+										{inner}
+									</Link>
+								</Button>
+							)
 
-						return [
-							heading,
-							<div key={item.id}>
-								{showTooltip ? (
-									<Tooltip>
-										<TooltipTrigger asChild>{control}</TooltipTrigger>
-										<TooltipContent side="right" sideOffset={8}>
-											{label}
-										</TooltipContent>
-									</Tooltip>
-								) : (
-									control
-								)}
-							</div>,
-						]
-					})}
-					<Separator className="my-4" />
+							const heading =
+								firstInGroup && group !== 'today' ? (
+									isCollapsed ? (
+										<div
+											key={`${group}-heading`}
+											aria-hidden
+											className="flex h-7 items-end justify-center pb-1"
+										>
+											<span className="h-px w-6 bg-rule" />
+										</div>
+									) : (
+										<p
+											key={`${group}-heading`}
+											className={cn(
+												'type-label flex items-end px-3 pb-1 text-ink-3',
+												isMobile ? 'h-6' : 'h-7',
+											)}
+										>
+											{tGroups(group)}
+										</p>
+									)
+								) : null
+
+							return [
+								heading,
+								<div key={item.id}>
+									{showTooltip ? (
+										<Tooltip>
+											<TooltipTrigger asChild>{control}</TooltipTrigger>
+											<TooltipContent side="right" sideOffset={8}>
+												{label}
+											</TooltipContent>
+										</Tooltip>
+									) : (
+										control
+									)}
+								</div>,
+							]
+						})}
+					</div>
+				</ScrollArea>
+				{/* Settings is pinned under the list rather than at its end, so a
+			    short window (a small notebook, a phone in landscape) scrolls the
+			    pages and never pushes Settings out of reach. The profile row that
+			    sat here went: it linked to Settings too, and the header avatar
+			    already opens the profile menu. */}
+				<div className="border-t border-rule px-2 py-2">
 					<Button
 						asChild
 						variant="ghost"
@@ -564,54 +572,8 @@ export default function Sidebar({
 							</span>
 						</Link>
 					</Button>
-				</nav>
-			</ScrollArea>
-			<div className="border-t border-rule p-4">
-				<Link
-					href="/settings"
-					onClick={() => {
-						if (isMobile) {
-							setIsMobileMenuOpen(false)
-						}
-					}}
-				>
-					<div
-						className={cn(
-							'flex cursor-pointer items-center gap-3 rounded-sm p-2 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
-							!isSidebarOpen && !isMobile && 'justify-center',
-						)}
-					>
-						<Avatar className="h-10 w-10 border border-rule">
-							<AvatarImage
-								src={user?.avatarUrl || ''}
-								alt={t('userAvatar')}
-								className="object-cover"
-							/>
-							<AvatarFallback>
-								{user?.name
-									?.split(' ')
-									.map(n => n.charAt(0))
-									.join('')
-									.slice(0, 2)
-									.toUpperCase()}
-							</AvatarFallback>
-						</Avatar>
-						<div
-							className={cn(
-								'flex flex-col',
-								!isSidebarOpen && !isMobile && 'opacity-0 w-0 overflow-hidden',
-							)}
-						>
-							<span className="truncate text-sm font-medium text-foreground">
-								{user?.name} {user?.lastName}
-							</span>
-							<span className="max-w-[10rem] truncate text-xs text-ink-3">
-								{user?.username ? `@${user.username}` : ''}
-							</span>
-						</div>
-					</div>
-				</Link>
-			</div>
+				</div>
+			</nav>
 		</div>
 	)
 }
