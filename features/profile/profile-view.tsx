@@ -119,6 +119,21 @@ const RANK_HEADER_PADDING = [
 	'px-[22px] pt-[66px] pb-[46px] @min-[600px]:px-[46px] @min-[600px]:pt-20 @min-[600px]:pb-[58px]',
 	'px-[30px] pt-[70px] pb-[50px] @min-[600px]:px-[60px] @min-[600px]:pt-[92px] @min-[600px]:pb-[66px]',
 ] as const
+/**
+ * v1.1: the Artisan knots and Maestro scrolls are large enough to reach the
+ * header's actions -- the knot was drawn over "Share profile" at 1440. The
+ * actions keep clear of the corner they sit beside: above it while the
+ * header is a column, left of it once it is a row (from 860px). The other
+ * ranks' corners are small enough not to need it.
+ */
+const RANK_ACTIONS_CLEARANCE = [
+	'',
+	'',
+	'mb-9 @min-[600px]:mb-12 @min-[860px]:mb-0 @min-[860px]:mr-16',
+	'mb-7 @min-[600px]:mb-10 @min-[860px]:mb-0 @min-[860px]:mr-[100px]',
+	'',
+	'',
+] as const
 const RANK_PORTRAIT_MARGIN = [
 	'm-[5px] sm:m-1.5',
 	'm-2 sm:m-2.5',
@@ -384,7 +399,12 @@ export function ProfileView(props: ProfileViewProps) {
 						</div>
 					</div>
 
-					<div className="flex flex-wrap gap-3">
+					<div
+						className={cn(
+							'flex flex-wrap gap-3',
+							decoration && RANK_ACTIONS_CLEARANCE[decoration.tier],
+						)}
+					>
 						<Button variant="outline" size="sm" onClick={onShareProfile}>
 							<Share2 className="mr-2 h-4 w-4" aria-hidden />{' '}
 							{t('shareProfile')}
