@@ -132,6 +132,8 @@ Any change that affects rendered UI — including new components, loading/empty/
 
 Before editing UI, always read §4.3 (colour rules), §5.3 (type-rank usage), §§7–10 (radii, elevation, motion and responsive behaviour) and §15 (verification), plus the relevant component subsection in §11. If changing tokens or global CSS, read §§3–4 in full. Restyle progress, direction, migration and QA/review documents are historical evidence only; they are not current styling authority.
 
+**Design skills advise; the design system decides.** General design skills (`frontend-design`, `ui-ux-pro-max`, `web-design-guidelines`) are good critique, but their defaults are written for no project in particular. Where one contradicts the [design system](docs/ui-design-system.md) or the [motion spec](docs/ui-motion-spec.md), the documented rule wins: Sunnsteel's uppercase region labels, Space Mono data, ruled zero-radius ledger and 0ms press and focus are deliberate, not oversights. Advice that fixes a defect -- contrast, focus, touch targets, an accessible name -- needs no amendment; apply it. Advice that would change a documented rule is a design-system amendment with its reason recorded, the way §26.0 records v1.1's, never a local exception. The project skill [`sunnsteel-design`](.claude/skills/sunnsteel-design/SKILL.md) carries this workflow.
+
 High-risk invariants:
 
 - **Use semantic tokens in component styling.** Do not add hardcoded colour literals or raw Tailwind palette classes. Literal values are permitted only when defining the approved tokens or when platform metadata requires them, and must match the design system.
