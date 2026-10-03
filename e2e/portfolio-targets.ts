@@ -265,8 +265,11 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		features: ['DASH-05', 'PREF-03'],
 		setup: async page => {
 			await page.getByRole('button', { name: 'Customize' }).click()
+			const dialog = page.getByRole('dialog', { name: 'Customize dashboard' })
+			await expect(dialog.getByText('Reset to default')).toBeVisible()
 		},
-		ready: ['Customize dashboard', 'Reset to default'],
+		// The dialog is portalled outside <main>; setup waits for it.
+		ready: ['finished in all', 'of started workouts'],
 		caption:
 			"Choosing the dashboard's order and which sections it shows, saved to the member's account; Today's Workouts always stays first.",
 	},
@@ -293,6 +296,15 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		features: ['LIVE-13', 'LIVE-20'],
 		setup: async page => {
 			await openBuildDaysStep(page)
+			// UX-20: warm-ups sit behind the exercise's "More options".
+			const more = page
+				.getByRole('button', { name: /^More options for / })
+				.first()
+			await expect(more).toBeVisible()
+			await more.click()
+			await expect(
+				page.getByRole('button', { name: /^Fewer options for / }).first(),
+			).toHaveAttribute('aria-expanded', 'true')
 			const add = page
 				.getByRole('button', { name: /^Add warm-up sets to / })
 				.first()
@@ -351,8 +363,11 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		// capture writes nothing.
 		setup: async page => {
 			await page.getByRole('button', { name: 'Plan deload' }).click()
+			const dialog = page.getByRole('dialog', { name: 'Plan a deload' })
+			await expect(dialog.getByText('What changes')).toBeVisible()
 		},
-		ready: ['Plan a deload', 'What changes'],
+		// The dialog is portalled outside <main>; setup waits for it.
+		ready: ['Autumn accumulation', 'Plan deload'],
 		caption:
 			'Planning a deload: a lighter copy of the plan in force, previewed exercise by exercise before it replaces those days.',
 	},
@@ -509,7 +524,13 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 					heading.closest('section')?.scrollIntoView({ block: 'center' }),
 				)
 		},
-		ready: ['Training signals', 'They state what changed, not why.'],
+		// UX-17: the intro's last line and the thresholds are behind "How this
+		// works"; the one-line summary is what shows.
+		ready: [
+			'Training signals',
+			'Four measures from your logged workouts',
+			'Effort (RPE)',
+		],
 		caption:
 			'Effort, rep targets, declining lifts and workouts over the last two fortnights, each with its numbers and thresholds and never a cause.',
 	},
@@ -555,7 +576,8 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 				.getByRole('heading', { name: 'Training Partners' })
 				.scrollIntoViewIfNeeded()
 		},
-		ready: ['Training Partners', 'A request shares nothing by itself.'],
+		// UX-17: the full description is behind "How this works".
+		ready: ['Training Partners', 'A request shares nothing.'],
 		caption:
 			'Training-partner requests and independent access controls for schedule, progress, activity, routines and encouragement.',
 	},
@@ -564,8 +586,9 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/settings/account',
 		features: ['EXPORT-01'],
 		setup: async page => {
+			// A card title is not a heading.
 			await page
-				.getByRole('heading', { name: 'Download Your Data' })
+				.getByText('Download Your Data', { exact: true })
 				.scrollIntoViewIfNeeded()
 		},
 		ready: ['Download Your Data', 'Download my data'],
@@ -577,8 +600,9 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		route: '/settings/account',
 		features: ['TRUST-01'],
 		setup: async page => {
+			// A card title is not a heading.
 			await page
-				.getByRole('heading', { name: 'Delete Account' })
+				.getByText('Delete Account', { exact: true })
 				.scrollIntoViewIfNeeded()
 		},
 		ready: ['Delete Account', 'cannot be undone'],
