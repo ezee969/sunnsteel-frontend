@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-09-24T20:27:48.093Z",
+	"mutatedAt": "2026-10-03T10:10:24.397Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -9,7 +9,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-09-23T08:50:21.920Z",
+			"capturedAt": "2026-10-03T09:59:50.266Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -23,9 +23,22 @@
 				"DASH-07",
 				"DASH-09",
 				"DASH-08",
+				"DASH-05",
+				"DASH-11",
+				"DASH-06",
 				"CORE-03"
 			],
-			"capturedAt": "2026-09-24T14:06:45.796Z",
+			"capturedAt": "2026-10-03T09:59:55.239Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "starter-templates",
+			"route": "/routines/new",
+			"features": [
+				"ROUT-03"
+			],
+			"capturedAt": "2026-10-03T10:00:42.154Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -37,7 +50,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-09-23T08:50:33.969Z",
+			"capturedAt": "2026-10-03T10:00:52.229Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -58,9 +71,10 @@
 				"ROUT-01",
 				"ROUT-02",
 				"ROUT-08",
-				"ROUT-09"
+				"ROUT-09",
+				"ROUT-15"
 			],
-			"capturedAt": "2026-09-23T14:33:34.031Z",
+			"capturedAt": "2026-10-03T10:01:29.242Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -71,7 +85,7 @@
 				"PROG-11",
 				"ROUT-09"
 			],
-			"capturedAt": "2026-09-24T17:45:38.312Z",
+			"capturedAt": "2026-10-03T10:01:37.910Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -81,7 +95,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-09-23T08:50:46.773Z",
+			"capturedAt": "2026-10-03T10:02:28.359Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -91,9 +105,10 @@
 			"features": [
 				"HIST-01",
 				"LIVE-09",
-				"SOC-07"
+				"SOC-07",
+				"LIVE-17"
 			],
-			"capturedAt": "2026-09-23T08:50:50.575Z",
+			"capturedAt": "2026-10-03T10:02:31.686Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -101,12 +116,37 @@
 			"slug": "progress",
 			"route": "/progress",
 			"features": [
+				"PROG-08",
+				"PROG-09",
+				"PROG-10",
+				"UX-11"
+			],
+			"capturedAt": "2026-10-03T10:02:37.382Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "progress-strength",
+			"route": "/progress/strength",
+			"features": [
 				"PROG-01",
+				"PROG-02",
+				"PROG-07",
+				"UX-11"
+			],
+			"capturedAt": "2026-10-03T10:02:42.938Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "progress-load",
+			"route": "/progress/load",
+			"features": [
 				"PROG-03",
 				"PROG-04",
-				"PROG-05"
+				"UX-11"
 			],
-			"capturedAt": "2026-09-23T08:50:56.866Z",
+			"capturedAt": "2026-10-03T10:02:48.407Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -118,9 +158,10 @@
 				"SCHED-03",
 				"SCHED-04",
 				"SCHED-05",
-				"NAV-05"
+				"NAV-05",
+				"ROUT-15"
 			],
-			"capturedAt": "2026-09-23T08:51:00.929Z",
+			"capturedAt": "2026-10-03T10:02:54.005Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -131,9 +172,10 @@
 				"ACH-01",
 				"ACH-02",
 				"ACH-04",
-				"ACH-05"
+				"ACH-05",
+				"ACH-09"
 			],
-			"capturedAt": "2026-09-23T08:51:05.356Z",
+			"capturedAt": "2026-10-03T10:02:59.437Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -144,7 +186,7 @@
 				"NOTIF-01",
 				"SOC-09"
 			],
-			"capturedAt": "2026-09-23T08:51:09.907Z",
+			"capturedAt": "2026-10-03T10:03:04.750Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -156,7 +198,7 @@
 				"SOC-04",
 				"SOC-06"
 			],
-			"capturedAt": "2026-09-23T08:51:14.773Z",
+			"capturedAt": "2026-10-03T10:03:10.119Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -167,7 +209,7 @@
 				"TRUST-04",
 				"PROF-10"
 			],
-			"capturedAt": "2026-09-23T08:51:19.086Z",
+			"capturedAt": "2026-10-03T10:03:15.402Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -179,7 +221,27 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-09-23T08:51:25.068Z",
+			"capturedAt": "2026-10-03T10:03:21.032Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "custom-exercise",
+			"route": "/exercises",
+			"features": [
+				"EXER-06"
+			],
+			"capturedAt": "2026-10-03T10:03:25.382Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "body-progress",
+			"route": "/progress/body",
+			"features": [
+				"PROG-12"
+			],
+			"capturedAt": "2026-10-03T10:03:34.730Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -201,7 +263,7 @@
 				"SOC-08",
 				"SOC-09"
 			],
-			"capturedAt": "2026-09-23T08:51:28.672Z",
+			"capturedAt": "2026-10-03T10:04:20.799Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -213,9 +275,34 @@
 				"PROF-04",
 				"PROF-05",
 				"PROF-06",
-				"PROF-11"
+				"ACH-10",
+				"ACH-11"
 			],
-			"capturedAt": "2026-09-23T19:50:07.043Z",
+			"capturedAt": "2026-10-03T10:04:26.407Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "settings-display",
+			"route": "/settings/account",
+			"features": [
+				"A11Y-02",
+				"LIVE-18",
+				"A11Y-01"
+			],
+			"capturedAt": "2026-10-03T10:04:31.826Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "settings-privacy",
+			"route": "/settings/privacy",
+			"features": [
+				"PROF-06",
+				"PROF-09",
+				"UX-12"
+			],
+			"capturedAt": "2026-10-03T10:04:37.326Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -239,7 +326,7 @@
 				"LIVE-04",
 				"LIVE-05"
 			],
-			"capturedAt": "2026-09-23T08:51:54.118Z",
+			"capturedAt": "2026-10-03T10:10:00.627Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -249,7 +336,7 @@
 			"features": [
 				"LIVE-15"
 			],
-			"capturedAt": "2026-09-24T19:01:44.591Z",
+			"capturedAt": "2026-10-03T10:10:14.522Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -259,7 +346,7 @@
 			"features": [
 				"LIVE-12"
 			],
-			"capturedAt": "2026-09-24T20:27:51.740Z",
+			"capturedAt": "2026-10-03T10:10:28.609Z",
 			"width": 1440,
 			"height": 900
 		}
