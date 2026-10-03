@@ -155,6 +155,7 @@ later:
 | Marker on first mount of a page | none — it appears in place | 0ms |
 | Nav item hover | `background-color`, `color` | 120ms standard |
 | Sidebar collapse chevron (topbar) | `transform: rotate(180deg)` | 200ms standard |
+| Desktop rail expand / collapse | the rail keeps its w-64 box and slides `translateX(0 ↔ -11rem)`; its content counter-translates by the same amount, so it holds still and the moving edge clips it. The content column's margin snaps (width and margin never animate) | 300ms standard expand / 200ms exit collapse; instant under reduced motion |
 | Mobile drawer enter | `transform: translateX(-100% → 0)` + scrim `opacity` 0→1 | 300ms standard / scrim 200ms standard |
 | Mobile drawer exit | `translateX(0 → -100%)` + scrim `opacity` →0 | 200ms exit / scrim 140ms exit |
 | Route change | **no page-level entrance animation** (locked §9.2). Content swaps instantly; each region draws its rule once (§2.9) | — |

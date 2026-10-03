@@ -695,9 +695,14 @@ for (const width of REGRESSION_WIDTHS) {
 			await expectWithinViewport(page, sidebarPanel(page), 'sidebar')
 
 			const main = page.locator('main')
+			// The rail keeps its 256px box and slides off the left edge when
+			// collapsed (motion spec 2.3), so its visible width is its right edge.
 			const expectColumns = async (sidebarWidth: number) => {
 				await expect
-					.poll(async () => (await box(sidebarPanel(page), 'sidebar')).width)
+					.poll(async () => {
+						const rail = await box(sidebarPanel(page), 'sidebar')
+						return rail.x + rail.width
+					})
 					.toBe(sidebarWidth)
 				await expect
 					.poll(async () => (await box(main, 'main')).x, {
