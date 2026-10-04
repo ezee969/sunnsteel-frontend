@@ -189,7 +189,7 @@ export interface CatalogContext {
 	label?: (name: string) => string
 }
 
-const fold = (value: string) =>
+export const fold = (value: string) =>
 	value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('en-US')
 
 /**

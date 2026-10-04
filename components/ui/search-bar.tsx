@@ -73,6 +73,7 @@ export function SearchBar() {
 				<Input
 					type="text"
 					placeholder={t('placeholder')}
+					aria-label={t('label')}
 					// v1.1 §26.6: a field too narrow for its placeholder ends it with
 					// an ellipsis rather than a cut letter; the right padding still
 					// clears the spinner.
@@ -147,8 +148,22 @@ export function SearchBar() {
 							</div>
 						) : (
 							!isLoading && (
-								<div className="type-body-sm p-4 text-center text-ink-3">
-									{t('noUsers', { query: debouncedQuery })}
+								// NAV-01: no member matching is not nothing matching, so the
+								// full results stay one tap away.
+								<div className="flex flex-col py-2">
+									<div className="type-body-sm px-3 pb-2 pt-1 text-center text-ink-3">
+										{t('noUsers', { query: debouncedQuery })}
+									</div>
+									<button
+										type="button"
+										className="type-body-sm w-full border-t border-rule-faint px-3 py-2 text-center text-ink-2 outline-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+										onClick={e => {
+											e.preventDefault()
+											handleSearchSubmit(e as unknown as React.FormEvent)
+										}}
+									>
+										{t('viewAll', { query: debouncedQuery })}
+									</button>
 								</div>
 							)
 						)}

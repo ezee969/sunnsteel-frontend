@@ -74,10 +74,11 @@
 		"resume": "Retomar"
 	},
 	"search": {
-		"placeholder": "Busca por nombre o @usuario…",
-		"topResults": "Resultados",
+		"placeholder": "Busca miembros, ejercicios, rutinas…",
+		"topResults": "Miembros",
 		"viewAll": "Ver todos los resultados de \"{query}\"",
-		"noUsers": "No hay usuarios para \"{query}\""
+		"noUsers": "Ningún miembro coincide con \"{query}\".",
+		"label": "Busca miembros, ejercicios, rutinas y tus entrenamientos"
 	},
 	"theme": {
 		"toLight": "Cambiar al tema claro",

@@ -74,10 +74,11 @@
 		"resume": "Resume"
 	},
 	"search": {
-		"placeholder": "Search by name or @username…",
-		"topResults": "Top Results",
+		"placeholder": "Search members, exercises, routines…",
+		"topResults": "Members",
 		"viewAll": "View all results for \"{query}\"",
-		"noUsers": "No users found for \"{query}\""
+		"noUsers": "No members match \"{query}\".",
+		"label": "Search members, exercises, routines and your workouts"
 	},
 	"theme": {
 		"toLight": "Switch to light theme",

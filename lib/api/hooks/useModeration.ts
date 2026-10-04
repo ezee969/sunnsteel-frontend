@@ -55,6 +55,8 @@ function useBlockMutation(
 				['routines'],
 				['notifications'],
 				['activity'],
+				// NAV-01: a blocked member and their routines leave search too.
+				['search'],
 			] as const) {
 				void queryClient.invalidateQueries({ queryKey: key })
 			}
@@ -147,6 +149,7 @@ function useReviewMutation(
 				['users'],
 				['routines'],
 				['activity'],
+				['search'],
 			] as const) {
 				void queryClient.invalidateQueries({ queryKey: key })
 			}

@@ -1,110 +1,41 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { normalizeSearchQuery } from '@sunsteel/contracts'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import React from 'react'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Skeleton } from '@/components/ui/skeleton'
 import { FollowSuggestions } from '@/features/profile/follow-suggestions'
-import { useUserSearch } from '@/lib/api/hooks/useUserSearch'
+import { SearchResults } from '@/features/search/search-results'
+import { parseSearchView } from '@/lib/utils/search'
 
+/**
+ * NAV-01: the full results of the header search. Without a query it is the
+ * place to start one, with the follow suggestions it always had.
+ */
 export default function SearchPage() {
 	const t = useTranslations('social.search')
 	const searchParams = useSearchParams()
-	const router = useRouter()
-	const query = searchParams.get('q') || ''
+	const raw = searchParams.get('q') ?? ''
+	const query = normalizeSearchQuery(raw)
+	const view = parseSearchView(searchParams.get('type'))
 
-	const { data: results = [], isLoading } = useUserSearch(query, 50)
-
-	if (!query) {
-		return (
-			// Final review 8: the page inscription on the page grid (§11.11), not
-			// a centred icon placeholder.
-			<div className="mx-auto max-w-6xl">
-				<div className="rule-heading pb-4">
-					<h1 className="type-page corner-brackets inline-block text-foreground">
-						{t('title')}
-					</h1>
-					<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
-						{t('prompt')}
-					</p>
-				</div>
-				<div className="mt-8 max-w-3xl">
-					<FollowSuggestions />
-				</div>
-			</div>
-		)
-	}
+	if (query) return <SearchResults query={query} view={view} />
 
 	return (
-		<div className="mx-auto max-w-6xl space-y-6">
-			{/* This page has no `HeroSection`, so its own heading is the page
-			    inscription (§11.11). */}
+		// Final review 8: the page inscription on the page grid (§11.11), not
+		// a centred icon placeholder.
+		<div className="mx-auto max-w-6xl">
 			<div className="rule-heading pb-4">
 				<h1 className="type-page corner-brackets inline-block text-foreground">
-					{t('resultsTitle')}
+					{t('title')}
 				</h1>
-				<p className="type-body-sm mt-2 text-ink-3">
-					{t.rich('showing', {
-						query,
-						hl: chunks => (
-							<span className="type-data text-foreground">{chunks}</span>
-						),
-					})}
+				<p className="mt-2 max-w-[68ch] text-sm text-ink-2 sm:text-base">
+					{raw.trim() ? t('tooShort') : t('prompt')}
 				</p>
 			</div>
-
-			{isLoading ? (
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-					{Array.from({ length: 8 }).map((_, i) => (
-						<div
-							key={i}
-							className="flex flex-col items-center rounded-sm border border-rule bg-surface p-6"
-						>
-							<Skeleton className="mb-4 h-20 w-20 rounded-full" />
-							<Skeleton className="mb-2 h-5 w-3/4" />
-							<Skeleton className="h-4 w-1/2" />
-						</div>
-					))}
-				</div>
-			) : results.length > 0 ? (
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{results.map(user => (
-						// §9.2 — the per-card stagger, the hover scale, the hover
-						// gradient wash and the shadow lift are all gone. A result is a
-						// `panel` (§11.5) and hover changes colour only.
-						<div
-							key={user.id}
-							onClick={() =>
-								router.push(`/profile/${encodeURIComponent(user.username)}`)
-							}
-							className="group flex cursor-pointer flex-col items-center rounded-sm border border-rule bg-surface p-6 transition-colors duration-[var(--motion-fast)] ease-standard hover:border-ink-3"
-						>
-							<Avatar className="mb-4 h-20 w-20 border border-rule">
-								<AvatarImage
-									src={user.avatarUrl || ''}
-									className="object-cover"
-								/>
-								<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
-									{user.name.charAt(0)}
-								</AvatarFallback>
-							</Avatar>
-							<h2 className="type-panel text-center text-foreground">
-								{user.name} {user.lastName || ''}
-							</h2>
-							<p className="type-body-sm mt-1 text-ink-3">@{user.username}</p>
-						</div>
-					))}
-				</div>
-			) : (
-				// Final review 8: no dashed placeholder box. The message sits on the
-				// page grid under the inscription, at a readable measure.
-				<div className="max-w-[68ch] space-y-1">
-					<h2 className="type-panel text-foreground">{t('noneTitle')}</h2>
-					<p className="type-body-sm text-ink-3">{t('noneBody', { query })}</p>
-				</div>
-			)}
+			<div className="mt-8 max-w-3xl">
+				<FollowSuggestions />
+			</div>
 		</div>
 	)
 }

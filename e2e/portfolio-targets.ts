@@ -380,6 +380,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Paginated workout history with status, routine, date and sort filters.',
 	},
 	{
+		slug: 'search',
+		route: '/search?q=press',
+		features: ['NAV-01'],
+		ready: ['Search results', 'Exercises'],
+		caption:
+			'One search across members, exercises, routines and your own workouts, each category one tab away.',
+	},
+	{
 		slug: 'history-detail',
 		route: '/workouts/history/:history',
 		features: ['HIST-01', 'LIVE-09', 'SOC-07', 'LIVE-17'],
