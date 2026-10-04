@@ -116,7 +116,13 @@ public proxy and the Railway connector cannot run SQL. Production's
 deploy and HTTP logs since 2026-09-20 show no `Non-improving` error and only
 200s on the timeline route. If production was restored from the Neon
 database the seed ran against, the owner's account there may hold the same
-event. Either way the migration removes it on the next deploy. Also not verified: the
+event. **Deployed 2026-10-04:** backend `0145efe` passed CI (checks,
+migrations and analytics-integration), and Railway deployment `2dcddee4`
+reached `SUCCESS`. Its pre-deploy step logged ``Applying migration
+`20261004120000_stale_record_events` `` and "All migrations have been
+successfully applied". Health answers 200 and the timeline route 401 without
+a token. How many rows the migration removed in production is not known,
+because nothing reports that count without database access. Also not verified: the
 query plan at a larger record history (the busiest local account has 66
 record events), and the `SESSION_PROGRESS` notification text of the affected
 workout, which still counts the removed record.
