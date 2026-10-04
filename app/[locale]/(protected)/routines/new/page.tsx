@@ -30,6 +30,7 @@ import { useExercises } from '@/lib/api/hooks/useExercises'
 import { catalogExercises } from '@/lib/utils/custom-exercises'
 import {
 	findRoutineTemplate,
+	parseTemplateWeekdays,
 	templateDraft,
 } from '@/lib/utils/routine-templates'
 
@@ -109,8 +110,14 @@ function CreateRoutineWizard() {
 	// ROUT-03: `?template=<slug>` opens a starter programme as the draft, once
 	// the catalog it names exercises from has loaded. Choosing another template
 	// replaces the draft; nothing is saved until the member creates it.
-	const templateSlug = useSearchParams().get('template')
+	const searchParams = useSearchParams()
+	const templateSlug = searchParams.get('template')
 	const template = findRoutineTemplate(templateSlug)
+	// ONBOARD-01: the weekdays onboarding asked for, when it sent them.
+	const templateWeekdays = useMemo(
+		() => parseTemplateWeekdays(searchParams.get('days')),
+		[searchParams],
+	)
 	const { data: catalog, isLoading: catalogLoading } = useExercises()
 	const [appliedTemplate, setAppliedTemplate] = useState<string | null>(null)
 	const [missingExercises, setMissingExercises] = useState<string[]>([])
@@ -121,6 +128,7 @@ function CreateRoutineWizard() {
 			template,
 			catalogExercises(catalog),
 			tTemplates,
+			templateWeekdays,
 		)
 		setAppliedTemplate(template.slug)
 		setCurrentStep(1)
@@ -132,7 +140,7 @@ function CreateRoutineWizard() {
 			setMissingExercises(result.missing)
 			setRoutineData(EMPTY_DRAFT)
 		}
-	}, [template, catalog, appliedTemplate, tTemplates])
+	}, [template, catalog, appliedTemplate, tTemplates, templateWeekdays])
 	const templateLoading =
 		!!template && appliedTemplate !== template.slug && catalogLoading
 

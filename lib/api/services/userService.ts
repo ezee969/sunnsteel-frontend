@@ -22,6 +22,7 @@ import {
 	TrainingPartnershipsResponse,
 	UpdateDashboardLayoutRequest,
 	UpdateLocaleRequest,
+	UpdateOnboardingRequest,
 	UpdateProfileDiscoveryRequest,
 	UpdateProfilePrivacyRequest,
 	UpdateProfileRequest,
@@ -86,6 +87,15 @@ export const userService = {
 	/** PREF-04: the weekday the account's weeks start on. */
 	async updateWeekStart(data: UpdateWeekStartRequest): Promise<UserProfile> {
 		return httpClient.request<UserProfile>('/users/preferences/week-start', {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		})
+	},
+
+	/** ONBOARD-01: progress through onboarding, written partially. */
+	async updateOnboarding(data: UpdateOnboardingRequest): Promise<UserProfile> {
+		return httpClient.request<UserProfile>('/users/preferences/onboarding', {
 			method: 'PUT',
 			body: JSON.stringify(data),
 			secure: true,

@@ -2,11 +2,15 @@
 
 import type { DashboardSectionId } from '@sunsteel/contracts'
 import { SlidersHorizontal } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
+import { useUpdateOnboarding } from '@/lib/api/hooks/useOnboarding'
+import { pendingSteps, shouldOpenWelcome } from '@/lib/onboarding/steps'
 import { dashboardRows } from '@/lib/utils/dashboard-layout'
 
 import { CustomizeDashboardDialog } from './components/CustomizeDashboardDialog'
@@ -48,6 +52,21 @@ export default function Dashboard() {
 
 	const name = user?.name?.trim()
 	const [customizing, setCustomizing] = useState(false)
+	const tOnboarding = useTranslations('onboarding.notice')
+	const router = useRouter()
+	const updateOnboarding = useUpdateOnboarding()
+	const opened = useRef(false)
+	// ONBOARD-01: a new account's first visit opens onboarding once; it is
+	// recorded first, so it never opens by itself again on any device.
+	useEffect(() => {
+		if (opened.current || !shouldOpenWelcome(user?.onboarding)) return
+		opened.current = true
+		updateOnboarding.mutate({ offered: true })
+		router.push('/welcome')
+	}, [user, updateOnboarding, router])
+	// A member past getting started is offered steps added since their
+	// version here; a new account resumes from Getting started instead.
+	const newSetupSteps = steps ? 0 : pendingSteps(user?.onboarding).length
 
 	return (
 		// v1.1 §26.4: the inscription, the greeting and the rank read as one
@@ -113,6 +132,18 @@ export default function Dashboard() {
 					<div className="max-w-3xl">
 						<TodaysWorkouts />
 					</div>
+
+					{newSetupSteps > 0 ? (
+						<p className="type-body-sm max-w-3xl text-ink-2">
+							{tOnboarding('text', { count: newSetupSteps })}{' '}
+							<Link
+								href="/welcome"
+								className="text-foreground underline underline-offset-4"
+							>
+								{tOnboarding('action')}
+							</Link>
+						</p>
+					) : null}
 
 					{/* UX-19: a new account's three first steps, under the one
 					    primary action rather than competing with it. */}

@@ -120,6 +120,19 @@ describe('gettingStartedSteps (UX-19)', () => {
 		])
 	})
 
+	it('leads with Finish setting up only while onboarding is waiting (ONBOARD-01)', () => {
+		const counts = { routines: 0, completedWorkouts: 0, trainingLocations: 0 }
+		expect(gettingStartedSteps({ ...counts, setupPending: true })[0]).toEqual({
+			id: 'setup',
+			done: false,
+		})
+		expect(
+			gettingStartedSteps({ ...counts, setupPending: false }).map(
+				step => step.id,
+			),
+		).toEqual(['routine', 'workout', 'gym'])
+	})
+
 	it('marks each step done from the data the account already has', () => {
 		expect(
 			gettingStartedSteps({

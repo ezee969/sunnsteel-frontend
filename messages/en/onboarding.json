@@ -1,0 +1,86 @@
+{
+	"page": {
+		"title": "Set up Sunnsteel",
+		"intro": "A few choices so the app fits how you train. Skip anything; all of it can be changed later.",
+		"stepOf": "Step {current} of {total}",
+		"skipForNow": "Skip for now",
+		"skip": "Skip this step",
+		"continue": "Continue",
+		"saving": "Saving…",
+		"saveFailed": "This step could not be saved",
+		"changeLater": "You can change this later in <link>Settings</link>.",
+		"doneTitle": "You're all set",
+		"doneBody": "There is nothing left to set up. Everything you chose here can be changed in Settings.",
+		"toDashboard": "Go to the dashboard",
+		"loading": "Loading your setup"
+	},
+	"steps": {
+		"units": {
+			"title": "Units and calendar",
+			"description": "How weights and lengths read, the time zone your training is counted in, and the day your weeks start.",
+			"weightUnit": "Weights",
+			"lengthUnit": "Lengths",
+			"kilograms": "Kilograms (kg)",
+			"pounds": "Pounds (lb)",
+			"centimeters": "Centimeters (cm)",
+			"inches": "Inches (in)",
+			"timeZone": "Time zone",
+			"weekStart": "Weeks start on",
+			"monday": "Monday",
+			"sunday": "Sunday"
+		},
+		"goals": {
+			"title": "Goals and experience",
+			"description": "What you train for and how long you have been training. They shape the routine suggested at the end.",
+			"goalsLabel": "Goals, up to {max}",
+			"experienceLabel": "Experience",
+			"notSpecified": "Not specified"
+		},
+		"days": {
+			"title": "Training days",
+			"description": "The weekdays you can usually train. The routine suggested at the end is set on them.",
+			"label": "Training days",
+			"count": "{count, plural, =0 {No days chosen} one {# day a week} other {# days a week}}"
+		},
+		"equipment": {
+			"title": "Equipment",
+			"description": "Where you train, so loads round to the bar and plates you actually have.",
+			"where": "Where do you train?",
+			"commercial": "A commercial gym",
+			"home": "A home gym",
+			"none": "Without equipment",
+			"homeEquipment": "What you have",
+			"bar": "Bar",
+			"plates": "Plates",
+			"platesStandard": "A standard set",
+			"platesLight": "A lighter set",
+			"gymName": "Gym",
+			"homeName": "Home Gym",
+			"noneNote": "Nothing to save: bodyweight exercises need no equipment. Add a gym later in Settings.",
+			"already": "{count, plural, one {You already have # training location.} other {You already have # training locations.}} {count, plural, one {Change it} other {Change them}} in <link>Settings</link>."
+		},
+		"target": {
+			"title": "Weekly target",
+			"description": "An optional private goal: how many workouts you mean to do each week. Progress and the dashboard show how close you are.",
+			"offer": "Add a goal to train {count, plural, one {# time} other {# times}} a week",
+			"noDays": "Choose training days to set a weekly target, or skip this step.",
+			"already": "You already have a weekly sessions goal."
+		},
+		"recommendation": {
+			"title": "Your first routine",
+			"intro": "Based on your answers:",
+			"reason": "Chosen for {count, plural, =0 {a schedule you have not set yet} one {# training day a week} other {# training days a week}}{beginner, select, yes { and someone starting out} other {}}.",
+			"onYourDays": "It is set on your days: {days}.",
+			"ownDays": "It keeps its own days; change them in the builder.",
+			"open": "Open this routine",
+			"other": "Choose another template",
+			"build": "Build my own routine",
+			"buildIntro": "The starter routines are strength programmes, so for your goals building your own fits better.",
+			"later": "Not now, go to the dashboard"
+		}
+	},
+	"notice": {
+		"text": "{count, plural, one {A new setup choice is waiting.} other {# new setup choices are waiting.}}",
+		"action": "Review"
+	}
+}

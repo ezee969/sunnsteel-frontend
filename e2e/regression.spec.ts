@@ -477,6 +477,9 @@ const ROUTES: SweepRoute[] = [
 	{ slug: 'settings-privacy', path: () => '/settings/privacy' },
 	{ slug: 'settings-notifications', path: () => '/settings/notifications' },
 	{ slug: 'settings-account', path: () => '/settings/account' },
+	// ONBOARD-01. The sweep's account finished onboarding before it shipped,
+	// so the page shows its done state; the flow's steps are checked by hand.
+	{ slug: 'welcome', path: () => '/welcome' },
 	// TRUST-04. The sweep signs in as the owner, who holds the moderator flag,
 	// so the page renders its own content rather than its not-found branch.
 	{ slug: 'moderation', path: () => '/moderation' },

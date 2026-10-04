@@ -333,6 +333,10 @@
 		"progress": "{done} de {total} hechos",
 		"done": "Hecho",
 		"steps": {
+			"setup": {
+				"title": "Termina de configurar",
+				"detail": "Unidades, objetivos, días de entrenamiento y equipamiento, y luego una rutina para empezar."
+			},
 			"routine": {
 				"title": "Elige una rutina",
 				"detail": "Empieza desde una plantilla o crea la tuya."

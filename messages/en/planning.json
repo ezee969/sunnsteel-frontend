@@ -333,6 +333,10 @@
 		"progress": "{done} of {total} done",
 		"done": "Done",
 		"steps": {
+			"setup": {
+				"title": "Finish setting up",
+				"detail": "Units, goals, training days and equipment, then a routine to start with."
+			},
 			"routine": {
 				"title": "Choose a routine",
 				"detail": "Start from a template or build your own."

@@ -250,6 +250,27 @@ export function describeTemplateSize(template: RoutineTemplate, t: T): string {
 	return t('size', { count: exercises })
 }
 
+/**
+ * ONBOARD-01: `?days=1,3,5` -- the weekdays a member said they train, as
+ * `Date.getDay()` numbers. Anything else, or a repeat, reads as none.
+ */
+export function parseTemplateWeekdays(
+	param: string | null | undefined,
+): number[] | null {
+	if (!param) return null
+	const parts = param.split(',')
+	const days = parts.map(Number)
+	if (
+		days.length > 7 ||
+		days.some(day => !Number.isInteger(day) || day < 0 || day > 6) ||
+		new Set(days).size !== days.length
+	) {
+		return null
+	}
+	// Monday first, as the weekdays read in the builder by default.
+	return [...days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7))
+}
+
 export type TemplateDraft =
 	{ ok: true; draft: RoutineWizardData } | { ok: false; missing: string[] }
 
@@ -266,6 +287,12 @@ export function templateDraft(
 	template: RoutineTemplate,
 	catalog: readonly { id: string; name: string }[],
 	t: T,
+	/**
+	 * ONBOARD-01: the member's training weekdays. A rotation trains on them;
+	 * a weekly template takes them only when it has as many days, in order,
+	 * and otherwise keeps its own.
+	 */
+	weekdays: readonly number[] | null = null,
 ): TemplateDraft {
 	const byName = new Map(catalog.map(item => [item.name, item.id]))
 	const missing = [
@@ -279,8 +306,14 @@ export function templateDraft(
 	]
 	if (missing.length) return { ok: false, missing }
 
-	const days: RoutineWizardDay[] = template.days.map(day => ({
-		slot: day.slot,
+	const weeklySlots =
+		template.scheduleMode === 'WEEKLY' &&
+		weekdays &&
+		weekdays.length === template.days.length
+			? weekdays
+			: null
+	const days: RoutineWizardDay[] = template.days.map((day, index) => ({
+		slot: weeklySlots ? weeklySlots[index] : day.slot,
 		name: templateDayName(day, t),
 		exercises: day.exercises.map((exercise): RoutineWizardExercise => ({
 			clientId: makeClientId(),
@@ -309,7 +342,10 @@ export function templateDraft(
 			scheduleMode: template.scheduleMode,
 			trainingDays: days.map(day => day.slot),
 			restDays: [],
-			rotationWeekdays: [...template.rotationWeekdays],
+			rotationWeekdays:
+				template.scheduleMode === 'ROTATION' && weekdays?.length
+					? [...weekdays]
+					: [...template.rotationWeekdays],
 			days,
 		},
 	}

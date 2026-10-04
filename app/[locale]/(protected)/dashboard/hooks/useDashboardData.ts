@@ -9,6 +9,7 @@ import {
 	useWorkoutProgress,
 	useWorkoutStats,
 } from '@/lib/api/hooks/useWorkoutSession'
+import { pendingSteps } from '@/lib/onboarding/steps'
 import {
 	type DashboardGrowthSignals,
 	effectiveDashboardLayout,
@@ -93,6 +94,7 @@ export function useDashboardData() {
 					completedWorkouts,
 					// A failed read leaves the step open rather than holding the page.
 					trainingLocations: locations.data?.length ?? 0,
+					setupPending: pendingSteps(user?.onboarding).length > 0,
 				})
 			: null,
 	}

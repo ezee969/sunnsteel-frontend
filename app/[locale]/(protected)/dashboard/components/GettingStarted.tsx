@@ -13,6 +13,7 @@ import {
 import { getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
 const STEP_HREF: Record<GettingStartedStepId, string> = {
+	setup: '/welcome',
 	routine: '/routines/new',
 	workout: '/workouts',
 	gym: '/settings/training',

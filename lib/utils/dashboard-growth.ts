@@ -78,7 +78,7 @@ export function effectiveDashboardLayout(
 	}))
 }
 
-export type GettingStartedStepId = 'routine' | 'workout' | 'gym'
+export type GettingStartedStepId = 'setup' | 'routine' | 'workout' | 'gym'
 
 export interface GettingStartedStep {
 	id: GettingStartedStepId
@@ -89,17 +89,22 @@ export interface GettingStartedStep {
  * The Getting started list, in the order a new member meets it: a routine to
  * train, a first finished workout, then the gym its loads round to. Each step
  * is read from data the account already has, so nothing new is stored.
+ * ONBOARD-01: while onboarding has steps waiting, "Finish setting up" leads
+ * the list and resumes it; it leaves the list once they are done.
  */
 export function gettingStartedSteps({
 	routines,
 	completedWorkouts,
 	trainingLocations,
+	setupPending = false,
 }: {
 	routines: number
 	completedWorkouts: number
 	trainingLocations: number
+	setupPending?: boolean
 }): GettingStartedStep[] {
 	return [
+		...(setupPending ? [{ id: 'setup' as const, done: false }] : []),
 		{ id: 'routine', done: routines > 0 },
 		{ id: 'workout', done: completedWorkouts > 0 },
 		{ id: 'gym', done: trainingLocations > 0 },

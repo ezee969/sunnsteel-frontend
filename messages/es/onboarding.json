@@ -1,0 +1,86 @@
+{
+	"page": {
+		"title": "Configura Sunnsteel",
+		"intro": "Algunas elecciones para que la app se ajuste a cómo entrenas. Puedes omitir cualquiera y cambiarlo todo después.",
+		"stepOf": "Paso {current} de {total}",
+		"skipForNow": "Omitir por ahora",
+		"skip": "Omitir este paso",
+		"continue": "Continuar",
+		"saving": "Guardando…",
+		"saveFailed": "No se pudo guardar este paso",
+		"changeLater": "Puedes cambiarlo después en <link>Ajustes</link>.",
+		"doneTitle": "Todo listo",
+		"doneBody": "No queda nada por configurar. Todo lo que elegiste aquí se puede cambiar en Ajustes.",
+		"toDashboard": "Ir al inicio",
+		"loading": "Cargando tu configuración"
+	},
+	"steps": {
+		"units": {
+			"title": "Unidades y calendario",
+			"description": "Cómo se leen los pesos y las longitudes, la zona horaria en la que se cuenta tu entrenamiento y el día en que empiezan tus semanas.",
+			"weightUnit": "Pesos",
+			"lengthUnit": "Longitudes",
+			"kilograms": "Kilogramos (kg)",
+			"pounds": "Libras (lb)",
+			"centimeters": "Centímetros (cm)",
+			"inches": "Pulgadas (in)",
+			"timeZone": "Zona horaria",
+			"weekStart": "Las semanas empiezan el",
+			"monday": "Lunes",
+			"sunday": "Domingo"
+		},
+		"goals": {
+			"title": "Objetivos y experiencia",
+			"description": "Para qué entrenas y cuánto tiempo llevas entrenando. Definen la rutina que se sugiere al final.",
+			"goalsLabel": "Objetivos, hasta {max}",
+			"experienceLabel": "Experiencia",
+			"notSpecified": "Sin especificar"
+		},
+		"days": {
+			"title": "Días de entrenamiento",
+			"description": "Los días de la semana en que sueles poder entrenar. La rutina que se sugiere al final se ubica en ellos.",
+			"label": "Días de entrenamiento",
+			"count": "{count, plural, =0 {Ningún día elegido} one {# día por semana} other {# días por semana}}"
+		},
+		"equipment": {
+			"title": "Equipamiento",
+			"description": "Dónde entrenas, para que las cargas se redondeen a la barra y los discos que realmente tienes.",
+			"where": "¿Dónde entrenas?",
+			"commercial": "En un gimnasio comercial",
+			"home": "En un gimnasio en casa",
+			"none": "Sin equipamiento",
+			"homeEquipment": "Lo que tienes",
+			"bar": "Barra",
+			"plates": "Discos",
+			"platesStandard": "Un juego estándar",
+			"platesLight": "Un juego más liviano",
+			"gymName": "Gimnasio",
+			"homeName": "Gimnasio en casa",
+			"noneNote": "No hay nada que guardar: los ejercicios con el peso corporal no necesitan equipamiento. Agrega un gimnasio después en Ajustes.",
+			"already": "{count, plural, one {Ya tienes # lugar de entrenamiento.} other {Ya tienes # lugares de entrenamiento.}} {count, plural, one {Cámbialo} other {Cámbialos}} en <link>Ajustes</link>."
+		},
+		"target": {
+			"title": "Objetivo semanal",
+			"description": "Un objetivo privado y opcional: cuántos entrenamientos piensas hacer cada semana. Progreso y el inicio muestran qué tan cerca estás.",
+			"offer": "Agregar un objetivo de entrenar {count, plural, one {# vez} other {# veces}} por semana",
+			"noDays": "Elige días de entrenamiento para fijar un objetivo semanal, u omite este paso.",
+			"already": "Ya tienes un objetivo de sesiones semanales."
+		},
+		"recommendation": {
+			"title": "Tu primera rutina",
+			"intro": "Según tus respuestas:",
+			"reason": "Elegida para {count, plural, =0 {un calendario que todavía no fijaste} one {# día de entrenamiento por semana} other {# días de entrenamiento por semana}}{beginner, select, yes { y alguien que empieza} other {}}.",
+			"onYourDays": "Está ubicada en tus días: {days}.",
+			"ownDays": "Conserva sus propios días; cámbialos en el constructor.",
+			"open": "Abrir esta rutina",
+			"other": "Elegir otra plantilla",
+			"build": "Crear mi propia rutina",
+			"buildIntro": "Las rutinas iniciales son programas de fuerza, así que para tus objetivos te conviene crear la tuya.",
+			"later": "Ahora no, ir al inicio"
+		}
+	},
+	"notice": {
+		"text": "{count, plural, one {Hay una nueva opción de configuración.} other {Hay # nuevas opciones de configuración.}}",
+		"action": "Revisar"
+	}
+}
