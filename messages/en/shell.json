@@ -75,10 +75,18 @@
 	},
 	"search": {
 		"placeholder": "Search members, exercises, routines…",
-		"topResults": "Members",
 		"viewAll": "View all results for \"{query}\"",
-		"noUsers": "No members match \"{query}\".",
-		"label": "Search members, exercises, routines and your workouts"
+		"label": "Search members, exercises, routines and your workouts",
+		"listLabel": "Suggestions for \"{query}\"",
+		"groups": {
+			"members": "Members",
+			"exercises": "Exercises",
+			"routines": "Routines",
+			"workouts": "Workouts"
+		},
+		"nothing": "Nothing matches \"{query}\".",
+		"searching": "Searching…",
+		"failed": "Suggestions could not load. Press Enter for the full results."
 	},
 	"theme": {
 		"toLight": "Switch to light theme",

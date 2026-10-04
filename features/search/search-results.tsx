@@ -11,13 +11,8 @@ import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useLoadMoreOnScroll } from '@/hooks/use-load-more-on-scroll'
-import { exerciseLabel } from '@/i18n/catalog'
-import { useExercises } from '@/lib/api/hooks/useExercises'
-import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import { useSearchPages, useSearchPreview } from '@/lib/api/hooks/useSearch'
 import {
-	matchExercises,
-	matchOwnRoutines,
 	SEARCH_ALL_VIEW_LIMIT,
 	searchHref,
 	searchTabs,
@@ -32,6 +27,7 @@ import {
 	SharedRoutineResultRow,
 	WorkoutResultRow,
 } from './search-rows'
+import { useOwnMatches } from './use-own-matches'
 
 /** How many rows a client-matched list shows before "Show N more" (§20.2). */
 const CLIENT_LIST_LIMIT = 20
@@ -113,27 +109,6 @@ function ResultSection({
 			) : null}
 		</section>
 	)
-}
-
-function useOwnMatches(query: string) {
-	const tExercises = useTranslations('catalog.exercises')
-	const exercises = useExercises()
-	const routines = useRoutines()
-	return {
-		exercises: useMemo(
-			() =>
-				matchExercises(exercises.data ?? [], query, name =>
-					exerciseLabel(name, tExercises),
-				),
-			[exercises.data, query, tExercises],
-		),
-		exercisesLoading: exercises.isLoading,
-		routines: useMemo(
-			() => matchOwnRoutines(routines.data ?? [], query),
-			[routines.data, query],
-		),
-		routinesLoading: routines.isLoading,
-	}
 }
 
 function AllResults({ query }: { query: string }) {

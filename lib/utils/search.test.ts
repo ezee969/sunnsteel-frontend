@@ -9,10 +9,12 @@ import {
 	matchExercises,
 	matchOwnRoutines,
 	memberHref,
+	moveActive,
 	parseSearchView,
 	searchHref,
 	searchTabs,
 	sharedRoutineHref,
+	suggestionGroups,
 	workoutHref,
 } from './search'
 
@@ -169,5 +171,79 @@ describe("NAV-01 the member's own routines", () => {
 
 	it('find nothing for a query under two characters', () => {
 		expect(matchOwnRoutines(routines, 'u')).toEqual([])
+	})
+})
+
+describe('NAV-02 grouped suggestions', () => {
+	const member = (id: string) => ({ id, username: id, name: id })
+	const shared = (id: string) => ({
+		routineId: id,
+		name: id,
+		description: null,
+		scheduleMode: 'WEEKLY' as const,
+		dayCount: 3,
+		exerciseCount: 9,
+		updatedAt: '2026-10-01T00:00:00.000Z',
+		author: { username: 'ana', name: 'Ana' },
+	})
+
+	it('keeps the results page order, caps each group and drops empty ones', () => {
+		const groups = suggestionGroups({
+			members: [member('a'), member('b'), member('c'), member('d')],
+			exercises: [],
+			workouts: [],
+		})
+		expect(groups.map(group => group.view)).toEqual(['members'])
+		expect(groups[0].entries.map(entry => entry.key)).toEqual([
+			'member:a',
+			'member:b',
+			'member:c',
+		])
+	})
+
+	it("lists the member's own routines before shared ones, within one limit", () => {
+		const [routines] = suggestionGroups({
+			ownRoutines: [routine('Mine 1'), routine('Mine 2')],
+			sharedRoutines: [shared('s1'), shared('s2')],
+		})
+		expect(routines.view).toBe('routines')
+		expect(routines.entries.map(entry => entry.href)).toEqual([
+			'/routines/Mine 1',
+			'/routines/Mine 2',
+			'/profile/ana/routines/s1',
+		])
+	})
+
+	it('opens each kind where the results page opens it', () => {
+		const groups = suggestionGroups({
+			exercises: [exercise('Bench Press')],
+			workouts: [
+				{
+					id: 'w1',
+					status: 'IN_PROGRESS',
+					startedAt: '2026-10-01T00:00:00.000Z',
+					routine: { id: 'r', name: 'Upper' },
+				},
+			],
+		})
+		expect(groups.flatMap(group => group.entries.map(e => e.href))).toEqual([
+			'/exercises/bench-press',
+			'/workouts/sessions/w1',
+		])
+	})
+})
+
+describe('NAV-02 arrow keys', () => {
+	it('enter the list from the field at either end and wrap', () => {
+		expect(moveActive(-1, 5, 1)).toBe(0)
+		expect(moveActive(-1, 5, -1)).toBe(4)
+		expect(moveActive(4, 5, 1)).toBe(0)
+		expect(moveActive(0, 5, -1)).toBe(4)
+		expect(moveActive(2, 5, 1)).toBe(3)
+	})
+
+	it('stay on the field when there is nothing to move to', () => {
+		expect(moveActive(-1, 0, 1)).toBe(-1)
+		expect(moveActive(3, 0, -1)).toBe(-1)
 	})
 })

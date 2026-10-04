@@ -2,6 +2,8 @@ import {
 	type Exercise,
 	normalizeSearchQuery,
 	type Routine,
+	type SharedRoutineSearchResult,
+	type UserSearchResponse,
 	type WorkoutSessionSummary,
 } from '@sunsteel/contracts'
 
@@ -128,3 +130,111 @@ export const workoutHref = (
 	session.status === 'IN_PROGRESS'
 		? `/workouts/sessions/${session.id}`
 		: `/workouts/history/${session.id}`
+
+// NAV-02: the header's grouped suggestions ---------------------------------
+
+/** How many of each category the header's suggestions show. */
+export const SEARCH_SUGGESTION_LIMIT = 3
+
+export type SuggestionEntry =
+	| { kind: 'member'; key: string; href: string; member: UserSearchResponse }
+	| { kind: 'exercise'; key: string; href: string; exercise: Exercise }
+	| { kind: 'routine'; key: string; href: string; routine: Routine }
+	| {
+			kind: 'sharedRoutine'
+			key: string
+			href: string
+			routine: SharedRoutineSearchResult
+	  }
+	| {
+			kind: 'workout'
+			key: string
+			href: string
+			session: WorkoutSessionSummary
+	  }
+
+export interface SuggestionGroup {
+	view: Exclude<SearchView, 'all'>
+	entries: SuggestionEntry[]
+}
+
+/**
+ * The suggestion groups in the results page's order, each at most `limit`
+ * long and left out when empty. Routines are the member's own first, then
+ * those other members shared, within the one limit.
+ */
+export function suggestionGroups(
+	found: {
+		members?: readonly UserSearchResponse[]
+		exercises?: readonly Exercise[]
+		ownRoutines?: readonly Routine[]
+		sharedRoutines?: readonly SharedRoutineSearchResult[]
+		workouts?: readonly WorkoutSessionSummary[]
+	},
+	limit = SEARCH_SUGGESTION_LIMIT,
+): SuggestionGroup[] {
+	const groups: SuggestionGroup[] = [
+		{
+			view: 'members',
+			entries: (found.members ?? []).map(member => ({
+				kind: 'member' as const,
+				key: `member:${member.id}`,
+				href: memberHref(member.username),
+				member,
+			})),
+		},
+		{
+			view: 'exercises',
+			entries: (found.exercises ?? []).map(exercise => ({
+				kind: 'exercise' as const,
+				key: `exercise:${exercise.id}`,
+				href: `/exercises/${exercise.id}`,
+				exercise,
+			})),
+		},
+		{
+			view: 'routines',
+			entries: [
+				...(found.ownRoutines ?? []).map(routine => ({
+					kind: 'routine' as const,
+					key: `routine:${routine.id}`,
+					href: `/routines/${routine.id}`,
+					routine,
+				})),
+				...(found.sharedRoutines ?? []).map(routine => ({
+					kind: 'sharedRoutine' as const,
+					key: `shared:${routine.routineId}`,
+					href: sharedRoutineHref(routine.author.username, routine.routineId),
+					routine,
+				})),
+			],
+		},
+		{
+			view: 'workouts',
+			entries: (found.workouts ?? []).map(session => ({
+				kind: 'workout' as const,
+				key: `workout:${session.id}`,
+				href: workoutHref(session),
+				session,
+			})),
+		},
+	]
+	return groups
+		.map(group => ({ ...group, entries: group.entries.slice(0, limit) }))
+		.filter(group => group.entries.length > 0)
+}
+
+/**
+ * The option the arrow keys land on in a list of `total`, where -1 is "none
+ * yet" (the field itself). Down from none is the first, up from none the
+ * last, and both ends wrap, as a combobox's list does.
+ */
+export function moveActive(
+	current: number,
+	total: number,
+	step: 1 | -1,
+): number {
+	if (total <= 0) return -1
+	if (current < 0) return step === 1 ? 0 : total - 1
+	return (current + step + total) % total
+}

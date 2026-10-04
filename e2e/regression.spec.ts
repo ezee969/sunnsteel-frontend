@@ -846,10 +846,10 @@ for (const width of REGRESSION_WIDTHS) {
 		// The header search suggestions are a custom panel, not a Radix menu.
 		const search = page.getByPlaceholder(msg('shell.search.placeholder'))
 		await search.fill('ez')
+		// NAV-02: every suggestion list ends in "See all results", whatever
+		// it found.
 		const panel = page.locator('div.top-full').filter({
-			hasText: new RegExp(
-				`${msg('shell.search.topResults')}|${msgPrefix('shell.search.noUsers').source.slice(1)}`,
-			),
+			hasText: msgPrefix('shell.search.viewAll').source.slice(1),
 		})
 		await expect(panel, 'search suggestions did not open').toBeVisible({
 			timeout: 10_000,

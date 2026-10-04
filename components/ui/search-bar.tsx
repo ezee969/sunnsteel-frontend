@@ -1,35 +1,53 @@
 'use client'
 
+import { normalizeSearchQuery } from '@sunsteel/contracts'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
 
-import { useUserSearch } from '@/lib/api/hooks/useUserSearch'
+import {
+	SearchSuggestions,
+	suggestionOptionId,
+} from '@/features/search/search-suggestions'
+import { useSearchPreview } from '@/lib/api/hooks/useSearch'
+import {
+	moveActive,
+	searchHref,
+	type SuggestionEntry,
+} from '@/lib/utils/search'
 
-import { Avatar, AvatarFallback, AvatarImage } from './avatar'
 import { Input } from './input'
 
+/**
+ * The header's one search field (NAV-01/NAV-02). Typing shows grouped
+ * suggestions under it; Enter opens the full results, or the suggestion the
+ * arrow keys are on. Its v1.1 presentation is unchanged (§26.6).
+ */
 export function SearchBar() {
 	const t = useTranslations('shell.search')
 	const [query, setQuery] = useState('')
 	const [debouncedQuery, setDebouncedQuery] = useState('')
 	const [isFocused, setIsFocused] = useState(false)
+	const [activeIndex, setActiveIndex] = useState(-1)
+	const entriesRef = useRef<SuggestionEntry[]>([])
 	const router = useRouter()
 	const containerRef = useRef<HTMLDivElement>(null)
+	const listId = useId()
 
-	// Custom debounce hook natively
 	useEffect(() => {
-		const handler = setTimeout(() => {
-			setDebouncedQuery(query)
-		}, 300)
+		const handler = setTimeout(() => setDebouncedQuery(query), 300)
 		return () => clearTimeout(handler)
 	}, [query])
 
-	const { data: results = [], isLoading } = useUserSearch(debouncedQuery)
+	// A new query starts with no suggestion chosen.
+	useEffect(() => setActiveIndex(-1), [debouncedQuery])
 
-	// Close dropdown when clicking outside
+	const normalized = normalizeSearchQuery(debouncedQuery)
+	// The same key the suggestions read, so this only drives the spinner.
+	const { isFetching } = useSearchPreview(debouncedQuery)
+
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
 			if (
@@ -43,35 +61,83 @@ export function SearchBar() {
 		return () => document.removeEventListener('mousedown', handleClickOutside)
 	}, [])
 
-	const handleSearchSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (debouncedQuery.trim().length > 0) {
-			router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`)
-			setIsFocused(false)
+	const showDropdown = isFocused && !!normalized
+	const onEntriesChange = useCallback((entries: SuggestionEntry[]) => {
+		entriesRef.current = entries
+		setActiveIndex(current => (current > entries.length ? -1 : current))
+	}, [])
+
+	const close = () => {
+		setIsFocused(false)
+		setActiveIndex(-1)
+	}
+
+	const openAll = () => {
+		const value = query.trim()
+		if (!value) return
+		router.push(searchHref(value))
+		close()
+	}
+
+	const openEntry = (entry: SuggestionEntry) => {
+		router.push(entry.href)
+		setQuery('')
+		setDebouncedQuery('')
+		close()
+	}
+
+	const handleSearchSubmit = (event: React.FormEvent) => {
+		event.preventDefault()
+		const entries = entriesRef.current
+		if (showDropdown && activeIndex >= 0 && activeIndex < entries.length) {
+			openEntry(entries[activeIndex])
+		} else {
+			openAll()
 		}
 	}
 
-	const handleSelectUser = (username: string) => {
-		// Navigate directly to the selected user's profile
-		router.push(`/profile/${encodeURIComponent(username)}`)
-		setIsFocused(false)
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === 'Escape') {
+			if (showDropdown) {
+				event.preventDefault()
+				close()
+			}
+			return
+		}
+		if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+		if (!normalized) return
+		event.preventDefault()
+		setIsFocused(true)
+		// Every suggestion plus "See all results".
+		const total = entriesRef.current.length + 1
+		setActiveIndex(current =>
+			moveActive(current, total, event.key === 'ArrowDown' ? 1 : -1),
+		)
 	}
-
-	const showDropdown = isFocused && debouncedQuery.length >= 2
 
 	return (
 		<div className="relative w-full max-w-sm" ref={containerRef}>
-			<form onSubmit={handleSearchSubmit} className="relative group">
+			<form
+				onSubmit={handleSearchSubmit}
+				className="relative group"
+				role="search"
+			>
 				<Search
 					className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard group-focus-within:text-foreground"
 					aria-hidden
 				/>
-				{/* The field takes the primitive's own boundary (§11.6). It was a
-				    translucent pill with a `--primary`-tinted border and ring, which
-				    made the one search field in the app the only control that did not
-				    look like the rest of them. */}
+				{/* The field takes the primitive's own boundary (§11.6). */}
 				<Input
 					type="text"
+					role="combobox"
+					aria-autocomplete="list"
+					aria-expanded={showDropdown}
+					aria-controls={showDropdown ? listId : undefined}
+					aria-activedescendant={
+						showDropdown && activeIndex >= 0
+							? suggestionOptionId(listId, activeIndex)
+							: undefined
+					}
 					placeholder={t('placeholder')}
 					aria-label={t('label')}
 					// v1.1 §26.6: a field too narrow for its placeholder ends it with
@@ -79,10 +145,14 @@ export function SearchBar() {
 					// clears the spinner.
 					className="w-full text-ellipsis pl-9 pr-9"
 					value={query}
-					onChange={e => setQuery(e.target.value)}
+					onChange={e => {
+						setQuery(e.target.value)
+						setIsFocused(true)
+					}}
 					onFocus={() => setIsFocused(true)}
+					onKeyDown={handleKeyDown}
 				/>
-				{isLoading && (
+				{isFetching && (
 					<Loader2
 						aria-hidden
 						className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-ink-3"
@@ -94,79 +164,26 @@ export function SearchBar() {
 				{showDropdown && (
 					// §11.9/§8 — an overlay separates by shadow in light, by scrim and
 					// a 1px rule in dark. Nothing here is translucent or blurred.
+					// NAV-02: below `sm` the field is too narrow to read a suggestion
+					// in, so the panel spans the screen under the topbar (16px
+					// gutters, §26.3); its height is capped to the viewport and the
+					// scroll is the overlay's own (§20).
 					<motion.div
 						initial={{ opacity: 0, y: -4 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -4 }}
 						transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-						className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-md border border-rule bg-popover text-popover-foreground shadow-overlay dark:shadow-none"
+						className="absolute top-full z-50 mt-2 w-full overflow-y-auto overscroll-contain rounded-md border border-rule bg-popover text-popover-foreground shadow-overlay max-sm:fixed max-sm:inset-x-4 max-sm:top-[3.75rem] max-sm:mt-0 max-sm:w-auto max-h-[min(70vh,32rem)] dark:shadow-none"
 					>
-						{results.length > 0 ? (
-							<div className="flex max-h-[300px] flex-col overflow-y-auto py-2">
-								<span className="type-label mb-1 px-3 text-ink-3">
-									{t('topResults')}
-								</span>
-								{results.map(
-									(
-										user: import('@/lib/api/services/userService').UserSearchResponse,
-									) => (
-										<button
-											key={user.id}
-											type="button"
-											onClick={() => handleSelectUser(user.username)}
-											className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted"
-										>
-											<Avatar className="h-8 w-8 border border-rule">
-												<AvatarImage src={user.avatarUrl || ''} />
-												<AvatarFallback className="type-body-sm bg-surface-sunk text-ink-2">
-													{user.name.charAt(0)}
-												</AvatarFallback>
-											</Avatar>
-											<div className="flex flex-col overflow-hidden">
-												<span className="type-panel truncate text-foreground">
-													{user.name} {user.lastName || ''}
-												</span>
-												<span className="type-body-sm truncate text-ink-3">
-													@{user.username}
-												</span>
-											</div>
-										</button>
-									),
-								)}
-								{/* a11y review 6: this was a clickable <div> - no role, no tab stop,
-								    unreachable from the keyboard. Same handler, real button. */}
-								<button
-									type="button"
-									className="type-body-sm mt-1 w-full border-t border-rule-faint px-3 py-2 text-center text-ink-2 outline-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-									onClick={e => {
-										e.preventDefault()
-										handleSearchSubmit(e as unknown as React.FormEvent)
-									}}
-								>
-									{t('viewAll', { query: debouncedQuery })}
-								</button>
-							</div>
-						) : (
-							!isLoading && (
-								// NAV-01: no member matching is not nothing matching, so the
-								// full results stay one tap away.
-								<div className="flex flex-col py-2">
-									<div className="type-body-sm px-3 pb-2 pt-1 text-center text-ink-3">
-										{t('noUsers', { query: debouncedQuery })}
-									</div>
-									<button
-										type="button"
-										className="type-body-sm w-full border-t border-rule-faint px-3 py-2 text-center text-ink-2 outline-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-										onClick={e => {
-											e.preventDefault()
-											handleSearchSubmit(e as unknown as React.FormEvent)
-										}}
-									>
-										{t('viewAll', { query: debouncedQuery })}
-									</button>
-								</div>
-							)
-						)}
+						<SearchSuggestions
+							query={debouncedQuery}
+							listId={listId}
+							activeIndex={activeIndex}
+							onEntriesChange={onEntriesChange}
+							onChoose={openEntry}
+							onSeeAll={openAll}
+							onHover={setActiveIndex}
+						/>
 					</motion.div>
 				)}
 			</AnimatePresence>

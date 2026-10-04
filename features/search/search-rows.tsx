@@ -151,26 +151,18 @@ export function SharedRoutineResultRow({
 	)
 }
 
-const STATUS_KEYS = {
-	COMPLETED: 'statusCompleted',
-	ABORTED: 'statusAborted',
-	IN_PROGRESS: 'statusInProgress',
-} as const
-
 export function WorkoutResultRow({
 	session,
 }: {
 	session: WorkoutSessionSummary
 }) {
 	const t = useTranslations('social.search')
-	const tMetrics = useTranslations('workout.metrics')
+	const tStatus = useTranslations('planning.scheduleMonth.status')
 	const locale = useLocale() as Locale
 	const date = dateFormatter(locale, {
 		dateStyle: 'medium',
 	}).format(new Date(session.startedAt))
-	const status = tMetrics(
-		STATUS_KEYS[session.status as keyof typeof STATUS_KEYS] ?? 'statusUnknown',
-	)
+	const status = tStatus(session.status)
 	return (
 		<ResultRow
 			href={workoutHref(session)}
