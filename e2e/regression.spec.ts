@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 
-import type { Locator, Page, TestInfo } from '@playwright/test'
+import type { Locator, Page, Request, TestInfo } from '@playwright/test'
 import {
 	TRAINING_PARTNERS_MAX,
 	type TrainingPartnershipsResponse,
@@ -599,16 +599,102 @@ for (const route of ROUTES) {
 // Interactions, once per width.
 // ---------------------------------------------------------------------------
 
-const NAV_TARGETS: Array<[string, RegExp]> = [
-	[msg('shell.nav.routines'), /\/routines$/],
-	[msg('shell.nav.history'), /\/workouts\/history$/],
-	[msg('shell.nav.progress'), /\/progress$/],
-	[msg('shell.nav.exercises'), /\/exercises$/],
-	[msg('shell.nav.discover'), /\/routines\/discover$/],
-	[msg('shell.nav.activity'), /\/activity$/],
-	[msg('shell.nav.settings'), /\/settings$/],
-	[msg('shell.nav.dashboard'), /\/dashboard$/],
+/** Each sidebar link, the path it must reach and that page's own `h1`. */
+const NAV_TARGETS: Array<{ link: string; path: RegExp; heading: string }> = [
+	{
+		link: msg('shell.nav.routines'),
+		path: /\/routines$/,
+		heading: msg('routines.listing.pageTitle'),
+	},
+	{
+		link: msg('shell.nav.history'),
+		path: /\/workouts\/history$/,
+		heading: msg('workout.historyPage.title'),
+	},
+	{
+		link: msg('shell.nav.progress'),
+		path: /\/progress$/,
+		heading: msg('progress.page.title'),
+	},
+	{
+		link: msg('shell.nav.exercises'),
+		path: /\/exercises$/,
+		heading: msg('catalog.exercisesPage.title'),
+	},
+	{
+		link: msg('shell.nav.discover'),
+		path: /\/routines\/discover$/,
+		heading: msg('routines.discovery.title'),
+	},
+	{
+		link: msg('shell.nav.activity'),
+		path: /\/activity$/,
+		heading: msg('social.activityPage.title'),
+	},
+	{
+		link: msg('shell.nav.settings'),
+		path: /\/settings$/,
+		heading: msg('settings.page.title'),
+	},
+	{
+		link: msg('shell.nav.dashboard'),
+		path: /\/dashboard$/,
+		heading: msg('planning.dashboardPage.heroTitle'),
+	},
 ]
+
+/**
+ * Clicks a sidebar link and waits for the page it names (TD-59).
+ *
+ * The App Router changes the address only when the destination's RSC payload
+ * has arrived, and in development that payload waits for Turbopack to compile
+ * the route on its first request: 4-8s per route measured cold, longer with
+ * three workers compiling at once. The 5s assertion timeout on the address
+ * failed exactly then, so the wait is split in two. First the click must
+ * start the navigation -- the router requests the route, or answers from its
+ * cache and changes the address at once -- within the assertion timeout, so
+ * a click that did nothing still fails fast. Then the page gets the project's
+ * navigation budget, the same one `page.goto` has for a cold route, and
+ * counts as reached when its own `h1` shows, not merely the address.
+ */
+/** `regression`'s navigationTimeout: a cold route compiles on first request. */
+function navigationBudget() {
+	return test.info().project.use.navigationTimeout ?? 90_000
+}
+
+async function followSidebarLink(
+	page: Page,
+	target: (typeof NAV_TARGETS)[number],
+) {
+	const { link, path, heading } = target
+	let requested = false
+	const onRequest = (request: Request) => {
+		const rsc = request.headers().rsc === '1'
+		if (rsc && path.test(new URL(request.url()).pathname)) {
+			requested = true
+		}
+	}
+	page.on('request', onRequest)
+	try {
+		await sidebarLink(page, link).click()
+		await expect
+			.poll(() => requested || path.test(pathOf(page)), {
+				message: `${link} did not navigate: the click started no navigation`,
+			})
+			.toBe(true)
+	} finally {
+		page.off('request', onRequest)
+	}
+
+	const budget = navigationBudget()
+	await expect(page, `${link} did not navigate`).toHaveURL(path, {
+		timeout: budget,
+	})
+	await expect(
+		page.getByRole('heading', { level: 1, name: heading, exact: true }),
+		`${link} reached ${pathOf(page)} but its page never rendered`,
+	).toBeVisible({ timeout: budget })
+}
 
 for (const width of REGRESSION_WIDTHS) {
 	const mobile = width <= MOBILE_MAX
@@ -617,11 +703,10 @@ for (const width of REGRESSION_WIDTHS) {
 		await prepare(page, width, 'light')
 		await load(page, '/dashboard')
 
-		for (const [name, url] of NAV_TARGETS) {
+		for (const target of NAV_TARGETS) {
+			const name = target.link
 			if (mobile) await openDrawer(page)
-			await sidebarLink(page, name).click()
-			await expect(page, `${name} did not navigate`).toHaveURL(url)
-			await page.waitForLoadState('networkidle')
+			await followSidebarLink(page, target)
 			if (mobile) {
 				await expectDrawerClosed(page)
 			} else {
@@ -639,7 +724,7 @@ for (const width of REGRESSION_WIDTHS) {
 		await page
 			.getByRole('menuitem', { name: msg('shell.header.profile') })
 			.click()
-		await expect(page).toHaveURL(/\/profile$/)
+		await expect(page).toHaveURL(/\/profile$/, { timeout: navigationBudget() })
 	})
 
 	if (mobile) {

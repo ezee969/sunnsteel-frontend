@@ -20,6 +20,9 @@ Quick Workout problems are not duplicated here.
 **`TD-57` is open**: the password-reset email goes through Supabase's default
 sender, which reaches only the project's own team and cannot be translated. It
 waits on the owner (a domain and an SMTP provider), then on a small code step.
+**`TD-59` is open until its three-worker run**: the sweep's `navigation @
+<width>` cases gave up on a route Turbopack was still compiling; the check is
+fixed on `claude/nav-flake`.
 `TD-58`, a stale record event that failed an exercise's whole progress
 timeline, was recorded and closed on 2026-10-04.
 `TD-56`, the double reload and splash after a deploy, was recorded and closed
@@ -43,6 +46,65 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-59"></a>
+
+### TD-59 — The sweep's navigation cases gave up on a route still compiling — OPEN, fixed on a branch
+
+**Impact.** `navigation @ <width>` in
+[e2e/regression.spec.ts](../../e2e/regression.spec.ts) failed intermittently
+whenever the sweep ran at `--workers=3`: "Discover did not navigate" or
+"Progress did not navigate", `toHaveURL` timing out after 5000ms with the
+address still on the page before. On 2026-10-04 it struck three scoped sweeps
+in a row (PREF-04: @ 320 and @ 390; ACH-06: @ 390, @ 430 and @ 768;
+ONBOARD-01: @ 320, @ 768 and @ 1024). Every one passed re-run alone at one
+worker, and the Spanish runs, also at three workers, passed every time. Each
+false failure cost a re-run and taught the next agent to wave this suite's
+failures through.
+
+**Evidence.** The App Router changes the address only once the destination's
+RSC payload has arrived, and the development server answers that payload only
+after Turbopack has compiled the route on its first request; `next/link` does
+not prefetch in development. Measured on a fresh `next dev --turbopack` from
+this branch:
+
+- Clicking `/login`'s link to `/signup`: the RSC request left at 0.08s, its
+  response came back at 2.44s and the address changed at 2.54s. To
+  `/forgot-password`: 2.15s and 2.20s. The address waits for the compile.
+- The navigation targets themselves, cold, with the marker cookie:
+  `/dashboard` 8.1s alone (21.2s on the first request after the server
+  started), `/routines` 3.0s alone, and `/workouts/history`, `/progress`,
+  `/exercises`, `/routines/discover`, `/activity` and `/settings` 3.8-4.3s each
+  when requested three at a time.
+
+`toHaveURL` waited the default 5s, which a cold route under three workers'
+load does not fit in. A route is compiled once per server process, so the
+pattern of the failures follows: a re-run alone at one worker, and the Spanish
+run straight after the English one, find every route already compiled. A click
+that lands starts the RSC request within 0.1s, so the time is the server's. A
+click lost while the drawer settles would start no request at all, and there
+is no prefetch or hover race to have in development; the old check could not
+tell these apart, and the new one does. `regression`'s `navigationTimeout` (90s, "the first request to each
+route compiles it under Turbopack") already covered `page.goto`; a click is a
+navigation too, but its wait was an assertion and got 5s.
+
+**Direction.** Wait for the right thing rather than only longer:
+`followSidebarLink` requires the click to start the navigation within the
+assertion timeout (the router requests the route, or answers from its Router
+Cache and changes the address at once), so a click that did nothing still
+fails fast and says so; then it gives the page the project's own
+`navigationTimeout`, and counts it reached only when the destination's own
+`h1` is visible, each target's heading named from the message files so
+`UI_LOCALE=es` keeps working. The account menu's Profile step at the end of
+the same case had the same 5s wait on a cold `/profile` and gets the same
+budget; its `h1` is the member's name, so it keeps the address check. The
+suite's intent is unchanged: every sidebar
+and drawer link reaches its page, then the drawer closes or the link is
+current.
+
+**Closure criteria.** The navigation scope passes at `--workers=3` against a
+dev server started cold, the condition that failed, in English and in Spanish,
+three runs in a row.
 
 <a id="td-58"></a>
 
