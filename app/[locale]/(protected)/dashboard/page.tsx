@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { dashboardRows } from '@/lib/utils/dashboard-layout'
 
 import { CustomizeDashboardDialog } from './components/CustomizeDashboardDialog'
+import DashboardGoals from './components/DashboardGoals'
 import DashboardLoading from './components/DashboardLoading'
 import DashboardRank from './components/DashboardRank'
 import FollowingPreview from './components/FollowingPreview'
@@ -31,6 +32,7 @@ import { useDashboardData } from './hooks/useDashboardData'
  */
 const SECTIONS: Record<DashboardSectionId, () => React.JSX.Element> = {
 	'this-week': WeekStrip,
+	goals: DashboardGoals,
 	stats: StatsOverview,
 	'recent-activity': RecentActivity,
 	'personal-records': PersonalRecords,

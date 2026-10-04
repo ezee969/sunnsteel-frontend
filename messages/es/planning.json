@@ -28,7 +28,8 @@
 			"personal-records": "Récords personales",
 			"training-insights": "Señales de entrenamiento",
 			"upcoming-milestones": "Próximos hitos",
-			"following": "De los miembros que sigues"
+			"following": "De los miembros que sigues",
+			"goals": "Tus objetivos"
 		},
 		"movedAnnouncement": "{section} se movió a la posición {position} de {total}."
 	},
@@ -51,7 +52,9 @@
 		"latestRecordSet": "Último: {exercise} {set}",
 		"facts": "{count, plural, one {# dato de tu entrenamiento reciente} other {# datos de tu entrenamiento reciente}}",
 		"next": "Próximo: {title}",
-		"nextMore": "Próximo: {title}, y {rest} más"
+		"nextMore": "Próximo: {title}, y {rest} más",
+		"goalsReached": "Objetivos alcanzados: {reached} de {total}",
+		"goalsSuggested": "{count, plural, one {# objetivo sugerido} other {# objetivos sugeridos}}"
 	},
 	"plateaus": {
 		"weeks": "{count, plural, one {# semana} other {# semanas}}",
@@ -343,5 +346,14 @@
 				"detail": "Su barra y sus discos, para que las cargas se redondeen a lo que puedes levantar. Los pesos se muestran en {unit}; <link>cambia la unidad</link>."
 			}
 		}
+	},
+	"dashboardGoals": {
+		"manage": "Gestionar objetivos",
+		"loadingAria": "Cargando tus objetivos",
+		"loadError": "No se pudieron cargar tus objetivos.",
+		"retry": "Reintentar",
+		"emptyTitle": "Todavía no hay objetivos",
+		"emptyBody": "Agrega un objetivo privado en Ajustes, o una de las sugerencias que aparecen aquí cuando tu entrenamiento dé una.",
+		"suggestionsHeading": "Sugeridos"
 	}
 }

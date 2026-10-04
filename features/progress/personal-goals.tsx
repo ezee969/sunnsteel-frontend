@@ -26,6 +26,8 @@ interface PersonalGoalsProps {
 	isPending: boolean
 	isError: boolean
 	onRetry: () => void
+	/** ACH-06: the suggested goals, after the member's own. */
+	suggestions?: React.ReactNode
 }
 
 const NUMBER_FORMATTER = (locale: Locale) =>
@@ -73,7 +75,7 @@ function getMissingCopy(
 	)
 }
 
-function GoalRow({
+export function GoalRow({
 	goal,
 	weightUnit,
 }: {
@@ -170,6 +172,7 @@ export function PersonalGoals({
 	isPending,
 	isError,
 	onRetry,
+	suggestions,
 }: PersonalGoalsProps) {
 	const t = useTranslations('progress.goals')
 	return (
@@ -218,6 +221,7 @@ export function PersonalGoals({
 					))}
 				</ul>
 			)}
+			{suggestions}
 		</section>
 	)
 }

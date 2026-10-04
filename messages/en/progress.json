@@ -420,5 +420,23 @@
 		"est1rm": "Est. 1RM {value}",
 		"truncated": "Showing the latest 500 record changes in this range.",
 		"noTrend": "This exercise has session history but no weighted strength trend."
+	},
+	"goalSuggestions": {
+		"heading": "Suggested goals",
+		"description": "Taken from your own training. One you add becomes an ordinary goal you can change or remove in Settings.",
+		"sessionsTitle": "Train {count, plural, one {# time} other {# times}} a week",
+		"volumeTitle": "Lift {value} a week",
+		"strengthTitle": "{exercise}: an estimated 1RM of {value}",
+		"basisPlan": "Your routines plan {count, plural, one {# workout} other {# workouts}} this week.",
+		"basisVolume": "Your last {weeks} weeks averaged {value} a week.",
+		"basisStrength": "Your best is {value}, and you trained it in {sessions} workouts over the last {weeks} weeks.",
+		"add": "Add goal",
+		"addAria": "Add the goal: {goal}",
+		"notNow": "Not now",
+		"notNowAria": "Not now: {goal}",
+		"added": "Goal added",
+		"addedBody": "{goal} is now one of your goals.",
+		"addFailed": "The goal could not be added",
+		"dismissFailed": "The suggestion could not be set aside"
 	}
 }

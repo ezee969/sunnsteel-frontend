@@ -35,6 +35,7 @@ describe('dashboard layout', () => {
 	it('lays out the default with Recent Activity beside Personal Records', () => {
 		expect(dashboardRows(undefined)).toEqual([
 			{ kind: 'single', id: 'this-week' },
+			{ kind: 'single', id: 'goals' },
 			{ kind: 'single', id: 'stats' },
 			{ kind: 'pair', ids: ['recent-activity', 'personal-records'] },
 			{ kind: 'single', id: 'training-insights' },
@@ -76,15 +77,19 @@ describe('dashboard layout', () => {
 	it('moves a section one place and ignores a move past either end', () => {
 		const moved = moveDashboardSection(DEFAULT_DASHBOARD_LAYOUT, 1, -1)
 		expect(moved.slice(0, 2).map(entry => entry.id)).toEqual([
-			'stats',
+			'goals',
 			'this-week',
 		])
 		expect(moveDashboardSection(DEFAULT_DASHBOARD_LAYOUT, 0, -1)).toBe(
 			DEFAULT_DASHBOARD_LAYOUT,
 		)
-		expect(moveDashboardSection(DEFAULT_DASHBOARD_LAYOUT, 6, 1)).toBe(
-			DEFAULT_DASHBOARD_LAYOUT,
-		)
+		expect(
+			moveDashboardSection(
+				DEFAULT_DASHBOARD_LAYOUT,
+				DEFAULT_DASHBOARD_LAYOUT.length - 1,
+				1,
+			),
+		).toBe(DEFAULT_DASHBOARD_LAYOUT)
 		expect(DEFAULT_DASHBOARD_LAYOUT[0].id).toBe('this-week')
 	})
 
@@ -100,7 +105,7 @@ describe('dashboard layout', () => {
 				...DEFAULT_DASHBOARD_LAYOUT,
 			]),
 		).toBe(true)
-		expect(describeShownCount(hidden, en)).toBe('6 of 7 sections shown')
+		expect(describeShownCount(hidden, en)).toBe('7 of 8 sections shown')
 	})
 })
 
@@ -111,7 +116,7 @@ describe('the layout copy in Spanish (I18N-04)', () => {
 			'following',
 			false,
 		)
-		expect(describeShownCount(hidden, es)).toBe('6 de 7 secciones visibles')
+		expect(describeShownCount(hidden, es)).toBe('7 de 8 secciones visibles')
 		expect(dashboardSectionLabel('this-week', es)).toBe('Esta semana')
 		// Every id the contract defines has a name in both languages.
 		for (const entry of DEFAULT_DASHBOARD_LAYOUT) {

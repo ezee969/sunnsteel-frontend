@@ -1,12 +1,14 @@
 'use client'
 
 import { GlossaryLine } from '@/components/layout/glossary-line'
+import { GoalSuggestionList } from '@/features/progress/goal-suggestions'
 import { PersonalGoals } from '@/features/progress/personal-goals'
 import { PlateauWatch } from '@/features/progress/plateau-watch'
 import { ProgressTab } from '@/features/progress/progress-tab'
 import { TrainingSignals } from '@/features/progress/training-signals'
 import { useHashForward } from '@/hooks/use-hash-forward'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { useGoalSuggestions } from '@/lib/api/hooks/useGoalSuggestions'
 import {
 	useDeloadSuggestion,
 	usePersonalGoals,
@@ -26,6 +28,7 @@ export default function ProgressOverviewPage() {
 	const forwarding = useHashForward(PROGRESS_HASH_RULES)
 	const weightUnit = useWeightUnit()
 	const personalGoals = usePersonalGoals()
+	const goalSuggestions = useGoalSuggestions()
 	const plateaus = usePlateaus()
 	const plateauPreferences = useUpdatePlateauPreferences()
 	const trainingSignals = useTrainingSignals()
@@ -42,6 +45,12 @@ export default function ProgressOverviewPage() {
 				isPending={personalGoals.isPending}
 				isError={Boolean(personalGoals.error)}
 				onRetry={() => void personalGoals.retry()}
+				suggestions={
+					<GoalSuggestionList
+						suggestions={goalSuggestions.data?.suggestions ?? []}
+						weightUnit={weightUnit}
+					/>
+				}
 			/>
 
 			<PlateauWatch

@@ -420,5 +420,23 @@
 		"est1rm": "1RM est. {value}",
 		"truncated": "Se muestran los últimos 500 cambios de récords de este período.",
 		"noTrend": "Este ejercicio tiene historial de sesiones, pero no una tendencia de fuerza con peso."
+	},
+	"goalSuggestions": {
+		"heading": "Objetivos sugeridos",
+		"description": "Salen de tu propio entrenamiento. El que agregues pasa a ser un objetivo común que puedes cambiar o quitar en Ajustes.",
+		"sessionsTitle": "Entrenar {count, plural, one {# vez} other {# veces}} por semana",
+		"volumeTitle": "Levantar {value} por semana",
+		"strengthTitle": "{exercise}: un 1RM estimado de {value}",
+		"basisPlan": "Tus rutinas planifican {count, plural, one {# entrenamiento} other {# entrenamientos}} esta semana.",
+		"basisVolume": "Tus últimas {weeks} semanas promediaron {value} por semana.",
+		"basisStrength": "Tu mejor marca es {value} y lo entrenaste en {sessions} entrenamientos en las últimas {weeks} semanas.",
+		"add": "Agregar objetivo",
+		"addAria": "Agregar el objetivo: {goal}",
+		"notNow": "Ahora no",
+		"notNowAria": "Ahora no: {goal}",
+		"added": "Objetivo agregado",
+		"addedBody": "{goal} ya es uno de tus objetivos.",
+		"addFailed": "No se pudo agregar el objetivo",
+		"dismissFailed": "No se pudo dejar de lado la sugerencia"
 	}
 }

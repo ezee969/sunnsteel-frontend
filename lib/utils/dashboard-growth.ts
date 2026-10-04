@@ -48,6 +48,10 @@ const HAS_SOMETHING: Record<
 	(signals: DashboardGrowthSignals) => boolean
 > = {
 	'this-week': () => true,
+	// DASH-04: a weekly volume or lift suggestion needs history, and a new
+	// account's goals are a Settings step away; the section joins once the
+	// account leaves getting started.
+	goals: () => false,
 	stats: signals => signals.completedWorkouts > 0,
 	'recent-activity': signals => signals.recentActivity > 0,
 	'personal-records': signals => signals.personalRecords > 0,

@@ -103,7 +103,9 @@ export function DashboardSection({
 		<section aria-labelledby={headingId} data-dashboard-section={id}>
 			{description || action ? (
 				<div className="rule-heading flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-2">
-					<div>
+					{/* A collapsible heading's toggle is full width, so beside an action
+					    it needs the room, or it shrinks to its narrowest word. */}
+					<div className={collapsible ? 'min-w-0 flex-1' : undefined}>
 						{heading}
 						{description}
 					</div>

@@ -28,7 +28,8 @@
 			"personal-records": "Personal Records",
 			"training-insights": "Training Insights",
 			"upcoming-milestones": "Upcoming Milestones",
-			"following": "From Members You Follow"
+			"following": "From Members You Follow",
+			"goals": "Your Goals"
 		},
 		"movedAnnouncement": "{section} moved to position {position} of {total}."
 	},
@@ -51,7 +52,9 @@
 		"latestRecordSet": "Latest: {exercise} {set}",
 		"facts": "{count, plural, one {# fact from your recent training} other {# facts from your recent training}}",
 		"next": "Next: {title}",
-		"nextMore": "Next: {title}, and {rest} more"
+		"nextMore": "Next: {title}, and {rest} more",
+		"goalsReached": "Goals reached: {reached} of {total}",
+		"goalsSuggested": "{count, plural, one {# suggested goal} other {# suggested goals}}"
 	},
 	"plateaus": {
 		"weeks": "{count, plural, one {# week} other {# weeks}}",
@@ -343,5 +346,14 @@
 				"detail": "Its bar and plates, so loads round to what you can lift. Weights show in {unit}; <link>change the unit</link>."
 			}
 		}
+	},
+	"dashboardGoals": {
+		"manage": "Manage goals",
+		"loadingAria": "Loading your goals",
+		"loadError": "Your goals could not be loaded.",
+		"retry": "Retry",
+		"emptyTitle": "No goals yet",
+		"emptyBody": "Add a private target in Settings, or one of the suggestions shown here once your training gives one.",
+		"suggestionsHeading": "Suggested"
 	}
 }

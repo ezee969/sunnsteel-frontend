@@ -3,6 +3,8 @@ import type {
 	CorrectSessionResponse,
 	CreateSessionShareRequest,
 	DeloadSuggestionResponse,
+	DismissGoalSuggestionRequest,
+	GoalSuggestionsResponse,
 	PersonalGoalsResponse,
 	PlateausResponse,
 	SessionCorrectionsResponse,
@@ -193,6 +195,19 @@ export const workoutService = {
 		httpClient.get<PersonalGoalsResponse>(
 			`${WORKOUTS_API_URL}/progress/goals${buildPersonalGoalsQueryString(timeZone)}`,
 			true,
+		),
+	/** ACH-06: goals the member might add, computed from their own data. */
+	getGoalSuggestions: (timeZone: string): Promise<GoalSuggestionsResponse> =>
+		httpClient.get<GoalSuggestionsResponse>(
+			`${WORKOUTS_API_URL}/progress/goal-suggestions${buildPersonalGoalsQueryString(timeZone)}`,
+			true,
+		),
+	dismissGoalSuggestion: (
+		data: DismissGoalSuggestionRequest,
+	): Promise<DismissGoalSuggestionRequest> =>
+		httpClient.request<DismissGoalSuggestionRequest>(
+			`${WORKOUTS_API_URL}/progress/goal-suggestions/dismissals`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
 		),
 	getSessionComparison: (
 		params: SessionComparisonQuery,
