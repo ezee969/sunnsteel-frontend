@@ -447,7 +447,11 @@
 		"exercisesNone": "Ningún ejercicio coincide con \"{query}\".",
 		"routinesNone": "Ninguna rutina coincide con \"{query}\".",
 		"sharedRoutinesNone": "Ninguna rutina compartida contigo coincide con \"{query}\".",
-		"workoutsNone": "Ninguno de tus entrenamientos coincide con \"{query}\"."
+		"workoutsNone": "Ninguno de tus entrenamientos coincide con \"{query}\".",
+		"recentTitle": "Búsquedas recientes",
+		"recentSummary": "Los últimos resultados que abriste desde la búsqueda, guardados en tu cuenta.",
+		"removeRecent": "Quitar {name} de las búsquedas recientes",
+		"clearRecent": "Borrar todo"
 	},
 	"activityPage": {
 		"title": "Actividad",

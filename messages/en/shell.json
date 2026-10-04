@@ -86,7 +86,9 @@
 		},
 		"nothing": "Nothing matches \"{query}\".",
 		"searching": "Searching…",
-		"failed": "Suggestions could not load. Press Enter for the full results."
+		"failed": "Suggestions could not load. Press Enter for the full results.",
+		"recent": "Recent",
+		"clearRecent": "Clear recent searches"
 	},
 	"theme": {
 		"toLight": "Switch to light theme",

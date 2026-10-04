@@ -11,6 +11,8 @@ import {
 	memberHref,
 	moveActive,
 	parseSearchView,
+	recentEntries,
+	recentTarget,
 	searchHref,
 	searchTabs,
 	sharedRoutineHref,
@@ -245,5 +247,78 @@ describe('NAV-02 arrow keys', () => {
 	it('stay on the field when there is nothing to move to', () => {
 		expect(moveActive(-1, 0, 1)).toBe(-1)
 		expect(moveActive(3, 0, -1)).toBe(-1)
+	})
+})
+
+describe('NAV-03 recent searches', () => {
+	const summary = {
+		routineId: 'r1',
+		name: 'Upper',
+		description: null,
+		scheduleMode: 'WEEKLY' as const,
+		dayCount: 4,
+		exerciseCount: 20,
+		updatedAt: '2026-10-01T00:00:00.000Z',
+	}
+	const items = [
+		{
+			kind: 'ROUTINE' as const,
+			openedAt: '2026-10-04T10:00:00.000Z',
+			routine: { ...summary, author: null, isArchived: false },
+		},
+		{
+			kind: 'ROUTINE' as const,
+			openedAt: '2026-10-04T09:00:00.000Z',
+			routine: {
+				...summary,
+				routineId: 'r2',
+				author: { username: 'ana', name: 'Ana' },
+				isArchived: false,
+			},
+		},
+		{
+			kind: 'MEMBER' as const,
+			openedAt: '2026-10-04T08:00:00.000Z',
+			member: { id: 'u1', username: 'ana', name: 'Ana' },
+		},
+		{
+			kind: 'EXERCISE' as const,
+			openedAt: '2026-10-04T07:00:00.000Z',
+			exercise: { id: 'e1', name: 'Squat', isCustom: false, archivedAt: null },
+		},
+	]
+
+	it('opens each recent result where it opens from search, in the server order', () => {
+		expect(recentEntries(items).map(entry => entry.href)).toEqual([
+			'/routines/r1',
+			'/profile/ana/routines/r2',
+			'/profile/ana',
+			'/exercises/e1',
+		])
+	})
+
+	it('records every kind of result by what it points at', () => {
+		const entries = [
+			...recentEntries(items),
+			...suggestionGroups({
+				ownRoutines: [routine('Mine')],
+				workouts: [
+					{
+						id: 'w1',
+						status: 'COMPLETED',
+						startedAt: '2026-10-01T00:00:00.000Z',
+						routine: { id: 'r', name: 'Upper' },
+					},
+				],
+			}).flatMap(group => group.entries),
+		]
+		expect(entries.map(recentTarget)).toEqual([
+			{ kind: 'ROUTINE', targetId: 'r1' },
+			{ kind: 'ROUTINE', targetId: 'r2' },
+			{ kind: 'MEMBER', targetId: 'u1' },
+			{ kind: 'EXERCISE', targetId: 'e1' },
+			{ kind: 'ROUTINE', targetId: 'Mine' },
+			{ kind: 'WORKOUT', targetId: 'w1' },
+		])
 	})
 })

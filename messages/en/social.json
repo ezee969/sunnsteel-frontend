@@ -447,7 +447,11 @@
 		"exercisesNone": "No exercises match \"{query}\".",
 		"routinesNone": "No routines match \"{query}\".",
 		"sharedRoutinesNone": "No routines shared with you match \"{query}\".",
-		"workoutsNone": "None of your workouts match \"{query}\"."
+		"workoutsNone": "None of your workouts match \"{query}\".",
+		"recentTitle": "Recent searches",
+		"recentSummary": "The last results you opened from search, kept on your account.",
+		"removeRecent": "Remove {name} from recent searches",
+		"clearRecent": "Clear all"
 	},
 	"activityPage": {
 		"title": "Activity",

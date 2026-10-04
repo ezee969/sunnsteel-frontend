@@ -1,5 +1,7 @@
 import type {
 	MemberSearchPage,
+	RecentSearchesResponse,
+	RecentSearchKind,
 	RoutineSearchPage,
 	SearchPreviewResponse,
 	SearchServerCategory,
@@ -35,5 +37,37 @@ export const searchService = {
 			`/search/${category}?${params.toString()}`,
 			true,
 		)
+	},
+
+	recent(): Promise<RecentSearchesResponse> {
+		return httpClient.get<RecentSearchesResponse>('/search/recent', true)
+	},
+
+	recordRecent(
+		kind: RecentSearchKind,
+		targetId: string,
+	): Promise<RecentSearchesResponse> {
+		return httpClient.request<RecentSearchesResponse>('/search/recent', {
+			method: 'POST',
+			body: JSON.stringify({ kind, targetId }),
+			secure: true,
+		})
+	},
+
+	removeRecent(
+		kind: RecentSearchKind,
+		targetId: string,
+	): Promise<RecentSearchesResponse> {
+		return httpClient.request<RecentSearchesResponse>(
+			`/search/recent/${kind}/${encodeURIComponent(targetId)}`,
+			{ method: 'DELETE', secure: true },
+		)
+	},
+
+	clearRecent(): Promise<RecentSearchesResponse> {
+		return httpClient.request<RecentSearchesResponse>('/search/recent', {
+			method: 'DELETE',
+			secure: true,
+		})
 	},
 }

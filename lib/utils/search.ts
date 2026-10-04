@@ -1,6 +1,9 @@
 import {
 	type Exercise,
 	normalizeSearchQuery,
+	type RecentRoutine,
+	type RecentSearchItem,
+	type RecentSearchKind,
 	type Routine,
 	type SharedRoutineSearchResult,
 	type UserSearchResponse,
@@ -138,7 +141,12 @@ export const SEARCH_SUGGESTION_LIMIT = 3
 
 export type SuggestionEntry =
 	| { kind: 'member'; key: string; href: string; member: UserSearchResponse }
-	| { kind: 'exercise'; key: string; href: string; exercise: Exercise }
+	| {
+			kind: 'exercise'
+			key: string
+			href: string
+			exercise: Pick<Exercise, 'id' | 'name' | 'isCustom' | 'archivedAt'>
+	  }
 	| { kind: 'routine'; key: string; href: string; routine: Routine }
 	| {
 			kind: 'sharedRoutine'
@@ -151,6 +159,13 @@ export type SuggestionEntry =
 			key: string
 			href: string
 			session: WorkoutSessionSummary
+	  }
+	| {
+			/** NAV-03: a routine as the recent list resolves it, own or shared. */
+			kind: 'recentRoutine'
+			key: string
+			href: string
+			routine: RecentRoutine
 	  }
 
 export interface SuggestionGroup {
@@ -237,4 +252,73 @@ export function moveActive(
 	if (total <= 0) return -1
 	if (current < 0) return step === 1 ? 0 : total - 1
 	return (current + step + total) % total
+}
+
+// NAV-03: recent searches -----------------------------------------------
+
+/** What to record when a suggestion or result opens. */
+export function recentTarget(entry: SuggestionEntry): {
+	kind: RecentSearchKind
+	targetId: string
+} {
+	switch (entry.kind) {
+		case 'member':
+			return { kind: 'MEMBER', targetId: entry.member.id }
+		case 'exercise':
+			return { kind: 'EXERCISE', targetId: entry.exercise.id }
+		case 'routine':
+			return { kind: 'ROUTINE', targetId: entry.routine.id }
+		case 'sharedRoutine':
+		case 'recentRoutine':
+			return { kind: 'ROUTINE', targetId: entry.routine.routineId }
+		case 'workout':
+			return { kind: 'WORKOUT', targetId: entry.session.id }
+	}
+}
+
+/**
+ * The recent list as suggestion entries, in the server's order (newest
+ * first), each opening where the same result opens from search. A routine
+ * with no author is the member's own and opens its own page.
+ */
+export function recentEntries(
+	items: readonly RecentSearchItem[],
+): SuggestionEntry[] {
+	return items.map(item => {
+		switch (item.kind) {
+			case 'MEMBER':
+				return {
+					kind: 'member',
+					key: `member:${item.member.id}`,
+					href: memberHref(item.member.username),
+					member: item.member,
+				}
+			case 'EXERCISE':
+				return {
+					kind: 'exercise',
+					key: `exercise:${item.exercise.id}`,
+					href: `/exercises/${item.exercise.id}`,
+					exercise: item.exercise,
+				}
+			case 'ROUTINE':
+				return {
+					kind: 'recentRoutine',
+					key: `routine:${item.routine.routineId}`,
+					href: item.routine.author
+						? sharedRoutineHref(
+								item.routine.author.username,
+								item.routine.routineId,
+							)
+						: `/routines/${item.routine.routineId}`,
+					routine: item.routine,
+				}
+			case 'WORKOUT':
+				return {
+					kind: 'workout',
+					key: `workout:${item.session.id}`,
+					href: workoutHref(item.session),
+					session: item.session,
+				}
+		}
+	})
 }

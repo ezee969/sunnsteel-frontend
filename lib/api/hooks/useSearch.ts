@@ -1,8 +1,15 @@
 import {
 	normalizeSearchQuery,
+	type RecentSearchesResponse,
+	type RecentSearchKind,
 	type SearchServerCategory,
 } from '@sunsteel/contracts'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from '@tanstack/react-query'
 
 import { searchService } from '@/lib/api/services/searchService'
 import { useSupabaseAuth as useAuth } from '@/providers/supabase-auth-provider'
@@ -18,6 +25,7 @@ export const searchKeys = {
 	preview: (query: string) => ['search', 'preview', query] as const,
 	page: (category: SearchServerCategory, query: string) =>
 		['search', category, query] as const,
+	recent: ['search', 'recent'] as const,
 }
 
 const SEARCH_STALE_MS = 30_000
@@ -52,4 +60,54 @@ export function useSearchPages<C extends SearchServerCategory>(
 		enabled: enabled && !!session && !!query,
 		staleTime: SEARCH_STALE_MS,
 	})
+}
+
+/**
+ * NAV-03: the results the member last opened from search, on the account.
+ * The server resolves every entry again on each read, so a block, a hide or
+ * a routine made private takes an entry away here too.
+ */
+export function useRecentSearches(enabled = true) {
+	const { session } = useAuth()
+	return useQuery({
+		queryKey: searchKeys.recent,
+		queryFn: () => searchService.recent(),
+		enabled: enabled && !!session,
+		staleTime: SEARCH_STALE_MS,
+	})
+}
+
+/** Every write answers with the whole list, which replaces the cache. */
+function useRecentWrite<V>(
+	write: (vars: V) => Promise<RecentSearchesResponse>,
+) {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: write,
+		onSuccess: response =>
+			queryClient.setQueryData(searchKeys.recent, response),
+	})
+}
+
+/**
+ * Called as a result opens. It is fire-and-forget: a failure only means the
+ * result is not listed later, never a message in the way of where the member
+ * was going.
+ */
+export function useRecordRecentSearch() {
+	return useRecentWrite(
+		(target: { kind: RecentSearchKind; targetId: string }) =>
+			searchService.recordRecent(target.kind, target.targetId),
+	)
+}
+
+export function useRemoveRecentSearch() {
+	return useRecentWrite(
+		(target: { kind: RecentSearchKind; targetId: string }) =>
+			searchService.removeRecent(target.kind, target.targetId),
+	)
+}
+
+export function useClearRecentSearches() {
+	return useRecentWrite<void>(() => searchService.clearRecent())
 }

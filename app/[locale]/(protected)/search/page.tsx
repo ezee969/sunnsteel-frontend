@@ -5,12 +5,14 @@ import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 
 import { FollowSuggestions } from '@/features/profile/follow-suggestions'
+import { RecentSearches } from '@/features/search/recent-searches'
 import { SearchResults } from '@/features/search/search-results'
 import { parseSearchView } from '@/lib/utils/search'
 
 /**
  * NAV-01: the full results of the header search. Without a query it is the
- * place to start one, with the follow suggestions it always had.
+ * place to start one: the member's recent searches (NAV-03) and the follow
+ * suggestions it always had.
  */
 export default function SearchPage() {
 	const t = useTranslations('social.search')
@@ -33,7 +35,8 @@ export default function SearchPage() {
 					{raw.trim() ? t('tooShort') : t('prompt')}
 				</p>
 			</div>
-			<div className="mt-8 max-w-3xl">
+			<div className="mt-8 max-w-3xl space-y-10">
+				<RecentSearches />
 				<FollowSuggestions />
 			</div>
 		</div>

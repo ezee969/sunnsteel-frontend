@@ -2,6 +2,7 @@
 
 import type {
 	Exercise,
+	RecentSearchKind,
 	Routine,
 	SharedRoutineSearchResult,
 	UserSearchResponse,
@@ -16,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
+import { useRecordRecentSearch } from '@/lib/api/hooks/useSearch'
 import {
 	isArchivedExercise,
 	isCustomExercise,
@@ -33,16 +35,21 @@ function ResultRow({
 	title,
 	caption,
 	leading,
+	recordAs,
 }: {
 	href: string
 	title: ReactNode
 	caption?: ReactNode
 	leading?: ReactNode
+	/** NAV-03: what opening this result records among recent searches. */
+	recordAs: { kind: RecentSearchKind; targetId: string }
 }) {
+	const record = useRecordRecentSearch()
 	return (
 		<li className="rule-row">
 			<Link
 				href={href}
+				onClick={() => record.mutate(recordAs)}
 				className="group flex min-w-0 items-center gap-3 rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 			>
 				{leading}
@@ -64,6 +71,7 @@ export function MemberResultRow({ member }: { member: UserSearchResponse }) {
 	return (
 		<ResultRow
 			href={memberHref(member.username)}
+			recordAs={{ kind: 'MEMBER', targetId: member.id }}
 			title={fullName}
 			caption={`@${member.username}`}
 			leading={
@@ -102,6 +110,7 @@ export function ExerciseResultRow({ exercise }: { exercise: Exercise }) {
 	return (
 		<ResultRow
 			href={`/exercises/${exercise.id}`}
+			recordAs={{ kind: 'EXERCISE', targetId: exercise.id }}
 			title={exerciseLabel(exercise.name, tExercises)}
 			caption={parts.join(' · ') || undefined}
 		/>
@@ -124,6 +133,7 @@ export function OwnRoutineResultRow({ routine }: { routine: Routine }) {
 	return (
 		<ResultRow
 			href={`/routines/${routine.id}`}
+			recordAs={{ kind: 'ROUTINE', targetId: routine.id }}
 			title={routine.name}
 			caption={routine.isCompleted ? `${t('archivedRoutine')} · ${size}` : size}
 		/>
@@ -142,6 +152,7 @@ export function SharedRoutineResultRow({
 	return (
 		<ResultRow
 			href={sharedRoutineHref(routine.author.username, routine.routineId)}
+			recordAs={{ kind: 'ROUTINE', targetId: routine.routineId }}
 			title={routine.name}
 			caption={`${t('byAuthor', { name: author })} · ${t('routineSize', {
 				days: routine.dayCount,
@@ -166,6 +177,7 @@ export function WorkoutResultRow({
 	return (
 		<ResultRow
 			href={workoutHref(session)}
+			recordAs={{ kind: 'WORKOUT', targetId: session.id }}
 			title={
 				session.routine.dayName
 					? `${session.routine.name} · ${session.routine.dayName}`

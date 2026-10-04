@@ -5,15 +5,30 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
+import React, {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 
 import {
+	RecentSuggestions,
 	SearchSuggestions,
 	suggestionOptionId,
 } from '@/features/search/search-suggestions'
-import { useSearchPreview } from '@/lib/api/hooks/useSearch'
+import {
+	useClearRecentSearches,
+	useRecentSearches,
+	useRecordRecentSearch,
+	useSearchPreview,
+} from '@/lib/api/hooks/useSearch'
 import {
 	moveActive,
+	recentEntries,
+	recentTarget,
 	searchHref,
 	type SuggestionEntry,
 } from '@/lib/utils/search'
@@ -21,9 +36,11 @@ import {
 import { Input } from './input'
 
 /**
- * The header's one search field (NAV-01/NAV-02). Typing shows grouped
+ * The header's one search field (NAV-01 to NAV-03). Typing shows grouped
  * suggestions under it; Enter opens the full results, or the suggestion the
- * arrow keys are on. Its v1.1 presentation is unchanged (§26.6).
+ * arrow keys are on. Focused and empty, it lists the results the member last
+ * opened from search, and opening any result records it there. Its v1.1
+ * presentation is unchanged (§26.6).
  */
 export function SearchBar() {
 	const t = useTranslations('shell.search')
@@ -61,7 +78,19 @@ export function SearchBar() {
 		return () => document.removeEventListener('mousedown', handleClickOutside)
 	}, [])
 
-	const showDropdown = isFocused && !!normalized
+	// NAV-03: read only once the field is focused, so no page pays for it.
+	const recent = useRecentSearches(isFocused)
+	const recentList = useMemo(
+		() => recentEntries(recent.data?.items ?? []),
+		[recent.data],
+	)
+	const recordRecent = useRecordRecentSearch()
+	const clearRecent = useClearRecentSearches()
+
+	const showSuggestions = isFocused && !!normalized
+	const showRecent = isFocused && !query.trim() && recentList.length > 0
+	const showDropdown = showSuggestions || showRecent
+	const currentEntries = () => (showRecent ? recentList : entriesRef.current)
 	const onEntriesChange = useCallback((entries: SuggestionEntry[]) => {
 		entriesRef.current = entries
 		setActiveIndex(current => (current > entries.length ? -1 : current))
@@ -80,6 +109,7 @@ export function SearchBar() {
 	}
 
 	const openEntry = (entry: SuggestionEntry) => {
+		recordRecent.mutate(recentTarget(entry))
 		router.push(entry.href)
 		setQuery('')
 		setDebouncedQuery('')
@@ -88,7 +118,7 @@ export function SearchBar() {
 
 	const handleSearchSubmit = (event: React.FormEvent) => {
 		event.preventDefault()
-		const entries = entriesRef.current
+		const entries = currentEntries()
 		if (showDropdown && activeIndex >= 0 && activeIndex < entries.length) {
 			openEntry(entries[activeIndex])
 		} else {
@@ -105,11 +135,11 @@ export function SearchBar() {
 			return
 		}
 		if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
-		if (!normalized) return
+		if (!normalized && !showRecent) return
 		event.preventDefault()
 		setIsFocused(true)
-		// Every suggestion plus "See all results".
-		const total = entriesRef.current.length + 1
+		// Every suggestion plus "See all results"; recent results alone.
+		const total = showRecent ? recentList.length : entriesRef.current.length + 1
 		setActiveIndex(current =>
 			moveActive(current, total, event.key === 'ArrowDown' ? 1 : -1),
 		)
@@ -150,6 +180,9 @@ export function SearchBar() {
 						setIsFocused(true)
 					}}
 					onFocus={() => setIsFocused(true)}
+					// Opening a suggestion keeps the field focused, so a click on
+					// it must reopen the list without a new focus event.
+					onClick={() => setIsFocused(true)}
 					onKeyDown={handleKeyDown}
 				/>
 				{isFetching && (
@@ -175,15 +208,30 @@ export function SearchBar() {
 						transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
 						className="absolute top-full z-50 mt-2 w-full overflow-y-auto overscroll-contain rounded-md border border-rule bg-popover text-popover-foreground shadow-overlay max-sm:fixed max-sm:inset-x-4 max-sm:top-[3.75rem] max-sm:mt-0 max-sm:w-auto max-h-[min(70vh,32rem)] dark:shadow-none"
 					>
-						<SearchSuggestions
-							query={debouncedQuery}
-							listId={listId}
-							activeIndex={activeIndex}
-							onEntriesChange={onEntriesChange}
-							onChoose={openEntry}
-							onSeeAll={openAll}
-							onHover={setActiveIndex}
-						/>
+						{showRecent ? (
+							<RecentSuggestions
+								listId={listId}
+								activeIndex={activeIndex}
+								entries={recentList}
+								onChoose={openEntry}
+								onHover={setActiveIndex}
+								onClear={() => {
+									clearRecent.mutate()
+									setActiveIndex(-1)
+								}}
+								clearing={clearRecent.isPending}
+							/>
+						) : (
+							<SearchSuggestions
+								query={debouncedQuery}
+								listId={listId}
+								activeIndex={activeIndex}
+								onEntriesChange={onEntriesChange}
+								onChoose={openEntry}
+								onSeeAll={openAll}
+								onHover={setActiveIndex}
+							/>
+						)}
 					</motion.div>
 				)}
 			</AnimatePresence>

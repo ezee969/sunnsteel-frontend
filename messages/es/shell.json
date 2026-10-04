@@ -86,7 +86,9 @@
 		},
 		"nothing": "Nada coincide con \"{query}\".",
 		"searching": "Buscando…",
-		"failed": "No se pudieron cargar las sugerencias. Pulsa Intro para ver todos los resultados."
+		"failed": "No se pudieron cargar las sugerencias. Pulsa Intro para ver todos los resultados.",
+		"recent": "Recientes",
+		"clearRecent": "Borrar búsquedas recientes"
 	},
 	"theme": {
 		"toLight": "Cambiar al tema claro",

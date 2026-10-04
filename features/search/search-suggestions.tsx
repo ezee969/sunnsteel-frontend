@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { type ReactNode, useEffect, useMemo } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -198,7 +199,8 @@ function Lines({ title, caption }: { title: ReactNode; caption?: ReactNode }) {
 	)
 }
 
-function EntryContent({ entry }: { entry: SuggestionEntry }) {
+/** How one entry reads, in the header list and in the recent list on /search. */
+export function EntryContent({ entry }: { entry: SuggestionEntry }) {
 	const t = useTranslations('social.search')
 	const tExercises = useTranslations('catalog.exercises')
 	const tUi = useTranslations('catalog.exercisesUi')
@@ -266,6 +268,30 @@ function EntryContent({ entry }: { entry: SuggestionEntry }) {
 				/>
 			)
 		}
+		case 'recentRoutine': {
+			const { routine } = entry
+			const size = t('routineSize', {
+				days: routine.dayCount,
+				exercises: routine.exerciseCount,
+			})
+			const author = routine.author
+				? [routine.author.name, routine.author.lastName]
+						.filter(Boolean)
+						.join(' ')
+				: null
+			return (
+				<Lines
+					title={routine.name}
+					caption={
+						author
+							? `${t('byAuthor', { name: author })} · ${size}`
+							: routine.isArchived
+								? `${t('archivedRoutine')} · ${size}`
+								: size
+					}
+				/>
+			)
+		}
 		case 'workout': {
 			const { session } = entry
 			return (
@@ -285,4 +311,73 @@ function EntryContent({ entry }: { entry: SuggestionEntry }) {
 			)
 		}
 	}
+}
+
+interface RecentSuggestionsProps {
+	listId: string
+	activeIndex: number
+	entries: SuggestionEntry[]
+	onChoose: (entry: SuggestionEntry) => void
+	onHover: (index: number) => void
+	onClear: () => void
+	clearing: boolean
+}
+
+/**
+ * NAV-03: with the field focused and empty, the results the member last
+ * opened from search, newest first, as the same options; the arrow keys walk
+ * them, and "Clear recent searches" sits outside the list.
+ */
+export function RecentSuggestions({
+	listId,
+	activeIndex,
+	entries,
+	onChoose,
+	onHover,
+	onClear,
+	clearing,
+}: RecentSuggestionsProps) {
+	const t = useTranslations('shell.search')
+	return (
+		<div>
+			<ul
+				id={listId}
+				role="listbox"
+				aria-labelledby={`${listId}-recent`}
+				className="py-1"
+			>
+				<li
+					role="presentation"
+					id={`${listId}-recent`}
+					className="type-label px-3 pb-1 pt-2 text-ink-3"
+				>
+					{t('recent')}
+				</li>
+				{entries.map((entry, index) => (
+					<Option
+						key={entry.key}
+						id={suggestionOptionId(listId, index)}
+						active={activeIndex === index}
+						onChoose={() => onChoose(entry)}
+						onHover={() => onHover(index)}
+					>
+						<EntryContent entry={entry} />
+					</Option>
+				))}
+			</ul>
+			<div className="border-t border-rule-faint px-1 py-1">
+				<Button
+					type="button"
+					variant="ghost"
+					size="sm"
+					className="w-full"
+					disabled={clearing}
+					onMouseDown={event => event.preventDefault()}
+					onClick={onClear}
+				>
+					{t('clearRecent')}
+				</Button>
+			</div>
+		</div>
+	)
 }
