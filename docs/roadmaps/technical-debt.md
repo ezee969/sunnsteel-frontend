@@ -20,6 +20,8 @@ Quick Workout problems are not duplicated here.
 **`TD-57` is open**: the password-reset email goes through Supabase's default
 sender, which reaches only the project's own team and cannot be translated. It
 waits on the owner (a domain and an SMTP provider), then on a small code step.
+`TD-58`, a stale record event that failed an exercise's whole progress
+timeline, was recorded and closed on 2026-10-04.
 `TD-56`, the double reload and splash after a deploy, was recorded and closed
 on 2026-09-27. `TD-54` and `TD-55`, both from the owner's
 mobile-density review, were recorded and closed on 2026-09-27. Their product-side companions are the `UX-*` items in the
@@ -41,6 +43,83 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-58"></a>
+
+### TD-58 — One stale record event failed an exercise's whole progress timeline — CLOSED 2026-10-04
+
+**Impact.** On a copy of the local database, the exercise page (`EXER-01`)
+for Bench Press showed an error on the owner's test account (@eze-prof):
+`GET /api/workouts/progress/timeline?exerciseId=…&limit=20` answered 500 with
+`Non-improving PERSONAL_RECORD event: 0b909c6f-…`. One bad row took down the
+whole feed, and the same row also reached the strength trend (a dip in the
+record line), the activity feed (a "new record" that was not one) and the
+milestone record count.
+
+**Evidence.** The account's Bench Press `PERSONAL_RECORD` events, in order:
+65×7, 65×8, 67.5×7, 72.5×7 (2026-08-09), **50×10 (2026-09-09)**, 75×7.
+Every event but the 50×10 has a deterministic portfolio-seed session id; the
+50×10 is a real workout with no routine. When it was finished the account had
+no earlier Bench Press, so the finish rightly wrote a first record. The
+portfolio seed then backdated heavier history around it and rebuilt the
+account's analytics (`rebuildAnalytics` in
+`prisma/portfolio-seed.analytics.ts`). The replay derives records from a
+generation-local frontier, so it no longer wrote one for that workout. But
+`applyContribution` only **upserts** events, so the old event stayed. The
+timeline's lateral join compared each record with the record just before it
+and threw on the 50×10. LIVE-17 corrections, LIVE-12 set kinds and LIVE-11
+substitutions were checked and ruled out: a correction only touches the
+latest workout and re-measures against every other one, and kinds and swaps
+change before the finish, never after it. A dry run of the repair rule found
+exactly this one event in the whole local database.
+
+**Direction.** Fix the writer, repair the rows already written, and make the
+read survive a bad row.
+
+**Closure criteria.** The seed's rebuild leaves no record event that fails to
+beat the best before it; existing ones are removed everywhere with the
+activity built on them; the timeline answers every row of the owner's account
+once, with `previous` the record actually beaten; a test covers each.
+
+**Closed 2026-10-04** (backend branch `claude/stale-record-events`).
+
+- **The writer.** `removeStaleRecordEvents`
+  (`src/workouts/analytics/stale-record-events.ts`) walks an account's record
+  events per exercise in time order and deletes each one that is not heavier
+  than the best before it (or equal and with more reps). It also removes their
+  comments, comment notifications, reactions and audience overrides through
+  `removeActivityEntries`, now shared with LIVE-17. The seed's
+  `rebuildAnalytics`, and so its teardown, run it before activating the
+  generation, and the seed's verification fails if any stale event is left.
+  The running app never calls it: only a replay over backdated history can
+  leave such an event, and only the seed writes backdated history.
+- **The rows already written.** Migration
+  `20261004120000_stale_record_events` applies the same rule once to every
+  account, with the same activity clean-up. It is idempotent: once the stale
+  events are gone, every remaining one beats the best before it.
+- **The read.** `previous` is now the **best** earlier record of the
+  exercise, which is the one just before it on a clean chain. A record that
+  does not beat it is dropped in the query, so pages stay full, and the mapper
+  skips it instead of throwing. `nextCursor` is the last row read.
+- **Found on the way.** The timeline cursor passed a `Date` against the
+  `timestamp` column, which NAV-01 had already recorded as shifted by the
+  session's zone. Paging the owner's unfiltered feed on the local database
+  (`Europe/Berlin`) repeated a row on unmodified `main`. The cursor now uses
+  the UTC wall clock cast to `timestamp(3)`, as the search cursor does.
+- **Measured** on the local database before the repair: the Bench Press page
+  answered 200 with five records, 75×7 naming 72.5×7 as the record it beat.
+  Paging all, records-only and progression-only feeds seven rows at a time
+  walked 100, 65 and 35 events once each, in 10 to 33 ms a page.
+
+**Not verified.** Whether production holds such a row. The database has no
+public proxy and the Railway connector cannot run SQL. Production's
+deploy and HTTP logs since 2026-09-20 show no `Non-improving` error and only
+200s on the timeline route. If production was restored from the Neon
+database the seed ran against, the owner's account there may hold the same
+event. Either way the migration removes it on the next deploy. Also not verified: the
+query plan at a larger record history (the busiest local account has 66
+record events), and the `SESSION_PROGRESS` notification text of the affected
+workout, which still counts the removed record.
 
 <a id="td-57"></a>
 
@@ -1107,6 +1186,13 @@ written in Spanish and kept frozen as a historical record. It must not be used a
 a list of active debt.
 
 ## Document history
+
+- **2026-10-04 (revision 33):** Recorded and closed `TD-58`: the portfolio
+  seed's analytics rebuild left a `PERSONAL_RECORD` event that no longer beat
+  the history backdated before it, and the progress timeline failed the whole
+  exercise on it. The seed now removes such events, a migration removes the
+  ones already written, the timeline skips one instead of failing, and its
+  cursor no longer moves with the database's time zone.
 
 - **2026-09-30 (revision 32):** Recorded `TD-57`: the password-reset email
   goes through Supabase's default sender, so it reaches only members of the
