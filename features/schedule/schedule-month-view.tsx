@@ -1,11 +1,13 @@
 'use client'
 
+import type { WeekStartsOn } from '@sunsteel/contracts'
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
@@ -22,11 +24,12 @@ import {
 
 import { SCHEDULE_STATUS } from './schedule-status'
 
-// 1 January 2024 was a Monday: seven days from it are the Monday-first columns.
-const weekdayLabels = (locale: Locale) =>
+// 1 January 2024 was a Monday, so seven days from it are Monday-first
+// columns; a Sunday start begins the day before (PREF-04).
+const weekdayLabels = (locale: Locale, weekStartsOn: WeekStartsOn) =>
 	Array.from({ length: 7 }, (_, index) =>
 		dateFormatter(locale, { weekday: 'short' }).format(
-			new Date(2024, 0, 1 + index),
+			new Date(2024, 0, 1 + index - (weekStartsOn === 0 ? 1 : 0)),
 		),
 	)
 
@@ -97,6 +100,7 @@ export function ScheduleMonthView({
 	footer,
 }: ScheduleMonthViewProps) {
 	const locale = useLocale() as Locale
+	const weekStartsOn = useWeekStartsOn()
 	const t = useTranslations('planning.scheduleMonth')
 	const monthLabel = month
 		? describeMonth(month.monthStart, now, locale, t)
@@ -203,7 +207,7 @@ export function ScheduleMonthView({
 					</caption>
 					<thead>
 						<tr>
-							{weekdayLabels(locale).map(day => (
+							{weekdayLabels(locale, weekStartsOn).map(day => (
 								<th
 									key={day}
 									scope="col"

@@ -167,7 +167,16 @@
 		"range30D": "30D",
 		"range90D": "90D",
 		"range1Y": "1A",
-		"rangeAll": "Todo"
+		"rangeAll": "Todo",
+		"notANumber": "{label} debe ser un número",
+		"outOfRange": "{label} debe estar entre {min} y {max}",
+		"atLeastOne": "Agrega al menos una medida",
+		"dateLabel": "Fecha",
+		"weightLabel": "Peso ({unit})",
+		"measurementsLegend": "Medidas ({unit}) y grasa corporal (%)",
+		"cancel": "Cancelar",
+		"save": "Guardar",
+		"startHistory": "Registra tu peso o una medida para empezar tu historial."
 	},
 	"tabs": {
 		"overview": "Resumen",

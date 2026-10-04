@@ -25,6 +25,7 @@ import {
 	UpdateProfileDiscoveryRequest,
 	UpdateProfilePrivacyRequest,
 	UpdateProfileRequest,
+	UpdateWeekStartRequest,
 	UserProfile,
 	UserSearchResponse,
 } from '@sunsteel/contracts'
@@ -76,6 +77,15 @@ export const userService = {
 	/** I18N-02: the account's language, or null to follow each device. */
 	async updateLocale(data: UpdateLocaleRequest): Promise<UserProfile> {
 		return httpClient.request<UserProfile>('/users/preferences/locale', {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			secure: true,
+		})
+	},
+
+	/** PREF-04: the weekday the account's weeks start on. */
+	async updateWeekStart(data: UpdateWeekStartRequest): Promise<UserProfile> {
+		return httpClient.request<UserProfile>('/users/preferences/week-start', {
 			method: 'PUT',
 			body: JSON.stringify(data),
 			secure: true,

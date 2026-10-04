@@ -442,7 +442,8 @@
 		"GOALS_MAX": "No more than {max} measurable goals are allowed",
 		"GOAL_DUPLICATE": "Duplicate measurable goal",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Strength goals require an exercise",
-		"BODY_ENTRY_IN_FUTURE": "An entry cannot be dated in the future"
+		"BODY_ENTRY_IN_FUTURE": "An entry cannot be dated in the future",
+		"TIME_ZONE_LIVE_WORKOUT": "Finish or discard the workout in progress before changing your time zone."
 	},
 	"glossary": {
 		"label": "Terms:",

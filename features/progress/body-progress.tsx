@@ -4,6 +4,7 @@ import type {
 	BodyMeasurement,
 	BodyProgressRange,
 	BodyProgressResponse,
+	LengthUnit,
 	MeasurableGoal,
 	WeightUnit,
 } from '@sunsteel/contracts'
@@ -60,6 +61,7 @@ import {
 	formatBodyValue,
 	getBodyWeightChart,
 } from '@/lib/utils/body-progress'
+import { getLengthUnitLabel } from '@/lib/utils/length-unit'
 import { localDateKey } from '@/lib/utils/schedule-week'
 import { getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -261,9 +263,11 @@ function BodyWeightChart({
 function MeasurementList({
 	data,
 	weightUnit,
+	lengthUnit,
 }: {
 	data: BodyProgressResponse
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 }) {
 	const tBody = useTranslations('progress.body')
 	const locale = useLocale() as Locale
@@ -287,10 +291,22 @@ function MeasurementList({
 					</dt>
 					<dd className="text-right">
 						<span className="type-data text-foreground">
-							{formatBodyValue(entry.field, entry.latest!, weightUnit, locale)}
+							{formatBodyValue(
+								entry.field,
+								entry.latest!,
+								weightUnit,
+								locale,
+								lengthUnit,
+							)}
 						</span>
 						<span className="type-body-sm block text-ink-3">
-							{describeBodyChange(entry, weightUnit, tBody, locale) ??
+							{describeBodyChange(
+								entry,
+								weightUnit,
+								tBody,
+								locale,
+								lengthUnit,
+							) ??
 								tBody('onDate', {
 									date: formatBodyDate(entry.latestDate!, locale),
 								})}
@@ -307,12 +323,14 @@ function BodyProgressBody({
 	query,
 	goals,
 	weightUnit,
+	lengthUnit,
 	emptyCopy,
 }: {
 	id: string
 	query: ReturnType<typeof useBodyProgress>
 	goals?: MeasurableGoal[]
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 	emptyCopy: React.ReactNode
 }) {
 	const tBody = useTranslations('progress.body')
@@ -352,7 +370,11 @@ function BodyProgressBody({
 			<div className="min-w-0">
 				<h3 className="type-body-sm text-ink-3">{tBody('measurements')}</h3>
 				<div className="mt-1">
-					<MeasurementList data={query.data} weightUnit={weightUnit} />
+					<MeasurementList
+						data={query.data}
+						weightUnit={weightUnit}
+						lengthUnit={lengthUnit}
+					/>
 				</div>
 			</div>
 		</div>
@@ -399,12 +421,14 @@ function BodyEntryDialog({
 	initial,
 	editing,
 	weightUnit,
+	lengthUnit,
 }: {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	initial: BodyEntryDraft
 	editing: boolean
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 }) {
 	const errorText = useApiErrorMessage()
 	const locale = useLocale() as Locale
@@ -424,7 +448,14 @@ function BodyEntryDialog({
 
 	const submit = (event: React.FormEvent) => {
 		event.preventDefault()
-		const result = bodyEntryRequest(draft, weightUnit, today, tBody, locale)
+		const result = bodyEntryRequest(
+			draft,
+			weightUnit,
+			today,
+			tBody,
+			locale,
+			lengthUnit,
+		)
 		if (result.problem !== null) {
 			setProblem({ message: result.problem, field: result.field })
 			return
@@ -451,7 +482,7 @@ function BodyEntryDialog({
 							htmlFor={`${baseId}-date`}
 							className="type-body-sm text-ink-3"
 						>
-							Date
+							{tBody('dateLabel')}
 						</Label>
 						<Input
 							id={`${baseId}-date`}
@@ -469,7 +500,9 @@ function BodyEntryDialog({
 					</div>
 					<NumberField
 						id={`${baseId}-weight`}
-						label={`Weight (${getWeightUnitLabel(weightUnit)})`}
+						label={tBody('weightLabel', {
+							unit: getWeightUnitLabel(weightUnit),
+						})}
 						value={draft.weightKg}
 						onChange={set('weightKg')}
 						invalid={problem?.field === 'weightKg'}
@@ -477,7 +510,9 @@ function BodyEntryDialog({
 					/>
 					<fieldset className="space-y-2">
 						<legend className="type-body-sm text-ink-3">
-							Measurements (cm) and body fat (%)
+							{tBody('measurementsLegend', {
+								unit: getLengthUnitLabel(lengthUnit),
+							})}
 						</legend>
 						<div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
 							{BODY_LENGTH_FIELDS.map(field => (
@@ -513,13 +548,13 @@ function BodyEntryDialog({
 							variant="outline"
 							onClick={() => onOpenChange(false)}
 						>
-							Cancel
+							{tBody('cancel')}
 						</Button>
 						<Button type="submit" disabled={upsert.isPending}>
 							{upsert.isPending ? (
 								<Loader2 className="size-4 animate-spin" aria-hidden />
 							) : null}
-							Save
+							{tBody('save')}
 						</Button>
 					</DialogFooter>
 				</form>
@@ -531,11 +566,13 @@ function BodyEntryDialog({
 function EntryList({
 	entries,
 	weightUnit,
+	lengthUnit,
 	onEdit,
 	onDelete,
 }: {
 	entries: BodyMeasurement[]
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 	onEdit: (entry: BodyMeasurement) => void
 	onDelete: (entry: BodyMeasurement) => void
 }) {
@@ -559,7 +596,13 @@ function EntryList({
 								{formatBodyDate(entry.date, locale)}
 							</p>
 							<p className="type-body-sm break-words text-ink-3">
-								{describeBodyEntry(entry, weightUnit, tBody, locale)}
+								{describeBodyEntry(
+									entry,
+									weightUnit,
+									tBody,
+									locale,
+									lengthUnit,
+								)}
 							</p>
 						</div>
 						<div className="flex shrink-0 gap-1">
@@ -605,9 +648,11 @@ function EntryList({
  */
 export function BodyProgressSection({
 	weightUnit,
+	lengthUnit,
 	goals,
 }: {
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 	goals?: MeasurableGoal[]
 }) {
 	const tBody = useTranslations('progress.body')
@@ -679,15 +724,17 @@ export function BodyProgressSection({
 					query={query}
 					goals={goals}
 					weightUnit={weightUnit}
-					emptyCopy="Log your weight or a measurement to start your history."
+					lengthUnit={lengthUnit}
+					emptyCopy={tBody('startHistory')}
 				/>
 				{query.data ? (
 					<EntryList
 						entries={query.data.entries}
 						weightUnit={weightUnit}
+						lengthUnit={lengthUnit}
 						onEdit={entry =>
 							setDialog({
-								draft: draftFromBodyEntry(entry, weightUnit),
+								draft: draftFromBodyEntry(entry, weightUnit, lengthUnit),
 								editing: true,
 								key: Date.now(),
 							})
@@ -703,6 +750,7 @@ export function BodyProgressSection({
 						initial={dialog.draft}
 						editing={dialog.editing}
 						weightUnit={weightUnit}
+						lengthUnit={lengthUnit}
 					/>
 				) : null}
 				<AlertDialog
@@ -756,9 +804,11 @@ export function BodyProgressSection({
 export function ProfileBodyProgress({
 	source,
 	weightUnit,
+	lengthUnit,
 }: {
 	source: BodyProgressSource
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 }) {
 	const tBody = useTranslations('progress.body')
 	const [range, setRange] = useState<BodyProgressRange>('90D')
@@ -785,6 +835,7 @@ export function ProfileBodyProgress({
 				id={`profile-body-${id}`}
 				query={query}
 				weightUnit={weightUnit}
+				lengthUnit={lengthUnit}
 				emptyCopy={
 					source.kind === 'own'
 						? tBody('nothingLogged')

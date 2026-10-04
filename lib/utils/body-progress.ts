@@ -5,6 +5,7 @@ import {
 	type BodyMeasurementField,
 	bodyMeasurementProblems,
 	type BodyProgressRange,
+	type LengthUnit,
 	type MeasurableGoal,
 	type UpsertBodyMeasurementRequest,
 	type WeightUnit,
@@ -14,6 +15,12 @@ import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import type { MessageKey, Translator } from '@/i18n/translator'
 
+import {
+	centimetresToDisplayLength,
+	formatLengthInput,
+	getLengthUnitLabel,
+	parseLengthInput,
+} from './length-unit'
 import {
 	formatWeightInput,
 	getWeightUnitLabel,
@@ -62,18 +69,40 @@ export function bodyFieldLabel(
 const oneDecimal = (value: number, locale: Locale) =>
 	numberFormatter(locale, { maximumFractionDigits: 1 }).format(value)
 
-/** Weight in the account's unit, lengths in cm and body fat in %. */
+/** A stored value in the unit it is shown in: kg or lb, cm or in, %. */
+function displayValue(
+	field: BodyMeasurementField,
+	value: number,
+	unit: WeightUnit,
+	lengthUnit: LengthUnit,
+): number {
+	if (field === 'weightKg') return kilogramsToDisplayWeight(value, unit)
+	if (field === 'bodyFatPercent') return value
+	return centimetresToDisplayLength(value, lengthUnit)
+}
+
+function unitSuffix(
+	field: BodyMeasurementField,
+	unit: WeightUnit,
+	lengthUnit: LengthUnit,
+): string {
+	if (field === 'weightKg') return ` ${getWeightUnitLabel(unit)}`
+	if (field === 'bodyFatPercent') return '%'
+	return ` ${getLengthUnitLabel(lengthUnit)}`
+}
+
+/**
+ * Weight in the account's unit, lengths in its length unit (PREF-04) and
+ * body fat in %.
+ */
 export function formatBodyValue(
 	field: BodyMeasurementField,
 	value: number,
 	unit: WeightUnit,
 	locale: Locale,
+	lengthUnit: LengthUnit = 'CM',
 ): string {
-	if (field === 'weightKg') {
-		return `${oneDecimal(kilogramsToDisplayWeight(value, unit), locale)} ${getWeightUnitLabel(unit)}`
-	}
-	if (field === 'bodyFatPercent') return `${oneDecimal(value, locale)}%`
-	return `${oneDecimal(value, locale)} cm`
+	return `${oneDecimal(displayValue(field, value, unit, lengthUnit), locale)}${unitSuffix(field, unit, lengthUnit)}`
 }
 
 /** A signed change; a change that rounds to nothing says so. */
@@ -83,12 +112,12 @@ export function formatBodyChange(
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
 	locale: Locale,
+	lengthUnit: LengthUnit = 'CM',
 ): string {
-	const shown =
-		field === 'weightKg' ? kilogramsToDisplayWeight(change, unit) : change
+	const shown = displayValue(field, change, unit, lengthUnit)
 	if (Math.abs(shown) < 0.05) return t('noChange')
 	const sign = shown > 0 ? '+' : '-'
-	return `${sign}${formatBodyValue(field, Math.abs(change), unit, locale)}`
+	return `${sign}${formatBodyValue(field, Math.abs(change), unit, locale, lengthUnit)}`
 }
 
 export function formatBodyDate(date: string, locale: Locale): string {
@@ -106,10 +135,18 @@ export function describeBodyChange(
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
 	locale: Locale,
+	lengthUnit: LengthUnit = 'CM',
 ): string | null {
 	if (summary.change === null || summary.changeSince === null) return null
 	return t('changeSince', {
-		change: formatBodyChange(summary.field, summary.change, unit, t, locale),
+		change: formatBodyChange(
+			summary.field,
+			summary.change,
+			unit,
+			t,
+			locale,
+			lengthUnit,
+		),
 		date: formatBodyDate(summary.changeSince, locale),
 	})
 }
@@ -239,15 +276,40 @@ export function emptyBodyEntryDraft(date: string): BodyEntryDraft {
 export function draftFromBodyEntry(
 	entry: BodyMeasurement,
 	unit: WeightUnit,
+	lengthUnit: LengthUnit = 'CM',
 ): BodyEntryDraft {
 	const draft = emptyBodyEntryDraft(entry.date)
 	for (const field of BODY_MEASUREMENT_FIELDS) {
 		const value = entry[field.key]
 		if (value === null) continue
 		draft[field.key] =
-			field.key === 'weightKg' ? formatWeightInput(value, unit) : String(value)
+			field.key === 'weightKg'
+				? formatWeightInput(value, unit)
+				: field.key === 'bodyFatPercent'
+					? String(value)
+					: formatLengthInput(value, lengthUnit)
 	}
 	return draft
+}
+
+/**
+ * A bound in the unit it is shown in, rounded inwards so that typing the
+ * number the message names is always accepted: 10 cm is "4 in", not "3.9 in".
+ */
+function boundText(
+	field: BodyMeasurementField,
+	bound: number,
+	side: 'min' | 'max',
+	unit: WeightUnit,
+	lengthUnit: LengthUnit,
+	locale: Locale,
+): string {
+	const shown = displayValue(field, bound, unit, lengthUnit)
+	const tenths =
+		side === 'min'
+			? Math.ceil(shown * 10 - 1e-9)
+			: Math.floor(shown * 10 + 1e-9)
+	return `${oneDecimal(tenths / 10, locale)}${unitSuffix(field, unit, lengthUnit)}`
 }
 
 export type BodyEntryResult =
@@ -259,9 +321,10 @@ export type BodyEntryResult =
 	  }
 
 /**
- * Turns the form into a request, weight back into kilograms. The bounds and
- * the at-least-one rule are the contracts' own, so the form refuses exactly
- * what the server would, in the unit the member typed.
+ * Turns the form into a request, weight back into kilograms and lengths into
+ * centimetres. The bounds and the at-least-one rule are the contracts' own,
+ * applied after the conversion, so the form refuses exactly what the server
+ * would, in the unit the member typed.
  */
 export function bodyEntryRequest(
 	draft: BodyEntryDraft,
@@ -269,6 +332,7 @@ export function bodyEntryRequest(
 	today: string,
 	t: Translator<'progress.body'>,
 	locale: Locale,
+	lengthUnit: LengthUnit = 'CM',
 ): BodyEntryResult {
 	if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(draft.date)) {
 		return { request: null, problem: t('chooseADate'), field: 'date' }
@@ -288,11 +352,15 @@ export function bodyEntryRequest(
 			continue
 		}
 		const value =
-			field.key === 'weightKg' ? parseWeightInput(text, unit) : Number(text)
+			field.key === 'weightKg'
+				? parseWeightInput(text, unit)
+				: field.key === 'bodyFatPercent'
+					? Number(text)
+					: parseLengthInput(text, lengthUnit)
 		if (value === undefined || !Number.isFinite(value)) {
 			return {
 				request: null,
-				problem: `${field.label} must be a number`,
+				problem: t('notANumber', { label: bodyFieldLabel(field.key, t) }),
 				field: field.key,
 			}
 		}
@@ -300,10 +368,16 @@ export function bodyEntryRequest(
 	}
 	const [problem] = bodyMeasurementProblems(request)
 	if (problem) {
-		const message =
-			problem.field === 'weightKg'
-				? `Weight must be between ${formatBodyValue('weightKg', 20, unit, locale)} and ${formatBodyValue('weightKg', 1000, unit, locale)}`
-				: problem.message
+		const field = BODY_MEASUREMENT_FIELDS.find(
+			entry => entry.key === problem.field,
+		)
+		const message = field
+			? t('outOfRange', {
+					label: bodyFieldLabel(field.key, t),
+					min: boundText(field.key, field.min, 'min', unit, lengthUnit, locale),
+					max: boundText(field.key, field.max, 'max', unit, lengthUnit, locale),
+				})
+			: t('atLeastOne')
 		return { request: null, problem: message, field: problem.field }
 	}
 	return { request, problem: null, field: null }
@@ -315,15 +389,20 @@ export function describeBodyEntry(
 	unit: WeightUnit,
 	t: Translator<'progress.body'>,
 	locale: Locale,
+	lengthUnit: LengthUnit = 'CM',
 ): string {
 	return BODY_MEASUREMENT_FIELDS.filter(field => entry[field.key] !== null)
-		.map(field =>
-			field.key === 'weightKg'
-				? formatBodyValue(field.key, entry[field.key]!, unit, locale)
-				: t('entryField', {
-						label: bodyFieldLabel(field.key, t),
-						value: formatBodyValue(field.key, entry[field.key]!, unit, locale),
-					}),
-		)
+		.map(field => {
+			const value = formatBodyValue(
+				field.key,
+				entry[field.key]!,
+				unit,
+				locale,
+				lengthUnit,
+			)
+			return field.key === 'weightKg'
+				? value
+				: t('entryField', { label: bodyFieldLabel(field.key, t), value })
+		})
 		.join(' · ')
 }

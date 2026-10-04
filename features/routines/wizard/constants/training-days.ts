@@ -1,3 +1,5 @@
+import type { WeekStartsOn } from '@sunsteel/contracts'
+
 import type { RoutineWizardData } from '../types'
 
 /**
@@ -25,6 +27,17 @@ export const DAYS_OF_WEEK: readonly TrainingDayInfo[] = [
 	{ id: 5 },
 	{ id: 6 },
 ] as const
+
+/**
+ * PREF-04: the weekday controls in the member's week order, Monday or Sunday
+ * first. Only the order changes; each control keeps its stored number.
+ */
+export const daysOfWeekInOrder = (
+	weekStartsOn: WeekStartsOn,
+): readonly TrainingDayInfo[] =>
+	[...DAYS_OF_WEEK].sort(
+		(a, b) => ((a.id - weekStartsOn + 7) % 7) - ((b.id - weekStartsOn + 7) % 7),
+	)
 
 export const COMMON_SPLITS: readonly TrainingSplit[] = [
 	{ key: 'pushPullLegs', days: [1, 3, 5] },

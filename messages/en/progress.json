@@ -167,7 +167,16 @@
 		"range30D": "30D",
 		"range90D": "90D",
 		"range1Y": "1Y",
-		"rangeAll": "All"
+		"rangeAll": "All",
+		"notANumber": "{label} must be a number",
+		"outOfRange": "{label} must be between {min} and {max}",
+		"atLeastOne": "Add at least one measurement",
+		"dateLabel": "Date",
+		"weightLabel": "Weight ({unit})",
+		"measurementsLegend": "Measurements ({unit}) and body fat (%)",
+		"cancel": "Cancel",
+		"save": "Save",
+		"startHistory": "Log your weight or a measurement to start your history."
 	},
 	"tabs": {
 		"overview": "Overview",

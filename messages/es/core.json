@@ -442,7 +442,8 @@
 		"GOALS_MAX": "Se permiten como máximo {max} objetivos medibles",
 		"GOAL_DUPLICATE": "Objetivo medible repetido",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Los objetivos de fuerza necesitan un ejercicio",
-		"BODY_ENTRY_IN_FUTURE": "Un registro no puede tener una fecha futura"
+		"BODY_ENTRY_IN_FUTURE": "Un registro no puede tener una fecha futura",
+		"TIME_ZONE_LIVE_WORKOUT": "Termina o descarta el entrenamiento en curso antes de cambiar tu zona horaria."
 	},
 	"glossary": {
 		"label": "Términos:",

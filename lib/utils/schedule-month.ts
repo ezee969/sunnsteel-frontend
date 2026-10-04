@@ -1,3 +1,5 @@
+import { DEFAULT_WEEK_STARTS_ON, type WeekStartsOn } from '@sunsteel/contracts'
+
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import type { MessageKey, Translator } from '@/i18n/translator'
@@ -77,16 +79,19 @@ export const addMonths = (date: Date, months: number): Date =>
 
 const DAY_MS = 86_400_000
 
-function monthGrid(monthStart: Date) {
-	const first = startOfWeek(monthStart)
+function monthGrid(monthStart: Date, weekStartsOn: WeekStartsOn) {
+	const first = startOfWeek(monthStart, weekStartsOn)
 	const last = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0)
 	const span = Math.round((last.getTime() - first.getTime()) / DAY_MS) + 1
 	return { first, weeks: Math.ceil(span / 7) }
 }
 
 /** The sessions read for the whole grid, one day past it (see the week range). */
-export function scheduleMonthRange(monthStart: Date) {
-	const { first, weeks } = monthGrid(monthStart)
+export function scheduleMonthRange(
+	monthStart: Date,
+	weekStartsOn: WeekStartsOn = DEFAULT_WEEK_STARTS_ON,
+) {
+	const { first, weeks } = monthGrid(monthStart, weekStartsOn)
 	return {
 		from: first.toISOString(),
 		to: addDays(first, weeks * 7 + 1).toISOString(),
@@ -95,9 +100,14 @@ export function scheduleMonthRange(monthStart: Date) {
 
 export function buildScheduleMonth({
 	monthStart,
+	weekStartsOn = DEFAULT_WEEK_STARTS_ON,
 	...input
-}: Omit<WeekInput, 'weekStart'> & { monthStart: Date }): ScheduleMonth {
-	const { first, weeks } = monthGrid(monthStart)
+}: Omit<WeekInput, 'weekStart'> & {
+	monthStart: Date
+	/** PREF-04: the weekday the grid's rows start on. */
+	weekStartsOn?: WeekStartsOn
+}): ScheduleMonth {
+	const { first, weeks } = monthGrid(monthStart, weekStartsOn)
 	const monthKey = localDateKey(monthStart).slice(0, 7)
 	const today = localDateKey(input.now)
 	const rows = Array.from({ length: weeks }, (_, index) =>

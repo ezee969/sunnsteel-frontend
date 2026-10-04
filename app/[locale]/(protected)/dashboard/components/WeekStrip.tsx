@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SCHEDULE_STATUS } from '@/features/schedule/schedule-status'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
@@ -43,7 +44,12 @@ export default function WeekStrip() {
 	const t = useTranslations('planning.weekStrip')
 	const tMonth = useTranslations('planning.scheduleMonth')
 	const [now] = useState(() => new Date())
-	const weekStart = useMemo(() => startOfWeek(now), [now])
+	// PREF-04: the member's week, as on the Schedule.
+	const weekStartsOn = useWeekStartsOn()
+	const weekStart = useMemo(
+		() => startOfWeek(now, weekStartsOn),
+		[now, weekStartsOn],
+	)
 	const range = useMemo(() => scheduleWeekRange(weekStart), [weekStart])
 	const data = useScheduleData(range)
 	const today = useTodaysWorkouts()

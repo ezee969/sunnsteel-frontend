@@ -2,6 +2,7 @@
 
 import { BodyProgressSection } from '@/features/progress/body-progress'
 import { ProgressTab } from '@/features/progress/progress-tab'
+import { useLengthUnit } from '@/hooks/use-length-unit'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { usePersonalGoals } from '@/lib/api/hooks/useWorkoutSession'
 
@@ -12,12 +13,14 @@ import { usePersonalGoals } from '@/lib/api/hooks/useWorkoutSession'
  */
 export default function ProgressBodyPage() {
 	const weightUnit = useWeightUnit()
+	const lengthUnit = useLengthUnit()
 	const personalGoals = usePersonalGoals()
 
 	return (
 		<ProgressTab>
 			<BodyProgressSection
 				weightUnit={weightUnit}
+				lengthUnit={lengthUnit}
 				goals={personalGoals.data?.goals}
 			/>
 		</ProgressTab>

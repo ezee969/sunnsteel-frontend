@@ -16,6 +16,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import {
@@ -283,6 +284,7 @@ export function ScheduleWeekView({
 	onRetry,
 }: ScheduleWeekViewProps) {
 	const locale = useLocale() as Locale
+	const weekStartsOn = useWeekStartsOn()
 	const tDate = useTranslations('routines.date')
 	const t = useTranslations('planning.scheduleWeek')
 	const tMonth = useTranslations('planning.scheduleMonth')
@@ -292,7 +294,7 @@ export function ScheduleWeekView({
 				<div>
 					<h2 id="schedule-week" className="type-section text-foreground">
 						{week
-							? describeWeek(week.weekStart, now, locale, t)
+							? describeWeek(week.weekStart, now, locale, t, weekStartsOn)
 							: t('thisWeek')}
 					</h2>
 					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">

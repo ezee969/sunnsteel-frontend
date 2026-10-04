@@ -48,10 +48,12 @@ export default function SharedProfilePage() {
 			variant="member"
 			profile={profile}
 			weightUnit="KG"
+			lengthUnit="CM"
 			bodyProgress={
 				<ProfileBodyProgress
 					source={{ kind: 'public', identifier: profile.username }}
 					weightUnit="KG"
+					lengthUnit="CM"
 				/>
 			}
 		/>

@@ -2,6 +2,7 @@
 
 import {
 	FeaturedProfileItem,
+	LengthUnit,
 	PublicProfileAchievements,
 	PublicUserProfile,
 	UserProfile,
@@ -46,6 +47,7 @@ import type { Locale } from '@/i18n/config'
 import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { formatHeight } from '@/lib/utils/length-unit'
 import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
@@ -101,6 +103,8 @@ type ProfileViewProps = (
 	 * the viewer may see it (the owner, or `viewerAccess.bodyProgress`).
 	 */
 	bodyProgress?: React.ReactNode
+	/** PREF-04: the viewer's length unit, as `weightUnit` is the viewer's. */
+	lengthUnit?: LengthUnit
 }
 
 /**
@@ -224,6 +228,7 @@ export function ProfileView(props: ProfileViewProps) {
 		? (progress?.totalVolumeKg ?? 0)
 		: (publicTrainingSummary?.totalVolumeKg ?? 0)
 	const weightUnit = props.weightUnit
+	const lengthUnit = props.lengthUnit ?? 'CM'
 	const totalVolume = kilogramsToDisplayWeight(totalVolumeKg, weightUnit)
 	const canViewRecords = isOwnProfile || publicUser!.viewerAccess.records
 	const personalRecords = isOwnProfile
@@ -581,7 +586,7 @@ export function ProfileView(props: ProfileViewProps) {
 									value={
 										bodyMetrics?.heightCm == null
 											? null
-											: `${bodyMetrics.heightCm} cm`
+											: formatHeight(bodyMetrics.heightCm, lengthUnit, locale)
 									}
 								/>
 							</dl>

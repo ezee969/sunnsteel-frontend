@@ -1,8 +1,10 @@
 'use client'
 
 import {
+	type LengthUnit,
 	PROFILE_BIO_MAX_LENGTH,
 	PROFILE_LOCATION_MAX_LENGTH,
+	WEIGHT_UNITS,
 	type WeightUnit,
 } from '@sunsteel/contracts'
 import { Camera, Loader2 } from 'lucide-react'
@@ -40,6 +42,13 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
+import {
+	convertHeightDraft,
+	type HeightDraft,
+	heightDraft,
+	heightFromDraft,
+	isLengthUnit,
+} from '@/lib/utils/length-unit'
 import { logger } from '@/lib/utils/logger'
 import { localDateKey } from '@/lib/utils/schedule-week'
 import { privacySettingHref } from '@/lib/utils/settings-anchor'
@@ -50,6 +59,9 @@ import {
 } from '@/lib/utils/username'
 import { formatWeightInput, parseWeightInput } from '@/lib/utils/weight-unit'
 
+const isWeightUnit = (value: string): value is WeightUnit =>
+	(WEIGHT_UNITS as readonly string[]).includes(value)
+
 interface SettingsFormData {
 	username: string
 	name: string
@@ -59,8 +71,9 @@ interface SettingsFormData {
 	age: string
 	sex: string
 	weight: string
-	height: string
+	height: HeightDraft
 	weightUnit: WeightUnit
+	lengthUnit: LengthUnit
 }
 
 /**
@@ -89,8 +102,9 @@ export default function SettingsProfilePage() {
 		age: '',
 		sex: '',
 		weight: '',
-		height: '',
+		height: heightDraft(null, 'CM'),
 		weightUnit: 'KG',
+		lengthUnit: 'CM',
 	})
 
 	const [avatarUrl, setAvatarUrl] = useState('')
@@ -111,8 +125,9 @@ export default function SettingsProfilePage() {
 				age: user.age ? String(user.age) : '',
 				sex: user.sex || '',
 				weight: formatWeightInput(user.weight, user.weightUnit),
-				height: user.height ? String(user.height) : '',
+				height: heightDraft(user.height, user.lengthUnit ?? 'CM'),
 				weightUnit: user.weightUnit,
+				lengthUnit: user.lengthUnit ?? 'CM',
 			})
 			setAvatarUrl(user.avatarUrl || '')
 		}
@@ -129,10 +144,15 @@ export default function SettingsProfilePage() {
 	}
 
 	const handleSelectChange = (val: string, name: string) => {
+		// No item has an empty value: '' is Radix reporting a change from outside.
+		if (val === '') return
 		setFormData(prev => ({ ...prev, [name]: val }))
 	}
 
-	const handleWeightUnitChange = (weightUnit: WeightUnit) => {
+	const handleWeightUnitChange = (weightUnit: string) => {
+		// The same '' from Radix as the length unit below: an account in pounds
+		// otherwise opened Settings with no unit and saved an empty one.
+		if (!isWeightUnit(weightUnit)) return
 		setFormData(previous => {
 			const currentWeightKg = parseWeightInput(
 				previous.weight,
@@ -144,6 +164,34 @@ export default function SettingsProfilePage() {
 				weight: formatWeightInput(currentWeightKg, weightUnit),
 			}
 		})
+	}
+
+	// PREF-04: the height follows the length unit, as the weight follows its
+	// unit; an untouched height still saves exactly as stored.
+	const handleHeightChange =
+		(field: keyof HeightDraft) =>
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const value = event.target.value
+			setFormData(previous => ({
+				...previous,
+				height: { ...previous.height, [field]: value },
+			}))
+		}
+
+	const handleLengthUnitChange = (lengthUnit: string) => {
+		// Radix's Select reports '' when its value changes from outside (the
+		// profile arriving with inches); only a real unit is a member's choice.
+		if (!isLengthUnit(lengthUnit)) return
+		setFormData(previous => ({
+			...previous,
+			lengthUnit,
+			height: convertHeightDraft(
+				previous.height,
+				previous.lengthUnit,
+				lengthUnit,
+				user?.height,
+			),
+		}))
 	}
 
 	const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,6 +268,19 @@ export default function SettingsProfilePage() {
 			formData.weight === originalWeight
 				? (user?.weight ?? null)
 				: (parseWeightInput(formData.weight, formData.weightUnit) ?? null)
+		const heightCm = heightFromDraft(
+			formData.height,
+			formData.lengthUnit,
+			user?.height,
+		)
+		if (heightCm === undefined) {
+			push({
+				title: t('errorTitle'),
+				description: t('heightInvalid'),
+				variant: 'destructive',
+			})
+			return
+		}
 		updateUserMutation.mutate(
 			{
 				username: normalizeUsername(formData.username),
@@ -232,8 +293,9 @@ export default function SettingsProfilePage() {
 				weight: weightKg,
 				// PROG-12: a changed weight becomes this local date's body measurement.
 				localDate: localDateKey(new Date()),
-				height: formData.height ? parseFloat(formData.height) : null,
+				height: heightCm,
 				weightUnit: formData.weightUnit,
+				lengthUnit: formData.lengthUnit,
 				avatarUrl: avatarUrl || null,
 			},
 			{
@@ -455,7 +517,7 @@ export default function SettingsProfilePage() {
 								</div>
 							</div>
 
-							<div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div className="space-y-2">
 									<Label htmlFor="weight">
 										{t('weight', {
@@ -476,9 +538,7 @@ export default function SettingsProfilePage() {
 									<Label htmlFor="weightUnit">{t('weightUnit')}</Label>
 									<Select
 										value={formData.weightUnit}
-										onValueChange={value =>
-											handleWeightUnitChange(value as WeightUnit)
-										}
+										onValueChange={value => handleWeightUnitChange(value)}
 									>
 										<SelectTrigger id="weightUnit" className="w-full">
 											<SelectValue aria-label={t('weightUnitAria')} />
@@ -489,17 +549,77 @@ export default function SettingsProfilePage() {
 										</SelectContent>
 									</Select>
 								</div>
+								{formData.lengthUnit === 'IN' ? (
+									<fieldset className="space-y-2">
+										<legend className="type-body-sm leading-none text-ink-3">
+											{t('heightImperial')}
+										</legend>
+										<div className="flex items-center gap-2">
+											<Input
+												id="height"
+												aria-label={t('heightFeet')}
+												className="w-20"
+												type="number"
+												inputMode="numeric"
+												min="0"
+												step="1"
+												value={formData.height.feet}
+												onChange={handleHeightChange('feet')}
+											/>
+											<span aria-hidden className="type-body-sm text-ink-3">
+												ft
+											</span>
+											<Input
+												id="heightInches"
+												aria-label={t('heightInches')}
+												className="w-24"
+												type="number"
+												inputMode="decimal"
+												min="0"
+												step="0.1"
+												value={formData.height.inches}
+												onChange={handleHeightChange('inches')}
+											/>
+											<span aria-hidden className="type-body-sm text-ink-3">
+												in
+											</span>
+										</div>
+									</fieldset>
+								) : (
+									<div className="space-y-2">
+										<Label htmlFor="height">{t('height')}</Label>
+										<Input
+											id="height"
+											name="height"
+											className="max-w-[var(--field-max)]"
+											type="number"
+											step="0.1"
+											value={formData.height.cm}
+											onChange={handleHeightChange('cm')}
+										/>
+									</div>
+								)}
 								<div className="space-y-2">
-									<Label htmlFor="height">{t('height')}</Label>
-									<Input
-										id="height"
-										name="height"
-										className="max-w-[var(--field-max)]"
-										type="number"
-										step="0.1"
-										value={formData.height}
-										onChange={handleInputChange}
-									/>
+									<Label htmlFor="lengthUnit">{t('lengthUnit')}</Label>
+									<Select
+										value={formData.lengthUnit}
+										onValueChange={value => handleLengthUnitChange(value)}
+									>
+										<SelectTrigger
+											id="lengthUnit"
+											className="w-full"
+											aria-describedby="lengthUnitNote"
+										>
+											<SelectValue aria-label={t('lengthUnitAria')} />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="CM">{t('centimeters')}</SelectItem>
+											<SelectItem value="IN">{t('inches')}</SelectItem>
+										</SelectContent>
+									</Select>
+									<p id="lengthUnitNote" className="type-body-sm text-ink-3">
+										{t('lengthUnitNote')}
+									</p>
 								</div>
 							</div>
 

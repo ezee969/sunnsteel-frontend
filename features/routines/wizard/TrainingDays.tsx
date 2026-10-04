@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/hooks/use-sidebar'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import { cn } from '@/lib/utils'
 import { weekdayName } from '@/lib/utils/date'
 
@@ -14,7 +15,7 @@ import { SelectedDaysSummary } from './components/SelectedDaysSummary'
 import { TrainingDayButton } from './components/TrainingDayButton'
 import {
 	COMMON_SPLITS,
-	DAYS_OF_WEEK,
+	daysOfWeekInOrder,
 	isSameTrainingSplit,
 	SPLIT_NAME_KEY_BY_SPLIT,
 } from './constants/training-days'
@@ -179,6 +180,8 @@ function RotationDays({ data, onUpdate }: TrainingDaysProps) {
  * its days on those weekdays in order; without them it runs on any day.
  */
 function RotationWeekdays({ data, onUpdate }: TrainingDaysProps) {
+	// PREF-04: the weekdays in the member's week order.
+	const orderedDays = daysOfWeekInOrder(useWeekStartsOn())
 	const t = useTranslations('routines.trainingDays')
 	const tDate = useTranslations('routines.date')
 	return (
@@ -194,7 +197,7 @@ function RotationWeekdays({ data, onUpdate }: TrainingDaysProps) {
 				aria-labelledby="rotation-weekdays-label"
 				className="flex flex-wrap gap-1"
 			>
-				{DAYS_OF_WEEK.map(day => {
+				{orderedDays.map(day => {
 					const isOn = data.rotationWeekdays.includes(day.id)
 					return (
 						<Button
@@ -222,9 +225,11 @@ function RotationWeekdays({ data, onUpdate }: TrainingDaysProps) {
  * It shows on the schedule as a rest day instead of an empty one.
  */
 function RestDays({ data, onUpdate }: TrainingDaysProps) {
+	// PREF-04: the weekdays in the member's week order.
+	const orderedDays = daysOfWeekInOrder(useWeekStartsOn())
 	const t = useTranslations('routines.trainingDays')
 	const tDate = useTranslations('routines.date')
-	const candidates = DAYS_OF_WEEK.filter(
+	const candidates = orderedDays.filter(
 		day => !data.trainingDays.includes(day.id),
 	)
 	if (data.trainingDays.length === 0 || candidates.length === 0) return null
@@ -263,6 +268,8 @@ function RestDays({ data, onUpdate }: TrainingDaysProps) {
 }
 
 function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
+	// PREF-04: the weekdays in the member's week order.
+	const orderedDays = daysOfWeekInOrder(useWeekStartsOn())
 	const { isMobile } = useSidebar()
 	const t = useTranslations('routines.trainingDays')
 	const tDate = useTranslations('routines.date')
@@ -322,7 +329,7 @@ function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 						{t('orSelectManually')}
 					</p>
 					<div className="grid grid-cols-7 gap-1 md:gap-2">
-						{DAYS_OF_WEEK.map(day => (
+						{orderedDays.map(day => (
 							<TrainingDayButton
 								key={day.id}
 								day={day}
@@ -340,7 +347,7 @@ function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 
 			<SelectedDaysSummary
 				trainingDays={data.trainingDays}
-				dayInfos={DAYS_OF_WEEK}
+				dayInfos={orderedDays}
 			/>
 		</div>
 	)

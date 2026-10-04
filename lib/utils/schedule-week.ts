@@ -1,9 +1,11 @@
 import {
+	DEFAULT_WEEK_STARTS_ON,
 	type Routine,
 	routineDayLabel,
 	SCHEDULE_MOVE_MAX_DAYS,
 	SCHEDULE_SKIP_PAST_DAYS,
 	type ScheduleOverride,
+	type WeekStartsOn,
 	type WorkoutSession,
 	type WorkoutSessionSummary,
 } from '@sunsteel/contracts'
@@ -158,10 +160,16 @@ export const addDays = (date: Date, days: number): Date => {
 	return next
 }
 
-/** Local midnight of the Monday that starts `date`'s week. */
-export const startOfWeek = (date: Date): Date => {
+/**
+ * Local midnight of the day that starts `date`'s week: Monday unless the
+ * member chose Sunday (PREF-04).
+ */
+export const startOfWeek = (
+	date: Date,
+	weekStartsOn: WeekStartsOn = DEFAULT_WEEK_STARTS_ON,
+): Date => {
 	const start = new Date(date)
-	start.setDate(start.getDate() - ((start.getDay() + 6) % 7))
+	start.setDate(start.getDate() - ((start.getDay() - weekStartsOn + 7) % 7))
 	start.setHours(0, 0, 0, 0)
 	return start
 }
@@ -691,8 +699,9 @@ export function describeWeek(
 	now: Date,
 	locale: Locale,
 	t: Translator<'planning.scheduleWeek'>,
+	weekStartsOn: WeekStartsOn = DEFAULT_WEEK_STARTS_ON,
 ): string {
-	const current = localDateKey(startOfWeek(now))
+	const current = localDateKey(startOfWeek(now, weekStartsOn))
 	if (weekStart === current) return t('thisWeek')
 	if (weekStart === localDateKey(addDays(fromKey(current), -7))) {
 		return t('lastWeek')

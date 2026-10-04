@@ -455,7 +455,16 @@
 		"kilograms": "Kilograms (kg)",
 		"pounds": "Pounds (lb)",
 		"height": "Height (cm)",
-		"save": "Save changes"
+		"save": "Save changes",
+		"heightImperial": "Height (ft, in)",
+		"heightFeet": "Feet",
+		"heightInches": "Inches",
+		"lengthUnit": "Length Unit",
+		"lengthUnitAria": "Length unit",
+		"centimeters": "Centimeters (cm)",
+		"inches": "Inches (in)",
+		"lengthUnitNote": "Used for your height and body measurements.",
+		"heightInvalid": "Enter your height as whole feet and inches."
 	},
 	"tabs": {
 		"profile": "Profile",
@@ -468,5 +477,21 @@
 		"title": "Settings",
 		"subtitle": "Manage your profile, training setup, privacy, notifications and account.",
 		"sectionsLabel": "Settings sections"
+	},
+	"timeCalendar": {
+		"title": "Time and calendar",
+		"description": "The time zone your training is counted in, and the day your weeks start on.",
+		"zoneLabel": "Time zone",
+		"zoneNote": "It decides the day each workout counts on, when reminders arrive and which plan a date trains. Changing it recounts your stats from each workout's real time, so one late at night can move to the day before or after; planned dates, blocks and deloads keep their dates.",
+		"rebuilding": "Your stats are being recounted in the new time zone.",
+		"deviceDiffers": "This device is set to {device}; your account uses {account}.",
+		"useDevice": "Use this device's time zone",
+		"zoneFailed": "Your time zone could not be changed",
+		"weekLabel": "Weeks start on",
+		"monday": "Monday",
+		"sunday": "Sunday",
+		"weekNote": "Your schedule, This week and every weekly number follow it. Your rank always counts Monday-to-Sunday weeks, the same for every member.",
+		"weekFailed": "Your week start could not be saved",
+		"saving": "Saving…"
 	}
 }

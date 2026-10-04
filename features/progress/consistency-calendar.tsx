@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 
 import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import {
 	addMonths,
 	buildScheduleMonth,
@@ -23,7 +24,11 @@ export function ConsistencyCalendar() {
 	const t = useTranslations('progress.consistency')
 	const [now] = useState(() => new Date())
 	const [monthStart, setMonthStart] = useState(() => startOfMonth(now))
-	const range = useMemo(() => scheduleMonthRange(monthStart), [monthStart])
+	const weekStartsOn = useWeekStartsOn()
+	const range = useMemo(
+		() => scheduleMonthRange(monthStart, weekStartsOn),
+		[monthStart, weekStartsOn],
+	)
 	const data = useScheduleData(range)
 
 	const month = useMemo(() => {
@@ -32,6 +37,7 @@ export function ConsistencyCalendar() {
 		}
 		return buildScheduleMonth({
 			monthStart,
+			weekStartsOn,
 			now,
 			routines: data.routines,
 			sessions: data.sessions,
@@ -46,6 +52,7 @@ export function ConsistencyCalendar() {
 		data.active,
 		data.overrides,
 		monthStart,
+		weekStartsOn,
 		now,
 	])
 

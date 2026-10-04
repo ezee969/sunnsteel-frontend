@@ -115,11 +115,13 @@ export default function ProfilePage() {
 				featuredItems={publicUser?.featuredItems}
 				achievements={publicUser?.achievements}
 				weightUnit={viewer.weightUnit}
+				lengthUnit={viewer.lengthUnit ?? 'CM'}
 				relationshipHrefs={getRelationshipHrefs(viewer.username)}
 				bodyProgress={
 					<ProfileBodyProgress
 						source={{ kind: 'own' }}
 						weightUnit={viewer.weightUnit}
+						lengthUnit={viewer.lengthUnit ?? 'CM'}
 					/>
 				}
 			/>
@@ -165,6 +167,7 @@ export default function ProfilePage() {
 			variant="member"
 			profile={publicUser}
 			weightUnit={viewer.weightUnit}
+			lengthUnit={viewer.lengthUnit ?? 'CM'}
 			isMutating={followMutation.isPending || unfollowMutation.isPending}
 			onFollowToggle={onFollowToggle}
 			relationshipHrefs={getRelationshipHrefs(publicUser.username)}
@@ -173,6 +176,7 @@ export default function ProfilePage() {
 				<ProfileBodyProgress
 					source={{ kind: 'member', identifier: publicUser.username }}
 					weightUnit={viewer.weightUnit}
+					lengthUnit={viewer.lengthUnit ?? 'CM'}
 				/>
 			}
 			trainingPartnerContent={

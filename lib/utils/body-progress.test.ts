@@ -234,6 +234,87 @@ describe('the entry form', () => {
 	})
 })
 
+describe('lengths in inches (PREF-04)', () => {
+	it('shows and signs lengths in inches, leaving weight and body fat alone', () => {
+		expect(formatBodyValue('waistCm', 84, 'KG', 'en', 'IN')).toBe('33.1 in')
+		expect(formatBodyValue('weightKg', 80, 'KG', 'en', 'IN')).toBe('80 kg')
+		expect(formatBodyValue('bodyFatPercent', 18, 'KG', 'en', 'IN')).toBe('18%')
+		expect(formatBodyChange('armCm', 2.54, 'KG', en, 'en', 'IN')).toBe('+1 in')
+		expect(formatBodyChange('armCm', 0.1, 'KG', en, 'en', 'IN')).toBe(
+			'No change',
+		)
+		expect(
+			describeBodyEntry(
+				entry('2026-09-01', { weightKg: 80, waistCm: 90 }),
+				'LB',
+				en,
+				'en',
+				'IN',
+			),
+		).toBe('176.4 lb · Waist 35.4 in')
+	})
+
+	it('fills the form in inches and saves centimetres', () => {
+		const draft = draftFromBodyEntry(
+			entry('2026-09-20', { waistCm: 84, bodyFatPercent: 18 }),
+			'KG',
+			'IN',
+		)
+		expect(draft).toMatchObject({ waistCm: '33.07', bodyFatPercent: '18' })
+		const result = bodyEntryRequest(
+			{ ...draft, waistCm: '33' },
+			'KG',
+			'2026-09-27',
+			en,
+			'en',
+			'IN',
+		)
+		expect(result.problem).toBeNull()
+		expect(result.request?.waistCm).toBe(83.82)
+		expect(result.request?.bodyFatPercent).toBe(18)
+	})
+
+	it("refuses the contracts' bounds after conversion, naming them in inches", () => {
+		const today = '2026-09-27'
+		expect(
+			bodyEntryRequest(
+				{ ...emptyBodyEntryDraft('2026-09-20'), waistCm: '3.9' },
+				'KG',
+				today,
+				en,
+				'en',
+				'IN',
+			),
+		).toMatchObject({
+			problem: 'Waist must be between 4 in and 118.1 in',
+			field: 'waistCm',
+		})
+		// The number the message names is accepted.
+		expect(
+			bodyEntryRequest(
+				{ ...emptyBodyEntryDraft('2026-09-20'), waistCm: '4' },
+				'KG',
+				today,
+				en,
+				'en',
+				'IN',
+			).problem,
+		).toBeNull()
+		expect(
+			bodyEntryRequest(
+				{ ...emptyBodyEntryDraft('2026-09-20'), waistCm: '5' },
+				'KG',
+				today,
+				es,
+				'es',
+			),
+		).toMatchObject({
+			problem: 'Cintura debe estar entre 10 cm y 300 cm',
+			field: 'waistCm',
+		})
+	})
+})
+
 describe('the same body copy in Spanish (I18N-05)', () => {
 	it('names every field and agrees the entry count', () => {
 		expect(bodyFieldLabel('waistCm', es)).toBe('Cintura')

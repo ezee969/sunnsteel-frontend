@@ -455,7 +455,16 @@
 		"kilograms": "Kilogramos (kg)",
 		"pounds": "Libras (lb)",
 		"height": "Estatura (cm)",
-		"save": "Guardar cambios"
+		"save": "Guardar cambios",
+		"heightImperial": "Estatura (ft, in)",
+		"heightFeet": "Pies",
+		"heightInches": "Pulgadas",
+		"lengthUnit": "Unidad de longitud",
+		"lengthUnitAria": "Unidad de longitud",
+		"centimeters": "Centímetros (cm)",
+		"inches": "Pulgadas (in)",
+		"lengthUnitNote": "Se usa para tu estatura y tus medidas corporales.",
+		"heightInvalid": "Escribe tu estatura en pies enteros y pulgadas."
 	},
 	"tabs": {
 		"profile": "Perfil",
@@ -468,5 +477,21 @@
 		"title": "Ajustes",
 		"subtitle": "Administra tu perfil, tu configuración de entrenamiento, la privacidad, las notificaciones y la cuenta.",
 		"sectionsLabel": "Secciones de Ajustes"
+	},
+	"timeCalendar": {
+		"title": "Hora y calendario",
+		"description": "La zona horaria en la que se cuenta tu entrenamiento y el día en que empiezan tus semanas.",
+		"zoneLabel": "Zona horaria",
+		"zoneNote": "Decide el día en que cuenta cada entrenamiento, cuándo llegan los recordatorios y qué plan entrena cada fecha. Al cambiarla, tus estadísticas se recalculan desde la hora real de cada entrenamiento, así que uno muy tarde por la noche puede pasar al día anterior o al siguiente; las fechas planificadas, los bloques y las descargas conservan sus fechas.",
+		"rebuilding": "Tus estadísticas se están recalculando en la nueva zona horaria.",
+		"deviceDiffers": "Este dispositivo está en {device}; tu cuenta usa {account}.",
+		"useDevice": "Usar la zona horaria de este dispositivo",
+		"zoneFailed": "No se pudo cambiar tu zona horaria",
+		"weekLabel": "Las semanas empiezan el",
+		"monday": "Lunes",
+		"sunday": "Domingo",
+		"weekNote": "Tu calendario, Esta semana y cada número semanal la siguen. Tu rango siempre cuenta semanas de lunes a domingo, igual para todos los miembros.",
+		"weekFailed": "No se pudo guardar el inicio de semana",
+		"saving": "Guardando…"
 	}
 }

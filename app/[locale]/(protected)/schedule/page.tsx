@@ -15,6 +15,7 @@ import { ScheduleMonthView } from '@/features/schedule/schedule-month-view'
 import { ScheduleWeekView } from '@/features/schedule/schedule-week-view'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
 import {
 	useSkipOccurrence,
 	useUndoMove,
@@ -48,14 +49,22 @@ export default function SchedulePage() {
 	const t = useTranslations('planning.schedulePage')
 	const [now] = useState(() => new Date())
 	const [view, setView] = useState<ScheduleView>('week')
-	const [weekStart, setWeekStart] = useState(() => startOfWeek(now))
+	// PREF-04: any day of the shown week; the week itself follows the
+	// member's week start, which may arrive with the profile after the first
+	// render.
+	const weekStartsOn = useWeekStartsOn()
+	const [weekAnchor, setWeekAnchor] = useState(now)
+	const weekStart = useMemo(
+		() => startOfWeek(weekAnchor, weekStartsOn),
+		[weekAnchor, weekStartsOn],
+	)
 	const [monthStart, setMonthStart] = useState(() => startOfMonth(now))
 	const range = useMemo(
 		() =>
 			view === 'week'
 				? scheduleWeekRange(weekStart)
-				: scheduleMonthRange(monthStart),
-		[view, weekStart, monthStart],
+				: scheduleMonthRange(monthStart, weekStartsOn),
+		[view, weekStart, monthStart, weekStartsOn],
 	)
 	const data = useScheduleData(range)
 
@@ -89,6 +98,7 @@ export default function SchedulePage() {
 		if (view !== 'month' || !ready || !data.routines || !data.sessions) return
 		return buildScheduleMonth({
 			monthStart,
+			weekStartsOn,
 			now,
 			routines: data.routines,
 			sessions: data.sessions,
@@ -103,6 +113,7 @@ export default function SchedulePage() {
 		data.active,
 		data.overrides,
 		monthStart,
+		weekStartsOn,
 		now,
 	])
 
@@ -228,11 +239,12 @@ export default function SchedulePage() {
 					}
 					pendingKey={undoingId ?? skippingKey}
 					isCurrentWeek={
-						localDateKey(weekStart) === localDateKey(startOfWeek(now))
+						localDateKey(weekStart) ===
+						localDateKey(startOfWeek(now, weekStartsOn))
 					}
-					onPrevious={() => setWeekStart(start => addDays(start, -7))}
-					onNext={() => setWeekStart(start => addDays(start, 7))}
-					onToday={() => setWeekStart(startOfWeek(now))}
+					onPrevious={() => setWeekAnchor(addDays(weekStart, -7))}
+					onNext={() => setWeekAnchor(addDays(weekStart, 7))}
+					onToday={() => setWeekAnchor(now)}
 					onRetry={data.refetch}
 				/>
 			) : (
@@ -251,7 +263,7 @@ export default function SchedulePage() {
 					onRetry={data.refetch}
 					// A day opens its week, where it can be started or reviewed.
 					onSelectDay={date => {
-						setWeekStart(startOfWeek(fromKey(date)))
+						setWeekAnchor(fromKey(date))
 						setView('week')
 					}}
 				/>
