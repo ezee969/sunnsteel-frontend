@@ -20,6 +20,8 @@ Quick Workout problems are not duplicated here.
 **`TD-57` is open**: the password-reset email goes through Supabase's default
 sender, which reaches only the project's own team and cannot be translated. It
 waits on the owner (a domain and an SMTP provider), then on a small code step.
+`TD-59`, the sweep's navigation cases giving up on a route Turbopack was
+still compiling, was recorded on 2026-10-04 and closed on 2026-10-05.
 `TD-58`, a stale record event that failed an exercise's whole progress
 timeline, was recorded and closed on 2026-10-04.
 `TD-56`, the double reload and splash after a deploy, was recorded and closed
@@ -43,6 +45,101 @@ matcher gap, on 2026-09-21. `TD-30` closed in Phase 13, `TD-34` in Phase 14,
 Phase-by-phase narrative and the full measurement evidence live in
 [ui-restyle-progress.md](../ui-restyle-progress.md); only the durable,
 actionable residue is recorded here.
+
+<a id="td-59"></a>
+
+### TD-59 — The sweep's navigation cases gave up on a route still compiling — CLOSED 2026-10-05
+
+**Impact.** `navigation @ <width>` in
+[e2e/regression.spec.ts](../../e2e/regression.spec.ts) failed intermittently
+whenever the sweep ran at `--workers=3`: "Discover did not navigate" or
+"Progress did not navigate", `toHaveURL` timing out after 5000ms with the
+address still on the page before. On 2026-10-04 it struck three scoped sweeps
+in a row (PREF-04: @ 320 and @ 390; ACH-06: @ 390, @ 430 and @ 768;
+ONBOARD-01: @ 320, @ 768 and @ 1024). Every one passed re-run alone at one
+worker, and the Spanish runs, also at three workers, passed every time. Each
+false failure cost a re-run and taught the next agent to wave this suite's
+failures through.
+
+**Evidence.** The App Router changes the address only once the destination's
+RSC payload has arrived, and the development server answers that payload only
+after Turbopack has compiled the route on its first request; `next/link` does
+not prefetch in development. Measured on a fresh `next dev --turbopack` from
+this branch:
+
+- Clicking `/login`'s link to `/signup`: the RSC request left at 0.08s, its
+  response came back at 2.44s and the address changed at 2.54s. To
+  `/forgot-password`: 2.15s and 2.20s. The address waits for the compile.
+- The navigation targets themselves, cold, with the marker cookie:
+  `/dashboard` 8.1s alone (21.2s on the first request after the server
+  started), `/routines` 3.0s alone, and `/workouts/history`, `/progress`,
+  `/exercises`, `/routines/discover`, `/activity` and `/settings` 3.8-4.3s each
+  when requested three at a time.
+
+`toHaveURL` waited the default 5s, which a cold route under three workers'
+load does not fit in. A route is compiled once per server process, so the
+pattern of the failures follows: a re-run alone at one worker, and the Spanish
+run straight after the English one, find every route already compiled. A click
+that lands starts the RSC request within 0.1s, so the time is the server's. A
+click lost while the drawer settles would start no request at all, and there
+is no prefetch or hover race to have in development; the old check could not
+tell these apart, and the new one does. `regression`'s `navigationTimeout` (90s, "the first request to each
+route compiles it under Turbopack") already covered `page.goto`; a click is a
+navigation too, but its wait was an assertion and got 5s.
+
+**Direction.** Wait for the right thing rather than only longer:
+`followSidebarLink` requires the click to start the navigation within the
+assertion timeout (the router requests the route, or answers from its Router
+Cache and changes the address at once), so a click that did nothing still
+fails fast and says so; then it gives the page the project's own
+`navigationTimeout`, and counts it reached only when the destination's own
+`h1` is visible, each target's heading named from the message files so
+`UI_LOCALE=es` keeps working. The account menu's Profile step at the end of
+the same case had the same 5s wait on a cold `/profile` and gets the same
+budget; its `h1` is the member's name, so it keeps the address check. The
+suite's intent is unchanged: every sidebar and drawer link reaches its page,
+then the drawer closes or the link is current.
+
+**Closure criteria.** The navigation scope passes at `--workers=3` against a
+dev server started cold, the condition that failed, in English and in Spanish,
+three runs in a row.
+
+**Closed 2026-10-05** (frontend branch `claude/nav-flake`).
+
+- **The check.** `followSidebarLink` in `e2e/regression.spec.ts`, as in the
+  direction above, plus the Profile step's budget.
+- **Found on the way: the cold compile's own 500.** With the check fixed, a
+  cold server still failed two cases on console errors. When the three
+  workers asked for the same uncompiled route at once, the server answered one
+  of them 500 (`SyntaxError: Unexpected end of JSON input` in its log, for
+  `/en/routines/discover`, `/en/activity` and others); the router fell back to
+  a full load that succeeded, so the navigation passed and the console check
+  rightly failed it. The same race hit `discoverIds`, which every worker runs
+  in `beforeAll` (`/workouts`, `/workouts/history`, `/exercises`), and once the
+  first `/dashboard` of a case, whose menu button then never rendered. No test
+  can order three workers, so [e2e/global-setup.ts](../../e2e/global-setup.ts)
+  now requests the shell's pages (every sidebar destination, `/profile` and
+  what `discoverIds` opens) one at a time with the marker cookie before any
+  worker starts, for the `regression` project only. A warm server answers each
+  in well under a second; a failure there is left for the sweep to report.
+  It also explains which links failed: `discoverIds` had already compiled
+  history, `/routines`, `/exercises` and `/profile`, so Progress and Discover
+  were the only targets still cold when the clicks started.
+- **Measured** on 2026-10-04 and 2026-10-05, each run on a dev server started
+  with an empty `.next` and the saved sign-in renewed first, at
+  `--workers=3`. Before, with `main`'s spec: `navigation` 4 of 7, two failing
+  "Progress did not navigate" (5000ms, the address still
+  `/workouts/history`) and one on the 500 above. The fixed check without the
+  setup step: 5 of 7, no navigation failure, two failing on the 500. With
+  both: 7 of 7 three times in English and three times in Spanish, no 500 in
+  the server log; then every interaction suite (`navigation`, `drawer`,
+  `sidebar`, `dialog`, `dropdowns`, `hover`, `keyboard focus`) 59 of 59.
+
+**Not verified.** A long-lived dev server recompiling after edits, the
+condition of the original failures, rather than a cold start; the setup step
+covers it only because a sweep starts after the edits. The full 621-case sweep
+was not run: the change is to the sweep's navigation case and its setup, and
+no layout case changed.
 
 <a id="td-58"></a>
 
@@ -1192,6 +1289,13 @@ written in Spanish and kept frozen as a historical record. It must not be used a
 a list of active debt.
 
 ## Document history
+
+- **2026-10-05 (revision 34):** Recorded and closed `TD-59`: the sweep's
+  `navigation` cases waited 5s for an address the App Router changes only
+  after Turbopack has compiled the route. They now require the click to start
+  the navigation, then wait for the page's own `h1` within the navigation
+  budget, and the run's global setup compiles the shell's pages one at a time
+  first, which also ends a 500 that three workers caused on a cold route.
 
 - **2026-10-04 (revision 33):** Recorded and closed `TD-58`: the portfolio
   seed's analytics rebuild left a `PERSONAL_RECORD` event that no longer beat
