@@ -1,4 +1,5 @@
 import type {
+	ContinueLinearBlockRequest,
 	CreateDeloadRequest,
 	CreateRoutineVersionRequest,
 	RestoreRoutineVersionResponse,
@@ -209,6 +210,21 @@ export const routineService = {
 		httpClient.request<RoutineTemporaryOverride>(
 			`${ROUTINES_API_URL}/${id}/deloads/${deloadId}/end`,
 			{ method: 'POST', secure: true },
+		),
+
+	/**
+	 * ROUT-19: what a finished 8-week block does next. `routineExerciseId` is
+	 * the exercise as rendered: the routine's own, or a block's or deload's
+	 * working copy.
+	 */
+	continueLinearBlock: async (
+		id: string,
+		routineExerciseId: string,
+		data: ContinueLinearBlockRequest,
+	): Promise<Routine> =>
+		httpClient.request<Routine>(
+			`${ROUTINES_API_URL}/${id}/exercises/${routineExerciseId}/linear-block`,
+			{ method: 'PUT', body: JSON.stringify(data), secure: true },
 		),
 
 	cancelDeload: async (id: string, deloadId: string): Promise<void> =>

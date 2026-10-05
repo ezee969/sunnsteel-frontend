@@ -615,6 +615,10 @@ export const useFinishSession = (id: string) => {
 			qc.invalidateQueries({ queryKey: qk.active })
 			qc.invalidateQueries({ queryKey: qk.stats })
 			qc.invalidateQueries({ queryKey: qk.progress })
+			// ROUT-17/ROUT-18: finishing moves 8-week blocks on the routine and
+			// can add a "block finished" notification.
+			qc.invalidateQueries({ queryKey: ['routines'] })
+			qc.invalidateQueries({ queryKey: ['notifications'] })
 		},
 	})
 }

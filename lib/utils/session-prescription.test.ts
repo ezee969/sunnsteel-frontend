@@ -55,6 +55,31 @@ describe('session prescription (ROUT-15)', () => {
 		})
 	})
 
+	it('keeps an LP slot’s block as the workout started, and null elsewhere (ROUT-17)', () => {
+		const block = {
+			referenceMaxKg: 100,
+			phase: 'BLOCK' as const,
+			step: 3,
+			cycle: 1,
+			samples: [],
+		}
+		const day = sessionPrescription({
+			routineDay: {
+				...snapshotDay,
+				exercises: [
+					{
+						...snapshotDay.exercises[0],
+						progressionScheme: 'LINEAR_PERIODIZATION',
+						linearPeriodization: block,
+					},
+					{ ...snapshotDay.exercises[0], id: 'slot-2', order: 1 },
+				],
+			},
+		})
+		expect(day?.exercises[0].linearPeriodization).toEqual(block)
+		expect(day?.exercises[1].linearPeriodization).toBeNull()
+	})
+
 	it('is nothing without a snapshot day', () => {
 		expect(sessionPrescription({ routineDay: undefined })).toBeNull()
 		expect(sessionPrescription(null)).toBeNull()

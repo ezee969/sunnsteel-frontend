@@ -34,6 +34,10 @@ import {
 	useUpsertSetLog,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
+import {
+	isRotationDay,
+	sessionLinearBlock,
+} from '@/lib/utils/session-linear-block'
 import { noteFor } from '@/lib/utils/session-notes'
 import {
 	sessionPrescription,
@@ -346,9 +350,10 @@ export default function ActiveSessionPage() {
 							set => set.isCompleted,
 						).length
 						const totalSets = group.sets.length
-						const prescribed = day.exercises.find(
+						const slot = day.exercises.find(
 							exercise => exercise.id === group.exerciseId,
-						)?.exercise
+						)
+						const prescribed = slot?.exercise
 						const substitution = substitutionFor(
 							session.exerciseSubstitutions,
 							group.exerciseId,
@@ -415,12 +420,29 @@ export default function ActiveSessionPage() {
 														name: prescribed.name,
 													},
 													hasCompletedSets: completedSets > 0,
+													// ROUT-17: a block's slot can be swapped
+													// for this workout only.
+													linearBlock: Boolean(
+														sessionLinearBlock(
+															slot ?? { progressionScheme: '' },
+														).state,
+													),
 												})
 										: undefined
 								}
 								onRemoveSet={
 									session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
 								}
+								linearBlock={
+									group.linearPeriodization
+										? {
+												state: group.linearPeriodization,
+												rotation: isRotationDay(session.routineDay),
+												routineId: routineId || undefined,
+											}
+										: null
+								}
+								linearBlockUnset={group.linearBlockUnset}
 								sessionId={session.id}
 								instruction={group.note}
 								sessionNote={noteFor(session.exerciseNotes, group.exerciseId)}
@@ -490,7 +512,11 @@ export default function ActiveSessionPage() {
 					.flatMap(group => (group.sets[0] ? [group.sets[0].exerciseId] : []))}
 				onClose={() => setSwapTarget(null)}
 			/>
-			<SessionRecapDialog recap={recap} onContinue={completeRecap} />
+			<SessionRecapDialog
+				recap={recap}
+				onContinue={completeRecap}
+				rotation={isRotationDay(session.routineDay)}
+			/>
 		</div>
 	)
 }

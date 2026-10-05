@@ -66,7 +66,10 @@ describe('shared recap view', () => {
 			records: false,
 			progression: false,
 			notes: true,
+			linearBlock: false,
 		})
+		expect(recap.linearBlockChanges).toEqual([])
+		expect(recap.routineId).toBeNull()
 		expect(recap.totalVolumeKg).toBe(5400)
 		expect(recap.previousSession).toBeNull()
 		expect(recap.records).toEqual([])

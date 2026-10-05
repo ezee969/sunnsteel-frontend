@@ -1,6 +1,10 @@
 'use client'
 
-import { requiredToFinish, type SetKind } from '@sunsteel/contracts'
+import {
+	type LinearPeriodizationState,
+	requiredToFinish,
+	type SetKind,
+} from '@sunsteel/contracts'
 import {
 	ArrowLeftRight,
 	Calculator,
@@ -10,7 +14,8 @@ import {
 	NotebookPen,
 	Plus,
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -23,7 +28,10 @@ import {
 import { useCompactWorkout } from '@/hooks/use-compact-workout'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
+import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
+import { lpSetTargetLabel } from '@/lib/utils/linear-periodization'
+import { lpFinishedNote, lpSessionLine } from '@/lib/utils/session-linear-block'
 import { MAX_EXTRA_SETS } from '@/lib/utils/session-progress.utils'
 import { comparablePrevious } from '@/lib/utils/session-substitutions'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
@@ -52,7 +60,21 @@ interface ExerciseGroupProps {
 		plannedRir?: number | null
 		isExtra?: boolean
 		kind: SetKind
+		/** ROUT-17: 0-based place among the working sets; null for a warm-up. */
+		workingIndex?: number | null
 	}>
+	/**
+	 * ROUT-17: the 8-week block this slot trains in this workout, with whether
+	 * the day is a rotation's (sessions, not weeks) and the routine whose page
+	 * chooses what follows a finished block.
+	 */
+	linearBlock?: {
+		state: LinearPeriodizationState
+		rotation: boolean
+		routineId?: string
+	} | null
+	/** ROUT-17: an LP slot without a reference max, trained as usual. */
+	linearBlockUnset?: boolean
 	isCollapsed: boolean
 	onToggleCollapse: () => void
 	completedSets: number
@@ -103,9 +125,37 @@ export const ExerciseGroup = ({
 	onRemoveSet,
 	roundLine,
 	upNext,
+	linearBlock,
+	linearBlockUnset,
 }: ExerciseGroupProps) => {
 	const t = useTranslations('workout.exerciseGroup')
 	const tEx = useTranslations('catalog.exercises')
+	const tBlock = useTranslations('workout.linearBlock')
+	const tRoutineBlock = useTranslations('routines.linearBlock')
+	const locale = useLocale() as Locale
+	const blockState = linearBlock?.state ?? null
+	const blockLine =
+		linearBlock && blockState?.phase !== 'FINISHED'
+			? lpSessionLine(
+					linearBlock.state,
+					linearBlock.rotation,
+					locale,
+					tBlock,
+					tRoutineBlock,
+				)
+			: null
+	// ROUT-17: a block's working set has a fixed load and the step's target.
+	const blockSet = (set: ExerciseGroupProps['sets'][number]) =>
+		blockState &&
+		!set.isExtra &&
+		set.workingIndex != null &&
+		set.plannedWeight != null &&
+		set.plannedWeight > 0
+			? {
+					loadKg: set.plannedWeight,
+					target: lpSetTargetLabel(blockState, set.workingIndex, tRoutineBlock),
+				}
+			: undefined
 	const exerciseName = exerciseLabel(rawExerciseName, tEx)
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
@@ -133,8 +183,12 @@ export const ExerciseGroup = ({
 	// values and not ticked. It is today's work; the prescription is unchanged.
 	const lastSet = sets[sets.length - 1]
 	const extraCount = sets.filter(set => set.isExtra).length
+	// ROUT-17: a block prescribes its sets; the server refuses an extra one.
 	const canAddSet =
-		lastSet !== undefined && Boolean(onRemoveSet) && extraCount < MAX_EXTRA_SETS
+		!blockState &&
+		lastSet !== undefined &&
+		Boolean(onRemoveSet) &&
+		extraCount < MAX_EXTRA_SETS
 	const addSet = () =>
 		lastSet &&
 		onSave({
@@ -183,6 +237,14 @@ export const ExerciseGroup = ({
 							<p className="type-data mt-0.5 text-ink-3">
 								{t('setsCount', { completed: completedSets, total: totalSets })}
 							</p>
+							{blockLine ? (
+								<p className="type-body-sm text-ink-2">{blockLine}</p>
+							) : null}
+							{linearBlockUnset ? (
+								<p className="type-body-sm whitespace-normal text-ink-3">
+									{tRoutineBlock('noReference')}
+								</p>
+							) : null}
 							{upNext ? (
 								<p className="type-body-sm text-foreground">{upNext}</p>
 							) : null}
@@ -304,6 +366,26 @@ export const ExerciseGroup = ({
 				</div>
 			</div>
 
+			{/* ROUT-17: a finished block's sets repeat its last step and move
+			    nothing; what follows is chosen on the routine page. Outside the
+			    header, which is a button and cannot hold a link. */}
+			{linearBlock && blockState?.phase === 'FINISHED' ? (
+				<p className="type-body-sm mt-2 max-w-[68ch] text-ink-2">
+					{lpFinishedNote(linearBlock.rotation, tBlock)}
+					{linearBlock.routineId ? (
+						<>
+							{' '}
+							<Link
+								href={`/routines/${linearBlock.routineId}`}
+								className="inline-flex min-h-11 items-center text-foreground underline underline-offset-4 md:min-h-0"
+							>
+								{tBlock('chooseNext')}
+							</Link>
+						</>
+					) : null}
+				</p>
+			) : null}
+
 			{!isCollapsed && (
 				<div className="mt-3 space-y-2">
 					{sets.map((set, index) => (
@@ -332,6 +414,7 @@ export const ExerciseGroup = ({
 							rpe={set.rpe}
 							isExtra={set.isExtra}
 							kind={set.kind}
+							linearBlock={blockSet(set)}
 							// LIVE-12: only a set of the same kind is worth copying.
 							setAbove={
 								index > 0 && sets[index - 1].kind === set.kind

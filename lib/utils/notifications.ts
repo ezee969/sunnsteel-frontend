@@ -1,12 +1,15 @@
 import type {
 	AppNotification,
 	NotificationsResponse,
+	WeightUnit,
 } from '@sunsteel/contracts'
 
-import { achievementText } from '@/i18n/catalog'
+import { achievementText, exerciseLabel } from '@/i18n/catalog'
+import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
 
 import { trainingPartnerEncouragementLabel } from './training-partners'
+import { formatWeight } from './weight-unit'
 
 type T = Translator<'social.notifications'>
 type TPartners = Translator<'settings.trainingPartners'>
@@ -29,12 +32,23 @@ export const sessionProgressSummary = (
 		both: recordCount > 0 && progressionCount > 0 ? 'yes' : 'no',
 	})
 
+/**
+ * What a notification that names a weight or a catalog exercise needs: the
+ * member's unit and language (ROUT-18), and the catalog names.
+ */
+export interface NotificationFormat {
+	weightUnit: WeightUnit
+	locale: Locale
+	tExercises?: Translator<'catalog.exercises'>
+}
+
 /** NOTIF-01: the words and destination of one notification. */
 export function describeNotification(
 	notification: AppNotification,
 	t: T,
 	tPartners: TPartners,
 	tAchievements?: Translator<'catalog.achievements'>,
+	format: NotificationFormat = { weightUnit: 'KG', locale: 'en' },
 ): NotificationView {
 	const text = (value: { id: string; title: string; description?: string }) =>
 		tAchievements
@@ -128,6 +142,28 @@ export function describeNotification(
 				}),
 				detail: t('partnerAchievementDetail', { username: actor.username }),
 				href: `/profile/${actor.username}`,
+			}
+		}
+		case 'LINEAR_BLOCK_FINISHED': {
+			// ROUT-18: the block is over and waits for the member's choice, which
+			// is made on the routine page. The estimate is never a tested max.
+			const weight = (kg: number) =>
+				formatWeight(kg, format.weightUnit, format.locale)
+			const reference = weight(notification.referenceMaxKg)
+			return {
+				title: t('linearBlockTitle', {
+					exercise: format.tExercises
+						? exerciseLabel(notification.exercise.name, format.tExercises)
+						: notification.exercise.name,
+				}),
+				detail:
+					notification.estimatedMaxKg != null
+						? t('linearBlockDetail', {
+								reference,
+								estimate: weight(notification.estimatedMaxKg),
+							})
+						: t('linearBlockDetailNoEstimate', { reference }),
+				href: `/routines/${notification.routine.id}`,
 			}
 		}
 	}

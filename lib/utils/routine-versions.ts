@@ -43,6 +43,8 @@ export function routineSetup(routine: Routine): RoutineVersionSetup {
 				note: exercise.note ?? null,
 				progressionScheme: exercise.progressionScheme,
 				minWeightIncrement: exercise.minWeightIncrement,
+				// ROUT-17: a block's place travels with the setup.
+				linearPeriodization: exercise.linearPeriodization ?? null,
 				sets: exercise.sets,
 			})),
 		})),
@@ -162,6 +164,8 @@ function progressionLabel(
 			return t('progressionDouble')
 		case 'DYNAMIC_DOUBLE_PROGRESSION':
 			return t('progressionDynamicDouble')
+		case 'LINEAR_PERIODIZATION':
+			return t('progressionLinear')
 		default:
 			return String(scheme).toLowerCase()
 	}
@@ -237,6 +241,22 @@ function compareExercise(
 				name,
 				from: formatWeight(current.minWeightIncrement, unit, locale),
 				to: formatWeight(target.minWeightIncrement, unit, locale),
+			}),
+		)
+	}
+	// ROUT-17: a block's reference max, when both sides have one.
+	const fromReference = current.linearPeriodization?.referenceMaxKg ?? null
+	const toReference = target.linearPeriodization?.referenceMaxKg ?? null
+	if (
+		fromReference != null &&
+		toReference != null &&
+		!areCanonicalWeightsEqual(fromReference, toReference)
+	) {
+		changes.push(
+			t('exerciseReferenceMaxChange', {
+				name,
+				from: formatWeight(fromReference, unit, locale),
+				to: formatWeight(toReference, unit, locale),
 			}),
 		)
 	}

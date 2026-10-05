@@ -113,7 +113,9 @@
 		"kindWORKING": "{count, plural, one {# efectiva} other {# efectivas}}",
 		"kindWARMUP": "{count, plural, one {# de calentamiento} other {# de calentamiento}}",
 		"kindDROP": "{count, plural, one {# descendente} other {# descendentes}}",
-		"kindOPTIONAL": "{count, plural, one {# opcional} other {# opcionales}}"
+		"kindOPTIONAL": "{count, plural, one {# opcional} other {# opcionales}}",
+		"progressionLinear": "bloque de 8 semanas (LP)",
+		"exerciseReferenceMaxChange": "{name}: máximo de referencia {from} → {to}"
 	},
 	"trainingBlocks": {
 		"upcoming": "Próximo",
@@ -635,7 +637,10 @@
 		"min": "Mín",
 		"max": "Máx",
 		"setNumber": "Serie {number}",
-		"kindAria": "Tipo de la serie {number}"
+		"kindAria": "Tipo de la serie {number}",
+		"rest": "Descanso",
+		"setsHeading": "Series",
+		"lpTarget": "Objetivo"
 	},
 	"presets": {
 		"dayPush": "Empuje",
@@ -733,7 +738,7 @@
 		"cloneAria": "Clonar {name}",
 		"cloneThisRoutine": "Clonar esta rutina",
 		"sharedBy": "Compartida por {name}",
-		"exerciseLine": "{sets, plural, one {# serie} other {# series}} · {seconds} s de descanso{progression, select, on { · progresión activa} other {}}",
+		"exerciseLine": "{sets, plural, one {# serie} other {# series}} · {seconds} s de descanso{progression, select, on { · progresión activa} lp { · bloque de 8 semanas (LP)} other {}}",
 		"setRepsFixed": "{reps} reps",
 		"setRepsRange": "{min}–{max} reps"
 	},
@@ -812,7 +817,8 @@
 		"restLabel": "Descanso",
 		"dayNamePlaceholderRotation": "p. ej. Empuje o Torso A",
 		"dayNamePlaceholderWeekly": "p. ej. Empuje, o deja el día de la semana",
-		"noteLabel": "Nota"
+		"noteLabel": "Nota",
+		"progressionLinear": "Bloque LP de 8 semanas"
 	},
 	"listing": {
 		"pageTitle": "Rutinas",
@@ -855,5 +861,54 @@
 		"tryAgain": "Reintentar",
 		"comparisonUnavailable": "La comparación no está disponible",
 		"liftsInBoth": "Ejercicios entrenados en ambos"
+	},
+	"linearBlock": {
+		"schemeName": "Bloque de 8 semanas (LP)",
+		"week": "Semana {step} de {total}",
+		"session": "Sesión {step} de {total}",
+		"recovery": "Sesión de recuperación",
+		"finished": "Bloque terminado",
+		"percentOf": "{percent} de {reference}",
+		"summary": "{position} · {percent} de {reference} · {load}",
+		"rirRange": "RIR {min}–{max}",
+		"rirOne": "RIR {value}",
+		"amrap": "AMRAP · RIR 0",
+		"recoveryReps": "{reps, plural, one {# repetición} other {# repeticiones}}",
+		"noReference": "Define un máximo de referencia para empezar el bloque",
+		"estimate": "1RM estimado: {value}",
+		"noEstimate": "No hay suficientes series de las semanas 7 y 8 para estimar un nuevo 1RM",
+		"referenceMax": "Máximo de referencia ({unit})",
+		"referenceMaxAria": "Máximo de referencia de {exercise}",
+		"referenceMaxHint": "Un 1RM estimado. Cada semana carga un porcentaje de él.",
+		"workingSetsLocked": "El bloque fija las series de trabajo: su carga, su objetivo y su tipo. Los calentamientos los sigues editando tú.",
+		"restart": "Reiniciar bloque",
+		"restartTitle": "¿Reiniciar este bloque?",
+		"restartBody": "{exercise} empieza un bloque nuevo desde su primer paso con {reference}. Los entrenamientos ya registrados quedan en tu historial.",
+		"cancel": "Cancelar",
+		"chooseOnRoutine": "El siguiente bloque se elige en la página de la rutina.",
+		"referenceUsed": "Máximo de referencia: {value}",
+		"chooseNext": "Elige qué sigue",
+		"dialogTitle": "Siguiente bloque de {exercise}",
+		"dialogDescription": "Tus series más pesadas dan una estimación, no un máximo probado. El máximo de referencia que elijas fija todas las cargas del siguiente bloque.",
+		"evidenceReference": "Referencia del bloque",
+		"evidenceEstimate": "1RM estimado",
+		"evidenceChange": "Cambio",
+		"noEstimateShort": "Sin estimación",
+		"kindProgress": "La estimación supera la referencia en {threshold} o más, así que se propone un bloque más pesado, como máximo {cap} por encima.",
+		"kindRepeat": "La estimación está a menos de {threshold} de la referencia, así que se propone la misma referencia.",
+		"kindRepeatNoEstimate": "Sin una estimación, se propone la misma referencia.",
+		"kindReset": "La estimación está más de {threshold} por debajo de la referencia, así que se propone un bloque en la estimación.",
+		"nextReference": "Máximo de referencia del siguiente bloque ({unit})",
+		"inputHeavier": "Más pesado que el último bloque",
+		"inputSame": "Igual que el último bloque",
+		"inputLighter": "Más liviano que el último bloque",
+		"invalidReference": "Ingresa un máximo de referencia mayor que 0 y de hasta {max}.",
+		"recoveryFirst": "Primero una sesión de recuperación: {sets} × {reps} al {percent} de {reference}",
+		"submit": "Empezar el siguiente bloque",
+		"toastStarted": "Siguiente bloque iniciado",
+		"recoveryLine": "Sesión de recuperación: {sets} × {reps} con {load}, luego un bloque nuevo desde {reference}",
+		"editRoutine": "Editar rutina",
+		"sharedSet": "{percent} de tu propio máximo · {target}",
+		"sharedTable": "Se muestra la semana 1 del bloque; el porcentaje sube cada semana, hasta {top} en la semana 8."
 	}
 }

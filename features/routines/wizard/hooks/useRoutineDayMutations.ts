@@ -1,6 +1,7 @@
 import {
 	followWorkingLoad,
 	isSetKind,
+	type LinearPeriodizationState,
 	type WarmUpEquipment,
 	type WeightUnit,
 } from '@sunsteel/contracts'
@@ -11,6 +12,13 @@ import { linksAfterReorder } from '@/lib/utils/exercise-links'
 import { stepCanonicalWeight } from '@/lib/utils/weight-unit'
 
 import type { ProgressionScheme, RoutineWizardData, SetField } from '../types'
+import {
+	enterLinearPeriodization,
+	isLinearExercise,
+	isLpWorkingSet,
+	leaveLinearPeriodization,
+	regenerateLinearSets,
+} from '../utils/linear-block'
 import { syncLeadWeight } from '../utils/set-kinds'
 
 interface UseRoutineDayMutationsParams {
@@ -160,6 +168,8 @@ export function useRoutineDayMutations({
 					MIN_WEIGHT_INCREMENT,
 					MAX_WEIGHT,
 				)
+				// ROUT-17: a block's loads are rounded to this step.
+				if (isLinearExercise(exercise)) regenerateLinearSets(exercise)
 				// Non-bar warm-ups round to this step.
 				syncDoubleProgressionWeights(exercise)
 			})
@@ -185,6 +195,15 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
+
+				// ROUT-17: the block owns its working sets and its rest; they take
+				// no rep range, so nothing below applies to it.
+				if (scheme === 'LINEAR_PERIODIZATION') {
+					if (!isLinearExercise(exercise)) enterLinearPeriodization(exercise)
+					syncDoubleProgressionWeights(exercise)
+					return
+				}
+				if (isLinearExercise(exercise)) leaveLinearPeriodization(exercise)
 
 				exercise.progressionScheme = scheme
 
@@ -214,6 +233,9 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				if (!exercise) return
+				// ROUT-17: a block's working sets are fixed; its warm-ups come
+				// from the ramp dialog.
+				if (isLinearExercise(exercise)) return
 
 				const lastSet = exercise.sets[exercise.sets.length - 1]
 				const newSetNumber = exercise.sets.length + 1
@@ -310,7 +332,8 @@ export function useRoutineDayMutations({
 		(exerciseIndex: number, setIndex: number) => {
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
-				if (!exercise) return
+				const removed = exercise?.sets[setIndex]
+				if (!exercise || !removed || isLpWorkingSet(exercise, removed)) return
 				exercise.sets.splice(setIndex, 1)
 				exercise.sets.forEach((set, index) => {
 					set.setNumber = index + 1
@@ -326,7 +349,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
-				if (!set) return
+				if (!set || isLpWorkingSet(exercise, set)) return
 				const current = set.reps ?? MIN_REPS
 				set.reps = clamp(current + delta, MIN_REPS, MAX_REPS)
 			})
@@ -344,7 +367,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
-				if (!set) return
+				if (!set || isLpWorkingSet(exercise, set)) return
 
 				if (field === 'minReps') {
 					const current = set.minReps ?? MIN_REPS
@@ -371,7 +394,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
-				if (!exercise || !set) return
+				if (!exercise || !set || isLpWorkingSet(exercise, set)) return
 
 				const current = set.weight ?? 0
 				const next = stepCanonicalWeight(current, weightUnit, delta)
@@ -387,7 +410,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
-				if (!set) return
+				if (!set || isLpWorkingSet(exercise, set)) return
 
 				if (field === 'minReps') {
 					if (
@@ -421,7 +444,7 @@ export function useRoutineDayMutations({
 			withDayMutation(day => {
 				const exercise = day.exercises[exerciseIndex]
 				const set = exercise?.sets[setIndex]
-				if (!exercise || !set) return
+				if (!exercise || !set || isLpWorkingSet(exercise, set)) return
 
 				if (field === 'repType') {
 					const nextType = value as 'FIXED' | 'RANGE'
@@ -478,6 +501,23 @@ export function useRoutineDayMutations({
 		[withDayMutation],
 	)
 
+	/**
+	 * ROUT-17: give an exercise on a block its state (a new reference, a
+	 * restart) and the working sets that state prescribes.
+	 */
+	const setLinearPeriodization = useCallback(
+		(exerciseIndex: number, state: LinearPeriodizationState) => {
+			withDayMutation(day => {
+				const exercise = day.exercises[exerciseIndex]
+				if (!exercise || !isLinearExercise(exercise)) return
+				exercise.linearPeriodization = state
+				regenerateLinearSets(exercise)
+				syncDoubleProgressionWeights(exercise)
+			})
+		},
+		[withDayMutation],
+	)
+
 	const setRestSeconds = useCallback(
 		(exerciseIndex: number, restSeconds: number) => {
 			withDayMutation(day => {
@@ -507,5 +547,6 @@ export function useRoutineDayMutations({
 		updateSet,
 		validateMinMaxReps,
 		setRestSeconds,
+		setLinearPeriodization,
 	}
 }

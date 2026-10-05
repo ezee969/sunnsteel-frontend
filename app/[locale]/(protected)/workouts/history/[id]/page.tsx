@@ -21,6 +21,7 @@ import {
 	useSessionRecap,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
+import { isRotationDay } from '@/lib/utils/session-linear-block'
 import { noteFor } from '@/lib/utils/session-notes'
 import { sessionRoutineTitle } from '@/lib/utils/session-prescription'
 
@@ -89,6 +90,7 @@ export default function WorkoutDetailPage() {
 					<SessionRecapPanel
 						recap={recap}
 						action={<SessionShareButton sessionId={session.id} />}
+						rotation={isRotationDay(session.routineDay)}
 						notesAction={
 							<WorkoutNoteButton
 								sessionId={session.id}
@@ -150,6 +152,7 @@ export default function WorkoutDetailPage() {
 								sessionId={
 									session.status === 'COMPLETED' ? session.id : undefined
 								}
+								rotation={isRotationDay(session.routineDay)}
 							/>
 						))}
 					</div>

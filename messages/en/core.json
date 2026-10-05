@@ -389,6 +389,13 @@
 		"SWAP_SESSION_NOT_ACTIVE": "Exercises can only be swapped in an active session",
 		"SWAP_SETS_COMPLETED": "This exercise already has completed sets. Swap it before completing any.",
 		"NOTES_DISCARDED_SESSION": "A discarded workout cannot take notes",
+		"LINEAR_BLOCK_INVALID": "This exercise's block is not valid: {reason}",
+		"LINEAR_BLOCK_EXTRA_SET": "An exercise on an 8-week block takes no extra sets",
+		"LINEAR_BLOCK_KIND_FIXED": "The working sets of an 8-week block cannot change kind",
+		"LINEAR_BLOCK_LOAD_FIXED": "The load of an 8-week block is prescribed and cannot be changed",
+		"LINEAR_BLOCK_SWAP_ROUTINE": "An exercise on an 8-week block can be swapped for this workout only",
+		"LINEAR_BLOCK_NOT_LINEAR": "This exercise is not on an 8-week block",
+		"LINEAR_BLOCK_NOT_FINISHED": "This exercise's block has not finished, so there is nothing to choose yet",
 		"CORRECTION_NOT_COMPLETED": "Only a completed workout can be corrected",
 		"CORRECTION_NOT_LATEST": "Only your most recent workout can be corrected",
 		"CORRECTION_LATER_SESSION": "This workout can no longer be corrected: another one has started since",
@@ -443,7 +450,16 @@
 		"GOAL_DUPLICATE": "Duplicate measurable goal",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Strength goals require an exercise",
 		"BODY_ENTRY_IN_FUTURE": "An entry cannot be dated in the future",
-		"TIME_ZONE_LIVE_WORKOUT": "Finish or discard the workout in progress before changing your time zone."
+		"TIME_ZONE_LIVE_WORKOUT": "Finish or discard the workout in progress before changing your time zone.",
+		"CONVERSATION_NOT_FOUND": "Conversation not found",
+		"MESSAGE_NOT_FOUND": "Message not found",
+		"MESSAGE_SELF": "You cannot message yourself",
+		"MESSAGE_LENGTH": "A message must not be empty and may be at most {max} characters.",
+		"MESSAGES_PER_MINUTE": "You can send at most {max} messages a minute.",
+		"CONVERSATIONS_PER_DAY": "You can start at most {max} new conversations a day.",
+		"MESSAGE_NOT_ADMITTED": "This member is not taking messages from you.",
+		"CONVERSATION_CLOSED": "This conversation can no longer receive messages.",
+		"MESSAGING_UNAVAILABLE": "Messaging is not available for this account."
 	},
 	"glossary": {
 		"label": "Terms:",
@@ -461,7 +477,7 @@
 		},
 		"progression": {
 			"term": "Progression",
-			"definition": "Double progression raises the weight of every working set by the exercise’s step once all of them reach the top of their rep target. Dynamic double progression does it set by set: each set that reaches its target goes up on its own."
+			"definition": "Double progression raises the weight of every working set by the exercise’s step once all of them reach the top of their rep target. Dynamic double progression does it set by set: each set that reaches its target goes up on its own. An 8-week block (LP) has no rep target: each week loads a rising share of a reference max."
 		},
 		"setKinds": {
 			"term": "Set kinds",

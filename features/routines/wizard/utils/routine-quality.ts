@@ -17,6 +17,7 @@ import {
 } from '@/lib/utils/exercise-equipment'
 
 import type { RoutineSet, RoutineWizardData } from '../types'
+import { isLpWorkingSet } from './linear-block'
 import { wizardDayTitle } from './schedule'
 
 /**
@@ -138,7 +139,11 @@ export const estimateDaySeconds = (
 	let remaining = setCount
 	for (const exercise of day.exercises) {
 		for (const set of exercise.sets) {
-			seconds += setReps(set) * SECONDS_PER_REP
+			// ROUT-17: a block's working set has no rep target, and counts no
+			// work time, as the server's discovery estimate counts it.
+			const reps =
+				isLpWorkingSet(exercise, set) && set.reps == null ? 0 : setReps(set)
+			seconds += reps * SECONDS_PER_REP
 			remaining -= 1
 			if (remaining > 0) seconds += Math.max(0, exercise.restSeconds)
 		}

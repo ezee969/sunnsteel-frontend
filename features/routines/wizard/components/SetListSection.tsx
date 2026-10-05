@@ -7,6 +7,11 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 
 import type { RoutineWizardExercise, SetField } from '../types'
+import {
+	isLinearExercise,
+	isLpWorkingSet,
+	lpWorkingSetTarget,
+} from '../utils/linear-block'
 import { isWeightLocked } from '../utils/set-kinds'
 import { SET_ROW_COLUMNS, SET_ROW_COLUMNS_SIMPLE, SetRow } from './SetRow'
 import { WarmUpRampDialog } from './WarmUpRampDialog'
@@ -98,6 +103,14 @@ export function SetListSection({
 	isRemovingSet,
 }: SetListSectionProps) {
 	const t = useTranslations('routines.builder')
+	const tBlock = useTranslations('routines.linearBlock')
+	// ROUT-17: the block's working sets are read-only, numbered among
+	// themselves for their targets.
+	const linear = isLinearExercise(exercise)
+	const workingIndex = (setIndex: number) =>
+		exercise.sets
+			.slice(0, setIndex)
+			.filter(set => isLpWorkingSet(exercise, set)).length
 	return (
 		<>
 			<div className="flex items-center justify-between mb-2 px-1">
@@ -169,22 +182,39 @@ export function SetListSection({
 										exercise.warmUpsFollowLoad,
 									)}
 									advanced={advanced}
+									lpWorking={
+										isLpWorkingSet(exercise, set)
+											? {
+													target: lpWorkingSetTarget(
+														exercise.linearPeriodization,
+														workingIndex(setIndex),
+														tBlock,
+													),
+												}
+											: undefined
+									}
 								/>
 							</div>
 						))}
 					</div>
 
 					<div className="mt-3 pt-3 border-t border-muted sm:border-0">
-						<Button
-							data-testid={`add-set-btn-${tabIndex}-${exerciseIndex}`}
-							onClick={onAddSet}
-							variant="outline"
-							className="w-full h-10 text-base mb-3"
-							disabled={exercise.sets.length >= 10}
-						>
-							<Plus className="h-4 w-4 mr-2" />
-							{t('addSet')}
-						</Button>
+						{linear ? (
+							<p className="type-body-sm mb-3 text-ink-3">
+								{tBlock('workingSetsLocked')}
+							</p>
+						) : (
+							<Button
+								data-testid={`add-set-btn-${tabIndex}-${exerciseIndex}`}
+								onClick={onAddSet}
+								variant="outline"
+								className="w-full h-10 text-base mb-3"
+								disabled={exercise.sets.length >= 10}
+							>
+								<Plus className="h-4 w-4 mr-2" />
+								{t('addSet')}
+							</Button>
+						)}
 						{advanced ? (
 							<WarmUpRampDialog
 								exerciseName={exerciseName}

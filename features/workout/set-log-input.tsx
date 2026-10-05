@@ -33,7 +33,9 @@ import {
 import { saveStateLabel } from '@/lib/utils/save-status-store'
 import {
 	formatWeight,
+	formatWeightAmount,
 	formatWeightInput,
+	getWeightUnitLabel,
 	parseWeightInput,
 } from '@/lib/utils/weight-unit'
 import type { LogRowProps } from '@/lib/utils/workout-session.types'
@@ -54,6 +56,12 @@ interface SetLogInputProps extends LogRowProps {
 	onRemove?: () => void
 	/** LIVE-12: what the set is for in this workout. */
 	kind?: SetKind
+	/**
+	 * ROUT-17: a working set of an 8-week block. Its load is the step's and
+	 * cannot be typed, its target is the step's RIR (or the recovery step's
+	 * reps), and the member logs only reps: no RPE, no kind, no fills.
+	 */
+	linearBlock?: { loadKg: number; target: string | null }
 }
 
 /** A LIVE-15 fill control: repeated on every row, so it is never primary. */
@@ -106,12 +114,14 @@ export const SetLogInput = ({
 	setAbove,
 	onRemove,
 	kind = 'WORKING',
+	linearBlock,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
 	const locale = useLocale() as Locale
 	const t = useTranslations('workout.setLogInput')
 	const tKinds = useTranslations('workout.setKinds')
+	const tBlock = useTranslations('workout.linearBlock')
 	const {
 		repsState,
 		weightState,
@@ -139,6 +149,7 @@ export const SetLogInput = ({
 		onSave,
 		onSetCompleted,
 		weightUnit,
+		fixedWeightKg: linearBlock?.loadKg,
 	})
 
 	const tSaveStatus = useTranslations('core.saveStatus')
@@ -191,12 +202,16 @@ export const SetLogInput = ({
 		(values.reps > 0 ? String(values.reps) : '') === repsState &&
 		formatWeightInput(values.weight ?? undefined, weightUnit) === weightState &&
 		(values.rpe != null ? String(values.rpe) : '') === rpeState
+	// ROUT-17: a block's working set has its load fixed and reps of its own,
+	// so neither fill has anything to offer it.
 	const canFillAbove =
+		!linearBlock &&
 		!isCompletedState &&
 		setAbove !== undefined &&
 		(setAbove.reps > 0 || (setAbove.weight ?? 0) > 0) &&
 		!holds(setAbove)
 	const canFillPrevious =
+		!linearBlock &&
 		!isCompletedState &&
 		previousPerformance !== undefined &&
 		!holds(previousPerformance)
@@ -225,74 +240,89 @@ export const SetLogInput = ({
 				{/* Set number & RIR */}
 				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px]">
 					{/* LIVE-12: the set number opens the kind menu. A warm-up never
-					    counts as work; only working and optional sets progress. */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								aria-label={
-									grouped
-										? t('setKindMenuMoreAria', {
-												number: setNumber,
-												kind: tKinds(kind),
-											})
-										: t('setKindMenuChangeAria', {
-												number: setNumber,
-												kind: tKinds(kind),
-											})
-								}
-								disabled={saveState === 'saving'}
-								className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
-									isCompletedState ? 'text-success' : 'text-ink-3'
-								}`}
-							>
-								{t('setLabel', { number: setNumber })}
-								<ChevronDown className="h-3 w-3" aria-hidden />
-							</button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="start">
-							<DropdownMenuLabel>{t('setKindHeading')}</DropdownMenuLabel>
-							<DropdownMenuRadioGroup
-								value={kind}
-								onValueChange={value => {
-									if (isSetKind(value) && value !== kind) changeKind(value)
-								}}
-							>
-								{SET_KINDS.map(option => (
-									<DropdownMenuRadioItem key={option} value={option}>
-										{tKinds(option)}
-									</DropdownMenuRadioItem>
-								))}
-							</DropdownMenuRadioGroup>
-							{grouped &&
-							((canFillAbove && setAbove) ||
-								(canFillPrevious && previousPerformance) ||
-								onRemove) ? (
-								<>
-									<DropdownMenuSeparator />
-									{canFillAbove && setAbove ? (
-										<DropdownMenuItem onSelect={() => fill(setAbove)}>
-											{t('sameAsSet', { number: setAbove.setNumber })}
-										</DropdownMenuItem>
-									) : null}
-									{canFillPrevious && previousPerformance ? (
-										<DropdownMenuItem
-											onSelect={() => fill(previousPerformance)}
-										>
-											{t('useLastTimeWithValue', { value: previousText })}
-										</DropdownMenuItem>
-									) : null}
-									{onRemove ? (
-										<DropdownMenuItem variant="destructive" onSelect={onRemove}>
-											<X className="h-4 w-4" aria-hidden />
-											{t('removeSetAria', { number: setNumber })}
-										</DropdownMenuItem>
-									) : null}
-								</>
-							) : null}
-						</DropdownMenuContent>
-					</DropdownMenu>
-					{kind !== 'WORKING' ? (
+					    counts as work; only working and optional sets progress.
+					    ROUT-17: a block's working set keeps its kind and has no
+					    fills, so its number is a plain label. */}
+					{linearBlock ? (
+						<span
+							className={`type-label flex min-h-11 items-center md:min-h-0 large-controls:min-h-12 ${
+								isCompletedState ? 'text-success' : 'text-ink-3'
+							}`}
+						>
+							{t('setLabel', { number: setNumber })}
+						</span>
+					) : (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									type="button"
+									aria-label={
+										grouped
+											? t('setKindMenuMoreAria', {
+													number: setNumber,
+													kind: tKinds(kind),
+												})
+											: t('setKindMenuChangeAria', {
+													number: setNumber,
+													kind: tKinds(kind),
+												})
+									}
+									disabled={saveState === 'saving'}
+									className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
+										isCompletedState ? 'text-success' : 'text-ink-3'
+									}`}
+								>
+									{t('setLabel', { number: setNumber })}
+									<ChevronDown className="h-3 w-3" aria-hidden />
+								</button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="start">
+								<DropdownMenuLabel>{t('setKindHeading')}</DropdownMenuLabel>
+								<DropdownMenuRadioGroup
+									value={kind}
+									onValueChange={value => {
+										if (isSetKind(value) && value !== kind) changeKind(value)
+									}}
+								>
+									{SET_KINDS.map(option => (
+										<DropdownMenuRadioItem key={option} value={option}>
+											{tKinds(option)}
+										</DropdownMenuRadioItem>
+									))}
+								</DropdownMenuRadioGroup>
+								{grouped &&
+								((canFillAbove && setAbove) ||
+									(canFillPrevious && previousPerformance) ||
+									onRemove) ? (
+									<>
+										<DropdownMenuSeparator />
+										{canFillAbove && setAbove ? (
+											<DropdownMenuItem onSelect={() => fill(setAbove)}>
+												{t('sameAsSet', { number: setAbove.setNumber })}
+											</DropdownMenuItem>
+										) : null}
+										{canFillPrevious && previousPerformance ? (
+											<DropdownMenuItem
+												onSelect={() => fill(previousPerformance)}
+											>
+												{t('useLastTimeWithValue', { value: previousText })}
+											</DropdownMenuItem>
+										) : null}
+										{onRemove ? (
+											<DropdownMenuItem
+												variant="destructive"
+												onSelect={onRemove}
+											>
+												<X className="h-4 w-4" aria-hidden />
+												{t('removeSetAria', { number: setNumber })}
+											</DropdownMenuItem>
+										) : null}
+									</>
+								) : null}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
+					{linearBlock ? null : kind !== 'WORKING' ? (
 						<span className="type-body-sm leading-none text-ink-3">
 							{tKinds(kind)}
 						</span>
@@ -324,69 +354,103 @@ export const SetLogInput = ({
 						}`}
 					/>
 					<span className="type-body-sm text-center text-ink-3">
-						{isExtra
-							? t('noTarget')
-							: plannedMinReps && plannedMaxReps
-								? t('targetRange', { min: plannedMinReps, max: plannedMaxReps })
-								: t('targetReps', { value: plannedRepsText })}
+						{linearBlock
+							? (linearBlock.target ?? t('noTarget'))
+							: isExtra
+								? t('noTarget')
+								: plannedMinReps && plannedMaxReps
+									? t('targetRange', {
+											min: plannedMinReps,
+											max: plannedMaxReps,
+										})
+									: t('targetReps', { value: plannedRepsText })}
 					</span>
 				</div>
 
 				{/* Weight */}
 				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[72px] sm:flex-1">
-					<Input
-						type="number"
-						inputMode="decimal"
-						step={weightUnit === 'LB' ? 1 : 0.5}
-						aria-label={
-							weightUnit === 'LB'
-								? t('performedWeightLbAria')
-								: t('performedWeightKgAria')
-						}
-						placeholder={t('weightPlaceholder')}
-						aria-invalid={weightInvalid || undefined}
-						aria-describedby={weightInvalid ? errorId : undefined}
-						value={weightState}
-						onChange={e => setWeight(e.target.value)}
-						disabled={saveState === 'saving'}
-						className={`${FIELD_CLASS} ${
-							weightInvalid ? FIELD_INVALID_CLASS : ''
-						}`}
-					/>
-					<span className="type-body-sm text-center text-ink-3">
-						{isExtra
-							? t('noTarget')
-							: t('targetWeight', {
-									value: formatWeight(plannedWeight, weightUnit, locale),
+					{linearBlock ? (
+						// ROUT-17: the step's load, read-only. It sits where the field
+						// would, at the field's height and digit size, without the
+						// field's well, so it reads as set rather than typed; the unit
+						// goes in the caption so a five-digit load fits at 320.
+						<>
+							<p className="flex h-11 w-full items-center justify-center font-mono tabular-nums text-foreground md:h-9 large-controls:h-14 large-controls:text-xl">
+								<span className="sr-only">
+									{tBlock('loadAria', {
+										value: formatWeight(linearBlock.loadKg, weightUnit, locale),
+									})}
+								</span>
+								<span aria-hidden>
+									{formatWeightAmount(linearBlock.loadKg, weightUnit, locale)}
+								</span>
+							</p>
+							<span className="type-body-sm text-center text-ink-3">
+								{tBlock('loadCaption', {
+									unit: getWeightUnitLabel(weightUnit),
 								})}
-					</span>
+							</span>
+						</>
+					) : (
+						<>
+							<Input
+								type="number"
+								inputMode="decimal"
+								step={weightUnit === 'LB' ? 1 : 0.5}
+								aria-label={
+									weightUnit === 'LB'
+										? t('performedWeightLbAria')
+										: t('performedWeightKgAria')
+								}
+								placeholder={t('weightPlaceholder')}
+								aria-invalid={weightInvalid || undefined}
+								aria-describedby={weightInvalid ? errorId : undefined}
+								value={weightState}
+								onChange={e => setWeight(e.target.value)}
+								disabled={saveState === 'saving'}
+								className={`${FIELD_CLASS} ${
+									weightInvalid ? FIELD_INVALID_CLASS : ''
+								}`}
+							/>
+							<span className="type-body-sm text-center text-ink-3">
+								{isExtra
+									? t('noTarget')
+									: t('targetWeight', {
+											value: formatWeight(plannedWeight, weightUnit, locale),
+										})}
+							</span>
+						</>
+					)}
 				</div>
 
 				{/* RPE (LIVE-04). Optional: the set log and the history view have
 				    always carried RPE, but nothing could enter it, so the history
-				    column was permanently empty. */}
-				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[48px]">
-					<Input
-						type="number"
-						inputMode="decimal"
-						step="0.5"
-						min="0"
-						max="10"
-						aria-label={t('rpeAria')}
-						placeholder={t('rpePlaceholder')}
-						aria-invalid={rpeInvalid || undefined}
-						aria-describedby={rpeInvalid ? errorId : undefined}
-						value={rpeState}
-						onChange={e => setRpe(e.target.value)}
-						disabled={saveState === 'saving'}
-						className={`${FIELD_CLASS} ${
-							rpeInvalid ? FIELD_INVALID_CLASS : ''
-						}`}
-					/>
-					<span className="type-body-sm text-center text-ink-3">
-						{t('optional')}
-					</span>
-				</div>
+				    column was permanently empty. ROUT-17: a block's working set
+				    logs reps only; its effort is the step's RIR target. */}
+				{linearBlock ? null : (
+					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[48px]">
+						<Input
+							type="number"
+							inputMode="decimal"
+							step="0.5"
+							min="0"
+							max="10"
+							aria-label={t('rpeAria')}
+							placeholder={t('rpePlaceholder')}
+							aria-invalid={rpeInvalid || undefined}
+							aria-describedby={rpeInvalid ? errorId : undefined}
+							value={rpeState}
+							onChange={e => setRpe(e.target.value)}
+							disabled={saveState === 'saving'}
+							className={`${FIELD_CLASS} ${
+								rpeInvalid ? FIELD_INVALID_CLASS : ''
+							}`}
+						/>
+						<span className="type-body-sm text-center text-ink-3">
+							{t('optional')}
+						</span>
+					</div>
+				)}
 
 				{/* Completion checkbox, doubling as the save-state indicator */}
 				<div className="flex shrink-0 items-center border-l border-rule-faint pl-2">

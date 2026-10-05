@@ -16,6 +16,8 @@ interface SetComparisonRowProps {
 	plannedSet?: ExerciseGroup['plannedSets'][number]
 	performedSet?: SetLog
 	weightUnit: WeightUnit
+	/** ROUT-17: a block's planned set, "72.5 kg · RIR 2–3", in place of reps @ load. */
+	plannedLabel?: string
 }
 
 /**
@@ -29,6 +31,7 @@ export function SetComparisonRow({
 	plannedSet,
 	performedSet,
 	weightUnit,
+	plannedLabel,
 }: SetComparisonRowProps) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('workout.setComparisonRow')
@@ -69,15 +72,17 @@ export function SetComparisonRow({
 					{t('plannedCaption')}
 				</div>
 				<div className="type-data text-ink-2">
-					{!plannedSet
-						? t('extraSet')
-						: plannedSet.repType === 'FIXED'
-							? t('repsValue', { count: plannedSet.reps ?? 0 })
-							: t('repsRange', {
-									min: plannedSet.minReps ?? 0,
-									max: plannedSet.maxReps ?? 0,
-								})}
-					{plannedSet?.weight
+					{plannedLabel
+						? plannedLabel
+						: !plannedSet
+							? t('extraSet')
+							: plannedSet.repType === 'FIXED'
+								? t('repsValue', { count: plannedSet.reps ?? 0 })
+								: t('repsRange', {
+										min: plannedSet.minReps ?? 0,
+										max: plannedSet.maxReps ?? 0,
+									})}
+					{!plannedLabel && plannedSet?.weight
 						? ` @ ${formatPlannedWeight(plannedSet.weight, weightUnit, locale)}`
 						: null}
 				</div>

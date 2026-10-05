@@ -176,7 +176,10 @@
 		"nothingToCorrectDescription": "Cada serie ya dice eso mismo.",
 		"workoutCorrectedTitle": "Entrenamiento corregido",
 		"everythingRecalculated": "Todo lo que este entrenamiento alimentó se recalculó.",
-		"couldNotCorrectTitle": "No se pudo corregir este entrenamiento"
+		"couldNotCorrectTitle": "No se pudo corregir este entrenamiento",
+		"keptLinearBlockOne": "El bloque de 8 semanas de {list} quedó como estaba, porque ya avanzó desde este entrenamiento.",
+		"setAria": "{exercise}, serie {number}",
+		"rpeAria": "RPE, de 0 a 10"
 	},
 	"restTimer": {
 		"resting": "Descansando",
@@ -495,5 +498,24 @@
 		"WARMUP": "Calentamiento",
 		"DROP": "Descendente",
 		"OPTIONAL": "Opcional"
+	},
+	"linearBlock": {
+		"positionLine": "{position} · {percent}",
+		"finishedNoteWeek": "Bloque terminado: estas series repiten la semana 8 y no mueven nada. Elige qué sigue en la página de la rutina.",
+		"finishedNoteSession": "Bloque terminado: estas series repiten la sesión 8 y no mueven nada. Elige qué sigue en la página de la rutina.",
+		"chooseNext": "Elegir qué sigue",
+		"loadAria": "Carga prescrita: {value}",
+		"loadCaption": "Fija ({unit})",
+		"swapNote": "Este ejercicio está en un bloque de 8 semanas, así que el cambio vale solo para este entrenamiento: el bloque conserva su ejercicio y no avanza.",
+		"plannedSet": "{load} · {target}",
+		"heading": "Bloques de 8 semanas",
+		"stepDone": "{position} completada",
+		"next": "Siguiente: {position}, {percent} · {load}",
+		"recoveryDone": "Sesión de recuperación completada · nuevo bloque desde {reference}",
+		"referenceUsed": "Máximo de referencia usado: {value}",
+		"estimate": "1RM estimado (una estimación, no un máximo probado): {value}",
+		"estimateFrom": "Calculado a partir de",
+		"sampleWeek": "Semana {step}, serie {set}: {load} × {reps}, RIR {rir}",
+		"sampleSession": "Sesión {step}, serie {set}: {load} × {reps}, RIR {rir}"
 	}
 }

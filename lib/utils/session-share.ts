@@ -30,6 +30,8 @@ export type RecapSection =
 	| 'records'
 	| 'progression'
 	| 'notes'
+	/** ROUT-17/ROUT-18: owner-only, since a finished block names the reference max. */
+	| 'linearBlock'
 
 export type RecapSections = Record<RecapSection, boolean>
 
@@ -84,6 +86,9 @@ export function sharedRecapToRecapView(shared: SharedSessionRecap): {
 			exerciseNotes: shared.exerciseNotes ?? [],
 			records: shared.records ?? [],
 			progressionChanges: shared.progressionChanges ?? [],
+			// Never shared: a finished block names the owner's reference max.
+			linearBlockChanges: [],
+			routineId: null,
 			previousSession: null,
 		},
 		sections: {
@@ -94,6 +99,7 @@ export function sharedRecapToRecapView(shared: SharedSessionRecap): {
 			records: has('records'),
 			progression: has('progression'),
 			notes: has('notes'),
+			linearBlock: false,
 		},
 	}
 }

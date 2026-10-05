@@ -38,6 +38,8 @@ export interface ExerciseListProps {
 	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
+	rotation: WizardExerciseCardProps['rotation']
+	onSetLinearPeriodization: WizardExerciseCardProps['onSetLinearPeriodization']
 	onAddSet: WizardExerciseCardProps['onAddSet']
 	onReplaceWarmUps: WizardExerciseCardProps['onReplaceWarmUps']
 	onSetWarmUpsFollowLoad: WizardExerciseCardProps['onSetWarmUpsFollowLoad']
@@ -79,6 +81,8 @@ export function ExerciseList({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
+	rotation,
+	onSetLinearPeriodization,
 	onAddSet,
 	onReplaceWarmUps,
 	onSetWarmUpsFollowLoad,
@@ -145,6 +149,8 @@ export function ExerciseList({
 								onUpdateNote={onUpdateNote}
 								onUpdateProgressionScheme={onUpdateProgressionScheme}
 								onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
+								rotation={rotation}
+								onSetLinearPeriodization={onSetLinearPeriodization}
 								onAddSet={onAddSet}
 								onReplaceWarmUps={onReplaceWarmUps}
 								onSetWarmUpsFollowLoad={onSetWarmUpsFollowLoad}
@@ -212,6 +218,8 @@ interface ReorderableExerciseRowProps {
 	onUpdateNote: WizardExerciseCardProps['onUpdateNote']
 	onUpdateProgressionScheme: WizardExerciseCardProps['onUpdateProgressionScheme']
 	onUpdateMinWeightIncrement: WizardExerciseCardProps['onUpdateMinWeightIncrement']
+	rotation: WizardExerciseCardProps['rotation']
+	onSetLinearPeriodization: WizardExerciseCardProps['onSetLinearPeriodization']
 	onAddSet: WizardExerciseCardProps['onAddSet']
 	onReplaceWarmUps: WizardExerciseCardProps['onReplaceWarmUps']
 	onSetWarmUpsFollowLoad: WizardExerciseCardProps['onSetWarmUpsFollowLoad']
@@ -246,6 +254,8 @@ function ReorderableExerciseRow({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
+	rotation,
+	onSetLinearPeriodization,
 	onAddSet,
 	onReplaceWarmUps,
 	onSetWarmUpsFollowLoad,
@@ -309,6 +319,8 @@ function ReorderableExerciseRow({
 					onUpdateNote={onUpdateNote}
 					onUpdateProgressionScheme={onUpdateProgressionScheme}
 					onUpdateMinWeightIncrement={onUpdateMinWeightIncrement}
+					rotation={rotation}
+					onSetLinearPeriodization={onSetLinearPeriodization}
 					onAddSet={onAddSet}
 					onReplaceWarmUps={onReplaceWarmUps}
 					onSetWarmUpsFollowLoad={onSetWarmUpsFollowLoad}

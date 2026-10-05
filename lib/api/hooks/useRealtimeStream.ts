@@ -21,6 +21,9 @@ import { notificationKeys } from './useNotifications'
  */
 const TOPIC_KEYS: Record<RealtimeTopic, QueryKey> = {
 	notifications: notificationKeys.all(),
+	// MSG-01's topic (contracts 0.86.0). No screen reads conversations yet;
+	// the direct-messages slice points this at its own query key.
+	conversations: ['conversations'],
 }
 
 async function readStream(

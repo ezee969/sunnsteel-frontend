@@ -97,16 +97,33 @@ export function describeSetCorrection(
 	})
 }
 
+function listNames(
+	names: string[],
+	t: Translator<'workout.corrections'>,
+): string {
+	return names.length === 1
+		? names[0]
+		: `${names.slice(0, -1).join(', ')}${t('listConjunction')}${names.at(-1)}`
+}
+
 export function describeKeptProgression(
 	names: string[],
 	t: Translator<'workout.corrections'>,
 ): string | null {
 	if (names.length === 0) return null
-	const list =
-		names.length === 1
-			? names[0]
-			: `${names.slice(0, -1).join(', ')}${t('listConjunction')}${names.at(-1)}`
-	return t('keptProgressionOne', { list })
+	return t('keptProgressionOne', { list: listNames(names, t) })
+}
+
+/**
+ * ROUT-17: the 8-week blocks a correction left where they are, because they
+ * have moved on since this workout.
+ */
+export function describeKeptLinearBlock(
+	names: string[],
+	t: Translator<'workout.corrections'>,
+): string | null {
+	if (names.length === 0) return null
+	return t('keptLinearBlockOne', { list: listNames(names, t) })
 }
 
 /** What the owner is typing, one row per logged set, in their unit. */
@@ -149,13 +166,16 @@ export type DraftProblem = { setLogId: string; message: string }
 /**
  * Turns the draft into the request. A weight the owner did not change is
  * sent back exactly as stored: in pounds the box shows a rounded value, and
- * converting that back would read as a correction nobody made.
+ * converting that back would read as a correction nobody made. A set whose
+ * load is fixed (ROUT-17: a working set of an 8-week block, whose load the
+ * server refuses to change) always sends its stored weight.
  */
 export function buildCorrectionRequest(
 	draft: Record<string, CorrectionDraftSet>,
 	logs: CorrectableSetLog[],
 	unit: WeightUnit,
 	t: Translator<'workout.corrections'>,
+	fixedWeightIds: ReadonlySet<string> = new Set(),
 ): { sets: CorrectSessionSetRequest[]; problems: DraftProblem[] } {
 	const sets: CorrectSessionSetRequest[] = []
 	const problems: DraftProblem[] = []
@@ -164,7 +184,9 @@ export function buildCorrectionRequest(
 		if (!row) continue
 		const original = log.weight ?? null
 		let weight: number | null = null
-		if (row.weight.trim() !== '') {
+		if (fixedWeightIds.has(log.id)) {
+			weight = original
+		} else if (row.weight.trim() !== '') {
 			const parsed = parseWeightInput(row.weight, unit)
 			if (parsed === undefined) {
 				problems.push({

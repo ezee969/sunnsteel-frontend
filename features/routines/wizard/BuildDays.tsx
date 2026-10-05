@@ -128,6 +128,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 		updateSet,
 		validateMinMaxReps,
 		setRestSeconds,
+		setLinearPeriodization,
 	} = useRoutineDayMutations({
 		data,
 		onUpdate,
@@ -408,6 +409,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											onUpdateNote={updateExerciseNote}
 											onUpdateProgressionScheme={updateProgressionScheme}
 											onUpdateMinWeightIncrement={updateMinWeightIncrement}
+											rotation={data.scheduleMode === 'ROTATION'}
+											onSetLinearPeriodization={setLinearPeriodization}
 											onAddSet={addSet}
 											onReplaceWarmUps={replaceWarmUps}
 											onSetWarmUpsFollowLoad={setWarmUpsFollowLoad}

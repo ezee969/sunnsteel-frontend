@@ -36,6 +36,8 @@ export function isWeightLocked(
 	if (!set) return false
 	// LIVE-20: a following warm-up is recalculated from the working load.
 	if (isFollowingWarmUp(set, warmUpsFollowLoad)) return true
+	// ROUT-17: a block prescribes every working load; warm-ups stay free.
+	if (progressionScheme === 'LINEAR_PERIODIZATION') return set.kind !== 'WARMUP'
 	if (progressionScheme !== 'DOUBLE_PROGRESSION') return false
 	if (!countsForProgression(set.kind)) return false
 	return setIndex !== leadSetIndex(sets)

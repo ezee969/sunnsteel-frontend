@@ -31,6 +31,9 @@ export function sessionPrescription(
 			minWeightIncrement: exercise.minWeightIncrement,
 			// ROUT-12/LIVE-14: the grouping the workout runs in rounds.
 			linkedToNext: exercise.linkedToNext ?? false,
+			// ROUT-17: the block as it stood when the workout started; the sets'
+			// weights below are its prescribed loads.
+			linearPeriodization: exercise.linearPeriodization ?? null,
 			exercise: {
 				id: exercise.exercise.id,
 				name: exercise.exercise.name,

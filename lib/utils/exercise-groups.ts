@@ -1,7 +1,8 @@
-import type { SetKind } from '@sunsteel/contracts'
+import type { LinearPeriodizationState, SetKind } from '@sunsteel/contracts'
 
 import type { SetLog, WorkoutSession } from '@/lib/api/types/workout.type'
 
+import { lpWorkingIndexes, sessionLinearBlock } from './session-linear-block'
 import { substitutionFor } from './session-substitutions'
 
 export interface ExerciseGroup {
@@ -22,12 +23,19 @@ export interface ExerciseGroup {
 		maxReps?: number | null
 		weight?: number | null
 		kind?: SetKind
+		/** ROUT-17: 0-based place among the working sets; null for a warm-up. */
+		workingIndex?: number | null
 	}[]
 	performedSets: SetLog[]
 	/** LIVE-15: sets logged beyond the prescription, in order. */
 	extraSets: SetLog[]
 	/** LIVE-11: the prescribed exercise when this slot was swapped. */
 	substitutedFrom?: { id: string; name: string }
+	/**
+	 * ROUT-17: the 8-week block this slot trained, as it stood when the workout
+	 * started; null on any other slot and on a swapped one.
+	 */
+	linearPeriodization?: LinearPeriodizationState | null
 }
 
 function groupSetLogsByExercise(setLogs?: SetLog[]): Record<string, SetLog[]> {
@@ -62,6 +70,11 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 			session.exerciseSubstitutions,
 			routineExercise.id,
 		)
+		const workingIndexes = lpWorkingIndexes(routineExercise.sets)
+		const plannedSets = routineExercise.sets.map(set => ({
+			...set,
+			workingIndex: workingIndexes.get(set.setNumber) ?? null,
+		}))
 		return {
 			routineExerciseId: routineExercise.id,
 			exercise: substitution
@@ -69,8 +82,8 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 				: routineExercise.exercise,
 			// The prescribed load belonged to the exercise that was replaced.
 			plannedSets: substitution
-				? routineExercise.sets.map(set => ({ ...set, weight: null }))
-				: routineExercise.sets,
+				? plannedSets.map(set => ({ ...set, weight: null }))
+				: plannedSets,
 			performedSets,
 			extraSets: performedSets
 				.filter(set => set.setNumber > prescribed)
@@ -81,6 +94,10 @@ export function buildExerciseGroups(session?: WorkoutSession): ExerciseGroup[] {
 						name: routineExercise.exercise.name,
 					}
 				: undefined,
+			// A swapped slot left its block for that workout.
+			linearPeriodization: substitution
+				? null
+				: sessionLinearBlock(routineExercise).state,
 		}
 	})
 }

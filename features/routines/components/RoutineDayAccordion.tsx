@@ -145,6 +145,7 @@ export const RoutineDayAccordion = ({
 											groupLabel={groupLabelAt(day.exercises, index)}
 											routineId={routine.id}
 											weightUnit={weightUnit}
+											rotation={routine.scheduleMode === 'ROTATION'}
 										/>
 									))}
 								</div>

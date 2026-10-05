@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { exerciseLabel } from '@/i18n/catalog'
+import type { Locale } from '@/i18n/config'
 import { useCorrectSession } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
@@ -32,13 +33,19 @@ import {
 	changedSets,
 	type CorrectionDraftSet,
 	describeCorrectionWindow,
+	describeKeptLinearBlock,
 	describeKeptProgression,
 	describeSetCorrection,
 	describeSetValues,
 	draftFromLogs,
 	type DraftProblem,
 } from '@/lib/utils/session-corrections'
-import { getWeightUnitLabel } from '@/lib/utils/weight-unit'
+import { lpFixedLoadLogIds } from '@/lib/utils/session-linear-block'
+import {
+	formatWeight,
+	formatWeightAmount,
+	getWeightUnitLabel,
+} from '@/lib/utils/weight-unit'
 
 /**
  * LIVE-17: the invitation to correct and the trail of corrections. The
@@ -144,7 +151,9 @@ export function SessionCorrectionEditor({
 }) {
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.corrections')
+	const tBlock = useTranslations('workout.linearBlock')
 	const tEx = useTranslations('catalog.exercises')
+	const locale = useLocale() as Locale
 	const { push } = useToast()
 	const correct = useCorrectSession(sessionId)
 	const logs = useMemo(
@@ -162,6 +171,8 @@ export function SessionCorrectionEditor({
 		null,
 	)
 	const unit = getWeightUnitLabel(weightUnit)
+	// ROUT-17: a block's working sets keep their prescribed load.
+	const fixedLoadIds = useMemo(() => lpFixedLoadLogIds(groups), [groups])
 	const logById = useMemo(() => new Map(logs.map(log => [log.id, log])), [logs])
 	const nameByLog = useMemo(() => {
 		const names = new Map<string, string>()
@@ -180,6 +191,7 @@ export function SessionCorrectionEditor({
 			logs,
 			weightUnit,
 			t,
+			fixedLoadIds,
 		)
 		setProblems(found)
 		if (found.length) return
@@ -204,12 +216,22 @@ export function SessionCorrectionEditor({
 					push({
 						title: t('workoutCorrectedTitle'),
 						description:
-							describeKeptProgression(
-								result.progressionKept.map(item =>
-									exerciseLabel(item.exerciseName, tEx),
+							[
+								describeKeptProgression(
+									result.progressionKept.map(item =>
+										exerciseLabel(item.exerciseName, tEx),
+									),
+									t,
 								),
-								t,
-							) ?? t('everythingRecalculated'),
+								describeKeptLinearBlock(
+									(result.linearBlockKept ?? []).map(item =>
+										exerciseLabel(item.exerciseName, tEx),
+									),
+									t,
+								),
+							]
+								.filter(Boolean)
+								.join(' ') || t('everythingRecalculated'),
 						variant: 'success',
 					})
 					onDone()
@@ -274,27 +296,58 @@ export function SessionCorrectionEditor({
 									const row = draft[log.id]
 									const problem = problemFor(log.id)
 									const errorId = `correct-${log.id}-error`
-									const label = `${exerciseLabel(group.exercise.name, tEx)}, set ${log.setNumber}`
+									const label = t('setAria', {
+										exercise: exerciseLabel(group.exercise.name, tEx),
+										number: log.setNumber,
+									})
+									const fixedLoad = fixedLoadIds.has(log.id)
 									return (
 										<div key={log.id} className="space-y-1">
 											<div className={`${ROW} items-center`}>
 												<span className="type-data text-ink-2">
 													{log.setNumber}
 												</span>
-												<Input
-													type="number"
-													inputMode="decimal"
-													min="0"
-													step={weightUnit === 'LB' ? 1 : 0.5}
-													aria-label={`${label}: ${t('weightCaption').toLowerCase()} (${unit})`}
-													aria-invalid={problem ? true : undefined}
-													aria-describedby={problem ? errorId : undefined}
-													value={row.weight}
-													onChange={event =>
-														update(log.id, { weight: event.target.value })
-													}
-													className={FIELD}
-												/>
+												{fixedLoad ? (
+													// ROUT-17: the block prescribed this load; the
+													// server refuses to change it, so it is shown, not
+													// offered.
+													<p className="type-data text-center text-foreground md:max-w-[var(--field-max)]">
+														<span className="sr-only">
+															{`${label}: ${tBlock('loadAria', {
+																value: formatWeight(
+																	log.weight,
+																	weightUnit,
+																	locale,
+																),
+															})}`}
+														</span>
+														{/* The unit is in the editor's intro line. */}
+														<span aria-hidden>
+															{log.weight
+																? formatWeightAmount(
+																		log.weight,
+																		weightUnit,
+																		locale,
+																	)
+																: '—'}
+														</span>
+													</p>
+												) : (
+													<Input
+														type="number"
+														inputMode="decimal"
+														min="0"
+														step={weightUnit === 'LB' ? 1 : 0.5}
+														aria-label={`${label}: ${t('weightCaption').toLowerCase()} (${unit})`}
+														aria-invalid={problem ? true : undefined}
+														aria-describedby={problem ? errorId : undefined}
+														value={row.weight}
+														onChange={event =>
+															update(log.id, { weight: event.target.value })
+														}
+														className={FIELD}
+													/>
+												)}
 												<Input
 													type="number"
 													inputMode="numeric"
@@ -315,7 +368,7 @@ export function SessionCorrectionEditor({
 													min="0"
 													max="10"
 													step="0.5"
-													aria-label={`${label}: RPE, 0-10`}
+													aria-label={`${label}: ${t('rpeAria')}`}
 													aria-invalid={problem ? true : undefined}
 													aria-describedby={problem ? errorId : undefined}
 													value={row.rpe}

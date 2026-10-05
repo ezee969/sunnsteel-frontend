@@ -323,6 +323,36 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Warm-up ramps: generated from the working load, the bar and your plates, previewed with what goes on each side, and able to follow the working weight as it progresses.',
 	},
 	{
+		slug: 'routine-builder-linear-block',
+		route: '/routines/edit/:routine',
+		features: ['ROUT-17'],
+		setup: async page => {
+			await openBuildDaysStep(page)
+			const more = page
+				.getByRole('button', { name: /^More options for / })
+				.first()
+			await expect(more).toBeVisible()
+			await more.click()
+			await page
+				.getByRole('combobox', { name: 'Progression scheme' })
+				.first()
+				.click()
+			await page.getByRole('option', { name: '8-week block (LP)' }).click()
+			const reference = page
+				.getByRole('textbox', { name: /^Reference max for / })
+				.first()
+			await reference.fill('140')
+			await reference.blur()
+			const summary = page.getByText(/^Week 1 of 8 · 63%/).first()
+			await expect(summary).toBeVisible()
+			await summary.scrollIntoViewIfNeeded()
+			// Nothing is saved: the frame is the builder's preview of the block.
+		},
+		ready: ['Build Your Training Days', 'Sets'],
+		caption:
+			'An 8-week block in the builder: a reference max sets every load, each working set shows its target RIR, and warm-ups stay editable.',
+	},
+	{
 		slug: 'routine-detail',
 		route: '/routines/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-08', 'ROUT-09', 'ROUT-15'],

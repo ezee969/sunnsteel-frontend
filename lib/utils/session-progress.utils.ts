@@ -3,6 +3,7 @@ import { requiredToFinish, type SetKind } from '@sunsteel/contracts'
 import type { Routine, RoutineExercise } from '@/lib/api/types/routine.type'
 import type { SetLog } from '@/lib/api/types/workout.type'
 
+import { lpWorkingIndexes, sessionLinearBlock } from './session-linear-block'
 import type {
 	ExerciseCompletionData,
 	GroupedExerciseLogs,
@@ -212,6 +213,8 @@ export function groupSetLogsByExercise(
 
 	return sortedExercises.map(re => {
 		const templateSets = [...re.sets].sort((a, b) => a.setNumber - b.setNumber)
+		const workingIndexes = lpWorkingIndexes(templateSets)
+		const block = sessionLinearBlock(re)
 
 		const sets = templateSets.map(tpl => {
 			const log = setLogs.find(
@@ -237,6 +240,7 @@ export function groupSetLogsByExercise(
 				plannedRir: tpl.rir,
 				isExtra: false,
 				kind: log?.kind ?? tpl.kind ?? 'WORKING',
+				workingIndex: workingIndexes.get(tpl.setNumber) ?? null,
 			}
 		})
 
@@ -257,6 +261,7 @@ export function groupSetLogsByExercise(
 			plannedRir: null,
 			isExtra: true,
 			kind: log.kind ?? 'WORKING',
+			workingIndex: null,
 		}))
 
 		return {
@@ -264,6 +269,8 @@ export function groupSetLogsByExercise(
 			exerciseName: re.exercise.name,
 			sets: [...sets, ...extras],
 			progressionScheme: re.progressionScheme,
+			linearPeriodization: block.state,
+			linearBlockUnset: block.unset,
 			restSeconds: re.restSeconds,
 			note: re.note,
 		} as GroupedExerciseLogs

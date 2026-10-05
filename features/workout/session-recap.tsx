@@ -2,6 +2,7 @@
 
 import type { WeightUnit, WorkoutSessionRecap } from '@sunsteel/contracts'
 import {
+	CalendarRange,
 	CheckCheck,
 	Clock3,
 	GitCompareArrows,
@@ -11,6 +12,7 @@ import {
 	Trophy,
 	Weight,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
@@ -25,7 +27,9 @@ import {
 } from '@/components/ui/dialog'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
+import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
+import { describeLinearBlockChanges } from '@/lib/utils/linear-block-recap'
 import {
 	getProgressionRuleExplanation,
 	getProgressionSetPresentation,
@@ -49,6 +53,7 @@ const ALL_SECTIONS: RecapSections = {
 	records: true,
 	progression: true,
 	notes: true,
+	linearBlock: true,
 }
 
 // A static map: Tailwind only emits classes it can see as whole strings.
@@ -69,6 +74,8 @@ interface SessionRecapContentProps {
 	sections?: Partial<RecapSections>
 	/** LIVE-16: the owner's control for editing the notes, on history only. */
 	notesAction?: ReactNode
+	/** ROUT-17: the workout's day is a rotation's, so blocks count sessions. */
+	rotation?: boolean
 }
 
 interface ComparisonMetricProps {
@@ -135,16 +142,28 @@ export function SessionRecapContent({
 	weightUnit: unitOverride,
 	sections,
 	notesAction,
+	rotation = false,
 }: SessionRecapContentProps) {
 	const t = useTranslations('workout.recap')
 	const tChange = useTranslations('progress.progressionChange')
 	const tEx = useTranslations('catalog.exercises')
-	const locale = useLocale()
+	const tBlock = useTranslations('workout.linearBlock')
+	const tRoutineBlock = useTranslations('routines.linearBlock')
+	const locale = useLocale() as Locale
 	const viewerUnit = useWeightUnit()
 	const weightUnit = unitOverride ?? viewerUnit
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const previous = recap.previousSession
 	const show = { ...ALL_SECTIONS, ...sections }
+	const blockItems = show.linearBlock
+		? describeLinearBlockChanges(
+				recap.linearBlockChanges,
+				{ rotation, unit: weightUnit, locale },
+				tBlock,
+				tRoutineBlock,
+			)
+		: []
+	const routineHref = recap.routineId ? `/routines/${recap.routineId}` : null
 
 	const headline = [
 		show.duration ? (
@@ -280,7 +299,10 @@ export function SessionRecapContent({
 				</section>
 			) : null}
 
-			{show.progression ? (
+			{/* An LP-only workout moved its blocks below, not a prescription:
+			    "No prescriptions changed" would read as nothing moving. */}
+			{show.progression &&
+			!(recap.progressionChanges.length === 0 && blockItems.length > 0) ? (
 				<section className="space-y-3">
 					{/* The second and last honour mark: a raised prescription is the
 					    definition of "better than planned". */}
@@ -342,6 +364,75 @@ export function SessionRecapContent({
 				</section>
 			) : null}
 
+			{blockItems.length > 0 ? (
+				// ROUT-17/ROUT-18: where each 8-week block stands after this
+				// workout. Owner-only (never in `sharedRecapToRecapView`), and in
+				// ink: the honour budget is spent on records and progression.
+				<section className="space-y-3">
+					<div className="rule-row flex items-center gap-2 pb-2">
+						<CalendarRange className="size-4 text-ink-3" aria-hidden />
+						<h3 className="type-panel text-foreground">{tBlock('heading')}</h3>
+					</div>
+					<ul className="space-y-px bg-rule-faint">
+						{blockItems.map(item => (
+							<li
+								key={item.routineExerciseId}
+								className="space-y-1 bg-surface-sunk p-3"
+							>
+								<p className="type-panel text-foreground">
+									{exerciseLabel(item.exerciseName, tEx)}
+								</p>
+								{item.kind === 'finished' ? (
+									<>
+										<p className="type-label text-foreground">
+											{tRoutineBlock('finished')}
+										</p>
+										<p className="type-body-sm text-ink-2">{item.reference}</p>
+										<p className="type-body-sm text-foreground">
+											{item.estimate}
+										</p>
+										{item.sets.length > 0 ? (
+											<div className="pt-1">
+												<p className="type-body-sm text-ink-3">
+													{tBlock('estimateFrom')}
+												</p>
+												<ul className="mt-1 space-y-0.5">
+													{item.sets.map(line => (
+														<li
+															key={line.label}
+															className="type-data flex flex-wrap justify-between gap-x-2 text-ink-2"
+														>
+															<span>{line.label}</span>
+															<span className="text-foreground">
+																{line.estimate}
+															</span>
+														</li>
+													))}
+												</ul>
+											</div>
+										) : null}
+										{routineHref ? (
+											<div className="pt-2">
+												<Button asChild variant="outline" size="sm">
+													<Link href={routineHref}>{tBlock('chooseNext')}</Link>
+												</Button>
+											</div>
+										) : null}
+									</>
+								) : (
+									<>
+										<p className="type-body-sm text-ink-2">{item.done}</p>
+										{item.next ? (
+											<p className="type-data text-foreground">{item.next}</p>
+										) : null}
+									</>
+								)}
+							</li>
+						))}
+					</ul>
+				</section>
+			) : null}
+
 			{show.notes ? (
 				<section className="space-y-3">
 					<div className="rule-row flex items-center gap-2 pb-2">
@@ -378,11 +469,14 @@ export function SessionRecapContent({
 interface SessionRecapDialogProps {
 	recap: WorkoutSessionRecap | null
 	onContinue: () => void
+	/** ROUT-17: the workout's day is a rotation's. */
+	rotation?: boolean
 }
 
 export function SessionRecapDialog({
 	recap,
 	onContinue,
+	rotation,
 }: SessionRecapDialogProps) {
 	const t = useTranslations('workout.recap')
 	return (
@@ -411,7 +505,7 @@ export function SessionRecapDialog({
 								{recap.dayName ? ` · ${recap.dayName}` : ''}
 							</DialogDescription>
 						</DialogHeader>
-						<SessionRecapContent recap={recap} />
+						<SessionRecapContent recap={recap} rotation={rotation} />
 						{/* v1.1 §26.7: the body scrolls under a footer pinned to the
 						    dialog's bottom edge, so Continue is in view from the start.
 						    `-bottom-6` cancels the panel's padding, as `shell-pin`
@@ -437,6 +531,7 @@ export function SessionRecapPanel({
 	recap,
 	action,
 	notesAction,
+	rotation,
 }: SessionRecapContentProps & { action?: ReactNode }) {
 	const t = useTranslations('workout.recap')
 	return (
@@ -456,7 +551,11 @@ export function SessionRecapPanel({
 				</div>
 				{action}
 			</div>
-			<SessionRecapContent recap={recap} notesAction={notesAction} />
+			<SessionRecapContent
+				recap={recap}
+				notesAction={notesAction}
+				rotation={rotation}
+			/>
 		</section>
 	)
 }

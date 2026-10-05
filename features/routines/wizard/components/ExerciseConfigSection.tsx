@@ -1,4 +1,4 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import type { LinearPeriodizationState, WeightUnit } from '@sunsteel/contracts'
 import { ChevronDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
@@ -11,6 +11,7 @@ import { formatTime, isValidTimeFormat, parseTime } from '@/lib/utils/time'
 import type { ProgressionScheme, RoutineWizardExercise } from '../types'
 import { requiresWeightIncrementField } from '../utils/progression.helpers'
 import { ExerciseNoteRow } from './ExerciseNoteRow'
+import { LinearBlockField } from './LinearBlockField'
 import { ProgressionSelect } from './ProgressionSelect'
 import { RestTimeExerciseConfig } from './RestTimeExerciseConfig'
 
@@ -32,6 +33,12 @@ interface ExerciseConfigSectionProps {
 	/** Null while options in use keep them open (`usesAdvancedOptions`). */
 	onToggleAdvanced: (() => void) | null
 	exerciseName: string
+	/** ROUT-17: the routine is a rotation, so a block counts sessions. */
+	rotation: boolean
+	onSetLinearPeriodization: (
+		exerciseIndex: number,
+		state: LinearPeriodizationState,
+	) => void
 }
 
 /**
@@ -63,6 +70,8 @@ export function ExerciseConfigSection({
 	advanced,
 	onToggleAdvanced,
 	exerciseName,
+	rotation,
+	onSetLinearPeriodization,
 }: ExerciseConfigSectionProps) {
 	const t = useTranslations('routines.builder')
 	// Local state for rest time input: allow free typing (digits and ":")
@@ -158,6 +167,17 @@ export function ExerciseConfigSection({
 					</div>
 				</div>
 			)}
+
+			{advanced && exercise.progressionScheme === 'LINEAR_PERIODIZATION' ? (
+				<LinearBlockField
+					exercise={exercise}
+					exerciseIndex={exerciseIndex}
+					exerciseName={exerciseName}
+					weightUnit={weightUnit}
+					rotation={rotation}
+					onSetLinearPeriodization={onSetLinearPeriodization}
+				/>
+			) : null}
 		</div>
 	)
 }

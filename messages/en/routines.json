@@ -113,7 +113,9 @@
 		"kindWORKING": "{count, plural, one {# working} other {# working}}",
 		"kindWARMUP": "{count, plural, one {# warm-up} other {# warm-up}}",
 		"kindDROP": "{count, plural, one {# drop} other {# drop}}",
-		"kindOPTIONAL": "{count, plural, one {# optional} other {# optional}}"
+		"kindOPTIONAL": "{count, plural, one {# optional} other {# optional}}",
+		"progressionLinear": "8-week block (LP)",
+		"exerciseReferenceMaxChange": "{name}: reference max {from} → {to}"
 	},
 	"trainingBlocks": {
 		"upcoming": "Upcoming",
@@ -635,7 +637,10 @@
 		"min": "Min",
 		"max": "Max",
 		"setNumber": "Set {number}",
-		"kindAria": "Set {number} kind"
+		"kindAria": "Set {number} kind",
+		"rest": "Rest",
+		"setsHeading": "Sets",
+		"lpTarget": "Target"
 	},
 	"presets": {
 		"dayPush": "Push",
@@ -733,7 +738,7 @@
 		"cloneAria": "Clone {name}",
 		"cloneThisRoutine": "Clone this routine",
 		"sharedBy": "Shared by {name}",
-		"exerciseLine": "{sets, plural, one {# set} other {# sets}} · {seconds}s rest{progression, select, on { · progression on} other {}}",
+		"exerciseLine": "{sets, plural, one {# set} other {# sets}} · {seconds}s rest{progression, select, on { · progression on} lp { · 8-week block (LP)} other {}}",
 		"setRepsFixed": "{reps} reps",
 		"setRepsRange": "{min}–{max} reps"
 	},
@@ -812,7 +817,8 @@
 		"restLabel": "Rest",
 		"dayNamePlaceholderRotation": "e.g. Push or Upper A",
 		"dayNamePlaceholderWeekly": "e.g. Push, or leave the weekday",
-		"noteLabel": "Note"
+		"noteLabel": "Note",
+		"progressionLinear": "8-week block (LP)"
 	},
 	"listing": {
 		"pageTitle": "Routines",
@@ -855,5 +861,54 @@
 		"tryAgain": "Try again",
 		"comparisonUnavailable": "The comparison is unavailable",
 		"liftsInBoth": "Lifts trained in both"
+	},
+	"linearBlock": {
+		"schemeName": "8-week block (LP)",
+		"week": "Week {step} of {total}",
+		"session": "Session {step} of {total}",
+		"recovery": "Recovery step",
+		"finished": "Block finished",
+		"percentOf": "{percent} of {reference}",
+		"summary": "{position} · {percent} of {reference} · {load}",
+		"rirRange": "RIR {min}–{max}",
+		"rirOne": "RIR {value}",
+		"amrap": "AMRAP · RIR 0",
+		"recoveryReps": "{reps, plural, one {# rep} other {# reps}}",
+		"noReference": "Set a reference max to start the block",
+		"estimate": "Estimated 1RM: {value}",
+		"noEstimate": "Not enough sets at weeks 7 and 8 to estimate a new 1RM",
+		"referenceMax": "Reference max ({unit})",
+		"referenceMaxAria": "Reference max for {exercise}",
+		"referenceMaxHint": "An estimated 1RM. Each week loads a share of it.",
+		"workingSetsLocked": "The block sets the working sets: their load, target and kind. Warm-ups stay yours to edit.",
+		"restart": "Restart block",
+		"restartTitle": "Restart this block?",
+		"restartBody": "{exercise} starts a new block from its first step at {reference}. Workouts already logged stay in your history.",
+		"cancel": "Cancel",
+		"chooseOnRoutine": "The next block is chosen on the routine's page.",
+		"referenceUsed": "Reference max: {value}",
+		"chooseNext": "Choose what follows",
+		"dialogTitle": "Next block for {exercise}",
+		"dialogDescription": "Your heaviest sets give an estimate, not a tested max. The reference you choose sets every load of the next block.",
+		"evidenceReference": "Block reference",
+		"evidenceEstimate": "Estimated 1RM",
+		"evidenceChange": "Change",
+		"noEstimateShort": "No estimate",
+		"kindProgress": "The estimate is {threshold} or more above the reference, so a heavier block is pre-filled, at most {cap} over it.",
+		"kindRepeat": "The estimate is within {threshold} of the reference, so the same reference is pre-filled.",
+		"kindRepeatNoEstimate": "Without an estimate, the same reference is pre-filled.",
+		"kindReset": "The estimate is more than {threshold} below the reference, so a block at the estimate is pre-filled.",
+		"nextReference": "Next block's reference max ({unit})",
+		"inputHeavier": "Heavier than the last block",
+		"inputSame": "Same as the last block",
+		"inputLighter": "Lighter than the last block",
+		"invalidReference": "Enter a reference max above 0 and up to {max}.",
+		"recoveryFirst": "Recovery step first: {sets} × {reps} at {percent} of {reference}",
+		"submit": "Start the next block",
+		"toastStarted": "Next block started",
+		"recoveryLine": "Recovery step: {sets} × {reps} at {load}, then a new block from {reference}",
+		"editRoutine": "Edit routine",
+		"sharedSet": "{percent} of your own max · {target}",
+		"sharedTable": "Week 1 of the block shown; the share rises each week, to {top} in week 8."
 	}
 }

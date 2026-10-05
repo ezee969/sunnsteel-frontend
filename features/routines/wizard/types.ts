@@ -1,4 +1,5 @@
 import type {
+	LinearPeriodizationState,
 	RoutineScheduleMode,
 	SetKind,
 	TrainingExperienceLevel,
@@ -39,6 +40,11 @@ export interface RoutineWizardExercise {
 	warmUpsFollowLoad?: boolean
 	/** ROUT-12: done in rounds with the next exercise of the day. */
 	linkedToNext?: boolean
+	/**
+	 * ROUT-17: where an exercise on an 8-week block stands; null on any other
+	 * scheme and before a reference max is set.
+	 */
+	linearPeriodization?: LinearPeriodizationState | null
 	note?: string
 	sets: RoutineSet[]
 	restSeconds: number

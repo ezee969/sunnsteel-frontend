@@ -1,4 +1,4 @@
-import type { SetKind } from '@sunsteel/contracts'
+import type { LinearPeriodizationState, SetKind } from '@sunsteel/contracts'
 
 import type { ProgressionScheme } from '@/lib/api/types/routine.shared'
 import type { Routine } from '@/lib/api/types/routine.type'
@@ -91,8 +91,22 @@ export type GroupedExerciseLogs = {
 		isExtra?: boolean
 		/** LIVE-12: what the set is for in this workout. */
 		kind: SetKind
+		/**
+		 * ROUT-17: the set's 0-based place among the prescription's working
+		 * (non-warm-up) sets, which picks its target in an 8-week block; null
+		 * for a warm-up and for an extra set.
+		 */
+		workingIndex: number | null
 	}>
 	progressionScheme: ProgressionScheme
+	/**
+	 * ROUT-17: the 8-week block this slot trains in this workout -- an LP slot,
+	 * not swapped, with a reference max -- as it stood when the workout
+	 * started; null otherwise.
+	 */
+	linearPeriodization: LinearPeriodizationState | null
+	/** ROUT-17: an LP slot without a reference max, trained as a normal exercise. */
+	linearBlockUnset: boolean
 	// LIVE-01 reads this to start the rest countdown.
 	restSeconds: number
 	note?: string | null

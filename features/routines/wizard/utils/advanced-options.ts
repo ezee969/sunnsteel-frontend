@@ -9,9 +9,12 @@ import type { RoutineWizardExercise } from '../types'
  * the next exercise are choices someone made.
  */
 export function usesAdvancedOptions(
-	exercise: Pick<RoutineWizardExercise, 'sets' | 'linkedToNext'>,
+	exercise: Pick<RoutineWizardExercise, 'sets' | 'linkedToNext'> &
+		Partial<Pick<RoutineWizardExercise, 'progressionScheme'>>,
 ): boolean {
 	if (exercise.linkedToNext) return true
+	// ROUT-17: a block's reference max and targets live in these options.
+	if (exercise.progressionScheme === 'LINEAR_PERIODIZATION') return true
 	return exercise.sets.some(
 		set =>
 			(set.kind ?? 'WORKING') !== 'WORKING' ||

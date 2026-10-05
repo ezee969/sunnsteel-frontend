@@ -1,13 +1,18 @@
 'use client'
 
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
+import type { Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import { formatMuscleGroups } from '@/lib/utils/muscle-groups'
+import {
+	lpPlannedSetLabel,
+	lpSessionLine,
+} from '@/lib/utils/session-linear-block'
 
 import { ExerciseNoteButton } from './session-notes'
 import { SetComparisonRow } from './set-comparison-row'
@@ -20,6 +25,8 @@ interface HistoryExerciseGroupProps {
 	sessionNote?: string | null
 	/** Present when the notes can be edited (a completed workout). */
 	sessionId?: string
+	/** ROUT-17: the workout's day was a rotation's, so blocks count sessions. */
+	rotation?: boolean
 }
 
 /**
@@ -35,11 +42,16 @@ export function HistoryExerciseGroup({
 	onToggle,
 	sessionNote,
 	sessionId,
+	rotation = false,
 }: HistoryExerciseGroupProps) {
 	const t = useTranslations('workout.historyExerciseGroup')
 	const weightUnit = useWeightUnit()
 	const tMuscles = useTranslations('routines.muscles')
 	const tEx = useTranslations('catalog.exercises')
+	const tBlock = useTranslations('workout.linearBlock')
+	const tRoutineBlock = useTranslations('routines.linearBlock')
+	const locale = useLocale() as Locale
+	const block = group.linearPeriodization ?? null
 	// LIVE-15: added sets count as sets of this exercise, like prescribed ones.
 	const totalSets = group.plannedSets.length + group.extraSets.length
 	const completedSets =
@@ -81,6 +93,11 @@ export function HistoryExerciseGroup({
 							{formatMuscleGroups(group.exercise.primaryMuscles, tMuscles)}
 							{group.exercise.equipment ? ` · ${group.exercise.equipment}` : ''}
 						</p>
+						{block ? (
+							<p className="type-body-sm text-ink-2">
+								{lpSessionLine(block, rotation, locale, tBlock, tRoutineBlock)}
+							</p>
+						) : null}
 						{group.substitutedFrom ? (
 							<p className="type-body-sm text-ink-3">
 								{t('swappedFrom', {
@@ -137,6 +154,18 @@ export function HistoryExerciseGroup({
 									plannedSet={plannedSet}
 									performedSet={performedSet}
 									weightUnit={weightUnit}
+									plannedLabel={
+										block && plannedSet.workingIndex != null
+											? lpPlannedSetLabel(
+													block,
+													plannedSet.workingIndex,
+													plannedSet.weight,
+													{ unit: weightUnit, locale },
+													tBlock,
+													tRoutineBlock,
+												)
+											: undefined
+									}
 								/>
 							)
 						})}

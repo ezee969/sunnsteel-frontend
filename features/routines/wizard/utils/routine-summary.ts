@@ -1,6 +1,7 @@
 import { CreateRoutineRequest } from '@/lib/api/types'
 
 import type { RoutineWizardData } from '../types'
+import { isLpWorkingSet } from './linear-block'
 
 export interface RoutineTotals {
 	trainingDays: number
@@ -61,6 +62,12 @@ export const buildRoutineRequest = (
 				minWeightIncrement: exercise.minWeightIncrement,
 				warmUpsFollowLoad: Boolean(exercise.warmUpsFollowLoad),
 				linkedToNext: Boolean(exercise.linkedToNext),
+				// ROUT-17: null clears a block's state when the scheme changed;
+				// the server regenerates an LP exercise's working sets from it.
+				linearPeriodization:
+					exercise.progressionScheme === 'LINEAR_PERIODIZATION'
+						? (exercise.linearPeriodization ?? null)
+						: null,
 				sets: exercise.sets.map(set => {
 					const baseSet = {
 						setNumber: set.setNumber,
@@ -73,6 +80,15 @@ export const buildRoutineRequest = (
 						...(set.kind === 'WARMUP' && typeof set.warmUpShare === 'number'
 							? { warmUpShare: set.warmUpShare }
 							: {}),
+					}
+
+					// ROUT-17: a block's working sets have no rep target.
+					if (isLpWorkingSet(exercise, set)) {
+						return {
+							...baseSet,
+							repType: 'FIXED' as const,
+							reps: set.reps ?? null,
+						}
 					}
 
 					if (set.repType === 'FIXED') {

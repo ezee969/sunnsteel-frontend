@@ -58,6 +58,11 @@ export function ProgressionSelect({
 					<SelectItem value="DYNAMIC_DOUBLE_PROGRESSION">
 						{t('progressionDynamic')}
 					</SelectItem>
+					{/* ROUT-17: the Spanish name leads with "Bloque LP" so the
+					    trigger's ellipsis at 390 still says which scheme it is. */}
+					<SelectItem value="LINEAR_PERIODIZATION">
+						{t('progressionLinear')}
+					</SelectItem>
 				</SelectContent>
 			</Select>
 		</div>

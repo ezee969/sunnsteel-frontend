@@ -9,6 +9,7 @@ import {
 import {
 	CheckCheck,
 	Dumbbell,
+	Flag,
 	HeartHandshake,
 	Medal,
 	MessageSquare,
@@ -24,6 +25,8 @@ import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLoadMoreOnScroll } from '@/hooks/use-load-more-on-scroll'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
 import { formatTimeAgo } from '@/lib/utils/date'
 import {
 	describeNotification,
@@ -40,6 +43,7 @@ const KIND_ICON = {
 	TRAINING_PARTNER_ENCOURAGEMENT: HeartHandshake,
 	TRAINING_PARTNER_SESSION: Dumbbell,
 	TRAINING_PARTNER_ACHIEVEMENT: Medal,
+	LINEAR_BLOCK_FINISHED: Flag,
 } as const
 
 /** A notification worded and linked the one way (NOTIF-01). */
@@ -47,8 +51,15 @@ export function useDescribeNotification() {
 	const t = useTranslations('social.notifications')
 	const tPartners = useTranslations('settings.trainingPartners')
 	const tAchievements = useTranslations('catalog.achievements')
+	const tExercises = useTranslations('catalog.exercises')
+	const weightUnit = useWeightUnit()
+	const locale = useLocale() as Locale
 	return (notification: AppNotification) =>
-		describeNotification(notification, t, tPartners, tAchievements)
+		describeNotification(notification, t, tPartners, tAchievements, {
+			weightUnit,
+			locale,
+			tExercises,
+		})
 }
 
 /**

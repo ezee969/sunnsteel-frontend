@@ -7,6 +7,7 @@ import {
 	changedSets,
 	describeClosedReason,
 	describeCorrectionWindow,
+	describeKeptLinearBlock,
 	describeKeptProgression,
 	describeSetCorrection,
 	describeSetValues,
@@ -178,5 +179,34 @@ describe('the draft becomes a request', () => {
 				message: 'Las repeticiones deben ser un número entero.',
 			},
 		])
+	})
+})
+
+describe('8-week blocks in a correction (ROUT-17)', () => {
+	it('sends a fixed load back exactly as stored, whatever the box holds', () => {
+		const stored = { ...log, id: 'lp', weight: 72.5 }
+		const draft = draftFromLogs([stored], 'LB')
+		draft.lp = { ...draft.lp, weight: '999', reps: '7' }
+		const { sets, problems } = buildCorrectionRequest(
+			draft,
+			[stored],
+			'LB',
+			en,
+			new Set(['lp']),
+		)
+		expect(problems).toEqual([])
+		expect(sets).toEqual([
+			{ setLogId: 'lp', weight: 72.5, reps: 7, rpe: 8, isCompleted: true },
+		])
+	})
+
+	it('names the blocks a correction left where they are, in both languages', () => {
+		expect(describeKeptLinearBlock([], en)).toBeNull()
+		expect(describeKeptLinearBlock(['Bench Press'], en)).toBe(
+			'The 8-week block of Bench Press was left where it is, because it has moved on since this workout.',
+		)
+		expect(describeKeptLinearBlock(['Sentadilla', 'Press de banca'], es)).toBe(
+			'El bloque de 8 semanas de Sentadilla y Press de banca quedó como estaba, porque ya avanzó desde este entrenamiento.',
+		)
 	})
 })

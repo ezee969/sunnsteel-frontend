@@ -176,7 +176,10 @@
 		"nothingToCorrectDescription": "Every set already reads that way.",
 		"workoutCorrectedTitle": "Workout corrected",
 		"everythingRecalculated": "Everything this workout fed has been recalculated.",
-		"couldNotCorrectTitle": "Could not correct this workout"
+		"couldNotCorrectTitle": "Could not correct this workout",
+		"keptLinearBlockOne": "The 8-week block of {list} was left where it is, because it has moved on since this workout.",
+		"setAria": "{exercise}, set {number}",
+		"rpeAria": "RPE, 0 to 10"
 	},
 	"restTimer": {
 		"resting": "Resting",
@@ -495,5 +498,24 @@
 		"WARMUP": "Warm-up",
 		"DROP": "Drop",
 		"OPTIONAL": "Optional"
+	},
+	"linearBlock": {
+		"positionLine": "{position} · {percent}",
+		"finishedNoteWeek": "Block finished — these sets repeat week 8 and move nothing. Choose what follows on the routine page.",
+		"finishedNoteSession": "Block finished — these sets repeat session 8 and move nothing. Choose what follows on the routine page.",
+		"chooseNext": "Choose what follows",
+		"loadAria": "Prescribed load: {value}",
+		"loadCaption": "Fixed ({unit})",
+		"swapNote": "This exercise is on an 8-week block, so a swap is for this workout only: the block keeps its exercise and does not move.",
+		"plannedSet": "{load} · {target}",
+		"heading": "8-week blocks",
+		"stepDone": "{position} done",
+		"next": "Next: {position}, {percent} · {load}",
+		"recoveryDone": "Recovery step done · new block from {reference}",
+		"referenceUsed": "Reference max used: {value}",
+		"estimate": "Estimated 1RM (an estimate, not a tested max): {value}",
+		"estimateFrom": "Estimated from",
+		"sampleWeek": "Week {step}, set {set}: {load} × {reps}, RIR {rir}",
+		"sampleSession": "Session {step}, set {set}: {load} × {reps}, RIR {rir}"
 	}
 }

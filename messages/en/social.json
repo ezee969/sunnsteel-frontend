@@ -282,7 +282,10 @@
 		"loadOlder": "Load older updates",
 		"loadingOlder": "Loading older updates…",
 		"olderError": "Older updates could not be loaded.",
-		"seeAll": "See all notifications"
+		"seeAll": "See all notifications",
+		"linearBlockTitle": "Block finished: {exercise}",
+		"linearBlockDetail": "Reference {reference} · estimated 1RM {estimate}",
+		"linearBlockDetailNoEstimate": "Reference {reference} · not enough sets to estimate a new 1RM"
 	},
 	"activity": {
 		"typeSessionCompleted": "Completed workouts",

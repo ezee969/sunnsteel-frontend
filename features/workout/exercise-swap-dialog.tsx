@@ -44,6 +44,11 @@ export interface SwapTarget {
 	/** The routine's own exercise for the slot. */
 	prescribed: { id: string; name: string }
 	hasCompletedSets: boolean
+	/**
+	 * ROUT-17: the slot is on an 8-week block, which the server lets be
+	 * swapped for this workout only.
+	 */
+	linearBlock?: boolean
 }
 
 interface ExerciseSwapDialogProps {
@@ -80,6 +85,7 @@ export function ExerciseSwapDialog({
 }: ExerciseSwapDialogProps) {
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.exerciseSwap')
+	const tBlock = useTranslations('workout.linearBlock')
 	const tAlternatives = useTranslations('routines.alternatives')
 	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
@@ -161,11 +167,12 @@ export function ExerciseSwapDialog({
 
 	const choose = (exercise: Pick<Exercise, 'id' | 'name'>) => {
 		if (!target) return
+		const alsoInPlan = applyToRoutine && !target.linearBlock
 		substitute.mutate(
 			{
 				routineExerciseId: target.routineExerciseId,
 				exerciseId: exercise.id,
-				applyToRoutine,
+				applyToRoutine: alsoInPlan,
 			},
 			{
 				onSuccess: result => {
@@ -173,7 +180,7 @@ export function ExerciseSwapDialog({
 						title: t('swappedToTitle', {
 							exercise: exerciseLabel(exercise.name, tEx),
 						}),
-						description: !applyToRoutine
+						description: !alsoInPlan
 							? t('onlySessionChanged')
 							: result.routineUpdated
 								? t('planUsesFromNext', { plan: Plan })
@@ -321,20 +328,24 @@ export function ExerciseSwapDialog({
 							)}
 						</div>
 
-						<div className="flex items-start gap-2">
-							<Checkbox
-								id="swap-apply-routine"
-								checked={applyToRoutine}
-								onCheckedChange={value => setApplyToRoutine(value === true)}
-								disabled={busy}
-							/>
-							<Label
-								htmlFor="swap-apply-routine"
-								className="type-body-sm leading-snug"
-							>
-								{t('alsoUseIt', { plan })}
-							</Label>
-						</div>
+						{target.linearBlock ? (
+							<p className="type-body-sm text-ink-2">{tBlock('swapNote')}</p>
+						) : (
+							<div className="flex items-start gap-2">
+								<Checkbox
+									id="swap-apply-routine"
+									checked={applyToRoutine}
+									onCheckedChange={value => setApplyToRoutine(value === true)}
+									disabled={busy}
+								/>
+								<Label
+									htmlFor="swap-apply-routine"
+									className="type-body-sm leading-snug"
+								>
+									{t('alsoUseIt', { plan })}
+								</Label>
+							</div>
+						)}
 						<p className="type-body-sm text-ink-3">{t('clearedNote')}</p>
 					</div>
 				) : null}

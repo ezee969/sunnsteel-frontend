@@ -34,6 +34,11 @@ interface UseSetLogFormProps {
 	initialRpe?: number
 	initialIsCompleted: boolean
 	weightUnit: WeightUnit
+	/**
+	 * ROUT-17: the load an 8-week block prescribes, kg. Set, the row's weight
+	 * is fixed: it cannot be typed, and every save sends exactly this value.
+	 */
+	fixedWeightKg?: number
 	onSave: (payload: UpsertSetLogPayload) => void
 	onSetCompleted?: () => void
 }
@@ -77,6 +82,7 @@ export const useSetLogForm = ({
 	initialRpe,
 	initialIsCompleted,
 	weightUnit,
+	fixedWeightKg,
 	onSave,
 	onSetCompleted,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
@@ -86,7 +92,14 @@ export const useSetLogForm = ({
 		initialReps > 0 ? String(initialReps) : '',
 	)
 	const [weightState, setWeightState] = useState<string>(
-		formatWeightInput(initialWeight, weightUnit),
+		formatWeightInput(fixedWeightKg ?? initialWeight, weightUnit),
+	)
+	// ROUT-17: a fixed load is read from the prescription, never from the
+	// field, so a pound value rounded for display never converts back as a
+	// different load.
+	const weightOf = useCallback(
+		(value: string) => fixedWeightKg ?? parseWeightInput(value, weightUnit),
+		[fixedWeightKg, weightUnit],
 	)
 	const weightUnitRef = useRef(weightUnit)
 	const isWeightUnitTransition = weightUnitRef.current !== weightUnit
@@ -123,16 +136,18 @@ export const useSetLogForm = ({
 		if (previousUnit === weightUnit) return
 
 		const currentWeightKg =
-			parseWeightInput(weightState, previousUnit) ?? initialWeight
+			fixedWeightKg ??
+			parseWeightInput(weightState, previousUnit) ??
+			initialWeight
 		const convertedWeight = formatWeightInput(currentWeightKg, weightUnit)
 		setWeightState(convertedWeight)
 		weightUnitRef.current = weightUnit
-	}, [initialWeight, weightState, weightUnit])
+	}, [fixedWeightKg, initialWeight, weightState, weightUnit])
 
 	// Track last saved values to prevent redundant saves
 	const lastSavedRef = useRef({
 		reps: initialReps,
-		weight: initialWeight,
+		weight: fixedWeightKg ?? initialWeight,
 		rpe: initialRpe,
 		isCompleted: initialIsCompleted,
 	})
@@ -141,11 +156,18 @@ export const useSetLogForm = ({
 	useEffect(() => {
 		lastSavedRef.current = {
 			reps: initialReps,
-			weight: initialWeight,
+			weight: fixedWeightKg ?? initialWeight,
 			rpe: initialRpe,
 			isCompleted: initialIsCompleted,
 		}
-	}, [initialReps, initialWeight, initialRpe, initialIsCompleted, setNumber])
+	}, [
+		initialReps,
+		initialWeight,
+		fixedWeightKg,
+		initialRpe,
+		initialIsCompleted,
+		setNumber,
+	])
 
 	// Create payload for validation and saving
 	const createPayload = useCallback(
@@ -159,12 +181,12 @@ export const useSetLogForm = ({
 			exerciseId,
 			setNumber,
 			reps: Number(reps) || 0,
-			weight: parseWeightInput(weight, weightUnit),
+			weight: weightOf(weight),
 			// An empty box means "not recorded", never RPE 0.
 			rpe: rpe === '' ? undefined : Number(rpe),
 			isCompleted,
 		}),
-		[routineExerciseId, exerciseId, setNumber, weightUnit],
+		[routineExerciseId, exerciseId, setNumber, weightOf],
 	)
 
 	// Validate current form state
@@ -192,7 +214,7 @@ export const useSetLogForm = ({
 			return
 
 		const currentReps = Number(debouncedReps) || 0
-		const currentWeight = parseWeightInput(debouncedWeight, weightUnit)
+		const currentWeight = weightOf(debouncedWeight)
 		const currentRpe = debouncedRpe === '' ? undefined : Number(debouncedRpe)
 
 		// Normalize nullish weights for stable comparisons (null === undefined)
@@ -240,7 +262,7 @@ export const useSetLogForm = ({
 		setNumber,
 		validation.isValid,
 		createPayload,
-		weightUnit,
+		weightOf,
 	])
 
 	// Immediate feedback effect for pending state
@@ -248,7 +270,7 @@ export const useSetLogForm = ({
 		if (isWeightUnitTransition) return
 
 		const currentReps = Number(repsState) || 0
-		const currentWeight = parseWeightInput(weightState, weightUnit)
+		const currentWeight = weightOf(weightState)
 		const currentRpe = rpeState === '' ? undefined : Number(rpeState)
 		// Normalize nullish weights for stable comparisons (null === undefined)
 		const norm = (w: number | undefined | null) => (w == null ? null : w)
@@ -269,7 +291,7 @@ export const useSetLogForm = ({
 		sessionId,
 		routineExerciseId,
 		setNumber,
-		weightUnit,
+		weightOf,
 		isWeightUnitTransition,
 	])
 
@@ -278,9 +300,12 @@ export const useSetLogForm = ({
 		setRepsState(value)
 	}, [])
 
-	const setWeight = useCallback((value: string) => {
-		setWeightState(value)
-	}, [])
+	const setWeight = useCallback(
+		(value: string) => {
+			if (fixedWeightKg === undefined) setWeightState(value)
+		},
+		[fixedWeightKg],
+	)
 
 	const setRpe = useCallback((value: string) => {
 		setRpeState(value)
@@ -292,7 +317,10 @@ export const useSetLogForm = ({
 	const fill = useCallback(
 		(values: SetValues) => {
 			const reps = values.reps > 0 ? String(values.reps) : ''
-			const weight = formatWeightInput(values.weight ?? undefined, weightUnit)
+			const weight = formatWeightInput(
+				fixedWeightKg ?? values.weight ?? undefined,
+				weightUnit,
+			)
 			const rpe = values.rpe != null ? String(values.rpe) : ''
 			setRepsState(reps)
 			setWeightState(weight)
@@ -311,6 +339,7 @@ export const useSetLogForm = ({
 		},
 		[
 			weightUnit,
+			fixedWeightKg,
 			createPayload,
 			isCompletedState,
 			sessionId,
@@ -365,7 +394,7 @@ export const useSetLogForm = ({
 			if (validateSetLogPayload(payload, t).isValid) {
 				onSaveRef.current(payload)
 				// Update last saved values to prevent redundant saves
-				const w = parseWeightInput(weightState, weightUnit)
+				const w = weightOf(weightState)
 				const r = rpeState === '' ? undefined : Number(rpeState)
 				lastSavedRef.current = {
 					reps: Number(repsState) || 0,
@@ -383,7 +412,7 @@ export const useSetLogForm = ({
 			weightState,
 			rpeState,
 			createPayload,
-			weightUnit,
+			weightOf,
 			t,
 		],
 	)

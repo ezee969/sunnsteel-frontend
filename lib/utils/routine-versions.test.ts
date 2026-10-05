@@ -3,6 +3,7 @@ import type {
 	RoutineVersionExercise,
 	RoutineVersionSetup,
 } from '@sunsteel/contracts'
+import { startLinearPeriodization } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
@@ -289,5 +290,48 @@ describe('routine versions', () => {
 				t: esVersions,
 			}),
 		).toMatch(/Elimina una versión/)
+	})
+})
+
+describe('routine versions of an 8-week block (ROUT-17)', () => {
+	const lp = (referenceMaxKg: number) =>
+		exercise('squat', 'Squat', 0, {
+			progressionScheme: 'LINEAR_PERIODIZATION',
+			linearPeriodization: {
+				...startLinearPeriodization(referenceMaxKg),
+				step: 3,
+			},
+			sets: exercise('squat', 'Squat', 0).sets.map(set => ({
+				...set,
+				repType: 'FIXED' as const,
+				minReps: null,
+				maxReps: null,
+				weight: 70,
+			})),
+		})
+	const withSquat = (squat: RoutineVersionExercise): RoutineVersionSetup => ({
+		...current,
+		days: [current.days[0], { ...current.days[1], exercises: [squat] }],
+	})
+
+	it('names the scheme and a changed reference max, in both languages', () => {
+		const from = withSquat(exercise('squat', 'Squat', 0))
+		expect(compare(from, withSquat(lp(100))).days[0].changes).toContain(
+			'Squat: progression double progression → 8-week block (LP)',
+		)
+		expect(compareEs(from, withSquat(lp(100))).days[0].changes).toContain(
+			'Squat: progresión doble progresión → bloque de 8 semanas (LP)',
+		)
+		expect(
+			compare(withSquat(lp(100)), withSquat(lp(110))).days[0].changes,
+		).toEqual(['Squat: reference max 100 kg → 110 kg'])
+		expect(
+			compareEs(withSquat(lp(100)), withSquat(lp(110)), 'LB').days[0].changes,
+		).toEqual(['Squat: máximo de referencia 220,46 lb → 242,51 lb'])
+	})
+
+	it('says nothing of a reference when one side has none', () => {
+		const clone = withSquat({ ...lp(100), linearPeriodization: null })
+		expect(compare(clone, withSquat(lp(100))).isEmpty).toBe(true)
 	})
 })

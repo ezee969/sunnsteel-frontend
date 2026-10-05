@@ -78,6 +78,12 @@ interface SetRowProps {
 	 * (`usesAdvancedOptions`), so a folded row never hides a kind in use.
 	 */
 	advanced: boolean
+	/**
+	 * ROUT-17: a working set of an 8-week block. The block prescribes its
+	 * load and target, so the row shows them and offers nothing to change;
+	 * `target` is "RIR 2–3", "AMRAP · RIR 0" or the recovery step's reps.
+	 */
+	lpWorking?: { target: string | null }
 }
 
 /**
@@ -114,6 +120,7 @@ export function SetRow({
 	disableRemove,
 	weightLocked,
 	advanced,
+	lpWorking,
 }: SetRowProps) {
 	const t = useTranslations('routines.setRow')
 	const tKinds = useTranslations('workout.setKinds')
@@ -161,16 +168,18 @@ export function SetRow({
 						{t('setNumber', { number: set.setNumber })}
 					</Badge>
 
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={onRemoveSet}
-						aria-label={t('removeSet')}
-						disabled={disableRemove}
-						className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
-					>
-						<Trash2 className="h-4 w-4" />
-					</Button>
+					{lpWorking ? null : (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={onRemoveSet}
+							aria-label={t('removeSet')}
+							disabled={disableRemove}
+							className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
+						>
+							<Trash2 className="h-4 w-4" />
+						</Button>
+					)}
 				</div>
 
 				{/* LIVE-12: the kind and the rep type wrap onto two lines in a
@@ -184,6 +193,7 @@ export function SetRow({
 							onValueChange={value =>
 								onUpdateSet(exerciseIndex, setIndex, 'kind', value)
 							}
+							disabled={Boolean(lpWorking)}
 						>
 							<SelectTrigger
 								aria-label={t('kindAria', { number: set.setNumber })}
@@ -201,26 +211,32 @@ export function SetRow({
 						</Select>
 					</div>
 
-					<div className="min-w-[104px] flex-1 sm:min-w-0">
-						<Select
-							value={set.repType}
-							onValueChange={value =>
-								onUpdateSet(exerciseIndex, setIndex, 'repType', value)
-							}
-							disabled={progressionScheme !== 'NONE'}
-						>
-							<SelectTrigger
-								aria-label={t('repType')}
-								className="w-full h-9 sm:h-8"
+					{/* ROUT-17: a block's set has no rep type to choose; the empty
+					    cell keeps the one-line row on its column tracks. */}
+					{lpWorking ? (
+						<div aria-hidden className="hidden lg:block" />
+					) : (
+						<div className="min-w-[104px] flex-1 sm:min-w-0">
+							<Select
+								value={set.repType}
+								onValueChange={value =>
+									onUpdateSet(exerciseIndex, setIndex, 'repType', value)
+								}
+								disabled={progressionScheme !== 'NONE'}
 							>
-								<SelectValue className="truncate" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="FIXED">{t('fixed')}</SelectItem>
-								<SelectItem value="RANGE">{t('range')}</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
+								<SelectTrigger
+									aria-label={t('repType')}
+									className="w-full h-9 sm:h-8"
+								>
+									<SelectValue className="truncate" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="FIXED">{t('fixed')}</SelectItem>
+									<SelectItem value="RANGE">{t('range')}</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					)}
 				</div>
 
 				{/* Inputs: Reps gets its own row on mobile so its steppers/input aren't
@@ -230,9 +246,17 @@ export function SetRow({
 					{/* Reps Column */}
 					<div className="space-y-1 lg:min-w-0">
 						<Label className="lg:hidden">
-							{set.repType === 'FIXED' ? t('reps') : t('repsRange')}
+							{lpWorking
+								? t('lpTarget')
+								: set.repType === 'FIXED'
+									? t('reps')
+									: t('repsRange')}
 						</Label>
-						{set.repType === 'FIXED' ? (
+						{lpWorking ? (
+							<p className="type-data flex min-h-10 items-center text-foreground sm:min-h-8">
+								{lpWorking.target ?? '—'}
+							</p>
+						) : set.repType === 'FIXED' ? (
 							<div className="flex items-center gap-2 w-full">
 								<Button
 									type="button"
@@ -406,75 +430,83 @@ export function SetRow({
 							</div>
 						</div>
 
-						{/* RIR Column */}
-						<div className={`space-y-1 lg:min-w-0 ${advanced ? '' : 'hidden'}`}>
-							<Label className="lg:hidden">{t('rir')}</Label>
-							<div className="flex items-center gap-2 w-full">
-								<Button
-									type="button"
-									variant="outline"
-									size="icon"
-									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label={t('decreaseRir')}
-									onClick={() =>
-										onUpdateSet(
-											exerciseIndex,
-											setIndex,
-											'rir',
-											Math.max(0, (set.rir ?? 0) - 1),
-										)
-									}
-								>
-									<Minus className="h-3 w-3" />
-								</Button>
-								<Input
-									type="text"
-									inputMode="numeric"
-									pattern="[0-9]*"
-									autoComplete="off"
-									aria-label={t('rir')}
-									placeholder="0"
-									value={rirInput}
-									onChange={event => handleRirChange(event.target.value)}
-									className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 sm:w-14 sm:flex-none lg:w-full"
-								/>
-								<Button
-									type="button"
-									variant="outline"
-									size="icon"
-									className="h-10 w-10 p-0 shrink-0 sm:hidden"
-									aria-label={t('increaseRir')}
-									onClick={() =>
-										onUpdateSet(
-											exerciseIndex,
-											setIndex,
-											'rir',
-											Math.min(10, (set.rir ?? 0) + 1),
-										)
-									}
-								>
-									<Plus className="h-3 w-3" />
-								</Button>
+						{/* RIR Column; ROUT-17: a block's target is in the reps cell. */}
+						{lpWorking ? (
+							<div aria-hidden className="hidden lg:block" />
+						) : (
+							<div
+								className={`space-y-1 lg:min-w-0 ${advanced ? '' : 'hidden'}`}
+							>
+								<Label className="lg:hidden">{t('rir')}</Label>
+								<div className="flex items-center gap-2 w-full">
+									<Button
+										type="button"
+										variant="outline"
+										size="icon"
+										className="h-10 w-10 p-0 shrink-0 sm:hidden"
+										aria-label={t('decreaseRir')}
+										onClick={() =>
+											onUpdateSet(
+												exerciseIndex,
+												setIndex,
+												'rir',
+												Math.max(0, (set.rir ?? 0) - 1),
+											)
+										}
+									>
+										<Minus className="h-3 w-3" />
+									</Button>
+									<Input
+										type="text"
+										inputMode="numeric"
+										pattern="[0-9]*"
+										autoComplete="off"
+										aria-label={t('rir')}
+										placeholder="0"
+										value={rirInput}
+										onChange={event => handleRirChange(event.target.value)}
+										className="text-center h-10 sm:h-8 flex-1 min-w-[56px] sm:min-w-0 sm:w-14 sm:flex-none lg:w-full"
+									/>
+									<Button
+										type="button"
+										variant="outline"
+										size="icon"
+										className="h-10 w-10 p-0 shrink-0 sm:hidden"
+										aria-label={t('increaseRir')}
+										onClick={() =>
+											onUpdateSet(
+												exerciseIndex,
+												setIndex,
+												'rir',
+												Math.min(10, (set.rir ?? 0) + 1),
+											)
+										}
+									>
+										<Plus className="h-3 w-3" />
+									</Button>
+								</div>
 							</div>
-						</div>
+						)}
 					</div>
 				</div>
 
 				{/* Desktop-only delete button */}
-				<div
-					className={`hidden sm:flex ${advanced ? 'sm:col-start-4' : 'sm:col-start-3'} sm:row-start-1 justify-end lg:col-start-auto lg:row-start-auto`}
-				>
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={onRemoveSet}
-						aria-label={t('removeSet')}
-						disabled={disableRemove}
-						className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+				{lpWorking ? null : (
+					<div
+						className={`hidden sm:flex ${advanced ? 'sm:col-start-4' : 'sm:col-start-3'} sm:row-start-1 justify-end lg:col-start-auto lg:row-start-auto`}
 					>
-						<Trash2 className="h-4 w-4" />
-					</Button>
-				</div>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={onRemoveSet}
+							aria-label={t('removeSet')}
+							disabled={disableRemove}
+							className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+						>
+							<Trash2 className="h-4 w-4" />
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	)

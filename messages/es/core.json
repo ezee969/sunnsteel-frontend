@@ -389,6 +389,13 @@
 		"SWAP_SESSION_NOT_ACTIVE": "Los ejercicios solo se pueden cambiar en una sesión en curso",
 		"SWAP_SETS_COMPLETED": "Este ejercicio ya tiene series completadas. Cámbialo antes de completar alguna.",
 		"NOTES_DISCARDED_SESSION": "Un entrenamiento descartado no admite notas",
+		"LINEAR_BLOCK_INVALID": "El bloque de este ejercicio no es válido: {reason}",
+		"LINEAR_BLOCK_EXTRA_SET": "Un ejercicio en un bloque de 8 semanas no admite series extra",
+		"LINEAR_BLOCK_KIND_FIXED": "Las series de trabajo de un bloque de 8 semanas no pueden cambiar de tipo",
+		"LINEAR_BLOCK_LOAD_FIXED": "La carga de un bloque de 8 semanas está prescrita y no se puede cambiar",
+		"LINEAR_BLOCK_SWAP_ROUTINE": "Un ejercicio en un bloque de 8 semanas solo se puede cambiar para este entrenamiento",
+		"LINEAR_BLOCK_NOT_LINEAR": "Este ejercicio no está en un bloque de 8 semanas",
+		"LINEAR_BLOCK_NOT_FINISHED": "El bloque de este ejercicio no ha terminado, así que todavía no hay nada que elegir",
 		"CORRECTION_NOT_COMPLETED": "Solo se puede corregir un entrenamiento completado",
 		"CORRECTION_NOT_LATEST": "Solo se puede corregir tu entrenamiento más reciente",
 		"CORRECTION_LATER_SESSION": "Este entrenamiento ya no se puede corregir: empezaste otro después",
@@ -443,7 +450,16 @@
 		"GOAL_DUPLICATE": "Objetivo medible repetido",
 		"GOAL_STRENGTH_NEEDS_EXERCISE": "Los objetivos de fuerza necesitan un ejercicio",
 		"BODY_ENTRY_IN_FUTURE": "Un registro no puede tener una fecha futura",
-		"TIME_ZONE_LIVE_WORKOUT": "Termina o descarta el entrenamiento en curso antes de cambiar tu zona horaria."
+		"TIME_ZONE_LIVE_WORKOUT": "Termina o descarta el entrenamiento en curso antes de cambiar tu zona horaria.",
+		"CONVERSATION_NOT_FOUND": "No se encontró la conversación",
+		"MESSAGE_NOT_FOUND": "No se encontró el mensaje",
+		"MESSAGE_SELF": "No puedes enviarte mensajes a ti mismo",
+		"MESSAGE_LENGTH": "Un mensaje no puede estar vacío y puede tener como máximo {max} caracteres.",
+		"MESSAGES_PER_MINUTE": "Puedes enviar como máximo {max} mensajes por minuto.",
+		"CONVERSATIONS_PER_DAY": "Puedes iniciar como máximo {max} conversaciones nuevas al día.",
+		"MESSAGE_NOT_ADMITTED": "Este miembro no recibe mensajes tuyos.",
+		"CONVERSATION_CLOSED": "Esta conversación ya no puede recibir mensajes.",
+		"MESSAGING_UNAVAILABLE": "Los mensajes no están disponibles para esta cuenta."
 	},
 	"glossary": {
 		"label": "Términos:",
@@ -461,7 +477,7 @@
 		},
 		"progression": {
 			"term": "Progresión",
-			"definition": "La progresión doble sube el peso de todas las series de trabajo según el incremento del ejercicio cuando todas llegan al máximo de su objetivo de repeticiones. La progresión doble dinámica lo hace serie por serie: cada serie que llega a su objetivo sube por su cuenta."
+			"definition": "La progresión doble sube el peso de todas las series de trabajo según el incremento del ejercicio cuando todas llegan al máximo de su objetivo de repeticiones. La progresión doble dinámica lo hace serie por serie: cada serie que llega a su objetivo sube por su cuenta. Un bloque de 8 semanas (LP) no tiene objetivo de repeticiones: cada semana carga un porcentaje mayor de un máximo de referencia."
 		},
 		"setKinds": {
 			"term": "Tipos de serie",

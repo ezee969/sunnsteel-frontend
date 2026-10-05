@@ -1,3 +1,4 @@
+import type { ContinueLinearBlockRequest } from '@sunsteel/contracts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { usePerformanceQuery } from '@/hooks/use-performance-query'
@@ -210,6 +211,35 @@ export const useUpdateRoutine = () => {
 			queryClient.invalidateQueries({
 				queryKey: routineQueryKeys.detail(variables.id),
 			})
+		},
+	})
+}
+
+/**
+ * ROUT-19: choose what follows a finished 8-week block. The answer is the
+ * whole routine, so it replaces the detail cache; a block's or deload's
+ * working copy may be what changed, so their reads are refreshed too.
+ */
+export const useContinueLinearBlock = (routineId: string) => {
+	const queryClient = useQueryClient()
+	return useMutation<
+		Routine,
+		Error,
+		{ routineExerciseId: string; data: ContinueLinearBlockRequest }
+	>({
+		mutationFn: ({ routineExerciseId, data }) =>
+			routineService.continueLinearBlock(routineId, routineExerciseId, data),
+		onSuccess: routine => {
+			queryClient.setQueryData(routineQueryKeys.detail(routineId), routine)
+			return Promise.all([
+				queryClient.invalidateQueries({ queryKey: ROUTINES_QUERY_KEY }),
+				queryClient.invalidateQueries({
+					queryKey: routineQueryKeys.trainingBlocksAll(routineId),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: routineQueryKeys.deloads(routineId),
+				}),
+			])
 		},
 	})
 }

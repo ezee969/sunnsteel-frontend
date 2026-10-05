@@ -70,7 +70,9 @@ const STEP_KEYS = [
 
 // Normalize/compatibility mapping for legacy backend values
 // Backend may send 'DYNAMIC' | 'DYNAMIC_DOUBLE'; the wizard uses
-// 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'NONE'
+// 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION' | 'LINEAR_PERIODIZATION'
+// | 'NONE'. An unknown value reads as NONE, so every current scheme must be
+// listed: an unlisted one would be saved back as NONE.
 const mapProgressionScheme = (
 	value: string | undefined | null,
 ): ProgressionScheme => {
@@ -79,6 +81,7 @@ const mapProgressionScheme = (
 		case 'NONE':
 		case 'DOUBLE_PROGRESSION':
 		case 'DYNAMIC_DOUBLE_PROGRESSION':
+		case 'LINEAR_PERIODIZATION':
 			return value as ProgressionScheme
 		case 'DYNAMIC':
 			return 'DOUBLE_PROGRESSION'
@@ -152,6 +155,8 @@ export default function EditRoutinePage() {
 						minWeightIncrement: exercise.minWeightIncrement || 2.5,
 						warmUpsFollowLoad: exercise.warmUpsFollowLoad ?? false,
 						linkedToNext: exercise.linkedToNext ?? false,
+						// ROUT-17: kept as read, so saving leaves the block where it is.
+						linearPeriodization: exercise.linearPeriodization ?? null,
 						sets: exercise.sets.map((set, index) => ({
 							setNumber: index + 1,
 							repType: set.repType,

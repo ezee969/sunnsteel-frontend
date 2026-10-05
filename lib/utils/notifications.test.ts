@@ -155,6 +155,61 @@ describe('notifications (NOTIF-01)', () => {
 		})
 	})
 
+	it('names a finished block, its reference and estimate in the member’s unit and language (ROUT-18)', () => {
+		const finished: AppNotification = {
+			...base,
+			id: 'n9',
+			kind: 'LINEAR_BLOCK_FINISHED',
+			routine: { id: 'r1', name: 'Strength' },
+			exercise: { id: 'bench', name: 'Bench Press' },
+			sessionId: 's9',
+			referenceMaxKg: 100,
+			estimatedMaxKg: 102.5,
+		}
+		expect(
+			describeNotification(finished, t, tPartners, undefined, {
+				weightUnit: 'KG',
+				locale: 'en',
+				tExercises: translatorFor('en', 'catalog.exercises'),
+			}),
+		).toEqual({
+			title: 'Block finished: Bench Press',
+			detail: 'Reference 100 kg · estimated 1RM 102.5 kg',
+			href: '/routines/r1',
+		})
+		expect(
+			describeNotification(finished, es, esPartners, undefined, {
+				weightUnit: 'KG',
+				locale: 'es',
+				tExercises: translatorFor('es', 'catalog.exercises'),
+			}),
+		).toEqual({
+			title: 'Bloque terminado: Press de banca',
+			detail: 'Referencia 100 kg · 1RM estimado 102,5 kg',
+			href: '/routines/r1',
+		})
+		expect(
+			describeNotification(
+				{ ...finished, estimatedMaxKg: null },
+				t,
+				tPartners,
+				undefined,
+				{ weightUnit: 'LB', locale: 'en' },
+			).detail,
+		).toBe('Reference 220.46 lb · not enough sets to estimate a new 1RM')
+		expect(
+			describeNotification(
+				{ ...finished, estimatedMaxKg: null },
+				es,
+				esPartners,
+				undefined,
+				{ weightUnit: 'KG', locale: 'es' },
+			).detail,
+		).toBe(
+			'Referencia 100 kg · no hay suficientes series para estimar un nuevo 1RM',
+		)
+	})
+
 	it('counts records and load changes in plain words', () => {
 		expect(sessionProgressSummary(1, 0, t)).toBe('1 new record')
 		expect(sessionProgressSummary(0, 3, t)).toBe('3 load changes')

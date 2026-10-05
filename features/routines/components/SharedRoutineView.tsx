@@ -13,6 +13,10 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
+	lpSharedSetLabel,
+	lpSharedTableNote,
+} from '@/lib/utils/routine-progression'
+import {
 	countSharedExercises,
 	describeSharedRoutineOwner,
 	sharedRoutineNote,
@@ -31,6 +35,7 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 	const tKinds = useTranslations('workout.setKinds')
 	const tSharing = useTranslations('routines.sharing')
 	const tEx = useTranslations('catalog.exercises')
+	const tBlock = useTranslations('routines.linearBlock')
 	const { setup } = routine
 	const exerciseCount = countSharedExercises(routine)
 
@@ -102,6 +107,12 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 						{day.exercises.map((exercise, index) => {
 							// ROUT-12: its place in a superset or circuit.
 							const position = exerciseGroupPosition(day.exercises, index)
+							// ROUT-17: a block's loads are a share of the owner's max,
+							// which a shared routine never carries; the reader's own
+							// max stands in, so its sets read as shares of it.
+							const linear =
+								exercise.progressionScheme === 'LINEAR_PERIODIZATION'
+							let working = 0
 							return (
 								<li
 									key={`${exercise.order}-${exercise.exercise.id}`}
@@ -120,10 +131,18 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 											{tSharing('exerciseLine', {
 												sets: exercise.sets.length,
 												seconds: exercise.restSeconds,
-												progression:
-													exercise.progressionScheme !== 'NONE' ? 'on' : 'off',
+												progression: linear
+													? 'lp'
+													: exercise.progressionScheme !== 'NONE'
+														? 'on'
+														: 'off',
 											})}
 										</p>
+										{linear ? (
+											<p className="type-body-sm mt-1 text-ink-3">
+												{lpSharedTableNote(locale, tBlock)}
+											</p>
+										) : null}
 										{exercise.note ? (
 											<p className="type-body-sm mt-1 text-ink-2">
 												{exercise.note}
@@ -133,7 +152,10 @@ export function SharedRoutineView({ routine }: { routine: SharedRoutine }) {
 									<ol className="type-data space-y-0.5 text-ink-2 lg:text-right">
 										{exercise.sets.map(set => (
 											<li key={set.setNumber}>
-												{set.setNumber}. {describeSet(set)}
+												{set.setNumber}.{' '}
+												{linear && set.kind !== 'WARMUP'
+													? lpSharedSetLabel(working++, locale, tBlock)
+													: describeSet(set)}
 											</li>
 										))}
 									</ol>

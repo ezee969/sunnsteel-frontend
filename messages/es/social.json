@@ -282,7 +282,10 @@
 		"loadOlder": "Cargar novedades anteriores",
 		"loadingOlder": "Cargando novedades anteriores…",
 		"olderError": "No se pudieron cargar las novedades anteriores.",
-		"seeAll": "Ver todas las notificaciones"
+		"seeAll": "Ver todas las notificaciones",
+		"linearBlockTitle": "Bloque terminado: {exercise}",
+		"linearBlockDetail": "Referencia {reference} · 1RM estimado {estimate}",
+		"linearBlockDetailNoEstimate": "Referencia {reference} · no hay suficientes series para estimar un nuevo 1RM"
 	},
 	"activity": {
 		"typeSessionCompleted": "Entrenamientos completados",

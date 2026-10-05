@@ -1,6 +1,6 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
+import type { LinearPeriodizationState, WeightUnit } from '@sunsteel/contracts'
 import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
@@ -51,6 +51,13 @@ export interface WizardExerciseCardProps {
 		scheme: ProgressionScheme,
 	) => void
 	onUpdateMinWeightIncrement: (exerciseIndex: number, increment: number) => void
+	/** ROUT-17: the routine is a rotation, so a block counts sessions. */
+	rotation: boolean
+	/** ROUT-17: give an exercise on a block its state. */
+	onSetLinearPeriodization: (
+		exerciseIndex: number,
+		state: LinearPeriodizationState,
+	) => void
 	onAddSet: (exerciseIndex: number) => void
 	/** LIVE-13: replace this exercise's warm-ups with a generated ramp. */
 	onReplaceWarmUps: (
@@ -108,6 +115,8 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 	onUpdateNote,
 	onUpdateProgressionScheme,
 	onUpdateMinWeightIncrement,
+	rotation,
+	onSetLinearPeriodization,
 	onAddSet,
 	onReplaceWarmUps,
 	onSetWarmUpsFollowLoad,
@@ -407,6 +416,8 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 							onUpdateProgressionScheme={onUpdateProgressionScheme}
 							advanced={advanced}
 							onToggleAdvanced={onToggleAdvanced}
+							rotation={rotation}
+							onSetLinearPeriodization={onSetLinearPeriodization}
 							exerciseName={
 								exerciseData?.name
 									? exerciseLabel(exerciseData.name, tEx)

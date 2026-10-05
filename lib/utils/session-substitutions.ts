@@ -22,7 +22,7 @@ export function substitutionFor(
 /**
  * Routine exercises as performed in the session: a swapped slot shows the
  * substitute and keeps its rep targets, but drops the prescribed load, which
- * was set for the other exercise.
+ * was set for the other exercise, and leaves any 8-week block (ROUT-17).
  */
 export function applySessionSubstitutions(
 	exercises: RoutineExercise[],
@@ -41,6 +41,12 @@ export function applySessionSubstitutions(
 				secondaryMuscles: substitution.exercise.secondaryMuscles,
 			},
 			sets: exercise.sets.map(set => ({ ...set, weight: undefined })),
+			// ROUT-17: a swapped slot leaves its 8-week block for this workout --
+			// its load is free and the block does not move -- so it is trained
+			// like an exercise with no scheme.
+			...(exercise.progressionScheme === 'LINEAR_PERIODIZATION'
+				? { progressionScheme: 'NONE' as const, linearPeriodization: null }
+				: {}),
 		}
 	})
 }
