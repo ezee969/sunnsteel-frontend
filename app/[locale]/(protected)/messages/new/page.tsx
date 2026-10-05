@@ -12,7 +12,10 @@ import { useToast } from '@/components/ui/toast'
 import { MemberAvatar } from '@/features/messages/member-avatar'
 import { MessageComposer } from '@/features/messages/message-composer'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
-import { useStartConversation } from '@/lib/api/hooks/useConversations'
+import {
+	useConversations,
+	useStartConversation,
+} from '@/lib/api/hooks/useConversations'
 import { usePublicUser } from '@/lib/api/hooks/usePublicUser'
 import { messageHref } from '@/lib/utils/messages'
 
@@ -32,6 +35,9 @@ function NewMessage() {
 	const to = useSearchParams().get('to')?.trim() ?? ''
 	const member = usePublicUser(to)
 	const start = useStartConversation()
+	// MSG-09: the list read says whether moderation restricted this member,
+	// which is the one reason worth naming when they cannot write.
+	const restricted = useConversations().data?.messagingRestricted ?? false
 	const existing = member.data?.messaging?.conversationId ?? null
 
 	useEffect(() => {
@@ -73,8 +79,14 @@ function NewMessage() {
 			<div className="flex flex-col gap-3">
 				{back}
 				<div role="alert" className="space-y-1">
-					<p className="type-body text-ink-2">{t('unavailable')}</p>
-					<p className="type-body-sm text-ink-3">{t('unavailableHint')}</p>
+					{restricted ? (
+						<p className="type-body text-ink-2">{t('restricted')}</p>
+					) : (
+						<>
+							<p className="type-body text-ink-2">{t('unavailable')}</p>
+							<p className="type-body-sm text-ink-3">{t('unavailableHint')}</p>
+						</>
+					)}
 				</div>
 			</div>
 		)

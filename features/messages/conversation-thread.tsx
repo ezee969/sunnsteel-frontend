@@ -4,7 +4,16 @@ import type {
 	ConversationMessage,
 	ConversationSummary,
 } from '@sunsteel/contracts'
-import { ArrowLeft, Loader2, MoreHorizontal, Trash2, User } from 'lucide-react'
+import {
+	ArrowLeft,
+	Ban,
+	EyeOff,
+	Flag,
+	Loader2,
+	MoreHorizontal,
+	Trash2,
+	User,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
@@ -29,6 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { ReportDialog } from '@/features/profile/report-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -60,6 +70,12 @@ function isNotFound(error: unknown): boolean {
  * conversation begins (decision 13). A conversation the server no longer
  * opens -- deleted, or a block or a hide between the two -- reads as
  * unavailable, without saying which.
+ *
+ * MSG-09: each of the other member's messages can be reported from its row,
+ * which hands a moderator that message and the five before it. A message
+ * moderation hid reads "Removed by moderation" for the other member and stays
+ * readable to its author, who is told; a member whose messaging is restricted
+ * sees why in place of the composer.
  */
 export function ConversationThread({
 	conversationId,
@@ -213,6 +229,7 @@ export function ConversationThread({
 								message={message}
 								startsGroup={startsGroup(message, messages[index - 1])}
 								author={message.sentByMe ? tCommon('you') : name}
+								otherName={name}
 								time={dateFormatter(locale, TIME_OPTIONS).format(
 									new Date(message.createdAt),
 								)}
@@ -223,7 +240,12 @@ export function ConversationThread({
 				<div ref={end} />
 			</section>
 
-			{conversation.canSend ? (
+			{conversation.messagingRestricted ? (
+				<p className="type-body-sm flex items-start gap-2 border-t border-rule-faint pt-4 text-ink-2">
+					<Ban className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
+					{t('restrictedNote')}
+				</p>
+			) : conversation.canSend ? (
 				<div className="border-t border-rule-faint pt-4">
 					<MessageComposer
 						onSend={onSend}
@@ -291,12 +313,15 @@ function MessageRow({
 	message,
 	startsGroup: first,
 	author,
+	otherName,
 	time,
 }: {
 	conversationId: string
 	message: ConversationMessage
 	startsGroup: boolean
 	author: string
+	/** The other participant, whom a hidden message of mine is hidden from. */
+	otherName: string
 	time: string
 }) {
 	const t = useTranslations('messaging.thread')
@@ -305,6 +330,9 @@ function MessageRow({
 	const { push } = useToast()
 	const remove = useDeleteMessage(conversationId)
 	const [confirming, setConfirming] = useState(false)
+	const [reporting, setReporting] = useState(false)
+	const removedForMe = message.hiddenByModeration && !message.sentByMe
+	const canReport = !message.sentByMe && !message.deleted && !removedForMe
 
 	return (
 		<li className={first ? 'rule-row pt-3' : 'pt-1'}>
@@ -326,11 +354,36 @@ function MessageRow({
 			<div className="flex items-start justify-between gap-2 pb-1">
 				{message.deleted ? (
 					<p className="type-body-sm text-ink-3">{tCommon('messageDeleted')}</p>
-				) : (
-					<p className="type-body min-w-0 whitespace-pre-wrap break-words text-foreground">
-						{message.body}
+				) : removedForMe ? (
+					<p className="type-body-sm text-ink-3">
+						{tCommon('removedByModeration')}
 					</p>
+				) : (
+					<div className="min-w-0">
+						<p className="type-body whitespace-pre-wrap break-words text-foreground">
+							{message.body}
+						</p>
+						{message.hiddenByModeration ? (
+							<p className="type-body-sm mt-1 flex items-start gap-1.5 text-ink-3">
+								<EyeOff className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+								{t('hiddenFromOther', { name: otherName })}
+							</p>
+						) : null}
+					</div>
 				)}
+				{canReport ? (
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						className="shrink-0"
+						aria-label={t('reportMessageLabel', { name: author, time })}
+						title={t('reportMessage')}
+						onClick={() => setReporting(true)}
+					>
+						<Flag className="size-3.5" aria-hidden />
+					</Button>
+				) : null}
 				{message.sentByMe && !message.deleted ? (
 					<Button
 						type="button"
@@ -345,6 +398,14 @@ function MessageRow({
 					</Button>
 				) : null}
 			</div>
+			{canReport ? (
+				<ReportDialog
+					open={reporting}
+					onOpenChange={setReporting}
+					subjectKind="MESSAGE"
+					subjectId={message.id}
+				/>
+			) : null}
 			<AlertDialog open={confirming} onOpenChange={setConfirming}>
 				<AlertDialogContent>
 					<AlertDialogHeader>

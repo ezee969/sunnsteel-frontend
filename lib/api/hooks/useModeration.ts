@@ -128,7 +128,8 @@ export function useModerationHistory(enabled = true) {
  * changes the subject of every other report about it, and both add a record
  * to the log. It also invalidates the reads a hide changes — `['users']`,
  * `['routines']` and `['activity']` — for the reason `PROF-10`'s block does:
- * a list still showing hidden content reads as the control failing.
+ * a list still showing hidden content reads as the control failing. A hidden
+ * message or a restriction (MSG-09) changes `['conversations']` too.
  */
 function useReviewMutation(
 	run: (
@@ -150,6 +151,7 @@ function useReviewMutation(
 				['routines'],
 				['activity'],
 				['search'],
+				['conversations'],
 			] as const) {
 				void queryClient.invalidateQueries({ queryKey: key })
 			}
@@ -178,4 +180,12 @@ export function useHideReportedContent() {
 
 export function useRestoreReportedContent() {
 	return useReviewMutation(moderationReviewService.restore)
+}
+
+export function useRestrictMessaging() {
+	return useReviewMutation(moderationReviewService.restrictMessaging)
+}
+
+export function useLiftMessagingRestriction() {
+	return useReviewMutation(moderationReviewService.liftMessagingRestriction)
 }

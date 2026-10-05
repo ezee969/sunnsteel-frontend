@@ -459,7 +459,11 @@
 		"CONVERSATIONS_PER_DAY": "You can start at most {max} new conversations a day.",
 		"MESSAGE_NOT_ADMITTED": "This member is not taking messages from you.",
 		"CONVERSATION_CLOSED": "This conversation can no longer receive messages.",
-		"MESSAGING_UNAVAILABLE": "Messaging is not available for this account."
+		"MESSAGING_UNAVAILABLE": "Messaging is not available for this account.",
+		"MESSAGING_RESTRICTED": "Moderation has restricted your messaging. You can still read and delete messages.",
+		"REPORT_OWN_MESSAGE": "You cannot report your own message",
+		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
+		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted"
 	},
 	"glossary": {
 		"label": "Terms:",

@@ -1,8 +1,10 @@
 import type {
 	BlockedMember,
+	CapturedMessage,
 	ModerationActionKind,
 	ModerationActionRecord,
 	ModerationReport,
+	ReportedMessageContext,
 	ReportReason,
 	ReportStatus,
 	ReportSubjectKind,
@@ -54,6 +56,7 @@ export const REPORT_SUBJECT_LABELS: Record<ReportSubjectKind, Key> = {
 	ROUTINE: 'subjectRoutine',
 	SESSION: 'subjectSession',
 	COMMENT: 'subjectComment',
+	MESSAGE: 'subjectMessage',
 }
 
 const SHORT_DATE: Intl.DateTimeFormatOptions = {
@@ -112,6 +115,8 @@ export const MODERATION_ACTION_LABELS: Record<ModerationActionKind, Key> = {
 	DISMISS_REPORT: 'actionDismissReport',
 	HIDE_SUBJECT: 'actionHideSubject',
 	RESTORE_SUBJECT: 'actionRestoreSubject',
+	RESTRICT_MESSAGING: 'actionRestrictMessaging',
+	LIFT_MESSAGING_RESTRICTION: 'actionLiftMessagingRestriction',
 }
 
 export const REPORT_SUBJECT_HEADINGS: Record<ReportSubjectKind, Key> = {
@@ -119,6 +124,7 @@ export const REPORT_SUBJECT_HEADINGS: Record<ReportSubjectKind, Key> = {
 	ROUTINE: 'headingRoutine',
 	SESSION: 'headingSession',
 	COMMENT: 'headingComment',
+	MESSAGE: 'headingMessage',
 }
 
 /**
@@ -147,6 +153,11 @@ export function moderationSubjectHref(
 			// find the entry first, and might refuse it, is worse than showing
 			// them the words they need and no link.
 			return null
+		case 'MESSAGE':
+			// MSG-09. A message has no page either, and its conversation is not
+			// the reviewer's to open: the report's capture, read through the
+			// logged view on the queue row, is the whole of what they may see.
+			return null
 	}
 }
 
@@ -169,6 +180,22 @@ export function describeReportSubject(
 		: kind
 }
 
+/**
+ * MSG-09: who wrote one captured message -- the reporter, or the member the
+ * report is about. A capture has only those two.
+ */
+export function capturedAuthorName(
+	message: CapturedMessage,
+	report: ModerationReport,
+	context: ReportedMessageContext,
+): string {
+	const member = message.fromReporter ? report.reporter : context.author
+	return (
+		[member.name, member.lastName].filter(Boolean).join(' ') ||
+		`@${member.username}`
+	)
+}
+
 /** Who owns a subject, when the reviewer is allowed to know. */
 export function reportSubjectOwner(
 	subject: ReportSubjectPreview,
@@ -181,21 +208,36 @@ export function reportSubjectOwner(
 /**
  * Which actions a report offers. Dismissing is always available, because a
  * report about something that no longer exists still has to leave the queue.
+ *
+ * MSG-09: a message report is read on the row (`canReadMessages`), never
+ * opened, and a message its author deleted has nothing left to hide or
+ * restore. Restricting messaging is about the member -- the reported one, or
+ * the message's author -- so it is offered on those two kinds whatever the
+ * report's status, and lifting one whenever it stands.
  */
 export function availableReviewActions(report: ModerationReport): {
 	canDismiss: boolean
 	canHide: boolean
 	canRestore: boolean
 	canOpen: boolean
+	canReadMessages: boolean
+	canRestrict: boolean
+	canLift: boolean
 } {
+	const { subject } = report
 	const resolved = report.status !== 'OPEN'
+	const message = subject.kind === 'MESSAGE'
+	const present = !subject.isMissing && !subject.messageGone
 	return {
 		canDismiss: !resolved,
-		canHide: !resolved && !report.subject.isMissing && !report.subject.isHidden,
+		canHide: !resolved && present && !subject.isHidden,
 		// A restore is offered on a resolved report too: undoing a hide is the
 		// one thing a reviewer needs after the report has left the queue.
-		canRestore: report.subject.isHidden,
-		canOpen: !report.subject.isMissing && !report.subject.isWithheld,
+		canRestore: present && subject.isHidden,
+		canOpen: !message && !subject.isMissing && !subject.isWithheld,
+		canReadMessages: message && !subject.isMissing,
+		canRestrict: subject.messagingRestricted === false,
+		canLift: subject.messagingRestricted === true,
 	}
 }
 

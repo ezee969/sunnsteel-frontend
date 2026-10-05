@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { Ban, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -61,18 +61,29 @@ export function ConversationList() {
 		)
 	}
 
-	const rows = conversations.data ?? []
+	const rows = conversations.data?.conversations ?? []
+	// MSG-09: said once, above the list, to the member it is about.
+	const restricted = conversations.data?.messagingRestricted ? (
+		<p className="type-body-sm flex items-start gap-2 py-3 text-ink-2">
+			<Ban className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
+			{t('restrictedNote')}
+		</p>
+	) : null
 	if (rows.length === 0) {
 		return (
-			<div className="space-y-1 py-4">
-				<p className="type-body text-ink-2">{t('empty')}</p>
-				<p className="type-body-sm text-ink-3">{t('emptyHint')}</p>
-			</div>
+			<>
+				{restricted}
+				<div className="space-y-1 py-4">
+					<p className="type-body text-ink-2">{t('empty')}</p>
+					<p className="type-body-sm text-ink-3">{t('emptyHint')}</p>
+				</div>
+			</>
 		)
 	}
 
 	return (
 		<>
+			{restricted}
 			<ul>
 				{rows.map(conversation => {
 					const name = memberName(conversation.counterpart, tCommon)

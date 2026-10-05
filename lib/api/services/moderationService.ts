@@ -106,4 +106,25 @@ export const moderationReviewService = {
 			request,
 			true,
 		),
+
+	/** MSG-09: on a member or a message report, about that account. */
+	restrictMessaging: (
+		reportId: string,
+		request: ReviewReportRequest = {},
+	): Promise<ReviewReportResponse> =>
+		httpClient.post<ReviewReportResponse>(
+			`/moderation/reports/${encodeURIComponent(reportId)}/restrict-messaging`,
+			request,
+			true,
+		),
+
+	liftMessagingRestriction: (
+		reportId: string,
+		request: ReviewReportRequest = {},
+	): Promise<ReviewReportResponse> =>
+		httpClient.post<ReviewReportResponse>(
+			`/moderation/reports/${encodeURIComponent(reportId)}/lift-messaging-restriction`,
+			request,
+			true,
+		),
 }

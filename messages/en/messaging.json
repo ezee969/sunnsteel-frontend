@@ -7,7 +7,8 @@
 		"you": "You",
 		"encryption": "Messages are stored on Sunnsteel's servers and aren't end-to-end encrypted.",
 		"tryAgain": "Try again",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"removedByModeration": "Removed by moderation"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -19,7 +20,8 @@
 		"loadError": "Your conversations couldn't be loaded.",
 		"older": "Show older conversations",
 		"loadingOlder": "Loading…",
-		"openWith": "Conversation with {name}"
+		"openWith": "Conversation with {name}",
+		"restrictedNote": "Moderation has restricted your messaging. You can still read and delete messages, and others can still write to you."
 	},
 	"thread": {
 		"back": "All messages",
@@ -44,7 +46,11 @@
 		"deleteConversationBody": "It leaves your list and its messages are hidden from you. {name} keeps them. If they write again, it comes back with only the new messages.",
 		"deleteConversationBodyDeleted": "It leaves your list for good.",
 		"deleteConversationFailed": "The conversation couldn't be deleted.",
-		"blockHint": "To stop someone writing to you, block them from their profile."
+		"blockHint": "To stop someone writing to you, block them from their profile.",
+		"restrictedNote": "Moderation has restricted your messaging, so you can't send messages. You can still read and delete them.",
+		"hiddenFromOther": "Hidden from {name} by moderation. Only you can see it.",
+		"reportMessage": "Report message",
+		"reportMessageLabel": "Report the message from {name} sent {time}"
 	},
 	"composer": {
 		"label": "Write a message",
@@ -62,7 +68,8 @@
 		"loading": "Loading…",
 		"unavailable": "You can't message this member.",
 		"unavailableHint": "They may not be taking messages from you, or the profile isn't available.",
-		"missing": "Choose a member to message from their profile."
+		"missing": "Choose a member to message from their profile.",
+		"restricted": "Moderation has restricted your messaging, so you can't start a conversation."
 	},
 	"profile": {
 		"message": "Message"

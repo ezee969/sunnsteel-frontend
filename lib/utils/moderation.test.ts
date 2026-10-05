@@ -15,6 +15,7 @@ import { translatorFor } from '@/i18n/translator'
 import {
 	availableReviewActions,
 	blockedMemberName,
+	capturedAuthorName,
 	describeModerationAction,
 	describeOtherReports,
 	describeReportFiled,
@@ -120,6 +121,8 @@ const subject = (
 	isMissing: false,
 	isWithheld: false,
 	isHidden: false,
+	messagingRestricted: null,
+	messageGone: false,
 	...overrides,
 })
 
@@ -229,6 +232,102 @@ describe('which actions a report offers', () => {
 			availableReviewActions(report({ subject: subject({ isWithheld: true }) }))
 				.canOpen,
 		).toBe(false)
+	})
+})
+
+describe('MSG-09 message reports', () => {
+	const messageSubject = (overrides: Partial<ReportSubjectPreview> = {}) =>
+		subject({
+			kind: 'MESSAGE',
+			id: 'message-1',
+			resolvedId: 'message-1',
+			title: null,
+			messagingRestricted: false,
+			...overrides,
+		})
+
+	it('are read on the row, never opened on a page', () => {
+		const actions = availableReviewActions(
+			report({ subject: messageSubject() }),
+		)
+		expect(actions.canOpen).toBe(false)
+		expect(actions.canReadMessages).toBe(true)
+		expect(moderationSubjectHref(messageSubject())).toBeNull()
+		expect(describeReportSubject(messageSubject(), t)).toBe('Message')
+	})
+
+	it('leave nothing to hide or restore once the author deleted the message', () => {
+		const gone = availableReviewActions(
+			report({
+				subject: messageSubject({ messageGone: true, isHidden: true }),
+			}),
+		)
+		expect(gone.canHide).toBe(false)
+		expect(gone.canRestore).toBe(false)
+		// The capture outlives the deletion.
+		expect(gone.canReadMessages).toBe(true)
+	})
+
+	it('can no longer be read once the capture went with its author', () => {
+		const missing = availableReviewActions(
+			report({
+				subject: messageSubject({ isMissing: true, messagingRestricted: null }),
+			}),
+		)
+		expect(missing.canReadMessages).toBe(false)
+		expect(missing.canRestrict).toBe(false)
+		expect(missing.canLift).toBe(false)
+	})
+
+	it('offer restricting or lifting by what stands, whatever the report status', () => {
+		const open = availableReviewActions(report({ subject: messageSubject() }))
+		expect([open.canRestrict, open.canLift]).toEqual([true, false])
+		const lifted = availableReviewActions(
+			report({
+				status: 'ACTIONED',
+				subject: messageSubject({ messagingRestricted: true }),
+			}),
+		)
+		expect([lifted.canRestrict, lifted.canLift]).toEqual([false, true])
+	})
+
+	it('offer restricting on a member report, never on a routine', () => {
+		expect(
+			availableReviewActions(
+				report({
+					subject: subject({ kind: 'MEMBER', messagingRestricted: false }),
+				}),
+			).canRestrict,
+		).toBe(true)
+		expect(availableReviewActions(report()).canRestrict).toBe(false)
+	})
+
+	it('names who wrote each captured message', () => {
+		const context = {
+			author: {
+				id: 'author',
+				username: 'author',
+				name: 'Aria',
+				lastName: 'Stone',
+				avatarUrl: null,
+			},
+			messages: [],
+			capturedAt: '2026-10-06T10:00:00.000Z',
+		}
+		const captured = {
+			id: 'm',
+			body: 'hi',
+			deleted: false,
+			isReported: false,
+			createdAt: '2026-10-06T09:00:00.000Z',
+		}
+		const filed = report({ subject: messageSubject() })
+		expect(
+			capturedAuthorName({ ...captured, fromReporter: false }, filed, context),
+		).toBe('Aria Stone')
+		expect(
+			capturedAuthorName({ ...captured, fromReporter: true }, filed, context),
+		).toBe(reportSubjectOwner({ ...filed.subject, owner: filed.reporter }))
 	})
 })
 

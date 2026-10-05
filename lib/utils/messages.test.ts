@@ -12,6 +12,7 @@ import { translatorFor } from '@/i18n/translator'
 
 import {
 	composerState,
+	conversationListFromPages,
 	conversationPreview,
 	enterSends,
 	flattenConversationPages,
@@ -40,6 +41,7 @@ const message = (
 	sentByMe: false,
 	body: `text ${id}`,
 	deleted: false,
+	hiddenByModeration: false,
 	createdAt: `2026-10-05T${at}:00.000Z`,
 	...overrides,
 })
@@ -53,6 +55,7 @@ const summary = (
 	lastMessage: message('x', '10:00'),
 	lastMessageAt: '2026-10-05T10:00:00.000Z',
 	canSend: true,
+	messagingRestricted: false,
 	...overrides,
 })
 
@@ -63,8 +66,16 @@ function pages<T>(...items: T[]): InfiniteData<T, string | null> {
 describe('MSG-01 the conversation list', () => {
 	it('reads the loaded pages as one list, a conversation that moved up shown once', () => {
 		const data = pages<ConversationsResponse>(
-			{ conversations: [summary('a'), summary('b')], nextCursor: 'c' },
-			{ conversations: [summary('b'), summary('c')], nextCursor: null },
+			{
+				conversations: [summary('a'), summary('b')],
+				nextCursor: 'c',
+				messagingRestricted: false,
+			},
+			{
+				conversations: [summary('b'), summary('c')],
+				nextCursor: null,
+				messagingRestricted: false,
+			},
 		)
 		expect(flattenConversationPages(data).map(row => row.id)).toEqual([
 			'a',
@@ -97,6 +108,52 @@ describe('MSG-01 the conversation list', () => {
 		expect(conversationPreview(summary('a', { lastMessage: null }), en)).toBe(
 			'No messages',
 		)
+	})
+
+	it('MSG-09: a hidden message keeps no text in the other member preview, and keeps it in the author preview', () => {
+		const hidden = { hiddenByModeration: true, body: null }
+		expect(
+			conversationPreview(
+				summary('a', { lastMessage: message('y', '10:00', hidden) }),
+				en,
+			),
+		).toBe('Removed by moderation')
+		expect(
+			conversationPreview(
+				summary('a', { lastMessage: message('y', '10:00', hidden) }),
+				es,
+			),
+		).toBe('Eliminado por moderación')
+		expect(
+			conversationPreview(
+				summary('a', {
+					lastMessage: message('y', '10:00', {
+						hiddenByModeration: true,
+						sentByMe: true,
+						body: 'mine',
+					}),
+				}),
+				en,
+			),
+		).toBe('You: mine')
+	})
+
+	it('MSG-09: says the viewer is restricted from the newest page', () => {
+		const data = pages<ConversationsResponse>(
+			{
+				conversations: [summary('a')],
+				nextCursor: 'c',
+				messagingRestricted: true,
+			},
+			{
+				conversations: [summary('b')],
+				nextCursor: null,
+				messagingRestricted: false,
+			},
+		)
+		const view = conversationListFromPages(data)
+		expect(view.messagingRestricted).toBe(true)
+		expect(view.conversations.map(row => row.id)).toEqual(['a', 'b'])
 	})
 
 	it('names a member by name, else handle, and a deleted account as such', () => {

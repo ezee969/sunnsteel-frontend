@@ -40,7 +40,18 @@
 		"filed": "Filed {date} by {reporter}",
 		"actionLine": "{action} · {who} · {when}",
 		"routineHidden": "A moderator has hidden this routine. Nobody else can open it, including through a link you shared. It is unchanged and still yours, and its own visibility setting applies again if it is restored.",
-		"sessionShareHidden": "A moderator has hidden this shared workout, so the link opens for nobody. The link is not revoked and the workout is unchanged."
+		"sessionShareHidden": "A moderator has hidden this shared workout, so the link opens for nobody. The link is not revoked and the workout is unchanged.",
+		"subjectMessage": "this message",
+		"headingMessage": "Message",
+		"messageReportNote": "A moderator will be able to read this message and up to five before it, as you see them now. Nothing else in the conversation.",
+		"actionRestrictMessaging": "Restricted messaging",
+		"actionLiftMessagingRestriction": "Lifted the messaging restriction",
+		"hideMessageExplanation": "Hiding removes this message for the other member, who sees “Removed by moderation” in its place. Its author still sees it and is told it is hidden, nothing is deleted, and you can restore it later.",
+		"restoreMessageExplanation": "Restoring shows this message to the other member again. The hide stays in the record; restoring is added to it rather than replacing it.",
+		"restrictExplanation": "This member will no longer be able to send messages or start conversations. They can still read and delete messages, and others can still write to them. Nobody else is told. It lasts until you lift it.",
+		"liftExplanation": "This member will be able to send messages and start conversations again. The restriction stays in the record; lifting it is added to it.",
+		"messageGoneNote": "Its author has since deleted the message. What was captured with the report can still be read.",
+		"messagesNote": "Reading the reported messages is recorded, the same as opening any other reported content."
 	},
 	"moderationPage": {
 		"notFound": "Page not found.",
@@ -66,7 +77,20 @@
 		"hideContent": "Hide content",
 		"restoreContent": "Restore content",
 		"noneWaiting": "No reports are waiting. Nothing here needs a decision.",
-		"noneInState": "No reports in this state."
+		"noneInState": "No reports in this state.",
+		"readMessages": "Read reported messages",
+		"hideMessages": "Hide reported messages",
+		"capturedHeading": "Captured {date}",
+		"capturedFromReporter": "Reporter",
+		"capturedFromAuthor": "Reported member",
+		"capturedReported": "Reported",
+		"capturedDeleted": "Already deleted when reported",
+		"capturedRemoved": "Already removed by moderation when reported",
+		"hideMessage": "Hide message",
+		"restoreMessage": "Restore message",
+		"restrictMessaging": "Restrict messaging",
+		"liftRestriction": "Lift restriction",
+		"messagingRestricted": "Messaging restricted"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",
@@ -84,7 +108,19 @@
 		"noteLabel": "Note for the record (optional)",
 		"notePlaceholder": "Why you decided this.",
 		"noteCounter": "{length}/{max} · Kept in the record. Neither the reporter nor the owner is shown it.",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"hideMessageTitle": "Hide this message",
+		"hideMessageConfirm": "Hide message",
+		"hideMessageDone": "Message hidden",
+		"restoreMessageTitle": "Restore this message",
+		"restoreMessageConfirm": "Restore message",
+		"restoreMessageDone": "Message restored",
+		"restrictTitle": "Restrict this member’s messaging",
+		"restrictConfirm": "Restrict messaging",
+		"restrictDone": "Messaging restricted",
+		"liftTitle": "Lift this member’s messaging restriction",
+		"liftConfirm": "Lift restriction",
+		"liftDone": "Restriction lifted"
 	},
 	"memberModeration": {
 		"unblocked": "Member unblocked",

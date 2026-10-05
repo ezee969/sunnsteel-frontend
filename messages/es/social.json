@@ -40,7 +40,18 @@
 		"filed": "Hecha el {date} por {reporter}",
 		"actionLine": "{action} · {who} · {when}",
 		"routineHidden": "Un moderador ocultó esta rutina. Nadie más puede abrirla, ni siquiera con un enlace que compartiste. No cambió y sigue siendo tuya, y su propia configuración de visibilidad vuelve a aplicarse si se restaura.",
-		"sessionShareHidden": "Un moderador ocultó este entrenamiento compartido, así que el enlace no se abre para nadie. El enlace no se revocó y el entrenamiento no cambió."
+		"sessionShareHidden": "Un moderador ocultó este entrenamiento compartido, así que el enlace no se abre para nadie. El enlace no se revocó y el entrenamiento no cambió.",
+		"subjectMessage": "este mensaje",
+		"headingMessage": "Mensaje",
+		"messageReportNote": "Un moderador podrá leer este mensaje y hasta cinco anteriores, tal como los ves ahora. Nada más de la conversación.",
+		"actionRestrictMessaging": "Restringió los mensajes",
+		"actionLiftMessagingRestriction": "Levantó la restricción de mensajes",
+		"hideMessageExplanation": "Ocultarlo quita este mensaje para el otro miembro, que verá “Eliminado por moderación” en su lugar. Su autor aún lo ve y se le avisa que está oculto; no se borra nada y puedes restaurarlo después.",
+		"restoreMessageExplanation": "Restaurarlo vuelve a mostrar este mensaje al otro miembro. El ocultamiento queda en el registro; la restauración se agrega en lugar de reemplazarlo.",
+		"restrictExplanation": "Este miembro ya no podrá enviar mensajes ni iniciar conversaciones. Aún puede leer y eliminar mensajes, y otros pueden escribirle. No se le avisa a nadie más. Dura hasta que la levantes.",
+		"liftExplanation": "Este miembro podrá volver a enviar mensajes e iniciar conversaciones. La restricción queda en el registro; levantarla se agrega a él.",
+		"messageGoneNote": "Su autor eliminó el mensaje después. Lo que se capturó con la denuncia aún se puede leer.",
+		"messagesNote": "Leer los mensajes denunciados queda registrado, igual que abrir cualquier otro contenido denunciado."
 	},
 	"moderationPage": {
 		"notFound": "Página no encontrada.",
@@ -66,7 +77,20 @@
 		"hideContent": "Ocultar contenido",
 		"restoreContent": "Restaurar contenido",
 		"noneWaiting": "No hay denuncias pendientes. Nada aquí necesita una decisión.",
-		"noneInState": "No hay denuncias en este estado."
+		"noneInState": "No hay denuncias en este estado.",
+		"readMessages": "Leer mensajes denunciados",
+		"hideMessages": "Ocultar mensajes denunciados",
+		"capturedHeading": "Capturados el {date}",
+		"capturedFromReporter": "Quien denunció",
+		"capturedFromAuthor": "Miembro denunciado",
+		"capturedReported": "Denunciado",
+		"capturedDeleted": "Ya eliminado al denunciarlo",
+		"capturedRemoved": "Ya eliminado por moderación al denunciarlo",
+		"hideMessage": "Ocultar mensaje",
+		"restoreMessage": "Restaurar mensaje",
+		"restrictMessaging": "Restringir mensajes",
+		"liftRestriction": "Levantar restricción",
+		"messagingRestricted": "Mensajes restringidos"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",
@@ -84,7 +108,19 @@
 		"noteLabel": "Nota para el registro (opcional)",
 		"notePlaceholder": "Por qué lo decidiste.",
 		"noteCounter": "{length}/{max} · Se guarda en el registro. No la ven ni quien denunció ni el propietario.",
-		"cancel": "Cancelar"
+		"cancel": "Cancelar",
+		"hideMessageTitle": "Ocultar este mensaje",
+		"hideMessageConfirm": "Ocultar mensaje",
+		"hideMessageDone": "Mensaje oculto",
+		"restoreMessageTitle": "Restaurar este mensaje",
+		"restoreMessageConfirm": "Restaurar mensaje",
+		"restoreMessageDone": "Mensaje restaurado",
+		"restrictTitle": "Restringir los mensajes de este miembro",
+		"restrictConfirm": "Restringir mensajes",
+		"restrictDone": "Mensajes restringidos",
+		"liftTitle": "Levantar la restricción de mensajes de este miembro",
+		"liftConfirm": "Levantar restricción",
+		"liftDone": "Restricción levantada"
 	},
 	"memberModeration": {
 		"unblocked": "Miembro desbloqueado",

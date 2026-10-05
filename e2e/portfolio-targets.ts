@@ -493,7 +493,8 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'messages-thread',
 		route: '/messages',
-		features: ['MSG-01'],
+		// MSG-09 for the report control on each of the partner's messages.
+		features: ['MSG-01', 'MSG-09'],
 		setup: async page => {
 			await page
 				.getByRole('link', { name: /Conversation with Ken/ })
@@ -504,7 +505,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		},
 		ready: [/aren't end-to-end encrypted/, 'Send'],
 		caption:
-			'A conversation read as a ruled ledger rather than bubbles, saying plainly that messages are not end-to-end encrypted.',
+			'A conversation read as a ruled ledger rather than bubbles, saying plainly that messages are not end-to-end encrypted, with a report control on each message from the other member.',
 	},
 	{
 		// The owner's own list, because the local stack has one real account

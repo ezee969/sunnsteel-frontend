@@ -13,7 +13,10 @@ import {
 } from '@tanstack/react-query'
 
 import { useRealtimeLive } from '@/lib/realtime/realtime-status'
-import { flattenConversationPages, threadFromPages } from '@/lib/utils/messages'
+import {
+	conversationListFromPages,
+	threadFromPages,
+} from '@/lib/utils/messages'
 
 import { messageService } from '../services/messageService'
 
@@ -42,7 +45,7 @@ export function useConversations() {
 		queryFn: ({ pageParam }) => messageService.listConversations(pageParam),
 		initialPageParam: null as string | null,
 		getNextPageParam: (last: ConversationsResponse) => last.nextCursor,
-		select: flattenConversationPages,
+		select: conversationListFromPages,
 		staleTime: 30_000,
 		refetchOnWindowFocus: true,
 		refetchInterval: live ? false : LIST_POLL_MS,

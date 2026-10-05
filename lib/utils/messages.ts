@@ -35,6 +35,23 @@ export function flattenConversationPages(
 	return out
 }
 
+export interface ConversationListView {
+	conversations: ConversationSummary[]
+	/** MSG-09: the viewer's own messaging is restricted by moderation. */
+	messagingRestricted: boolean
+}
+
+/** The list as the page reads it: the rows, and whether the viewer may write. */
+export function conversationListFromPages(
+	data: InfiniteData<ConversationsResponse, string | null>,
+): ConversationListView {
+	return {
+		conversations: flattenConversationPages(data),
+		// The newest page is the freshest answer about the viewer.
+		messagingRestricted: data.pages[0]?.messagingRestricted ?? false,
+	}
+}
+
 export interface ThreadView {
 	conversation: ConversationSummary | null
 	/** Oldest first, as a conversation is read. */
@@ -95,7 +112,13 @@ export function conversationPreview(
 ): string {
 	const last = conversation.lastMessage
 	if (!last) return t('noMessages')
-	const text = last.deleted ? t('messageDeleted') : (last.body ?? '')
+	// MSG-09: a message moderation hid keeps no text for the other participant;
+	// its author still reads it.
+	const text = last.deleted
+		? t('messageDeleted')
+		: last.hiddenByModeration && !last.sentByMe
+			? t('removedByModeration')
+			: (last.body ?? '')
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
 }

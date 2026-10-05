@@ -30,12 +30,15 @@ interface ReportDialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	subjectKind: ReportSubjectKind
-	/** A member id or username, a routine id, or a session share token. */
+	/**
+	 * A member id or username, a routine id, a session share token, a comment
+	 * id or a message id.
+	 */
 	subjectId: string
 }
 
 /**
- * PROF-10's report path. The receipt says the report was recorded and nothing
+ * PROF-10's report path (and MSG-09's, for a message). The receipt says the report was recorded and nothing
  * more: the queue, the review and the enforcement are `TRUST-04`, so promising
  * that someone will look at it, or when, would be a promise the product cannot
  * currently keep.
@@ -89,6 +92,14 @@ export function ReportDialog({
 					</DialogTitle>
 					<DialogDescription>{tModeration('reportReceipt')}</DialogDescription>
 				</DialogHeader>
+
+				{subjectKind === 'MESSAGE' ? (
+					// MSG-09: said before sending, because the reporter's own messages
+					// are part of what a moderator will read.
+					<p className="type-body-sm text-ink-2">
+						{tModeration('messageReportNote')}
+					</p>
+				) : null}
 
 				<div className="space-y-4">
 					<div className="space-y-2">

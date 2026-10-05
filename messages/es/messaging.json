@@ -7,7 +7,8 @@
 		"you": "Tú",
 		"encryption": "Los mensajes se guardan en los servidores de Sunnsteel y no tienen cifrado de extremo a extremo.",
 		"tryAgain": "Intentar de nuevo",
-		"cancel": "Cancelar"
+		"cancel": "Cancelar",
+		"removedByModeration": "Eliminado por moderación"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -19,7 +20,8 @@
 		"loadError": "No se pudieron cargar tus conversaciones.",
 		"older": "Ver conversaciones anteriores",
 		"loadingOlder": "Cargando…",
-		"openWith": "Conversación con {name}"
+		"openWith": "Conversación con {name}",
+		"restrictedNote": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes, y otros pueden escribirte."
 	},
 	"thread": {
 		"back": "Todos los mensajes",
@@ -44,7 +46,11 @@
 		"deleteConversationBody": "Sale de tu lista y sus mensajes dejan de verse para ti. {name} los conserva. Si vuelve a escribirte, reaparece solo con los mensajes nuevos.",
 		"deleteConversationBodyDeleted": "Sale de tu lista de forma definitiva.",
 		"deleteConversationFailed": "No se pudo eliminar la conversación.",
-		"blockHint": "Para que alguien deje de escribirte, bloquéalo desde su perfil."
+		"blockHint": "Para que alguien deje de escribirte, bloquéalo desde su perfil.",
+		"restrictedNote": "La moderación restringió tus mensajes, así que no puedes enviar. Aún puedes leerlos y eliminarlos.",
+		"hiddenFromOther": "Oculto para {name} por moderación. Solo tú puedes verlo.",
+		"reportMessage": "Denunciar mensaje",
+		"reportMessageLabel": "Denunciar el mensaje de {name} enviado {time}"
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -62,7 +68,8 @@
 		"loading": "Cargando…",
 		"unavailable": "No puedes enviarle mensajes a este miembro.",
 		"unavailableHint": "Puede que no esté recibiendo tus mensajes o que el perfil no esté disponible.",
-		"missing": "Elige a quién escribir desde su perfil."
+		"missing": "Elige a quién escribir desde su perfil.",
+		"restricted": "La moderación restringió tus mensajes, así que no puedes iniciar una conversación."
 	},
 	"profile": {
 		"message": "Mensaje"

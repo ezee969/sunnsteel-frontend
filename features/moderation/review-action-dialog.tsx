@@ -26,7 +26,9 @@ import type { MessageKey } from '@/i18n/translator'
 import {
 	useDismissReport,
 	useHideReportedContent,
+	useLiftMessagingRestriction,
 	useRestoreReportedContent,
+	useRestrictMessaging,
 } from '@/lib/api/hooks/useModeration'
 import { describeReportSubject } from '@/lib/utils/moderation'
 
@@ -40,11 +42,43 @@ interface ReviewActionDialogProps {
 }
 
 type ReviewKey = MessageKey<'social.reviewAction'>
+type ModerationKey = MessageKey<'social.moderation'>
 
-const COPY: Record<
-	ReviewAction,
-	{ title: ReviewKey; confirm: ReviewKey; done: ReviewKey }
+interface ActionCopy {
+	title: ReviewKey
+	confirm: ReviewKey
+	done: ReviewKey
+}
+
+/** MSG-09: a message's hide and restore say what they do to a conversation. */
+const MESSAGE_COPY: Partial<
+	Record<ReviewAction, ActionCopy & { description: ModerationKey }>
 > = {
+	HIDE_SUBJECT: {
+		title: 'hideMessageTitle',
+		confirm: 'hideMessageConfirm',
+		done: 'hideMessageDone',
+		description: 'hideMessageExplanation',
+	},
+	RESTORE_SUBJECT: {
+		title: 'restoreMessageTitle',
+		confirm: 'restoreMessageConfirm',
+		done: 'restoreMessageDone',
+		description: 'restoreMessageExplanation',
+	},
+}
+
+const DESCRIPTIONS: Record<
+	Exclude<ReviewAction, 'DISMISS_REPORT'>,
+	ModerationKey
+> = {
+	HIDE_SUBJECT: 'hideExplanation',
+	RESTORE_SUBJECT: 'restoreExplanation',
+	RESTRICT_MESSAGING: 'restrictExplanation',
+	LIFT_MESSAGING_RESTRICTION: 'liftExplanation',
+}
+
+const COPY: Record<ReviewAction, ActionCopy> = {
 	DISMISS_REPORT: {
 		title: 'dismissTitle',
 		confirm: 'dismissConfirm',
@@ -59,6 +93,16 @@ const COPY: Record<
 		title: 'restoreTitle',
 		confirm: 'restoreConfirm',
 		done: 'restoreDone',
+	},
+	RESTRICT_MESSAGING: {
+		title: 'restrictTitle',
+		confirm: 'restrictConfirm',
+		done: 'restrictDone',
+	},
+	LIFT_MESSAGING_RESTRICTION: {
+		title: 'liftTitle',
+		confirm: 'liftConfirm',
+		done: 'liftDone',
 	},
 }
 
@@ -81,23 +125,26 @@ export function ReviewActionDialog({
 	const dismiss = useDismissReport()
 	const hide = useHideReportedContent()
 	const restore = useRestoreReportedContent()
+	const restrict = useRestrictMessaging()
+	const lift = useLiftMessagingRestriction()
 	const [note, setNote] = useState('')
 
-	const mutation =
-		action === 'DISMISS_REPORT'
-			? dismiss
-			: action === 'HIDE_SUBJECT'
-				? hide
-				: restore
-	const keys = COPY[action]
+	const mutation = {
+		DISMISS_REPORT: dismiss,
+		HIDE_SUBJECT: hide,
+		RESTORE_SUBJECT: restore,
+		RESTRICT_MESSAGING: restrict,
+		LIFT_MESSAGING_RESTRICTION: lift,
+	}[action]
+	const messageCopy =
+		report.subject.kind === 'MESSAGE' ? MESSAGE_COPY[action] : undefined
+	const keys = messageCopy ?? COPY[action]
 	const copy = {
 		title: t(keys.title),
 		description:
 			action === 'DISMISS_REPORT'
 				? t('dismissDescription')
-				: action === 'HIDE_SUBJECT'
-					? tModeration('hideExplanation')
-					: tModeration('restoreExplanation'),
+				: tModeration(messageCopy?.description ?? DESCRIPTIONS[action]),
 		confirm: t(keys.confirm),
 		done: t(keys.done),
 	}

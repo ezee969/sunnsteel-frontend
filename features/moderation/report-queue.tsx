@@ -3,15 +3,17 @@
 import type {
 	ModerationActionKind,
 	ModerationReport,
+	ReportedMessageContext,
 	ReportStatus,
 } from '@sunsteel/contracts'
-import { EyeOff, Loader2 } from 'lucide-react'
+import { Ban, EyeOff, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { ReportedMessages } from '@/features/moderation/reported-messages'
 import { ReviewActionDialog } from '@/features/moderation/review-action-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
@@ -43,6 +45,11 @@ const STATUS_TABS: ReportStatus[] = ['OPEN', 'ACTIONED', 'DISMISSED']
  * **Opening a subject is an action.** The row awaits the audit record before
  * navigating, so a read cannot happen without one; a failed record means the
  * reviewer stays where they are rather than opening it unlogged.
+ *
+ * MSG-09: a message report has no page to open. Reading it is the same logged
+ * view, and its answer -- the capture -- is shown on the row itself; a failed
+ * record shows nothing. Restricting a member's messaging is offered on member
+ * and message reports.
  */
 export function ReportQueue() {
 	const errorText = useApiErrorMessage()
@@ -57,6 +64,10 @@ export function ReportQueue() {
 		report: ModerationReport
 	} | null>(null)
 	const [opening, setOpening] = useState<string | null>(null)
+	const [captures, setCaptures] = useState<
+		Record<string, ReportedMessageContext>
+	>({})
+	const [shown, setShown] = useState<Record<string, boolean>>({})
 
 	const queue = useModerationQueue(status)
 	const recordView = useRecordSubjectView()
@@ -72,6 +83,34 @@ export function ReportQueue() {
 			{ reportId: report.id },
 			{
 				onSuccess: () => router.push(href),
+				onError: error => {
+					setOpening(null)
+					push({
+						title: t('openFailedTitle'),
+						description: t('openFailedBody', { message: errorText(error) }),
+						variant: 'destructive',
+					})
+				},
+			},
+		)
+	}
+
+	const readMessages = (report: ModerationReport) => {
+		if (captures[report.id]) {
+			setShown(current => ({ ...current, [report.id]: !current[report.id] }))
+			return
+		}
+		setOpening(report.id)
+		recordView.mutate(
+			{ reportId: report.id },
+			{
+				onSuccess: response => {
+					setOpening(null)
+					const context = response.messageContext
+					if (!context) return
+					setCaptures(current => ({ ...current, [report.id]: context }))
+					setShown(current => ({ ...current, [report.id]: true }))
+				},
 				onError: error => {
 					setOpening(null)
 					push({
@@ -134,6 +173,8 @@ export function ReportQueue() {
 				<div className="border-t border-rule-faint">
 					{reports.map(report => {
 						const actions = availableReviewActions(report)
+						const isMessage = report.subject.kind === 'MESSAGE'
+						const capture = shown[report.id] ? captures[report.id] : undefined
 						const owner = reportSubjectOwner(report.subject)
 						const others = describeOtherReports(
 							report.otherOpenReports,
@@ -152,6 +193,12 @@ export function ReportQueue() {
 										<span className="type-body-sm inline-flex items-center gap-1 text-ink-3">
 											<EyeOff className="size-3.5" aria-hidden />
 											{t('hidden')}
+										</span>
+									) : null}
+									{report.subject.messagingRestricted ? (
+										<span className="type-body-sm inline-flex items-center gap-1 text-ink-3">
+											<Ban className="size-3.5" aria-hidden />
+											{t('messagingRestricted')}
 										</span>
 									) : null}
 								</div>
@@ -187,6 +234,17 @@ export function ReportQueue() {
 											: ''}
 									</p>
 								) : null}
+								{isMessage && !report.subject.isMissing ? (
+									<p className="type-body-sm text-ink-3">
+										{report.subject.messageGone
+											? `${tModeration('messageGoneNote')} `
+											: ''}
+										{tModeration('messagesNote')}
+									</p>
+								) : null}
+								{capture ? (
+									<ReportedMessages report={report} context={capture} />
+								) : null}
 
 								<div className="flex flex-wrap gap-2">
 									{actions.canOpen ? (
@@ -204,6 +262,24 @@ export function ReportQueue() {
 												/>
 											) : null}
 											{t('openContent')}
+										</Button>
+									) : null}
+									{actions.canReadMessages ? (
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											aria-expanded={Boolean(capture)}
+											disabled={opening === report.id}
+											onClick={() => readMessages(report)}
+										>
+											{opening === report.id ? (
+												<Loader2
+													className="mr-2 size-4 animate-spin"
+													aria-hidden
+												/>
+											) : null}
+											{capture ? t('hideMessages') : t('readMessages')}
 										</Button>
 									) : null}
 									{actions.canDismiss ? (
@@ -227,7 +303,7 @@ export function ReportQueue() {
 												setPending({ action: 'HIDE_SUBJECT', report })
 											}
 										>
-											{t('hideContent')}
+											{isMessage ? t('hideMessage') : t('hideContent')}
 										</Button>
 									) : null}
 									{actions.canRestore ? (
@@ -239,7 +315,34 @@ export function ReportQueue() {
 												setPending({ action: 'RESTORE_SUBJECT', report })
 											}
 										>
-											{t('restoreContent')}
+											{isMessage ? t('restoreMessage') : t('restoreContent')}
+										</Button>
+									) : null}
+									{actions.canRestrict ? (
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											onClick={() =>
+												setPending({ action: 'RESTRICT_MESSAGING', report })
+											}
+										>
+											{t('restrictMessaging')}
+										</Button>
+									) : null}
+									{actions.canLift ? (
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											onClick={() =>
+												setPending({
+													action: 'LIFT_MESSAGING_RESTRICTION',
+													report,
+												})
+											}
+										>
+											{t('liftRestriction')}
 										</Button>
 									) : null}
 								</div>
