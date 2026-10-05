@@ -59,6 +59,11 @@ const context = await browser.newContext({
 	storageState: STATE_PATH,
 	baseURL: BASE_URL,
 })
+// MSG-06: a live realtime stream never finishes, so `networkidle` below would
+// never arrive; answer it with an empty one, as the suites do (fixtures.ts).
+await context.route('**/api/realtime/stream', route =>
+	route.fulfill({ status: 200, contentType: 'text/event-stream', body: '' }),
+)
 // The first request to a route compiles it under Turbopack, which the default
 // 30s navigation timeout does not survive on a cold dev server.
 context.setDefaultNavigationTimeout(90_000)

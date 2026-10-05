@@ -1,6 +1,7 @@
 import type { Browser } from '@playwright/test'
 import { USERNAME_PATTERN_SOURCE } from '@sunsteel/contracts'
 
+import { muteRealtimeStream } from './fixtures'
 import { BASE_URL, STATE_PATH } from './preconditions'
 
 /**
@@ -26,6 +27,7 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 		storageState: STATE_PATH,
 		viewport: { width: 1440, height: 900 },
 	})
+	await muteRealtimeStream(context)
 	context.setDefaultNavigationTimeout(90_000)
 	const page = await context.newPage()
 	const found: Ids = {}

@@ -9,6 +9,8 @@ import {
 	useQueryClient,
 } from '@tanstack/react-query'
 
+import { useRealtimeLive } from '@/lib/realtime/realtime-status'
+import { notificationsPollInterval } from '@/lib/realtime/realtime-stream'
 import {
 	flattenNotificationPages,
 	markReadInPages,
@@ -29,11 +31,13 @@ export const notificationKeys = {
  * NOTIF-01/NOTIF-09: the owner's notifications, read a page at a time, and
  * the unread count. The top bar and sidebar read it on every protected page
  * and only ever need the first page; the Notifications page loads the rest
- * as its end scrolls into view. It refreshes on focus and every five minutes
- * rather than waiting out the default stale time, and a refresh re-reads the
- * loaded pages in order from the first, so they stay one consistent list.
+ * as its end scrolls into view. It refreshes on focus and, while the MSG-06
+ * stream is not live, every five minutes; while it is live the stream's
+ * signals refresh it instead. A refresh re-reads the loaded pages in order
+ * from the first, so they stay one consistent list.
  */
 export const useNotifications = () => {
+	const live = useRealtimeLive()
 	const query = useInfiniteQuery<
 		NotificationsResponse,
 		Error,
@@ -51,7 +55,7 @@ export const useNotifications = () => {
 		getNextPageParam: last => last.nextCursor ?? null,
 		select: flattenNotificationPages,
 		staleTime: 60_000,
-		refetchInterval: 5 * 60_000,
+		refetchInterval: notificationsPollInterval(live),
 		refetchOnWindowFocus: true,
 	})
 	return query

@@ -87,6 +87,25 @@ async function attachAuthHeader(
 	return true
 }
 
+/**
+ * MSG-06: a streamed GET with the bearer token, read by the caller as it
+ * arrives rather than parsed as JSON. `EventSource` cannot send the token,
+ * and the token never goes in the URL. Resolves null without a session.
+ */
+export async function openAuthorizedStream(
+	endpoint: string,
+	signal: AbortSignal,
+): Promise<Response | null> {
+	const headers: Record<string, string> = { Accept: 'text/event-stream' }
+	if (!(await attachAuthHeader(headers))) return null
+	return fetch(`${API_BASE_URL}${endpoint}`, {
+		headers,
+		signal,
+		credentials: 'include',
+		cache: 'no-store',
+	})
+}
+
 function prepareRequest(
 	endpoint: string,
 	fetchOptions: RequestInit,

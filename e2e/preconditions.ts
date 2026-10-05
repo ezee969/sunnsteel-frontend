@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 
 import type { Browser } from '@playwright/test'
 
+import { muteRealtimeStream } from './fixtures'
+
 export const STATE_PATH = '.auth/state.json'
 
 export const BASE_URL = process.env.UI_BASE_URL ?? 'http://localhost:3000'
@@ -166,6 +168,7 @@ export async function findActiveSessionId(
 		storageState: STATE_PATH,
 		viewport: { width: 1440, height: 900 },
 	})
+	await muteRealtimeStream(context)
 	context.setDefaultNavigationTimeout(90_000)
 
 	try {
