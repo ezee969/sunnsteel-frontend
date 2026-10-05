@@ -64,6 +64,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/schedule')) return 'schedule'
 		if (path.startsWith('/achievements')) return 'achievements'
 		if (path.startsWith('/notifications')) return 'notifications'
+		if (path.startsWith('/messages')) return 'messages'
 		if (path.startsWith('/activity')) return 'activity'
 		if (path.startsWith('/moderation')) return 'moderation'
 		if (path.startsWith('/settings')) return 'settings'
@@ -86,6 +87,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		if (path.startsWith('/schedule')) return t('titles.schedule')
 		if (path.startsWith('/achievements')) return t('titles.achievements')
 		if (path.startsWith('/notifications')) return t('titles.notifications')
+		if (path.startsWith('/messages')) return t('titles.messages')
 		if (path.startsWith('/activity')) return t('titles.activity')
 		if (path.startsWith('/moderation')) return t('titles.moderation')
 		if (path.startsWith('/settings')) return t('titles.settings')

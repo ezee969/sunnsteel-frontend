@@ -20,6 +20,7 @@ export const PROTECTED_PREFIXES = [
 	'/activity',
 	'/moderation',
 	'/welcome',
+	'/messages',
 ] as const
 
 const AUTH_PAGES = new Set(['/login', '/signup'])

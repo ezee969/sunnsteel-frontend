@@ -454,10 +454,10 @@
 		"CONVERSATION_NOT_FOUND": "No se encontró la conversación",
 		"MESSAGE_NOT_FOUND": "No se encontró el mensaje",
 		"MESSAGE_SELF": "No puedes enviarte mensajes a ti mismo",
-		"MESSAGE_LENGTH": "Un mensaje no puede estar vacío y puede tener como máximo {max} caracteres.",
+		"MESSAGE_LENGTH": "Un mensaje no puede estar vacío y tiene como máximo {max} caracteres.",
 		"MESSAGES_PER_MINUTE": "Puedes enviar como máximo {max} mensajes por minuto.",
-		"CONVERSATIONS_PER_DAY": "Puedes iniciar como máximo {max} conversaciones nuevas al día.",
-		"MESSAGE_NOT_ADMITTED": "Este miembro no recibe mensajes tuyos.",
+		"CONVERSATIONS_PER_DAY": "Puedes iniciar como máximo {max} conversaciones nuevas por día.",
+		"MESSAGE_NOT_ADMITTED": "Este miembro no está recibiendo tus mensajes.",
 		"CONVERSATION_CLOSED": "Esta conversación ya no puede recibir mensajes.",
 		"MESSAGING_UNAVAILABLE": "Los mensajes no están disponibles para esta cuenta."
 	},

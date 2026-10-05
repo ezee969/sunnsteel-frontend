@@ -1,0 +1,81 @@
+{
+	"common": {
+		"deletedMember": "Deleted member",
+		"noMessages": "No messages",
+		"messageDeleted": "Message deleted",
+		"youSaid": "You: {text}",
+		"you": "You",
+		"encryption": "Messages are stored on Sunnsteel's servers and aren't end-to-end encrypted.",
+		"tryAgain": "Try again",
+		"cancel": "Cancel"
+	},
+	"list": {
+		"pageTitle": "Messages",
+		"pageSubtitle": "Your conversations with other members.",
+		"regionTitle": "Conversations",
+		"empty": "No conversations yet.",
+		"emptyHint": "Start one with Message on a member's profile.",
+		"loading": "Loading conversations…",
+		"loadError": "Your conversations couldn't be loaded.",
+		"older": "Show older conversations",
+		"loadingOlder": "Loading…",
+		"openWith": "Conversation with {name}"
+	},
+	"thread": {
+		"back": "All messages",
+		"loading": "Loading messages…",
+		"loadError": "This conversation couldn't be loaded.",
+		"notFound": "This conversation isn't available.",
+		"notFoundHint": "It may have been deleted, or you can no longer reach this member.",
+		"earlier": "Earlier messages",
+		"loadingEarlier": "Loading…",
+		"empty": "No messages here yet.",
+		"deletedMemberNote": "This member deleted their account. You can no longer write here.",
+		"unavailableNote": "You can't send messages right now.",
+		"viewProfile": "View profile",
+		"options": "Conversation options",
+		"delete": "Delete",
+		"deleteMessageLabel": "Delete your message sent {time}",
+		"deleteMessageTitle": "Delete this message?",
+		"deleteMessageBody": "It's removed for both of you, and \"Message deleted\" stays in its place.",
+		"deleteMessageFailed": "The message couldn't be deleted.",
+		"deleteConversation": "Delete conversation",
+		"deleteConversationTitle": "Delete this conversation?",
+		"deleteConversationBody": "It leaves your list and its messages are hidden from you. {name} keeps them. If they write again, it comes back with only the new messages.",
+		"deleteConversationBodyDeleted": "It leaves your list for good.",
+		"deleteConversationFailed": "The conversation couldn't be deleted.",
+		"blockHint": "To stop someone writing to you, block them from their profile."
+	},
+	"composer": {
+		"label": "Write a message",
+		"placeholder": "Write a message",
+		"send": "Send",
+		"sending": "Sending…",
+		"count": "{count} / {max}",
+		"tooLong": "{count} / {max}, too long to send",
+		"keyboardHint": "Enter sends, Shift+Enter adds a line.",
+		"sendFailed": "The message couldn't be sent."
+	},
+	"new": {
+		"pageTitle": "New message",
+		"to": "To {name}",
+		"loading": "Loading…",
+		"unavailable": "You can't message this member.",
+		"unavailableHint": "They may not be taking messages from you, or the profile isn't available.",
+		"missing": "Choose a member to message from their profile."
+	},
+	"profile": {
+		"message": "Message"
+	},
+	"settings": {
+		"title": "Messages",
+		"description": "Who can write to you, and how your messages are kept.",
+		"legend": "Who can start a conversation with you",
+		"followed": "People you follow",
+		"followedHint": "Members you follow can start a conversation with you.",
+		"nobody": "Nobody",
+		"nobodyHint": "No one can start a new conversation with you.",
+		"existingNote": "Conversations you already have keep working. To stop someone writing to you, block them.",
+		"saveFailed": "Your choice couldn't be saved."
+	}
+}

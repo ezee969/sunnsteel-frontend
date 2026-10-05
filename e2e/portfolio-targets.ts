@@ -481,6 +481,32 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Today’s training actions and a private fixed-prompt encouragement from a training partner.',
 	},
 	{
+		// MSG-01. `db:seed:portfolio` writes one conversation with the training
+		// partner, and its reset removes it before the peers go.
+		slug: 'messages',
+		route: '/messages',
+		features: ['MSG-01', 'MSG-06'],
+		ready: ['Messages', /Ken/],
+		caption:
+			'One-to-one conversations with other members, newest first, updated as messages arrive.',
+	},
+	{
+		slug: 'messages-thread',
+		route: '/messages',
+		features: ['MSG-01'],
+		setup: async page => {
+			await page
+				.getByRole('link', { name: /Conversation with Ken/ })
+				.first()
+				.click()
+			await page.waitForURL(/\/messages\/[0-9a-f-]{36}$/)
+			await page.getByText('Bring chalk.', { exact: false }).waitFor()
+		},
+		ready: [/aren't end-to-end encrypted/, 'Send'],
+		caption:
+			'A conversation read as a ruled ledger rather than bubbles, saying plainly that messages are not end-to-end encrypted.',
+	},
+	{
 		// The owner's own list, because the local stack has one real account
 		// and the feed would photograph an empty state. It is the SOC-04 half:
 		// every entry with the audience that actually applies.

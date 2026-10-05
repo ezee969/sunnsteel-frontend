@@ -11,6 +11,7 @@ import {
 	Home,
 	LucideIcon,
 	Medal,
+	MessageSquare,
 	Rss,
 	Settings,
 	ShieldCheck,
@@ -56,6 +57,7 @@ type NavLabelKey =
 	| 'schedule'
 	| 'achievements'
 	| 'activity'
+	| 'messages'
 	| 'notifications'
 	| 'moderation'
 
@@ -154,6 +156,15 @@ const SIDEBAR_NAV_ITEMS: NavItem[] = [
 		labelKey: 'activity',
 		icon: Rss,
 		href: '/activity',
+		disabled: false,
+	},
+	// MSG-01: one-to-one conversations, between Discover and Notifications in
+	// the Community group (owner, 2026-10-05).
+	{
+		id: 'messages',
+		labelKey: 'messages',
+		icon: MessageSquare,
+		href: '/messages',
 		disabled: false,
 	},
 	{

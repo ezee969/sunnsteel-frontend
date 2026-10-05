@@ -18,6 +18,7 @@ export type Ids = {
 	routine?: string
 	username?: string
 	exercise?: string
+	conversation?: string
 }
 
 /** Finds seeded records to reach the routes that need an id. */
@@ -76,6 +77,15 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 		const text = await page.locator('main').innerText()
 		const username = new RegExp(`@(${USERNAME_PATTERN_SOURCE.slice(1, -1)})`)
 		found.username = text.match(username)?.[1]
+
+		// MSG-01: the owner's newest conversation, when they have one.
+		await page.goto('/messages', { waitUntil: 'networkidle' })
+		const conversation = page.locator('main ul a[href^="/messages/"]').first()
+		if ((await conversation.count()) > 0) {
+			found.conversation = (await conversation.getAttribute('href'))
+				?.split('/')
+				.pop()
+		}
 	} finally {
 		await context.close()
 	}

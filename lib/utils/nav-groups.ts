@@ -10,7 +10,7 @@ export const NAV_GROUPS = [
 	{ id: 'progress', items: ['progress', 'history', 'achievements'] },
 	{
 		id: 'community',
-		items: ['activity', 'discover-routines', 'notifications'],
+		items: ['activity', 'discover-routines', 'messages', 'notifications'],
 	},
 	{ id: 'more', items: ['exercises', 'moderation', 'settings'] },
 ] as const

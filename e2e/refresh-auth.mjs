@@ -102,7 +102,10 @@ try {
 		await page.waitForTimeout(3_000)
 
 		const after = await readExpiry(page)
-		if (!after || after <= before) {
+		// Later than before is not enough: a run that failed leaves the expiry
+		// this script wrote (a minute ago), and the next one would read the same
+		// write as a renewal. A real one is in the future.
+		if (!after || after <= before || after <= Date.now() / 1000) {
 			console.error(
 				'\nThe session did not renew. Run "npm run ui:login" before a long sweep.\n',
 			)

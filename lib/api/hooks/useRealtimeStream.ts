@@ -13,6 +13,7 @@ import {
 } from '@/lib/realtime/realtime-stream'
 
 import { realtimeService } from '../services/realtimeService'
+import { conversationKeys } from './useConversations'
 import { notificationKeys } from './useNotifications'
 
 /**
@@ -21,9 +22,7 @@ import { notificationKeys } from './useNotifications'
  */
 const TOPIC_KEYS: Record<RealtimeTopic, QueryKey> = {
 	notifications: notificationKeys.all(),
-	// MSG-01's topic (contracts 0.86.0). No screen reads conversations yet;
-	// the direct-messages slice points this at its own query key.
-	conversations: ['conversations'],
+	conversations: conversationKeys.all(),
 }
 
 async function readStream(

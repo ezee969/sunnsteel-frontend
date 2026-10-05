@@ -3,6 +3,7 @@ import type { Locale } from '@/i18n/config'
 import enAchievements from './en/achievements.json'
 import enCatalog from './en/catalog.json'
 import enCore from './en/core.json'
+import enMessaging from './en/messaging.json'
 import enOnboarding from './en/onboarding.json'
 import enPlanning from './en/planning.json'
 import enProgress from './en/progress.json'
@@ -14,6 +15,7 @@ import enWorkout from './en/workout.json'
 import esAchievements from './es/achievements.json'
 import esCatalog from './es/catalog.json'
 import esCore from './es/core.json'
+import esMessaging from './es/messaging.json'
 import esOnboarding from './es/onboarding.json'
 import esPlanning from './es/planning.json'
 import esProgress from './es/progress.json'
@@ -40,6 +42,7 @@ const en = {
 	settings: enSettings,
 	achievements: enAchievements,
 	onboarding: enOnboarding,
+	messaging: enMessaging,
 }
 
 export type Messages = typeof en
@@ -58,5 +61,6 @@ export const MESSAGES: Record<Locale, Messages> = {
 		settings: esSettings,
 		achievements: esAchievements,
 		onboarding: esOnboarding,
+		messaging: esMessaging,
 	},
 }

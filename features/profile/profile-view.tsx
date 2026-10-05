@@ -17,6 +17,7 @@ import {
 	Dumbbell,
 	Flame,
 	MapPin,
+	MessageSquare,
 	Scale,
 	Share2,
 	Target,
@@ -48,6 +49,7 @@ import { dateFnsLocale, numberFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
 import { formatTimeAgo } from '@/lib/utils/date'
 import { formatHeight } from '@/lib/utils/length-unit'
+import { messageHref } from '@/lib/utils/messages'
 import {
 	copyTextToClipboard,
 	getSharedProfileUrl,
@@ -156,6 +158,7 @@ export function ProfileView(props: ProfileViewProps) {
 	const tExercises = useTranslations('catalog.exercises')
 	const tRanks = useTranslations('catalog.ranks')
 	const t = useTranslations('social.profile')
+	const tMessaging = useTranslations('messaging.profile')
 	const { push } = useToast()
 	const isOwnProfile = props.variant === 'owner'
 	const profile = props.profile
@@ -437,6 +440,21 @@ export function ProfileView(props: ProfileViewProps) {
 								)}
 							</Button>
 						)}
+						{/* MSG-01: only when the server says this viewer may start (or
+						    already has) a conversation; nothing says why otherwise. */}
+						{!isOwnProfile && publicUser?.messaging?.canStart ? (
+							<Button asChild variant="outline" size="sm">
+								<Link
+									href={messageHref(
+										publicUser.username,
+										publicUser.messaging.conversationId,
+									)}
+								>
+									<MessageSquare className="mr-2 h-4 w-4" aria-hidden />
+									{tMessaging('message')}
+								</Link>
+							</Button>
+						) : null}
 						{props.trainingPartnerAction}
 						{/* PROF-10: blocking and reporting are only ever about somebody
 						    else, and only inside the authenticated shell — the signed-out

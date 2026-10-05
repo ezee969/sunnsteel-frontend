@@ -9,7 +9,12 @@ describe('navigation groups (UX-22)', () => {
 			expect(navGroupOf(id)).toBe('train')
 		for (const id of ['progress', 'history', 'achievements'])
 			expect(navGroupOf(id)).toBe('progress')
-		for (const id of ['activity', 'discover-routines', 'notifications'])
+		for (const id of [
+			'activity',
+			'discover-routines',
+			'messages',
+			'notifications',
+		])
 			expect(navGroupOf(id)).toBe('community')
 		for (const id of ['exercises', 'moderation', 'settings'])
 			expect(navGroupOf(id)).toBe('more')

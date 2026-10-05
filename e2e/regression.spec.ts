@@ -469,6 +469,20 @@ const ROUTES: SweepRoute[] = [
 	{ slug: 'notifications', path: () => '/notifications' },
 	{ slug: 'activity', path: () => '/activity' },
 	{ slug: 'activity-yours', path: () => '/activity?view=yours' },
+	// MSG-01: the list, a conversation and the first-message page. The new
+	// page is opened to the owner's own handle, which no one may message, so
+	// it shows its unavailable state.
+	{ slug: 'messages', path: () => '/messages' },
+	{
+		slug: 'messages-thread',
+		path: found => found.conversation && `/messages/${found.conversation}`,
+		needs: 'a conversation',
+	},
+	{
+		slug: 'messages-new',
+		path: found => found.username && `/messages/new?to=${found.username}`,
+		needs: 'a username, read from /profile',
+	},
 	{ slug: 'profile', path: () => '/profile' },
 	{ slug: 'search', path: () => '/search?q=press' },
 	{ slug: 'settings', path: () => '/settings' },

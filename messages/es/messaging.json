@@ -1,0 +1,81 @@
+{
+	"common": {
+		"deletedMember": "Miembro eliminado",
+		"noMessages": "Sin mensajes",
+		"messageDeleted": "Mensaje eliminado",
+		"youSaid": "Tú: {text}",
+		"you": "Tú",
+		"encryption": "Los mensajes se guardan en los servidores de Sunnsteel y no tienen cifrado de extremo a extremo.",
+		"tryAgain": "Intentar de nuevo",
+		"cancel": "Cancelar"
+	},
+	"list": {
+		"pageTitle": "Mensajes",
+		"pageSubtitle": "Tus conversaciones con otros miembros.",
+		"regionTitle": "Conversaciones",
+		"empty": "Todavía no tienes conversaciones.",
+		"emptyHint": "Inicia una con Mensaje en el perfil de un miembro.",
+		"loading": "Cargando conversaciones…",
+		"loadError": "No se pudieron cargar tus conversaciones.",
+		"older": "Ver conversaciones anteriores",
+		"loadingOlder": "Cargando…",
+		"openWith": "Conversación con {name}"
+	},
+	"thread": {
+		"back": "Todos los mensajes",
+		"loading": "Cargando mensajes…",
+		"loadError": "No se pudo cargar esta conversación.",
+		"notFound": "Esta conversación no está disponible.",
+		"notFoundHint": "Puede que se haya eliminado o que ya no puedas contactar a este miembro.",
+		"earlier": "Mensajes anteriores",
+		"loadingEarlier": "Cargando…",
+		"empty": "Todavía no hay mensajes aquí.",
+		"deletedMemberNote": "Este miembro eliminó su cuenta. Ya no puedes escribir aquí.",
+		"unavailableNote": "No puedes enviar mensajes en este momento.",
+		"viewProfile": "Ver perfil",
+		"options": "Opciones de la conversación",
+		"delete": "Eliminar",
+		"deleteMessageLabel": "Eliminar tu mensaje enviado {time}",
+		"deleteMessageTitle": "¿Eliminar este mensaje?",
+		"deleteMessageBody": "Se elimina para los dos y en su lugar queda \"Mensaje eliminado\".",
+		"deleteMessageFailed": "No se pudo eliminar el mensaje.",
+		"deleteConversation": "Eliminar conversación",
+		"deleteConversationTitle": "¿Eliminar esta conversación?",
+		"deleteConversationBody": "Sale de tu lista y sus mensajes dejan de verse para ti. {name} los conserva. Si vuelve a escribirte, reaparece solo con los mensajes nuevos.",
+		"deleteConversationBodyDeleted": "Sale de tu lista de forma definitiva.",
+		"deleteConversationFailed": "No se pudo eliminar la conversación.",
+		"blockHint": "Para que alguien deje de escribirte, bloquéalo desde su perfil."
+	},
+	"composer": {
+		"label": "Escribe un mensaje",
+		"placeholder": "Escribe un mensaje",
+		"send": "Enviar",
+		"sending": "Enviando…",
+		"count": "{count} / {max}",
+		"tooLong": "{count} / {max}, demasiado largo para enviar",
+		"keyboardHint": "Enter envía; Mayús+Enter agrega una línea.",
+		"sendFailed": "No se pudo enviar el mensaje."
+	},
+	"new": {
+		"pageTitle": "Nuevo mensaje",
+		"to": "Para {name}",
+		"loading": "Cargando…",
+		"unavailable": "No puedes enviarle mensajes a este miembro.",
+		"unavailableHint": "Puede que no esté recibiendo tus mensajes o que el perfil no esté disponible.",
+		"missing": "Elige a quién escribir desde su perfil."
+	},
+	"profile": {
+		"message": "Mensaje"
+	},
+	"settings": {
+		"title": "Mensajes",
+		"description": "Quién puede escribirte y cómo se guardan tus mensajes.",
+		"legend": "Quién puede iniciar una conversación contigo",
+		"followed": "Personas que sigues",
+		"followedHint": "Los miembros que sigues pueden iniciar una conversación contigo.",
+		"nobody": "Nadie",
+		"nobodyHint": "Nadie puede iniciar una conversación nueva contigo.",
+		"existingNote": "Las conversaciones que ya tienes siguen funcionando. Para que alguien deje de escribirte, bloquéalo.",
+		"saveFailed": "No se pudo guardar tu elección."
+	}
+}
