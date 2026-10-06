@@ -15,9 +15,11 @@ import {
 	conversationListFromPages,
 	conversationPreview,
 	enterSends,
+	firstNewIndex,
 	flattenConversationPages,
 	memberName,
 	messageHref,
+	readThrough,
 	startsGroup,
 	threadFromPages,
 } from './messages'
@@ -56,6 +58,8 @@ const summary = (
 	lastMessageAt: '2026-10-05T10:00:00.000Z',
 	canSend: true,
 	messagingRestricted: false,
+	unread: false,
+	lastReadAt: null,
 	...overrides,
 })
 
@@ -220,5 +224,41 @@ describe('MSG-01 the composer', () => {
 	it('opens the conversation a pair has, or a new message to the member', () => {
 		expect(messageHref('ana', 'c-1')).toBe('/messages/c-1')
 		expect(messageHref('ana b', null)).toBe('/messages/new?to=ana%20b')
+	})
+})
+
+describe('MSG-03 unread state', () => {
+	const thread = [
+		message('a', '10:00'),
+		message('b', '10:01', { sentByMe: true }),
+		message('c', '10:05'),
+		message('d', '10:06'),
+	]
+
+	it('puts "new since you last looked" above the first message after it', () => {
+		expect(firstNewIndex(thread, '2026-10-05T10:02:00.000Z')).toBe(2)
+	})
+
+	it('never on my own messages', () => {
+		expect(
+			firstNewIndex(
+				[message('a', '10:00'), message('b', '10:03', { sentByMe: true })],
+				'2026-10-05T10:01:00.000Z',
+			),
+		).toBe(-1)
+	})
+
+	it('not at all when nothing was ever read, nothing is new, or it would sit at the top', () => {
+		expect(firstNewIndex(thread, null)).toBe(-1)
+		expect(firstNewIndex(thread, '2026-10-05T10:07:00.000Z')).toBe(-1)
+		expect(firstNewIndex(thread, '2026-10-05T09:00:00.000Z')).toBe(-1)
+	})
+
+	it('marks read through the newest message, once, only while visible and unread', () => {
+		expect(readThrough({ unread: true }, thread, true, null)).toBe('d')
+		expect(readThrough({ unread: true }, thread, true, 'd')).toBeNull()
+		expect(readThrough({ unread: true }, thread, false, null)).toBeNull()
+		expect(readThrough({ unread: false }, thread, true, null)).toBeNull()
+		expect(readThrough({ unread: true }, [], true, null)).toBeNull()
 	})
 })

@@ -28,7 +28,8 @@
 	"indicators": {
 		"notifications": "Notificaciones, {count} sin leer",
 		"schedule": "Calendario, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy",
-		"bell": "Notificaciones"
+		"bell": "Notificaciones",
+		"messages": "Mensajes, {count, plural, one {# conversación sin leer} other {# conversaciones sin leer}}"
 	},
 	"header": {
 		"toggleMenu": "Abrir menú",
@@ -105,6 +106,8 @@
 		"more": "Más",
 		"moreAria": "Más: todas las páginas",
 		"trainPlanned": "Entrenar, {count, plural, one {# entrenamiento planificado} other {# entrenamientos planificados}} para hoy",
-		"communityUnread": "Comunidad, {count} notificaciones sin leer"
+		"communityUnread": "Comunidad, {count} notificaciones sin leer",
+		"communityMessages": "Comunidad, {count, plural, one {# conversación sin leer} other {# conversaciones sin leer}}",
+		"communityUnreadBoth": "Comunidad, {notifications} notificaciones sin leer y {conversations, plural, one {# conversación sin leer} other {# conversaciones sin leer}}"
 	}
 }

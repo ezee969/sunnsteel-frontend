@@ -77,6 +77,41 @@ export function threadFromPages(
 	}
 }
 
+/**
+ * MSG-03: where "new since you last looked" goes -- the first message from the
+ * other member after the read position the reader opened the conversation
+ * with -- or -1 when there is nothing new, nothing was ever read, or the new
+ * part starts at the top, where a line would only repeat that it all is.
+ */
+export function firstNewIndex(
+	messages: ConversationMessage[],
+	lastReadAt: string | null,
+): number {
+	if (!lastReadAt) return -1
+	const since = Date.parse(lastReadAt)
+	const index = messages.findIndex(
+		message => !message.sentByMe && Date.parse(message.createdAt) > since,
+	)
+	return index > 0 ? index : -1
+}
+
+/**
+ * MSG-03: the message to mark read through -- the newest one on screen -- or
+ * null when there is nothing to mark: the conversation has nothing new, the
+ * tab is hidden (a message that arrives then stays unread), or it was marked
+ * through that message already.
+ */
+export function readThrough(
+	conversation: { unread: boolean },
+	messages: ConversationMessage[],
+	visible: boolean,
+	alreadyMarked: string | null,
+): string | null {
+	const newest = messages.at(-1)
+	if (!conversation.unread || !visible || !newest) return null
+	return newest.id === alreadyMarked ? null : newest.id
+}
+
 /** Consecutive messages from one side within this long share an author line. */
 export const MESSAGE_GROUP_GAP_MS = 5 * 60_000
 

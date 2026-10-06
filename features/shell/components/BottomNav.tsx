@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
 import { useTodaysWorkouts } from '@/app/[locale]/(protected)/dashboard/hooks/useTodaysWorkouts'
+import { useUnreadConversations } from '@/lib/api/hooks/useConversations'
 import { useNotifications } from '@/lib/api/hooks/useNotifications'
 import { cn } from '@/lib/utils'
 import {
@@ -19,6 +20,7 @@ import {
 	type NavGroupId,
 	navGroupOf,
 } from '@/lib/utils/nav-groups'
+import { communityIndicator } from '@/lib/utils/navigation-indicators'
 
 interface BottomNavProps {
 	activeNav: string
@@ -55,12 +57,22 @@ export function BottomNav({
 	const notifications = useNotifications()
 	const today = useTodaysWorkouts()
 	const activeGroup = navGroupOf(activeNav)
-	const unread = Math.max(0, notifications.data?.unreadCount ?? 0)
+	const unreadConversations = useUnreadConversations()
+	// MSG-03: Community carries unread notifications and conversations both.
+	const community = communityIndicator(
+		notifications.data?.unreadCount,
+		unreadConversations.data,
+		t,
+	)
 	const planned =
 		today.active?.status === 'IN_PROGRESS' ? 0 : today.entries.length
 
 	const count = (group: NavGroupId) =>
-		group === 'train' ? planned : group === 'community' ? unread : 0
+		group === 'train'
+			? planned
+			: group === 'community'
+				? (community?.count ?? 0)
+				: 0
 
 	// v1.1 §26.6 / motion §8: the active group's 2px rule is ONE element that
 	// slides between the five equal slots, as the sidebar's marker does,
@@ -120,7 +132,7 @@ export function BottomNav({
 							n > 0
 								? group === 'train'
 									? t('trainPlanned', { count: n })
-									: t('communityUnread', { count: n })
+									: (community?.label ?? label)
 								: label
 						}
 						onClick={() => onNavigateStart?.()}

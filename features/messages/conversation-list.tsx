@@ -17,7 +17,8 @@ import { MemberAvatar } from './member-avatar'
 /**
  * MSG-01: the member's conversations, newest activity first, as a §11.5
  * ruled list. A row is one link to its thread; the other member's name, a
- * one-line preview and when it last moved.
+ * one-line preview and when it last moved. MSG-03: a conversation with
+ * something new says "New" before its time, as an unread notification does.
  */
 export function ConversationList() {
 	const t = useTranslations('messaging.list')
@@ -91,7 +92,11 @@ export function ConversationList() {
 						<li key={conversation.id} className="rule-row">
 							<Link
 								href={`/messages/${encodeURIComponent(conversation.id)}`}
-								aria-label={t('openWith', { name })}
+								aria-label={
+									conversation.unread
+										? t('openWithNew', { name })
+										: t('openWith', { name })
+								}
 								className="group flex min-w-0 items-center gap-3 rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 							>
 								<MemberAvatar member={conversation.counterpart} />
@@ -102,6 +107,12 @@ export function ConversationList() {
 										</span>
 										{conversation.lastMessageAt ? (
 											<span className="type-body-sm shrink-0 text-ink-3">
+												{/* MSG-03: unread is a word, never colour alone (§4.3). */}
+												{conversation.unread ? (
+													<span className="type-label mr-2 text-foreground">
+														{t('new')}
+													</span>
+												) : null}
 												{formatTimeAgo(conversation.lastMessageAt, locale)}
 											</span>
 										) : null}

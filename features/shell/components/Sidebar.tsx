@@ -40,6 +40,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useUnreadConversations } from '@/lib/api/hooks/useConversations'
 import { useNotifications } from '@/lib/api/hooks/useNotifications'
 import { useUser } from '@/lib/api/hooks/useUser'
 import { cn } from '@/lib/utils'
@@ -210,6 +211,7 @@ export default function Sidebar({
 }: SidebarProps) {
 	const { user } = useUser()
 	const notifications = useNotifications()
+	const unreadConversations = useUnreadConversations()
 	const today = useTodaysWorkouts()
 	const { push } = useToast()
 	const t = useTranslations('shell.nav')
@@ -228,6 +230,7 @@ export default function Sidebar({
 	const indicators = buildNavigationIndicators(
 		{
 			unreadNotifications: notifications.data?.unreadCount,
+			unreadConversations: unreadConversations.data,
 			plannedToday: today.entries.length,
 			hasActiveSession: today.active?.status === 'IN_PROGRESS',
 		},
@@ -395,9 +398,11 @@ export default function Sidebar({
 								const indicator =
 									item.id === 'notifications'
 										? indicators.notifications
-										: item.id === 'schedule'
-											? indicators.schedule
-											: null
+										: item.id === 'messages'
+											? indicators.messages
+											: item.id === 'schedule'
+												? indicators.schedule
+												: null
 								const ItemIcon =
 									item.id === 'notifications' && indicator ? BellDot : item.icon
 								const itemClassName = cn(

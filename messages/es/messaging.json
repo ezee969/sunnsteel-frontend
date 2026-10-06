@@ -21,7 +21,9 @@
 		"older": "Ver conversaciones anteriores",
 		"loadingOlder": "Cargando…",
 		"openWith": "Conversación con {name}",
-		"restrictedNote": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes, y otros pueden escribirte."
+		"restrictedNote": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes, y otros pueden escribirte.",
+		"new": "Nuevo",
+		"openWithNew": "Conversación con {name}, mensajes nuevos"
 	},
 	"thread": {
 		"back": "Todos los mensajes",
@@ -50,7 +52,8 @@
 		"restrictedNote": "La moderación restringió tus mensajes, así que no puedes enviar. Aún puedes leerlos y eliminarlos.",
 		"hiddenFromOther": "Oculto para {name} por moderación. Solo tú puedes verlo.",
 		"reportMessage": "Denunciar mensaje",
-		"reportMessageLabel": "Denunciar el mensaje de {name} enviado {time}"
+		"reportMessageLabel": "Denunciar el mensaje de {name} enviado {time}",
+		"newSince": "Nuevo desde tu última visita"
 	},
 	"composer": {
 		"label": "Escribe un mensaje",

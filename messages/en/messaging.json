@@ -21,7 +21,9 @@
 		"older": "Show older conversations",
 		"loadingOlder": "Loading…",
 		"openWith": "Conversation with {name}",
-		"restrictedNote": "Moderation has restricted your messaging. You can still read and delete messages, and others can still write to you."
+		"restrictedNote": "Moderation has restricted your messaging. You can still read and delete messages, and others can still write to you.",
+		"new": "New",
+		"openWithNew": "Conversation with {name}, new messages"
 	},
 	"thread": {
 		"back": "All messages",
@@ -50,7 +52,8 @@
 		"restrictedNote": "Moderation has restricted your messaging, so you can't send messages. You can still read and delete them.",
 		"hiddenFromOther": "Hidden from {name} by moderation. Only you can see it.",
 		"reportMessage": "Report message",
-		"reportMessageLabel": "Report the message from {name} sent {time}"
+		"reportMessageLabel": "Report the message from {name} sent {time}",
+		"newSince": "New since you last looked"
 	},
 	"composer": {
 		"label": "Write a message",

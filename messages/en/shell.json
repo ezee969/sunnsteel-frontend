@@ -28,7 +28,8 @@
 	"indicators": {
 		"notifications": "Notifications, {count} unread",
 		"schedule": "Schedule, {count, plural, one {# workout} other {# workouts}} planned today",
-		"bell": "Notifications"
+		"bell": "Notifications",
+		"messages": "Messages, {count, plural, one {# unread conversation} other {# unread conversations}}"
 	},
 	"header": {
 		"toggleMenu": "Toggle Menu",
@@ -105,6 +106,8 @@
 		"more": "More",
 		"moreAria": "More: every page",
 		"trainPlanned": "Train, {count, plural, one {# workout} other {# workouts}} planned today",
-		"communityUnread": "Community, {count} unread notifications"
+		"communityUnread": "Community, {count} unread notifications",
+		"communityMessages": "Community, {count, plural, one {# unread conversation} other {# unread conversations}}",
+		"communityUnreadBoth": "Community, {notifications} unread notifications and {conversations, plural, one {# unread conversation} other {# unread conversations}}"
 	}
 }

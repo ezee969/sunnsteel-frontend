@@ -9,6 +9,7 @@ import {
 	type InfiniteData,
 	useInfiniteQuery,
 	useMutation,
+	useQuery,
 	useQueryClient,
 } from '@tanstack/react-query'
 
@@ -30,6 +31,7 @@ type ThreadPages = InfiniteData<ConversationMessagesResponse, string | null>
 export const conversationKeys = {
 	all: () => ['conversations'] as const,
 	list: () => ['conversations', 'list'] as const,
+	unread: () => ['conversations', 'unread'] as const,
 	thread: (id: string) => ['conversations', 'thread', id] as const,
 }
 
@@ -49,6 +51,46 @@ export function useConversations() {
 		staleTime: 30_000,
 		refetchOnWindowFocus: true,
 		refetchInterval: live ? false : LIST_POLL_MS,
+	})
+}
+
+/**
+ * MSG-03: how many conversations have something new. The shell reads it on
+ * every page, so it is one small read the `conversations` signal refreshes,
+ * and it polls only while the stream is not live.
+ */
+export function useUnreadConversations(enabled = true) {
+	const live = useRealtimeLive()
+	return useQuery({
+		queryKey: conversationKeys.unread(),
+		queryFn: messageService.unreadCount,
+		select: data => data.unreadConversations,
+		enabled,
+		staleTime: 30_000,
+		refetchOnWindowFocus: true,
+		refetchInterval: live ? false : LIST_POLL_MS,
+	})
+}
+
+/**
+ * MSG-03: the reader has seen up to a message. The list and the count change;
+ * the open thread is left alone, so its "new since you last looked" stays
+ * where it was for the rest of the visit.
+ */
+export function useMarkConversationRead(conversationId: string) {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (through: string) =>
+			messageService.markRead(conversationId, { through }),
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
+				queryKey: conversationKeys.unread(),
+			})
+			void queryClient.invalidateQueries({ queryKey: conversationKeys.list() })
+			void queryClient.invalidateQueries({
+				queryKey: conversationKeys.unread(),
+			})
+		},
 	})
 }
 
@@ -114,6 +156,9 @@ export function useSendMessage(conversationId: string) {
 				pages => withSent(pages, sent),
 			)
 			void queryClient.invalidateQueries({ queryKey: conversationKeys.list() })
+			void queryClient.invalidateQueries({
+				queryKey: conversationKeys.unread(),
+			})
 		},
 	})
 }
@@ -138,6 +183,9 @@ export function useDeleteMessage(conversationId: string) {
 					},
 			)
 			void queryClient.invalidateQueries({ queryKey: conversationKeys.list() })
+			void queryClient.invalidateQueries({
+				queryKey: conversationKeys.unread(),
+			})
 		},
 	})
 }
@@ -152,6 +200,9 @@ export function useDeleteConversation() {
 				queryKey: conversationKeys.thread(conversationId),
 			})
 			void queryClient.invalidateQueries({ queryKey: conversationKeys.list() })
+			void queryClient.invalidateQueries({
+				queryKey: conversationKeys.unread(),
+			})
 		},
 	})
 }

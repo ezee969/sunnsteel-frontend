@@ -46,9 +46,15 @@ import {
 	useConversationThread,
 	useDeleteConversation,
 	useDeleteMessage,
+	useMarkConversationRead,
 	useSendMessage,
 } from '@/lib/api/hooks/useConversations'
-import { memberName, startsGroup } from '@/lib/utils/messages'
+import {
+	firstNewIndex,
+	memberName,
+	readThrough,
+	startsGroup,
+} from '@/lib/utils/messages'
 
 import { MemberAvatar } from './member-avatar'
 import { MessageComposer } from './message-composer'
@@ -76,6 +82,11 @@ function isNotFound(error: unknown): boolean {
  * moderation hid reads "Removed by moderation" for the other member and stays
  * readable to its author, who is told; a member whose messaging is restricted
  * sees why in place of the composer.
+ *
+ * MSG-03: seeing the conversation reads it. Opening it, or a message arriving
+ * while it is open in a visible tab, marks it read through the newest message
+ * on screen; one that arrives while the tab is hidden waits for the reader to
+ * come back. "New since you last looked" stays where the visit began.
  */
 export function ConversationThread({
 	conversationId,
@@ -92,9 +103,41 @@ export function ConversationThread({
 	const thread = useConversationThread(conversationId)
 	const send = useSendMessage(conversationId)
 	const removeConversation = useDeleteConversation()
+	const markRead = useMarkConversationRead(conversationId)
 	const [confirmingDelete, setConfirmingDelete] = useState(false)
 	const end = useRef<HTMLDivElement>(null)
 	const newestId = thread.data?.messages.at(-1)?.id
+	// The read position this visit began with: marking read moves the server's
+	// but must not move the line the reader is looking at.
+	const [since, setSince] = useState<{ id: string; at: string | null }>()
+	const marked = useRef<string | null>(null)
+	const [visible, setVisible] = useState(
+		() => typeof document === 'undefined' || !document.hidden,
+	)
+	const loaded = thread.data?.conversation ?? null
+	if (loaded && since?.id !== conversationId) {
+		setSince({ id: conversationId, at: loaded.lastReadAt })
+	}
+
+	useEffect(() => {
+		const onChange = () => setVisible(!document.hidden)
+		document.addEventListener('visibilitychange', onChange)
+		return () => document.removeEventListener('visibilitychange', onChange)
+	}, [])
+
+	useEffect(() => {
+		if (!thread.data?.conversation) return
+		const through = readThrough(
+			thread.data.conversation,
+			thread.data.messages,
+			visible,
+			marked.current,
+		)
+		if (!through) return
+		marked.current = through
+		markRead.mutate(through)
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- one mark per newest message
+	}, [thread.data, visible])
 
 	// Bring the newest message into view on arrival, not when older pages load.
 	useEffect(() => {
@@ -145,6 +188,7 @@ export function ConversationThread({
 
 	const conversation = thread.data.conversation as ConversationSummary
 	const messages = thread.data.messages
+	const newFrom = firstNewIndex(messages, since?.at ?? null)
 	const name = memberName(conversation.counterpart, tCommon)
 	const counterpart = conversation.counterpart
 
@@ -223,17 +267,22 @@ export function ConversationThread({
 				) : (
 					<ol aria-live="polite" aria-relevant="additions">
 						{messages.map((message, index) => (
-							<MessageRow
+							<NewSinceAware
 								key={message.id}
-								conversationId={conversationId}
-								message={message}
-								startsGroup={startsGroup(message, messages[index - 1])}
-								author={message.sentByMe ? tCommon('you') : name}
-								otherName={name}
-								time={dateFormatter(locale, TIME_OPTIONS).format(
-									new Date(message.createdAt),
-								)}
-							/>
+								showLine={index === newFrom}
+								label={t('newSince')}
+							>
+								<MessageRow
+									conversationId={conversationId}
+									message={message}
+									startsGroup={startsGroup(message, messages[index - 1])}
+									author={message.sentByMe ? tCommon('you') : name}
+									otherName={name}
+									time={dateFormatter(locale, TIME_OPTIONS).format(
+										new Date(message.createdAt),
+									)}
+								/>
+							</NewSinceAware>
 						))}
 					</ol>
 				)}
@@ -293,6 +342,36 @@ export function ConversationThread({
 				</AlertDialogContent>
 			</AlertDialog>
 		</div>
+	)
+}
+
+/**
+ * MSG-03: the line above the first message that arrived since the reader last
+ * looked -- a ruled row with its words, never colour alone.
+ */
+function NewSinceAware({
+	showLine,
+	label,
+	children,
+}: {
+	showLine: boolean
+	label: string
+	children: React.ReactNode
+}) {
+	if (!showLine) return <>{children}</>
+	return (
+		<>
+			<li
+				role="separator"
+				aria-label={label}
+				className="type-label flex items-center gap-3 pt-3 text-foreground"
+			>
+				<span className="h-px flex-1 bg-rule" aria-hidden />
+				{label}
+				<span className="h-px flex-1 bg-rule" aria-hidden />
+			</li>
+			{children}
+		</>
 	)
 }
 
