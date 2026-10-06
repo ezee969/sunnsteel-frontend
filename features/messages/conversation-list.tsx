@@ -1,5 +1,6 @@
 'use client'
 
+import type { ConversationBox } from '@sunsteel/contracts'
 import { Ban, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -20,12 +21,17 @@ import { MemberAvatar } from './member-avatar'
  * one-line preview and when it last moved. MSG-03: a conversation with
  * something new says "New" before its time, as an unread notification does.
  */
-export function ConversationList() {
+export function ConversationList({
+	box = 'INBOX',
+}: {
+	/** MSG-02: the inbox, or the requests waiting for the member. */
+	box?: ConversationBox
+}) {
 	const t = useTranslations('messaging.list')
 	const tCommon = useTranslations('messaging.common')
 	const locale = useLocale() as Locale
 	const errorText = useApiErrorMessage()
-	const conversations = useConversations()
+	const conversations = useConversations(box)
 
 	if (conversations.isPending) {
 		return (
@@ -75,8 +81,12 @@ export function ConversationList() {
 			<>
 				{restricted}
 				<div className="space-y-1 py-4">
-					<p className="type-body text-ink-2">{t('empty')}</p>
-					<p className="type-body-sm text-ink-3">{t('emptyHint')}</p>
+					<p className="type-body text-ink-2">
+						{box === 'REQUESTS' ? t('requestsEmpty') : t('empty')}
+					</p>
+					<p className="type-body-sm text-ink-3">
+						{box === 'REQUESTS' ? t('requestsEmptyHint') : t('emptyHint')}
+					</p>
 				</div>
 			</>
 		)

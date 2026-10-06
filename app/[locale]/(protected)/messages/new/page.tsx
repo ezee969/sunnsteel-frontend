@@ -117,6 +117,11 @@ function NewMessage() {
 				</div>
 			</div>
 			<p className="type-body-sm text-ink-3">{tCommon('encryption')}</p>
+			{profile.messaging?.asRequest ? (
+				// MSG-02: said before the first message, which is all a request
+				// may hold until it is accepted.
+				<p className="type-body-sm text-ink-2">{t('asRequest', { name })}</p>
+			) : null}
 			<MessageComposer
 				autoFocus
 				isSending={start.isPending}

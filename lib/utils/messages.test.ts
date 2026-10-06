@@ -60,6 +60,7 @@ const summary = (
 	messagingRestricted: false,
 	unread: false,
 	lastReadAt: null,
+	request: null,
 	...overrides,
 })
 

@@ -57,6 +57,8 @@ function useBlockMutation(
 				['activity'],
 				// NAV-01: a blocked member and their routines leave search too.
 				['search'],
+				// MSG-01: a block hides the pair's conversation, request or not.
+				['conversations'],
 			] as const) {
 				void queryClient.invalidateQueries({ queryKey: key })
 			}

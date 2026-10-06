@@ -23,7 +23,13 @@
 		"openWith": "Conversación con {name}",
 		"restrictedNote": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes, y otros pueden escribirte.",
 		"new": "Nuevo",
-		"openWithNew": "Conversación con {name}, mensajes nuevos"
+		"openWithNew": "Conversación con {name}, mensajes nuevos",
+		"viewsLabel": "Vistas de mensajes",
+		"inboxTab": "Bandeja",
+		"requestsTab": "Solicitudes{count, plural, =0 {} other { (#)}}",
+		"requestsRegion": "Solicitudes de mensajes",
+		"requestsEmpty": "No hay solicitudes de mensajes.",
+		"requestsEmptyHint": "Cuando alguien a quien no sigues te escribe, su primer mensaje espera aquí."
 	},
 	"thread": {
 		"back": "Todos los mensajes",
@@ -53,7 +59,17 @@
 		"hiddenFromOther": "Oculto para {name} por moderación. Solo tú puedes verlo.",
 		"reportMessage": "Denunciar mensaje",
 		"reportMessageLabel": "Denunciar el mensaje de {name} enviado {time}",
-		"newSince": "Nuevo desde tu última visita"
+		"newSince": "Nuevo desde tu última visita",
+		"requestIncoming": "{name} quiere enviarte mensajes. No puede enviar más hasta que aceptes.",
+		"requestFollowHint": "Al aceptar, la conversación pasa a tu bandeja. Al rechazarla, se quita; no se le avisa a {name}.",
+		"accept": "Aceptar",
+		"decline": "Rechazar",
+		"block": "Bloquear",
+		"declineTitle": "¿Rechazar esta solicitud?",
+		"declineBody": "No se le avisa a {name}. No podrá enviarte otra solicitud durante 30 días.",
+		"blockTitle": "¿Bloquear a {name}?",
+		"decisionFailed": "No se pudo hacer.",
+		"requestOutgoing": "Tu solicitud se envió. Podrás escribir más cuando {name} la acepte."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -72,7 +88,8 @@
 		"unavailable": "No puedes enviarle mensajes a este miembro.",
 		"unavailableHint": "Puede que no esté recibiendo tus mensajes o que el perfil no esté disponible.",
 		"missing": "Elige a quién escribir desde su perfil.",
-		"restricted": "La moderación restringió tus mensajes, así que no puedes iniciar una conversación."
+		"restricted": "La moderación restringió tus mensajes, así que no puedes iniciar una conversación.",
+		"asRequest": "Esto llega a las solicitudes de mensajes de {name}. Podrás escribir más cuando la acepte."
 	},
 	"profile": {
 		"message": "Mensaje"
@@ -86,6 +103,8 @@
 		"nobody": "Nadie",
 		"nobodyHint": "Nadie puede iniciar una conversación nueva contigo.",
 		"existingNote": "Las conversaciones que ya tienes siguen funcionando. Para que alguien deje de escribirte, bloquéalo.",
-		"saveFailed": "No se pudo guardar tu elección."
+		"saveFailed": "No se pudo guardar tu elección.",
+		"everyone": "Todos",
+		"everyoneHint": "Los miembros que sigues llegan a tu bandeja. El primer mensaje de cualquier otra persona espera en Solicitudes hasta que lo aceptes."
 	}
 }

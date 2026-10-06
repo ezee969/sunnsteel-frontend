@@ -58,6 +58,7 @@ import {
 
 import { MemberAvatar } from './member-avatar'
 import { MessageComposer } from './message-composer'
+import { RequestPanel } from './request-panel'
 
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = {
 	dateStyle: 'medium',
@@ -100,7 +101,10 @@ export function ConversationThread({
 	const errorText = useApiErrorMessage()
 	const { push } = useToast()
 	const router = useRouter()
-	const thread = useConversationThread(conversationId)
+	// MSG-02: blocking from a request stops this thread reading first, so the
+	// conversation the block hides is not re-read into a 404 on the way out.
+	const [leaving, setLeaving] = useState(false)
+	const thread = useConversationThread(conversationId, !leaving)
 	const send = useSendMessage(conversationId)
 	const removeConversation = useDeleteConversation()
 	const markRead = useMarkConversationRead(conversationId)
@@ -289,7 +293,21 @@ export function ConversationThread({
 				<div ref={end} />
 			</section>
 
-			{conversation.messagingRestricted ? (
+			{conversation.request?.direction === 'INCOMING' ? (
+				<RequestPanel
+					onLeave={() => setLeaving(true)}
+					conversationId={conversationId}
+					name={name}
+					username={counterpart?.username ?? null}
+				/>
+			) : conversation.request?.direction === 'OUTGOING' &&
+			  !conversation.canSend ? (
+				// MSG-02: a sender waits after the first message, told neither
+				// whether it was seen nor whether it was declined.
+				<p className="type-body-sm border-t border-rule-faint pt-4 text-ink-2">
+					{t('requestOutgoing', { name })}
+				</p>
+			) : conversation.messagingRestricted ? (
 				<p className="type-body-sm flex items-start gap-2 border-t border-rule-faint pt-4 text-ink-2">
 					<Ban className="mt-0.5 size-4 shrink-0 text-ink-3" aria-hidden />
 					{t('restrictedNote')}
@@ -307,7 +325,7 @@ export function ConversationThread({
 					{counterpart ? t('unavailableNote') : t('deletedMemberNote')}
 				</p>
 			)}
-			{counterpart ? (
+			{counterpart && conversation.request?.direction !== 'INCOMING' ? (
 				<p className="type-body-sm text-ink-3">{t('blockHint')}</p>
 			) : null}
 

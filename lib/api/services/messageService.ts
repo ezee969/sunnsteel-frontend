@@ -1,4 +1,5 @@
 import type {
+	ConversationBox,
 	ConversationMessage,
 	ConversationMessagesResponse,
 	ConversationsResponse,
@@ -16,14 +17,35 @@ import { httpClient } from './httpClient'
 const CONVERSATIONS_API_URL = '/conversations'
 
 const page = (url: string, cursor: string | null) =>
-	cursor ? `${url}?cursor=${encodeURIComponent(cursor)}` : url
+	cursor
+		? `${url}${url.includes('?') ? '&' : '?'}cursor=${encodeURIComponent(cursor)}`
+		: url
 
 /** MSG-01: the signed-in member's conversations and their messages. */
 export const messageService = {
-	listConversations: (cursor: string | null) =>
+	listConversations: (cursor: string | null, box: ConversationBox = 'INBOX') =>
 		httpClient.request<ConversationsResponse>(
-			page(CONVERSATIONS_API_URL, cursor),
+			page(
+				box === 'REQUESTS'
+					? `${CONVERSATIONS_API_URL}?box=REQUESTS`
+					: CONVERSATIONS_API_URL,
+				cursor,
+			),
 			{ method: 'GET', secure: true },
+		),
+
+	/** MSG-02: the recipient takes a request into their inbox. */
+	acceptRequest: (conversationId: string) =>
+		httpClient.request<void>(
+			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/accept`,
+			{ method: 'POST', secure: true },
+		),
+
+	/** MSG-02: the recipient declines a request; its sender is not told. */
+	declineRequest: (conversationId: string) =>
+		httpClient.request<void>(
+			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/decline`,
+			{ method: 'POST', secure: true },
 		),
 
 	listMessages: (conversationId: string, cursor: string | null) =>

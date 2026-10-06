@@ -71,6 +71,7 @@ export function MessagingSettingsCard({ profile }: { profile: UserProfile }) {
 							aria-describedby="message-permission-hint"
 						>
 							<option value="FOLLOWED">{t('followed')}</option>
+							<option value="EVERYONE">{t('everyone')}</option>
 							<option value="NOBODY">{t('nobody')}</option>
 						</NativeSelect>
 						{update.isPending ? (
@@ -84,7 +85,11 @@ export function MessagingSettingsCard({ profile }: { profile: UserProfile }) {
 						id="message-permission-hint"
 						className="type-body-sm max-w-[68ch] text-ink-3"
 					>
-						{current === 'NOBODY' ? t('nobodyHint') : t('followedHint')}
+						{current === 'NOBODY'
+							? t('nobodyHint')
+							: current === 'EVERYONE'
+								? t('everyoneHint')
+								: t('followedHint')}
 					</p>
 				</div>
 				<p className="type-body-sm max-w-[68ch] text-ink-2">

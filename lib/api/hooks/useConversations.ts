@@ -1,4 +1,5 @@
 import type {
+	ConversationBox,
 	ConversationMessagesResponse,
 	ConversationsResponse,
 	MessagePermission,
@@ -31,6 +32,8 @@ type ThreadPages = InfiniteData<ConversationMessagesResponse, string | null>
 export const conversationKeys = {
 	all: () => ['conversations'] as const,
 	list: () => ['conversations', 'list'] as const,
+	/** MSG-02: one box of the list; `list()` stays the prefix for both. */
+	box: (box: ConversationBox) => ['conversations', 'list', box] as const,
 	unread: () => ['conversations', 'unread'] as const,
 	thread: (id: string) => ['conversations', 'thread', id] as const,
 }
@@ -39,12 +42,16 @@ export const conversationKeys = {
 const LIST_POLL_MS = 60_000
 const THREAD_POLL_MS = 20_000
 
-/** The member's conversations, newest activity first, a page at a time. */
-export function useConversations() {
+/**
+ * The member's conversations, newest activity first, a page at a time: the
+ * inbox, or (MSG-02) the requests waiting for them.
+ */
+export function useConversations(box: ConversationBox = 'INBOX') {
 	const live = useRealtimeLive()
 	return useInfiniteQuery({
-		queryKey: conversationKeys.list(),
-		queryFn: ({ pageParam }) => messageService.listConversations(pageParam),
+		queryKey: conversationKeys.box(box),
+		queryFn: ({ pageParam }) =>
+			messageService.listConversations(pageParam, box),
 		initialPageParam: null as string | null,
 		getNextPageParam: (last: ConversationsResponse) => last.nextCursor,
 		select: conversationListFromPages,
@@ -70,6 +77,40 @@ export function useUnreadConversations(enabled = true) {
 		refetchOnWindowFocus: true,
 		refetchInterval: live ? false : LIST_POLL_MS,
 	})
+}
+
+/** MSG-02: requests waiting for the member, for the Requests tab only. */
+export function useConversationRequestCount() {
+	const live = useRealtimeLive()
+	return useQuery({
+		queryKey: conversationKeys.unread(),
+		queryFn: messageService.unreadCount,
+		select: data => data.requests,
+		staleTime: 30_000,
+		refetchOnWindowFocus: true,
+		refetchInterval: live ? false : LIST_POLL_MS,
+	})
+}
+
+/**
+ * MSG-02: accepting or declining a request moves it between the boxes and
+ * changes the counts, so every conversation read is refreshed.
+ */
+function useRequestDecision(run: (conversationId: string) => Promise<void>) {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: run,
+		onSuccess: () =>
+			void queryClient.invalidateQueries({ queryKey: conversationKeys.all() }),
+	})
+}
+
+export function useAcceptRequest() {
+	return useRequestDecision(messageService.acceptRequest)
+}
+
+export function useDeclineRequest() {
+	return useRequestDecision(messageService.declineRequest)
 }
 
 /**
@@ -98,9 +139,10 @@ export function useMarkConversationRead(conversationId: string) {
  * One conversation's messages. Pages run newest first and the thread reads
  * oldest first; older pages load as the reader asks for them.
  */
-export function useConversationThread(conversationId: string) {
+export function useConversationThread(conversationId: string, enabled = true) {
 	const live = useRealtimeLive()
 	return useInfiniteQuery({
+		enabled,
 		queryKey: conversationKeys.thread(conversationId),
 		queryFn: ({ pageParam }) =>
 			messageService.listMessages(conversationId, pageParam),

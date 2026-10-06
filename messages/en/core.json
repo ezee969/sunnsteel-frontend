@@ -463,7 +463,8 @@
 		"MESSAGING_RESTRICTED": "Moderation has restricted your messaging. You can still read and delete messages.",
 		"REPORT_OWN_MESSAGE": "You cannot report your own message",
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
-		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted"
+		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",
+		"REQUEST_PENDING": "You can send more once they accept your request."
 	},
 	"glossary": {
 		"label": "Terms:",

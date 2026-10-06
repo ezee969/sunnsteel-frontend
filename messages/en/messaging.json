@@ -23,7 +23,13 @@
 		"openWith": "Conversation with {name}",
 		"restrictedNote": "Moderation has restricted your messaging. You can still read and delete messages, and others can still write to you.",
 		"new": "New",
-		"openWithNew": "Conversation with {name}, new messages"
+		"openWithNew": "Conversation with {name}, new messages",
+		"viewsLabel": "Message views",
+		"inboxTab": "Inbox",
+		"requestsTab": "Requests{count, plural, =0 {} other { (#)}}",
+		"requestsRegion": "Message requests",
+		"requestsEmpty": "No message requests.",
+		"requestsEmptyHint": "When someone you don't follow writes to you, their first message waits here."
 	},
 	"thread": {
 		"back": "All messages",
@@ -53,7 +59,17 @@
 		"hiddenFromOther": "Hidden from {name} by moderation. Only you can see it.",
 		"reportMessage": "Report message",
 		"reportMessageLabel": "Report the message from {name} sent {time}",
-		"newSince": "New since you last looked"
+		"newSince": "New since you last looked",
+		"requestIncoming": "{name} wants to message you. They can't send more until you accept.",
+		"requestFollowHint": "Accepting moves the conversation to your inbox. Declining removes it; {name} isn't told.",
+		"accept": "Accept",
+		"decline": "Decline",
+		"block": "Block",
+		"declineTitle": "Decline this request?",
+		"declineBody": "{name} isn't told. They can't send you another request for 30 days.",
+		"blockTitle": "Block {name}?",
+		"decisionFailed": "That couldn't be done.",
+		"requestOutgoing": "Your request is sent. You can write more once {name} accepts it."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -72,7 +88,8 @@
 		"unavailable": "You can't message this member.",
 		"unavailableHint": "They may not be taking messages from you, or the profile isn't available.",
 		"missing": "Choose a member to message from their profile.",
-		"restricted": "Moderation has restricted your messaging, so you can't start a conversation."
+		"restricted": "Moderation has restricted your messaging, so you can't start a conversation.",
+		"asRequest": "This goes to {name}'s message requests. You can write more once they accept it."
 	},
 	"profile": {
 		"message": "Message"
@@ -86,6 +103,8 @@
 		"nobody": "Nobody",
 		"nobodyHint": "No one can start a new conversation with you.",
 		"existingNote": "Conversations you already have keep working. To stop someone writing to you, block them.",
-		"saveFailed": "Your choice couldn't be saved."
+		"saveFailed": "Your choice couldn't be saved.",
+		"everyone": "Everyone",
+		"everyoneHint": "Members you follow reach your inbox. Anyone else's first message waits in Requests until you accept it."
 	}
 }

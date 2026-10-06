@@ -463,7 +463,8 @@
 		"MESSAGING_RESTRICTED": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes.",
 		"REPORT_OWN_MESSAGE": "No puedes denunciar tu propio mensaje",
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
-		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos"
+		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
+		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud."
 	},
 	"glossary": {
 		"label": "Términos:",
