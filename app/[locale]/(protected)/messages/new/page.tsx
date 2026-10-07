@@ -11,7 +11,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { MemberAvatar } from '@/features/messages/member-avatar'
 import { MessageComposer } from '@/features/messages/message-composer'
-import { useAttachedRoutine } from '@/features/messages/use-attached-routine'
+import {
+	useAttachedObject,
+	useAttachRef,
+} from '@/features/messages/use-attached-object'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import {
 	useConversations,
@@ -35,12 +38,12 @@ function NewMessage() {
 	const router = useRouter()
 	const params = useSearchParams()
 	const to = params.get('to')?.trim() ?? ''
-	// The id as handed in: the conversation it redirects to resolves it.
-	const routineId = params.get('routine')
+	// As handed in: the conversation it redirects to resolves its name.
+	const attachRef = useAttachRef()
 	const member = usePublicUser(to)
 	const start = useStartConversation()
-	// MSG-07: "Send in a message" opens the composer with the routine attached.
-	const initialRoutine = useAttachedRoutine()
+	// MSG-07/MSG-10: "Send in a message" opens the composer with it attached.
+	const initialAttachment = useAttachedObject()
 	// MSG-09: the list read says whether moderation restricted this member,
 	// which is the one reason worth naming when they cannot write.
 	const restricted = useConversations().data?.messagingRestricted ?? false
@@ -48,9 +51,11 @@ function NewMessage() {
 
 	useEffect(() => {
 		if (existing && member.data) {
-			router.replace(messageHref(member.data.username, existing, routineId))
+			router.replace(messageHref(member.data.username, existing, attachRef))
 		}
-	}, [existing, member.data, router, routineId])
+		// The ref is rebuilt each render; its kind and id are what matter.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [existing, member.data, router, attachRef?.kind, attachRef?.id])
 
 	const back = (
 		<Link
@@ -131,7 +136,7 @@ function NewMessage() {
 			<MessageComposer
 				autoFocus
 				isSending={start.isPending}
-				initialRoutine={initialRoutine}
+				initialAttachment={initialAttachment}
 				onSend={content =>
 					start
 						.mutateAsync({ recipient: profile.id, ...content })

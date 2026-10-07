@@ -6,6 +6,7 @@ import type {
 	SendMessageRequest,
 	SendMessageResponse,
 	SharedRoutine,
+	SharedWorkout,
 	UserProfile,
 } from '@sunsteel/contracts'
 import {
@@ -41,6 +42,9 @@ export const conversationKeys = {
 	/** MSG-07: a routine a message shared, inside the topic's prefix. */
 	routine: (conversationId: string, messageId: string) =>
 		['conversations', 'routine', conversationId, messageId] as const,
+	/** MSG-10: a workout a message shared. */
+	workout: (conversationId: string, messageId: string) =>
+		['conversations', 'workout', conversationId, messageId] as const,
 }
 
 /** While the realtime stream is not live, how often an open screen re-reads. */
@@ -220,6 +224,17 @@ export function useMessageRoutine(conversationId: string, messageId: string) {
 	return useQuery<SharedRoutine>({
 		queryKey: conversationKeys.routine(conversationId, messageId),
 		queryFn: () => messageService.messageRoutine(conversationId, messageId),
+		enabled: !!conversationId && !!messageId,
+		staleTime: 0,
+		retry: false,
+	})
+}
+
+/** MSG-10: the workout a message shared, read as it is now. */
+export function useMessageWorkout(conversationId: string, messageId: string) {
+	return useQuery<SharedWorkout>({
+		queryKey: conversationKeys.workout(conversationId, messageId),
+		queryFn: () => messageService.messageWorkout(conversationId, messageId),
 		enabled: !!conversationId && !!messageId,
 		staleTime: 0,
 		retry: false,

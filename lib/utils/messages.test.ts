@@ -20,11 +20,14 @@ import {
 	memberName,
 	messageHref,
 	messageRoutineHref,
+	messageWorkoutHref,
 	readThrough,
 	routineLine,
 	sendableRoutines,
 	startsGroup,
 	threadFromPages,
+	workoutLine,
+	workoutName,
 } from './messages'
 
 const en = translatorFor('en', 'messaging.common')
@@ -255,14 +258,22 @@ describe('MSG-07 a routine in a message', () => {
 		})
 
 	it('sends a routine with or without a note, never an empty message', () => {
-		expect(composerState('', 'r-1').sendable).toEqual({ routineId: 'r-1' })
-		expect(composerState('  try this ', 'r-1').sendable).toEqual({
+		expect(
+			composerState('', { kind: 'ROUTINE' as const, id: 'r-1' }).sendable,
+		).toEqual({ routineId: 'r-1' })
+		expect(
+			composerState('  try this ', { kind: 'ROUTINE' as const, id: 'r-1' })
+				.sendable,
+		).toEqual({
 			body: 'try this',
 			routineId: 'r-1',
 		})
 		expect(composerState('').sendable).toBeNull()
 		expect(
-			composerState('a'.repeat(MESSAGE_BODY_MAX + 1), 'r-1').sendable,
+			composerState('a'.repeat(MESSAGE_BODY_MAX + 1), {
+				kind: 'ROUTINE' as const,
+				id: 'r-1',
+			}).sendable,
 		).toBeNull()
 	})
 
@@ -301,10 +312,12 @@ describe('MSG-07 a routine in a message', () => {
 	})
 
 	it('opens the composer with the routine attached, and the routine from its message', () => {
-		expect(messageHref('ana', 'c-1', 'r-1')).toBe('/messages/c-1?routine=r-1')
-		expect(messageHref('ana', null, 'r-1')).toBe(
-			'/messages/new?to=ana&routine=r-1',
-		)
+		expect(
+			messageHref('ana', 'c-1', { kind: 'ROUTINE' as const, id: 'r-1' }),
+		).toBe('/messages/c-1?routine=r-1')
+		expect(
+			messageHref('ana', null, { kind: 'ROUTINE' as const, id: 'r-1' }),
+		).toBe('/messages/new?to=ana&routine=r-1')
 		expect(messageRoutineHref('c-1', 'm-1')).toBe('/messages/c-1/routines/m-1')
 	})
 })
@@ -342,5 +355,55 @@ describe('MSG-03 unread state', () => {
 		expect(readThrough({ unread: true }, thread, false, null)).toBeNull()
 		expect(readThrough({ unread: false }, thread, true, null)).toBeNull()
 		expect(readThrough({ unread: true }, [], true, null)).toBeNull()
+	})
+})
+
+describe('MSG-10 a finished workout in a message', () => {
+	const workout = {
+		sessionId: 's-1',
+		routineName: 'Upper / Lower',
+		dayName: 'Upper A',
+		endedAt: '2026-10-07T09:00:00.000Z',
+		durationSec: 3600,
+		totalVolumeKg: 6250,
+		completedSets: 18,
+	}
+	const W = { kind: 'WORKOUT' as const, id: 's-1' }
+
+	it('sends a workout with or without a note, as a session id', () => {
+		expect(composerState('', W).sendable).toEqual({ sessionId: 's-1' })
+		expect(composerState(' look ', W).sendable).toEqual({
+			body: 'look',
+			sessionId: 's-1',
+		})
+	})
+
+	it('names a workout by its routine and day, and previews it in both languages', () => {
+		expect(workoutName(workout)).toBe('Upper / Lower · Upper A')
+		expect(workoutName({ routineName: 'Full Body', dayName: null })).toBe(
+			'Full Body',
+		)
+		const preview = summary('a', {
+			lastMessage: message('x', '10:00', {
+				body: null,
+				attachment: { kind: 'WORKOUT', workout },
+			}),
+		})
+		expect(conversationPreview(preview, en)).toBe(
+			'Workout: Upper / Lower · Upper A',
+		)
+		expect(conversationPreview(preview, es)).toBe(
+			'Entrenamiento: Upper / Lower · Upper A',
+		)
+		expect(workoutLine(null, en)).toBe("A workout that's no longer available")
+		expect(workoutLine(null, es)).toBe(
+			'Un entrenamiento que ya no está disponible',
+		)
+	})
+
+	it('opens the composer with the workout attached, and the workout from its message', () => {
+		expect(messageHref('ana', 'c-1', W)).toBe('/messages/c-1?workout=s-1')
+		expect(messageHref('ana', null, W)).toBe('/messages/new?to=ana&workout=s-1')
+		expect(messageWorkoutHref('c-1', 'm-1')).toBe('/messages/c-1/workouts/m-1')
 	})
 })

@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
-import { SendRoutineInMessage } from '@/features/routines/components/SendRoutineInMessage'
+import { SendRoutineInMessage } from '@/features/messages/send-in-message'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import {
 	useCreateRoutineShare,

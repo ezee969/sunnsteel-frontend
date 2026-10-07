@@ -5,8 +5,10 @@ import {
 	type ConversationsResponse,
 	type ConversationSummary,
 	MESSAGE_BODY_MAX,
+	type MessageAttachment,
 	messageBodyLength,
 	messageNote,
+	type MessageWorkoutSummary,
 	type SendMessageRequest,
 } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
@@ -156,12 +158,40 @@ export function conversationPreview(
 			? t('removedByModeration')
 			: last.body
 				? last.body
-				: // MSG-07: a routine sent without a note is named by the routine.
+				: // MSG-07/MSG-10: an object sent without a note is named by it.
 					last.attachment
-					? routineLine(last.attachment.routine, t)
+					? attachmentLine(last.attachment, t)
 					: ''
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
+}
+
+/** MSG-07/MSG-10: what a message carries, in one line. */
+export function attachmentLine(
+	attachment: MessageAttachment,
+	t: Translator<'messaging.common'>,
+): string {
+	return attachment.kind === 'ROUTINE'
+		? routineLine(attachment.routine, t)
+		: workoutLine(attachment.workout, t)
+}
+
+/** MSG-10: a workout's name -- its routine and day, as a recap names it. */
+export function workoutName(workout: {
+	routineName: string
+	dayName?: string | null
+}): string {
+	return [workout.routineName, workout.dayName].filter(Boolean).join(' · ')
+}
+
+/** MSG-10: a workout in one line, or that it is no longer available. */
+export function workoutLine(
+	workout: MessageWorkoutSummary | null,
+	t: Translator<'messaging.common'>,
+): string {
+	return workout
+		? t('sharedWorkout', { name: workoutName(workout) })
+		: t('workoutUnavailable')
 }
 
 /** MSG-07: a routine in one line, or that it is no longer available. */
@@ -178,19 +208,25 @@ export interface ComposerState {
 	length: number
 	/**
 	 * What would be sent, or null when nothing can be: the text, and the
-	 * routine it carries (MSG-07), beside which the text may be empty.
+	 * object it carries (MSG-07/MSG-10), beside which the text may be empty.
 	 */
 	sendable: SendMessageRequest | null
 	over: boolean
 }
 
+/** MSG-07/MSG-10: one object a message carries -- a routine or a workout. */
+export interface AttachRef {
+	kind: 'ROUTINE' | 'WORKOUT'
+	id: string
+}
+
 /** What the composer can say about a draft, by the server's own rule. */
 export function composerState(
 	draft: string,
-	routineId: string | null = null,
+	attached: AttachRef | null = null,
 ): ComposerState {
 	const length = messageBodyLength(draft.replace(/\r\n?/g, '\n').trim())
-	const note = messageNote(draft, routineId !== null)
+	const note = messageNote(draft, attached !== null)
 	return {
 		length,
 		sendable:
@@ -198,7 +234,8 @@ export function composerState(
 				? null
 				: {
 						...(note === null ? {} : { body: note }),
-						...(routineId ? { routineId } : {}),
+						...(attached?.kind === 'ROUTINE' ? { routineId: attached.id } : {}),
+						...(attached?.kind === 'WORKOUT' ? { sessionId: attached.id } : {}),
 					},
 		over: length > MESSAGE_BODY_MAX,
 	}
@@ -221,19 +258,32 @@ export function enterSends(
 	)
 }
 
+/** MSG-07/MSG-10: the query that hands an object to the composer. */
+export const ATTACH_PARAMS = { ROUTINE: 'routine', WORKOUT: 'workout' } as const
+
 /**
- * Where a profile's Message action opens. With a routine (MSG-07), the
- * composer opens with it attached, ready for a note.
+ * Where a profile's Message action opens. With an object (MSG-07/MSG-10),
+ * the composer opens with it attached, ready for a note.
  */
 export function messageHref(
 	username: string,
 	conversationId: string | null,
-	routineId: string | null = null,
+	attached: AttachRef | null = null,
 ): string {
-	const routine = routineId ? `routine=${encodeURIComponent(routineId)}` : ''
+	const query = attached
+		? `${ATTACH_PARAMS[attached.kind]}=${encodeURIComponent(attached.id)}`
+		: ''
 	return conversationId
-		? `/messages/${encodeURIComponent(conversationId)}${routine ? `?${routine}` : ''}`
-		: `/messages/new?to=${encodeURIComponent(username)}${routine ? `&${routine}` : ''}`
+		? `/messages/${encodeURIComponent(conversationId)}${query ? `?${query}` : ''}`
+		: `/messages/new?to=${encodeURIComponent(username)}${query ? `&${query}` : ''}`
+}
+
+/** MSG-10: the page that opens the workout a message shared. */
+export function messageWorkoutHref(
+	conversationId: string,
+	messageId: string,
+): string {
+	return `/messages/${encodeURIComponent(conversationId)}/workouts/${encodeURIComponent(messageId)}`
 }
 
 /**

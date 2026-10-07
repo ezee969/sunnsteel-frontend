@@ -74,11 +74,20 @@ export function ReportedMessages({
 							<p className="type-body whitespace-pre-wrap break-words text-foreground">
 								{message.body}
 							</p>
-						) : typeof message.routineName === 'string' ? null : (
+						) : typeof message.routineName === 'string' ||
+						  typeof message.workoutName === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-10: a workout it carried, by the name the reporter saw. */}
+						{typeof message.workoutName === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.workoutName
+									? t('capturedWorkout', { name: message.workoutName })
+									: t('capturedWorkoutGone')}
+							</p>
+						) : null}
 						{/* MSG-07: a routine it carried, by the name the reporter saw. */}
 						{typeof message.routineName === 'string' ? (
 							<p className="type-body-sm text-ink-2">

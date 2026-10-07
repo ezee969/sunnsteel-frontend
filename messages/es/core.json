@@ -464,7 +464,8 @@
 		"REPORT_OWN_MESSAGE": "No puedes denunciar tu propio mensaje",
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
 		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
-		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud."
+		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud.",
+		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una rutina o un entrenamiento, no ambos."
 	},
 	"glossary": {
 		"label": "Términos:",

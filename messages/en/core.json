@@ -464,7 +464,8 @@
 		"REPORT_OWN_MESSAGE": "You cannot report your own message",
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",
-		"REQUEST_PENDING": "You can send more once they accept your request."
+		"REQUEST_PENDING": "You can send more once they accept your request.",
+		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine or one workout."
 	},
 	"glossary": {
 		"label": "Terms:",

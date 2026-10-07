@@ -10,7 +10,9 @@
 		"cancel": "Cancel",
 		"removedByModeration": "Removed by moderation",
 		"sharedRoutine": "Routine: {name}",
-		"routineUnavailable": "A routine that's no longer available"
+		"routineUnavailable": "A routine that's no longer available",
+		"sharedWorkout": "Workout: {name}",
+		"workoutUnavailable": "A workout that's no longer available"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -76,7 +78,12 @@
 		"routineMeta": "{days, plural, one {# day} other {# days}} · {exercises, plural, one {# exercise} other {# exercises}}",
 		"openRoutine": "Open routine",
 		"openRoutineLabel": "Open the routine {name}",
-		"routineGone": "This routine is no longer available."
+		"routineGone": "This routine is no longer available.",
+		"workoutCardLabel": "Workout",
+		"workoutMeta": "{date} · {duration} · {sets, plural, one {# set} other {# sets}} · {volume}",
+		"openWorkout": "Open workout",
+		"openWorkoutLabel": "Open the workout {name}",
+		"workoutGone": "This workout is no longer available."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -87,15 +94,20 @@
 		"tooLong": "{count} / {max}, too long to send",
 		"keyboardHint": "Enter sends, Shift+Enter adds a line.",
 		"sendFailed": "The message couldn't be sent.",
-		"attachRoutine": "Attach a routine",
 		"attachedRoutine": "Routine: {name}",
-		"removeRoutine": "Remove the routine {name}",
 		"notePlaceholder": "Add a note (optional)",
-		"pickerTitle": "Attach one of your routines",
-		"pickerDescription": "The other member can open it and make their own copy, whatever its visibility, until you delete the message. They see it as it is when they open it, and never your workouts.",
 		"pickerLoading": "Loading your routines…",
 		"pickerEmpty": "You have no routines yet.",
-		"pickerChoose": "Attach {name}"
+		"pickerChoose": "Attach {name}",
+		"attach": "Attach",
+		"attachedWorkout": "Workout: {name}",
+		"removeAttachment": "Remove {name}",
+		"attachTitle": "Attach a routine or a workout",
+		"attachDescription": "The other member can open what you send, whatever your privacy settings, until you delete the message. A routine can be copied; a workout shows its totals, records and sets, never your notes.",
+		"routinesHeading": "Your routines",
+		"workoutsHeading": "Recent workouts",
+		"workoutsEmpty": "No finished workouts yet.",
+		"workoutsLoading": "Loading your workouts…"
 	},
 	"new": {
 		"pageTitle": "New message",
@@ -134,5 +146,36 @@
 		"yours": "This is your routine, as you sent it in this conversation.",
 		"openYours": "Open it in your routines",
 		"tryAgain": "Try again"
+	},
+	"workout": {
+		"back": "Back to the conversation",
+		"loading": "Loading the workout…",
+		"unavailable": "This workout isn't available.",
+		"unavailableHint": "The message or the workout may have been deleted.",
+		"loadError": "The workout couldn't be loaded.",
+		"tryAgain": "Try again",
+		"sentToYou": "{name} sent you this workout. You can open it until the message is deleted.",
+		"yours": "This is your workout, as you sent it in this conversation.",
+		"openYours": "Open it in your history",
+		"finishedOn": "Finished {date}",
+		"duration": "Duration",
+		"sets": "Sets",
+		"volume": "Volume",
+		"recordsHeading": "Records set",
+		"exercisesHeading": "Exercises",
+		"noSetsNote": "Only completed sets are shown, never notes or effort ratings.",
+		"setLine": "{weight} × {reps}",
+		"setRepsOnly": "{reps, plural, one {# rep} other {# reps}}",
+		"setNumber": "Set {number}"
+	},
+	"send": {
+		"title": "Send {name} in a message",
+		"recent": "Recent conversations",
+		"noConversations": "No conversations yet.",
+		"searchLabel": "Find a member",
+		"searchPlaceholder": "Name or username",
+		"searchEmpty": "No members found.",
+		"sendTo": "Send to {name}",
+		"description": "Choose a conversation or a member. It opens attached in the message, where you can add a note before sending."
 	}
 }

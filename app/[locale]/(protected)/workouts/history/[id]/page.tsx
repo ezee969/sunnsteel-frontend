@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
+import { SendWorkoutInMessage } from '@/features/messages/send-in-message'
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
 import {
@@ -21,6 +22,7 @@ import {
 	useSessionRecap,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
+import { workoutName } from '@/lib/utils/messages'
 import { isRotationDay } from '@/lib/utils/session-linear-block'
 import { noteFor } from '@/lib/utils/session-notes'
 import { sessionRoutineTitle } from '@/lib/utils/session-prescription'
@@ -89,7 +91,16 @@ export default function WorkoutDetailPage() {
 				recap ? (
 					<SessionRecapPanel
 						recap={recap}
-						action={<SessionShareButton sessionId={session.id} />}
+						action={
+							<div className="flex flex-wrap gap-2">
+								<SessionShareButton sessionId={session.id} />
+								{/* MSG-10: to one member, in a conversation. */}
+								<SendWorkoutInMessage
+									sessionId={session.id}
+									name={workoutName(recap)}
+								/>
+							</div>
+						}
 						rotation={isRotationDay(session.routineDay)}
 						notesAction={
 							<WorkoutNoteButton

@@ -7,6 +7,7 @@ import type {
 	SendMessageRequest,
 	SendMessageResponse,
 	SharedRoutine,
+	SharedWorkout,
 	StartConversationRequest,
 	UnreadConversationsResponse,
 	UpdateMessagePermissionRequest,
@@ -75,6 +76,13 @@ export const messageService = {
 	messageRoutine: (conversationId: string, messageId: string) =>
 		httpClient.request<SharedRoutine>(
 			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/messages/${encodeURIComponent(messageId)}/routine`,
+			{ method: 'GET', secure: true },
+		),
+
+	/** MSG-10: the workout a message shared, opened. */
+	messageWorkout: (conversationId: string, messageId: string) =>
+		httpClient.request<SharedWorkout>(
+			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/messages/${encodeURIComponent(messageId)}/workout`,
 			{ method: 'GET', secure: true },
 		),
 

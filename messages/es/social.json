@@ -92,7 +92,9 @@
 		"liftRestriction": "Levantar restricción",
 		"messagingRestricted": "Mensajes restringidos",
 		"capturedRoutine": "Compartió una rutina: {name}",
-		"capturedRoutineGone": "Compartió una rutina que ya no está disponible"
+		"capturedRoutineGone": "Compartió una rutina que ya no está disponible",
+		"capturedWorkout": "Compartió un entrenamiento: {name}",
+		"capturedWorkoutGone": "Compartió un entrenamiento que ya no está disponible"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",

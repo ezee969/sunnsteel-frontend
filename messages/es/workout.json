@@ -517,5 +517,8 @@
 		"estimateFrom": "Calculado a partir de",
 		"sampleWeek": "Semana {step}, serie {set}: {load} × {reps}, RIR {rir}",
 		"sampleSession": "Sesión {step}, serie {set}: {load} × {reps}, RIR {rir}"
+	},
+	"history": {
+		"sendInMessage": "Enviar en un mensaje"
 	}
 }

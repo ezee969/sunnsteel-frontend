@@ -10,7 +10,9 @@
 		"cancel": "Cancelar",
 		"removedByModeration": "Eliminado por moderación",
 		"sharedRoutine": "Rutina: {name}",
-		"routineUnavailable": "Una rutina que ya no está disponible"
+		"routineUnavailable": "Una rutina que ya no está disponible",
+		"sharedWorkout": "Entrenamiento: {name}",
+		"workoutUnavailable": "Un entrenamiento que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -76,7 +78,12 @@
 		"routineMeta": "{days, plural, one {# día} other {# días}} · {exercises, plural, one {# ejercicio} other {# ejercicios}}",
 		"openRoutine": "Abrir rutina",
 		"openRoutineLabel": "Abrir la rutina {name}",
-		"routineGone": "Esta rutina ya no está disponible."
+		"routineGone": "Esta rutina ya no está disponible.",
+		"workoutCardLabel": "Entrenamiento",
+		"workoutMeta": "{date} · {duration} · {sets, plural, one {# serie} other {# series}} · {volume}",
+		"openWorkout": "Abrir entrenamiento",
+		"openWorkoutLabel": "Abrir el entrenamiento {name}",
+		"workoutGone": "Este entrenamiento ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -87,15 +94,20 @@
 		"tooLong": "{count} / {max}, demasiado largo para enviar",
 		"keyboardHint": "Enter envía; Mayús+Enter agrega una línea.",
 		"sendFailed": "No se pudo enviar el mensaje.",
-		"attachRoutine": "Adjuntar una rutina",
 		"attachedRoutine": "Rutina: {name}",
-		"removeRoutine": "Quitar la rutina {name}",
 		"notePlaceholder": "Agrega una nota (opcional)",
-		"pickerTitle": "Adjunta una de tus rutinas",
-		"pickerDescription": "La otra persona puede abrirla y hacer su propia copia, sea cual sea su visibilidad, hasta que borres el mensaje. La ve tal como esté al abrirla, y nunca tus entrenamientos.",
 		"pickerLoading": "Cargando tus rutinas…",
 		"pickerEmpty": "Aún no tienes rutinas.",
-		"pickerChoose": "Adjuntar {name}"
+		"pickerChoose": "Adjuntar {name}",
+		"attach": "Adjuntar",
+		"attachedWorkout": "Entrenamiento: {name}",
+		"removeAttachment": "Quitar {name}",
+		"attachTitle": "Adjunta una rutina o un entrenamiento",
+		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas.",
+		"routinesHeading": "Tus rutinas",
+		"workoutsHeading": "Entrenamientos recientes",
+		"workoutsEmpty": "Aún no tienes entrenamientos terminados.",
+		"workoutsLoading": "Cargando tus entrenamientos…"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",
@@ -134,5 +146,36 @@
 		"yours": "Es tu rutina, tal como la enviaste en esta conversación.",
 		"openYours": "Abrirla en tus rutinas",
 		"tryAgain": "Intentar de nuevo"
+	},
+	"workout": {
+		"back": "Volver a la conversación",
+		"loading": "Cargando el entrenamiento…",
+		"unavailable": "Este entrenamiento no está disponible.",
+		"unavailableHint": "Puede que se haya borrado el mensaje o el entrenamiento.",
+		"loadError": "No se pudo cargar el entrenamiento.",
+		"tryAgain": "Intentar de nuevo",
+		"sentToYou": "{name} te envió este entrenamiento. Puedes abrirlo hasta que se borre el mensaje.",
+		"yours": "Es tu entrenamiento, tal como lo enviaste en esta conversación.",
+		"openYours": "Abrirlo en tu historial",
+		"finishedOn": "Terminado el {date}",
+		"duration": "Duración",
+		"sets": "Series",
+		"volume": "Volumen",
+		"recordsHeading": "Récords logrados",
+		"exercisesHeading": "Ejercicios",
+		"noSetsNote": "Solo se muestran las series completadas, nunca notas ni valoraciones de esfuerzo.",
+		"setLine": "{weight} × {reps}",
+		"setRepsOnly": "{reps, plural, one {# repetición} other {# repeticiones}}",
+		"setNumber": "Serie {number}"
+	},
+	"send": {
+		"title": "Enviar {name} en un mensaje",
+		"recent": "Conversaciones recientes",
+		"noConversations": "Aún no tienes conversaciones.",
+		"searchLabel": "Buscar a un miembro",
+		"searchPlaceholder": "Nombre o usuario",
+		"searchEmpty": "No se encontraron miembros.",
+		"sendTo": "Enviar a {name}",
+		"description": "Elige una conversación o un miembro. Se abre adjunto en el mensaje, donde puedes agregar una nota antes de enviarlo."
 	}
 }

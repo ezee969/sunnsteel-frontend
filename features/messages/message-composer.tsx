@@ -1,7 +1,14 @@
 'use client'
 
 import { MESSAGE_BODY_MAX, type SendMessageRequest } from '@sunsteel/contracts'
-import { ClipboardList, Loader2, Send, X } from 'lucide-react'
+import {
+	ClipboardList,
+	Dumbbell,
+	Loader2,
+	Paperclip,
+	Send,
+	X,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useState } from 'react'
 
@@ -10,9 +17,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { composerState, enterSends } from '@/lib/utils/messages'
 
-import { RoutinePicker } from './routine-picker'
+import { AttachPicker } from './attach-picker'
 
-export interface AttachedRoutine {
+/** MSG-07/MSG-10: what the composer has attached, with its name. */
+export interface AttachedObject {
+	kind: 'ROUTINE' | 'WORKOUT'
 	id: string
 	name: string
 }
@@ -22,8 +31,8 @@ type MessageComposerProps = {
 	onSend: (content: SendMessageRequest) => Promise<unknown>
 	isSending: boolean
 	autoFocus?: boolean
-	/** MSG-07: a routine to open with, from "Send in a message". */
-	initialRoutine?: AttachedRoutine | null
+	/** MSG-07/MSG-10: an object to open with, from "Send in a message". */
+	initialAttachment?: AttachedObject | null
 }
 
 /**
@@ -32,29 +41,32 @@ type MessageComposerProps = {
  * would send is one the server accepts. Send is the region's one filled
  * control (§4.3 rule 1).
  *
- * MSG-07: one of the member's own routines can travel with the message,
- * beside which the text is an optional note. Attaching is a ghost control,
- * and the attached routine sits above the field until it is sent or removed.
+ * MSG-07/MSG-10: one of the member's own routines or finished workouts can
+ * travel with the message, beside which the text is an optional note.
+ * Attaching is a ghost control, and what is attached sits above the field
+ * until it is sent or removed.
  */
 export function MessageComposer({
 	onSend,
 	isSending,
 	autoFocus = false,
-	initialRoutine = null,
+	initialAttachment = null,
 }: MessageComposerProps) {
 	const t = useTranslations('messaging.composer')
 	const [draft, setDraft] = useState('')
-	const [routine, setRoutine] = useState<AttachedRoutine | null>(initialRoutine)
+	const [attached, setAttached] = useState<AttachedObject | null>(
+		initialAttachment,
+	)
 	const [picking, setPicking] = useState(false)
 	const [coarse, setCoarse] = useState(false)
 	const hintId = useId()
-	const state = composerState(draft, routine?.id ?? null)
+	const state = composerState(draft, attached)
 
-	// A routine handed in once the member's routines have loaded.
-	const handed = initialRoutine?.id
+	// An object handed in once its name has loaded.
+	const handed = initialAttachment?.id
 	useEffect(() => {
-		if (initialRoutine) setRoutine(initialRoutine)
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- once per routine handed in
+		if (initialAttachment) setAttached(initialAttachment)
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- once per object handed in
 	}, [handed])
 
 	useEffect(() => {
@@ -70,11 +82,13 @@ export function MessageComposer({
 		try {
 			await onSend(state.sendable)
 			setDraft('')
-			setRoutine(null)
+			setAttached(null)
 		} catch {
 			// The caller reports the refusal; the draft stays to retry.
 		}
 	}
+
+	const AttachedIcon = attached?.kind === 'WORKOUT' ? Dumbbell : ClipboardList
 
 	return (
 		<form
@@ -84,12 +98,14 @@ export function MessageComposer({
 				void submit()
 			}}
 		>
-			{routine ? (
+			{attached ? (
 				<div className="flex items-center justify-between gap-2 border border-rule px-3 py-2">
 					<p className="type-body-sm flex min-w-0 items-center gap-2 text-foreground">
-						<ClipboardList className="size-4 shrink-0 text-ink-3" aria-hidden />
+						<AttachedIcon className="size-4 shrink-0 text-ink-3" aria-hidden />
 						<span className="truncate">
-							{t('attachedRoutine', { name: routine.name })}
+							{attached.kind === 'WORKOUT'
+								? t('attachedWorkout', { name: attached.name })
+								: t('attachedRoutine', { name: attached.name })}
 						</span>
 					</p>
 					<Button
@@ -97,9 +113,9 @@ export function MessageComposer({
 						variant="ghost"
 						size="sm"
 						className="shrink-0"
-						aria-label={t('removeRoutine', { name: routine.name })}
+						aria-label={t('removeAttachment', { name: attached.name })}
 						disabled={isSending}
-						onClick={() => setRoutine(null)}
+						onClick={() => setAttached(null)}
 					>
 						<X className="size-4" aria-hidden />
 					</Button>
@@ -109,7 +125,7 @@ export function MessageComposer({
 				aria-label={t('label')}
 				aria-describedby={hintId}
 				aria-invalid={state.over || undefined}
-				placeholder={routine ? t('notePlaceholder') : t('placeholder')}
+				placeholder={attached ? t('notePlaceholder') : t('placeholder')}
 				value={draft}
 				rows={3}
 				autoFocus={autoFocus}
@@ -131,8 +147,8 @@ export function MessageComposer({
 						disabled={isSending}
 						onClick={() => setPicking(true)}
 					>
-						<ClipboardList className="size-4" aria-hidden />
-						{t('attachRoutine')}
+						<Paperclip className="size-4" aria-hidden />
+						{t('attach')}
 					</Button>
 					<p
 						id={hintId}
@@ -158,11 +174,11 @@ export function MessageComposer({
 					{isSending ? t('sending') : t('send')}
 				</Button>
 			</div>
-			<RoutinePicker
+			<AttachPicker
 				open={picking}
 				onOpenChange={setPicking}
 				onChoose={chosen => {
-					setRoutine(chosen)
+					setAttached(chosen)
 					setPicking(false)
 				}}
 			/>

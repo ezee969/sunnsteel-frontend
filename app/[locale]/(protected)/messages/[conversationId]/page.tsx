@@ -4,16 +4,16 @@ import { useParams } from 'next/navigation'
 import { Suspense } from 'react'
 
 import { ConversationThread } from '@/features/messages/conversation-thread'
-import { useAttachedRoutine } from '@/features/messages/use-attached-routine'
+import { useAttachedObject } from '@/features/messages/use-attached-object'
 
 function Conversation({ conversationId }: { conversationId: string }) {
-	// MSG-07: "Send in a message" opens the composer with the routine attached.
-	const initialRoutine = useAttachedRoutine()
+	// MSG-07/MSG-10: "Send in a message" opens the composer with it attached.
+	const initialAttachment = useAttachedObject()
 	return (
 		<ConversationThread
 			key={conversationId}
 			conversationId={conversationId}
-			initialRoutine={initialRoutine}
+			initialAttachment={initialAttachment}
 		/>
 	)
 }

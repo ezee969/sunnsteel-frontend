@@ -92,7 +92,9 @@
 		"liftRestriction": "Lift restriction",
 		"messagingRestricted": "Messaging restricted",
 		"capturedRoutine": "Shared a routine: {name}",
-		"capturedRoutineGone": "Shared a routine that's no longer available"
+		"capturedRoutineGone": "Shared a routine that's no longer available",
+		"capturedWorkout": "Shared a workout: {name}",
+		"capturedWorkoutGone": "Shared a workout that's no longer available"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",

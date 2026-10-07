@@ -9,6 +9,7 @@ import {
 	ArrowLeft,
 	Ban,
 	ClipboardList,
+	Dumbbell,
 	EyeOff,
 	Flag,
 	Loader2,
@@ -42,6 +43,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import {
@@ -55,12 +57,16 @@ import {
 	firstNewIndex,
 	memberName,
 	messageRoutineHref,
+	messageWorkoutHref,
 	readThrough,
 	startsGroup,
+	workoutName,
 } from '@/lib/utils/messages'
+import { formatDuration } from '@/lib/utils/time-format.utils'
+import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
 import { MemberAvatar } from './member-avatar'
-import { type AttachedRoutine, MessageComposer } from './message-composer'
+import { type AttachedObject, MessageComposer } from './message-composer'
 import { RequestPanel } from './request-panel'
 
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -98,10 +104,10 @@ function isNotFound(error: unknown): boolean {
  */
 export function ConversationThread({
 	conversationId,
-	initialRoutine = null,
+	initialAttachment = null,
 }: {
 	conversationId: string
-	initialRoutine?: AttachedRoutine | null
+	initialAttachment?: AttachedObject | null
 }) {
 	const t = useTranslations('messaging.thread')
 	const tCommon = useTranslations('messaging.common')
@@ -210,7 +216,7 @@ export function ConversationThread({
 			.mutateAsync(content)
 			.then(() => {
 				// The routine went; a reload must not attach it again.
-				if (initialRoutine) {
+				if (initialAttachment) {
 					router.replace(`/messages/${encodeURIComponent(conversationId)}`)
 				}
 			})
@@ -334,7 +340,7 @@ export function ConversationThread({
 					<MessageComposer
 						onSend={onSend}
 						isSending={send.isPending}
-						initialRoutine={initialRoutine}
+						initialAttachment={initialAttachment}
 						autoFocus
 					/>
 				</div>
@@ -481,7 +487,10 @@ function MessageRow({
 							</p>
 						) : null}
 						{message.attachment ? (
-							<RoutineCard conversationId={conversationId} message={message} />
+							<AttachmentCard
+								conversationId={conversationId}
+								message={message}
+							/>
 						) : null}
 						{message.hiddenByModeration ? (
 							<p className="type-body-sm mt-1 flex items-start gap-1.5 text-ink-3">
@@ -558,11 +567,12 @@ function MessageRow({
 }
 
 /**
- * MSG-07: the routine a message carries, as it is now. It names the routine
- * and what it programs and opens it to read and copy; a routine deleted or
- * hidden since says it is no longer available rather than what it was.
+ * MSG-07/MSG-10: what a message carries, as it is now -- a routine or a
+ * finished workout -- named, summed up and opened from its own page. One
+ * deleted or hidden since says it is no longer available rather than what it
+ * was.
  */
-function RoutineCard({
+function AttachmentCard({
 	conversationId,
 	message,
 }: {
@@ -570,15 +580,57 @@ function RoutineCard({
 	message: ConversationMessage
 }) {
 	const t = useTranslations('messaging.thread')
-	const routine = message.attachment?.routine ?? null
+	const locale = useLocale() as Locale
+	const unit = useWeightUnit()
+	const attachment = message.attachment
+	if (!attachment) return null
+	const box = message.body
+		? 'mt-2 max-w-md border border-rule p-3'
+		: 'max-w-md border border-rule p-3'
+
+	if (attachment.kind === 'WORKOUT') {
+		const workout = attachment.workout
+		const name = workout ? workoutName(workout) : ''
+		return (
+			<div className={box}>
+				<p className="type-label flex items-center gap-1.5 text-ink-3">
+					<Dumbbell className="size-3.5" aria-hidden />
+					{t('workoutCardLabel')}
+				</p>
+				{workout ? (
+					<div className="mt-1 space-y-2">
+						<div className="min-w-0">
+							<p className="type-panel truncate text-foreground">{name}</p>
+							<p className="type-body-sm text-ink-3">
+								{t('workoutMeta', {
+									date: dateFormatter(locale, { dateStyle: 'medium' }).format(
+										new Date(workout.endedAt),
+									),
+									duration: formatDuration(workout.durationSec),
+									sets: workout.completedSets,
+									volume: `${formatWeightAmount(workout.totalVolumeKg, unit, locale, 0)} ${getWeightUnitLabel(unit)}`,
+								})}
+							</p>
+						</div>
+						<Button asChild variant="outline" size="sm">
+							<Link
+								href={messageWorkoutHref(conversationId, message.id)}
+								aria-label={t('openWorkoutLabel', { name })}
+							>
+								{t('openWorkout')}
+							</Link>
+						</Button>
+					</div>
+				) : (
+					<p className="type-body-sm mt-1 text-ink-3">{t('workoutGone')}</p>
+				)}
+			</div>
+		)
+	}
+
+	const routine = attachment.routine
 	return (
-		<div
-			className={
-				message.body
-					? 'mt-2 max-w-md border border-rule p-3'
-					: 'max-w-md border border-rule p-3'
-			}
-		>
+		<div className={box}>
 			<p className="type-label flex items-center gap-1.5 text-ink-3">
 				<ClipboardList className="size-3.5" aria-hidden />
 				{t('routineCardLabel')}
