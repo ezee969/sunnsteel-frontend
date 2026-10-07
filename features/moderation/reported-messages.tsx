@@ -75,11 +75,20 @@ export function ReportedMessages({
 								{message.body}
 							</p>
 						) : typeof message.routineName === 'string' ||
-						  typeof message.workoutName === 'string' ? null : (
+						  typeof message.workoutName === 'string' ||
+						  typeof message.recordName === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-11: a record it carried, by its lift. */}
+						{typeof message.recordName === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.recordName
+									? t('capturedRecord', { name: message.recordName })
+									: t('capturedRecordGone')}
+							</p>
+						) : null}
 						{/* MSG-10: a workout it carried, by the name the reporter saw. */}
 						{typeof message.workoutName === 'string' ? (
 							<p className="type-body-sm text-ink-2">

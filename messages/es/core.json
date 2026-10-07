@@ -465,7 +465,7 @@
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
 		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
 		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud.",
-		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una rutina o un entrenamiento, no ambos."
+		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una sola rutina, un solo entrenamiento o un solo récord."
 	},
 	"glossary": {
 		"label": "Términos:",

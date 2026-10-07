@@ -94,7 +94,9 @@
 		"capturedRoutine": "Compartió una rutina: {name}",
 		"capturedRoutineGone": "Compartió una rutina que ya no está disponible",
 		"capturedWorkout": "Compartió un entrenamiento: {name}",
-		"capturedWorkoutGone": "Compartió un entrenamiento que ya no está disponible"
+		"capturedWorkoutGone": "Compartió un entrenamiento que ya no está disponible",
+		"capturedRecord": "Compartió un récord: {name}",
+		"capturedRecordGone": "Compartió un récord que ya no está disponible"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",

@@ -7,6 +7,7 @@ import {
 	Loader2,
 	Paperclip,
 	Send,
+	Trophy,
 	X,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -19,11 +20,13 @@ import { composerState, enterSends } from '@/lib/utils/messages'
 
 import { AttachPicker } from './attach-picker'
 
-/** MSG-07/MSG-10: what the composer has attached, with its name. */
+/** MSG-07/MSG-10/MSG-11: what the composer has attached, with its name. */
 export interface AttachedObject {
-	kind: 'ROUTINE' | 'WORKOUT'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD'
 	id: string
 	name: string
+	/** MSG-11: a record's lift. */
+	exerciseId?: string
 }
 
 type MessageComposerProps = {
@@ -88,7 +91,12 @@ export function MessageComposer({
 		}
 	}
 
-	const AttachedIcon = attached?.kind === 'WORKOUT' ? Dumbbell : ClipboardList
+	const AttachedIcon =
+		attached?.kind === 'WORKOUT'
+			? Dumbbell
+			: attached?.kind === 'RECORD'
+				? Trophy
+				: ClipboardList
 
 	return (
 		<form
@@ -105,7 +113,9 @@ export function MessageComposer({
 						<span className="truncate">
 							{attached.kind === 'WORKOUT'
 								? t('attachedWorkout', { name: attached.name })
-								: t('attachedRoutine', { name: attached.name })}
+								: attached.kind === 'RECORD'
+									? t('attachedRecord', { name: attached.name })
+									: t('attachedRoutine', { name: attached.name })}
 						</span>
 					</p>
 					<Button

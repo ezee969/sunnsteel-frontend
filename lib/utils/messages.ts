@@ -8,6 +8,7 @@ import {
 	type MessageAttachment,
 	messageBodyLength,
 	messageNote,
+	type MessageRecordSummary,
 	type MessageWorkoutSummary,
 	type SendMessageRequest,
 } from '@sunsteel/contracts'
@@ -147,6 +148,7 @@ export function memberName(
 export function conversationPreview(
 	conversation: ConversationSummary,
 	t: Translator<'messaging.common'>,
+	exerciseName: (name: string) => string = name => name,
 ): string {
 	const last = conversation.lastMessage
 	if (!last) return t('noMessages')
@@ -160,7 +162,9 @@ export function conversationPreview(
 				? last.body
 				: // MSG-07/MSG-10: an object sent without a note is named by it.
 					last.attachment
-					? attachmentLine(last.attachment, t)
+					? last.attachment.kind === 'RECORD'
+						? recordLine(last.attachment.record, t, exerciseName)
+						: attachmentLine(last.attachment, t)
 					: ''
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
@@ -171,9 +175,29 @@ export function attachmentLine(
 	attachment: MessageAttachment,
 	t: Translator<'messaging.common'>,
 ): string {
-	return attachment.kind === 'ROUTINE'
-		? routineLine(attachment.routine, t)
-		: workoutLine(attachment.workout, t)
+	switch (attachment.kind) {
+		case 'ROUTINE':
+			return routineLine(attachment.routine, t)
+		case 'WORKOUT':
+			return workoutLine(attachment.workout, t)
+		case 'RECORD':
+			return recordLine(attachment.record, t)
+	}
+}
+
+/**
+ * MSG-11: a record in one line, by its lift (as `exerciseName` names it, the
+ * catalog's word in the reader's language), or that it is no longer
+ * available.
+ */
+export function recordLine(
+	record: MessageRecordSummary | null,
+	t: Translator<'messaging.common'>,
+	exerciseName: (name: string) => string = name => name,
+): string {
+	return record
+		? t('sharedRecord', { name: exerciseName(record.exerciseName) })
+		: t('recordUnavailable')
 }
 
 /** MSG-10: a workout's name -- its routine and day, as a recap names it. */
@@ -214,10 +238,14 @@ export interface ComposerState {
 	over: boolean
 }
 
-/** MSG-07/MSG-10: one object a message carries -- a routine or a workout. */
+/**
+ * MSG-07/MSG-10/MSG-11: one object a message carries -- a routine, a workout
+ * or a record. A record also names its lift, so the composer can find it.
+ */
 export interface AttachRef {
-	kind: 'ROUTINE' | 'WORKOUT'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD'
 	id: string
+	exerciseId?: string
 }
 
 /** What the composer can say about a draft, by the server's own rule. */
@@ -236,6 +264,9 @@ export function composerState(
 						...(note === null ? {} : { body: note }),
 						...(attached?.kind === 'ROUTINE' ? { routineId: attached.id } : {}),
 						...(attached?.kind === 'WORKOUT' ? { sessionId: attached.id } : {}),
+						...(attached?.kind === 'RECORD'
+							? { recordEventId: attached.id }
+							: {}),
 					},
 		over: length > MESSAGE_BODY_MAX,
 	}
@@ -259,7 +290,14 @@ export function enterSends(
 }
 
 /** MSG-07/MSG-10: the query that hands an object to the composer. */
-export const ATTACH_PARAMS = { ROUTINE: 'routine', WORKOUT: 'workout' } as const
+export const ATTACH_PARAMS = {
+	ROUTINE: 'routine',
+	WORKOUT: 'workout',
+	RECORD: 'record',
+} as const
+
+/** MSG-11: the lift a handed-in record belongs to. */
+export const ATTACH_EXERCISE_PARAM = 'exercise'
 
 /**
  * Where a profile's Message action opens. With an object (MSG-07/MSG-10),
@@ -271,7 +309,14 @@ export function messageHref(
 	attached: AttachRef | null = null,
 ): string {
 	const query = attached
-		? `${ATTACH_PARAMS[attached.kind]}=${encodeURIComponent(attached.id)}`
+		? [
+				`${ATTACH_PARAMS[attached.kind]}=${encodeURIComponent(attached.id)}`,
+				...(attached.exerciseId
+					? [
+							`${ATTACH_EXERCISE_PARAM}=${encodeURIComponent(attached.exerciseId)}`,
+						]
+					: []),
+			].join('&')
 		: ''
 	return conversationId
 		? `/messages/${encodeURIComponent(conversationId)}${query ? `?${query}` : ''}`

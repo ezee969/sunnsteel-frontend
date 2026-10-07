@@ -465,7 +465,7 @@
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",
 		"REQUEST_PENDING": "You can send more once they accept your request.",
-		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine or one workout."
+		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine, one workout or one record."
 	},
 	"glossary": {
 		"label": "Terms:",

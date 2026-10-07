@@ -210,7 +210,9 @@
 		"nextPageError": "No se pudo cargar la página siguiente.",
 		"retry": "Reintentar",
 		"loadingMore": "Cargando eventos…",
-		"loadEarlier": "Cargar eventos anteriores"
+		"loadEarlier": "Cargar eventos anteriores",
+		"sendRecord": "Enviar en un mensaje",
+		"sendRecordLabel": "Enviar el récord de {name} en un mensaje"
 	},
 	"page": {
 		"title": "Progreso del entrenamiento",

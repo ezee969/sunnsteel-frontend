@@ -210,7 +210,9 @@
 		"nextPageError": "The next page could not be loaded.",
 		"retry": "Retry",
 		"loadingMore": "Loading events…",
-		"loadEarlier": "Load earlier events"
+		"loadEarlier": "Load earlier events",
+		"sendRecord": "Send in a message",
+		"sendRecordLabel": "Send the {name} record in a message"
 	},
 	"page": {
 		"title": "Training Progress",

@@ -8,6 +8,12 @@ import type { Translator } from '@/i18n/translator'
 
 import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
+/** MSG-11: what the timeline and a shared record word alike. */
+type RecordParts = Pick<
+	ProgressTimelinePersonalRecordItem,
+	'current' | 'previous' | 'reason'
+>
+
 function performanceLabel(
 	performance: ProgressTimelinePersonalRecordItem['current'],
 	unit: WeightUnit,
@@ -17,7 +23,7 @@ function performanceLabel(
 }
 
 export function getRecordTimelineExplanation(
-	item: ProgressTimelinePersonalRecordItem,
+	item: RecordParts,
 	unit: WeightUnit,
 	t: Translator<'progress.timeline'>,
 	locale: Locale = 'en',
@@ -34,7 +40,7 @@ export function getRecordTimelineExplanation(
 }
 
 export function getRecordTimelinePerformanceLabel(
-	item: ProgressTimelinePersonalRecordItem,
+	item: RecordParts,
 	unit: WeightUnit,
 	locale: Locale = 'en',
 ) {

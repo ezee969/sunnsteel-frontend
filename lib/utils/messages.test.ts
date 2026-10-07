@@ -22,6 +22,7 @@ import {
 	messageRoutineHref,
 	messageWorkoutHref,
 	readThrough,
+	recordLine,
 	routineLine,
 	sendableRoutines,
 	startsGroup,
@@ -405,5 +406,50 @@ describe('MSG-10 a finished workout in a message', () => {
 		expect(messageHref('ana', 'c-1', W)).toBe('/messages/c-1?workout=s-1')
 		expect(messageHref('ana', null, W)).toBe('/messages/new?to=ana&workout=s-1')
 		expect(messageWorkoutHref('c-1', 'm-1')).toBe('/messages/c-1/workouts/m-1')
+	})
+})
+
+describe('MSG-11 a personal record in a message', () => {
+	const record = {
+		eventId: 'e-1',
+		exerciseId: 'bench',
+		exerciseName: 'Bench Press',
+		occurredAt: '2026-10-07T09:00:00.000Z',
+		current: { weightKg: 100, reps: 5, estimated1rmKg: 116.7 },
+		previous: { weightKg: 95, reps: 5, estimated1rmKg: 110.8 },
+		reason: 'HEAVIER_LOAD' as const,
+	}
+	const R = { kind: 'RECORD' as const, id: 'e-1', exerciseId: 'bench' }
+	const preview = summary('a', {
+		lastMessage: message('x', '10:00', {
+			body: null,
+			attachment: { kind: 'RECORD', record },
+		}),
+	})
+
+	it('sends a record by its event, with or without a note', () => {
+		expect(composerState('', R).sendable).toEqual({ recordEventId: 'e-1' })
+		expect(composerState(' new PR ', R).sendable).toEqual({
+			body: 'new PR',
+			recordEventId: 'e-1',
+		})
+	})
+
+	it("previews a record by its lift, in the reader's words, in both languages", () => {
+		expect(conversationPreview(preview, en)).toBe('Record: Bench Press')
+		expect(conversationPreview(preview, es, () => 'Press de banca')).toBe(
+			'Récord: Press de banca',
+		)
+		expect(recordLine(null, en)).toBe("A record that's no longer available")
+		expect(recordLine(null, es)).toBe('Un récord que ya no está disponible')
+	})
+
+	it('hands the composer the record and its lift', () => {
+		expect(messageHref('ana', 'c-1', R)).toBe(
+			'/messages/c-1?record=e-1&exercise=bench',
+		)
+		expect(messageHref('ana', null, R)).toBe(
+			'/messages/new?to=ana&record=e-1&exercise=bench',
+		)
 	})
 })

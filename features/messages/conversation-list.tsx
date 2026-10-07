@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { useConversations } from '@/lib/api/hooks/useConversations'
 import { formatTimeAgo } from '@/lib/utils/date'
@@ -29,6 +30,7 @@ export function ConversationList({
 }) {
 	const t = useTranslations('messaging.list')
 	const tCommon = useTranslations('messaging.common')
+	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
 	const errorText = useApiErrorMessage()
 	const conversations = useConversations(box)
@@ -128,7 +130,9 @@ export function ConversationList({
 										) : null}
 									</span>
 									<span className="type-body-sm block truncate text-ink-3">
-										{conversationPreview(conversation, tCommon)}
+										{conversationPreview(conversation, tCommon, name =>
+											exerciseLabel(name, tEx),
+										)}
 									</span>
 								</span>
 							</Link>

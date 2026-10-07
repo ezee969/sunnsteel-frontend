@@ -5,15 +5,17 @@ import type {
 	ProgressTimelineItem,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { CalendarClock, History, RefreshCw } from 'lucide-react'
+import { CalendarClock, History, MessageSquare, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SendInMessageDialog } from '@/features/messages/send-in-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
@@ -97,6 +99,8 @@ function RecordTimelineItem({
 	const locale = useLocale() as Locale
 	const tTimeline = useTranslations('progress.timeline')
 	const tEx = useTranslations('catalog.exercises')
+	const [sending, setSending] = useState(false)
+	const lift = exerciseLabel(item.exerciseName, tEx)
 	return (
 		<li className="rule-row grid gap-2 py-4 [content-visibility:auto] [contain-intrinsic-size:auto_8rem]">
 			<div className="flex flex-wrap items-center gap-2">
@@ -126,11 +130,34 @@ function RecordTimelineItem({
 					})}
 				</p>
 			</div>
-			<Button variant="link" className="h-auto w-fit p-0" asChild>
-				<Link href={`/workouts/sessions/${item.session.sessionId}`}>
-					{tTimeline('openRecap')}
-				</Link>
-			</Button>
+			<div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+				<Button variant="link" className="h-auto w-fit p-0" asChild>
+					<Link href={`/workouts/sessions/${item.session.sessionId}`}>
+						{tTimeline('openRecap')}
+					</Link>
+				</Button>
+				{/* MSG-11: this record, as set, to one member. */}
+				<Button
+					type="button"
+					variant="link"
+					className="h-auto w-fit gap-1 p-0"
+					aria-label={tTimeline('sendRecordLabel', { name: lift })}
+					onClick={() => setSending(true)}
+				>
+					<MessageSquare className="size-3.5" aria-hidden />
+					{tTimeline('sendRecord')}
+				</Button>
+			</div>
+			<SendInMessageDialog
+				open={sending}
+				onOpenChange={setSending}
+				attach={{
+					kind: 'RECORD',
+					id: item.eventId,
+					exerciseId: item.exerciseId,
+				}}
+				name={`${lift} · ${getRecordTimelinePerformanceLabel(item, weightUnit, locale)}`}
+			/>
 		</li>
 	)
 }

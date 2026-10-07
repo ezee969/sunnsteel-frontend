@@ -15,6 +15,7 @@ import {
 	Loader2,
 	MoreHorizontal,
 	Trash2,
+	Trophy,
 	User,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -44,6 +45,7 @@ import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import {
@@ -62,6 +64,10 @@ import {
 	startsGroup,
 	workoutName,
 } from '@/lib/utils/messages'
+import {
+	getRecordTimelineExplanation,
+	getRecordTimelinePerformanceLabel,
+} from '@/lib/utils/progress-timeline'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -628,6 +634,10 @@ function AttachmentCard({
 		)
 	}
 
+	if (attachment.kind === 'RECORD') {
+		return <RecordCard message={message} box={box} />
+	}
+
 	const routine = attachment.routine
 	return (
 		<div className={box}>
@@ -659,6 +669,58 @@ function AttachmentCard({
 				</div>
 			) : (
 				<p className="type-body-sm mt-1 text-ink-3">{t('routineGone')}</p>
+			)}
+		</div>
+	)
+}
+
+/**
+ * MSG-11: a personal record, as it was set -- its lift, the performance, the
+ * best it beat in the progress timeline's words, and when. Everything it says
+ * is on the card; a record a correction removed says it is no longer
+ * available.
+ */
+function RecordCard({
+	message,
+	box,
+}: {
+	message: ConversationMessage
+	box: string
+}) {
+	const t = useTranslations('messaging.thread')
+	const tTimeline = useTranslations('progress.timeline')
+	const tEx = useTranslations('catalog.exercises')
+	const locale = useLocale() as Locale
+	const unit = useWeightUnit()
+	const record =
+		message.attachment?.kind === 'RECORD' ? message.attachment.record : null
+	return (
+		<div className={box}>
+			<p className="type-label flex items-center gap-1.5 text-ink-3">
+				<Trophy className="size-3.5" aria-hidden />
+				{t('recordCardLabel')}
+			</p>
+			{record ? (
+				<div className="mt-1 min-w-0 space-y-1">
+					<p className="type-panel truncate text-foreground">
+						{exerciseLabel(record.exerciseName, tEx)}
+					</p>
+					<p className="type-data type-data-strong text-foreground">
+						{getRecordTimelinePerformanceLabel(record, unit, locale)}
+					</p>
+					<p className="type-body-sm text-ink-2">
+						{getRecordTimelineExplanation(record, unit, tTimeline, locale)}
+					</p>
+					<p className="type-body-sm text-ink-3">
+						<time dateTime={record.occurredAt}>
+							{dateFormatter(locale, { dateStyle: 'medium' }).format(
+								new Date(record.occurredAt),
+							)}
+						</time>
+					</p>
+				</div>
+			) : (
+				<p className="type-body-sm mt-1 text-ink-3">{t('recordGone')}</p>
 			)}
 		</div>
 	)

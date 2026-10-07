@@ -11,16 +11,23 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
-import { useSessions } from '@/lib/api/hooks/useWorkoutSession'
+import {
+	useProgressTimeline,
+	useSessions,
+} from '@/lib/api/hooks/useWorkoutSession'
 import { sendableRoutines, workoutName } from '@/lib/utils/messages'
+import { getRecordTimelinePerformanceLabel } from '@/lib/utils/progress-timeline'
 
 import type { AttachedObject } from './message-composer'
 
-/** How many finished workouts the picker offers. */
+/** How many finished workouts, and records, the picker offers. */
 const RECENT_WORKOUTS = 10
+const RECENT_RECORDS = 10
 
 /**
  * MSG-07/MSG-10: one of the member's own routines or finished workouts,
@@ -48,6 +55,15 @@ export function AttachPicker({
 		RECENT_WORKOUTS,
 	)
 	const date = dateFormatter(locale, { dateStyle: 'medium' })
+	// MSG-11: their most recent records, from the progress timeline.
+	const tEx = useTranslations('catalog.exercises')
+	const unit = useWeightUnit()
+	const timeline = useProgressTimeline('PERSONAL_RECORD', {
+		limit: RECENT_RECORDS,
+	})
+	const records = (timeline.data?.pages[0]?.items ?? []).flatMap(item =>
+		item.type === 'PERSONAL_RECORD' ? [item] : [],
+	)
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,6 +131,43 @@ export function AttachPicker({
 												detail={when}
 												onClick={() =>
 													onChoose({ kind: 'WORKOUT', id: session.id, name })
+												}
+											/>
+										</li>
+									)
+								})}
+							</ul>
+						)}
+					</section>
+					<section className="space-y-2">
+						<h3 className="type-label text-ink-3">{t('recordsHeading')}</h3>
+						{timeline.isPending ? (
+							<Skeleton
+								className="h-11"
+								aria-busy="true"
+								aria-label={t('recordsLoading')}
+							/>
+						) : records.length === 0 ? (
+							<p className="type-body-sm text-ink-3">{t('recordsEmpty')}</p>
+						) : (
+							<ul className="border-t border-rule-faint">
+								{records.map(record => {
+									const lift = exerciseLabel(record.exerciseName, tEx)
+									const name = `${lift} · ${getRecordTimelinePerformanceLabel(record, unit, locale)}`
+									const when = date.format(new Date(record.occurredAt))
+									return (
+										<li key={record.eventId} className="rule-row">
+											<ChoiceButton
+												label={t('pickerChoose', { name: `${name}, ${when}` })}
+												title={name}
+												detail={when}
+												onClick={() =>
+													onChoose({
+														kind: 'RECORD',
+														id: record.eventId,
+														exerciseId: record.exerciseId,
+														name,
+													})
 												}
 											/>
 										</li>

@@ -12,7 +12,9 @@
 		"sharedRoutine": "Rutina: {name}",
 		"routineUnavailable": "Una rutina que ya no está disponible",
 		"sharedWorkout": "Entrenamiento: {name}",
-		"workoutUnavailable": "Un entrenamiento que ya no está disponible"
+		"workoutUnavailable": "Un entrenamiento que ya no está disponible",
+		"sharedRecord": "Récord: {name}",
+		"recordUnavailable": "Un récord que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -83,7 +85,9 @@
 		"workoutMeta": "{date} · {duration} · {sets, plural, one {# serie} other {# series}} · {volume}",
 		"openWorkout": "Abrir entrenamiento",
 		"openWorkoutLabel": "Abrir el entrenamiento {name}",
-		"workoutGone": "Este entrenamiento ya no está disponible."
+		"workoutGone": "Este entrenamiento ya no está disponible.",
+		"recordCardLabel": "Récord personal",
+		"recordGone": "Este récord ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -107,7 +111,11 @@
 		"routinesHeading": "Tus rutinas",
 		"workoutsHeading": "Entrenamientos recientes",
 		"workoutsEmpty": "Aún no tienes entrenamientos terminados.",
-		"workoutsLoading": "Cargando tus entrenamientos…"
+		"workoutsLoading": "Cargando tus entrenamientos…",
+		"attachedRecord": "Récord: {name}",
+		"recordsHeading": "Récords recientes",
+		"recordsEmpty": "Aún no tienes récords personales.",
+		"recordsLoading": "Cargando tus récords…"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",

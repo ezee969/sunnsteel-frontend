@@ -12,7 +12,9 @@
 		"sharedRoutine": "Routine: {name}",
 		"routineUnavailable": "A routine that's no longer available",
 		"sharedWorkout": "Workout: {name}",
-		"workoutUnavailable": "A workout that's no longer available"
+		"workoutUnavailable": "A workout that's no longer available",
+		"sharedRecord": "Record: {name}",
+		"recordUnavailable": "A record that's no longer available"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -83,7 +85,9 @@
 		"workoutMeta": "{date} · {duration} · {sets, plural, one {# set} other {# sets}} · {volume}",
 		"openWorkout": "Open workout",
 		"openWorkoutLabel": "Open the workout {name}",
-		"workoutGone": "This workout is no longer available."
+		"workoutGone": "This workout is no longer available.",
+		"recordCardLabel": "Personal record",
+		"recordGone": "This record is no longer available."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -107,7 +111,11 @@
 		"routinesHeading": "Your routines",
 		"workoutsHeading": "Recent workouts",
 		"workoutsEmpty": "No finished workouts yet.",
-		"workoutsLoading": "Loading your workouts…"
+		"workoutsLoading": "Loading your workouts…",
+		"attachedRecord": "Record: {name}",
+		"recordsHeading": "Recent records",
+		"recordsEmpty": "No personal records yet.",
+		"recordsLoading": "Loading your records…"
 	},
 	"new": {
 		"pageTitle": "New message",

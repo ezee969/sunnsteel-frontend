@@ -94,7 +94,9 @@
 		"capturedRoutine": "Shared a routine: {name}",
 		"capturedRoutineGone": "Shared a routine that's no longer available",
 		"capturedWorkout": "Shared a workout: {name}",
-		"capturedWorkoutGone": "Shared a workout that's no longer available"
+		"capturedWorkoutGone": "Shared a workout that's no longer available",
+		"capturedRecord": "Shared a record: {name}",
+		"capturedRecordGone": "Shared a record that's no longer available"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",
