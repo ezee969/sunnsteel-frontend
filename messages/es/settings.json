@@ -16,14 +16,16 @@
 			"TRAINING_REMINDER": "Recordatorios de entrenamiento",
 			"STREAK_AT_RISK": "Racha en riesgo",
 			"TRAINING_PARTNER_SESSION": "Entrenamientos de compañeros",
-			"TRAINING_PARTNER_ACHIEVEMENT": "Logros de compañeros"
+			"TRAINING_PARTNER_ACHIEVEMENT": "Logros de compañeros",
+			"MESSAGE": "Mensajes nuevos"
 		},
 		"categoryDescription": {
 			"REST_ALERT": "Cuando termina un descanso mientras Sunnsteel está cerrado o tu pantalla está bloqueada.",
 			"TRAINING_REMINDER": "Una vez en los días en que tienes planificado entrenar, a la hora que elijas abajo.",
 			"STREAK_AT_RISK": "El último día en que aún se puede continuar una racha de entrenamiento. Reemplaza el recordatorio de ese día en lugar de agregar una segunda notificación, e indica las fechas en lugar de decirte que entrenes.",
 			"TRAINING_PARTNER_SESSION": "Cuando un compañero de entrenamiento activo completa un entrenamiento que comparte contigo en ese momento. Los récords y los cambios de carga no crean alertas adicionales.",
-			"TRAINING_PARTNER_ACHIEVEMENT": "Cuando un compañero de entrenamiento activo obtiene un logro nuevo que comparte contigo en ese momento. Los logros anteriores nunca se reenvían."
+			"TRAINING_PARTNER_ACHIEVEMENT": "Cuando un compañero de entrenamiento activo obtiene un logro nuevo que comparte contigo en ese momento. Los logros anteriores nunca se reenvían.",
+			"MESSAGE": "Cuando alguien te escribe y no lo ves en medio minuto. Una notificación por conversación hasta que la leas, que dice quién te escribió y nunca lo que dijo. Las solicitudes de mensaje nunca notifican."
 		},
 		"quietHoursAny": "Las notificaciones pueden llegar a cualquier hora.",
 		"quietHoursEmpty": "La ventana está vacía, así que no se silencia nada.",
@@ -41,6 +43,7 @@
 		"title": "Controles de notificaciones",
 		"description": "Sobre qué puede notificarte Sunnsteel y cuándo no puede hacerlo.",
 		"trainingAndRest": "Entrenamiento y descanso",
+		"messages": "Mensajes",
 		"partnerActivity": "Actividad de compañeros",
 		"partnerActivityNote": "Desactivado de forma predeterminada. Solo se crea una alerta mientras la relación, su permiso de actividad y el uso compartido del evento sigan activos. Al activar una categoría, empieza con la actividad nueva desde ese momento.",
 		"partnerActivityNoteSummary": "Desactivado de forma predeterminada. Una alerta requiere uso compartido activo y empieza al activarla.",

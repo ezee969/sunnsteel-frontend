@@ -44,6 +44,9 @@ const PARTNER_CATEGORIES = [
 	'TRAINING_PARTNER_SESSION',
 	'TRAINING_PARTNER_ACHIEVEMENT',
 ] as const satisfies readonly NotificationCategory[]
+const MESSAGE_CATEGORIES = [
+	'MESSAGE',
+] as const satisfies readonly NotificationCategory[]
 
 /**
  * NOTIF-05, with the NOTIF-04 reminder time inside it because a reminder with
@@ -142,6 +145,11 @@ export function NotificationControlsCard() {
 						</Explanation>
 					</div>
 					{PARTNER_CATEGORIES.map(categoryRow)}
+				</div>
+
+				<div className="space-y-3 border-t border-rule pt-4">
+					<p className="type-panel text-foreground">{t('messages')}</p>
+					{MESSAGE_CATEGORIES.map(categoryRow)}
 				</div>
 
 				<div className="space-y-2 border-t border-rule pt-4">

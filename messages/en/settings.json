@@ -16,14 +16,16 @@
 			"TRAINING_REMINDER": "Training reminders",
 			"STREAK_AT_RISK": "Streak at risk",
 			"TRAINING_PARTNER_SESSION": "Partner workouts",
-			"TRAINING_PARTNER_ACHIEVEMENT": "Partner achievements"
+			"TRAINING_PARTNER_ACHIEVEMENT": "Partner achievements",
+			"MESSAGE": "New messages"
 		},
 		"categoryDescription": {
 			"REST_ALERT": "When a rest period ends while Sunnsteel is closed or your screen is locked.",
 			"TRAINING_REMINDER": "Once on the days you are planned to train, at the time you choose below.",
 			"STREAK_AT_RISK": "On the last day a training run can still be continued. It replaces that day’s reminder rather than adding a second notification, and it states the dates rather than telling you to train.",
 			"TRAINING_PARTNER_SESSION": "When an active training partner completes one workout they currently share with you. Records and load changes do not create extra alerts.",
-			"TRAINING_PARTNER_ACHIEVEMENT": "When an active training partner earns a new achievement they currently share with you. Historical achievements are never replayed."
+			"TRAINING_PARTNER_ACHIEVEMENT": "When an active training partner earns a new achievement they currently share with you. Historical achievements are never replayed.",
+			"MESSAGE": "When a member writes to you and you have not seen it within half a minute. One notification per conversation until you read it, naming who wrote and never what they said. Message requests never notify."
 		},
 		"quietHoursAny": "Notifications can arrive at any time.",
 		"quietHoursEmpty": "The window is empty, so nothing is silenced.",
@@ -41,6 +43,7 @@
 		"title": "Notification controls",
 		"description": "What Sunnsteel may notify you about, and when it may not.",
 		"trainingAndRest": "Training and rest",
+		"messages": "Messages",
 		"partnerActivity": "Partner activity",
 		"partnerActivityNote": "Off by default. An alert is created only while the partnership, their activity grant and the event's sharing are all still active. Turning one on starts with new activity from that moment.",
 		"partnerActivityNoteSummary": "Off by default. An alert needs active sharing, and starts from the moment you turn it on.",

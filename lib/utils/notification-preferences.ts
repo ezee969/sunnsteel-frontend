@@ -22,6 +22,7 @@ export const CATEGORY_LABEL_KEYS = {
 	STREAK_AT_RISK: 'categoryLabel.STREAK_AT_RISK',
 	TRAINING_PARTNER_SESSION: 'categoryLabel.TRAINING_PARTNER_SESSION',
 	TRAINING_PARTNER_ACHIEVEMENT: 'categoryLabel.TRAINING_PARTNER_ACHIEVEMENT',
+	MESSAGE: 'categoryLabel.MESSAGE',
 } as const satisfies Record<NotificationCategory, Key>
 
 export const CATEGORY_DESCRIPTION_KEYS = {
@@ -31,6 +32,7 @@ export const CATEGORY_DESCRIPTION_KEYS = {
 	TRAINING_PARTNER_SESSION: 'categoryDescription.TRAINING_PARTNER_SESSION',
 	TRAINING_PARTNER_ACHIEVEMENT:
 		'categoryDescription.TRAINING_PARTNER_ACHIEVEMENT',
+	MESSAGE: 'categoryDescription.MESSAGE',
 } as const satisfies Record<NotificationCategory, Key>
 
 /** `1110` → `18:30`. Zero-padded so it round-trips through a time input. */

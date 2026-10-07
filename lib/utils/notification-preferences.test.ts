@@ -29,6 +29,7 @@ const response = (
 			STREAK_AT_RISK: true,
 			TRAINING_PARTNER_SESSION: false,
 			TRAINING_PARTNER_ACHIEVEMENT: false,
+			MESSAGE: true,
 		},
 		quietHours: null,
 		reminder: { minuteOfDay: null },
@@ -135,6 +136,7 @@ describe('the notice above the controls', () => {
 							STREAK_AT_RISK: false,
 							TRAINING_PARTNER_SESSION: false,
 							TRAINING_PARTNER_ACHIEVEMENT: false,
+							MESSAGE: false,
 						},
 					},
 				),
@@ -154,6 +156,7 @@ describe('the notice above the controls', () => {
 							STREAK_AT_RISK: false,
 							TRAINING_PARTNER_SESSION: false,
 							TRAINING_PARTNER_ACHIEVEMENT: false,
+							MESSAGE: false,
 						},
 					},
 				),
@@ -212,6 +215,26 @@ describe('partner activity alerts (NOTIF-07)', () => {
 		expect(t(CATEGORY_DESCRIPTION_KEYS.TRAINING_PARTNER_ACHIEVEMENT)).toMatch(
 			/Historical achievements are never replayed/,
 		)
+	})
+})
+
+describe('message notifications (MSG-08)', () => {
+	it('says when one arrives, that it names only the sender, and that requests never notify', () => {
+		const copy = t(CATEGORY_DESCRIPTION_KEYS.MESSAGE)
+		expect(t(CATEGORY_LABEL_KEYS.MESSAGE)).toBe('New messages')
+		expect(copy).toMatch(/half a minute/)
+		expect(copy).toMatch(/One notification per conversation until you read it/)
+		expect(copy).toMatch(/never what they said/)
+		expect(copy).toMatch(/requests never notify/)
+	})
+
+	it('says the same in Spanish', () => {
+		const copy = tEs(CATEGORY_DESCRIPTION_KEYS.MESSAGE)
+		expect(tEs(CATEGORY_LABEL_KEYS.MESSAGE)).toBe('Mensajes nuevos')
+		expect(copy).toMatch(/medio minuto/)
+		expect(copy).toMatch(/Una notificación por conversación hasta que la leas/)
+		expect(copy).toMatch(/nunca lo que dijo/)
+		expect(copy).toMatch(/solicitudes de mensaje nunca notifican/)
 	})
 })
 
