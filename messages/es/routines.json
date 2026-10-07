@@ -843,6 +843,7 @@
 		"editErrorTitle": "Error al editar la rutina",
 		"retryEdit": "Reintentar la edición",
 		"loadingRoutine": "Cargando la rutina",
+		"backToProfile": "Volver al perfil",
 		"routineUnavailable": "Rutina no disponible",
 		"couldNotLoadRoutine": "No se pudo cargar esta rutina",
 		"noLongerShared": "Ya no está compartida, o nunca lo estuvo.",

@@ -843,6 +843,7 @@
 		"editErrorTitle": "Edit Routine Error",
 		"retryEdit": "Retry edit",
 		"loadingRoutine": "Loading routine",
+		"backToProfile": "Back to profile",
 		"routineUnavailable": "Routine unavailable",
 		"couldNotLoadRoutine": "Could not load this routine",
 		"noLongerShared": "It is no longer shared, or it never was.",

@@ -36,7 +36,7 @@ export function MemberRoutineView({
 	const back = (
 		<Button asChild variant="ghost" size="sm">
 			<Link href={profileHref}>
-				<ArrowLeft className="size-4" aria-hidden /> Back to profile
+				<ArrowLeft className="size-4" aria-hidden /> {t('backToProfile')}
 			</Link>
 		</Button>
 	)
