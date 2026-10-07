@@ -310,8 +310,8 @@ describe('telling the owner what actually applies', () => {
 		).toBe('The routine itself is private now, so nobody else can see this.')
 	})
 
-	it('says a default reaches past entries, and that everything starts private', () => {
-		expect(ACTIVITY_DEFAULTS_NOTE).toContain('Only me')
+	it('says a default reaches past entries, and that new accounts start at Followers', () => {
+		expect(ACTIVITY_DEFAULTS_NOTE).toContain('start every kind at Followers')
 		expect(ACTIVITY_DEFAULTS_NOTE).toContain('past activity')
 		expect(ACTIVITY_EVERYONE_NOTE).toContain('signed in')
 	})
@@ -478,7 +478,7 @@ describe('the activity copy in Spanish', () => {
 	})
 
 	it('keeps the same promises about defaults and reach', () => {
-		expect(es('defaultsNote')).toContain('Solo yo')
+		expect(es('defaultsNote')).toContain('Seguidores')
 		expect(es('defaultsNote')).toContain('actividad pasada')
 		expect(es('everyoneNote')).toContain('sesión iniciada')
 		expect(describeCommentDelete(true, es)).toMatch(/tu comentario/i)

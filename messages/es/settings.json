@@ -45,8 +45,8 @@
 		"trainingAndRest": "Entrenamiento y descanso",
 		"messages": "Mensajes",
 		"partnerActivity": "Actividad de compañeros",
-		"partnerActivityNote": "Desactivado de forma predeterminada. Solo se crea una alerta mientras la relación, su permiso de actividad y el uso compartido del evento sigan activos. Al activar una categoría, empieza con la actividad nueva desde ese momento.",
-		"partnerActivityNoteSummary": "Desactivado de forma predeterminada. Una alerta requiere uso compartido activo y empieza al activarla.",
+		"partnerActivityNote": "Activado en las cuentas nuevas. Solo se crea una alerta mientras la relación, su permiso de actividad y el uso compartido del evento sigan activos. Al activar una categoría, empieza con la actividad nueva desde ese momento.",
+		"partnerActivityNoteSummary": "Activado en las cuentas nuevas. Una alerta requiere uso compartido activo y empieza al activarla.",
 		"reminderTime": "Hora del recordatorio",
 		"reminderTimeNote": "Sunnsteel sabe qué días entrenas, no a qué hora, así que esta es la hora que eliges y no una cuenta regresiva hasta una sesión.",
 		"turnOff": "Desactivar",
@@ -156,7 +156,7 @@
 		"updatedDescription": "Los ajustes de visibilidad de tu perfil ya están activos.",
 		"failedTitle": "No se pudo actualizar la privacidad",
 		"title": "Privacidad del perfil",
-		"description": "Elige quién puede ver cada parte de tu perfil. Las cuentas nuevas empiezan en privado, salvo el rango, que empieza en Todos.",
+		"description": "Elige quién puede ver cada parte de tu perfil. Las cuentas nuevas empiezan en Seguidores, salvo el rango, que empieza en Todos.",
 		"save": "Guardar privacidad"
 	},
 	"activitySharing": {

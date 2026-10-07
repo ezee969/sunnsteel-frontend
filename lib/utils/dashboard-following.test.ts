@@ -120,7 +120,9 @@ describe('the preview empty states are the feed empty states', () => {
 		)
 		expect(state).toEqual(describeEmptyFeed(4, tActivity))
 		expect(state.action).toBeUndefined()
-		expect(state.description).toContain('Everyone starts private')
+		expect(state.description).toContain(
+			'have not shared any activity with you yet',
+		)
 	})
 })
 

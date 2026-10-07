@@ -45,8 +45,8 @@
 		"trainingAndRest": "Training and rest",
 		"messages": "Messages",
 		"partnerActivity": "Partner activity",
-		"partnerActivityNote": "Off by default. An alert is created only while the partnership, their activity grant and the event's sharing are all still active. Turning one on starts with new activity from that moment.",
-		"partnerActivityNoteSummary": "Off by default. An alert needs active sharing, and starts from the moment you turn it on.",
+		"partnerActivityNote": "On for new accounts. An alert is created only while the partnership, their activity grant and the event's sharing are all still active. Turning one on starts with new activity from that moment.",
+		"partnerActivityNoteSummary": "On for new accounts. An alert needs active sharing and starts when you turn it on.",
 		"reminderTime": "Reminder time",
 		"reminderTimeNote": "Sunnsteel knows which days you train, not what hour, so this is the time you choose rather than a countdown to a session.",
 		"turnOff": "Turn off",
@@ -156,7 +156,7 @@
 		"updatedDescription": "Your profile visibility settings are now active.",
 		"failedTitle": "Could not update privacy",
 		"title": "Profile Privacy",
-		"description": "Choose who can see each part of your profile. New accounts start private, except the rank, which starts at Everyone.",
+		"description": "Choose who can see each part of your profile. New accounts start at Followers, except the rank, which starts at Everyone.",
 		"save": "Save privacy"
 	},
 	"activitySharing": {

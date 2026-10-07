@@ -353,7 +353,7 @@
 		"feedScopeNote": "Lo que hicieron los miembros que sigues, generado a partir de su entrenamiento verificado. Nadie escribe estas entradas; cada miembro elige quién ve cada tipo.",
 		"everyoneNote": "Todos significa cualquier miembro con sesión iniciada en Sunnsteel. La actividad nunca aparece en el enlace público de tu perfil.",
 		"defaultsSummary": "Un valor predeterminado también se aplica a tu actividad pasada, salvo entradas con ajuste propio.",
-		"defaultsNote": "Cada tipo empieza en Solo yo. Una configuración predeterminada se aplica a tu actividad pasada de ese tipo y a la nueva, salvo a las entradas que configuraste por separado. La privacidad de tu perfil es el límite: un tipo nunca llega más lejos que la sección de la que viene.",
+		"defaultsNote": "Las cuentas nuevas empiezan cada tipo en Seguidores. Una configuración predeterminada se aplica a tu actividad pasada de ese tipo y a la nueva, salvo a las entradas que configuraste por separado. La privacidad de tu perfil es el límite: un tipo nunca llega más lejos que la sección de la que viene.",
 		"sets": "{count, plural, one {# serie} other {# series}}",
 		"days": "{count, plural, one {# día} other {# días}}",
 		"exercises": "{count, plural, one {# ejercicio} other {# ejercicios}}",
@@ -390,7 +390,7 @@
 		"emptyNoFollowsTitle": "Todavía no sigues a nadie",
 		"emptyNoFollowsBody": "Sigue a otros miembros para ver aquí lo que entrenan, cuando elijan compartirlo.",
 		"emptyNothingTitle": "Todavía nadie compartió nada contigo",
-		"emptyNothingBody": "Los miembros que sigues no compartieron actividad contigo. Todos empiezan en privado."
+		"emptyNothingBody": "Los miembros que sigues todavía no compartieron actividad contigo."
 	},
 	"activityUi": {
 		"following": "Siguiendo",

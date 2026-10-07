@@ -353,7 +353,7 @@
 		"feedScopeNote": "What the members you follow did, generated from their verified training. Nobody writes these; each member chooses who sees each kind.",
 		"everyoneNote": "Everyone means any member signed in to Sunnsteel. Activity never appears on your public profile link.",
 		"defaultsSummary": "A default applies to past activity too, except entries you set on their own.",
-		"defaultsNote": "Every kind starts at Only me. A default applies to your past activity of that kind as well as new activity, except entries you set on their own. Your profile privacy is the upper bound: a kind can never reach further than the section it comes from.",
+		"defaultsNote": "New accounts start every kind at Followers. A default applies to your past activity of that kind as well as new activity, except entries you set on their own. Your profile privacy is the upper bound: a kind can never reach further than the section it comes from.",
 		"sets": "{count, plural, one {# set} other {# sets}}",
 		"days": "{count, plural, one {# day} other {# days}}",
 		"exercises": "{count, plural, one {# exercise} other {# exercises}}",
@@ -390,7 +390,7 @@
 		"emptyNoFollowsTitle": "You are not following anyone yet",
 		"emptyNoFollowsBody": "Follow members to see what they train here, once they choose to share it.",
 		"emptyNothingTitle": "Nothing shared with you yet",
-		"emptyNothingBody": "The members you follow have not shared any activity with you. Everyone starts private."
+		"emptyNothingBody": "The members you follow have not shared any activity with you yet."
 	},
 	"activityUi": {
 		"following": "Following",
