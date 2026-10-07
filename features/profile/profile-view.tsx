@@ -112,7 +112,7 @@ type ProfileViewProps = (
 /**
  * ACH-11 (§24.2): the room each rank's frame and portrait ornament take. The
  * frame answers to the header's own width (its compact pieces sit below
- * 600px), the portrait to the avatar, which grows at `sm`. A decorated header
+ * 600px), the portrait to the avatar, which grows from the same 600px. A decorated header
  * puts the portrait beside the text only from 860px of its own width: below
  * that the frame and the ornament leave the text column too narrow, so it
  * stacks as it does on a phone.
@@ -143,13 +143,30 @@ const RANK_ACTIONS_CLEARANCE = [
 	'',
 	'',
 ] as const
+/**
+ * The portrait's ornament overflows the avatar in proportion to it, so its
+ * margin scales with the avatar: 64px below a 600px header, 96px from it.
+ */
 const RANK_PORTRAIT_MARGIN = [
-	'm-[5px] sm:m-1.5',
-	'm-2 sm:m-2.5',
-	'm-3 sm:m-3.5',
-	'mx-5 mt-5 mb-8 sm:mx-6 sm:mt-6 @min-[860px]:mb-0',
-	'mx-6 mt-7 mb-8 sm:mx-7 sm:mt-7 @min-[860px]:mb-0',
-	'mx-9 mt-10 mb-10 sm:mx-[46px] sm:mt-[46px] @min-[860px]:mb-0',
+	'm-1 @min-[600px]:m-1.5',
+	'm-1.5 @min-[600px]:m-2.5',
+	'm-2.5 @min-[600px]:m-3.5',
+	'mx-4 mt-4 mb-6.5 @min-[600px]:mx-6 @min-[600px]:mt-6 @min-[600px]:mb-8 @min-[860px]:mb-0',
+	'mx-5 mt-5.5 mb-6.5 @min-[600px]:mx-7 @min-[600px]:mt-7 @min-[600px]:mb-8 @min-[860px]:mb-0',
+	'mx-7 mt-8 mb-8 @min-[600px]:mx-[46px] @min-[600px]:mt-[46px] @min-[600px]:mb-10 @min-[860px]:mb-0',
+] as const
+/**
+ * Below a 600px header your own profile's one action, Share, sits beside the
+ * portrait, so the counts are the column's last row and keep clear of the
+ * corners the actions used to sit above.
+ */
+const RANK_COMPACT_TEXT_CLEARANCE = [
+	'',
+	'',
+	'@max-[600px]:pb-7',
+	'@max-[600px]:pb-5',
+	'',
+	'',
 ] as const
 
 export function ProfileView(props: ProfileViewProps) {
@@ -281,6 +298,8 @@ export function ProfileView(props: ProfileViewProps) {
 				? `${oneDecimal(totalVolume / 1_000)}k`
 				: formatWeightAmount(totalVolumeKg, weightUnit, locale, 1)
 	const isMutating = props.variant === 'member' && props.isMutating
+	/** Your own profile's only header action is Share (see the compact grid). */
+	const shareBesidePortrait = Boolean(decoration) && isOwnProfile
 
 	const onFollowToggle = () => {
 		followAction?.()
@@ -331,7 +350,9 @@ export function ProfileView(props: ProfileViewProps) {
 						'flex flex-col gap-5',
 						decoration
 							? cn(
-									'relative @min-[860px]:flex-row @min-[860px]:items-end',
+									'relative @max-[600px]:gap-4 @min-[860px]:flex-row @min-[860px]:items-end',
+									shareBesidePortrait &&
+										'@max-[600px]:grid @max-[600px]:grid-cols-[auto_1fr]',
 									RANK_HEADER_PADDING[decoration.tier],
 								)
 							: 'sm:flex-row sm:items-end',
@@ -339,8 +360,13 @@ export function ProfileView(props: ProfileViewProps) {
 				>
 					<div
 						className={cn(
-							'relative h-20 w-20 shrink-0 sm:h-24 sm:w-24',
-							decoration && RANK_PORTRAIT_MARGIN[decoration.tier],
+							'relative shrink-0',
+							decoration
+								? cn(
+										'size-16 @min-[600px]:size-24',
+										RANK_PORTRAIT_MARGIN[decoration.tier],
+									)
+								: 'h-20 w-20 sm:h-24 sm:w-24',
 						)}
 					>
 						<RankPortraitOrnament assets={decorationAssets} layer="behind" />
@@ -358,7 +384,17 @@ export function ProfileView(props: ProfileViewProps) {
 						<RankPortraitOrnament assets={decorationAssets} layer="front" />
 					</div>
 
-					<div className="min-w-0 flex-1 space-y-1">
+					<div
+						className={cn(
+							'min-w-0 flex-1 space-y-1',
+							shareBesidePortrait &&
+								decoration &&
+								cn(
+									'@max-[600px]:col-span-2',
+									RANK_COMPACT_TEXT_CLEARANCE[decoration.tier],
+								),
+						)}
+					>
 						{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
 							membership, plan or tier, so no badge rendered here can be backed by
 							real account state. The one mark beside the name is the ACH-10 rank
@@ -386,11 +422,15 @@ export function ProfileView(props: ProfileViewProps) {
 								)}
 							</p>
 						) : null}
-						<p className="type-data text-ink-3">@{profileUsername}</p>
-						<p className="type-body-sm flex items-center gap-1.5 text-ink-3">
-							<CalendarDays className="h-4 w-4" aria-hidden />{' '}
-							{t('joined', { when: joinDateText })}
-						</p>
+						{/* The handle and the join date share a line, wrapping only
+						    when the column is too narrow for both. */}
+						<div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+							<p className="type-data text-ink-3">@{profileUsername}</p>
+							<p className="type-body-sm flex items-center gap-1.5 text-ink-3">
+								<CalendarDays className="h-4 w-4" aria-hidden />{' '}
+								{t('joined', { when: joinDateText })}
+							</p>
+						</div>
 
 						{/* SOC-02: inside the authenticated shell the counts open the
 							browsable lists. The signed-out /members route passes no hrefs, so
@@ -414,11 +454,35 @@ export function ProfileView(props: ProfileViewProps) {
 						className={cn(
 							'flex flex-wrap gap-3',
 							decoration && RANK_ACTIONS_CLEARANCE[decoration.tier],
+							shareBesidePortrait &&
+								'@max-[600px]:col-start-2 @max-[600px]:row-start-1 @max-[600px]:mb-0 @max-[600px]:self-end @max-[600px]:justify-self-end',
 						)}
 					>
-						<Button variant="outline" size="sm" onClick={onShareProfile}>
-							<Share2 className="mr-2 h-4 w-4" aria-hidden />{' '}
-							{t('shareProfile')}
+						{/* Below a 600px decorated header Share keeps its name for
+						    assistive technology and shows only its icon: 44px on its
+						    own beside the portrait, 36px like the controls beside it
+						    on someone else's profile. */}
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onShareProfile}
+							className={cn(
+								decoration &&
+									(shareBesidePortrait
+										? '@max-[600px]:size-11'
+										: '@max-[600px]:size-9'),
+							)}
+						>
+							<Share2
+								className={cn(
+									'mr-2 h-4 w-4',
+									decoration && '@max-[600px]:mr-0',
+								)}
+								aria-hidden
+							/>{' '}
+							<span className={cn(decoration && '@max-[600px]:sr-only')}>
+								{t('shareProfile')}
+							</span>
 						</Button>
 						{!isOwnProfile && followAction && (
 							<Button

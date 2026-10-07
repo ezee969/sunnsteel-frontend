@@ -1879,7 +1879,8 @@ quality (§24.6).
 
 Below a 600px header width each treatment uses its compact pieces: smaller
 corners, thinner bands and no festoons. The header reads as one region in both
-cases. It keeps one filled primary action, and its controls do not change.
+cases. It keeps one filled primary action, and its controls do not change
+(except Share's presentation below 600px, §24.7).
 
 ### 24.3 Colour
 
@@ -1958,6 +1959,33 @@ and run `npm run rank-decoration:generate`. The colours in it are placeholders
 that the stylesheet maps to tokens, so a token change never needs a
 regeneration. Repeating pieces (bands and grounds) are tiles drawn as CSS
 masks in the pigment.
+
+### 24.7 The compact header (2026-10-07, `UX-23`)
+
+Owner-approved on 2026-10-07 from before and after captures of all six ranks
+at 320 and 390. On a phone the decorated header took 344px (Initiate) to 502px
+(Laureate) of an 844px screen, so the first screen showed the header and little
+else (§23.4: a phone's first screen is the measure). This amends §24.2's "its
+controls do not change" for one control, below a 600px header only:
+
+- **Share shows only its icon** and keeps "Share profile" as its accessible
+  name. On your own profile, where it is the header's one action, it sits
+  beside the portrait at 44px, so the counts are the column's last row. On
+  someone else's profile it stays with Follow and Message, at their 36px.
+- **The portrait is 64px** (96px from a 600px header, where it was 80px below
+  `sm` and 96px from it). The ornament scales with it, and so do its margins.
+- **The handle and the join date share a line** at every width, wrapping when
+  the column is too narrow for both.
+- On your own profile the counts keep clear of the bottom corners
+  (Artisan and Maestro take extra room under them), as the actions did.
+
+Measured on the owner's profile at 390: Initiate 344 → 243px, Apprentice
+362 → 259, Artisan 424 → 313, Maestro 462 → 345, Virtuoso 474 → 363, Laureate
+502 → 387 (410 at 320). From 600px the header is unchanged except for the
+shared line, which takes 24px off it. **Not changed:** another member's
+header still wraps Follow, Message, the partner action and the menu onto
+several rows at 320; a smaller set of visible actions there is a separate
+decision.
 
 ---
 
