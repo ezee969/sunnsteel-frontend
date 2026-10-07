@@ -6,7 +6,8 @@ import {
 	type ConversationSummary,
 	MESSAGE_BODY_MAX,
 	messageBodyLength,
-	normalizeMessageBody,
+	messageNote,
+	type SendMessageRequest,
 } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
@@ -153,24 +154,52 @@ export function conversationPreview(
 		? t('messageDeleted')
 		: last.hiddenByModeration && !last.sentByMe
 			? t('removedByModeration')
-			: (last.body ?? '')
+			: last.body
+				? last.body
+				: // MSG-07: a routine sent without a note is named by the routine.
+					last.attachment
+					? routineLine(last.attachment.routine, t)
+					: ''
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
 }
 
+/** MSG-07: a routine in one line, or that it is no longer available. */
+export function routineLine(
+	routine: { name: string } | null,
+	t: Translator<'messaging.common'>,
+): string {
+	return routine
+		? t('sharedRoutine', { name: routine.name })
+		: t('routineUnavailable')
+}
+
 export interface ComposerState {
 	length: number
-	/** The body as it would be sent, or null when it cannot be. */
-	sendable: string | null
+	/**
+	 * What would be sent, or null when nothing can be: the text, and the
+	 * routine it carries (MSG-07), beside which the text may be empty.
+	 */
+	sendable: SendMessageRequest | null
 	over: boolean
 }
 
 /** What the composer can say about a draft, by the server's own rule. */
-export function composerState(draft: string): ComposerState {
+export function composerState(
+	draft: string,
+	routineId: string | null = null,
+): ComposerState {
 	const length = messageBodyLength(draft.replace(/\r\n?/g, '\n').trim())
+	const note = messageNote(draft, routineId !== null)
 	return {
 		length,
-		sendable: normalizeMessageBody(draft),
+		sendable:
+			note === undefined
+				? null
+				: {
+						...(note === null ? {} : { body: note }),
+						...(routineId ? { routineId } : {}),
+					},
 		over: length > MESSAGE_BODY_MAX,
 	}
 }
@@ -192,12 +221,39 @@ export function enterSends(
 	)
 }
 
-/** Where a profile's Message action opens. */
+/**
+ * Where a profile's Message action opens. With a routine (MSG-07), the
+ * composer opens with it attached, ready for a note.
+ */
 export function messageHref(
 	username: string,
 	conversationId: string | null,
+	routineId: string | null = null,
 ): string {
+	const routine = routineId ? `routine=${encodeURIComponent(routineId)}` : ''
 	return conversationId
-		? `/messages/${encodeURIComponent(conversationId)}`
-		: `/messages/new?to=${encodeURIComponent(username)}`
+		? `/messages/${encodeURIComponent(conversationId)}${routine ? `?${routine}` : ''}`
+		: `/messages/new?to=${encodeURIComponent(username)}${routine ? `&${routine}` : ''}`
+}
+
+/**
+ * MSG-07: the routines a member may send -- their own, never one moderation
+ * hid, which the server refuses -- with archived ones last.
+ */
+export function sendableRoutines<
+	R extends { isCompleted: boolean; isHiddenByModeration?: boolean },
+>(routines: R[]): R[] {
+	const offered = routines.filter(routine => !routine.isHiddenByModeration)
+	return [
+		...offered.filter(routine => !routine.isCompleted),
+		...offered.filter(routine => routine.isCompleted),
+	]
+}
+
+/** MSG-07: the page that opens the routine a message shared. */
+export function messageRoutineHref(
+	conversationId: string,
+	messageId: string,
+): string {
+	return `/messages/${encodeURIComponent(conversationId)}/routines/${encodeURIComponent(messageId)}`
 }

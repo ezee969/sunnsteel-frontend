@@ -90,7 +90,9 @@
 		"restoreMessage": "Restaurar mensaje",
 		"restrictMessaging": "Restringir mensajes",
 		"liftRestriction": "Levantar restricción",
-		"messagingRestricted": "Mensajes restringidos"
+		"messagingRestricted": "Mensajes restringidos",
+		"capturedRoutine": "Compartió una rutina: {name}",
+		"capturedRoutineGone": "Compartió una rutina que ya no está disponible"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",

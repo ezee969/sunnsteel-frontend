@@ -6,6 +6,7 @@ import type {
 	MarkConversationReadRequest,
 	SendMessageRequest,
 	SendMessageResponse,
+	SharedRoutine,
 	StartConversationRequest,
 	UnreadConversationsResponse,
 	UpdateMessagePermissionRequest,
@@ -68,6 +69,13 @@ export const messageService = {
 		httpClient.request<SendMessageResponse>(
 			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/messages`,
 			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	/** MSG-07: the routine a message shared, as it is now. */
+	messageRoutine: (conversationId: string, messageId: string) =>
+		httpClient.request<SharedRoutine>(
+			`${CONVERSATIONS_API_URL}/${encodeURIComponent(conversationId)}/messages/${encodeURIComponent(messageId)}/routine`,
+			{ method: 'GET', secure: true },
 		),
 
 	deleteMessage: (conversationId: string, messageId: string) =>

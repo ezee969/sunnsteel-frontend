@@ -740,7 +740,17 @@
 		"sharedBy": "Compartida por {name}",
 		"exerciseLine": "{sets, plural, one {# serie} other {# series}} · {seconds} s de descanso{progression, select, on { · progresión activa} lp { · bloque de 8 semanas (LP)} other {}}",
 		"setRepsFixed": "{reps} reps",
-		"setRepsRange": "{min}–{max} reps"
+		"setRepsRange": "{min}–{max} reps",
+		"sendInMessage": "Enviar en un mensaje",
+		"sendInMessageNote": "Envía esta rutina a un miembro. Podrá abrirla y hacer su propia copia, sea cual sea su visibilidad, hasta que borres el mensaje.",
+		"sendDialogTitle": "Enviar {name} en un mensaje",
+		"sendDialogDescription": "Elige una conversación o un miembro. La rutina se abre adjunta en el mensaje, donde puedes agregar una nota antes de enviarla.",
+		"sendRecent": "Conversaciones recientes",
+		"sendNoConversations": "Aún no tienes conversaciones.",
+		"sendSearchLabel": "Buscar a un miembro",
+		"sendSearchPlaceholder": "Nombre o usuario",
+		"sendSearchEmpty": "No se encontraron miembros.",
+		"sendTo": "Enviar a {name}"
 	},
 	"builder": {
 		"review": "Revisar",

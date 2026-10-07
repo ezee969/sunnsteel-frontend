@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { SendRoutineInMessage } from '@/features/routines/components/SendRoutineInMessage'
 import { PrivacyCapNote } from '@/features/settings/privacy-cap-note'
 import {
 	useCreateRoutineShare,
@@ -31,6 +32,8 @@ interface RoutineSharingProps {
 	accountRoutinesRule: ProfileVisibility
 	/** TRUST-04: a moderator has hidden the routine from everyone but its owner. */
 	isHiddenByModeration: boolean
+	/** MSG-07: named in "Send in a message". */
+	routineName: string
 }
 
 /**
@@ -44,6 +47,7 @@ export function RoutineSharing({
 	visibility,
 	accountRoutinesRule,
 	isHiddenByModeration,
+	routineName,
 }: RoutineSharingProps) {
 	const { push } = useToast()
 	const t = useTranslations('routines.sharing')
@@ -193,6 +197,11 @@ export function RoutineSharing({
 					<p className="type-body-sm text-ink-3">{t('noLinks')}</p>
 				)}
 			</div>
+
+			{/* MSG-07: a hidden routine cannot be sent; the server refuses it. */}
+			{isHiddenByModeration ? null : (
+				<SendRoutineInMessage routineId={routineId} routineName={routineName} />
+			)}
 		</section>
 	)
 }

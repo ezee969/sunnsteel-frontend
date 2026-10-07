@@ -200,6 +200,7 @@ export default function RoutineDetailsPage() {
 					visibility={routine.visibility}
 					accountRoutinesRule={user?.privacySettings?.routines ?? 'PRIVATE'}
 					isHiddenByModeration={routine.isHiddenByModeration ?? false}
+					routineName={routine.name}
 				/>
 
 				<RoutineTrainingBlocks routine={routine} weightUnit={weightUnit} />

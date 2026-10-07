@@ -3,10 +3,12 @@
 import type {
 	ConversationMessage,
 	ConversationSummary,
+	SendMessageRequest,
 } from '@sunsteel/contracts'
 import {
 	ArrowLeft,
 	Ban,
+	ClipboardList,
 	EyeOff,
 	Flag,
 	Loader2,
@@ -52,12 +54,13 @@ import {
 import {
 	firstNewIndex,
 	memberName,
+	messageRoutineHref,
 	readThrough,
 	startsGroup,
 } from '@/lib/utils/messages'
 
 import { MemberAvatar } from './member-avatar'
-import { MessageComposer } from './message-composer'
+import { type AttachedRoutine, MessageComposer } from './message-composer'
 import { RequestPanel } from './request-panel'
 
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -88,11 +91,17 @@ function isNotFound(error: unknown): boolean {
  * while it is open in a visible tab, marks it read through the newest message
  * on screen; one that arrives while the tab is hidden waits for the reader to
  * come back. "New since you last looked" stays where the visit began.
+ *
+ * MSG-07: a message can carry one of its sender's routines, shown as a card
+ * with the routine as it is now, which opens it to read and copy. A routine
+ * handed in from "Send in a message" opens attached to the composer.
  */
 export function ConversationThread({
 	conversationId,
+	initialRoutine = null,
 }: {
 	conversationId: string
+	initialRoutine?: AttachedRoutine | null
 }) {
 	const t = useTranslations('messaging.thread')
 	const tCommon = useTranslations('messaging.common')
@@ -196,15 +205,23 @@ export function ConversationThread({
 	const name = memberName(conversation.counterpart, tCommon)
 	const counterpart = conversation.counterpart
 
-	const onSend = (body: string) =>
-		send.mutateAsync(body).catch(error => {
-			push({
-				title: tComposer('sendFailed'),
-				description: errorText(error),
-				variant: 'destructive',
+	const onSend = (content: SendMessageRequest) =>
+		send
+			.mutateAsync(content)
+			.then(() => {
+				// The routine went; a reload must not attach it again.
+				if (initialRoutine) {
+					router.replace(`/messages/${encodeURIComponent(conversationId)}`)
+				}
 			})
-			throw error
-		})
+			.catch(error => {
+				push({
+					title: tComposer('sendFailed'),
+					description: errorText(error),
+					variant: 'destructive',
+				})
+				throw error
+			})
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -317,6 +334,7 @@ export function ConversationThread({
 					<MessageComposer
 						onSend={onSend}
 						isSending={send.isPending}
+						initialRoutine={initialRoutine}
 						autoFocus
 					/>
 				</div>
@@ -456,10 +474,15 @@ function MessageRow({
 						{tCommon('removedByModeration')}
 					</p>
 				) : (
-					<div className="min-w-0">
-						<p className="type-body whitespace-pre-wrap break-words text-foreground">
-							{message.body}
-						</p>
+					<div className="min-w-0 flex-1">
+						{message.body ? (
+							<p className="type-body whitespace-pre-wrap break-words text-foreground">
+								{message.body}
+							</p>
+						) : null}
+						{message.attachment ? (
+							<RoutineCard conversationId={conversationId} message={message} />
+						) : null}
 						{message.hiddenByModeration ? (
 							<p className="type-body-sm mt-1 flex items-start gap-1.5 text-ink-3">
 								<EyeOff className="mt-0.5 size-3.5 shrink-0" aria-hidden />
@@ -531,5 +554,60 @@ function MessageRow({
 				</AlertDialogContent>
 			</AlertDialog>
 		</li>
+	)
+}
+
+/**
+ * MSG-07: the routine a message carries, as it is now. It names the routine
+ * and what it programs and opens it to read and copy; a routine deleted or
+ * hidden since says it is no longer available rather than what it was.
+ */
+function RoutineCard({
+	conversationId,
+	message,
+}: {
+	conversationId: string
+	message: ConversationMessage
+}) {
+	const t = useTranslations('messaging.thread')
+	const routine = message.attachment?.routine ?? null
+	return (
+		<div
+			className={
+				message.body
+					? 'mt-2 max-w-md border border-rule p-3'
+					: 'max-w-md border border-rule p-3'
+			}
+		>
+			<p className="type-label flex items-center gap-1.5 text-ink-3">
+				<ClipboardList className="size-3.5" aria-hidden />
+				{t('routineCardLabel')}
+			</p>
+			{routine ? (
+				<div className="mt-1 space-y-2">
+					<div className="min-w-0">
+						<p className="type-panel truncate text-foreground">
+							{routine.name}
+						</p>
+						<p className="type-body-sm text-ink-3">
+							{t('routineMeta', {
+								days: routine.dayCount,
+								exercises: routine.exerciseCount,
+							})}
+						</p>
+					</div>
+					<Button asChild variant="outline" size="sm">
+						<Link
+							href={messageRoutineHref(conversationId, message.id)}
+							aria-label={t('openRoutineLabel', { name: routine.name })}
+						>
+							{t('openRoutine')}
+						</Link>
+					</Button>
+				</div>
+			) : (
+				<p className="type-body-sm mt-1 text-ink-3">{t('routineGone')}</p>
+			)}
+		</div>
 	)
 }

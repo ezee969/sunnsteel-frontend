@@ -3,7 +3,9 @@ import type {
 	ConversationMessagesResponse,
 	ConversationsResponse,
 	MessagePermission,
+	SendMessageRequest,
 	SendMessageResponse,
+	SharedRoutine,
 	UserProfile,
 } from '@sunsteel/contracts'
 import {
@@ -36,6 +38,9 @@ export const conversationKeys = {
 	box: (box: ConversationBox) => ['conversations', 'list', box] as const,
 	unread: () => ['conversations', 'unread'] as const,
 	thread: (id: string) => ['conversations', 'thread', id] as const,
+	/** MSG-07: a routine a message shared, inside the topic's prefix. */
+	routine: (conversationId: string, messageId: string) =>
+		['conversations', 'routine', conversationId, messageId] as const,
 }
 
 /** While the realtime stream is not live, how often an open screen re-reads. */
@@ -191,7 +196,8 @@ export function useStartConversation() {
 export function useSendMessage(conversationId: string) {
 	const queryClient = useQueryClient()
 	return useMutation({
-		mutationFn: (body: string) => messageService.send(conversationId, { body }),
+		mutationFn: (content: SendMessageRequest) =>
+			messageService.send(conversationId, content),
 		onSuccess: sent => {
 			queryClient.setQueryData<ThreadPages>(
 				conversationKeys.thread(conversationId),
@@ -202,6 +208,21 @@ export function useSendMessage(conversationId: string) {
 				queryKey: conversationKeys.unread(),
 			})
 		},
+	})
+}
+
+/**
+ * MSG-07: the routine a message shared, read as it is now. `staleTime: 0`,
+ * as a shared link's read is: a deleted message or routine must stop
+ * resolving at once.
+ */
+export function useMessageRoutine(conversationId: string, messageId: string) {
+	return useQuery<SharedRoutine>({
+		queryKey: conversationKeys.routine(conversationId, messageId),
+		queryFn: () => messageService.messageRoutine(conversationId, messageId),
+		enabled: !!conversationId && !!messageId,
+		staleTime: 0,
+		retry: false,
 	})
 }
 

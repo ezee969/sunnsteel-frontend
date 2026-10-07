@@ -8,7 +8,9 @@
 		"encryption": "Messages are stored on Sunnsteel's servers and aren't end-to-end encrypted.",
 		"tryAgain": "Try again",
 		"cancel": "Cancel",
-		"removedByModeration": "Removed by moderation"
+		"removedByModeration": "Removed by moderation",
+		"sharedRoutine": "Routine: {name}",
+		"routineUnavailable": "A routine that's no longer available"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -69,7 +71,12 @@
 		"declineBody": "{name} isn't told. They can't send you another request for 30 days.",
 		"blockTitle": "Block {name}?",
 		"decisionFailed": "That couldn't be done.",
-		"requestOutgoing": "Your request is sent. You can write more once {name} accepts it."
+		"requestOutgoing": "Your request is sent. You can write more once {name} accepts it.",
+		"routineCardLabel": "Routine",
+		"routineMeta": "{days, plural, one {# day} other {# days}} · {exercises, plural, one {# exercise} other {# exercises}}",
+		"openRoutine": "Open routine",
+		"openRoutineLabel": "Open the routine {name}",
+		"routineGone": "This routine is no longer available."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -79,7 +86,16 @@
 		"count": "{count} / {max}",
 		"tooLong": "{count} / {max}, too long to send",
 		"keyboardHint": "Enter sends, Shift+Enter adds a line.",
-		"sendFailed": "The message couldn't be sent."
+		"sendFailed": "The message couldn't be sent.",
+		"attachRoutine": "Attach a routine",
+		"attachedRoutine": "Routine: {name}",
+		"removeRoutine": "Remove the routine {name}",
+		"notePlaceholder": "Add a note (optional)",
+		"pickerTitle": "Attach one of your routines",
+		"pickerDescription": "The other member can open it and make their own copy, whatever its visibility, until you delete the message. They see it as it is when they open it, and never your workouts.",
+		"pickerLoading": "Loading your routines…",
+		"pickerEmpty": "You have no routines yet.",
+		"pickerChoose": "Attach {name}"
 	},
 	"new": {
 		"pageTitle": "New message",
@@ -106,5 +122,17 @@
 		"saveFailed": "Your choice couldn't be saved.",
 		"everyone": "Everyone",
 		"everyoneHint": "Members you follow reach your inbox. Anyone else's first message waits in Requests until you accept it."
+	},
+	"routine": {
+		"pageTitle": "Routine",
+		"back": "Back to the conversation",
+		"loading": "Loading the routine…",
+		"unavailable": "This routine isn't available.",
+		"unavailableHint": "The message or the routine may have been deleted.",
+		"loadError": "The routine couldn't be loaded.",
+		"sentToYou": "{name} sent you this routine. You can open it and make your own copy until the message is deleted.",
+		"yours": "This is your routine, as you sent it in this conversation.",
+		"openYours": "Open it in your routines",
+		"tryAgain": "Try again"
 	}
 }

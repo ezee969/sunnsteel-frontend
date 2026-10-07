@@ -74,11 +74,19 @@ export function ReportedMessages({
 							<p className="type-body whitespace-pre-wrap break-words text-foreground">
 								{message.body}
 							</p>
-						) : (
+						) : typeof message.routineName === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-07: a routine it carried, by the name the reporter saw. */}
+						{typeof message.routineName === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.routineName
+									? t('capturedRoutine', { name: message.routineName })
+									: t('capturedRoutineGone')}
+							</p>
+						) : null}
 					</li>
 				))}
 			</ol>

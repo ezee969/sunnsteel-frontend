@@ -19,7 +19,10 @@ import {
 	flattenConversationPages,
 	memberName,
 	messageHref,
+	messageRoutineHref,
 	readThrough,
+	routineLine,
+	sendableRoutines,
 	startsGroup,
 	threadFromPages,
 } from './messages'
@@ -44,6 +47,7 @@ const message = (
 	body: `text ${id}`,
 	deleted: false,
 	hiddenByModeration: false,
+	attachment: null,
 	createdAt: `2026-10-05T${at}:00.000Z`,
 	...overrides,
 })
@@ -203,7 +207,7 @@ describe('MSG-01 the composer', () => {
 	it('counts as the server does and sends only what it would accept', () => {
 		expect(composerState('  hi\r\nthere ')).toEqual({
 			length: 8,
-			sendable: 'hi\nthere',
+			sendable: { body: 'hi\nthere' },
 			over: false,
 		})
 		expect(composerState('   ').sendable).toBeNull()
@@ -225,6 +229,83 @@ describe('MSG-01 the composer', () => {
 	it('opens the conversation a pair has, or a new message to the member', () => {
 		expect(messageHref('ana', 'c-1')).toBe('/messages/c-1')
 		expect(messageHref('ana b', null)).toBe('/messages/new?to=ana%20b')
+	})
+})
+
+describe('MSG-07 a routine in a message', () => {
+	const upper = {
+		routineId: 'r-1',
+		name: 'Upper / Lower',
+		description: null,
+		scheduleMode: 'WEEKLY' as const,
+		dayCount: 4,
+		exerciseCount: 22,
+		updatedAt: '2026-10-07T08:00:00.000Z',
+	}
+	const withRoutine = (
+		routine: typeof upper | null,
+		overrides: Partial<ConversationMessage> = {},
+	) =>
+		summary('a', {
+			lastMessage: message('x', '10:00', {
+				body: null,
+				attachment: { kind: 'ROUTINE', routine },
+				...overrides,
+			}),
+		})
+
+	it('sends a routine with or without a note, never an empty message', () => {
+		expect(composerState('', 'r-1').sendable).toEqual({ routineId: 'r-1' })
+		expect(composerState('  try this ', 'r-1').sendable).toEqual({
+			body: 'try this',
+			routineId: 'r-1',
+		})
+		expect(composerState('').sendable).toBeNull()
+		expect(
+			composerState('a'.repeat(MESSAGE_BODY_MAX + 1), 'r-1').sendable,
+		).toBeNull()
+	})
+
+	it('previews a routine without a note by its name, in both languages', () => {
+		expect(conversationPreview(withRoutine(upper), en)).toBe(
+			'Routine: Upper / Lower',
+		)
+		expect(conversationPreview(withRoutine(upper), es)).toBe(
+			'Rutina: Upper / Lower',
+		)
+		expect(
+			conversationPreview(withRoutine(upper, { sentByMe: true }), en),
+		).toBe('You: Routine: Upper / Lower')
+		expect(conversationPreview(withRoutine(null), en)).toBe(
+			"A routine that's no longer available",
+		)
+		expect(routineLine(null, es)).toBe('Una rutina que ya no está disponible')
+	})
+
+	it('previews the note when there is one', () => {
+		expect(
+			conversationPreview(withRoutine(upper, { body: 'try this' }), en),
+		).toBe('try this')
+	})
+
+	it('offers only routines the server would send, archived ones last', () => {
+		const routines = [
+			{ id: 'a', isCompleted: true },
+			{ id: 'b', isCompleted: false, isHiddenByModeration: true },
+			{ id: 'c', isCompleted: false },
+		]
+		expect(sendableRoutines(routines).map(routine => routine.id)).toEqual([
+			'c',
+			'a',
+		])
+	})
+
+	it('opens the composer with the routine attached, and the routine from its message', () => {
+		expect(messageHref('ana', 'c-1', 'r-1')).toBe('/messages/c-1?routine=r-1')
+		expect(messageHref('ana', null, 'r-1')).toBe(
+			'/messages/new?to=ana&routine=r-1',
+		)
+		expect(messageRoutineHref('c-1', 'm-1')).toBe('/messages/c-1/routines/m-1')
 	})
 })
 

@@ -90,7 +90,9 @@
 		"restoreMessage": "Restore message",
 		"restrictMessaging": "Restrict messaging",
 		"liftRestriction": "Lift restriction",
-		"messagingRestricted": "Messaging restricted"
+		"messagingRestricted": "Messaging restricted",
+		"capturedRoutine": "Shared a routine: {name}",
+		"capturedRoutineGone": "Shared a routine that's no longer available"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",

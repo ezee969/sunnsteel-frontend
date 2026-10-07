@@ -338,7 +338,7 @@
 		"EXERCISE_GROUP_TOO_LARGE": "Una superserie o un circuito tiene como máximo {max} ejercicios",
 		"ROUTINE_ACTIVE_SESSION": "Termina la sesión en curso antes de cambiar la estructura de la rutina",
 		"ROUTINE_SHARE_LINKS_MAX": "Una rutina puede tener como máximo {max} enlaces activos.",
-		"CLONE_SOURCE_REQUIRED": "Indica un enlace compartido o una rutina para copiar",
+		"CLONE_SOURCE_REQUIRED": "Indica un enlace compartido, una rutina o un mensaje para copiar",
 		"CLONE_UNKNOWN_EXERCISE": "Un ejercicio de esta rutina ya no está en el catálogo",
 		"ROUTINE_VERSIONS_MAX": "Una rutina guarda como máximo {max} versiones; elimina una primero",
 		"ROUTINE_VERSION_EXERCISE_GONE": "Un ejercicio de esta versión ya no está en el catálogo",

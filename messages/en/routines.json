@@ -740,7 +740,17 @@
 		"sharedBy": "Shared by {name}",
 		"exerciseLine": "{sets, plural, one {# set} other {# sets}} · {seconds}s rest{progression, select, on { · progression on} lp { · 8-week block (LP)} other {}}",
 		"setRepsFixed": "{reps} reps",
-		"setRepsRange": "{min}–{max} reps"
+		"setRepsRange": "{min}–{max} reps",
+		"sendInMessage": "Send in a message",
+		"sendInMessageNote": "Send this routine to a member. They can open it and make their own copy, whatever its visibility, until you delete the message.",
+		"sendDialogTitle": "Send {name} in a message",
+		"sendDialogDescription": "Choose a conversation or a member. The routine opens attached in the message, where you can add a note before sending.",
+		"sendRecent": "Recent conversations",
+		"sendNoConversations": "No conversations yet.",
+		"sendSearchLabel": "Find a member",
+		"sendSearchPlaceholder": "Name or username",
+		"sendSearchEmpty": "No members found.",
+		"sendTo": "Send to {name}"
 	},
 	"builder": {
 		"review": "Review",

@@ -8,7 +8,9 @@
 		"encryption": "Los mensajes se guardan en los servidores de Sunnsteel y no tienen cifrado de extremo a extremo.",
 		"tryAgain": "Intentar de nuevo",
 		"cancel": "Cancelar",
-		"removedByModeration": "Eliminado por moderación"
+		"removedByModeration": "Eliminado por moderación",
+		"sharedRoutine": "Rutina: {name}",
+		"routineUnavailable": "Una rutina que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -69,7 +71,12 @@
 		"declineBody": "No se le avisa a {name}. No podrá enviarte otra solicitud durante 30 días.",
 		"blockTitle": "¿Bloquear a {name}?",
 		"decisionFailed": "No se pudo hacer.",
-		"requestOutgoing": "Tu solicitud se envió. Podrás escribir más cuando {name} la acepte."
+		"requestOutgoing": "Tu solicitud se envió. Podrás escribir más cuando {name} la acepte.",
+		"routineCardLabel": "Rutina",
+		"routineMeta": "{days, plural, one {# día} other {# días}} · {exercises, plural, one {# ejercicio} other {# ejercicios}}",
+		"openRoutine": "Abrir rutina",
+		"openRoutineLabel": "Abrir la rutina {name}",
+		"routineGone": "Esta rutina ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -79,7 +86,16 @@
 		"count": "{count} / {max}",
 		"tooLong": "{count} / {max}, demasiado largo para enviar",
 		"keyboardHint": "Enter envía; Mayús+Enter agrega una línea.",
-		"sendFailed": "No se pudo enviar el mensaje."
+		"sendFailed": "No se pudo enviar el mensaje.",
+		"attachRoutine": "Adjuntar una rutina",
+		"attachedRoutine": "Rutina: {name}",
+		"removeRoutine": "Quitar la rutina {name}",
+		"notePlaceholder": "Agrega una nota (opcional)",
+		"pickerTitle": "Adjunta una de tus rutinas",
+		"pickerDescription": "La otra persona puede abrirla y hacer su propia copia, sea cual sea su visibilidad, hasta que borres el mensaje. La ve tal como esté al abrirla, y nunca tus entrenamientos.",
+		"pickerLoading": "Cargando tus rutinas…",
+		"pickerEmpty": "Aún no tienes rutinas.",
+		"pickerChoose": "Adjuntar {name}"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",
@@ -106,5 +122,17 @@
 		"saveFailed": "No se pudo guardar tu elección.",
 		"everyone": "Todos",
 		"everyoneHint": "Los miembros que sigues llegan a tu bandeja. El primer mensaje de cualquier otra persona espera en Solicitudes hasta que lo aceptes."
+	},
+	"routine": {
+		"pageTitle": "Rutina",
+		"back": "Volver a la conversación",
+		"loading": "Cargando la rutina…",
+		"unavailable": "Esta rutina no está disponible.",
+		"unavailableHint": "Puede que se haya borrado el mensaje o la rutina.",
+		"loadError": "No se pudo cargar la rutina.",
+		"sentToYou": "{name} te envió esta rutina. Puedes abrirla y hacer tu propia copia hasta que se borre el mensaje.",
+		"yours": "Es tu rutina, tal como la enviaste en esta conversación.",
+		"openYours": "Abrirla en tus rutinas",
+		"tryAgain": "Intentar de nuevo"
 	}
 }
