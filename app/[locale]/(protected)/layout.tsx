@@ -165,8 +165,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		return <div className="relative min-h-screen bg-background" />
 	}
 
+	// One scroll: only <main> scrolls. `overflow-clip` keeps anything that
+	// escapes the column from growing the document, and unlike `hidden` it is
+	// not a scroll container that `scrollIntoView` could shift.
 	const layoutContent = (
-		<div className="relative min-h-screen">
+		<div className="relative min-h-screen overflow-clip">
 			<StaleSessionRecoveryDialog session={activeSession} />
 			<LocaleSync />
 			<RealtimeSync />
@@ -256,8 +259,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
 					{/* Content. v1.1 §26.3: `shell-main` pads by --shell-gutter, the
 					    topbar's own 16px edge on a phone, so pinned rows inside can
-					    cancel it with `shell-pin` / `shell-bleed`. */}
-					<main className="shell-main flex-1 overflow-auto">
+					    cancel it with `shell-pin` / `shell-bleed`. `relative` is
+					    load-bearing: without it an absolutely positioned descendant
+					    (every `sr-only` heading) took the shell's outer div as its
+					    containing block, escaped this scroll box and stretched the
+					    document, so the page had a second scroll beside this one. */}
+					<main className="shell-main relative flex-1 overflow-auto">
 						<Suspense
 							fallback={
 								<div className="w-full max-w-lg space-y-3 p-6">
