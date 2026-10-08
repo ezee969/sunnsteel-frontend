@@ -13,6 +13,12 @@ export const SESSION_ACTIONS = {
 	ABORT: 'abort',
 } as const
 
+/**
+ * LIVE-21: how long a finished exercise stays open after its last tick, so the
+ * tick and the completed mark land before it folds.
+ */
+export const AUTO_COLLAPSE_DELAY_MS = 700
+
 export const DEBOUNCE_DELAYS = {
 	SET_LOG_SAVE: 3500,
 	SEARCH: 300,

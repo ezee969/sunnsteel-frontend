@@ -346,6 +346,8 @@
 		"rpePlaceholder": "RPE",
 		"optional": "Optional",
 		"markCompleteAria": "Mark set as complete",
+		"completeNeedsReps": "Enter your reps to complete the set",
+		"completeNeedsWeight": "Enter the weight to complete the set (0 for bodyweight)",
 		"lastTime": "Last time",
 		"improvement": "↑ Improvement",
 		"errorSaving": "Error saving set. Please try again.",

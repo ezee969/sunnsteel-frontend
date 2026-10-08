@@ -13,6 +13,39 @@ import type {
 /** LIVE-15: an exercise takes at most this many sets beyond its prescription. */
 export const MAX_EXTRA_SETS = 10
 
+interface CompletableSet {
+	setNumber: number
+	isCompleted: boolean
+	kind?: SetKind | null
+}
+
+/**
+ * LIVE-12: an exercise is done once every required set is done; a skipped
+ * warm-up or optional set does not hold it back. With no required sets, every
+ * set counts.
+ */
+export const isExerciseDone = (sets: CompletableSet[]): boolean => {
+	if (!sets.some(set => set.isCompleted)) return false
+	const required = sets.filter(set => requiredToFinish(set.kind))
+	return (required.length > 0 ? required : sets).every(set => set.isCompleted)
+}
+
+/**
+ * LIVE-21: whether ticking `setNumber` is the tick that finishes the
+ * exercise -- it was not done before and is done after. A tick on an exercise
+ * that was already done (an optional set after the working ones) is not.
+ */
+export const completesExercise = (
+	sets: CompletableSet[],
+	setNumber: number,
+): boolean =>
+	!isExerciseDone(sets) &&
+	isExerciseDone(
+		sets.map(set =>
+			set.setNumber === setNumber ? { ...set, isCompleted: true } : set,
+		),
+	)
+
 const prescribedSetCount = (exercise: RoutineExercise) =>
 	exercise.sets.reduce((max, set) => Math.max(max, set.setNumber), 0)
 

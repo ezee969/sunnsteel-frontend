@@ -346,6 +346,8 @@
 		"rpePlaceholder": "RPE",
 		"optional": "Opcional",
 		"markCompleteAria": "Marcar la serie como completada",
+		"completeNeedsReps": "Escribe las repeticiones para completar la serie",
+		"completeNeedsWeight": "Escribe el peso para completar la serie (0 si es peso corporal)",
 		"lastTime": "La vez anterior",
 		"improvement": "↑ Mejora",
 		"errorSaving": "Error al guardar la serie. Inténtalo de nuevo.",

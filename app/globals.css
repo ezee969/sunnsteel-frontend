@@ -563,6 +563,15 @@
     animation: mark-fill var(--motion-slow) var(--ease-standard) forwards;
   }
 
+  /* LIVE-21: where a superset or circuit hands over. The exercise the screen
+     glides to holds a neutral tint while the scroll runs, then settles back
+     to its own tone. Colour only (§1.2), so reduced motion keeps it: there the
+     scroll is instant and the tint shorter, because the duration is built on
+     --motion-slow, which the reduction sets to 120ms. */
+  [data-arriving] {
+    animation: arrival-cue calc(var(--motion-slow) * 4) var(--ease-standard);
+  }
+
 
   /* The one classical device the direction keeps: gold brackets, one pair per
      screen, on the page inscription rather than around a photograph. A
@@ -690,6 +699,12 @@
   }
   to {
     transform: scaleX(1);
+  }
+}
+@keyframes arrival-cue {
+  0%,
+  60% {
+    background-color: var(--accent);
   }
 }
 @keyframes mark-fill {

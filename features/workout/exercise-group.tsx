@@ -2,7 +2,6 @@
 
 import {
 	type LinearPeriodizationState,
-	requiredToFinish,
 	type SetKind,
 } from '@sunsteel/contracts'
 import {
@@ -32,7 +31,10 @@ import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { lpSetTargetLabel } from '@/lib/utils/linear-periodization'
 import { lpFinishedNote, lpSessionLine } from '@/lib/utils/session-linear-block'
-import { MAX_EXTRA_SETS } from '@/lib/utils/session-progress.utils'
+import {
+	isExerciseDone,
+	MAX_EXTRA_SETS,
+} from '@/lib/utils/session-progress.utils'
 import { comparablePrevious } from '@/lib/utils/session-substitutions'
 import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
@@ -101,6 +103,13 @@ interface ExerciseGroupProps {
 	 * which also hides Add set.
 	 */
 	onRemoveSet?: (routineExerciseId: string, setNumber: number) => void
+	/**
+	 * LIVE-21: the rounds just handed over to this exercise; the section is
+	 * tinted briefly so the member sees where the screen went.
+	 */
+	arriving?: boolean
+	/** LIVE-21: the arrival tint has run its course. */
+	onArrivalEnd?: () => void
 }
 
 /**
@@ -127,6 +136,8 @@ export const ExerciseGroup = ({
 	upNext,
 	linearBlock,
 	linearBlockUnset,
+	arriving,
+	onArrivalEnd,
 }: ExerciseGroupProps) => {
 	const t = useTranslations('workout.exerciseGroup')
 	const tEx = useTranslations('catalog.exercises')
@@ -159,12 +170,7 @@ export const ExerciseGroup = ({
 	const exerciseName = exerciseLabel(rawExerciseName, tEx)
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
-	const required = sets.filter(set => requiredToFinish(set.kind))
-	const isComplete =
-		completedSets > 0 &&
-		(required.length > 0
-			? required.every(set => set.isCompleted)
-			: completedSets === totalSets)
+	const isComplete = isExerciseDone(sets)
 	const weightUnit = useWeightUnit()
 	// LIVE-18: under larger controls the swap, plate calculator and note move
 	// into one More menu, so the header keeps the exercise and one control.
@@ -207,6 +213,10 @@ export const ExerciseGroup = ({
 		// so it is `--success` (§4.3 rule 2), not gold.
 		<section
 			id={`exercise-${exerciseId}`}
+			data-arriving={arriving || undefined}
+			onAnimationEnd={event => {
+				if (event.animationName === 'arrival-cue') onArrivalEnd?.()
+			}}
 			// Motion spec §2.9 signature 2: `mark-fill` makes the mark grow top to
 			// bottom instead of appearing, and the row settles onto the completed
 			// tone over the same 300ms. The fill is a transform on an overlay bar,
@@ -217,6 +227,7 @@ export const ExerciseGroup = ({
 		>
 			<div className="flex items-center justify-between gap-2">
 				<Button
+					id={`exercise-${exerciseId}-toggle`}
 					variant="ghost"
 					onClick={onToggleCollapse}
 					className="h-auto min-h-11 min-w-0 flex-1 justify-between rounded-none p-0 hover:bg-transparent large-controls:h-auto large-controls:min-h-12 large-controls:px-0"

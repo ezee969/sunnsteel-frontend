@@ -193,8 +193,8 @@ async function startScratchSession(
 					.getByText(/^Target: /)
 					.nth(1)
 					.innerText()
-				const load = target.match(/\d+(\.\d+)?/)?.[0]
-				if (load) await weight.fill(load)
+				// LIVE-21: a tick needs a weight; 0 is a bodyweight set.
+				await weight.fill(target.match(/\d+(\.\d+)?/)?.[0] ?? '0')
 			}
 			const box = row.getByRole('checkbox', { name: 'Mark set as complete' })
 			await box.click()

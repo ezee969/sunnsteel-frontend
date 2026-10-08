@@ -137,6 +137,7 @@ export const SetLogInput = ({
 		isValid,
 		validationError,
 		validationField,
+		completionField,
 	} = useSetLogForm({
 		sessionId,
 		routineExerciseId,
@@ -162,8 +163,21 @@ export const SetLogInput = ({
 	// a11y review 7: the invalid field and its message are linked, so a screen
 	// reader user editing one of several repeated rows hears which one failed.
 	const errorId = `set-${routineExerciseId}-${setNumber}-error`
-	const repsInvalid = !isValid && validationField === 'reps'
-	const weightInvalid = !isValid && validationField === 'weight'
+	// LIVE-21: a refused tick focuses the field it needs. `Input` takes no ref
+	// (React 18), so each field is found by its id.
+	const repsId = `set-${routineExerciseId}-${setNumber}-reps`
+	const weightId = `set-${routineExerciseId}-${setNumber}-weight`
+	const repsInvalid =
+		completionField === 'reps' || (!isValid && validationField === 'reps')
+	const weightInvalid =
+		completionField === 'weight' || (!isValid && validationField === 'weight')
+	const fieldMessage = completionField
+		? completionField === 'reps'
+			? t('completeNeedsReps')
+			: t('completeNeedsWeight')
+		: !isValid
+			? validationError
+			: undefined
 	const rpeInvalid = !isValid && validationField === 'rpe'
 	// TD-28: the save state is drawn on the completion checkbox instead of in
 	// its own column -- after the RPE input there is no width left for one. A
@@ -340,6 +354,7 @@ export const SetLogInput = ({
 				{/* Reps */}
 				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[62px]">
 					<Input
+						id={repsId}
 						type="number"
 						inputMode="numeric"
 						aria-label={t('performedRepsAria')}
@@ -394,6 +409,7 @@ export const SetLogInput = ({
 					) : (
 						<>
 							<Input
+								id={weightId}
 								type="number"
 								inputMode="decimal"
 								step={weightUnit === 'LB' ? 1 : 0.5}
@@ -461,9 +477,14 @@ export const SetLogInput = ({
 					</span>
 					<Checkbox
 						checked={isCompletedState}
-						onCheckedChange={(checked: boolean | 'indeterminate') =>
-							handleCompletionToggle(Boolean(checked))
-						}
+						onCheckedChange={(checked: boolean | 'indeterminate') => {
+							const missing = handleCompletionToggle(Boolean(checked))
+							// Focus inside the tap, so a phone opens its keypad.
+							if (missing)
+								document
+									.getElementById(missing === 'reps' ? repsId : weightId)
+									?.focus()
+						}}
 						aria-label={t('markCompleteAria')}
 						disabled={saveState === 'saving'}
 						// Checked colour comes from the primitive (`--success-strong`,
@@ -535,14 +556,14 @@ export const SetLogInput = ({
 				</div>
 			) : null}
 
-			{/* Validation error */}
-			{!isValid && validationError && (
+			{/* Validation error, or the field a tick needs (LIVE-21) */}
+			{fieldMessage && (
 				<div
 					id={errorId}
 					role="alert"
 					className="type-body-sm mt-2 text-center text-destructive"
 				>
-					{validationError}
+					{fieldMessage}
 				</div>
 			)}
 

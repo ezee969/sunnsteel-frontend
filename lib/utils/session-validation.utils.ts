@@ -64,6 +64,27 @@ export const validateSetLogPayload = (
 }
 
 /**
+ * LIVE-21: the field a set still needs before it can be ticked, or null.
+ * Reps must be a whole count of at least one, and the weight must be typed --
+ * 0 included, which is how a bodyweight set is logged -- so a done set always
+ * records what was done. `weight` is the parsed field (or a block's fixed
+ * load): `undefined` means the box is empty or unreadable.
+ */
+export const missingForCompletion = ({
+	reps,
+	weight,
+}: {
+	reps: string
+	weight: number | undefined
+}): 'reps' | 'weight' | null => {
+	const count = Number(reps)
+	if (reps.trim() === '' || !Number.isInteger(count) || count < 1) return 'reps'
+	if (weight === undefined || !Number.isFinite(weight) || weight < 0)
+		return 'weight'
+	return null
+}
+
+/**
  * Checks if a set is considered complete based on reps
  * @param reps - Number of reps performed
  * @param isCompleted - Explicit completion flag

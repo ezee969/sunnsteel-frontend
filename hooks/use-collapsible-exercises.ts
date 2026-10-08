@@ -3,6 +3,10 @@ import { useCallback, useState } from 'react'
 interface UseCollapsibleExercisesReturn {
 	collapsedExercises: Set<string>
 	toggleExercise: (exerciseId: string) => void
+	/** LIVE-21: fold one exercise; folding a folded one changes nothing. */
+	collapseExercise: (exerciseId: string) => void
+	/** Open one exercise; opening an open one changes nothing. */
+	expandExercise: (exerciseId: string) => void
 	collapseAll: (exerciseIds: string[]) => void
 	expandAll: () => void
 	isCollapsed: (exerciseId: string) => boolean
@@ -30,6 +34,21 @@ export const useCollapsibleExercises = (
 		})
 	}, [])
 
+	const collapseExercise = useCallback((exerciseId: string) => {
+		setCollapsedExercises(prev =>
+			prev.has(exerciseId) ? prev : new Set(prev).add(exerciseId),
+		)
+	}, [])
+
+	const expandExercise = useCallback((exerciseId: string) => {
+		setCollapsedExercises(prev => {
+			if (!prev.has(exerciseId)) return prev
+			const next = new Set(prev)
+			next.delete(exerciseId)
+			return next
+		})
+	}, [])
+
 	const collapseAll = useCallback((exerciseIds: string[]) => {
 		setCollapsedExercises(new Set(exerciseIds))
 	}, [])
@@ -48,6 +67,8 @@ export const useCollapsibleExercises = (
 	return {
 		collapsedExercises,
 		toggleExercise,
+		collapseExercise,
+		expandExercise,
 		collapseAll,
 		expandAll,
 		isCollapsed,

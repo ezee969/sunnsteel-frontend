@@ -21,6 +21,7 @@ import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapDialog } from '@/features/workout/session-recap'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
+import { useMotionPreference } from '@/hooks/use-motion-preference'
 import { useRestTimer } from '@/hooks/use-rest-timer'
 import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { useSessionManagement } from '@/hooks/use-session-management'
@@ -34,6 +35,7 @@ import {
 	useUpsertSetLog,
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
+import { AUTO_COLLAPSE_DELAY_MS } from '@/lib/constants/session.constants'
 import {
 	isRotationDay,
 	sessionLinearBlock,
@@ -43,7 +45,11 @@ import {
 	sessionPrescription,
 	sessionRoutineTitle,
 } from '@/lib/utils/session-prescription'
-import { groupSetLogsByExercise } from '@/lib/utils/session-progress.utils'
+import {
+	completesExercise,
+	groupSetLogsByExercise,
+	isExerciseDone,
+} from '@/lib/utils/session-progress.utils'
 import {
 	describeRound,
 	describeUpNext,
@@ -158,7 +164,8 @@ export default function ActiveSessionPage() {
 	})
 
 	// Collapsible exercises state
-	const { toggleExercise, isCollapsed } = useCollapsibleExercises()
+	const { toggleExercise, isCollapsed, collapseExercise, expandExercise } =
+		useCollapsibleExercises()
 
 	// LIVE-14: the set last ticked, which decides where the rounds go next.
 	const [lastCompleted, setLastCompleted] = useState<{
@@ -240,6 +247,74 @@ export default function ActiveSessionPage() {
 	const upNext = useMemo(
 		() => nextSetAfter(roundSlots, lastCompleted),
 		[roundSlots, lastCompleted],
+	)
+
+	// LIVE-21: an exercise its last tick finished folds a moment later, and a
+	// round handing over glides to the next exercise and tints it on arrival.
+	const { reduced: reducedMotion } = useMotionPreference()
+	const reducedMotionRef = useRef(reducedMotion)
+	const groupedLogsRef = useRef(groupedLogs)
+	useEffect(() => {
+		reducedMotionRef.current = reducedMotion
+		groupedLogsRef.current = groupedLogs
+	}, [reducedMotion, groupedLogs])
+	const [arrival, setArrival] = useState<string | null>(null)
+	const [scrollRequest, setScrollRequest] = useState<{
+		exerciseId: string
+		block: ScrollLogicalPosition
+	} | null>(null)
+	// Runs after the commit that opened or folded the exercises, so the target
+	// is already where it will stay when the scroll starts.
+	useEffect(() => {
+		if (!scrollRequest) return
+		document
+			.getElementById(`exercise-${scrollRequest.exerciseId}`)
+			?.scrollIntoView({
+				behavior: reducedMotionRef.current ? 'auto' : 'smooth',
+				block: scrollRequest.block,
+			})
+	}, [scrollRequest])
+	const foldTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+	useEffect(() => {
+		const timers = foldTimers.current
+		return () => timers.forEach(clearTimeout)
+	}, [])
+	const handOff = useCallback(
+		(exerciseId: string) => {
+			expandExercise(exerciseId)
+			setArrival(exerciseId)
+			setScrollRequest({ exerciseId, block: 'start' })
+		},
+		[expandExercise],
+	)
+	const foldWhenDone = useCallback(
+		(exerciseId: string, then: string | null) => {
+			clearTimeout(foldTimers.current.get(exerciseId))
+			foldTimers.current.set(
+				exerciseId,
+				setTimeout(() => {
+					foldTimers.current.delete(exerciseId)
+					// A set unticked meanwhile keeps the exercise open.
+					const latest = groupedLogsRef.current.find(
+						group => group.exerciseId === exerciseId,
+					)
+					if (!latest || !isExerciseDone(latest.sets)) return
+					// The tick is about to unmount -- and saving disables it, which
+					// already dropped focus to the body: hand focus to the
+					// exercise's own toggle, unless the member has moved on.
+					const section = document.getElementById(`exercise-${exerciseId}`)
+					const active = document.activeElement
+					if (active === document.body || section?.contains(active))
+						document
+							.getElementById(`exercise-${exerciseId}-toggle`)
+							?.focus({ preventScroll: true })
+					collapseExercise(exerciseId)
+					if (then) handOff(then)
+					else setScrollRequest({ exerciseId, block: 'nearest' })
+				}, AUTO_COLLAPSE_DELAY_MS),
+			)
+		},
+		[collapseExercise, handOff],
 	)
 
 	if (isLoading) {
@@ -393,16 +468,19 @@ export default function ActiveSessionPage() {
 										tEx,
 									)
 									restTimer.start(group.restSeconds)
-									if (status && next && next.exerciseId !== group.exerciseId) {
-										if (isCollapsed(next.exerciseId))
-											toggleExercise(next.exerciseId)
-										requestAnimationFrame(() =>
-											document
-												.getElementById(`exercise-${next.exerciseId}`)
-												?.scrollIntoView({ block: 'nearest' }),
-										)
-									}
+									const handsOverTo =
+										status && next && next.exerciseId !== group.exerciseId
+											? next.exerciseId
+											: null
+									// LIVE-21: a finished exercise folds first and the
+									// hand-off follows, so the fold never moves the
+									// scroll's target mid-way.
+									if (completesExercise(group.sets, setNumber))
+										foldWhenDone(group.exerciseId, handsOverTo)
+									else if (handsOverTo) handOff(handsOverTo)
 								}}
+								arriving={arrival === group.exerciseId}
+								onArrivalEnd={() => setArrival(null)}
 								substitutedFrom={
 									substitution && prescribed ? prescribed.name : null
 								}

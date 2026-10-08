@@ -4,6 +4,7 @@ import { translatorFor } from '@/i18n/translator'
 
 import {
 	isSetComplete,
+	missingForCompletion,
 	validateSessionFinish,
 	validateSetLogPayload,
 	validateWeight,
@@ -160,5 +161,33 @@ describe('validateWeight', () => {
 	it('honours allowZero', () => {
 		expect(validateWeight(0)).toBe(true)
 		expect(validateWeight(0, false)).toBe(false)
+	})
+})
+
+describe('missingForCompletion (LIVE-21)', () => {
+	it('asks for reps first when both fields are empty', () => {
+		expect(missingForCompletion({ reps: '', weight: undefined })).toBe('reps')
+	})
+
+	it('needs a whole count of at least one rep', () => {
+		expect(missingForCompletion({ reps: '0', weight: 60 })).toBe('reps')
+		expect(missingForCompletion({ reps: '2.5', weight: 60 })).toBe('reps')
+		expect(missingForCompletion({ reps: '  ', weight: 60 })).toBe('reps')
+	})
+
+	it('needs a typed weight, however light', () => {
+		expect(missingForCompletion({ reps: '8', weight: undefined })).toBe(
+			'weight',
+		)
+		expect(missingForCompletion({ reps: '8', weight: NaN })).toBe('weight')
+		expect(missingForCompletion({ reps: '8', weight: -1 })).toBe('weight')
+	})
+
+	it('takes 0 as a bodyweight set', () => {
+		expect(missingForCompletion({ reps: '12', weight: 0 })).toBeNull()
+	})
+
+	it('lets a set with both fields be ticked', () => {
+		expect(missingForCompletion({ reps: '8', weight: 62.5 })).toBeNull()
 	})
 })

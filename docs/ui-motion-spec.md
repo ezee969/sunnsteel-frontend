@@ -232,6 +232,12 @@ group collapse on the session screen.
 | Expand | content mounts at full height **instantly**, `opacity` 0→1 | 120ms standard |
 | Collapse | content unmounts instantly; chevron rotates | 0ms content / 200ms chevron |
 
+**LIVE-21:** on the session screen an exercise also folds by itself 700ms after
+the tick that finishes it (`AUTO_COLLAPSE_DELAY_MS`), so the tick and the mark
+fill land first. The delay is state, not motion -- a timer that changes which
+exercises are open, never a style write -- and the fold itself is the row
+above: the content unmounts instantly.
+
 The current `transition-[grid-template-rows] duration-300 ease-in-out` is a
 layout animation and is deleted. The honest alternative — instant height,
 120ms reveal — keeps the chevron as the state signal and costs zero layout
@@ -281,6 +287,7 @@ reflow the row on every set.
 | --- | --- | --- |
 | Save-status ring on the set checkbox (idle/saving/saved/error) | `box-shadow` colour only | 120ms standard |
 | Honour improvement mark (arrow + text) appearing on a row | `opacity` 0→1, once when the state arrives; no scale pop, no replay on re-render | 200ms standard |
+| Superset / circuit hand-off (LIVE-21) | the browser's own smooth `scrollIntoView` to the next exercise, then the arriving section holds `--accent` and settles back to its tone (`arrival-cue`, `background-color` only) -- *where am I* after the screen moved | tint `calc(var(--motion-slow) * 4)` standard, held for 60% of it |
 | Stepper connector (current → complete) | `background-color`, `border-color` | 200ms standard |
 | Theme crossfade | `color`, `background-color`, `border-color` app-wide via a temporary class on the shell, removed after the transition ends | 300ms standard |
 | Rest timer digits | **none** — fixed mono slot (§5.4); a ticking numeral is information, not motion | 0ms |
@@ -311,6 +318,7 @@ Locked behaviour (§9.3), resolved per surface:
 | Spinner rotation, skeleton pulse | **Static.** The arc and the block hold; the label and the skeleton position carry the state |
 | Theme crossfade | Instant |
 | Hover / focus / control-state colour | Unchanged at 120ms — colour at this duration is not vestibular load |
+| Superset hand-off (LIVE-21) | The scroll is instant (`behavior: 'auto'`, from `useMotionPreference`); the arrival tint stays, as colour, and shortens with `--motion-slow` to 480ms |
 
 Implementation: one `@media (prefers-reduced-motion: reduce)` block in
 `globals.css` that (a) sets the three `--motion-*` properties to `120ms`,

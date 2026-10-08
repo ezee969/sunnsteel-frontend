@@ -7,6 +7,7 @@ import { markSetPending } from '@/lib/api/hooks/useWorkoutSession'
 import { DEBOUNCE_DELAYS } from '@/lib/constants/session.constants'
 import { useSaveState } from '@/lib/utils/save-status-store'
 import {
+	missingForCompletion,
 	type SetLogValidationField,
 	validateSetLogPayload,
 } from '@/lib/utils/session-validation.utils'
@@ -57,7 +58,11 @@ interface UseSetLogFormReturn {
 	setReps: (value: string) => void
 	setWeight: (value: string) => void
 	setRpe: (value: string) => void
-	handleCompletionToggle: (checked: boolean) => void
+	/**
+	 * Ticks or unticks the set. LIVE-21: a tick with a field still empty is
+	 * refused and returns that field, so the row can point at it.
+	 */
+	handleCompletionToggle: (checked: boolean) => 'reps' | 'weight' | null
 	/** LIVE-15: put another set's values in the fields and save them. */
 	fill: (values: SetValues) => void
 	/** LIVE-12: change what the set is for, saved at once with its values. */
@@ -67,6 +72,11 @@ interface UseSetLogFormReturn {
 	isValid: boolean
 	validationError?: string
 	validationField?: SetLogValidationField
+	/**
+	 * LIVE-21: the field the set needs before it can be (or stay) ticked, shown
+	 * once a tick was refused, or while a ticked set has a field emptied.
+	 */
+	completionField: 'reps' | 'weight' | null
 }
 
 /**
@@ -109,6 +119,8 @@ export const useSetLogForm = ({
 	const [isCompletedState, setIsCompletedState] = useState<boolean>(
 		initialIsCompleted ?? false,
 	)
+	// LIVE-21: a tick was refused for an empty field; cleared by the next tick.
+	const [tickRefused, setTickRefused] = useState(false)
 
 	// Debounced values for auto-save
 	const debouncedReps = useDebounce(repsState, DEBOUNCE_DELAYS.SET_LOG_SAVE)
@@ -197,6 +209,14 @@ export const useSetLogForm = ({
 		isCompletedState,
 	)
 	const validation = validateSetLogPayload(currentPayload, t)
+	const missingField = missingForCompletion({
+		reps: repsState,
+		weight: weightOf(weightState),
+	})
+	const completionField = tickRefused || isCompletedState ? missingField : null
+	// LIVE-21: a ticked set never stores an empty field; emptying one holds
+	// the save until it is filled again.
+	const canSave = validation.isValid && !(isCompletedState && missingField)
 
 	// Auto-save effect for debounced values
 	useEffect(() => {
@@ -231,7 +251,7 @@ export const useSetLogForm = ({
 		}
 
 		// Only save if validation passes
-		if (validation.isValid) {
+		if (canSave) {
 			const payload = createPayload(
 				debouncedReps,
 				debouncedWeight,
@@ -260,7 +280,7 @@ export const useSetLogForm = ({
 		sessionId,
 		routineExerciseId,
 		setNumber,
-		validation.isValid,
+		canSave,
 		createPayload,
 		weightOf,
 	])
@@ -358,6 +378,14 @@ export const useSetLogForm = ({
 				isCompletedState,
 			)
 			if (!validateSetLogPayload(payload, t).isValid) return
+			if (
+				isCompletedState &&
+				missingForCompletion({
+					reps: repsState,
+					weight: weightOf(weightState),
+				})
+			)
+				return
 			markSetPending(sessionId, routineExerciseId, setNumber)
 			onSaveRef.current({ ...payload, kind })
 			lastSavedRef.current = {
@@ -376,12 +404,27 @@ export const useSetLogForm = ({
 			sessionId,
 			routineExerciseId,
 			setNumber,
+			weightOf,
 			t,
 		],
 	)
 
 	const handleCompletionToggle = useCallback(
-		(checked: boolean) => {
+		(checked: boolean): 'reps' | 'weight' | null => {
+			// LIVE-21: a tick needs reps and a weight (0 for bodyweight). A
+			// refused tick changes nothing: no completion, no rest, no save.
+			// Unticking is always allowed.
+			const missing = checked
+				? missingForCompletion({
+						reps: repsState,
+						weight: weightOf(weightState),
+					})
+				: null
+			if (missing) {
+				setTickRefused(true)
+				return missing
+			}
+			setTickRefused(false)
 			setIsCompletedState(checked)
 			markSetPending(sessionId, routineExerciseId, setNumber)
 
@@ -403,6 +446,7 @@ export const useSetLogForm = ({
 					isCompleted: checked,
 				}
 			}
+			return null
 		},
 		[
 			sessionId,
@@ -439,5 +483,6 @@ export const useSetLogForm = ({
 		isValid: validation.isValid,
 		validationError: validation.errors[0]?.message, // Use first error from errors array
 		validationField: validation.errors[0]?.field,
+		completionField,
 	}
 }
