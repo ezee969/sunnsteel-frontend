@@ -26,7 +26,7 @@ export default function RoutinesPage() {
 		return {} as const
 	}, [activeFilter])
 
-	const { data: routines, isLoading, error } = useRoutines(listFilters)
+	const { data: routines, isLoading, error, refetch } = useRoutines(listFilters)
 	useEffect(() => {
 		router.prefetch('/routines/new')
 	}, [router])
@@ -51,7 +51,7 @@ export default function RoutinesPage() {
 					/>
 					<Button asChild className="ml-auto h-11 shrink-0 gap-2 md:h-10">
 						<Link href="/routines/new" prefetch>
-							<Plus className="h-4 w-4" />
+							<Plus className="h-4 w-4" aria-hidden />
 							<span>{t('createRoutine')}</span>
 						</Link>
 					</Button>
@@ -60,6 +60,7 @@ export default function RoutinesPage() {
 					routines={routines}
 					isLoading={isLoading}
 					error={error}
+					onRetry={() => void refetch()}
 					filtered={
 						activeFilter === 'favorites' || activeFilter === 'completed'
 					}

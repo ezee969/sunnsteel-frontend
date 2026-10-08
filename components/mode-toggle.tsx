@@ -43,8 +43,14 @@ export const ModeToggle = () => {
 			className="relative size-11 overflow-hidden md:size-10"
 			onClick={toggleTheme}
 		>
-			<Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-transform duration-[var(--motion-base)] ease-standard dark:-rotate-90 dark:scale-0" />
-			<Sun className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-transform duration-[var(--motion-base)] ease-standard dark:rotate-0 dark:scale-100" />
+			<Moon
+				aria-hidden
+				className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-transform duration-[var(--motion-base)] ease-standard dark:-rotate-90 dark:scale-0"
+			/>
+			<Sun
+				aria-hidden
+				className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-transform duration-[var(--motion-base)] ease-standard dark:rotate-0 dark:scale-100"
+			/>
 		</Button>
 	)
 }

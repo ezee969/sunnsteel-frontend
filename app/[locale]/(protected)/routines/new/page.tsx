@@ -251,7 +251,7 @@ function CreateRoutineWizard() {
 						onClick={handleCancel}
 						className="flex items-center gap-2 p-2 sm:px-4"
 					>
-						<ArrowLeft className="h-4 w-4" />
+						<ArrowLeft aria-hidden className="h-4 w-4" />
 						<span className="hidden sm:inline">{t('backToRoutines')}</span>
 					</Button>
 				</div>

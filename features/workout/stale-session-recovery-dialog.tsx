@@ -187,7 +187,7 @@ export function StaleSessionRecoveryDialog({
 						onClick={() => resolveSession('ABORTED')}
 						disabled={isPending}
 					>
-						<Trash2 className="h-4 w-4" />
+						<Trash2 aria-hidden className="h-4 w-4" />
 						{t('discard')}
 					</Button>
 					<Button
@@ -195,11 +195,11 @@ export function StaleSessionRecoveryDialog({
 						onClick={() => resolveSession('COMPLETED')}
 						disabled={isPending || !canFinishSavedWork}
 					>
-						<CheckCircle2 className="h-4 w-4" />
+						<CheckCircle2 aria-hidden className="h-4 w-4" />
 						{t('finishSavedWork')}
 					</Button>
 					<Button variant="default" onClick={handleResume} disabled={isPending}>
-						<Play className="h-4 w-4" />
+						<Play aria-hidden className="h-4 w-4" />
 						{resumeSession.isPending ? t('resuming') : t('resume')}
 					</Button>
 				</AlertDialogFooter>

@@ -130,7 +130,7 @@ export function GoalRow({
 			) : (
 				<div className="space-y-2">
 					<div className="flex flex-wrap items-baseline justify-between gap-2">
-						<span className="type-data-emphatic text-foreground">
+						<span className="type-data type-data-strong text-foreground">
 							{current}
 						</span>
 						<span

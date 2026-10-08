@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
+import { InlineError } from '@/components/layout/inline-error'
 import { SendWorkoutInMessage } from '@/features/messages/send-in-message'
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
@@ -14,6 +15,7 @@ import {
 import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapPanel } from '@/features/workout/session-recap'
 import { SessionShareButton } from '@/features/workout/session-share-dialog'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useCollapseMap } from '@/hooks/use-collapse-map'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useWorkoutSessionData } from '@/hooks/use-workout-session-data'
@@ -34,8 +36,16 @@ export default function WorkoutDetailPage() {
 	const router = useRouter()
 	const id = params.id as string
 
-	const { session, exerciseGroups, metrics, isLoading, isError, error } =
-		useWorkoutSessionData(id)
+	const errorText = useApiErrorMessage()
+	const {
+		session,
+		exerciseGroups,
+		metrics,
+		isLoading,
+		isError,
+		error,
+		refetch,
+	} = useWorkoutSessionData(id)
 	const {
 		data: recap,
 		isLoading: isRecapLoading,
@@ -66,9 +76,14 @@ export default function WorkoutDetailPage() {
 	if (isError || !session) {
 		return (
 			<div className="ledger-page py-6 md:py-8">
-				<div className="type-body-sm text-destructive" role="alert">
-					{String(error) || t('failedToLoad')}
-				</div>
+				{/* UX-24 (audit B31): `String(error)` is never empty, so the
+				    translated fallback never showed and the member read a raw
+				    "Error: …"; it now names what failed and offers a retry. */}
+				<InlineError
+					title={t('failedToLoad')}
+					message={error ? errorText(error) : undefined}
+					onRetry={refetch}
+				/>
 			</div>
 		)
 	}

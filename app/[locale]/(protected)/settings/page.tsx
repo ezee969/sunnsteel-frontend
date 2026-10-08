@@ -342,9 +342,9 @@ export default function SettingsProfilePage() {
 								className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-foreground/70 text-background opacity-0 transition-opacity duration-[var(--motion-fast)] ease-standard group-hover:opacity-100"
 							>
 								{uploading ? (
-									<Loader2 className="h-6 w-6 animate-spin" />
+									<Loader2 aria-hidden className="h-6 w-6 animate-spin" />
 								) : (
-									<Camera className="h-8 w-8" />
+									<Camera aria-hidden className="h-8 w-8" />
 								)}
 							</label>
 							<input
@@ -632,7 +632,10 @@ export default function SettingsProfilePage() {
 									className="min-w-[120px]"
 								>
 									{updateUserMutation.isPending ? (
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										<Loader2
+											aria-hidden
+											className="mr-2 h-4 w-4 animate-spin"
+										/>
 									) : null}
 									{t('save')}
 								</Button>

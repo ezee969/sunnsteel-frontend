@@ -29,7 +29,7 @@ export default function WorkoutsIndexPage() {
 		return (
 			<div className="flex h-[calc(100vh-300px)] items-center justify-center">
 				<div className="type-body-sm flex items-center gap-2 text-ink-3">
-					<Loader2 className="h-5 w-5 animate-spin" />
+					<Loader2 aria-hidden className="h-5 w-5 animate-spin" />
 					<span>{t('loadingWorkouts')}</span>
 				</div>
 			</div>
@@ -83,7 +83,7 @@ export default function WorkoutsIndexPage() {
 				<Button asChild variant="secondary">
 					<Link href="/dashboard">
 						{t('dashboard')}
-						<ChevronRight className="ml-2 h-4 w-4" />
+						<ChevronRight aria-hidden className="ml-2 h-4 w-4" />
 					</Link>
 				</Button>
 			</div>

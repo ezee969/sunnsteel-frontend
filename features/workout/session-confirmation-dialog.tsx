@@ -58,11 +58,11 @@ export const SessionConfirmationDialog = ({
 				<AlertDialogHeader>
 					<AlertDialogTitle className="type-section flex items-center gap-2 text-foreground">
 						{isDiscarding ? (
-							<Trash2 className="h-5 w-5 text-destructive" />
+							<Trash2 aria-hidden className="h-5 w-5 text-destructive" />
 						) : isComplete ? (
 							<CheckCircle className="h-5 w-5 text-success" aria-hidden />
 						) : (
-							<AlertTriangle className="h-5 w-5 text-ink-2" />
+							<AlertTriangle aria-hidden className="h-5 w-5 text-ink-2" />
 						)}
 						{copy.title}
 					</AlertDialogTitle>
@@ -89,7 +89,7 @@ export const SessionConfirmationDialog = ({
 								</div>
 
 								<div className="flex items-center gap-2 text-sm text-ink-2">
-									<Target className="h-4 w-4 shrink-0 text-ink-3" />
+									<Target aria-hidden className="h-4 w-4 shrink-0 text-ink-3" />
 									<span>
 										{tDialog('setsCompleted', {
 											completed: completedSets,

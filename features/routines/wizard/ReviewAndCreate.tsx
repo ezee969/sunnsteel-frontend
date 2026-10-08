@@ -197,15 +197,15 @@ export function ReviewAndCreate({
 				>
 					{isLoading ? (
 						<>
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
 							{isEditing ? t('updating') : t('creating')}
 						</>
 					) : (
 						<>
 							{isEditing ? (
-								<Save className="mr-2 h-4 w-4" />
+								<Save aria-hidden className="mr-2 h-4 w-4" />
 							) : (
-								<CheckCircle className="mr-2 h-4 w-4" />
+								<CheckCircle aria-hidden className="mr-2 h-4 w-4" />
 							)}
 							{isEditing ? t('updateRoutine') : t('createRoutine')}
 						</>

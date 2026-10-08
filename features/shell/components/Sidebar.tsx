@@ -350,7 +350,7 @@ export default function Sidebar({
 							className="size-11"
 							onClick={() => setIsMobileMenuOpen(false)}
 						>
-							<X className="h-5 w-5" />
+							<X aria-hidden className="h-5 w-5" />
 						</Button>
 					)}
 				</div>
@@ -587,6 +587,7 @@ export default function Sidebar({
 								onClick={() => setActiveNav('settings')}
 							>
 								<Settings
+									aria-hidden
 									className={cn(
 										'size-5 shrink-0 transition-colors',
 										activeNav === 'settings'

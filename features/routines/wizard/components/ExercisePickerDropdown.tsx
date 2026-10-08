@@ -90,10 +90,13 @@ export const ExercisePickerDropdown = forwardRef<
 				className="justify-between w-full sm:min-w-[200px] h-10"
 			>
 				<div className="flex items-center gap-2">
-					<Plus className="h-4 w-4" />
+					<Plus aria-hidden className="h-4 w-4" />
 					<span>{t('addExercise')}</span>
 				</div>
-				<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+				<ChevronsUpDown
+					aria-hidden
+					className="ml-2 h-4 w-4 shrink-0 opacity-50"
+				/>
 			</Button>
 
 			{isOpen && (
@@ -111,7 +114,7 @@ export const ExercisePickerDropdown = forwardRef<
 					<div className="max-h-[260px] overflow-y-auto p-2">
 						{isLoading ? (
 							<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-								<Loader2 className="h-4 w-4 animate-spin" />
+								<Loader2 aria-hidden className="h-4 w-4 animate-spin" />
 								{t('loading')}
 							</div>
 						) : exercises.length > 0 ? (

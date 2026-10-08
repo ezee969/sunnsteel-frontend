@@ -83,6 +83,7 @@ export const RoutineHeader = ({
 					disabled={isToggling}
 				>
 					<Heart
+						aria-hidden
 						className={`h-4 w-4 mr-2 ${routine.isFavorite ? 'fill-current text-foreground' : ''}`}
 					/>
 					{routine.isFavorite ? t('unfavorite') : t('favorite')}
@@ -95,13 +96,14 @@ export const RoutineHeader = ({
 					disabled={isToggling}
 				>
 					<Check
+						aria-hidden
 						className={`h-4 w-4 mr-2 ${routine.isCompleted ? 'fill-current text-success' : ''}`}
 					/>
 					{routine.isCompleted ? t('markIncomplete') : t('markComplete')}
 				</Button>
 
 				<Button variant="outline" size="sm" onClick={onEdit}>
-					<Edit className="h-4 w-4 mr-2" />
+					<Edit aria-hidden className="h-4 w-4 mr-2" />
 					{t('edit')}
 				</Button>
 			</div>

@@ -76,7 +76,11 @@ export const SessionHeader = ({
 					<div className="flex shrink-0 items-center gap-6">
 						<div className="hidden text-right sm:block">
 							<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
-							<p className="type-data text-foreground">{duration}</p>
+							{/* §5.4 (UX-24): the elapsed string changes length as it
+							    ticks, so it renders in a reserved slot. */}
+							<p className="type-data duration-slot text-right text-foreground">
+								{duration}
+							</p>
 						</div>
 
 						<div className="hidden text-right sm:block">
@@ -132,7 +136,9 @@ export const SessionHeader = ({
 				<div className="mt-3 flex items-center justify-between border-t border-rule-faint pt-2 sm:hidden">
 					<div>
 						<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
-						<p className="type-data text-foreground">{duration}</p>
+						<p className="type-data duration-slot text-foreground">
+							{duration}
+						</p>
 					</div>
 					<div>
 						<p className="type-body-sm text-ink-3">{t('sets')}</p>

@@ -125,6 +125,7 @@ export function SetListSection({
 					className="h-8 w-8 p-0"
 				>
 					<ChevronsUpDown
+						aria-hidden
 						className={`h-4 w-4 transition-transform duration-[var(--motion-slow)] ease-standard ${
 							setsExpanded ? 'rotate-180' : ''
 						}`}
@@ -211,7 +212,7 @@ export function SetListSection({
 								className="w-full h-10 text-base mb-3"
 								disabled={exercise.sets.length >= 10}
 							>
-								<Plus className="h-4 w-4 mr-2" />
+								<Plus aria-hidden className="h-4 w-4 mr-2" />
 								{t('addSet')}
 							</Button>
 						)}

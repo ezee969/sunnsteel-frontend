@@ -380,6 +380,17 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
+  /* §5.2 Body: running text that is the point of its row, such as a message.
+     UX-24: messages and onboarding used this class before it existed, so
+     they rendered in whatever face they inherited. */
+  .type-body {
+    font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    text-transform: none;
+  }
   /* The caption rank inside a repeated row: sentence case, untracked. */
   /* UX-16 (§23.3): 14px, up from 13. Source Sans 3 sets a lower x-height than
      the condensed Oswald it replaced (UX-14), so at 13px the captions that
@@ -541,7 +552,8 @@
   /* Motion spec §2.9 signature 2. The mark fills top to bottom rather than
      appearing. The 3px border stays transparent and holds the space; the fill
      is an overlay bar, so nothing reflows when a set completes. Applied only on
-     the session set row - every other `.mark` consumer keeps the static border.
+     the session's exercise section (`exercise-group.tsx`); the set row and
+     every other `.mark` consumer keep the static border.
      A React re-render does not restart this: the class string is unchanged, and
      `groupSetLogsByExercise` rebuilding its objects cannot retrigger a CSS
      animation (§1.3 rule 1). */

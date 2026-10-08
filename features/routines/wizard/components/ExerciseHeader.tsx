@@ -113,7 +113,7 @@ export function ExerciseHeader({
 									{plannedSets}
 								</Badge>
 								<div className="flex items-center gap-0.5">
-									<Clock className="h-3 w-3" />
+									<Clock aria-hidden className="h-3 w-3" />
 									<span className="type-data">
 										{restMinutes}:{restSeconds}
 									</span>
@@ -137,6 +137,7 @@ export function ExerciseHeader({
 						)}
 					>
 						<ChevronsUpDown
+							aria-hidden
 							className={cn(
 								'transition-transform duration-[var(--motion-slow)] ease-standard',
 								expanded ? 'h-4 w-4 rotate-180' : 'h-3 w-3',
@@ -153,7 +154,7 @@ export function ExerciseHeader({
 							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>
-						<Pencil className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
+						<Pencil aria-hidden className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
 					</Button>
 					<Button
 						variant="ghost"
@@ -165,7 +166,7 @@ export function ExerciseHeader({
 							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>
-						<Trash2 className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
+						<Trash2 aria-hidden className={expanded ? 'h-4 w-4' : 'h-3 w-3'} />
 					</Button>
 				</div>
 			</div>

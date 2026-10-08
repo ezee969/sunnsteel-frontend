@@ -612,7 +612,8 @@ Confirmed working in Phase 4, including that `@layer components` classes beat th
   .type-section   { /* Cinzel 600, 16→18, 1.25, 0.06em,  uppercase */ }
   .type-panel     { /* Oswald 600, 15→16, 1.30, 0.02em */ }
   .type-label     { /* Oswald 500, 12,    1.30, 0.06em,  uppercase */ }
-  .type-body-sm   { /* Oswald 400, 13,    1.45 */ }
+  .type-body      { /* Source Sans 3 400, 15, 1.60 — §23.1, defined by UX-24 */ }
+  .type-body-sm   { /* Source Sans 3 400, 14, 1.50 — §23.1, §23.3 */ }
   .type-data      { /* Space Mono 400, 13, 1.50, tabular */ }
   .type-numeral   { /* Bebas 400, 40→52, 0.95, 0.02em */ }
 
@@ -759,7 +760,9 @@ terminal action.
 - Sidebar as an index column: ground-coloured, no panel fill, 1px `--rule` on its
   right edge, the brand lockup (§18), items Oswald 500 at 14/36px.
 - **Active item: no filled block.** A 3px `--honour-strong` left marker, ink text
-  at 600, icon in `--honour-strong`. The light black slab and dark ivory slab
+  at 600, icon in `--honour-strong`. (UX-24, 2026-10-08: the active row also
+  takes the `--surface` tone hover uses; that is a tonal step, not a slab, and
+  the marker, icon and weight keep it distinct from hover.) The light black slab and dark ivory slab
   both retire — that inversion is the heaviest object on every screen.
 - Hover fills `--surface` and darkens text. Hover and active differ by colour,
   not geometry.
@@ -2223,3 +2226,132 @@ the screen where it matters most.
   checked by diff (§9 of the coverage record) and in the browser.
 - Reduced motion from both sources, higher contrast, larger controls and
   Spanish on the changed screens.
+
+---
+
+## 27. Amendment — Train focus (DRAFT, 2026-10-08)
+
+**Status: draft for the owner.** Drafted under `UX-24` from the owner-approved
+[UI/UX audit](ui-audit-2026-10.md) (§6, §7.2) and the owner's four decisions
+of 2026-10-08. Nothing in this section is in force until the owner approves
+it; `LIVE-22` implements it. §27.1 and §27.6 describe primitives `UX-24` has
+already shipped, because they change no documented rule.
+
+**Why.** The live workout is the one screen that is not a ledger but a task,
+and it applied the ledger the wrong way round: every *set* was a boxed well
+with bordered fields while the *exercise*, the unit the member works through,
+was a heading over a hairline. The prescription was restated on every row
+("Target: 8", "Target: 60 kg", "Optional", "RIR 2"), no set was marked as the
+current one, a pre-filled target read exactly like a logged value, overall
+progress was stated twice, and the screen's one filled control was Finish,
+from the first set. The audit measured the first editable field at about 510px
+of an 844px phone screen. None of this needs a new colour, face or radius; it
+needs the existing roles composed around the current task.
+
+### 27.1 One status vocabulary (shipped, `UX-24`)
+
+`components/ui/status-mark.tsx`. Every status a list or row states is a glyph
+plus a word (§4.3 rule 8), the glyph in the role's mark-grade token and the
+word in ink:
+
+| State | Glyph | Glyph token | Row rule (`statusMarkRule`) |
+| --- | --- | --- | --- |
+| done | check | `success-strong` | `.mark-success` |
+| current | dotted circle | `foreground` | none |
+| upcoming | circle | `ink-3` | none |
+| skipped | dash | `ink-3` | none |
+| ended early | triangle | `warning-strong` | `.mark-warning` |
+| error | cross | `destructive` | none |
+
+No status is drawn as coloured text alone, as an uppercase word inside a
+repeated row (§5.3), or as a filled badge. History's rows are its first
+consumer.
+
+### 27.2 The unit of work is the box (supersedes §11.5's list, narrowly)
+
+§11.5 read: "Only three things stay boxed: overlays, the set rows in an active
+session, and a screen's single primary call to action." It now reads:
+**overlays, the current exercise in an active session, and a screen's single
+primary call to action.** The current exercise is a `panel` (`--surface`, 1px
+`--rule`, 2px radius) with a 3px `.mark` in `--primary` (ink) on its left edge.
+Its sets are ruled rows inside it. A box never sits inside another box.
+
+### 27.3 The set row (supersedes §11.7's first and third bullets)
+
+- **Only the current set is a well.** The current set — the first required
+  open set in session order (`nextSetAfter`, `session-rounds.ts`) — is a
+  `--surface-sunk` well with the §26.5 bounded fields and the tick at its
+  larger size. "Last time" shows only on it.
+- **A done set reads as data** (§11.12's read-only treatment): its values in
+  Space Mono on the panel, the `StatusMark` done glyph, `.mark-success`; a tap
+  makes it editable again.
+- **An upcoming set is a quiet ruled row**: its suggested values in `--ink-3`,
+  no field boxes until it is tapped or becomes current.
+- **A pre-filled target is a suggestion** (owner, 2026-10-08): it renders in
+  the placeholder tone until the member edits the field or ticks the set, and
+  ticking an untouched suggestion logs it, so one-tap logging stays.
+- **The prescription is said once.** Each exercise states it on one line under
+  its name ("3 × 6–8 · 57.5 kg · RIR 2 · rest 2:00") and its rows sit under one
+  column header (Body small `--ink-3`, sentence case). A row carries a caption
+  only where it differs from the line (a warm-up, a drop set, an extra set).
+- **Inputs are never disabled while saving.** The §11.7 save ring stays; a
+  disabled field drops focus and closes a phone's keyboard mid-entry.
+- After a tick, focus moves to the next current set's first field and it
+  scrolls into view (instantly under reduced motion, §9.3). Reps, weight and
+  RPE carry `enterKeyHint`, and Enter on the last field ticks the set.
+
+The set-completion signature (§9.1) is unchanged.
+
+### 27.4 Exercises outside the current one
+
+- **Done:** one folded summary row — the done glyph, the name in `--ink-2`, the
+  work done ("3 of 3 · 60 kg") — opened by a tap. `LIVE-21`'s auto-fold folds
+  it; this is how a folded exercise looks.
+- **Upcoming:** its name and prescription line, its sets folded until it
+  becomes current or is opened.
+- **Supersets and circuits** share one container: the group label in its
+  header ("Superset A · round 2 of 3"), one continuous ink `.mark` along its
+  left edge while it is current, and each member's letter and number ("A1",
+  "A2") as the leading column of its rows. No connector lines, no new colour.
+
+### 27.5 Progress and Finish (restates §11.8)
+
+- **Overall progress is stated once:** "4 of 12 sets" with a 2px ink bar (the
+  Radix `Progress` primitive, so it keeps its `progressbar` role) in the
+  masthead. The separate percentage goes.
+- **Finish** (owner, 2026-10-08) sits at the end of the exercise list on a
+  phone and inline in the masthead from `md`. It is outline while required sets
+  remain, and becomes the screen's one filled control once they are done. The
+  "Complete all sets" notice shows only after a Finish attempt; the
+  confirmation dialog already states what remains.
+- The live title wraps (§11.11) and never clamps.
+- The glossary line (§23.5) moves behind an information control in the
+  masthead, keeping its one source of definitions.
+
+### 27.6 One way a section fails (shipped, `UX-24`)
+
+`components/layout/inline-error.tsx`: a failed read inside a page is a
+`.mark-warning` row on `--surface-sunk` with the triangle, a title and the
+`useApiErrorMessage` reason in ink, and an outline Try again. A failed read is
+a risk to the member's task, not a destruction, so it is never crimson text
+(§4.3 rules 4 and 5). A whole route that fails keeps `RouteError`.
+
+### 27.7 Unchanged
+
+The palettes and every contrast figure, the faces and scale, radii, tonal
+elevation and the one shadow, the motion tokens and signatures, gym mode's
+sizes (§22.4) and the phone's grouped actions (§23.7), the 44px floor (§22.3),
+16px inputs below `md`, the rest bar, LP rows, extra sets, set kinds, swaps,
+notes and the plate calculator. `--primary` gains one use, the current mark;
+it is the action colour, not an accent, so §4.3's accent rules are unaffected,
+and `--honour` stays capped and reserved.
+
+### 27.8 Verification (for `LIVE-22`)
+
+At 390×844 on a fresh three-exercise session: the first editable field within
+300px of the top; overall progress stated once; one filled control, and not
+Finish until the required sets are done; the current set identifiable in a
+one-second glance; at most two captions per set row; nothing clipped in
+Spanish at 320; after a tick, focus on the next set's first field without the
+keyboard closing (iOS Safari and Android Chrome). Both themes, reduced motion,
+higher contrast and larger controls; the scoped sweep in English and Spanish.

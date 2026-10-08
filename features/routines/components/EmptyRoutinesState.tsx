@@ -39,7 +39,7 @@ export function EmptyRoutinesState({
 			<p className="type-body-sm mb-4 text-ink-3">{t('startFromTemplate')}</p>
 			<Button asChild variant="default">
 				<Link href="/routines/new" {...preloadOnHover('newRoutinePage')}>
-					<PlusCircle className="mr-2 h-4 w-4" />
+					<PlusCircle aria-hidden className="mr-2 h-4 w-4" />
 					{t('createRoutine')}
 				</Link>
 			</Button>

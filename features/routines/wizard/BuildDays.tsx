@@ -1,6 +1,7 @@
 'use client'
 
 import { ROUTINE_DAY_NAME_MAX } from '@sunsteel/contracts'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -272,13 +273,13 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 					<div className="relative mb-2">
 						<TabsList
 							ref={dayTabsRef}
-							className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1"
+							className="flex w-full justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap"
 						>
 							{data.trainingDays.map((dayId, index) => (
 								<TabsTrigger
 									key={dayId}
 									value={index.toString()}
-									className="flex-shrink-0 whitespace-nowrap h-10 px-4"
+									className="flex-shrink-0 whitespace-nowrap px-4"
 								>
 									{labelFor(dayId, index)}
 									<Badge
@@ -291,11 +292,23 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 								</TabsTrigger>
 							))}
 						</TabsList>
+						{/* UX-24: §4.3 rule 6 allows no gradient, so the cue that more
+						    days sit off the edge is a chevron on an opaque patch. */}
 						{dayTabsOverflow.left && (
-							<div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-muted to-transparent" />
+							<div
+								aria-hidden
+								className="pointer-events-none absolute inset-y-0 left-0 mb-1 flex w-6 items-center justify-start bg-background"
+							>
+								<ChevronLeft aria-hidden className="size-4 text-ink-3" />
+							</div>
 						)}
 						{dayTabsOverflow.right && (
-							<div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-muted to-transparent" />
+							<div
+								aria-hidden
+								className="pointer-events-none absolute inset-y-0 right-0 mb-1 flex w-6 items-center justify-end bg-background"
+							>
+								<ChevronRight aria-hidden className="size-4 text-ink-3" />
+							</div>
 						)}
 					</div>
 

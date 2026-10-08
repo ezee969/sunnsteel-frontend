@@ -114,7 +114,7 @@ export const ExerciseCard = ({
 									size="icon"
 									className="h-8 w-8 relative"
 								>
-									<FileText className="h-4 w-4 text-foreground" />
+									<FileText aria-hidden className="h-4 w-4 text-foreground" />
 									<span className="absolute top-0 right-0">
 										<svg
 											width="6"

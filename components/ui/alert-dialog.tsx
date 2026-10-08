@@ -112,7 +112,7 @@ function AlertDialogDescription({
 	return (
 		<AlertDialogPrimitive.Description
 			data-slot="alert-dialog-description"
-			className={cn('text-ink-2 text-sm', className)}
+			className={cn('type-body-sm text-ink-2', className)}
 			{...props}
 		/>
 	)

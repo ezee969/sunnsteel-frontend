@@ -246,9 +246,9 @@ export function SupabaseSignupForm() {
 												tabIndex={-1}
 											>
 												{showPassword ? (
-													<EyeOff className="h-4 w-4" />
+													<EyeOff aria-hidden className="h-4 w-4" />
 												) : (
-													<Eye className="h-4 w-4" />
+													<Eye aria-hidden className="h-4 w-4" />
 												)}
 											</button>
 										</div>
@@ -308,9 +308,9 @@ export function SupabaseSignupForm() {
 												tabIndex={-1}
 											>
 												{showConfirmPassword ? (
-													<EyeOff className="h-4 w-4" />
+													<EyeOff aria-hidden className="h-4 w-4" />
 												) : (
-													<Eye className="h-4 w-4" />
+													<Eye aria-hidden className="h-4 w-4" />
 												)}
 											</button>
 										</div>
@@ -328,7 +328,7 @@ export function SupabaseSignupForm() {
 						>
 							{isPending ? (
 								<>
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
 									{t('creatingAccount')}
 								</>
 							) : (
@@ -361,7 +361,7 @@ export function SupabaseSignupForm() {
 					type="button"
 				>
 					{isGooglePending ? (
-						<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
 					) : (
 						<Image
 							src="/icons/google-icon-logo-svgrepo-com.svg"

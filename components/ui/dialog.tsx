@@ -76,7 +76,7 @@ function DialogContent({
 						data-slot="dialog-close"
 						className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-sm text-ink-3 transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
 					>
-						<XIcon />
+						<XIcon aria-hidden />
 						<span className="sr-only">{t('close')}</span>
 					</DialogPrimitive.Close>
 				)}
@@ -132,7 +132,7 @@ function DialogDescription({
 	return (
 		<DialogPrimitive.Description
 			data-slot="dialog-description"
-			className={cn('text-ink-2 text-sm', className)}
+			className={cn('type-body-sm text-ink-2', className)}
 			{...props}
 		/>
 	)

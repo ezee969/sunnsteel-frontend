@@ -72,7 +72,7 @@ export function WizardNavigation({
 					className="gap-2"
 					aria-label={t('previous')}
 				>
-					<ArrowLeft className="h-4 w-4" />
+					<ArrowLeft aria-hidden className="h-4 w-4" />
 					<span className="sr-only sm:not-sr-only">{t('previous')}</span>
 				</Button>
 
@@ -86,13 +86,13 @@ export function WizardNavigation({
 					>
 						{isSubmitting ? (
 							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
 								{t('saving')}
 							</>
 						) : (
 							<>
 								<span className="sr-only sm:not-sr-only">{label}</span>
-								<ArrowRight className="h-4 w-4" />
+								<ArrowRight aria-hidden className="h-4 w-4" />
 							</>
 						)}
 					</Button>

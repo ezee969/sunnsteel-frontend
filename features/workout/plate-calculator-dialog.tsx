@@ -107,7 +107,7 @@ export const PlateCalculatorDialog = ({
 						aria-label={t('triggerAria', { exercise: exerciseName })}
 						title={t('triggerTitle')}
 					>
-						<Calculator className="h-4 w-4" />
+						<Calculator aria-hidden className="h-4 w-4" />
 					</Button>
 				</DialogTrigger>
 			)}
@@ -121,7 +121,7 @@ export const PlateCalculatorDialog = ({
 
 				{isLoading ? (
 					<div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-						<Loader2 className="h-4 w-4 animate-spin" />
+						<Loader2 aria-hidden className="h-4 w-4 animate-spin" />
 						{t('loadingEquipment')}
 					</div>
 				) : error ? (
@@ -147,7 +147,7 @@ export const PlateCalculatorDialog = ({
 						</div>
 						<Button asChild variant="outline">
 							<Link href="/settings/training">
-								<Settings className="h-4 w-4" />
+								<Settings aria-hidden className="h-4 w-4" />
 								{t('openSettings')}
 							</Link>
 						</Button>

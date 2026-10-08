@@ -20,12 +20,15 @@ interface UseWorkoutSessionDataResult {
 	isLoading: boolean
 	isError: boolean
 	error: unknown
+	refetch: () => void
 }
 
 export function useWorkoutSessionData(
 	sessionId: string | undefined,
 ): UseWorkoutSessionDataResult {
-	const { data, isLoading, isError, error } = useSession(sessionId ?? '')
+	const { data, isLoading, isError, error, refetch } = useSession(
+		sessionId ?? '',
+	)
 	const weightUnit = useWeightUnit()
 	const t = useTranslations('workout.metrics')
 	const locale = useLocale()
@@ -43,5 +46,6 @@ export function useWorkoutSessionData(
 		isLoading,
 		isError,
 		error,
+		refetch: () => void refetch(),
 	}
 }

@@ -155,9 +155,9 @@ export default function ResetPasswordPage() {
 															disabled={isPending}
 														>
 															{showPassword ? (
-																<EyeOff className="h-4 w-4" />
+																<EyeOff aria-hidden className="h-4 w-4" />
 															) : (
-																<Eye className="h-4 w-4" />
+																<Eye aria-hidden className="h-4 w-4" />
 															)}
 														</button>
 													)}
@@ -176,7 +176,10 @@ export default function ResetPasswordPage() {
 								>
 									{isPending ? (
 										<>
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											<Loader2
+												aria-hidden
+												className="mr-2 h-4 w-4 animate-spin"
+											/>
 											{t('updating')}
 										</>
 									) : (

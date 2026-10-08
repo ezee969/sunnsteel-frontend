@@ -823,6 +823,7 @@
 		"progressionLinear": "Bloque LP de 8 semanas"
 	},
 	"listing": {
+		"loadError": "No se pudieron cargar tus rutinas.",
 		"pageTitle": "Rutinas",
 		"pageSubtitle": "Planifica, registra y afina tu entrenamiento.",
 		"createRoutine": "Crear rutina",

@@ -52,7 +52,7 @@ export function ExerciseNoteRow({
 		>
 			{!minimal && (
 				<div className="flex items-center gap-2 shrink-0">
-					<StickyNote className="h-4 w-4 text-muted-foreground" />
+					<StickyNote aria-hidden className="h-4 w-4 text-muted-foreground" />
 					<Label className="text-sm font-medium text-muted-foreground">
 						{t('noteLabel')}
 					</Label>
@@ -69,6 +69,7 @@ export function ExerciseNoteRow({
 							onClick={handleOpen}
 						>
 							<FileText
+								aria-hidden
 								className={`h-4 w-4 ${note ? 'text-foreground' : 'text-ink-3'}`}
 							/>
 							{note && (

@@ -4,6 +4,11 @@ import type { Ref } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Button } from '@/components/ui/button'
+import {
+	StatusMark,
+	statusMarkRule,
+	type StatusState,
+} from '@/components/ui/status-mark'
 import { intlLocale } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
@@ -62,6 +67,14 @@ export function WorkoutHistoryList({
 	const router = useRouter()
 	const tDeloads = useTranslations('routines.deloads')
 	const tEmpty = useTranslations('planning.emptyStates')
+	// UX-24: the one status vocabulary. A session still running is current,
+	// not an outcome, so it carries no rule (see the row's comment below).
+	const statusState = (status: string): StatusState =>
+		status === 'COMPLETED'
+			? 'done'
+			: status === 'ABORTED'
+				? 'endedEarly'
+				: 'current'
 	const statusLabel = (status: string) =>
 		tMetrics(STATUS_KEYS[status as keyof typeof STATUS_KEYS] ?? 'statusUnknown')
 	const dateTime = (iso: string) =>
@@ -131,8 +144,7 @@ export function WorkoutHistoryList({
 								// neighbours while saying so.
 								className={cn(
 									'rule-row mark cursor-pointer py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
-									s.status === 'COMPLETED' && 'mark-success',
-									s.status === 'ABORTED' && 'mark-warning',
+									statusMarkRule(statusState(s.status)),
 								)}
 								onClick={() => router.push(`/workouts/history/${s.id}`)}
 								role="button"
@@ -172,9 +184,10 @@ export function WorkoutHistoryList({
 												</span>
 											) : null}
 										</div>
-										<div className="type-body-sm shrink-0 text-ink-3 sm:text-right xl:text-left">
-											{statusLabel(s.status)}
-										</div>
+										<StatusMark
+											state={statusState(s.status)}
+											label={statusLabel(s.status)}
+										/>
 									</div>
 
 									{/* §10.1 — at `xl` the ledger opens: duration and volume become

@@ -21,7 +21,7 @@ export function SettingsTab({ children }: { children: React.ReactNode }) {
 	if (isLoading) {
 		return (
 			<div className="flex justify-center p-8">
-				<Loader2 className="h-8 w-8 animate-spin text-ink-3" />
+				<Loader2 aria-hidden className="h-8 w-8 animate-spin text-ink-3" />
 			</div>
 		)
 	}

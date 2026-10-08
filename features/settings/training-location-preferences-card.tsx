@@ -148,14 +148,14 @@ export const TrainingLocationPreferencesCard = ({
 					onClick={addLocation}
 					disabled={isLoading || drafts.length >= 10}
 				>
-					<Plus className="mr-2 h-4 w-4" />
+					<Plus aria-hidden className="mr-2 h-4 w-4" />
 					{t('add')}
 				</Button>
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
-						<Loader2 className="h-4 w-4 animate-spin" />
+						<Loader2 aria-hidden className="h-4 w-4 animate-spin" />
 						{t('loading')}
 					</div>
 				) : error ? (
@@ -243,7 +243,7 @@ export const TrainingLocationPreferencesCard = ({
 										})}
 										onClick={() => removeLocation(location.key)}
 									>
-										<Trash2 className="h-4 w-4 text-destructive" />
+										<Trash2 aria-hidden className="h-4 w-4 text-destructive" />
 									</Button>
 								</div>
 
@@ -292,7 +292,7 @@ export const TrainingLocationPreferencesCard = ({
 												}))
 											}
 										>
-											<Plus className="mr-2 h-4 w-4" />
+											<Plus aria-hidden className="mr-2 h-4 w-4" />
 											{t('addPlate')}
 										</Button>
 									</div>
@@ -372,7 +372,10 @@ export const TrainingLocationPreferencesCard = ({
 													}))
 												}
 											>
-												<Trash2 className="h-4 w-4 text-destructive" />
+												<Trash2
+													aria-hidden
+													className="h-4 w-4 text-destructive"
+												/>
 											</Button>
 										</div>
 									))}
@@ -394,7 +397,7 @@ export const TrainingLocationPreferencesCard = ({
 								className="min-w-40"
 							>
 								{replaceLocations.isPending ? (
-									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
 								) : null}
 								{t('save')}
 							</Button>

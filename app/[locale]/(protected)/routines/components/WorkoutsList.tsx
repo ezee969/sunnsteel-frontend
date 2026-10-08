@@ -3,6 +3,7 @@
 import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { InlineError } from '@/components/layout/inline-error'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -27,6 +28,7 @@ interface WorkoutsListProps {
 	error: Error | null
 	/** A narrowing filter is applied, so an empty list is not an empty account. */
 	filtered?: boolean
+	onRetry?: () => void
 }
 
 /**
@@ -42,6 +44,7 @@ export default function WorkoutsList({
 	isLoading,
 	error,
 	filtered = false,
+	onRetry,
 }: WorkoutsListProps) {
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('routines.listing')
@@ -70,7 +73,11 @@ export default function WorkoutsList({
 
 	if (error) {
 		return (
-			<p className="type-body-sm text-destructive">Error: {errorText(error)}</p>
+			<InlineError
+				title={t('loadError')}
+				message={errorText(error)}
+				onRetry={onRetry}
+			/>
 		)
 	}
 
@@ -139,7 +146,7 @@ export default function WorkoutsList({
 						>
 							{isDeleting ? (
 								<>
-									<Loader2 className="h-4 w-4 animate-spin mr-2" />
+									<Loader2 aria-hidden className="h-4 w-4 animate-spin mr-2" />
 									{t('deleting')}
 								</>
 							) : (

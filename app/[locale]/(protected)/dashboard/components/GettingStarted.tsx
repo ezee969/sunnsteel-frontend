@@ -65,7 +65,11 @@ export default function GettingStarted({
 									: 'border-ink-3 text-foreground',
 							)}
 						>
-							{step.done ? <Check className="size-3.5" /> : index + 1}
+							{step.done ? (
+								<Check aria-hidden className="size-3.5" />
+							) : (
+								index + 1
+							)}
 						</span>
 						<div className="min-w-0">
 							<h3 className="type-panel">

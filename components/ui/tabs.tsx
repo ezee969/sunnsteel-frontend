@@ -26,7 +26,9 @@ const TabsList = React.forwardRef<
 		ref={ref}
 		data-slot="tabs-list"
 		className={cn(
-			'bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md p-1',
+			// UX-24: the §21.3 look, so in-page tabs read as the route tabs do: a
+			// row on a rule, never the stock segmented pill on a muted fill.
+			'inline-flex w-fit items-end gap-1 border-b border-rule text-ink-2',
 			className,
 		)}
 		{...props}
@@ -42,7 +44,9 @@ function TabsTrigger({
 		<TabsPrimitive.Trigger
 			data-slot="tabs-trigger"
 			className={cn(
-				"data-[state=active]:bg-background data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium whitespace-nowrap transition-colors duration-[var(--motion-base)] ease-standard focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:text-ink-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+				// §21.3: Button type in ink-2; the current tab is ink over a 2px ink
+				// underline. Hover changes colour only. 44px below `md`, 40 from it.
+				"type-action inline-flex min-h-11 flex-1 touch-manipulation items-center justify-center gap-1.5 whitespace-nowrap rounded-none border-b-2 border-transparent px-3 text-ink-2 outline-none transition-colors duration-[var(--motion-fast)] ease-standard hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:text-ink-3 data-[state=active]:border-foreground data-[state=active]:text-foreground md:min-h-10 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 				className,
 			)}
 			{...props}

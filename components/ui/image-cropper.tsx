@@ -107,7 +107,9 @@ export function ImageCropper({
 						{t('cancel')}
 					</Button>
 					<Button onClick={handleSave} disabled={isProcessing}>
-						{isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+						{isProcessing && (
+							<Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" />
+						)}
 						{t('save')}
 					</Button>
 				</DialogFooter>

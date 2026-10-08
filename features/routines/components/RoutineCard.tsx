@@ -144,7 +144,7 @@ export function RoutineCard({
 							aria-label={t('routineActions')}
 							className="-mr-1 size-11 flex-shrink-0 touch-manipulation sm:size-9"
 						>
-							<MoreVertical className="h-4 w-4" />
+							<MoreVertical aria-hidden className="h-4 w-4" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
@@ -279,7 +279,10 @@ export function RoutineCard({
 							{...preloadOnHover('activeWorkoutSession')}
 						>
 							{isStarting && startActingId === routine.id ? (
-								<Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+								<Loader2
+									aria-hidden
+									className="mr-1.5 h-3.5 w-3.5 animate-spin"
+								/>
 							) : (
 								<ClassicalIcon
 									name="dumbbell"
@@ -306,9 +309,13 @@ export function RoutineCard({
 						}}
 					>
 						{isTogglingCompleted && completedActingId === routine.id ? (
-							<Loader2 className="h-4 w-4 animate-spin text-success" />
+							<Loader2
+								aria-hidden
+								className="h-4 w-4 animate-spin text-success"
+							/>
 						) : (
 							<ListChecks
+								aria-hidden
 								className={cn(
 									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
 									routine.isCompleted ? 'text-success' : 'text-ink-3',
@@ -333,9 +340,13 @@ export function RoutineCard({
 						disabled={isTogglingFavorite && favoriteActingId === routine.id}
 					>
 						{isTogglingFavorite && favoriteActingId === routine.id ? (
-							<Loader2 className="h-4 w-4 animate-spin text-ink-3" />
+							<Loader2
+								aria-hidden
+								className="h-4 w-4 animate-spin text-ink-3"
+							/>
 						) : (
 							<Heart
+								aria-hidden
 								className={cn(
 									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
 									routine.isFavorite ? 'text-foreground' : 'text-ink-3',

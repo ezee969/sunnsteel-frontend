@@ -823,6 +823,7 @@
 		"progressionLinear": "8-week block (LP)"
 	},
 	"listing": {
+		"loadError": "Your routines could not be loaded.",
 		"pageTitle": "Routines",
 		"pageSubtitle": "Plan, track, and refine your training.",
 		"createRoutine": "Create Routine",

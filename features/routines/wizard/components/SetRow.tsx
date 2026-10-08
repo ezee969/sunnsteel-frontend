@@ -177,7 +177,7 @@ export function SetRow({
 							disabled={disableRemove}
 							className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
 						>
-							<Trash2 className="h-4 w-4" />
+							<Trash2 aria-hidden className="h-4 w-4" />
 						</Button>
 					)}
 				</div>
@@ -266,7 +266,7 @@ export function SetRow({
 									aria-label={t('decreaseReps')}
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, -1)}
 								>
-									<Minus className="h-3 w-3" />
+									<Minus aria-hidden className="h-3 w-3" />
 								</Button>
 								<Input
 									type="text"
@@ -287,7 +287,7 @@ export function SetRow({
 									aria-label={t('increaseReps')}
 									onClick={() => onStepFixedReps(exerciseIndex, setIndex, 1)}
 								>
-									<Plus className="h-3 w-3" />
+									<Plus aria-hidden className="h-3 w-3" />
 								</Button>
 							</div>
 						) : (
@@ -304,7 +304,7 @@ export function SetRow({
 												onStepRangeReps(exerciseIndex, setIndex, 'minReps', -1)
 											}
 										>
-											<Minus className="h-3 w-3" />
+											<Minus aria-hidden className="h-3 w-3" />
 										</Button>
 										<Input
 											type="text"
@@ -328,7 +328,7 @@ export function SetRow({
 												onStepRangeReps(exerciseIndex, setIndex, 'minReps', 1)
 											}
 										>
-											<Plus className="h-3 w-3" />
+											<Plus aria-hidden className="h-3 w-3" />
 										</Button>
 									</div>
 									<span className="hidden sm:inline text-muted-foreground">
@@ -345,7 +345,7 @@ export function SetRow({
 												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', -1)
 											}
 										>
-											<Minus className="h-3 w-3" />
+											<Minus aria-hidden className="h-3 w-3" />
 										</Button>
 										<Input
 											type="text"
@@ -369,7 +369,7 @@ export function SetRow({
 												onStepRangeReps(exerciseIndex, setIndex, 'maxReps', 1)
 											}
 										>
-											<Plus className="h-3 w-3" />
+											<Plus aria-hidden className="h-3 w-3" />
 										</Button>
 									</div>
 								</div>
@@ -399,7 +399,7 @@ export function SetRow({
 									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, -1)}
 								>
-									<Minus className="h-3 w-3" />
+									<Minus aria-hidden className="h-3 w-3" />
 								</Button>
 								<Input
 									type="text"
@@ -425,7 +425,7 @@ export function SetRow({
 									disabled={weightLocked}
 									onClick={() => onStepWeight(exerciseIndex, setIndex, 1)}
 								>
-									<Plus className="h-3 w-3" />
+									<Plus aria-hidden className="h-3 w-3" />
 								</Button>
 							</div>
 						</div>
@@ -454,7 +454,7 @@ export function SetRow({
 											)
 										}
 									>
-										<Minus className="h-3 w-3" />
+										<Minus aria-hidden className="h-3 w-3" />
 									</Button>
 									<Input
 										type="text"
@@ -482,7 +482,7 @@ export function SetRow({
 											)
 										}
 									>
-										<Plus className="h-3 w-3" />
+										<Plus aria-hidden className="h-3 w-3" />
 									</Button>
 								</div>
 							</div>
@@ -503,7 +503,7 @@ export function SetRow({
 							disabled={disableRemove}
 							className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
 						>
-							<Trash2 className="h-4 w-4" />
+							<Trash2 aria-hidden className="h-4 w-4" />
 						</Button>
 					</div>
 				)}

@@ -127,7 +127,7 @@ export const RoutineDayAccordion = ({
 										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />
 									) : (
 										<>
-											<Play className="h-4 w-4 mr-1" />
+											<Play aria-hidden className="h-4 w-4 mr-1" />
 											{hasActiveSession ? t('resume') : t('start')}
 										</>
 									)}
