@@ -15,6 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { useProgressControls } from '@/features/progress/progress-controls'
 import { ProgressTab } from '@/features/progress/progress-tab'
@@ -145,24 +146,17 @@ export default function ProgressStrengthPage() {
 					</Select>
 				</div>
 
-				<div
-					role="group"
-					aria-label={t('dateRange')}
-					className="flex flex-wrap gap-1"
-				>
+				<ToggleRow aria-label={t('dateRange')}>
 					{STRENGTH_RANGE_OPTIONS.map(option => (
-						<Button
+						<ToggleOption
 							key={option.value}
-							type="button"
-							size="sm"
-							variant={range === option.value ? 'secondary' : 'ghost'}
-							aria-pressed={range === option.value}
+							pressed={range === option.value}
 							onClick={() => setRange(option.value)}
 						>
 							{t(`range${option.value}`)}
-						</Button>
+						</ToggleOption>
 					))}
-				</div>
+				</ToggleRow>
 			</section>
 
 			{history.isPending ? (

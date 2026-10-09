@@ -8,6 +8,7 @@ import { useMemo } from 'react'
 import { Explanation } from '@/components/layout/explanation'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
@@ -82,20 +83,17 @@ export function MuscleGroupHeatmap({
 						</p>
 					</div>
 				</div>
-				<div role="group" aria-label={t('rangeLabel')} className="flex gap-1">
+				<ToggleRow aria-label={t('rangeLabel')}>
 					{MUSCLE_HEATMAP_WEEK_OPTIONS.map(option => (
-						<Button
+						<ToggleOption
 							key={option}
-							type="button"
-							size="sm"
-							variant={weeks === option ? 'secondary' : 'ghost'}
-							aria-pressed={weeks === option}
+							pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
 							{t('weekOption', { weeks: option })}
-						</Button>
+						</ToggleOption>
 					))}
-				</div>
+				</ToggleRow>
 			</div>
 			<div id="progress-muscles-body" className="space-y-4">
 				{isPending ? (

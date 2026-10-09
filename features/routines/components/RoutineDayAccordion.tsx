@@ -80,6 +80,12 @@ export const RoutineDayAccordion = ({
 				const dayValidation = validateRoutineDayDate(day, todayDow, tDate)
 				const canStartToday = dayValidation.isValid
 				const isUnscheduled = !hasActiveSession && !canStartToday
+				// UX-25 (§4.3 rule 1): one filled control -- the live session's
+				// day, else the day due today when nothing is live.
+				const isDue =
+					!activeSession &&
+					canStartToday &&
+					(routine.scheduleMode === 'ROTATION' ? isNext : isToday)
 
 				return (
 					<AccordionItem
@@ -119,7 +125,7 @@ export const RoutineDayAccordion = ({
 							<div className="py-2 pl-4">
 								<Button
 									size="sm"
-									variant={hasActiveSession ? 'default' : 'outline'}
+									variant={hasActiveSession || isDue ? 'default' : 'outline'}
 									disabled={isLoadingThisDay || isUnscheduled}
 									onClick={() => onStartWorkout(day.id)}
 								>

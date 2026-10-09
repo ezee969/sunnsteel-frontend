@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import {
 	ActivityEntryList,
 	ActivityFact,
@@ -317,24 +318,17 @@ export function OwnActivity() {
 				<p id="activity-view-as" className="type-label text-ink-3">
 					{t('seeItAs')}
 				</p>
-				<div
-					role="group"
-					aria-labelledby="activity-view-as"
-					className="flex flex-wrap gap-1"
-				>
+				<ToggleRow aria-labelledby="activity-view-as">
 					{options.map(option => (
-						<Button
+						<ToggleOption
 							key={option.value}
-							type="button"
-							size="sm"
-							variant={view === option.value ? 'secondary' : 'ghost'}
-							aria-pressed={view === option.value}
+							pressed={view === option.value}
 							onClick={() => setView(option.value)}
 						>
 							{option.label}
-						</Button>
+						</ToggleOption>
 					))}
-				</div>
+				</ToggleRow>
 			</div>
 
 			{view === 'manage' ? (

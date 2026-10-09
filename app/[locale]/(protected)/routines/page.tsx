@@ -22,7 +22,6 @@ export default function RoutinesPage() {
 	const listFilters = useMemo(() => {
 		if (activeFilter === 'favorites') return { isFavorite: true } as const
 		if (activeFilter === 'completed') return { isCompleted: true } as const
-		// 'all' and 'recent' currently map to no backend filters
 		return {} as const
 	}, [activeFilter])
 

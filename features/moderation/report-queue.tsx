@@ -13,6 +13,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { ReportedMessages } from '@/features/moderation/reported-messages'
 import { ReviewActionDialog } from '@/features/moderation/review-action-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
@@ -127,27 +128,20 @@ export function ReportQueue() {
 		<div className="flex flex-col gap-4">
 			<p className="type-body-sm text-ink-3">{tModeration('accessNote')}</p>
 
-			<div
-				role="group"
-				aria-label={t('statusGroup')}
-				className="flex flex-wrap gap-1"
-			>
+			<ToggleRow aria-label={t('statusGroup')}>
 				{STATUS_TABS.map(option => (
-					<Button
+					<ToggleOption
 						key={option}
-						type="button"
-						size="sm"
-						variant={status === option ? 'secondary' : 'ghost'}
-						aria-pressed={status === option}
+						pressed={status === option}
 						onClick={() => setStatus(option)}
 					>
 						{t('statusTab', {
 							label: tModeration(REPORT_STATUS_LABELS[option]),
 							count: option === 'OPEN' ? openCount : 0,
 						})}
-					</Button>
+					</ToggleOption>
 				))}
-			</div>
+			</ToggleRow>
 
 			{queue.isLoading ? (
 				<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">

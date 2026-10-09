@@ -37,6 +37,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import {
@@ -86,20 +87,17 @@ function RangeControl({
 		ALL: tBody('rangeAll'),
 	}
 	return (
-		<div role="group" aria-label={label} className="flex flex-wrap gap-1">
+		<ToggleRow aria-label={label}>
 			{BODY_PROGRESS_RANGE_OPTIONS.map(option => (
-				<Button
+				<ToggleOption
 					key={option.value}
-					type="button"
-					size="sm"
-					variant={range === option.value ? 'secondary' : 'ghost'}
-					aria-pressed={range === option.value}
+					pressed={range === option.value}
 					onClick={() => onChange(option.value)}
 				>
 					{optionLabels[option.value]}
-				</Button>
+				</ToggleOption>
 			))}
-		</div>
+		</ToggleRow>
 	)
 }
 

@@ -1,4 +1,4 @@
-import { CalendarDays, CircleAlert, ListChecks, Repeat } from 'lucide-react'
+import { Archive, CalendarDays, CircleAlert, Repeat } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
@@ -45,11 +45,13 @@ export function RoutineScheduleNote({
 	const { Icon, label, value, iconTone, valueTone } = (() => {
 		if (isCompleted) {
 			return {
-				Icon: ListChecks,
+				// UX-25: archived is not "completed as planned", so it takes no
+				// success colour -- an ink glyph and the word.
+				Icon: Archive,
 				label: t('statusLabel'),
 				value: t('completedValue'),
-				iconTone: 'text-success',
-				valueTone: 'text-success',
+				iconTone: 'text-ink-3',
+				valueTone: 'text-ink-2',
 			}
 		}
 		if (rotationNext) {

@@ -1,4 +1,4 @@
-export type WorkoutFilter = 'all' | 'recent' | 'favorites' | 'completed'
+export type WorkoutFilter = 'all' | 'favorites' | 'completed'
 
 export interface Workout {
 	id: string

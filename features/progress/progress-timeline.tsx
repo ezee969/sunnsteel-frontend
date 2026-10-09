@@ -15,6 +15,7 @@ import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { SendInMessageDialog } from '@/features/messages/send-in-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
@@ -278,27 +279,20 @@ export function ProgressTimeline({
 				</div>
 			</div>
 
-			<div
-				role="group"
-				aria-label={t('filterGroup')}
-				className="flex flex-wrap gap-1"
-			>
+			<ToggleRow aria-label={t('filterGroup')}>
 				{FILTERS.map(option => {
 					const active = filter === option.value
 					return (
-						<Button
+						<ToggleOption
 							key={option.label}
-							type="button"
-							size="sm"
-							variant={active ? 'secondary' : 'ghost'}
-							aria-pressed={active}
+							pressed={active}
 							onClick={() => onFilterChange(option.value)}
 						>
 							{t(option.label)}
-						</Button>
+						</ToggleOption>
 					)
 				})}
-			</div>
+			</ToggleRow>
 
 			{isPending && items.length === 0 ? (
 				<div className="space-y-3" aria-label={t('loading')}>

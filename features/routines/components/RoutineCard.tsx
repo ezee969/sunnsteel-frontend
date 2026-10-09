@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, ListChecks, Loader2, MoreVertical } from 'lucide-react'
+import { Heart, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -45,14 +45,11 @@ export interface RoutineCardProps {
 	isActiveRoutine: boolean
 	activeSessionId?: string
 	onStartSession: (routine: Routine, routineDayId?: string) => void
-	onToggleCompleted: (routine: Routine) => void
 	onToggleFavorite: (routine: Routine) => void
 	onDelete: (routineId: string) => void
 	isStarting: boolean
 	startActingId: string | null
 	lastStartReused: boolean
-	isTogglingCompleted: boolean
-	completedActingId: string | null
 	isTogglingFavorite: boolean
 	favoriteActingId: string | null
 }
@@ -62,14 +59,11 @@ export function RoutineCard({
 	isActiveRoutine,
 	activeSessionId,
 	onStartSession,
-	onToggleCompleted,
 	onToggleFavorite,
 	onDelete,
 	isStarting,
 	startActingId,
 	lastStartReused,
-	isTogglingCompleted,
-	completedActingId,
 	isTogglingFavorite,
 	favoriteActingId,
 }: RoutineCardProps) {
@@ -119,7 +113,16 @@ export function RoutineCard({
 		>
 			<div className="flex items-start justify-between gap-2">
 				<div className="flex-1 min-w-0">
-					<p className="type-panel truncate text-foreground">{routine.name}</p>
+					{/* UX-25: the name opens the routine; it used to be reachable only
+					    through the actions menu. */}
+					<p className="type-panel truncate text-foreground">
+						<Link
+							href={`/routines/${routine.id}`}
+							className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+						>
+							{routine.name}
+						</Link>
+					</p>
 					{routine.description && (
 						<p className="type-body-sm line-clamp-1 text-ink-3">
 							{routine.description}
@@ -222,11 +225,14 @@ export function RoutineCard({
 					}
 				/>
 
+				{/* UX-25: Start and Resume are outline -- a control repeated on
+				    every row is never the page's primary (§4.3 rule 1); Create
+				    Routine is. */}
 				<div className="flex items-center gap-1.5 pt-1">
 					{isActiveRoutine ? (
 						<Button
 							type="button"
-							variant="default"
+							variant="outline"
 							size="sm"
 							className="relative flex-1 touch-manipulation pl-6 sm:flex-initial sm:min-w-[120px]"
 							aria-label={t('resumeActiveSession')}
@@ -251,7 +257,7 @@ export function RoutineCard({
 					) : (
 						<Button
 							type="button"
-							variant="default"
+							variant="outline"
 							size="sm"
 							className="flex-1 touch-manipulation sm:flex-initial sm:min-w-[120px]"
 							aria-label={t('startSession')}
@@ -293,37 +299,6 @@ export function RoutineCard({
 							{lastStartReused ? t('resume') : t('start')}
 						</Button>
 					)}
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						className="size-11 flex-shrink-0 touch-manipulation sm:size-9"
-						aria-label={
-							routine.isCompleted ? t('unmarkCompleted') : t('markCompleted')
-						}
-						disabled
-						aria-pressed={routine.isCompleted}
-						onClick={() => onToggleCompleted(routine)}
-						onKeyDown={e => {
-							onPressEnterOrSpace(() => onToggleCompleted(routine))(e)
-						}}
-					>
-						{isTogglingCompleted && completedActingId === routine.id ? (
-							<Loader2
-								aria-hidden
-								className="h-4 w-4 animate-spin text-success"
-							/>
-						) : (
-							<ListChecks
-								aria-hidden
-								className={cn(
-									'h-4 w-4 transition-colors duration-[var(--motion-fast)] ease-standard',
-									routine.isCompleted ? 'text-success' : 'text-ink-3',
-								)}
-								fill={routine.isCompleted ? 'currentColor' : 'none'}
-							/>
-						)}
-					</Button>
 					<Button
 						type="button"
 						variant="ghost"

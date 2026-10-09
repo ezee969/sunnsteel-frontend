@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 import {
 	useDeleteRoutine,
-	useToggleRoutineCompleted,
 	useToggleRoutineFavorite,
 } from '@/lib/api/hooks/useRoutines'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'
@@ -26,7 +25,7 @@ import { localDateKey } from '@/lib/utils/schedule-week'
  * - completedActingId: id of the routine currently performing a completed toggle or `null`
  * - startActingId: id of the routine currently starting a session or `null`
  * - lastStartReused: whether the last started session was reused
- * - isDeleting, isTogglingFavorite, isTogglingCompleted, isStarting: flags for ongoing async operations
+ * - isDeleting, isTogglingFavorite, isStarting: flags for ongoing async operations
  * - handleDeleteClick, handleConfirmDelete, handleToggleFavorite, handleToggleCompleted, handleStartSessionForRoutine: action handler functions
  */
 export function useRoutineListActions() {
@@ -37,17 +36,12 @@ export function useRoutineListActions() {
 		null,
 	)
 	const [favoriteActingId, setFavoriteActingId] = useState<string | null>(null)
-	const [completedActingId, setCompletedActingId] = useState<string | null>(
-		null,
-	)
 	const [startActingId, setStartActingId] = useState<string | null>(null)
 	const [lastStartReused, setLastStartReused] = useState(false)
 
 	const { mutate: deleteRoutine, isPending: isDeleting } = useDeleteRoutine()
 	const { mutate: toggleFavorite, isPending: isTogglingFavorite } =
 		useToggleRoutineFavorite()
-	const { mutate: toggleCompleted, isPending: isTogglingCompleted } =
-		useToggleRoutineCompleted()
 	const { mutateAsync: startSession, isPending: isStarting } = useStartSession()
 
 	const handleDeleteClick = (routineId: string) => {
@@ -71,15 +65,6 @@ export function useRoutineListActions() {
 		toggleFavorite(
 			{ id: routine.id, isFavorite: !routine.isFavorite },
 			{ onSettled: () => setFavoriteActingId(null) },
-		)
-	}
-
-	const handleToggleCompleted = (routine: Routine) => {
-		if (!routine?.id) return
-		setCompletedActingId(routine.id)
-		toggleCompleted(
-			{ id: routine.id, isCompleted: !routine.isCompleted },
-			{ onSettled: () => setCompletedActingId(null) },
 		)
 	}
 
@@ -123,19 +108,16 @@ export function useRoutineListActions() {
 		setIsDeleteDialogOpen,
 		selectedRoutineId,
 		favoriteActingId,
-		completedActingId,
 		startActingId,
 		lastStartReused,
 		// async flags
 		isDeleting,
 		isTogglingFavorite,
-		isTogglingCompleted,
 		isStarting,
 		// handlers
 		handleDeleteClick,
 		handleConfirmDelete,
 		handleToggleFavorite,
-		handleToggleCompleted,
 		handleStartSessionForRoutine,
 	}
 }

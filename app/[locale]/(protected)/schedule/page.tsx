@@ -5,8 +5,8 @@ import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
-import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import {
 	MoveOccurrenceDialog,
 	type MoveRequest,
@@ -205,20 +205,17 @@ export default function SchedulePage() {
 	return (
 		<div className="mx-auto flex max-w-6xl flex-col gap-6 sm:gap-8">
 			<HeroSection title={t('title')} subtitle={t('subtitle')} />
-			<div role="group" aria-label={t('viewGroup')} className="flex gap-1">
+			<ToggleRow aria-label={t('viewGroup')}>
 				{(['week', 'month'] as const).map(option => (
-					<Button
+					<ToggleOption
 						key={option}
-						type="button"
-						size="sm"
-						variant={view === option ? 'secondary' : 'ghost'}
-						aria-pressed={view === option}
+						pressed={view === option}
 						onClick={() => setView(option)}
 					>
 						{option === 'week' ? t('week') : t('month')}
-					</Button>
+					</ToggleOption>
 				))}
-			</div>
+			</ToggleRow>
 			{view === 'week' ? (
 				<ScheduleWeekView
 					week={week}

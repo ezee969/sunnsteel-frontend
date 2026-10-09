@@ -52,17 +52,14 @@ export default function WorkoutsList({
 		isDeleteDialogOpen,
 		setIsDeleteDialogOpen,
 		favoriteActingId,
-		completedActingId,
 		startActingId,
 		lastStartReused,
 		isDeleting,
 		isTogglingFavorite,
-		isTogglingCompleted,
 		isStarting,
 		handleDeleteClick,
 		handleConfirmDelete,
 		handleToggleFavorite,
-		handleToggleCompleted,
 		handleStartSessionForRoutine,
 	} = useRoutineListActions()
 	const { data: activeSession } = useActiveSession()
@@ -110,14 +107,11 @@ export default function WorkoutsList({
 								isActiveRoutine={isActiveRoutine}
 								activeSessionId={activeSession?.id}
 								onStartSession={handleStartSessionForRoutine}
-								onToggleCompleted={handleToggleCompleted}
 								onToggleFavorite={handleToggleFavorite}
 								onDelete={handleDeleteClick}
 								isStarting={isStarting}
 								startActingId={startActingId}
 								lastStartReused={lastStartReused}
-								isTogglingCompleted={isTogglingCompleted}
-								completedActingId={completedActingId}
 								isTogglingFavorite={isTogglingFavorite}
 								favoriteActingId={favoriteActingId}
 							/>

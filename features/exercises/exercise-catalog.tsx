@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -514,49 +515,43 @@ export function ExerciseCatalog() {
 							onChange={pattern => update({ pattern })}
 						/>
 					</div>
-					<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-						<Button
-							type="button"
-							size="sm"
-							variant={filters.trained ? 'secondary' : 'outline'}
-							aria-pressed={filters.trained}
-							onClick={() => update({ trained: !filters.trained })}
-						>
-							{filters.trained ? (
-								<Check className="size-4" aria-hidden />
-							) : (
-								<History className="size-4" aria-hidden />
-							)}
-							{t('trainedByMe')}
-						</Button>
-						<Button
-							type="button"
-							size="sm"
-							variant={filters.starred ? 'secondary' : 'outline'}
-							aria-pressed={filters.starred}
-							onClick={() => update({ starred: !filters.starred })}
-						>
-							{filters.starred ? (
-								<Check className="size-4" aria-hidden />
-							) : (
-								<Star className="size-4" aria-hidden />
-							)}
-							{t('starred')}
-						</Button>
-						<Button
-							type="button"
-							size="sm"
-							variant={filters.mine ? 'secondary' : 'outline'}
-							aria-pressed={filters.mine}
-							onClick={() => update({ mine: !filters.mine })}
-						>
-							{filters.mine ? (
-								<Check className="size-4" aria-hidden />
-							) : (
-								<UserRound className="size-4" aria-hidden />
-							)}
-							{t('yours')}
-						</Button>
+					<div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+						{/* UX-25 (§28.2): filters are toggles, not commands. */}
+						<ToggleRow aria-label={t('showOnly')}>
+							<ToggleOption
+								pressed={filters.trained}
+								onClick={() => update({ trained: !filters.trained })}
+							>
+								{filters.trained ? (
+									<Check className="size-4" aria-hidden />
+								) : (
+									<History className="size-4" aria-hidden />
+								)}
+								{t('trainedByMe')}
+							</ToggleOption>
+							<ToggleOption
+								pressed={filters.starred}
+								onClick={() => update({ starred: !filters.starred })}
+							>
+								{filters.starred ? (
+									<Check className="size-4" aria-hidden />
+								) : (
+									<Star className="size-4" aria-hidden />
+								)}
+								{t('starred')}
+							</ToggleOption>
+							<ToggleOption
+								pressed={filters.mine}
+								onClick={() => update({ mine: !filters.mine })}
+							>
+								{filters.mine ? (
+									<Check className="size-4" aria-hidden />
+								) : (
+									<UserRound className="size-4" aria-hidden />
+								)}
+								{t('yours')}
+							</ToggleOption>
+						</ToggleRow>
 						{trained.isError && !filters.trained ? (
 							<p className="type-body-sm text-ink-3">
 								{t('historyInline')}{' '}

@@ -14,6 +14,7 @@ import { Explanation } from '@/components/layout/explanation'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -71,18 +72,11 @@ function PlateauSensitivity({
 			<p id="plateau-sensitivity" className="type-body-sm text-ink-3">
 				{t('sensitivityLabel')}
 			</p>
-			<div
-				role="group"
-				aria-labelledby="plateau-sensitivity"
-				className="flex flex-wrap gap-1"
-			>
+			<ToggleRow aria-labelledby="plateau-sensitivity">
 				{PLATEAU_SESSION_OPTIONS.map(option => (
-					<Button
+					<ToggleOption
 						key={option}
-						type="button"
-						size="sm"
-						variant={selected === option ? 'secondary' : 'ghost'}
-						aria-pressed={selected === option}
+						pressed={selected === option}
 						aria-label={getPlateauSessionLabel(option, t)}
 						disabled={saving !== undefined}
 						onClick={() => {
@@ -90,9 +84,9 @@ function PlateauSensitivity({
 						}}
 					>
 						{option}
-					</Button>
+					</ToggleOption>
 				))}
-			</div>
+			</ToggleRow>
 			{saveFailed ? (
 				<p role="alert" className="type-body-sm text-ink-2">
 					{t('notSaved', { sessions: current })}

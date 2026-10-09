@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { EnforcementRecord } from '@/features/moderation/enforcement-record'
 import { ReportQueue } from '@/features/moderation/report-queue'
 import { useUser } from '@/lib/api/hooks/useUser'
@@ -39,20 +39,17 @@ export default function ModerationPage() {
 				subtitle={<>{tModeration('queueScope')}</>}
 				subtitleOnPhone
 			/>
-			<div role="group" aria-label={t('viewGroup')} className="flex gap-1">
+			<ToggleRow aria-label={t('viewGroup')}>
 				{(['queue', 'record'] as const).map(option => (
-					<Button
+					<ToggleOption
 						key={option}
-						type="button"
-						size="sm"
-						variant={view === option ? 'secondary' : 'ghost'}
-						aria-pressed={view === option}
+						pressed={view === option}
 						onClick={() => setView(option)}
 					>
 						{option === 'queue' ? t('reports') : t('record')}
-					</Button>
+					</ToggleOption>
 				))}
-			</div>
+			</ToggleRow>
 			{view === 'queue' ? <ReportQueue /> : <EnforcementRecord />}
 		</div>
 	)

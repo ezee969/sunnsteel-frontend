@@ -15,6 +15,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, intlLocale, numberFormatter } from '@/i18n/date-locale'
@@ -125,20 +126,17 @@ export function VolumeTrends({
 						</p>
 					</div>
 				</div>
-				<div role="group" aria-label={t('rangeLabel')} className="flex gap-1">
+				<ToggleRow aria-label={t('rangeLabel')}>
 					{VOLUME_TREND_WEEK_OPTIONS.map(option => (
-						<Button
+						<ToggleOption
 							key={option}
-							type="button"
-							size="sm"
-							variant={weeks === option ? 'secondary' : 'ghost'}
-							aria-pressed={weeks === option}
+							pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
 							{t('weekOption', { weeks: option })}
-						</Button>
+						</ToggleOption>
 					))}
-				</div>
+				</ToggleRow>
 			</div>
 			<div id="progress-volume-body" className="space-y-4">
 				{isPending ? (
@@ -168,24 +166,17 @@ export function VolumeTrends({
 				) : (
 					<>
 						<div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-							<div
-								role="group"
-								aria-label={t('breakdownLabel')}
-								className="flex flex-wrap gap-1"
-							>
+							<ToggleRow aria-label={t('breakdownLabel')}>
 								{SCOPE_OPTIONS.map(option => (
-									<Button
+									<ToggleOption
 										key={option}
-										type="button"
-										size="sm"
-										variant={scope === option ? 'secondary' : 'ghost'}
-										aria-pressed={scope === option}
+										pressed={scope === option}
 										onClick={() => setScope(option)}
 									>
 										{t(SCOPE_KEYS[option])}
-									</Button>
+									</ToggleOption>
 								))}
-							</div>
+							</ToggleRow>
 
 							{scope !== 'overall' ? (
 								<div className="w-full lg:max-w-sm">
