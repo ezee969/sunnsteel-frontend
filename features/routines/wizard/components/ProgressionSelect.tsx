@@ -28,7 +28,7 @@ export function ProgressionSelect({
 	return (
 		<div className="flex items-center justify-between gap-3">
 			<div className="flex items-center gap-2">
-				<Label className="text-sm font-medium text-muted-foreground">
+				<Label className="text-sm font-medium text-ink-3">
 					{t('progression')}
 				</Label>
 			</div>

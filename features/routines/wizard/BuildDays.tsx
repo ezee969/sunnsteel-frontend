@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { GlossaryLine } from '@/components/layout/glossary-line'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -226,7 +225,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 
 	if (data.trainingDays.length === 0) {
 		return (
-			<div className="text-center py-8 text-muted-foreground">
+			<div className="text-center py-8 text-ink-3">
 				<p>{t('noTrainingDays')}</p>
 			</div>
 		)
@@ -364,11 +363,13 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 								value={tabIndex.toString()}
 								className="mt-4"
 							>
-								<Card>
-									<CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
-										<CardTitle>
+								{/* UX-25 (§28.3): a day is a ruled section; its exercises are
+								    the boxes. */}
+								<div>
+									<div className="flex flex-col items-start justify-between gap-3 border-b border-rule pb-3 sm:flex-row sm:items-center">
+										<h3 className="type-panel text-foreground">
 											{t('dayWorkout', { day: labelFor(dayId, tabIndex) })}
-										</CardTitle>
+										</h3>
 										<ExercisePickerDropdown
 											ref={dropdownRef}
 											isOpen={isPickerOpen}
@@ -380,8 +381,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											isLoading={!!exercisesLoading}
 											onSelect={handleAddExercise}
 										/>
-									</CardHeader>
-									<CardContent className="p-4 sm:p-6">
+									</div>
+									<div className="pt-4">
 										<div className="mb-4 max-w-sm space-y-2">
 											<Label htmlFor={`day-name-${dayId}`}>
 												{t('dayNameOptional')}
@@ -455,8 +456,8 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											exercises={exercises}
 											isExercisesLoading={exercisesLoading}
 										/>
-									</CardContent>
-								</Card>
+									</div>
+								</div>
 							</TabsContent>
 						)
 					})}

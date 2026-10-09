@@ -264,7 +264,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 
 	return (
 		<>
-			<Card className="border-muted overflow-visible p-0">
+			<Card className="border-rule overflow-visible p-0">
 				<div className="relative">
 					<ExerciseHeader
 						exercise={exercise}
@@ -311,7 +311,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 														onClick={() =>
 															handleEditExercise(alternative.exercise.id)
 														}
-														className="w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
+														className="w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-muted"
 													>
 														<span className="block text-sm font-medium">
 															{exerciseLabel(alternative.exercise.name, tEx)}
@@ -332,7 +332,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 									</>
 								)}
 								{isExercisesLoading ? (
-									<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+									<div className="flex items-center justify-center gap-2 py-6 text-sm text-ink-3">
 										<Loader2 className="h-4 w-4 animate-spin" aria-hidden />
 										{tPicker('loading')}
 									</div>
@@ -361,13 +361,13 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 													<button
 														key={ex.id}
 														onClick={() => handleEditExercise(ex.id)}
-														className="w-full text-left px-3 py-3 rounded-md hover:bg-accent transition-colors"
+														className="w-full text-left px-3 py-3 rounded-md hover:bg-muted transition-colors"
 													>
 														<div className="flex flex-col items-start">
 															<span className="text-sm font-medium">
 																{exerciseLabel(ex.name, tEx)}
 															</span>
-															<span className="text-xs text-muted-foreground">
+															<span className="text-xs text-ink-3">
 																{t('musclesAndEquipment', {
 																	muscles: ex.primaryMuscles?.length
 																		? ex.primaryMuscles.join(', ')
@@ -382,7 +382,7 @@ export const WizardExerciseCard: FC<WizardExerciseCardProps> = ({
 										</div>
 									))
 								) : (
-									<div className="py-6 text-center text-sm text-muted-foreground">
+									<div className="py-6 text-center text-sm text-ink-3">
 										{t('noExercisesFound')}
 									</div>
 								)}

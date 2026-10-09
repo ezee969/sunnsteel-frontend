@@ -99,19 +99,15 @@ export function ReviewAndCreate({
 					</AccordionTrigger>
 					<AccordionContent className="space-y-3 pl-1">
 						<div>
-							<p className="text-sm font-medium text-muted-foreground">
-								{t('name')}
-							</p>
+							<p className="text-sm font-medium text-ink-3">{t('name')}</p>
 							<p className="text-base">{data.name}</p>
 						</div>
 						{data.description && (
 							<div>
-								<p className="text-sm font-medium text-muted-foreground">
+								<p className="text-sm font-medium text-ink-3">
 									{t('description')}
 								</p>
-								<p className="text-sm text-muted-foreground">
-									{data.description}
-								</p>
+								<p className="text-sm text-ink-3">{data.description}</p>
 							</div>
 						)}
 					</AccordionContent>
@@ -132,7 +128,7 @@ export function ReviewAndCreate({
 								</Badge>
 							))}
 						</div>
-						<p className="text-sm text-muted-foreground">
+						<p className="text-sm text-ink-3">
 							{data.scheduleMode === 'ROTATION'
 								? t('rotationSummary', {
 										days: data.days.length,
@@ -148,7 +144,7 @@ export function ReviewAndCreate({
 								: t('weeklySummary', { days: data.trainingDays.length })}
 						</p>
 						{data.scheduleMode === 'WEEKLY' && data.restDays.length > 0 ? (
-							<p className="text-sm text-muted-foreground">
+							<p className="text-sm text-ink-3">
 								{t('restDays', {
 									weekdays: data.restDays
 										.map(day => weekdayName(day, 'long', tDate))
@@ -213,9 +209,9 @@ export function ReviewAndCreate({
 				</Button>
 			</div>
 
-			<div className="bg-muted/50 p-4 rounded-md">
+			<div className="bg-surface-sunk p-4 rounded-md">
 				<h4 className="type-panel mb-2 text-foreground">{t('nextTitle')}</h4>
-				<ul className="text-sm text-muted-foreground space-y-1">
+				<ul className="text-sm text-ink-3 space-y-1">
 					<li>{t('nextSaved')}</li>
 					<li>{t('nextStart')}</li>
 					<li>{t('nextEdit')}</li>

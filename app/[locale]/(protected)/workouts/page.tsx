@@ -59,34 +59,40 @@ export default function WorkoutsIndexPage() {
 				</p>
 			</div>
 
-			{/* Actions */}
-			<div className="flex flex-wrap gap-3">
-				{/* LIVE-06. This is where the Quick Workout button was, and it is
-				    the reason FIX-04 could only hide it: starting an empty routine
-				    opened a session with nothing to log. This starts a real day of
-				    the owner's own instead. */}
+			{/* LIVE-06. This is where the Quick Workout button was, and it is
+			    the reason FIX-04 could only hide it: starting an empty routine
+			    opened a session with nothing to log. This starts a real day of
+			    the owner's own instead. UX-25 (§4.3 rule 1): it is the page's one
+			    filled control; the rest are places to go, so they are links. */}
+			<div>
 				<Button variant="default" onClick={() => setPickingDay(true)}>
 					<ClassicalIcon name="dumbbell" className="mr-2 h-4 w-4" aria-hidden />
 					{t('trainAnotherDay')}
 				</Button>
-				<Button asChild variant="outline">
-					<Link href="/routines">{t('goToRoutines')}</Link>
-				</Button>
-				<Button asChild variant="outline">
-					<Link
-						href="/workouts/history"
-						{...preloadOnHover('workoutHistoryPage')}
-					>
-						{t('viewHistory')}
-					</Link>
-				</Button>
-				<Button asChild variant="secondary">
-					<Link href="/dashboard">
-						{t('dashboard')}
-						<ChevronRight aria-hidden className="ml-2 h-4 w-4" />
-					</Link>
-				</Button>
 			</div>
+
+			<nav aria-label={t('goTo')} className="max-w-[var(--cluster-max)]">
+				<ul className="border-t border-rule">
+					{(
+						[
+							['/routines', t('goToRoutines'), undefined],
+							['/workouts/history', t('viewHistory'), 'workoutHistoryPage'],
+							['/dashboard', t('dashboard'), undefined],
+						] as const
+					).map(([href, label, preload]) => (
+						<li key={href} className="rule-row">
+							<Link
+								href={href}
+								{...(preload ? preloadOnHover(preload) : {})}
+								className="type-action flex min-h-11 items-center justify-between gap-2 py-2 text-foreground hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+							>
+								{label}
+								<ChevronRight aria-hidden className="h-4 w-4 text-ink-3" />
+							</Link>
+						</li>
+					))}
+				</ul>
+			</nav>
 
 			<TrainAnotherDayDialog open={pickingDay} onOpenChange={setPickingDay} />
 		</div>

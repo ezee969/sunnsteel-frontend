@@ -113,7 +113,7 @@ export const ExercisePickerDropdown = forwardRef<
 					</div>
 					<div className="max-h-[260px] overflow-y-auto p-2">
 						{isLoading ? (
-							<div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+							<div className="flex items-center justify-center gap-2 py-6 text-sm text-ink-3">
 								<Loader2 aria-hidden className="h-4 w-4 animate-spin" />
 								{t('loading')}
 							</div>
@@ -149,7 +149,7 @@ export const ExercisePickerDropdown = forwardRef<
 														<span className="text-sm font-medium whitespace-normal break-words">
 															{exerciseLabel(exercise.name, tEx)}
 														</span>
-														<span className="text-xs text-muted-foreground whitespace-normal">
+														<span className="text-xs text-ink-3 whitespace-normal">
 															{exercise.isCustom ? t('yoursPrefix') : null}
 															{t('musclesAndEquipment', {
 																muscles: exercise.primaryMuscles?.length
@@ -169,7 +169,7 @@ export const ExercisePickerDropdown = forwardRef<
 								</div>
 							))
 						) : (
-							<div className="py-6 text-center text-sm text-muted-foreground">
+							<div className="py-6 text-center text-sm text-ink-3">
 								{t('noneFound')}
 							</div>
 						)}

@@ -112,10 +112,7 @@ export function LinearBlockField({
 		<div className="space-y-1.5">
 			{editable ? (
 				<div className="flex items-center justify-between gap-3">
-					<Label
-						htmlFor={inputId}
-						className="text-sm font-medium text-muted-foreground"
-					>
+					<Label htmlFor={inputId} className="text-sm font-medium text-ink-3">
 						{t('referenceMax', { unit: getWeightUnitLabel(weightUnit) })}
 					</Label>
 					<Input

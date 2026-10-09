@@ -447,6 +447,7 @@
 		"title": "Sin entrenamiento en curso",
 		"description": "No tienes un entrenamiento en curso en este momento. Elige una rutina para empezar a entrenar, o revisa tu historial.",
 		"trainAnotherDay": "Entrenar otro día",
+		"goTo": "Ir a",
 		"goToRoutines": "Ir a rutinas",
 		"viewHistory": "Ver historial",
 		"dashboard": "Inicio"

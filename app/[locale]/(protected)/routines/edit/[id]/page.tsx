@@ -8,13 +8,6 @@ import { useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
 import { ClassicalLoader } from '@/components/ui/classical-loader'
 import { Stepper } from '@/components/ui/stepper'
 // Step components — steps 3 and 4 are loaded on demand, see TD-09 and the
@@ -338,8 +331,6 @@ export default function EditRoutinePage() {
 						{t('backToRoutines')}
 					</Button>
 				</div>
-				<h2 className="type-section text-foreground">{t('editRoutine')}</h2>
-				<p className="type-body-sm mt-1 text-ink-3">{t('updateSubtitle')}</p>
 			</div>
 
 			{/* Stepper: sticky on top for easier navigation on mobile */}
@@ -364,23 +355,19 @@ export default function EditRoutinePage() {
 				</div>
 			</div>
 
-			{/* Main Content */}
-			{/* v1.1 §26.4: below `sm` the step body loses its box and padding
-			    and keeps its heading rule, so a set row gets the screen's width
-			    rather than 48px less; from `sm` it is the §11.5 panel. The title
-			    is `type-panel` as it always rendered (a second rank here lost to
-			    it in the cascade). */}
-			<Card className="overflow-hidden max-sm:gap-4 max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:py-0">
-				<CardHeader className="border-b border-rule-faint pb-4 max-sm:px-0 max-sm:pb-2">
-					<CardTitle className="text-foreground">
-						{STEPS[currentStep - 1].title}
-					</CardTitle>
-					<CardDescription className="hidden sm:block">
-						{STEPS[currentStep - 1].description}
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="px-0 sm:p-6">{renderCurrentStep()}</CardContent>
-			</Card>
+			{/* UX-25 (§28.3): the step body is a ruled region, not a panel. The
+			    stepper above names the step, so its title here is for screen
+			    readers only; the boxes inside it are the exercises, the unit of
+			    work. It was a panel holding a day panel holding exercise panels. */}
+			<section aria-labelledby="wizard-step-title">
+				<h2 id="wizard-step-title" className="sr-only">
+					{STEPS[currentStep - 1].title}
+				</h2>
+				<p className="type-body-sm mb-4 hidden text-ink-3 sm:block">
+					{STEPS[currentStep - 1].description}
+				</p>
+				{renderCurrentStep()}
+			</section>
 
 			{/* Navigation */}
 			<WizardNavigation

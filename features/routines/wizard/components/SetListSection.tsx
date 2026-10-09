@@ -137,7 +137,7 @@ export function SetListSection({
 				<div id={`sets-list-${tabIndex}-${exerciseIndex}`}>
 					{/* TD-50: headings only over the one-line row, on its columns. */}
 					<div
-						className={`hidden lg:grid gap-2 text-xs font-medium text-muted-foreground mb-2 ${
+						className={`hidden lg:grid gap-2 text-xs font-medium text-ink-3 mb-2 ${
 							advanced ? SET_ROW_COLUMNS : SET_ROW_COLUMNS_SIMPLE
 						}`}
 					>
@@ -199,7 +199,7 @@ export function SetListSection({
 						))}
 					</div>
 
-					<div className="mt-3 pt-3 border-t border-muted sm:border-0">
+					<div className="mt-3 pt-3 border-t border-rule sm:border-0">
 						{linear ? (
 							<p className="type-body-sm mb-3 text-ink-3">
 								{tBlock('workingSetsLocked')}

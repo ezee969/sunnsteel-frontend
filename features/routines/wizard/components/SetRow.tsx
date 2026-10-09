@@ -149,11 +149,12 @@ export function SetRow({
 
 	return (
 		<div
-			className={`bg-card border border-muted rounded-md p-2 lg:p-0 lg:bg-transparent lg:border-0 lg:rounded-none transition-colors duration-[var(--motion-fast)] ease-standard ${
+			className={`border-t border-rule-faint py-3 first:border-t-0 lg:border-0 lg:py-0 transition-colors duration-[var(--motion-fast)] ease-standard ${
 				isRemoving ? 'animate-out fade-out-0 duration-[140ms] ease-exit' : ''
 			}`}
 		>
-			{/* TD-50: below `sm` a card of stacked fields with steppers; from `sm`
+			{/* UX-25 (§28.3): each set is a ruled row inside its exercise's box.
+			    TD-50: below `sm` stacked fields with steppers; from `sm`
 			    two lines -- the set, its kind, its rep type and remove, then its
 			    fields -- and from `lg` one line under the column headings. */}
 			<div
@@ -175,7 +176,7 @@ export function SetRow({
 							onClick={onRemoveSet}
 							aria-label={t('removeSet')}
 							disabled={disableRemove}
-							className="sm:hidden h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
+							className="sm:hidden h-8 w-8 p-0 text-ink-3 hover:text-destructive shrink-0"
 						>
 							<Trash2 aria-hidden className="h-4 w-4" />
 						</Button>
@@ -331,9 +332,7 @@ export function SetRow({
 											<Plus aria-hidden className="h-3 w-3" />
 										</Button>
 									</div>
-									<span className="hidden sm:inline text-muted-foreground">
-										-
-									</span>
+									<span className="hidden sm:inline text-ink-3">-</span>
 									<div className="flex items-center gap-2 flex-1 min-w-0">
 										<Button
 											type="button"
@@ -501,7 +500,7 @@ export function SetRow({
 							onClick={onRemoveSet}
 							aria-label={t('removeSet')}
 							disabled={disableRemove}
-							className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+							className="h-8 w-8 p-0 text-ink-3 hover:text-destructive"
 						>
 							<Trash2 aria-hidden className="h-4 w-4" />
 						</Button>

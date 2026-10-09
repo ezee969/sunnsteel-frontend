@@ -22,7 +22,7 @@ export const SelectedDaysSummary = ({
 	const tFormat = useTranslations('routines.format')
 	const tDate = useTranslations('routines.date')
 	return (
-		<div className="bg-muted/50 p-3 md:p-4 rounded-md">
+		<div className="bg-surface-sunk p-3 md:p-4 rounded-md">
 			<h4 className="type-panel mb-2 text-foreground md:mb-3">
 				{t('selectedDaysTitle', {
 					count: formatDaysPerWeek(trainingDays.length, tFormat),
@@ -37,7 +37,7 @@ export const SelectedDaysSummary = ({
 							: 'opacity-0 pointer-events-none',
 					)}
 				>
-					<p className="text-muted-foreground text-sm text-center">
+					<p className="text-ink-3 text-sm text-center">
 						{t('selectAtLeastOne')}
 					</p>
 				</div>

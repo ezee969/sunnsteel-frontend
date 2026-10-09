@@ -101,7 +101,7 @@ export function ExerciseList({
 	const t = useTranslations('routines.builder')
 	if (!day || day.exercises.length === 0) {
 		return (
-			<div className="text-center text-sm text-muted-foreground py-8">
+			<div className="text-center text-sm text-ink-3 py-8">
 				No exercises added yet. Use &quot;Add Exercise&quot; to start building
 				your day.
 			</div>
@@ -344,7 +344,7 @@ function ReorderableExerciseRow({
 								e.stopPropagation()
 								dragControls.start(e)
 							}}
-							className="inline-flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-md text-muted-foreground/50 hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none transition-colors"
+							className="inline-flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-md text-ink-3 hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing touch-none transition-colors"
 						>
 							<GripVertical aria-hidden className="h-4 w-4" />
 						</button>

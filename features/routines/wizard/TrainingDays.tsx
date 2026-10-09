@@ -282,7 +282,7 @@ function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 		<div className="space-y-4 md:space-y-6">
 			<div>
 				<div className="mb-3 md:mb-4">
-					<p className="text-xs text-muted-foreground mb-1.5 md:mb-2">
+					<p className="text-xs text-ink-3 mb-1.5 md:mb-2">
 						{t('quickSelectSplits')}
 					</p>
 					<div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2">
@@ -325,7 +325,7 @@ function WeeklyDays({ data, onUpdate }: TrainingDaysProps) {
 					</div>
 				</div>
 				<div>
-					<p className="text-xs md:text-sm text-muted-foreground mb-2 md:mb-3">
+					<p className="text-xs md:text-sm text-ink-3 mb-2 md:mb-3">
 						{t('orSelectManually')}
 					</p>
 					<div className="grid grid-cols-7 gap-1 md:gap-2">

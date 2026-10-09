@@ -4,7 +4,6 @@ import type { WeightUnit } from '@sunsteel/contracts'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { Exercise } from '@/lib/api/types'
@@ -44,7 +43,7 @@ export function RoutineDayCard({
 	const tMuscles = useTranslations('routines.muscles')
 	const tEx = useTranslations('catalog.exercises')
 	return (
-		<Card className="border rounded-md p-3">
+		<section className="border-t border-rule pt-3">
 			<h4 className="type-panel mb-2 flex items-center justify-between text-foreground">
 				{label}
 				<Badge variant="outline">
@@ -56,7 +55,10 @@ export function RoutineDayCard({
 					const meta = exerciseMap[exercise.exerciseId]
 
 					return (
-						<div key={exerciseIndex} className="border rounded-md p-3">
+						<div
+							key={exerciseIndex}
+							className="border-t border-rule-faint pt-3 first:border-t-0 first:pt-0"
+						>
 							<div className="flex items-start justify-between mb-2">
 								<div>
 									<h5 className="font-medium">
@@ -64,7 +66,7 @@ export function RoutineDayCard({
 											? exerciseLabel(meta.name, tEx)
 											: t('exerciseFallback')}
 									</h5>
-									<p className="text-xs text-muted-foreground">
+									<p className="text-xs text-ink-3">
 										{t('musclesAndEquipment', {
 											muscles: meta?.primaryMuscles
 												? formatMuscleGroups(meta.primaryMuscles, tMuscles)
@@ -73,12 +75,12 @@ export function RoutineDayCard({
 										})}
 									</p>
 									{exercise.note && (
-										<p className="text-xs text-muted-foreground mt-1 italic">
+										<p className="text-xs text-ink-3 mt-1 italic">
 											{t('note', { note: exercise.note })}
 										</p>
 									)}
 								</div>
-								<div className="flex items-center gap-1 text-xs text-muted-foreground pt-0.5">
+								<div className="flex items-center gap-1 text-xs text-ink-3 pt-0.5">
 									<span>
 										{t('rest', { time: formatTime(exercise.restSeconds) })}
 									</span>
@@ -110,6 +112,6 @@ export function RoutineDayCard({
 					)
 				})}
 			</div>
-		</Card>
+		</section>
 	)
 }

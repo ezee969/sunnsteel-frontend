@@ -15,7 +15,7 @@ interface RoutineSummaryStatsProps {
 export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 	const t = useTranslations('routines.builder')
 	return (
-		<div className="rounded-md border bg-card text-card-foreground p-4">
+		<div className="border-y border-rule py-4">
 			<h3 className="type-panel mb-3 text-center text-foreground">
 				{t('routineSummary')}
 			</h3>
@@ -24,17 +24,17 @@ export function RoutineSummaryStats({ totals }: RoutineSummaryStatsProps) {
 					<p className="text-xl font-bold text-primary">
 						{totals.trainingDays}
 					</p>
-					<p className="text-xs text-muted-foreground">{t('statDays')}</p>
+					<p className="text-xs text-ink-3">{t('statDays')}</p>
 				</div>
 				<div>
 					<p className="text-xl font-bold text-primary">
 						{totals.totalExercises}
 					</p>
-					<p className="text-xs text-muted-foreground">{t('statExercises')}</p>
+					<p className="text-xs text-ink-3">{t('statExercises')}</p>
 				</div>
 				<div>
 					<p className="text-xl font-bold text-primary">{totals.totalSets}</p>
-					<p className="text-xs text-muted-foreground">{t('statSets')}</p>
+					<p className="text-xs text-ink-3">{t('statSets')}</p>
 				</div>
 			</div>
 		</div>

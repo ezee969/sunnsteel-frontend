@@ -52,8 +52,8 @@ export function ExerciseNoteRow({
 		>
 			{!minimal && (
 				<div className="flex items-center gap-2 shrink-0">
-					<StickyNote aria-hidden className="h-4 w-4 text-muted-foreground" />
-					<Label className="text-sm font-medium text-muted-foreground">
+					<StickyNote aria-hidden className="h-4 w-4 text-ink-3" />
+					<Label className="text-sm font-medium text-ink-3">
 						{t('noteLabel')}
 					</Label>
 				</div>

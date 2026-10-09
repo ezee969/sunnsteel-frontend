@@ -8,13 +8,6 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
 import { Stepper } from '@/components/ui/stepper'
 import { StarterTemplates } from '@/features/routines/components/StarterTemplates'
 // Step components. Steps 1-2 are static: the user always sees step 1 first and
@@ -255,10 +248,6 @@ function CreateRoutineWizard() {
 						<span className="hidden sm:inline">{t('backToRoutines')}</span>
 					</Button>
 				</div>
-				<h2 className="type-section text-foreground">
-					{t('createNewRoutine')}
-				</h2>
-				<p className="type-body-sm mt-1 text-ink-3">{t('createSubtitle')}</p>
 			</div>
 
 			<div className="mb-4 border-b border-rule bg-background sm:mb-8">
@@ -272,23 +261,19 @@ function CreateRoutineWizard() {
 				</div>
 			</div>
 
-			{/* Main Content */}
-			{/* v1.1 §26.4: below `sm` the step body loses its box and padding
-			    and keeps its heading rule, so a set row gets the screen's width
-			    rather than 48px less; from `sm` it is the §11.5 panel. The title
-			    is `type-panel` as it always rendered (a second rank here lost to
-			    it in the cascade). */}
-			<Card className="overflow-hidden max-sm:gap-4 max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:py-0">
-				<CardHeader className="border-b border-rule-faint pb-4 max-sm:px-0 max-sm:pb-2">
-					<CardTitle className="text-foreground">
-						{STEPS[currentStep - 1].title}
-					</CardTitle>
-					<CardDescription className="hidden sm:block">
-						{STEPS[currentStep - 1].description}
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="px-0 sm:p-6">{renderCurrentStep()}</CardContent>
-			</Card>
+			{/* UX-25 (§28.3): the step body is a ruled region, not a panel. The
+			    stepper above names the step, so its title here is for screen
+			    readers only; the boxes inside it are the exercises, the unit of
+			    work. It was a panel holding a day panel holding exercise panels. */}
+			<section aria-labelledby="wizard-step-title">
+				<h2 id="wizard-step-title" className="sr-only">
+					{STEPS[currentStep - 1].title}
+				</h2>
+				<p className="type-body-sm mb-4 hidden text-ink-3 sm:block">
+					{STEPS[currentStep - 1].description}
+				</p>
+				{renderCurrentStep()}
+			</section>
 
 			{/* Sticky bottom navigation */}
 			<WizardNavigation

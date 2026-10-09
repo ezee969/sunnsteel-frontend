@@ -60,7 +60,7 @@ export function ExerciseHeader({
 	return (
 		<CardHeader
 			className={cn(
-				'cursor-pointer transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-muted/30',
+				'cursor-pointer transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
 				expanded ? 'p-3 sm:p-4' : 'p-2 sm:p-3',
 			)}
 			role="button"
@@ -94,7 +94,7 @@ export function ExerciseHeader({
 									: t('exerciseFallback')}
 							</h4>
 							{expanded && (
-								<p className="text-xs sm:text-sm text-muted-foreground break-words">
+								<p className="text-xs sm:text-sm text-ink-3 break-words">
 									{t('musclesAndEquipment', {
 										muscles: exerciseData?.primaryMuscles
 											? formatMuscleGroups(
@@ -108,7 +108,7 @@ export function ExerciseHeader({
 							)}
 						</div>
 						{!expanded && (
-							<div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+							<div className="flex items-center gap-1.5 text-xs text-ink-3 shrink-0">
 								<Badge variant="secondary" className="h-5 px-1.5 py-0.5">
 									{plannedSets}
 								</Badge>
@@ -150,7 +150,7 @@ export function ExerciseHeader({
 						aria-label={t('editExercise')}
 						onClick={onEditButtonClick}
 						className={cn(
-							'p-0 text-muted-foreground hover:text-primary',
+							'p-0 text-ink-3 hover:text-primary',
 							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>
@@ -162,7 +162,7 @@ export function ExerciseHeader({
 						aria-label={t('removeExercise')}
 						onClick={onRemoveButtonClick}
 						className={cn(
-							'p-0 text-muted-foreground hover:text-destructive',
+							'p-0 text-ink-3 hover:text-destructive',
 							expanded ? 'h-9 w-9 sm:h-8 sm:w-8' : 'h-6 w-6',
 						)}
 					>

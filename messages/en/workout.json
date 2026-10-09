@@ -447,6 +447,7 @@
 		"title": "No Active Workout",
 		"description": "You don’t have a workout in progress right now. Pick a routine to start training, or review your history.",
 		"trainAnotherDay": "Train another day",
+		"goTo": "Go to",
 		"goToRoutines": "Go to routines",
 		"viewHistory": "View history",
 		"dashboard": "Dashboard"

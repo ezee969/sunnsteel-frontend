@@ -88,7 +88,7 @@ export function ExerciseConfigSection({
 	}, [exercise.restSeconds, restFocused])
 
 	return (
-		<div className="mb-3 p-2 sm:p-3 bg-muted/30 rounded-md space-y-2 sm:space-y-3">
+		<div className="mb-3 p-2 sm:p-3 bg-surface-sunk rounded-md space-y-2 sm:space-y-3">
 			<ExerciseNoteRow
 				note={exercise.note}
 				onSave={note => onUpdateNote(exerciseIndex, note)}
@@ -145,7 +145,7 @@ export function ExerciseConfigSection({
 			{advanced && requiresWeightIncrementField(exercise.progressionScheme) && (
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
-						<Label className="text-sm font-medium text-muted-foreground">
+						<Label className="text-sm font-medium text-ink-3">
 							{t('weightIncrement', {
 								unit: weightUnit === 'LB' ? 'lb' : 'kg',
 							})}
