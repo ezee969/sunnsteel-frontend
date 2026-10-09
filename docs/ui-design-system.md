@@ -2229,13 +2229,14 @@ the screen where it matters most.
 
 ---
 
-## 27. Amendment — Train focus (DRAFT, 2026-10-08)
+## 27. Amendment — Train focus (2026-10-09)
 
-**Status: draft for the owner.** Drafted under `UX-24` from the owner-approved
+**Status: in force.** Drafted under `UX-24` from the owner-approved
 [UI/UX audit](ui-audit-2026-10.md) (§6, §7.2) and the owner's four decisions
-of 2026-10-08. Nothing in this section is in force until the owner approves
-it; `LIVE-22` implements it. §27.1 and §27.6 describe primitives `UX-24` has
-already shipped, because they change no documented rule.
+of 2026-10-08; approved by the owner on 2026-10-08 and implemented by
+`LIVE-22` on 2026-10-09. §27.1 and §27.6 describe primitives `UX-24` shipped,
+because they change no documented rule. Where building it refined the draft,
+the refinement is written into the rule below and marked *(`LIVE-22`)*.
 
 **Why.** The live workout is the one screen that is not a ledger but a task,
 and it applied the ledger the wrong way round: every *set* was a boxed well
@@ -2276,6 +2277,12 @@ primary call to action.** The current exercise is a `panel` (`--surface`, 1px
 `--rule`, 2px radius) with a 3px `.mark` in `--primary` (ink) on its left edge.
 Its sets are ruled rows inside it. A box never sits inside another box.
 
+*(`LIVE-22`)* Inside a superset or circuit (§27.4) the group's own left rule
+carries the mark, so the current member's panel has no 3px mark of its own,
+and below `sm` it gives up its side border and padding too: at 320 with
+larger controls the set fields needed that width, and the group's rule
+already says where the member's region begins.
+
 ### 27.3 The set row (supersedes §11.7's first and third bullets)
 
 - **Only the current set is a well.** The current set — the first required
@@ -2283,10 +2290,20 @@ Its sets are ruled rows inside it. A box never sits inside another box.
   `--surface-sunk` well with the §26.5 bounded fields and the tick at its
   larger size. "Last time" shows only on it.
 - **A done set reads as data** (§11.12's read-only treatment): its values in
-  Space Mono on the panel, the `StatusMark` done glyph, `.mark-success`; a tap
-  makes it editable again.
+  Space Mono on the panel, the ticked box as its glyph, `.mark-success`;
+  focusing a field gives it the bounded cell back, so it is edited in place.
 - **An upcoming set is a quiet ruled row**: its suggested values in `--ink-3`,
-  no field boxes until it is tapped or becomes current.
+  no field boxes until it is focused or becomes current. *(`LIVE-22`)* An empty
+  field on it shows a dash, not "Reps" or "RPE": the column header already
+  names it, and the word clipped a narrow field.
+- *(`LIVE-22`)* **Below `sm` a row shows only its number** under the "Set"
+  column header; the whole "Set 2" stays for screen readers and returns from
+  `sm`. The column header is hidden from assistive technology, because every
+  field's accessible name already says set, exercise and field ("Set 2 of
+  Front Squat: reps").
+- *(`LIVE-22`)* **The fills** ("Same as set N", "Use last time") show on the
+  current row only; on every other row they and Remove are in its "Set N"
+  menu, as gym mode already had them.
 - **A pre-filled target is a suggestion** (owner, 2026-10-08): it renders in
   the placeholder tone until the member edits the field or ticks the set, and
   ticking an untouched suggestion logs it, so one-tap logging stays.
@@ -2299,20 +2316,31 @@ Its sets are ruled rows inside it. A box never sits inside another box.
 - After a tick, focus moves to the next current set's first field and it
   scrolls into view (instantly under reduced motion, §9.3). Reps, weight and
   RPE carry `enterKeyHint`, and Enter on the last field ticks the set.
+  *(`LIVE-22`)* Focus moves only after a keyboard tick (Enter, or Space on the
+  box): after a tap it would open a phone's keypad the member did not ask
+  for, so a tapped tick leaves focus where it was and the next set is still
+  marked current. The set fields have no spin buttons; a desktop browser
+  reserves their width even unhovered.
 
 The set-completion signature (§9.1) is unchanged.
 
 ### 27.4 Exercises outside the current one
 
-- **Done:** one folded summary row — the done glyph, the name in `--ink-2`, the
-  work done ("3 of 3 · 60 kg") — opened by a tap. `LIVE-21`'s auto-fold folds
-  it; this is how a folded exercise looks.
+- **Done:** its header folded — the `StatusMark` done glyph with "Complete",
+  the name, the count and the prescription line — opened by a tap.
+  `LIVE-21`'s auto-fold folds it; this is how a folded exercise looks.
+  *(`LIVE-22`)* An exercise already done when the page loads starts folded.
 - **Upcoming:** its name and prescription line, its sets folded until it
-  becomes current or is opened.
+  becomes current or is opened. An exercise begun but not finished stays
+  open, so a set left behind is in sight. A member's own fold or open always
+  wins over these defaults.
 - **Supersets and circuits** share one container: the group label in its
-  header ("Superset A · round 2 of 3"), one continuous ink `.mark` along its
-  left edge while it is current, and each member's letter and number ("A1",
-  "A2") as the leading column of its rows. No connector lines, no new colour.
+  header ("Superset A · Round 2 of 3"), one continuous 3px rule along its
+  left edge — `--primary` while it holds the current set, `--rule`
+  otherwise — and each member's letter and number ("A1", "A2").
+  *(`LIVE-22`)* The position sits above the member's name, where the round
+  line was, rather than as a leading column of its rows: the rows' first
+  column is already the set number. No connector lines, no new colour.
 
 ### 27.5 Progress and Finish (restates §11.8)
 
@@ -2321,12 +2349,20 @@ The set-completion signature (§9.1) is unchanged.
   masthead. The separate percentage goes.
 - **Finish** (owner, 2026-10-08) sits at the end of the exercise list on a
   phone and inline in the masthead from `md`. It is outline while required sets
-  remain, and becomes the screen's one filled control once they are done. The
-  "Complete all sets" notice shows only after a Finish attempt; the
-  confirmation dialog already states what remains.
-- The live title wraps (§11.11) and never clamps.
-- The glossary line (§23.5) moves behind an information control in the
-  masthead, keeping its one source of definitions.
+  remain, and becomes the screen's one filled control once they are done.
+  *(`LIVE-22`)* The "Complete all sets" notice is gone rather than deferred:
+  the confirmation dialog already states what remains, so a second statement
+  of it said nothing new. Discard follows Finish as the destructive outline
+  (§4.3 rule 5).
+- The live title wraps (§11.11) and never clamps. *(`LIVE-22`)* Below `sm` the
+  figures are one line under the title (Elapsed, Sets, Started) rather than
+  three captioned columns, so the pinned masthead takes less of a phone's
+  screen; the elapsed time ticks every second in its `.duration-slot`.
+- *(`LIVE-22`)* The glossary line (§23.5) moves below the exercise list,
+  before the workout note, rather than behind a masthead control: a
+  disclosure in the pinned masthead would have cost a control on every
+  screen of the workout for a line read once. Its one source of definitions
+  is unchanged.
 
 ### 27.6 One way a section fails (shipped, `UX-24`)
 
@@ -2348,10 +2384,32 @@ and `--honour` stays capped and reserved.
 
 ### 27.8 Verification (for `LIVE-22`)
 
-At 390×844 on a fresh three-exercise session: the first editable field within
-300px of the top; overall progress stated once; one filled control, and not
-Finish until the required sets are done; the current set identifiable in a
-one-second glance; at most two captions per set row; nothing clipped in
-Spanish at 320; after a tick, focus on the next set's first field without the
-keyboard closing (iOS Safari and Android Chrome). Both themes, reduced motion,
-higher contrast and larger controls; the scoped sweep in English and Spanish.
+The targets: at 390×844 on a fresh three-exercise session, the first editable
+field within 300px of the top; overall progress stated once; one filled
+control, and not Finish until the required sets are done; the current set
+identifiable in a one-second glance; at most two captions per set row;
+nothing clipped in Spanish at 320; after a tick, focus on the next set's
+first field without the keyboard closing (iOS Safari and Android Chrome).
+Both themes, reduced motion, higher contrast and larger controls; the scoped
+sweep in English and Spanish.
+
+**Record (2026-10-09, `LIVE-22`).** Measured against the local stack on the
+John Doe test account, in headless Chromium:
+
+- **First editable field: about 440px at 390×844, against a target of 300 —
+  not met.** It was about 510. The 64px topbar, the pinned masthead (a
+  wrapped title, the one figures line and the bar) and the current
+  exercise's header, prescription line and column header sit above it; what
+  remains is structure §27 keeps, not noise, so the target was optimistic
+  rather than the layout wrong. Recorded rather than forced.
+- Overall progress once ("1 of 9 sets" with the bar); Finish outline
+  while required sets remained; the current set the only
+  well; at most two captions per row (the RIR under the number, "Last time").
+- Spanish at 320, standard and larger controls, inside a superset (the
+  narrowest a row gets): no clipped field, a typed "102.5" fitting its field,
+  no horizontal overflow.
+- Keyboard: Enter moved reps → weight → RPE and ticked; focus landed on the
+  next set's reps field, in a single exercise and across a superset's
+  members; an untouched suggestion logged as its weight.
+- **Not verified:** the keyboard staying open on a real phone (iOS Safari and
+  Android Chrome) and a screen reader pass; both need a device.
