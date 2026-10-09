@@ -2417,5 +2417,9 @@ John Doe test account, in headless Chromium:
 - Keyboard: Enter moved reps → weight → RPE and ticked; focus landed on the
   next set's reps field, in a single exercise and across a superset's
   members; an untouched suggestion logged as its weight.
+- Two defects older than `LIVE-22` surfaced in its frames and were fixed
+  with it: under reduced motion the completion mark (`.mark-fill`) was drawn
+  on every exercise, so an untouched one read as done; and the fixed rest bar
+  hid its countdown under the sidebar from `md` (§27.5).
 - **Not verified:** the keyboard staying open on a real phone (iOS Safari and
   Android Chrome) and a screen reader pass; both need a device.

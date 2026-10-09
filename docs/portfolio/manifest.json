@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-10-09T11:49:57.760Z",
+	"mutatedAt": "2026-10-09T12:13:58.250Z",
 	"screenshots": [
 		{
 			"slug": "login",
@@ -376,9 +376,10 @@
 				"LIVE-01",
 				"LIVE-03",
 				"LIVE-04",
-				"LIVE-05"
+				"LIVE-05",
+				"LIVE-22"
 			],
-			"capturedAt": "2026-10-03T10:10:00.627Z",
+			"capturedAt": "2026-10-09T12:13:36.131Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -388,7 +389,7 @@
 			"features": [
 				"LIVE-15"
 			],
-			"capturedAt": "2026-10-03T10:10:14.522Z",
+			"capturedAt": "2026-10-09T12:13:49.619Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -398,7 +399,7 @@
 			"features": [
 				"LIVE-12"
 			],
-			"capturedAt": "2026-10-03T10:10:28.609Z",
+			"capturedAt": "2026-10-09T12:14:02.229Z",
 			"width": 1440,
 			"height": 900
 		}

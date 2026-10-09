@@ -150,21 +150,56 @@ async function startScratchSession(
 	}
 
 	const rows = page.getByTestId('set-log-container')
-	const logged: number[] = []
+	// LIVE-22: the set to log is always the current one, and a finished
+	// exercise folds, so rows are found by their names, never by position.
+	const logged: string[] = []
+	const exerciseOf = (label: string) =>
+		label.match(/^Mark set \d+ of (.+) complete$/)?.[1] ?? ''
+	const removeExtra = async () => {
+		const extra = rows.filter({ hasText: 'Extra' })
+		if (!(await extra.count())) return
+		// On the current row Remove is a button; off it, it is in the set's menu.
+		const button = extra.first().getByRole('button', { name: /^Remove set / })
+		if (await button.count()) {
+			await button.click()
+		} else {
+			await extra
+				.first()
+				.getByRole('button', { name: /^Set \d+, / })
+				.click()
+			await page.getByRole('menuitem', { name: /^Remove set / }).click()
+		}
+		await expect(extra).toHaveCount(0)
+	}
 	const cleanup: Cleanup = async () => {
 		await page.keyboard.press('Escape')
-		const remove = page.getByRole('button', { name: /^Remove set / })
-		if (await remove.count()) {
-			await remove.first().click()
-			await expect(remove).toHaveCount(0)
-		}
-		for (const index of logged) {
-			const box = rows.nth(index).getByRole('checkbox', {
-				name: /^Mark set \d+ of .+ complete$/,
-			})
+		await removeExtra()
+		for (const label of logged) {
+			const box = page.getByRole('checkbox', { name: label, exact: true })
+			if (!(await box.count())) {
+				// A finished exercise folds; open it to reach the set. Its toggle
+				// is the button in the h3 that names exactly that exercise.
+				await page
+					.locator('h3')
+					.filter({
+						has: page.getByText(exerciseOf(label), { exact: true }),
+					})
+					.getByRole('button', { expanded: false })
+					.first()
+					.click()
+				await expect(box).toBeVisible()
+			}
 			if ((await box.getAttribute('data-state')) === 'checked') {
 				await box.click()
-				await expect(box).toHaveAttribute('data-state', 'unchecked')
+				// Unticking can move the current set and re-render the row, so
+				// read the box again rather than holding the old element.
+				await expect
+					.poll(async () =>
+						(await box.count())
+							? await box.getAttribute('data-state')
+							: 'unchecked',
+					)
+					.toBe('unchecked')
 			}
 		}
 		await page.waitForLoadState('networkidle')
@@ -172,28 +207,25 @@ async function startScratchSession(
 	}
 
 	try {
-		await expect(
-			rows.nth(SETS_TO_LOG - 1),
-			`The started day has fewer than ${SETS_TO_LOG} sets.`,
-		).toBeVisible()
-
 		for (let index = 0; index < SETS_TO_LOG; index++) {
-			const row = rows.nth(index)
+			const row = page.locator('[data-state="current"]').first()
+			await expect(
+				row,
+				`The started day has fewer than ${SETS_TO_LOG} sets.`,
+			).toBeVisible()
 			const reps = row.getByLabel(/: reps$/)
 			if (!(await reps.inputValue())) {
 				// LIVE-22: a set that matches its exercise's prescription line
 				// ("3 × 8 · 60 kg") has no caption of its own.
 				const caption = row.getByText(/^Target: /)
+				const line = row
+					.locator('xpath=ancestor::*[.//h3][1]')
+					.getByText(/^\d+ × \d+/)
 				const target = (await caption.count())
 					? await caption.first().innerText()
-					: ((
-							await page
-								.getByText(/^\d+ × \d+/)
-								.filter({ visible: true })
-								.first()
-								.innerText()
-								.catch(() => '')
-						).match(/× (\d+)/)?.[1] ?? '')
+					: (((await line.count())
+							? (await line.first().innerText()).match(/× (\d+)/)?.[1]
+							: '') ?? '')
 				await reps.fill(target.match(/\d+/)?.[0] ?? '8')
 			}
 			const weight = row.getByLabel(/: weight in /)
@@ -209,9 +241,12 @@ async function startScratchSession(
 			const box = row.getByRole('checkbox', {
 				name: /^Mark set \d+ of .+ complete$/,
 			})
+			const label = (await box.getAttribute('aria-label')) ?? ''
 			await box.click()
-			logged.push(index)
-			await expect(box).toHaveAttribute('data-state', 'checked')
+			logged.push(label)
+			await expect(
+				page.getByRole('checkbox', { name: label, exact: true }),
+			).toHaveAttribute('data-state', 'checked')
 		}
 		await page.waitForLoadState('networkidle')
 		if (extraSet) {
@@ -225,12 +260,11 @@ async function startScratchSession(
 			await extra.scrollIntoViewIfNeeded()
 		}
 		if (kindMenu) {
-			// LIVE-12: the next set's kind menu, open; nothing is changed.
+			// LIVE-12: the current set's kind menu, open; nothing is changed.
 			const trigger = page
-				.getByRole('button', {
-					name: /^Set \d+, .+\. (Change set kind|More for this set)$/,
-				})
-				.nth(SETS_TO_LOG)
+				.locator('[data-state="current"]')
+				.first()
+				.getByRole('button', { name: /^Set \d+, / })
 			await trigger.scrollIntoViewIfNeeded()
 			await trigger.click()
 			await expect(page.getByRole('menuitemradio').first()).toBeVisible()

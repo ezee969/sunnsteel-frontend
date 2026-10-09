@@ -771,8 +771,10 @@
   .mark-fill.mark-success::before {
     animation: none !important;
   }
-  /* The mark is simply there, at its final state. */
-  .mark-fill::before {
+  /* The mark is simply there, at its final state -- on a completed row only.
+     LIVE-22: unscoped, it drew the completion mark on every exercise, so under
+     reduced motion an untouched one read as done. */
+  .mark-fill.mark-success::before {
     transform: scaleY(1);
   }
   /* Overlays become opacity-only: no scale, no side translate (§3). */
@@ -809,7 +811,7 @@
 :root[data-motion='reduce'] .mark-fill.mark-success::before {
   animation: none !important;
 }
-:root[data-motion='reduce'] .mark-fill::before {
+:root[data-motion='reduce'] .mark-fill.mark-success::before {
   transform: scaleY(1);
 }
 :root[data-motion='reduce'] *,
