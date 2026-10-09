@@ -41,6 +41,8 @@ import {
 import type { LogRowProps } from '@/lib/utils/workout-session.types'
 
 interface SetLogInputProps extends LogRowProps {
+	/** LIVE-22: names every field after its set and exercise. */
+	exerciseName: string
 	plannedReps?: number | null
 	plannedMinReps?: number | null
 	plannedMaxReps?: number | null
@@ -115,6 +117,7 @@ export const SetLogInput = ({
 	onRemove,
 	kind = 'WORKING',
 	linearBlock,
+	exerciseName,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -167,6 +170,30 @@ export const SetLogInput = ({
 	// (React 18), so each field is found by its id.
 	const repsId = `set-${routineExerciseId}-${setNumber}-reps`
 	const weightId = `set-${routineExerciseId}-${setNumber}-weight`
+	const rpeId = `set-${routineExerciseId}-${setNumber}-rpe`
+	const repsTargetId = `${repsId}-target`
+	const weightTargetId = `${weightId}-target`
+	// LIVE-22: a field is described by its target, and by its error while it
+	// has one, so a screen reader hears both.
+	const describedBy = (targetId: string | null, invalid: boolean) =>
+		[targetId, invalid ? errorId : null].filter(Boolean).join(' ') || undefined
+	const focusField = (id: string) => document.getElementById(id)?.focus()
+	// LIVE-21's refused tick points at the field it needs. LIVE-22: inputs are
+	// never disabled while saving, because disabling a focused field blurs it
+	// and closes a phone's keyboard in the middle of an entry.
+	const tick = () => {
+		const missing = handleCompletionToggle(true)
+		if (missing) focusField(missing === 'reps' ? repsId : weightId)
+	}
+	// LIVE-22: Enter moves on to the next field, and on the last one ticks the
+	// set, so a keyboard logs a set without reaching for the box.
+	const onEnter =
+		(next: string | null) => (event: React.KeyboardEvent<HTMLInputElement>) => {
+			if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
+			event.preventDefault()
+			if (next) focusField(next)
+			else if (!isCompletedState) tick()
+		}
 	const repsInvalid =
 		completionField === 'reps' || (!isValid && validationField === 'reps')
 	const weightInvalid =
@@ -281,7 +308,6 @@ export const SetLogInput = ({
 													kind: tKinds(kind),
 												})
 									}
-									disabled={saveState === 'saving'}
 									className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
 										isCompletedState ? 'text-success' : 'text-ink-3'
 									}`}
@@ -357,18 +383,25 @@ export const SetLogInput = ({
 						id={repsId}
 						type="number"
 						inputMode="numeric"
-						aria-label={t('performedRepsAria')}
+						enterKeyHint={linearBlock ? 'done' : 'next'}
+						aria-label={t('repsAria', {
+							number: setNumber,
+							exercise: exerciseName,
+						})}
 						placeholder={t('repsPlaceholder')}
 						aria-invalid={repsInvalid || undefined}
-						aria-describedby={repsInvalid ? errorId : undefined}
+						aria-describedby={describedBy(repsTargetId, repsInvalid)}
 						value={repsState}
 						onChange={e => setReps(e.target.value)}
-						disabled={saveState === 'saving'}
+						onKeyDown={onEnter(linearBlock ? null : weightId)}
 						className={`${FIELD_CLASS} ${
 							repsInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span className="type-body-sm text-center text-ink-3">
+					<span
+						id={repsTargetId}
+						className="type-body-sm text-center text-ink-3"
+					>
 						{linearBlock
 							? (linearBlock.target ?? t('noTarget'))
 							: isExtra
@@ -413,22 +446,32 @@ export const SetLogInput = ({
 								type="number"
 								inputMode="decimal"
 								step={weightUnit === 'LB' ? 1 : 0.5}
+								enterKeyHint="next"
 								aria-label={
 									weightUnit === 'LB'
-										? t('performedWeightLbAria')
-										: t('performedWeightKgAria')
+										? t('weightLbAria', {
+												number: setNumber,
+												exercise: exerciseName,
+											})
+										: t('weightKgAria', {
+												number: setNumber,
+												exercise: exerciseName,
+											})
 								}
 								placeholder={t('weightPlaceholder')}
 								aria-invalid={weightInvalid || undefined}
-								aria-describedby={weightInvalid ? errorId : undefined}
+								aria-describedby={describedBy(weightTargetId, weightInvalid)}
 								value={weightState}
 								onChange={e => setWeight(e.target.value)}
-								disabled={saveState === 'saving'}
+								onKeyDown={onEnter(rpeId)}
 								className={`${FIELD_CLASS} ${
 									weightInvalid ? FIELD_INVALID_CLASS : ''
 								}`}
 							/>
-							<span className="type-body-sm text-center text-ink-3">
+							<span
+								id={weightTargetId}
+								className="type-body-sm text-center text-ink-3"
+							>
 								{isExtra
 									? t('noTarget')
 									: t('targetWeight', {
@@ -446,18 +489,23 @@ export const SetLogInput = ({
 				{linearBlock ? null : (
 					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[48px]">
 						<Input
+							id={rpeId}
 							type="number"
 							inputMode="decimal"
 							step="0.5"
 							min="0"
 							max="10"
-							aria-label={t('rpeAria')}
+							enterKeyHint="done"
+							aria-label={t('rpeAria', {
+								number: setNumber,
+								exercise: exerciseName,
+							})}
 							placeholder={t('rpePlaceholder')}
 							aria-invalid={rpeInvalid || undefined}
-							aria-describedby={rpeInvalid ? errorId : undefined}
+							aria-describedby={describedBy(null, rpeInvalid)}
 							value={rpeState}
 							onChange={e => setRpe(e.target.value)}
-							disabled={saveState === 'saving'}
+							onKeyDown={onEnter(null)}
 							className={`${FIELD_CLASS} ${
 								rpeInvalid ? FIELD_INVALID_CLASS : ''
 							}`}
@@ -478,15 +526,14 @@ export const SetLogInput = ({
 					<Checkbox
 						checked={isCompletedState}
 						onCheckedChange={(checked: boolean | 'indeterminate') => {
-							const missing = handleCompletionToggle(Boolean(checked))
 							// Focus inside the tap, so a phone opens its keypad.
-							if (missing)
-								document
-									.getElementById(missing === 'reps' ? repsId : weightId)
-									?.focus()
+							if (checked === true) tick()
+							else handleCompletionToggle(false)
 						}}
-						aria-label={t('markCompleteAria')}
-						disabled={saveState === 'saving'}
+						aria-label={t('completeAria', {
+							number: setNumber,
+							exercise: exerciseName,
+						})}
 						// Checked colour comes from the primitive (`--success-strong`,
 						// v1.0 §4.3 rule 2). This call site only sizes the box and draws
 						// the save-state ring; it must not re-specify the fill.

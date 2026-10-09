@@ -160,7 +160,7 @@ async function startScratchSession(
 		}
 		for (const index of logged) {
 			const box = rows.nth(index).getByRole('checkbox', {
-				name: 'Mark set as complete',
+				name: /^Mark set \d+ of .+ complete$/,
 			})
 			if ((await box.getAttribute('data-state')) === 'checked') {
 				await box.click()
@@ -179,7 +179,7 @@ async function startScratchSession(
 
 		for (let index = 0; index < SETS_TO_LOG; index++) {
 			const row = rows.nth(index)
-			const reps = row.getByLabel('Performed reps')
+			const reps = row.getByLabel(/: reps$/)
 			if (!(await reps.inputValue())) {
 				const target = await row
 					.getByText(/^Target: /)
@@ -187,7 +187,7 @@ async function startScratchSession(
 					.innerText()
 				await reps.fill(target.match(/\d+/)?.[0] ?? '8')
 			}
-			const weight = row.getByLabel(/^Performed weight in /)
+			const weight = row.getByLabel(/: weight in /)
 			if (!(await weight.inputValue())) {
 				const target = await row
 					.getByText(/^Target: /)
@@ -196,7 +196,9 @@ async function startScratchSession(
 				// LIVE-21: a tick needs a weight; 0 is a bodyweight set.
 				await weight.fill(target.match(/\d+(\.\d+)?/)?.[0] ?? '0')
 			}
-			const box = row.getByRole('checkbox', { name: 'Mark set as complete' })
+			const box = row.getByRole('checkbox', {
+				name: /^Mark set \d+ of .+ complete$/,
+			})
 			await box.click()
 			logged.push(index)
 			await expect(box).toHaveAttribute('data-state', 'checked')

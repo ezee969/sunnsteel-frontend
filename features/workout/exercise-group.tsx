@@ -24,6 +24,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { StatusMark } from '@/components/ui/status-mark'
 import { useCompactWorkout } from '@/hooks/use-compact-workout'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
@@ -168,6 +169,7 @@ export const ExerciseGroup = ({
 				}
 			: undefined
 	const exerciseName = exerciseLabel(rawExerciseName, tEx)
+	const setsId = `exercise-${exerciseId}-sets`
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
 	const isComplete = isExerciseDone(sets)
@@ -226,59 +228,81 @@ export const ExerciseGroup = ({
 			}`}
 		>
 			<div className="flex items-center justify-between gap-2">
-				<Button
-					id={`exercise-${exerciseId}-toggle`}
-					variant="ghost"
-					onClick={onToggleCollapse}
-					className="h-auto min-h-11 min-w-0 flex-1 justify-between rounded-none p-0 hover:bg-transparent large-controls:h-auto large-controls:min-h-12 large-controls:px-0"
-				>
-					<div className="flex min-w-0 flex-1 items-center gap-3">
-						{isCollapsed ? (
-							<ChevronRight className="h-4 w-4 shrink-0 text-ink-3" />
-						) : (
-							<ChevronDown className="h-4 w-4 shrink-0 text-ink-3" />
-						)}
-						<div className="min-w-0 text-left">
-							{roundLine ? (
-								<p className="type-body-sm text-ink-3">{roundLine}</p>
-							) : null}
-							<h3 className="type-panel line-clamp-1 text-foreground">
-								{exerciseName}
-							</h3>
-							<p className="type-data mt-0.5 text-ink-3">
-								{t('setsCount', { completed: completedSets, total: totalSets })}
-							</p>
-							{blockLine ? (
-								<p className="type-body-sm text-ink-2">{blockLine}</p>
-							) : null}
-							{linearBlockUnset ? (
-								<p className="type-body-sm whitespace-normal text-ink-3">
-									{tRoutineBlock('noReference')}
-								</p>
-							) : null}
-							{upNext ? (
-								<p className="type-body-sm text-foreground">{upNext}</p>
-							) : null}
-							{substitutedFrom ? (
-								<p className="type-body-sm line-clamp-1 text-ink-3">
-									{t('swappedFrom', {
-										name: exerciseLabel(substitutedFrom, tEx),
+				{/* LIVE-22: the heading holds the toggle, as `CollapsibleSection`'s does
+			(§20.1): a button may hold only phrasing content, so the lines inside
+			are spans, and its state is `aria-expanded`, never the chevron alone. */}
+				<h3 className="type-panel min-w-0 flex-1">
+					<Button
+						id={`exercise-${exerciseId}-toggle`}
+						variant="ghost"
+						onClick={onToggleCollapse}
+						aria-expanded={!isCollapsed}
+						aria-controls={setsId}
+						className="h-auto min-h-11 w-full min-w-0 justify-between rounded-none p-0 hover:bg-transparent hover:no-underline large-controls:h-auto large-controls:min-h-12 large-controls:px-0"
+					>
+						<span className="flex min-w-0 flex-1 items-center gap-3">
+							{isCollapsed ? (
+								<ChevronRight
+									className="h-4 w-4 shrink-0 text-ink-3"
+									aria-hidden
+								/>
+							) : (
+								<ChevronDown
+									className="h-4 w-4 shrink-0 text-ink-3"
+									aria-hidden
+								/>
+							)}
+							<span className="min-w-0 text-left">
+								{roundLine ? (
+									<span className="type-body-sm block text-ink-3">
+										{roundLine}
+									</span>
+								) : null}
+								<span className="type-panel line-clamp-1 text-foreground">
+									{exerciseName}
+								</span>
+								<span className="type-data mt-0.5 block text-ink-3">
+									{t('setsCount', {
+										completed: completedSets,
+										total: totalSets,
 									})}
-								</p>
-							) : null}
-							{instruction ? (
-								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-3">
-									{t('routineNote', { note: instruction })}
-								</p>
-							) : null}
-							{sessionNote ? (
-								<p className="type-body-sm line-clamp-2 whitespace-normal text-ink-2">
-									{t('yourNote', { note: sessionNote })}
-								</p>
-							) : null}
-						</div>
-					</div>
-				</Button>
+								</span>
+								{blockLine ? (
+									<span className="type-body-sm block text-ink-2">
+										{blockLine}
+									</span>
+								) : null}
+								{linearBlockUnset ? (
+									<span className="type-body-sm block whitespace-normal text-ink-3">
+										{tRoutineBlock('noReference')}
+									</span>
+								) : null}
+								{upNext ? (
+									<span className="type-body-sm block text-foreground">
+										{upNext}
+									</span>
+								) : null}
+								{substitutedFrom ? (
+									<span className="type-body-sm line-clamp-1 text-ink-3">
+										{t('swappedFrom', {
+											name: exerciseLabel(substitutedFrom, tEx),
+										})}
+									</span>
+								) : null}
+								{instruction ? (
+									<span className="type-body-sm line-clamp-2 whitespace-normal text-ink-3">
+										{t('routineNote', { note: instruction })}
+									</span>
+								) : null}
+								{sessionNote ? (
+									<span className="type-body-sm line-clamp-2 whitespace-normal text-ink-2">
+										{t('yourNote', { note: sessionNote })}
+									</span>
+								) : null}
+							</span>
+						</span>
+					</Button>
+				</h3>
 
 				<div className="flex shrink-0 items-center gap-3">
 					{grouped ? (
@@ -289,6 +313,8 @@ export const ExerciseGroup = ({
 										type="button"
 										variant="ghost"
 										size="icon"
+										// LIVE-22: 44px on a phone, as every workout control is (§22.3).
+										className="size-11 md:size-10"
 										aria-label={t('moreForAria', { exercise: exerciseName })}
 										onClick={event => event.stopPropagation()}
 									>
@@ -347,7 +373,7 @@ export const ExerciseGroup = ({
 										onSwapRequest()
 									}}
 								>
-									<ArrowLeftRight className="h-4 w-4" />
+									<ArrowLeftRight className="h-4 w-4" aria-hidden />
 								</Button>
 							) : null}
 
@@ -371,9 +397,11 @@ export const ExerciseGroup = ({
 						</>
 					)}
 
-					{isComplete && (
-						<span className="type-label text-success">{t('complete')}</span>
-					)}
+					{/* LIVE-22 (§27.1): a glyph and a word, sentence case and unclipped,
+					rather than tracked capitals in success text. */}
+					{isComplete ? (
+						<StatusMark state="done" label={t('complete')} />
+					) : null}
 				</div>
 			</div>
 
@@ -398,7 +426,7 @@ export const ExerciseGroup = ({
 			) : null}
 
 			{!isCollapsed && (
-				<div className="mt-3 space-y-2">
+				<div id={setsId} className="mt-3 space-y-2">
 					{sets.map((set, index) => (
 						<SetLogInput
 							// The exercise is part of the key: a LIVE-11 swap must remount the
@@ -417,6 +445,7 @@ export const ExerciseGroup = ({
 							plannedWeight={set.plannedWeight}
 							plannedRir={set.plannedRir}
 							weightUnit={weightUnit}
+							exerciseName={exerciseName}
 							// LIVE-11: last time counts only if it was the same exercise.
 							previousPerformance={comparablePrevious(
 								previousSets?.get(`${set.routineExerciseId}:${set.setNumber}`),

@@ -299,9 +299,8 @@ export default function ActiveSessionPage() {
 						group => group.exerciseId === exerciseId,
 					)
 					if (!latest || !isExerciseDone(latest.sets)) return
-					// The tick is about to unmount -- and saving disables it, which
-					// already dropped focus to the body: hand focus to the
-					// exercise's own toggle, unless the member has moved on.
+					// The tick is about to unmount: hand focus to the exercise's
+					// own toggle, unless the member has moved on.
 					const section = document.getElementById(`exercise-${exerciseId}`)
 					const active = document.activeElement
 					if (active === document.body || section?.contains(active))
@@ -419,6 +418,9 @@ export default function ActiveSessionPage() {
 				    reading width -- header, sets and rules aligned -- instead of
 				    three numbers floating in 300px columns at 1440. */}
 				<div className="border-y border-rule md:max-w-3xl">
+					{/* LIVE-22: the outline runs page, exercises, exercise; the
+				masthead's title is the page's h1. */}
+					<h2 className="sr-only">{t('exercisesHeading')}</h2>
 					{groupedLogs.map((group, groupIndex) => {
 						const status = roundStatus(roundSlots, groupIndex)
 						const completedSets = group.sets.filter(

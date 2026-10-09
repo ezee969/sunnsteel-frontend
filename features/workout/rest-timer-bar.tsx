@@ -47,7 +47,8 @@ export const RestTimerBar = ({
 			{/* Elapsed fraction, drawn as a hairline so the bar stays readable
 			    at a glance from arm's length. Rest ending is a system state, not
 			    an earned mark, so it takes `success` and never gold. */}
-			<div className="h-1 w-full bg-surface-sunk">
+			{/* Decorative: the countdown beside it is the value read aloud. */}
+			<div className="h-1 w-full bg-surface-sunk" aria-hidden>
 				{/* Motion spec §1.2/§2.8: `scaleX`, never `width`. This ticks once a
 				    second for the length of a rest interval, on the screen that
 				    re-renders most broadly (TD-07) - animating width would relayout

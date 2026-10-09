@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ZoomIn, ZoomOut } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
@@ -34,8 +35,15 @@ export const SessionHeader = ({
 	// here as well as in Settings. It is the same device choice, not a mode.
 	const { largeControls, setControlSize } = useDisplayPreference()
 	const isComplete = percentage === 100
+	// LIVE-22: the elapsed time ticks on its own; it used to move only when
+	// something else re-rendered the page, so it froze between rests.
+	const [now, setNow] = useState(() => Date.now())
+	useEffect(() => {
+		const timer = setInterval(() => setNow(Date.now()), 1000)
+		return () => clearInterval(timer)
+	}, [])
 	const duration = formatDuration(
-		Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000),
+		Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000)),
 	)
 
 	return (
@@ -64,7 +72,9 @@ export const SessionHeader = ({
 							{/* §11.11 / v1.1 §26.4: the inscription wraps -- three lines on
 							    a phone, two to `lg` -- rather than clamping beside the
 							    progress figure. */}
-							<h1 className="corner-brackets type-section line-clamp-3 text-foreground sm:line-clamp-2 lg:line-clamp-1">
+							{/* LIVE-22 (§27.5): never clamped. A clamp truncated the title in
+							Spanish at 320; §11.11 says an inscription wraps. */}
+							<h1 className="corner-brackets type-section text-foreground">
 								{routineName}
 							</h1>
 							<p className="type-body-sm text-ink-2">{dayName}</p>

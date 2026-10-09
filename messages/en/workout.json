@@ -334,18 +334,14 @@
 		"remove": "Remove",
 		"extra": "Extra",
 		"rir": "RIR {value}",
-		"performedRepsAria": "Performed reps",
 		"repsPlaceholder": "Reps",
 		"noTarget": "No target",
 		"targetReps": "Target: {value}",
 		"targetWeight": "Target: {value}",
-		"performedWeightKgAria": "Performed weight in kilograms",
-		"performedWeightLbAria": "Performed weight in pounds",
 		"weightPlaceholder": "Weight",
-		"rpeAria": "Rate of perceived exertion, 0 to 10",
+		"rpeAria": "Set {number} of {exercise}: RPE, 0 to 10",
 		"rpePlaceholder": "RPE",
 		"optional": "Optional",
-		"markCompleteAria": "Mark set as complete",
 		"completeNeedsReps": "Enter your reps to complete the set",
 		"completeNeedsWeight": "Enter the weight to complete the set (0 for bodyweight)",
 		"lastTime": "Last time",
@@ -355,7 +351,11 @@
 		"saved": "Saved",
 		"unsaved": "Unsaved",
 		"error": "Error",
-		"targetRange": "Target: {min}-{max}"
+		"targetRange": "Target: {min}-{max}",
+		"repsAria": "Set {number} of {exercise}: reps",
+		"weightKgAria": "Set {number} of {exercise}: weight in kilograms",
+		"weightLbAria": "Set {number} of {exercise}: weight in pounds",
+		"completeAria": "Mark set {number} of {exercise} complete"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",
@@ -481,7 +481,8 @@
 		"noExercisesBody": "This workout session doesn’t have any exercises to log.",
 		"couldNotRemoveSetTitle": "Could not remove the set",
 		"tryAgain": "Try again.",
-		"nextSetFallback": "Your next set"
+		"nextSetFallback": "Your next set",
+		"exercisesHeading": "Exercises"
 	},
 	"errors": {
 		"workoutsFailedTitle": "Failed to load workouts",

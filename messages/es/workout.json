@@ -334,18 +334,14 @@
 		"remove": "Quitar",
 		"extra": "Extra",
 		"rir": "RIR {value}",
-		"performedRepsAria": "Repeticiones hechas",
 		"repsPlaceholder": "Reps",
 		"noTarget": "Sin objetivo",
 		"targetReps": "Objetivo: {value}",
 		"targetWeight": "Objetivo: {value}",
-		"performedWeightKgAria": "Peso hecho en kilogramos",
-		"performedWeightLbAria": "Peso hecho en libras",
 		"weightPlaceholder": "Peso",
-		"rpeAria": "Esfuerzo percibido, de 0 a 10",
+		"rpeAria": "Serie {number} de {exercise}: RPE, de 0 a 10",
 		"rpePlaceholder": "RPE",
 		"optional": "Opcional",
-		"markCompleteAria": "Marcar la serie como completada",
 		"completeNeedsReps": "Escribe las repeticiones para completar la serie",
 		"completeNeedsWeight": "Escribe el peso para completar la serie (0 si es peso corporal)",
 		"lastTime": "La vez anterior",
@@ -355,7 +351,11 @@
 		"saved": "Guardado",
 		"unsaved": "Sin guardar",
 		"error": "Error",
-		"targetRange": "Objetivo: {min}-{max}"
+		"targetRange": "Objetivo: {min}-{max}",
+		"repsAria": "Serie {number} de {exercise}: repeticiones",
+		"weightKgAria": "Serie {number} de {exercise}: peso en kilogramos",
+		"weightLbAria": "Serie {number} de {exercise}: peso en libras",
+		"completeAria": "Marcar la serie {number} de {exercise} como completa"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",
@@ -481,7 +481,8 @@
 		"noExercisesBody": "Esta sesión de entrenamiento no tiene ejercicios para registrar.",
 		"couldNotRemoveSetTitle": "No se pudo quitar la serie",
 		"tryAgain": "Inténtalo de nuevo.",
-		"nextSetFallback": "Tu próxima serie"
+		"nextSetFallback": "Tu próxima serie",
+		"exercisesHeading": "Ejercicios"
 	},
 	"errors": {
 		"workoutsFailedTitle": "No se pudieron cargar los entrenamientos",
