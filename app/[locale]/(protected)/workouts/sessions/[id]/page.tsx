@@ -583,9 +583,9 @@ export default function ActiveSessionPage() {
 			<div
 				// v1.1 §26.4: a phone reaches the first set sooner; the regions keep
 				// their order and their rules.
-				className={`ledger-page space-y-6 py-4 md:space-y-8 md:py-8 ${SCROLL_CLEAR_CLASS} ${
-					restTimer.remaining !== null ? 'pb-28' : ''
-				}`}
+				// LIVE-22: no bottom padding for the rest bar; it is in the flow
+				// now, after the content, rather than fixed over it.
+				className={`ledger-page space-y-6 py-4 md:space-y-8 md:py-8 ${SCROLL_CLEAR_CLASS}`}
 			>
 				{/* Exercise Groups */}
 				{previousPerformanceError ? (
@@ -680,8 +680,8 @@ export default function ActiveSessionPage() {
 				)}
 			</div>
 
-			{/* Rest timer (LIVE-01). Fixed to the bottom, so it is rendered last
-			    and outside the scrolling content. */}
+			{/* Rest timer (LIVE-01). Pinned to the bottom of <main> (LIVE-22), so
+			    it is rendered last, after the content it stays below. */}
 			<RestTimerBar
 				remaining={restTimer.remaining}
 				total={restTimer.total}

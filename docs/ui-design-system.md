@@ -2364,6 +2364,11 @@ The set-completion signature (§9.1) is unchanged.
   disclosure in the pinned masthead would have cost a control on every
   screen of the workout for a line read once. Its one source of definitions
   is unchanged.
+- *(`LIVE-22`)* The rest bar is pinned to the bottom of `<main>`, not of the
+  viewport. Fixed, it spanned the window and centred on it, so from `md` its
+  countdown sat under the sidebar; in the page's flow it takes the content
+  column whatever the sidebar's width, and the end of the list is never
+  under it.
 
 ### 27.6 One way a section fails (shipped, `UX-24`)
 

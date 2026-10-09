@@ -38,10 +38,15 @@ export const RestTimerBar = ({
 	const progress = restProgress(remaining, total)
 
 	return (
-		// Fixed chrome, not an overlay, so it separates by a rule rather than a
+		// Pinned chrome, not an overlay, so it separates by a rule rather than a
 		// shadow (§8) and is opaque rather than blurred.
+		// LIVE-22: pinned to the bottom of <main>, not of the viewport. Fixed, it
+		// spanned the window and centred on it, so from `md` its countdown sat
+		// under the sidebar. Sticky in the page's flow it takes <main>'s column
+		// whatever the sidebar's width; like `.shell-pin`, the offset and the
+		// margins cancel <main>'s gutter so it reaches the column's edges.
 		<div
-			className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-surface"
+			className="sticky bottom-[calc(-1*var(--shell-gutter,0px))] z-40 mx-[calc(-1*var(--shell-gutter,0px))] border-t border-rule bg-surface"
 			style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
 		>
 			{/* Elapsed fraction, drawn as a hairline so the bar stays readable
@@ -61,57 +66,58 @@ export const RestTimerBar = ({
 				/>
 			</div>
 
-			{/* The bar is fixed, outside <main>'s gutter, so below `md` it keeps
-			    its own 16px inset (v1.1 §26.3 drops `.ledger-page`'s phone
-			    padding only for content that sits inside the gutter). */}
-			<div className="ledger-page flex items-center gap-3 py-3 max-md:px-4">
-				<div className="flex flex-col">
-					<span className="type-label text-ink-3">
-						{isOver ? t('restOver') : t('resting')}
-					</span>
-					<span
-						// Announce the end once, rather than reading every tick aloud.
-						aria-live={isOver ? 'polite' : 'off'}
-						// A countdown must be tabular or the digits shuffle every
-						// second; Space Mono is monospaced, so it is by construction.
-						className={`type-data-strong text-2xl leading-tight large-controls:text-4xl ${
-							isOver ? 'text-success' : 'text-foreground'
-						}`}
-					>
-						{formatRestTime(remaining)}
-					</span>
-				</div>
+			{/* The gutter restored inside, so the row lines up with the page's
+			    content above it (v1.1 §26.3). */}
+			<div className="px-[var(--shell-gutter,0px)]">
+				<div className="ledger-page flex items-center gap-3 py-3">
+					<div className="flex flex-col">
+						<span className="type-label text-ink-3">
+							{isOver ? t('restOver') : t('resting')}
+						</span>
+						<span
+							// Announce the end once, rather than reading every tick aloud.
+							aria-live={isOver ? 'polite' : 'off'}
+							// A countdown must be tabular or the digits shuffle every
+							// second; Space Mono is monospaced, so it is by construction.
+							className={`type-data-strong text-2xl leading-tight large-controls:text-4xl ${
+								isOver ? 'text-success' : 'text-foreground'
+							}`}
+						>
+							{formatRestTime(remaining)}
+						</span>
+					</div>
 
-				<div className="ml-auto flex items-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={onExtend}
-						aria-label={t('addSecondsAria', {
-							seconds: REST_TIMER_EXTEND_SECONDS,
-						})}
-						className="h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
-					>
-						<Plus className="mr-1 h-4 w-4" aria-hidden />
-						{t('secondsShort', { seconds: REST_TIMER_EXTEND_SECONDS })}
-					</Button>
-					{/* The `classical` gold-gradient variant is retired in v0.1 — gold
+					<div className="ml-auto flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onExtend}
+							aria-label={t('addSecondsAria', {
+								seconds: REST_TIMER_EXTEND_SECONDS,
+							})}
+							className="h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm border-rule bg-transparent text-foreground shadow-none hover:bg-muted"
+						>
+							<Plus className="mr-1 h-4 w-4" aria-hidden />
+							{t('secondsShort', { seconds: REST_TIMER_EXTEND_SECONDS })}
+						</Button>
+						{/* The `classical` gold-gradient variant is retired in v0.1 — gold
 					    never fills a control. This is not the region's primary action
 					    either, so it stays quiet rather than becoming a second crimson. */}
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={onDismiss}
-						aria-label={isOver ? t('dismissAria') : t('skipAria')}
-						className={`h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
-							isOver
-								? 'border-success bg-transparent text-success hover:bg-success/10'
-								: 'border-rule bg-transparent text-foreground hover:bg-muted'
-						}`}
-					>
-						<X className="mr-1 h-4 w-4" aria-hidden />
-						{isOver ? t('done') : t('skip')}
-					</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onDismiss}
+							aria-label={isOver ? t('dismissAria') : t('skipAria')}
+							className={`h-11 md:h-9 large-controls:h-14 large-controls:px-5 rounded-sm shadow-none ${
+								isOver
+									? 'border-success bg-transparent text-success hover:bg-success/10'
+									: 'border-rule bg-transparent text-foreground hover:bg-muted'
+							}`}
+						>
+							<X className="mr-1 h-4 w-4" aria-hidden />
+							{isOver ? t('done') : t('skip')}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>
