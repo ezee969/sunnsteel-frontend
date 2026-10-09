@@ -1,95 +1,61 @@
 'use client'
 
-import { AlertCircle, CheckCircle, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
-import type { SessionProgressData } from '@/lib/utils/workout-session.types'
 
 interface SessionActionCardProps {
-	sessionId: string
-	routineName: string
-	dayName: string
-	startedAt: string
-	progressData: SessionProgressData
+	/** LIVE-22: every required set is done, so Finish becomes the one filled control. */
+	canFinish: boolean
 	isFinishing: boolean
 	onFinishAttempt: () => void
 	onDiscardAttempt: () => void
-	onNavigateBack: () => void
 }
 
 /**
- * Reusable component for displaying session information and primary actions
+ * The workout's terminal actions, after the work (design system §27.5).
+ *
+ * LIVE-22: they used to sit above the first exercise, with Finish filled from
+ * the first set and a "Complete all sets" notice before anything was logged,
+ * so the screen's strongest control was the one that ends the workout. They
+ * now follow the exercises and the workout note. Finish is here below `md`
+ * and in the masthead from it; it is outline while required sets remain --
+ * the confirmation still says what is left -- and filled once they are done.
+ * Discard destroys data, so it is the destructive outline (§4.3 rule 5).
  */
 export const SessionActionCard = ({
-	progressData,
+	canFinish,
 	isFinishing,
 	onFinishAttempt,
 	onDiscardAttempt,
 }: SessionActionCardProps) => {
 	const t = useTranslations('workout.sessionActionCard')
-	const { percentage } = progressData
-	const isComplete = percentage === 100
 
 	return (
-		// Final review 4 / §11.8: an inline control row directly under the
-		// masthead, not a boxed "metric card plus giant button". The progress bar
-		// and percentage it used to carry restated what the masthead already
-		// shows, so overall progress is now stated exactly once on this screen.
 		<section
 			aria-label={t('actionsLabel')}
-			className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+			className="flex flex-wrap items-center gap-2 border-t border-rule pt-4"
 		>
-			{/* Completion Status */}
-			{!isComplete ? (
-				<div className="mark mark-warning flex items-center gap-2 bg-surface-sunk py-2 pl-3 pr-3">
-					<AlertCircle
-						className="h-4 w-4 shrink-0 text-warning-strong"
-						aria-hidden
-					/>
-					<p className="type-body-sm text-ink-2">{t('completeAllSets')}</p>
-				</div>
-			) : (
-				<span className="hidden sm:block" />
-			)}
-
-			{/* Finish is the region's one filled control, in ink (§4.3 rule 1);
-			    Discard destroys data, so it is the destructive outline (rule 5).
-			    Sized to their labels rather than stretched across the column.
-			    Their padding narrows below `sm`, where the pair ran past a 320
-			    screen in Spanish (1px as they are, 9px in gym mode). */}
-			<div className="flex gap-2">
-				<Button
-					type="button"
-					variant="outline"
-					onClick={onDiscardAttempt}
-					disabled={isFinishing}
-					className="h-11 rounded-sm border-destructive/50 bg-transparent text-destructive shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-destructive/10 hover:text-destructive md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
-				>
-					<Trash2 className="mr-2 h-4 w-4" aria-hidden />
-					{t('discard')}
-				</Button>
-				<Button
-					type="button"
-					onClick={onFinishAttempt}
-					disabled={isFinishing}
-					className="type-button h-11 flex-1 rounded-sm bg-primary text-primary-foreground shadow-none transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-primary-hover sm:flex-none md:h-10 max-sm:px-3 max-sm:large-controls:px-4"
-				>
-					{isFinishing ? (
-						<>
-							<AlertCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-							{t('finishing')}
-						</>
-					) : isComplete ? (
-						<>
-							<CheckCircle className="mr-2 h-4 w-4" aria-hidden />
-							{t('finishSession')}
-						</>
-					) : (
-						t('finishSession')
-					)}
-				</Button>
-			</div>
+			<Button
+				type="button"
+				variant={canFinish ? 'default' : 'outline'}
+				onClick={onFinishAttempt}
+				disabled={isFinishing}
+				className="h-11 flex-1 md:hidden large-controls:h-12"
+			>
+				{isFinishing ? t('finishing') : t('finishSession')}
+			</Button>
+			<Button
+				type="button"
+				variant="destructive"
+				onClick={onDiscardAttempt}
+				disabled={isFinishing}
+				className="h-11 md:h-10 max-sm:px-3"
+			>
+				<Trash2 className="h-4 w-4" aria-hidden />
+				{t('discard')}
+			</Button>
 		</section>
 	)
 }

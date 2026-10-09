@@ -285,16 +285,15 @@
 		"back": "Back",
 		"elapsed": "Elapsed",
 		"sets": "Sets",
-		"complete": "Complete",
-		"progress": "Progress",
 		"started": "Started",
 		"largerControlsAria": "Larger controls",
 		"largerControlsOn": "Larger controls: on",
-		"largerControlsOff": "Larger controls: off"
+		"largerControlsOff": "Larger controls: off",
+		"setsDone": "{completed} of {total}",
+		"progressAria": "{completed} of {total} sets done"
 	},
 	"sessionActionCard": {
 		"actionsLabel": "Session actions",
-		"completeAllSets": "Complete all sets to finish the session",
 		"discard": "Discard",
 		"finishing": "Finishing...",
 		"finishSession": "Finish Session"
@@ -523,5 +522,12 @@
 	},
 	"history": {
 		"sendInMessage": "Send in a message"
+	},
+	"prescriptionLine": {
+		"setsReps": "{count} × {reps}",
+		"setsOnly": "{count, plural, one {# set} other {# sets}}",
+		"range": "{min}–{max}",
+		"rir": "RIR {value}",
+		"rest": "rest {time}"
 	}
 }

@@ -23,6 +23,9 @@ function Progress({ className, value, ...props }: ProgressProps) {
 	return (
 		<ProgressPrimitive.Root
 			data-slot="progress"
+			// LIVE-22: the value reaches Radix, so the bar announces it; without it
+			// every progressbar read as indeterminate.
+			value={value}
 			className={cn(
 				'relative h-2 w-full overflow-hidden rounded-none bg-surface-sunk',
 				className,

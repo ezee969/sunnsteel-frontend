@@ -285,16 +285,15 @@
 		"back": "Atrás",
 		"elapsed": "Transcurrido",
 		"sets": "Series",
-		"complete": "Completo",
-		"progress": "Progreso",
 		"started": "Inicio",
 		"largerControlsAria": "Controles más grandes",
 		"largerControlsOn": "Controles más grandes: activados",
-		"largerControlsOff": "Controles más grandes: desactivados"
+		"largerControlsOff": "Controles más grandes: desactivados",
+		"setsDone": "{completed} de {total}",
+		"progressAria": "{completed} de {total} series hechas"
 	},
 	"sessionActionCard": {
 		"actionsLabel": "Acciones de la sesión",
-		"completeAllSets": "Completa todas las series para terminar la sesión",
 		"discard": "Descartar",
 		"finishing": "Terminando...",
 		"finishSession": "Terminar sesión"
@@ -523,5 +522,12 @@
 	},
 	"history": {
 		"sendInMessage": "Enviar en un mensaje"
+	},
+	"prescriptionLine": {
+		"setsReps": "{count} × {reps}",
+		"setsOnly": "{count, plural, one {# serie} other {# series}}",
+		"range": "{min}–{max}",
+		"rir": "RIR {value}",
+		"rest": "descanso {time}"
 	}
 }

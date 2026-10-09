@@ -5,8 +5,10 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { useDisplayPreference } from '@/hooks/use-display-preference'
 import type { Locale } from '@/i18n/config'
+import { cn } from '@/lib/utils'
 import { formatDuration, formatTime } from '@/lib/utils/time-format.utils'
 import type { SessionProgressData } from '@/lib/utils/workout-session.types'
 
@@ -15,26 +17,34 @@ interface SessionHeaderProps {
 	dayName: string
 	startedAt: string
 	progressData: SessionProgressData
+	/** LIVE-22: every required set is done, so Finish becomes the one filled control. */
+	canFinish: boolean
+	isFinishing: boolean
+	onFinishAttempt: () => void
 	onNavigateBack: () => void
 }
 
 /**
- * Header component for workout session pages with navigation and status
+ * The live workout's masthead: the title, the time, the one statement of how
+ * far the workout has come and, from `md`, Finish (design system §27.5).
  */
 export const SessionHeader = ({
 	routineName,
 	dayName,
 	startedAt,
 	progressData,
+	canFinish,
+	isFinishing,
+	onFinishAttempt,
 	onNavigateBack,
 }: SessionHeaderProps) => {
 	const t = useTranslations('workout.sessionHeader')
+	const tActions = useTranslations('workout.sessionActionCard')
 	const locale = useLocale() as Locale
 	const { completedSets, totalSets, percentage } = progressData
 	// LIVE-18: the gym is where larger controls are needed, so the switch is
 	// here as well as in Settings. It is the same device choice, not a mode.
 	const { largeControls, setControlSize } = useDisplayPreference()
-	const isComplete = percentage === 100
 	// LIVE-22: the elapsed time ticks on its own; it used to move only when
 	// something else re-rendered the page, so it froze between rests.
 	const [now, setNow] = useState(() => Date.now())
@@ -45,6 +55,7 @@ export const SessionHeader = ({
 	const duration = formatDuration(
 		Math.max(0, Math.floor((now - new Date(startedAt).getTime()) / 1000)),
 	)
+	const setsDone = t('setsDone', { completed: completedSets, total: totalSets })
 
 	return (
 		// The page inscription. This is the one double rule on the screen
@@ -69,11 +80,8 @@ export const SessionHeader = ({
 						<div className="min-w-0">
 							{/* The one classical device the direction keeps: gold brackets,
 							    one pair per screen, on the inscription. */}
-							{/* §11.11 / v1.1 §26.4: the inscription wraps -- three lines on
-							    a phone, two to `lg` -- rather than clamping beside the
-							    progress figure. */}
 							{/* LIVE-22 (§27.5): never clamped. A clamp truncated the title in
-							Spanish at 320; §11.11 says an inscription wraps. */}
+							    Spanish at 320; §11.11 says an inscription wraps. */}
 							<h1 className="corner-brackets type-section text-foreground">
 								{routineName}
 							</h1>
@@ -83,7 +91,7 @@ export const SessionHeader = ({
 
 					{/* Right side - Status and stats. Labels above mono values, so the
 					    figures are the scannable rank rather than their captions. */}
-					<div className="flex shrink-0 items-center gap-6">
+					<div className="flex shrink-0 items-center gap-4 lg:gap-6">
 						<div className="hidden text-right sm:block">
 							<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
 							{/* §5.4 (UX-24): the elapsed string changes length as it
@@ -93,28 +101,24 @@ export const SessionHeader = ({
 							</p>
 						</div>
 
+						{/* §11.8 / §27.5: the screen's one statement of how far the
+						    workout has come -- sets done of all, with the bar below. */}
 						<div className="hidden text-right sm:block">
 							<p className="type-body-sm text-ink-3">{t('sets')}</p>
-							<p className="type-data text-foreground">
-								{completedSets}/{totalSets}
-							</p>
+							<p className="type-data text-foreground">{setsDone}</p>
 						</div>
 
-						{/* The screen's one statement of overall progress (§11.8).
-						    Completion is "done, as planned", so it is --success, not
-						    gold (§4.3 rule 2). */}
-						<div className="text-right">
-							<p className="type-body-sm text-ink-3">
-								{isComplete ? t('complete') : t('progress')}
-							</p>
-							<p
-								className={`type-data type-data-strong ${
-									isComplete ? 'text-success' : 'text-foreground'
-								}`}
-							>
-								{Math.round(percentage)}%
-							</p>
-						</div>
+						{/* §27.5: Finish sits in the masthead from `md`, outline until the
+						    required sets are done, then the screen's one filled control. */}
+						<Button
+							type="button"
+							variant={canFinish ? 'default' : 'outline'}
+							onClick={onFinishAttempt}
+							disabled={isFinishing}
+							className="hidden md:inline-flex"
+						>
+							{isFinishing ? tActions('finishing') : tActions('finishSession')}
+						</Button>
 
 						<Button
 							type="button"
@@ -152,9 +156,7 @@ export const SessionHeader = ({
 					</div>
 					<div>
 						<p className="type-body-sm text-ink-3">{t('sets')}</p>
-						<p className="type-data text-foreground">
-							{completedSets}/{totalSets}
-						</p>
+						<p className="type-data text-foreground">{setsDone}</p>
 					</div>
 					<div className="text-right">
 						<p className="type-body-sm text-ink-3">{t('started')}</p>
@@ -163,6 +165,23 @@ export const SessionHeader = ({
 						</p>
 					</div>
 				</div>
+
+				{/* §27.5: a 2px bar under the figures -- ink while sets remain, the
+				    completion mark once they are all done (§4.3 rule 2). The bar
+				    keeps the primitive's progressbar role; its name is the line
+				    above it. */}
+				<Progress
+					value={percentage}
+					aria-label={t('progressAria', {
+						completed: completedSets,
+						total: totalSets,
+					})}
+					className={cn(
+						'mt-3 h-0.5',
+						percentage === 100 &&
+							'[&_[data-slot=progress-indicator]]:bg-success-strong',
+					)}
+				/>
 			</div>
 		</div>
 	)

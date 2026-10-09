@@ -36,6 +36,7 @@ import {
 } from '@/lib/api/hooks/useWorkoutSession'
 import type { SetLog } from '@/lib/api/types/workout.type'
 import { AUTO_COLLAPSE_DELAY_MS } from '@/lib/constants/session.constants'
+import { allRequiredDone } from '@/lib/utils/session-focus'
 import {
 	isRotationDay,
 	sessionLinearBlock,
@@ -248,6 +249,9 @@ export default function ActiveSessionPage() {
 		() => nextSetAfter(roundSlots, lastCompleted),
 		[roundSlots, lastCompleted],
 	)
+	// LIVE-22: Finish becomes the screen's one filled control once every
+	// exercise's required sets are done.
+	const canFinish = allRequiredDone(groupedLogs)
 
 	// LIVE-21: an exercise its last tick finished folds a moment later, and a
 	// round handing over glides to the next exercise and tints it on arrival.
@@ -374,6 +378,9 @@ export default function ActiveSessionPage() {
 				dayName={routineDayLabel(day)}
 				startedAt={session.startedAt}
 				progressData={progressData}
+				canFinish={canFinish}
+				isFinishing={isFinishing}
+				onFinishAttempt={() => handleFinishAttempt('COMPLETED')}
 				onNavigateBack={handleBack}
 			/>
 
@@ -386,19 +393,6 @@ export default function ActiveSessionPage() {
 					restTimer.remaining !== null ? 'pb-28' : ''
 				}`}
 			>
-				{/* Action Card */}
-				<SessionActionCard
-					sessionId={session.id}
-					routineName={sessionRoutineTitle(session, tPrescription)}
-					dayName={routineDayLabel(day)}
-					startedAt={session.startedAt}
-					progressData={progressData}
-					isFinishing={isFinishing}
-					onFinishAttempt={() => handleFinishAttempt('COMPLETED')}
-					onDiscardAttempt={() => handleFinishAttempt('ABORTED')}
-					onNavigateBack={handleBack}
-				/>
-
 				{/* UX-18: the terms the set rows use, defined one tap away. */}
 				<GlossaryLine terms={['rpe', 'rir', 'setKinds']} />
 
@@ -547,6 +541,14 @@ export default function ActiveSessionPage() {
 						note={session.notes ?? null}
 					/>
 				</section>
+
+				{/* LIVE-22 (§27.5): the terminal actions follow the work. */}
+				<SessionActionCard
+					canFinish={canFinish}
+					isFinishing={isFinishing}
+					onFinishAttempt={() => handleFinishAttempt('COMPLETED')}
+					onDiscardAttempt={() => handleFinishAttempt('ABORTED')}
+				/>
 
 				{/* Empty state */}
 				{groupedLogs.length === 0 && (
