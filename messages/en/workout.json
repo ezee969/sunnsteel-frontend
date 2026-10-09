@@ -137,7 +137,8 @@
 		"roundDone": "Round done",
 		"allRoundsDone": "All {count} rounds done",
 		"roundOfTotal": "Round {round} of {rounds}",
-		"upNext": "Up next: set {setNumber}"
+		"upNext": "Up next: set {setNumber}",
+		"groupLabel": "{kind, select, SUPERSET {Superset {letter}} other {Circuit {letter}}}"
 	},
 	"corrections": {
 		"effects": "Your records, weekly totals, achievements and the loads this workout set for next time are recalculated from the corrected sets. A record or load change that no longer holds leaves your activity, with any reactions and comments on it. Every correction is kept with the values before and after.",

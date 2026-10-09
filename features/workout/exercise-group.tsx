@@ -265,10 +265,14 @@ export const ExerciseGroup = ({
 			// so completing a set never reflows the row.
 			// LIVE-22 (§27.2): the current exercise is the screen's one box -- a
 			// panel with the action colour as its mark; the others stay ruled
-			// entries, a finished one keeping the completion mark.
+			// entries, a finished one keeping the completion mark. Inside a
+			// superset or circuit the group's own rule already carries the
+			// mark, so the member's panel keeps a plain border.
 			className={`mark mark-fill transition-colors duration-[var(--motion-slow)] ease-standard ${
 				isCurrent && !isComplete
-					? 'my-2 rounded-sm border border-rule border-l-[3px] border-l-primary bg-surface py-4 pl-3 pr-3'
+					? `my-2 rounded-sm border border-rule bg-surface py-4 pl-3 pr-3 ${
+							roundLine ? '' : 'border-l-[3px] border-l-primary'
+						}`
 					: `rule-row py-4 pl-3 ${isComplete ? 'mark-success' : ''}`
 			}`}
 		>

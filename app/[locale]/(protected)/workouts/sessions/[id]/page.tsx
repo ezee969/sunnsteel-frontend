@@ -1,6 +1,10 @@
 'use client'
 
-import { routineDayLabel } from '@sunsteel/contracts'
+import {
+	type ExerciseGroup as ExerciseGroupContract,
+	exerciseGroups,
+	routineDayLabel,
+} from '@sunsteel/contracts'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -75,6 +79,9 @@ import type {
  * in docs/ui-design-system.md §14.
  */
 const SHELL_CLASS = 'min-h-screen bg-background'
+
+/** LIVE-22: "A1" from contracts' "Superset A1" -- the container names the group. */
+const positionLabel = (label: string) => label.split(' ').pop() ?? label
 
 /**
  * WCAG 2.4.11 (v1.1): a field or exercise brought into view -- by Tab, or by
@@ -406,6 +413,157 @@ export default function ActiveSessionPage() {
 		)
 	}
 
+	// LIVE-22: one exercise of the list, inside or outside a group.
+	const renderExercise = (group: GroupedExerciseLogs, groupIndex: number) => {
+		const status = roundStatus(roundSlots, groupIndex)
+		const completedSets = group.sets.filter(set => set.isCompleted).length
+		const totalSets = group.sets.length
+		const slot = day.exercises.find(
+			exercise => exercise.id === group.exerciseId,
+		)
+		const prescribed = slot?.exercise
+		const substitution = substitutionFor(
+			session.exerciseSubstitutions,
+			group.exerciseId,
+		)
+
+		return (
+			<ExerciseGroup
+				key={group.exerciseId}
+				exerciseId={group.exerciseId}
+				exerciseName={group.exerciseName}
+				sets={group.sets}
+				isCollapsed={isCollapsed(group.exerciseId, foldedByDefault(group))}
+				onToggleCollapse={() =>
+					toggleExercise(
+						group.exerciseId,
+						isCollapsed(group.exerciseId, foldedByDefault(group)),
+					)
+				}
+				isCurrent={upNext?.exerciseId === group.exerciseId}
+				currentSetNumber={
+					upNext?.exerciseId === group.exerciseId ? upNext.setNumber : null
+				}
+				restSeconds={group.restSeconds}
+				completedSets={completedSets}
+				totalSets={totalSets}
+				onSave={handleSaveSetLog}
+				previousSets={previousSets}
+				roundLine={status ? positionLabel(status.label) : null}
+				upNext={
+					status && upNext?.exerciseId === group.exerciseId
+						? describeUpNext(upNext, tRounds)
+						: null
+				}
+				onSetCompleted={(setNumber, viaKeyboard) => {
+					// LIVE-14: in a superset or circuit the next set is the
+					// partner's; the rest is this exercise's own (0:00 when it
+					// hands straight over), and the alert names what follows.
+					const just = { exerciseId: group.exerciseId, setNumber }
+					const next = nextSetAfter(roundSlots, just)
+					setLastCompleted(just)
+					restingExerciseRef.current = exerciseLabel(
+						next?.exerciseName ?? group.exerciseName,
+						tEx,
+					)
+					restTimer.start(group.restSeconds)
+					const handsOverTo =
+						status && next && next.exerciseId !== group.exerciseId
+							? next.exerciseId
+							: null
+					// LIVE-22: the field a keyboard tick hands focus to.
+					const focusTarget =
+						viaKeyboard && next
+							? `set-${next.exerciseId}-${next.setNumber}-reps`
+							: null
+					// LIVE-21: a finished exercise folds first and the
+					// hand-off follows, so the fold never moves the
+					// scroll's target mid-way.
+					if (completesExercise(group.sets, setNumber)) {
+						pendingFocus.current = focusTarget
+						foldWhenDone(group.exerciseId, handsOverTo)
+					} else {
+						if (handsOverTo) handOff(handsOverTo)
+						if (focusTarget) setFocusRequest(focusTarget)
+					}
+				}}
+				arriving={arrival === group.exerciseId}
+				onArrivalEnd={() => setArrival(null)}
+				substitutedFrom={substitution && prescribed ? prescribed.name : null}
+				onSwapRequest={
+					session.status === 'IN_PROGRESS' && prescribed
+						? () =>
+								setSwapTarget({
+									routineExerciseId: group.exerciseId,
+									performed: {
+										id: substitution?.exercise.id ?? prescribed.id,
+										name: group.exerciseName,
+									},
+									prescribed: {
+										id: prescribed.id,
+										name: prescribed.name,
+									},
+									hasCompletedSets: completedSets > 0,
+									// ROUT-17: a block's slot can be swapped
+									// for this workout only.
+									linearBlock: Boolean(
+										sessionLinearBlock(slot ?? { progressionScheme: '' }).state,
+									),
+								})
+						: undefined
+				}
+				onRemoveSet={
+					session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
+				}
+				linearBlock={
+					group.linearPeriodization
+						? {
+								state: group.linearPeriodization,
+								rotation: isRotationDay(session.routineDay),
+								routineId: routineId || undefined,
+							}
+						: null
+				}
+				linearBlockUnset={group.linearBlockUnset}
+				sessionId={session.id}
+				instruction={group.note}
+				sessionNote={noteFor(session.exerciseNotes, group.exerciseId)}
+			/>
+		)
+	}
+
+	// LIVE-22: the list in runs -- a lone exercise, or a whole group.
+	const listRuns = (() => {
+		const groups = exerciseGroups(roundSlots)
+		const startOf = new Map(groups.map(group => [group.indices[0], group]))
+		const runs: {
+			group: ExerciseGroupContract | null
+			indices: number[]
+			label: string | null
+			round: string | null
+		}[] = []
+		for (let index = 0; index < groupedLogs.length;) {
+			const group = startOf.get(index)
+			if (!group) {
+				runs.push({ group: null, indices: [index], label: null, round: null })
+				index += 1
+				continue
+			}
+			const status = roundStatus(roundSlots, index)
+			runs.push({
+				group,
+				indices: group.indices,
+				label: tRounds('groupLabel', {
+					kind: group.kind,
+					letter: group.letter,
+				}),
+				round: status ? describeRound(status, tRounds) : null,
+			})
+			index = group.indices[group.indices.length - 1] + 1
+		}
+		return runs
+	})()
+
 	return (
 		<div className={SHELL_CLASS}>
 			{/* Header */}
@@ -448,138 +606,37 @@ export default function ActiveSessionPage() {
 					{/* LIVE-22: the outline runs page, exercises, exercise; the
 				masthead's title is the page's h1. */}
 					<h2 className="sr-only">{t('exercisesHeading')}</h2>
-					{groupedLogs.map((group, groupIndex) => {
-						const status = roundStatus(roundSlots, groupIndex)
-						const completedSets = group.sets.filter(
-							set => set.isCompleted,
-						).length
-						const totalSets = group.sets.length
-						const slot = day.exercises.find(
-							exercise => exercise.id === group.exerciseId,
-						)
-						const prescribed = slot?.exercise
-						const substitution = substitutionFor(
-							session.exerciseSubstitutions,
-							group.exerciseId,
-						)
-
-						return (
-							<ExerciseGroup
-								key={group.exerciseId}
-								exerciseId={group.exerciseId}
-								exerciseName={group.exerciseName}
-								sets={group.sets}
-								isCollapsed={isCollapsed(
-									group.exerciseId,
-									foldedByDefault(group),
+					{/* LIVE-22 (§27.4): a superset or circuit shares one container --
+					    its label and round in the header, one rule along its left edge
+					    (the action colour while it holds the current set) -- and its
+					    members keep only their place in it. */}
+					{listRuns.map(run =>
+						run.group ? (
+							<div
+								key={`group-${run.group.letter}`}
+								role="group"
+								aria-label={run.label ?? undefined}
+								className={`rule-row my-2 border-l-[3px] py-2 pl-2 ${
+									run.indices.some(
+										index =>
+											groupedLogs[index].exerciseId === upNext?.exerciseId,
+									)
+										? 'border-l-primary'
+										: 'border-l-rule'
+								}`}
+							>
+								<p className="type-body-sm px-1 pt-2 text-ink-2">
+									{run.label}
+									{run.round ? ` · ${run.round}` : ''}
+								</p>
+								{run.indices.map(index =>
+									renderExercise(groupedLogs[index], index),
 								)}
-								onToggleCollapse={() =>
-									toggleExercise(
-										group.exerciseId,
-										isCollapsed(group.exerciseId, foldedByDefault(group)),
-									)
-								}
-								isCurrent={upNext?.exerciseId === group.exerciseId}
-								currentSetNumber={
-									upNext?.exerciseId === group.exerciseId
-										? upNext.setNumber
-										: null
-								}
-								restSeconds={group.restSeconds}
-								completedSets={completedSets}
-								totalSets={totalSets}
-								onSave={handleSaveSetLog}
-								previousSets={previousSets}
-								roundLine={
-									status
-										? `${status.label} · ${describeRound(status, tRounds)}`
-										: null
-								}
-								upNext={
-									status && upNext?.exerciseId === group.exerciseId
-										? describeUpNext(upNext, tRounds)
-										: null
-								}
-								onSetCompleted={(setNumber, viaKeyboard) => {
-									// LIVE-14: in a superset or circuit the next set is the
-									// partner's; the rest is this exercise's own (0:00 when it
-									// hands straight over), and the alert names what follows.
-									const just = { exerciseId: group.exerciseId, setNumber }
-									const next = nextSetAfter(roundSlots, just)
-									setLastCompleted(just)
-									restingExerciseRef.current = exerciseLabel(
-										next?.exerciseName ?? group.exerciseName,
-										tEx,
-									)
-									restTimer.start(group.restSeconds)
-									const handsOverTo =
-										status && next && next.exerciseId !== group.exerciseId
-											? next.exerciseId
-											: null
-									// LIVE-22: the field a keyboard tick hands focus to.
-									const focusTarget =
-										viaKeyboard && next
-											? `set-${next.exerciseId}-${next.setNumber}-reps`
-											: null
-									// LIVE-21: a finished exercise folds first and the
-									// hand-off follows, so the fold never moves the
-									// scroll's target mid-way.
-									if (completesExercise(group.sets, setNumber)) {
-										pendingFocus.current = focusTarget
-										foldWhenDone(group.exerciseId, handsOverTo)
-									} else {
-										if (handsOverTo) handOff(handsOverTo)
-										if (focusTarget) setFocusRequest(focusTarget)
-									}
-								}}
-								arriving={arrival === group.exerciseId}
-								onArrivalEnd={() => setArrival(null)}
-								substitutedFrom={
-									substitution && prescribed ? prescribed.name : null
-								}
-								onSwapRequest={
-									session.status === 'IN_PROGRESS' && prescribed
-										? () =>
-												setSwapTarget({
-													routineExerciseId: group.exerciseId,
-													performed: {
-														id: substitution?.exercise.id ?? prescribed.id,
-														name: group.exerciseName,
-													},
-													prescribed: {
-														id: prescribed.id,
-														name: prescribed.name,
-													},
-													hasCompletedSets: completedSets > 0,
-													// ROUT-17: a block's slot can be swapped
-													// for this workout only.
-													linearBlock: Boolean(
-														sessionLinearBlock(
-															slot ?? { progressionScheme: '' },
-														).state,
-													),
-												})
-										: undefined
-								}
-								onRemoveSet={
-									session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
-								}
-								linearBlock={
-									group.linearPeriodization
-										? {
-												state: group.linearPeriodization,
-												rotation: isRotationDay(session.routineDay),
-												routineId: routineId || undefined,
-											}
-										: null
-								}
-								linearBlockUnset={group.linearBlockUnset}
-								sessionId={session.id}
-								instruction={group.note}
-								sessionNote={noteFor(session.exerciseNotes, group.exerciseId)}
-							/>
-						)
-					})}
+							</div>
+						) : (
+							renderExercise(groupedLogs[run.indices[0]], run.indices[0])
+						),
+					)}
 				</div>
 
 				{/* UX-18: the terms the set rows use, defined one tap away.

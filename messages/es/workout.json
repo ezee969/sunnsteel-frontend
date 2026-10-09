@@ -137,7 +137,8 @@
 		"roundDone": "Ronda terminada",
 		"allRoundsDone": "Se terminaron las {count} rondas",
 		"roundOfTotal": "Ronda {round} de {rounds}",
-		"upNext": "Sigue: serie {setNumber}"
+		"upNext": "Sigue: serie {setNumber}",
+		"groupLabel": "{kind, select, SUPERSET {Superserie {letter}} other {Circuito {letter}}}"
 	},
 	"corrections": {
 		"effects": "Tus récords, totales semanales, logros y las cargas que este entrenamiento fijó para la próxima vez se recalculan a partir de las series corregidas. Un récord o cambio de carga que ya no se sostenga sale de tu actividad, con sus reacciones y comentarios. Cada corrección se guarda con los valores de antes y de después.",
