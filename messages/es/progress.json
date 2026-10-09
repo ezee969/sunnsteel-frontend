@@ -215,7 +215,7 @@
 		"sendRecordLabel": "Enviar el récord de {name} en un mensaje"
 	},
 	"page": {
-		"title": "Progreso del entrenamiento",
+		"title": "Progreso",
 		"subtitle": "Mira cómo se reparte tu entrenamiento, sigue la evolución de los récords y revisa cada rendimiento detrás de ellos.",
 		"sectionsLabel": "Secciones de Progreso"
 	},

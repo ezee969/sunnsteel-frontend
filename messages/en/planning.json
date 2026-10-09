@@ -184,8 +184,8 @@
 		"undoFailed": "Change not undone"
 	},
 	"dashboardPage": {
-		"heroTitle": "Forge Your Path",
-		"heroSubtitle": "Strength • Discipline • Craft",
+		"heroTitle": "Dashboard",
+		"heroSubtitle": "Forge your path · Strength · Discipline · Craft",
 		"bootstrapError": "Unable to prepare your workout progress. Please try again.",
 		"retry": "Retry",
 		"welcomeNamed": "Welcome back, {name}!",

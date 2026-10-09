@@ -184,8 +184,8 @@
 		"undoFailed": "No se pudo deshacer el cambio"
 	},
 	"dashboardPage": {
-		"heroTitle": "Forja tu camino",
-		"heroSubtitle": "Fuerza • Disciplina • Oficio",
+		"heroTitle": "Inicio",
+		"heroSubtitle": "Forja tu camino · Fuerza · Disciplina · Oficio",
 		"bootstrapError": "No pudimos preparar tu progreso de entrenamiento. Inténtalo de nuevo.",
 		"retry": "Reintentar",
 		"welcomeNamed": "¡Te damos la bienvenida de nuevo, {name}!",

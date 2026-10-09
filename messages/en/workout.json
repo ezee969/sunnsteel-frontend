@@ -452,8 +452,8 @@
 		"dashboard": "Dashboard"
 	},
 	"historyPage": {
-		"title": "Training Archive",
-		"subtitle": "Browse and filter your sessions.",
+		"title": "History",
+		"subtitle": "Your training archive. Browse and filter your sessions.",
 		"description": "Browse your past workout sessions with filters.",
 		"heading": "Workout History",
 		"filter": "Filter",

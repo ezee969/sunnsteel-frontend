@@ -215,7 +215,7 @@
 		"sendRecordLabel": "Send the {name} record in a message"
 	},
 	"page": {
-		"title": "Training Progress",
+		"title": "Progress",
 		"subtitle": "See how your training is distributed, follow record trends, and review every performance behind them.",
 		"sectionsLabel": "Progress sections"
 	},

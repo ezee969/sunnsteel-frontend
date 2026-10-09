@@ -452,8 +452,8 @@
 		"dashboard": "Inicio"
 	},
 	"historyPage": {
-		"title": "Archivo de entrenamiento",
-		"subtitle": "Explora y filtra tus sesiones.",
+		"title": "Historial",
+		"subtitle": "Tu archivo de entrenamiento. Explora y filtra tus sesiones.",
 		"description": "Explora tus sesiones de entrenamiento anteriores con filtros.",
 		"heading": "Historial de entrenamientos",
 		"filter": "Filtrar",
