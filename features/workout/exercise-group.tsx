@@ -267,11 +267,14 @@ export const ExerciseGroup = ({
 			// panel with the action colour as its mark; the others stay ruled
 			// entries, a finished one keeping the completion mark. Inside a
 			// superset or circuit the group's own rule already carries the
-			// mark, so the member's panel keeps a plain border.
+			// mark, so the member's panel keeps a plain border -- and below `sm`
+			// none at its sides, whose width the set fields need.
 			className={`mark mark-fill transition-colors duration-[var(--motion-slow)] ease-standard ${
 				isCurrent && !isComplete
-					? `my-2 rounded-sm border border-rule bg-surface py-4 pl-3 pr-3 ${
-							roundLine ? '' : 'border-l-[3px] border-l-primary'
+					? `my-2 rounded-sm border border-rule bg-surface px-2 py-4 sm:px-3 ${
+							roundLine
+								? 'max-sm:rounded-none max-sm:border-x-0 max-sm:px-0'
+								: 'border-l-[3px] border-l-primary'
 						}`
 					: `rule-row py-4 pl-3 ${isComplete ? 'mark-success' : ''}`
 			}`}

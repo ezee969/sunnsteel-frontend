@@ -616,7 +616,7 @@ export default function ActiveSessionPage() {
 								key={`group-${run.group.letter}`}
 								role="group"
 								aria-label={run.label ?? undefined}
-								className={`rule-row my-2 border-l-[3px] py-2 pl-2 ${
+								className={`rule-row my-2 border-l-[3px] py-2 pl-1 sm:pl-2 ${
 									run.indices.some(
 										index =>
 											groupedLogs[index].exerciseId === upNext?.exerciseId,

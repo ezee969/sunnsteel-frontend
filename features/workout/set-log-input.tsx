@@ -99,6 +99,9 @@ const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
  */
 const FIELD_CLASS =
 	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
+	// LIVE-22: no spin buttons -- a desktop browser reserves their width inside
+	// the field even unhovered, which clipped a value at the narrowest widths.
+	'[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ' +
 	// A11Y-02 / LIVE-18 (§22): gym mode's taller fields and larger digits.
 	'large-controls:h-14 large-controls:text-xl large-controls:placeholder:text-base'
 
@@ -131,9 +134,9 @@ export const SetColumnsHeader = ({
 	return (
 		<div
 			aria-hidden
-			className="type-body-sm flex items-end justify-between gap-1 border-l-[3px] border-transparent pb-1 pl-2 pr-2.5 text-ink-3 sm:gap-2 md:justify-start"
+			className="type-body-sm flex items-end justify-between gap-1 border-l-[3px] border-transparent pb-1 pl-2 pr-1 text-ink-3 sm:pr-2.5 sm:gap-2 md:justify-start"
 		>
-			<div className="min-w-[40px] shrink-0 sm:min-w-[46px] md:w-16">
+			<div className="min-w-9 shrink-0 sm:min-w-[46px] md:w-16">
 				{t('columnSet')}
 			</div>
 			<div
@@ -157,6 +160,33 @@ export const SetColumnsHeader = ({
 		</div>
 	)
 }
+
+/**
+ * LIVE-22 (§27.3): below `sm` a row shows only its number under the "Set"
+ * column header, which already says what it is; the whole label stays for
+ * screen readers and returns from `sm`.
+ */
+const SetNumberLabel = ({
+	label,
+	number,
+}: {
+	label: string
+	number: number
+}) => (
+	<>
+		<span aria-hidden className="sm:hidden">
+			{number}
+		</span>
+		<span className="max-sm:sr-only">{label}</span>
+	</>
+)
+
+/**
+ * LIVE-22 (§27.3): an empty field on a row that is not the current one says
+ * nothing the column header has not -- a dash, so a narrow field never clips
+ * its word.
+ */
+const QUIET_PLACEHOLDER = '–'
 
 const FIELD_INVALID_CLASS = 'text-destructive ring-2 ring-destructive/50'
 
@@ -353,7 +383,7 @@ export const SetLogInput = ({
 		<div
 			data-testid="set-log-container"
 			data-state={state}
-			className={`mark border-t border-rule-faint py-2 pl-2 pr-2.5 transition-colors duration-[var(--motion-base)] ease-standard ${rowTone}`}
+			className={`mark border-t border-rule-faint py-2 pl-2 pr-1 transition-colors sm:pr-2.5 duration-[var(--motion-base)] ease-standard ${rowTone}`}
 		>
 			{/* TD-35: the fixed column minimums (46 + 62 + 72 + 48px) plus the
 			    checkbox column needed 273px, and at 320 this row has 228. Below `sm`
@@ -364,7 +394,7 @@ export const SetLogInput = ({
 			    area clear of the RPE field. From `sm` nothing changes. */}
 			<div className="flex items-stretch justify-between gap-1 sm:gap-2 md:justify-start">
 				{/* Set number & RIR */}
-				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px] md:w-16">
+				<div className="flex min-w-9 shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px] md:w-16">
 					{/* LIVE-12: the set number opens the kind menu. A warm-up never
 					    counts as work; only working and optional sets progress.
 					    ROUT-17: a block's working set keeps its kind and has no
@@ -379,7 +409,10 @@ export const SetLogInput = ({
 										: 'text-ink-3'
 							}`}
 						>
-							{t('setLabel', { number: setNumber })}
+							<SetNumberLabel
+								label={t('setLabel', { number: setNumber })}
+								number={setNumber}
+							/>
 						</span>
 					) : (
 						<DropdownMenu>
@@ -405,7 +438,10 @@ export const SetLogInput = ({
 												: 'text-ink-3'
 									}`}
 								>
-									{t('setLabel', { number: setNumber })}
+									<SetNumberLabel
+										label={t('setLabel', { number: setNumber })}
+										number={setNumber}
+									/>
 									<ChevronDown className="h-3 w-3" aria-hidden />
 								</button>
 							</DropdownMenuTrigger>
@@ -483,7 +519,7 @@ export const SetLogInput = ({
 							number: setNumber,
 							exercise: exerciseName,
 						})}
-						placeholder={t('repsPlaceholder')}
+						placeholder={isCurrent ? t('repsPlaceholder') : QUIET_PLACEHOLDER}
 						aria-invalid={repsInvalid || undefined}
 						aria-describedby={describedBy(
 							linearBlock || isExtra || showRepsTarget ? repsTargetId : null,
@@ -565,7 +601,9 @@ export const SetLogInput = ({
 									// LIVE-22 (§27.3): the prescription's weight, as a suggestion.
 									suggestedWeight != null && suggestedWeight > 0
 										? formatWeightInput(suggestedWeight, weightUnit)
-										: t('weightPlaceholder')
+										: isCurrent
+											? t('weightPlaceholder')
+											: QUIET_PLACEHOLDER
 								}
 								aria-invalid={weightInvalid || undefined}
 								aria-describedby={describedBy(
@@ -613,7 +651,7 @@ export const SetLogInput = ({
 								number: setNumber,
 								exercise: exerciseName,
 							})}
-							placeholder={t('rpePlaceholder')}
+							placeholder={isCurrent ? t('rpePlaceholder') : QUIET_PLACEHOLDER}
 							aria-invalid={rpeInvalid || undefined}
 							aria-describedby={describedBy(null, rpeInvalid)}
 							value={rpeState}
