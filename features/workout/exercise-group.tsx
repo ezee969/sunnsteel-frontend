@@ -31,6 +31,11 @@ import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
 import { lpSetTargetLabel } from '@/lib/utils/linear-periodization'
+import {
+	matchesPrescription,
+	prescriptionLine,
+	sharedPrescription,
+} from '@/lib/utils/session-focus'
 import { lpFinishedNote, lpSessionLine } from '@/lib/utils/session-linear-block'
 import {
 	isExerciseDone,
@@ -41,7 +46,11 @@ import type { UpsertSetLogPayload } from '@/lib/utils/workout-session.types'
 
 import { PlateCalculatorDialog } from './plate-calculator-dialog'
 import { ExerciseNoteButton } from './session-notes'
-import { SetLogInput } from './set-log-input'
+import {
+	SetColumnsHeader,
+	SetLogInput,
+	type SetRowState,
+} from './set-log-input'
 
 interface ExerciseGroupProps {
 	exerciseId: string
@@ -65,6 +74,8 @@ interface ExerciseGroupProps {
 		kind: SetKind
 		/** ROUT-17: 0-based place among the working sets; null for a warm-up. */
 		workingIndex?: number | null
+		/** LIVE-22: the weight shown is the prescription's, not a logged one. */
+		weightIsSuggestion?: boolean
 	}>
 	/**
 	 * ROUT-17: the 8-week block this slot trains in this workout, with whether
@@ -111,6 +122,15 @@ interface ExerciseGroupProps {
 	arriving?: boolean
 	/** LIVE-21: the arrival tint has run its course. */
 	onArrivalEnd?: () => void
+	/**
+	 * LIVE-22 (§27.2): the exercise the current set belongs to. It is the one
+	 * box on the screen; every other exercise is a ruled entry.
+	 */
+	isCurrent?: boolean
+	/** LIVE-22: the set to do now, when it is this exercise's. */
+	currentSetNumber?: number | null
+	/** LIVE-22: the rest after each set, stated once in the prescription line. */
+	restSeconds?: number | null
 }
 
 /**
@@ -139,6 +159,9 @@ export const ExerciseGroup = ({
 	linearBlockUnset,
 	arriving,
 	onArrivalEnd,
+	isCurrent = false,
+	currentSetNumber = null,
+	restSeconds,
 }: ExerciseGroupProps) => {
 	const t = useTranslations('workout.exerciseGroup')
 	const tEx = useTranslations('catalog.exercises')
@@ -169,11 +192,28 @@ export const ExerciseGroup = ({
 				}
 			: undefined
 	const exerciseName = exerciseLabel(rawExerciseName, tEx)
+	const tLine = useTranslations('workout.prescriptionLine')
 	const setsId = `exercise-${exerciseId}-sets`
 	// LIVE-12: done once every required set is done; a skipped warm-up or
 	// optional set does not hold the mark back.
 	const isComplete = isExerciseDone(sets)
 	const weightUnit = useWeightUnit()
+	// LIVE-22 (§27.3): the prescription said once, under the name; a block
+	// states its own step in `blockLine`.
+	const prescription = blockState ? null : sharedPrescription(sets)
+	const line = prescriptionLine(
+		prescription,
+		restSeconds,
+		weightUnit,
+		locale,
+		tLine,
+	)
+	const rowState = (set: ExerciseGroupProps['sets'][number]): SetRowState =>
+		set.setNumber === currentSetNumber
+			? 'current'
+			: set.isCompleted
+				? 'done'
+				: 'upcoming'
 	// LIVE-18: under larger controls the swap, plate calculator and note move
 	// into one More menu, so the header keeps the exercise and one control.
 	// UX-21: one menu per exercise on a phone, as under larger controls.
@@ -223,8 +263,13 @@ export const ExerciseGroup = ({
 			// bottom instead of appearing, and the row settles onto the completed
 			// tone over the same 300ms. The fill is a transform on an overlay bar,
 			// so completing a set never reflows the row.
-			className={`rule-row mark mark-fill py-4 pl-3 transition-colors duration-[var(--motion-slow)] ease-standard ${
-				isComplete ? 'mark-success bg-surface/60' : ''
+			// LIVE-22 (§27.2): the current exercise is the screen's one box -- a
+			// panel with the action colour as its mark; the others stay ruled
+			// entries, a finished one keeping the completion mark.
+			className={`mark mark-fill transition-colors duration-[var(--motion-slow)] ease-standard ${
+				isCurrent && !isComplete
+					? 'my-2 rounded-sm border border-rule border-l-[3px] border-l-primary bg-surface py-4 pl-3 pr-3'
+					: `rule-row py-4 pl-3 ${isComplete ? 'mark-success' : ''}`
 			}`}
 		>
 			<div className="flex items-center justify-between gap-2">
@@ -267,6 +312,11 @@ export const ExerciseGroup = ({
 										total: totalSets,
 									})}
 								</span>
+								{line ? (
+									<span className="type-body-sm block whitespace-normal text-ink-2">
+										{line}
+									</span>
+								) : null}
 								{blockLine ? (
 									<span className="type-body-sm block text-ink-2">
 										{blockLine}
@@ -426,7 +476,11 @@ export const ExerciseGroup = ({
 			) : null}
 
 			{!isCollapsed && (
-				<div id={setsId} className="mt-3 space-y-2">
+				<div id={setsId} className="mt-3">
+					<SetColumnsHeader
+						weightUnit={weightUnit}
+						linearBlock={Boolean(blockState)}
+					/>
 					{sets.map((set, index) => (
 						<SetLogInput
 							// The exercise is part of the key: a LIVE-11 swap must remount the
@@ -437,7 +491,24 @@ export const ExerciseGroup = ({
 							exerciseId={set.exerciseId}
 							setNumber={set.setNumber}
 							reps={set.reps}
-							weight={set.weight}
+							weight={
+								set.weightIsSuggestion && !set.isCompleted
+									? undefined
+									: set.weight
+							}
+							suggestedWeight={
+								set.weightIsSuggestion ? set.plannedWeight : null
+							}
+							state={rowState(set)}
+							showRepsTarget={!matchesPrescription(set, prescription).reps}
+							showWeightTarget={!matchesPrescription(set, prescription).weight}
+							showRir={
+								!(
+									prescription?.rir != null &&
+									set.kind === 'WORKING' &&
+									!set.isExtra
+								)
+							}
 							isCompleted={set.isCompleted}
 							plannedReps={set.plannedReps}
 							plannedMinReps={set.plannedMinReps}

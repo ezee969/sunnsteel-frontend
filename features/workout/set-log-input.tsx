@@ -64,7 +64,21 @@ interface SetLogInputProps extends LogRowProps {
 	 * reps), and the member logs only reps: no RPE, no kind, no fills.
 	 */
 	linearBlock?: { loadKg: number; target: string | null }
+	/**
+	 * LIVE-22 (§27.3): where the set stands. Only the current set is a well
+	 * with bounded fields; a done set reads as data and an upcoming one as a
+	 * quiet ruled row. Both stay editable: a tap gives the field its edge.
+	 */
+	state?: SetRowState
+	/** LIVE-22: the exercise's line already states this target, so the row need not. */
+	showRepsTarget?: boolean
+	showWeightTarget?: boolean
+	showRir?: boolean
+	/** LIVE-22: the prescription's weight, kg, shown as a suggestion until edited or ticked. */
+	suggestedWeight?: number | null
 }
+
+export type SetRowState = 'current' | 'done' | 'upcoming'
 
 /** A LIVE-15 fill control: repeated on every row, so it is never primary. */
 const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
@@ -83,13 +97,65 @@ const FILL_CLASS = 'type-body-sm h-11 px-2 text-ink-2 md:h-8'
  * the weight column at 320.
  */
 const FIELD_CLASS =
-	// v1.1 §26.5: a bounded cell on the row's well -- `--surface` with a
-	// faint edge -- so a typed value reads as entered and the target under it
-	// as read-only (§11.7, §11.12). Sizes are unchanged.
-	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border border-rule-faint bg-surface px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
-	// A11Y-02 / LIVE-18 (§22): gym mode's taller fields and larger digits, and
-	// under higher contrast a visible boundary instead of the well's tone alone.
-	'large-controls:h-14 large-controls:text-xl large-controls:placeholder:text-base contrast-more:border contrast-more:border-rule'
+	'h-11 md:h-9 md:max-w-[var(--field-max)] rounded-none border px-0 sm:px-1 text-center font-mono font-normal tabular-nums shadow-none focus-visible:ring-2 focus-visible:ring-ring/40 ' +
+	// A11Y-02 / LIVE-18 (§22): gym mode's taller fields and larger digits.
+	'large-controls:h-14 large-controls:text-xl large-controls:placeholder:text-base'
+
+// v1.1 §26.5: a bounded cell on the row's well -- `--surface` with a faint
+// edge -- so a typed value reads as entered and the target under it as
+// read-only (§11.7, §11.12). Under higher contrast the edge is a full rule.
+const FIELD_BOUNDED_CLASS =
+	'border-rule-faint bg-surface contrast-more:border-rule'
+
+// LIVE-22 (§27.3): a done or upcoming set reads as data; focusing a field
+// gives it the bounded cell back, so it is still edited in place.
+const FIELD_QUIET_CLASS =
+	'border-transparent bg-transparent focus-visible:border-rule-faint focus-visible:bg-surface'
+
+/**
+ * LIVE-22 (§27.3): the column names, once above an exercise's sets, so a row
+ * no longer captions each field. Hidden from assistive technology: every
+ * field already carries its full name. The columns repeat the row's own
+ * widths so the names sit over their fields.
+ */
+export const SetColumnsHeader = ({
+	weightUnit,
+	linearBlock,
+}: {
+	weightUnit: WeightUnit
+	linearBlock: boolean
+}) => {
+	const t = useTranslations('workout.setLogInput')
+	const cell = 'border-l border-transparent pl-1 text-center'
+	return (
+		<div
+			aria-hidden
+			className="type-body-sm flex items-end justify-between gap-1 border-l-[3px] border-transparent pb-1 pl-2 pr-2.5 text-ink-3 sm:gap-2 md:justify-start"
+		>
+			<div className="min-w-[40px] shrink-0 sm:min-w-[46px] md:w-16">
+				{t('columnSet')}
+			</div>
+			<div
+				className={`min-w-0 flex-1 sm:min-w-[62px] md:w-[var(--field-max)] md:flex-none ${cell}`}
+			>
+				{t('repsPlaceholder')}
+			</div>
+			<div
+				className={`min-w-0 flex-[1.4] sm:min-w-[72px] sm:flex-1 md:w-[var(--field-max)] md:flex-none ${cell}`}
+			>
+				{getWeightUnitLabel(weightUnit)}
+			</div>
+			{linearBlock ? null : (
+				<div
+					className={`min-w-0 flex-1 sm:min-w-[48px] md:w-[var(--field-max)] md:flex-none ${cell}`}
+				>
+					{t('rpePlaceholder')}
+				</div>
+			)}
+			<div className="w-7 shrink-0 border-l border-transparent pl-2 md:ml-auto large-controls:w-10" />
+		</div>
+	)
+}
 
 const FIELD_INVALID_CLASS = 'text-destructive ring-2 ring-destructive/50'
 
@@ -118,6 +184,11 @@ export const SetLogInput = ({
 	kind = 'WORKING',
 	linearBlock,
 	exerciseName,
+	state = 'current',
+	showRepsTarget = true,
+	showWeightTarget = true,
+	showRir = true,
+	suggestedWeight,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -154,6 +225,7 @@ export const SetLogInput = ({
 		onSetCompleted,
 		weightUnit,
 		fixedWeightKg: linearBlock?.loadKg,
+		suggestedWeightKg: suggestedWeight,
 	})
 
 	const tSaveStatus = useTranslations('core.saveStatus')
@@ -259,6 +331,16 @@ export const SetLogInput = ({
 	const previousText = previousPerformance
 		? formatPreviousPerformance(previousPerformance, weightUnit, tPrev, locale)
 		: ''
+	const isCurrent = state === 'current'
+	const fieldTone = isCurrent ? FIELD_BOUNDED_CLASS : FIELD_QUIET_CLASS
+	// LIVE-22 (§27.3): the current set is the one well; a done set keeps the
+	// completion rule; an upcoming one keeps only the transparent rule that
+	// holds the left axis. Rows are ruled from each other, never boxed.
+	const rowTone = isCurrent
+		? `bg-surface-sunk ${isCompletedState ? 'mark-success' : 'mark-current'}`
+		: isCompletedState
+			? 'mark-success'
+			: ''
 
 	return (
 		// The second of the three things v0.1 keeps boxed (§11.5): a dense grid of
@@ -266,9 +348,8 @@ export const SetLogInput = ({
 		// well — square, no resting border, separated from the ground by tone.
 		<div
 			data-testid="set-log-container"
-			className={`mark bg-surface-sunk py-2 pl-2 pr-2.5 transition-colors duration-[var(--motion-base)] ease-standard ${
-				isCompletedState ? 'mark-success' : 'mark'
-			}`}
+			data-state={state}
+			className={`mark border-t border-rule-faint py-2 pl-2 pr-2.5 transition-colors duration-[var(--motion-base)] ease-standard ${rowTone}`}
 		>
 			{/* TD-35: the fixed column minimums (46 + 62 + 72 + 48px) plus the
 			    checkbox column needed 273px, and at 320 this row has 228. Below `sm`
@@ -277,17 +358,21 @@ export const SetLogInput = ({
 			    because it carries the longest value. The gap and the checkbox
 			    column's padding stay: together they keep the checkbox's 44px hit
 			    area clear of the RPE field. From `sm` nothing changes. */}
-			<div className="flex items-stretch justify-between gap-1 sm:gap-2">
+			<div className="flex items-stretch justify-between gap-1 sm:gap-2 md:justify-start">
 				{/* Set number & RIR */}
-				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px]">
+				<div className="flex min-w-[40px] shrink-0 flex-col justify-center gap-0.5 sm:min-w-[46px] md:w-16">
 					{/* LIVE-12: the set number opens the kind menu. A warm-up never
 					    counts as work; only working and optional sets progress.
 					    ROUT-17: a block's working set keeps its kind and has no
 					    fills, so its number is a plain label. */}
 					{linearBlock ? (
 						<span
-							className={`type-label flex min-h-11 items-center md:min-h-0 large-controls:min-h-12 ${
-								isCompletedState ? 'text-success' : 'text-ink-3'
+							className={`type-body-sm flex min-h-11 items-center md:min-h-0 large-controls:min-h-12 ${
+								isCompletedState
+									? 'text-success'
+									: isCurrent
+										? 'text-foreground'
+										: 'text-ink-3'
 							}`}
 						>
 							{t('setLabel', { number: setNumber })}
@@ -298,7 +383,7 @@ export const SetLogInput = ({
 								<button
 									type="button"
 									aria-label={
-										grouped
+										grouped || !isCurrent
 											? t('setKindMenuMoreAria', {
 													number: setNumber,
 													kind: tKinds(kind),
@@ -308,8 +393,12 @@ export const SetLogInput = ({
 													kind: tKinds(kind),
 												})
 									}
-									className={`type-label -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
-										isCompletedState ? 'text-success' : 'text-ink-3'
+									className={`type-body-sm -mx-1 flex min-h-11 items-center gap-0.5 rounded-sm px-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:min-h-0 large-controls:min-h-12 ${
+										isCompletedState
+											? 'text-success'
+											: isCurrent
+												? 'text-foreground'
+												: 'text-ink-3'
 									}`}
 								>
 									{t('setLabel', { number: setNumber })}
@@ -330,7 +419,9 @@ export const SetLogInput = ({
 										</DropdownMenuRadioItem>
 									))}
 								</DropdownMenuRadioGroup>
-								{grouped &&
+								{/* LIVE-22: off the current set, the fills and Remove live
+								    here at every width. */}
+								{(grouped || !isCurrent) &&
 								((canFillAbove && setAbove) ||
 									(canFillPrevious && previousPerformance) ||
 									onRemove) ? (
@@ -370,7 +461,7 @@ export const SetLogInput = ({
 						<span className="type-body-sm leading-none text-ink-3">
 							{t('extra')}
 						</span>
-					) : plannedRir !== undefined && plannedRir !== null ? (
+					) : showRir && plannedRir !== undefined && plannedRir !== null ? (
 						<span className="type-data leading-none text-ink-3">
 							{t('rir', { value: plannedRir })}
 						</span>
@@ -378,7 +469,7 @@ export const SetLogInput = ({
 				</div>
 
 				{/* Reps */}
-				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[62px]">
+				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[62px] md:w-[var(--field-max)] md:flex-none">
 					<Input
 						id={repsId}
 						type="number"
@@ -390,33 +481,41 @@ export const SetLogInput = ({
 						})}
 						placeholder={t('repsPlaceholder')}
 						aria-invalid={repsInvalid || undefined}
-						aria-describedby={describedBy(repsTargetId, repsInvalid)}
+						aria-describedby={describedBy(
+							linearBlock || isExtra || showRepsTarget ? repsTargetId : null,
+							repsInvalid,
+						)}
 						value={repsState}
 						onChange={e => setReps(e.target.value)}
 						onKeyDown={onEnter(linearBlock ? null : weightId)}
-						className={`${FIELD_CLASS} ${
+						className={`${FIELD_CLASS} ${fieldTone} ${
 							repsInvalid ? FIELD_INVALID_CLASS : ''
 						}`}
 					/>
-					<span
-						id={repsTargetId}
-						className="type-body-sm text-center text-ink-3"
-					>
-						{linearBlock
-							? (linearBlock.target ?? t('noTarget'))
-							: isExtra
-								? t('noTarget')
-								: plannedMinReps && plannedMaxReps
-									? t('targetRange', {
-											min: plannedMinReps,
-											max: plannedMaxReps,
-										})
-									: t('targetReps', { value: plannedRepsText })}
-					</span>
+					{/* LIVE-22 (§27.3): a target the exercise's line already states is
+					not repeated on the row; a different one, a block's step and an
+					extra set's "no target" still are. */}
+					{linearBlock || isExtra || showRepsTarget ? (
+						<span
+							id={repsTargetId}
+							className="type-body-sm text-center text-ink-3"
+						>
+							{linearBlock
+								? (linearBlock.target ?? t('noTarget'))
+								: isExtra
+									? t('noTarget')
+									: plannedMinReps && plannedMaxReps
+										? t('targetRange', {
+												min: plannedMinReps,
+												max: plannedMaxReps,
+											})
+										: t('targetReps', { value: plannedRepsText })}
+						</span>
+					) : null}
 				</div>
 
 				{/* Weight */}
-				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[72px] sm:flex-1">
+				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[72px] sm:flex-1 md:w-[var(--field-max)] md:flex-none">
 					{linearBlock ? (
 						// ROUT-17: the step's load, read-only. It sits where the field
 						// would, at the field's height and digit size, without the
@@ -458,26 +557,36 @@ export const SetLogInput = ({
 												exercise: exerciseName,
 											})
 								}
-								placeholder={t('weightPlaceholder')}
+								placeholder={
+									// LIVE-22 (§27.3): the prescription's weight, as a suggestion.
+									suggestedWeight != null && suggestedWeight > 0
+										? formatWeightInput(suggestedWeight, weightUnit)
+										: t('weightPlaceholder')
+								}
 								aria-invalid={weightInvalid || undefined}
-								aria-describedby={describedBy(weightTargetId, weightInvalid)}
+								aria-describedby={describedBy(
+									isExtra || showWeightTarget ? weightTargetId : null,
+									weightInvalid,
+								)}
 								value={weightState}
 								onChange={e => setWeight(e.target.value)}
 								onKeyDown={onEnter(rpeId)}
-								className={`${FIELD_CLASS} ${
+								className={`${FIELD_CLASS} ${fieldTone} ${
 									weightInvalid ? FIELD_INVALID_CLASS : ''
 								}`}
 							/>
-							<span
-								id={weightTargetId}
-								className="type-body-sm text-center text-ink-3"
-							>
-								{isExtra
-									? t('noTarget')
-									: t('targetWeight', {
-											value: formatWeight(plannedWeight, weightUnit, locale),
-										})}
-							</span>
+							{isExtra || showWeightTarget ? (
+								<span
+									id={weightTargetId}
+									className="type-body-sm text-center text-ink-3"
+								>
+									{isExtra
+										? t('noTarget')
+										: t('targetWeight', {
+												value: formatWeight(plannedWeight, weightUnit, locale),
+											})}
+								</span>
+							) : null}
 						</>
 					)}
 				</div>
@@ -487,7 +596,7 @@ export const SetLogInput = ({
 				    column was permanently empty. ROUT-17: a block's working set
 				    logs reps only; its effort is the step's RIR target. */}
 				{linearBlock ? null : (
-					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-rule-faint pl-1 sm:min-w-[48px]">
+					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[48px] md:w-[var(--field-max)] md:flex-none">
 						<Input
 							id={rpeId}
 							type="number"
@@ -506,18 +615,15 @@ export const SetLogInput = ({
 							value={rpeState}
 							onChange={e => setRpe(e.target.value)}
 							onKeyDown={onEnter(null)}
-							className={`${FIELD_CLASS} ${
+							className={`${FIELD_CLASS} ${fieldTone} ${
 								rpeInvalid ? FIELD_INVALID_CLASS : ''
 							}`}
 						/>
-						<span className="type-body-sm text-center text-ink-3">
-							{t('optional')}
-						</span>
 					</div>
 				)}
 
 				{/* Completion checkbox, doubling as the save-state indicator */}
-				<div className="flex shrink-0 items-center border-l border-rule-faint pl-2">
+				<div className="flex shrink-0 items-center border-l border-transparent pl-2 md:ml-auto">
 					{/* Colour alone must not carry this, so the same state is announced
 					    to screen readers. The visible error footer below is unaffected. */}
 					<span className="sr-only" role="status" aria-live="polite">
@@ -537,12 +643,14 @@ export const SetLogInput = ({
 						// Checked colour comes from the primitive (`--success-strong`,
 						// v1.0 §4.3 rule 2). This call site only sizes the box and draws
 						// the save-state ring; it must not re-specify the fill.
-						className={`relative size-5 after:absolute after:-inset-3 after:content-[''] large-controls:size-8 ${saveRingClass}`}
+						// LIVE-22: the current set's tick is the larger target.
+						className={`relative ${isCurrent ? 'size-6' : 'size-5'} after:absolute after:-inset-3 after:content-[''] large-controls:size-8 ${saveRingClass}`}
 					/>
 				</div>
 			</div>
 
-			{previousPerformance ? (
+			{/* LIVE-22 (§27.3): "Last time" belongs to the set being done. */}
+			{previousPerformance && isCurrent ? (
 				<div
 					className={`type-body-sm mt-2 flex items-center justify-between border-t border-rule-faint pt-1.5 ${
 						hasImproved ? 'text-honour' : 'text-ink-3'
@@ -562,8 +670,12 @@ export const SetLogInput = ({
 				</div>
 			) : null}
 
-			{!grouped && (canFillAbove || canFillPrevious || onRemove) ? (
+			{!grouped &&
+			isCurrent &&
+			(canFillAbove || canFillPrevious || onRemove) ? (
 				<div className="mt-1 flex flex-wrap items-center gap-x-1">
+					{/* LIVE-22: the fills sit under the set being done; every
+					    other row keeps them in its Set N menu. */}
 					{canFillAbove && setAbove ? (
 						<Button
 							type="button"

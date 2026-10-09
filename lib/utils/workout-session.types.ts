@@ -97,6 +97,12 @@ export type GroupedExerciseLogs = {
 		 * for a warm-up and for an extra set.
 		 */
 		workingIndex: number | null
+		/**
+		 * LIVE-22 (§27.3): the weight is the prescription's, not one the member
+		 * logged, so the row shows it as a suggestion until it is edited or the
+		 * set is ticked.
+		 */
+		weightIsSuggestion: boolean
 	}>
 	progressionScheme: ProgressionScheme
 	/**

@@ -253,6 +253,23 @@ export default function ActiveSessionPage() {
 	// exercise's required sets are done.
 	const canFinish = allRequiredDone(groupedLogs)
 
+	// LIVE-22 (§27.2-27.4): the set to do now is the next open one in the
+	// rounds' order, and its exercise is the current one. Exercises open
+	// while current and fold before and after it -- the ones already done when
+	// the workout opened start folded; one finished now is folded by LIVE-21
+	// after its last tick -- and a member's own tap always wins.
+	const doneAtLoad = useRef<ReadonlySet<string> | null>(null)
+	if (doneAtLoad.current === null && groupedLogs.length > 0)
+		doneAtLoad.current = new Set(
+			groupedLogs
+				.filter(group => isExerciseDone(group.sets))
+				.map(group => group.exerciseId),
+		)
+	const foldedByDefault = (group: GroupedExerciseLogs) =>
+		upNext?.exerciseId !== group.exerciseId &&
+		(!group.sets.some(set => set.isCompleted) ||
+			Boolean(doneAtLoad.current?.has(group.exerciseId)))
+
 	// LIVE-21: an exercise its last tick finished folds a moment later, and a
 	// round handing over glides to the next exercise and tints it on arrival.
 	const { reduced: reducedMotion } = useMotionPreference()
@@ -393,9 +410,6 @@ export default function ActiveSessionPage() {
 					restTimer.remaining !== null ? 'pb-28' : ''
 				}`}
 			>
-				{/* UX-18: the terms the set rows use, defined one tap away. */}
-				<GlossaryLine terms={['rpe', 'rir', 'setKinds']} />
-
 				{/* Exercise Groups */}
 				{previousPerformanceError ? (
 					<p
@@ -436,8 +450,23 @@ export default function ActiveSessionPage() {
 								exerciseId={group.exerciseId}
 								exerciseName={group.exerciseName}
 								sets={group.sets}
-								isCollapsed={isCollapsed(group.exerciseId)}
-								onToggleCollapse={() => toggleExercise(group.exerciseId)}
+								isCollapsed={isCollapsed(
+									group.exerciseId,
+									foldedByDefault(group),
+								)}
+								onToggleCollapse={() =>
+									toggleExercise(
+										group.exerciseId,
+										isCollapsed(group.exerciseId, foldedByDefault(group)),
+									)
+								}
+								isCurrent={upNext?.exerciseId === group.exerciseId}
+								currentSetNumber={
+									upNext?.exerciseId === group.exerciseId
+										? upNext.setNumber
+										: null
+								}
+								restSeconds={group.restSeconds}
 								completedSets={completedSets}
 								totalSets={totalSets}
 								onSave={handleSaveSetLog}
@@ -524,6 +553,11 @@ export default function ActiveSessionPage() {
 						)
 					})}
 				</div>
+
+				{/* UX-18: the terms the set rows use, defined one tap away.
+				LIVE-22 (§27.5): after the work, so the first exercise is reached
+				sooner; the definitions are unchanged. */}
+				<GlossaryLine terms={['rpe', 'rir', 'setKinds']} />
 
 				{/* LIVE-16: the note about the whole workout, written as it happens. */}
 				<section aria-labelledby="workout-note-heading" className="space-y-3">

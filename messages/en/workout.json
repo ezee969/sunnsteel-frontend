@@ -340,7 +340,6 @@
 		"weightPlaceholder": "Weight",
 		"rpeAria": "Set {number} of {exercise}: RPE, 0 to 10",
 		"rpePlaceholder": "RPE",
-		"optional": "Optional",
 		"completeNeedsReps": "Enter your reps to complete the set",
 		"completeNeedsWeight": "Enter the weight to complete the set (0 for bodyweight)",
 		"lastTime": "Last time",
@@ -354,7 +353,8 @@
 		"repsAria": "Set {number} of {exercise}: reps",
 		"weightKgAria": "Set {number} of {exercise}: weight in kilograms",
 		"weightLbAria": "Set {number} of {exercise}: weight in pounds",
-		"completeAria": "Mark set {number} of {exercise} complete"
+		"completeAria": "Mark set {number} of {exercise} complete",
+		"columnSet": "Set"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",

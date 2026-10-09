@@ -40,6 +40,12 @@ interface UseSetLogFormProps {
 	 * is fixed: it cannot be typed, and every save sends exactly this value.
 	 */
 	fixedWeightKg?: number
+	/**
+	 * LIVE-22 (§27.3): the prescription's weight, kg, shown as a suggestion
+	 * while the field is empty. Ticking with the field untouched logs it, so
+	 * one-tap logging stays.
+	 */
+	suggestedWeightKg?: number | null
 	onSave: (payload: UpsertSetLogPayload) => void
 	onSetCompleted?: () => void
 }
@@ -93,6 +99,7 @@ export const useSetLogForm = ({
 	initialIsCompleted,
 	weightUnit,
 	fixedWeightKg,
+	suggestedWeightKg,
 	onSave,
 	onSetCompleted,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
@@ -209,9 +216,19 @@ export const useSetLogForm = ({
 		isCompletedState,
 	)
 	const validation = validateSetLogPayload(currentPayload, t)
+	// LIVE-22: an empty weight field with a suggestion counts as that weight
+	// for a tick, which then writes it into the field. A ticked set never takes
+	// it: emptying a done set's weight still holds its save (LIVE-21).
+	const suggestionInput =
+		!isCompletedState &&
+		weightState === '' &&
+		suggestedWeightKg != null &&
+		fixedWeightKg === undefined
+			? formatWeightInput(suggestedWeightKg, weightUnit)
+			: null
 	const missingField = missingForCompletion({
 		reps: repsState,
-		weight: weightOf(weightState),
+		weight: weightOf(suggestionInput ?? weightState),
 	})
 	const completionField = tickRefused || isCompletedState ? missingField : null
 	// LIVE-21: a ticked set never stores an empty field; emptying one holds
@@ -414,10 +431,12 @@ export const useSetLogForm = ({
 			// LIVE-21: a tick needs reps and a weight (0 for bodyweight). A
 			// refused tick changes nothing: no completion, no rest, no save.
 			// Unticking is always allowed.
+			const tickWeight =
+				checked && suggestionInput ? suggestionInput : weightState
 			const missing = checked
 				? missingForCompletion({
 						reps: repsState,
-						weight: weightOf(weightState),
+						weight: weightOf(tickWeight),
 					})
 				: null
 			if (missing) {
@@ -425,6 +444,7 @@ export const useSetLogForm = ({
 				return missing
 			}
 			setTickRefused(false)
+			if (tickWeight !== weightState) setWeightState(tickWeight)
 			setIsCompletedState(checked)
 			markSetPending(sessionId, routineExerciseId, setNumber)
 
@@ -433,11 +453,11 @@ export const useSetLogForm = ({
 			if (checked) onSetCompletedRef.current?.()
 
 			// Immediately save completion toggle
-			const payload = createPayload(repsState, weightState, rpeState, checked)
+			const payload = createPayload(repsState, tickWeight, rpeState, checked)
 			if (validateSetLogPayload(payload, t).isValid) {
 				onSaveRef.current(payload)
 				// Update last saved values to prevent redundant saves
-				const w = weightOf(weightState)
+				const w = weightOf(tickWeight)
 				const r = rpeState === '' ? undefined : Number(rpeState)
 				lastSavedRef.current = {
 					reps: Number(repsState) || 0,
@@ -455,6 +475,7 @@ export const useSetLogForm = ({
 			repsState,
 			weightState,
 			rpeState,
+			suggestionInput,
 			createPayload,
 			weightOf,
 			t,

@@ -539,6 +539,11 @@
   .mark {
     border-left: 3px solid transparent;
   }
+  /* LIVE-22 (§27.2): the current exercise and set carry the action colour as
+     a mark -- the one place `--primary` is a mark rather than a fill. */
+  .mark-current {
+    border-left-color: var(--primary);
+  }
   .mark-success {
     border-left-color: var(--success-strong);
   }

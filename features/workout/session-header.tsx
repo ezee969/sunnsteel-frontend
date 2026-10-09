@@ -146,25 +146,27 @@ export const SessionHeader = ({
 					</div>
 				</div>
 
-				{/* Mobile stats row */}
-				<div className="mt-3 flex items-center justify-between border-t border-rule-faint pt-2 sm:hidden">
-					<div>
-						<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
-						<p className="type-data duration-slot text-foreground">
+				{/* LIVE-22: below `sm` the figures are one line under the title rather
+				than a row of three captioned columns, so the pinned masthead takes
+				less of a phone's screen for the whole workout. */}
+				<p className="type-body-sm mt-2 flex flex-wrap gap-x-3 text-ink-3 sm:hidden">
+					<span>
+						{t('elapsed')}{' '}
+						<span className="type-data duration-slot text-foreground">
 							{duration}
-						</p>
-					</div>
-					<div>
-						<p className="type-body-sm text-ink-3">{t('sets')}</p>
-						<p className="type-data text-foreground">{setsDone}</p>
-					</div>
-					<div className="text-right">
-						<p className="type-body-sm text-ink-3">{t('started')}</p>
-						<p className="type-data text-foreground">
+						</span>
+					</span>
+					<span>
+						{t('sets')}{' '}
+						<span className="type-data text-foreground">{setsDone}</span>
+					</span>
+					<span>
+						{t('started')}{' '}
+						<span className="type-data text-foreground">
 							{formatTime(startedAt, locale)}
-						</p>
-					</div>
-				</div>
+						</span>
+					</span>
+				</p>
 
 				{/* §27.5: a 2px bar under the figures -- ink while sets remain, the
 				    completion mark once they are all done (§4.3 rule 2). The bar

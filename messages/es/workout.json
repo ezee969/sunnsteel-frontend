@@ -340,7 +340,6 @@
 		"weightPlaceholder": "Peso",
 		"rpeAria": "Serie {number} de {exercise}: RPE, de 0 a 10",
 		"rpePlaceholder": "RPE",
-		"optional": "Opcional",
 		"completeNeedsReps": "Escribe las repeticiones para completar la serie",
 		"completeNeedsWeight": "Escribe el peso para completar la serie (0 si es peso corporal)",
 		"lastTime": "La vez anterior",
@@ -354,7 +353,8 @@
 		"repsAria": "Serie {number} de {exercise}: repeticiones",
 		"weightKgAria": "Serie {number} de {exercise}: peso en kilogramos",
 		"weightLbAria": "Serie {number} de {exercise}: peso en libras",
-		"completeAria": "Marcar la serie {number} de {exercise} como completa"
+		"completeAria": "Marcar la serie {number} de {exercise} como completa",
+		"columnSet": "Serie"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",
