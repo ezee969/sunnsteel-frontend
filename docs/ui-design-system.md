@@ -2354,10 +2354,11 @@ The set-completion signature (§9.1) is unchanged.
   the confirmation dialog already states what remains, so a second statement
   of it said nothing new. Discard follows Finish as the destructive outline
   (§4.3 rule 5).
-- The live title wraps (§11.11) and never clamps. *(`LIVE-22`)* Below `sm` the
+- The live title wraps (§11.11) and never clamps. *(`LIVE-22`)* Below `lg` the
   figures are one line under the title (Elapsed, Sets, Started) rather than
   three captioned columns, so the pinned masthead takes less of a phone's
-  screen; the elapsed time ticks every second in its `.duration-slot`.
+  screen, and at `md` the 512px column keeps room for the title beside
+  Finish; the elapsed time ticks every second in its `.duration-slot`.
 - *(`LIVE-22`)* The glossary line (§23.5) moves below the exercise list,
   before the workout note, rather than behind a masthead control: a
   disclosure in the pinned masthead would have cost a control on every

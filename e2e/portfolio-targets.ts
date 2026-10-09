@@ -181,20 +181,30 @@ async function startScratchSession(
 			const row = rows.nth(index)
 			const reps = row.getByLabel(/: reps$/)
 			if (!(await reps.inputValue())) {
-				const target = await row
-					.getByText(/^Target: /)
-					.first()
-					.innerText()
+				// LIVE-22: a set that matches its exercise's prescription line
+				// ("3 × 8 · 60 kg") has no caption of its own.
+				const caption = row.getByText(/^Target: /)
+				const target = (await caption.count())
+					? await caption.first().innerText()
+					: ((
+							await page
+								.getByText(/^\d+ × \d+/)
+								.filter({ visible: true })
+								.first()
+								.innerText()
+								.catch(() => '')
+						).match(/× (\d+)/)?.[1] ?? '')
 				await reps.fill(target.match(/\d+/)?.[0] ?? '8')
 			}
 			const weight = row.getByLabel(/: weight in /)
-			if (!(await weight.inputValue())) {
-				const target = await row
-					.getByText(/^Target: /)
-					.nth(1)
-					.innerText()
-				// LIVE-21: a tick needs a weight; 0 is a bodyweight set.
-				await weight.fill(target.match(/\d+(\.\d+)?/)?.[0] ?? '0')
+			// LIVE-22: a pre-filled target is a suggestion shown as the
+			// placeholder, and ticking the set logs it. Without one, LIVE-21's
+			// tick needs a weight; 0 is a bodyweight set.
+			if (
+				!(await weight.inputValue()) &&
+				!/^\d/.test((await weight.getAttribute('placeholder')) ?? '')
+			) {
+				await weight.fill('0')
 			}
 			const box = row.getByRole('checkbox', {
 				name: /^Mark set \d+ of .+ complete$/,
@@ -217,7 +227,9 @@ async function startScratchSession(
 		if (kindMenu) {
 			// LIVE-12: the next set's kind menu, open; nothing is changed.
 			const trigger = page
-				.getByRole('button', { name: /Change set kind$/ })
+				.getByRole('button', {
+					name: /^Set \d+, .+\. (Change set kind|More for this set)$/,
+				})
 				.nth(SETS_TO_LOG)
 			await trigger.scrollIntoViewIfNeeded()
 			await trigger.click()
@@ -683,12 +695,20 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'live-session',
 		route: '/workouts/sessions/:session',
 		openAt: '/routines',
-		features: ['LIVE-00', 'LIVE-01', 'LIVE-03', 'LIVE-04', 'LIVE-05'],
+		features: [
+			'LIVE-00',
+			'LIVE-01',
+			'LIVE-03',
+			'LIVE-04',
+			'LIVE-05',
+			'LIVE-22',
+		],
 		mutates: true,
 		setup: startScratchSession,
-		ready: [/^Target: /, 'Discard'],
+		// LIVE-22: the masthead's one progress statement ("3 of 12").
+		ready: [/^\d+ of \d+$/, 'Discard'],
 		caption:
-			'A live session with three sets logged, the rest timer and last-time comparison.',
+			'A live session built around the current set: the prescription stated once, three sets logged, the rest timer and the last-time comparison.',
 	},
 	{
 		slug: 'live-session-extra-set',
@@ -709,7 +729,8 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		mutates: true,
 		setup: page => startScratchSession(page, { kindMenu: true }),
 		// The open menu is portalled outside <main>; setup waits for it.
-		ready: [/^Target: /, 'Discard'],
+		// LIVE-22: the masthead's one progress statement ("3 of 12").
+		ready: [/^\d+ of \d+$/, 'Discard'],
 		caption:
 			'Set kinds: any set can be marked warm-up, working, drop or optional, so only intended work reaches progression, records and analytics.',
 	},

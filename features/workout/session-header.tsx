@@ -92,7 +92,7 @@ export const SessionHeader = ({
 					{/* Right side - Status and stats. Labels above mono values, so the
 					    figures are the scannable rank rather than their captions. */}
 					<div className="flex shrink-0 items-center gap-4 lg:gap-6">
-						<div className="hidden text-right sm:block">
+						<div className="hidden text-right lg:block">
 							<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
 							{/* §5.4 (UX-24): the elapsed string changes length as it
 							    ticks, so it renders in a reserved slot. */}
@@ -103,7 +103,7 @@ export const SessionHeader = ({
 
 						{/* §11.8 / §27.5: the screen's one statement of how far the
 						    workout has come -- sets done of all, with the bar below. */}
-						<div className="hidden text-right sm:block">
+						<div className="hidden text-right lg:block">
 							<p className="type-body-sm text-ink-3">{t('sets')}</p>
 							<p className="type-data text-foreground">{setsDone}</p>
 						</div>
@@ -146,10 +146,12 @@ export const SessionHeader = ({
 					</div>
 				</div>
 
-				{/* LIVE-22: below `sm` the figures are one line under the title rather
+				{/* LIVE-22: below `lg` the figures are one line under the title rather
 				than a row of three captioned columns, so the pinned masthead takes
-				less of a phone's screen for the whole workout. */}
-				<p className="type-body-sm mt-2 flex flex-wrap gap-x-3 text-ink-3 sm:hidden">
+				less of a phone's screen for the whole workout. Up to `lg` too: at
+				`md` the shell leaves 512px, and the columns beside Finish and the
+				larger-controls switch squeezed the title to nothing. */}
+				<p className="type-body-sm mt-2 flex flex-wrap gap-x-3 text-ink-3 lg:hidden">
 					<span>
 						{t('elapsed')}{' '}
 						<span className="type-data duration-slot text-foreground">

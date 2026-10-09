@@ -140,18 +140,18 @@ export const SetColumnsHeader = ({
 				{t('columnSet')}
 			</div>
 			<div
-				className={`min-w-0 flex-1 sm:min-w-[62px] md:w-[var(--field-max)] md:flex-none ${cell}`}
+				className={`min-w-0 flex-1 sm:min-w-[62px] md:max-w-[var(--field-max)] ${cell}`}
 			>
 				{t('repsPlaceholder')}
 			</div>
 			<div
-				className={`min-w-0 flex-[1.4] sm:min-w-[72px] sm:flex-1 md:w-[var(--field-max)] md:flex-none ${cell}`}
+				className={`min-w-0 flex-[1.4] sm:min-w-[72px] sm:flex-1 md:max-w-[var(--field-max)] ${cell}`}
 			>
 				{getWeightUnitLabel(weightUnit)}
 			</div>
 			{linearBlock ? null : (
 				<div
-					className={`min-w-0 flex-1 sm:min-w-[48px] md:w-[var(--field-max)] md:flex-none ${cell}`}
+					className={`min-w-0 flex-1 sm:min-w-[48px] md:max-w-[var(--field-max)] ${cell}`}
 				>
 					{t('rpePlaceholder')}
 				</div>
@@ -509,7 +509,7 @@ export const SetLogInput = ({
 				</div>
 
 				{/* Reps */}
-				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[62px] md:w-[var(--field-max)] md:flex-none">
+				<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[62px] md:max-w-[var(--field-max)]">
 					<Input
 						id={repsId}
 						type="number"
@@ -555,7 +555,7 @@ export const SetLogInput = ({
 				</div>
 
 				{/* Weight */}
-				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[72px] sm:flex-1 md:w-[var(--field-max)] md:flex-none">
+				<div className="flex min-w-0 flex-[1.4] flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[72px] sm:flex-1 md:max-w-[var(--field-max)]">
 					{linearBlock ? (
 						// ROUT-17: the step's load, read-only. It sits where the field
 						// would, at the field's height and digit size, without the
@@ -638,7 +638,7 @@ export const SetLogInput = ({
 				    column was permanently empty. ROUT-17: a block's working set
 				    logs reps only; its effort is the step's RIR target. */}
 				{linearBlock ? null : (
-					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[48px] md:w-[var(--field-max)] md:flex-none">
+					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[48px] md:max-w-[var(--field-max)]">
 						<Input
 							id={rpeId}
 							type="number"
