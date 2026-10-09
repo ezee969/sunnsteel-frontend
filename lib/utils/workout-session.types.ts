@@ -31,7 +31,7 @@ export type LogRowProps = {
 	plannedRir?: number | null
 	onSave: (payload: UpsertSetLogPayload) => void
 	/** Fired only when a set is ticked complete, never when it is unticked. */
-	onSetCompleted?: () => void
+	onSetCompleted?: (viaKeyboard: boolean) => void
 }
 
 export type GroupedLogsProps = {

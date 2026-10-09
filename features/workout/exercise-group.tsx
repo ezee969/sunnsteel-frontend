@@ -96,7 +96,7 @@ interface ExerciseGroupProps {
 	onSave: (payload: UpsertSetLogPayload) => void
 	previousSets?: ReadonlyMap<string, PreviousSetPerformance>
 	/** Fired with the set's number when one is ticked complete (LIVE-01). */
-	onSetCompleted?: (setNumber: number) => void
+	onSetCompleted?: (setNumber: number, viaKeyboard: boolean) => void
 	/** LIVE-14: "Superset A1 · Round 2 of 3" while the exercise is in a group. */
 	roundLine?: string | null
 	/** LIVE-14: "Up next: set 2" while the next set of the rounds is this one's. */
@@ -544,7 +544,9 @@ export const ExerciseGroup = ({
 							}
 							onSave={onSave}
 							onSetCompleted={
-								onSetCompleted ? () => onSetCompleted(set.setNumber) : undefined
+								onSetCompleted
+									? viaKeyboard => onSetCompleted(set.setNumber, viaKeyboard)
+									: undefined
 							}
 						/>
 					))}

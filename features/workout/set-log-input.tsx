@@ -8,6 +8,7 @@ import {
 } from '@sunsteel/contracts'
 import { ChevronDown, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -253,10 +254,13 @@ export const SetLogInput = ({
 	// LIVE-21's refused tick points at the field it needs. LIVE-22: inputs are
 	// never disabled while saving, because disabling a focused field blurs it
 	// and closes a phone's keyboard in the middle of an entry.
-	const tick = () => {
-		const missing = handleCompletionToggle(true)
+	const tick = (viaKeyboard: boolean) => {
+		const missing = handleCompletionToggle(true, viaKeyboard)
 		if (missing) focusField(missing === 'reps' ? repsId : weightId)
 	}
+	// The checkbox toggles on a click; a Space press reaches it as one, so the
+	// key is remembered for the click that follows.
+	const keyTick = useRef(false)
 	// LIVE-22: Enter moves on to the next field, and on the last one ticks the
 	// set, so a keyboard logs a set without reaching for the box.
 	const onEnter =
@@ -264,7 +268,7 @@ export const SetLogInput = ({
 			if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
 			event.preventDefault()
 			if (next) focusField(next)
-			else if (!isCompletedState) tick()
+			else if (!isCompletedState) tick(true)
 		}
 	const repsInvalid =
 		completionField === 'reps' || (!isValid && validationField === 'reps')
@@ -631,9 +635,14 @@ export const SetLogInput = ({
 					</span>
 					<Checkbox
 						checked={isCompletedState}
+						onKeyDown={event => {
+							if (event.key === ' ') keyTick.current = true
+						}}
 						onCheckedChange={(checked: boolean | 'indeterminate') => {
+							const viaKeyboard = keyTick.current
+							keyTick.current = false
 							// Focus inside the tap, so a phone opens its keypad.
-							if (checked === true) tick()
+							if (checked === true) tick(viaKeyboard)
 							else handleCompletionToggle(false)
 						}}
 						aria-label={t('completeAria', {

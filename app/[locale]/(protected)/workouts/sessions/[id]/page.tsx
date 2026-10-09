@@ -295,6 +295,21 @@ export default function ActiveSessionPage() {
 				block: scrollRequest.block,
 			})
 	}, [scrollRequest])
+	// LIVE-22 (§27.3): after a tick from the keyboard, focus moves on to the
+	// next set's first field, once any fold and hand-off have landed. A tap
+	// moves only the current-set mark, so no phone keypad is raised mid-rest.
+	const pendingFocus = useRef<string | null>(null)
+	const [focusRequest, setFocusRequest] = useState<string | null>(null)
+	useEffect(() => {
+		if (!focusRequest) return
+		const field = document.getElementById(focusRequest)
+		field?.focus({ preventScroll: true })
+		field?.scrollIntoView({
+			behavior: reducedMotionRef.current ? 'auto' : 'smooth',
+			block: 'nearest',
+		})
+		setFocusRequest(null)
+	}, [focusRequest])
 	const foldTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
 	useEffect(() => {
 		const timers = foldTimers.current
@@ -331,6 +346,10 @@ export default function ActiveSessionPage() {
 					collapseExercise(exerciseId)
 					if (then) handOff(then)
 					else setScrollRequest({ exerciseId, block: 'nearest' })
+					if (pendingFocus.current) {
+						setFocusRequest(pendingFocus.current)
+						pendingFocus.current = null
+					}
 				}, AUTO_COLLAPSE_DELAY_MS),
 			)
 		},
@@ -481,7 +500,7 @@ export default function ActiveSessionPage() {
 										? describeUpNext(upNext, tRounds)
 										: null
 								}
-								onSetCompleted={setNumber => {
+								onSetCompleted={(setNumber, viaKeyboard) => {
 									// LIVE-14: in a superset or circuit the next set is the
 									// partner's; the rest is this exercise's own (0:00 when it
 									// hands straight over), and the alert names what follows.
@@ -497,12 +516,21 @@ export default function ActiveSessionPage() {
 										status && next && next.exerciseId !== group.exerciseId
 											? next.exerciseId
 											: null
+									// LIVE-22: the field a keyboard tick hands focus to.
+									const focusTarget =
+										viaKeyboard && next
+											? `set-${next.exerciseId}-${next.setNumber}-reps`
+											: null
 									// LIVE-21: a finished exercise folds first and the
 									// hand-off follows, so the fold never moves the
 									// scroll's target mid-way.
-									if (completesExercise(group.sets, setNumber))
+									if (completesExercise(group.sets, setNumber)) {
+										pendingFocus.current = focusTarget
 										foldWhenDone(group.exerciseId, handsOverTo)
-									else if (handsOverTo) handOff(handsOverTo)
+									} else {
+										if (handsOverTo) handOff(handsOverTo)
+										if (focusTarget) setFocusRequest(focusTarget)
+									}
 								}}
 								arriving={arrival === group.exerciseId}
 								onArrivalEnd={() => setArrival(null)}

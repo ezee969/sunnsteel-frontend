@@ -47,7 +47,11 @@ interface UseSetLogFormProps {
 	 */
 	suggestedWeightKg?: number | null
 	onSave: (payload: UpsertSetLogPayload) => void
-	onSetCompleted?: () => void
+	/**
+	 * Fired when a set is ticked. LIVE-22: `viaKeyboard` says the tick came
+	 * from the keyboard, so the screen may move focus on to the next set.
+	 */
+	onSetCompleted?: (viaKeyboard: boolean) => void
 }
 
 interface UseSetLogFormReturn {
@@ -68,7 +72,10 @@ interface UseSetLogFormReturn {
 	 * Ticks or unticks the set. LIVE-21: a tick with a field still empty is
 	 * refused and returns that field, so the row can point at it.
 	 */
-	handleCompletionToggle: (checked: boolean) => 'reps' | 'weight' | null
+	handleCompletionToggle: (
+		checked: boolean,
+		viaKeyboard?: boolean,
+	) => 'reps' | 'weight' | null
 	/** LIVE-15: put another set's values in the fields and save them. */
 	fill: (values: SetValues) => void
 	/** LIVE-12: change what the set is for, saved at once with its values. */
@@ -427,7 +434,7 @@ export const useSetLogForm = ({
 	)
 
 	const handleCompletionToggle = useCallback(
-		(checked: boolean): 'reps' | 'weight' | null => {
+		(checked: boolean, viaKeyboard = false): 'reps' | 'weight' | null => {
 			// LIVE-21: a tick needs reps and a weight (0 for bodyweight). A
 			// refused tick changes nothing: no completion, no rest, no save.
 			// Unticking is always allowed.
@@ -450,7 +457,7 @@ export const useSetLogForm = ({
 
 			// Ticking a set is what starts rest (LIVE-01). Unticking is a
 			// correction and must not restart the countdown.
-			if (checked) onSetCompletedRef.current?.()
+			if (checked) onSetCompletedRef.current?.(viaKeyboard)
 
 			// Immediately save completion toggle
 			const payload = createPayload(repsState, tickWeight, rpeState, checked)
