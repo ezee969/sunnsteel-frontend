@@ -262,16 +262,13 @@ function CreateRoutineWizard() {
 			</div>
 
 			{/* UX-25 (§28.3): the step body is a ruled region, not a panel. The
-			    stepper above names the step, so its title here is for screen
-			    readers only; the boxes inside it are the exercises, the unit of
+			    stepper above names and describes the step, so its title here is
+			    for screen readers only; the boxes inside it are the exercises, the unit of
 			    work. It was a panel holding a day panel holding exercise panels. */}
 			<section aria-labelledby="wizard-step-title">
 				<h2 id="wizard-step-title" className="sr-only">
 					{STEPS[currentStep - 1].title}
 				</h2>
-				<p className="type-body-sm mb-4 hidden text-ink-3 sm:block">
-					{STEPS[currentStep - 1].description}
-				</p>
 				{renderCurrentStep()}
 			</section>
 
