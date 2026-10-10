@@ -60,6 +60,7 @@
 		"accountDeletedTitle": "Cuenta eliminada",
 		"loadingFallback": "Cargando…",
 		"unableToSignIn": "No se pudo iniciar sesión",
+		"emailNotConfirmed": "Primero confirma tu correo con el enlace que te enviamos.",
 		"checkCredentials": "Revisa tus credenciales.",
 		"forgotPasswordLink": "¿Olvidaste tu contraseña?",
 		"signingIn": "Iniciando sesión…",

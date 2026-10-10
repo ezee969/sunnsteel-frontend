@@ -60,6 +60,7 @@
 		"accountDeletedTitle": "Account deleted",
 		"loadingFallback": "Loading...",
 		"unableToSignIn": "Unable to sign in",
+		"emailNotConfirmed": "Confirm your email address first, with the link we sent you.",
 		"checkCredentials": "Please check your credentials.",
 		"forgotPasswordLink": "Forgot password?",
 		"signingIn": "Signing in...",

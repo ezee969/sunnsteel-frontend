@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-	AlertCircle,
 	CheckCircle2,
 	ChevronRight,
 	Eye,
@@ -35,6 +34,8 @@ import {
 } from '@/lib/api/hooks/useSupabaseAuth'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
 import { LoginFormValues, loginSchema } from '@/schema/login-schema'
+
+import { AuthNotice } from '../../components/AuthPageParts'
 
 /**
  * Renders a login UI that supports email/password and Google sign-in via Supabase.
@@ -99,22 +100,16 @@ export function SupabaseLoginForm() {
 				</div>
 			)}
 
+			{/* UX-25: a failed sign-in destroys nothing, so it is AuthNotice's
+			    warning rather than crimson (§4.3 rules 4 and 5), and it says
+			    the failure in the member's language rather than the provider's
+			    English message. */}
 			{isError && (
-				<div
-					role="alert"
-					className="type-body-sm mark mb-6 flex items-start gap-3 border-l-destructive bg-surface-sunk p-3 text-foreground"
-				>
-					<AlertCircle
-						className="mt-0.5 h-5 w-5 shrink-0 text-destructive"
-						aria-hidden
-					/>
-					<div className="flex-1">
-						<p className="type-panel mb-1">{t('unableToSignIn')}</p>
-						<p className="text-ink-2">
-							{error?.message || t('checkCredentials')}
-						</p>
-					</div>
-				</div>
+				<AuthNotice tone="warning" role="alert" title={t('unableToSignIn')}>
+					{(error as { code?: string } | null)?.code === 'email_not_confirmed'
+						? t('emailNotConfirmed')
+						: t('checkCredentials')}
+				</AuthNotice>
 			)}
 
 			<div className="grid gap-6">

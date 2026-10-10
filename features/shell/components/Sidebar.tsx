@@ -413,8 +413,10 @@ export default function Sidebar({
 									'mark group relative w-full gap-3 rounded-none text-sm font-medium normal-case tracking-normal no-underline transition-colors duration-[var(--motion-fast)] ease-standard hover:no-underline',
 									isMobile ? 'h-11' : 'h-9',
 									isCollapsed ? 'justify-center' : 'justify-start',
+									// UX-25 (§11.10): the marker and the ink say which row is
+									// current; the row takes no fill of its own.
 									isActive
-										? 'bg-surface font-semibold text-foreground'
+										? 'font-semibold text-foreground'
 										: 'text-ink-2 hover:bg-surface hover:text-foreground',
 									item.disabled &&
 										'cursor-not-allowed text-ink-3 hover:bg-transparent hover:text-ink-3',
@@ -572,7 +574,7 @@ export default function Sidebar({
 								isMobile ? 'h-11' : 'h-9',
 								!isSidebarOpen && !isMobile ? 'justify-center' : '',
 								activeNav === 'settings'
-									? 'mark-honour bg-surface font-semibold text-foreground'
+									? 'mark-honour font-semibold text-foreground'
 									: 'text-ink-2 hover:bg-surface hover:text-foreground',
 							)}
 							onClick={() => {

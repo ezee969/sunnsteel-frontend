@@ -1,17 +1,14 @@
 'use client'
 
-import {
-	Dumbbell,
-	Home,
-	type LucideIcon,
-	MoreHorizontal,
-	TrendingUp,
-	Users,
-} from 'lucide-react'
+import { type LucideIcon, MoreHorizontal, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
 import { useTodaysWorkouts } from '@/app/[locale]/(protected)/dashboard/hooks/useTodaysWorkouts'
+import {
+	ClassicalIcon,
+	type ClassicalIconName,
+} from '@/components/icons/ClassicalIcon'
 import { useUnreadConversations } from '@/lib/api/hooks/useConversations'
 import { useNotifications } from '@/lib/api/hooks/useNotifications'
 import { cn } from '@/lib/utils'
@@ -29,10 +26,14 @@ interface BottomNavProps {
 	onNavigateStart?: () => void
 }
 
-const ICONS: Record<NavGroupId, LucideIcon> = {
-	today: Home,
-	train: Dumbbell,
-	progress: TrendingUp,
+// UX-25: one icon family per destination. A group that is a sidebar
+// destination takes the sidebar's classical glyph (Dashboard's pillar,
+// Workouts' dumbbell, Progress's compass); the others have no classical
+// counterpart and stay lucide.
+const ICONS: Record<NavGroupId, ClassicalIconName | LucideIcon> = {
+	today: 'pillar-icon',
+	train: 'dumbbell',
+	progress: 'compass',
 	community: Users,
 	more: MoreHorizontal,
 }
@@ -91,10 +92,18 @@ export function BottomNav({
 		const n = count(group)
 		return (
 			<span className="relative flex">
-				<Icon
-					aria-hidden
-					className={cn('size-5', active ? 'text-honour-strong' : '')}
-				/>
+				{typeof Icon === 'string' ? (
+					<ClassicalIcon
+						name={Icon}
+						aria-hidden
+						className={cn('size-5', active ? 'text-honour-strong' : '')}
+					/>
+				) : (
+					<Icon
+						aria-hidden
+						className={cn('size-5', active ? 'text-honour-strong' : '')}
+					/>
+				)}
 				{n > 0 ? (
 					<span
 						aria-hidden

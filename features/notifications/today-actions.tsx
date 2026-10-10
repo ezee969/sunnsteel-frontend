@@ -20,6 +20,7 @@ import { routineDayTitle } from '@/lib/utils/routine-schedule'
  */
 export function TodayActions() {
 	const router = useRouter()
+	const t = useTranslations('social.notifications')
 	const tDate = useTranslations('routines.date')
 	const { entries, active, isPending, error } = useTodaysWorkouts()
 	const startSession = useStartSession()
@@ -45,35 +46,32 @@ export function TodayActions() {
 		<section aria-labelledby="notifications-today" className="space-y-4">
 			<div className="rule-heading pb-4">
 				<h2 id="notifications-today" className="type-section text-foreground">
-					Today
+					{t('todayTitle')}
 				</h2>
-				<p className="type-body-sm mt-1 text-ink-3">
-					What you can act on now. It follows your plan, so it is never counted
-					as unread.
-				</p>
+				<p className="type-body-sm mt-1 text-ink-3">{t('todayBody')}</p>
 			</div>
 			{isPending ? (
-				<Skeleton className="h-12" aria-label="Loading today’s workouts" />
+				<Skeleton className="h-12" aria-label={t('todayLoading')} />
 			) : error ? (
-				<p className="type-body-sm text-ink-3">
-					Today’s plan is unavailable right now.
-				</p>
+				<p className="type-body-sm text-ink-3">{t('todayError')}</p>
 			) : live ? (
 				<ul>
 					<li className="rule-row flex flex-wrap items-center justify-between gap-3 py-3">
 						<p className="type-body-sm min-w-0 text-foreground">
-							{live.routine?.name ?? 'Your workout'} is in progress
+							{t('todayLive', {
+								name: live.routine?.name ?? t('todayLiveFallback'),
+							})}
 						</p>
 						<Button asChild variant="outline" size="sm">
 							<Link href={`/workouts/sessions/${live.id}`}>
 								<Dumbbell className="size-4" aria-hidden />
-								Resume
+								{t('todayResume')}
 							</Link>
 						</Button>
 					</li>
 				</ul>
 			) : entries.length === 0 ? (
-				<p className="type-body-sm text-ink-3">Nothing planned for today.</p>
+				<p className="type-body-sm text-ink-3">{t('todayNone')}</p>
 			) : (
 				<ul>
 					{entries.map(({ routine, day, canStartToday }) => {
@@ -84,13 +82,13 @@ export function TodayActions() {
 								className="rule-row flex flex-wrap items-center justify-between gap-3 py-3"
 							>
 								<p className="type-body-sm min-w-0 text-foreground">
-									{target} is planned today
+									{t('todayPlanned', { target })}
 								</p>
 								<Button
 									type="button"
 									variant="outline"
 									size="sm"
-									aria-label={`Start ${target}`}
+									aria-label={t('todayStartAria', { target })}
 									disabled={!canStartToday || startingDayId !== null}
 									onClick={() => void handleStart(routine.id, day.id)}
 								>
@@ -99,7 +97,7 @@ export function TodayActions() {
 									) : (
 										<Dumbbell className="size-4" aria-hidden />
 									)}
-									Start
+									{t('todayStart')}
 								</Button>
 							</li>
 						)
