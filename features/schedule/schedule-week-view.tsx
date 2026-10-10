@@ -81,15 +81,39 @@ interface ActionProps {
 	target: string
 	startingDayId: string | null
 	onStart: (routineId: string, routineDayId: string) => void
+	/** UX-25: the action that is today's task, the page's one filled control. */
+	primaryKey?: string | null
 }
 
-/** Repeated row controls are outline, never the region's primary (§4.3). */
-function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
+/** Which action an entry's control performs, to name today's primary. */
+const actionKey = (action: ScheduleAction) =>
+	!action
+		? null
+		: action.kind === 'RESUME'
+			? `resume:${action.sessionId}`
+			: `start:${action.routineDayId}`
+
+/**
+ * Repeated row controls are outline (§4.3 rule 1) -- except today's next
+ * action, the one thing the page exists to start (UX-25).
+ */
+function EntryAction({
+	action,
+	target,
+	startingDayId,
+	onStart,
+	primaryKey,
+}: ActionProps) {
 	const t = useTranslations('planning.scheduleWeek')
 	if (!action) return null
 	if (action.kind === 'RESUME') {
 		return (
-			<Button asChild size="sm" variant="outline" className="shrink-0">
+			<Button
+				asChild
+				size="sm"
+				variant={primaryKey === actionKey(action) ? 'default' : 'outline'}
+				className="shrink-0"
+			>
 				<Link
 					href={`/workouts/sessions/${action.sessionId}`}
 					aria-label={t('resumeAria', { target })}
@@ -103,7 +127,7 @@ function EntryAction({ action, target, startingDayId, onStart }: ActionProps) {
 		<Button
 			type="button"
 			size="sm"
-			variant="outline"
+			variant={primaryKey === actionKey(action) ? 'default' : 'outline'}
 			className="shrink-0"
 			aria-label={t('startAria', { target })}
 			disabled={startingDayId !== null}
@@ -288,6 +312,26 @@ export function ScheduleWeekView({
 	const tDate = useTranslations('routines.date')
 	const t = useTranslations('planning.scheduleWeek')
 	const tMonth = useTranslations('planning.scheduleMonth')
+	// UX-25: today's first action -- a live session to resume, else the first
+	// workout planned today, else a rotation's next day -- is the page's one
+	// filled control.
+	const today = week?.days.find(day => day.isToday)
+	const todayKey = actionKey(
+		today?.entries
+			.map(entry => scheduleEntryAction(entry, today, hasActiveSession))
+			.find(Boolean) ?? null,
+	)
+	// The rotation line names the same day as today's row when it trains
+	// today, so it takes the mark only when today's rows offer nothing.
+	const rotationKey = todayKey
+		? null
+		: actionKey(
+				(week?.rotations ?? [])
+					.map(rotation =>
+						rotationStartAction(rotation, week!, hasActiveSession),
+					)
+					.find(Boolean) ?? null,
+			)
 	return (
 		<section aria-labelledby="schedule-week" className="space-y-4">
 			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
@@ -411,6 +455,7 @@ export function ScheduleWeekView({
 										target={`${rotation.routineName} · ${rotation.nextDayName}`}
 										startingDayId={startingDayId}
 										onStart={onStart}
+										primaryKey={rotationKey}
 									/>
 								</li>
 							))}
@@ -452,6 +497,7 @@ export function ScheduleWeekView({
 													)}
 													startingDayId={startingDayId}
 													onStart={onStart}
+													primaryKey={todayKey}
 													moveAction={scheduleMoveAction(entry, day, now)}
 													onMove={onMove}
 													onUndoMove={onUndoMove}
