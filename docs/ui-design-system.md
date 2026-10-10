@@ -2423,3 +2423,74 @@ John Doe test account, in headless Chromium:
   hid its countdown under the sidebar from `md` (§27.5).
 - **Not verified:** the keyboard staying open on a real phone (iOS Safari and
   Android Chrome) and a screen reader pass; both need a device.
+
+## 28. Amendment — Core workflows (2026-10-10)
+
+**Status: in force.** From the owner-approved [UI/UX audit](ui-audit-2026-10.md)
+§11 Phase C and the owner's decisions of 2026-10-08 (mastheads name the page)
+and 2026-10-09 (an archived routine is a status, not a toggle; the Recent
+filter goes). Implemented by `UX-25`. Nothing here adds a colour, face, radius
+or shadow; it applies rules v1.0 already had to the screens that broke them.
+
+### 28.1 One filled control per region, and it is the task
+
+§4.3 rule 1 restated where pages broke it. A control repeated on every row is
+outline or ghost, never filled; the region's one filled control is the thing
+the member came to do now:
+
+- **Routines:** Create Routine. A card's Start and Resume are outline; the
+  routine's name opens it.
+- **A routine's page:** the Start of the day due today -- a rotation's next
+  day -- or Resume on the live session's day.
+- **Schedule:** today's first action -- the live session's Resume, else the
+  first workout planned today, else a rotation's next day when today offers
+  nothing. Every other Start stays outline (this narrows `SCHED-03`'s "every
+  Start is outline").
+- **Workouts:** Train another day. Routines, History and Dashboard are places
+  to go, so they are a ruled list of links, not buttons.
+
+### 28.2 A toggle is not a command
+
+`components/ui/toggle-row.tsx`. Every in-page choice -- a view (Schedule's
+week or month), a range (Progress, Body), a breakdown, a status (the report
+queue), a filter (Routines, the exercise catalog) -- is a `ToggleRow` of
+`ToggleOption`s: §21.3's tab look, Button type in `--ink-2` on a rule, the
+chosen option `--foreground` over a 2px ink underline, never a fill. They used
+the secondary button fill, so a choice read as an action. One-of-several and
+independent filters look the same and both say their state with
+`aria-pressed`; an independent filter may add a check glyph. Form controls
+that pick values (weekday pickers, chips in Settings) are inputs, not
+toggles, and are untouched.
+
+### 28.3 The builder: one heading, one box per exercise
+
+- The masthead names the page ("New routine", "Edit routine") with the
+  slogan as its subtitle (§28.4). The stepper names the step; the step body
+  keeps the step's name only as a screen-reader heading. It used to carry a
+  second heading and the step name twice more.
+- **The exercise is the box** (the §27.2 rule applied to the builder): the
+  step body and a day are ruled regions, and a set is a ruled row inside its
+  exercise at every width. They were a panel holding a day panel holding
+  exercise panels, with each set a fourth box below `lg`.
+- The review step's days and exercises are ruled the same way, and the
+  wizard's stock shadcn colours take the system's tokens.
+
+### 28.4 Mastheads name the page
+
+(Owner, 2026-10-08.) A masthead's inscription is the page's name as the
+navigation says it; a slogan moves to the subtitle. Below `sm` the running
+head is hidden, so the inscription is the page's only name. Dashboard was
+"Forge Your Path", History "Training Archive", Progress "Training Progress".
+
+### 28.5 Navigation and status
+
+- The sidebar's current row has no fill (§11.10): the marker and the ink say
+  it. The phone's bottom bar draws a destination with the sidebar's glyph for
+  it, so one place has one icon.
+- **An archived routine is a status** (owner, 2026-10-09): the card's
+  disabled Completed toggle is gone, and the schedule note says "Archived"
+  with an ink glyph -- never the success colour, which means completed as
+  planned. The filter and the routine page's action say Archived and
+  Restore.
+- A failed sign-in is `AuthNotice`'s warning with the reason in the member's
+  language, never the provider's English in crimson (§4.3 rules 4 and 5).
