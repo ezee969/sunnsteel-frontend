@@ -1,6 +1,12 @@
 import { existsSync } from 'node:fs'
 
-import type { Locator, Page, Request, TestInfo } from '@playwright/test'
+import {
+	errors,
+	type Locator,
+	type Page,
+	type Request,
+	type TestInfo,
+} from '@playwright/test'
 import {
 	TRAINING_PARTNERS_MAX,
 	type TrainingPartnershipsResponse,
@@ -124,9 +130,62 @@ async function settle(page: Page) {
 	await page.waitForTimeout(250)
 }
 
+/**
+ * How long a page may take, after `networkidle`, to replace its loading state
+ * with content. On a loaded machine under Turbopack (~13s to `networkidle`) a
+ * page still showed "Loading session data" when the checks ran, and failed
+ * them for a measurement taken too early (2026-10-09).
+ */
+const CONTENT_TIMEOUT = 30_000
+
+/**
+ * Waits until the page's content area (`<main>`, or the body on a page without
+ * one) shows a visible `h1` and no loading state: nothing `aria-busy="true"`
+ * and no labelled `role="status"`. The app labels every loading status (the
+ * skeletons, `ClassicalLoader`) and leaves the ones that report something --
+ * an empty list, a notice -- unlabelled, so those never hold the wait.
+ *
+ * The wait is bounded and never fails by itself: a page still loading after
+ * it is annotated and measured as it stands, and the checks that follow
+ * report what they find, exactly as before the wait existed.
+ */
+async function waitForContent(page: Page) {
+	try {
+		await page.waitForFunction(
+			() => {
+				const root = document.querySelector('main') ?? document.body
+				const shown = (element: Element) => {
+					const rect = element.getBoundingClientRect()
+					return (
+						rect.width > 0 &&
+						rect.height > 0 &&
+						getComputedStyle(element).visibility !== 'hidden'
+					)
+				}
+				const loading = root.querySelectorAll(
+					'[aria-busy="true"], [role="status"][aria-label]',
+				)
+				return (
+					![...loading].some(shown) &&
+					[...root.querySelectorAll('h1')].some(shown)
+				)
+			},
+			undefined,
+			{ timeout: CONTENT_TIMEOUT, polling: 100 },
+		)
+	} catch (error) {
+		if (!(error instanceof errors.TimeoutError)) throw error
+		test.info().annotations.push({
+			type: 'still loading',
+			description: `${pathOf(page)} had no h1 or was still loading after ${CONTENT_TIMEOUT / 1000}s`,
+		})
+	}
+}
+
 async function load(page: Page, path: string) {
 	await page.goto(path, { waitUntil: 'networkidle' })
 	await settle(page)
+	await waitForContent(page)
 }
 
 /** Resolves once CSS and Web Animations on the element have finished. */
@@ -832,6 +891,10 @@ for (const width of REGRESSION_WIDTHS) {
 		const actions = page.getByRole('button', {
 			name: msg('routines.card.routineActions'),
 		})
+		// Counted once the list has rendered, not while it is still loading.
+		await expect(actions.first(), 'needs at least one routine').toBeVisible({
+			timeout: CONTENT_TIMEOUT,
+		})
 		const routines = await actions.count()
 		expect(routines, 'needs at least one routine').toBeGreaterThan(0)
 
@@ -1078,7 +1141,11 @@ test('an old Settings link opens its tab', async ({ page }) => {
 	await prepare(page, 1280, 'dark')
 	// UX-12: links written before the tabs name a card on the one page.
 	await load(page, '/settings#training-partners')
-	await expect(page).toHaveURL(/\/settings\/privacy#training-partners$/)
+	// `useHashForward` forwards once the profile has loaded, which a loaded
+	// machine took longer than the default assertion timeout to read.
+	await expect(page).toHaveURL(/\/settings\/privacy#training-partners$/, {
+		timeout: CONTENT_TIMEOUT,
+	})
 	await expect(
 		page.getByRole('heading', { name: msg('settings.trainingPartners.title') }),
 	).toBeInViewport()
