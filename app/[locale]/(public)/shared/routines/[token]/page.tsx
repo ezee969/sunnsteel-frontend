@@ -23,7 +23,7 @@ export default function SharedRoutinePage() {
 	if (isLoading) {
 		return (
 			<div
-				className="mx-auto w-full max-w-3xl space-y-6 px-4 py-8 sm:px-6 sm:py-12"
+				className="mx-auto w-full max-w-3xl space-y-6"
 				aria-busy="true"
 				aria-label={t('loadingLabel')}
 			>
@@ -39,7 +39,7 @@ export default function SharedRoutinePage() {
 		// purpose: neither should confirm that a routine is there.
 		const isGone = error instanceof HttpError && error.status === 404
 		return (
-			<div className="mx-auto w-full max-w-3xl space-y-3 px-4 py-8 sm:px-6 sm:py-12">
+			<div className="mx-auto w-full max-w-3xl space-y-3">
 				<h1 className="type-section text-foreground">
 					{isGone ? t('linkGoneTitle') : t('unavailableTitle')}
 				</h1>
@@ -56,7 +56,7 @@ export default function SharedRoutinePage() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-3xl space-y-10 px-4 py-8 sm:px-6 sm:py-12">
+		<div className="mx-auto w-full max-w-3xl space-y-10">
 			<SharedRoutineView routine={data} />
 			{session ? (
 				<CloneSharedRoutine source={{ token }} routineName={data.setup.name} />
