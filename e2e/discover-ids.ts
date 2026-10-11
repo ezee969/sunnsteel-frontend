@@ -34,13 +34,10 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 	const found: Ids = {}
 	try {
 		await page.goto('/workouts/history', { waitUntil: 'networkidle' })
-		const row = page
-			.locator('main [role="button"][aria-label^="Open session"]')
-			.first()
+		// UX-26: a history row is a link, so its address carries the id.
+		const row = page.locator('main a[aria-label^="Open session"]').first()
 		if ((await row.count()) > 0) {
-			await row.click()
-			await page.waitForURL(/\/workouts\/history\/[^/]+$/)
-			found.history = new URL(page.url()).pathname.split('/').pop()
+			found.history = (await row.getAttribute('href'))?.split('/').pop()
 		}
 
 		await page.goto('/routines', { waitUntil: 'networkidle' })
