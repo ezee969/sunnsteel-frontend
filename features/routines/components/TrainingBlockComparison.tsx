@@ -1,11 +1,10 @@
 'use client'
 
 import type { RoutineTrainingBlock, WeightUnit } from '@sunsteel/contracts'
-import { RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import {
 	Dialog,
 	DialogContent,
@@ -14,6 +13,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { useTrainingBlockComparison } from '@/lib/api/hooks/useRoutineTrainingBlocks'
@@ -43,6 +43,7 @@ export function TrainingBlockComparisonDialog({
 	onClose: () => void
 }) {
 	const t = useTranslations('routines.listing')
+	const errorText = useApiErrorMessage()
 	const tCompare = useTranslations('progress.blockComparison')
 	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
@@ -72,24 +73,17 @@ export function TrainingBlockComparisonDialog({
 						<Skeleton className="h-10" />
 					</div>
 				) : comparison.isError || !data ? (
-					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">
-							{t('comparisonUnavailable')}
-						</p>
-						<p className="type-body-sm mt-1 text-ink-3">
-							{comparison.error?.message ?? t('comparisonFailed')}
-						</p>
-						<Button
-							type="button"
-							size="sm"
-							variant="outline"
-							className="mt-3"
-							onClick={() => void comparison.refetch()}
-						>
-							<RefreshCw className="size-4" aria-hidden />
-							Retry
-						</Button>
-					</div>
+					// UX-26: the shared InlineError, in the member's language; this
+					// printed the error's own message and an English "Retry".
+					<InlineError
+						title={t('comparisonUnavailable')}
+						message={
+							comparison.error
+								? errorText(comparison.error)
+								: t('comparisonFailed')
+						}
+						onRetry={() => void comparison.refetch()}
+					/>
 				) : (
 					<div className="space-y-6">
 						<dl className="grid grid-cols-2 gap-3 border-b border-rule-faint pb-3">

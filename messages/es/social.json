@@ -60,6 +60,8 @@
 		"reports": "Denuncias",
 		"record": "Registro",
 		"loadingRecord": "Cargando el registro…",
+		"reportsFailed": "No se pudieron cargar los reportes",
+		"recordFailed": "No se pudo cargar el registro",
 		"tryAgain": "Reintentar",
 		"nothingRecorded": "Todavía no se registró nada.",
 		"loading": "Cargando…",

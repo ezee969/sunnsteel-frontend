@@ -1,11 +1,12 @@
 'use client'
 
-import { Loader2, RefreshCw } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ActivityEntryList } from '@/features/activity/activity-entry-list'
@@ -49,19 +50,11 @@ export function ActivityFeed() {
 					<Skeleton className="h-20" />
 				</div>
 			) : query.isError ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						type="button"
-						variant="outline"
-						className="mt-4"
-						onClick={() => void query.refetch()}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={() => void query.refetch()}
+				/>
 			) : entries.length === 0 ? (
 				<EmptyModule
 					{...describeEmptyFeed(first?.followedCount ?? 0, tActivity)}

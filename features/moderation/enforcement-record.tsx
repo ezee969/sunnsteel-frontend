@@ -1,8 +1,9 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { InlineError } from '@/components/layout/inline-error'
+import { LoadingRows } from '@/components/layout/loading-rows'
 import { Button } from '@/components/ui/button'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useModerationHistory } from '@/lib/api/hooks/useModeration'
@@ -30,25 +31,13 @@ export function EnforcementRecord() {
 			<p className="type-body-sm text-ink-3">{tModeration('recordNote')}</p>
 
 			{history.isLoading ? (
-				<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
-					<Loader2 className="size-4 animate-spin" aria-hidden />
-					{t('loadingRecord')}
-				</div>
+				<LoadingRows label={t('loadingRecord')} rows={3} />
 			) : history.error ? (
-				<div role="alert" className="border border-destructive bg-surface p-4">
-					<p className="type-body-sm text-destructive">
-						{errorText(history.error)}
-					</p>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="mt-3"
-						onClick={() => void history.refetch()}
-					>
-						{t('tryAgain')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('recordFailed')}
+					message={errorText(history.error)}
+					onRetry={() => void history.refetch()}
+				/>
 			) : actions.length ? (
 				<div className="border-t border-rule-faint">
 					{actions.map(action => (

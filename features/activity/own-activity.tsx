@@ -6,13 +6,14 @@ import type {
 	OwnActivityEntry,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { Loader2, RefreshCw } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -56,19 +57,11 @@ const PREVIEW_NOTES = {
 function PageError({ onRetry }: { onRetry: () => void }) {
 	const t = useTranslations('social.activityUi')
 	return (
-		<div role="alert" className="border border-rule bg-surface p-6">
-			<p className="type-panel text-foreground">{t('errorTitle')}</p>
-			<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-			<Button
-				type="button"
-				variant="outline"
-				className="mt-4"
-				onClick={onRetry}
-			>
-				<RefreshCw className="size-4" aria-hidden />
-				{t('retry')}
-			</Button>
-		</div>
+		<InlineError
+			title={t('errorTitle')}
+			message={t('errorBody')}
+			onRetry={onRetry}
+		/>
 	)
 }
 

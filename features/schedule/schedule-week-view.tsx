@@ -5,7 +5,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Loader2,
-	RefreshCw,
 	Repeat,
 	SkipForward,
 	Undo2,
@@ -14,6 +13,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
@@ -401,20 +401,11 @@ export function ScheduleWeekView({
 					<Skeleton className="h-14" />
 				</div>
 			) : isError || !week ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
-					<Button
-						type="button"
-						size="sm"
-						variant="outline"
-						className="mt-3"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('unavailableTitle')}
+					message={t('unavailableBody')}
+					onRetry={onRetry}
+				/>
 			) : (
 				<>
 					{week.rotations.length > 0 ? (

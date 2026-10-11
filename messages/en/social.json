@@ -60,6 +60,8 @@
 		"reports": "Reports",
 		"record": "Record",
 		"loadingRecord": "Loading the record…",
+		"reportsFailed": "The reports could not be loaded",
+		"recordFailed": "The record could not be loaded",
 		"tryAgain": "Try again",
 		"nothingRecorded": "Nothing has been recorded yet.",
 		"loading": "Loading…",

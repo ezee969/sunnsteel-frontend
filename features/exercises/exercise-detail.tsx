@@ -1,14 +1,14 @@
 'use client'
 
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
-import { ArrowLeft, RefreshCw } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { type ReactNode, useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import HeroSection from '@/components/layout/HeroSection'
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
@@ -89,23 +89,7 @@ function RetryAlert({
 	description: string
 	onRetry: () => void
 }) {
-	const t = useTranslations('catalog.exercisesUi')
-	return (
-		<div role="alert" className="border border-rule bg-surface p-5">
-			<p className="type-panel text-foreground">{title}</p>
-			<p className="type-body-sm mt-1 text-ink-3">{description}</p>
-			<Button
-				type="button"
-				size="sm"
-				variant="outline"
-				className="mt-3"
-				onClick={onRetry}
-			>
-				<RefreshCw className="size-4" aria-hidden />
-				{t('retry')}
-			</Button>
-		</div>
-	)
+	return <InlineError title={title} message={description} onRetry={onRetry} />
 }
 
 function BackLink() {
@@ -285,9 +269,7 @@ function BestPerformance({
 				description={t('bestDescription')}
 			/>
 			{!hasStrengthTrend ? (
-				<p className="type-body-sm border border-dashed border-rule bg-surface p-4 text-ink-3">
-					{t('noWeightedBest')}
-				</p>
+				<p className="type-body-sm py-3 text-ink-3">{t('noWeightedBest')}</p>
 			) : trend.isPending ? (
 				<div role="status" aria-label={t('loadingBest')} className="space-y-4">
 					<Skeleton className="h-20" />

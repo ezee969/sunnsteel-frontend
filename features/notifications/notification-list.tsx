@@ -13,7 +13,6 @@ import {
 	HeartHandshake,
 	Medal,
 	MessageSquare,
-	RefreshCw,
 	TrendingUp,
 	UserPlus,
 } from 'lucide-react'
@@ -21,6 +20,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { InlineError } from '@/components/layout/inline-error'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -338,19 +338,11 @@ export function NotificationList({
 					<Skeleton className="h-16" />
 				</div>
 			) : isError ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						type="button"
-						variant="outline"
-						className="mt-4"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : !data || data.notifications.length === 0 ? (
 				<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 			) : (

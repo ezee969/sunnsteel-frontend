@@ -1,11 +1,11 @@
 'use client'
 
-import { CalendarDays, RefreshCw } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SCHEDULE_STATUS } from '@/features/schedule/schedule-status'
 import { useScheduleData } from '@/features/schedule/use-schedule-data'
@@ -119,20 +119,11 @@ export default function WeekStrip() {
 					<Skeleton className="h-16 sm:h-20" />
 				</div>
 			) : data.isError || !week ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
-					<Button
-						type="button"
-						size="sm"
-						variant="outline"
-						className="mt-3"
-						onClick={data.refetch}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('unavailableTitle')}
+					message={t('unavailableBody')}
+					onRetry={data.refetch}
+				/>
 			) : (
 				<>
 					{/* DASH-06 (§25.3): a ruled band like the stat row below it --

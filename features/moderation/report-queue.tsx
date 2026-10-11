@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
+import { InlineError } from '@/components/layout/inline-error'
+import { LoadingRows } from '@/components/layout/loading-rows'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -150,25 +152,13 @@ export function ReportQueue() {
 			</ToggleRow>
 
 			{queue.isLoading ? (
-				<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
-					<Loader2 className="size-4 animate-spin" aria-hidden />
-					{t('loadingReports')}
-				</div>
+				<LoadingRows label={t('loadingReports')} rows={3} />
 			) : queue.error ? (
-				<div role="alert" className="border border-destructive bg-surface p-4">
-					<p className="type-body-sm text-destructive">
-						{errorText(queue.error)}
-					</p>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="mt-3"
-						onClick={() => void queue.refetch()}
-					>
-						{t('tryAgain')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('reportsFailed')}
+					message={errorText(queue.error)}
+					onRetry={() => void queue.refetch()}
+				/>
 			) : reports.length ? (
 				<div className="border-t border-rule-faint">
 					{reports.map(report => {

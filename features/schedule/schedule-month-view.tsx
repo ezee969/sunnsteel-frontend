@@ -1,10 +1,11 @@
 'use client'
 
 import type { WeekStartsOn } from '@sunsteel/contracts'
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
+import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeekStartsOn } from '@/hooks/use-week-starts-on'
@@ -186,20 +187,11 @@ export function ScheduleMonthView({
 					<Skeleton className="h-72" />
 				</div>
 			) : isError || !month ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('unavailableTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('unavailableBody')}</p>
-					<Button
-						type="button"
-						size="sm"
-						variant="outline"
-						className="mt-3"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('unavailableTitle')}
+					message={t('unavailableBody')}
+					onRetry={onRetry}
+				/>
 			) : (
 				<table className="w-full table-fixed border-collapse">
 					<caption className="sr-only">
