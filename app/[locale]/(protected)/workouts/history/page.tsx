@@ -217,7 +217,13 @@ function WorkoutHistoryContent() {
 					/>
 
 					<WorkoutHistoryList
-						data={{ items, isLoading, isError, error }}
+						data={{
+							items,
+							isLoading,
+							isError,
+							error,
+							onRetry: () => void refetch(),
+						}}
 						pagination={{
 							hasNextPage,
 							isFetchingNextPage,

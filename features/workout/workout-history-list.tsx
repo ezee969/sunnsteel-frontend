@@ -1,35 +1,27 @@
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import type { Ref } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
+import { InlineError } from '@/components/layout/inline-error'
+import { LoadingRows } from '@/components/layout/loading-rows'
 import { Button } from '@/components/ui/button'
 import {
 	StatusMark,
 	statusMarkRule,
 	type StatusState,
 } from '@/components/ui/status-mark'
-import { intlLocale } from '@/i18n/date-locale'
-import type { Translator } from '@/i18n/translator'
+import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { useWeightUnit } from '@/hooks/use-weight-unit'
+import type { Locale } from '@/i18n/config'
+import { dateFormatter, intlLocale, numberFormatter } from '@/i18n/date-locale'
 import type { WorkoutSessionSummary } from '@/lib/api/types/workout.type'
 import { cn } from '@/lib/utils'
 import { getHistoryEmptyState } from '@/lib/utils/empty-states'
 import { groupByMonth } from '@/lib/utils/month-groups'
 import { planLabel } from '@/lib/utils/routine-deloads'
 import { formatDuration } from '@/lib/utils/time-format.utils'
-
-const getErrorMessage = (
-	err: unknown,
-	t: Translator<'workout.historyList'>,
-): string => {
-	if (err instanceof Error) return err.message
-	if (typeof err === 'string') return err
-	if (err && typeof err === 'object' && 'message' in err) {
-		const m = (err as { message?: unknown }).message
-		if (typeof m === 'string') return m
-	}
-	return t('failedToLoad')
-}
+import { formatWeight } from '@/lib/utils/weight-unit'
 
 const STATUS_KEYS = {
 	COMPLETED: 'statusCompleted',
@@ -43,6 +35,8 @@ export interface WorkoutHistoryListProps {
 		isLoading: boolean
 		isError: boolean
 		error: unknown
+		/** UX-26: a failed read offers Try again. */
+		onRetry?: () => void
 	}
 	pagination: {
 		hasNextPage: boolean
@@ -57,14 +51,15 @@ export interface WorkoutHistoryListProps {
 }
 
 export function WorkoutHistoryList({
-	data: { items, isLoading, isError, error },
+	data: { items, isLoading, isError, error, onRetry },
 	pagination: { hasNextPage, isFetchingNextPage, fetchNextPage, sentinelRef },
 	emptyState: { hasActiveFilters, onClearFilters },
 }: WorkoutHistoryListProps) {
 	const t = useTranslations('workout.historyList')
 	const tMetrics = useTranslations('workout.metrics')
-	const locale = useLocale()
-	const router = useRouter()
+	const locale = useLocale() as Locale
+	const errorText = useApiErrorMessage()
+	const weightUnit = useWeightUnit()
 	const tDeloads = useTranslations('routines.deloads')
 	const tEmpty = useTranslations('planning.emptyStates')
 	// UX-24: the one status vocabulary. A session still running is current,
@@ -77,26 +72,46 @@ export function WorkoutHistoryList({
 				: 'current'
 	const statusLabel = (status: string) =>
 		tMetrics(STATUS_KEYS[status as keyof typeof STATUS_KEYS] ?? 'statusUnknown')
-	const dateTime = (iso: string) =>
-		new Date(iso).toLocaleString(intlLocale(locale))
+	// UX-26: a date and a time to the minute, in the app's language; the old
+	// toLocaleString printed the device's format with seconds.
+	const startedFormat = dateFormatter(locale, {
+		weekday: 'short',
+		day: 'numeric',
+		month: 'short',
+		hour: 'numeric',
+		minute: '2-digit',
+	})
+	const dateTime = (iso: string) => startedFormat.format(new Date(iso))
+	const count = numberFormatter(locale, {})
+	/** One line: when, how long, how much and how many sets, where known. */
+	const summary = (s: WorkoutSessionSummary) =>
+		[
+			dateTime(s.startedAt),
+			s.durationSec ? formatDuration(s.durationSec) : null,
+			s.totalVolume ? formatWeight(s.totalVolume, weightUnit, locale) : null,
+			s.totalSets != null
+				? t('setsCount', {
+						count: s.totalSets,
+						sets: count.format(s.totalSets),
+					})
+				: null,
+		]
+			.filter(Boolean)
+			.join(' · ')
 
+	// UX-26 (§28.6): the shared loading rows and inline error, where this was
+	// a plain line and a crimson one with the error's own English.
 	if (isLoading) {
-		return (
-			<div className="type-body-sm flex h-40 items-center justify-center text-ink-3">
-				{t('loadingSessions')}
-			</div>
-		)
+		return <LoadingRows label={t('loadingSessions')} rows={8} />
 	}
 
 	if (isError) {
 		return (
-			<div
-				className="type-body-sm text-destructive"
-				role="alert"
-				aria-live="polite"
-			>
-				{getErrorMessage(error, t)}
-			</div>
+			<InlineError
+				title={t('failedToLoad')}
+				message={errorText(error)}
+				onRetry={onRetry}
+			/>
 		)
 	}
 
@@ -127,115 +142,60 @@ export function WorkoutHistoryList({
 						>
 							{group.label}
 						</h3>
-						{group.items.map(s => (
-							<div
-								key={s.id}
-								// §11.12 — status is a mark, and the status word beside it is what
-								// carries the meaning (§4.3 rule 8). A finished session is "done,
-								// as planned"; an aborted one is the row worth noticing.
+						{group.items.map(s => {
+							const plan = planLabel(
+								{
+									trainingBlockName: s.routine.trainingBlockName,
+									deload: !!s.routine.temporaryOverrideKind,
+								},
+								tDeloads,
+							)
+							return (
+								// UX-26: a row is a link, so it opens in a new tab and reads as
+								// one; it was a div with a button role. One summary line says
+								// when, how long, how much and how many sets, where five
+								// captioned figures said it before.
 								//
-								// `IN_PROGRESS` is deliberately unmarked, not overlooked. All three
-								// mark colours describe an outcome — `--success` is completion,
-								// `--honour` is better than planned and capped at two per viewport,
-								// and `--warning-strong` already means "aborted" in this very list,
-								// so reusing it would collapse two different states into one colour.
-								// A session still running has no outcome yet, and `.mark`'s
-								// transparent 3px keeps the row on the same left axis as its
-								// neighbours while saying so.
-								className={cn(
-									'rule-row mark cursor-pointer py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface',
-									statusMarkRule(statusState(s.status)),
-								)}
-								onClick={() => router.push(`/workouts/history/${s.id}`)}
-								role="button"
-								tabIndex={0}
-								aria-label={t('openSessionAria', {
-									status: statusLabel(s.status).toLowerCase(),
-									routine: s.routine.name,
-									date: dateTime(s.startedAt),
-								})}
-								onKeyDown={e => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault()
-										router.push(`/workouts/history/${s.id}`)
-									}
-								}}
-							>
-								<div className="xl:grid xl:grid-cols-[minmax(0,2fr)_minmax(0,5fr)] xl:items-center xl:gap-8">
-									<div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 xl:flex-col xl:items-start xl:gap-0.5">
-										<div className="type-panel min-w-0 text-foreground">
+								// §11.12: status is a mark and its word (§4.3 rule 8). A
+								// session still running has no outcome yet, so it carries no
+								// rule; `.mark`'s transparent 3px keeps it on the same axis.
+								<Link
+									key={s.id}
+									href={`/workouts/history/${s.id}`}
+									aria-label={t('openSessionAria', {
+										status: statusLabel(s.status).toLowerCase(),
+										routine: s.routine.name,
+										date: dateTime(s.startedAt),
+									})}
+									className={cn(
+										'rule-row mark block py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+										statusMarkRule(statusState(s.status)),
+									)}
+								>
+									<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+										<p className="type-panel min-w-0 text-foreground">
 											{s.routine.name}
 											{s.routine.dayName ? ` · ${s.routine.dayName}` : ''}
-											{planLabel(
-												{
-													trainingBlockName: s.routine.trainingBlockName,
-													deload: !!s.routine.temporaryOverrideKind,
-												},
-												tDeloads,
-											) ? (
-												<span className="type-body-sm block text-ink-3">
-													{planLabel(
-														{
-															trainingBlockName: s.routine.trainingBlockName,
-															deload: !!s.routine.temporaryOverrideKind,
-														},
-														tDeloads,
-													)}
-												</span>
-											) : null}
-										</div>
+										</p>
 										<StatusMark
 											state={statusState(s.status)}
 											label={statusLabel(s.status)}
 										/>
 									</div>
-
-									{/* §10.1 — at `xl` the ledger opens: duration and volume become
-					    right-aligned mono columns rather than left-aligned pairs. */}
-									<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4 sm:gap-y-2 xl:mt-0">
-										{/* v1.1 §26.8: below `sm` a date-time takes a whole line,
-										    caption and value on one baseline, instead of wrapping inside
-										    half a row. */}
-										<div className="col-span-2 flex items-baseline justify-between gap-3 sm:col-span-1 sm:block">
-											<div className="type-body-sm text-ink-3">
-												{t('started')}
-											</div>
-											<div className="type-data text-ink-2">
-												{dateTime(s.startedAt)}
-											</div>
-										</div>
-										<div className="col-span-2 flex items-baseline justify-between gap-3 sm:col-span-1 sm:block">
-											<div className="type-body-sm text-ink-3">
-												{t('ended')}
-											</div>
-											<div className="type-data text-ink-2">
-												{s.endedAt ? dateTime(s.endedAt) : '—'}
-											</div>
-										</div>
-										<div className="xl:text-right">
-											<div className="type-body-sm text-ink-3">
-												{t('duration')}
-											</div>
-											<div className="type-data text-ink-2">
-												{s.durationSec ? formatDuration(s.durationSec) : '—'}
-											</div>
-										</div>
-										<div className="xl:text-right">
-											<div className="type-body-sm text-ink-3">
-												{t('volumeSets')}
-											</div>
-											<div className="type-data text-ink-2">
-												{s.totalVolume ?? '—'} / {s.totalSets ?? '—'}
-											</div>
-										</div>
-									</div>
-								</div>
-
-								{s.notes && (
-									<div className="type-body-sm mt-2 text-ink-3">{s.notes}</div>
-								)}
-							</div>
-						))}
+									<p className="type-body-sm mt-1 text-ink-2">
+										{summary(s)}
+										{plan ? (
+											<span className="text-ink-3">{` · ${plan}`}</span>
+										) : null}
+									</p>
+									{s.notes ? (
+										<p className="type-body-sm mt-1 line-clamp-2 text-ink-3">
+											{s.notes}
+										</p>
+									) : null}
+								</Link>
+							)
+						})}
 					</section>
 				),
 			)}

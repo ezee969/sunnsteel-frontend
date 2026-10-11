@@ -2,7 +2,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function WorkoutHistoryLoading() {
 	return (
-		<div className="mx-auto max-w-3xl space-y-6 p-4 xl:max-w-[var(--content-max)]">
+		<div
+			aria-busy="true"
+			className="mx-auto max-w-3xl space-y-6 xl:max-w-[var(--content-max)]"
+		>
 			{/* Masthead */}
 			<div className="rule-heading pb-4">
 				<Skeleton className="mb-2 h-8 w-48" />
@@ -26,14 +29,8 @@ export default function WorkoutHistoryLoading() {
 							<Skeleton className="h-4 w-56 max-w-full" />
 							<Skeleton className="h-3 w-20 shrink-0" />
 						</div>
-						<div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
-							{Array.from({ length: 4 }).map((__, j) => (
-								<div key={j} className="space-y-1">
-									<Skeleton className="h-3 w-16" />
-									<Skeleton className="h-3 w-24 max-w-full" />
-								</div>
-							))}
-						</div>
+						{/* UX-26: one summary line, as the loaded row has. */}
+						<Skeleton className="mt-2 h-3 w-72 max-w-full" />
 					</div>
 				))}
 			</div>

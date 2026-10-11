@@ -435,10 +435,7 @@
 		"loadMore": "Cargar más",
 		"loading": "Cargando…",
 		"noMoreSessions": "No hay más sesiones",
-		"started": "Inicio",
-		"ended": "Fin",
-		"duration": "Duración",
-		"volumeSets": "Volumen / Series",
+		"setsCount": "{count, plural, one {{sets} serie} other {{sets} series}}",
 		"openSessionAria": "Abrir sesión {status} de {routine} iniciada el {date}"
 	},
 	"page": {
