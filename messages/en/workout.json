@@ -1,9 +1,9 @@
 {
 	"metrics": {
-		"statusCompleted": "COMPLETED",
-		"statusAborted": "ABORTED",
-		"statusInProgress": "IN_PROGRESS",
-		"statusUnknown": "UNKNOWN",
+		"statusCompleted": "Completed",
+		"statusAborted": "Aborted",
+		"statusInProgress": "In progress",
+		"statusUnknown": "Unknown",
 		"unknownDay": "Unknown Day",
 		"unknownDate": "Unknown Date"
 	},

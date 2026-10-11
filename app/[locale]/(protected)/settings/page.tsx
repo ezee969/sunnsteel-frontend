@@ -377,7 +377,7 @@ export default function SettingsProfilePage() {
 						<form onSubmit={handleSubmit} className="space-y-4">
 							<div className="space-y-2">
 								<Label htmlFor="username">{t('username')}</Label>
-								<div className="relative max-w-[var(--field-max)]">
+								<div className="relative max-w-sm">
 									<span
 										className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
 										aria-hidden
