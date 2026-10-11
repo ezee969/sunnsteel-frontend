@@ -433,7 +433,7 @@
 		"saveError": "Error al guardar el perfil: {message}",
 		"pictureTitle": "Foto de perfil",
 		"pictureDescription": "Actualiza tu avatar",
-		"clickToUpload": "Haz clic en la imagen para subir un avatar nuevo.",
+		"changePhoto": "Cambiar foto",
 		"personalTitle": "Información personal",
 		"personalDescription": "Actualiza aquí tus datos personales.",
 		"username": "Nombre de usuario",

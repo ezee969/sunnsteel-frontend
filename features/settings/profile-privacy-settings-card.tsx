@@ -4,11 +4,11 @@ import type {
 	ProfilePrivacySettings,
 	ProfileVisibility,
 } from '@sunsteel/contracts'
-import { Loader2, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { SaveStatus } from '@/components/layout/save-status'
 import {
 	Card,
 	CardContent,
@@ -69,18 +69,16 @@ export function ProfilePrivacySettingsCard({
 		setDraft(settings)
 	}, [settings])
 
-	const hasChanges = PRIVACY_FIELDS.some(key => draft[key] !== settings[key])
-
-	const handleSave = () => {
-		updatePrivacy.mutate(draft, {
-			onSuccess: () => {
-				push({
-					title: t('updatedTitle'),
-					description: t('updatedDescription'),
-					variant: 'success',
-				})
-			},
+	// UX-26 (§28.7): a choice saves when it is made, and SaveStatus says so;
+	// a failed save puts the stored setting back and says why.
+	const choose = (key: (typeof PRIVACY_FIELDS)[number], value: string) => {
+		if (!VISIBILITY_OPTIONS.includes(value as ProfileVisibility)) return
+		if (value === draft[key]) return
+		const next = { ...draft, [key]: value as ProfileVisibility }
+		setDraft(next)
+		updatePrivacy.mutate(next, {
 			onError: error => {
+				setDraft(settings)
 				push({
 					title: t('failedTitle'),
 					description: errorText(error),
@@ -114,12 +112,7 @@ export function ProfilePrivacySettingsCard({
 							</div>
 							<Select
 								value={draft[key]}
-								onValueChange={value =>
-									setDraft(previous => ({
-										...previous,
-										[key]: value as ProfileVisibility,
-									}))
-								}
+								onValueChange={value => choose(key, value)}
 							>
 								<SelectTrigger id={`privacy-${key}`} className="w-full">
 									<SelectValue />
@@ -136,18 +129,10 @@ export function ProfilePrivacySettingsCard({
 					))}
 				</div>
 
-				<div className="flex justify-end">
-					<Button
-						type="button"
-						onClick={handleSave}
-						disabled={!hasChanges || updatePrivacy.isPending}
-					>
-						{updatePrivacy.isPending ? (
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-						) : null}
-						{t('save')}
-					</Button>
-				</div>
+				<SaveStatus
+					pending={updatePrivacy.isPending}
+					saved={updatePrivacy.isSuccess}
+				/>
 			</CardContent>
 		</Card>
 	)

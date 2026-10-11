@@ -10,7 +10,7 @@ import {
 import { Camera, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -110,6 +110,7 @@ export default function SettingsProfilePage() {
 	const [avatarUrl, setAvatarUrl] = useState('')
 	const uploadAvatar = useUploadAvatar()
 	const uploading = uploadAvatar.isPending
+	const avatarInputRef = useRef<HTMLInputElement>(null)
 
 	const [cropperOpen, setCropperOpen] = useState(false)
 	const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
@@ -330,24 +331,18 @@ export default function SettingsProfilePage() {
 						<CardDescription>{t('pictureDescription')}</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-col items-center gap-4">
-						<div className="relative group">
+						{/* UX-26: a visible button, where the only way in was hovering
+						    the portrait -- unreachable by keyboard, since the file input
+						    is hidden, and drawn with a translucent fill. */}
+						<div className="relative">
 							<Avatar className="h-32 w-32 border border-rule">
 								<AvatarImage src={avatarUrl || ''} className="object-cover" />
 								<AvatarFallback className="type-numeral bg-surface-sunk text-ink-2">
 									{user?.name?.charAt(0)}
 								</AvatarFallback>
 							</Avatar>
-							<label
-								htmlFor="avatar-upload"
-								className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-foreground/70 text-background opacity-0 transition-opacity duration-[var(--motion-fast)] ease-standard group-hover:opacity-100"
-							>
-								{uploading ? (
-									<Loader2 aria-hidden className="h-6 w-6 animate-spin" />
-								) : (
-									<Camera aria-hidden className="h-8 w-8" />
-								)}
-							</label>
 							<input
+								ref={avatarInputRef}
 								id="avatar-upload"
 								type="file"
 								accept="image/*"
@@ -356,9 +351,20 @@ export default function SettingsProfilePage() {
 								disabled={uploading}
 							/>
 						</div>
-						<p className="type-body-sm text-center text-ink-3">
-							{t('clickToUpload')}
-						</p>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							disabled={uploading}
+							onClick={() => avatarInputRef.current?.click()}
+						>
+							{uploading ? (
+								<Loader2 aria-hidden className="size-4 animate-spin" />
+							) : (
+								<Camera aria-hidden className="size-4" />
+							)}
+							{t('changePhoto')}
+						</Button>
 					</CardContent>
 				</Card>
 

@@ -6,10 +6,11 @@ import {
 	type UserProfile,
 	type WeekStartsOn,
 } from '@sunsteel/contracts'
-import { CalendarClock, Loader2 } from 'lucide-react'
+import { CalendarClock } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { SaveStatus } from '@/components/layout/save-status'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -119,13 +120,11 @@ export function TimeCalendarCard({ profile }: { profile: UserProfile }) {
 								</option>
 							))}
 						</NativeSelect>
-						{changeZone.isPending ? (
-							<Loader2
-								className="size-4 shrink-0 animate-spin text-ink-3"
-								aria-label={t('saving')}
-							/>
-						) : null}
 					</div>
+					<SaveStatus
+						pending={changeZone.isPending}
+						saved={changeZone.isSuccess}
+					/>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
 						{t('zoneNote')}
 					</p>
@@ -168,13 +167,11 @@ export function TimeCalendarCard({ profile }: { profile: UserProfile }) {
 							<option value="1">{t('monday')}</option>
 							<option value="0">{t('sunday')}</option>
 						</NativeSelect>
-						{updateWeek.isPending ? (
-							<Loader2
-								className="size-4 shrink-0 animate-spin text-ink-3"
-								aria-label={t('saving')}
-							/>
-						) : null}
 					</div>
+					<SaveStatus
+						pending={updateWeek.isPending}
+						saved={updateWeek.isSuccess}
+					/>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
 						{t('weekNote')}
 					</p>

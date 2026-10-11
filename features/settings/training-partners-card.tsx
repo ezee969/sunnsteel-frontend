@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { SaveStatus } from '@/components/layout/save-status'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -222,27 +223,28 @@ function ActivePartnerRow({
 	const remove = useRemoveTrainingPartner()
 	const { push } = useToast()
 	const name = memberName(partnership)
-	const changed = TRAINING_PARTNER_PERMISSION_KEYS.some(
-		key => draft[key] !== partnership.permissionsGrantedByMe[key],
-	)
 
 	useEffect(() => {
 		setDraft(partnership.permissionsGrantedByMe)
 	}, [partnership.permissionsGrantedByMe])
 
-	const save = () => {
+	// UX-26 (§28.7): a grant saves when it is chosen; a failed save puts the
+	// stored grants back.
+	const choose = (
+		key: (typeof TRAINING_PARTNER_PERMISSION_KEYS)[number],
+		value: string,
+	) => {
+		if (value !== 'SHARE' && value !== 'PRIVATE') return
+		if ((value === 'SHARE') === draft[key]) return
+		const next = { ...draft, [key]: value === 'SHARE' }
+		setDraft(next)
 		update.mutate(
-			{ partnershipId: partnership.id, permissions: draft },
+			{ partnershipId: partnership.id, permissions: next },
 			{
-				onSuccess: () =>
-					push({
-						title: t('accessUpdatedTitle'),
-						description: t('accessUpdatedDescription', {
-							username: partnership.member.username,
-						}),
-						variant: 'success',
-					}),
-				onError: error => showError(push, t('errorTitle'), errorText(error)),
+				onError: error => {
+					setDraft(partnership.permissionsGrantedByMe)
+					showError(push, t('errorTitle'), errorText(error))
+				},
 			},
 		)
 	}
@@ -281,12 +283,7 @@ function ActivePartnerRow({
 						</div>
 						<Select
 							value={draft[key] ? 'SHARE' : 'PRIVATE'}
-							onValueChange={value =>
-								setDraft(previous => ({
-									...previous,
-									[key]: value === 'SHARE',
-								}))
-							}
+							onValueChange={value => choose(key, value)}
 						>
 							<SelectTrigger id={`${partnership.id}-${key}`}>
 								<SelectValue />
@@ -300,7 +297,8 @@ function ActivePartnerRow({
 				))}
 			</div>
 
-			<div className="flex flex-wrap justify-end gap-2">
+			<div className="flex flex-wrap items-center justify-between gap-2">
+				<SaveStatus pending={update.isPending} saved={update.isSuccess} />
 				<Button
 					type="button"
 					variant="destructive"
@@ -322,18 +320,6 @@ function ActivePartnerRow({
 					}
 				>
 					{t('end')}
-				</Button>
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					disabled={!changed || update.isPending || remove.isPending}
-					onClick={save}
-				>
-					{update.isPending ? (
-						<Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-					) : null}
-					{t('save')}
 				</Button>
 			</div>
 		</div>

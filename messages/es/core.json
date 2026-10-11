@@ -1,4 +1,8 @@
 {
+	"saveStatus": {
+		"saving": "Guardando…",
+		"saved": "Guardado"
+	},
 	"common": {
 		"loading": "Cargando",
 		"howThisWorks": "Cómo funciona",

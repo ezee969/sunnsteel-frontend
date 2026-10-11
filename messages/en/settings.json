@@ -433,7 +433,7 @@
 		"saveError": "Error saving profile: {message}",
 		"pictureTitle": "Profile Picture",
 		"pictureDescription": "Update your avatar",
-		"clickToUpload": "Click the image to upload a new avatar.",
+		"changePhoto": "Change photo",
 		"personalTitle": "Personal Information",
 		"personalDescription": "Update your personal details here.",
 		"username": "Username",

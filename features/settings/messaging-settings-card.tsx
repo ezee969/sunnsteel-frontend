@@ -5,9 +5,10 @@ import {
 	isMessagePermission,
 	type UserProfile,
 } from '@sunsteel/contracts'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { MessageSquare } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { SaveStatus } from '@/components/layout/save-status'
 import {
 	Card,
 	CardContent,
@@ -74,13 +75,8 @@ export function MessagingSettingsCard({ profile }: { profile: UserProfile }) {
 							<option value="EVERYONE">{t('everyone')}</option>
 							<option value="NOBODY">{t('nobody')}</option>
 						</NativeSelect>
-						{update.isPending ? (
-							<Loader2
-								className="size-4 shrink-0 animate-spin text-ink-3"
-								aria-hidden
-							/>
-						) : null}
 					</div>
+					<SaveStatus pending={update.isPending} saved={update.isSuccess} />
 					<p
 						id="message-permission-hint"
 						className="type-body-sm max-w-[68ch] text-ink-3"

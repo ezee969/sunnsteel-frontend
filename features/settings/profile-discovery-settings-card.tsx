@@ -1,12 +1,12 @@
 'use client'
 
 import type { ProfileDiscoverySettings } from '@sunsteel/contracts'
-import { Loader2, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
-import { Button } from '@/components/ui/button'
+import { SaveStatus } from '@/components/layout/save-status'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -37,18 +37,14 @@ export function ProfileDiscoverySettingsCard({
 		setDraft(settings)
 	}, [settings])
 
-	const hasChanges = DISCOVERY_FIELDS.some(key => draft[key] !== settings[key])
-
-	const handleSave = () => {
-		updateDiscovery.mutate(draft, {
-			onSuccess: () => {
-				push({
-					title: t('updatedTitle'),
-					description: t('updatedDescription'),
-					variant: 'success',
-				})
-			},
+	// UX-26 (§28.7): a switch saves when it is flipped.
+	const choose = (key: (typeof DISCOVERY_FIELDS)[number], value: boolean) => {
+		if (value === draft[key]) return
+		const next = { ...draft, [key]: value }
+		setDraft(next)
+		updateDiscovery.mutate(next, {
 			onError: error => {
+				setDraft(settings)
 				push({
 					title: t('failedTitle'),
 					description: errorText(error),
@@ -91,13 +87,7 @@ export function ProfileDiscoverySettingsCard({
 								<Checkbox
 									id={`discovery-${key}`}
 									checked={draft[key]}
-									disabled={updateDiscovery.isPending}
-									onCheckedChange={checked =>
-										setDraft(previous => ({
-											...previous,
-											[key]: checked === true,
-										}))
-									}
+									onCheckedChange={checked => choose(key, checked === true)}
 									aria-label={t(`field.${key}.label`)}
 									className="size-5"
 								/>
@@ -106,18 +96,10 @@ export function ProfileDiscoverySettingsCard({
 					))}
 				</div>
 
-				<div className="flex justify-end">
-					<Button
-						type="button"
-						onClick={handleSave}
-						disabled={!hasChanges || updateDiscovery.isPending}
-					>
-						{updateDiscovery.isPending ? (
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-						) : null}
-						{t('save')}
-					</Button>
-				</div>
+				<SaveStatus
+					pending={updateDiscovery.isPending}
+					saved={updateDiscovery.isSuccess}
+				/>
 			</CardContent>
 		</Card>
 	)
