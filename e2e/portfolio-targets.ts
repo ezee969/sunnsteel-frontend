@@ -373,7 +373,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'routine-builder-linear-block',
 		route: '/routines/edit/:routine',
-		features: ['ROUT-17'],
+		features: ['ROUT-17', 'ROUT-20'],
 		setup: async page => {
 			await openBuildDaysStep(page)
 			const more = page
@@ -391,14 +391,19 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 				.first()
 			await reference.fill('140')
 			await reference.blur()
-			const summary = page.getByText(/^Week 1 of 8 · 63%/).first()
+			// ROUT-20: a member already part of the way through starts there.
+			await page
+				.getByRole('combobox', { name: /^Current week of the block for / })
+				.first()
+				.selectOption('3')
+			const summary = page.getByText(/^Week 3 of 8 · 69%/).first()
 			await expect(summary).toBeVisible()
 			await summary.scrollIntoViewIfNeeded()
 			// Nothing is saved: the frame is the builder's preview of the block.
 		},
 		ready: ['Build Your Training Days', 'Sets'],
 		caption:
-			'An 8-week block in the builder: a reference max sets every load, each working set shows its target RIR, and warm-ups stay editable.',
+			'An 8-week block in the builder: a reference max sets every load, the block can start at the week you are already on, each working set shows its target RIR, and warm-ups stay editable.',
 	},
 	{
 		slug: 'routine-detail',
