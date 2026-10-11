@@ -432,7 +432,12 @@ export function RoutineTrainingBlocks({
 			</div>
 
 			{blocks.isPending ? (
-				<div role="status" aria-label={t('loading')} className="space-y-2">
+				<div
+					aria-busy="true"
+					role="status"
+					aria-label={t('loading')}
+					className="space-y-2"
+				>
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 				</div>

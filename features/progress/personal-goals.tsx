@@ -6,10 +6,12 @@ import type {
 	PersonalGoalsResponse,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { CheckCircle2, RefreshCw, Target } from 'lucide-react'
+import { CheckCircle2, Target } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { EmptyModule } from '@/components/layout/empty-module'
+import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -190,30 +192,23 @@ export function PersonalGoals({
 			</div>
 
 			{isPending ? (
-				<div className="space-y-3" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-3"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 				</div>
 			) : isError ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						type="button"
-						variant="outline"
-						className="mt-4"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : !data?.goals.length ? (
-				<div className="border border-dashed border-rule bg-surface p-6 text-center">
-					<Target className="mx-auto size-6 text-ink-3" aria-hidden />
-					<p className="type-panel mt-3 text-foreground">{t('emptyTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
-				</div>
+				<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 			) : (
 				<ul className="rule-list">
 					{data.goals.map(goal => (

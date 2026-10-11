@@ -91,7 +91,12 @@ export function OnboardingFlow() {
 
 	if (!user || !queue) {
 		return (
-			<div role="status" aria-label={t('loading')} className="space-y-3">
+			<div
+				aria-busy="true"
+				role="status"
+				aria-label={t('loading')}
+				className="space-y-3"
+			>
 				<Skeleton className="h-10 max-w-sm" />
 				<Skeleton className="h-40" />
 			</div>

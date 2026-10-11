@@ -182,7 +182,7 @@ export function ScheduleMonthView({
 			</ul>
 
 			{isPending ? (
-				<div role="status" aria-label={t('loading')}>
+				<div aria-busy="true" role="status" aria-label={t('loading')}>
 					<Skeleton className="h-72" />
 				</div>
 			) : isError || !month ? (

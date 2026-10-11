@@ -38,7 +38,12 @@ export function MemberActivity({
 				<Rss className="h-4 w-4 text-ink-3" aria-hidden /> {t('title')}
 			</h2>
 			{query.isPending ? (
-				<div className="space-y-3 pt-3" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-3 pt-3"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 				</div>

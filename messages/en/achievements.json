@@ -78,6 +78,7 @@
 		"highest": "Highest: {title}"
 	},
 	"page": {
+		"errorTitle": "Achievements are unavailable right now",
 		"title": "Achievements",
 		"subtitle": "A record of training milestones verified from your completed work."
 	}

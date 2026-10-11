@@ -5,11 +5,13 @@ import type {
 	SessionComparisonSet,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { GitCompareArrows, NotebookPen, RefreshCw } from 'lucide-react'
+import { GitCompareArrows, NotebookPen } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
+import { InlineError } from '@/components/layout/inline-error'
 import {
 	Accordion,
 	AccordionContent,
@@ -161,29 +163,23 @@ export function SessionComparison({
 			</div>
 			<div className="space-y-4">
 				{isPending && !data ? (
-					<div className="space-y-3" aria-label={t('loading')}>
+					<div
+						role="status"
+						aria-busy="true"
+						className="space-y-3"
+						aria-label={t('loading')}
+					>
 						<Skeleton className="h-16" />
 						<Skeleton className="h-56" />
 					</div>
 				) : isError || !data ? (
-					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">{t('errorTitle')}</p>
-						<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-						<Button
-							variant="outline"
-							size="sm"
-							className="mt-3"
-							onClick={onRetry}
-						>
-							<RefreshCw aria-hidden />
-							{t('retry')}
-						</Button>
-					</div>
+					<InlineError
+						title={t('errorTitle')}
+						message={t('errorBody')}
+						onRetry={onRetry}
+					/>
 				) : data.routineDays.length === 0 || !latest ? (
-					<div className="border border-dashed border-rule bg-surface p-6 text-center">
-						<p className="type-panel text-foreground">{t('emptyTitle')}</p>
-						<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
-					</div>
+					<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<>
 						<div className="w-full sm:max-w-lg">

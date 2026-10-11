@@ -492,7 +492,12 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 			</div>
 
 			{deloads.isPending ? (
-				<div role="status" aria-label={t('loading')} className="space-y-2">
+				<div
+					aria-busy="true"
+					role="status"
+					aria-label={t('loading')}
+					className="space-y-2"
+				>
 					<Skeleton className="h-16" />
 				</div>
 			) : deloads.isError ? (

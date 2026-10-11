@@ -14,6 +14,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	AlertDialog,
@@ -249,7 +250,7 @@ function BodyWeightChart({
 					) : null}
 				</div>
 			) : (
-				<p className="type-body-sm mt-4 border border-dashed border-rule bg-surface-sunk p-4 text-ink-3">
+				<p className="type-body-sm mt-4 text-ink-3">
 					{tBody('noWeightInRange')}
 				</p>
 			)}
@@ -341,18 +342,10 @@ function BodyProgressBody({
 	}
 	if (query.isError || !query.data) {
 		return (
-			<div role="alert" className="border border-rule bg-surface p-5">
-				<p className="type-panel text-foreground">{tBody('unavailable')}</p>
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					className="mt-3"
-					onClick={() => void query.refetch()}
-				>
-					{tBody('tryAgain')}
-				</Button>
-			</div>
+			<InlineError
+				title={tBody('unavailable')}
+				onRetry={() => void query.refetch()}
+			/>
 		)
 	}
 	const hasAny = query.data.summary.some(entry => entry.latest !== null)

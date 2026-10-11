@@ -2,13 +2,13 @@ import type {
 	AchievementsResponse,
 	EarnedAchievement,
 } from '@sunsteel/contracts'
-import { Check, Medal, RefreshCw } from 'lucide-react'
+import { Check, Medal } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import { Skeleton } from '@/components/ui/skeleton'
 import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
@@ -98,19 +98,11 @@ export function AchievementLedger({
 					<Skeleton className="h-20" />
 				</div>
 			) : isError ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						type="button"
-						variant="outline"
-						className="mt-4"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : !data?.analyticsReady ? (
 				<div role="status" className="border border-rule bg-surface p-6">
 					<p className="type-panel text-foreground">{t('preparingTitle')}</p>

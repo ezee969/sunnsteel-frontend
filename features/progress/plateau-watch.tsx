@@ -5,14 +5,14 @@ import type {
 	PlateausResponse,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { Gauge, RefreshCw } from 'lucide-react'
+import { Gauge } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { exerciseLabel } from '@/i18n/catalog'
@@ -210,25 +210,21 @@ export function PlateauWatch({
 			</div>
 
 			{isPending ? (
-				<div role="status" aria-label={t('loading')} className="space-y-3">
+				<div
+					aria-busy="true"
+					role="status"
+					aria-label={t('loading')}
+					className="space-y-3"
+				>
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 				</div>
 			) : isError || !data ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						type="button"
-						size="sm"
-						variant="outline"
-						className="mt-3"
-						onClick={onRetry}
-					>
-						<RefreshCw className="size-4" aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : data.plateaus.length === 0 ? (
 				<EmptyModule
 					{...getPlateauEmptyState(data.checkedExercises, data.thresholds, t)}

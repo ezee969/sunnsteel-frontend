@@ -390,7 +390,12 @@ export function ScheduleWeekView({
 			</Explanation>
 
 			{isPending ? (
-				<div role="status" aria-label={t('loading')} className="space-y-3">
+				<div
+					aria-busy="true"
+					role="status"
+					aria-label={t('loading')}
+					className="space-y-3"
+				>
 					<Skeleton className="h-14" />
 					<Skeleton className="h-14" />
 					<Skeleton className="h-14" />

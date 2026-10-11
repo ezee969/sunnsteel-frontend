@@ -327,7 +327,12 @@ export function NotificationList({
 			</div>
 
 			{isPending ? (
-				<div className="space-y-3" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-3"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />
 					<Skeleton className="h-16" />

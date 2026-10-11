@@ -37,7 +37,7 @@ export function ConversationList({
 
 	if (conversations.isPending) {
 		return (
-			<div aria-busy="true" aria-label={t('loading')}>
+			<div role="status" aria-busy="true" aria-label={t('loading')}>
 				{[0, 1, 2].map(index => (
 					<div key={index} className="rule-row flex items-center gap-3 py-3">
 						<Skeleton className="h-10 w-10 rounded-full" />

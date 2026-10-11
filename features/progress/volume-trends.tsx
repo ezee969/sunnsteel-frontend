@@ -1,12 +1,13 @@
 'use client'
 
 import type { VolumeTrendResponse } from '@sunsteel/contracts'
-import { BarChart3, RefreshCw } from 'lucide-react'
+import { BarChart3 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import {
 	Select,
 	SelectContent,
@@ -140,29 +141,23 @@ export function VolumeTrends({
 			</div>
 			<div id="progress-volume-body" className="space-y-4">
 				{isPending ? (
-					<div className="space-y-3" aria-label={t('loading')}>
+					<div
+						role="status"
+						aria-busy="true"
+						className="space-y-3"
+						aria-label={t('loading')}
+					>
 						<Skeleton className="h-20" />
 						<Skeleton className="h-72" />
 					</div>
 				) : isError || !data ? (
-					<div role="alert" className="border border-rule bg-surface p-5">
-						<p className="type-panel text-foreground">{t('errorTitle')}</p>
-						<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-						<Button
-							variant="outline"
-							size="sm"
-							className="mt-3"
-							onClick={onRetry}
-						>
-							<RefreshCw aria-hidden />
-							{t('retry')}
-						</Button>
-					</div>
+					<InlineError
+						title={t('errorTitle')}
+						message={t('errorBody')}
+						onRetry={onRetry}
+					/>
 				) : !hasCompletedWork ? (
-					<div className="border border-dashed border-rule bg-surface p-6 text-center">
-						<p className="type-panel text-foreground">{t('emptyTitle')}</p>
-						<p className="type-body-sm mt-1 text-ink-3">{t('emptyBody')}</p>
-					</div>
+					<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<>
 						<div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -211,11 +206,9 @@ export function VolumeTrends({
 						</div>
 
 						{scope !== 'overall' && series.length === 0 ? (
-							<div className="border border-dashed border-rule bg-surface p-5 text-center">
-								<p className="type-body-sm text-ink-3">
-									{t('seriesEmpty', { scope: scopeLabel })}
-								</p>
-							</div>
+							<p className="type-body-sm py-3 text-ink-3">
+								{t('seriesEmpty', { scope: scopeLabel })}
+							</p>
 						) : null}
 
 						{selection?.id && summary ? (

@@ -200,7 +200,7 @@ export function WorkoutResultRow({
 export function ResultRowsLoading({ rows = 3 }: { rows?: number }) {
 	const t = useTranslations('social.search')
 	return (
-		<ul aria-busy="true" aria-label={t('loading')}>
+		<ul role="status" aria-busy="true" aria-label={t('loading')}>
 			{Array.from({ length: rows }).map((_, index) => (
 				<li key={index} className="rule-row space-y-2 py-3">
 					<Skeleton className="h-4 w-48 max-w-full" />

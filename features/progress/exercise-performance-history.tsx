@@ -9,12 +9,13 @@ import {
 	Clock3,
 	History,
 	NotebookPen,
-	RefreshCw,
 	TrendingUp,
 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	Accordion,
@@ -280,26 +281,26 @@ export function ExercisePerformanceHistory({
 			</div>
 
 			{isPending ? (
-				<div className="space-y-4" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-4"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-32" />
 					<Skeleton className="h-32" />
 				</div>
 			) : isError && sessions.length === 0 ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button variant="outline" className="mt-3" onClick={onRetry}>
-						<RefreshCw aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : sessions.length === 0 ? (
-				<div className="border border-dashed border-rule bg-surface p-6 text-center">
-					<p className="type-panel text-foreground">{copy.emptyTitle}</p>
-					<p className="type-body-sm mt-1 text-ink-3">
-						{copy.emptyDescription}
-					</p>
-				</div>
+				<EmptyModule
+					title={copy.emptyTitle}
+					description={copy.emptyDescription}
+				/>
 			) : (
 				<Accordion
 					id="performance-history-list"

@@ -5,12 +5,14 @@ import type {
 	ProgressTimelineItem,
 	WeightUnit,
 } from '@sunsteel/contracts'
-import { CalendarClock, History, MessageSquare, RefreshCw } from 'lucide-react'
+import { History, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
+import { InlineError } from '@/components/layout/inline-error'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -295,33 +297,24 @@ export function ProgressTimeline({
 			</ToggleRow>
 
 			{isPending && items.length === 0 ? (
-				<div className="space-y-3" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-3"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-28" />
 					<Skeleton className="h-28" />
 					<Skeleton className="h-28" />
 				</div>
 			) : isError && items.length === 0 ? (
-				<div role="alert" className="border border-rule bg-surface p-5">
-					<p className="type-panel text-foreground">{t('errorTitle')}</p>
-					<p className="type-body-sm mt-1 text-ink-3">{t('errorBody')}</p>
-					<Button
-						variant="outline"
-						size="sm"
-						className="mt-3"
-						onClick={onRetry}
-					>
-						<RefreshCw aria-hidden />
-						{t('retryTimeline')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={onRetry}
+				/>
 			) : items.length === 0 ? (
-				<div className="border border-dashed border-rule bg-surface p-6 text-center">
-					<CalendarClock className="mx-auto size-7 text-ink-3" aria-hidden />
-					<p className="type-panel mt-3 text-foreground">{t('emptyTitle')}</p>
-					<p className="type-body-sm mx-auto mt-1 max-w-lg text-ink-3">
-						{t('emptyBody')}
-					</p>
-				</div>
+				<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 			) : (
 				<ol id={`${heading.id}-list`} className="border-y border-rule-faint">
 					{shownItems.visible.map(item =>

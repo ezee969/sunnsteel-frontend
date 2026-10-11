@@ -1,6 +1,5 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
 import type { Locale } from '@/i18n/config'
@@ -141,10 +140,7 @@ export function StrengthTrendChart({
 					</div>
 				</div>
 			) : (
-				<div className="mt-6 flex min-h-48 flex-col items-center justify-center border border-dashed border-rule bg-surface-sunk p-6 text-center">
-					<TrendingUp className="size-6 text-ink-3" aria-hidden />
-					<p className="type-body-sm mt-3 text-ink-2">{t('empty')}</p>
-				</div>
+				<p className="type-body-sm mt-6 text-ink-3">{t('empty')}</p>
 			)}
 		</section>
 	)

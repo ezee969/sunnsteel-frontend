@@ -1,12 +1,13 @@
 'use client'
 
-import { Dumbbell, RefreshCw, TrendingUp } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
+import { EmptyModule } from '@/components/layout/empty-module'
 import { GlossaryLine } from '@/components/layout/glossary-line'
-import { Button } from '@/components/ui/button'
+import { InlineError } from '@/components/layout/inline-error'
 import {
 	Select,
 	SelectContent,
@@ -43,7 +44,12 @@ import {
 function ProgressLoading() {
 	const t = useTranslations('progress.strength')
 	return (
-		<div className="space-y-6" aria-label={t('loading')}>
+		<div
+			role="status"
+			aria-busy="true"
+			className="space-y-6"
+			aria-label={t('loading')}
+		>
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Skeleton className="h-20" />
 				<Skeleton className="h-20" />
@@ -162,28 +168,13 @@ export default function ProgressStrengthPage() {
 			{history.isPending ? (
 				<ProgressLoading />
 			) : history.isError && !history.data ? (
-				<div role="alert" className="border border-rule bg-surface p-6">
-					<h2 className="type-section text-foreground">{t('errorTitle')}</h2>
-					<p className="type-body-sm mt-2 text-ink-3">{t('errorBody')}</p>
-					<Button
-						className="mt-4"
-						variant="outline"
-						onClick={() => void history.refetch()}
-					>
-						<RefreshCw aria-hidden />
-						{t('retry')}
-					</Button>
-				</div>
+				<InlineError
+					title={t('errorTitle')}
+					message={t('errorBody')}
+					onRetry={() => void history.refetch()}
+				/>
 			) : !selectedPerformance ? (
-				<div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-rule bg-surface p-8 text-center">
-					<Dumbbell className="size-8 text-ink-3" aria-hidden />
-					<h2 className="type-section mt-4 text-foreground">
-						{t('emptyTitle')}
-					</h2>
-					<p className="type-body-sm mt-2 max-w-md text-ink-3">
-						{t('emptyBody')}
-					</p>
-				</div>
+				<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 			) : (
 				<>
 					<section aria-labelledby="current-strength" className="space-y-3">
@@ -211,23 +202,11 @@ export default function ProgressStrengthPage() {
 								<Skeleton className="h-80" />
 							</div>
 						) : trend.isError ? (
-							<div role="alert" className="border border-rule bg-surface p-5">
-								<p className="type-panel text-foreground">
-									{t('trendsErrorTitle')}
-								</p>
-								<p className="type-body-sm mt-1 text-ink-3">
-									{t('trendsErrorBody')}
-								</p>
-								<Button
-									size="sm"
-									variant="outline"
-									className="mt-3"
-									onClick={() => void trend.refetch()}
-								>
-									<RefreshCw aria-hidden />
-									{t('retryTrends')}
-								</Button>
-							</div>
+							<InlineError
+								title={t('trendsErrorTitle')}
+								message={t('trendsErrorBody')}
+								onRetry={() => void trend.refetch()}
+							/>
 						) : current ? (
 							<>
 								{/* v1.1 §26.4: the two figures side by side at every width,
@@ -330,9 +309,7 @@ export default function ProgressStrengthPage() {
 							</>
 						) : null
 					) : (
-						<p className="type-body-sm border border-dashed border-rule bg-surface p-4 text-ink-3">
-							{t('noTrend')}
-						</p>
+						<p className="type-body-sm py-3 text-ink-3">{t('noTrend')}</p>
 					)}
 
 					<ExercisePerformanceHistory

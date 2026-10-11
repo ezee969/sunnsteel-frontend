@@ -78,6 +78,7 @@
 		"highest": "Más alto: {title}"
 	},
 	"page": {
+		"errorTitle": "Los logros no están disponibles en este momento",
 		"title": "Logros",
 		"subtitle": "Un registro de hitos de entrenamiento verificados a partir de tu trabajo completado."
 	}

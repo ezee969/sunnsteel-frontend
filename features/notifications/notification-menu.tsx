@@ -88,6 +88,7 @@ export function NotificationMenu() {
 				>
 					{notifications.isPending ? (
 						<div
+							aria-busy="true"
 							role="status"
 							aria-label={t('loading')}
 							className="space-y-2 p-3"

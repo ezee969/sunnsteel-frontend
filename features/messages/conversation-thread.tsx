@@ -172,6 +172,7 @@ export function ConversationThread({
 	if (thread.isPending) {
 		return (
 			<div
+				role="status"
 				aria-busy="true"
 				aria-label={t('loading')}
 				className="space-y-4 py-4"

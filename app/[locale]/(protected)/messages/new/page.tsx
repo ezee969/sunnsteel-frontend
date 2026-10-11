@@ -78,7 +78,12 @@ function NewMessage() {
 
 	if (member.isPending || existing) {
 		return (
-			<div aria-busy="true" aria-label={t('loading')} className="space-y-3">
+			<div
+				role="status"
+				aria-busy="true"
+				aria-label={t('loading')}
+				className="space-y-3"
+			>
 				<Skeleton className="h-10 w-56" />
 				<Skeleton className="h-24 w-full" />
 			</div>

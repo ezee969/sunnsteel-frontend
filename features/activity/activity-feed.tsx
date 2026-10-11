@@ -38,7 +38,12 @@ export function ActivityFeed() {
 			</div>
 
 			{query.isPending ? (
-				<div className="space-y-3" aria-label={t('loading')}>
+				<div
+					role="status"
+					aria-busy="true"
+					className="space-y-3"
+					aria-label={t('loading')}
+				>
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
 					<Skeleton className="h-20" />
