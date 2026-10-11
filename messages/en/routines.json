@@ -115,7 +115,8 @@
 		"kindDROP": "{count, plural, one {# drop} other {# drop}}",
 		"kindOPTIONAL": "{count, plural, one {# optional} other {# optional}}",
 		"progressionLinear": "8-week block (LP)",
-		"exerciseReferenceMaxChange": "{name}: reference max {from} → {to}"
+		"exerciseReferenceMaxChange": "{name}: reference max {from} → {to}",
+		"exerciseBlockStepChange": "{name}: 8-week block step {from} → {to}"
 	},
 	"trainingBlocks": {
 		"upcoming": "Upcoming",
@@ -906,6 +907,17 @@
 		"recoveryLine": "Recovery step: {sets} × {reps} at {load}, then a new block from {reference}",
 		"editRoutine": "Edit routine",
 		"sharedSet": "{percent} of your own max · {target}",
-		"sharedTable": "Week 1 of the block shown; the share rises each week, to {top} in week 8."
+		"sharedTable": "Week 1 of the block shown; the share rises each week, to {top} in week 8.",
+		"currentWeek": "Current week",
+		"currentSession": "Current session",
+		"currentWeekAria": "Current week of the block for {exercise}",
+		"currentSessionAria": "Current session of the block for {exercise}",
+		"positionHint": "Part of the way through this block already? Pick your week; earlier weeks aren't logged.",
+		"positionHintSession": "Part of the way through this block already? Pick your session; earlier ones aren't logged.",
+		"reviewTitle": "8-week blocks",
+		"reviewDescription": "Each block starts at the week shown. Starting this programme part-way? Set them all here.",
+		"reviewSetAll": "Set every block to",
+		"reviewMixed": "Different weeks",
+		"reviewRow": "{day} · {exercise}: {position}"
 	}
 }

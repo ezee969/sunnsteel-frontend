@@ -1,5 +1,6 @@
 import {
 	type LinearPeriodizationState,
+	LP_BLOCK_STEPS,
 	LP_REFERENCE_MAX_KG,
 	type WeightUnit,
 } from '@sunsteel/contracts'
@@ -20,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NativeSelect } from '@/components/ui/native-select'
 import type { Locale } from '@/i18n/config'
 import { lpSummary } from '@/lib/utils/linear-periodization'
 import {
@@ -34,6 +36,7 @@ import {
 	canRestartBlock,
 	restartLinearPeriodization,
 	withReferenceMax,
+	withStep,
 } from '../utils/linear-block'
 import { sanitizeDecimalInput } from '../utils/validation.helpers'
 
@@ -54,7 +57,9 @@ interface LinearBlockFieldProps {
  * ROUT-17: an 8-week block's reference max and where the slot stands, beside
  * the exercise's load step. The reference is editable while the block runs;
  * once it finishes, what follows is chosen on the routine's page (ROUT-19),
- * and here only a restart is offered.
+ * and here only a restart is offered. ROUT-20: a running block can be set to
+ * the week the member is already on; before a reference is typed, the chosen
+ * week waits here and the block starts at it.
  */
 export function LinearBlockField({
 	exercise,
@@ -67,8 +72,11 @@ export function LinearBlockField({
 	const t = useTranslations('routines.linearBlock')
 	const locale = useLocale() as Locale
 	const inputId = useId()
+	const stepId = useId()
 	const state = exercise.linearPeriodization ?? null
 	const editable = !state || state.phase === 'BLOCK'
+	const [pendingStep, setPendingStep] = useState(1)
+	const step = state?.step ?? pendingStep
 	const current = formatWeightInput(state?.referenceMaxKg, weightUnit)
 	const [input, setInput] = useState(current)
 	const [focused, setFocused] = useState(false)
@@ -92,7 +100,20 @@ export function LinearBlockField({
 			return
 		}
 		setInvalid(false)
-		onSetLinearPeriodization(exerciseIndex, withReferenceMax(state, kg))
+		onSetLinearPeriodization(
+			exerciseIndex,
+			withReferenceMax(state, kg, pendingStep),
+		)
+	}
+
+	const chooseStep = (value: string) => {
+		const next = Number(value)
+		if (!Number.isInteger(next) || next < 1 || next > LP_BLOCK_STEPS) return
+		if (!state) {
+			setPendingStep(next)
+			return
+		}
+		onSetLinearPeriodization(exerciseIndex, withStep(state, next))
 	}
 
 	const summary = state
@@ -136,6 +157,32 @@ export function LinearBlockField({
 					/>
 				</div>
 			) : null}
+			{editable ? (
+				<div className="flex items-center justify-between gap-3">
+					<Label htmlFor={stepId} className="text-sm font-medium text-ink-3">
+						{t(rotation ? 'currentSession' : 'currentWeek')}
+					</Label>
+					<NativeSelect
+						id={stepId}
+						aria-label={t(rotation ? 'currentSessionAria' : 'currentWeekAria', {
+							exercise: exerciseName,
+						})}
+						aria-describedby={`${stepId}-hint`}
+						value={String(step)}
+						onChange={event => chooseStep(event.target.value)}
+						className="w-32 sm:w-40"
+					>
+						{Array.from({ length: LP_BLOCK_STEPS }, (_, index) => (
+							<option key={index + 1} value={index + 1}>
+								{t(rotation ? 'session' : 'week', {
+									step: index + 1,
+									total: LP_BLOCK_STEPS,
+								})}
+							</option>
+						))}
+					</NativeSelect>
+				</div>
+			) : null}
 			{invalid ? (
 				<p role="alert" className="type-body-sm text-ink">
 					{t('invalidReference', {
@@ -147,7 +194,12 @@ export function LinearBlockField({
 				{summary}
 			</p>
 			{editable ? (
-				<p className="type-body-sm text-ink-3">{t('referenceMaxHint')}</p>
+				<>
+					<p className="type-body-sm text-ink-3">{t('referenceMaxHint')}</p>
+					<p id={`${stepId}-hint`} className="type-body-sm text-ink-3">
+						{t(rotation ? 'positionHintSession' : 'positionHint')}
+					</p>
+				</>
 			) : (
 				<p className="type-body-sm text-ink-3">{t('chooseOnRoutine')}</p>
 			)}

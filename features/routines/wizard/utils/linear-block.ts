@@ -1,6 +1,7 @@
 import {
 	type LinearPeriodizationState,
 	LP_REST_SECONDS,
+	lpAtStep,
 	lpStep,
 	type LpStoredSet,
 	lpStoredSets,
@@ -13,7 +14,11 @@ import {
 	lpTargetLabel,
 } from '@/lib/utils/linear-periodization'
 
-import type { RoutineSet, RoutineWizardExercise } from '../types'
+import type {
+	RoutineSet,
+	RoutineWizardData,
+	RoutineWizardExercise,
+} from '../types'
 
 // ROUT-17: the builder's side of an exercise on an 8-week block. The block
 // owns its working sets (the server regenerates them from the state), so the
@@ -92,17 +97,96 @@ export function leaveLinearPeriodization<E extends LpExercise>(exercise: E): E {
 
 /**
  * The state a reference max typed in the builder leaves: a new block when
- * there is none, the same place in the block with the new reference during
- * one. A finished block or its recovery step is unchanged: what follows it
- * is chosen on the routine's page (ROUT-19).
+ * there is none -- at `step` when the member already chose the week they are
+ * on (ROUT-20) -- and the same place in the block with the new reference
+ * during one. A finished block or its recovery step is unchanged: what
+ * follows it is chosen on the routine's page (ROUT-19).
  */
 export function withReferenceMax(
 	state: LinearPeriodizationState | null | undefined,
 	referenceMaxKg: number,
+	step = 1,
 ): LinearPeriodizationState {
-	if (!state) return startLinearPeriodization(referenceMaxKg)
+	if (!state) return startLinearPeriodization(referenceMaxKg, 1, step)
 	if (state.phase !== 'BLOCK') return state
 	return { ...state, referenceMaxKg }
+}
+
+/**
+ * ROUT-20: where a running block stands, chosen by the member who already
+ * trained part of it outside the app. Only a running block moves; the weeks
+ * before it are never treated as workouts.
+ */
+export function withStep(
+	state: LinearPeriodizationState,
+	step: number,
+): LinearPeriodizationState {
+	if (state.phase !== 'BLOCK' || state.step === step) return state
+	return lpAtStep(state, step)
+}
+
+/** A running block of the routine: where it is in the days. */
+export interface LinearBlockSlot {
+	dayIndex: number
+	exerciseIndex: number
+	exerciseId: string
+	state: LinearPeriodizationState
+}
+
+/** Every exercise of the routine on a running 8-week block, in day order. */
+export function runningLinearBlocks(
+	data: Pick<RoutineWizardData, 'days'>,
+): LinearBlockSlot[] {
+	return data.days.flatMap((day, dayIndex) =>
+		day.exercises.flatMap((exercise, exerciseIndex) => {
+			const state = exercise.linearPeriodization
+			return isLinearExercise(exercise) && state?.phase === 'BLOCK'
+				? [{ dayIndex, exerciseIndex, exerciseId: exercise.exerciseId, state }]
+				: []
+		}),
+	)
+}
+
+/** The week every running block shares, or null when they differ. */
+export function sharedLinearStep(slots: LinearBlockSlot[]): number | null {
+	const steps = new Set(slots.map(slot => slot.state.step))
+	return steps.size === 1 ? [...steps][0] : null
+}
+
+/**
+ * ROUT-20: every running block of the routine at one week, with its working
+ * sets regenerated -- "I'm starting this programme at week 2" in one step.
+ * Days and exercises not on a running block are returned as they were.
+ */
+export function withAllLinearSteps(
+	days: RoutineWizardData['days'],
+	step: number,
+): RoutineWizardData['days'] {
+	return days.map(day => {
+		if (
+			!day.exercises.some(
+				exercise =>
+					isLinearExercise(exercise) &&
+					exercise.linearPeriodization?.phase === 'BLOCK',
+			)
+		) {
+			return day
+		}
+		return {
+			...day,
+			exercises: day.exercises.map(exercise => {
+				const state = exercise.linearPeriodization
+				if (!isLinearExercise(exercise) || state?.phase !== 'BLOCK') {
+					return exercise
+				}
+				return regenerateLinearSets({
+					...exercise,
+					sets: exercise.sets.map(set => ({ ...set })),
+					linearPeriodization: withStep(state, step),
+				})
+			}),
+		}
+	})
 }
 
 /** A new block from step 1, on the same reference. */

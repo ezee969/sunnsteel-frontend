@@ -217,6 +217,7 @@ function CreateRoutineWizard() {
 				return (
 					<ReviewAndCreate
 						data={routineData}
+						onUpdate={updateRoutineData}
 						onComplete={() => {
 							router.push('/routines')
 						}}

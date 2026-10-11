@@ -115,7 +115,8 @@
 		"kindDROP": "{count, plural, one {# descendente} other {# descendentes}}",
 		"kindOPTIONAL": "{count, plural, one {# opcional} other {# opcionales}}",
 		"progressionLinear": "bloque de 8 semanas (LP)",
-		"exerciseReferenceMaxChange": "{name}: máximo de referencia {from} → {to}"
+		"exerciseReferenceMaxChange": "{name}: máximo de referencia {from} → {to}",
+		"exerciseBlockStepChange": "{name}: paso del bloque de 8 semanas {from} → {to}"
 	},
 	"trainingBlocks": {
 		"upcoming": "Próximo",
@@ -906,6 +907,17 @@
 		"recoveryLine": "Sesión de recuperación: {sets} × {reps} con {load}, luego un bloque nuevo desde {reference}",
 		"editRoutine": "Editar rutina",
 		"sharedSet": "{percent} de tu propio máximo · {target}",
-		"sharedTable": "Se muestra la semana 1 del bloque; el porcentaje sube cada semana, hasta {top} en la semana 8."
+		"sharedTable": "Se muestra la semana 1 del bloque; el porcentaje sube cada semana, hasta {top} en la semana 8.",
+		"currentWeek": "Semana actual",
+		"currentSession": "Sesión actual",
+		"currentWeekAria": "Semana actual del bloque de {exercise}",
+		"currentSessionAria": "Sesión actual del bloque de {exercise}",
+		"positionHint": "¿Ya hiciste parte de este bloque? Elige tu semana; las anteriores no se registran.",
+		"positionHintSession": "¿Ya hiciste parte de este bloque? Elige tu sesión; las anteriores no se registran.",
+		"reviewTitle": "Bloques de 8 semanas",
+		"reviewDescription": "Cada bloque empieza en la semana indicada. ¿Empiezas el programa a mitad de camino? Ajústalos aquí.",
+		"reviewSetAll": "Poner todos los bloques en",
+		"reviewMixed": "Semanas distintas",
+		"reviewRow": "{day} · {exercise}: {position}"
 	}
 }

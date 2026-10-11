@@ -16,6 +16,7 @@ import { useExercises } from '@/lib/api/hooks'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
 import { weekdayName } from '@/lib/utils/date'
 
+import { LinearBlockWeeks } from './components/LinearBlockWeeks'
 import { RoutineDayCard } from './components/RoutineDayCard'
 import { RoutineQualitySummary } from './components/RoutineQualitySummary'
 import { RoutineSummaryStats } from './components/RoutineSummaryStats'
@@ -31,6 +32,8 @@ interface ReviewAndCreateProps {
 	routineId?: string
 	isEditing?: boolean
 	onComplete: () => void
+	/** ROUT-20: lets the review set every 8-week block to one week. */
+	onUpdate?: (updates: Partial<RoutineWizardData>) => void
 }
 
 /**
@@ -50,6 +53,7 @@ export function ReviewAndCreate({
 	routineId,
 	isEditing = false,
 	onComplete,
+	onUpdate,
 }: ReviewAndCreateProps) {
 	const {
 		data: exercises,
@@ -175,6 +179,14 @@ export function ReviewAndCreate({
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
+
+			{onUpdate ? (
+				<LinearBlockWeeks
+					data={data}
+					exerciseMap={exerciseMap}
+					onUpdate={onUpdate}
+				/>
+			) : null}
 
 			<RoutineSummaryStats totals={totals} />
 

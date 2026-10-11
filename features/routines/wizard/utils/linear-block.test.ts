@@ -13,7 +13,11 @@ import {
 	lpWorkingSetTarget,
 	regenerateLinearSets,
 	restartLinearPeriodization,
+	runningLinearBlocks,
+	sharedLinearStep,
+	withAllLinearSteps,
 	withReferenceMax,
+	withStep,
 } from './linear-block'
 import { estimateDaySeconds } from './routine-quality'
 import { buildRoutineRequest } from './routine-summary'
@@ -173,5 +177,86 @@ describe('the rest of the builder around a block', () => {
 		expect(Number.isNaN(seconds)).toBe(false)
 		// 60 s setup, 8 reps × 4 s for the warm-up, 3 × 180 s rest: 632 s.
 		expect(seconds).toBe(600)
+	})
+})
+
+describe('a block started part of the way through (ROUT-20)', () => {
+	const atWeek = (step: number, referenceMaxKg = 100) => {
+		const exercise = enterLinearPeriodization(squat())
+		exercise.linearPeriodization = withReferenceMax(null, referenceMaxKg, step)
+		return regenerateLinearSets(exercise)
+	}
+	const routine = (
+		...days: RoutineWizardExercise[][]
+	): Pick<RoutineWizardData, 'days'> => ({
+		days: days.map((exercises, index) => ({ slot: index + 1, exercises })),
+	})
+
+	it('starts a new block at the week chosen before the reference', () => {
+		const exercise = atWeek(3)
+		expect(exercise.linearPeriodization).toMatchObject({
+			phase: 'BLOCK',
+			step: 3,
+			cycle: 1,
+			samples: [],
+		})
+		// Week 3 is 69 % of 100 kg, on the 2.5 kg step.
+		expect(exercise.sets.slice(1).map(set => set.weight)).toEqual([70, 70, 70])
+		expect(exercise.sets[0]).toMatchObject({ kind: 'WARMUP', weight: 40 })
+	})
+
+	it('moves a running block to another week and leaves a finished one alone', () => {
+		const running = startLinearPeriodization(100)
+		expect(withStep(running, 5)).toMatchObject({ step: 5, referenceMaxKg: 100 })
+		expect(withStep(running, 1)).toBe(running)
+		const finished = { ...running, phase: 'FINISHED' as const, step: 8 }
+		expect(withStep(finished, 2)).toBe(finished)
+	})
+
+	it('keeps the week when the reference changes during the block', () => {
+		const state = withReferenceMax(startLinearPeriodization(100, 1, 4), 120)
+		expect(state).toMatchObject({ step: 4, referenceMaxKg: 120 })
+	})
+
+	it('lists the running blocks in day order and says when they share a week', () => {
+		const data = routine([atWeek(2), squat()], [atWeek(2, 80)])
+		const slots = runningLinearBlocks(data)
+		expect(slots.map(slot => [slot.dayIndex, slot.exerciseIndex])).toEqual([
+			[0, 0],
+			[1, 0],
+		])
+		expect(sharedLinearStep(slots)).toBe(2)
+		const mixed = routine([atWeek(2)], [atWeek(4)])
+		expect(sharedLinearStep(runningLinearBlocks(mixed))).toBeNull()
+	})
+
+	it('sets every running block to one week without touching anything else', () => {
+		const other = squat()
+		const data = routine([atWeek(1), other], [atWeek(3, 80)])
+		const days = withAllLinearSteps(data.days, 2)
+		expect(
+			days.map(day =>
+				day.exercises.map(exercise => exercise.linearPeriodization?.step),
+			),
+		).toEqual([[2, undefined], [2]])
+		// Week 2 is 66 %: 66 kg → 65, 52.8 kg → 52.5 on the 2.5 kg step.
+		expect(days[0].exercises[0].sets[1].weight).toBe(65)
+		expect(days[1].exercises[0].sets[1].weight).toBe(52.5)
+		expect(days[0].exercises[1]).toBe(other)
+		// The days it was given are left as they were.
+		expect(data.days[0].exercises[0].linearPeriodization?.step).toBe(1)
+		expect(data.days[0].exercises[0].sets[1].weight).toBe(62.5)
+	})
+
+	it('names the week control and its hint in both languages', () => {
+		expect(en('currentWeek')).toBe('Current week')
+		expect(en('currentSession')).toBe('Current session')
+		expect(es('currentWeek')).toBe('Semana actual')
+		for (const t of [en, es]) {
+			expect(t('positionHint').length).toBeLessThanOrEqual(110)
+			expect(
+				t('reviewRow', { day: 'A', exercise: 'B', position: 'C' }),
+			).toContain('C')
+		}
 	})
 })

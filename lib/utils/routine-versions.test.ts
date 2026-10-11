@@ -330,6 +330,22 @@ describe('routine versions of an 8-week block (ROUT-17)', () => {
 		).toEqual(['Squat: máximo de referencia 220,46 lb → 242,51 lb'])
 	})
 
+	it('names a block moved to another week (ROUT-20)', () => {
+		const at = (step: number) => {
+			const squat = lp(100)
+			return withSquat({
+				...squat,
+				linearPeriodization: { ...squat.linearPeriodization!, step },
+			})
+		}
+		expect(compare(at(3), at(5)).days[0].changes).toEqual([
+			'Squat: 8-week block step 3 → 5',
+		])
+		expect(compareEs(at(5), at(2)).days[0].changes).toEqual([
+			'Squat: paso del bloque de 8 semanas 5 → 2',
+		])
+	})
+
 	it('says nothing of a reference when one side has none', () => {
 		const clone = withSquat({ ...lp(100), linearPeriodization: null })
 		expect(compare(clone, withSquat(lp(100))).isEmpty).toBe(true)

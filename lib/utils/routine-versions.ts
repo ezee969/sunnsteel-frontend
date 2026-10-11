@@ -260,6 +260,22 @@ function compareExercise(
 			}),
 		)
 	}
+	// ROUT-20: where a running block stands, when both sides run one.
+	const fromStep = current.linearPeriodization
+	const toStep = target.linearPeriodization
+	if (
+		fromStep?.phase === 'BLOCK' &&
+		toStep?.phase === 'BLOCK' &&
+		fromStep.step !== toStep.step
+	) {
+		changes.push(
+			t('exerciseBlockStepChange', {
+				name,
+				from: fromStep.step,
+				to: toStep.step,
+			}),
+		)
+	}
 	if ((current.note ?? '').trim() !== (target.note ?? '').trim()) {
 		changes.push(
 			target.note?.trim()

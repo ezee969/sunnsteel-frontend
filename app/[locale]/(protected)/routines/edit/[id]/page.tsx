@@ -294,6 +294,7 @@ export default function EditRoutinePage() {
 				return (
 					<ReviewAndCreate
 						data={routineData}
+						onUpdate={updateRoutineData}
 						routineId={routineId}
 						isEditing={true}
 						onComplete={() => {
