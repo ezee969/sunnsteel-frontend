@@ -2494,3 +2494,32 @@ head is hidden, so the inscription is the page's only name. Dashboard was
   Restore.
 - A failed sign-in is `AuthNotice`'s warning with the reason in the member's
   language, never the provider's English in crimson (§4.3 rules 4 and 5).
+
+### 28.6 One way to say empty, failed and loading (`UX-26`)
+
+- **Failed:** `InlineError` (§27.6) with Try again, everywhere a section's
+  read fails -- never a boxed panel, a crimson line or the error's own
+  English. Where several sections come from one read, the page says it once
+  in their place (Achievements), rather than leaving the rest blank.
+- **Empty:** `EmptyModule` on the ruled ground, never a centred dashed box;
+  a one-line absence ("No weighted best yet") is a plain line.
+- **Loading:** `LoadingRows` (`components/layout/loading-rows.tsx`) for a
+  list -- the ruled rows it will become, announced once -- and an anatomy
+  skeleton for anything else; either way a loading block is `role="status"`,
+  `aria-busy="true"` and labelled, so it is announced and the sweep waits for
+  it. A status that reports something (§28.7) is never busy and never
+  labelled.
+- **History rows are links** with one summary line: the routine and day with
+  the status mark, then when (to the minute), how long, how much and how many
+  sets.
+
+### 28.7 Settings saves a choice when it is made (owner, 2026-10-11)
+
+Every Settings control that is one choice -- a select or a switch -- saves
+when it changes, and `SaveStatus` (`components/layout/save-status.tsx`)
+says "Saving…" then "Saved" in one quiet status line; a failed save puts the
+stored value back and raises its toast. The multi-field editors -- the
+profile form, goals, training locations, identity and featured
+accomplishments -- are forms and keep their one Save. Activity sharing's
+defaults keep theirs too, because a default reaches past entries and the
+card says so before it is saved.
