@@ -7,6 +7,7 @@ import { useMemo } from 'react'
 import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { LogPastWorkout } from '@/features/routines/components/LogPastWorkout'
 import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAccordion'
 import { RoutineDeloads } from '@/features/routines/components/RoutineDeloads'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
@@ -184,6 +185,10 @@ export default function RoutineDetailsPage() {
 					/>
 				</div>
 			)}
+
+			{/* LIVE-23: while the routine is new enough, the workouts done
+			    before it existed can be logged. */}
+			<LogPastWorkout routine={routine} />
 
 			{/* UX-20 (§23.6): the days first; sharing and the planning tools in
 			    one group, open while the routine uses any of them. The group's

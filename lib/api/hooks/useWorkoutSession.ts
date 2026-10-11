@@ -2,14 +2,18 @@ import type {
 	CorrectSessionRequest,
 	CorrectSessionResponse,
 	DeloadSuggestionResponse,
+	LogPastWorkoutRequest,
+	LogPastWorkoutResponse,
 	PlateauPreferences,
 	PlateausResponse,
+	RemoveLoggedWorkoutResponse,
 	SessionCorrectionsResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
 	TrainingSignalsResponse,
 	UpdateSessionNotesRequest,
 	UpdateSessionNotesResponse,
+	WorkoutAnalyticsStatus,
 } from '@sunsteel/contracts'
 import {
 	useInfiniteQuery,
@@ -518,6 +522,47 @@ export const useCorrectSession = (id: string) => {
 			])
 				void qc.invalidateQueries({ queryKey })
 		},
+	})
+}
+
+/**
+ * LIVE-23: logging a past workout, or removing one, replays the member's
+ * history on the server, so every read built from it is stale; the answer
+ * carries the analytics status, which polls until the replay is done.
+ */
+const afterHistoryChange = (
+	qc: ReturnType<typeof useQueryClient>,
+	analytics: WorkoutAnalyticsStatus,
+	userId: string | undefined,
+) => {
+	qc.setQueryData(['workout', 'analytics', userId], analytics)
+	for (const queryKey of [
+		['workout'],
+		['routines'],
+		['achievements'],
+		['users'],
+		['schedule-overrides'],
+	])
+		void qc.invalidateQueries({ queryKey })
+}
+
+export const useLogPastWorkout = () => {
+	const qc = useQueryClient()
+	const { session } = useAuth()
+	return useMutation<LogPastWorkoutResponse, Error, LogPastWorkoutRequest>({
+		mutationFn: data => workoutService.logPastWorkout(data),
+		onSuccess: response =>
+			afterHistoryChange(qc, response.analytics, session?.user.id),
+	})
+}
+
+export const useRemoveLoggedWorkout = () => {
+	const qc = useQueryClient()
+	const { session } = useAuth()
+	return useMutation<RemoveLoggedWorkoutResponse, Error, string>({
+		mutationFn: id => workoutService.removeLoggedWorkout(id),
+		onSuccess: response =>
+			afterHistoryChange(qc, response.analytics, session?.user.id),
 	})
 }
 

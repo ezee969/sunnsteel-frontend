@@ -5,8 +5,11 @@ import type {
 	DeloadSuggestionResponse,
 	DismissGoalSuggestionRequest,
 	GoalSuggestionsResponse,
+	LogPastWorkoutRequest,
+	LogPastWorkoutResponse,
 	PersonalGoalsResponse,
 	PlateausResponse,
+	RemoveLoggedWorkoutResponse,
 	SessionCorrectionsResponse,
 	SessionShare,
 	SessionShareListResponse,
@@ -367,6 +370,23 @@ export const workoutService = {
 		httpClient.request<CorrectSessionResponse>(
 			`${WORKOUTS_API_URL}/sessions/${id}/corrections`,
 			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	/** LIVE-23: a workout done before the routine existed, logged later. */
+	logPastWorkout: async (
+		data: LogPastWorkoutRequest,
+	): Promise<LogPastWorkoutResponse> =>
+		httpClient.request<LogPastWorkoutResponse>(
+			`${WORKOUTS_API_URL}/sessions/logged`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	removeLoggedWorkout: async (
+		id: string,
+	): Promise<RemoveLoggedWorkoutResponse> =>
+		httpClient.request<RemoveLoggedWorkoutResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/logged`,
+			{ method: 'DELETE', secure: true },
 		),
 
 	finishSession: async (

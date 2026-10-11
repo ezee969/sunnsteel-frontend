@@ -146,6 +146,7 @@
 		"closedReasonWindowPassed": "Las correcciones se cierran {hours} horas después de terminar un entrenamiento.",
 		"closedReasonLaterSession": "Las correcciones se cerraron cuando empezaste otro entrenamiento, que se construyó sobre este.",
 		"closedReasonLimitReached": "Este entrenamiento ya se corrigió tantas veces como está permitido.",
+		"closedReasonLoggedLater": "Un entrenamiento registrado después se cambia quitándolo y registrándolo de nuevo.",
 		"bodyweight": "Peso corporal",
 		"noReps": "sin repeticiones",
 		"notDone": "sin hacer",

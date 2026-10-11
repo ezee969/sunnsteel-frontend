@@ -146,6 +146,7 @@
 		"closedReasonWindowPassed": "Corrections close {hours} hours after a workout ends.",
 		"closedReasonLaterSession": "Corrections closed when you started another workout, which was built on this one.",
 		"closedReasonLimitReached": "This workout has been corrected as many times as allowed.",
+		"closedReasonLoggedLater": "A workout logged later is changed by removing it and logging it again.",
 		"bodyweight": "Bodyweight",
 		"noReps": "no reps",
 		"notDone": "not done",

@@ -58,6 +58,9 @@ export function describeClosedReason(
 			return t('closedReasonLaterSession')
 		case 'LIMIT_REACHED':
 			return t('closedReasonLimitReached')
+		// LIVE-23: a workout logged later is removed and logged again instead.
+		case 'LOGGED_LATER':
+			return t('closedReasonLoggedLater')
 		// Older workouts and unfinished ones say nothing: there is nothing the
 		// owner could have done here.
 		case 'NOT_LATEST':

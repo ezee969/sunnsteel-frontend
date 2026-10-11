@@ -470,7 +470,16 @@
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",
 		"REQUEST_PENDING": "You can send more once they accept your request.",
-		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine, one workout or one record."
+		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine, one workout or one record.",
+		"LOGGED_WORKOUT_DATE": "A past workout can be logged only before the routine was created, within the last {days} days",
+		"LOGGED_WORKOUT_OVERLAP": "Another workout overlaps that time",
+		"LOGGED_WORKOUT_SAME_DAY": "This day of the routine is already logged on that date",
+		"LOGGED_WORKOUT_LIMIT": "A routine can hold at most {max} logged workouts",
+		"LOGGED_WORKOUT_NO_SETS": "Log at least one completed set",
+		"LOGGED_WORKOUT_SET_NOT_IN_DAY": "Every set must belong to an exercise of this day",
+		"LOGGED_WORKOUT_DAY_NOT_BASELINE": "Only the routine's own days can be logged, not a training block's or a deload's",
+		"LOGGED_WORKOUT_NOT_LOGGED": "Only a workout logged later can be removed",
+		"CORRECTION_LOGGED_LATER": "A workout logged later is changed by removing it and logging it again"
 	},
 	"glossary": {
 		"label": "Terms:",

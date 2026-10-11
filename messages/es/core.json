@@ -470,7 +470,16 @@
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
 		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
 		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud.",
-		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una sola rutina, un solo entrenamiento o un solo récord."
+		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una sola rutina, un solo entrenamiento o un solo récord.",
+		"LOGGED_WORKOUT_DATE": "Un entrenamiento pasado solo se puede registrar antes de crear la rutina, dentro de los últimos {days} días",
+		"LOGGED_WORKOUT_OVERLAP": "Otro entrenamiento coincide con ese horario",
+		"LOGGED_WORKOUT_SAME_DAY": "Este día de la rutina ya está registrado en esa fecha",
+		"LOGGED_WORKOUT_LIMIT": "Una rutina admite como máximo {max} entrenamientos registrados después",
+		"LOGGED_WORKOUT_NO_SETS": "Registra al menos una serie hecha",
+		"LOGGED_WORKOUT_SET_NOT_IN_DAY": "Cada serie debe pertenecer a un ejercicio de este día",
+		"LOGGED_WORKOUT_DAY_NOT_BASELINE": "Solo se pueden registrar los días propios de la rutina, no los de un bloque de entrenamiento ni de una descarga",
+		"LOGGED_WORKOUT_NOT_LOGGED": "Solo se puede quitar un entrenamiento registrado después",
+		"CORRECTION_LOGGED_LATER": "Un entrenamiento registrado después se cambia quitándolo y registrándolo de nuevo"
 	},
 	"glossary": {
 		"label": "Términos:",
