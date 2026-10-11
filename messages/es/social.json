@@ -73,6 +73,8 @@
 		"hidden": "Oculto",
 		"reasonWithOwner": "{reason} · {owner}",
 		"openContent": "Abrir contenido",
+		"moreActions": "Más",
+		"moreActionsAria": "Más acciones para este reporte",
 		"dismiss": "Descartar",
 		"hideContent": "Ocultar contenido",
 		"restoreContent": "Restaurar contenido",

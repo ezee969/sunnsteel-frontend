@@ -6,12 +6,18 @@ import type {
 	ReportedMessageContext,
 	ReportStatus,
 } from '@sunsteel/contracts'
-import { Ban, EyeOff, Loader2 } from 'lucide-react'
+import { Ban, EyeOff, Loader2, MoreHorizontal } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/toast'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { ReportedMessages } from '@/features/moderation/reported-messages'
@@ -288,56 +294,74 @@ export function ReportQueue() {
 											{t('dismiss')}
 										</Button>
 									) : null}
-									{actions.canHide ? (
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												setPending({ action: 'HIDE_SUBJECT', report })
-											}
-										>
-											{isMessage ? t('hideMessage') : t('hideContent')}
-										</Button>
-									) : null}
-									{actions.canRestore ? (
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												setPending({ action: 'RESTORE_SUBJECT', report })
-											}
-										>
-											{isMessage ? t('restoreMessage') : t('restoreContent')}
-										</Button>
-									) : null}
-									{actions.canRestrict ? (
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												setPending({ action: 'RESTRICT_MESSAGING', report })
-											}
-										>
-											{t('restrictMessaging')}
-										</Button>
-									) : null}
-									{actions.canLift ? (
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												setPending({
-													action: 'LIFT_MESSAGING_RESTRICTION',
-													report,
-												})
-											}
-										>
-											{t('liftRestriction')}
-										</Button>
+									{/* UX-26: a row keeps two buttons -- inspect and dismiss -- and
+									    the enforcement actions sit in one menu. A row used to
+									    line up to seven outline buttons, which read as equal
+									    weights of very different acts. Each still opens its
+									    confirmation, which says what it does and does not do. */}
+									{actions.canHide ||
+									actions.canRestore ||
+									actions.canRestrict ||
+									actions.canLift ? (
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													type="button"
+													variant="ghost"
+													size="sm"
+													aria-label={t('moreActionsAria')}
+												>
+													<MoreHorizontal className="size-4" aria-hidden />
+													{t('moreActions')}
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="start">
+												{actions.canHide ? (
+													<DropdownMenuItem
+														onSelect={() =>
+															setPending({ action: 'HIDE_SUBJECT', report })
+														}
+													>
+														{isMessage ? t('hideMessage') : t('hideContent')}
+													</DropdownMenuItem>
+												) : null}
+												{actions.canRestore ? (
+													<DropdownMenuItem
+														onSelect={() =>
+															setPending({ action: 'RESTORE_SUBJECT', report })
+														}
+													>
+														{isMessage
+															? t('restoreMessage')
+															: t('restoreContent')}
+													</DropdownMenuItem>
+												) : null}
+												{actions.canRestrict ? (
+													<DropdownMenuItem
+														onSelect={() =>
+															setPending({
+																action: 'RESTRICT_MESSAGING',
+																report,
+															})
+														}
+													>
+														{t('restrictMessaging')}
+													</DropdownMenuItem>
+												) : null}
+												{actions.canLift ? (
+													<DropdownMenuItem
+														onSelect={() =>
+															setPending({
+																action: 'LIFT_MESSAGING_RESTRICTION',
+																report,
+															})
+														}
+													>
+														{t('liftRestriction')}
+													</DropdownMenuItem>
+												) : null}
+											</DropdownMenuContent>
+										</DropdownMenu>
 									) : null}
 								</div>
 							</article>
