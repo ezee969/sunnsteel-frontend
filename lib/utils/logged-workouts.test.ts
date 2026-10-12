@@ -11,6 +11,7 @@ import { translatorFor } from '@/i18n/translator'
 
 import {
 	buildLoggedWorkoutRequest,
+	defaultLoggedDate,
 	defaultLoggedStep,
 	loggableDateRange,
 	loggableDays,
@@ -285,5 +286,21 @@ describe('a logged workout on its own page', () => {
 		expect(t('body')).toMatch(/never shared or announced/)
 		expect(t('removeBody')).toMatch(/recalculated/)
 		expect(t('removeBody')).toMatch(/can't be undone/)
+	})
+})
+
+describe('the date a day opens on', () => {
+	it('is the latest date on its weekday, else the last of the range', () => {
+		// 2026-10-08 is a Thursday.
+		expect(defaultLoggedDate({ dayOfWeek: 1 }, range)).toBe('2026-10-05')
+		expect(defaultLoggedDate({ dayOfWeek: 4 }, range)).toBe('2026-10-08')
+		expect(defaultLoggedDate({ dayOfWeek: 0 }, range)).toBe('2026-10-04')
+		expect(defaultLoggedDate({ dayOfWeek: null }, range)).toBe('2026-10-08')
+		expect(
+			defaultLoggedDate(
+				{ dayOfWeek: 1 },
+				{ first: '2026-10-07', last: '2026-10-08' },
+			),
+		).toBe('2026-10-08')
 	})
 })

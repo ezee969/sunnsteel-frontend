@@ -1,4 +1,5 @@
 import {
+	addCalendarDays,
 	type LinearPeriodizationState,
 	LOGGED_WORKOUT_MAX_DURATION_SEC,
 	loggedWorkoutDateRange,
@@ -39,6 +40,26 @@ export function loggableDateRange(
 		today: localDateKey(now),
 		createdOn: localDateKey(new Date(routine.createdAt)),
 	})
+}
+
+const weekdayOf = (date: string) => {
+	const [year, month, day] = date.split('-').map(Number)
+	return new Date(Date.UTC(year, month - 1, day)).getUTCDay()
+}
+
+/**
+ * The date a day's form opens on: the latest date in the range on that day's
+ * weekday, else the range's last date (a rotation day, or a range too short
+ * to hold the weekday).
+ */
+export function defaultLoggedDate(
+	day: Pick<RoutineDay, 'dayOfWeek'>,
+	range: { first: string; last: string },
+): string {
+	if (day.dayOfWeek == null) return range.last
+	const back = (weekdayOf(range.last) - day.dayOfWeek + 7) % 7
+	const date = addCalendarDays(range.last, -back)
+	return date >= range.first ? date : range.last
 }
 
 /** The routine's own days a workout can be logged on: those with exercises. */

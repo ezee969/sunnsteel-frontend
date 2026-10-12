@@ -26,6 +26,7 @@ import { dateFormatter } from '@/i18n/date-locale'
 import { useLogPastWorkout } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	buildLoggedWorkoutRequest,
+	defaultLoggedDate,
 	loggableDateRange,
 	loggableDays,
 	loggedDraftForDay,
@@ -98,7 +99,7 @@ function LogPastWorkoutDialog({
 			name,
 		)
 	const [draft, setDraft] = useState<LoggedWorkoutDraft>(() =>
-		draftFor(days[0].id, range.last),
+		draftFor(days[0].id, defaultLoggedDate(days[0], range)),
 	)
 	const [problems, setProblems] = useState<string[]>([])
 	const day = days.find(item => item.id === draft.dayId) ?? days[0]
@@ -182,7 +183,15 @@ function LogPastWorkoutDialog({
 								value={draft.dayId}
 								onChange={event =>
 									setDraft(current => ({
-										...draftFor(event.target.value, current.date),
+										// A day opens on the latest date on its own weekday.
+										...draftFor(
+											event.target.value,
+											defaultLoggedDate(
+												days.find(item => item.id === event.target.value) ??
+													days[0],
+												range,
+											),
+										),
 										startTime: current.startTime,
 										duration: current.duration,
 									}))
