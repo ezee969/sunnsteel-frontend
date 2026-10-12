@@ -306,8 +306,10 @@ function LogPastWorkoutDialog({
 											</NativeSelect>
 										</div>
 									) : null}
-									<div className="grid grid-cols-[minmax(0,1fr)_4.5rem_5.5rem_auto] items-center gap-x-2 gap-y-2">
-										<span aria-hidden />
+									{/* Below sm a set's label is its own line above its fields:
+									    inline, a 320 dialog left it a few pixels. */}
+									<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 sm:grid-cols-[minmax(0,1fr)_4.5rem_5.5rem_auto]">
+										<span aria-hidden className="hidden sm:block" />
 										<span className="type-label text-ink-3">{t('reps')}</span>
 										<span className="type-label text-ink-3">
 											{t('weight', { unit: getWeightUnitLabel(unit) })}
@@ -322,7 +324,7 @@ function LogPastWorkoutDialog({
 												})
 											return (
 												<div key={set.setNumber} className="contents">
-													<span className="type-body-sm text-ink-2">
+													<span className="type-body-sm col-span-3 text-ink-2 sm:col-span-1">
 														{t('setLabel', { number: set.setNumber })}
 														{set.isWarmUp ? ` · ${t('warmUp')}` : ''}
 													</span>
