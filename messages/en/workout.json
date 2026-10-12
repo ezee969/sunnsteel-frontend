@@ -437,7 +437,8 @@
 		"loading": "Loading…",
 		"noMoreSessions": "No more sessions",
 		"setsCount": "{count, plural, one {{sets} set} other {{sets} sets}}",
-		"openSessionAria": "Open session {status} for {routine} started {date}"
+		"openSessionAria": "Open session {status} for {routine} started {date}",
+		"loggedLater": "Logged later"
 	},
 	"page": {
 		"loadingWorkouts": "Loading your workouts...",
@@ -464,6 +465,16 @@
 		"loadingRecap": "Loading session recap...",
 		"recapUnavailable": "The session recap is temporarily unavailable.",
 		"exercisesHeading": "Exercises"
+	},
+	"loggedWorkout": {
+		"title": "Logged later",
+		"body": "You logged this workout after it happened. The plan shown is the routine as it stood when you logged it, at the week you chose. It counts in your history, records and stats, and it was never shared or announced.",
+		"remove": "Remove workout",
+		"removeQuestion": "Remove this workout?",
+		"removeBody": "It leaves your history, and your records and stats are recalculated without it: records it set stop counting, and any it had replaced count again. This can't be undone.",
+		"keep": "Keep it",
+		"confirmRemove": "Remove workout",
+		"removed": "Workout removed"
 	},
 	"sessionPage": {
 		"errorTitle": "Error Loading Session",

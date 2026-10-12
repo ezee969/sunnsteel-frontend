@@ -272,3 +272,18 @@ describe('the request a form makes', () => {
 		expect(en('consequences')).toMatch(/does not change this routine/)
 	})
 })
+
+describe('a logged workout on its own page', () => {
+	it('says it was logged later and what removing it does, in both languages', () => {
+		for (const locale of ['en', 'es'] as const) {
+			const t = translatorFor(locale, 'workout.loggedWorkout')
+			const list = translatorFor(locale, 'workout.historyList')
+			expect(list('loggedLater')).toBe(t('title'))
+			expect(t('removeBody').length).toBeGreaterThan(0)
+		}
+		const t = translatorFor('en', 'workout.loggedWorkout')
+		expect(t('body')).toMatch(/never shared or announced/)
+		expect(t('removeBody')).toMatch(/recalculated/)
+		expect(t('removeBody')).toMatch(/can't be undone/)
+	})
+})

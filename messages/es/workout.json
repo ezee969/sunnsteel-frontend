@@ -437,7 +437,8 @@
 		"loading": "Cargando…",
 		"noMoreSessions": "No hay más sesiones",
 		"setsCount": "{count, plural, one {{sets} serie} other {{sets} series}}",
-		"openSessionAria": "Abrir sesión {status} de {routine} iniciada el {date}"
+		"openSessionAria": "Abrir sesión {status} de {routine} iniciada el {date}",
+		"loggedLater": "Registrado después"
 	},
 	"page": {
 		"loadingWorkouts": "Cargando tus entrenamientos...",
@@ -464,6 +465,16 @@
 		"loadingRecap": "Cargando resumen de la sesión...",
 		"recapUnavailable": "El resumen de la sesión no está disponible por el momento.",
 		"exercisesHeading": "Ejercicios"
+	},
+	"loggedWorkout": {
+		"title": "Registrado después",
+		"body": "Registraste este entrenamiento después de hacerlo. El plan que ves es la rutina tal como estaba al registrarlo, en la semana que elegiste. Cuenta en tu historial, tus récords y tus estadísticas, y nunca se compartió ni se anunció.",
+		"remove": "Eliminar entrenamiento",
+		"removeQuestion": "¿Eliminar este entrenamiento?",
+		"removeBody": "Sale de tu historial, y tus récords y estadísticas se recalculan sin él: los récords que marcó dejan de contar y los que había superado vuelven a contar. No se puede deshacer.",
+		"keep": "Conservarlo",
+		"confirmRemove": "Eliminar entrenamiento",
+		"removed": "Entrenamiento eliminado"
 	},
 	"sessionPage": {
 		"errorTitle": "Error al cargar la sesión",

@@ -150,6 +150,8 @@ export function WorkoutHistoryList({
 								},
 								tDeloads,
 							)
+							// LIVE-23: a workout logged after it happened says so, in ink.
+							const loggedLater = s.origin === 'LOGGED_LATER'
 							return (
 								// UX-26: a row is a link, so it opens in a new tab and reads as
 								// one; it was a div with a button role. One summary line says
@@ -162,11 +164,16 @@ export function WorkoutHistoryList({
 								<Link
 									key={s.id}
 									href={`/workouts/history/${s.id}`}
-									aria-label={t('openSessionAria', {
-										status: statusLabel(s.status).toLowerCase(),
-										routine: s.routine.name,
-										date: dateTime(s.startedAt),
-									})}
+									aria-label={[
+										t('openSessionAria', {
+											status: statusLabel(s.status).toLowerCase(),
+											routine: s.routine.name,
+											date: dateTime(s.startedAt),
+										}),
+										loggedLater ? t('loggedLater') : null,
+									]
+										.filter(Boolean)
+										.join(', ')}
 									className={cn(
 										'rule-row mark block py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
 										statusMarkRule(statusState(s.status)),
@@ -186,6 +193,9 @@ export function WorkoutHistoryList({
 										{summary(s)}
 										{plan ? (
 											<span className="text-ink-3">{` · ${plan}`}</span>
+										) : null}
+										{loggedLater ? (
+											<span className="text-ink-3">{` · ${t('loggedLater')}`}</span>
 										) : null}
 									</p>
 									{s.notes ? (

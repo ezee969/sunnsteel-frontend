@@ -8,6 +8,7 @@ import { InlineError } from '@/components/layout/inline-error'
 import { SendWorkoutInMessage } from '@/features/messages/send-in-message'
 import { HistoryExerciseGroup } from '@/features/workout/history-exercise-group'
 import { HistorySessionHeader } from '@/features/workout/history-session-header'
+import { LoggedWorkoutNote } from '@/features/workout/logged-workout-note'
 import {
 	SessionCorrectionEditor,
 	SessionCorrectionSummary,
@@ -101,6 +102,11 @@ export default function WorkoutDetailPage() {
 				onBack={() => router.back()}
 				showSummary={!recap}
 			/>
+
+			{/* LIVE-23: logged after it happened, and removable for that reason. */}
+			{session.origin === 'LOGGED_LATER' ? (
+				<LoggedWorkoutNote sessionId={session.id} />
+			) : null}
 
 			{session.status === 'COMPLETED' ? (
 				recap ? (
