@@ -3,7 +3,7 @@ import type { Breadcrumb, Event } from '@sentry/nextjs'
 /**
  * PLAT-02: what may leave the browser in an error report or a trace.
  *
- * Nothing a member typed, no credential and no address. A share link's token
+ * Nothing a member typed and no credential. A share link's token
  * is its only credential (`ROUT-04`, `SOC-07`), the query string carries
  * search terms, recipients and the OAuth code, and the fragment can carry a
  * Supabase access token on the sign-in callback, so all three go. The SDK is
@@ -24,17 +24,6 @@ const URL_KEYS = [
 	'http.target',
 	'from',
 	'to',
-]
-
-/** Attributes naming the caller's address. */
-const ADDRESS_KEYS = [
-	'client.address',
-	'client.port',
-	'http.client_ip',
-	'net.peer.ip',
-	'net.peer.port',
-	'net.sock.peer.addr',
-	'net.sock.peer.port',
 ]
 
 /** Every captured request or response header is dropped, filtered or not. */
@@ -59,7 +48,6 @@ function scrubData(data: Record<string, unknown> | undefined): void {
 		if (typeof value === 'string') data[key] = scrubUrl(value)
 	}
 	for (const key of QUERY_KEYS) delete data[key]
-	for (const key of ADDRESS_KEYS) delete data[key]
 	for (const key of Object.keys(data)) {
 		if (HEADER_PREFIXES.some(prefix => key.startsWith(prefix))) delete data[key]
 	}
@@ -88,10 +76,14 @@ export function redactEvent<T extends Event>(event: T): T {
 		}
 	}
 
-	// An account is named by its id only: never an email, a username or an IP.
+	// An account is named by its id, never an email or a username. The
+	// address is kept, by the owner's decision of 2026-10-14.
 	if (event.user) {
-		event.user =
-			event.user.id === undefined ? {} : { id: String(event.user.id) }
+		const { id, ip_address } = event.user
+		event.user = {
+			...(id === undefined ? {} : { id: String(id) }),
+			...(ip_address ? { ip_address } : {}),
+		}
 	}
 
 	if (event.transaction) event.transaction = scrubUrl(event.transaction)

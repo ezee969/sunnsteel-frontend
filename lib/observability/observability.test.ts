@@ -91,7 +91,10 @@ describe('PLAT-02 what leaves the browser', () => {
 
 		expect(event.transaction).toBe('/shared/sessions/[token]')
 		expect(event.spans?.[0].description).toBe('GET http://api/api/search')
-		expect(event.spans?.[0].data).toEqual({ url: 'http://api/api/search' })
+		expect(event.spans?.[0].data).toEqual({
+			url: 'http://api/api/search',
+			'net.peer.ip': '203.0.113.9',
+		})
 	})
 })
 
