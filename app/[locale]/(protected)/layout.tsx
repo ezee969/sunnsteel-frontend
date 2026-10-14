@@ -15,6 +15,7 @@ import Header from '@/features/shell/components/Header'
 import Sidebar from '@/features/shell/components/Sidebar'
 import { ConnectionStatus } from '@/features/shell/connection-status'
 import { LocaleSync } from '@/features/shell/locale-sync'
+import { ObservabilityUser } from '@/features/shell/observability-user'
 import { RealtimeSync } from '@/features/shell/realtime-sync'
 import { StaleSessionRecoveryDialog } from '@/features/workout/stale-session-recovery-dialog'
 import { useSidebar } from '@/hooks/use-sidebar'
@@ -174,6 +175,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 			<StaleSessionRecoveryDialog session={activeSession} />
 			<LocaleSync />
 			<RealtimeSync />
+			<ObservabilityUser />
 			{/* Ground. v1.0 §1.4 retires the gold mesh gradient and the parchment
 			    wash: the identity is carried by structure, not by texture behind
 			    the content. One flat surface, both themes. */}

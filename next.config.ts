@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 
+import { withSentryConfig } from '@sentry/nextjs/config'
 import withSerwistInit from '@serwist/next'
 import type { NextConfig } from 'next'
 import { PHASE_DEVELOPMENT_SERVER } from 'next/constants'
@@ -89,7 +90,27 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 // Development runs on Turbopack and never registers a worker (the provider
 // clears one instead), so the webpack plugin is only applied to builds.
+// PLAT-02: Sentry's build step names the release and, only when
+// SENTRY_AUTH_TOKEN is set (the Vercel build), uploads the browser source maps
+// and deletes them from the output, so none is ever served. Without a DSN the
+// SDK it wires in initialises nothing (instrumentation-client.ts).
+const sentryBuildOptions = {
+	org: process.env.SENTRY_ORG,
+	project: process.env.SENTRY_PROJECT,
+	authToken: process.env.SENTRY_AUTH_TOKEN,
+	silent: !process.env.CI,
+	telemetry: false,
+	widenClientFileUpload: true,
+	sourcemaps: {
+		disable: !process.env.SENTRY_AUTH_TOKEN,
+		deleteSourcemapsAfterUpload: true,
+	},
+}
+
 export default function config(phase: string): NextConfig {
 	const config = withNextIntl(nextConfig)
-	return phase === PHASE_DEVELOPMENT_SERVER ? config : withSerwist(config)
+	return withSentryConfig(
+		phase === PHASE_DEVELOPMENT_SERVER ? config : withSerwist(config),
+		sentryBuildOptions,
+	)
 }

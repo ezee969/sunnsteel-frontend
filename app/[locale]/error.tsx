@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { RouteError } from '@/components/layout/RouteError'
 import { Button } from '@/components/ui/button'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { useReportBoundaryError } from '@/lib/observability/report-error'
 import { logger } from '@/lib/utils/logger'
 
 export default function RootError({
@@ -15,6 +16,8 @@ export default function RootError({
 	error: Error & { digest?: string }
 	reset: () => void
 }) {
+	// PLAT-02: reported unless it is the API refusing (a 4xx).
+	useReportBoundaryError(error)
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('core.appError')
 

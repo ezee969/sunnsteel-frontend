@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 import { RouteError } from '@/components/layout/RouteError'
 import { buttonVariants } from '@/components/ui/button'
+import { useReportBoundaryError } from '@/lib/observability/report-error'
 
 export default function GlobalError({
 	error,
@@ -12,6 +13,8 @@ export default function GlobalError({
 	error: Error & { digest?: string }
 	reset: () => void
 }) {
+	// PLAT-02: reported unless it is the API refusing (a 4xx).
+	useReportBoundaryError(error)
 	useEffect(() => {
 		// This boundary replaces the root layout, so avoid relying on app
 		// providers/logger here in case the crash originated in the layout itself.
