@@ -14,7 +14,9 @@
 		"sharedWorkout": "Workout: {name}",
 		"workoutUnavailable": "A workout that's no longer available",
 		"sharedRecord": "Record: {name}",
-		"recordUnavailable": "A record that's no longer available"
+		"recordUnavailable": "A record that's no longer available",
+		"sharedAchievement": "Milestone: {name}",
+		"achievementUnavailable": "A milestone that's no longer available"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -87,7 +89,11 @@
 		"openWorkoutLabel": "Open the workout {name}",
 		"workoutGone": "This workout is no longer available.",
 		"recordCardLabel": "Personal record",
-		"recordGone": "This record is no longer available."
+		"recordGone": "This record is no longer available.",
+		"achievementCardLabel": "Milestone",
+		"achievementEarned": "Earned {date}",
+		"achievementFromHistory": "Recognized from history",
+		"achievementGone": "This milestone is no longer available."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -106,8 +112,8 @@
 		"attach": "Attach",
 		"attachedWorkout": "Workout: {name}",
 		"removeAttachment": "Remove {name}",
-		"attachTitle": "Attach a routine or a workout",
-		"attachDescription": "The other member can open what you send, whatever your privacy settings, until you delete the message. A routine can be copied; a workout shows its totals, records and sets, never your notes.",
+		"attachTitle": "Attach something you trained",
+		"attachDescription": "The other member can open what you send, whatever your privacy settings, until you delete the message. A routine can be copied; a workout shows its totals, records and sets, never your notes; a record or a milestone shows just what you earned.",
 		"routinesHeading": "Your routines",
 		"workoutsHeading": "Recent workouts",
 		"workoutsEmpty": "No finished workouts yet.",
@@ -115,7 +121,11 @@
 		"attachedRecord": "Record: {name}",
 		"recordsHeading": "Recent records",
 		"recordsEmpty": "No personal records yet.",
-		"recordsLoading": "Loading your records…"
+		"recordsLoading": "Loading your records…",
+		"attachedAchievement": "Milestone: {name}",
+		"achievementsHeading": "Your milestones",
+		"achievementsEmpty": "No milestones earned yet.",
+		"achievementsLoading": "Loading your milestones…"
 	},
 	"new": {
 		"pageTitle": "New message",

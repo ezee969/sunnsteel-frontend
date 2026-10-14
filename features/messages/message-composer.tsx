@@ -5,6 +5,7 @@ import {
 	ClipboardList,
 	Dumbbell,
 	Loader2,
+	Medal,
 	Paperclip,
 	Send,
 	Trophy,
@@ -20,9 +21,9 @@ import { composerState, enterSends } from '@/lib/utils/messages'
 
 import { AttachPicker } from './attach-picker'
 
-/** MSG-07/MSG-10/MSG-11: what the composer has attached, with its name. */
+/** MSG-07 to MSG-12: what the composer has attached, with its name. */
 export interface AttachedObject {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT'
 	id: string
 	name: string
 	/** MSG-11: a record's lift. */
@@ -96,7 +97,9 @@ export function MessageComposer({
 			? Dumbbell
 			: attached?.kind === 'RECORD'
 				? Trophy
-				: ClipboardList
+				: attached?.kind === 'ACHIEVEMENT'
+					? Medal
+					: ClipboardList
 
 	return (
 		<form
@@ -115,7 +118,9 @@ export function MessageComposer({
 								? t('attachedWorkout', { name: attached.name })
 								: attached.kind === 'RECORD'
 									? t('attachedRecord', { name: attached.name })
-									: t('attachedRoutine', { name: attached.name })}
+									: attached.kind === 'ACHIEVEMENT'
+										? t('attachedAchievement', { name: attached.name })
+										: t('attachedRoutine', { name: attached.name })}
 						</span>
 					</p>
 					<Button

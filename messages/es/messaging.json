@@ -14,7 +14,9 @@
 		"sharedWorkout": "Entrenamiento: {name}",
 		"workoutUnavailable": "Un entrenamiento que ya no está disponible",
 		"sharedRecord": "Récord: {name}",
-		"recordUnavailable": "Un récord que ya no está disponible"
+		"recordUnavailable": "Un récord que ya no está disponible",
+		"sharedAchievement": "Hito: {name}",
+		"achievementUnavailable": "Un hito que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -87,7 +89,11 @@
 		"openWorkoutLabel": "Abrir el entrenamiento {name}",
 		"workoutGone": "Este entrenamiento ya no está disponible.",
 		"recordCardLabel": "Récord personal",
-		"recordGone": "Este récord ya no está disponible."
+		"recordGone": "Este récord ya no está disponible.",
+		"achievementCardLabel": "Hito",
+		"achievementEarned": "Obtenido el {date}",
+		"achievementFromHistory": "Reconocido a partir del historial",
+		"achievementGone": "Este hito ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -106,8 +112,8 @@
 		"attach": "Adjuntar",
 		"attachedWorkout": "Entrenamiento: {name}",
 		"removeAttachment": "Quitar {name}",
-		"attachTitle": "Adjunta una rutina o un entrenamiento",
-		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas.",
+		"attachTitle": "Adjunta algo que entrenaste",
+		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas; un récord o un hito muestra solo lo que lograste.",
 		"routinesHeading": "Tus rutinas",
 		"workoutsHeading": "Entrenamientos recientes",
 		"workoutsEmpty": "Aún no tienes entrenamientos terminados.",
@@ -115,7 +121,11 @@
 		"attachedRecord": "Récord: {name}",
 		"recordsHeading": "Récords recientes",
 		"recordsEmpty": "Aún no tienes récords personales.",
-		"recordsLoading": "Cargando tus récords…"
+		"recordsLoading": "Cargando tus récords…",
+		"attachedAchievement": "Hito: {name}",
+		"achievementsHeading": "Tus hitos",
+		"achievementsEmpty": "Aún no has obtenido ningún hito.",
+		"achievementsLoading": "Cargando tus hitos…"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",

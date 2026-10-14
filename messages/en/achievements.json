@@ -75,7 +75,9 @@
 		"earnedOn": "Earned {date}",
 		"viewSession": "View session",
 		"earnedCount": "{count} earned",
-		"highest": "Highest: {title}"
+		"highest": "Highest: {title}",
+		"sendAchievement": "Send in a message",
+		"sendAchievementLabel": "Send the {name} milestone in a message"
 	},
 	"page": {
 		"errorTitle": "Achievements are unavailable right now",

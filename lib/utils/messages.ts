@@ -5,6 +5,7 @@ import {
 	type ConversationsResponse,
 	type ConversationSummary,
 	MESSAGE_BODY_MAX,
+	type MessageAchievementSummary,
 	type MessageAttachment,
 	messageBodyLength,
 	messageNote,
@@ -149,6 +150,7 @@ export function conversationPreview(
 	conversation: ConversationSummary,
 	t: Translator<'messaging.common'>,
 	exerciseName: (name: string) => string = name => name,
+	achievementTitle: AchievementTitle = achievement => achievement.title,
 ): string {
 	const last = conversation.lastMessage
 	if (!last) return t('noMessages')
@@ -164,7 +166,13 @@ export function conversationPreview(
 					last.attachment
 					? last.attachment.kind === 'RECORD'
 						? recordLine(last.attachment.record, t, exerciseName)
-						: attachmentLine(last.attachment, t)
+						: last.attachment.kind === 'ACHIEVEMENT'
+							? achievementLine(
+									last.attachment.achievement,
+									t,
+									achievementTitle,
+								)
+							: attachmentLine(last.attachment, t)
 					: ''
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
@@ -182,7 +190,29 @@ export function attachmentLine(
 			return workoutLine(attachment.workout, t)
 		case 'RECORD':
 			return recordLine(attachment.record, t)
+		case 'ACHIEVEMENT':
+			return achievementLine(attachment.achievement, t)
 	}
+}
+
+/** MSG-12: a milestone's title in the reader's language. */
+export type AchievementTitle = (
+	achievement: MessageAchievementSummary,
+) => string
+
+/**
+ * MSG-12: a milestone in one line, by its title (as `title` names it, the
+ * catalog's words in the reader's language), or that it is no longer
+ * available.
+ */
+export function achievementLine(
+	achievement: MessageAchievementSummary | null,
+	t: Translator<'messaging.common'>,
+	title: AchievementTitle = achievement => achievement.title,
+): string {
+	return achievement
+		? t('sharedAchievement', { name: title(achievement) })
+		: t('achievementUnavailable')
 }
 
 /**
@@ -239,11 +269,12 @@ export interface ComposerState {
 }
 
 /**
- * MSG-07/MSG-10/MSG-11: one object a message carries -- a routine, a workout
- * or a record. A record also names its lift, so the composer can find it.
+ * MSG-07/MSG-10/MSG-11/MSG-12: one object a message carries -- a routine, a
+ * workout, a record or a milestone. A record also names its lift, so the
+ * composer can find it; a milestone is named by its catalog id.
  */
 export interface AttachRef {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT'
 	id: string
 	exerciseId?: string
 }
@@ -266,6 +297,9 @@ export function composerState(
 						...(attached?.kind === 'WORKOUT' ? { sessionId: attached.id } : {}),
 						...(attached?.kind === 'RECORD'
 							? { recordEventId: attached.id }
+							: {}),
+						...(attached?.kind === 'ACHIEVEMENT'
+							? { achievementId: attached.id }
 							: {}),
 					},
 		over: length > MESSAGE_BODY_MAX,
@@ -294,6 +328,7 @@ export const ATTACH_PARAMS = {
 	ROUTINE: 'routine',
 	WORKOUT: 'workout',
 	RECORD: 'record',
+	ACHIEVEMENT: 'achievement',
 } as const
 
 /** MSG-11: the lift a handed-in record belongs to. */
@@ -351,4 +386,20 @@ export function messageRoutineHref(
 	messageId: string,
 ): string {
 	return `/messages/${encodeURIComponent(conversationId)}/routines/${encodeURIComponent(messageId)}`
+}
+
+/**
+ * MSG-12: the milestones the composer offers -- the most recently earned
+ * first, ties by id so the order never shifts.
+ */
+export function recentAchievements<
+	T extends { id: string; unlockedAt: string },
+>(achievements: readonly T[], limit: number): T[] {
+	return achievements
+		.toSorted(
+			(left, right) =>
+				right.unlockedAt.localeCompare(left.unlockedAt) ||
+				left.id.localeCompare(right.id),
+		)
+		.slice(0, limit)
 }

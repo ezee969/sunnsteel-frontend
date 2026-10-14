@@ -7,6 +7,7 @@ import type {
 import { Flag } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { capturedAuthorName } from '@/lib/utils/moderation'
@@ -32,6 +33,7 @@ export function ReportedMessages({
 	context: ReportedMessageContext
 }) {
 	const t = useTranslations('social.moderationPage')
+	const tCatalog = useTranslations('catalog.achievements')
 	const locale = useLocale() as Locale
 	const format = dateFormatter(locale, TIME_OPTIONS)
 
@@ -76,11 +78,28 @@ export function ReportedMessages({
 							</p>
 						) : typeof message.routineName === 'string' ||
 						  typeof message.workoutName === 'string' ||
-						  typeof message.recordName === 'string' ? null : (
+						  typeof message.recordName === 'string' ||
+						  typeof message.achievementId === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-12: a milestone it carried, by its title. */}
+						{typeof message.achievementId === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.achievementId
+									? t('capturedAchievement', {
+											name: achievementText(
+												{
+													id: message.achievementId,
+													title: message.achievementId,
+												},
+												tCatalog,
+											).title,
+										})
+									: t('capturedAchievementGone')}
+							</p>
+						) : null}
 						{/* MSG-11: a record it carried, by its lift. */}
 						{typeof message.recordName === 'string' ? (
 							<p className="type-body-sm text-ink-2">

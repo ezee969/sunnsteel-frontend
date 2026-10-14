@@ -8,9 +8,11 @@ import { MESSAGE_BODY_MAX } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
+import { achievementText } from '@/i18n/catalog'
 import { translatorFor } from '@/i18n/translator'
 
 import {
+	achievementLine,
 	composerState,
 	conversationListFromPages,
 	conversationPreview,
@@ -22,6 +24,7 @@ import {
 	messageRoutineHref,
 	messageWorkoutHref,
 	readThrough,
+	recentAchievements,
 	recordLine,
 	routineLine,
 	sendableRoutines,
@@ -451,5 +454,76 @@ describe('MSG-11 a personal record in a message', () => {
 		expect(messageHref('ana', null, R)).toBe(
 			'/messages/new?to=ana&record=e-1&exercise=bench',
 		)
+	})
+})
+
+describe('MSG-12 an earned milestone in a message', () => {
+	const milestone = {
+		id: 'sessions:10',
+		category: 'SESSIONS' as const,
+		threshold: 10,
+		title: '10 Sessions',
+		description: 'Complete 10 training sessions.',
+		unlockedAt: '2026-10-07T09:00:00.000Z',
+		backfilled: false,
+	}
+	const A = { kind: 'ACHIEVEMENT' as const, id: 'sessions:10' }
+	const preview = summary('a', {
+		lastMessage: message('x', '10:00', {
+			body: null,
+			attachment: { kind: 'ACHIEVEMENT', achievement: milestone },
+		}),
+	})
+	const esCatalog = translatorFor('es', 'catalog.achievements')
+
+	it('sends a milestone by its catalog id, with or without a note', () => {
+		expect(composerState('', A).sendable).toEqual({
+			achievementId: 'sessions:10',
+		})
+		expect(composerState(' ten! ', A).sendable).toEqual({
+			body: 'ten!',
+			achievementId: 'sessions:10',
+		})
+	})
+
+	it("previews a milestone by its title, in the reader's words, in both languages", () => {
+		expect(conversationPreview(preview, en)).toBe('Milestone: 10 Sessions')
+		const spanish = conversationPreview(
+			preview,
+			es,
+			name => name,
+			achievement => achievementText(achievement, esCatalog).title,
+		)
+		expect(spanish).toBe(`Hito: ${achievementText(milestone, esCatalog).title}`)
+		expect(spanish).not.toContain('Sessions')
+		expect(achievementLine(null, en)).toBe(
+			"A milestone that's no longer available",
+		)
+		expect(achievementLine(null, es)).toBe('Un hito que ya no está disponible')
+	})
+
+	it('hands the composer the milestone by its id', () => {
+		expect(messageHref('ana', 'c-1', A)).toBe(
+			'/messages/c-1?achievement=sessions%3A10',
+		)
+		expect(messageHref('ana', null, A)).toBe(
+			'/messages/new?to=ana&achievement=sessions%3A10',
+		)
+	})
+
+	it('offers the most recently earned first, ties by id, up to the limit', () => {
+		const at = (id: string, unlockedAt: string) => ({ id, unlockedAt })
+		const earned = [
+			at('sessions:1', '2026-09-01T00:00:00.000Z'),
+			at('sets:10', '2026-10-01T00:00:00.000Z'),
+			at('records:1', '2026-10-01T00:00:00.000Z'),
+			at('sessions:10', '2026-10-07T00:00:00.000Z'),
+		]
+		expect(recentAchievements(earned, 3).map(item => item.id)).toEqual([
+			'sessions:10',
+			'records:1',
+			'sets:10',
+		])
+		expect(earned[0].id).toBe('sessions:1')
 	})
 })

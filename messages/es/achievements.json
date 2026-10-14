@@ -75,7 +75,9 @@
 		"earnedOn": "Obtenido el {date}",
 		"viewSession": "Ver sesión",
 		"earnedCount": "{count, plural, one {# obtenido} other {# obtenidos}}",
-		"highest": "Más alto: {title}"
+		"highest": "Más alto: {title}",
+		"sendAchievement": "Enviar en un mensaje",
+		"sendAchievementLabel": "Enviar el hito {name} en un mensaje"
 	},
 	"page": {
 		"errorTitle": "Los logros no están disponibles en este momento",

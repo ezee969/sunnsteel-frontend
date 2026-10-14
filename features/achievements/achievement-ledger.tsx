@@ -2,14 +2,17 @@ import type {
 	AchievementsResponse,
 	EarnedAchievement,
 } from '@sunsteel/contracts'
-import { Check, Medal } from 'lucide-react'
+import { Check, Medal, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import { CollapsibleSection } from '@/components/layout/collapsible-section'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { InlineError } from '@/components/layout/inline-error'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SendInMessageDialog } from '@/features/messages/send-in-message'
 import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import {
@@ -32,6 +35,7 @@ function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 		achievement,
 		useTranslations('catalog.achievements'),
 	)
+	const [sending, setSending] = useState(false)
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -51,14 +55,33 @@ function AchievementRow({ achievement }: { achievement: EarnedAchievement }) {
 								date: formatAchievementDate(achievement.unlockedAt, locale),
 							})}
 				</p>
-				{achievement.sourceSessionId ? (
-					<Link
-						href={`/workouts/history/${achievement.sourceSessionId}`}
-						className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
+				<div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
+					{achievement.sourceSessionId ? (
+						<Link
+							href={`/workouts/history/${achievement.sourceSessionId}`}
+							className="type-body-sm text-primary underline-offset-4 hover:underline"
+						>
+							{t('viewSession')}
+						</Link>
+					) : null}
+					{/* MSG-12: this milestone, as held now, to one member. */}
+					<Button
+						type="button"
+						variant="link"
+						className="type-body-sm h-auto w-fit gap-1 p-0"
+						aria-label={t('sendAchievementLabel', { name: text.title })}
+						onClick={() => setSending(true)}
 					>
-						{t('viewSession')}
-					</Link>
-				) : null}
+						<MessageSquare className="size-3.5" aria-hidden />
+						{t('sendAchievement')}
+					</Button>
+				</div>
+				<SendInMessageDialog
+					open={sending}
+					onOpenChange={setSending}
+					attach={{ kind: 'ACHIEVEMENT', id: achievement.id }}
+					name={text.title}
+				/>
 			</div>
 		</li>
 	)

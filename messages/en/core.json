@@ -470,7 +470,7 @@
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",
 		"REQUEST_PENDING": "You can send more once they accept your request.",
-		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine, one workout or one record.",
+		"MESSAGE_ONE_ATTACHMENT": "A message can carry one routine, one workout, one record or one milestone.",
 		"LOGGED_WORKOUT_DATE": "A past workout can be logged only before the routine was created, within the last {days} days",
 		"LOGGED_WORKOUT_OVERLAP": "Another workout overlaps that time",
 		"LOGGED_WORKOUT_SAME_DAY": "This day of the routine is already logged on that date",

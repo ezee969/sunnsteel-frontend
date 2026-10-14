@@ -100,7 +100,9 @@
 		"capturedWorkout": "Compartió un entrenamiento: {name}",
 		"capturedWorkoutGone": "Compartió un entrenamiento que ya no está disponible",
 		"capturedRecord": "Compartió un récord: {name}",
-		"capturedRecordGone": "Compartió un récord que ya no está disponible"
+		"capturedRecordGone": "Compartió un récord que ya no está disponible",
+		"capturedAchievement": "Compartió un hito: {name}",
+		"capturedAchievementGone": "Compartió un hito que ya no está disponible"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",

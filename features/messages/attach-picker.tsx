@@ -12,22 +12,29 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
-import { exerciseLabel } from '@/i18n/catalog'
+import { achievementText, exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
+import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
 	useProgressTimeline,
 	useSessions,
 } from '@/lib/api/hooks/useWorkoutSession'
-import { sendableRoutines, workoutName } from '@/lib/utils/messages'
+import { formatAchievementDate } from '@/lib/utils/achievements'
+import {
+	recentAchievements,
+	sendableRoutines,
+	workoutName,
+} from '@/lib/utils/messages'
 import { getRecordTimelinePerformanceLabel } from '@/lib/utils/progress-timeline'
 
 import type { AttachedObject } from './message-composer'
 
-/** How many finished workouts, and records, the picker offers. */
+/** How many finished workouts, records and milestones the picker offers. */
 const RECENT_WORKOUTS = 10
 const RECENT_RECORDS = 10
+const RECENT_ACHIEVEMENTS = 10
 
 /**
  * MSG-07/MSG-10: one of the member's own routines or finished workouts,
@@ -63,6 +70,13 @@ export function AttachPicker({
 	})
 	const records = (timeline.data?.pages[0]?.items ?? []).flatMap(item =>
 		item.type === 'PERSONAL_RECORD' ? [item] : [],
+	)
+	// MSG-12: their most recently earned milestones.
+	const tCatalog = useTranslations('catalog.achievements')
+	const achievements = useAchievements()
+	const milestones = recentAchievements(
+		achievements.data?.achievements ?? [],
+		RECENT_ACHIEVEMENTS,
 	)
 
 	return (
@@ -166,6 +180,49 @@ export function AttachPicker({
 														kind: 'RECORD',
 														id: record.eventId,
 														exerciseId: record.exerciseId,
+														name,
+													})
+												}
+											/>
+										</li>
+									)
+								})}
+							</ul>
+						)}
+					</section>
+					<section className="space-y-2">
+						<h3 className="type-label text-ink-3">
+							{t('achievementsHeading')}
+						</h3>
+						{achievements.isPending ? (
+							<Skeleton
+								className="h-11"
+								aria-busy="true"
+								aria-label={t('achievementsLoading')}
+							/>
+						) : milestones.length === 0 ? (
+							<p className="type-body-sm text-ink-3">
+								{t('achievementsEmpty')}
+							</p>
+						) : (
+							<ul className="border-t border-rule-faint">
+								{milestones.map(achievement => {
+									const name = achievementText(achievement, tCatalog).title
+									const when = achievement.backfilled
+										? undefined
+										: formatAchievementDate(achievement.unlockedAt, locale)
+									return (
+										<li key={achievement.id} className="rule-row">
+											<ChoiceButton
+												label={t('pickerChoose', {
+													name: when ? `${name}, ${when}` : name,
+												})}
+												title={name}
+												detail={when}
+												onClick={() =>
+													onChoose({
+														kind: 'ACHIEVEMENT',
+														id: achievement.id,
 														name,
 													})
 												}

@@ -4,8 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
-import { exerciseLabel } from '@/i18n/catalog'
+import { achievementText, exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
+import { useAchievements } from '@/lib/api/hooks/useAchievements'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
 	useProgressTimeline,
@@ -33,6 +34,9 @@ export function useAttachRef(): AttachRef | null {
 	if (routineId) return { kind: 'ROUTINE', id: routineId }
 	const sessionId = params.get(ATTACH_PARAMS.WORKOUT)
 	if (sessionId) return { kind: 'WORKOUT', id: sessionId }
+	// MSG-12: a milestone, by its catalog id.
+	const achievementId = params.get(ATTACH_PARAMS.ACHIEVEMENT)
+	if (achievementId) return { kind: 'ACHIEVEMENT', id: achievementId }
 	const eventId = params.get(ATTACH_PARAMS.RECORD)
 	const exerciseId = params.get(ATTACH_EXERCISE_PARAM)
 	return eventId && exerciseId
@@ -61,7 +65,21 @@ export function useAttachedObject(): AttachedObject | null {
 		limit: 50,
 		enabled: ref?.kind === 'RECORD',
 	})
+	const tCatalog = useTranslations('catalog.achievements')
+	const achievements = useAchievements()
 	if (!ref) return null
+	if (ref.kind === 'ACHIEVEMENT') {
+		const achievement = achievements.data?.achievements.find(
+			candidate => candidate.id === ref.id,
+		)
+		return achievement
+			? {
+					kind: 'ACHIEVEMENT',
+					id: achievement.id,
+					name: achievementText(achievement, tCatalog).title,
+				}
+			: null
+	}
 	if (ref.kind === 'RECORD') {
 		const record = (lift.data?.pages ?? [])
 			.flatMap(page => page.items)

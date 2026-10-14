@@ -13,6 +13,7 @@ import {
 	EyeOff,
 	Flag,
 	Loader2,
+	Medal,
 	MoreHorizontal,
 	Trash2,
 	Trophy,
@@ -45,7 +46,7 @@ import { useToast } from '@/components/ui/toast'
 import { ReportDialog } from '@/features/profile/report-dialog'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
-import { exerciseLabel } from '@/i18n/catalog'
+import { achievementText, exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import {
@@ -55,6 +56,7 @@ import {
 	useMarkConversationRead,
 	useSendMessage,
 } from '@/lib/api/hooks/useConversations'
+import { formatAchievementDate } from '@/lib/utils/achievements'
 import {
 	firstNewIndex,
 	memberName,
@@ -639,6 +641,10 @@ function AttachmentCard({
 		return <RecordCard message={message} box={box} />
 	}
 
+	if (attachment.kind === 'ACHIEVEMENT') {
+		return <AchievementCard message={message} box={box} />
+	}
+
 	const routine = attachment.routine
 	return (
 		<div className={box}>
@@ -722,6 +728,56 @@ function RecordCard({
 				</div>
 			) : (
 				<p className="type-body-sm mt-1 text-ink-3">{t('recordGone')}</p>
+			)}
+		</div>
+	)
+}
+
+/**
+ * MSG-12: an earned milestone, as its sender holds it now -- what it is in
+ * the reader's language and when it was earned, or that it was recognized
+ * from history. Nothing of the session behind it; one its sender no longer
+ * holds says it is no longer available.
+ */
+function AchievementCard({
+	message,
+	box,
+}: {
+	message: ConversationMessage
+	box: string
+}) {
+	const t = useTranslations('messaging.thread')
+	const tCatalog = useTranslations('catalog.achievements')
+	const locale = useLocale() as Locale
+	const achievement =
+		message.attachment?.kind === 'ACHIEVEMENT'
+			? message.attachment.achievement
+			: null
+	const text = achievement ? achievementText(achievement, tCatalog) : null
+	return (
+		<div className={box}>
+			<p className="type-label flex items-center gap-1.5 text-ink-3">
+				<Medal className="size-3.5" aria-hidden />
+				{t('achievementCardLabel')}
+			</p>
+			{achievement && text ? (
+				<div className="mt-1 min-w-0 space-y-1">
+					<p className="type-panel text-foreground">{text.title}</p>
+					<p className="type-body-sm text-ink-2">{text.description}</p>
+					<p className="type-body-sm text-ink-3">
+						{achievement.backfilled ? (
+							t('achievementFromHistory')
+						) : (
+							<time dateTime={achievement.unlockedAt}>
+								{t('achievementEarned', {
+									date: formatAchievementDate(achievement.unlockedAt, locale),
+								})}
+							</time>
+						)}
+					</p>
+				</div>
+			) : (
+				<p className="type-body-sm mt-1 text-ink-3">{t('achievementGone')}</p>
 			)}
 		</div>
 	)
