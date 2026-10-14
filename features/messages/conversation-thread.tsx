@@ -15,6 +15,7 @@ import {
 	Loader2,
 	Medal,
 	MoreHorizontal,
+	RotateCcw,
 	Trash2,
 	Trophy,
 	User,
@@ -56,7 +57,10 @@ import {
 	useMarkConversationRead,
 	useSendMessage,
 } from '@/lib/api/hooks/useConversations'
-import { formatAchievementDate } from '@/lib/utils/achievements'
+import {
+	formatAchievementDate,
+	formatComebackEvidence,
+} from '@/lib/utils/achievements'
 import {
 	firstNewIndex,
 	memberName,
@@ -645,6 +649,10 @@ function AttachmentCard({
 		return <AchievementCard message={message} box={box} />
 	}
 
+	if (attachment.kind === 'COMEBACK') {
+		return <ComebackCard message={message} box={box} />
+	}
+
 	const routine = attachment.routine
 	return (
 		<div className={box}>
@@ -778,6 +786,51 @@ function AchievementCard({
 				</div>
 			) : (
 				<p className="type-body-sm mt-1 text-ink-3">{t('achievementGone')}</p>
+			)}
+		</div>
+	)
+}
+
+/**
+ * MSG-13: a comeback, as its sender holds it now -- worded as Achievements
+ * words it: the days away, the active days in the window and when it was
+ * recognized. Nothing of the sessions behind it; one its sender no longer
+ * holds says it is no longer available.
+ */
+function ComebackCard({
+	message,
+	box,
+}: {
+	message: ConversationMessage
+	box: string
+}) {
+	const t = useTranslations('messaging.thread')
+	const tComeback = useTranslations('achievements.comeback')
+	const locale = useLocale() as Locale
+	const comeback =
+		message.attachment?.kind === 'COMEBACK' ? message.attachment.comeback : null
+	return (
+		<div className={box}>
+			<p className="type-label flex items-center gap-1.5 text-ink-3">
+				<RotateCcw className="size-3.5" aria-hidden />
+				{t('comebackCardLabel')}
+			</p>
+			{comeback ? (
+				<div className="mt-1 min-w-0 space-y-1">
+					<p className="type-panel text-foreground">{tComeback('recorded')}</p>
+					<p className="type-data text-foreground">
+						{formatComebackEvidence(comeback, tComeback)}
+					</p>
+					<p className="type-body-sm text-ink-3">
+						<time dateTime={comeback.recognizedAt}>
+							{tComeback('recognized', {
+								date: formatAchievementDate(comeback.recognizedAt, locale),
+							})}
+						</time>
+					</p>
+				</div>
+			) : (
+				<p className="type-body-sm mt-1 text-ink-3">{t('comebackGone')}</p>
 			)}
 		</div>
 	)

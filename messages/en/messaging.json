@@ -16,7 +16,9 @@
 		"sharedRecord": "Record: {name}",
 		"recordUnavailable": "A record that's no longer available",
 		"sharedAchievement": "Milestone: {name}",
-		"achievementUnavailable": "A milestone that's no longer available"
+		"achievementUnavailable": "A milestone that's no longer available",
+		"sharedComeback": "Comeback after {days, plural, one {# day} other {# days}} away",
+		"comebackUnavailable": "A comeback that's no longer available"
 	},
 	"list": {
 		"pageTitle": "Messages",
@@ -93,7 +95,9 @@
 		"achievementCardLabel": "Milestone",
 		"achievementEarned": "Earned {date}",
 		"achievementFromHistory": "Recognized from history",
-		"achievementGone": "This milestone is no longer available."
+		"achievementGone": "This milestone is no longer available.",
+		"comebackCardLabel": "Comeback",
+		"comebackGone": "This comeback is no longer available."
 	},
 	"composer": {
 		"label": "Write a message",
@@ -113,7 +117,7 @@
 		"attachedWorkout": "Workout: {name}",
 		"removeAttachment": "Remove {name}",
 		"attachTitle": "Attach something you trained",
-		"attachDescription": "The other member can open what you send, whatever your privacy settings, until you delete the message. A routine can be copied; a workout shows its totals, records and sets, never your notes; a record or a milestone shows just what you earned.",
+		"attachDescription": "The other member can open what you send, whatever your privacy settings, until you delete the message. A routine can be copied; a workout shows its totals, records and sets, never your notes; a record, a milestone or a comeback shows just what you earned.",
 		"routinesHeading": "Your routines",
 		"workoutsHeading": "Recent workouts",
 		"workoutsEmpty": "No finished workouts yet.",
@@ -125,7 +129,11 @@
 		"attachedAchievement": "Milestone: {name}",
 		"achievementsHeading": "Your milestones",
 		"achievementsEmpty": "No milestones earned yet.",
-		"achievementsLoading": "Loading your milestones…"
+		"achievementsLoading": "Loading your milestones…",
+		"attachedComeback": "Comeback: {name}",
+		"comebacksHeading": "Your comebacks",
+		"comebacksEmpty": "No comebacks recorded yet.",
+		"comebacksLoading": "Loading your comebacks…"
 	},
 	"new": {
 		"pageTitle": "New message",

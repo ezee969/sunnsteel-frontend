@@ -50,7 +50,9 @@
 		"rule": "A comeback is recorded after {minimumInactiveDays} full days without a completed workout, then {requiredActiveDays} separate training days within {windowDays} days of returning. Sessions on the same day count once.",
 		"truncated": "Shows comebacks detected in your 500 most recent completed sessions.",
 		"emptyTitle": "No comeback recorded yet",
-		"emptyBody": "If time away happens, returning steadily can earn one. An uninterrupted streak is not the only form of consistency."
+		"emptyBody": "If time away happens, returning steadily can earn one. An uninterrupted streak is not the only form of consistency.",
+		"sendComeback": "Send in a message",
+		"sendComebackLabel": "Send the comeback ({evidence}) in a message"
 	},
 	"milestones": {
 		"loadingAria": "Loading milestone progress",

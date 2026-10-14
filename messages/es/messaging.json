@@ -16,7 +16,9 @@
 		"sharedRecord": "Récord: {name}",
 		"recordUnavailable": "Un récord que ya no está disponible",
 		"sharedAchievement": "Hito: {name}",
-		"achievementUnavailable": "Un hito que ya no está disponible"
+		"achievementUnavailable": "Un hito que ya no está disponible",
+		"sharedComeback": "Regreso tras {days, plural, one {# día} other {# días}} sin entrenar",
+		"comebackUnavailable": "Un regreso que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -93,7 +95,9 @@
 		"achievementCardLabel": "Hito",
 		"achievementEarned": "Obtenido el {date}",
 		"achievementFromHistory": "Reconocido a partir del historial",
-		"achievementGone": "Este hito ya no está disponible."
+		"achievementGone": "Este hito ya no está disponible.",
+		"comebackCardLabel": "Regreso",
+		"comebackGone": "Este regreso ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -113,7 +117,7 @@
 		"attachedWorkout": "Entrenamiento: {name}",
 		"removeAttachment": "Quitar {name}",
 		"attachTitle": "Adjunta algo que entrenaste",
-		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas; un récord o un hito muestra solo lo que lograste.",
+		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas; un récord, un hito o un regreso muestra solo lo que lograste.",
 		"routinesHeading": "Tus rutinas",
 		"workoutsHeading": "Entrenamientos recientes",
 		"workoutsEmpty": "Aún no tienes entrenamientos terminados.",
@@ -125,7 +129,11 @@
 		"attachedAchievement": "Hito: {name}",
 		"achievementsHeading": "Tus hitos",
 		"achievementsEmpty": "Aún no has obtenido ningún hito.",
-		"achievementsLoading": "Cargando tus hitos…"
+		"achievementsLoading": "Cargando tus hitos…",
+		"attachedComeback": "Regreso: {name}",
+		"comebacksHeading": "Tus regresos",
+		"comebacksEmpty": "Aún no tienes regresos registrados.",
+		"comebacksLoading": "Cargando tus regresos…"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",

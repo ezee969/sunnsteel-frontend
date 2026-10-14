@@ -8,6 +8,7 @@ import {
 	type MessageAchievementSummary,
 	type MessageAttachment,
 	messageBodyLength,
+	type MessageComebackSummary,
 	messageNote,
 	type MessageRecordSummary,
 	type MessageWorkoutSummary,
@@ -192,7 +193,22 @@ export function attachmentLine(
 			return recordLine(attachment.record, t)
 		case 'ACHIEVEMENT':
 			return achievementLine(attachment.achievement, t)
+		case 'COMEBACK':
+			return comebackLine(attachment.comeback, t)
 	}
+}
+
+/**
+ * MSG-13: a comeback in one line, by how long its sender was away, or that it
+ * is no longer available.
+ */
+export function comebackLine(
+	comeback: MessageComebackSummary | null,
+	t: Translator<'messaging.common'>,
+): string {
+	return comeback
+		? t('sharedComeback', { days: comeback.inactiveDays })
+		: t('comebackUnavailable')
 }
 
 /** MSG-12: a milestone's title in the reader's language. */
@@ -269,12 +285,13 @@ export interface ComposerState {
 }
 
 /**
- * MSG-07/MSG-10/MSG-11/MSG-12: one object a message carries -- a routine, a
- * workout, a record or a milestone. A record also names its lift, so the
- * composer can find it; a milestone is named by its catalog id.
+ * MSG-07 to MSG-13: one object a message carries -- a routine, a workout, a
+ * record, a milestone or a comeback. A record also names its lift, so the
+ * composer can find it; a milestone is named by its catalog id and a comeback
+ * by its recognition id.
  */
 export interface AttachRef {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK'
 	id: string
 	exerciseId?: string
 }
@@ -300,6 +317,9 @@ export function composerState(
 							: {}),
 						...(attached?.kind === 'ACHIEVEMENT'
 							? { achievementId: attached.id }
+							: {}),
+						...(attached?.kind === 'COMEBACK'
+							? { comebackId: attached.id }
 							: {}),
 					},
 		over: length > MESSAGE_BODY_MAX,
@@ -329,6 +349,7 @@ export const ATTACH_PARAMS = {
 	WORKOUT: 'workout',
 	RECORD: 'record',
 	ACHIEVEMENT: 'achievement',
+	COMEBACK: 'comeback',
 } as const
 
 /** MSG-11: the lift a handed-in record belongs to. */

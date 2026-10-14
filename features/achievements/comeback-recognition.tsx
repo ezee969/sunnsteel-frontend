@@ -2,12 +2,15 @@ import type {
 	ComebackRecognition as ComebackRecognitionData,
 	ComebackRecognitionSummary,
 } from '@sunsteel/contracts'
-import { RotateCcw } from 'lucide-react'
+import { MessageSquare, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SendInMessageDialog } from '@/features/messages/send-in-message'
 import type { Locale } from '@/i18n/config'
 import {
 	formatAchievementDate,
@@ -22,6 +25,8 @@ interface ComebackRecognitionProps {
 function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('achievements.comeback')
+	const [sending, setSending] = useState(false)
+	const evidence = formatComebackEvidence(comeback, t)
 	return (
 		<li className="rule-row grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 			<div className="flex min-w-0 gap-3">
@@ -30,9 +35,7 @@ function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 				</span>
 				<div className="min-w-0">
 					<h3 className="type-panel text-foreground">{t('recorded')}</h3>
-					<p className="type-data mt-1 text-foreground">
-						{formatComebackEvidence(comeback, t)}
-					</p>
+					<p className="type-data mt-1 text-foreground">{evidence}</p>
 				</div>
 			</div>
 			<div className="pl-11 sm:pl-0 sm:text-right">
@@ -41,12 +44,31 @@ function ComebackRow({ comeback }: { comeback: ComebackRecognitionData }) {
 						date: formatAchievementDate(comeback.recognizedAt, locale),
 					})}
 				</p>
-				<Link
-					href={`/workouts/history/${comeback.sourceSessionId}`}
-					className="type-body-sm mt-1 inline-block text-primary underline-offset-4 hover:underline"
-				>
-					{t('viewSession')}
-				</Link>
+				<div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
+					<Link
+						href={`/workouts/history/${comeback.sourceSessionId}`}
+						className="type-body-sm text-primary underline-offset-4 hover:underline"
+					>
+						{t('viewSession')}
+					</Link>
+					{/* MSG-13: this comeback, as held now, to one member. */}
+					<Button
+						type="button"
+						variant="link"
+						className="type-body-sm h-auto w-fit gap-1 p-0"
+						aria-label={t('sendComebackLabel', { evidence })}
+						onClick={() => setSending(true)}
+					>
+						<MessageSquare className="size-3.5" aria-hidden />
+						{t('sendComeback')}
+					</Button>
+				</div>
+				<SendInMessageDialog
+					open={sending}
+					onOpenChange={setSending}
+					attach={{ kind: 'COMEBACK', id: comeback.id }}
+					name={t('recorded')}
+				/>
 			</div>
 		</li>
 	)

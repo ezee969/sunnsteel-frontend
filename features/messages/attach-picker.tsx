@@ -21,7 +21,10 @@ import {
 	useProgressTimeline,
 	useSessions,
 } from '@/lib/api/hooks/useWorkoutSession'
-import { formatAchievementDate } from '@/lib/utils/achievements'
+import {
+	formatAchievementDate,
+	formatComebackEvidence,
+} from '@/lib/utils/achievements'
 import {
 	recentAchievements,
 	sendableRoutines,
@@ -35,6 +38,7 @@ import type { AttachedObject } from './message-composer'
 const RECENT_WORKOUTS = 10
 const RECENT_RECORDS = 10
 const RECENT_ACHIEVEMENTS = 10
+const RECENT_COMEBACKS = 10
 
 /**
  * MSG-07/MSG-10: one of the member's own routines or finished workouts,
@@ -73,10 +77,17 @@ export function AttachPicker({
 	)
 	// MSG-12: their most recently earned milestones.
 	const tCatalog = useTranslations('catalog.achievements')
-	const achievements = useAchievements()
+	// Only once the picker is open: the ledger's read takes the account lock.
+	const achievements = useAchievements({ enabled: open })
 	const milestones = recentAchievements(
 		achievements.data?.achievements ?? [],
 		RECENT_ACHIEVEMENTS,
+	)
+	// MSG-13: their comebacks, most recent first as Achievements lists them.
+	const tComeback = useTranslations('achievements.comeback')
+	const comebacks = (achievements.data?.comeback?.recognitions ?? []).slice(
+		0,
+		RECENT_COMEBACKS,
 	)
 
 	return (
@@ -225,6 +236,40 @@ export function AttachPicker({
 														id: achievement.id,
 														name,
 													})
+												}
+											/>
+										</li>
+									)
+								})}
+							</ul>
+						)}
+					</section>
+					<section className="space-y-2">
+						<h3 className="type-label text-ink-3">{t('comebacksHeading')}</h3>
+						{achievements.isPending ? (
+							<Skeleton
+								className="h-11"
+								aria-busy="true"
+								aria-label={t('comebacksLoading')}
+							/>
+						) : comebacks.length === 0 ? (
+							<p className="type-body-sm text-ink-3">{t('comebacksEmpty')}</p>
+						) : (
+							<ul className="border-t border-rule-faint">
+								{comebacks.map(comeback => {
+									const name = formatComebackEvidence(comeback, tComeback)
+									const when = formatAchievementDate(
+										comeback.recognizedAt,
+										locale,
+									)
+									return (
+										<li key={comeback.id} className="rule-row">
+											<ChoiceButton
+												label={t('pickerChoose', { name: `${name}, ${when}` })}
+												title={name}
+												detail={when}
+												onClick={() =>
+													onChoose({ kind: 'COMEBACK', id: comeback.id, name })
 												}
 											/>
 										</li>

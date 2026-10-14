@@ -7,6 +7,7 @@ import {
 	Loader2,
 	Medal,
 	Paperclip,
+	RotateCcw,
 	Send,
 	Trophy,
 	X,
@@ -23,7 +24,7 @@ import { AttachPicker } from './attach-picker'
 
 /** MSG-07 to MSG-12: what the composer has attached, with its name. */
 export interface AttachedObject {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT'
+	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK'
 	id: string
 	name: string
 	/** MSG-11: a record's lift. */
@@ -99,7 +100,9 @@ export function MessageComposer({
 				? Trophy
 				: attached?.kind === 'ACHIEVEMENT'
 					? Medal
-					: ClipboardList
+					: attached?.kind === 'COMEBACK'
+						? RotateCcw
+						: ClipboardList
 
 	return (
 		<form
@@ -120,7 +123,9 @@ export function MessageComposer({
 									? t('attachedRecord', { name: attached.name })
 									: attached.kind === 'ACHIEVEMENT'
 										? t('attachedAchievement', { name: attached.name })
-										: t('attachedRoutine', { name: attached.name })}
+										: attached.kind === 'COMEBACK'
+											? t('attachedComeback', { name: attached.name })
+											: t('attachedRoutine', { name: attached.name })}
 						</span>
 					</p>
 					<Button

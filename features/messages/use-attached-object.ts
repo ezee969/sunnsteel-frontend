@@ -12,6 +12,7 @@ import {
 	useProgressTimeline,
 	useSessionRecap,
 } from '@/lib/api/hooks/useWorkoutSession'
+import { formatComebackEvidence } from '@/lib/utils/achievements'
 import {
 	ATTACH_EXERCISE_PARAM,
 	ATTACH_PARAMS,
@@ -34,6 +35,9 @@ export function useAttachRef(): AttachRef | null {
 	if (routineId) return { kind: 'ROUTINE', id: routineId }
 	const sessionId = params.get(ATTACH_PARAMS.WORKOUT)
 	if (sessionId) return { kind: 'WORKOUT', id: sessionId }
+	// MSG-13: a comeback, by its recognition id.
+	const comebackId = params.get(ATTACH_PARAMS.COMEBACK)
+	if (comebackId) return { kind: 'COMEBACK', id: comebackId }
 	// MSG-12: a milestone, by its catalog id.
 	const achievementId = params.get(ATTACH_PARAMS.ACHIEVEMENT)
 	if (achievementId) return { kind: 'ACHIEVEMENT', id: achievementId }
@@ -66,8 +70,25 @@ export function useAttachedObject(): AttachedObject | null {
 		enabled: ref?.kind === 'RECORD',
 	})
 	const tCatalog = useTranslations('catalog.achievements')
-	const achievements = useAchievements()
+	// Only for a milestone or a comeback handed in: the ledger's read takes the
+	// account lock, and a conversation must not run it on every open.
+	const achievements = useAchievements({
+		enabled: ref?.kind === 'ACHIEVEMENT' || ref?.kind === 'COMEBACK',
+	})
+	const tComeback = useTranslations('achievements.comeback')
 	if (!ref) return null
+	if (ref.kind === 'COMEBACK') {
+		const comeback = achievements.data?.comeback?.recognitions.find(
+			candidate => candidate.id === ref.id,
+		)
+		return comeback
+			? {
+					kind: 'COMEBACK',
+					id: comeback.id,
+					name: formatComebackEvidence(comeback, tComeback),
+				}
+			: null
+	}
 	if (ref.kind === 'ACHIEVEMENT') {
 		const achievement = achievements.data?.achievements.find(
 			candidate => candidate.id === ref.id,

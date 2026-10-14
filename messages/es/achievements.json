@@ -50,7 +50,9 @@
 		"rule": "Un regreso se registra tras {minimumInactiveDays} días completos sin un entrenamiento completado y luego {requiredActiveDays} días de entrenamiento distintos dentro de los {windowDays} días posteriores a volver. Las sesiones del mismo día cuentan una sola vez.",
 		"truncated": "Muestra los regresos detectados en tus 500 sesiones completadas más recientes.",
 		"emptyTitle": "Aún no hay ningún regreso registrado",
-		"emptyBody": "Si pasas un tiempo sin entrenar, volver con constancia puede lograr uno. Una racha ininterrumpida no es la única forma de constancia."
+		"emptyBody": "Si pasas un tiempo sin entrenar, volver con constancia puede lograr uno. Una racha ininterrumpida no es la única forma de constancia.",
+		"sendComeback": "Enviar en un mensaje",
+		"sendComebackLabel": "Enviar el regreso ({evidence}) en un mensaje"
 	},
 	"milestones": {
 		"loadingAria": "Cargando el progreso de hitos",

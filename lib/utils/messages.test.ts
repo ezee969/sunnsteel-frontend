@@ -13,6 +13,7 @@ import { translatorFor } from '@/i18n/translator'
 
 import {
 	achievementLine,
+	comebackLine,
 	composerState,
 	conversationListFromPages,
 	conversationPreview,
@@ -525,5 +526,51 @@ describe('MSG-12 an earned milestone in a message', () => {
 			'sets:10',
 		])
 		expect(earned[0].id).toBe('sessions:1')
+	})
+})
+
+describe('MSG-13 a comeback in a message', () => {
+	const comeback = {
+		id: 'comeback:a:b:v1',
+		inactiveDays: 18,
+		returnedAt: '2026-09-20T10:00:00.000Z',
+		recognizedAt: '2026-09-24T10:00:00.000Z',
+		activeDays: 3,
+		windowDays: 5,
+	}
+	const C = { kind: 'COMEBACK' as const, id: 'comeback:a:b:v1' }
+	const preview = summary('a', {
+		lastMessage: message('x', '10:00', {
+			body: null,
+			attachment: { kind: 'COMEBACK', comeback },
+		}),
+	})
+
+	it('sends a comeback by its recognition id, with or without a note', () => {
+		expect(composerState('', C).sendable).toEqual({
+			comebackId: 'comeback:a:b:v1',
+		})
+		expect(composerState(' back! ', C).sendable).toEqual({
+			body: 'back!',
+			comebackId: 'comeback:a:b:v1',
+		})
+	})
+
+	it('previews a comeback by the days away, in both languages', () => {
+		expect(conversationPreview(preview, en)).toBe('Comeback after 18 days away')
+		expect(conversationPreview(preview, es)).toBe(
+			'Regreso tras 18 días sin entrenar',
+		)
+		expect(comebackLine({ ...comeback, inactiveDays: 1 }, en)).toBe(
+			'Comeback after 1 day away',
+		)
+		expect(comebackLine(null, en)).toBe("A comeback that's no longer available")
+		expect(comebackLine(null, es)).toBe('Un regreso que ya no está disponible')
+	})
+
+	it('hands the composer the comeback by its id', () => {
+		expect(messageHref('ana', 'c-1', C)).toBe(
+			'/messages/c-1?comeback=comeback%3Aa%3Ab%3Av1',
+		)
 	})
 })

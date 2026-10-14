@@ -102,7 +102,9 @@
 		"capturedRecord": "Shared a record: {name}",
 		"capturedRecordGone": "Shared a record that's no longer available",
 		"capturedAchievement": "Shared a milestone: {name}",
-		"capturedAchievementGone": "Shared a milestone that's no longer available"
+		"capturedAchievementGone": "Shared a milestone that's no longer available",
+		"capturedComeback": "Shared a comeback",
+		"capturedComebackGone": "Shared a comeback that's no longer available"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",

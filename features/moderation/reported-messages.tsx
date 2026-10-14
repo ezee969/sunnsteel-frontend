@@ -79,11 +79,20 @@ export function ReportedMessages({
 						) : typeof message.routineName === 'string' ||
 						  typeof message.workoutName === 'string' ||
 						  typeof message.recordName === 'string' ||
-						  typeof message.achievementId === 'string' ? null : (
+						  typeof message.achievementId === 'string' ||
+						  typeof message.comebackId === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-13: a comeback it carried. */}
+						{typeof message.comebackId === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.comebackId
+									? t('capturedComeback')
+									: t('capturedComebackGone')}
+							</p>
+						) : null}
 						{/* MSG-12: a milestone it carried, by its title. */}
 						{typeof message.achievementId === 'string' ? (
 							<p className="type-body-sm text-ink-2">
