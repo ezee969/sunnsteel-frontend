@@ -1,5 +1,6 @@
 'use client'
 
+import { MESSAGE_PROGRESS_ID } from '@sunsteel/contracts'
 import { useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -17,6 +18,7 @@ import {
 	ATTACH_EXERCISE_PARAM,
 	ATTACH_PARAMS,
 	type AttachRef,
+	progressMonthLabel,
 	sendableRoutines,
 	workoutName,
 } from '@/lib/utils/messages'
@@ -35,6 +37,10 @@ export function useAttachRef(): AttachRef | null {
 	if (routineId) return { kind: 'ROUTINE', id: routineId }
 	const sessionId = params.get(ATTACH_PARAMS.WORKOUT)
 	if (sessionId) return { kind: 'WORKOUT', id: sessionId }
+	// MSG-14: a month of training, `progress:YYYY-MM`.
+	const progressId = params.get(ATTACH_PARAMS.PROGRESS)
+	if (progressId && MESSAGE_PROGRESS_ID.test(progressId))
+		return { kind: 'PROGRESS', id: progressId }
 	// MSG-13: a comeback, by its recognition id.
 	const comebackId = params.get(ATTACH_PARAMS.COMEBACK)
 	if (comebackId) return { kind: 'COMEBACK', id: comebackId }
@@ -77,6 +83,13 @@ export function useAttachedObject(): AttachedObject | null {
 	})
 	const tComeback = useTranslations('achievements.comeback')
 	if (!ref) return null
+	// MSG-14: the month names itself; the server decides whether it may go.
+	if (ref.kind === 'PROGRESS')
+		return {
+			kind: 'PROGRESS',
+			id: ref.id,
+			name: progressMonthLabel(ref.id.slice('progress:'.length), locale),
+		}
 	if (ref.kind === 'COMEBACK') {
 		const comeback = achievements.data?.comeback?.recognitions.find(
 			candidate => candidate.id === ref.id,

@@ -18,7 +18,9 @@
 		"sharedAchievement": "Hito: {name}",
 		"achievementUnavailable": "Un hito que ya no está disponible",
 		"sharedComeback": "Regreso tras {days, plural, one {# día} other {# días}} sin entrenar",
-		"comebackUnavailable": "Un regreso que ya no está disponible"
+		"comebackUnavailable": "Un regreso que ya no está disponible",
+		"sharedProgress": "Progreso: {month}",
+		"progressUnavailable": "Un mes de entrenamiento que ya no está disponible"
 	},
 	"list": {
 		"pageTitle": "Mensajes",
@@ -97,7 +99,14 @@
 		"achievementFromHistory": "Reconocido a partir del historial",
 		"achievementGone": "Este hito ya no está disponible.",
 		"comebackCardLabel": "Regreso",
-		"comebackGone": "Este regreso ya no está disponible."
+		"comebackGone": "Este regreso ya no está disponible.",
+		"progressCardLabel": "Progreso",
+		"progressSoFar": "{month} hasta hoy",
+		"progressWorkouts": "{workouts, plural, one {# entrenamiento} other {# entrenamientos}} en {days, plural, one {# día} other {# días}}",
+		"progressSets": "{sets, plural, one {# serie} other {# series}} · {volume}",
+		"progressRecords": "{records, plural, =0 {Sin récords personales} one {# récord personal} other {# récords personales}}",
+		"progressNone": "Sin entrenamientos en {month}.",
+		"progressGone": "Este mes de entrenamiento ya no está disponible."
 	},
 	"composer": {
 		"label": "Escribe un mensaje",
@@ -117,7 +126,7 @@
 		"attachedWorkout": "Entrenamiento: {name}",
 		"removeAttachment": "Quitar {name}",
 		"attachTitle": "Adjunta algo que entrenaste",
-		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas; un récord, un hito o un regreso muestra solo lo que lograste.",
+		"attachDescription": "La otra persona puede abrir lo que envíes, sea cual sea tu privacidad, hasta que borres el mensaje. Una rutina se puede copiar; un entrenamiento muestra sus totales, récords y series, nunca tus notas; un récord, un hito, un regreso o un mes de progreso muestra solo lo que lograste.",
 		"routinesHeading": "Tus rutinas",
 		"workoutsHeading": "Entrenamientos recientes",
 		"workoutsEmpty": "Aún no tienes entrenamientos terminados.",
@@ -133,7 +142,11 @@
 		"attachedComeback": "Regreso: {name}",
 		"comebacksHeading": "Tus regresos",
 		"comebacksEmpty": "Aún no tienes regresos registrados.",
-		"comebacksLoading": "Cargando tus regresos…"
+		"comebacksLoading": "Cargando tus regresos…",
+		"attachedProgress": "Progreso: {name}",
+		"progressHeading": "Tu progreso",
+		"progressEmpty": "Sin entrenamientos este mes ni el anterior.",
+		"progressLoading": "Cargando tu progreso…"
 	},
 	"new": {
 		"pageTitle": "Nuevo mensaje",

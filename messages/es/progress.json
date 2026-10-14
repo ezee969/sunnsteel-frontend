@@ -222,7 +222,9 @@
 	"consistency": {
 		"heading": "Constancia",
 		"footer": "Los días planificados siguen tus rutinas tal como están ahora; los días pasados sin entrenamiento dicen “Sin registrar”.",
-		"openSchedule": "Abrir calendario"
+		"openSchedule": "Abrir calendario",
+		"sendMonth": "Enviar este mes en un mensaje",
+		"sendMonthLabel": "Enviar {month} en un mensaje"
 	},
 	"strengthChart": {
 		"firstRecord": "Primer récord",

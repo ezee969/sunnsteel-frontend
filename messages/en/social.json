@@ -104,7 +104,9 @@
 		"capturedAchievement": "Shared a milestone: {name}",
 		"capturedAchievementGone": "Shared a milestone that's no longer available",
 		"capturedComeback": "Shared a comeback",
-		"capturedComebackGone": "Shared a comeback that's no longer available"
+		"capturedComebackGone": "Shared a comeback that's no longer available",
+		"capturedProgress": "Shared a month of training: {month}",
+		"capturedProgressGone": "Shared a month of training that's no longer available"
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",

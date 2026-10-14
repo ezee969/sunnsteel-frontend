@@ -24,6 +24,10 @@ import {
 	messageHref,
 	messageRoutineHref,
 	messageWorkoutHref,
+	monthKey,
+	progressCard,
+	progressLine,
+	progressMonthLabel,
 	readThrough,
 	recentAchievements,
 	recordLine,
@@ -572,5 +576,92 @@ describe('MSG-13 a comeback in a message', () => {
 		expect(messageHref('ana', 'c-1', C)).toBe(
 			'/messages/c-1?comeback=comeback%3Aa%3Ab%3Av1',
 		)
+	})
+})
+
+describe('MSG-14 a month of training in a message', () => {
+	const progress = {
+		id: 'progress:2026-10',
+		month: '2026-10',
+		complete: false,
+		workouts: 3,
+		trainingDays: 2,
+		completedSets: 32,
+		volumeKg: 8000.5,
+		personalRecords: 1,
+	}
+	const P = { kind: 'PROGRESS' as const, id: 'progress:2026-10' }
+	const thread = translatorFor('en', 'messaging.thread')
+	const threadEs = translatorFor('es', 'messaging.thread')
+
+	it('sends a month by its id, with or without a note', () => {
+		expect(composerState('', P).sendable).toEqual({
+			progressId: 'progress:2026-10',
+		})
+		expect(composerState(' month! ', P).sendable).toEqual({
+			body: 'month!',
+			progressId: 'progress:2026-10',
+		})
+		expect(messageHref('ana', 'c-1', P)).toBe(
+			'/messages/c-1?progress=progress%3A2026-10',
+		)
+	})
+
+	it('names the month as a calendar month, in both languages', () => {
+		expect(progressMonthLabel('2026-10', 'en')).toBe('October 2026')
+		expect(progressMonthLabel('2026-10', 'es')).toBe('octubre de 2026')
+		expect(progressMonthLabel('2026-01', 'en')).toBe('January 2026')
+		expect(monthKey(new Date(2026, 0, 31))).toBe('2026-01')
+	})
+
+	it('previews a month by its name, or as no longer available', () => {
+		const preview = summary('a', {
+			lastMessage: message('x', '10:00', {
+				body: null,
+				attachment: { kind: 'PROGRESS', progress },
+			}),
+		})
+		expect(conversationPreview(preview, en)).toBe('Progress: October 2026')
+		expect(conversationPreview(preview, es, undefined, undefined, 'es')).toBe(
+			'Progreso: octubre de 2026',
+		)
+		expect(progressLine(null, en)).toBe(
+			"A month of training that's no longer available",
+		)
+	})
+
+	it('says the month, so far while it runs, then workouts, sets, volume and records', () => {
+		expect(progressCard(progress, thread, 'en', 'KG')).toEqual({
+			title: 'October 2026 so far',
+			lines: [
+				'3 workouts on 2 days',
+				'32 sets · 8,001 kg',
+				'1 personal record',
+			],
+		})
+		const done = progressCard(
+			{ ...progress, complete: true, personalRecords: 0 },
+			threadEs,
+			'es',
+			'KG',
+		)
+		expect(done.title).toBe('Octubre de 2026')
+		expect(done.lines[0]).toBe('3 entrenamientos en 2 días')
+		expect(done.lines[2]).toBe('Sin récords personales')
+	})
+
+	it("reads the volume in the reader's unit", () => {
+		expect(progressCard(progress, thread, 'en', 'LB').lines[1]).toMatch(
+			/^32 sets · 17,6\d\d lb$/,
+		)
+	})
+
+	it('says a month without training had none, rather than nothing', () => {
+		expect(
+			progressCard({ ...progress, workouts: 0 }, thread, 'en', 'KG'),
+		).toEqual({
+			title: 'October 2026 so far',
+			lines: ['No workouts in October 2026.'],
+		})
 	})
 })

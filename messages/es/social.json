@@ -104,7 +104,9 @@
 		"capturedAchievement": "Compartió un hito: {name}",
 		"capturedAchievementGone": "Compartió un hito que ya no está disponible",
 		"capturedComeback": "Compartió un regreso",
-		"capturedComebackGone": "Compartió un regreso que ya no está disponible"
+		"capturedComebackGone": "Compartió un regreso que ya no está disponible",
+		"capturedProgress": "Compartió un mes de entrenamiento: {month}",
+		"capturedProgressGone": "Compartió un mes de entrenamiento que ya no está disponible"
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",

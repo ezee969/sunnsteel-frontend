@@ -9,6 +9,7 @@ import {
 	Paperclip,
 	RotateCcw,
 	Send,
+	TrendingUp,
 	Trophy,
 	X,
 } from 'lucide-react'
@@ -24,7 +25,8 @@ import { AttachPicker } from './attach-picker'
 
 /** MSG-07 to MSG-12: what the composer has attached, with its name. */
 export interface AttachedObject {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK'
+	kind:
+		'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK' | 'PROGRESS'
 	id: string
 	name: string
 	/** MSG-11: a record's lift. */
@@ -102,7 +104,9 @@ export function MessageComposer({
 					? Medal
 					: attached?.kind === 'COMEBACK'
 						? RotateCcw
-						: ClipboardList
+						: attached?.kind === 'PROGRESS'
+							? TrendingUp
+							: ClipboardList
 
 	return (
 		<form
@@ -125,7 +129,9 @@ export function MessageComposer({
 										? t('attachedAchievement', { name: attached.name })
 										: attached.kind === 'COMEBACK'
 											? t('attachedComeback', { name: attached.name })
-											: t('attachedRoutine', { name: attached.name })}
+											: attached.kind === 'PROGRESS'
+												? t('attachedProgress', { name: attached.name })
+												: t('attachedRoutine', { name: attached.name })}
 						</span>
 					</p>
 					<Button

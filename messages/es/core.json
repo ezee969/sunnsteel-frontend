@@ -471,7 +471,7 @@
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
 		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
 		"REQUEST_PENDING": "Podrás enviar más cuando acepten tu solicitud.",
-		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una sola rutina, un solo entrenamiento, un solo récord, un solo hito o un solo regreso.",
+		"MESSAGE_ONE_ATTACHMENT": "Un mensaje puede llevar una sola rutina, un solo entrenamiento, un solo récord, un solo hito, un solo regreso o un solo mes de progreso.",
 		"LOGGED_WORKOUT_DATE": "Un entrenamiento pasado solo se puede registrar antes de crear la rutina, dentro de los últimos {days} días",
 		"LOGGED_WORKOUT_OVERLAP": "Otro entrenamiento coincide con ese horario",
 		"LOGGED_WORKOUT_SAME_DAY": "Este día de la rutina ya está registrado en esa fecha",

@@ -10,13 +10,19 @@ import {
 	messageBodyLength,
 	type MessageComebackSummary,
 	messageNote,
+	type MessageProgressSummary,
 	type MessageRecordSummary,
 	type MessageWorkoutSummary,
 	type SendMessageRequest,
+	type WeightUnit,
 } from '@sunsteel/contracts'
 import type { InfiniteData } from '@tanstack/react-query'
 
+import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
+
+import { formatWeightAmount, getWeightUnitLabel } from './weight-unit'
 
 /**
  * MSG-01: the pure half of the messaging screens -- the loaded pages read as
@@ -152,6 +158,7 @@ export function conversationPreview(
 	t: Translator<'messaging.common'>,
 	exerciseName: (name: string) => string = name => name,
 	achievementTitle: AchievementTitle = achievement => achievement.title,
+	locale: Locale = 'en',
 ): string {
 	const last = conversation.lastMessage
 	if (!last) return t('noMessages')
@@ -173,7 +180,9 @@ export function conversationPreview(
 									t,
 									achievementTitle,
 								)
-							: attachmentLine(last.attachment, t)
+							: last.attachment.kind === 'PROGRESS'
+								? progressLine(last.attachment.progress, t, locale)
+								: attachmentLine(last.attachment, t)
 					: ''
 	const line = text.replace(/\s+/g, ' ').trim()
 	return last.sentByMe ? t('youSaid', { text: line }) : line
@@ -195,6 +204,72 @@ export function attachmentLine(
 			return achievementLine(attachment.achievement, t)
 		case 'COMEBACK':
 			return comebackLine(attachment.comeback, t)
+		case 'PROGRESS':
+			return progressLine(attachment.progress, t)
+	}
+}
+
+/**
+ * MSG-14: a month (`YYYY-MM`) named in the app's language -- "October 2026",
+ * "octubre de 2026" -- read as a calendar month, never shifted by a zone.
+ */
+export function progressMonthLabel(month: string, locale: Locale): string {
+	return dateFormatter(locale, {
+		month: 'long',
+		year: 'numeric',
+		timeZone: 'UTC',
+	}).format(new Date(`${month}-01T00:00:00.000Z`))
+}
+
+/** MSG-14: `YYYY-MM` for a date, in this device's calendar. */
+export function monthKey(date: Date): string {
+	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+}
+
+/**
+ * MSG-14: a month of training in one line, by its month, or that it is no
+ * longer available.
+ */
+export function progressLine(
+	progress: MessageProgressSummary | null,
+	t: Translator<'messaging.common'>,
+	locale: Locale = 'en',
+): string {
+	return progress
+		? t('sharedProgress', { month: progressMonthLabel(progress.month, locale) })
+		: t('progressUnavailable')
+}
+
+/**
+ * MSG-14: what a month-of-training card says -- its month (and "so far"
+ * while it is not over), then the workouts and days, the sets and volume in
+ * the reader's unit, and the personal records; or, for a month without
+ * training, that it had none.
+ */
+export function progressCard(
+	progress: MessageProgressSummary,
+	t: Translator<'messaging.thread'>,
+	locale: Locale,
+	unit: WeightUnit,
+): { title: string; lines: string[] } {
+	const month = progressMonthLabel(progress.month, locale)
+	const named = month.charAt(0).toLocaleUpperCase(locale) + month.slice(1)
+	const title = progress.complete ? named : t('progressSoFar', { month: named })
+	if (progress.workouts === 0)
+		return { title, lines: [t('progressNone', { month })] }
+	return {
+		title,
+		lines: [
+			t('progressWorkouts', {
+				workouts: progress.workouts,
+				days: progress.trainingDays,
+			}),
+			t('progressSets', {
+				sets: progress.completedSets,
+				volume: `${formatWeightAmount(progress.volumeKg, unit, locale, 0)} ${getWeightUnitLabel(unit)}`,
+			}),
+			t('progressRecords', { records: progress.personalRecords }),
+		],
 	}
 }
 
@@ -291,7 +366,8 @@ export interface ComposerState {
  * by its recognition id.
  */
 export interface AttachRef {
-	kind: 'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK'
+	kind:
+		'ROUTINE' | 'WORKOUT' | 'RECORD' | 'ACHIEVEMENT' | 'COMEBACK' | 'PROGRESS'
 	id: string
 	exerciseId?: string
 }
@@ -320,6 +396,9 @@ export function composerState(
 							: {}),
 						...(attached?.kind === 'COMEBACK'
 							? { comebackId: attached.id }
+							: {}),
+						...(attached?.kind === 'PROGRESS'
+							? { progressId: attached.id }
 							: {}),
 					},
 		over: length > MESSAGE_BODY_MAX,
@@ -350,6 +429,7 @@ export const ATTACH_PARAMS = {
 	RECORD: 'record',
 	ACHIEVEMENT: 'achievement',
 	COMEBACK: 'comeback',
+	PROGRESS: 'progress',
 } as const
 
 /** MSG-11: the lift a handed-in record belongs to. */

@@ -222,7 +222,9 @@
 	"consistency": {
 		"heading": "Consistency",
 		"footer": "Planned days follow your routines as they are now; past days without a workout read “Not logged”.",
-		"openSchedule": "Open schedule"
+		"openSchedule": "Open schedule",
+		"sendMonth": "Send this month in a message",
+		"sendMonthLabel": "Send {month} in a message"
 	},
 	"strengthChart": {
 		"firstRecord": "First record",

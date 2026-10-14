@@ -10,6 +10,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { achievementText } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
+import { progressMonthLabel } from '@/lib/utils/messages'
 import { capturedAuthorName } from '@/lib/utils/moderation'
 
 const TIME_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -80,11 +81,25 @@ export function ReportedMessages({
 						  typeof message.workoutName === 'string' ||
 						  typeof message.recordName === 'string' ||
 						  typeof message.achievementId === 'string' ||
-						  typeof message.comebackId === 'string' ? null : (
+						  typeof message.comebackId === 'string' ||
+						  typeof message.progressId === 'string' ? null : (
 							<p className="type-body-sm text-ink-3">
 								{message.deleted ? t('capturedDeleted') : t('capturedRemoved')}
 							</p>
 						)}
+						{/* MSG-14: a month of training it carried, by its month. */}
+						{typeof message.progressId === 'string' ? (
+							<p className="type-body-sm text-ink-2">
+								{message.progressId
+									? t('capturedProgress', {
+											month: progressMonthLabel(
+												message.progressId.slice('progress:'.length),
+												locale,
+											),
+										})
+									: t('capturedProgressGone')}
+							</p>
+						) : null}
 						{/* MSG-13: a comeback it carried. */}
 						{typeof message.comebackId === 'string' ? (
 							<p className="type-body-sm text-ink-2">

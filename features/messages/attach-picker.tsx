@@ -1,7 +1,9 @@
 'use client'
 
+import { messageProgressId } from '@sunsteel/contracts'
 import { ChevronRight } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import {
 	Dialog,
@@ -26,6 +28,8 @@ import {
 	formatComebackEvidence,
 } from '@/lib/utils/achievements'
 import {
+	monthKey,
+	progressMonthLabel,
 	recentAchievements,
 	sendableRoutines,
 	workoutName,
@@ -88,6 +92,37 @@ export function AttachPicker({
 	const comebacks = (achievements.data?.comeback?.recognitions ?? []).slice(
 		0,
 		RECENT_COMEBACKS,
+	)
+	// MSG-14: this month and last, each only once it has a finished workout.
+	// Read only while the picker is open.
+	const [thisMonthStart] = useState(() => {
+		const now = new Date()
+		return new Date(now.getFullYear(), now.getMonth(), 1)
+	})
+	const lastMonthStart = new Date(
+		thisMonthStart.getFullYear(),
+		thisMonthStart.getMonth() - 1,
+		1,
+	)
+	const thisMonth = useSessions(
+		{ status: 'COMPLETED', from: thisMonthStart.toISOString(), limit: 1 },
+		{ enabled: open },
+	)
+	const lastMonth = useSessions(
+		{
+			status: 'COMPLETED',
+			from: lastMonthStart.toISOString(),
+			to: thisMonthStart.toISOString(),
+			limit: 1,
+		},
+		{ enabled: open },
+	)
+	const progressPending = thisMonth.isPending || lastMonth.isPending
+	const months = [
+		[thisMonthStart, thisMonth] as const,
+		[lastMonthStart, lastMonth] as const,
+	].flatMap(([start, query]) =>
+		(query.data?.pages[0]?.items.length ?? 0) > 0 ? [monthKey(start)] : [],
 	)
 
 	return (
@@ -270,6 +305,39 @@ export function AttachPicker({
 												detail={when}
 												onClick={() =>
 													onChoose({ kind: 'COMEBACK', id: comeback.id, name })
+												}
+											/>
+										</li>
+									)
+								})}
+							</ul>
+						)}
+					</section>
+					<section className="space-y-2">
+						<h3 className="type-label text-ink-3">{t('progressHeading')}</h3>
+						{progressPending ? (
+							<Skeleton
+								className="h-11"
+								aria-busy="true"
+								aria-label={t('progressLoading')}
+							/>
+						) : months.length === 0 ? (
+							<p className="type-body-sm text-ink-3">{t('progressEmpty')}</p>
+						) : (
+							<ul className="border-t border-rule-faint">
+								{months.map(month => {
+									const name = progressMonthLabel(month, locale)
+									return (
+										<li key={month} className="rule-row">
+											<ChoiceButton
+												label={t('pickerChoose', { name })}
+												title={name}
+												onClick={() =>
+													onChoose({
+														kind: 'PROGRESS',
+														id: messageProgressId(month),
+														name,
+													})
 												}
 											/>
 										</li>

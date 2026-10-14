@@ -17,6 +17,7 @@ import {
 	MoreHorizontal,
 	RotateCcw,
 	Trash2,
+	TrendingUp,
 	Trophy,
 	User,
 } from 'lucide-react'
@@ -66,6 +67,7 @@ import {
 	memberName,
 	messageRoutineHref,
 	messageWorkoutHref,
+	progressCard,
 	readThrough,
 	startsGroup,
 	workoutName,
@@ -653,6 +655,10 @@ function AttachmentCard({
 		return <ComebackCard message={message} box={box} />
 	}
 
+	if (attachment.kind === 'PROGRESS') {
+		return <ProgressCard message={message} box={box} />
+	}
+
 	const routine = attachment.routine
 	return (
 		<div className={box}>
@@ -831,6 +837,48 @@ function ComebackCard({
 				</div>
 			) : (
 				<p className="type-body-sm mt-1 text-ink-3">{t('comebackGone')}</p>
+			)}
+		</div>
+	)
+}
+
+/**
+ * MSG-14: a month of the sender's training, as their stored training reads
+ * now -- the workouts and days, sets and volume in the reader's unit, and
+ * the personal records -- and nothing of any single workout. A month
+ * without training says so; one that cannot be read says it is no longer
+ * available.
+ */
+function ProgressCard({
+	message,
+	box,
+}: {
+	message: ConversationMessage
+	box: string
+}) {
+	const t = useTranslations('messaging.thread')
+	const locale = useLocale() as Locale
+	const unit = useWeightUnit()
+	const progress =
+		message.attachment?.kind === 'PROGRESS' ? message.attachment.progress : null
+	const card = progress ? progressCard(progress, t, locale, unit) : null
+	return (
+		<div className={box}>
+			<p className="type-label flex items-center gap-1.5 text-ink-3">
+				<TrendingUp className="size-3.5" aria-hidden />
+				{t('progressCardLabel')}
+			</p>
+			{card ? (
+				<div className="mt-1 min-w-0 space-y-1">
+					<p className="type-panel text-foreground">{card.title}</p>
+					{card.lines.map(line => (
+						<p key={line} className="type-body-sm text-ink-2">
+							{line}
+						</p>
+					))}
+				</div>
+			) : (
+				<p className="type-body-sm mt-1 text-ink-3">{t('progressGone')}</p>
 			)}
 		</div>
 	)

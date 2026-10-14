@@ -137,6 +137,7 @@ export function ConversationList({
 											name => exerciseLabel(name, tEx),
 											achievement =>
 												achievementText(achievement, tCatalog).title,
+											locale,
 										)}
 									</span>
 								</span>

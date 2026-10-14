@@ -569,6 +569,7 @@ export const useRemoveLoggedWorkout = () => {
 
 export const useSessions = (
 	params: Omit<ListSessionsParams, 'cursor' | 'limit'> & { limit?: number },
+	{ enabled = true }: { enabled?: boolean } = {},
 ) => {
 	const { session, isLoading } = useAuth()
 	const { limit = 20, ...rest } = params
@@ -586,7 +587,7 @@ export const useSessions = (
 		initialPageParam: undefined,
 		getNextPageParam: lastPage => lastPage.nextCursor,
 		// See useActiveSession above.
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 // Exposed utility to mark a set as locally dirty (pending) before debounce/autosave
