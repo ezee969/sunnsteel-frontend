@@ -6,7 +6,7 @@ import {
 	type SetKind,
 	type WeightUnit,
 } from '@sunsteel/contracts'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDown, WifiOff, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
@@ -239,6 +239,7 @@ export const SetLogInput = ({
 		handleCompletionToggle,
 		fill,
 		changeKind,
+		retrySave,
 		isValid,
 		validationError,
 		validationField,
@@ -321,7 +322,7 @@ export const SetLogInput = ({
 	// `success` and `warning` are for. Completion is `--success` too (§4.3
 	// rule 2); gold is reserved for the improvement line below.
 	const saveRingClass =
-		saveState === 'saving' || saveState === 'pending'
+		saveState === 'saving' || saveState === 'pending' || saveState === 'waiting'
 			? 'ring-2 ring-warning-strong'
 			: saveState === 'saved'
 				? 'ring-2 ring-success'
@@ -773,14 +774,39 @@ export const SetLogInput = ({
 				</div>
 			)}
 
-			{/* Save state error footer (silent unless error) */}
+			{/* TRUST-03: offline, the set waits in this page for the connection. */}
+			{saveState === 'waiting' && (
+				<p
+					className="type-body-sm mt-2 flex items-center justify-center gap-2 text-ink-2"
+					role="status"
+				>
+					<WifiOff
+						className="size-4 shrink-0 text-warning-strong"
+						aria-hidden
+					/>
+					<span>{t('waitingSaving')}</span>
+				</p>
+			)}
+
+			{/* Save state error footer (silent unless error), with Try again */}
 			{saveState === 'error' && (
 				<div
-					className="type-body-sm mt-2 flex items-center justify-center text-destructive"
+					className="type-body-sm mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-destructive"
 					role="alert"
 				>
-					<span className="mr-2 inline-block h-1.5 w-1.5 bg-current" />
-					<span>{t('errorSaving')}</span>
+					<span className="flex items-center">
+						<span className="mr-2 inline-block h-1.5 w-1.5 bg-current" />
+						<span>{t('errorSaving')}</span>
+					</span>
+					<Button
+						type="button"
+						variant="link"
+						className="type-body-sm h-11 p-0 md:h-auto"
+						aria-label={t('retrySaveLabel', { set: setNumber })}
+						onClick={retrySave}
+					>
+						{t('retrySave')}
+					</Button>
 				</div>
 			)}
 		</div>

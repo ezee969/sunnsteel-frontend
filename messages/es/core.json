@@ -253,7 +253,8 @@
 		"unsaved": "Sin guardar",
 		"saving": "Guardando…",
 		"saved": "Guardado",
-		"error": "Error"
+		"error": "Error",
+		"waiting": "Esperando conexión"
 	},
 	"setLogValidation": {
 		"routineExerciseIdRequired": "Se requiere el ID del ejercicio de la rutina",

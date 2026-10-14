@@ -346,7 +346,7 @@
 		"completeNeedsWeight": "Escribe el peso para completar la serie (0 si es peso corporal)",
 		"lastTime": "La vez anterior",
 		"improvement": "↑ Mejora",
-		"errorSaving": "Error al guardar la serie. Inténtalo de nuevo.",
+		"errorSaving": "Esta serie no se guardó.",
 		"saving": "Guardando…",
 		"saved": "Guardado",
 		"unsaved": "Sin guardar",
@@ -356,7 +356,10 @@
 		"weightKgAria": "Serie {number} de {exercise}: peso en kilogramos",
 		"weightLbAria": "Serie {number} de {exercise}: peso en libras",
 		"completeAria": "Marcar la serie {number} de {exercise} como completa",
-		"columnSet": "Serie"
+		"columnSet": "Serie",
+		"waitingSaving": "Esperando conexión. Esta serie se guardará cuando vuelvas a estar en línea.",
+		"retrySave": "Reintentar",
+		"retrySaveLabel": "Volver a guardar la serie {set}"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",

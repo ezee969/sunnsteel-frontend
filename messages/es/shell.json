@@ -109,5 +109,13 @@
 		"communityUnread": "Comunidad, {count} notificaciones sin leer",
 		"communityMessages": "Comunidad, {count, plural, one {# conversación sin leer} other {# conversaciones sin leer}}",
 		"communityUnreadBoth": "Comunidad, {notifications} notificaciones sin leer y {conversations, plural, one {# conversación sin leer} other {# conversaciones sin leer}}"
+	},
+	"connection": {
+		"offline": "No tienes conexión. Los cambios que hagas esperarán aquí hasta que vuelvas a conectarte.",
+		"offlineWaiting": "No tienes conexión. {count, plural, one {# cambio espera y se guardará} other {# cambios esperan y se guardarán}} al reconectarte: mantén esta página abierta.",
+		"sending": "Conexión recuperada. Guardando {count, plural, one {# cambio} other {# cambios}}…",
+		"sent": "Conexión recuperada. Tus cambios están guardados.",
+		"failed": "Conexión recuperada, pero {count, plural, one {# cambio no se guardó} other {# cambios no se guardaron}}. Vuelve a intentarlo donde está marcado.",
+		"dismiss": "Cerrar"
 	}
 }

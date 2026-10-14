@@ -16,6 +16,7 @@ import type {
 	WorkoutAnalyticsStatus,
 } from '@sunsteel/contracts'
 import {
+	onlineManager,
 	useInfiniteQuery,
 	useMutation,
 	useQuery,
@@ -694,10 +695,12 @@ export const useUpsertSetLog = (id: string) => {
 			return result
 		},
 		onMutate: async (data: UpsertSetLogRequest) => {
-			// Mark as saving for immediate UI feedback
+			// Mark as saving for immediate UI feedback -- or, offline, as waiting
+			// for the connection: the write is paused until it returns (TRUST-03),
+			// and `mutationFn` marks it saving once it is really sent.
 			setSaveState(
 				`set:${id}:${data.routineExerciseId}:${data.setNumber}`,
-				'saving',
+				onlineManager.isOnline() ? 'saving' : 'waiting',
 			)
 
 			// Optimistically update the session cache

@@ -13,6 +13,7 @@ import { InitialLoadAnimation } from '@/features/initial-load-animation/InitialL
 import { BottomNav } from '@/features/shell/components/BottomNav'
 import Header from '@/features/shell/components/Header'
 import Sidebar from '@/features/shell/components/Sidebar'
+import { ConnectionStatus } from '@/features/shell/connection-status'
 import { LocaleSync } from '@/features/shell/locale-sync'
 import { RealtimeSync } from '@/features/shell/realtime-sync'
 import { StaleSessionRecoveryDialog } from '@/features/workout/stale-session-recovery-dialog'
@@ -227,6 +228,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 						setIsMobileMenuOpen={setIsMobileMenuOpen}
 						onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 					/>
+					{/* TRUST-03 (§28.8): offline, changes waiting, and back online. */}
+					<ConnectionStatus />
 					{/* DASH-06: the dashboard's Today's Workouts card already resumes
 					    the session, so the banner would be a second filled Resume. */}
 					{!isOnSessionPage &&

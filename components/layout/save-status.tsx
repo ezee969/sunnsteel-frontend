@@ -1,8 +1,9 @@
 'use client'
 
-import { Check } from 'lucide-react'
+import { Check, WifiOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { useOnline } from '@/hooks/use-connection'
 import { cn } from '@/lib/utils'
 
 interface SaveStatusProps {
@@ -19,9 +20,11 @@ interface SaveStatusProps {
  * check -- in one polite status line, so a choice that took effect is not
  * silent. A failed save still raises its toast and puts the choice back.
  * Deliberately no `aria-label`: it reports something, it is not loading.
+ * TRUST-03: offline, a save on its way is waiting for the connection.
  */
 export function SaveStatus({ pending, saved, className }: SaveStatusProps) {
 	const t = useTranslations('core.saveStatus')
+	const online = useOnline()
 	return (
 		<p
 			role="status"
@@ -30,7 +33,12 @@ export function SaveStatus({ pending, saved, className }: SaveStatusProps) {
 				className,
 			)}
 		>
-			{pending ? (
+			{pending && !online ? (
+				<>
+					<WifiOff className="size-4 text-warning-strong" aria-hidden />
+					{t('waiting')}
+				</>
+			) : pending ? (
 				t('saving')
 			) : saved ? (
 				<>

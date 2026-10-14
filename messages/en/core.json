@@ -253,7 +253,8 @@
 		"unsaved": "Unsaved",
 		"saving": "Saving…",
 		"saved": "Saved",
-		"error": "Error"
+		"error": "Error",
+		"waiting": "Waiting for connection"
 	},
 	"setLogValidation": {
 		"routineExerciseIdRequired": "Routine exercise ID is required",

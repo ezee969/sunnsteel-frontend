@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 
 import type { Translator } from '@/i18n/translator'
 
-export type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error'
+/**
+ * `waiting` (TRUST-03): the write is paused until the connection returns,
+ * and is sent then only while the page stays open.
+ */
+export type SaveState =
+	'idle' | 'pending' | 'waiting' | 'saving' | 'saved' | 'error'
 
 interface Entry {
 	state: SaveState
@@ -81,6 +86,8 @@ export function saveStateLabel(
 	switch (state) {
 		case 'pending':
 			return t('unsaved')
+		case 'waiting':
+			return t('waiting')
 		case 'saving':
 			return t('saving')
 		case 'saved':

@@ -109,5 +109,13 @@
 		"communityUnread": "Community, {count} unread notifications",
 		"communityMessages": "Community, {count, plural, one {# unread conversation} other {# unread conversations}}",
 		"communityUnreadBoth": "Community, {notifications} unread notifications and {conversations, plural, one {# unread conversation} other {# unread conversations}}"
+	},
+	"connection": {
+		"offline": "You're offline. Changes you make will wait here until you reconnect.",
+		"offlineWaiting": "You're offline. {count, plural, one {# change is} other {# changes are}} waiting and will save when you reconnect. Keep this page open.",
+		"sending": "Back online. Saving {count, plural, one {# change} other {# changes}}…",
+		"sent": "Back online. Your changes are saved.",
+		"failed": "Back online, but {count, plural, one {# change} other {# changes}} didn't save. Try again where it's marked.",
+		"dismiss": "Dismiss"
 	}
 }

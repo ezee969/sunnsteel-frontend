@@ -346,7 +346,7 @@
 		"completeNeedsWeight": "Enter the weight to complete the set (0 for bodyweight)",
 		"lastTime": "Last time",
 		"improvement": "↑ Improvement",
-		"errorSaving": "Error saving set. Please try again.",
+		"errorSaving": "This set didn't save.",
 		"saving": "Saving…",
 		"saved": "Saved",
 		"unsaved": "Unsaved",
@@ -356,7 +356,10 @@
 		"weightKgAria": "Set {number} of {exercise}: weight in kilograms",
 		"weightLbAria": "Set {number} of {exercise}: weight in pounds",
 		"completeAria": "Mark set {number} of {exercise} complete",
-		"columnSet": "Set"
+		"columnSet": "Set",
+		"waitingSaving": "Waiting for connection. This set saves when you're back online.",
+		"retrySave": "Try again",
+		"retrySaveLabel": "Try saving set {set} again"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",

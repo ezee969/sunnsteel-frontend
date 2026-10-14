@@ -62,7 +62,9 @@ interface UseSetLogFormReturn {
 	isCompletedState: boolean
 
 	// Save state
-	saveState: 'idle' | 'pending' | 'saving' | 'saved' | 'error'
+	saveState: 'idle' | 'pending' | 'waiting' | 'saving' | 'saved' | 'error'
+	/** TRUST-03: send the row again as it stands, after a failed save. */
+	retrySave: () => void
 
 	// Form handlers
 	setReps: (value: string) => void
@@ -393,6 +395,43 @@ export const useSetLogForm = ({
 		],
 	)
 
+	// TRUST-03: a failed save offers Try again, which sends the row as it
+	// stands now -- the same rule as any other save, so a ticked set with an
+	// empty field still waits for it.
+	const retrySave = useCallback(() => {
+		const payload = createPayload(
+			repsState,
+			weightState,
+			rpeState,
+			isCompletedState,
+		)
+		if (!validateSetLogPayload(payload, t).isValid) return
+		if (
+			isCompletedState &&
+			missingForCompletion({ reps: repsState, weight: weightOf(weightState) })
+		)
+			return
+		markSetPending(sessionId, routineExerciseId, setNumber)
+		onSaveRef.current(payload)
+		lastSavedRef.current = {
+			reps: payload.reps,
+			weight: payload.weight,
+			rpe: payload.rpe,
+			isCompleted: isCompletedState,
+		}
+	}, [
+		createPayload,
+		repsState,
+		weightState,
+		rpeState,
+		isCompletedState,
+		t,
+		weightOf,
+		sessionId,
+		routineExerciseId,
+		setNumber,
+	])
+
 	const changeKind = useCallback(
 		(kind: SetKind) => {
 			const payload = createPayload(
@@ -506,6 +545,7 @@ export const useSetLogForm = ({
 		handleCompletionToggle,
 		fill,
 		changeKind,
+		retrySave,
 
 		// Validation
 		isValid: validation.isValid,

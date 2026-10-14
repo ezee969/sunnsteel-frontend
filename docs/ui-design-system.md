@@ -2523,3 +2523,32 @@ profile form, goals, training locations, identity and featured
 accomplishments -- are forms and keep their one Save. Activity sharing's
 defaults keep theirs too, because a default reaches past entries and the
 card says so before it is saved.
+
+### 28.8 The connection, and a change waiting for it (`TRUST-03`, 2026-10-14)
+
+Nothing is stored durably while offline (that is `OFFLINE-01`): a change made
+without a connection is a write TanStack Query pauses in the page's memory, so
+everything that speaks about it says it saves on reconnect only while the page
+stays open. `onlineManager` is the one source of the connection state, seeded
+from `navigator.onLine`, so what the screen says and what the app does never
+disagree.
+
+- **The shell's connection line** (`features/shell/connection-status.tsx`) is a
+  §26.6 status band under the topbar, above the active-session band: a glyph
+  plus a sentence, `role="status"`. Offline (`WifiOff`, `warning-strong`) it
+  says so, and how many changes wait; back online after something waited it
+  says they are being saved (`CloudUpload`, `ink-2`), then that they were
+  (`Check`, `success-strong`) for four seconds, or how many did not
+  (`X`, `destructive`) with a Dismiss link until the next drop. Online with
+  nothing to report it is absent: a band that is always there is chatter.
+- **Leaving with a change waiting asks first** (`beforeunload`), because
+  closing the page drops it.
+- **A set waiting for the connection says so**: the §11.7 save ring stays
+  `warning-strong`, and a `WifiOff` line under the row says it saves when the
+  member is back online. "Saving…" is never shown for a write that is not
+  being sent.
+- **A set that failed to save offers Try again**, a link-style button beside
+  "This set didn't save.", which sends the row as it stands, under the same
+  rule as any other save.
+- **A Settings choice made offline** reads "Waiting for connection" with the
+  `WifiOff` glyph in its `SaveStatus` line instead of "Saving…".
