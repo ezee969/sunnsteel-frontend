@@ -248,6 +248,7 @@ This records dependency order, not an estimate or a detailed implementation plan
 | 18    | Rank as identity         | L    | DASH-11, ACH-10 and ACH-11 shipped                                                                                                              | `DASH-11` is frontend only over the owner's own `/achievements` read and can ship first. `ACH-10` needs the new `rank` privacy row (contracts, a backend migration and the frontend) (existing accounts start at Everyone too, by the owner's decision). `ACH-11` follows `ACH-10`, because its decoration obeys the same privacy row, and starts with a design-system amendment and comps the owner approves. Independent of group 17: the dashboard masthead is not a section `UX-19` trims, and work built before `UX-14` to `UX-17` ship is restyled by that pass like everything else. |
 | 19    | Notification menu        | M    | Complete — NOTIF-09, NOTIF-10 shipped                                                                                                         | `NOTIF-09` pages the list on the server and on `/notifications` first, because the menu's infinite scroll needs the same cursor and cache. `NOTIF-10` is then frontend only; its overlay primitive is a design-system decision made at claim. Independent of group 17; `UX-22` changes navigation only below 768, where the bell keeps linking to the page. |
 | 20    | Linear periodization     | L    | Complete — ROUT-17 through ROUT-19 shipped                                                                                                         | `ROUT-17` builds the scheme and its execution first; `ROUT-18` reads the sets it logs to finish a block and estimate a new 1RM; `ROUT-19` needs that estimate to pre-select what follows. Independent of groups 11 to 13. |
+| 21    | Pro tier and platform    | XL   | PLAT-02 and PLAT-03 beside the rest; then BILL-01, BILL-02, INTEL-03, PLAT-01, BILL-03, BILL-04, INTEL-04 (approved 2026-10-14) | `BILL-01` gives the server one entitlement decision before anything is gated; `BILL-02` gates existing capabilities, so Pro has value before any payment exists; `INTEL-03` is the first new Pro capability; `PLAT-01` precedes checkout because a billing effect must survive a restart; `BILL-04` needs `BILL-03`'s provider; `INTEL-04` reuses `INTEL-03`'s usage model. `PLAT-02` and `PLAT-03` depend on nothing in the group. |
 
 Order is dependency order, not priority: group 1 leads because it is already in
 flight, not because it outranks the honesty fixes in group 2, which were a day of
@@ -269,6 +270,13 @@ verified activity data (`DATA-02`, `SOC-03`) precede every system that depends
 on them. Each `XL` in those groups is a subsystem: decompose it into
 independently deliverable features with their own IDs before any of it enters
 implementation, the way `SOC-12` was decomposed into the `COMM-*` family.
+
+Group 21 is the same rule applied to monetization: a Free / Pro tier was
+approved by the owner on 2026-10-14 as nine separately deliverable items in
+[Monetization and billing](#monetization-and-billing),
+[Platform and reliability](#platform-and-reliability) and the two `INTEL` rows,
+never as one billing initiative. The Coach tier is `COACH-01`'s and is not part
+of it.
 
 ## Feature catalog
 
@@ -819,6 +827,68 @@ and requests (`MSG-02`) exist only for members who admit strangers.
 | MSG-05 | `DEFERRED` | L    | Media attachments                    | Unchanged and still deferred: images or media with storage quotas, type and size limits, and abuse controls. Needs a storage policy decision of its own. | MSG-01, TRUST-04, storage policy |
 | MSG-04 | `DEFERRED` | L    | Group discussion                     | **Superseded by `COMM-03`.** Retained as an ID so moderated group conversation is not proposed again as a system parallel to community rooms. The open question this row used to record is settled: conversations are one-to-one (owner, 2026-10-05, decision 4), and a small private group with no community behind it is a candidate for later, never part of `MSG-01`. | COMM-03 |
 
+### Monetization and billing
+
+Approved by the owner on 2026-10-14 as queue group 21. Sunnsteel gains a Free
+and a Pro plan so the product carries a complete commercial cycle --
+entitlements, checkout, notifications from the provider, a subscription
+lifecycle and reconciliation -- without degrading TRAIN. The rules every item
+here follows are under [Product rules](#product-rules-and-retained-decisions)
+(Monetization).
+
+**Payments run in the provider's sandbox, and the product says so.** The
+provider is Mercado Pago (preapproval subscriptions), because Stripe does not
+offer payment accounts to individuals in Argentina; a `FakePaymentProvider`
+drives the automated tests, and the `PaymentProvider` interface leaves room for
+another adapter. Charging real money needs the owner's tax and provider
+situation resolved first and is not part of any item below.
+
+| ID      | Status   | Size | Feature                                  | User-facing behavior | Dependencies |
+| ------- | -------- | ---- | ---------------------------------------- | -------------------- | ------------ |
+| BILL-01 | `QUEUED` | L    | Plans and entitlements                   | `Plan`, `Subscription` and `EntitlementGrant` models; every grant records its source (`SUBSCRIPTION`, `PROMO` or `ADMIN`) and its expiry. `EntitlementsService.can(user, key)` and a `@RequiresEntitlement()` guard decide on the server; contracts carry `PLAN_IDS`, `FEATURE_KEYS` and each plan's limits; `GET /billing/me` and `UserProfile.plan` tell the frontend, which reads them through `useEntitlement` and never decides access itself. A script grants and revokes, as `db:seed:moderator` does. **Nothing is gated and no payment exists yet.** Acceptance: an account without a subscription keeps every capability it has; granting, expiring and revoking change access at once; two concurrent grants cannot leave incompatible states. | None |
+| BILL-02 | `QUEUED` | L    | Pro gating of existing capabilities      | Applies [the Pro split](#the-pro-split) on the server -- a guard on each read, a limit on each write -- with every capability's downgrade rule tested. A locked capability shows its name, what it does and "Available in Pro" through one locked-state pattern, which needs a design-system amendment before it is built; never a blurred chart, invented data or urgency. A plans page compares Free and Pro. **Every account that exists when this ships receives a non-expiring founding-member `PROMO` grant**, so nobody loses a capability they already used. | BILL-01; design-system amendment |
+| BILL-03 | `QUEUED` | L    | Sandbox checkout                         | A `PaymentProvider` interface with `MercadoPagoAdapter` and `FakePaymentProvider`; `CheckoutAttempt` records each attempt. **Returning from checkout grants nothing**: Pro starts only from a verified provider notification or a confirmed read of the provider's state. Credentials stay on the server; a repeated request does not open a second active attempt; a provider error becomes a stated, recoverable state. Every billing surface says payments are in test mode and no money is charged. | BILL-02, PLAT-01 |
+| BILL-04 | `QUEUED` | L    | Subscription lifecycle and reconciliation | A notification inbox unique on (provider, external event id), persisted before it is processed and handled through `PLAT-01`; a subscription state machine (`trialing`, `active`, `past_due`, `canceled`) in which an unknown transition neither grants nor revokes; a trial, cancellation at the end of the period and a stated grace period after a failed renewal; a daily job that reconciles each subscription against the provider. Cancelling or lapsing never touches training data. **Open:** reminding a member of a failed renewal by email needs an email sender, which `TD-57` decides; until then the reminder is in-app. | BILL-03; TD-57 for email |
+
+#### The Pro split
+
+The owner's decision of 2026-10-14. Pro gates advanced planning and deep
+analysis; the right-hand column is what a member keeps after a downgrade, and
+no row deletes or rewrites data.
+
+| Capability                                   | ID              | Free                | Pro                          | After a downgrade |
+| -------------------------------------------- | --------------- | ------------------- | ---------------------------- | ----------------- |
+| Strength-trend ranges                        | PROG-01         | 30 and 90 days      | 6 months, 1 year, all time   | The data stays; the Free ranges show it |
+| Block and session comparison                 | PROG-11, PROG-06 | --                 | Yes                          | No longer shown |
+| Training signals and the deload suggestion   | PROG-10, INTEL-02 | --                | Yes                          | No longer shown |
+| Muscle heatmap and volume trends             | PROG-03, PROG-04 | 4 weeks            | 8 and 12 weeks               | Back to 4 weeks |
+| Dated training blocks                        | ROUT-09, ROUT-15 | --                 | Yes                          | Existing blocks run to their end date; no new ones |
+| Planned deloads                              | ROUT-16         | --                  | Yes                          | As blocks |
+| 8-week blocks                                | ROUT-17 to ROUT-20 | --               | Yes                          | A running block finishes; no new one starts |
+| Saved routine versions                       | ROUT-08         | 3                   | 20                           | All kept; no new one beyond 3 |
+| Goals and goal suggestions                   | PROG-08, ACH-06 | 3 goals             | 8 goals and suggestions      | Goals beyond 3 are paused, never deleted |
+| Training locations                           | PREF-01         | 1                   | Several                      | The others are kept; only the default is used |
+| Body measurements                            | PROG-12         | Weight              | Every measurement            | The history is kept, read-only |
+| Dashboard customization                      | DASH-05         | --                  | Yes                          | The default order; the stored layout is kept |
+| Natural-language routine drafts              | INTEL-03        | --                  | A monthly quota              | No new drafts |
+| Training review assistant                    | INTEL-04        | --                  | A monthly quota              | No new reviews |
+
+**Never Pro:** logging sets, the rest timer and its alerts, automatic
+progression, warm-ups and the plate calculator; history, records, achievements
+and ranks; every social, messaging and moderation surface; privacy, security,
+data export and account deletion.
+
+### Platform and reliability
+
+Group 21's engineering foundations. Each stands on its own and is worth
+shipping without billing; `PLAT-02` and `PLAT-03` can run beside anything.
+
+| ID      | Status   | Size | Feature                               | User-facing or architectural outcome | Dependencies |
+| ------- | -------- | ---- | ------------------------------------- | ------------------------------------ | ------------ |
+| PLAT-01 | `QUEUED` | L    | Transactional outbox and durable jobs | An `OutboxMessage` written in the same transaction as the domain change it announces, and a dispatcher that enqueues it into pg-boss on the same PostgreSQL (no Redis): retries with backoff, a dead-letter state and a replay tool, with idempotent consumers. Its first consumer is billing (`BILL-04`). It does not replace `@nestjs/schedule` or the push sweep's claim, and it is not a second realtime transport beside `MSG-06`. Held by a test that stops the worker between the commit and the dispatch and sees the effect exactly once. | pg-boss on Railway's topology, checked at claim |
+| PLAT-02 | `QUEUED` | M    | Observability                         | Error reporting (Sentry) in both apps and OpenTelemetry tracing from the browser through the API to Prisma, propagating `traceparent`, beside the existing Prometheus `/metrics`. Traces and error reports redact bearer tokens, notes, messages, body data and request bodies, and a test holds the redaction. Latency and error dashboards; no on-call alerting. | None |
+| PLAT-03 | `QUEUED` | M    | End-to-end tests in CI                | Playwright in GitHub Actions against an ephemeral PostgreSQL with a synthetic seed and the backend built from its repository, covering sign-in, creating a routine and training a workout through to its recap; a regression fails the pull request. The local visual sweep stays local. | A test identity for CI that is not the owner's account, decided at claim |
+
 ### Deferred infrastructure-heavy features
 
 | ID         | Status     | Size | Feature                      | User-facing behavior                                                                                                                                                                                                                                                                                                                                                                                                 | Why deferred / dependencies                                                                        |
@@ -848,8 +918,8 @@ the exercise instructions and media in `EXER-03` and `EXER-04`.
 | -------- | ----------- | ---- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | INTEL-01 | `CANDIDATE` | L    | Adaptive progression suggestions  | Recommend changes using comparable performance and RPE while requiring user confirmation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | LIVE-04, DATA-01, DATA-04            |
 | INTEL-02 | `SHIPPED`   | M    | Deload suggestions                | Shipped 2026-09-24. The server evaluates the `PROG-10` signals for today and as they stood 7 days ago; a load signal -- effort, rep targets or declining lifts, never the workout count -- marked in both, or two marked today, is sustained. No suggestion appears while any deload is in force or planned, within 21 days after one ended, or when the chosen routine plans nothing on the dates. The routine is the active one trained most in the last 14 days; the deload starts today (tomorrow when that routine was already trained today) and lasts the ROUT-16 default 7 days, cut at a training-block boundary, with its default 10% lighter loads and half the sets. It appears only on `/progress`, as the last row of Training signals: the evidence restated, the deload described, and an outline "Plan this deload" that opens the routine page's Deloads dialog pre-filled once. There is no dismiss control -- it leaves when the evidence clears or a deload is planned -- no push and no dashboard card, and the copy is tested never to name a cause or say what the member needs. `PROG-10` observes and this item acts. Shipped through `@sunsteel/contracts@0.68.0` without a migration. | PROG-10, ROUT-09; `@sunsteel/contracts@0.68.0` |
-| INTEL-03 | `CANDIDATE` | L    | Natural-language routine draft    | Turn goals and constraints into an editable wizard draft, never directly publish a hidden plan.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | ROUT-03, EXER metadata               |
-| INTEL-04 | `CANDIDATE` | L    | Workout review assistant          | Explain patterns using the user's selected training data and cite the sessions behind each claim.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | DATA-01 through DATA-04              |
+| INTEL-03 | `QUEUED`    | L    | Natural-language routine draft    | Turn goals and constraints into an editable wizard draft, never directly publish a hidden plan. **Queued 2026-10-14 in group 21 as the first new Pro capability**: the model returns a structured draft that is validated against the contracts' routine shapes and the catalog, with at most one automatic repair, and opens in the wizard; nothing is saved until the member presses Create. A monthly quota per plan is recorded in `AiUsageRecord` under a cost ceiling, the member's text is treated as data against prompt injection, and evals (a set of requests with checks for real exercises, sane volume and a valid structure) run in CI. The model provider is chosen at claim. | ROUT-03, EXER metadata, BILL-02 |
+| INTEL-04 | `QUEUED`    | L    | Workout review assistant          | Explain patterns using the user's selected training data and cite the sessions behind each claim. **Queued 2026-10-14 in group 21 as a Pro capability**: a deterministic evidence pack is built from the rollups and the sessions the member selects, never the whole history; every claim carries `evidenceRefs` that must resolve, and a validator rejects invented metrics, unresolvable citations and any stated cause (the product rule below). The answer streams as its own response, under a Pro quota. | DATA-01 through DATA-04, INTEL-03 |
 | INTEL-05 | `CANDIDATE` | L    | Evidence-linked guidance          | Connect the member's own training evidence to relevant library material without inferring a cause the product cannot observe. Sunnsteel may state that an exercise has produced no new estimated-1RM best across a stated number of sessions (`PROG-09`) and offer reading on programming, recovery, sleep or nutrition; it must never conclude a medical condition, hormonal status, CNS fatigue or a specific recovery problem. Show evidence first. Do not invent causes. If the DEVELOP layer is dropped this collapses into `INTEL-04`: it earns a separate ID only because `LIB-02` is what it points at. | PROG-09, PROG-10, LIB-02             |
 | INTEG-01 | `CANDIDATE` | L    | Wearable integration              | Import useful workout duration, heart-rate, or recovery signals with explicit provenance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Provider selection and consent model |
 | INTEG-02 | `CANDIDATE` | XL   | Health-platform integration       | Optionally synchronize workouts and measurements with Apple Health or Health Connect.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Mobile/PWA feasibility study         |
@@ -859,6 +929,15 @@ the exercise instructions and media in `EXER-03` and `EXER-04`.
 
 - Privacy is designed before activity feeds, public routines, comments, coaching,
   or messaging. Sensitive profile and body data is private by default.
+- **Monetization**, as decided by the owner on 2026-10-14: Pro gates advanced
+  planning and deep analysis, never the act of training or anything a member
+  earned. What stays free is listed under [the Pro split](#the-pro-split) and
+  is not negotiable per feature. A downgrade never deletes or rewrites data:
+  what was made under Pro is kept, running plans finish, and only new use
+  stops. A locked capability states what it is and that it is in Pro, without
+  blurred previews, invented data or urgency. The server decides every
+  entitlement. While payments run in the provider's sandbox, every billing
+  surface says no money is charged.
 - Every profile privacy setting starts at Only me except the rank (`ACH-10`),
   which starts at Everyone by the owner's decision of 2026-10-01: an attendance
   rank is the member's public identity, discloses no body data, load or
@@ -2980,5 +3059,6 @@ decision. An ID is never reused.
 - **2026-10-14 (revision 264):** Claimed `MSG-12` (contracts, backend, frontend) for an earned milestone first, with the decisions at claim.
 - **2026-10-14 (revision 265):** Shipped `MSG-12` for an earned milestone and released its claim. A comeback and a progress summary continue as `MSG-13` (`QUEUED`).
 - **2026-10-14 (revision 266):** Claimed `TRUST-03` (frontend) and re-scoped it to honest in-memory connection and save states while `OFFLINE-01` stays deferred.
+- **2026-10-14 (revision 267):** Added queue group 21 (Pro tier and platform) from the owner's approval: `BILL-01` to `BILL-04` in a new Monetization and billing section with the Pro split, `PLAT-01` to `PLAT-03` in a new Platform and reliability section, and `INTEL-03` and `INTEL-04` moved to `QUEUED` as Pro capabilities. The owner's monetization decisions are recorded under Product rules. Nothing is claimed.
 - **2026-10-14 (revision 268):** Shipped `TRUST-03` (connection and save states, in memory) and released its claim.
 - **2026-10-14 (revision 269):** Claimed `MSG-13` (contracts, backend, frontend) for a comeback first, with the decisions at claim.
