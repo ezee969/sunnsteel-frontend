@@ -80,6 +80,7 @@ else until it merges, so claims live here, on `main`.
 | ID      | Status        | Owner  | Branch / worktree | Claimed    | Repositories |
 | ------- | ------------- | ------ | ----------------- | ---------- | ------------ |
 | MSG-13  | `IN_PROGRESS` | Claude | `main`            | 2026-10-14 | CT, BE, FE   |
+| PLAT-02 | `IN_PROGRESS` | Claude | `claude/plat-02` (`.claude-worktrees/plat-02-fe`, `plat-02-be`) | 2026-10-14 | BE, FE |
 
 ## Current product snapshot
 
@@ -886,7 +887,7 @@ shipping without billing; `PLAT-02` and `PLAT-03` can run beside anything.
 | ID      | Status   | Size | Feature                               | User-facing or architectural outcome | Dependencies |
 | ------- | -------- | ---- | ------------------------------------- | ------------------------------------ | ------------ |
 | PLAT-01 | `QUEUED` | L    | Transactional outbox and durable jobs | An `OutboxMessage` written in the same transaction as the domain change it announces, and a dispatcher that enqueues it into pg-boss on the same PostgreSQL (no Redis): retries with backoff, a dead-letter state and a replay tool, with idempotent consumers. Its first consumer is billing (`BILL-04`). It does not replace `@nestjs/schedule` or the push sweep's claim, and it is not a second realtime transport beside `MSG-06`. Held by a test that stops the worker between the commit and the dispatch and sees the effect exactly once. | pg-boss on Railway's topology, checked at claim |
-| PLAT-02 | `QUEUED` | M    | Observability                         | Error reporting (Sentry) in both apps and OpenTelemetry tracing from the browser through the API to Prisma, propagating `traceparent`, beside the existing Prometheus `/metrics`. Traces and error reports redact bearer tokens, notes, messages, body data and request bodies, and a test holds the redaction. Latency and error dashboards; no on-call alerting. | None |
+| PLAT-02 | `IN_PROGRESS` | M    | Observability                         | Error reporting (Sentry) in both apps and OpenTelemetry tracing from the browser through the API to Prisma, propagating `traceparent`, beside the existing Prometheus `/metrics`. Traces and error reports redact bearer tokens, notes, messages, body data and request bodies, and a test holds the redaction. Latency and error dashboards; no on-call alerting. | None |
 | PLAT-03 | `QUEUED` | M    | End-to-end tests in CI                | Playwright in GitHub Actions against an ephemeral PostgreSQL with a synthetic seed and the backend built from its repository, covering sign-in, creating a routine and training a workout through to its recap; a regression fails the pull request. The local visual sweep stays local. | A test identity for CI that is not the owner's account, decided at claim |
 
 ### Deferred infrastructure-heavy features
@@ -3062,3 +3063,4 @@ decision. An ID is never reused.
 - **2026-10-14 (revision 267):** Added queue group 21 (Pro tier and platform) from the owner's approval: `BILL-01` to `BILL-04` in a new Monetization and billing section with the Pro split, `PLAT-01` to `PLAT-03` in a new Platform and reliability section, and `INTEL-03` and `INTEL-04` moved to `QUEUED` as Pro capabilities. The owner's monetization decisions are recorded under Product rules. Nothing is claimed.
 - **2026-10-14 (revision 268):** Shipped `TRUST-03` (connection and save states, in memory) and released its claim.
 - **2026-10-14 (revision 269):** Claimed `MSG-13` (contracts, backend, frontend) for a comeback first, with the decisions at claim.
+- **2026-10-14 (revision 270):** Claimed `PLAT-02` (backend, frontend). Sentry is the one vendor for errors and traces: its SDKs are built on OpenTelemetry and propagate `traceparent` and its own trace headers, so no second tracing backend is needed. Everything is off without a DSN, as push is without VAPID keys.
