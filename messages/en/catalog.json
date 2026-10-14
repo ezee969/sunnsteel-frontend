@@ -159,6 +159,8 @@
 			"KNEE_EXTENSION": "Knee extension",
 			"KNEE_FLEXION": "Knee flexion",
 			"HIP_EXTENSION": "Hip extension",
+			"HIP_ADDUCTION": "Hip adduction",
+			"HIP_ABDUCTION": "Hip abduction",
 			"PLANTAR_FLEXION": "Calf raise",
 			"CORE_FLEXION": "Core flexion",
 			"CORE_ROTATION": "Core rotation",
