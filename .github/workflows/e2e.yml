@@ -21,6 +21,11 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Each repository in its own folder: `next build` typechecks every .ts
+    # under the frontend, so the backend must not sit inside it.
+    defaults:
+      run:
+        working-directory: frontend
     env:
       E2E_EMAIL: ci-member@sunnsteel.test
       APP_URL: http://localhost:3000
@@ -28,6 +33,8 @@ jobs:
     steps:
       - name: Checkout frontend
         uses: actions/checkout@v4
+        with:
+          path: frontend
 
       - name: Checkout backend
         uses: actions/checkout@v4
@@ -42,7 +49,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: |
-            package-lock.json
+            frontend/package-lock.json
             backend/package-lock.json
 
       - name: Setup Supabase CLI
@@ -62,6 +69,7 @@ jobs:
           supabase status -o env | sed -E 's/^([A-Z_]+)="?([^"]*)"?$/SB_\1=\2/' >> "$GITHUB_ENV"
 
       - name: Create the app's database
+        working-directory: ${{ runner.temp }}
         run: psql "$SB_DB_URL" -c 'CREATE DATABASE sunnsteel'
 
       - name: Install, migrate, seed and build the backend
@@ -136,6 +144,6 @@ jobs:
         with:
           name: playwright-report
           path: |
-            playwright-report
-            test-results
+            frontend/playwright-report
+            frontend/test-results
           retention-days: 7
