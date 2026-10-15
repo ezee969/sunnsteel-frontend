@@ -182,7 +182,7 @@
 		"keptLinearBlockOne": "The 8-week block of {list} was left where it is, because it has moved on since this workout.",
 		"setAria": "{exercise}, set {number}",
 		"rpeAria": "RPE, 0 to 10",
-		"endTimeCorrectionLine": "Ended at: {before} → {after}"
+		"endTimeCorrectionLine": "End time: {before} → {after}"
 	},
 	"restTimer": {
 		"resting": "Resting",
@@ -319,6 +319,8 @@
 		"correctionLabel": "Ended at",
 		"hint": "Last set at {lastSet}",
 		"hintWithDuration": "Last set at {lastSet} · {duration}",
+		"startedHint": "Started at {started}",
+		"startedHintWithDuration": "Started at {started} · {duration}",
 		"pauseNote": "Your last set was a while ago, so this workout ends when you say.",
 		"correctionHint": "It can only move earlier, back to {earliest}.",
 		"problemInvalid": "Enter a date and a time.",

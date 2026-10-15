@@ -21,7 +21,7 @@ export function WorkoutEndTimeField({
 	earliest,
 	latest,
 	startedAt,
-	lastActivity,
+	lastSet,
 	problem,
 }: {
 	id: string
@@ -33,7 +33,8 @@ export function WorkoutEndTimeField({
 	earliest: Date
 	latest: Date
 	startedAt: string
-	lastActivity: Date
+	/** The last completed set, which the hint names; null before the first. */
+	lastSet: Date | null
 	problem?: string | null
 }) {
 	const t = useTranslations('workout.endTime')
@@ -56,7 +57,7 @@ export function WorkoutEndTimeField({
 				className="sm:w-64"
 			/>
 			<p id={hintId} className="type-body-sm text-ink-3">
-				{describeEndTime({ startedAt, lastActivity, value }, locale, t)}
+				{describeEndTime({ startedAt, lastSet, value }, locale, t)}
 			</p>
 			{problem ? (
 				<p id={errorId} role="alert" className="type-body-sm text-destructive">

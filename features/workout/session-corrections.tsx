@@ -51,6 +51,7 @@ import {
 	chosenEnd,
 	describeEndTimeProblem,
 	formatEndTime,
+	lastSetOf,
 	toDateTimeLocal,
 } from '@/lib/utils/workout-end-time'
 
@@ -343,7 +344,7 @@ export function SessionCorrectionEditor({
 				earliest={earliestEnd}
 				latest={recordedEnd}
 				startedAt={startedAt}
-				lastActivity={earliestEnd}
+				lastSet={lastSetOf(earliestEnd, startedAt)}
 				problem={endProblem}
 			/>
 			<div className="border-y border-rule">

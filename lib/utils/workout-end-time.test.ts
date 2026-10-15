@@ -32,6 +32,7 @@ describe('where a workout in progress stands (LIVE-24)', () => {
 			at(19, 30),
 		)
 		expect(timeline.earliest).toEqual(at(11, 20, 40))
+		expect(timeline.lastSet).toEqual(at(11, 20, 40))
 		expect(timeline.lastActivity).toEqual(at(11, 22))
 		expect(timeline.asks).toBe(true)
 	})
@@ -45,6 +46,7 @@ describe('where a workout in progress stands (LIVE-24)', () => {
 	it('starts from the start when nothing was done', () => {
 		const timeline = finishTimeline({ startedAt }, at(10, 10))
 		expect(timeline.earliest).toEqual(at(10, 0))
+		expect(timeline.lastSet).toBeNull()
 		expect(timeline.asks).toBe(false)
 	})
 })
@@ -94,7 +96,7 @@ describe('a chosen minute stands for an end between the bounds', () => {
 describe('the end time is said in both languages', () => {
 	const input = {
 		startedAt: at(10, 0).toISOString(),
-		lastActivity: at(11, 20, 40),
+		lastSet: at(11, 20, 40),
 		value: '2026-10-15T11:30',
 	}
 
@@ -105,6 +107,19 @@ describe('the end time is said in both languages', () => {
 		expect(describeEndTime(input, 'es', es)).toContain('Última serie a las')
 		expect(describeEndTime({ ...input, value: '' }, 'en', en)).not.toContain(
 			'·',
+		)
+		// Minutes only, as the field holds them.
+		expect(
+			describeEndTime(
+				{ ...input, startedAt: at(10, 0, 40).toISOString() },
+				'en',
+				en,
+			),
+		).toContain('1h 29m')
+		const started = describeEndTime({ ...input, lastSet: null }, 'en', en)
+		expect(started).toMatch(/^Started at .* · 1h 30m$/)
+		expect(describeEndTime({ ...input, lastSet: null }, 'es', es)).toMatch(
+			/^Empezó a las /,
 		)
 	})
 

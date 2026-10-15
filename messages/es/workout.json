@@ -182,7 +182,7 @@
 		"keptLinearBlockOne": "El bloque de 8 semanas de {list} quedó como estaba, porque ya avanzó desde este entrenamiento.",
 		"setAria": "{exercise}, serie {number}",
 		"rpeAria": "RPE, de 0 a 10",
-		"endTimeCorrectionLine": "Terminó a las: {before} → {after}"
+		"endTimeCorrectionLine": "Hora de fin: {before} → {after}"
 	},
 	"restTimer": {
 		"resting": "Descansando",
@@ -319,6 +319,8 @@
 		"correctionLabel": "Terminó a las",
 		"hint": "Última serie a las {lastSet}",
 		"hintWithDuration": "Última serie a las {lastSet} · {duration}",
+		"startedHint": "Empezó a las {started}",
+		"startedHintWithDuration": "Empezó a las {started} · {duration}",
 		"pauseNote": "Tu última serie fue hace un rato, así que el entrenamiento termina cuando digas.",
 		"correctionHint": "Solo puede adelantarse, hasta las {earliest}.",
 		"problemInvalid": "Ingresa una fecha y una hora.",

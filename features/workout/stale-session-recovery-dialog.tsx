@@ -234,7 +234,7 @@ export function StaleSessionRecoveryDialog({
 						earliest={endTimeline.earliest}
 						latest={new Date(nowMs)}
 						startedAt={sessionDetails.startedAt}
-						lastActivity={endTimeline.lastActivity}
+						lastSet={endTimeline.lastSet}
 						problem={endProblem}
 					/>
 				) : null}

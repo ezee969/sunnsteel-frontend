@@ -22,6 +22,8 @@ interface LoggedSet {
 export interface FinishTimeline {
 	/** The earliest the workout can end: its start or its last completed set. */
 	earliest: Date
+	/** The last completed set, or null before the first. */
+	lastSet: Date | null
 	/** The last thing saved: a set ticked, a set saved or the start. */
 	lastActivity: Date
 	/** Finish asks when the workout ended: the last activity is a pause old. */
@@ -53,9 +55,15 @@ export function finishTimeline(
 	)
 	return {
 		earliest,
+		lastSet: lastSetOf(earliest, input.startedAt),
 		lastActivity,
 		asks: finishNeedsEndTime(lastActivity, now),
 	}
+}
+
+/** The earliest end is the last set's time once a set was done. */
+export function lastSetOf(earliest: Date, startedAt: Instant): Date | null {
+	return earliest.getTime() > new Date(startedAt).getTime() ? earliest : null
 }
 
 const pad = (value: number) => String(value).padStart(2, '0')
@@ -124,20 +132,33 @@ export function formatEndTime(
 	).format(date)
 }
 
-/** "Last set at 14:32 · 2h 27m": what the chosen end makes of the workout. */
+/**
+ * "Last set at 14:32 · 2h 27m": what the chosen end makes of the workout,
+ * from its start when no set was done. The length is in whole minutes, as
+ * the field is.
+ */
 export function describeEndTime(
-	input: { startedAt: Instant; lastActivity: Date; value: string },
+	input: { startedAt: Instant; lastSet: Date | null; value: string },
 	locale: Locale,
 	t: Translator<'workout.endTime'>,
 ): string {
-	const lastSet = formatEndTime(input.lastActivity, locale)
 	const end = fromDateTimeLocal(input.value)
-	const seconds = end
-		? Math.round((end.getTime() - new Date(input.startedAt).getTime()) / 1000)
-		: null
-	return seconds !== null && seconds > 0
-		? t('hintWithDuration', { lastSet, duration: formatDuration(seconds) })
-		: t('hint', { lastSet })
+	const minutes = end
+		? Math.round(
+				(end.getTime() - new Date(input.startedAt).getTime()) / MINUTE_MS,
+			)
+		: 0
+	const duration = minutes > 0 ? formatDuration(minutes * 60) : null
+	if (input.lastSet) {
+		const lastSet = formatEndTime(input.lastSet, locale)
+		return duration
+			? t('hintWithDuration', { lastSet, duration })
+			: t('hint', { lastSet })
+	}
+	const started = formatEndTime(input.startedAt, locale)
+	return duration
+		? t('startedHintWithDuration', { started, duration })
+		: t('startedHint', { started })
 }
 
 /** Why a chosen end cannot be used, in the member's words. */

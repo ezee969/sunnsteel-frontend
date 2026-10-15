@@ -717,7 +717,7 @@ export default function ActiveSessionPage() {
 							earliest={endTime.timeline.earliest}
 							latest={endTime.openedAt}
 							startedAt={session.startedAt}
-							lastActivity={endTime.timeline.lastActivity}
+							lastSet={endTime.timeline.lastSet}
 							problem={endTime.problem}
 						/>
 					) : undefined
