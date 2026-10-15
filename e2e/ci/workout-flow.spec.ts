@@ -60,10 +60,18 @@ test('a new member signs in, builds a routine from a template and trains it to i
 
 	await test.step('build a routine from a starter template', async () => {
 		await page.goto('/routines/new?template=full-body-foundations')
-		const create = page.getByRole('button', { name: 'Create Routine' })
-		for (let step = 0; step < 4 && !(await create.isVisible()); step++) {
+		// Four steps; the last two load on demand, so each move waits for the
+		// stepper to mark the next step current rather than for a button.
+		for (const step of [2, 3, 4]) {
 			await page.getByRole('button', { name: /^(Next|Review)$/ }).click()
+			await expect(
+				page.getByRole('button', {
+					name: new RegExp(`^Step ${step} of 4: .*current step$`),
+				}),
+			).toBeVisible({ timeout: 30_000 })
 		}
+		const create = page.getByRole('button', { name: 'Create Routine' })
+		await expect(create).toBeVisible({ timeout: 30_000 })
 		await create.click()
 		await page.waitForURL(url => !url.pathname.endsWith('/routines/new'), {
 			timeout: 60_000,
