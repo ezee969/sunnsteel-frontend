@@ -58,7 +58,8 @@ jobs:
           mkdir -p sb && cd sb
           supabase init < /dev/null
           supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta
-          supabase status -o env | sed -E 's/^([A-Z_]+)=/SB_\1=/' >> "$GITHUB_ENV"
+          # `status -o env` quotes its values; $GITHUB_ENV would keep the quotes.
+          supabase status -o env | sed -E 's/^([A-Z_]+)="?([^"]*)"?$/SB_\1=\2/' >> "$GITHUB_ENV"
 
       - name: Create the app's database
         run: psql "$SB_DB_URL" -c 'CREATE DATABASE sunnsteel'
