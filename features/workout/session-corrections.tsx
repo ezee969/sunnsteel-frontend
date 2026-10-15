@@ -1,10 +1,11 @@
 'use client'
 
-import type {
-	CorrectSessionSetRequest,
-	SessionCorrection,
-	SessionCorrectionWindow,
-	WeightUnit,
+import {
+	type CorrectSessionSetRequest,
+	earliestWorkoutEnd,
+	type SessionCorrection,
+	type SessionCorrectionWindow,
+	type WeightUnit,
 } from '@sunsteel/contracts'
 import { History, Loader2, PencilLine } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
@@ -46,6 +47,14 @@ import {
 	formatWeightAmount,
 	getWeightUnitLabel,
 } from '@/lib/utils/weight-unit'
+import {
+	chosenEnd,
+	describeEndTimeProblem,
+	formatEndTime,
+	toDateTimeLocal,
+} from '@/lib/utils/workout-end-time'
+
+import { WorkoutEndTimeField } from './workout-end-time-field'
 
 /**
  * LIVE-17: the invitation to correct and the trail of corrections. The
@@ -108,6 +117,22 @@ export function SessionCorrectionSummary({
 								})}
 							</p>
 							<ul className="space-y-0.5">
+								{correction.endedAt ? (
+									<li className="type-body-sm text-ink-2">
+										{t('endTimeCorrectionLine', {
+											before: formatEndTime(
+												correction.endedAt.before,
+												locale,
+												correction.endedAt.before,
+											),
+											after: formatEndTime(
+												correction.endedAt.after,
+												locale,
+												correction.endedAt.before,
+											),
+										})}
+									</li>
+								) : null}
 								{correction.changes.map(change => (
 									<li
 										key={`${correction.id}-${change.setLogId}`}
@@ -142,15 +167,21 @@ export function SessionCorrectionEditor({
 	sessionId,
 	groups,
 	weightUnit,
+	startedAt,
+	endedAt,
 	onDone,
 }: {
 	sessionId: string
 	groups: ExerciseGroup[]
 	weightUnit: WeightUnit
+	/** LIVE-24: the end can move earlier, back to the last set. */
+	startedAt: string
+	endedAt: string
 	onDone: () => void
 }) {
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('workout.corrections')
+	const tEnd = useTranslations('workout.endTime')
 	const tBlock = useTranslations('workout.linearBlock')
 	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
@@ -167,9 +198,23 @@ export function SessionCorrectionEditor({
 		draftFromLogs(logs, weightUnit),
 	)
 	const [problems, setProblems] = useState<DraftProblem[]>([])
-	const [pending, setPending] = useState<CorrectSessionSetRequest[] | null>(
-		null,
-	)
+	const [pending, setPending] = useState<{
+		sets: CorrectSessionSetRequest[]
+		endedAt?: string
+	} | null>(null)
+	const recordedEnd = useMemo(() => new Date(endedAt), [endedAt])
+	const initialEnd = useMemo(() => toDateTimeLocal(recordedEnd), [recordedEnd])
+	const [endValue, setEndValue] = useState(initialEnd)
+	const [endProblem, setEndProblem] = useState<string | null>(null)
+	// The sets as they will read: a set ticked here is stamped with the end
+	// and moves with it, so only sets done during the workout hold it back.
+	const earliestEnd = earliestWorkoutEnd({
+		startedAt,
+		completedAts: logs
+			.filter(log => draft[log.id]?.isCompleted && log.isCompleted)
+			.map(log => log.completedAt),
+		movesWithEnd: recordedEnd,
+	})
 	const unit = getWeightUnitLabel(weightUnit)
 	// ROUT-17: a block's working sets keep their prescribed load.
 	const fixedLoadIds = useMemo(() => lpFixedLoadLogIds(groups), [groups])
@@ -194,22 +239,41 @@ export function SessionCorrectionEditor({
 			fixedLoadIds,
 		)
 		setProblems(found)
+		let movedEnd: string | undefined
+		if (endValue !== initialEnd) {
+			const result = chosenEnd(endValue, earliestEnd, recordedEnd)
+			if ('problem' in result) {
+				setEndProblem(
+					describeEndTimeProblem(
+						result.problem,
+						{ earliest: earliestEnd, latest: recordedEnd, finishing: false },
+						locale,
+						tEnd,
+					),
+				)
+				return
+			}
+			if (result.endedAt.getTime() !== recordedEnd.getTime())
+				movedEnd = result.endedAt.toISOString()
+		}
 		if (found.length) return
 		const changes = changedSets(sets, logs)
-		if (changes.length === 0) {
+		if (changes.length === 0 && !movedEnd) {
 			push({
 				title: t('nothingToCorrectTitle'),
 				description: t('nothingToCorrectDescription'),
 			})
 			return
 		}
-		setPending(changes)
+		setPending({ sets: changes, endedAt: movedEnd })
 	}
 
 	const save = () => {
 		if (!pending) return
 		correct.mutate(
-			{ sets: pending },
+			pending.endedAt
+				? { sets: pending.sets, endedAt: pending.endedAt }
+				: { sets: pending.sets },
 			{
 				onSuccess: result => {
 					setPending(null)
@@ -264,6 +328,24 @@ export function SessionCorrectionEditor({
 					{t('weightsInUnit', { unit })}
 				</p>
 			</div>
+			{/* LIVE-24: when the workout ended, before the sets. */}
+			<WorkoutEndTimeField
+				id="correct-end-time"
+				label={tEnd('correctionLabel')}
+				note={tEnd('correctionHint', {
+					earliest: formatEndTime(earliestEnd, locale, recordedEnd),
+				})}
+				value={endValue}
+				onChange={value => {
+					setEndValue(value)
+					setEndProblem(null)
+				}}
+				earliest={earliestEnd}
+				latest={recordedEnd}
+				startedAt={startedAt}
+				lastActivity={earliestEnd}
+				problem={endProblem}
+			/>
 			<div className="border-y border-rule">
 				{groups
 					.filter(group => group.performedSets.length > 0)
@@ -424,7 +506,15 @@ export function SessionCorrectionEditor({
 						<DialogDescription>{t('effects')}</DialogDescription>
 					</DialogHeader>
 					<ul className="space-y-1 border-t border-rule-faint pt-3">
-						{(pending ?? []).map(set => {
+						{pending?.endedAt ? (
+							<li className="type-body-sm text-ink-2">
+								{t('endTimeCorrectionLine', {
+									before: formatEndTime(recordedEnd, locale, recordedEnd),
+									after: formatEndTime(pending.endedAt, locale, recordedEnd),
+								})}
+							</li>
+						) : null}
+						{(pending?.sets ?? []).map(set => {
 							const log = logById.get(set.setLogId)
 							if (!log) return null
 							return (

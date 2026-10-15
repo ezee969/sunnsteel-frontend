@@ -2,6 +2,7 @@
 
 import { AlertTriangle, CheckCircle, Target, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 
 import {
 	AlertDialog,
@@ -22,11 +23,14 @@ import type {
 interface SessionConfirmationDialogProps {
 	isOpen: boolean
 	onClose: () => void
-	onConfirm: () => void
+	/** False keeps the dialog open: what it asks for is not right yet. */
+	onConfirm: () => boolean | void
 	progressData: SessionProgressData
 	routineName: string
 	isFinishing: boolean
 	status: SessionStatus | null
+	/** LIVE-24: when the workout ended, asked for while finishing. */
+	endTime?: ReactNode
 }
 
 /**
@@ -40,6 +44,7 @@ export const SessionConfirmationDialog = ({
 	routineName,
 	isFinishing,
 	status,
+	endTime,
 }: SessionConfirmationDialogProps) => {
 	const t = useTranslations('workout.sessionResolution')
 	const tDialog = useTranslations('workout.sessionConfirmationDialog')
@@ -147,6 +152,8 @@ export const SessionConfirmationDialog = ({
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 
+				{!isDiscarding && endTime ? endTime : null}
+
 				<AlertDialogFooter>
 					{/* Cancel is quiet, so the one crimson fill in the dialog is
 					    unambiguously the thing that proceeds (§4.3 rule 1). */}
@@ -154,7 +161,9 @@ export const SessionConfirmationDialog = ({
 						{tDialog('cancel')}
 					</AlertDialogCancel>
 					<AlertDialogAction
-						onClick={onConfirm}
+						onClick={event => {
+							if (onConfirm() === false) event.preventDefault()
+						}}
 						disabled={isFinishing}
 						className={
 							isDiscarding

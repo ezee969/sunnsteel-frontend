@@ -23,6 +23,7 @@ import { SessionHeader } from '@/features/workout/session-header'
 import { SessionLoadingSkeleton } from '@/features/workout/session-loading-skeleton'
 import { WorkoutNoteButton } from '@/features/workout/session-notes'
 import { SessionRecapDialog } from '@/features/workout/session-recap'
+import { WorkoutEndTimeField } from '@/features/workout/workout-end-time-field'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useCollapsibleExercises } from '@/hooks/use-collapsible-exercises'
 import { useMotionPreference } from '@/hooks/use-motion-preference'
@@ -106,6 +107,7 @@ export default function ActiveSessionPage() {
 	const t = useTranslations('workout.sessionPage')
 	const tRounds = useTranslations('workout.rounds')
 	const tPrescription = useTranslations('workout.prescription')
+	const tEndTime = useTranslations('workout.endTime')
 	const tEx = useTranslations('catalog.exercises')
 	const params = useParams<{ id: string | string[] }>()
 	const router = useRouter()
@@ -159,16 +161,19 @@ export default function ActiveSessionPage() {
 		isConfirmingFinish,
 		progressData,
 		handleFinishAttempt,
-		executeFinish,
+		confirmFinish,
 		cancelFinish,
 		isFinishing,
 		finishStatus,
 		recap,
 		completeRecap,
+		endTime,
 	} = useSessionManagement({
 		sessionId: idParam,
 		day,
 		setLogs: session?.setLogs,
+		startedAt: session?.startedAt,
+		lastActivityAt: session?.lastActivityAt,
 	})
 
 	// Collapsible exercises state
@@ -694,13 +699,29 @@ export default function ActiveSessionPage() {
 			<SessionConfirmationDialog
 				isOpen={isConfirmingFinish}
 				onClose={cancelFinish}
-				onConfirm={() => {
-					if (finishStatus) executeFinish(finishStatus)
-				}}
+				onConfirm={confirmFinish}
 				progressData={progressData}
 				routineName={sessionRoutineTitle(session, tPrescription)}
 				isFinishing={isFinishing}
 				status={finishStatus}
+				endTime={
+					endTime ? (
+						<WorkoutEndTimeField
+							id="finish-end-time"
+							label={
+								endTime.timeline.asks ? tEndTime('askLabel') : tEndTime('label')
+							}
+							note={endTime.timeline.asks ? tEndTime('pauseNote') : undefined}
+							value={endTime.value}
+							onChange={endTime.setValue}
+							earliest={endTime.timeline.earliest}
+							latest={endTime.openedAt}
+							startedAt={session.startedAt}
+							lastActivity={endTime.timeline.lastActivity}
+							problem={endTime.problem}
+						/>
+					) : undefined
+				}
 			/>
 			<ExerciseSwapDialog
 				sessionId={session.id}

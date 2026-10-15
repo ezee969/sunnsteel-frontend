@@ -159,10 +159,10 @@
 		"problemInvalidRpe": "El RPE debe estar entre 0 y 10.",
 		"problemCompletedNeedsReps": "Una serie hecha necesita al menos una repetición.",
 		"heading": "Correcciones",
-		"correctSets": "Corregir series",
+		"correctSets": "Corregir entrenamiento",
 		"correctedAgo": "Corregido {time}",
 		"savedCorrectionsLabel": "Correcciones guardadas",
-		"correctSetsHeading": "Corregir series",
+		"correctSetsHeading": "Corregir entrenamiento",
 		"weightsInUnit": "Cambia lo que realmente hiciste. Los pesos están en {unit}.",
 		"setCaption": "Serie",
 		"weightCaption": "Peso",
@@ -175,13 +175,14 @@
 		"keepEditing": "Seguir editando",
 		"saveCorrection": "Guardar corrección",
 		"nothingToCorrectTitle": "Nada que corregir",
-		"nothingToCorrectDescription": "Cada serie ya dice eso mismo.",
+		"nothingToCorrectDescription": "Cada serie y la hora de fin ya dicen eso mismo.",
 		"workoutCorrectedTitle": "Entrenamiento corregido",
 		"everythingRecalculated": "Todo lo que este entrenamiento alimentó se recalculó.",
 		"couldNotCorrectTitle": "No se pudo corregir este entrenamiento",
 		"keptLinearBlockOne": "El bloque de 8 semanas de {list} quedó como estaba, porque ya avanzó desde este entrenamiento.",
 		"setAria": "{exercise}, serie {number}",
-		"rpeAria": "RPE, de 0 a 10"
+		"rpeAria": "RPE, de 0 a 10",
+		"endTimeCorrectionLine": "Terminó a las: {before} → {after}"
 	},
 	"restTimer": {
 		"resting": "Descansando",
@@ -311,6 +312,19 @@
 		"greatJob": "¡Buen trabajo!",
 		"completeBody": "Completaste todas las series. Tu progreso se guardará y se aplicará a los próximos entrenamientos.",
 		"cancel": "Cancelar"
+	},
+	"endTime": {
+		"askLabel": "¿A qué hora terminaste?",
+		"label": "Terminaste a las",
+		"correctionLabel": "Terminó a las",
+		"hint": "Última serie a las {lastSet}",
+		"hintWithDuration": "Última serie a las {lastSet} · {duration}",
+		"pauseNote": "Tu última serie fue hace un rato, así que el entrenamiento termina cuando digas.",
+		"correctionHint": "Solo puede adelantarse, hasta las {earliest}.",
+		"problemInvalid": "Ingresa una fecha y una hora.",
+		"problemBeforeEarliest": "Un entrenamiento termina después de su última serie, a las {time}.",
+		"problemFuture": "Un entrenamiento no puede terminar en el futuro.",
+		"problemOnlyEarlier": "Solo puede ser antes de las {time}."
 	},
 	"sessionLoadingSkeleton": {
 		"loadingAria": "Cargando datos de la sesión"

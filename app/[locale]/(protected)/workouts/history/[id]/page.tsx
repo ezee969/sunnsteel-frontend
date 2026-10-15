@@ -152,11 +152,13 @@ export default function WorkoutDetailPage() {
 				onStart={() => setCorrecting(true)}
 			/>
 
-			{correcting ? (
+			{correcting && session.endedAt ? (
 				<SessionCorrectionEditor
 					sessionId={session.id}
 					groups={exerciseGroups}
 					weightUnit={weightUnit}
+					startedAt={session.startedAt}
+					endedAt={session.endedAt}
 					onDone={() => setCorrecting(false)}
 				/>
 			) : (

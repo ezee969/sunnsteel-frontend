@@ -159,10 +159,10 @@
 		"problemInvalidRpe": "RPE must be between 0 and 10.",
 		"problemCompletedNeedsReps": "A done set needs at least one rep.",
 		"heading": "Corrections",
-		"correctSets": "Correct sets",
+		"correctSets": "Correct workout",
 		"correctedAgo": "Corrected {time}",
 		"savedCorrectionsLabel": "Saved corrections",
-		"correctSetsHeading": "Correct Sets",
+		"correctSetsHeading": "Correct Workout",
 		"weightsInUnit": "Change what you actually did. Weights are in {unit}.",
 		"setCaption": "Set",
 		"weightCaption": "Weight",
@@ -175,13 +175,14 @@
 		"keepEditing": "Keep editing",
 		"saveCorrection": "Save correction",
 		"nothingToCorrectTitle": "Nothing to correct",
-		"nothingToCorrectDescription": "Every set already reads that way.",
+		"nothingToCorrectDescription": "Every set and the end time already read that way.",
 		"workoutCorrectedTitle": "Workout corrected",
 		"everythingRecalculated": "Everything this workout fed has been recalculated.",
 		"couldNotCorrectTitle": "Could not correct this workout",
 		"keptLinearBlockOne": "The 8-week block of {list} was left where it is, because it has moved on since this workout.",
 		"setAria": "{exercise}, set {number}",
-		"rpeAria": "RPE, 0 to 10"
+		"rpeAria": "RPE, 0 to 10",
+		"endTimeCorrectionLine": "Ended at: {before} → {after}"
 	},
 	"restTimer": {
 		"resting": "Resting",
@@ -311,6 +312,19 @@
 		"greatJob": "Great job!",
 		"completeBody": "You’ve completed all sets. Your progress will be saved and applied to future workouts.",
 		"cancel": "Cancel"
+	},
+	"endTime": {
+		"askLabel": "When did you finish?",
+		"label": "Finished at",
+		"correctionLabel": "Ended at",
+		"hint": "Last set at {lastSet}",
+		"hintWithDuration": "Last set at {lastSet} · {duration}",
+		"pauseNote": "Your last set was a while ago, so this workout ends when you say.",
+		"correctionHint": "It can only move earlier, back to {earliest}.",
+		"problemInvalid": "Enter a date and a time.",
+		"problemBeforeEarliest": "A workout ends after its last set, at {time}.",
+		"problemFuture": "A workout can’t end in the future.",
+		"problemOnlyEarlier": "It can only move earlier than {time}."
 	},
 	"sessionLoadingSkeleton": {
 		"loadingAria": "Loading session data"
