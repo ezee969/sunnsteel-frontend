@@ -469,6 +469,7 @@
 		"CONVERSATION_CLOSED": "Esta conversación ya no puede recibir mensajes.",
 		"MESSAGING_UNAVAILABLE": "Los mensajes no están disponibles para esta cuenta.",
 		"MESSAGING_RESTRICTED": "La moderación restringió tus mensajes. Aún puedes leer y eliminar mensajes.",
+		"ENTITLEMENT_REQUIRED": "Esto está disponible en Pro",
 		"REPORT_OWN_MESSAGE": "No puedes denunciar tu propio mensaje",
 		"MESSAGING_ALREADY_RESTRICTED": "Los mensajes de este miembro ya están restringidos",
 		"MESSAGING_NOT_RESTRICTED": "Los mensajes de este miembro no están restringidos",
