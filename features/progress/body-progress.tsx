@@ -15,6 +15,7 @@ import { useId, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
 import { InlineError } from '@/components/layout/inline-error'
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import { ShowMoreButton, useShowMore } from '@/components/layout/show-more'
 import {
 	AlertDialog,
@@ -41,6 +42,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import {
 	type BodyProgressSource,
 	useBodyProgress,
@@ -379,6 +381,7 @@ function NumberField({
 	onChange,
 	invalid,
 	describedBy,
+	readOnly = false,
 }: {
 	id: string
 	label: string
@@ -386,6 +389,7 @@ function NumberField({
 	onChange: (value: string) => void
 	invalid: boolean
 	describedBy?: string
+	readOnly?: boolean
 }) {
 	return (
 		<div className="space-y-1">
@@ -398,6 +402,7 @@ function NumberField({
 				autoComplete="off"
 				value={value}
 				onChange={event => onChange(event.target.value)}
+				readOnly={readOnly}
 				aria-invalid={invalid ? true : undefined}
 				aria-describedby={invalid ? describedBy : undefined}
 				className="max-w-[var(--field-max)]"
@@ -413,6 +418,7 @@ function BodyEntryDialog({
 	editing,
 	weightUnit,
 	lengthUnit,
+	storedOn,
 }: {
 	open: boolean
 	onOpenChange: (open: boolean) => void
@@ -420,8 +426,16 @@ function BodyEntryDialog({
 	editing: boolean
 	weightUnit: WeightUnit
 	lengthUnit: LengthUnit
+	/**
+	 * BILL-02: the stored entry for a date, so a Free write sends every
+	 * measurement beyond weight back exactly as stored (kept, read-only).
+	 */
+	storedOn: (date: string) => BodyMeasurement | undefined
 }) {
 	const errorText = useApiErrorMessage()
+	const tBilling = useTranslations('billing.limits')
+	const measurementsLocked =
+		useEntitlement('BODY_MEASUREMENTS').allowed === false
 	const locale = useLocale() as Locale
 	const tBody = useTranslations('progress.body')
 	const baseId = useId()
@@ -452,8 +466,20 @@ function BodyEntryDialog({
 			return
 		}
 		setProblem(null)
+		const stored = storedOn(draft.date)
+		const data = measurementsLocked
+			? {
+					...result.request,
+					...Object.fromEntries(
+						BODY_LENGTH_FIELDS.map(field => [
+							field.key,
+							stored?.[field.key] ?? undefined,
+						]),
+					),
+				}
+			: result.request
 		upsert.mutate(
-			{ date: draft.date, data: result.request },
+			{ date: draft.date, data },
 			{ onSuccess: () => onOpenChange(false) },
 		)
 	}
@@ -519,9 +545,13 @@ function BodyEntryDialog({
 									onChange={set(field.key)}
 									invalid={problem?.field === field.key}
 									describedBy={problemId}
+									readOnly={measurementsLocked}
 								/>
 							))}
 						</div>
+						{measurementsLocked ? (
+							<PlanLimitNote>{tBilling('bodyKept')}</PlanLimitNote>
+						) : null}
 					</fieldset>
 					{problem ? (
 						<p id={problemId} role="alert" className="type-body-sm text-ink">
@@ -742,6 +772,9 @@ export function BodyProgressSection({
 						editing={dialog.editing}
 						weightUnit={weightUnit}
 						lengthUnit={lengthUnit}
+						storedOn={date =>
+							query.data?.entries.find(entry => entry.date === date)
+						}
 					/>
 				) : null}
 				<AlertDialog

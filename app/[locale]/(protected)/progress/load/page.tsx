@@ -11,10 +11,21 @@ import {
 
 /** Progress › Load (UX-11): how the work is spread across muscles and weeks. */
 export default function ProgressLoadPage() {
-	const { heatmapWeeks, setHeatmapWeeks, volumeWeeks, setVolumeWeeks } =
-		useProgressControls()
-	const muscleHeatmap = useMuscleGroupHeatmap(heatmapWeeks)
-	const volumeTrend = useVolumeTrend(volumeWeeks)
+	const {
+		heatmapWeeks,
+		setHeatmapWeeks,
+		volumeWeeks,
+		setVolumeWeeks,
+		weeksLimit,
+	} = useProgressControls()
+	// BILL-02: a window past the plan's limit is shown locked, never read.
+	const readable = (weeks: number) =>
+		weeksLimit !== undefined && (weeksLimit === null || weeks <= weeksLimit)
+	const muscleHeatmap = useMuscleGroupHeatmap(
+		heatmapWeeks,
+		readable(heatmapWeeks),
+	)
+	const volumeTrend = useVolumeTrend(volumeWeeks, readable(volumeWeeks))
 
 	return (
 		<ProgressTab>
@@ -24,6 +35,7 @@ export default function ProgressLoadPage() {
 				isPending={muscleHeatmap.isPending}
 				isError={Boolean(muscleHeatmap.error)}
 				onWeeksChange={setHeatmapWeeks}
+				maxWeeks={weeksLimit}
 				onRetry={() => void muscleHeatmap.retry()}
 			/>
 
@@ -33,6 +45,7 @@ export default function ProgressLoadPage() {
 				isPending={volumeTrend.isPending}
 				isError={Boolean(volumeTrend.error)}
 				onWeeksChange={setVolumeWeeks}
+				maxWeeks={weeksLimit}
 				onRetry={() => void volumeTrend.retry()}
 			/>
 		</ProgressTab>

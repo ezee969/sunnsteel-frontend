@@ -6,12 +6,14 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toast'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { usePlanLimit } from '@/lib/api/hooks/useBilling'
 import {
 	useReplaceTrainingLocations,
 	useTrainingLocations,
@@ -35,6 +37,10 @@ export const TrainingLocationPreferencesCard = ({
 }: TrainingLocationPreferencesCardProps) => {
 	const errorText = useApiErrorMessage()
 	const t = useTranslations('settings.trainingLocations')
+	const tBilling = useTranslations('billing.limits')
+	// BILL-02: past the plan's limit every location is kept, and none is added.
+	const locationLimit = usePlanLimit('TRAINING_LOCATIONS')
+	const maxLocations = Math.min(locationLimit ?? 10, 10)
 	const { data: locations, isLoading, error, refetch } = useTrainingLocations()
 	const replaceLocations = useReplaceTrainingLocations()
 	const { push } = useToast()
@@ -146,13 +152,16 @@ export const TrainingLocationPreferencesCard = ({
 					type="button"
 					variant="outline"
 					onClick={addLocation}
-					disabled={isLoading || drafts.length >= 10}
+					disabled={isLoading || drafts.length >= maxLocations}
 				>
 					<Plus aria-hidden className="mr-2 h-4 w-4" />
 					{t('add')}
 				</Button>
 			</CardHeader>
 			<CardContent className="space-y-4">
+				{locationLimit != null && drafts.length >= locationLimit ? (
+					<PlanLimitNote>{tBilling('TRAINING_LOCATIONS')}</PlanLimitNote>
+				) : null}
 				{isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 aria-hidden className="h-4 w-4 animate-spin" />

@@ -3,6 +3,7 @@
 import type { ProgressTimelineEventType } from '@sunsteel/contracts'
 import { createContext, useContext, useMemo, useState } from 'react'
 
+import { usePlanLimit } from '@/lib/api/hooks/useBilling'
 import type { MuscleHeatmapWeeks } from '@/lib/utils/muscle-heatmap'
 import type { StrengthRange } from '@/lib/utils/strength-trend'
 import type { VolumeTrendWeeks } from '@/lib/utils/volume-trend'
@@ -24,6 +25,11 @@ interface ProgressControls {
 	setHeatmapWeeks: (weeks: MuscleHeatmapWeeks) => void
 	volumeWeeks: VolumeTrendWeeks
 	setVolumeWeeks: (weeks: VolumeTrendWeeks) => void
+	/**
+	 * BILL-02: the plan's limit on weeks of muscle history: a number, null for
+	 * none of its own, undefined until the server answers.
+	 */
+	weeksLimit: number | null | undefined
 	routineDayId: string | undefined
 	setRoutineDayId: (routineDayId: string | undefined) => void
 	timelineFilter: ProgressTimelineEventType | undefined
@@ -40,8 +46,16 @@ export function ProgressControlsProvider({
 	const [range, setRange] = useState<StrengthRange>('90D')
 	const [rangeAnchor] = useState(() => new Date())
 	const [exerciseId, setExerciseId] = useState<string>()
-	const [heatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>(8)
-	const [volumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>(8)
+	// BILL-02: until the member chooses, a window opens at 8 weeks, or at the
+	// plan's limit when that is shorter.
+	const weeksLimit = usePlanLimit('MUSCLE_HISTORY_WEEKS')
+	const defaultWeeks = (
+		weeksLimit == null ? 8 : Math.min(8, weeksLimit)
+	) as MuscleHeatmapWeeks & VolumeTrendWeeks
+	const [chosenHeatmapWeeks, setHeatmapWeeks] = useState<MuscleHeatmapWeeks>()
+	const [chosenVolumeWeeks, setVolumeWeeks] = useState<VolumeTrendWeeks>()
+	const heatmapWeeks = chosenHeatmapWeeks ?? defaultWeeks
+	const volumeWeeks = chosenVolumeWeeks ?? defaultWeeks
 	const [routineDayId, setRoutineDayId] = useState<string>()
 	const [timelineFilter, setTimelineFilter] =
 		useState<ProgressTimelineEventType>()
@@ -57,6 +71,7 @@ export function ProgressControlsProvider({
 			setHeatmapWeeks,
 			volumeWeeks,
 			setVolumeWeeks,
+			weeksLimit,
 			routineDayId,
 			setRoutineDayId,
 			timelineFilter,
@@ -68,6 +83,7 @@ export function ProgressControlsProvider({
 			exerciseId,
 			heatmapWeeks,
 			volumeWeeks,
+			weeksLimit,
 			routineDayId,
 			timelineFilter,
 		],

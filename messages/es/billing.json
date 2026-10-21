@@ -1,0 +1,136 @@
+{
+	"locked": {
+		"availableInPro": "Disponible en Pro",
+		"comparePlans": "Comparar planes",
+		"lockedOption": "{label}, disponible en Pro"
+	},
+	"features": {
+		"STRENGTH_TRENDS_LONG_RANGES": {
+			"name": "Rangos de fuerza largos",
+			"description": "Tu 1RM estimado en seis meses, un año o todo tu entrenamiento."
+		},
+		"TRAINING_COMPARISON": {
+			"name": "Comparación de entrenamiento",
+			"description": "Un bloque de entrenamiento junto al período anterior, y un entrenamiento junto a la última vez que entrenaste ese día."
+		},
+		"TRAINING_SIGNALS": {
+			"name": "Señales de entrenamiento",
+			"description": "Tus últimas dos semanas junto a las dos anteriores: esfuerzo, objetivos de repeticiones y ejercicios que bajaron, con una semana más ligera sugerida cuando se mantienen."
+		},
+		"MUSCLE_HISTORY_LONG": {
+			"name": "Historial muscular más largo",
+			"description": "El mapa de calor muscular y las tendencias de volumen en 8 o 12 semanas."
+		},
+		"TRAINING_BLOCKS": {
+			"name": "Bloques de entrenamiento",
+			"description": "Bloques con fechas que cambian lo que entrena una rutina entre dos fechas."
+		},
+		"PLANNED_DELOADS": {
+			"name": "Descargas planificadas",
+			"description": "Una semana más ligera en las fechas que elijas, sin editar la rutina."
+		},
+		"EIGHT_WEEK_BLOCKS": {
+			"name": "Bloques de 8 semanas",
+			"description": "Cada serie de trabajo prescrita a partir de un máximo de referencia, semana a semana, con una estimación al final."
+		},
+		"GOAL_SUGGESTIONS": {
+			"name": "Sugerencias de objetivos",
+			"description": "Objetivos calculados a partir de tu propio entrenamiento, cada uno diciendo de dónde sale su número."
+		},
+		"BODY_MEASUREMENTS": {
+			"name": "Medidas corporales",
+			"description": "Cintura, cadera, pecho, brazo, muslo y grasa corporal junto a tu peso."
+		},
+		"DASHBOARD_CUSTOMIZATION": {
+			"name": "Personalización de Inicio",
+			"description": "Reordena las secciones de Inicio y oculta las que no usas."
+		}
+	},
+	"limits": {
+		"ROUTINE_VERSIONS": "Free guarda {max, plural, one {# versión} other {# versiones}} por rutina, y todas las versiones que tienes se conservan.",
+		"GOALS": "Free guarda {max, plural, one {# objetivo} other {# objetivos}}. Los demás quedan en pausa, nunca se eliminan.",
+		"TRAINING_LOCATIONS": "Free usa un lugar de entrenamiento. Todos tus lugares se conservan y se usa el predeterminado.",
+		"bodyKept": "Tus otras medidas se conservan y se muestran. Registrarlas está disponible en Pro.",
+		"strengthRange": "Free muestra los últimos 90 días.",
+		"lpRunning": "Este bloque de 8 semanas sigue como está. Cambiarlo o empezar otro está disponible en Pro.",
+		"lpNew": "Los bloques de 8 semanas están disponibles en Pro.",
+		"lpNext": "Empezar el siguiente bloque está disponible en Pro."
+	},
+	"goalPaused": "En pausa",
+	"goalPausedDescription": "En pausa: Free evalúa tus primeros {max, plural, one {# objetivo} other {# objetivos}}.",
+	"settingsPlan": {
+		"title": "Tu plan",
+		"free": "Free",
+		"pro": "Pro",
+		"proUntil": "Pro hasta el {date}",
+		"proNoEnd": "Pro, sin fecha de fin",
+		"comparePlans": "Comparar planes"
+	},
+	"plans": {
+		"title": "Planes",
+		"subtitle": "Lo que incluyen Free y Pro",
+		"currentFree": "Estás en Free.",
+		"currentPro": "Estás en Pro, sin fecha de fin.",
+		"currentProUntil": "Estás en Pro hasta el {date}.",
+		"notForSale": "Pro todavía no se puede comprar. No se cobra nada, y nada aquí te pide pagar.",
+		"tableCaption": "Free y Pro comparados",
+		"capability": "Función",
+		"free": "Free",
+		"pro": "Pro",
+		"none": "No incluido",
+		"yes": "Incluido",
+		"downgrade": "Si una cuenta deja Pro, no se elimina ni se reescribe nada: lo creado con Pro se conserva, los planes en curso terminan y solo se detiene el uso nuevo.",
+		"alwaysFreeTitle": "Siempre gratis",
+		"alwaysFree": "Registrar series, el temporizador de descanso y sus alertas, la progresión automática, los calentamientos y la calculadora de discos; el historial, los récords, los logros y los rangos; todo lo social, los mensajes y la moderación; la privacidad, la seguridad, la exportación de datos y la eliminación de la cuenta.",
+		"rows": {
+			"strength": {
+				"name": "Rangos de tendencia de fuerza",
+				"free": "30 y 90 días",
+				"pro": "6 meses, 1 año, todo"
+			},
+			"comparison": {
+				"name": "Comparación de bloques y entrenamientos"
+			},
+			"signals": {
+				"name": "Señales de entrenamiento y la sugerencia de descarga"
+			},
+			"muscles": {
+				"name": "Mapa de calor muscular y tendencias de volumen",
+				"free": "4 semanas",
+				"pro": "8 y 12 semanas"
+			},
+			"blocks": {
+				"name": "Bloques de entrenamiento con fechas"
+			},
+			"deloads": {
+				"name": "Descargas planificadas"
+			},
+			"eightWeek": {
+				"name": "Bloques de 8 semanas"
+			},
+			"versions": {
+				"name": "Versiones guardadas de rutinas",
+				"free": "3 por rutina",
+				"pro": "20 por rutina"
+			},
+			"goals": {
+				"name": "Objetivos y sugerencias de objetivos",
+				"free": "3 objetivos",
+				"pro": "8 objetivos y sugerencias"
+			},
+			"locations": {
+				"name": "Lugares de entrenamiento",
+				"free": "1",
+				"pro": "Varios"
+			},
+			"body": {
+				"name": "Medidas corporales",
+				"free": "Peso",
+				"pro": "Todas las medidas"
+			},
+			"dashboard": {
+				"name": "Personalización de Inicio"
+			}
+		}
+	}
+}

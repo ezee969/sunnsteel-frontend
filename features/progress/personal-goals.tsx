@@ -19,6 +19,7 @@ import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { numberFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
+import { usePlanLimit } from '@/lib/api/hooks/useBilling'
 import { getMeasurableGoalLabel } from '@/lib/utils/measurable-goals'
 import { formatWeightAmount, getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
@@ -87,6 +88,8 @@ export function GoalRow({
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.goals')
 	const tEx = useTranslations('catalog.exercises')
+	const tBilling = useTranslations('billing')
+	const goalLimit = usePlanLimit('GOALS')
 	const current =
 		goal.currentValue === null
 			? null
@@ -127,7 +130,12 @@ export function GoalRow({
 				</p>
 			</div>
 
-			{current === null ? (
+			{goal.paused ? (
+				// BILL-02: kept and shown, not evaluated, past the plan's limit.
+				<p className="type-body-sm text-ink-3">
+					{tBilling('goalPausedDescription', { max: goalLimit ?? 0 })}
+				</p>
+			) : current === null ? (
 				<p className="type-body-sm text-ink-3">{getMissingCopy(goal, t)}</p>
 			) : (
 				<div className="space-y-2">

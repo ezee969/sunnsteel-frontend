@@ -7,6 +7,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useId, useState } from 'react'
 
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -23,6 +24,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { lpSummary } from '@/lib/utils/linear-periodization'
 import {
 	formatWeight,
@@ -71,6 +73,10 @@ export function LinearBlockField({
 }: LinearBlockFieldProps) {
 	const t = useTranslations('routines.linearBlock')
 	const locale = useLocale() as Locale
+	// BILL-02: a running block travels with the routine unchanged; changing it
+	// or starting one needs Pro.
+	const blocksAccess = useEntitlement('EIGHT_WEEK_BLOCKS')
+	const tBilling = useTranslations('billing.limits')
 	const inputId = useId()
 	const stepId = useId()
 	const state = exercise.linearPeriodization ?? null
@@ -128,6 +134,14 @@ export function LinearBlockField({
 				t,
 			)
 		: t('noReference')
+
+	if (blocksAccess.allowed === false) {
+		return (
+			<PlanLimitNote className="mt-2">
+				{tBilling(state ? 'lpRunning' : 'lpNew')}
+			</PlanLimitNote>
+		)
+	}
 
 	return (
 		<div className="space-y-1.5">

@@ -266,22 +266,22 @@ export const usePlateaus = () => {
 }
 
 /** PROG-10: training signals; refreshed with the rest of Progress on finish. */
-export const useTrainingSignals = () => {
+export const useTrainingSignals = ({ enabled = true } = {}) => {
 	const { session, isLoading } = useAuth()
 	return useQuery<TrainingSignalsResponse>({
 		queryKey: qk.trainingSignals,
 		queryFn: workoutService.getTrainingSignals,
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 
 /** INTEL-02: the deload suggestion shown under the training signals. */
-export const useDeloadSuggestion = () => {
+export const useDeloadSuggestion = ({ enabled = true } = {}) => {
 	const { session, isLoading } = useAuth()
 	return useQuery<DeloadSuggestionResponse>({
 		queryKey: qk.deloadSuggestion,
 		queryFn: workoutService.getDeloadSuggestion,
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 
@@ -298,7 +298,7 @@ export const useUpdatePlateauPreferences = () => {
 	})
 }
 
-export const useMuscleGroupHeatmap = (weeks = 8) => {
+export const useMuscleGroupHeatmap = (weeks = 8, enabled = true) => {
 	const { session, isLoading } = useAuth()
 	const analytics = useWorkoutAnalytics()
 	const timeZone =
@@ -307,7 +307,8 @@ export const useMuscleGroupHeatmap = (weeks = 8) => {
 	const query = useQuery<MuscleGroupHeatmapResponse>({
 		queryKey: qk.muscleHeatmap(params),
 		queryFn: () => workoutService.getMuscleGroupHeatmap(params),
-		enabled: !isLoading && !!session && !!timeZone,
+		// BILL-02: a window past the plan's limit is not read.
+		enabled: enabled && !isLoading && !!session && !!timeZone,
 	})
 	const bootstrapError =
 		analytics.error ??
@@ -326,7 +327,7 @@ export const useMuscleGroupHeatmap = (weeks = 8) => {
 	}
 }
 
-export const useVolumeTrend = (weeks = 8) => {
+export const useVolumeTrend = (weeks = 8, enabled = true) => {
 	const { session, isLoading } = useAuth()
 	const analytics = useWorkoutAnalytics()
 	const timeZone =
@@ -335,7 +336,8 @@ export const useVolumeTrend = (weeks = 8) => {
 	const query = useQuery<VolumeTrendResponse>({
 		queryKey: qk.volumeTrend(params),
 		queryFn: () => workoutService.getVolumeTrend(params),
-		enabled: !isLoading && !!session && !!timeZone,
+		// BILL-02: a window past the plan's limit is not read.
+		enabled: enabled && !isLoading && !!session && !!timeZone,
 	})
 	const bootstrapError =
 		analytics.error ??
@@ -381,12 +383,12 @@ export const usePersonalGoals = () => {
 	}
 }
 
-export const useSessionComparison = (routineDayId?: string) => {
+export const useSessionComparison = (routineDayId?: string, enabled = true) => {
 	const { session, isLoading } = useAuth()
 	return useQuery<SessionComparisonResponse>({
 		queryKey: qk.sessionComparison(routineDayId),
 		queryFn: () => workoutService.getSessionComparison({ routineDayId }),
-		enabled: !isLoading && !!session,
+		enabled: enabled && !isLoading && !!session,
 	})
 }
 

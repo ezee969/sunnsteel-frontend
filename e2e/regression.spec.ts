@@ -526,6 +526,8 @@ const ROUTES: SweepRoute[] = [
 	},
 	{ slug: 'achievements', path: () => '/achievements' },
 	{ slug: 'notifications', path: () => '/notifications' },
+	// BILL-02: Free and Pro compared.
+	{ slug: 'plans', path: () => '/plans' },
 	{ slug: 'activity', path: () => '/activity' },
 	{ slug: 'activity-yours', path: () => '/activity?view=yours' },
 	// MSG-01: the list, a conversation and the first-message page. The new

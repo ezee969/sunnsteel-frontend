@@ -24,6 +24,7 @@ export const useRoutineTrainingBlocks = (routineId: string) =>
 export const useTrainingBlockComparison = (
 	routineId: string,
 	seriesId: string | null,
+	enabled = true,
 ) =>
 	useQuery<TrainingBlockComparisonResponse, Error>({
 		queryKey: routineQueryKeys.trainingBlockComparison(
@@ -32,7 +33,7 @@ export const useTrainingBlockComparison = (
 		),
 		queryFn: () =>
 			routineService.getTrainingBlockComparison(routineId, seriesId!),
-		enabled: !!routineId && !!seriesId,
+		enabled: enabled && !!routineId && !!seriesId,
 		staleTime: 0,
 	})
 

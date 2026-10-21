@@ -12,6 +12,7 @@ import { useMemo } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { InlineError } from '@/components/layout/inline-error'
+import { LockedModule } from '@/components/layout/locked-module'
 import {
 	Accordion,
 	AccordionContent,
@@ -49,6 +50,8 @@ interface SessionComparisonProps {
 	isError: boolean
 	onRoutineDayChange: (routineDayId: string) => void
 	onRetry: () => void
+	/** BILL-02: the plan does not include comparison; the section says so. */
+	locked?: boolean
 }
 
 interface MetricComparisonProps {
@@ -131,6 +134,7 @@ export function SessionComparison({
 	isError,
 	onRoutineDayChange,
 	onRetry,
+	locked = false,
 }: SessionComparisonProps) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.sessionComparison')
@@ -162,7 +166,9 @@ export function SessionComparison({
 				</div>
 			</div>
 			<div className="space-y-4">
-				{isPending && !data ? (
+				{locked ? (
+					<LockedModule feature="TRAINING_COMPARISON" />
+				) : isPending && !data ? (
 					<div
 						role="status"
 						aria-busy="true"
