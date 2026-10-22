@@ -1,0 +1,136 @@
+{
+	"locked": {
+		"availableInPro": "Available in Pro",
+		"comparePlans": "Compare plans",
+		"lockedOption": "{label}, available in Pro"
+	},
+	"features": {
+		"STRENGTH_TRENDS_LONG_RANGES": {
+			"name": "Long strength ranges",
+			"description": "Your estimated 1RM over six months, a year or all of your training."
+		},
+		"TRAINING_COMPARISON": {
+			"name": "Training comparison",
+			"description": "A training block beside the period before it, and a workout beside the last time you trained that day."
+		},
+		"TRAINING_SIGNALS": {
+			"name": "Training signals",
+			"description": "Your last two weeks beside the two before: effort, rep targets and lifts that declined, with a lighter week suggested when they persist."
+		},
+		"MUSCLE_HISTORY_LONG": {
+			"name": "Longer muscle history",
+			"description": "The muscle heatmap and volume trends over 8 or 12 weeks."
+		},
+		"TRAINING_BLOCKS": {
+			"name": "Training blocks",
+			"description": "Dated blocks that change what a routine trains between two dates."
+		},
+		"PLANNED_DELOADS": {
+			"name": "Planned deloads",
+			"description": "A lighter week on the dates you choose, without editing the routine."
+		},
+		"EIGHT_WEEK_BLOCKS": {
+			"name": "8-week blocks",
+			"description": "Every working set prescribed from a reference max, week by week, with an estimate at the end."
+		},
+		"GOAL_SUGGESTIONS": {
+			"name": "Goal suggestions",
+			"description": "Goals worked out from your own training, each saying where its number came from."
+		},
+		"BODY_MEASUREMENTS": {
+			"name": "Body measurements",
+			"description": "Waist, hips, chest, arm, thigh and body fat beside your weight."
+		},
+		"DASHBOARD_CUSTOMIZATION": {
+			"name": "Dashboard customization",
+			"description": "Reorder the dashboard's sections and hide the ones you don't use."
+		}
+	},
+	"limits": {
+		"ROUTINE_VERSIONS": "Free keeps {max, plural, one {# version} other {# versions}} of a routine, and every version you have is kept.",
+		"GOALS": "Free keeps {max, plural, one {# goal} other {# goals}}. Goals past that are paused, never deleted.",
+		"TRAINING_LOCATIONS": "Free keeps one training location in use. Every location you have is kept, and the default is the one used.",
+		"bodyKept": "Your other measurements are kept and shown. Recording them is available in Pro.",
+		"strengthRange": "Free charts the last 90 days.",
+		"lpRunning": "This 8-week block keeps running as it is. Changing it or starting another is available in Pro.",
+		"lpNew": "8-week blocks are available in Pro.",
+		"lpNext": "Starting the next block is available in Pro."
+	},
+	"goalPaused": "Paused",
+	"goalPausedDescription": "Paused: Free evaluates your first {max, plural, one {# goal} other {# goals}}.",
+	"settingsPlan": {
+		"title": "Your plan",
+		"free": "Free",
+		"pro": "Pro",
+		"proUntil": "Pro until {date}",
+		"proNoEnd": "Pro, with no end date",
+		"comparePlans": "Compare plans"
+	},
+	"plans": {
+		"title": "Plans",
+		"subtitle": "What Free and Pro include",
+		"currentFree": "You're on Free.",
+		"currentPro": "You're on Pro, with no end date.",
+		"currentProUntil": "You're on Pro until {date}.",
+		"notForSale": "Pro can't be bought yet. Nothing is charged, and nothing here asks you to pay.",
+		"tableCaption": "Free and Pro compared",
+		"capability": "Capability",
+		"free": "Free",
+		"pro": "Pro",
+		"none": "Not included",
+		"yes": "Included",
+		"downgrade": "If an account leaves Pro, nothing is deleted or rewritten: what was made under Pro is kept, plans already running finish, and only new use stops.",
+		"alwaysFreeTitle": "Always free",
+		"alwaysFree": "Logging sets, the rest timer and its alerts, automatic progression, warm-ups and the plate calculator; history, records, achievements and ranks; every social, messaging and moderation surface; privacy, security, data export and account deletion.",
+		"rows": {
+			"strength": {
+				"name": "Strength-trend ranges",
+				"free": "30 and 90 days",
+				"pro": "6 months, 1 year, all time"
+			},
+			"comparison": {
+				"name": "Block and session comparison"
+			},
+			"signals": {
+				"name": "Training signals and the deload suggestion"
+			},
+			"muscles": {
+				"name": "Muscle heatmap and volume trends",
+				"free": "4 weeks",
+				"pro": "8 and 12 weeks"
+			},
+			"blocks": {
+				"name": "Dated training blocks"
+			},
+			"deloads": {
+				"name": "Planned deloads"
+			},
+			"eightWeek": {
+				"name": "8-week blocks"
+			},
+			"versions": {
+				"name": "Saved routine versions",
+				"free": "3 per routine",
+				"pro": "20 per routine"
+			},
+			"goals": {
+				"name": "Goals and goal suggestions",
+				"free": "3 goals",
+				"pro": "8 goals and suggestions"
+			},
+			"locations": {
+				"name": "Training locations",
+				"free": "1",
+				"pro": "Several"
+			},
+			"body": {
+				"name": "Body measurements",
+				"free": "Weight",
+				"pro": "Every measurement"
+			},
+			"dashboard": {
+				"name": "Dashboard customization"
+			}
+		}
+	}
+}

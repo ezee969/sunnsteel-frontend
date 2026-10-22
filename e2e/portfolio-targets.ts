@@ -526,6 +526,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Verified milestones, Renaissance ranks with their own crest and pigment, and the next goal per category.',
 	},
 	{
+		slug: 'plans',
+		route: '/plans',
+		features: ['BILL-02'],
+		ready: ['Free and Pro compared'],
+		caption:
+			'Free and Pro compared row by row, in the order of the Pro split, with the downgrade rule and what is always free.',
+	},
+	{
 		slug: 'notifications',
 		route: '/notifications',
 		features: ['NOTIF-01', 'SOC-09'],

@@ -470,6 +470,7 @@
 		"MESSAGING_UNAVAILABLE": "Messaging is not available for this account.",
 		"MESSAGING_RESTRICTED": "Moderation has restricted your messaging. You can still read and delete messages.",
 		"ENTITLEMENT_REQUIRED": "This is available in Pro",
+		"PLAN_LIMIT_REACHED": "Your plan allows {max} here",
 		"REPORT_OWN_MESSAGE": "You cannot report your own message",
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",

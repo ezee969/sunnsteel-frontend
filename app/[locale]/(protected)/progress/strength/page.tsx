@@ -1,5 +1,6 @@
 'use client'
 
+import { strengthRangeNeedsPro } from '@sunsteel/contracts'
 import { TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -8,6 +9,10 @@ import { useMemo } from 'react'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { GlossaryLine } from '@/components/layout/glossary-line'
 import { InlineError } from '@/components/layout/inline-error'
+import {
+	LockedModule,
+	LockedOptionLabel,
+} from '@/components/layout/locked-module'
 import {
 	Select,
 	SelectContent,
@@ -26,6 +31,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import {
 	useExercisePerformanceHistory,
 	useExerciseStrengthTrend,
@@ -86,6 +92,19 @@ export default function ProgressStrengthPage() {
 		[exerciseId, range, rangeAnchor],
 	)
 	const history = useExercisePerformanceHistory(historyParams)
+	// BILL-02: past 90 days needs Pro. Without it the current best still shows
+	// (it is answered whatever the range) and the charts give way to the
+	// locked module; the read waits until the plan is known.
+	const longRanges = useEntitlement('STRENGTH_TRENDS_LONG_RANGES')
+	const rangeNeedsPro = strengthRangeNeedsPro(historyParams)
+	const rangeLocked = rangeNeedsPro && longRanges.allowed === false
+	const trendParams = useMemo(
+		() =>
+			rangeLocked
+				? { exerciseId, ...getStrengthTrendRange('90D', rangeAnchor) }
+				: historyParams,
+		[exerciseId, historyParams, rangeAnchor, rangeLocked],
+	)
 	const timeline = useProgressTimeline(timelineFilter)
 	const historyPage = history.data?.pages[0]
 	const selectedExerciseId =
@@ -94,9 +113,10 @@ export default function ProgressStrengthPage() {
 		exercise => exercise.exerciseId === selectedExerciseId,
 	)
 	const trend = useExerciseStrengthTrend(
-		historyParams,
-		exerciseId === undefined ||
-			Boolean(selectedExerciseId && selectedPerformance?.hasStrengthTrend),
+		trendParams,
+		!(rangeNeedsPro && longRanges.allowed === null) &&
+			(exerciseId === undefined ||
+				Boolean(selectedExerciseId && selectedPerformance?.hasStrengthTrend)),
 	)
 	const weightUnit = useWeightUnit()
 	const unitLabel = getWeightUnitLabel(weightUnit)
@@ -159,7 +179,14 @@ export default function ProgressStrengthPage() {
 							pressed={range === option.value}
 							onClick={() => setRange(option.value)}
 						>
-							{t(`range${option.value}`)}
+							{longRanges.allowed === false &&
+							strengthRangeNeedsPro(
+								getStrengthTrendRange(option.value, rangeAnchor),
+							) ? (
+								<LockedOptionLabel label={t(`range${option.value}`)} />
+							) : (
+								t(`range${option.value}`)
+							)}
 						</ToggleOption>
 					))}
 				</ToggleRow>
@@ -226,46 +253,55 @@ export default function ProgressStrengthPage() {
 									</div>
 								</div>
 
-								{trend.data?.baseline && trend.data.points.length === 0 ? (
+								{!rangeLocked &&
+								trend.data?.baseline &&
+								trend.data.points.length === 0 ? (
 									<p role="status" className="type-body-sm text-ink-3">
 										{t('unchanged')}
 									</p>
 								) : null}
 
-								<div className="grid gap-6 lg:grid-cols-2">
-									<StrengthTrendChart
-										id="estimated-one-rep-max"
-										title={t('e1rmTitle')}
-										description={t('e1rmDescription')}
-										points={displayPoints}
-										getValue={point =>
-											kilogramsToDisplayWeight(point.estimated1rmKg, weightUnit)
-										}
-										formatValue={value =>
-											`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
-										}
-										formatPointDetail={point =>
-											`${formatMetric(point.weightKg)} × ${point.reps}`
-										}
-									/>
-									<StrengthTrendChart
-										id="best-set-load"
-										title={t('loadTitle')}
-										description={t('loadDescription')}
-										points={displayPoints}
-										getValue={point =>
-											kilogramsToDisplayWeight(point.weightKg, weightUnit)
-										}
-										formatValue={value =>
-											`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
-										}
-										formatPointDetail={point =>
-											t('repsDetail', { reps: point.reps })
-										}
-									/>
-								</div>
+								{rangeLocked ? (
+									<LockedModule feature="STRENGTH_TRENDS_LONG_RANGES" />
+								) : (
+									<div className="grid gap-6 lg:grid-cols-2">
+										<StrengthTrendChart
+											id="estimated-one-rep-max"
+											title={t('e1rmTitle')}
+											description={t('e1rmDescription')}
+											points={displayPoints}
+											getValue={point =>
+												kilogramsToDisplayWeight(
+													point.estimated1rmKg,
+													weightUnit,
+												)
+											}
+											formatValue={value =>
+												`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
+											}
+											formatPointDetail={point =>
+												`${formatMetric(point.weightKg)} × ${point.reps}`
+											}
+										/>
+										<StrengthTrendChart
+											id="best-set-load"
+											title={t('loadTitle')}
+											description={t('loadDescription')}
+											points={displayPoints}
+											getValue={point =>
+												kilogramsToDisplayWeight(point.weightKg, weightUnit)
+											}
+											formatValue={value =>
+												`${numberFormatter(locale, { maximumFractionDigits: 2 }).format(value)} ${unitLabel}`
+											}
+											formatPointDetail={point =>
+												t('repsDetail', { reps: point.reps })
+											}
+										/>
+									</div>
+								)}
 
-								{recentChanges.length > 0 ? (
+								{!rangeLocked && recentChanges.length > 0 ? (
 									<section
 										aria-labelledby="record-changes"
 										className="space-y-3"

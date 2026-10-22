@@ -8,7 +8,15 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
+import { LockedModule } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useUpdateOnboarding } from '@/lib/api/hooks/useOnboarding'
 import { pendingSteps, shouldOpenWelcome } from '@/lib/onboarding/steps'
 import { dashboardRows } from '@/lib/utils/dashboard-layout'
@@ -52,6 +60,8 @@ export default function Dashboard() {
 
 	const name = user?.name?.trim()
 	const [customizing, setCustomizing] = useState(false)
+	const customizationLocked =
+		useEntitlement('DASHBOARD_CUSTOMIZATION').allowed === false
 	const tOnboarding = useTranslations('onboarding.notice')
 	const router = useRouter()
 	const updateOnboarding = useUpdateOnboarding()
@@ -180,7 +190,17 @@ export default function Dashboard() {
 					})}
 				</div>
 			)}
-			{customizing ? (
+			{customizing && customizationLocked ? (
+				// BILL-02: the default layout on Free; a stored one is kept for Pro.
+				<Dialog open onOpenChange={open => !open && setCustomizing(false)}>
+					<DialogContent className="max-w-md">
+						<DialogHeader>
+							<DialogTitle>{t('customize')}</DialogTitle>
+						</DialogHeader>
+						<LockedModule feature="DASHBOARD_CUSTOMIZATION" />
+					</DialogContent>
+				</Dialog>
+			) : customizing ? (
 				<CustomizeDashboardDialog
 					layout={user?.dashboardLayout}
 					gettingStarted={gettingStarted}

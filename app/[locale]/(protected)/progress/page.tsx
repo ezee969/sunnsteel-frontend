@@ -1,6 +1,7 @@
 'use client'
 
 import { GlossaryLine } from '@/components/layout/glossary-line'
+import { LockedModule } from '@/components/layout/locked-module'
 import { GoalSuggestionList } from '@/features/progress/goal-suggestions'
 import { PersonalGoals } from '@/features/progress/personal-goals'
 import { PlateauWatch } from '@/features/progress/plateau-watch'
@@ -8,6 +9,7 @@ import { ProgressTab } from '@/features/progress/progress-tab'
 import { TrainingSignals } from '@/features/progress/training-signals'
 import { useHashForward } from '@/hooks/use-hash-forward'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useGoalSuggestions } from '@/lib/api/hooks/useGoalSuggestions'
 import {
 	useDeloadSuggestion,
@@ -28,11 +30,20 @@ export default function ProgressOverviewPage() {
 	const forwarding = useHashForward(PROGRESS_HASH_RULES)
 	const weightUnit = useWeightUnit()
 	const personalGoals = usePersonalGoals()
-	const goalSuggestions = useGoalSuggestions()
+	// BILL-02: suggestions, signals and the deload suggestion are Pro's.
+	const suggestionsAccess = useEntitlement('GOAL_SUGGESTIONS')
+	const signalsAccess = useEntitlement('TRAINING_SIGNALS')
+	const goalSuggestions = useGoalSuggestions({
+		enabled: suggestionsAccess.allowed === true,
+	})
 	const plateaus = usePlateaus()
 	const plateauPreferences = useUpdatePlateauPreferences()
-	const trainingSignals = useTrainingSignals()
-	const deloadSuggestion = useDeloadSuggestion()
+	const trainingSignals = useTrainingSignals({
+		enabled: signalsAccess.allowed === true,
+	})
+	const deloadSuggestion = useDeloadSuggestion({
+		enabled: signalsAccess.allowed === true,
+	})
 
 	if (forwarding) return null
 
@@ -46,10 +57,14 @@ export default function ProgressOverviewPage() {
 				isError={Boolean(personalGoals.error)}
 				onRetry={() => void personalGoals.retry()}
 				suggestions={
-					<GoalSuggestionList
-						suggestions={goalSuggestions.data?.suggestions ?? []}
-						weightUnit={weightUnit}
-					/>
+					suggestionsAccess.allowed === false ? (
+						<LockedModule feature="GOAL_SUGGESTIONS" />
+					) : (
+						<GoalSuggestionList
+							suggestions={goalSuggestions.data?.suggestions ?? []}
+							weightUnit={weightUnit}
+						/>
+					)
 				}
 			/>
 
@@ -77,6 +92,7 @@ export default function ProgressOverviewPage() {
 				isError={trainingSignals.isError}
 				onRetry={() => void trainingSignals.refetch()}
 				deloadSuggestion={deloadSuggestion.data}
+				locked={signalsAccess.allowed === false}
 			/>
 		</ProgressTab>
 	)

@@ -26,6 +26,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { LockedModule } from '@/components/layout/locked-module'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -60,6 +61,7 @@ import { useToast } from '@/components/ui/toast'
 import { RoutineSetupComparison } from '@/features/routines/components/RoutineSetupComparison'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import {
 	useCancelDeload,
 	useCreateDeload,
@@ -419,13 +421,22 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 		length: number
 	} | null>(null)
 	const opened = useRef(false)
+	// BILL-02: planning a deload needs Pro; ending or cancelling one never does.
+	const deloadsAccess = useEntitlement('PLANNED_DELOADS')
+	const locked = deloadsAccess.allowed === false
 	useEffect(() => {
-		if (!suggested || !deloads.data || opened.current) return
+		if (
+			!suggested ||
+			!deloads.data ||
+			deloadsAccess.allowed !== true ||
+			opened.current
+		)
+			return
 		opened.current = true
 		setInitial(suggested)
 		setCreating(true)
 		router.replace(pathname, { scroll: false })
-	}, [suggested, deloads.data, router, pathname])
+	}, [suggested, deloads.data, deloadsAccess.allowed, router, pathname])
 	const [reviewing, setReviewing] = useState<RoutineTemporaryOverride | null>(
 		null,
 	)
@@ -479,17 +490,20 @@ export function RoutineDeloads({ routine, weightUnit }: RoutineDeloadsProps) {
 						<p>{t('description', { days: deloads.data?.maxDays ?? 14 })}</p>
 					</Explanation>
 				</div>
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={() => setCreating(true)}
-					disabled={!deloads.data}
-				>
-					<Plus aria-hidden />
-					{t('planDeload')}
-				</Button>
+				{locked ? null : (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setCreating(true)}
+						disabled={!deloads.data}
+					>
+						<Plus aria-hidden />
+						{t('planDeload')}
+					</Button>
+				)}
 			</div>
+			{locked ? <LockedModule feature="PLANNED_DELOADS" /> : null}
 
 			{deloads.isPending ? (
 				<div

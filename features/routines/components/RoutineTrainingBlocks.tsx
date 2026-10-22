@@ -22,6 +22,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { LockedModule } from '@/components/layout/locked-module'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -57,6 +58,7 @@ import { RoutineSetupComparison } from '@/features/routines/components/RoutineSe
 import { TrainingBlockComparisonDialog } from '@/features/routines/components/TrainingBlockComparison'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import {
 	useCreateRoutineTrainingBlock,
 	useDeleteRoutineTrainingBlock,
@@ -377,6 +379,10 @@ export function RoutineTrainingBlocks({
 	const list = blocks.data?.blocks ?? []
 	const max = blocks.data?.max ?? ROUTINE_TRAINING_BLOCKS_MAX
 	const full = list.length >= max
+	// BILL-02: existing blocks run to their end date; a new one or a revision
+	// needs Pro.
+	const blocksAccess = useEntitlement('TRAINING_BLOCKS')
+	const locked = blocksAccess.allowed === false
 
 	const onDelete = (block: RoutineTrainingBlock) =>
 		remove.mutate(block.id, {
@@ -419,17 +425,20 @@ export function RoutineTrainingBlocks({
 						<p>{t('footnote')}</p>
 					</Explanation>
 				</div>
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={() => setEditor('new')}
-					disabled={!blocks.data || full}
-				>
-					<Plus aria-hidden />
-					{t('addBlock')}
-				</Button>
+				{locked ? null : (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setEditor('new')}
+						disabled={!blocks.data || full}
+					>
+						<Plus aria-hidden />
+						{t('addBlock')}
+					</Button>
+				)}
 			</div>
+			{locked ? <LockedModule feature="TRAINING_BLOCKS" /> : null}
 
 			{blocks.isPending ? (
 				<div
@@ -508,7 +517,7 @@ export function RoutineTrainingBlocks({
 										{blockComparisonAction(tCompare)}
 									</Button>
 								) : null}
-								{block.state !== 'COMPLETE' ? (
+								{block.state !== 'COMPLETE' && !locked ? (
 									<Button
 										type="button"
 										variant="outline"

@@ -2552,3 +2552,69 @@ disagree.
   rule as any other save.
 - **A Settings choice made offline** reads "Waiting for connection" with the
   `WifiOff` glyph in its `SaveStatus` line instead of "Saving…".
+
+## 29. Amendment — Locked capabilities (2026-10-21, `BILL-02`)
+
+**Status: in force.** The owner's decisions of 2026-10-21 at `BILL-02`'s
+claim: a capability the account's plan does not include is a **ruled module**
+where its content would be, and the comparison is its own page, `/plans`. It
+follows the monetization product rule: a locked capability states what it is
+and that it is in Pro, without blurred previews, invented data or urgency.
+Nothing here adds a colour, face, radius or shadow.
+
+### 29.1 The locked module
+
+`components/layout/locked-module.tsx` (`LockedModule`). It sits where the
+section's content would be, on the module's ruled ground like `EmptyModule`
+(§28.6), and the section keeps its own heading:
+
+- the capability's name in `type-panel`, beside a `Lock` glyph in `ink-2`
+  (16px, `aria-hidden`);
+- one sentence of what it does, `type-body-sm` in `ink-3`;
+- "Available in Pro" in `type-label`, `ink-2`;
+- an outline `sm` **Compare plans** link to `/plans`.
+
+**Ink only.** Never honour, warning, success or a filled control -- a locked
+module is never a region's primary (§4.3 rule 1). **Never** a blurred or
+faded preview of the content, sample or invented numbers, a countdown, a
+discount, "Upgrade now", "Unlock" or any other urgency. A read the plan does
+not include is not made at all: the module replaces it, so no refusal is
+ever shown as an error.
+
+### 29.2 A locked option in a choice
+
+An option of a `ToggleRow` (§28.2) past the plan -- a strength range, a
+window of weeks -- keeps its label with a 14px `Lock` glyph before it and an
+accessible name ending ", available in Pro" (`LockedOptionLabel`). Choosing
+it is allowed and shows the locked module in the content's place; nothing is
+stored. A default never opens on a locked option: a window that would default
+past the plan opens at the plan's limit instead.
+
+### 29.3 A limit reached
+
+Where a plan's count is reached (routine versions, goals, training
+locations), the control that would add one more is disabled and one line says
+so: `PlanLimitNote`, the `Lock` glyph, the rule in `type-body-sm` `ink-3`
+("Free keeps 3 goals. Goals past that are paused, never deleted.") and a text
+link **Compare plans**. What exists past the limit is kept and shown:
+a goal past it reads "Paused: Free evaluates your first 3 goals." in `ink-3`,
+with no progress bar and no colour. A capability that runs on after a
+downgrade -- a running 8-week block, existing training blocks and deloads,
+stored body measurements -- shows as it is, read-only, with the same note in
+place of the control that would change it.
+
+### 29.4 Plans
+
+`/plans` (a protected route; the masthead names the page, §28.4): the
+account's plan as one `type-panel` line ("You're on Free.", "You're on Pro,
+with no end date."), a sentence that Pro cannot be bought yet and nothing is
+charged, the comparison, the downgrade rule and what is always free.
+
+- **The comparison is a table** with a caption, a row header per capability
+  in the order of the Pro split and Free and Pro columns; below `sm` each row
+  stacks, its two values labelled. Rows are ruled (`divide-rule-faint`), never
+  boxed, and nothing in them is coloured: Pro is not "better", it is more.
+- There is no purchase control until `BILL-03`, and then it says that
+  payments are in test mode and no money is charged.
+- Settings › Account carries **Your plan** first: the plan in words and an
+  outline Compare plans.

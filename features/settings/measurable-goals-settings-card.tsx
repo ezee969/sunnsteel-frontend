@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
+import { usePlanLimit } from '@/lib/api/hooks/useBilling'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import {
 	useMeasurableGoals,
@@ -60,6 +62,7 @@ export function MeasurableGoalsSettingsCard({
 	const errorText = useApiErrorMessage()
 	const tGoals = useTranslations('progress.goals')
 	const t = useTranslations('settings.measurableGoals')
+	const tBilling = useTranslations('billing.limits')
 	const goalsQuery = useMeasurableGoals()
 	const replaceGoals = useReplaceMeasurableGoals()
 	const exercisesQuery = useExercises()
@@ -98,7 +101,14 @@ export function MeasurableGoalsSettingsCard({
 			type === 'EXERCISE_ESTIMATED_1RM' || !usedNonExerciseTypes.has(type),
 	)
 	const selectedAddType = addOptions.includes(newType) ? newType : addOptions[0]
-	const canAdd = drafts.length < MEASURABLE_GOALS_MAX && !!selectedAddType
+	// BILL-02: past the plan's limit every goal is kept, and none is added.
+	const goalLimit = usePlanLimit('GOALS')
+	const maxGoals = Math.min(
+		goalLimit ?? MEASURABLE_GOALS_MAX,
+		MEASURABLE_GOALS_MAX,
+	)
+	const atPlanLimit = goalLimit != null && drafts.length >= goalLimit
+	const canAdd = drafts.length < maxGoals && !!selectedAddType
 
 	const updateDraft = (
 		key: string,
@@ -183,6 +193,9 @@ export function MeasurableGoalsSettingsCard({
 			</CardHeader>
 
 			<CardContent className="space-y-4">
+				{atPlanLimit && goalLimit < MEASURABLE_GOALS_MAX ? (
+					<PlanLimitNote>{tBilling('GOALS', { max: goalLimit })}</PlanLimitNote>
+				) : null}
 				{goalsQuery.isLoading ? (
 					<div className="type-body-sm flex items-center justify-center gap-2 py-8 text-ink-3">
 						<Loader2 className="size-4 animate-spin" aria-hidden />

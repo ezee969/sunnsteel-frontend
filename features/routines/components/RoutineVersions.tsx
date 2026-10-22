@@ -9,6 +9,7 @@ import { GitCompare, RefreshCw, RotateCcw, Save, Trash2 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -267,6 +268,9 @@ export function RoutineVersions({
 	const list = versions.data?.versions ?? []
 	const max = versions.data?.max ?? ROUTINE_VERSIONS_MAX
 	const full = list.length >= max
+	// BILL-02: the server answers the plan's limit when it is the lower one.
+	const planLimited = max < ROUTINE_VERSIONS_MAX
+	const tBilling = useTranslations('billing.limits')
 
 	const onDelete = (version: RoutineVersion) =>
 		remove.mutate(version.id, {
@@ -390,7 +394,11 @@ export function RoutineVersions({
 			)}
 
 			{full ? (
-				<p className="type-body-sm text-ink-3">{t('fullNotice', { max })}</p>
+				planLimited ? (
+					<PlanLimitNote>{tBilling('ROUTINE_VERSIONS', { max })}</PlanLimitNote>
+				) : (
+					<p className="type-body-sm text-ink-3">{t('fullNotice', { max })}</p>
+				)
 			) : null}
 
 			<SaveVersionDialog

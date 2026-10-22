@@ -9,6 +9,7 @@ import { Clock, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -20,6 +21,7 @@ import {
 import { lpWorkingSetTarget } from '@/features/routines/wizard/utils/linear-block'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { lpSummary } from '@/lib/utils/linear-periodization'
 import {
 	lpRecoveryLine,
@@ -265,6 +267,9 @@ function LinearBlockStatus({
 }) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('routines.linearBlock')
+	// BILL-02: what follows a finished block is a new block, which is Pro's.
+	const nextBlockLocked = useEntitlement('EIGHT_WEEK_BLOCKS').allowed === false
+	const tBilling = useTranslations('billing.limits')
 
 	if (!block) {
 		return (
@@ -309,7 +314,9 @@ function LinearBlockStatus({
 							})
 						: t('noEstimate')}
 				</p>
-				{routineId ? (
+				{routineId && nextBlockLocked ? (
+					<PlanLimitNote className="pt-1">{tBilling('lpNext')}</PlanLimitNote>
+				) : routineId ? (
 					<div className="pt-1">
 						<LinearBlockContinueDialog
 							routineId={routineId}

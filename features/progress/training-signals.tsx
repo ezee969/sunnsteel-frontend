@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
 
 import { Explanation } from '@/components/layout/explanation'
 import { InlineError } from '@/components/layout/inline-error'
+import { LockedModule } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { exerciseLabel } from '@/i18n/catalog'
@@ -52,6 +53,8 @@ interface TrainingSignalsProps {
 	onRetry: () => void
 	/** INTEL-02: shown only when the server suggests a deload. */
 	deloadSuggestion?: DeloadSuggestionResponse
+	/** BILL-02: the plan does not include signals; the section says so. */
+	locked?: boolean
 }
 
 /**
@@ -111,6 +114,7 @@ export function TrainingSignals({
 	isError,
 	onRetry,
 	deloadSuggestion,
+	locked = false,
 }: TrainingSignalsProps) {
 	const t = useTranslations('progress.signals')
 	const tDeload = useTranslations('progress.deloadSuggestion')
@@ -147,7 +151,9 @@ export function TrainingSignals({
 				</div>
 			</div>
 
-			{isPending ? (
+			{locked ? (
+				<LockedModule feature="TRAINING_SIGNALS" />
+			) : isPending ? (
 				<div
 					aria-busy="true"
 					role="status"

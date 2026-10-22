@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { InlineError } from '@/components/layout/inline-error'
+import { LockedModule } from '@/components/layout/locked-module'
 import {
 	Dialog,
 	DialogContent,
@@ -16,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useTrainingBlockComparison } from '@/lib/api/hooks/useRoutineTrainingBlocks'
 import {
 	comparisonRows,
@@ -47,7 +49,13 @@ export function TrainingBlockComparisonDialog({
 	const tCompare = useTranslations('progress.blockComparison')
 	const tEx = useTranslations('catalog.exercises')
 	const locale = useLocale() as Locale
-	const comparison = useTrainingBlockComparison(routineId, block.seriesId)
+	// BILL-02: comparison is Pro's; without it the dialog says so.
+	const access = useEntitlement('TRAINING_COMPARISON')
+	const comparison = useTrainingBlockComparison(
+		routineId,
+		block.seriesId,
+		access.allowed === true,
+	)
 	const data = comparison.data
 
 	return (
@@ -62,7 +70,9 @@ export function TrainingBlockComparisonDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				{comparison.isPending ? (
+				{access.allowed === false ? (
+					<LockedModule feature="TRAINING_COMPARISON" />
+				) : comparison.isPending ? (
 					<div
 						role="status"
 						aria-label={t('loadingComparison')}

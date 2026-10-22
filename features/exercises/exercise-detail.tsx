@@ -9,6 +9,7 @@ import { type ReactNode, useMemo, useState } from 'react'
 import { EmptyModule } from '@/components/layout/empty-module'
 import HeroSection from '@/components/layout/HeroSection'
 import { InlineError } from '@/components/layout/inline-error'
+import { PlanLimitNote } from '@/components/layout/locked-module'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ExercisePerformanceHistory } from '@/features/progress/exercise-performance-history'
 import { ProgressTimeline } from '@/features/progress/progress-timeline'
@@ -17,6 +18,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import { useRoutines } from '@/lib/api/hooks/useRoutines'
 import {
@@ -245,13 +247,26 @@ function BestPerformance({
 	const t = useTranslations('catalog.exercisesUi')
 	const weightUnit = useWeightUnit()
 	const tPlateaus = useTranslations('planning.plateaus')
+	const tBilling = useTranslations('billing.limits')
 	const unitLabel = getWeightUnitLabel(weightUnit)
 	const [anchor] = useState(() => new Date())
+	// BILL-02: the chart is all time on Pro and the last 90 days on Free; the
+	// best set above it is the same fact on either.
+	const longRanges = useEntitlement('STRENGTH_TRENDS_LONG_RANGES')
 	const params = useMemo(
-		() => ({ exerciseId, ...getStrengthTrendRange('ALL', anchor) }),
-		[anchor, exerciseId],
+		() => ({
+			exerciseId,
+			...getStrengthTrendRange(
+				longRanges.allowed === false ? '90D' : 'ALL',
+				anchor,
+			),
+		}),
+		[anchor, exerciseId, longRanges.allowed],
 	)
-	const trend = useExerciseStrengthTrend(params, hasStrengthTrend)
+	const trend = useExerciseStrengthTrend(
+		params,
+		hasStrengthTrend && longRanges.allowed !== null,
+	)
 	// PROG-09: the same plateau watch Progress shows, for this lift only.
 	const plateaus = usePlateaus()
 	const plateau = plateaus.data?.plateaus.find(
@@ -366,6 +381,9 @@ function BestPerformance({
 						<p role="status" className="type-body-sm text-ink-3">
 							{t('chartTruncated')}
 						</p>
+					) : null}
+					{longRanges.allowed === false ? (
+						<PlanLimitNote>{tBilling('strengthRange')}</PlanLimitNote>
 					) : null}
 				</>
 			)}

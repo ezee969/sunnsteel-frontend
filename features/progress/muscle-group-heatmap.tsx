@@ -8,6 +8,10 @@ import { useMemo } from 'react'
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
 import { InlineError } from '@/components/layout/inline-error'
+import {
+	LockedModule,
+	LockedOptionLabel,
+} from '@/components/layout/locked-module'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import type { Locale } from '@/i18n/config'
@@ -48,6 +52,8 @@ interface MuscleGroupHeatmapProps {
 	isError: boolean
 	onWeeksChange: (weeks: MuscleHeatmapWeeks) => void
 	onRetry: () => void
+	/** BILL-02: the plan's limit on weeks; a longer window shows locked. */
+	maxWeeks?: number | null
 }
 
 export function MuscleGroupHeatmap({
@@ -57,6 +63,7 @@ export function MuscleGroupHeatmap({
 	isError,
 	onWeeksChange,
 	onRetry,
+	maxWeeks = null,
 }: MuscleGroupHeatmapProps) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.muscles')
@@ -91,13 +98,19 @@ export function MuscleGroupHeatmap({
 							pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
-							{t('weekOption', { weeks: option })}
+							{maxWeeks != null && option > maxWeeks ? (
+								<LockedOptionLabel label={t('weekOption', { weeks: option })} />
+							) : (
+								t('weekOption', { weeks: option })
+							)}
 						</ToggleOption>
 					))}
 				</ToggleRow>
 			</div>
 			<div id="progress-muscles-body" className="space-y-4">
-				{isPending ? (
+				{maxWeeks != null && weeks > maxWeeks ? (
+					<LockedModule feature="MUSCLE_HISTORY_LONG" />
+				) : isPending ? (
 					<div
 						role="status"
 						aria-busy="true"

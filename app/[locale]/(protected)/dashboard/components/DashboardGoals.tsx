@@ -11,6 +11,7 @@ import { GoalSuggestionList } from '@/features/progress/goal-suggestions'
 import { GoalRow } from '@/features/progress/personal-goals'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useGoalSuggestions } from '@/lib/api/hooks/useGoalSuggestions'
 import { usePersonalGoals } from '@/lib/api/hooks/useWorkoutSession'
 import { dashboardGoalsSummary } from '@/lib/utils/goal-suggestions'
@@ -30,7 +31,11 @@ export default function DashboardGoals() {
 	const tSuggestions = useTranslations('progress.goalSuggestions')
 	const weightUnit = useWeightUnit()
 	const goals = usePersonalGoals()
-	const suggestions = useGoalSuggestions()
+	// BILL-02: suggestions are Pro's; the dashboard simply leaves them out.
+	const suggestionsAccess = useEntitlement('GOAL_SUGGESTIONS')
+	const suggestions = useGoalSuggestions({
+		enabled: suggestionsAccess.allowed === true,
+	})
 	const list = goals.data?.goals ?? []
 	const suggested = suggestions.data?.suggestions ?? []
 

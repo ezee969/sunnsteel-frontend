@@ -9,6 +9,10 @@ import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
 import { InlineError } from '@/components/layout/inline-error'
 import {
+	LockedModule,
+	LockedOptionLabel,
+} from '@/components/layout/locked-module'
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -68,6 +72,8 @@ interface VolumeTrendsProps {
 	isError: boolean
 	onWeeksChange: (weeks: VolumeTrendWeeks) => void
 	onRetry: () => void
+	/** BILL-02: the plan's limit on weeks; a longer window shows locked. */
+	maxWeeks?: number | null
 }
 
 export function VolumeTrends({
@@ -77,6 +83,7 @@ export function VolumeTrends({
 	isError,
 	onWeeksChange,
 	onRetry,
+	maxWeeks = null,
 }: VolumeTrendsProps) {
 	const locale = useLocale() as Locale
 	const t = useTranslations('progress.volume')
@@ -134,13 +141,19 @@ export function VolumeTrends({
 							pressed={weeks === option}
 							onClick={() => onWeeksChange(option)}
 						>
-							{t('weekOption', { weeks: option })}
+							{maxWeeks != null && option > maxWeeks ? (
+								<LockedOptionLabel label={t('weekOption', { weeks: option })} />
+							) : (
+								t('weekOption', { weeks: option })
+							)}
 						</ToggleOption>
 					))}
 				</ToggleRow>
 			</div>
 			<div id="progress-volume-body" className="space-y-4">
-				{isPending ? (
+				{maxWeeks != null && weeks > maxWeeks ? (
+					<LockedModule feature="MUSCLE_HISTORY_LONG" />
+				) : isPending ? (
 					<div
 						role="status"
 						aria-busy="true"
