@@ -12,6 +12,7 @@ import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 
+import { normalizeDecimalInput } from './decimal-input'
 import {
 	areCanonicalWeightsEqual,
 	formatWeightInput,
@@ -211,7 +212,8 @@ export function buildCorrectionRequest(
 			})
 			continue
 		}
-		const rpe = row.rpe.trim() === '' ? null : Number(row.rpe)
+		const rpe =
+			row.rpe.trim() === '' ? null : Number(normalizeDecimalInput(row.rpe))
 		if (rpe !== null && (!Number.isFinite(rpe) || rpe < 0 || rpe > 10)) {
 			problems.push({
 				setLogId: log.id,

@@ -1,11 +1,12 @@
+import { normalizeDecimalInput } from '@/lib/utils/decimal-input'
+
+export { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
+
 export const sanitizeIntegerInput = (value: string) =>
 	value.replace(/[^0-9]/g, '')
 
-export const sanitizeDecimalInput = (value: string) =>
-	value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
-
 export const parseOptionalPositiveFloat = (value: string) => {
-	const trimmed = value.trim()
+	const trimmed = normalizeDecimalInput(value)
 	if (trimmed === '') {
 		return undefined
 	}

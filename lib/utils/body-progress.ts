@@ -15,6 +15,7 @@ import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import type { MessageKey, Translator } from '@/i18n/translator'
 
+import { normalizeDecimalInput } from './decimal-input'
 import {
 	centimetresToDisplayLength,
 	formatLengthInput,
@@ -355,7 +356,7 @@ export function bodyEntryRequest(
 			field.key === 'weightKg'
 				? parseWeightInput(text, unit)
 				: field.key === 'bodyFatPercent'
-					? Number(text)
+					? Number(normalizeDecimalInput(text))
 					: parseLengthInput(text, lengthUnit)
 		if (value === undefined || !Number.isFinite(value)) {
 			return {

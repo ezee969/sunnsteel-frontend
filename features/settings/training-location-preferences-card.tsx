@@ -18,6 +18,7 @@ import {
 	useReplaceTrainingLocations,
 	useTrainingLocations,
 } from '@/lib/api/hooks/useTrainingLocations'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import {
 	buildTrainingLocationsRequest,
 	convertTrainingLocationDrafts,
@@ -218,15 +219,14 @@ export const TrainingLocationPreferencesCard = ({
 										<Input
 											id={`bar-${location.key}`}
 											className="max-w-[var(--field-max)]"
-											type="number"
-											min="0.5"
-											max={weightUnit === 'KG' ? '100' : '220.46'}
-											step="0.01"
+											type="text"
+											inputMode="decimal"
+											autoComplete="off"
 											value={location.barWeight}
 											onChange={event =>
 												updateLocation(location.key, current => ({
 													...current,
-													barWeight: event.target.value,
+													barWeight: sanitizeDecimalInput(event.target.value),
 												}))
 											}
 										/>
@@ -318,9 +318,9 @@ export const TrainingLocationPreferencesCard = ({
 												<Input
 													id={`plate-weight-${plate.key}`}
 													className="max-w-[var(--field-max)]"
-													type="number"
-													min="0.05"
-													step="0.01"
+													type="text"
+													inputMode="decimal"
+													autoComplete="off"
 													value={plate.weight}
 													onChange={event =>
 														updateLocation(location.key, current => ({
@@ -330,7 +330,9 @@ export const TrainingLocationPreferencesCard = ({
 																	currentPlate.key === plate.key
 																		? {
 																				...currentPlate,
-																				weight: event.target.value,
+																				weight: sanitizeDecimalInput(
+																					event.target.value,
+																				),
 																			}
 																		: currentPlate,
 																),

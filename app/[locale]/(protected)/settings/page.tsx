@@ -42,6 +42,7 @@ import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useUploadAvatar } from '@/lib/api/hooks/useUploadAvatar'
 import { useUser } from '@/lib/api/hooks/useUser'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import {
 	convertHeightDraft,
 	type HeightDraft,
@@ -140,7 +141,9 @@ export default function SettingsProfilePage() {
 		const value =
 			e.target.name === 'username'
 				? e.target.value.replace(/^@/, '').toLowerCase()
-				: e.target.value
+				: e.target.name === 'weight'
+					? sanitizeDecimalInput(e.target.value)
+					: e.target.value
 		setFormData(prev => ({ ...prev, [e.target.name]: value }))
 	}
 
@@ -172,7 +175,10 @@ export default function SettingsProfilePage() {
 	const handleHeightChange =
 		(field: keyof HeightDraft) =>
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = event.target.value
+			const value =
+				field === 'feet'
+					? event.target.value
+					: sanitizeDecimalInput(event.target.value)
 			setFormData(previous => ({
 				...previous,
 				height: { ...previous.height, [field]: value },
@@ -534,8 +540,9 @@ export default function SettingsProfilePage() {
 										id="weight"
 										name="weight"
 										className="max-w-[var(--field-max)]"
-										type="number"
-										step="0.1"
+										type="text"
+										inputMode="decimal"
+										autoComplete="off"
 										value={formData.weight}
 										onChange={handleInputChange}
 									/>
@@ -579,10 +586,9 @@ export default function SettingsProfilePage() {
 												id="heightInches"
 												aria-label={t('heightInches')}
 												className="w-24"
-												type="number"
+												type="text"
 												inputMode="decimal"
-												min="0"
-												step="0.1"
+												autoComplete="off"
 												value={formData.height.inches}
 												onChange={handleHeightChange('inches')}
 											/>
@@ -598,8 +604,9 @@ export default function SettingsProfilePage() {
 											id="height"
 											name="height"
 											className="max-w-[var(--field-max)]"
-											type="number"
-											step="0.1"
+											type="text"
+											inputMode="decimal"
+											autoComplete="off"
 											value={formData.height.cm}
 											onChange={handleHeightChange('cm')}
 										/>

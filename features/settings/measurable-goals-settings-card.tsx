@@ -30,6 +30,7 @@ import {
 	useMeasurableGoals,
 	useReplaceMeasurableGoals,
 } from '@/lib/api/hooks/useMeasurableGoals'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import {
 	buildMeasurableGoalsRequest,
 	convertMeasurableGoalDrafts,
@@ -40,10 +41,7 @@ import {
 	type MeasurableGoalDraft,
 	measurableGoalsToDrafts,
 } from '@/lib/utils/measurable-goals'
-import {
-	getWeightUnitLabel,
-	kilogramsToDisplayWeight,
-} from '@/lib/utils/weight-unit'
+import { getWeightUnitLabel } from '@/lib/utils/weight-unit'
 
 interface MeasurableGoalsSettingsCardProps {
 	weightUnit: WeightUnit
@@ -358,25 +356,19 @@ export function MeasurableGoalsSettingsCard({
 											</label>
 											<Input
 												id={`goal-target-${draft.key}`}
-												type="number"
-												min={
-													draft.type === 'BODY_WEIGHT'
-														? kilogramsToDisplayWeight(20, weightUnit)
-														: draft.type === 'EXERCISE_ESTIMATED_1RM'
-															? kilogramsToDisplayWeight(0.1, weightUnit)
-															: 1
-												}
-												step={
+												type="text"
+												inputMode={
 													draft.type === 'WEEKLY_SESSIONS' ||
 													draft.type === 'STREAK_DAYS'
-														? 1
-														: 0.1
+														? 'numeric'
+														: 'decimal'
 												}
+												autoComplete="off"
 												value={draft.target}
 												onChange={event =>
 													updateDraft(draft.key, current => ({
 														...current,
-														target: event.target.value,
+														target: sanitizeDecimalInput(event.target.value),
 													}))
 												}
 											/>

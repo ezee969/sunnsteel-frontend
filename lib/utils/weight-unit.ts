@@ -2,6 +2,7 @@ import type { WeightUnit } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
 import { numberFormatter } from '@/i18n/date-locale'
+import { normalizeDecimalInput } from '@/lib/utils/decimal-input'
 
 export const POUNDS_PER_KILOGRAM = 2.2046226218
 export const WEIGHT_EQUALITY_TOLERANCE_KG = 0.0025
@@ -47,7 +48,7 @@ export function parseWeightInput(
 	value: string,
 	unit: WeightUnit,
 ): number | undefined {
-	const trimmed = value.trim()
+	const trimmed = normalizeDecimalInput(value)
 	if (trimmed === '') return undefined
 
 	const parsed = Number.parseFloat(trimmed)

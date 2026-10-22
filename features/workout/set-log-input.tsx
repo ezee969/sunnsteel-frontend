@@ -27,6 +27,7 @@ import { useCompactWorkout } from '@/hooks/use-compact-workout'
 import { type SetValues, useSetLogForm } from '@/hooks/use-set-log-form'
 import type { Locale } from '@/i18n/config'
 import type { PreviousSetPerformance } from '@/lib/api/types/workout.type'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import {
 	formatPreviousPerformance,
 	isSetPerformanceImproved,
@@ -583,9 +584,11 @@ export const SetLogInput = ({
 						<>
 							<Input
 								id={weightId}
-								type="number"
+								// Text, not number: iOS keeps a comma region's "2,5" only
+								// in a text field, and the sanitizer reads it as 2.5.
+								type="text"
 								inputMode="decimal"
-								step={weightUnit === 'LB' ? 1 : 0.5}
+								autoComplete="off"
 								enterKeyHint="next"
 								aria-label={
 									weightUnit === 'LB'
@@ -612,7 +615,7 @@ export const SetLogInput = ({
 									weightInvalid,
 								)}
 								value={weightState}
-								onChange={e => setWeight(e.target.value)}
+								onChange={e => setWeight(sanitizeDecimalInput(e.target.value))}
 								onKeyDown={onEnter(rpeId)}
 								className={`${FIELD_CLASS} ${fieldTone} ${
 									weightInvalid ? FIELD_INVALID_CLASS : ''
@@ -642,11 +645,9 @@ export const SetLogInput = ({
 					<div className="flex min-w-0 flex-1 flex-col items-center gap-0.5 border-l border-transparent pl-1 sm:min-w-[48px] md:max-w-[var(--field-max)]">
 						<Input
 							id={rpeId}
-							type="number"
+							type="text"
 							inputMode="decimal"
-							step="0.5"
-							min="0"
-							max="10"
+							autoComplete="off"
 							enterKeyHint="done"
 							aria-label={t('rpeAria', {
 								number: setNumber,
@@ -656,7 +657,7 @@ export const SetLogInput = ({
 							aria-invalid={rpeInvalid || undefined}
 							aria-describedby={describedBy(null, rpeInvalid)}
 							value={rpeState}
-							onChange={e => setRpe(e.target.value)}
+							onChange={e => setRpe(sanitizeDecimalInput(e.target.value))}
 							onKeyDown={onEnter(null)}
 							className={`${FIELD_CLASS} ${fieldTone} ${
 								rpeInvalid ? FIELD_INVALID_CLASS : ''
