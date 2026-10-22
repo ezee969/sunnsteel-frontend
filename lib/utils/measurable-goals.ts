@@ -8,6 +8,7 @@ import type {
 
 import type { MessageKey, Translator } from '@/i18n/translator'
 
+import { normalizeDecimalInput } from './decimal-input'
 import {
 	displayWeightToKilograms,
 	formatWeightInput,
@@ -118,7 +119,7 @@ export function buildMeasurableGoalsRequest(
 	const keys = new Set<string>()
 	return {
 		goals: drafts.map(draft => {
-			const parsed = Number.parseFloat(draft.target.trim())
+			const parsed = Number.parseFloat(normalizeDecimalInput(draft.target))
 			if (!Number.isFinite(parsed)) {
 				throw new Error(
 					t('enterTarget', { goal: getMeasurableGoalLabel(draft.type, t) }),

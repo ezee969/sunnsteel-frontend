@@ -28,6 +28,7 @@ import { exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
 import { useCorrectSession } from '@/lib/api/hooks/useWorkoutSession'
 import { formatTimeAgo } from '@/lib/utils/date'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import type { ExerciseGroup } from '@/lib/utils/exercise-groups'
 import {
 	buildCorrectionRequest,
@@ -417,16 +418,19 @@ export function SessionCorrectionEditor({
 													</p>
 												) : (
 													<Input
-														type="number"
+														type="text"
 														inputMode="decimal"
-														min="0"
-														step={weightUnit === 'LB' ? 1 : 0.5}
+														autoComplete="off"
 														aria-label={`${label}: ${t('weightCaption').toLowerCase()} (${unit})`}
 														aria-invalid={problem ? true : undefined}
 														aria-describedby={problem ? errorId : undefined}
 														value={row.weight}
 														onChange={event =>
-															update(log.id, { weight: event.target.value })
+															update(log.id, {
+																weight: sanitizeDecimalInput(
+																	event.target.value,
+																),
+															})
 														}
 														className={FIELD}
 													/>
@@ -446,17 +450,17 @@ export function SessionCorrectionEditor({
 													className={FIELD}
 												/>
 												<Input
-													type="number"
+													type="text"
 													inputMode="decimal"
-													min="0"
-													max="10"
-													step="0.5"
+													autoComplete="off"
 													aria-label={`${label}: ${t('rpeAria')}`}
 													aria-invalid={problem ? true : undefined}
 													aria-describedby={problem ? errorId : undefined}
 													value={row.rpe}
 													onChange={event =>
-														update(log.id, { rpe: event.target.value })
+														update(log.id, {
+															rpe: sanitizeDecimalInput(event.target.value),
+														})
 													}
 													className={FIELD}
 												/>

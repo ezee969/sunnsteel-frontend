@@ -9,6 +9,7 @@ import {
 
 import type { Locale } from '@/i18n/config'
 import { numberFormatter } from '@/i18n/date-locale'
+import { normalizeDecimalInput } from '@/lib/utils/decimal-input'
 
 /**
  * PREF-04: lengths are stored in centimetres, as weights are stored in
@@ -52,7 +53,7 @@ export function parseLengthInput(
 	value: string,
 	unit: LengthUnit,
 ): number | undefined {
-	const trimmed = value.trim()
+	const trimmed = normalizeDecimalInput(value)
 	if (trimmed === '') return undefined
 	const parsed = Number(trimmed)
 	if (!Number.isFinite(parsed) || parsed < 0) return undefined
@@ -121,13 +122,13 @@ export function heightFromDraft(
 		return stored
 	}
 	if (unit === 'CM') {
-		const text = draft.cm.trim()
+		const text = normalizeDecimalInput(draft.cm)
 		if (text === '') return null
 		const cm = Number(text)
 		return Number.isFinite(cm) && cm >= 0 ? cm : undefined
 	}
 	const feetText = draft.feet.trim()
-	const inchesText = draft.inches.trim()
+	const inchesText = normalizeDecimalInput(draft.inches)
 	if (feetText === '' && inchesText === '') return null
 	const feet = feetText === '' ? 0 : Number(feetText)
 	const inches = inchesText === '' ? 0 : Number(inchesText)

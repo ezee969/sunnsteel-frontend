@@ -27,6 +27,7 @@ import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import type { Locale } from '@/i18n/config'
 import { useTrainingLocations } from '@/lib/api/hooks/useTrainingLocations'
+import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import { calculatePlateLoading } from '@/lib/utils/plate-calculator'
 import {
 	formatWeightAmount,
@@ -185,12 +186,13 @@ export const PlateCalculatorDialog = ({
 								</Label>
 								<Input
 									id="plate-calculator-target"
-									type="number"
+									type="text"
 									inputMode="decimal"
-									min="0"
-									step={weightUnit === 'LB' ? '1' : '0.5'}
+									autoComplete="off"
 									value={targetInput}
-									onChange={event => setTargetInput(event.target.value)}
+									onChange={event =>
+										setTargetInput(sanitizeDecimalInput(event.target.value))
+									}
 								/>
 							</div>
 						</div>
