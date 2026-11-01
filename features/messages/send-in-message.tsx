@@ -36,11 +36,14 @@ export function SendInMessageDialog({
 	onOpenChange,
 	attach,
 	name,
+	note,
 }: {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	attach: AttachRef
 	name: string
+	/** What sending this object does, said before a member is chosen. */
+	note?: string
 }) {
 	const t = useTranslations('messaging.send')
 	const tCommon = useTranslations('messaging.common')
@@ -65,6 +68,8 @@ export function SendInMessageDialog({
 					<DialogTitle>{t('title', { name })}</DialogTitle>
 					<DialogDescription>{t('description')}</DialogDescription>
 				</DialogHeader>
+
+				{note ? <p className="type-body-sm text-ink-2">{note}</p> : null}
 
 				<section className="space-y-2">
 					<h3 className="type-label text-ink-3">{t('recent')}</h3>
@@ -143,9 +148,9 @@ export function SendInMessageDialog({
 }
 
 /**
- * MSG-07: the routine page's "Send in a message", saying first what sending
- * does: the other member may open and copy the routine, whatever its
- * visibility, until the message is deleted.
+ * MSG-07: the routine masthead's "Send in a message", whose dialog says first
+ * what sending does: the other member may open and copy the routine, whatever
+ * its visibility, until the message is deleted.
  */
 export function SendRoutineInMessage({
 	routineId,
@@ -157,29 +162,24 @@ export function SendRoutineInMessage({
 	const t = useTranslations('routines.sharing')
 	const [open, setOpen] = useState(false)
 	return (
-		<div className="space-y-3 border-t border-rule pt-4">
-			<div className="flex flex-wrap items-center justify-between gap-2">
-				<p className="type-panel text-foreground">{t('sendInMessage')}</p>
-				<Button
-					type="button"
-					size="sm"
-					variant="outline"
-					onClick={() => setOpen(true)}
-				>
-					<MessageSquare className="size-4" aria-hidden />
-					{t('sendInMessage')}
-				</Button>
-			</div>
-			<p className="type-body-sm max-w-[68ch] text-ink-3">
-				{t('sendInMessageNote')}
-			</p>
+		<>
+			<Button
+				type="button"
+				size="sm"
+				variant="outline"
+				onClick={() => setOpen(true)}
+			>
+				<MessageSquare className="mr-2 size-4" aria-hidden />
+				{t('sendInMessage')}
+			</Button>
 			<SendInMessageDialog
 				open={open}
 				onOpenChange={setOpen}
 				attach={{ kind: 'ROUTINE', id: routineId }}
 				name={routineName}
+				note={t('sendInMessageNote')}
 			/>
-		</div>
+		</>
 	)
 }
 

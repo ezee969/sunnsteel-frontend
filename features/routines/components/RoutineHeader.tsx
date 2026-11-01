@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 
 import { GlossaryLine } from '@/components/layout/glossary-line'
 import { Button } from '@/components/ui/button'
+import { SendRoutineInMessage } from '@/features/messages/send-in-message'
 import type { Routine } from '@/lib/api/types/routine.type'
 
 interface RoutineHeaderProps {
@@ -106,6 +107,14 @@ export const RoutineHeader = ({
 					<Edit aria-hidden className="h-4 w-4 mr-2" />
 					{t('edit')}
 				</Button>
+
+				{/* MSG-07: a hidden routine cannot be sent; the server refuses it. */}
+				{routine.isHiddenByModeration ? null : (
+					<SendRoutineInMessage
+						routineId={routine.id}
+						routineName={routine.name}
+					/>
+				)}
 			</div>
 		</header>
 	)
