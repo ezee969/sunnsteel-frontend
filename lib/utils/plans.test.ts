@@ -29,14 +29,10 @@ describe('BILL-02 plans', () => {
 			'feature' in row ? [row.feature] : [],
 		)
 		const limits = PLAN_ROWS.flatMap(row => ('limit' in row ? [row.limit] : []))
-		// The INTEL-03/INTEL-04 drafts and reviews are not built yet, so they are
-		// not offered; muscle weeks are the MUSCLE_HISTORY_LONG row.
+		// The INTEL-04 reviews are not built yet, so they are not offered; muscle
+		// weeks are the MUSCLE_HISTORY_LONG row.
 		expect(new Set(features)).toEqual(
-			new Set(
-				FEATURE_KEYS.filter(
-					key => key !== 'ROUTINE_DRAFTS' && key !== 'TRAINING_REVIEW',
-				),
-			),
+			new Set(FEATURE_KEYS.filter(key => key !== 'TRAINING_REVIEW')),
 		)
 		expect(new Set(limits)).toEqual(
 			new Set(PLAN_LIMIT_KEYS.filter(key => key !== 'MUSCLE_HISTORY_WEEKS')),

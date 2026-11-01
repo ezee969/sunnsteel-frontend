@@ -11,6 +11,7 @@ const free: BillingStatus = {
 		GOALS: 3,
 		TRAINING_LOCATIONS: 1,
 		MUSCLE_HISTORY_WEEKS: 4,
+		ROUTINE_DRAFTS_PER_MONTH: 0,
 	},
 	grants: [],
 }

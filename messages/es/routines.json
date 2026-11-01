@@ -954,5 +954,24 @@
 		"problemWeight": "Serie {number} de {exercise}: escribe un peso (0 si es con el peso corporal).",
 		"problemDoneNeedsReps": "Serie {number} de {exercise}: una serie hecha necesita al menos una rep.",
 		"problemNoSets": "Marca al menos una serie como hecha."
+	},
+	"drafts": {
+		"heading": "Describe tu rutina",
+		"intro": "Cuenta lo que quieres y aquí se abre un borrador para que lo edites. No se guarda nada hasta que presiones Crear.",
+		"label": "Tus objetivos y limitaciones",
+		"placeholder": "Cuatro días por semana, torso y pierna. Tengo mancuernas y un banco, y quiero ganar músculo.",
+		"disclosure": "Lo que escribes se envía a Anthropic para redactar el borrador y no se guarda.",
+		"left": "Te {left, plural, one {queda # borrador} other {quedan # borradores}} de {limit} este mes. Se renuevan el {date}.",
+		"write": "Redactar borrador",
+		"writing": "Redactando…",
+		"writingStatus": "Redactando tu borrador. Puede tardar hasta un minuto.",
+		"quotaReached": "Ya usaste tus {limit} borradores de este mes. Se renuevan el {date}.",
+		"paused": "La redacción de borradores está en pausa hasta el próximo mes.",
+		"unavailable": "La redacción de borradores no está disponible ahora.",
+		"started": "Borrador a partir de tu descripción. Revisa cada día antes de presionar Crear; hasta entonces no se guarda nada.",
+		"notMedical": "Un borrador no es consejo médico. Si algo te duele, consulta a un profesional antes de entrenar.",
+		"discard": "Descartar borrador",
+		"failed": "No se redactó el borrador",
+		"usageFailed": "No se pudieron leer los borradores"
 	}
 }

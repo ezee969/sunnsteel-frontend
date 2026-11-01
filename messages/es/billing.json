@@ -44,6 +44,10 @@
 		"DASHBOARD_CUSTOMIZATION": {
 			"name": "Personalización de Inicio",
 			"description": "Reordena las secciones de Inicio y oculta las que no usas."
+		},
+		"ROUTINE_DRAFTS": {
+			"name": "Borradores de rutina",
+			"description": "Describe tus objetivos y limitaciones y abre un borrador de rutina para editarlo."
 		}
 	},
 	"limits": {
@@ -130,6 +134,11 @@
 			},
 			"dashboard": {
 				"name": "Personalización de Inicio"
+			},
+			"drafts": {
+				"name": "Borradores de rutina en lenguaje natural",
+				"free": "No incluido",
+				"pro": "10 al mes"
 			}
 		}
 	}
