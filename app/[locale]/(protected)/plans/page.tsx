@@ -1,10 +1,12 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
+import { Suspense } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { InlineError } from '@/components/layout/inline-error'
 import { LoadingRows } from '@/components/layout/loading-rows'
+import { PlanCheckout } from '@/features/billing/plan-checkout'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
@@ -13,8 +15,8 @@ import { currentPlan, PLAN_ROWS } from '@/lib/utils/plans'
 
 /**
  * BILL-02 (design system §29.4): Free and Pro compared, in the order of the
- * owner's Pro split. The account's plan is the server's answer; nothing here
- * offers a purchase, because none exists yet.
+ * owner's Pro split. The account's plan is the server's answer, and BILL-03
+ * buys Pro through `PlanCheckout`.
  */
 export default function PlansPage() {
 	const t = useTranslations('billing.plans')
@@ -54,9 +56,10 @@ export default function PlansPage() {
 				) : (
 					<p className="type-panel text-foreground">{current}</p>
 				)}
-				<p className="type-body-sm max-w-[68ch] text-ink-3">
-					{t('notForSale')}
-				</p>
+				{/* useSearchParams needs a boundary on a page built statically. */}
+				<Suspense fallback={null}>
+					<PlanCheckout />
+				</Suspense>
 			</section>
 
 			<section aria-labelledby="plans-compare" className="space-y-3">

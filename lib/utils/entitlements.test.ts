@@ -1,4 +1,5 @@
 import type { BillingStatus } from '@sunsteel/contracts'
+import { PRO_PRICE } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { entitlementLimit, entitlementState } from './entitlements'
@@ -13,6 +14,13 @@ const free: BillingStatus = {
 		MUSCLE_HISTORY_WEEKS: 4,
 	},
 	grants: [],
+	checkout: {
+		available: false,
+		testMode: true,
+		price: PRO_PRICE,
+		pending: null,
+	},
+	subscription: null,
 }
 
 describe('BILL-01 entitlements in the client', () => {
