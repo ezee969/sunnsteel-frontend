@@ -68,7 +68,29 @@
 		"pro": "Pro",
 		"proUntil": "Pro until {date}",
 		"proNoEnd": "Pro, with no end date",
-		"comparePlans": "Compare plans"
+		"comparePlans": "Compare plans",
+		"subscriptionActive": "Subscribed through Mercado Pago.",
+		"testMode": "Test mode: payments run in Mercado Pago's sandbox and no money is charged."
+	},
+	"checkout": {
+		"notForSale": "Pro can't be bought yet. Nothing is charged, and nothing here asks you to pay.",
+		"price": "Pro is {price} a month",
+		"howItWorks": "You pay on Mercado Pago's page, and Pro starts once Mercado Pago confirms it.",
+		"subscribe": "Subscribe with Mercado Pago",
+		"opening": "Opening Mercado Pago…",
+		"resume": "Continue on Mercado Pago",
+		"testMode": "Test mode: payments run in Mercado Pago's sandbox and no money is charged.",
+		"confirming": "Checking with Mercado Pago…",
+		"checkAgain": "Check again",
+		"toDashboard": "Go to the dashboard",
+		"startErrorTitle": "Checkout didn't open",
+		"confirmErrorTitle": "We couldn't check with Mercado Pago",
+		"return": {
+			"CONFIRMED": "Mercado Pago confirmed your subscription, and Pro has started.",
+			"WAITING": "Mercado Pago hasn't confirmed this yet. Pro starts once it does.",
+			"CANCELED": "Mercado Pago reports this checkout as cancelled, so Pro didn't start.",
+			"CLOSED": "This checkout is closed, so Pro didn't start. You can start a new one."
+		}
 	},
 	"plans": {
 		"title": "Plans",
@@ -76,7 +98,6 @@
 		"currentFree": "You're on Free.",
 		"currentPro": "You're on Pro, with no end date.",
 		"currentProUntil": "You're on Pro until {date}.",
-		"notForSale": "Pro can't be bought yet. Nothing is charged, and nothing here asks you to pay.",
 		"tableCaption": "Free and Pro compared",
 		"capability": "Capability",
 		"free": "Free",

@@ -1,4 +1,4 @@
-import { FEATURE_KEYS, PLAN_LIMIT_KEYS } from '@sunsteel/contracts'
+import { FEATURE_KEYS, PLAN_LIMIT_KEYS, PRO_PRICE } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
@@ -14,6 +14,13 @@ const base = {
 		MUSCLE_HISTORY_WEEKS: 4,
 		ROUTINE_DRAFTS_PER_MONTH: 0,
 	},
+	checkout: {
+		available: false,
+		testMode: true,
+		price: PRO_PRICE,
+		pending: null,
+	},
+	subscription: null,
 }
 const grant = (id: string, expiresAt: string | null) => ({
 	id,
