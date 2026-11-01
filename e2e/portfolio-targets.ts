@@ -330,6 +330,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'Starting a routine from a curated template: each opens in the builder as an editable draft, with the loads left to the member.',
 	},
 	{
+		slug: 'routine-draft',
+		route: '/routines/new',
+		features: ['INTEL-03'],
+		ready: ['Describe your routine', 'Write a draft'],
+		caption:
+			'Describing a routine in your own words: the server writes a draft from the catalog and it opens in the builder to edit, with nothing saved until Create.',
+	},
+	{
 		slug: 'routine-builder',
 		route: '/routines/edit/:routine',
 		features: ['ROUT-01', 'ROUT-02', 'ROUT-11'],
