@@ -64,7 +64,29 @@
 		"pro": "Pro",
 		"proUntil": "Pro hasta el {date}",
 		"proNoEnd": "Pro, sin fecha de fin",
-		"comparePlans": "Comparar planes"
+		"comparePlans": "Comparar planes",
+		"subscriptionActive": "Suscripción por Mercado Pago.",
+		"testMode": "Modo de prueba: los pagos corren en el sandbox de Mercado Pago y no se cobra dinero."
+	},
+	"checkout": {
+		"notForSale": "Pro todavía no se puede comprar. No se cobra nada, y nada aquí te pide pagar.",
+		"price": "Pro cuesta {price} por mes",
+		"howItWorks": "Pagas en la página de Mercado Pago, y Pro empieza cuando Mercado Pago lo confirma.",
+		"subscribe": "Suscribirme con Mercado Pago",
+		"opening": "Abriendo Mercado Pago…",
+		"resume": "Continuar en Mercado Pago",
+		"testMode": "Modo de prueba: los pagos corren en el sandbox de Mercado Pago y no se cobra dinero.",
+		"confirming": "Consultando a Mercado Pago…",
+		"checkAgain": "Volver a consultar",
+		"toDashboard": "Ir a Inicio",
+		"startErrorTitle": "El pago no se abrió",
+		"confirmErrorTitle": "No pudimos consultar a Mercado Pago",
+		"return": {
+			"CONFIRMED": "Mercado Pago confirmó tu suscripción, y Pro ya empezó.",
+			"WAITING": "Mercado Pago todavía no lo confirmó. Pro empieza cuando lo haga.",
+			"CANCELED": "Mercado Pago informa que este pago se canceló, así que Pro no empezó.",
+			"CLOSED": "Este pago está cerrado, así que Pro no empezó. Puedes iniciar otro."
+		}
 	},
 	"plans": {
 		"title": "Planes",
@@ -72,7 +94,6 @@
 		"currentFree": "Estás en Free.",
 		"currentPro": "Estás en Pro, sin fecha de fin.",
 		"currentProUntil": "Estás en Pro hasta el {date}.",
-		"notForSale": "Pro todavía no se puede comprar. No se cobra nada, y nada aquí te pide pagar.",
 		"tableCaption": "Free y Pro comparados",
 		"capability": "Función",
 		"free": "Free",

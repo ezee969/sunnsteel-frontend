@@ -15,11 +15,12 @@ import {
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { useBilling } from '@/lib/api/hooks/useBilling'
+import { showsTestMode } from '@/lib/utils/checkout'
 import { currentPlan } from '@/lib/utils/plans'
 
 /**
  * BILL-02: the account's plan as the server answered it, and the way to the
- * comparison. Nothing here buys anything; Pro cannot be bought yet.
+ * comparison, where BILL-03 buys Pro. A sandbox subscription says so here too.
  */
 export function PlanCard() {
 	const t = useTranslations('billing.settingsPlan')
@@ -47,7 +48,13 @@ export function PlanCard() {
 				</div>
 				{label ? <CardDescription>{label}</CardDescription> : null}
 			</CardHeader>
-			<CardContent>
+			<CardContent className="space-y-3">
+				{billing.data?.subscription?.status === 'ACTIVE' ? (
+					<p className="type-body-sm text-ink-2">{t('subscriptionActive')}</p>
+				) : null}
+				{billing.data && showsTestMode(billing.data) ? (
+					<p className="type-body-sm text-ink-3">{t('testMode')}</p>
+				) : null}
 				<Button asChild variant="outline" size="sm">
 					<Link href="/plans">{t('comparePlans')}</Link>
 				</Button>

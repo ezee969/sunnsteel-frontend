@@ -1,5 +1,5 @@
 import type { FeatureKey, PlanLimitKey } from '@sunsteel/contracts'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { billingService } from '@/lib/api/services/billingService'
 import {
@@ -27,6 +27,42 @@ export function useBilling() {
 		queryFn: billingService.status,
 		enabled: !isLoading && Boolean(session),
 		staleTime: 0,
+	})
+}
+
+/** BILL-03: opens the member's one waiting attempt, or returns it. */
+export function useStartCheckout() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: () => billingService.startCheckout(),
+		onSuccess: data => queryClient.setQueryData(billingKeys.me, data.billing),
+	})
+}
+
+/**
+ * Asks the server to read the provider on coming back from it; `refetch` asks
+ * again. A query rather than a mutation because it runs by itself on arrival:
+ * a mutation fired from an effect loses its observer when React re-runs
+ * effects, and the page stayed on "Checking" after Pro had started. Asking
+ * twice is harmless, since the server grants once. The answer carries the
+ * plan, and the profile carries it too, so that is read again; a billing read
+ * already on its way would be older than the answer, so it is cancelled.
+ */
+export function useCheckoutConfirmation(id: string | null) {
+	const queryClient = useQueryClient()
+	const { session, isLoading } = useSupabaseAuth()
+	return useQuery({
+		queryKey: [...billingKeys.all, 'checkout', id],
+		queryFn: async () => {
+			const data = await billingService.confirmCheckout(id as string)
+			await queryClient.cancelQueries({ queryKey: billingKeys.me })
+			queryClient.setQueryData(billingKeys.me, data.billing)
+			void queryClient.invalidateQueries({ queryKey: ['user'] })
+			return data.attempt
+		},
+		enabled: id !== null && !isLoading && Boolean(session),
+		staleTime: Number.POSITIVE_INFINITY,
+		retry: false,
 	})
 }
 

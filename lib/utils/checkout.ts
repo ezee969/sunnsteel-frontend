@@ -1,0 +1,77 @@
+import type {
+	BillingStatus,
+	CheckoutAttemptSummary,
+	PlanPrice,
+} from '@sunsteel/contracts'
+
+import type { Locale } from '@/i18n/config'
+import { numberFormatter } from '@/i18n/date-locale'
+
+/**
+ * BILL-03: what `/plans` offers, from the server's answer alone. Nothing here
+ * decides access: `pro` is the plan the server reports, and Pro starts only
+ * from a confirmed read of the provider.
+ */
+export type CheckoutOfferState =
+	/** Already on Pro, from any source: nothing to buy. */
+	| { kind: 'pro' }
+	/** No provider is configured: Pro can't be bought. */
+	| { kind: 'unavailable' }
+	| { kind: 'buy'; price: PlanPrice }
+	/** An attempt is waiting: go back to it rather than open another. */
+	| { kind: 'resume'; price: PlanPrice; checkoutUrl: string }
+
+export function checkoutOfferState(status: BillingStatus): CheckoutOfferState {
+	if (status.plan === 'PRO') return { kind: 'pro' }
+	if (!status.checkout.available) return { kind: 'unavailable' }
+	const url = status.checkout.pending?.checkoutUrl
+	return url
+		? { kind: 'resume', price: status.checkout.price, checkoutUrl: url }
+		: { kind: 'buy', price: status.checkout.price }
+}
+
+/** What the page says after returning from the provider. */
+export type CheckoutReturn =
+	/** Mercado Pago authorized it, and the server granted Pro. */
+	| 'CONFIRMED'
+	/** Not decided yet: nothing changes until the provider confirms. */
+	| 'WAITING'
+	| 'CANCELED'
+	/** It failed or ran out of time, and a new one may start. */
+	| 'CLOSED'
+
+export function checkoutReturn(
+	attempt: Pick<CheckoutAttemptSummary, 'status'>,
+): CheckoutReturn {
+	switch (attempt.status) {
+		case 'COMPLETED':
+			return 'CONFIRMED'
+		case 'PENDING':
+			return 'WAITING'
+		case 'CANCELED':
+			return 'CANCELED'
+		default:
+			return 'CLOSED'
+	}
+}
+
+/**
+ * Every billing surface says no money is charged while payments run in the
+ * sandbox -- wherever checkout is offered, and for a member who holds a
+ * sandbox subscription.
+ */
+export function showsTestMode(status: BillingStatus): boolean {
+	return (
+		status.checkout.testMode &&
+		(status.checkout.available || status.subscription !== null)
+	)
+}
+
+/** The price as the member's language writes it, without cents. */
+export function formatPlanPrice(price: PlanPrice, locale: Locale): string {
+	return numberFormatter(locale, {
+		style: 'currency',
+		currency: price.currency,
+		maximumFractionDigits: 0,
+	}).format(price.amount)
+}
