@@ -487,7 +487,12 @@
 		"LOGGED_WORKOUT_SET_NOT_IN_DAY": "Every set must belong to an exercise of this day",
 		"LOGGED_WORKOUT_DAY_NOT_BASELINE": "Only the routine's own days can be logged, not a training block's or a deload's",
 		"LOGGED_WORKOUT_NOT_LOGGED": "Only a workout logged later can be removed",
-		"CORRECTION_LOGGED_LATER": "A workout logged later is changed by removing it and logging it again"
+		"CORRECTION_LOGGED_LATER": "A workout logged later is changed by removing it and logging it again",
+		"ROUTINE_DRAFT_QUOTA_REACHED": "You have used your {max} drafts this month",
+		"ROUTINE_DRAFTS_PAUSED": "Drafting is paused until next month",
+		"ROUTINE_DRAFTS_UNAVAILABLE": "Drafting isn't available right now",
+		"ROUTINE_DRAFT_NOT_TRAINING": "That doesn't read like a training request. Nothing was counted.",
+		"ROUTINE_DRAFT_FAILED": "We couldn't write a draft from that. Nothing was counted; try again."
 	},
 	"glossary": {
 		"label": "Terms:",

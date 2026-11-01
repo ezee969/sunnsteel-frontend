@@ -44,6 +44,10 @@
 		"DASHBOARD_CUSTOMIZATION": {
 			"name": "Dashboard customization",
 			"description": "Reorder the dashboard's sections and hide the ones you don't use."
+		},
+		"ROUTINE_DRAFTS": {
+			"name": "Routine drafts",
+			"description": "Describe your goals and constraints and open a draft routine to edit."
 		}
 	},
 	"limits": {
@@ -151,6 +155,11 @@
 			},
 			"dashboard": {
 				"name": "Dashboard customization"
+			},
+			"drafts": {
+				"name": "Natural-language routine drafts",
+				"free": "Not included",
+				"pro": "10 a month"
 			}
 		}
 	}

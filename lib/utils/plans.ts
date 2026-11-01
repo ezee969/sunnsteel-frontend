@@ -23,6 +23,12 @@ export const PLAN_ROWS = [
 	{ key: 'locations', limit: 'TRAINING_LOCATIONS', worded: true },
 	{ key: 'body', feature: 'BODY_MEASUREMENTS', worded: true },
 	{ key: 'dashboard', feature: 'DASHBOARD_CUSTOMIZATION', worded: false },
+	{
+		key: 'drafts',
+		feature: 'ROUTINE_DRAFTS',
+		limit: 'ROUTINE_DRAFTS_PER_MONTH',
+		worded: true,
+	},
 ] as const satisfies ReadonlyArray<{
 	key: string
 	feature?: FeatureKey

@@ -1,5 +1,6 @@
 'use client'
 
+import type { RoutineDraft } from '@sunsteel/contracts'
 import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -7,8 +8,10 @@ import { useTranslations } from 'next-intl'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
+import { LockedModule } from '@/components/layout/locked-module'
 import { Button } from '@/components/ui/button'
 import { Stepper } from '@/components/ui/stepper'
+import { RoutineDraftBox } from '@/features/routines/components/RoutineDraftBox'
 import { StarterTemplates } from '@/features/routines/components/StarterTemplates'
 // Step components. Steps 1-2 are static: the user always sees step 1 first and
 // step 2 immediately after. Steps 3-4 are the heavy ones and are loaded on
@@ -19,8 +22,15 @@ import { TrainingDays } from '@/features/routines/wizard/TrainingDays'
 import { RoutineWizardData } from '@/features/routines/wizard/types'
 import { WizardNavigation } from '@/features/routines/wizard/WizardNavigation'
 import { WizardStepSkeleton } from '@/features/routines/wizard/WizardStepSkeleton'
+import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useExercises } from '@/lib/api/hooks/useExercises'
 import { catalogExercises } from '@/lib/utils/custom-exercises'
+import {
+	draftToWizard,
+	forgetDraft,
+	keepDraft,
+	readKeptDraft,
+} from '@/lib/utils/routine-draft'
 import {
 	findRoutineTemplate,
 	parseTemplateWeekdays,
@@ -137,6 +147,33 @@ function CreateRoutineWizard() {
 	const templateLoading =
 		!!template && appliedTemplate !== template.slug && catalogLoading
 
+	// INTEL-03: a delivered draft opens like a template and survives a reload
+	// of this tab; nothing is saved until the member creates it.
+	const tDrafts = useTranslations('routines.drafts')
+	const draftAccess = useEntitlement('ROUTINE_DRAFTS')
+	const [draftOpen, setDraftOpen] = useState(false)
+	const openDraft = (draft: RoutineDraft) => {
+		setDraftOpen(true)
+		setRoutineData(draftToWizard(draft))
+		setCurrentStep(1)
+		setVisitedSteps(new Set([1]))
+	}
+	const discardDraft = () => {
+		forgetDraft(window.sessionStorage)
+		setDraftOpen(false)
+		setRoutineData(EMPTY_DRAFT)
+		setCurrentStep(1)
+		setVisitedSteps(new Set([1]))
+	}
+	useEffect(() => {
+		if (templateSlug) return
+		const kept = readKeptDraft(window.sessionStorage)
+		if (kept) {
+			setDraftOpen(true)
+			setRoutineData(draftToWizard(kept))
+		}
+	}, [templateSlug])
+
 	const updateRoutineData = (updates: Partial<RoutineWizardData>) => {
 		setRoutineData(prev => ({ ...prev, ...updates }))
 	}
@@ -185,6 +222,33 @@ function CreateRoutineWizard() {
 			case 1:
 				return (
 					<div className="space-y-8">
+						{draftOpen ? (
+							<div className="space-y-2">
+								<p role="status" className="type-body-sm text-ink-2">
+									{tDrafts('started')}
+								</p>
+								<p className="type-body-sm text-ink-3">
+									{tDrafts('notMedical')}
+								</p>
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={discardDraft}
+								>
+									{tDrafts('discard')}
+								</Button>
+							</div>
+						) : !template && draftAccess.allowed ? (
+							<div className="rule-row pb-6">
+								<RoutineDraftBox
+									onDraft={draft => {
+										keepDraft(window.sessionStorage, draft)
+										openDraft(draft)
+									}}
+								/>
+							</div>
+						) : null}
 						{template && appliedTemplate === template.slug ? (
 							missingExercises.length ? (
 								<p role="status" className="type-body-sm text-ink-2">
@@ -202,9 +266,20 @@ function CreateRoutineWizard() {
 							)
 						) : null}
 						<RoutineBasicInfo data={routineData} onUpdate={updateRoutineData} />
-						{!template || missingExercises.length ? (
-							<div className="rule-row pt-6">
+						{(!template || missingExercises.length) && !draftOpen ? (
+							<div className="rule-row space-y-8 pt-6">
 								<StarterTemplates />
+								{draftAccess.allowed === false ? (
+									<section aria-labelledby="routine-draft-locked">
+										<h3
+											id="routine-draft-locked"
+											className="type-section text-foreground"
+										>
+											{tDrafts('heading')}
+										</h3>
+										<LockedModule feature="ROUTINE_DRAFTS" />
+									</section>
+								) : null}
 							</div>
 						) : null}
 					</div>
@@ -219,6 +294,7 @@ function CreateRoutineWizard() {
 						data={routineData}
 						onUpdate={updateRoutineData}
 						onComplete={() => {
+							forgetDraft(window.sessionStorage)
 							router.push('/routines')
 						}}
 					/>

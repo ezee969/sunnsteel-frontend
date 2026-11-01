@@ -487,7 +487,12 @@
 		"LOGGED_WORKOUT_SET_NOT_IN_DAY": "Cada serie debe pertenecer a un ejercicio de este día",
 		"LOGGED_WORKOUT_DAY_NOT_BASELINE": "Solo se pueden registrar los días propios de la rutina, no los de un bloque de entrenamiento ni de una descarga",
 		"LOGGED_WORKOUT_NOT_LOGGED": "Solo se puede quitar un entrenamiento registrado después",
-		"CORRECTION_LOGGED_LATER": "Un entrenamiento registrado después se cambia quitándolo y registrándolo de nuevo"
+		"CORRECTION_LOGGED_LATER": "Un entrenamiento registrado después se cambia quitándolo y registrándolo de nuevo",
+		"ROUTINE_DRAFT_QUOTA_REACHED": "Ya usaste tus {max} borradores de este mes",
+		"ROUTINE_DRAFTS_PAUSED": "La redacción de borradores está en pausa hasta el próximo mes",
+		"ROUTINE_DRAFTS_UNAVAILABLE": "La redacción de borradores no está disponible ahora",
+		"ROUTINE_DRAFT_NOT_TRAINING": "Eso no parece un pedido de entrenamiento. No se contó nada.",
+		"ROUTINE_DRAFT_FAILED": "No pudimos redactar un borrador con eso. No se contó nada; inténtalo de nuevo."
 	},
 	"glossary": {
 		"label": "Términos:",

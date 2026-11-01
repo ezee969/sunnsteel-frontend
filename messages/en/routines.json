@@ -954,5 +954,24 @@
 		"problemWeight": "Set {number} of {exercise}: enter a weight (0 for bodyweight).",
 		"problemDoneNeedsReps": "Set {number} of {exercise}: a done set needs at least one rep.",
 		"problemNoSets": "Mark at least one set as done."
+	},
+	"drafts": {
+		"heading": "Describe your routine",
+		"intro": "Say what you want and a draft opens here for you to edit. Nothing is saved until you press Create.",
+		"label": "Your goals and constraints",
+		"placeholder": "Four days a week, upper and lower. I have dumbbells and a bench, and I want to build muscle.",
+		"disclosure": "What you type goes to Anthropic to write the draft and is not stored.",
+		"left": "{left, plural, one {# draft} other {# drafts}} of {limit} left this month. Renews on {date}.",
+		"write": "Write a draft",
+		"writing": "Writing…",
+		"writingStatus": "Writing your draft. This can take up to a minute.",
+		"quotaReached": "You have used your {limit} drafts this month. They renew on {date}.",
+		"paused": "Drafting is paused until next month.",
+		"unavailable": "Drafting isn't available right now.",
+		"started": "Drafted from your description. Check every day before you press Create; nothing is saved until then.",
+		"notMedical": "A draft is not medical advice. If something hurts, ask a professional before you train.",
+		"discard": "Discard draft",
+		"failed": "No draft was written",
+		"usageFailed": "Drafts could not be read"
 	}
 }
