@@ -125,5 +125,7 @@ export function proUntilIfCancelled(
 	subscription: SubscriptionSummary,
 ): string | null {
 	if (subscription.status === 'PAST_DUE') return subscription.graceEndsAt
+	// Nothing was paid during a trial, so Pro ends with it (as the server does).
+	if (subscription.status === 'TRIALING') return subscription.trialEndsAt
 	return subscription.currentPeriodEnd
 }

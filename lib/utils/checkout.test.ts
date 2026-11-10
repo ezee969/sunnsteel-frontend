@@ -179,5 +179,10 @@ describe('the subscription in Settings (BILL-04)', () => {
 				sub({ status: 'PAST_DUE', graceEndsAt: '2026-11-15T12:00:00.000Z' }),
 			),
 		).toBe('2026-11-15T12:00:00.000Z')
+		expect(
+			proUntilIfCancelled(
+				sub({ status: 'TRIALING', trialEndsAt: '2026-11-08T12:00:00.000Z' }),
+			),
+		).toBe('2026-11-08T12:00:00.000Z')
 	})
 })
