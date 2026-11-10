@@ -354,3 +354,38 @@ describe('notifications name achievements in the viewer language (I18N-07)', () 
 		expect(en.title).toBe('Achievement earned: 10 Sessions')
 	})
 })
+
+describe('a failed renewal (BILL-04)', () => {
+	const notice: AppNotification = {
+		...base,
+		id: 'n-paid',
+		kind: 'SUBSCRIPTION_PAYMENT_FAILED',
+		graceEndsAt: '2026-11-15T12:00:00.000Z',
+	}
+
+	it('says when Pro ends and sends the member to their plan, in both languages', () => {
+		expect(
+			describeNotification(
+				notice,
+				translatorFor('en', 'social.notifications'),
+				translatorFor('en', 'settings.trainingPartners'),
+				undefined,
+				{ weightUnit: 'KG', locale: 'en' },
+			),
+		).toEqual({
+			title: "Your Pro payment didn't go through",
+			detail:
+				'Mercado Pago will try again. You keep Pro until November 15, 2026; update your payment method on Mercado Pago to keep it after that.',
+			href: '/settings/account#plan',
+		})
+		const es = describeNotification(
+			notice,
+			translatorFor('es', 'social.notifications'),
+			translatorFor('es', 'settings.trainingPartners'),
+			undefined,
+			{ weightUnit: 'KG', locale: 'es' },
+		)
+		expect(es.title).toBe('Tu pago de Pro no se procesó')
+		expect(es.detail).toContain('15 de noviembre de 2026')
+	})
+})

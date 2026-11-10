@@ -474,6 +474,7 @@
 		"CHECKOUT_UNAVAILABLE": "Checkout isn't available right now",
 		"CHECKOUT_PROVIDER_ERROR": "Mercado Pago couldn't be reached. Nothing was charged; try again.",
 		"PLAN_ALREADY_PRO": "You already have Pro",
+		"SUBSCRIPTION_NOT_ACTIVE": "There is no subscription to cancel",
 		"REPORT_OWN_MESSAGE": "You cannot report your own message",
 		"MESSAGING_ALREADY_RESTRICTED": "This member's messaging is already restricted",
 		"MESSAGING_NOT_RESTRICTED": "This member's messaging is not restricted",

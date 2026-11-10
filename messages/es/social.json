@@ -346,6 +346,8 @@
 		"loadingOlder": "Cargando novedades anteriores…",
 		"olderError": "No se pudieron cargar las novedades anteriores.",
 		"seeAll": "Ver todas las notificaciones",
+		"paymentFailedTitle": "Tu pago de Pro no se procesó",
+		"paymentFailedDetail": "Mercado Pago volverá a intentarlo. Conservas Pro hasta el {date}; actualiza tu medio de pago en Mercado Pago para mantenerlo después.",
 		"linearBlockTitle": "Bloque terminado: {exercise}",
 		"linearBlockDetail": "Referencia {reference} · 1RM estimado {estimate}",
 		"linearBlockDetailNoEstimate": "Referencia {reference} · no hay suficientes series para estimar un nuevo 1RM"

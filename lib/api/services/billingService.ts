@@ -9,6 +9,13 @@ export const billingService = {
 	/** BILL-03: opens the member's one waiting attempt, or returns it. */
 	startCheckout: (): Promise<CheckoutConfirmation> =>
 		httpClient.post<CheckoutConfirmation>('/billing/checkout', undefined, true),
+	/** BILL-04: cancels at the provider; Pro lasts to the end of what was paid. */
+	cancelSubscription: (): Promise<BillingStatus> =>
+		httpClient.post<BillingStatus>(
+			'/billing/subscription/cancel',
+			undefined,
+			true,
+		),
 	/** Asks the server to read the provider; only that can start Pro. */
 	confirmCheckout: (id: string): Promise<CheckoutConfirmation> =>
 		httpClient.post<CheckoutConfirmation>(

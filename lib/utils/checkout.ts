@@ -2,6 +2,7 @@ import type {
 	BillingStatus,
 	CheckoutAttemptSummary,
 	PlanPrice,
+	SubscriptionSummary,
 } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
@@ -74,4 +75,55 @@ export function formatPlanPrice(price: PlanPrice, locale: Locale): string {
 		currency: price.currency,
 		maximumFractionDigits: 0,
 	}).format(price.amount)
+}
+
+/**
+ * BILL-04: what Settings › Account says about the member's subscription, from
+ * the server's answer alone. A date is always the server's: the trial's end,
+ * the next renewal, the end of the grace period after a failed payment, or
+ * the last day of Pro once cancelled.
+ */
+export type SubscriptionState =
+	| { kind: 'TRIALING'; until: string | null }
+	| { kind: 'ACTIVE'; renews: string | null }
+	| { kind: 'PAST_DUE'; until: string | null }
+	| { kind: 'CANCELED'; until: string | null }
+
+export function subscriptionState(
+	subscription: SubscriptionSummary | null,
+): SubscriptionState | null {
+	if (!subscription) return null
+	switch (subscription.status) {
+		case 'TRIALING':
+			return { kind: 'TRIALING', until: subscription.trialEndsAt }
+		case 'ACTIVE':
+			return subscription.cancelAtPeriodEnd
+				? { kind: 'CANCELED', until: subscription.currentPeriodEnd }
+				: { kind: 'ACTIVE', renews: subscription.currentPeriodEnd }
+		case 'PAST_DUE':
+			return { kind: 'PAST_DUE', until: subscription.graceEndsAt }
+		case 'CANCELED':
+			return { kind: 'CANCELED', until: subscription.currentPeriodEnd }
+	}
+}
+
+/** Whether there is anything left to cancel: something would renew. */
+export function canCancelSubscription(
+	subscription: SubscriptionSummary | null,
+): boolean {
+	return (
+		subscription !== null &&
+		!subscription.cancelAtPeriodEnd &&
+		(subscription.status === 'TRIALING' ||
+			subscription.status === 'ACTIVE' ||
+			subscription.status === 'PAST_DUE')
+	)
+}
+
+/** The last day of Pro if the member cancels now, as the server would keep it. */
+export function proUntilIfCancelled(
+	subscription: SubscriptionSummary,
+): string | null {
+	if (subscription.status === 'PAST_DUE') return subscription.graceEndsAt
+	return subscription.currentPeriodEnd
 }
