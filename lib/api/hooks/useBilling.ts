@@ -66,6 +66,21 @@ export function useCheckoutConfirmation(id: string | null) {
 	})
 }
 
+/**
+ * BILL-04: cancels the subscription. The answer is the billing state; the
+ * profile carries the plan too, so it is read again.
+ */
+export function useCancelSubscription() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: () => billingService.cancelSubscription(),
+		onSuccess: data => {
+			queryClient.setQueryData(billingKeys.me, data)
+			void queryClient.invalidateQueries({ queryKey: ['user'] })
+		},
+	})
+}
+
 /** Whether the server says this account may use a capability now. */
 export function useEntitlement(feature: FeatureKey): EntitlementState & {
 	isLoading: boolean

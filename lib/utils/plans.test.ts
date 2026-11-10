@@ -16,6 +16,7 @@ const base = {
 	},
 	checkout: {
 		available: false,
+		trialDays: null,
 		testMode: true,
 		price: PRO_PRICE,
 		pending: null,

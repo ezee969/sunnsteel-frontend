@@ -6,6 +6,7 @@ import type {
 
 import { achievementText, exerciseLabel } from '@/i18n/catalog'
 import type { Locale } from '@/i18n/config'
+import { dateFormatter } from '@/i18n/date-locale'
 import type { Translator } from '@/i18n/translator'
 
 import { trainingPartnerEncouragementLabel } from './training-partners'
@@ -166,6 +167,18 @@ export function describeNotification(
 				href: `/routines/${notification.routine.id}`,
 			}
 		}
+		case 'SUBSCRIPTION_PAYMENT_FAILED':
+			// BILL-04: Pro stays through the grace period while the provider
+			// retries; Settings › Account is where the member acts on it.
+			return {
+				title: t('paymentFailedTitle'),
+				detail: t('paymentFailedDetail', {
+					date: dateFormatter(format.locale, { dateStyle: 'long' }).format(
+						new Date(notification.graceEndsAt),
+					),
+				}),
+				href: '/settings/account#plan',
+			}
 	}
 }
 

@@ -1,12 +1,19 @@
-import type { BillingStatus, CheckoutAttemptSummary } from '@sunsteel/contracts'
+import type {
+	BillingStatus,
+	CheckoutAttemptSummary,
+	SubscriptionSummary,
+} from '@sunsteel/contracts'
 import { PRO_PRICE } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
+	canCancelSubscription,
 	checkoutOfferState,
 	checkoutReturn,
 	formatPlanPrice,
+	proUntilIfCancelled,
 	showsTestMode,
+	subscriptionState,
 } from './checkout'
 
 const attempt = (over: Partial<CheckoutAttemptSummary> = {}) =>
@@ -39,6 +46,7 @@ function status(
 		...over,
 		checkout: {
 			available: true,
+			trialDays: null,
 			testMode: true,
 			price: PRO_PRICE,
 			pending: null,
@@ -93,6 +101,9 @@ describe('showsTestMode', () => {
 							status: 'ACTIVE',
 							currentPeriodEnd: null,
 							createdAt: '2026-11-01T12:00:00.000Z',
+							trialEndsAt: null,
+							graceEndsAt: null,
+							cancelAtPeriodEnd: false,
 						},
 					},
 					{ available: false },
@@ -111,5 +122,67 @@ describe('formatPlanPrice', () => {
 	it('writes pesos without cents in each language', () => {
 		expect(formatPlanPrice(PRO_PRICE, 'es')).toBe('4999 ARS')
 		expect(formatPlanPrice(PRO_PRICE, 'en')).toBe('ARS 4,999')
+	})
+})
+
+describe('the subscription in Settings (BILL-04)', () => {
+	const sub = (
+		over: Partial<SubscriptionSummary> = {},
+	): SubscriptionSummary => ({
+		planId: 'PRO',
+		status: 'ACTIVE',
+		currentPeriodEnd: '2026-12-01T12:00:00.000Z',
+		createdAt: '2026-11-01T12:00:00.000Z',
+		trialEndsAt: null,
+		graceEndsAt: null,
+		cancelAtPeriodEnd: false,
+		...over,
+	})
+
+	it('says each state with the date the server gave', () => {
+		expect(subscriptionState(null)).toBeNull()
+		expect(
+			subscriptionState(
+				sub({ status: 'TRIALING', trialEndsAt: '2026-11-08T12:00:00.000Z' }),
+			),
+		).toEqual({ kind: 'TRIALING', until: '2026-11-08T12:00:00.000Z' })
+		expect(subscriptionState(sub())).toEqual({
+			kind: 'ACTIVE',
+			renews: '2026-12-01T12:00:00.000Z',
+		})
+		expect(
+			subscriptionState(
+				sub({ status: 'PAST_DUE', graceEndsAt: '2026-11-15T12:00:00.000Z' }),
+			),
+		).toEqual({ kind: 'PAST_DUE', until: '2026-11-15T12:00:00.000Z' })
+		expect(
+			subscriptionState(sub({ status: 'CANCELED', cancelAtPeriodEnd: true })),
+		).toEqual({ kind: 'CANCELED', until: '2026-12-01T12:00:00.000Z' })
+	})
+
+	it('offers Cancel only while something would renew', () => {
+		expect(canCancelSubscription(null)).toBe(false)
+		expect(canCancelSubscription(sub({ status: 'TRIALING' }))).toBe(true)
+		expect(canCancelSubscription(sub())).toBe(true)
+		expect(canCancelSubscription(sub({ status: 'PAST_DUE' }))).toBe(true)
+		expect(
+			canCancelSubscription(
+				sub({ status: 'CANCELED', cancelAtPeriodEnd: true }),
+			),
+		).toBe(false)
+	})
+
+	it('names the last day of Pro a cancellation would keep', () => {
+		expect(proUntilIfCancelled(sub())).toBe('2026-12-01T12:00:00.000Z')
+		expect(
+			proUntilIfCancelled(
+				sub({ status: 'PAST_DUE', graceEndsAt: '2026-11-15T12:00:00.000Z' }),
+			),
+		).toBe('2026-11-15T12:00:00.000Z')
+		expect(
+			proUntilIfCancelled(
+				sub({ status: 'TRIALING', trialEndsAt: '2026-11-08T12:00:00.000Z' }),
+			),
+		).toBe('2026-11-08T12:00:00.000Z')
 	})
 })

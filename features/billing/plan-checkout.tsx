@@ -98,6 +98,14 @@ export function PlanCheckout() {
 					<p className="type-panel text-foreground">
 						{t('price', { price: formatPlanPrice(offer.price, locale) })}
 					</p>
+					{billing.data.checkout.trialDays ? (
+						<p className="type-body-sm max-w-[68ch] text-ink-2">
+							{t('trial', {
+								days: billing.data.checkout.trialDays,
+								price: formatPlanPrice(offer.price, locale),
+							})}
+						</p>
+					) : null}
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
 						{t('howItWorks')}
 					</p>
