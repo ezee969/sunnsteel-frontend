@@ -176,5 +176,37 @@
 				"pro": "10 al mes"
 			}
 		}
+	},
+	"consumerRequest": {
+		"name": "Nombre y apellido",
+		"email": "Email",
+		"reference": "Número de pago o usuario de Sunnsteel (opcional)",
+		"referenceHint": "El número de pago está en el email de Mercado Pago sobre el cobro.",
+		"details": "Comentario (opcional)",
+		"send": "Enviar pedido",
+		"sending": "Enviando…",
+		"failed": "No se pudo enviar el pedido",
+		"problemKind": "Elige qué estás pidiendo",
+		"problemName": "Escribe tu nombre",
+		"problemEmail": "Escribe un email válido",
+		"problemTooLong": "Usa {max} caracteres como máximo",
+		"privacy": "Usamos estos datos solo para encontrar tu compra y responder este pedido.",
+		"receivedTitle": "Recibimos tu pedido",
+		"codeLabel": "Tu código",
+		"receivedBody": "Guárdalo: es la constancia de que hiciste este pedido el {date}.",
+		"nextRevocation": "Vamos a cancelar la suscripción y devolverte el pago por Mercado Pago, al mismo medio de pago.",
+		"nextCancellation": "Vamos a cancelar la suscripción en Mercado Pago. Pro sigue hasta el final del período que ya pagaste y no se te vuelve a cobrar."
+	},
+	"revocationPage": {
+		"title": "Botón de arrepentimiento",
+		"intro": "Puedes revocar la compra de Sunnsteel Pro dentro de los {days} días corridos desde que la hiciste, sin dar motivos y sin costo. Envía este formulario y te damos un código al instante como constancia; te devolvemos el pago por Mercado Pago.",
+		"noAccount": "No necesitas tener una cuenta ni iniciar sesión."
+	},
+	"cancellationPage": {
+		"title": "Botón de baja",
+		"introSignedIn": "Puedes cancelar tu suscripción aquí mismo. Pro sigue hasta el final del período que ya pagaste y no se te vuelve a cobrar.",
+		"introSignedOut": "Puedes pedir la baja de tu suscripción a Sunnsteel Pro sin iniciar sesión. Te damos un código al instante y la cancelamos en Mercado Pago; Pro sigue hasta el final del período que ya pagaste.",
+		"signInInstead": "Si prefieres, inicia sesión y cancélala desde aquí o desde Ajustes.",
+		"loading": "Comprobando tu sesión…"
 	}
 }

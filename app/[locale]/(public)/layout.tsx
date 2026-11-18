@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
+import { LegalLinks } from '@/components/layout/legal-links'
 import { ModeToggle } from '@/components/mode-toggle'
 import { Button } from '@/components/ui/button'
 
@@ -47,6 +48,9 @@ export default async function PublicLayout({
 			<main className="mx-auto w-full max-w-6xl px-3 py-6 sm:px-6 sm:py-10">
 				{children}
 			</main>
+			<footer className="border-t border-rule">
+				<LegalLinks className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-6" />
+			</footer>
 		</div>
 	)
 }

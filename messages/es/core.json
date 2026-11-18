@@ -127,6 +127,11 @@
 		"loadingFallback": "Cargando…",
 		"preparingAuthText": "Preparando el inicio de sesión…"
 	},
+	"legalLinks": {
+		"label": "Derechos del consumidor",
+		"revocation": "Botón de arrepentimiento",
+		"cancellation": "Botón de baja"
+	},
 	"publicLayout": {
 		"signIn": "Iniciar sesión",
 		"join": "Unirme"
@@ -493,7 +498,8 @@
 		"ROUTINE_DRAFTS_PAUSED": "La redacción de borradores está en pausa hasta el próximo mes",
 		"ROUTINE_DRAFTS_UNAVAILABLE": "La redacción de borradores no está disponible ahora",
 		"ROUTINE_DRAFT_NOT_TRAINING": "Eso no parece un pedido de entrenamiento. No se contó nada.",
-		"ROUTINE_DRAFT_FAILED": "No pudimos redactar un borrador con eso. No se contó nada; inténtalo de nuevo."
+		"ROUTINE_DRAFT_FAILED": "No pudimos redactar un borrador con eso. No se contó nada; inténtalo de nuevo.",
+		"CONSUMER_REQUEST_INVALID": "Revisa tu nombre y tu email e inténtalo de nuevo"
 	},
 	"glossary": {
 		"label": "Términos:",

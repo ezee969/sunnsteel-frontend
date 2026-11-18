@@ -176,5 +176,37 @@
 				"pro": "10 a month"
 			}
 		}
+	},
+	"consumerRequest": {
+		"name": "Full name",
+		"email": "Email",
+		"reference": "Payment number or Sunnsteel username (optional)",
+		"referenceHint": "You'll find the payment number in Mercado Pago's email about the charge.",
+		"details": "Comment (optional)",
+		"send": "Send request",
+		"sending": "Sending…",
+		"failed": "The request could not be sent",
+		"problemKind": "Choose what you are asking for",
+		"problemName": "Write your name",
+		"problemEmail": "Write a valid email",
+		"problemTooLong": "Use {max} characters at most",
+		"privacy": "We use these details only to find your purchase and answer this request.",
+		"receivedTitle": "We received your request",
+		"codeLabel": "Your code",
+		"receivedBody": "Keep it: it proves you made this request on {date}.",
+		"nextRevocation": "We will cancel the subscription and refund the payment through Mercado Pago, to the same payment method.",
+		"nextCancellation": "We will cancel the subscription in Mercado Pago. Pro lasts until the end of the period you already paid, and you will not be charged again."
+	},
+	"revocationPage": {
+		"title": "Revoke a purchase (botón de arrepentimiento)",
+		"intro": "You can revoke your Sunnsteel Pro purchase within {days} calendar days of making it, without giving a reason and at no cost. Send this form and you get a code at once as proof; we refund the payment through Mercado Pago.",
+		"noAccount": "You don't need an account or to sign in."
+	},
+	"cancellationPage": {
+		"title": "Cancel a subscription (botón de baja)",
+		"introSignedIn": "You can cancel your subscription right here. Pro lasts until the end of the period you already paid, and you will not be charged again.",
+		"introSignedOut": "You can ask to cancel your Sunnsteel Pro subscription without signing in. You get a code at once and we cancel it in Mercado Pago; Pro lasts until the end of the period you already paid.",
+		"signInInstead": "If you prefer, sign in and cancel it yourself here or in Settings.",
+		"loading": "Checking your session…"
 	}
 }

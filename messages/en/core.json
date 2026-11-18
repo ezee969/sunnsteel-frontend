@@ -127,6 +127,11 @@
 		"loadingFallback": "Loading...",
 		"preparingAuthText": "Preparing authentication..."
 	},
+	"legalLinks": {
+		"label": "Consumer rights",
+		"revocation": "Revoke a purchase (botón de arrepentimiento)",
+		"cancellation": "Cancel a subscription (botón de baja)"
+	},
 	"publicLayout": {
 		"signIn": "Sign in",
 		"join": "Join"
@@ -493,7 +498,8 @@
 		"ROUTINE_DRAFTS_PAUSED": "Drafting is paused until next month",
 		"ROUTINE_DRAFTS_UNAVAILABLE": "Drafting isn't available right now",
 		"ROUTINE_DRAFT_NOT_TRAINING": "That doesn't read like a training request. Nothing was counted.",
-		"ROUTINE_DRAFT_FAILED": "We couldn't write a draft from that. Nothing was counted; try again."
+		"ROUTINE_DRAFT_FAILED": "We couldn't write a draft from that. Nothing was counted; try again.",
+		"CONSUMER_REQUEST_INVALID": "Check your name and email and try again"
 	},
 	"glossary": {
 		"label": "Terms:",
