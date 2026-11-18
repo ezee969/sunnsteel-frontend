@@ -6,11 +6,12 @@ import { useState } from 'react'
 import HeroSection from '@/components/layout/HeroSection'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
+import { ChargesDownload } from '@/features/moderation/charges-download'
 import { EnforcementRecord } from '@/features/moderation/enforcement-record'
 import { ReportQueue } from '@/features/moderation/report-queue'
 import { useUser } from '@/lib/api/hooks/useUser'
 
-type ModerationView = 'queue' | 'record'
+type ModerationView = 'queue' | 'record' | 'charges'
 
 /**
  * TRUST-04. The page renders nothing for an account without the flag, and the
@@ -40,17 +41,23 @@ export default function ModerationPage() {
 				subtitleOnPhone
 			/>
 			<ToggleRow aria-label={t('viewGroup')}>
-				{(['queue', 'record'] as const).map(option => (
+				{(['queue', 'record', 'charges'] as const).map(option => (
 					<ToggleOption
 						key={option}
 						pressed={view === option}
 						onClick={() => setView(option)}
 					>
-						{option === 'queue' ? t('reports') : t('record')}
+						{t(option === 'queue' ? 'reports' : option)}
 					</ToggleOption>
 				))}
 			</ToggleRow>
-			{view === 'queue' ? <ReportQueue /> : <EnforcementRecord />}
+			{view === 'queue' ? (
+				<ReportQueue />
+			) : view === 'record' ? (
+				<EnforcementRecord />
+			) : (
+				<ChargesDownload />
+			)}
 		</div>
 	)
 }

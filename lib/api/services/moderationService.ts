@@ -56,6 +56,16 @@ export const moderationService = {
  * and the UI must await it **before** navigating, not alongside.
  */
 export const moderationReviewService = {
+	/**
+	 * BILL-06: the month's Mercado Pago charges as a CSV (`YYYY-MM`, Argentina's
+	 * month). The server answers text, which `httpClient` hands back as is.
+	 */
+	chargesCsv: (month: string): Promise<string> =>
+		httpClient.get<string>(
+			`/moderation/billing/charges?month=${encodeURIComponent(month)}`,
+			true,
+		),
+
 	queue: (query: ModerationQueueQuery = {}): Promise<ModerationQueueResponse> =>
 		httpClient.get<ModerationQueueResponse>(
 			`/moderation/queue${buildModerationParams(query)}`,

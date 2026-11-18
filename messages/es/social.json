@@ -106,7 +106,17 @@
 		"capturedComeback": "Compartió un regreso",
 		"capturedComebackGone": "Compartió un regreso que ya no está disponible",
 		"capturedProgress": "Compartió un mes de entrenamiento: {month}",
-		"capturedProgressGone": "Compartió un mes de entrenamiento que ya no está disponible"
+		"capturedProgressGone": "Compartió un mes de entrenamiento que ya no está disponible",
+		"charges": "Cobros",
+		"chargesSection": {
+			"title": "Cobros para facturar",
+			"description": "Cada cobro de suscripción de Mercado Pago del mes que elijas, en hora de Argentina, para emitir una Factura C por cada uno en ARCA.",
+			"month": "Mes",
+			"download": "Descargar CSV",
+			"downloading": "Descargando…",
+			"failed": "No se pudieron descargar los cobros",
+			"columns": "Columnas: fecha, fecha de aprobación, pago, descripción, monto, moneda, estado y email del pagador. Facturá los aprobados; uno devuelto necesita una nota de crédito."
+		}
 	},
 	"reviewAction": {
 		"dismissTitle": "Descartar esta denuncia",
