@@ -115,7 +115,23 @@
 			"download": "Descargar CSV",
 			"downloading": "Descargando…",
 			"failed": "No se pudieron descargar los cobros",
-			"columns": "Columnas: fecha, fecha de aprobación, pago, descripción, monto, moneda, estado y email del pagador. Facturá los aprobados; uno devuelto necesita una nota de crédito."
+			"columns": "Columnas: fecha, fecha de aprobación, pago, descripción, monto, moneda, estado y email del pagador. Factura los aprobados; uno devuelto necesita una nota de crédito."
+		},
+		"requests": "Pedidos",
+		"requestsSection": {
+			"howTo": "Un arrepentimiento: cancela la suscripción y devuelve el pago en Mercado Pago. Una baja: cancela la suscripción en Mercado Pago. Después marca el pedido como resuelto.",
+			"loading": "Cargando pedidos…",
+			"failed": "No se pudieron cargar los pedidos",
+			"none": "Todavía no hay pedidos",
+			"noneDetail": "Aquí aparecen los arrepentimientos y las bajas que pida la gente.",
+			"kind": "{kind, select, REVOCATION {Arrepentimiento} other {Baja}}",
+			"name": "Nombre",
+			"email": "Email",
+			"reference": "Referencia",
+			"details": "Comentario",
+			"markDone": "Marcar resuelto",
+			"markFailed": "No se pudo marcar el pedido como resuelto",
+			"doneOn": "Resuelto el {date}"
 		}
 	},
 	"reviewAction": {
@@ -360,7 +376,9 @@
 		"paymentFailedDetail": "Mercado Pago volverá a intentarlo. Conservas Pro hasta el {date}; actualiza tu medio de pago en Mercado Pago para mantenerlo después.",
 		"linearBlockTitle": "Bloque terminado: {exercise}",
 		"linearBlockDetail": "Referencia {reference} · 1RM estimado {estimate}",
-		"linearBlockDetailNoEstimate": "Referencia {reference} · no hay suficientes series para estimar un nuevo 1RM"
+		"linearBlockDetailNoEstimate": "Referencia {reference} · no hay suficientes series para estimar un nuevo 1RM",
+		"consumerRequestTitle": "Nuevo pedido de {kind, select, REVOCATION {arrepentimiento} other {baja}}",
+		"consumerRequestDetail": "Código {code}. Resuélvelo en Moderación."
 	},
 	"activity": {
 		"typeSessionCompleted": "Entrenamientos completados",

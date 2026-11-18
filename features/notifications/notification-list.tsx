@@ -10,6 +10,7 @@ import {
 	CheckCheck,
 	CreditCard,
 	Dumbbell,
+	FileText,
 	Flag,
 	HeartHandshake,
 	Medal,
@@ -46,6 +47,7 @@ const KIND_ICON = {
 	TRAINING_PARTNER_ACHIEVEMENT: Medal,
 	LINEAR_BLOCK_FINISHED: Flag,
 	SUBSCRIPTION_PAYMENT_FAILED: CreditCard,
+	CONSUMER_REQUEST: FileText,
 } as const
 
 /** A notification worded and linked the one way (NOTIF-01). */

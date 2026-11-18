@@ -116,6 +116,22 @@
 			"downloading": "Downloading…",
 			"failed": "The charges could not be downloaded",
 			"columns": "Columns: date, date approved, payment, description, amount, currency, status and payer email. Invoice the approved ones; a refunded one needs a credit note."
+		},
+		"requests": "Requests",
+		"requestsSection": {
+			"howTo": "A revocation: cancel the subscription and refund the payment in Mercado Pago. A cancellation: cancel the subscription in Mercado Pago. Then mark the request done.",
+			"loading": "Loading requests…",
+			"failed": "The requests could not be loaded",
+			"none": "No requests yet",
+			"noneDetail": "Revocations and cancellations people ask for appear here.",
+			"kind": "{kind, select, REVOCATION {Revocation} other {Cancellation}}",
+			"name": "Name",
+			"email": "Email",
+			"reference": "Reference",
+			"details": "Comment",
+			"markDone": "Mark done",
+			"markFailed": "The request could not be marked done",
+			"doneOn": "Done on {date}"
 		}
 	},
 	"reviewAction": {
@@ -360,7 +376,9 @@
 		"paymentFailedTitle": "Your Pro payment didn't go through",
 		"paymentFailedDetail": "Mercado Pago will try again. You keep Pro until {date}; update your payment method on Mercado Pago to keep it after that.",
 		"linearBlockDetail": "Reference {reference} · estimated 1RM {estimate}",
-		"linearBlockDetailNoEstimate": "Reference {reference} · not enough sets to estimate a new 1RM"
+		"linearBlockDetailNoEstimate": "Reference {reference} · not enough sets to estimate a new 1RM",
+		"consumerRequestTitle": "New {kind, select, REVOCATION {revocation} other {cancellation}} request",
+		"consumerRequestDetail": "Code {code}. Handle it in Moderation."
 	},
 	"activity": {
 		"typeSessionCompleted": "Completed workouts",

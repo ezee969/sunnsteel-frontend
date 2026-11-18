@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
+import { LegalLinks } from '@/components/layout/legal-links'
 import { ModeToggle } from '@/components/mode-toggle'
 
 /**
@@ -44,6 +45,9 @@ export default function AuthLayout({
 					{mounted ? children : null}
 				</div>
 			</main>
+			<footer className="border-t border-rule px-4 py-4 md:px-8">
+				<LegalLinks className="mx-auto max-w-md justify-center" />
+			</footer>
 		</div>
 	)
 }

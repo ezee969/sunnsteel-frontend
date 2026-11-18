@@ -1,28 +1,41 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
 import { ChargesDownload } from '@/features/moderation/charges-download'
+import { ConsumerRequestsList } from '@/features/moderation/consumer-requests-list'
 import { EnforcementRecord } from '@/features/moderation/enforcement-record'
 import { ReportQueue } from '@/features/moderation/report-queue'
 import { useUser } from '@/lib/api/hooks/useUser'
 
-type ModerationView = 'queue' | 'record' | 'charges'
+const VIEWS = ['queue', 'record', 'requests', 'charges'] as const
+type ModerationView = (typeof VIEWS)[number]
+
+/** `?view=requests` opens a view directly: BILL-07's notice links there. */
+function viewFrom(value: string | null): ModerationView {
+	return (VIEWS as readonly string[]).includes(value ?? '')
+		? (value as ModerationView)
+		: 'queue'
+}
 
 /**
  * TRUST-04. The page renders nothing for an account without the flag, and the
  * sidebar does not offer it either; the server answers 404 on every route
  * regardless, so this is presentation rather than the control.
  */
-export default function ModerationPage() {
+function ModerationViews() {
 	const t = useTranslations('social.moderationPage')
 	const tModeration = useTranslations('social.moderation')
 	const { user, isLoading } = useUser()
-	const [view, setView] = useState<ModerationView>('queue')
+	const params = useSearchParams()
+	const [view, setView] = useState<ModerationView>(() =>
+		viewFrom(params.get('view')),
+	)
 
 	if (isLoading) return <Skeleton className="h-40" />
 	if (!user?.isModerator) {
@@ -41,7 +54,7 @@ export default function ModerationPage() {
 				subtitleOnPhone
 			/>
 			<ToggleRow aria-label={t('viewGroup')}>
-				{(['queue', 'record', 'charges'] as const).map(option => (
+				{VIEWS.map(option => (
 					<ToggleOption
 						key={option}
 						pressed={view === option}
@@ -55,9 +68,19 @@ export default function ModerationPage() {
 				<ReportQueue />
 			) : view === 'record' ? (
 				<EnforcementRecord />
+			) : view === 'requests' ? (
+				<ConsumerRequestsList />
 			) : (
 				<ChargesDownload />
 			)}
 		</div>
+	)
+}
+
+export default function ModerationPage() {
+	return (
+		<Suspense fallback={<Skeleton className="h-40" />}>
+			<ModerationViews />
+		</Suspense>
 	)
 }

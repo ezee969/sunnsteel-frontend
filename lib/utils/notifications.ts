@@ -179,6 +179,13 @@ export function describeNotification(
 				}),
 				href: '/settings/account#plan',
 			}
+		case 'CONSUMER_REQUEST':
+			// BILL-07: moderators only; the request is read in Moderation.
+			return {
+				title: t('consumerRequestTitle', { kind: notification.request.kind }),
+				detail: t('consumerRequestDetail', { code: notification.request.code }),
+				href: '/moderation?view=requests',
+			}
 	}
 }
 
