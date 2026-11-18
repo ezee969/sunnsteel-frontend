@@ -106,7 +106,17 @@
 		"capturedComeback": "Shared a comeback",
 		"capturedComebackGone": "Shared a comeback that's no longer available",
 		"capturedProgress": "Shared a month of training: {month}",
-		"capturedProgressGone": "Shared a month of training that's no longer available"
+		"capturedProgressGone": "Shared a month of training that's no longer available",
+		"charges": "Charges",
+		"chargesSection": {
+			"title": "Charges for invoicing",
+			"description": "Every Mercado Pago subscription charge in the month you choose, in Argentina's time, so you can issue a Factura C for each in ARCA.",
+			"month": "Month",
+			"download": "Download CSV",
+			"downloading": "Downloading…",
+			"failed": "The charges could not be downloaded",
+			"columns": "Columns: date, date approved, payment, description, amount, currency, status and payer email. Invoice the approved ones; a refunded one needs a credit note."
+		}
 	},
 	"reviewAction": {
 		"dismissTitle": "Dismiss this report",
