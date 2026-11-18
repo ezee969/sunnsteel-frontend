@@ -31,6 +31,20 @@ export function checkoutOfferState(status: BillingStatus): CheckoutOfferState {
 		: { kind: 'buy', price: status.checkout.price }
 }
 
+const ATTEMPT_ID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+
+/**
+ * The attempt `/plans?checkout=<id>` names on coming back, or null. Mercado
+ * Pago appends its own `?preapproval_id=...` to a return URL that already has
+ * a query, so the value arrives as `<id>?preapproval_id=...`: only the leading
+ * id is the attempt's, and anything that does not start with one names none.
+ */
+export function returnedCheckoutAttempt(value: string | null): string | null {
+	const match = value?.trim().match(ATTEMPT_ID)
+	return match ? match[0].toLowerCase() : null
+}
+
 /** What the page says after returning from the provider. */
 export type CheckoutReturn =
 	/** Mercado Pago authorized it, and the server granted Pro. */

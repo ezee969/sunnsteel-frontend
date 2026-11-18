@@ -17,6 +17,7 @@ import {
 	checkoutOfferState,
 	checkoutReturn,
 	formatPlanPrice,
+	returnedCheckoutAttempt,
 	showsTestMode,
 } from '@/lib/utils/checkout'
 
@@ -30,7 +31,7 @@ import {
 export function PlanCheckout() {
 	const t = useTranslations('billing.checkout')
 	const locale = useLocale() as Locale
-	const returning = useSearchParams().get('checkout')
+	const returning = returnedCheckoutAttempt(useSearchParams().get('checkout'))
 	const billing = useBilling()
 	const start = useStartCheckout()
 	const confirmation = useCheckoutConfirmation(returning)
