@@ -472,7 +472,7 @@
 		"ENTITLEMENT_REQUIRED": "Esto está disponible en Pro",
 		"PLAN_LIMIT_REACHED": "Tu plan permite {max} aquí",
 		"CHECKOUT_UNAVAILABLE": "El pago no está disponible en este momento",
-		"CHECKOUT_PROVIDER_ERROR": "No pudimos conectar con Mercado Pago. No se cobró nada; inténtalo de nuevo.",
+		"CHECKOUT_PROVIDER_ERROR": "Mercado Pago no completó el pedido. No se cobró ni se cambió nada; inténtalo de nuevo.",
 		"PLAN_ALREADY_PRO": "Ya tienes Pro",
 		"SUBSCRIPTION_NOT_ACTIVE": "No hay una suscripción para cancelar",
 		"REPORT_OWN_MESSAGE": "No puedes denunciar tu propio mensaje",
