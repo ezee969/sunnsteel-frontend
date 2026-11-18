@@ -12,6 +12,7 @@ import {
 	checkoutReturn,
 	formatPlanPrice,
 	proUntilIfCancelled,
+	returnedCheckoutAttempt,
 	showsTestMode,
 	subscriptionState,
 } from './checkout'
@@ -86,6 +87,30 @@ describe('checkoutReturn', () => {
 		expect(checkoutReturn({ status: 'CANCELED' })).toBe('CANCELED')
 		expect(checkoutReturn({ status: 'FAILED' })).toBe('CLOSED')
 		expect(checkoutReturn({ status: 'EXPIRED' })).toBe('CLOSED')
+	})
+})
+
+describe('returnedCheckoutAttempt', () => {
+	const id = 'dadff054-fd8d-4e54-a392-765f32fc5906'
+
+	it('reads the attempt the return URL names', () => {
+		expect(returnedCheckoutAttempt(id)).toBe(id)
+		expect(returnedCheckoutAttempt(id.toUpperCase())).toBe(id)
+	})
+
+	it('drops the query Mercado Pago appends to the return URL', () => {
+		expect(
+			returnedCheckoutAttempt(
+				`${id}?preapproval_id=7459a7ead9384e71bee2455b78f11289`,
+			),
+		).toBe(id)
+	})
+
+	it('names no attempt without a leading id', () => {
+		expect(returnedCheckoutAttempt(null)).toBeNull()
+		expect(returnedCheckoutAttempt('')).toBeNull()
+		expect(returnedCheckoutAttempt('dadff054')).toBeNull()
+		expect(returnedCheckoutAttempt(`x${id}`)).toBeNull()
 	})
 })
 
