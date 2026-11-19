@@ -175,6 +175,29 @@
 				"free": "Not included",
 				"pro": "10 a month"
 			}
+		},
+		"offerTitle": "What Pro adds",
+		"faqTitle": "Questions",
+		"faq": {
+			"cancel": {
+				"q": "Can I cancel any time?",
+				"a": "Yes, from <settings>Settings › Account</settings> or the <cancellation>cancellation page</cancellation>. Nothing renews after that, and you keep Pro until the end of what you paid for, or of the free trial."
+			},
+			"trial": {
+				"q": "How does the free trial work?",
+				"a": "An account's first subscription starts with {days} days free. Mercado Pago checks your card without charging it, and the first charge comes when the trial ends; cancel before then and nothing is charged."
+			},
+			"refund": {
+				"q": "Can I get my money back?",
+				"a": "Within {days} days of subscribing you can revoke the purchase from the <revocation>revocation page</revocation>, with no reason needed, and what was charged is refunded. The <refunds>refund policy</refunds> has the details."
+			},
+			"charge": {
+				"q": "How am I charged?",
+				"a": "Mercado Pago charges {price} each month to the card or account you choose on its page. Sunnsteel never sees your card."
+			},
+			"leaving": {
+				"q": "What happens if I leave Pro?"
+			}
 		}
 	},
 	"consumerRequest": {
@@ -208,5 +231,35 @@
 		"introSignedOut": "You can ask to cancel your Sunnsteel Pro subscription without signing in. You get a code at once and we cancel it in Mercado Pago; Pro lasts until the end of the period you already paid.",
 		"signInInstead": "If you prefer, sign in and cancel it yourself here or in Settings.",
 		"loading": "Checking your session…"
+	},
+	"offer": {
+		"title": "Sunnsteel Pro",
+		"lead": "For planning ahead and reading your training in depth.",
+		"notNow": "Not now",
+		"see": "See Pro",
+		"price": "{price} a month. Cancel any time.",
+		"priceTrial": "{days} days free, then {price} a month. Cancel any time.",
+		"outcomes": {
+			"plan": {
+				"title": "Plan ahead",
+				"short": "Training blocks, planned deloads and 8-week blocks",
+				"description": "Dated training blocks, planned deloads and 8-week blocks that set each week's loads."
+			},
+			"compare": {
+				"title": "Compare and adjust",
+				"short": "Block and session comparisons, and training signals",
+				"description": "Compare blocks and sessions, read your training signals and get goal suggestions from your own data."
+			},
+			"history": {
+				"title": "See your whole history",
+				"short": "Strength trends and muscle history past Free's ranges",
+				"description": "Strength trends past 90 days, muscle history past four weeks and every body measurement."
+			},
+			"yours": {
+				"title": "Make it yours",
+				"short": "Your dashboard in your order, and routine drafts",
+				"description": "Your dashboard in your order, routine drafts from your own words, and more routine versions, goals and gyms."
+			}
+		}
 	}
 }

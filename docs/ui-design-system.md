@@ -2607,14 +2607,69 @@ place of the control that would change it.
 
 `/plans` (a protected route; the masthead names the page, §28.4): the
 account's plan as one `type-panel` line ("You're on Free.", "You're on Pro,
-with no end date."), a sentence that Pro cannot be bought yet and nothing is
-charged, the comparison, the downgrade rule and what is always free.
+with no end date."), then -- for an account that can buy Pro -- what Pro adds
+and the checkout (§30.2), the questions a buyer asks, the comparison and what
+is always free. The downgrade rule is the answer to "What happens if I leave
+Pro?".
 
 - **The comparison is a table** with a caption, a row header per capability
   in the order of the Pro split and Free and Pro columns; below `sm` each row
   stacks, its two values labelled. Rows are ruled (`divide-rule-faint`), never
   boxed, and nothing in them is coloured: Pro is not "better", it is more.
-- There is no purchase control until `BILL-03`, and then it says that
-  payments are in test mode and no money is charged.
+- The purchase control arrived with `BILL-03` (`PlanCheckout`); its test-mode
+  line shows only while payments run in Mercado Pago's sandbox.
 - Settings › Account carries **Your plan** first: the plan in words and an
   outline Compare plans.
+
+## 30. Amendment — Offering Pro (2026-11-19, `BILL-05`)
+
+**Status: in force.** The owner's decisions of 2026-11-19 at `BILL-05`'s
+claim: Pro is offered by **a card on the dashboard**, never a navigation
+entry, and the locked states of §29 do not change; the card, once put away,
+**comes back after 30 days**, remembered **on the device**; `/plans` puts **the
+offer above and the comparison below**. It follows §29's rule: what Pro does,
+stated plainly, with no countdown, discount, urgency or invented data. Nothing
+here adds a colour, face, radius or shadow.
+
+### 30.1 The dashboard card
+
+`features/billing/pro-offer.tsx` (`ProOffer`), shown only to an account whose
+checkout offers a purchase (`buy` or `resume`), so never on Pro from any
+source and never where Pro cannot be bought. It sits **under Today's Workouts
+and Getting Started, never above them**, and outside the member's section
+order (`DASH-05`), so it cannot be moved over the day's training.
+
+- A ruled section like Getting Started: `rule-heading`, the title **Sunnsteel
+  Pro** in `type-section` beside a 16px `Crown` glyph in `ink-3`
+  (`aria-hidden`), and a ghost `sm` **Not now** on the heading's row.
+- One `type-body` line of what Pro is for, then three outcomes as a
+  `list-disc` in `type-body-sm` `ink-2` -- outcomes, never feature names.
+- The price in `type-body-sm` `ink-3`, with the trial's length when the
+  account still has one, and "Cancel any time."
+- An **outline** `sm` **See Pro** link to `/plans`. The dashboard's one
+  filled control stays Today's Workouts (§28.1).
+
+**Not now** stores the moment on this device (`ss-pro-offer-put-away-at`);
+the card stays away for `PRO_OFFER_AWAY_DAYS` (30) and returns after. Storage
+that throws puts it away for the tab only. The card renders nothing until
+the device has been read, so no static render shows a card the device then
+removes.
+
+### 30.2 Plans
+
+For an account that can buy Pro, `/plans` reads top to bottom as a decision:
+
+1. the plan line (§29.4);
+2. **What Pro adds**: `type-section`, one lead line, and the same four
+   outcomes as a ruled list (`divide-rule-faint`, `border-y`), each a
+   `type-panel` title over a `type-body-sm` `ink-3` description;
+3. `PlanCheckout`: the price, the trial, the consent line and **Subscribe with
+   Mercado Pago**, the page's one filled control;
+4. **Questions**: an `Accordion` (`type="multiple"`, ruled rows) answering
+   cancelling, the trial, refunds, how the charge is made and what happens on
+   leaving Pro; answers link to Settings › Account, `/baja`,
+   `/arrepentimiento` and `/reembolsos` in text links, and every number
+   (trial days, the ten days, the price) comes from contracts;
+5. the comparison table and what is always free (§29.4).
+
+An account on Pro sees no offer: the plan line, the questions, the table.

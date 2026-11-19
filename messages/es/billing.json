@@ -175,6 +175,29 @@
 				"free": "No incluido",
 				"pro": "10 al mes"
 			}
+		},
+		"offerTitle": "Lo que suma Pro",
+		"faqTitle": "Preguntas frecuentes",
+		"faq": {
+			"cancel": {
+				"q": "¿Puedo cancelar cuando quiera?",
+				"a": "Sí, desde <settings>Ajustes › Cuenta</settings> o la <cancellation>página de baja</cancellation>. Después de eso no se renueva nada, y conservas Pro hasta el final de lo que pagaste o de la prueba gratis."
+			},
+			"trial": {
+				"q": "¿Cómo funciona la prueba gratis?",
+				"a": "La primera suscripción de una cuenta empieza con {days} días gratis. Mercado Pago verifica tu tarjeta sin cobrarte, y el primer cobro llega cuando termina la prueba; si cancelas antes, no se cobra nada."
+			},
+			"refund": {
+				"q": "¿Me pueden devolver el dinero?",
+				"a": "Dentro de los {days} días desde que te suscribes puedes revocar la compra desde la <revocation>página de arrepentimiento</revocation>, sin dar motivos, y te devolvemos lo cobrado. Los detalles están en la <refunds>política de reembolsos</refunds>."
+			},
+			"charge": {
+				"q": "¿Cómo se cobra?",
+				"a": "Mercado Pago cobra {price} cada mes a la tarjeta o la cuenta que elijas en su página. Sunnsteel nunca ve tu tarjeta."
+			},
+			"leaving": {
+				"q": "¿Qué pasa si dejo Pro?"
+			}
 		}
 	},
 	"consumerRequest": {
@@ -208,5 +231,35 @@
 		"introSignedOut": "Puedes pedir la baja de tu suscripción a Sunnsteel Pro sin iniciar sesión. Te damos un código al instante y la cancelamos en Mercado Pago; Pro sigue hasta el final del período que ya pagaste.",
 		"signInInstead": "Si prefieres, inicia sesión y cancélala desde aquí o desde Ajustes.",
 		"loading": "Comprobando tu sesión…"
+	},
+	"offer": {
+		"title": "Sunnsteel Pro",
+		"lead": "Para planificar con anticipación y entender tu entrenamiento a fondo.",
+		"notNow": "Ahora no",
+		"see": "Ver Pro",
+		"price": "{price} por mes. Cancela cuando quieras.",
+		"priceTrial": "{days} días gratis y luego {price} por mes. Cancela cuando quieras.",
+		"outcomes": {
+			"plan": {
+				"title": "Planifica con anticipación",
+				"short": "Bloques de entrenamiento, descargas planificadas y bloques de 8 semanas",
+				"description": "Bloques de entrenamiento con fecha, descargas planificadas y bloques de 8 semanas que fijan las cargas de cada semana."
+			},
+			"compare": {
+				"title": "Compara y ajusta",
+				"short": "Comparaciones de bloques y sesiones, y señales de entrenamiento",
+				"description": "Compara bloques y sesiones, lee tus señales de entrenamiento y recibe sugerencias de objetivos a partir de tus datos."
+			},
+			"history": {
+				"title": "Mira todo tu historial",
+				"short": "Tendencias de fuerza e historial muscular sin los límites de Free",
+				"description": "Tendencias de fuerza de más de 90 días, historial muscular de más de cuatro semanas y todas las medidas corporales."
+			},
+			"yours": {
+				"title": "Hazlo tuyo",
+				"short": "Inicio en tu orden y borradores de rutina",
+				"description": "Inicio en tu orden, borradores de rutina a partir de tus palabras y más versiones de rutinas, objetivos y gimnasios."
+			}
+		}
 	}
 }
