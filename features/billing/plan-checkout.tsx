@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 
+import { ConsentLine } from '@/components/layout/consent-line'
 import { InlineError } from '@/components/layout/inline-error'
 import { Button } from '@/components/ui/button'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
@@ -123,6 +124,7 @@ export function PlanCheckout() {
 							{start.isPending ? t('opening') : t('subscribe')}
 						</Button>
 					)}
+					<ConsentLine kind="checkout" />
 				</div>
 			) : null}
 

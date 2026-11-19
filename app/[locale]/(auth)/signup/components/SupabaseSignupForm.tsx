@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { ConsentLine } from '@/components/layout/consent-line'
 import { Button } from '@/components/ui/button'
 import {
 	Form,
@@ -338,6 +339,7 @@ export function SupabaseSignupForm() {
 								</>
 							)}
 						</Button>
+						<ConsentLine kind="signup" />
 					</form>
 				</Form>
 

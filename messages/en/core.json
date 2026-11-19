@@ -128,9 +128,21 @@
 		"preparingAuthText": "Preparing authentication..."
 	},
 	"legalLinks": {
+		"terms": "Terms",
+		"privacy": "Privacy",
+		"refunds": "Refunds",
 		"label": "Consumer rights",
 		"revocation": "Revoke a purchase (botón de arrepentimiento)",
 		"cancellation": "Cancel a subscription (botón de baja)"
+	},
+	"legalPage": {
+		"updated": "Last updated {date}",
+		"translationNotice": "This is a translation for your convenience. The Spanish version governs; you can read it at the end of this page.",
+		"spanishVersion": "Read the Spanish version, which governs"
+	},
+	"consent": {
+		"signup": "By creating an account you accept the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>.",
+		"checkout": "By subscribing you accept the <terms>Terms</terms> and the <refunds>Refund policy</refunds>."
 	},
 	"publicLayout": {
 		"signIn": "Sign in",
