@@ -536,10 +536,10 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 	{
 		slug: 'plans',
 		route: '/plans',
-		features: ['BILL-02'],
+		features: ['BILL-02', 'BILL-05'],
 		ready: ['Free and Pro compared'],
 		caption:
-			'Free and Pro compared row by row, in the order of the Pro split, with the downgrade rule and what is always free.',
+			'What Pro adds as outcomes, the questions a buyer asks about cancelling, the trial and refunds, then Free and Pro compared row by row.',
 	},
 	{
 		slug: 'notifications',

@@ -16,6 +16,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
+import { ProOffer } from '@/features/billing/pro-offer'
 import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useUpdateOnboarding } from '@/lib/api/hooks/useOnboarding'
 import { pendingSteps, shouldOpenWelcome } from '@/lib/onboarding/steps'
@@ -162,6 +163,12 @@ export default function Dashboard() {
 							<GettingStarted steps={steps} />
 						</div>
 					) : null}
+
+					{/* BILL-05: Pro, for an account on Free that can buy it, under
+					    the day's training and the first steps, never above them. */}
+					<div className="max-w-3xl empty:hidden">
+						<ProOffer />
+					</div>
 
 					{/*
 					 * DASH-05: the member's order, with hidden sections left out.
