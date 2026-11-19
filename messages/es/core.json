@@ -128,9 +128,21 @@
 		"preparingAuthText": "Preparando el inicio de sesión…"
 	},
 	"legalLinks": {
+		"terms": "Términos y condiciones",
+		"privacy": "Privacidad",
+		"refunds": "Reembolsos",
 		"label": "Derechos del consumidor",
 		"revocation": "Botón de arrepentimiento",
 		"cancellation": "Botón de baja"
+	},
+	"legalPage": {
+		"updated": "Última actualización: {date}",
+		"translationNotice": "Esta es una traducción para tu comodidad. Rige la versión en español, que puedes leer al final de esta página.",
+		"spanishVersion": "Leer la versión en español, que es la que rige"
+	},
+	"consent": {
+		"signup": "Al crear una cuenta aceptas los <terms>Términos y condiciones</terms> y la <privacy>Política de privacidad</privacy>.",
+		"checkout": "Al suscribirte aceptas los <terms>Términos y condiciones</terms> y la <refunds>Política de reembolsos</refunds>."
 	},
 	"publicLayout": {
 		"signIn": "Iniciar sesión",
