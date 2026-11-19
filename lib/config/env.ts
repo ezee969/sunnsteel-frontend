@@ -18,6 +18,15 @@ export const PUBLIC_ENV = {
 	ENABLE_DEBUG_LOGS: asBoolean(process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS),
 } as const
 
+/**
+ * The app's public address: what links in emails, OAuth callbacks and the
+ * link-preview tags (`metadataBase`) are built on. `NEXT_PUBLIC_SITE_URL` is
+ * the one Vercel sets; `FRONTEND_URL` alone fell back to localhost there, so
+ * every shared link previewed `http://localhost:3000/og-image.jpg` -- an
+ * image no app could fetch -- until 2026-11-19.
+ */
+export const PUBLIC_ORIGIN = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
+
 export const SHOULD_SHOW_PERFORMANCE_PANEL =
 	IS_DEVELOPMENT && PUBLIC_ENV.SHOW_PERFORMANCE_PANEL
 export const SHOULD_LOG_PERFORMANCE =

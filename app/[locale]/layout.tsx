@@ -18,7 +18,7 @@ import {
 
 import DevInjections from '@/components/dev-injections'
 import { type Locale, LOCALES } from '@/i18n/config'
-import { PUBLIC_ENV, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
+import { PUBLIC_ORIGIN, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
 import type { Messages } from '@/messages'
@@ -116,7 +116,7 @@ export async function generateMetadata({
 		authors: [{ name: 'Sunnsteel Team' }],
 		creator: 'Sunnsteel',
 		publisher: 'Sunnsteel',
-		metadataBase: new URL(PUBLIC_ENV.FRONTEND_URL),
+		metadataBase: new URL(PUBLIC_ORIGIN),
 		alternates: {
 			canonical: '/',
 		},
@@ -127,7 +127,7 @@ export async function generateMetadata({
 			siteName: 'Sunnsteel',
 			images: [
 				{
-					url: '/og-image.jpg',
+					url: '/og-image.png',
 					width: 1200,
 					height: 630,
 					alt: t('ogAlt'),

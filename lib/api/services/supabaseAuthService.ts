@@ -4,7 +4,7 @@ import type { Session } from '@supabase/supabase-js'
 import type { Translator } from '@/i18n/translator'
 import { AuthVerificationCancelledError } from '@/lib/auth/auth-verification-error'
 import { buildPasswordResetRedirect } from '@/lib/auth/password-reset'
-import { PUBLIC_ENV } from '@/lib/config/env'
+import { PUBLIC_ORIGIN } from '@/lib/config/env'
 import { supabase } from '@/lib/supabase/client'
 import { getFullErrorMessage } from '@/lib/utils/error-messages'
 import { sanitizeInternalRedirect } from '@/lib/utils/internal-redirect'
@@ -66,7 +66,7 @@ export class SupabaseAuthService {
 	): Promise<AuthResponse> {
 		logger.debug('[auth-service] signUp start', { email })
 
-		const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
+		const configuredBaseUrl = PUBLIC_ORIGIN
 		const siteUrl =
 			configuredBaseUrl ||
 			(typeof window !== 'undefined' ? window.location.origin : '')
@@ -144,7 +144,7 @@ export class SupabaseAuthService {
 	 * Sign in with Google.
 	 */
 	async signInWithGoogle(callbackUrl?: string): Promise<{ url: string }> {
-		const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
+		const configuredBaseUrl = PUBLIC_ORIGIN
 		const siteUrl =
 			configuredBaseUrl ||
 			(typeof window !== 'undefined' ? window.location.origin : '')
@@ -180,7 +180,7 @@ export class SupabaseAuthService {
 		email: string,
 		t: Translator<'core.errorMessages'>,
 	): Promise<void> {
-		const configuredBaseUrl = PUBLIC_ENV.SITE_URL || PUBLIC_ENV.FRONTEND_URL
+		const configuredBaseUrl = PUBLIC_ORIGIN
 		const siteUrl =
 			configuredBaseUrl ||
 			(typeof window !== 'undefined' ? window.location.origin : '')
