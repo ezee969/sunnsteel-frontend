@@ -30,17 +30,21 @@ const MARK = `
 const MARK_HEIGHT = 20.5
 const MARK_CENTRE = { x: 12, y: 11.75 }
 
-/** A square tile of `size` with the mark `fraction` of its height, centred. */
-function tile(size, fraction, radius = 0) {
-	const k = (fraction * size) / MARK_HEIGHT
-	const tx = size / 2 - MARK_CENTRE.x * k
-	const ty = size / 2 - MARK_CENTRE.y * k
-	return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-	<rect width="${size}" height="${size}" rx="${radius}" fill="${GROUND}" />
+/** A `width` x `height` ground with the mark `fraction` of its height, centred. */
+function canvas(width, height, fraction, radius = 0) {
+	const k = (fraction * height) / MARK_HEIGHT
+	const tx = width / 2 - MARK_CENTRE.x * k
+	const ty = height / 2 - MARK_CENTRE.y * k
+	return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+	<rect width="${width}" height="${height}" rx="${radius}" fill="${GROUND}" />
 	<g transform="translate(${tx} ${ty}) scale(${k})" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="butt">${MARK}
 	</g>
 </svg>`
 }
+
+/** A square tile of `size` with the mark `fraction` of its height, centred. */
+const tile = (size, fraction, radius = 0) =>
+	canvas(size, size, fraction, radius)
 
 const png = (svg, size) =>
 	sharp(Buffer.from(svg), { density: 72 })
@@ -95,6 +99,16 @@ const icoImages = await Promise.all(
 	})),
 )
 writeFileSync(out('app/favicon.ico'), ico(icoImages))
+
+// The link preview (Open Graph, 1200x630): the same mark, centred, so the
+// square crop WhatsApp shows keeps all of it. It replaced og-image.jpg, the
+// illustrated emblem from before the mark, on 2026-11-19.
+writeFileSync(
+	out('public/og-image.png'),
+	await sharp(Buffer.from(canvas(1200, 630, 0.56)), { density: 72 })
+		.png({ compressionLevel: 9 })
+		.toBuffer(),
+)
 
 // The SVG favicon is the header mark itself: no tile, ink per colour scheme.
 writeFileSync(

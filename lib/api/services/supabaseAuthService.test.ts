@@ -12,7 +12,7 @@ import { SupabaseAuthService } from './supabaseAuthService'
 
 const t = translatorFor('en', 'core.errorMessages')
 
-vi.mock('@/lib/config/env', () => ({ PUBLIC_ENV: {} }))
+vi.mock('@/lib/config/env', () => ({ PUBLIC_ORIGIN: '' }))
 vi.mock('@/lib/supabase/client', () => ({
 	supabase: { auth: { signInWithPassword: vi.fn() } },
 }))
