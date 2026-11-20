@@ -35,6 +35,8 @@ import { useSessions } from '@/lib/api/hooks/useWorkoutSession'
 import {
 	forgetReview,
 	keepReview,
+	latestWorkouts,
+	quickPicks,
 	readKeptReview,
 	reviewCandidates,
 	reviewFindings,
@@ -213,6 +215,34 @@ function TrainingReviewPanel() {
 							/>
 						) : (
 							<>
+								<div className="flex flex-wrap items-center gap-x-1">
+									{quickPicks(candidates.length).map(count => (
+										<Button
+											key={count}
+											type="button"
+											variant="ghost"
+											size="sm"
+											aria-label={t('latestLabel', { count })}
+											disabled={create.isPending}
+											onClick={() =>
+												setSelected(latestWorkouts(candidates, count))
+											}
+										>
+											{t('latest', { count })}
+										</Button>
+									))}
+									{selected.length ? (
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											disabled={create.isPending}
+											onClick={() => setSelected([])}
+										>
+											{t('clear')}
+										</Button>
+									) : null}
+								</div>
 								<ToggleRow
 									aria-labelledby={workoutsLabelId}
 									aria-describedby={hintId}

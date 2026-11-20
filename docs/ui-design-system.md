@@ -2694,7 +2694,9 @@ Progress › Workouts, after session comparison, as its own ruled section
   question below it in `type-body`.
 - **The workouts** are a second `ToggleRow` of independent options
   (`aria-pressed`), the member's latest completed workouts as date and day,
-  newest first. **Never checkboxes**: a ticked box means done as planned
+  newest first, up to twelve. Above it, ghost `sm` **Last 4 / 8 / 12** buttons
+  pick the latest at once (only as many as there are), and **Clear** empties
+  the pick; they are commands, so they are buttons, not options. **Never checkboxes**: a ticked box means done as planned
   (§4.3 rule 2). An option wraps rather than truncating, and past the most a
   review reads the unchosen ones are disabled. A hint under it states the
   range and how many are chosen.

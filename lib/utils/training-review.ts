@@ -47,6 +47,24 @@ export function toggleReviewWorkout(
 	return [...selected, sessionId]
 }
 
+/** The quick picks: the latest four, eight or twelve, as far as there are. */
+export const REVIEW_QUICK_PICKS = [4, 8, 12] as const
+
+export function quickPicks(available: number): number[] {
+	const most = Math.min(available, TRAINING_REVIEW_WORKOUTS_MAX)
+	return REVIEW_QUICK_PICKS.filter(count => count <= most)
+}
+
+/** The latest `count` workouts the picker offers, as one pick. */
+export function latestWorkouts(
+	candidates: readonly WorkoutSessionSummary[],
+	count: number,
+): string[] {
+	return candidates
+		.slice(0, Math.min(count, TRAINING_REVIEW_WORKOUTS_MAX))
+		.map(session => session.id)
+}
+
 /** How many reviews remain this month, never below none. */
 export function reviewsLeft(usage: TrainingReviewUsage): number {
 	return Math.max(0, usage.limit - usage.used)
