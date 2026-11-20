@@ -71,10 +71,11 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
    signals), *Earn* (records, milestones, ranks). Each: a heading, two lines,
    an animated mock-up of the app's screen in an original phone frame (§7.3),
    and one detail callout.
-5. **The workout, in motion** — an animated mock-up of the live session in a
-   phone frame (§7.3) that plays by itself when it comes into view: a set
-   ticked, the rest bar counting, a record crossed in gold, with labelled
-   synthetic data. Not interactive (the owner's decision).
+5. **Tools for every workout** (§12.5) — a bento grid: automatic progression
+   as the large card and three small ones (rest that starts itself and
+   alerts, supersets and circuits, swapping an exercise), each with an
+   animated mock-up. It replaced "the workout, in motion", which the hero's
+   phone now shows (the owner's decision).
 6. **Progress you can read** — the strength chart and the body map
    (`PROG-15`, shipped 2026-11-20), with real-looking synthetic data, labelled.
 7. **Ranks** — the six crests from Initiate to Laureate drawn with the
@@ -438,6 +439,7 @@ Each phase ends in an owner approval before the next starts.
 | 19 | Headline | "Forge yourself. Prove it in every set." / "Fórjate. Demuéstralo en cada serie." |
 | 20 | Proof band | Two usage placeholders and two true facts, counting up, on the hero's dark ground; production swaps placeholders for reserve true facts (§12.3) |
 | 21 | Four verbs | A fixed stage on desktop, one phone pinned while the verbs scroll; "Planifica · Entrena · Mide · Gana"; Train shows plates and warm-ups (§12.4) |
+| 22 | Section 5 | A tools bento in place of "the workout, in motion": automatic progression large; rest, supersets and swapping small (§12.5) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -623,8 +625,8 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   5. 700ms: the phone rises 40px and fades in over 1000ms; once settled its
      script runs (§7.3): set 3 is ticked (the set-completion signature), the
      rest bar appears and counts down, then a card rises under the phone --
-     "New record · Back squat 85 kg × 5" / "Nuevo récord · Sentadilla trasera
-     85 kg × 5" -- with its honour mark, and the phone rests on that state.
+     "New record · Squat 85 kg × 5" / "Nuevo récord · Sentadilla 85 kg × 5"
+     -- with its honour mark, and the phone rests on that state.
      **The script lasts at most 5 seconds** and plays again each time the
      phone re-enters the view (WCAG 2.2.2 then needs no control for it).
   6. When the video can play (it is requested after the page's `load`
@@ -662,9 +664,10 @@ decoration. The phone's record (below) is the viewport's one honour mark.
 - **Phone mock-up:** the live session's presentational set rows and rest bar
   (§7.3), identified at build, in the SVG frame.
 
-**Data.** Synthetic and labelled "Example": Back squat (named through
-[catalog.ts](../i18n/catalog.ts)), three sets of 80 kg × 5, the record 85 kg
-× 5, in kilograms in both languages. No placeholder figures here; those are
+**Data.** Synthetic and labelled "Example": Squat / Sentadilla (the catalog's
+names, through [catalog.ts](../i18n/catalog.ts)), sets 1 and 2 done at 80 kg ×
+5 and set 3 ticked at 85 kg × 5, which is the record, in kilograms in both
+languages. No placeholder figures here; those are
 the proof band's (§12.3).
 
 **SEO.** The headline is the page's `h1`; the title is "Sunnsteel — Forge
@@ -874,6 +877,110 @@ states.
 **Needs from §33.** The sticky stage; drawing an SVG chart line
 (`stroke-dashoffset`) on public pages; per-section entrances on public pages,
 which §9.2 forbids in the app; callout cards overlapping a phone.
+
+### 12.5 Tools for every workout — `SiteTools`
+
+*Approved 2026-11-20: a bento grid in place of "the workout, in motion";
+automatic progression large, and rest, supersets and swapping small. Copy is
+draft except where it restates a rule.*
+
+**Job.** Show the tools that make a workout easier, leading with the promise
+under every routine -- the weight goes up when you earn it -- without
+repeating the hero or section 4.
+
+**Content and copy** (`site.tools`). The `h2` *(draft)*: "Tools for every
+workout" / "Herramientas para cada entrenamiento". Four cards, each an
+eyebrow (label rank), an `h3`, a body and a mock-up:
+
+| Card | Eyebrow | Title *(draft)* | Body | Link |
+| --- | --- | --- | --- | --- |
+| Large | AUTOMATIC PROGRESSION / PROGRESIÓN AUTOMÁTICA | Reach the top of your range. The weight goes up. / Llega al tope de tu rango. El peso sube. | When every set reaches the top of its rep range, your next workout is loaded with one more step -- 2.5 kg unless you choose another. Fall short and the weight you lifted carries over. / Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento sube un paso de peso: 2,5 kg si no eliges otro. Si no llegas, se mantiene el peso que levantaste. | See automatic progression → `/features/progression` |
+| Small | REST / DESCANSO | Rest that starts itself / Un descanso que arranca solo | It starts when you tick a set and tells you when it is over, even with the screen locked once the app is installed and notifications are on. / Arranca al tildar la serie y te avisa cuando termina, incluso con la pantalla bloqueada si instalaste la app y activaste las notificaciones. | — |
+| Small | SUPERSETS AND CIRCUITS / SUPERSERIES Y CIRCUITOS | Link exercises and train in rounds / Enlaza ejercicios y entrena por rondas | Up to six exercises in a group, one set of each per round, each keeping its own loads and progression. / Hasta seis ejercicios en un grupo, una serie de cada uno por ronda, y cada uno conserva sus cargas y su progresión. | — |
+| Small | SWAP AN EXERCISE / CAMBIAR UN EJERCICIO | Machine taken? Swap it for today. / ¿Máquina ocupada? Cámbiala por hoy. | Close alternatives ranked by movement and muscles, and your routine stays as it is unless you choose to update it. / Alternativas parecidas, ordenadas por movimiento y músculos, y tu rutina queda igual salvo que elijas actualizarla. | — |
+
+**The large card's body restates the server's rule exactly**
+(`buildProgressionOutcome` in the backend's `progression-changes.ts`, scheme
+`DOUBLE_PROGRESSION`): the weight rises by the exercise's step (default 2.5 kg)
+only when every working set reached its target -- a range's top -- and
+otherwise the weight lifted carries into the routine. It never says the app
+adds reps: the member does, within the range. The rest card never promises a
+countdown on the lock screen, which no platform can show (backend
+`CLAUDE.md`): the alert is one line, worded as the server words it.
+
+**Mock-up scripts** (each at most 5 seconds, §7.3):
+- **Large -- a progression ledger**, rows in Space Mono under the headings
+  Workout · Weight · Reps / Entrenamiento · Peso · Reps, typed in about 0.6s
+  apart: 1 · 80 kg · 8, 8, 8 — 2 · 80 kg · 9, 9, 8 — 3 · 80 kg · 10, 10, 9 —
+  4 · 80 kg · 12, 11, 11 — 5 · 80 kg · 12, 12, 12, where each 12 gets the
+  set-completion mark as the row lands; then row 6 · 82.5 kg arrives with
+  "+2.5 kg" and an up-arrow glyph in ink while a rule draws under it. Bench
+  press, range 8–12, step 2.5 kg. **A unit test runs the example through the
+  same rule**, so the ledger can never show a step the app would not make.
+- **Rest:** the rest bar drains from 1:30 to 0:00 (time compressed, the
+  digits in their fixed slot), then an original, platform-neutral
+  notification card slides down over the frame: "Rest is over · Bench Press
+  is up next." / "Terminó el descanso · Sigue: Press de banca." -- the
+  server's `restOverTitle` and `restNextBody`.
+- **Supersets:** two exercise rows, A1 and A2 ("Superset A" / "Superserie A",
+  the app's group label); the link bracket draws between them; "Round 2 of 3"
+  / "Ronda 2 de 3" ticks to 3 as each row's set completes.
+- **Swap:** a Leg Press row; its menu opens on alternatives; Hack Squat (same
+  movement) is chosen and the row updates with the app's caption "Swapped
+  from Leg Press" / "Cambiado desde Prensa de piernas" (names through the
+  catalog).
+
+**Layout.**
+- **Ground:** the page's theme. Cards on `--surface` with a `--rule` border
+  and the small radius, no shadow; the grid's gaps are the ground.
+- **≥ 1024:** a bento on 12 columns: the large card in columns 1–7 spanning
+  the height of the three small cards stacked in columns 8–12; about 720px
+  tall. Text sits at each card's top, its mock-up below.
+- **768–1023:** the large card full width (text left, ledger right), then the
+  small cards full width, each with its text left and mock-up right.
+- **< 768:** every card stacked, text first, mock-up under it at full width.
+- No filled action; the large card's link is link-style.
+
+**Motion.**
+- *Heading:* the `h2` rises from behind a mask line by line (900ms) and its
+  rule draws (480ms).
+- *Desktop entrance:* when the grid is 30% in view, the large card rises 24px
+  and fades in (700ms), then the small cards, 120ms apart; the column of
+  small cards drifts up to 30px against the large one as the page scrolls
+  (CSS scroll-driven, transform only).
+- *Desktop scripts:* one loop at a time (§7.3), so the grid plays as a
+  sequence -- the ledger, then rest, supersets and swap -- each after the one
+  before ends, about 15 seconds in all, then every card rests on its final
+  state; the sequence plays again when the grid re-enters the view.
+- *Below 1024:* each card's entrance and script run when that card is at
+  least half in view, once per entry.
+- *Reduced motion:* final states, no entrance, no drift.
+- *No JavaScript:* final states in the HTML.
+
+**Assets.** Mock-ups from the app's presentational parts, identified at
+build: a ledger built from the exercise-performance history's set rows (or
+the site's own ruled table in the same type ranks, if those rows carry data
+hooks), the live session's rest bar, a platform-neutral notification card
+drawn for the site, the session's superset group rows and round line
+(`LIVE-14`), and the swap dialog's alternative rows (`LIVE-11`).
+
+**Data.** Synthetic and labelled "Example": Bench Press at 80 kg in an 8–12
+range with the default 2.5 kg step; Leg Press swapped for Hack Squat (both
+catalog exercises, named through the catalog); a 90-second rest.
+
+**Accessibility.** The `h2`, then an `h3` per card; mock-ups `aria-hidden`,
+each card's text saying what its mock-up shows; the sequence holds no focus
+and needs no control, since every script ends within 5 seconds.
+
+**Acceptance checks.** The ledger example passes the progression rule's test;
+the rest card's lines match the server's copy in both languages; the
+sequence runs one script at a time and replays on re-entry; Spanish titles
+fit two lines in the small cards at 1024 and at 320; nothing shifts layout
+while a script plays; final states without JavaScript and under reduced
+motion.
+
+**Needs from §33.** Boxed cards on the public site (a bento); the sequenced
+scripts; the scroll-driven drift.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
