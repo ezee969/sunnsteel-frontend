@@ -437,6 +437,7 @@ Each phase ends in an owner approval before the next starts.
 | 18 | Hero layout | Text with the animated live-session phone on desktop, text alone on phones (§12.2) |
 | 19 | Headline | "Forge yourself. Prove it in every set." / "Fórjate. Demuéstralo en cada serie." |
 | 20 | Proof band | Two usage placeholders and two true facts, counting up, on the hero's dark ground; production swaps placeholders for reserve true facts (§12.3) |
+| 21 | Four verbs | A fixed stage on desktop, one phone pinned while the verbs scroll; "Planifica · Entrena · Mide · Gana"; Train shows plates and warm-ups (§12.4) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -777,6 +778,102 @@ values.
 
 **Needs from §33.** The display numeral size; counting numbers on public
 pages; the Night region continuing under the hero.
+
+### 12.4 The four verbs — `SiteVerbs`
+
+*Approved 2026-11-20: a fixed stage on desktop where one phone stays while the
+verbs scroll past; the Spanish verbs in the imperative; Train shows plates and
+warm-ups. Titles and bodies are draft.*
+
+**Job.** Show the whole product in four moves, each proven by the app's own
+screen, and send each move to its feature page.
+
+**Content and copy** (`site.verbs`). The section's `h2` is the four words:
+"Plan. Train. Measure. Earn." / "Planifica. Entrena. Mide. Gana." Each verb
+is a panel with a number, an `h3`, a body, a link, a phone script and a
+callout card:
+
+| | 01 Plan / Planifica | 02 Train / Entrena | 03 Measure / Mide | 04 Earn / Gana |
+| --- | --- | --- | --- | --- |
+| Title *(draft)* | Build your routine, or start from a template / Arma tu rutina o empieza con una plantilla | Load the bar without doing the maths / Carga la barra sin hacer cuentas | See what is really moving / Mira qué avanza de verdad | Records, milestones and ranks you earn by training / Récords, logros y rangos que se ganan entrenando |
+| Body *(draft)* | Weekly or rotating schedules, rep ranges that progress by themselves, 8-week blocks and deloads when you need them. / Semanas fijas o rotaciones, rangos de repeticiones que progresan solos, bloques de 8 semanas y descargas cuando las necesites. | Your last numbers beside every set, a rest timer that starts by itself, the plates for each side and a warm-up ramp worked out from your working load. / Tus últimos números junto a cada serie, un descanso que arranca solo, los discos de cada lado y una rampa de calentamiento calculada desde tu carga de trabajo. | Strength by estimated 1RM, the muscles you trained each week on a body map, body progress, and signals that state numbers, never verdicts. / Fuerza por 1RM estimado, los músculos que entrenaste cada semana en un mapa corporal, tu progreso físico y señales que dan números, nunca veredictos. | Every record is found in your sets. Milestones and six ranks reward showing up, never posting. / Cada récord sale de tus series. Los logros y los seis rangos premian que vengas a entrenar, no que publiques. |
+| Link | See the routine builder → `/features/routine-builder` / Ver el constructor de rutinas | See the workout tracker → `/features/workout-tracker` / Ver el registro de entrenamiento | See progress → `/features/progress` / Ver el progreso | See ranks and achievements → `/features/ranks` / Ver rangos y logros |
+| Phone script (≤ 5 s) | The Upper / Lower template card is tapped; its four days slide in one after another; the first day opens on four exercises reading "3 × 8–12 · double progression". | The plate calculator for 100 kg: the bar, then 25 and 15 slide onto each side one by one; under it the warm-up ramp fills row by row (bar × 10, 40 × 5, 60 × 3, 80 × 2). | The strength chart's line draws from left to right; the body map's muscles shade in, band by band. | The Artisan crest draws itself (§24.4); the rank's name appears; the milestone row `sessions:50` ("50 Sessions", by its catalog title) ticks in. |
+| Callout card | Upper / Lower · 4 days a week / Superior / inferior · 4 días por semana | 100 kg · 25 + 15 per side / 100 kg · 25 + 15 por lado | Bench press · e1RM 102 kg · +4 kg in 8 weeks / Press de banca · 1RM est. 102 kg · +4 kg en 8 semanas | Rank reached · Artisan / Rango alcanzado · Artesano |
+
+Names are the app's own: the templates and ranks come from their message
+areas and the catalog (`Superior / inferior`, `Artesano`), never retyped. The
+Measure callout's rise is an up-arrow glyph in ink, not honour; the Earn crest
+is in its rank pigment with the name in ink (§19). No honour mark appears in
+this section.
+
+**Layout.**
+- **Ground:** the page's own theme starts here (Stone or Night).
+- **The four words** open the section in the display rank,
+  `clamp(32px, 4.6vw, 64px)`, on one line from 1024 and two lines (two words
+  each) below; each word ends in a full stop in ink.
+- **≥ 1024, the stage:** the verb panels in columns 1–6, each at least 80svh
+  tall with its text centred in it; the phone in columns 8–12, `position:
+  sticky`, held at the viewport's centre while the panels pass (about 320svh
+  in all). A vertical rule runs beside the panels with four ticks, the current
+  one filled. The callout card overlaps the phone's lower-left corner: a
+  ruled card on `--surface` with the small radius and no shadow (elevation is
+  tone, §8). The phone is the 320px SVG frame of §7.1 with the "Example" mark.
+- **768–1023 and < 768:** no stage; each verb stacks its number, title, body,
+  link, then its phone (280px, 260px below 768) with the callout card under
+  it.
+- No filled action here; the links are link-style controls.
+
+**Motion.**
+- *The four words:* when in view, each rises from behind a mask over 900ms,
+  120ms apart; then the rule draws under the line (480ms).
+- *Desktop stage:* the active verb is the panel whose middle is nearest the
+  viewport's centre (an IntersectionObserver on a centre band, never a scroll
+  listener). On a change, the outgoing screen fades and rises 24px (300ms,
+  `--ease-exit`) as the incoming one rises from 24px below and fades in
+  (500ms, `--ease-standard`); 150ms later its callout card rises 16px into
+  place (500ms) while the old one leaves (200ms); the rail's filled tick moves
+  (300ms, transform); the active panel's text is in ink, the others in
+  `--ink-3`, changing over `--motion-base`. Then the incoming screen plays its
+  script once. Scrolling back reverses to the earlier verb. The callout card
+  also drifts 40px against the scroll (a CSS scroll-driven animation,
+  transform only).
+- *Stacked (below 1024):* each panel, the first time it is in view: text
+  rises 12px and fades in (600ms), its phone rises 32px and fades in (700ms),
+  the script plays, then the callout card rises. Once per visit.
+- *Reduced motion:* the stage still holds the phone, but every change is
+  instant; screens show their final states; the words are simply there.
+- *No JavaScript:* the stacked layout at every width, each phone in its final
+  state; the stage is switched on by the `js` class.
+
+**Assets.** Four mock-ups (§7.3) built from the app's presentational parts,
+identified at build: the starter template card and the builder's day list;
+the plate calculator's bar figure and the warm-up ramp rows; the strength
+chart and `MuscleMap`; `RankCrest` and a milestone row. Each loads as a client
+island when the section comes within two screens, and counts against §5's
+script budget.
+
+**Data.** Synthetic and labelled "Example": the Upper / Lower template, a
+100 kg working load with 20 kg bar and the gym's default plates, a bench
+press at 102 kg estimated 1RM rising 4 kg over 8 weeks, a weekly body map in
+the §32 bands, the Artisan rank and the `sessions:50` milestone (both real
+catalog entries, named through the catalog).
+
+**Accessibility.** The `h2` is the four words and each panel's title an
+`h3`; the phones, the rail and the callout cards are `aria-hidden`, because
+each panel's text already says what its phone shows; the sticky phone never
+traps scrolling or focus; the links stay in reading order.
+
+**Acceptance checks.** From 1024 to 1440 the phone stays pinned and swaps as
+each panel crosses the centre, forwards and backwards; each script ends
+within 5 seconds; nothing shifts layout during a swap; Spanish titles take at
+most two lines in columns 1–6 at 1024; at 320 and 390 each phone and its card
+fit the width; without JavaScript the stacked layout shows all four final
+states.
+
+**Needs from §33.** The sticky stage; drawing an SVG chart line
+(`stroke-dashoffset`) on public pages; per-section entrances on public pages,
+which §9.2 forbids in the app; callout cards overlapping a phone.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
