@@ -56,8 +56,8 @@ legal pages keep working exactly as they do.
 Each section names its content, its proof and its asset. Order is the
 proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 
-1. **Top bar** — lockup (`SunnsteelMark` + wordmark, §18), links to Features
-   (`/features`) and Pricing (`/pricing`), an anchor to Questions, language switch (sets `ss-locale`, as Settings does),
+1. **Top bar** (§12.1) — lockup (`SunnsteelMark` + wordmark, §18), the
+   Product menu and Pricing (`/pricing`), language switch (sets `ss-locale`, as Settings does),
    **Sign in** (ghost) and **Start free** (filled). Collapses to the lockup,
    Sign in and a menu below `md`.
 2. **Hero** — headline, one-sentence subline, the two actions, the install
@@ -101,17 +101,17 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 ### 4.1 The public pages beside it
 
 The owner's structure (2026-11-20), after Boostcamp's: the product shown **by
-feature** and **by use case, divided by experience**. The top bar carries a
-menu for each, plus Pricing.
+feature** and **by use case, divided by experience**. The top bar's Product
+menu has a column for each, plus Plans, and Pricing sits beside it (§12.1).
 
 - **`/features`** — every feature at a glance, each linking to its own page.
-- **One page per feature**, `/features/<slug>` (slugs fixed in §12): the
+- **One page per feature**, `/features/<slug>` (slugs fixed in §12.1): the
   workout tracker (live session, rest timer, plates, warm-ups, set kinds,
   supersets), the routine builder (templates, rotations, versions), automatic
   progression (double progression, the 8-week block), progress (strength,
   the body map, body progress, training signals), ranks and achievements, and
   training with people (follows, partners, messages, privacy).
-- **Use cases by experience**, `/use-cases/<level>` (slugs fixed in §12), each
+- **Use cases by experience**, `/use-cases/<level>` (slugs fixed in §12.1), each
   with its starter template, the features that matter at that level and the
   plan that fits:
   - **Beginners** — Full Body Foundations, the onboarding's recommendation,
@@ -431,6 +431,9 @@ Each phase ends in an owner approval before the next starts.
 | 14 | Use cases | Three pages by experience: beginners, intermediates, advanced lifters (§4.1) |
 | 15 | Use cases by goal | Not now |
 | 16 | Reference review | Boostcamp's whole site reviewed before §12 is written (§13) |
+| 17 | Top bar | A Product menu with Features, Use cases and Plans columns, plus Pricing; transparent over the hero, solid after it (§12.1) |
+| 18 | Hero layout | Text with the animated live-session phone on desktop, text alone on phones (§12.2) |
+| 19 | Headline | "Forge yourself. Prove it in every set." / "Fórjate. Demuéstralo en cada serie." |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -438,10 +441,251 @@ day.
 
 ## 12. Section-by-section specification
 
-To be written with the owner, one section at a time, before the build: for
-each section of §4 and each page of §4.1, its job, copy in English and
-Spanish, layout at 390 and 1440, its motion (desktop and phone), its assets
-and its data.
+Written with the owner, one section at a time, before the build. Every
+section states the same things, in this order: **job**, **content and copy**
+(English and Spanish, message keys under `site.<section>`), **layout** (390,
+768 and 1440), **motion** (desktop, phone, reduced motion and no
+JavaScript), **assets**, **data**, **accessibility** and **acceptance
+checks**. Copy marked *draft* is settled in the phase 1 copy deck; everything
+else in an approved section is decided.
+
+Items a section needs from design-system amendment §33 are listed at its end
+and collected in §12.9 when §33 is drafted.
+
+### 12.1 Top bar — `SiteTopBar`
+
+*Approved 2026-11-20: Product menu plus Pricing; transparent over the hero,
+solid after it.*
+
+**Job.** The brand, the way into every public page, and both actions at every
+scroll position.
+
+**Content and copy** (`site.topBar`):
+
+| Item | English | Spanish | Goes to |
+| --- | --- | --- | --- |
+| Lockup | `SunnsteelLockup` (§18), accessible name "Sunnsteel, home" | "Sunnsteel, inicio" | `/` |
+| Menu trigger | Product | Producto | opens the panel |
+| Link | Pricing | Precios | `/pricing` |
+| Language | EN · ES, the current one marked by an underline and `aria-current`, never by colour alone; names read "English" and "Español" | same | sets `ss-locale` through [locale-cookie.ts](../i18n/locale-cookie.ts) and reloads on the same page (each language is its own static build) |
+| Ghost action | Sign in | Iniciar sesión | `/login` |
+| Filled action | Start free | Empezar gratis | `/signup` |
+
+A signed-in visitor needs no detection on these static pages: the middleware
+already sends a signed-in `/login` or `/signup` to `/dashboard`, so both
+actions take them into the app.
+
+The **Product panel** has three columns, each headed by a region label:
+
+| Column | English | Spanish | Address |
+| --- | --- | --- | --- |
+| FEATURES / FUNCIONES | All features | Todas las funciones | `/features` |
+| | Workout tracker | Registro de entrenamiento | `/features/workout-tracker` |
+| | Routine builder | Constructor de rutinas | `/features/routine-builder` |
+| | Automatic progression | Progresión automática | `/features/progression` |
+| | Progress | Progreso | `/features/progress` |
+| | Ranks and achievements | Rangos y logros | `/features/ranks` |
+| | Training with people | Entrenar con gente | `/features/community` |
+| USE CASES / CASOS DE USO | Beginners | Principiantes | `/use-cases/beginners` |
+| | Intermediates | Intermedios | `/use-cases/intermediates` |
+| | Advanced lifters | Avanzados | `/use-cases/advanced` |
+| PLANS / PLANES | Pricing | Precios | `/pricing` |
+| | Is it free? | ¿Es gratis? | `/pricing#free` |
+| | Pro | Pro | `/pricing#pro` |
+| | Install the app | Instalar la app | `/#install`, the landing's question on installing (no page of its own) |
+
+These addresses fix the slugs §4.1 left open.
+
+**Layout.**
+- **≥ 1024:** a 64px bar, content up to 1280px with 32px gutters: lockup
+  left; Product and Pricing after it; the language switch, Sign in and Start
+  free right. The panel opens under its trigger, up to 720px wide, three
+  columns divided by `--rule-faint`, on `--popover` with `shadow-overlay`
+  (the one shadow, reserved for overlays) and the small radius.
+- **768–1023:** the same bar without the language switch, which moves to the
+  foot of the panel.
+- **< 768:** a 56px bar with 16px gutters: the lockup (the mark alone below
+  360px), Start free at the `sm` size (44px) and a menu button (44px, "Open
+  menu" / "Abrir menú"). The menu is the existing drawer primitive, full
+  height: the three columns as accordion groups, Pricing, the language switch
+  and Sign in as a full-width outline. Start free stays the bar's one filled
+  control.
+- **Over the hero** the bar has no ground and renders with the Night tokens in
+  both themes (a `.dark` scope), because the video beneath is dark either
+  way. **Once the hero's lower edge passes under it** (an
+  IntersectionObserver on a sentinel there), it takes the page's own ground
+  and theme and its bottom rule draws in. It stays sticky; it never hides on
+  scroll, so Start free is always one tap away.
+
+**Motion.**
+- *Desktop and phone:* the bar is present at first paint, never animated in
+  -- chrome does not perform. Becoming solid: the ground fades in over
+  `--motion-base` and the bottom rule draws from the left over 240ms (the rule
+  draw, §9.1); going back over the hero reverses it at exit timing. The panel
+  enters over 200ms (opacity and a 4px drop), its columns 40ms apart, and
+  leaves over 140ms; the trigger's chevron turns over 200ms. Hover changes
+  colour only (§9.2).
+- *Phone menu:* the drawer's own 300ms enter and 200ms exit with its scrim;
+  accordion groups reveal by opacity.
+- *Reduced motion:* every change is instant or opacity-only at
+  `--motion-fast`; no draw, no stagger.
+- *No JavaScript:* the bar renders solid; the Product trigger is a link to
+  `/features`, and the phone menu button to the footer's links.
+
+**Assets.** None beyond the lockup.
+
+**Data.** None; static.
+
+**Accessibility.** `<header>` holding `<nav aria-label>` ("Main" /
+"Principal"); a "Skip to content" / "Saltar al contenido" link first in the
+tab order; the panel built on Radix NavigationMenu (shadcn's
+`navigation-menu`, added and styled to the system), which gives
+`aria-expanded`, arrow-key movement, Escape and focus return; hover opens it
+only for a fine pointer, after a short intent delay; every target at least
+44px on touch.
+
+**Acceptance checks.** At 320 in Spanish the bar holds the mark, Empezar
+gratis and the menu button without overflow; the panel is usable by keyboard
+alone; the language switch reloads into the other language on the same page;
+the bar turns solid exactly when the hero leaves; a signed-in visitor's Sign
+in opens the dashboard.
+
+**Needs from §33.** The Night scope for regions laid over imagery in the
+light theme; the transparent-to-solid bar.
+
+### 12.2 Hero — `SiteHero`
+
+*Approved 2026-11-20: text with the animated live-session phone on desktop,
+text alone on phones; the headline. The other copy is draft.*
+
+**Job.** In the first viewport at 390×844, in either language, state the
+offer and show both actions; at 1440, also show the product working.
+
+**Content and copy** (`site.hero`):
+
+| Part | English | Spanish |
+| --- | --- | --- |
+| Eyebrow (label rank) | FREE TO START · NO APP STORE NEEDED | GRATIS PARA EMPEZAR · SIN TIENDA DE APPS |
+| Headline (`h1`) | Forge yourself. Prove it in **every set**. | Fórjate. Demuéstralo en **cada serie**. |
+| Subline *(draft)* | Plan your training, log every set and watch your records and your rank build up, in a history nobody can fake. | Planifica tu entrenamiento, registra cada serie y mira crecer tus récords y tu rango, en un historial que nadie puede inventar. |
+| Filled action | Create a free account → `/signup` | Crear cuenta gratis → `/signup` |
+| Ghost action | Sign in → `/login` | Iniciar sesión → `/login` |
+| Install line *(draft)* | Works in your browser and installs on any phone, with no app store. **How to install** → `/#install` | Funciona en el navegador y se instala en cualquier teléfono, sin tienda. **Cómo instalarla** → `/#install` |
+| Video control | "Pause background video" / "Play background video" | "Pausar el video de fondo" / "Reproducir el video de fondo" |
+| Mock-up mark | Example | Ejemplo |
+
+The headline is written in sentence case in the messages and set in Cinzel
+capitals by its rank. The bold words are a `<mark>` rich-text tag
+(`t.rich`), which carries **the brand's rule drawn under them** -- not gold:
+honour stays "better than planned" (§4.3), and gold under a headline would be
+decoration. The phone's record (below) is the viewport's one honour mark.
+
+**Layout.**
+- **≥ 1024:** height `min(100svh, 900px)`, at least 640px. Content up to
+  1280px on a 12-column grid: the text in columns 1–7, left-aligned and
+  vertically centred; the phone mock-up (a 320px original SVG frame, §7.1) in
+  columns 9–12, standing on the hero's lower edge and overlapping the proof
+  band (§12.3) by 48px, so the next section starts under it.
+- **768–1023:** the text alone, left-aligned; the phone appears from 1024.
+- **< 768:** the text alone, centred; the hero is as tall as its content
+  (about 96px above it, 48px below) so the proof band starts inside the first
+  viewport and says there is more. The two actions sit side by side only
+  where both fit (Spanish needs about 400px); otherwise they stack full width,
+  filled first. Measured estimate at 390×844 in Spanish with stacked actions:
+  about 530px of the 844, the bar included.
+- **Type** (from §33): the headline in a display rank of Cinzel 600 capitals,
+  `clamp(30px, 8vw, 88px)`, line-height about 1.02, `text-wrap: balance`,
+  wrapping naturally ("DEMUÉSTRALO EN" is too wide for one line at 320);
+  the subline in a lead rank of Source Sans 3 at 18–20px, at most 52
+  characters a line, in Night `--ink-2`; the eyebrow is the label rank; the
+  install line body small.
+- **The video** fills the hero (`object-fit: cover`) under a flat Night scrim;
+  on desktop a second flat layer sits under the text column only. Each cut is
+  framed so its subject is clear of the text: the right two thirds on
+  desktop, the upper half on phones. Text contrast is measured against the
+  brightest frame of each cut and must reach 4.5:1.
+
+**Motion.**
+- *Desktop, on load* (t = first paint; the poster is already there, and it is
+  the LCP element):
+  1. 80ms: the eyebrow rises 12px and fades in over 700ms.
+  2. 160, 250 and 340ms: the headline's three lines rise from behind a mask
+     (each line clipped, translated from 100% to 0) over 900ms.
+  3. About 1.2s: the rule draws under "every set" / "cada serie" from the left
+     over 480ms (the rule draw at display scale; §33 records the longer
+     duration).
+  4. 600ms: the subline rises 12px and fades in over 700ms; 720ms: the
+     actions, 8px over 600ms; 840ms: the install line fades in over 500ms.
+  5. 700ms: the phone rises 40px and fades in over 1000ms; once settled its
+     script runs (§7.3): set 3 is ticked (the set-completion signature), the
+     rest bar appears and counts down, then a card rises under the phone --
+     "New record · Back squat 85 kg × 5" / "Nuevo récord · Sentadilla trasera
+     85 kg × 5" -- with its honour mark, and the phone rests on that state.
+     **The script lasts at most 5 seconds** and plays again each time the
+     phone re-enters the view (WCAG 2.2.2 then needs no control for it).
+  6. When the video can play (it is requested after the page's `load`
+     event, when the browser is idle), it crossfades in over the poster over
+     600ms.
+  All easing is `--ease-standard`.
+- *Desktop, on scroll* (a fine pointer, ≥ 1024): as the hero scrolls away,
+  the video scales from 1 to 1.08 and its scrim darkens; the text column
+  rises 60px and fades to 40%; the phone rises 120px, faster than the text,
+  coming forward. CSS scroll-driven animations (`animation-timeline: view()`)
+  only, transform and opacity only, with no scroll listener; where the
+  browser lacks them, the hero simply scrolls.
+- *Phone:* the same load sequence, shorter (lines 60ms apart over 700ms, the
+  subline at 400ms, the actions at 480ms); the light clip after first paint;
+  no scroll effect, no phone mock-up.
+- *Reduced motion, either source:* the poster only -- the video is never
+  requested -- and everything present at first paint, the rule already drawn.
+- *No JavaScript:* the load sequence is CSS keyframes with `backwards` fill,
+  so it still runs and ends visible; the video, which JavaScript requests,
+  never loads, and the poster stays.
+- *Save-Data:* as reduced motion for the video; the text sequence still runs.
+
+**Assets.**
+- **Desktop cut:** 1920×1080, a seamless 10–14 s loop of four to six 2–3 s
+  shots, MP4 (H.264) and WebM (AV1), no audio track, at most 4 MB.
+- **Phone cut:** 720×1280 portrait, 8–12 s, aiming at 0.6 MB (§13.4), at most
+  1.5 MB.
+- **Posters:** each cut's first frame, AVIF and WebP, at most 150 KB (desktop)
+  and 60 KB (phone), preloaded per media query with `fetchpriority="high"`.
+- **Generation brief** for phase 2: illustrative athletes of different
+  genders, ages and builds -- a squat, a deadlift, a bench press, chalk on the
+  hands, a plate loaded -- in a gym of concrete and stone, raking warm light,
+  deep blacks, graded towards the brand's stone and steel. No logos, no
+  branded clothing, no recognisable real person, no visible screen.
+- **Phone mock-up:** the live session's presentational set rows and rest bar
+  (§7.3), identified at build, in the SVG frame.
+
+**Data.** Synthetic and labelled "Example": Back squat (named through
+[catalog.ts](../i18n/catalog.ts)), three sets of 80 kg × 5, the record 85 kg
+× 5, in kilograms in both languages. No placeholder figures here; those are
+the proof band's (§12.3).
+
+**SEO.** The headline is the page's `h1`; the title is "Sunnsteel — Forge
+yourself. Prove it in every set." / "Sunnsteel — Fórjate. Demuéstralo en cada
+serie."; the description is the subline.
+
+**Accessibility.** The video and the mock-up are `aria-hidden`; the video has
+no sound, so no captions. The pause control (44px, after the actions in the
+tab order) satisfies WCAG 2.2.2 for the looping video, and a paused video is
+remembered on the device (`localStorage`, read in `try`/`catch`). The
+headline's line wrappers are spans inside one `h1`, so it is read as one
+sentence.
+
+**Acceptance checks.** The first viewport at 390×844 holds the eyebrow, the
+headline, the subline, both actions and the install line in English and in
+Spanish; nothing overflows at 320; the poster is the LCP element; the video
+is never requested under reduced motion or `Save-Data`; pause works and is
+remembered; the phone's script ends within 5 seconds and replays on re-entry;
+text over the video reaches 4.5:1 on each cut's brightest frame in both
+themes.
+
+**Needs from §33.** The display and lead ranks; the image scrim; the Night
+scope over imagery; the rule draw at display scale (480ms); the load sequence
+on public pages, which §9.2 forbids in the app; scroll-driven motion; the
+video pause control.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
