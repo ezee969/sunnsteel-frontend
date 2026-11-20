@@ -252,9 +252,26 @@
 		"assignedTotal": "Total asignado",
 		"note": "Cada serie completada aporta 1 a los músculos primarios y 0,5 a los secundarios. La semana actual sigue en curso.",
 		"noteSummary": "Una serie completada cuenta 1 para los músculos primarios y 0,5 para los secundarios.",
-		"intensityLabel": "Intensidad del mapa, de menos a más",
-		"less": "Menos",
-		"more": "Más"
+		"previousWeek": "Semana anterior",
+		"nextWeek": "Semana siguiente",
+		"weekRange": "{start} – {end}",
+		"thisWeek": "Esta semana, hasta hoy",
+		"weekEmpty": "No hay series completadas esta semana.",
+		"weekUntrained": "Sin entrenar esta semana: {muscles}."
+	},
+	"bodyMap": {
+		"front": "Frente",
+		"back": "Espalda",
+		"legendLabel": "Series semanales por músculo",
+		"band0": "Ninguna",
+		"band1": "Menos de 5",
+		"band2": "De 5 a 10",
+		"band3": "De 10 a 15",
+		"band4": "De 15 a 20",
+		"band5": "20 o más",
+		"listLabel": "Series por músculo",
+		"sets": "{sets, plural, one {{formatted} serie} other {{formatted} series}}",
+		"summary": "Mapa del cuerpo: {trained, plural, =0 {ningún músculo tiene series} one {# músculo tiene series} other {# músculos tienen series}}, {untrained, plural, =0 {todos cubiertos} one {# sin series} other {# sin series}}."
 	},
 	"volume": {
 		"heading": "Volumen de carga",

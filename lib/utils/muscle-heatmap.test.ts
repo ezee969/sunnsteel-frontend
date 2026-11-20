@@ -46,10 +46,12 @@ describe('muscle-group heatmap', () => {
 		])
 	})
 
-	it('assigns stable intensity bands relative to the peak cell', () => {
+	it('bands a cell by its weekly sets, never by the busiest cell (PROG-15)', () => {
 		expect(
-			[0, 0.5, 2, 3, 4].map(value => getMuscleHeatmapLevel(value, 4)),
-		).toEqual([0, 1, 2, 3, 4])
+			[0, 0.5, 4.5, 5, 9.5, 10, 14.5, 15, 19.5, 20, 31].map(value =>
+				getMuscleHeatmapLevel(value),
+			),
+		).toEqual([0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
 	})
 
 	it('ranks trained muscles while keeping canonical order for ties', () => {

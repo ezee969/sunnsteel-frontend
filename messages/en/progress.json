@@ -252,9 +252,26 @@
 		"assignedTotal": "Assigned total",
 		"note": "Each completed set contributes 1 to primary muscles and 0.5 to secondary muscles. The current week is still in progress.",
 		"noteSummary": "A completed set counts 1 for primary muscles and 0.5 for secondary muscles.",
-		"intensityLabel": "Heatmap intensity, less to more",
-		"less": "Less",
-		"more": "More"
+		"previousWeek": "Previous week",
+		"nextWeek": "Next week",
+		"weekRange": "{start} – {end}",
+		"thisWeek": "This week so far",
+		"weekEmpty": "No completed sets this week.",
+		"weekUntrained": "Not trained this week: {muscles}."
+	},
+	"bodyMap": {
+		"front": "Front",
+		"back": "Back",
+		"legendLabel": "Weekly sets per muscle",
+		"band0": "None",
+		"band1": "Under 5",
+		"band2": "5 to 10",
+		"band3": "10 to 15",
+		"band4": "15 to 20",
+		"band5": "20 or more",
+		"listLabel": "Sets per muscle",
+		"sets": "{sets, plural, one {{formatted} set} other {{formatted} sets}}",
+		"summary": "Body map: {trained, plural, =0 {no muscle has sets} one {# muscle has sets} other {# muscles have sets}}, {untrained, plural, =0 {every muscle is covered} one {# has none} other {# have none}}."
 	},
 	"volume": {
 		"heading": "Load volume",

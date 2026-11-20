@@ -12,6 +12,7 @@ import { RoutineDayAccordion } from '@/features/routines/components/RoutineDayAc
 import { RoutineDeloads } from '@/features/routines/components/RoutineDeloads'
 import { RoutineHeader } from '@/features/routines/components/RoutineHeader'
 import { RoutineLineageNote } from '@/features/routines/components/RoutineLineageNote'
+import { RoutineMuscleMap } from '@/features/routines/components/RoutineMuscleMap'
 import { RoutineSharing } from '@/features/routines/components/RoutineSharing'
 import { RoutineTrainingBlocks } from '@/features/routines/components/RoutineTrainingBlocks'
 import { RoutineVersions } from '@/features/routines/components/RoutineVersions'
@@ -184,6 +185,11 @@ export default function RoutineDetailsPage() {
 						}
 					/>
 				</div>
+			)}
+
+			{/* PROG-15: what the plan in force today asks of each muscle. */}
+			{todayPlan && todayPlan.days.length > 0 && (
+				<RoutineMuscleMap routineId={routine.id} plan={todayPlan} />
 			)}
 
 			{/* LIVE-23: while the routine is new enough, the workouts done

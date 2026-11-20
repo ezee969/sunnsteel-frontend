@@ -4,6 +4,8 @@ import {
 	type MuscleGroupHeatmapResponse,
 } from '@sunsteel/contracts'
 
+import { type BodyMapLevel, bodyMapLevel } from './body-map'
+
 export const MUSCLE_HEATMAP_WEEK_OPTIONS = [4, 8, 12] as const
 export type MuscleHeatmapWeeks = (typeof MUSCLE_HEATMAP_WEEK_OPTIONS)[number]
 
@@ -13,16 +15,12 @@ export interface MuscleHeatmapRow {
 	totalWeightedSets: number
 }
 
-export function getMuscleHeatmapLevel(
-	weightedSets: number,
-	peakWeightedSets: number,
-): 0 | 1 | 2 | 3 | 4 {
-	if (weightedSets <= 0 || peakWeightedSets <= 0) return 0
-	const ratio = weightedSets / peakWeightedSets
-	if (ratio <= 0.25) return 1
-	if (ratio <= 0.5) return 2
-	if (ratio <= 0.75) return 3
-	return 4
+/**
+ * PROG-15: a cell's level is the body map's fixed band of weekly sets
+ * (design system §32), not a share of the window's busiest cell.
+ */
+export function getMuscleHeatmapLevel(weightedSets: number): BodyMapLevel {
+	return bodyMapLevel(weightedSets)
 }
 
 export function buildMuscleHeatmapRows(

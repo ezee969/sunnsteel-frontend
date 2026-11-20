@@ -3,13 +3,13 @@ import {
 	EXERCISE_EQUIPMENT,
 	type ExerciseEquipment,
 	type MovementPattern,
-	MUSCLE_GROUPS,
 	type MuscleGroup,
 	type TrainingLocationPreference,
 } from '@sunsteel/contracts'
 
 import type { Translator } from '@/i18n/translator'
 import type { Exercise } from '@/lib/api/types'
+import { plannedMuscleSets, trainedMuscles } from '@/lib/utils/body-map'
 import {
 	defaultTrainingLocation,
 	equipmentLabel,
@@ -156,32 +156,9 @@ export const estimateDaySeconds = (
 export const computeWeeklyMuscleSets = (
 	data: RoutineWizardData,
 	exercises: ExerciseLookup,
-): MuscleSetCount[] => {
-	const totals = new Map<MuscleGroup, number>()
-	for (const day of data.days) {
-		for (const planned of day.exercises) {
-			const meta = exercises[planned.exerciseId]
-			// LIVE-12: a warm-up is not a set of work for any muscle.
-			const workSets = planned.sets.filter(set => countsAsWork(set.kind)).length
-			if (!meta || workSets === 0) continue
-			const primary = new Set(meta.primaryMuscles)
-			for (const muscle of primary) {
-				totals.set(muscle, (totals.get(muscle) ?? 0) + workSets)
-			}
-			for (const muscle of new Set(meta.secondaryMuscles)) {
-				if (primary.has(muscle)) continue
-				totals.set(muscle, (totals.get(muscle) ?? 0) + workSets * 0.5)
-			}
-		}
-	}
-	return [...totals]
-		.map(([muscle, sets]) => ({ muscle, sets }))
-		.sort(
-			(a, b) =>
-				b.sets - a.sets ||
-				MUSCLE_GROUPS.indexOf(a.muscle) - MUSCLE_GROUPS.indexOf(b.muscle),
-		)
-}
+): MuscleSetCount[] =>
+	// PROG-15: the same count the routine's body map draws.
+	trainedMuscles(plannedMuscleSets(data.days, exercises))
 
 export const computeRoutineEquipment = (
 	data: RoutineWizardData,

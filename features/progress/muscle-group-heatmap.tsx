@@ -1,9 +1,9 @@
 'use client'
 
 import type { MuscleGroupHeatmapResponse } from '@sunsteel/contracts'
-import { Activity } from 'lucide-react'
+import { Activity, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { EmptyModule } from '@/components/layout/empty-module'
 import { Explanation } from '@/components/layout/explanation'
@@ -12,11 +12,22 @@ import {
 	LockedModule,
 	LockedOptionLabel,
 } from '@/components/layout/locked-module'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToggleOption, ToggleRow } from '@/components/ui/toggle-row'
+import {
+	BodyMapLegend,
+	INTENSITY_SWATCH,
+	MuscleMap,
+} from '@/features/body-map/body-map'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import { cn } from '@/lib/utils'
+import {
+	muscleSetsOfWeek,
+	resolveBodyMapWeek,
+	weekEnd,
+} from '@/lib/utils/body-map'
 import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import {
 	buildMuscleHeatmapRows,
@@ -25,14 +36,6 @@ import {
 	MUSCLE_HEATMAP_WEEK_OPTIONS,
 	type MuscleHeatmapWeeks,
 } from '@/lib/utils/muscle-heatmap'
-
-const CELL_LEVEL_CLASSES = [
-	'bg-rule-faint',
-	'bg-honour/20',
-	'bg-honour/40',
-	'bg-honour/70',
-	'bg-honour',
-] as const
 
 const NUMBER_FORMATTER = (locale: Locale) =>
 	numberFormatter(locale, {
@@ -73,6 +76,18 @@ export function MuscleGroupHeatmap({
 		WEEK_FORMATTER(locale).format(new Date(`${value}T00:00:00.000Z`))
 	const rows = useMemo(() => (data ? buildMuscleHeatmapRows(data) : []), [data])
 	const topMuscles = useMemo(() => getTopMuscleHeatmapRows(rows), [rows])
+	// PROG-15: the body map shows one week of the loaded window, the current
+	// one until another is chosen.
+	const [chosenWeek, setChosenWeek] = useState<string | null>(null)
+	const weekStart = data ? resolveBodyMapWeek(data.weeks, chosenWeek) : null
+	const weekIndex = data
+		? data.weeks.findIndex(week => week.weekStart === weekStart)
+		: -1
+	const shownWeek = data && weekIndex >= 0 ? data.weeks[weekIndex] : null
+	const weekSets = useMemo(
+		() => (shownWeek ? muscleSetsOfWeek(shownWeek) : new Map()),
+		[shownWeek],
+	)
 
 	return (
 		<section aria-labelledby="muscle-distribution" className="space-y-4">
@@ -130,6 +145,53 @@ export function MuscleGroupHeatmap({
 					<EmptyModule title={t('emptyTitle')} description={t('emptyBody')} />
 				) : (
 					<>
+						{shownWeek ? (
+							<MuscleMap
+								sets={weekSets}
+								emptyText={t('weekEmpty')}
+								untrainedText={muscles => t('weekUntrained', { muscles })}
+								header={
+									<>
+										<Button
+											variant="ghost"
+											size="icon"
+											aria-label={t('previousWeek')}
+											disabled={weekIndex <= 0}
+											onClick={() =>
+												setChosenWeek(data.weeks[weekIndex - 1].weekStart)
+											}
+										>
+											<ChevronLeft aria-hidden />
+										</Button>
+										<p className="type-body-sm min-w-0 flex-1 text-center text-foreground">
+											<time dateTime={shownWeek.weekStart}>
+												{t('weekRange', {
+													start: formatWeek(shownWeek.weekStart),
+													end: formatWeek(weekEnd(shownWeek.weekStart)),
+												})}
+											</time>
+											{shownWeek.isCurrentWeek ? (
+												<span className="block text-ink-3">
+													{t('thisWeek')}
+												</span>
+											) : null}
+										</p>
+										<Button
+											variant="ghost"
+											size="icon"
+											aria-label={t('nextWeek')}
+											disabled={weekIndex >= data.weeks.length - 1}
+											onClick={() =>
+												setChosenWeek(data.weeks[weekIndex + 1].weekStart)
+											}
+										>
+											<ChevronRight aria-hidden />
+										</Button>
+									</>
+								}
+							/>
+						) : null}
+
 						<div className="grid gap-px bg-rule-faint sm:grid-cols-3">
 							{topMuscles.map((row, index) => (
 								<div key={row.muscle} className="bg-surface p-4">
@@ -173,7 +235,7 @@ export function MuscleGroupHeatmap({
 													{formatWeek(week.weekStart)}
 												</time>
 												{week.isCurrentWeek ? (
-													<span className="mt-1 block text-honour">
+													<span className="mt-1 block text-ink-2">
 														{t('currentWeek')}
 													</span>
 												) : null}
@@ -191,10 +253,7 @@ export function MuscleGroupHeatmap({
 												{getFriendlyMuscleName(row.muscle, tMuscles)}
 											</th>
 											{row.weightedSets.map((value, index) => {
-												const level = getMuscleHeatmapLevel(
-													value,
-													data.peakWeightedSets,
-												)
+												const level = getMuscleHeatmapLevel(value)
 												return (
 													<td
 														key={data.weeks[index].weekStart}
@@ -214,7 +273,7 @@ export function MuscleGroupHeatmap({
 															<span
 																className={cn(
 																	'size-3 border border-rule-faint',
-																	CELL_LEVEL_CLASSES[level],
+																	INTENSITY_SWATCH[level],
 																)}
 																aria-hidden
 															/>
@@ -251,20 +310,7 @@ export function MuscleGroupHeatmap({
 							<Explanation summary={t('noteSummary')}>
 								<p>{t('note')}</p>
 							</Explanation>
-							<div
-								className="flex items-center gap-1"
-								aria-label={t('intensityLabel')}
-							>
-								<span className="mr-1">{t('less')}</span>
-								{CELL_LEVEL_CLASSES.slice(1).map(className => (
-									<span
-										key={className}
-										className={cn('size-4 border border-rule-faint', className)}
-										aria-hidden
-									/>
-								))}
-								<span className="ml-1">{t('more')}</span>
-							</div>
+							<BodyMapLegend />
 						</div>
 					</>
 				)}

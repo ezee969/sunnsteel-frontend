@@ -155,7 +155,7 @@ The page is designed under [ui-design-system.md](ui-design-system.md) and
 [ui-motion-spec.md](ui-motion-spec.md), through the project skill
 [`sunnsteel-design`](../.claude/skills/sunnsteel-design/SKILL.md): general
 skills advise, the documented rules decide. A landing needs things the app
-never did, so the build starts with **design-system amendment §31 "The public
+never did, so the build starts with **design-system amendment §33 "The public
 site"**, approved by the owner with the chosen comp, covering:
 
 - **Display type above `type-display`:** one or two marketing ranks for the
@@ -229,7 +229,7 @@ Each phase ends in an owner approval before the next starts.
   3. **Canva MCP** `generate-image` as a fallback for scene variants.
 - **`frontend-design`** and **`web-design-guidelines`** as critique of each
   comp, sorted through `sunnsteel-design` (fix / fits / contradicts / declined).
-- Deliverable: one approved comp per breakpoint + amendment §31 drafted.
+- Deliverable: one approved comp per breakpoint + amendment §33 drafted.
 
 ### Phase 3 — Assets
 - **`impeccable-asset-producer` agent** — turns the approved comp's raster
@@ -256,7 +256,7 @@ Each phase ends in an owner approval before the next starts.
 - **`impeccable` comp-led build** (`build-phase`: spec → plates → hero →
   sections → responsive) so the page matches the approved comp by measurement,
   not by eye.
-- **`impeccable animate`** — implements §31's motion with CSS and the
+- **`impeccable animate`** — implements §33's motion with CSS and the
   already-installed `framer-motion` (no new animation library; Lottie, GSAP and
   video heroes are declined unless the amendment says otherwise).
 
@@ -269,7 +269,7 @@ Each phase ends in an owner approval before the next starts.
 - **`vercel:performance-optimizer` agent** — Core Web Vitals against §5's
   budget.
 - **`web-design-guidelines`** — a final pass.
-- **`impeccable-documenter` agent** — drafts amendment §31's final text from
+- **`impeccable-documenter` agent** — drafts amendment §33's final text from
   the built page; it lands in `ui-design-system.md`, not a separate DESIGN.md.
 
 ### Phase 6 — Verify and ship
@@ -297,13 +297,13 @@ Each phase ends in an owner approval before the next starts.
 4. Both languages, both themes, all seven sweep widths pass; no text truncated
    in Spanish.
 5. §5's performance budget and Lighthouse ≥ 95 are met and recorded.
-6. Amendment §31 is in the design system, approved, and the page follows it.
+6. Amendment §33 is in the design system, approved, and the page follows it.
 7. Legal buttons and pages are reachable from the footer.
 
 ## 10. Risks
 
 - **Marketing drift into the app** — mitigated by the route group's own layout
-  and §31 applying only to `(site)`.
+  and §33 applying only to `(site)`.
 - **Generated imagery that looks generic or uncanny** — the comp round and
   the owner's approval gate it; direction 2 (the ledger) needs no generated
   figure at all.

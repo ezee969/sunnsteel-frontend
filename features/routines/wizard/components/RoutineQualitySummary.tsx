@@ -3,17 +3,16 @@
 import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import { type ReactNode, useMemo } from 'react'
 
+import { MuscleMap } from '@/features/body-map/body-map'
 import type { Translator } from '@/i18n/translator'
 import { equipmentLabel } from '@/lib/utils/exercise-equipment'
-import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 import { formatDuration } from '@/lib/utils/time-format.utils'
 
 import {
 	ASSUMED_REPS,
 	type EquipmentCheck,
-	formatSetCount,
 	type RoutineQualitySummary as Summary,
 	SECONDS_PER_REP,
 } from '../utils/routine-quality'
@@ -120,8 +119,11 @@ export function RoutineQualitySummary({
 	showEquipmentCheck,
 }: RoutineQualitySummaryProps) {
 	const t = useTranslations('routines.quality')
-	const tMuscles = useTranslations('routines.muscles')
 	const tEquipment = useTranslations('routines.equipment')
+	const muscleSets = useMemo(
+		() => new Map(summary.muscleSets.map(row => [row.muscle, row.sets])),
+		[summary.muscleSets],
+	)
 	return (
 		<section aria-labelledby="routine-quality-heading" className="space-y-4">
 			<div className="rule-heading pb-2">
@@ -149,25 +151,12 @@ export function RoutineQualitySummary({
 						}
 						caption={t('musclesCaption')}
 					>
-						{summary.muscleSets.length === 0 ? (
-							<p className="type-body-sm text-ink-3">{t('noSetsPlanned')}</p>
-						) : (
-							<ul>
-								{summary.muscleSets.map(({ muscle, sets }) => (
-									<li
-										key={muscle}
-										className="rule-row flex items-baseline justify-between gap-4 py-1.5"
-									>
-										<span className="type-body-sm text-ink">
-											{getFriendlyMuscleName(muscle, tMuscles)}
-										</span>
-										<span className="type-data text-ink">
-											{formatSetCount(sets)}
-										</span>
-									</li>
-								))}
-							</ul>
-						)}
+						{/* PROG-15: the plan drawn on the body, with the Progress scale. */}
+						<MuscleMap
+							sets={muscleSets}
+							emptyText={t('noSetsPlanned')}
+							untrainedText={muscles => t('plannedUntrained', { muscles })}
+						/>
 					</QualityBlock>
 
 					<QualityBlock title={t('imbalancesTitle')}>
