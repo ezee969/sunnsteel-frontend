@@ -11,6 +11,8 @@ import {
 	factText,
 	forgetReview,
 	keepReview,
+	latestWorkouts,
+	quickPicks,
 	readKeptReview,
 	reviewCandidates,
 	reviewFindings,
@@ -111,12 +113,23 @@ describe('INTEL-04 training review', () => {
 		expect(reviewCandidates(many)).toHaveLength(20)
 	})
 
-	it('picks and unpicks, and never more than a review reads', () => {
+	it('picks and unpicks, and never more than the twelve a review reads', () => {
 		expect(toggleReviewWorkout([], 'a')).toEqual(['a'])
 		expect(toggleReviewWorkout(['a', 'b'], 'a')).toEqual(['b'])
-		const full = ['a', 'b', 'c', 'd', 'e', 'f']
-		expect(toggleReviewWorkout(full, 'g')).toEqual(full)
-		expect(toggleReviewWorkout(full, 'c')).toHaveLength(5)
+		const full = Array.from({ length: 12 }, (_, i) => `w${i}`)
+		expect(toggleReviewWorkout(full, 'x')).toEqual(full)
+		expect(toggleReviewWorkout(full, 'w3')).toHaveLength(11)
+	})
+
+	it('offers the latest four, eight or twelve, as far as there are', () => {
+		expect(quickPicks(3)).toEqual([])
+		expect(quickPicks(9)).toEqual([4, 8])
+		expect(quickPicks(20)).toEqual([4, 8, 12])
+		const offered = Array.from({ length: 20 }, (_, i) =>
+			session(`s${i}`, `2026-11-${String(20 - i).padStart(2, '0')}T10:00:00Z`),
+		)
+		expect(latestWorkouts(offered, 4)).toEqual(['s0', 's1', 's2', 's3'])
+		expect(latestWorkouts(offered, 30)).toHaveLength(12)
 	})
 
 	it('says what is left, never below none', () => {
