@@ -2734,8 +2734,10 @@ drawing not copied). It adds one token family and no face, radius or shadow.
 No colour role meant "how much": `honour` means better than planned (§4.3
 rule 3) and the matrix's honour ramp borrowed it. Six tokens,
 `--intensity-0` to `--intensity-5`, are mixed in `oklch` from the theme's
-own `--foreground` over `--rule-faint` (0, 22, 40, 58, 78 and 100 %), so
-Night and higher contrast re-value them with no block of their own. Use
+own `--foreground` over `--rule` (0, 22, 40, 58, 78 and 100 %), so Night and
+higher contrast re-value them with no block of their own. The base is
+`--rule`, not `--rule-faint`: an untrained figure on `--surface` must still
+read as a figure in Night (the faint rule left it near the panel's tone). Use
 them only for a quantity of training: `fill-intensity-*` on the figure,
 `bg-intensity-*` on a swatch.
 

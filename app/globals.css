@@ -56,7 +56,7 @@
   --color-surface-sunk: var(--surface-sunk);
   --color-rule: var(--rule);
   --color-rule-faint: var(--rule-faint);
-  /* PROG-15 (§32): how much a muscle was trained, an ink ramp over the faint
+  /* PROG-15 (§32): how much a muscle was trained, an ink ramp over the
      rule. Steps are fixed weekly-set bands, never relative to the week. */
   --color-intensity-0: var(--intensity-0);
   --color-intensity-1: var(--intensity-1);
@@ -167,13 +167,13 @@
   --field-max: 96px;
   --cluster-max: 480px;
 
-  /* PROG-15 (§32): mixed from the theme's own ink and faint rule, so Night and
+  /* PROG-15 (§32): mixed from the theme's own ink and rule, so Night and
      higher contrast re-value them without a block of their own. */
-  --intensity-0: var(--rule-faint);
-  --intensity-1: color-mix(in oklch, var(--foreground) 22%, var(--rule-faint));
-  --intensity-2: color-mix(in oklch, var(--foreground) 40%, var(--rule-faint));
-  --intensity-3: color-mix(in oklch, var(--foreground) 58%, var(--rule-faint));
-  --intensity-4: color-mix(in oklch, var(--foreground) 78%, var(--rule-faint));
+  --intensity-0: var(--rule);
+  --intensity-1: color-mix(in oklch, var(--foreground) 22%, var(--rule));
+  --intensity-2: color-mix(in oklch, var(--foreground) 40%, var(--rule));
+  --intensity-3: color-mix(in oklch, var(--foreground) 58%, var(--rule));
+  --intensity-4: color-mix(in oklch, var(--foreground) 78%, var(--rule));
   --intensity-5: var(--foreground);
 }
 
