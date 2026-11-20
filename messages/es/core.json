@@ -511,6 +511,14 @@
 		"ROUTINE_DRAFTS_UNAVAILABLE": "La redacción de borradores no está disponible ahora",
 		"ROUTINE_DRAFT_NOT_TRAINING": "Eso no parece un pedido de entrenamiento. Igual usó uno de los pedidos de este mes.",
 		"ROUTINE_DRAFT_FAILED": "No pudimos redactar un borrador con eso; inténtalo de nuevo.",
+		"TRAINING_REVIEW_QUOTA_REACHED": "Ya usaste tus {max} revisiones de este mes",
+		"TRAINING_REVIEWS_PAUSED": "Las revisiones están en pausa hasta el próximo mes",
+		"TRAINING_REVIEWS_UNAVAILABLE": "Las revisiones no están disponibles ahora",
+		"TRAINING_REVIEW_WORKOUTS": "Elige de {min} a {max} de tus entrenamientos terminados",
+		"TRAINING_REVIEW_NO_SHARED_EXERCISE": "Esos entrenamientos no comparten ningún ejercicio, así que no hay nada que comparar",
+		"TRAINING_REVIEW_NO_EFFORT_DATA": "Esos entrenamientos no tienen objetivos de repeticiones ni RPE con los que comparar el esfuerzo",
+		"TRAINING_REVIEW_NOT_ENOUGH": "Esos entrenamientos no muestran lo suficiente para responder eso. Igual usó una de las revisiones de este mes.",
+		"TRAINING_REVIEW_FAILED": "No pudimos escribir una revisión con esos entrenamientos; inténtalo de nuevo.",
 		"CONSUMER_REQUEST_INVALID": "Revisa tu nombre y tu email e inténtalo de nuevo"
 	},
 	"glossary": {

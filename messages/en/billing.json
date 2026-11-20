@@ -174,6 +174,11 @@
 				"name": "Natural-language routine drafts",
 				"free": "Not included",
 				"pro": "10 a month"
+			},
+			"review": {
+				"name": "Training review",
+				"free": "Not included",
+				"pro": "20 a month"
 			}
 		},
 		"offerTitle": "What Pro adds",
@@ -247,8 +252,8 @@
 			},
 			"compare": {
 				"title": "Compare and adjust",
-				"short": "Block and session comparisons, and training signals",
-				"description": "Compare blocks and sessions, read your training signals and get goal suggestions from your own data."
+				"short": "Comparisons, training signals and workout reviews",
+				"description": "Compare blocks and sessions, read your training signals, get goal suggestions and have chosen workouts reviewed from your own data."
 			},
 			"history": {
 				"title": "See your whole history",

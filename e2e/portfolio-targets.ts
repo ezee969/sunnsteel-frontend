@@ -511,6 +511,14 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'How the work spreads across muscles and weeks, with volume compared by muscle, routine and exercise.',
 	},
 	{
+		slug: 'progress-workouts',
+		route: '/progress/workouts',
+		features: ['PROG-05', 'PROG-06', 'INTEL-04', 'UX-11'],
+		ready: ['Training review'],
+		caption:
+			'Which days were trained, two sessions compared, and a review of the workouts you pick that cites every number it states.',
+	},
+	{
 		slug: 'schedule-week',
 		route: '/schedule',
 		features: [

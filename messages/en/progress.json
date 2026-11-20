@@ -442,5 +442,49 @@
 		"addedBody": "{goal} is now one of your goals.",
 		"addFailed": "The goal could not be added",
 		"dismissFailed": "The suggestion could not be set aside"
+	},
+	"review": {
+		"title": "Training review",
+		"description": "Pick a few finished workouts and a question. The answer says what your logs show and cites every number.",
+		"loading": "Loading reviews",
+		"usageFailed": "Reviews could not be read",
+		"unavailable": "Reviews aren't available right now.",
+		"paused": "Reviews are paused until next month.",
+		"quotaReached": "You have used your {limit} reviews this month. They renew on {date}.",
+		"questionLabel": "Question",
+		"questions": {
+			"CHANGES": "What changed",
+			"PROGRESS": "Progress",
+			"EFFORT": "Effort"
+		},
+		"questionText": {
+			"CHANGES": "What changed between these workouts?",
+			"PROGRESS": "Where did my lifts move, and where did they stall?",
+			"EFFORT": "How did my effort compare with the plan?"
+		},
+		"workoutsLabel": "Workouts",
+		"workoutsHint": "Choose {min} to {max}. {count, plural, =0 {None chosen} one {# chosen} other {# chosen}}.",
+		"loadingWorkouts": "Loading your workouts",
+		"workoutsFailed": "Your workouts could not be read",
+		"notEnoughTitle": "Not enough workouts yet",
+		"notEnoughBody": "Finish at least {min} workouts to review them together.",
+		"workoutOption": "{date} · {name}",
+		"disclosure": "The workouts you choose go to Anthropic to write the review and are not stored.",
+		"left": "{left, plural, one {# review} other {# reviews}} of {limit} left this month. Renews on {date}.",
+		"review": "Review",
+		"reviewing": "Reviewing…",
+		"reviewingStatus": "Reviewing your workouts. This can take up to a minute.",
+		"failed": "No review was written",
+		"resultTitle": "What your logs show",
+		"workoutsRead": "Workouts read",
+		"citation": "From the workout on {date}",
+		"notAdvice": "A review describes your logs. It doesn't explain why and isn't medical advice.",
+		"discard": "Discard review",
+		"facts": {
+			"weightTimesReps": "{weight} × {reps}",
+			"reps": "{count, plural, one {# rep} other {# reps}}",
+			"minutes": "{count} min",
+			"rpe": "RPE {value}"
+		}
 	}
 }

@@ -4,10 +4,14 @@ import { ConsistencyCalendar } from '@/features/progress/consistency-calendar'
 import { useProgressControls } from '@/features/progress/progress-controls'
 import { ProgressTab } from '@/features/progress/progress-tab'
 import { SessionComparison } from '@/features/progress/session-comparison'
+import { TrainingReviewSection } from '@/features/progress/training-review'
 import { useEntitlement } from '@/lib/api/hooks/useBilling'
 import { useSessionComparison } from '@/lib/api/hooks/useWorkoutSession'
 
-/** Progress › Workouts (UX-11): which days were trained, and how two compare. */
+/**
+ * Progress › Workouts (UX-11): which days were trained, how two compare, and
+ * (INTEL-04) a review of the ones the member picks.
+ */
 export default function ProgressWorkoutsPage() {
 	const { routineDayId, setRoutineDayId } = useProgressControls()
 	// BILL-02: comparison is Pro's; without it the section says so.
@@ -30,6 +34,8 @@ export default function ProgressWorkoutsPage() {
 				onRetry={() => void sessionComparison.refetch()}
 				locked={comparison.allowed === false}
 			/>
+
+			<TrainingReviewSection />
 		</ProgressTab>
 	)
 }

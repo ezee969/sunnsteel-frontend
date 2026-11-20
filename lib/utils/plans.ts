@@ -29,6 +29,12 @@ export const PLAN_ROWS = [
 		limit: 'ROUTINE_DRAFTS_PER_MONTH',
 		worded: true,
 	},
+	{
+		key: 'review',
+		feature: 'TRAINING_REVIEW',
+		limit: 'TRAINING_REVIEWS_PER_MONTH',
+		worded: true,
+	},
 ] as const satisfies ReadonlyArray<{
 	key: string
 	feature?: FeatureKey

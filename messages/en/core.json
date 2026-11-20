@@ -511,6 +511,14 @@
 		"ROUTINE_DRAFTS_UNAVAILABLE": "Drafting isn't available right now",
 		"ROUTINE_DRAFT_NOT_TRAINING": "That doesn't read like a training request. It still used one of this month's requests.",
 		"ROUTINE_DRAFT_FAILED": "We couldn't write a draft from that; try again.",
+		"TRAINING_REVIEW_QUOTA_REACHED": "You have used your {max} reviews this month",
+		"TRAINING_REVIEWS_PAUSED": "Reviews are paused until next month",
+		"TRAINING_REVIEWS_UNAVAILABLE": "Reviews aren't available right now",
+		"TRAINING_REVIEW_WORKOUTS": "Choose {min} to {max} of your finished workouts",
+		"TRAINING_REVIEW_NO_SHARED_EXERCISE": "Those workouts share no exercise, so there is nothing to compare",
+		"TRAINING_REVIEW_NO_EFFORT_DATA": "Those workouts have no rep targets or RPE to compare effort with",
+		"TRAINING_REVIEW_NOT_ENOUGH": "Those workouts don't show enough to answer that. It still used one of this month's reviews.",
+		"TRAINING_REVIEW_FAILED": "We couldn't write a review from those workouts; try again.",
 		"CONSUMER_REQUEST_INVALID": "Check your name and email and try again"
 	},
 	"glossary": {

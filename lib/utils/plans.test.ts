@@ -13,6 +13,7 @@ const base = {
 		TRAINING_LOCATIONS: 1,
 		MUSCLE_HISTORY_WEEKS: 4,
 		ROUTINE_DRAFTS_PER_MONTH: 0,
+		TRAINING_REVIEWS_PER_MONTH: 0,
 	},
 	checkout: {
 		available: false,
@@ -38,11 +39,8 @@ describe('BILL-02 plans', () => {
 			'feature' in row ? [row.feature] : [],
 		)
 		const limits = PLAN_ROWS.flatMap(row => ('limit' in row ? [row.limit] : []))
-		// The INTEL-04 reviews are not built yet, so they are not offered; muscle
-		// weeks are the MUSCLE_HISTORY_LONG row.
-		expect(new Set(features)).toEqual(
-			new Set(FEATURE_KEYS.filter(key => key !== 'TRAINING_REVIEW')),
-		)
+		// Muscle weeks are the MUSCLE_HISTORY_LONG row.
+		expect(new Set(features)).toEqual(new Set(FEATURE_KEYS))
 		expect(new Set(limits)).toEqual(
 			new Set(PLAN_LIMIT_KEYS.filter(key => key !== 'MUSCLE_HISTORY_WEEKS')),
 		)
