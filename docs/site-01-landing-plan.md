@@ -181,9 +181,11 @@ and bolder than app copy, never less true.
   live site.** Placeholder figures are used for now (the owner's decision):
   during the comps and the build, the proof line and any counter show mock-up
   numbers, held in one module and marked as placeholders. **They never reach
-  production**: the production build fails while any placeholder remains, and
-  before launch each becomes a real number read from production (above a
-  threshold the owner sets) or is removed -- decided then.
+  production**: a production build renders each placeholder as a reserve true
+  fact instead (§12.3), so nothing invented ships and no deploy of the app is
+  ever blocked by the site; before launch each becomes a real number read
+  from production (above a threshold the owner sets) or stays replaced --
+  decided then.
 - Allowed true facts today: free to start; works in the browser and installs
   on any phone; works offline with changes saved on reconnect; English and
   Spanish; your data exportable and deletable; private by default.
@@ -399,8 +401,8 @@ Each phase ends in an owner approval before the next starts.
 - **Generated imagery or video that looks generic or uncanny** — the comp
   round and the owner's approval gate it; licensed stock footage is the
   hero's fallback.
-- **Placeholder figures shipped by mistake** — the production build refuses
-  them (§6.2).
+- **Placeholder figures shipped by mistake** — a production build swaps each
+  for a reserve true fact, and a test holds it (§6.2, §12.3).
 - **Mock-ups drifting from the app** — mitigated by rendering the app's own
   presentational components (§7.3), so a changed screen changes its mock-up;
   a mock-up that cannot is listed in §12 and checked at each release.
@@ -434,6 +436,7 @@ Each phase ends in an owner approval before the next starts.
 | 17 | Top bar | A Product menu with Features, Use cases and Plans columns, plus Pricing; transparent over the hero, solid after it (§12.1) |
 | 18 | Hero layout | Text with the animated live-session phone on desktop, text alone on phones (§12.2) |
 | 19 | Headline | "Forge yourself. Prove it in every set." / "Fórjate. Demuéstralo en cada serie." |
+| 20 | Proof band | Two usage placeholders and two true facts, counting up, on the hero's dark ground; production swaps placeholders for reserve true facts (§12.3) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -686,6 +689,94 @@ themes.
 scope over imagery; the rule draw at display scale (480ms); the load sequence
 on public pages, which §9.2 forbids in the app; scroll-driven motion; the
 video pause control.
+
+### 12.3 Proof band — `SiteProofBand`
+
+*Approved 2026-11-20: two usage figures as placeholders and two true facts;
+the numbers count up; the band is the hero's dark foot.*
+
+**Job.** Back the offer with figures in one glance, straight under the hero,
+and still stand on launch day if no real usage figure is ready.
+
+**Content and copy** (`site.proof`), four cells, each a numeral and a label:
+
+| Cell | Figure | English label | Spanish label | Source |
+| --- | --- | --- | --- | --- |
+| 1 | 12,400 / 12.400 | MEMBERS | MIEMBROS | **placeholder** |
+| 2 | 350,000 / 350.000 | WORKOUTS LOGGED | ENTRENAMIENTOS REGISTRADOS | **placeholder** |
+| 3 | 80+ | EXERCISES IN THE CATALOG | EJERCICIOS EN EL CATÁLOGO | true: the seeded catalog (`exercise-catalog.ts`, 80 today), confirmed against production before launch |
+| 4 | FREE / GRATIS | TO START | PARA EMPEZAR | true |
+
+**Reserve facts**, true today and drawn from contracts rather than typed: the
+milestones in the achievement catalog (25) and the ranks on the ladder (6),
+labelled MILESTONES TO EARN / LOGROS POR GANAR and RANKS TO REACH / RANGOS POR
+ALCANZAR. **A production build renders each placeholder as the next reserve
+fact**, in order, so production shows 80+ exercises, 25 milestones, 6 ranks
+and Free until real usage figures exist. Outside production each placeholder
+cell carries a small "Mock" / "Ejemplo ficticio" tag (label rank, `--ink-3`,
+dashed rule), so nobody reviewing a preview mistakes it.
+
+Numbers are formatted by the language (`numberFormatter`): "12,400" in
+English, "12.400" in Spanish. "80+" keeps its plus, which stays true as the
+catalog grows.
+
+**Real usage figures**, when the owner wants them, need a read the site does
+not have: a public, cached aggregate from the backend (members, finished
+workouts) revalidated about once a day, shown only above the owner's
+threshold. That is decided before launch and is the one backend change
+`SITE-01` might need.
+
+**Layout.**
+- **Ground:** the hero's Night region continues (dark in both themes) and the
+  hero's phone stands on it. The page's own theme begins with section 4.
+- **The band is ruled** (§25.3): a rule above and below, `--rule-faint`
+  hairlines between cells, no boxes and no rule at either end.
+- **≥ 1024:** one row of four cells in columns 1–8, clear of the phone in
+  columns 9–12; cells top-aligned, a label allowed two lines.
+- **768–1023:** one row of four across the width.
+- **< 768:** two by two, starting inside the first viewport at 390×844 (§12.2).
+- **Numerals** in a display numeral rank from §33 (Bebas Neue,
+  `clamp(40px, 5vw, 64px)`); labels in the label rank. Each numeral also
+  renders its final value invisibly underneath to hold its width, so the
+  count never reflows the row.
+
+**Motion.**
+- *Desktop:* the first time at least half the band is in view, the rules
+  above and below draw from the left over 480ms, then the hairlines top to
+  bottom over 240ms, 80ms apart; each number counts from 0 to its value over
+  1200ms (`--ease-standard`, which slows into the value), cells 120ms apart,
+  each frame formatted by the language; "80+" counts to 80 and then shows its
+  plus; FREE / GRATIS rises 8px and fades in. Once per visit (motion spec
+  §1.3), never again on re-entry.
+- *Phone:* the band is in view at load, so the same sequence starts when the
+  hero's text has landed (about 900ms after first paint).
+- *Reduced motion:* final values and drawn rules at first paint.
+- *No JavaScript:* the final values are in the HTML. Numerals hide before
+  counting only under a `js` class an inline script sets before paint, so
+  without JavaScript nothing is hidden and nothing flashes.
+
+**Assets.** None.
+
+**Data.** `lib/site/proof-figures.ts`: the four cells and the reserves, each
+with its source (`placeholder` or `fact`); the 25 and the 6 read from
+contracts' achievement catalog and rank ladder; the 80 a constant beside a
+note to confirm it against production. `proofCellsFor(environment)` returns
+what renders, and a unit test holds that the production result has no
+placeholder.
+
+**Accessibility.** A `section` named "In figures" / "En cifras"; each cell's
+counting value is `aria-hidden` and its final value is in visually hidden
+text, so a screen reader hears "12,400 members" once, not a count; the Mock
+tag is read ("Example figure" / "Cifra de ejemplo").
+
+**Acceptance checks.** A production render shows no placeholder and no Mock
+tag; a preview shows the tags; numbers group by language; the band adds no
+layout shift while counting; Spanish labels take at most two lines at 1024
+and at 320; the count runs once per visit and screen readers hear only final
+values.
+
+**Needs from §33.** The display numeral size; counting numbers on public
+pages; the Night region continuing under the hero.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
