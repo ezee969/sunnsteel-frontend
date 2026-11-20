@@ -69,11 +69,12 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
    (live session: rest timer, plate calculator, set kinds, supersets),
    *Measure* (strength trends, muscle distribution, body progress, training
    signals), *Earn* (records, milestones, ranks). Each: a heading, two lines,
-   a real screenshot in an original phone frame, and one detail callout.
-5. **The workout, in motion** — no interactive demo (the owner's decision):
-   real screenshots of the live session in a phone frame, advanced by the
-   scroll (§7.1) through a set ticked, the rest bar counting and a record
-   crossed, with labelled synthetic data.
+   an animated mock-up of the app's screen in an original phone frame (§7.3),
+   and one detail callout.
+5. **The workout, in motion** — an animated mock-up of the live session in a
+   phone frame (§7.3) that plays by itself when it comes into view: a set
+   ticked, the rest bar counting, a record crossed in gold, with labelled
+   synthetic data. Not interactive (the owner's decision).
 6. **Progress you can read** — the strength chart and the body map
    (`PROG-15`, shipped 2026-11-20), with real-looking synthetic data, labelled.
 7. **Ranks** — the six crests from Initiate to Laureate drawn with the
@@ -186,7 +187,7 @@ and bolder than app copy, never less true.
 - Allowed true facts today: free to start; works in the browser and installs
   on any phone; works offline with changes saved on reconnect; English and
   Spanish; your data exportable and deletable; private by default.
-- Every screenshot with data is **synthetic and labelled** as an
+- Every screenshot or mock-up with data is **synthetic and labelled** as an
   example. No real member's name, face, record or message appears.
 - Generated people are allowed (the owner's decision), the hero video's
   included: clearly illustrative, never presented as members, their results
@@ -242,6 +243,38 @@ The 2026-10-01 material (the `final-4a` "presencia" bust, the monument under
 construction) may serve other sections, such as Ranks. **Gate:** a clip whose
 people look uncanny is rejected at the comp review; the fallback, licensed
 stock footage, is put to the owner then.
+
+### 7.3 Phone mock-ups — the app's screens, animated
+
+The owner's decision (2026-11-20), after Boostcamp (§13.4): the phones on
+the public pages show **the app's own interface as animated HTML**, not
+still screenshots, playing by themselves -- a set ticked, plates sliding onto
+the bar, the rest bar counting, a record crossing in gold, a crest drawing, a
+floating card rising under the phone. Never interactive.
+
+- **Built from the app, not imitated.** Each mock-up renders the real
+  presentational components with the real tokens and type ranks, fed
+  synthetic data in the visitor's language; where a component is tied to a
+  data hook, it is split into a presentational part the app and the site both
+  use. A mock-up never fetches, never signs in and never reaches the API.
+  That is what keeps them current as the app changes.
+- **A mock-up is a script**: a list of states with their timings, declared
+  per section in §12 (desktop and phone), using the motion tokens and the
+  product's own signatures (set completion, rule draw, crest draw §24.4).
+- **When it plays:** from when at least half of it is in view; paused off
+  screen and in a hidden tab; one loop running per viewport. Under either
+  reduced-motion source, and before JavaScript runs, it shows its final state
+  as a still.
+- **Accessibility:** the mock-up is `aria-hidden` and never focusable; the
+  section's own text says what it shows, so nothing depends on watching it.
+- **Weight:** CSS keyframes and transitions first, `framer-motion` only for
+  sequences CSS cannot express; each mock-up's client code counts against
+  §5's landing JS budget, and the mock-ups load as islands, never in the
+  first viewport's critical path.
+- **Labelled:** each carries the "example" mark of §6.2.
+- Still screenshots from the portfolio pipeline (§8, phase 3) remain for the
+  OG images, feature-page figures where nothing moves, and the reduced-motion
+  fallback where a component cannot render a final state.
 
 ## 8. Skills, tools and agents — the production workflow
 
@@ -368,6 +401,9 @@ Each phase ends in an owner approval before the next starts.
   hero's fallback.
 - **Placeholder figures shipped by mistake** — the production build refuses
   them (§6.2).
+- **Mock-ups drifting from the app** — mitigated by rendering the app's own
+  presentational components (§7.3), so a changed screen changes its mock-up;
+  a mock-up that cannot is listed in §12 and checked at each release.
 - **Stale screenshots** — mitigated by capturing them from the portfolio
   pipeline, re-run when a pictured screen changes.
 - **SEO limits of a locale-less address** — accepted for now; a `/es`,
@@ -381,7 +417,7 @@ Each phase ends in an owner approval before the next starts.
 | --- | --- | --- |
 | 1 | Scope | The landing at `/` plus public `/features` and `/pricing` (§4.1) |
 | 2 | Motion | Cinematic, on the public pages only, declared section by section with the richest version on desktop (§7.1) |
-| 3 | Live-session demo | None: screenshots only (§4, section 5) |
+| 3 | Phones | Animated HTML mock-ups of the app's screens, playing by themselves as Boostcamp's do; no interactive demo (§7.3; replaced "screenshots only" the same day) |
 | 4 | Human figures | Illustrative generated people allowed (§6.2) |
 | 5 | Hero | A background video of people training; the treatment for the comps chosen by Claude (§7.2) |
 | 6 | Video source | AI-generated, with licensed stock as the fallback if it looks uncanny |
@@ -509,10 +545,9 @@ and the closing video loads its source only when near.
 - Questions on every page (with `FAQPage` structured data), an "Updated
   <month>" line, and cross-links between levels and features.
 - The motion vocabulary of §13.4, declared per section in §12, with ours
-  added on top (rule draw, crest draw, set completion). Whether the phone
-  mock-ups carry **animated HTML** rather than still screenshots -- the
-  reference's way -- is put to the owner in §12, since §11 chose
-  screenshots.
+  added on top (rule draw, crest draw, set completion).
+- **Animated HTML inside the phone mock-ups**, the reference's way, adopted
+  by the owner (§7.3).
 
 ### 13.6 What Sunnsteel refuses
 Their figures, star ratings, store badges, testimonials and before/after
