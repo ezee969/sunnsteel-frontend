@@ -99,13 +99,33 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 
 ### 4.1 The public pages beside it
 
-- **`/features`** — every capability in depth, grouped by the four verbs, each
-  with its screenshot; the landing's verbs link to their part of it.
+The owner's structure (2026-11-20), after Boostcamp's: the product shown **by
+feature** and **by use case, divided by experience**. The top bar carries a
+menu for each, plus Pricing.
+
+- **`/features`** — every feature at a glance, each linking to its own page.
+- **One page per feature**, `/features/<slug>` (slugs fixed in §12): the
+  workout tracker (live session, rest timer, plates, warm-ups, set kinds,
+  supersets), the routine builder (templates, rotations, versions), automatic
+  progression (double progression, the 8-week block), progress (strength,
+  the body map, body progress, training signals), ranks and achievements, and
+  training with people (follows, partners, messages, privacy).
+- **Use cases by experience**, `/use-cases/<level>` (slugs fixed in §12), each
+  with its starter template, the features that matter at that level and the
+  plan that fits:
+  - **Beginners** — Full Body Foundations, the onboarding's recommendation,
+    warm-ups, the plate calculator, the rest timer.
+  - **Intermediates** — Upper / Lower, Push / Pull / Legs, double
+    progression, the 8-week block, plateau watch.
+  - **Advanced lifters** — training blocks, deloads, training signals and
+    block comparison, the training review (Pro).
+  No use cases by goal (powerlifting, hypertrophy): Sunnsteel has no
+  goal-specific programmes, so such a page would promise what is not there.
 - **`/pricing`** — Free and Pro from contracts, the comparison rows `/plans`
   already renders ([plans.ts](../lib/utils/plans.ts)), the trial and the
   payment questions. What a signed-in visitor sees there is decided in §12.
-- Both share the landing's layout, top bar and footer, and every rule in
-  §5–§7.
+- All of them share the landing's layout, top bar and footer, and every rule
+  in §5–§7.
 
 ## 5. Architecture and routing
 
@@ -141,7 +161,8 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
   0.05, INP ≤ 200 ms, landing JS ≤ 90 KB gzip beyond the framework, hero image
   ≤ 150 KB AVIF with WebP fallback, fonts already self-hosted and preloaded.
   **The hero video never delays LCP**: its still poster is the LCP element;
-  the muted, looping clip (≤ 1.5 MB on phones, ≤ 4 MB on desktop, no audio
+  the muted, looping clip (≤ 1.5 MB on phones -- the reference ships about
+  0.6 MB, §13.4, which is the target -- ≤ 4 MB on desktop, no audio
   track) starts after first paint; under either reduced-motion source or
   `Save-Data` the poster stays. Lighthouse ≥ 95 in all four categories on
   phone and desktop.
@@ -370,6 +391,10 @@ Each phase ends in an owner approval before the next starts.
 | 10 | Analytics | Vercel Web Analytics |
 | 11 | Counters | Placeholder figures for now; none in production (§6.2) |
 | 12 | Founding members | Not mentioned |
+| 13 | Features | One page per feature under `/features`, plus the overview (§4.1) |
+| 14 | Use cases | Three pages by experience: beginners, intermediates, advanced lifters (§4.1) |
+| 15 | Use cases by goal | Not now |
+| 16 | Reference review | Boostcamp's whole site reviewed before §12 is written (§13) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -381,3 +406,116 @@ To be written with the owner, one section at a time, before the build: for
 each section of §4 and each page of §4.1, its job, copy in English and
 Spanish, layout at 390 and 1440, its motion (desktop and phone), its assets
 and its data.
+
+## 13. Reference review: Boostcamp's public site (2026-11-20)
+
+Reviewed at the owner's request before §12: the home, `/features`, one
+feature page (auto progression), `/use-cases`, the intermediates page, `/pro`
+and the home at 390. Full-page captures are kept **locally, outside every
+repository**, in `branding-explorations/boostcamp-reference-2026-11-20/`
+(excluded in the root checkout's `.git/info/exclude`); they are reference,
+never assets, and nothing of their look, copy, figures or imagery is reused.
+What follows is structure and technique, in our words.
+
+### 13.1 How the site is organised
+- **Top bar:** logo; Home, Programs, a *Product* mega menu and a *Resources*
+  menu; a ghost Log in and one filled primary action. The Product menu has
+  three columns: **Features** (all features plus five feature pages),
+  **Use cases** (all, by experience -- beginners, intermediates, advanced --
+  and by goal) and **Plans** (the free app, "is it free?", Pro, download).
+  Below `md` it is the logo, the primary action and a menu button.
+- **Footer:** five link columns (product, resources, research, company,
+  download) under the logo and the support address.
+- **Use-case pages sit at the root** (`/beginners`, `/intermediates`,
+  `/advanced`); feature pages under `/features/<slug>` -- fifteen of them,
+  grouped Programs, Train, Analytics, Community, Integrations, each marked
+  Free, Pro or Free + Pro on the overview.
+
+### 13.2 The home, section by section
+1. **Hero:** a full-bleed, muted, looping video montage of people training
+   under a dark scrim; a proof badge; a very large condensed uppercase
+   headline with one word in the accent colour; a two-line subline; the
+   store badges. On load the badge, each headline line and the subline rise
+   in a short stagger (about 1.1 s each, lines about 90 ms apart).
+2. **Stats band:** four figures in ruled cells (three at 390).
+3. **Track · Follow · Build · Measure:** four huge words with an accent full
+   stop, four phones, a floating "toast" card under each phone (a logged set,
+   a programme, a toggle, a score), then a title and two lines per column.
+4. **Programme picker:** a dark band with a coverflow carousel of category
+   cards (the centre card full size, neighbours at 85, 70 and 55 % and
+   fading), with category tabs under it.
+5. **Tools:** a bento grid -- one tall card and two short ones -- each with an
+   eyebrow, a condensed headline and a phone.
+6. **Results:** horizontally scrolling before/after cards with a drag
+   slider, the change as a big number, a quote and a name.
+7. **Coaches:** one featured coach, large name and figures, a photo card and
+   a strip of avatars that selects the coach.
+8. **Testimonials:** a ruled grid of six quotes with their source.
+9. **Closing band:** a second background video, the headline, the store
+   badges and, on desktop, a **QR card to open the app on a phone**.
+10. **Questions**, then the footer.
+
+### 13.3 The page templates
+- **Feature page** -- a guide, not a showcase: breadcrumb with a Free/Pro
+  badge, title, subline and an "Updated <month>" line; an overview card with
+  three highlights and a grid of facts (method, cadence, step, price);
+  numbered "how it works" steps; the idea explained; **a worked example as
+  a session-by-session table**; what it covers, as a table; tips; related
+  programmes; the Pro note; related features; questions. No video and almost
+  no motion.
+- **Use-case page:** an eyebrow ("For intermediates · Free"), the headline,
+  a subline, two actions and an audience line; a stats band; **"what
+  changes" at this level** in four numbered cards; the programmes for the
+  level; the tools that matter at it; **a numbered step-by-step to the next
+  level**; a card linking to the next level; the download band; questions.
+- **Pro page:** the headline; a band with the price, the trial and "cancel
+  anytime"; what Pro adds in six cards; Free beside Pro in two columns; the
+  two prices; who it is for; a link to every feature; the trial band;
+  questions.
+
+### 13.4 Motion, as built
+All of it is CSS keyframes and transitions toggled when an element enters
+the viewport -- no animation library, no scroll-linked timelines. Headings
+rise from behind a mask word by word (about 1 s); text and cards fade up
+(about 0.9 s); phones fade in and their toast cards slide up; **the UI inside
+the phone mock-ups is animated HTML** (a tap ripple, a tick, plates sliding
+onto the bar, a blinking cursor); avatar strips stagger in at about 24 ms per
+item; the carousel and the before/after slider move on input; the header is
+sticky. **The cinema is on the home only**: the feature, use-case and Pro
+pages are quiet. Videos: the desktop hero is a full-width montage; phones get
+**a separate 960×540, 12.6 s clip of about 0.6 MB** with `preload="none"`,
+and the closing video loads its source only when near.
+
+### 13.5 What Sunnsteel takes, subject to §12
+- The **mega menu** with Features, Use cases and Plans columns (§4.1); in our
+  Plans column, Pricing, "Is Sunnsteel free?", Pro and **Install the app**.
+- **A hero video at about 0.6 MB on phones**, separate from the desktop cut,
+  which tightens §5's budget for the phone clip.
+- The **four-verb section with a floating card under each phone** -- in our
+  case a real fact of the app (a set ticked, a record, a rank) on a ruled
+  card.
+- The **bento grid** for the tools section, and a **coverflow** for the
+  starter templates (three, so the coverflow becomes a row that brings one
+  forward).
+- **Feature pages as exact guides**: a worked example table suits Sunnsteel
+  (double progression on a real rep range, an 8-week block's loads, a deload
+  preview), and every number in it comes from contracts' own rules.
+- **Use-case pages built on "what changes" and a step-by-step to the next
+  level**, each linking to the next level and to its starter template.
+- The **pricing page's** band of facts (price, trial, cancel anytime), Free
+  beside Pro, and "who it is for".
+- **A QR card on desktop to open the site on a phone**, which suits a PWA:
+  the visitor installs it where they train.
+- Questions on every page (with `FAQPage` structured data), an "Updated
+  <month>" line, and cross-links between levels and features.
+- The motion vocabulary of §13.4, declared per section in §12, with ours
+  added on top (rule draw, crest draw, set completion). Whether the phone
+  mock-ups carry **animated HTML** rather than still screenshots -- the
+  reference's way -- is put to the owner in §12, since §11 chose
+  screenshots.
+
+### 13.6 What Sunnsteel refuses
+Their figures, star ratings, store badges, testimonials and before/after
+photos (we have no true equivalent: §6.2), coach programmes (Sunnsteel has
+none), yellow on black, the condensed grotesk, and any of their words. Use
+cases by goal stay out (§11).
