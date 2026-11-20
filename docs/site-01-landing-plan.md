@@ -440,6 +440,7 @@ Each phase ends in an owner approval before the next starts.
 | 20 | Proof band | Two usage placeholders and two true facts, counting up, on the hero's dark ground; production swaps placeholders for reserve true facts (§12.3) |
 | 21 | Four verbs | A fixed stage on desktop, one phone pinned while the verbs scroll; "Planifica · Entrena · Mide · Gana"; Train shows plates and warm-ups (§12.4) |
 | 22 | Section 5 | A tools bento in place of "the workout, in motion": automatic progression large; rest, supersets and swapping small (§12.5) |
+| 23 | Section 6 | A large body map whose weeks advance with the scroll, then four analysis cards tagged Free or Pro; the training review here, the routine draft in the Pro section (§12.6) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -455,8 +456,23 @@ JavaScript), **assets**, **data**, **accessibility** and **acceptance
 checks**. Copy marked *draft* is settled in the phase 1 copy deck; everything
 else in an approved section is decided.
 
-Items a section needs from design-system amendment §33 are listed at its end
-and collected in §12.9 when §33 is drafted.
+Sections are numbered as in §4 (12.1 the top bar … 12.13 the footer), and
+the public pages of §4.1 follow. Items a section needs from design-system
+amendment §33 are listed at its end and collected in a closing list when §33
+is drafted.
+
+**Free and Pro are always told apart.** Wherever the site names a capability
+Pro unlocks, it carries the Pro tag the app already uses (§29.2's locked
+option label, a word and never a colour alone), and every tag and every plan
+number (weeks of history, drafts and reviews a month) is derived from
+contracts' `PLANS` and `FEATURE_KEYS`, never typed; a unit test fails when a
+tag disagrees with contracts. Today Pro unlocks, among what the site shows:
+8-week blocks, dated training blocks, planned deloads, training signals and
+the deload suggestion, block and session comparison, strength ranges past 90
+days, muscle history past 4 weeks (12 on Pro), body measurements beyond
+weight, goal suggestions, routine drafts and the training review. Plateau
+watch, records, ranks, the body map within 4 weeks and everything in the
+workout itself are free.
 
 ### 12.1 Top bar — `SiteTopBar`
 
@@ -799,7 +815,7 @@ callout card:
 | | 01 Plan / Planifica | 02 Train / Entrena | 03 Measure / Mide | 04 Earn / Gana |
 | --- | --- | --- | --- | --- |
 | Title *(draft)* | Build your routine, or start from a template / Arma tu rutina o empieza con una plantilla | Load the bar without doing the maths / Carga la barra sin hacer cuentas | See what is really moving / Mira qué avanza de verdad | Records, milestones and ranks you earn by training / Récords, logros y rangos que se ganan entrenando |
-| Body *(draft)* | Weekly or rotating schedules, rep ranges that progress by themselves, 8-week blocks and deloads when you need them. / Semanas fijas o rotaciones, rangos de repeticiones que progresan solos, bloques de 8 semanas y descargas cuando las necesites. | Your last numbers beside every set, a rest timer that starts by itself, the plates for each side and a warm-up ramp worked out from your working load. / Tus últimos números junto a cada serie, un descanso que arranca solo, los discos de cada lado y una rampa de calentamiento calculada desde tu carga de trabajo. | Strength by estimated 1RM, the muscles you trained each week on a body map, body progress, and signals that state numbers, never verdicts. / Fuerza por 1RM estimado, los músculos que entrenaste cada semana en un mapa corporal, tu progreso físico y señales que dan números, nunca veredictos. | Every record is found in your sets. Milestones and six ranks reward showing up, never posting. / Cada récord sale de tus series. Los logros y los seis rangos premian que vengas a entrenar, no que publiques. |
+| Body *(draft)* | Weekly or rotating schedules and rep ranges that progress by themselves; with **Pro**, 8-week blocks and planned deloads. / Semanas fijas o rotaciones y rangos de repeticiones que progresan solos; con **Pro**, bloques de 8 semanas y descargas planificadas. | Your last numbers beside every set, a rest timer that starts by itself, the plates for each side and a warm-up ramp worked out from your working load. / Tus últimos números junto a cada serie, un descanso que arranca solo, los discos de cada lado y una rampa de calentamiento calculada desde tu carga de trabajo. | Strength by estimated 1RM, the muscles you trained each week on a body map and your weight over time; with **Pro**, training signals that state numbers, never verdicts. / Fuerza por 1RM estimado, los músculos que entrenaste cada semana en un mapa corporal y tu peso a lo largo del tiempo; con **Pro**, señales de entrenamiento que dan números, nunca veredictos. | Every record is found in your sets. Milestones and six ranks reward showing up, never posting. / Cada récord sale de tus series. Los logros y los seis rangos premian que vengas a entrenar, no que publiques. |
 | Link | See the routine builder → `/features/routine-builder` / Ver el constructor de rutinas | See the workout tracker → `/features/workout-tracker` / Ver el registro de entrenamiento | See progress → `/features/progress` / Ver el progreso | See ranks and achievements → `/features/ranks` / Ver rangos y logros |
 | Phone script (≤ 5 s) | The Upper / Lower template card is tapped; its four days slide in one after another; the first day opens on four exercises reading "3 × 8–12 · double progression". | The plate calculator for 100 kg: the bar, then 25 and 15 slide onto each side one by one; under it the warm-up ramp fills row by row (bar × 10, 40 × 5, 60 × 3, 80 × 2). | The strength chart's line draws from left to right; the body map's muscles shade in, band by band. | The Artisan crest draws itself (§24.4); the rank's name appears; the milestone row `sessions:50` ("50 Sessions", by its catalog title) ticks in. |
 | Callout card | Upper / Lower · 4 days a week / Superior / inferior · 4 días por semana | 100 kg · 25 + 15 per side / 100 kg · 25 + 15 por lado | Bench press · e1RM 102 kg · +4 kg in 8 weeks / Press de banca · 1RM est. 102 kg · +4 kg en 8 semanas | Rank reached · Artisan / Rango alcanzado · Artesano |
@@ -981,6 +997,108 @@ motion.
 
 **Needs from §33.** Boxed cards on the public site (a bento); the sequenced
 scripts; the scroll-driven drift.
+
+### 12.6 Progress you can read — `SiteProgress`
+
+*Approved 2026-11-20: a large body map whose weeks advance with the scroll,
+then a strip of analysis cards; the training review belongs here. Copy is
+draft.*
+
+**Job.** Show that progress is read from the member's own sets, week by
+week, at full size -- the phone in section 4 only previews it -- and that the
+analysis states numbers, never verdicts.
+
+**Content and copy** (`site.progress`). The `h2` *(draft)*: "Progress you can
+read" / "Un progreso que se puede leer". Two parts.
+
+**A. The map stage.**
+- `h3` *(draft)*: "Every set you log lands on the map" / "Cada serie que
+  registras llega al mapa"; body *(draft)*: "Weekly sets per muscle on a
+  body map, front and back, beside the number behind every colour, and your
+  estimated 1RM week by week." / "Series semanales por músculo en un mapa
+  corporal, de frente y de espalda, junto al número detrás de cada color, y
+  tu 1RM estimado semana a semana."
+- The **week rail**: Week 1 · 2 · 3 · 4 / Semana 1 · 2 · 3 · 4, and under it
+  "Four weeks free, up to twelve with Pro." / "Cuatro semanas gratis, hasta
+  doce con Pro." -- both numbers from contracts' `MUSCLE_HISTORY_WEEKS`.
+- The **map**: `MuscleMap`, front and back, in the §32 bands with its legend
+  ("Weekly sets per muscle" / "Series semanales por músculo") and its list
+  ("Sets per muscle" / "Series por músculo"), worded by the app's own
+  `progress.bodyMap` messages.
+- The **strength line**: "Bench Press · estimated 1RM" / "Press de banca · 1RM
+  estimado", its latest value in Space Mono.
+
+**B. The analysis strip**, four cards, each a name, its plan tag, one
+sentence and a small mock-up state:
+
+| Card | Plan | Sentence *(draft)* | Mock-up |
+| --- | --- | --- | --- |
+| Plateau watch / the app's Spanish heading | Free | Lifts with no new best after several sessions, with the rule printed above them. / Ejercicios sin una nueva mejor marca después de varias sesiones, con la regla escrita arriba. | "Squat · No new best in 4 sessions" / "Sentadilla · Sin nueva mejor marca en 4 sesiones" (the app's `noNewBest`) |
+| Training signals / Señales de entrenamiento | Pro | Effort, rep targets, declines and workouts over two weeks against the two before; a change is marked, never explained. / Esfuerzo, objetivos de repeticiones, caídas y entrenamientos en dos semanas frente a las dos anteriores; un cambio se marca, nunca se explica. | The effort row with its warning mark and the word "Changed" / "Cambió" |
+| Deload suggestion / Sugerencia: una semana más liviana | Pro | When a load signal holds, it proposes a lighter week with its dates; nothing changes until you save it. / Cuando una señal de carga se mantiene, propone una semana más liviana con sus fechas; nada cambia hasta que la guardas. | The suggestion row with its dates and an outline "Plan this deload" / "Planificar esta descarga" |
+| Training review / Revisión del entrenamiento | Pro | Pick a question and a few workouts: the answer describes your logs, cites every number from them and never guesses a cause. / Elige una pregunta y algunos entrenamientos: la respuesta describe tus registros, cita cada número y nunca adivina una causa. | The question "What changed between these workouts?" / "¿Qué cambió entre estos entrenamientos?" and one finding whose figures are links |
+
+Names, questions and row wording are the app's own messages (`progress`,
+`planning`), never retyped. The routine draft, the other AI feature, is named
+in the Pro section (§12.10); where answers are written and what is sent is
+said in the questions (§12.11), as the app says it.
+
+**Layout.**
+- **Ground:** the page's theme.
+- **≥ 1024, the stage:** sticky, about 300svh. The text, the week rail and
+  its plan line in columns 1–4; the map, front and back side by side (about
+  520px tall), in columns 5–9; the list in columns 10–12, with the strength
+  line under the map across columns 5–12. Four invisible step markers, one
+  per week, pass the viewport's centre as the page scrolls.
+- **Below 1024:** no stage: the text, the rail, the map (front and back side
+  by side from 390, stacked below), the list and the line, one after another.
+- **The strip:** four cards in a row from 1024, two by two at 768, stacked
+  below; ruled cards on `--surface` with the small radius, the plan tag in
+  each card's corner.
+
+**Motion.**
+- *Heading:* line rise and rule draw, as every section.
+- *Desktop stage:* each week marker reaching the centre advances the week
+  (an IntersectionObserver, never a scroll listener): each muscle's fill
+  crossfades to its new band (400ms, `fill`), the list's numbers count to the
+  week's values (400ms) and re-sort, the strength line draws one more segment
+  (400ms, `stroke-dashoffset`) and its value counts, and the rail's dot slides
+  (300ms, transform). Scrolling back steps back. The stage starts at week 1,
+  so the first frame is sparse and the map fills as the visitor reads.
+- *Below 1024:* when the map is half in view, the four weeks play by
+  themselves, 1.2s apart (under 5 seconds), and rest on week 4; once per
+  entry.
+- *The strip:* the cards rise 24px and fade in, 120ms apart; each mock-up
+  makes one move as its card lands (the "Changed" mark appears, the finding's
+  figures underline) and rests.
+- *Reduced motion:* week 4 at once, every value final, no stage scrolling
+  behaviour, the cards present.
+- *No JavaScript:* the stacked layout at week 4; the stage is switched on by
+  the `js` class.
+
+**Assets.** `MuscleMap` and its generated figure (§32), the strength chart's
+line, and the presentational rows of plateau watch, training signals, the
+deload suggestion and the training review, identified at build.
+
+**Data.** Synthetic and labelled "Example", four weeks within the free
+window. Weekly sets (chest, back, quadriceps, hamstrings, shoulders, biceps,
+triceps, glutes, calves, core), chosen so muscles cross bands as the weeks
+pass -- for example chest 8, 10, 12, 14; calves 0, 2, 2, 4; core 0, 0, 2, 4 --
+and Bench Press estimated 1RM 99, 100, 101, 102 kg, consistent with section
+4's "+4 kg in 8 weeks". Muscle names through the catalog's muscle groups.
+
+**Accessibility.** The stage's visuals are `aria-hidden`; its `h3` and body
+say what it shows, and the final week's list is also in visually hidden text
+as a list, so no value is announced while scrolling. The cards are real text
+with real headings; a plan tag is read as a word.
+
+**Acceptance checks.** Every plan tag and both week numbers come from
+contracts and a test holds them; the stage steps forwards and backwards with
+the scroll; below 1024 the weeks finish within 5 seconds; Spanish fits the
+cards at 1024 and 320; week 4 without JavaScript or under reduced motion.
+
+**Needs from §33.** A second sticky stage; fill crossfades on the body map;
+the Pro tag on public pages.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
