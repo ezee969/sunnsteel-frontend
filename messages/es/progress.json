@@ -442,5 +442,49 @@
 		"addedBody": "{goal} ya es uno de tus objetivos.",
 		"addFailed": "No se pudo agregar el objetivo",
 		"dismissFailed": "No se pudo dejar de lado la sugerencia"
+	},
+	"review": {
+		"title": "Revisión del entrenamiento",
+		"description": "Elige algunos entrenamientos terminados y una pregunta. La respuesta dice lo que muestran tus registros y cita cada número.",
+		"loading": "Cargando revisiones",
+		"usageFailed": "No se pudieron leer las revisiones",
+		"unavailable": "Las revisiones no están disponibles ahora.",
+		"paused": "Las revisiones están en pausa hasta el próximo mes.",
+		"quotaReached": "Ya usaste tus {limit} revisiones de este mes. Se renuevan el {date}.",
+		"questionLabel": "Pregunta",
+		"questions": {
+			"CHANGES": "Qué cambió",
+			"PROGRESS": "Progreso",
+			"EFFORT": "Esfuerzo"
+		},
+		"questionText": {
+			"CHANGES": "¿Qué cambió entre estos entrenamientos?",
+			"PROGRESS": "¿Dónde progresaron mis ejercicios y dónde se estancaron?",
+			"EFFORT": "¿Cómo fue mi esfuerzo frente al plan?"
+		},
+		"workoutsLabel": "Entrenamientos",
+		"workoutsHint": "Elige de {min} a {max}. {count, plural, =0 {Ninguno elegido} one {# elegido} other {# elegidos}}.",
+		"loadingWorkouts": "Cargando tus entrenamientos",
+		"workoutsFailed": "No se pudieron leer tus entrenamientos",
+		"notEnoughTitle": "Todavía no hay suficientes entrenamientos",
+		"notEnoughBody": "Termina al menos {min} entrenamientos para revisarlos juntos.",
+		"workoutOption": "{date} · {name}",
+		"disclosure": "Los entrenamientos que elijas se envían a Anthropic para escribir la revisión y no se guardan.",
+		"left": "Te {left, plural, one {queda # revisión} other {quedan # revisiones}} de {limit} este mes. Se renuevan el {date}.",
+		"review": "Revisar",
+		"reviewing": "Revisando…",
+		"reviewingStatus": "Revisando tus entrenamientos. Puede tardar hasta un minuto.",
+		"failed": "No se escribió ninguna revisión",
+		"resultTitle": "Lo que muestran tus registros",
+		"workoutsRead": "Entrenamientos leídos",
+		"citation": "Del entrenamiento del {date}",
+		"notAdvice": "Una revisión describe tus registros. No explica por qué y no es consejo médico.",
+		"discard": "Descartar revisión",
+		"facts": {
+			"weightTimesReps": "{weight} × {reps}",
+			"reps": "{count, plural, one {# repetición} other {# repeticiones}}",
+			"minutes": "{count} min",
+			"rpe": "RPE {value}"
+		}
 	}
 }

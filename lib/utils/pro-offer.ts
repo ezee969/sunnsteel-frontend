@@ -52,7 +52,12 @@ export const PRO_OUTCOMES = [
 	},
 	{
 		key: 'compare',
-		features: ['TRAINING_COMPARISON', 'TRAINING_SIGNALS', 'GOAL_SUGGESTIONS'],
+		features: [
+			'TRAINING_COMPARISON',
+			'TRAINING_SIGNALS',
+			'GOAL_SUGGESTIONS',
+			'TRAINING_REVIEW',
+		],
 	},
 	{
 		key: 'history',

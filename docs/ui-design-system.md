@@ -2673,3 +2673,48 @@ For an account that can buy Pro, `/plans` reads top to bottom as a decision:
 5. the comparison table and what is always free (§29.4).
 
 An account on Pro sees no offer: the plan line, the questions, the table.
+
+## 31. Amendment — Training review (2026-11-20, `INTEL-04`)
+
+**Status: in force.** The owner's decisions at `INTEL-04`'s claim: the
+questions are fixed, never free text, and every number a review shows is one
+the server computed. A review describes the member's own logs; it never names
+a cause, a condition of the body or advice, and the screen says so. Nothing
+here adds a colour, face, radius or shadow.
+
+### 31.1 Placement
+
+Progress › Workouts, after session comparison, as its own ruled section
+(icon, `type-section` title, one `type-body-sm` `ink-3` line). Free sees
+§29's `LockedModule` in its place and no read is made.
+
+### 31.2 Choosing
+
+- **The question** is a `ToggleRow` of the three questions (§28.2), the full
+  question below it in `type-body`.
+- **The workouts** are a second `ToggleRow` of independent options
+  (`aria-pressed`), the member's latest completed workouts as date and day,
+  newest first. **Never checkboxes**: a ticked box means done as planned
+  (§4.3 rule 2). An option wraps rather than truncating, and past the most a
+  review reads the unchosen ones are disabled. A hint under it states the
+  range and how many are chosen.
+- What is sent and to whom, and how many reviews are left this month, are
+  `type-body-sm` `ink-3` lines, as for routine drafts.
+- **Review** is an outline `sm` button; while it runs, a `role="status"`
+  line says it can take up to a minute. There is no streaming and no typing
+  effect: the review appears whole, once the server has checked it.
+
+### 31.3 The answer
+
+- `type-panel` "What your logs show" over the question in `type-body-sm`
+  `ink-3`.
+- The findings are a ruled ordered list in `type-body`. **Every value is a
+  fact** rendered in `type-data` with a dotted underline, a link to the
+  workout it came from whose title names that workout's date; this is the one
+  inline-link style in prose, and it means "cited". An exercise's name is
+  plain text.
+- **Workouts read**: a `type-label` over a ruled list of links to each
+  workout.
+- A `type-body-sm` `ink-3` line that a review describes the logs, explains
+  no why and is not medical advice, then a ghost **Discard review**. The
+  review is kept in the tab for a reload, never on the account.
