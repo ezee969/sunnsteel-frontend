@@ -27,7 +27,7 @@ import {
 	type BodyMapRegion,
 } from './body-map-geometry'
 
-/** Design system §32: one ink step per band, from the faint rule to ink. */
+/** Design system §32: one verdigris step per band; 0 is the untrained figure. */
 const FILL: Record<BodyMapLevel, string> = {
 	0: 'fill-intensity-0',
 	1: 'fill-intensity-1',

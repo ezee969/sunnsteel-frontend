@@ -2724,22 +2724,34 @@ Progress › Workouts, after session comparison, as its own ruled section
 **Status: in force.** The owner's decisions of 2026-11-20 at `PROG-15`'s
 claim: a front-and-back figure shaded by how much each muscle was trained,
 on Progress for a week and on a routine for its plan; **fixed bands of
-weekly sets**, never a share of the busiest muscle; an **ink ramp**, which
-the `PROG-03` matrix adopts too; and an **original figure**, approved by the
+weekly sets**, never a share of the busiest muscle; a **ramp of its own** --
+verdigris, chosen after a first ink ramp read too faint (§32.1) -- which the
+`PROG-03` matrix adopts too; and an **original figure**, approved by the
 owner from previews in both themes (the reference app's pose and seams, its
 drawing not copied). It adds one token family and no face, radius or shadow.
 
 ### 32.1 Intensity is a quantity, so it has its own ramp
 
 No colour role meant "how much": `honour` means better than planned (§4.3
-rule 3) and the matrix's honour ramp borrowed it. Six tokens,
-`--intensity-0` to `--intensity-5`, are mixed in `oklch` from the theme's
-own `--foreground` over `--rule` (0, 22, 40, 58, 78 and 100 %), so Night and
-higher contrast re-value them with no block of their own. The base is
-`--rule`, not `--rule-faint`: an untrained figure on `--surface` must still
-read as a figure in Night (the faint rule left it near the panel's tone). Use
-them only for a quantity of training: `fill-intensity-*` on the figure,
-`bg-intensity-*` on a swatch.
+rule 3) and the matrix's honour ramp borrowed it. Six tokens, `--intensity-0`
+to `--intensity-5`, hold a **verdigris** ramp -- the patina of bronze, hue
+185 in `oklch`, which no role uses (success is 152, the rank pigments start
+at 203). In daylight the bands get darker and fuller (L 0.80 to 0.36); in
+Night lighter and fuller (L 0.42 to 0.84). `--intensity-0` is the untrained
+figure, a neutral a step off the panel (L 0.88 / 0.30).
+
+**Why verdigris (the owner, 2026-11-20).** The first ramp was ink over the
+rule; the owner found its greys too close to tell apart. Three were drawn on
+the same week in both themes: a higher-contrast ink ramp (still grey, the
+middle bands read by lightness alone), verdigris, and a forge ramp from dull
+red to white-hot (the most legible, but it borrows the warm hues of honour,
+warning and destructive, and turns its order around between themes). The
+owner chose verdigris: colour that separates the bands, with no role's
+meaning borrowed. Higher contrast keeps the same ramp: the numbers beside the
+figure carry the reading (§32.4).
+
+Use the tokens only for a quantity of training: `fill-intensity-*` on the
+figure, `bg-intensity-*` on a swatch.
 
 ### 32.2 Bands, printed
 

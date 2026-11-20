@@ -56,8 +56,8 @@
   --color-surface-sunk: var(--surface-sunk);
   --color-rule: var(--rule);
   --color-rule-faint: var(--rule-faint);
-  /* PROG-15 (§32): how much a muscle was trained, an ink ramp over the
-     rule. Steps are fixed weekly-set bands, never relative to the week. */
+  /* PROG-15 (§32): how much a muscle was trained, a verdigris ramp. Steps
+     are fixed weekly-set bands, never relative to the week. */
   --color-intensity-0: var(--intensity-0);
   --color-intensity-1: var(--intensity-1);
   --color-intensity-2: var(--intensity-2);
@@ -167,14 +167,15 @@
   --field-max: 96px;
   --cluster-max: 480px;
 
-  /* PROG-15 (§32): mixed from the theme's own ink and rule, so Night and
-     higher contrast re-value them without a block of their own. */
-  --intensity-0: var(--rule);
-  --intensity-1: color-mix(in oklch, var(--foreground) 22%, var(--rule));
-  --intensity-2: color-mix(in oklch, var(--foreground) 40%, var(--rule));
-  --intensity-3: color-mix(in oklch, var(--foreground) 58%, var(--rule));
-  --intensity-4: color-mix(in oklch, var(--foreground) 78%, var(--rule));
-  --intensity-5: var(--foreground);
+  /* PROG-15 (§32): verdigris, the owner's choice of 2026-11-20. One hue (185)
+     no role uses, getting darker and fuller band by band; 0 is the untrained
+     figure, a neutral a step off the panel. */
+  --intensity-0: oklch(0.88 0.01 86);
+  --intensity-1: oklch(0.8 0.06 185);
+  --intensity-2: oklch(0.69 0.09 185);
+  --intensity-3: oklch(0.58 0.1 185);
+  --intensity-4: oklch(0.47 0.09 185);
+  --intensity-5: oklch(0.36 0.08 185);
 }
 
 /* Dark: "Night" (§4.2). A remap of the same roles, not an inversion. Gold and
@@ -229,6 +230,14 @@
   --sidebar-accent-foreground: oklch(0.94 0.01 88);
   --sidebar-border: oklch(0.37 0.012 72);
   --sidebar-ring: oklch(0.84 0.11 90);
+
+  /* PROG-15 (§32): in Night the bands get lighter and fuller instead. */
+  --intensity-0: oklch(0.3 0.008 70);
+  --intensity-1: oklch(0.42 0.05 185);
+  --intensity-2: oklch(0.52 0.08 185);
+  --intensity-3: oklch(0.62 0.1 185);
+  --intensity-4: oklch(0.73 0.11 185);
+  --intensity-5: oklch(0.84 0.11 185);
 }
 
 /* A11Y-02 (§22): higher contrast. Every text role clears 7:1 against
