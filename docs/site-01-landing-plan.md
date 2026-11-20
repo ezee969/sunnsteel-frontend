@@ -1,9 +1,10 @@
 # SITE-01 — The public landing page: plan
 
-Status: **plan, not started** (roadmap [`SITE-01`](roadmaps/product-roadmap.md#public-site)).
+Status: **plan, not started; the owner's scope decisions taken 2026-11-20**
+(§11) (roadmap [`SITE-01`](roadmaps/product-roadmap.md#public-site)).
 Written 2026-11-20 at the owner's request. It is the brief the build starts
-from; every decision marked **Owner** is asked at claim, before any comp is
-drawn.
+from. The section-by-section specification (§12) is written next, with the
+owner, one section at a time.
 
 The owner's reference is Boostcamp's signed-out home page (hero with a
 headline and two actions, a proof line, four verbs over phone frames, a
@@ -20,7 +21,9 @@ Today a signed-out visitor who opens `/` is redirected to `/login`
 thing anyone sees of Sunnsteel is a form. After `SITE-01`, `/` serves a
 static, fast, bilingual presentation of the product to signed-out visitors,
 with **Create a free account** as its one primary action and **Sign in**
-beside it; a signed-in visitor still goes straight to `/dashboard`.
+beside it; a signed-in visitor still goes straight to `/dashboard`. Two
+public pages sit beside it: `/features`, every capability in depth, and
+`/pricing`, Free and Pro.
 `/login`, `/signup`, every protected route, the public profile, share and
 legal pages keep working exactly as they do.
 
@@ -53,27 +56,26 @@ legal pages keep working exactly as they do.
 Each section names its content, its proof and its asset. Order is the
 proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 
-1. **Top bar** — lockup (`SunnsteelMark` + wordmark, §18), anchors (Features,
-   Pro, Questions), language switch (sets `ss-locale`, as Settings does),
+1. **Top bar** — lockup (`SunnsteelMark` + wordmark, §18), links to Features
+   (`/features`) and Pricing (`/pricing`), an anchor to Questions, language switch (sets `ss-locale`, as Settings does),
    **Sign in** (ghost) and **Start free** (filled). Collapses to the lockup,
    Sign in and a menu below `md`.
 2. **Hero** — headline, one-sentence subline, the two actions, the install
    line, and the hero visual (§7.2). Must make the offer intelligible in the
    first viewport at 390×844 without scrolling.
-3. **Proof line** — true facts only (§6.2).
+3. **Proof line** — true facts only (§6.2); placeholder figures during the
+   build, never in production.
 4. **The four verbs** — *Plan* (routine builder, templates, blocks), *Train*
    (live session: rest timer, plate calculator, set kinds, supersets),
    *Measure* (strength trends, muscle distribution, body progress, training
    signals), *Earn* (records, milestones, ranks). Each: a heading, two lines,
    a real screenshot in an original phone frame, and one detail callout.
-5. **The workout, demonstrated** — the page's signature section: a small,
-   self-running and touchable demo of the live session built from the app's
-   own primitives with labelled synthetic data — tick a set, the set-completion
-   signature plays, the rest bar counts, a record is crossed and celebrated.
-   Proves the product instead of describing it.
-6. **Progress you can read** — the strength chart and the muscle map
-   (`PROG-15`, if shipped; otherwise the `PROG-03` matrix), with real-looking
-   synthetic data, labelled.
+5. **The workout, in motion** — no interactive demo (the owner's decision):
+   real screenshots of the live session in a phone frame, advanced by the
+   scroll (§7.1) through a set ticked, the rest bar counting and a record
+   crossed, with labelled synthetic data.
+6. **Progress you can read** — the strength chart and the body map
+   (`PROG-15`, shipped 2026-11-20), with real-looking synthetic data, labelled.
 7. **Ranks** — the six crests from Initiate to Laureate drawn with the
    existing crest family, the rank decoration on a profile header (§24), and
    one line on what a rank means (attendance, not vanity).
@@ -85,8 +87,8 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
    messages; privacy first (every setting starts private).
 10. **Free and Pro** — the Free/Pro split from `BILL-02` rendered from
     contracts (`PRO_PRICE`, `SUBSCRIPTION_TRIAL_DAYS`), never typed by hand;
-    links to the legal pages. The founding-member offer only if the owner
-    wants it public.
+    links to the legal pages and to `/pricing`. Founding members are not
+    mentioned (the owner's decision: it no longer applies to a new account).
 11. **Questions** — an accordion: is it free, do I need to install it, does it
     work offline, Spanish/English, what Pro adds, how to cancel (`/baja`),
     data export and deletion.
@@ -95,19 +97,31 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
     legally required on every signed-out surface, `BILL-07`), terms, privacy,
     refunds, language, contact.
 
+### 4.1 The public pages beside it
+
+- **`/features`** — every capability in depth, grouped by the four verbs, each
+  with its screenshot; the landing's verbs link to their part of it.
+- **`/pricing`** — Free and Pro from contracts, the comparison rows `/plans`
+  already renders ([plans.ts](../lib/utils/plans.ts)), the trial and the
+  payment questions. What a signed-in visitor sees there is decided in §12.
+- Both share the landing's layout, top bar and footer, and every rule in
+  §5–§7.
+
 ## 5. Architecture and routing
 
 - **Route:** a new route group `app/[locale]/(site)/` with its own lean layout
-  (no protected shell, no notification or realtime providers). The page is a
+  (no protected shell, no notification or realtime providers), holding the
+  landing and `/features` and `/pricing`, which are in neither
+  `PROTECTED_PREFIXES` nor `AUTH_PAGES`. The page is a
   **Server Component, fully static per language** — no TanStack Query, no
-  Supabase read on render. Interactive islands (the demo, the menu, the
+  Supabase read on render. Interactive islands (the hero video, the menu, the
   accordion, the language switch) are small client components.
 - **Middleware:** the `/` branch changes from "redirect to `/login` when
   signed out" to "rewrite to the landing when signed out"; signed in still
   redirects to `/dashboard`. `middleware.test.ts` gains both cases.
 - **Language:** the address carries no locale (I18N-01), so crawlers see the
-  language chosen by `Accept-Language`. **Owner:** which language a crawler
-  without one gets (Spanish recommended for the Argentine market). Copy lives
+  language chosen by `Accept-Language`. A crawler without one gets
+  **English**, the app's default (the owner's decision). Copy lives
   in a new `site` message area in both languages, written together.
 - **SEO:** per-language `generateMetadata` (title, description, OG image per
   language from the existing generator), canonical URL, `robots.txt` and
@@ -119,13 +133,18 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
   worker's network-first page policy is unchanged; confirm `/` offline shows
   `/offline`, not a stale landing.
 - **Observability and analytics:** Sentry already covers the page. Conversion
-  (landing → signup → first workout) needs a measurement. **Owner:** Vercel Web
-  Analytics (cookieless, no consent banner) or nothing for now.
+  (landing → signup → first workout) is measured with **Vercel Web Analytics**
+  (the owner's decision: cookieless, no consent banner) on the public pages;
+  whether signup and the first workout can be custom events depends on the
+  Vercel plan, checked at build.
 - **Performance budget** (mid-range Android, 4G, cold): LCP ≤ 2.0 s, CLS ≤
   0.05, INP ≤ 200 ms, landing JS ≤ 90 KB gzip beyond the framework, hero image
-  ≤ 150 KB AVIF with WebP fallback, fonts already self-hosted and preloaded, no
-  video in the first viewport on phones. Lighthouse ≥ 95 in all four
-  categories on phone and desktop.
+  ≤ 150 KB AVIF with WebP fallback, fonts already self-hosted and preloaded.
+  **The hero video never delays LCP**: its still poster is the LCP element;
+  the muted, looping clip (≤ 1.5 MB on phones, ≤ 4 MB on desktop, no audio
+  track) starts after first paint; under either reduced-motion source or
+  `Save-Data` the poster stays. Lighthouse ≥ 95 in all four categories on
+  phone and desktop.
 
 ## 6. Content rules
 
@@ -136,17 +155,21 @@ Latin American with *tú* and the glossary's words. Headlines may be shorter
 and bolder than app copy, never less true.
 
 ### 6.2 Honesty (non-negotiable)
-- **No invented number, rating, testimonial, logo wall or user count.** A
-  counter appears only if it is real, read from production, above a threshold
-  the owner sets, and refreshed at build or revalidated — **Owner** decides if
-  any appears at launch.
+- **No invented number, rating, testimonial, logo wall or user count on the
+  live site.** Placeholder figures are used for now (the owner's decision):
+  during the comps and the build, the proof line and any counter show mock-up
+  numbers, held in one module and marked as placeholders. **They never reach
+  production**: the production build fails while any placeholder remains, and
+  before launch each becomes a real number read from production (above a
+  threshold the owner sets) or is removed -- decided then.
 - Allowed true facts today: free to start; works in the browser and installs
   on any phone; works offline with changes saved on reconnect; English and
   Spanish; your data exportable and deletable; private by default.
-- Every screenshot or demo with data is **synthetic and labelled** as an
+- Every screenshot with data is **synthetic and labelled** as an
   example. No real member's name, face, record or message appears.
-- Generated people (if the chosen direction uses any) are clearly
-  illustrative, never presented as members or results.
+- Generated people are allowed (the owner's decision), the hero video's
+  included: clearly illustrative, never presented as members, their results
+  or testimonials.
 
 ## 7. Visual design
 
@@ -165,32 +188,39 @@ site"**, approved by the owner with the chosen comp, covering:
   material from the 2026-10-01 brand explorations may appear, and how text
   sits over them at AA contrast in both themes.
 - **Colour:** roles unchanged — ink fills the primary action, honour gold
-  stays "exceeded expectation" (a record in the demo, a reached rank), never
+  stays "exceeded expectation" (a record in the live-session sequence, a reached rank), never
   decoration. Richness comes from material and imagery, not new hues.
-- **Motion** (the third motion amendment): §9.2 forbids page entrances and
-  per-section fade-ups; the landing keeps that ban. Motion is allowed only as
-  **demonstration of the product's own signatures**: the rule draw on section
-  headings, set completion in the demo, the crest draw (§24.4), and the rest
-  bar. Optional scroll-linked behaviour (for example the phone frames
-  advancing a screenshot as the verbs scroll) is decided with the comp, uses
-  transform/opacity only, and is off under both reduced-motion sources.
+- **Motion** (the third motion amendment), **cinematic by the owner's
+  decision**: the page is to be far more animated than the app, in the way
+  Boostcamp's signed-out home is. Within `(site)` only, §9.2's ban on page
+  entrances and per-section fade-ups is lifted: scroll-driven section
+  entrances, parallax on imagery, the hero video, scroll-linked phone
+  sequences, and the product's own signatures (rule draw, set completion,
+  crest draw §24.4, rest bar). **Each section's motion is declared in §12
+  when that section is specified**, desktop first -- the browser version is
+  the richest; phones get a lighter cut of the same motion. Transform and
+  opacity only, CSS scroll-driven animations or the installed `framer-motion`
+  (a new library only if §33 records why), never on the app's own pages, and
+  all of it off under both reduced-motion sources, where every section is
+  simply present.
 - **Device frames:** original, drawn as SVG to the brand's line language — not
   Apple's or Google's frames.
 
-### 7.2 Hero visual — three candidate directions for the comp round
-The `impeccable` direction round (§8, phase 2) decides; these are the
-starting material, all inside the system:
+### 7.2 Hero visual — a background video of people training
+The owner's decision, after Boostcamp's signed-out hero: **AI-generated,
+muted, looping clips of illustrative athletes training**, graded to the
+brand's stone and steel, under the headline and actions, at AA contrast in
+both themes through a toned overlay. The comp round (§8, phase 2) compares
+treatments of it, the choice delegated to Claude:
 
-1. **Sculpted presence** — the `final-4a` "presencia" bust from
-   `branding-explorations/2026-10-01/` (stone/steel, raking light) beside the
-   headline, with the live-session phone overlapping it. Strongest brand
-   continuity.
-2. **The ledger** — no figure: a large, slowly self-filling training ledger
-   (sets ticking, a record crossing in gold) as the hero itself. Most
-   product-honest, lightest to load.
-3. **Monument in progress** — a generated architectural image of a column or
-   arch under construction, scaffolding giving way to marble, paired with the
-   rank ladder: "building a monument" made literal.
+1. full-bleed video with the headline over it;
+2. the video beside the live-session phone, which overlaps it;
+3. the video inside a stone or arch frame.
+
+The 2026-10-01 material (the `final-4a` "presencia" bust, the monument under
+construction) may serve other sections, such as Ranks. **Gate:** a clip whose
+people look uncanny is rejected at the comp review; the fallback, licensed
+stock footage, is put to the owner then.
 
 ## 8. Skills, tools and agents — the production workflow
 
@@ -203,7 +233,8 @@ Each phase ends in an owner approval before the next starts.
   `ui-design-system.md` as the visual authority** rather than generate a
   competing `DESIGN.md` (the `sunnsteel-design` rule); any `DESIGN.md`
   impeccable needs is a pointer file.
-- **`AskUserQuestion`** at claim for every **Owner** item in §11.
+- The owner's decisions are recorded in §11; anything new that comes up at
+  claim is asked with **`AskUserQuestion`**.
 
 ### Phase 1 — Shape (structure and copy, no visuals)
 - **`impeccable shape landing`** — the section order, each section's job, the
@@ -214,7 +245,7 @@ Each phase ends in an owner approval before the next starts.
 
 ### Phase 2 — Direction and comps (the UI decision)
 - **`impeccable` new-work flow** (`concept-seed --scope direction --mode
-  persuade`) over the three directions in §7.2, constrained by the design
+  persuade`) over the three hero treatments in §7.2, constrained by the design
   system. The chosen direction is recorded as a **direction contract** in the
   surface brief, never in shipped code.
 - **Comps** (impeccable's `visualize` round): three full-page compositions at
@@ -227,6 +258,10 @@ Each phase ends in an owner approval before the next starts.
      ornament and frames, and `use_figma` to lay the comps out as editable
      frames the owner can comment on (`get_screenshot` to review);
   3. **Canva MCP** `generate-image` as a fallback for scene variants.
+- **Hero video**: the Canva MCP's `create-video` (with
+  `get-video-production-guide`) or the Figma MCP's generative models
+  (`weave_find_model`/`weave_run_model`), whichever gives the best clip; each
+  candidate is reviewed as a still and in motion at 390 and 1440.
 - **`frontend-design`** and **`web-design-guidelines`** as critique of each
   comp, sorted through `sunnsteel-design` (fix / fits / contradicts / declined).
 - Deliverable: one approved comp per breakpoint + amendment §33 drafted.
@@ -238,7 +273,8 @@ Each phase ends in an owner approval before the next starts.
 - **`scripts/generate-landing-assets.mjs`** (new, `sharp`, like
   `generate-brand-icons.mjs`) — every plate to AVIF + WebP at 640/1080/1600/
   2400 widths with fixed aspect ratios (no CLS), plus the per-language OG
-  images.
+  images, and the hero video as MP4 (H.264) and WebM at phone and desktop
+  sizes with its poster (`ffmpeg`, its availability checked at build).
 - **Real product screenshots** — extend
   [e2e/portfolio-targets.ts](../e2e/portfolio-targets.ts) with `site-*` slugs
   captured by `npm run ui:capture:portfolio` at 390×844 (phone frames) and
@@ -256,9 +292,9 @@ Each phase ends in an owner approval before the next starts.
 - **`impeccable` comp-led build** (`build-phase`: spec → plates → hero →
   sections → responsive) so the page matches the approved comp by measurement,
   not by eye.
-- **`impeccable animate`** — implements §33's motion with CSS and the
-  already-installed `framer-motion` (no new animation library; Lottie, GSAP and
-  video heroes are declined unless the amendment says otherwise).
+- **`impeccable animate`** — implements each section's motion as §12 declares
+  it, with CSS and the already-installed `framer-motion` (no new animation
+  library unless §33 records why).
 
 ### Phase 5 — Review and harden
 - **`impeccable critique`**, **`impeccable audit`** (a11y, performance,
@@ -290,10 +326,12 @@ Each phase ends in an owner approval before the next starts.
 ## 9. Acceptance criteria
 
 1. A signed-out visit to `/` in production shows the landing in the visitor's
-   language; a signed-in one opens the dashboard; no other route changed.
+   language; a signed-in one opens the dashboard; `/features` and `/pricing`
+   open for anyone; no other route changed.
 2. The first viewport at 390×844 states the offer and shows both actions.
-3. Every claim on the page is true on launch day; every data image is
-   labelled synthetic; prices come from contracts.
+3. Every claim on the page is true on launch day; no placeholder figure is in
+   the production build; every data image is labelled synthetic; prices come
+   from contracts.
 4. Both languages, both themes, all seven sweep widths pass; no text truncated
    in Spanish.
 5. §5's performance budget and Lighthouse ≥ 95 are met and recorded.
@@ -304,23 +342,42 @@ Each phase ends in an owner approval before the next starts.
 
 - **Marketing drift into the app** — mitigated by the route group's own layout
   and §33 applying only to `(site)`.
-- **Generated imagery that looks generic or uncanny** — the comp round and
-  the owner's approval gate it; direction 2 (the ledger) needs no generated
-  figure at all.
+- **Generated imagery or video that looks generic or uncanny** — the comp
+  round and the owner's approval gate it; licensed stock footage is the
+  hero's fallback.
+- **Placeholder figures shipped by mistake** — the production build refuses
+  them (§6.2).
 - **Stale screenshots** — mitigated by capturing them from the portfolio
   pipeline, re-run when a pictured screen changes.
 - **SEO limits of a locale-less address** — accepted for now; a `/es`,
   `/en` public prefix is a separate decision if search traffic matters.
-- **Weight** — imagery and demo must fit §5; anything that does not is cut,
+- **Weight** — imagery, video and motion must fit §5; anything that does not is cut,
   not compressed until it looks bad.
 
-## 11. Decisions for the owner at claim
+## 11. The owner's decisions (2026-11-20)
 
-1. Headline and positioning line (phase 1 proposes three).
-2. Hero direction (§7.2: presence, ledger or monument) — decided on comps.
-3. Generated people: allowed, or no human figures at all.
-4. Any real counter on the page at launch, and its threshold.
-5. The crawler's default language.
-6. Analytics: Vercel Web Analytics or none.
-7. Whether the founding-member offer is mentioned publicly.
-8. Whether `PROG-15` (muscle map) should ship first so the landing can show it.
+| # | Decision | Answer |
+| --- | --- | --- |
+| 1 | Scope | The landing at `/` plus public `/features` and `/pricing` (§4.1) |
+| 2 | Motion | Cinematic, on the public pages only, declared section by section with the richest version on desktop (§7.1) |
+| 3 | Live-session demo | None: screenshots only (§4, section 5) |
+| 4 | Human figures | Illustrative generated people allowed (§6.2) |
+| 5 | Hero | A background video of people training; the treatment for the comps chosen by Claude (§7.2) |
+| 6 | Video source | AI-generated, with licensed stock as the fallback if it looks uncanny |
+| 7 | Video on phones | Yes, a light version after first paint (§5) |
+| 8 | Addresses | `/features` and `/pricing`, in English like the app's routes |
+| 9 | Crawler language | English |
+| 10 | Analytics | Vercel Web Analytics |
+| 11 | Counters | Placeholder figures for now; none in production (§6.2) |
+| 12 | Founding members | Not mentioned |
+
+Taken by default, not asked: the headline and positioning line (phase 1
+proposes three); the body map on Progress, since `PROG-15` shipped the same
+day.
+
+## 12. Section-by-section specification
+
+To be written with the owner, one section at a time, before the build: for
+each section of §4 and each page of §4.1, its job, copy in English and
+Spanish, layout at 390 and 1440, its motion (desktop and phone), its assets
+and its data.
