@@ -58,7 +58,7 @@ that nobody can fake.
 - Earn: six ranks (Initiate to Laureate) and 25 milestones; rank decoration
   on the profile.
 - People: follows and activity with reactions and comments, training
-  partners with fixed encouragements, direct messages carrying routines,
+  partners, direct messages carrying routines,
   workouts, records, milestones, comebacks and months.
 - **Free and Pro** are decided by contracts' `PLANS` (never typed): Pro adds
   8-week blocks, dated training blocks, planned deloads, training signals and

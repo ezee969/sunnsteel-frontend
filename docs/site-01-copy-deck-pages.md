@@ -290,10 +290,10 @@ retyped.
 | `subline` | Follow, train with partners and send what you trained, with each part of your profile shown only to whom you choose. | Sigue, entrena con compañeros y comparte lo que entrenaste, con cada parte de tu perfil visible solo para quien elijas. |
 | `overview` | Your activity comes from what you train, not from posts. Followers see what you let them; partners see what you grant; messages carry the real thing. | Tu actividad sale de lo que entrenas, no de publicaciones. Tus seguidores ven lo que les permites; tus compañeros, lo que les das; y los mensajes llevan lo real. |
 | `highlights.activity.title` / `.body` | Activity / Workouts, records and milestones from people you follow, with {reactions} reactions and comments. | Actividad / Entrenamientos, récords y logros de la gente que sigues, con {reactions} reacciones y comentarios. |
-| `highlights.partners.title` / `.body` | Training partners / Up to {max} partners, each choosing what the other sees, with {kinds} fixed encouragements. | Compañeros de entrenamiento / Hasta {max} compañeros, cada uno elige qué ve el otro, con {kinds} mensajes de ánimo fijos. |
+| `highlights.partners.title` / `.body` | Training partners / Up to {max} partners, each choosing what the other sees, with an alert when a partner finishes a workout if you want one. | Compañeros de entrenamiento / Hasta {max} compañeros, cada uno elige qué ve el otro, con un aviso cuando un compañero termina un entrenamiento, si lo quieres. |
 | `highlights.messages.title` / `.body` | Messages / One to one, carrying a routine, a workout, a record, a milestone, a comeback or a month of training. | Mensajes / Uno a uno, con una rutina, un entrenamiento, un récord, un logro, un regreso o un mes de entrenamiento. |
 | `facts.privacy` | {count} parts of your profile, each with its own audience | {count} partes de tu perfil, cada una con su público |
-| `facts.encouragement` | Up to {max} encouragements to each partner every 24 hours | Hasta {max} mensajes de ánimo a cada compañero cada 24 horas |
+| `facts.partners` | Up to {max} training partners | Hasta {max} compañeros de entrenamiento |
 | `facts.message` | Messages up to {max} characters | Mensajes de hasta {max} caracteres |
 | `facts.plan` | Free | Free |
 | `steps.1` | Follow people you train with or admire. | Sigue a la gente con la que entrenas o que admiras. |
@@ -439,7 +439,7 @@ charge is made, leaving Pro), with the legal links of `LegalLinks`.
 - **Every number is an argument from code:** the step, the set kinds, the
   extra-set and correction limits, the routine days, versions, own exercises,
   drafts and reviews a month, the history windows, goals, the comeback rule,
-  the featured slots, the partner and encouragement limits, the message
+  the featured slots, the partner limit, the message
   length and context, the ranks and milestones, the price and the trial.
 - **Worked examples** (warm-ups and plates; Upper / Lower's weekly sets; the
   double-progression ledger; the 8-week block at a 100 kg reference max; one

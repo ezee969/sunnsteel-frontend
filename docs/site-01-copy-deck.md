@@ -16,7 +16,7 @@ in sentence case and set in capitals by their rank.
   first), written in US spelling: *program*, not *programme*.
 - **Spanish is neutral Latin American with *tú*** and the glossary's words
   ([i18n.md](reference/i18n.md)): *serie*, *calentamiento*, *descarga*,
-  *denunciar* (not *reportar*), *ánimo*, *mapa del cuerpo*, *marcar* a set
+  *denunciar* (not *reportar*), *mapa del cuerpo*, *marcar* a set
   (not *tildar*).
 - **Every claim is checked against the code** (the plan's §12 names each
   source); nothing promises a result, a cause or a default the product does
@@ -213,8 +213,8 @@ Template names, schedules, descriptions and day names are the app's
 | `activity.entry` | {name} finished {day} · {records, plural, one {# record} other {# records}} | {name} terminó {day} · {records, plural, one {# récord} other {# récords}} |
 | `partners.eyebrow` | Training partners | Compañeros de entrenamiento |
 | `partners.title` | Train with partners | Entrena con compañeros |
-| `partners.body` | Up to {max} partners. Each of you chooses what the other sees, and encouragement is one of four fixed messages, never free text. | Hasta {max} compañeros. Cada uno elige qué ve el otro, y el ánimo es uno de cuatro mensajes fijos, nunca texto libre. |
-| `partners.sent` | Sent | Enviado |
+| `partners.body` | Up to {max} partners. Each of you chooses what the other sees, and you can be told when a partner finishes a workout. | Hasta {max} compañeros. Cada uno elige qué ve el otro, y puedes recibir un aviso cuando un compañero termina un entrenamiento. |
+| `partners.shares` | Shares with you: {parts} | Comparte contigo: {parts} |
 | `messages.eyebrow` | Messages | Mensajes |
 | `messages.title` | Send what you trained | Comparte lo que entrenaste |
 | `messages.body` | One-to-one messages that can carry a routine, a workout, a record, a milestone or a month of training. People you don't follow can only send you a request, and only if you allow it. | Mensajes uno a uno que pueden llevar una rutina, un entrenamiento, un récord, un logro o un mes de entrenamiento. Quien no sigues solo puede mandarte una solicitud, y solo si lo permites. |
@@ -223,8 +223,9 @@ Template names, schedules, descriptions and day names are the app's
 | `privacy.title` | You choose who sees each part | Tú eliges quién ve cada parte |
 | `privacy.body` | {count} parts of your profile, each set to Everyone, Followers or Only me. Block anyone, report anything, and delete your account or take your data with you whenever you want. | {count} partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea a quien quieras, denuncia lo que haga falta, y borra tu cuenta o llévate tus datos cuando quieras. |
 
-The four reactions and encouragements, the partner limit and the privacy
-rows' names are the app's and contracts' (§12.9).
+The four reactions, the partner limit, the partner alert's wording and the
+privacy rows' names are the app's and contracts' (§12.9). **Partner
+encouragement is never mentioned on the site** (the owner, 2026-11-21).
 
 ## 10. Free and Pro — `site.plans`
 
@@ -327,7 +328,7 @@ legal buttons are `LegalLinks`' own.
   and the trial all arrive as arguments from contracts or the app, so the
   copy cannot drift from them.
 - **Glossary:** every Spanish term above is the glossary's; *denunciar* for
-  report, *marcar* for completing a set, *mapa del cuerpo*, *ánimo*.
+  report, *marcar* for completing a set, *mapa del cuerpo*.
 - **Length:** the longest Spanish strings (the hero subline, the plans'
   window line, answer 2) are measured at 320 and 390 in the build; a line
   that does not fit is rephrased, never shrunk.

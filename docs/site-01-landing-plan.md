@@ -86,8 +86,7 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 8. **Start with a programme** — the three starter templates with their days
    and level; each links to `/signup?template=<slug>`, and the template
    reaches the builder through sign-up and onboarding (§12.8).
-9. **Train with people** (§12.9) — follow, training partners, encouragement,
-   messages; you choose who sees each part. (This line used to say every
+9. **Train with people** (§12.9) — follow, training partners, messages; you choose who sees each part. (This line used to say every
    setting starts private, which is untrue for new accounts.)
 10. **Free and Pro** — the Free/Pro split from `BILL-02` rendered from
     contracts (`PRO_PRICE`, `SUBSCRIPTION_TRIAL_DAYS`), never typed by hand;
@@ -459,6 +458,7 @@ Each phase ends in an owner approval before the next starts.
 | 34 | Audience (2026-11-21) | A varied audience, English first, Spanish written alongside -- replacing "mostly Spanish (Argentina)" in §2; recorded in `PRODUCT.md` |
 | 35 | Evidence (2026-11-21) | None real; everything shown is mock-up, labelled, with placeholders replaced by true facts in production |
 | 36 | Build path (2026-11-21) | Comp-first (`.impeccable/config.json`) |
+| 37 | Encouragement (2026-11-21) | Partner encouragement (`SOC-09`) never appears on the site -- "too corny"; the partners scene shows what partners share and the partner alert instead (§12.9) |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
 which an international English audience may not be able to pay; how Pro is
@@ -1351,22 +1351,22 @@ member decides who sees what.
   | Scene | Eyebrow | Title *(draft)* | Sentence *(draft)* | Fragment script (≤ 5 s) |
   | --- | --- | --- | --- | --- |
   | Activity | ACTIVITY / ACTIVIDAD | Follow people, see them train / Sigue a otros y míralos entrenar | Workouts, records and milestones from the people you follow, with four reactions and comments -- nothing to post. / Entrenamientos, récords y logros de la gente que sigues, con cuatro reacciones y comentarios: no hay nada que publicar. | An entry slides in -- "Lu finished Push · 3 records" / "Lu terminó Empuje · 3 récords" -- then Strength / Fuerza is tapped and its count goes from 2 to 3 |
-  | Partners | TRAINING PARTNERS / COMPAÑEROS | Train with partners / Entrena con compañeros | Up to 20 partners; each of you grants what the other sees, and encouragement is one of four fixed messages, never free text. / Hasta 20 compañeros; cada uno elige qué ve el otro, y el aliento es uno de cuatro mensajes fijos, nunca texto libre. | Lu's partner card shows the four prompts; "Strong session" / "Gran sesión" is tapped and reads as sent |
+  | Partners | TRAINING PARTNERS / COMPAÑEROS | Train with partners / Entrena con compañeros | Up to 20 partners. Each of you chooses what the other sees, and you can be told when a partner finishes a workout. / Hasta 20 compañeros. Cada uno elige qué ve el otro, y puedes recibir un aviso cuando un compañero termina un entrenamiento. | Lu's partner card shows what each of you shares (activity, progress); then the partner alert slides in, worded as the app words it ("Lu finished Push") |
   | Messages | MESSAGES / MENSAJES | Send what you trained / Comparte lo que entrenaste | One-to-one messages that can carry a routine, a workout, a record, a milestone or a month of training; a stranger's first message waits as a request. / Mensajes uno a uno que pueden llevar una rutina, un entrenamiento, un récord, un logro o un mes de entrenamiento; el primer mensaje de alguien que no sigues espera como solicitud. | A message from Lu arrives with the Upper / Lower routine card; the copy action is tapped and the routine is in "your routines" |
 
   The reactions (Strength, Discipline, Respect, Inspiring / Fuerza,
-  Disciplina, Respeto, Inspirador), the four prompts (Ready to train, Strong
-  session, Good work, Keep going / Listo para entrenar, Gran sesión, Buen
-  trabajo, Sigue así), the limit of 20 and the six kinds a message carries
-  are the app's and contracts' (`TRAINING_PARTNER_ENCOURAGEMENT_KINDS`,
-  `TRAINING_PARTNERS_MAX`), never retyped; so is the clone action's label.
+  Disciplina, Respeto, Inspirador), the limit of 20, the partner alert's
+  wording (`NOTIF-07`) and the six kinds a message carries are the app's and
+  contracts' (`TRAINING_PARTNERS_MAX`), never retyped; so is the clone
+  action's label. **Partner encouragement (`SOC-09`) never appears on the
+  site** (the owner, 2026-11-21: too corny).
 - **The privacy band**: `h3` *(draft)* "You choose who sees each part" / "Tú
   eliges quién ve cada parte", and *(draft)* "Ten parts of your profile, each
   set to Everyone, Followers or Only me. Block anyone, report anything, and
   delete your account or take your data with you whenever you want." /
   "Diez partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea
-  a quien quieras, reporta lo que sea, y borra tu cuenta o llévate tus datos
-  cuando quieras." Beside it, three of the app's privacy rows -- Personal
+  a quien quieras, denuncia lo que haga falta, y borra tu cuenta o llévate tus
+  datos cuando quieras." Beside it, three of the app's privacy rows -- Personal
   records, Workout history, Rank / Récords personales, Historial de
   entrenamientos, Rango -- each with its three-way choice, as an
   illustration. **No default is stated**: new accounts start at Followers and
@@ -1393,8 +1393,8 @@ member decides who sees what.
 - *Reduced motion and no JavaScript:* final states.
 
 **Assets.** Presentational parts of the activity entry and its reactions
-(`SOC-03`/`SOC-04`), the training-partner card and its prompts (`SOC-08`/
-`SOC-09`), the conversation thread and its routine card (`MSG-01`/`MSG-07`)
+(`SOC-03`/`SOC-04`), the training-partner card and the partner alert
+(`SOC-08`/`NOTIF-07`), the conversation thread and its routine card (`MSG-01`/`MSG-07`)
 and the privacy rows (`PROF-06`, `ToggleRow`), identified at build.
 
 **Data.** Synthetic and labelled "Example": a member "Lu" with an initials
