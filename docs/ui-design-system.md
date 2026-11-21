@@ -2907,10 +2907,11 @@ present at first paint, never animated in.
 - **Where:** the landing's hero and closing band only. Feature, use-case and
   pricing headers use the Night ground -- with an animated mock-up where their
   specification gives one -- never video.
-- **People** are generated and illustrative: never presented as members,
-  their results or testimonials; no logos, branded clothing, recognisable
-  real person or visible screen. A clip whose people look uncanny is rejected
-  at review; licensed stock footage is the fallback, put to the owner.
+- **People** are real models from licensed stock footage (the owner,
+  2026-11-21: Mixkit's free-licence series in a gym with machines), graded
+  black and white with grain: never presented as members, their results or
+  testimonials, and never shown endorsing the product; no legible logo,
+  branded clothing, sign or visible screen in any frame kept.
 - **Weight and loading:** the poster is the LCP element; a clip is requested
   only after first paint (the hero) or near its band (the closing band);
   phones get a separate light cut (about 0.6 MB) or, for the closing band, the

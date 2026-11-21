@@ -89,8 +89,9 @@ that nobody can fake.
 - **No real evidence exists** (the owner, 2026-11-21): no testimonials,
   reviews, ratings, press, customer logos, member photos or real usage
   figures. Everything the site shows is mock-up: synthetic data labelled
-  "Example", illustrative generated people, and placeholder usage figures
-  that a production build replaces with true product facts.
+  "Example", background footage of real models from licensed stock (Mixkit,
+  never presented as members), and placeholder usage figures that a
+  production build replaces with true product facts.
 - Real product screenshots, captured from a seeded account:
   `docs/portfolio/screenshots/` (34 frames).
 - The owner's 2026-10-01 brand explorations (bust, stone and steel) are

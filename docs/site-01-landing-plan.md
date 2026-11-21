@@ -196,9 +196,10 @@ and bolder than app copy, never less true.
   default": new accounts start at Followers.
 - Every screenshot or mock-up with data is **synthetic and labelled** as an
   example. No real member's name, face, record or message appears.
-- Generated people are allowed (the owner's decision), the hero video's
-  included: clearly illustrative, never presented as members, their results
-  or testimonials.
+- The people in the videos are real models from licensed stock footage (the
+  owner's decision of 2026-11-21, §7.2): background only, never presented as
+  members, their results or testimonials, never named or quoted, and never
+  shown endorsing Sunnsteel.
 
 ## 7. Visual design
 
@@ -236,20 +237,37 @@ site"**, approved by the owner with the chosen comp, covering:
   Apple's or Google's frames.
 
 ### 7.2 Hero visual — a background video of people training
-The owner's decision, after Boostcamp's signed-out hero: **AI-generated,
-muted, looping clips of illustrative athletes training**, graded to the
-brand's stone and steel, under the headline and actions, at AA contrast in
-both themes through a toned overlay. The comp round (§8, phase 2) compares
-treatments of it, the choice delegated to Claude:
+The owner's decision, after Boostcamp's signed-out hero: **muted, looping
+clips of people training**, under the headline and actions, at AA contrast in
+both themes through a toned overlay. The comp round (§8, phase 2) compared
+three treatments -- the video full-bleed with the headline over it, beside the
+live-session phone, or inside a stone or arch frame -- and the owner approved
+the first (comp A, §11 row 38).
 
-1. full-bleed video with the headline over it;
-2. the video beside the live-session phone, which overlaps it;
-3. the video inside a stone or arch frame.
+**Footage (the owner, 2026-11-21).** The comps' AI-generated people looked
+too artificial to the owner, and photographs taken from the web are someone
+else's work, so the footage is **real, licensed stock**. After four rounds of
+candidates (Pexels and Mixkit: a woman alone, mixed series, free weights,
+then machines) the owner chose **Mixkit's series shot in a gym with machines
+under an LED-lit ceiling**, because its models are more muscular and read as
+more serious:
+- **Led by the man**; the woman appears in fewer shots.
+- **No chest-press or shoulder-press shots** (the owner's exclusion).
+- **Shortlist** (Mixkit ids, each free in 4K): 100546 cable fly, 100549 lat
+  pulldown, 100550 seated cable row and 100523 the woman on a pulldown
+  machine for the hero; 100540, a close back at a machine, for the closing
+  band; 100547 and 100541 spare.
+- **Out:** 100548 and 100551 (a slogan painted on the wall), 100518 and
+  100554 (the gym's sign), 100543–100545 (bench press).
+- **Licence:** the Mixkit Stock Video Free License (commercial use and
+  modification, no attribution required). Mixkit's *Restricted* licence is
+  personal use only, so no restricted clip is ever used.
+- **Grade:** black and white with grain, towards the brand's stone and steel.
+  The cable towers carry the manufacturer's small printed labels, unreadable
+  under the grade and scrim; each cut is checked for legible text at review.
 
 The 2026-10-01 material (the `final-4a` "presencia" bust, the monument under
-construction) may serve other sections, such as Ranks. **Gate:** a clip whose
-people look uncanny is rejected at the comp review; the fallback, licensed
-stock footage, is put to the owner then.
+construction) may serve other sections, such as Ranks.
 
 ### 7.3 Phone mock-ups — the app's screens, animated
 
@@ -319,10 +337,9 @@ Each phase ends in an owner approval before the next starts.
      ornament and frames, and `use_figma` to lay the comps out as editable
      frames the owner can comment on (`get_screenshot` to review);
   3. **Canva MCP** `generate-image` as a fallback for scene variants.
-- **Hero video**: the Canva MCP's `create-video` (with
-  `get-video-production-guide`) or the Figma MCP's generative models
-  (`weave_find_model`/`weave_run_model`), whichever gives the best clip; each
-  candidate is reviewed as a still and in motion at 390 and 1440.
+- **Hero video**: licensed stock footage (§7.2), each file downloaded only
+  with the owner's approval and kept outside the repository as a master;
+  each cut is reviewed as a still and in motion at 390 and 1440.
 - **`frontend-design`** and **`web-design-guidelines`** as critique of each
   comp, sorted through `sunnsteel-design` (fix / fits / contradicts / declined).
 - Deliverable: one approved comp per breakpoint + amendment §33 drafted.
@@ -403,9 +420,9 @@ Each phase ends in an owner approval before the next starts.
 
 - **Marketing drift into the app** — mitigated by the route group's own layout
   and §33 applying only to `(site)`.
-- **Generated imagery or video that looks generic or uncanny** — the comp
-  round and the owner's approval gate it; licensed stock footage is the
-  hero's fallback.
+- **Stock footage that reads as an advert or carries text** — the owner
+  chose the series; every cut is checked for legible logos or signs, and the
+  people are never presented as members or as endorsing the product (§7.2).
 - **Placeholder figures shipped by mistake** — a production build swaps each
   for a reserve true fact, and a test holds it (§6.2, §12.3).
 - **Mock-ups drifting from the app** — mitigated by rendering the app's own
@@ -425,9 +442,9 @@ Each phase ends in an owner approval before the next starts.
 | 1 | Scope | The landing at `/` plus public `/features` and `/pricing` (§4.1) |
 | 2 | Motion | Cinematic, on the public pages only, declared section by section with the richest version on desktop (§7.1) |
 | 3 | Phones | Animated HTML mock-ups of the app's screens, playing by themselves as Boostcamp's do; no interactive demo (§7.3; replaced "screenshots only" the same day) |
-| 4 | Human figures | Illustrative generated people allowed (§6.2) |
+| 4 | Human figures | Illustrative generated people allowed (§6.2); superseded by row 39 |
 | 5 | Hero | A background video of people training; the treatment for the comps chosen by Claude (§7.2) |
-| 6 | Video source | AI-generated, with licensed stock as the fallback if it looks uncanny |
+| 6 | Video source | AI-generated, with licensed stock as the fallback if it looks uncanny; superseded by row 39 |
 | 7 | Video on phones | Yes, a light version after first paint (§5) |
 | 8 | Addresses | `/features` and `/pricing`, in English like the app's routes |
 | 9 | Crawler language | English |
@@ -450,7 +467,7 @@ Each phase ends in an owner approval before the next starts.
 | 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
 | 27 | Free and Pro | Two equal cards side by side (Free first on phones); "Try Pro free for 7 days" filled; the Pro intent carried through sign-up to `/plans`, charging nothing by itself (§12.10) |
 | 28 | Questions | One list of twelve, including messages not being end-to-end encrypted and what the AI receives; payment detail on `/pricing` (§12.11) |
-| 29 | Closing band | A second generated clip on desktop (poster on phones), "Empieza a forjarte.", and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
+| 29 | Closing band | A second clip on desktop (poster on phones), "Empieza a forjarte.", and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
 | 30 | Footer | Site map, help, legal pages and the two legal buttons; no seller identification (§12.13) |
 | 31 | Public pages | Four templates and an outline per page, in one pass (§12.14–12.21) |
 | 32 | Feature pages | A guide under an animated header, worked examples computed from the product's own rules (§12.15–12.16) |
@@ -458,8 +475,9 @@ Each phase ends in an owner approval before the next starts.
 | 34 | Audience (2026-11-21) | A varied audience, English first, Spanish written alongside -- replacing "mostly Spanish (Argentina)" in §2; recorded in `PRODUCT.md` |
 | 35 | Evidence (2026-11-21) | None real; everything shown is mock-up, labelled, with placeholders replaced by true facts in production |
 | 36 | Build path (2026-11-21) | Comp-first (`.impeccable/config.json`) |
-| 38 | Hero comp (2026-11-21) | Comp A approved: the video full-bleed, text over its dark side, the phone lower right (`.impeccable/mocks/comp-a-full-bleed.png`). The owner finds AI-generated people too artificial and wants real people training; the source is being settled (real photographs taken from the web are someone else's work, so licensed footage is proposed) |
+| 38 | Hero comp (2026-11-21) | Comp A approved: the video full-bleed, text over its dark side, the phone lower right (`.impeccable/mocks/comp-a-full-bleed.png`). The owner finds AI-generated people too artificial and wants real people training (row 39) |
 | 37 | Encouragement (2026-11-21) | Partner encouragement (`SOC-09`) never appears on the site -- "too corny"; the partners scene shows what partners share and the partner alert instead (§12.9) |
+| 39 | Footage (2026-11-21) | Real, licensed stock: Mixkit's free-licence series in a gym with machines, chosen for its more muscular, more serious models; led by the man, the woman in fewer shots; no chest-press or shoulder-press shots (§7.2) |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
 which an international English audience may not be able to pay; how Pro is
@@ -703,11 +721,11 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   1.5 MB.
 - **Posters:** each cut's first frame, AVIF and WebP, at most 150 KB (desktop)
   and 60 KB (phone), preloaded per media query with `fetchpriority="high"`.
-- **Generation brief** for phase 2: illustrative athletes of different
-  genders, ages and builds -- a squat, a deadlift, a bench press, chalk on the
-  hands, a plate loaded -- in a gym of concrete and stone, raking warm light,
-  deep blacks, graded towards the brand's stone and steel. No logos, no
-  branded clothing, no recognisable real person, no visible screen.
+- **Footage** (§7.2): the desktop cut is the Mixkit shortlist in this order
+  -- cable fly, lat pulldown, the woman at a pulldown machine, seated cable
+  row -- each trimmed to its strongest 2–3 s; the phone cut is the cable fly
+  alone, cropped to portrait around the man. Black and white with grain,
+  deep blacks. No legible logo, sign or screen in any frame kept.
 - **Phone mock-up:** the live session's presentational set rows and rest bar
   (§7.3), identified at build, in the SVG frame.
 
@@ -1572,7 +1590,7 @@ matches the visible text; answers fit at 320 in Spanish.
 
 ### 12.12 Closing band — `SiteClosing`
 
-*Approved 2026-11-21: a second generated clip behind it on desktop (its
+*Approved 2026-11-21: a second clip behind it on desktop (its
 poster on phones), the headline "Start forging yourself.", and a QR card on
 desktop.*
 
@@ -1629,10 +1647,10 @@ the format needs.
   present.
 
 **Assets.**
-- **The second clip** (desktop only): close-ups -- chalk on hands, plates
-  sliding onto a bar, a collar tightened, a bar set down -- in the hero's
+- **The second clip** (desktop only): a closer shot from the hero's series
+  -- Mixkit 100540, the man's back at a machine (§7.2) -- in the hero's
   grade, a seamless 8–12 s loop, no audio, at most 2 MB, requested only when
-  the band is within one screen; same generation brief and gate as §7.2.
+  the band is within one screen.
 - **Posters:** desktop and phone, AVIF and WebP, at most 120 KB and 60 KB.
 - **The QR code**, generated at build per environment's `PUBLIC_ORIGIN`.
 

@@ -26,8 +26,9 @@ history nobody can fake — read back as numbers, never verdicts.
 
 **Proof and content:** the app's own screens as animated mock-ups with
 synthetic, labelled data; real product facts from code (templates, ranks,
-milestones, catalog size, plan limits, price); an AI-generated background
-video of illustrative people training. No real testimonials, ratings, counts
+milestones, catalog size, plan limits, price); a background video of real
+models training on machines, from licensed stock (Mixkit; the plan's §7.2
+shortlist), graded black and white. No real testimonials, ratings, counts
 or member imagery exist; usage figures are placeholders replaced by true
 facts in production.
 
@@ -37,6 +38,8 @@ plan's §5; Pro tagged wherever named; build path comp-first.
 
 **Approved comp (2026-11-21):** `.impeccable/mocks/comp-a-full-bleed.png` -- the video full-bleed behind the hero, text over its dark left side, the live-session phone on the lower right standing on the proof band. Its composition is the contract; its AI-generated imagery is not (the owner wants real people; see the plan §11).
 
-**Unresolved:** the direction contract; the hero imagery source; how Pro is offered to
+**Footage (2026-11-21):** Mixkit's free-licence gym-with-machines series, led by the man, no chest-press or shoulder-press shots (plan §7.2, §11 row 39).
+
+**Unresolved:** the direction contract; how Pro is offered to
 an international audience paying in ARS; whether real usage figures exist at
 launch.
