@@ -1,0 +1,9 @@
+{
+  "tool": "figma generate_image",
+  "model": "gpt-image-2.5-flare",
+  "figmaFile": "yvkKVcATY8FJlEhEXjtOLw",
+  "figmaNode": "1:4",
+  "treatment": "text left, the video seen through a round-top Roman arch right, phone in front of the arch's base",
+  "prompt": "See the SITE-01 plan §12.2 and the session transcript; the full prompt is embedded in the PNG.",
+  "approved": false
+}

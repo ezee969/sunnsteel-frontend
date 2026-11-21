@@ -1,8 +1,8 @@
 # SITE-01 — Copy deck, part 2: the public pages
 
 The copy of `/features`, its six feature pages, the three use-case pages and
-`/pricing`, in English and Spanish, written together. **Status: draft for the
-owner's approval** (2026-11-21). Part 1, the landing, is
+`/pricing`, in English and Spanish, written together. **Status: approved by
+the owner on 2026-11-21**, after taking partner encouragement out. Part 1, the landing, is
 [site-01-copy-deck.md](site-01-copy-deck.md) (approved); its conventions
 apply unchanged: English leads in US spelling, Spanish is neutral with *tú*
 and the glossary's words, `{name}` arguments come from code, and every claim
