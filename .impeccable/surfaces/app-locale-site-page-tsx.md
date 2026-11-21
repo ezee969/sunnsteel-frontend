@@ -35,6 +35,8 @@ facts in production.
 §33 for the site; both languages; WCAG 2.2 AA; the performance budget of the
 plan's §5; Pro tagged wherever named; build path comp-first.
 
-**Unresolved:** the direction contract (phase 2, comps); how Pro is offered to
+**Approved comp (2026-11-21):** `.impeccable/mocks/comp-a-full-bleed.png` -- the video full-bleed behind the hero, text over its dark left side, the live-session phone on the lower right standing on the proof band. Its composition is the contract; its AI-generated imagery is not (the owner wants real people; see the plan §11).
+
+**Unresolved:** the direction contract; the hero imagery source; how Pro is offered to
 an international audience paying in ARS; whether real usage figures exist at
-launch; the copy deck's approval.
+launch.

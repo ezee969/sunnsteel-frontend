@@ -458,6 +458,7 @@ Each phase ends in an owner approval before the next starts.
 | 34 | Audience (2026-11-21) | A varied audience, English first, Spanish written alongside -- replacing "mostly Spanish (Argentina)" in §2; recorded in `PRODUCT.md` |
 | 35 | Evidence (2026-11-21) | None real; everything shown is mock-up, labelled, with placeholders replaced by true facts in production |
 | 36 | Build path (2026-11-21) | Comp-first (`.impeccable/config.json`) |
+| 38 | Hero comp (2026-11-21) | Comp A approved: the video full-bleed, text over its dark side, the phone lower right (`.impeccable/mocks/comp-a-full-bleed.png`). The owner finds AI-generated people too artificial and wants real people training; the source is being settled (real photographs taken from the web are someone else's work, so licensed footage is proposed) |
 | 37 | Encouragement (2026-11-21) | Partner encouragement (`SOC-09`) never appears on the site -- "too corny"; the partners scene shows what partners share and the partner alert instead (§12.9) |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
