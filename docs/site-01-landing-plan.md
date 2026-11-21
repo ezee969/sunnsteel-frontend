@@ -447,6 +447,7 @@ Each phase ends in an owner approval before the next starts.
 | 24 | Ranks | A climb with the scroll: each step draws the next crest and dresses a "Your name" profile header in that rank; phones get the ladder and one Artisan header (§12.7) |
 | 25 | Templates | A carousel by level; "none of these?" offers building your own and describing it (Pro); the chosen template travels through sign-up and onboarding into the builder (§12.8) |
 | 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
+| 27 | Free and Pro | Two equal cards side by side (Free first on phones); "Try Pro free for 7 days" filled; the Pro intent carried through sign-up to `/plans`, charging nothing by itself (§12.10) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1387,6 +1388,97 @@ at 1024 and the stacked panels at 320; final states without JavaScript.
 
 **Needs from §33.** Illustrative, non-interactive copies of controls (the
 privacy rows) on public pages.
+
+### 12.10 Free and Pro — `SitePlans`
+
+*Approved 2026-11-20: Free and Pro side by side; "Try Pro free for 7 days" is
+the section's filled action. Copy is draft where marked.*
+
+**Job.** Say what is free, what Pro adds and what it costs, plainly enough
+that nobody signs up to a surprise -- §29 and §30's rule applies: what Pro
+does, stated plainly, with no countdown, discount, urgency or invented data,
+and Pro is not "better", it is more.
+
+**Content and copy** (`site.plans`, with the app's `billing` messages wherever
+they already say it).
+- Eyebrow PLANS / PLANES; `h2` *(draft)*: "Free to train. Pro to plan further."
+  / "Gratis para entrenar. Pro para planificar más lejos."
+- **The Free card:** "Free" and "No card needed" / "Sin tarjeta"; the
+  always-free list as six lines restating the app's `billing.alwaysFree`
+  (logging sets, the rest timer and its alerts; automatic progression,
+  warm-ups and the plate calculator; history, records, achievements and
+  ranks; strength trends up to 90 days and muscle history up to 4 weeks;
+  everything social and messages; data export and account deletion); the
+  Free limits that matter (3 routine versions, 3 goals, 1 gym) -- every
+  number from contracts' `PLANS.FREE.limits` and `strengthRangeNeedsPro`. The
+  action: **"Start free" / "Empezar gratis"**, outline → `/signup`.
+- **The Pro card:** "Pro" beside the 16px `Crown` glyph in `--ink-3` (§30.1);
+  the price from `PRO_PRICE`, formatted by the language with its currency
+  and interval ("ARS 4,999 a month" / "ARS 4.999 por mes"); the trial from
+  `SUBSCRIPTION_TRIAL_DAYS` ("First 7 days free, once per account" / "Los
+  primeros 7 días gratis, una vez por cuenta"); "Cancel any time; Pro lasts
+  until the end of what you paid" (`BILL-04`'s rule) and "Paid with Mercado
+  Pago" -- the app's own wording where `/plans` already has it. Then **the four
+  outcomes the app uses** (`PRO_OUTCOMES` with `billing.offer.outcomes`):
+  Plan ahead · Compare and adjust · See all your history · Make it yours /
+  Planifica con anticipación · Compara y ajusta · Mira todo tu historial ·
+  Hazlo tuyo, each with its short line. Under them the AI line, which is
+  where the **routine draft** is named: "Includes up to 10 routine drafts and
+  20 training reviews a month" / "Incluye hasta 10 borradores de rutina y 20
+  revisiones de entrenamiento por mes", the numbers from `PLANS.PRO.limits`.
+  The action: **"Try Pro free for 7 days" / "Probar Pro 7 días gratis"**, the
+  section's one filled control, → `/signup?plan=pro`.
+- **Under both:** "See the full comparison" / "Ver la comparación completa" →
+  `/pricing`, and one line of links: refunds (`/reembolsos`), the cancellation
+  button (`/baja`) and the revocation button (`/arrepentimiento`), named as
+  the law names them (`LegalLinks`).
+- **Never** mentioned: founding members (§11), any discount, or "most
+  popular".
+
+**The Pro hand-off.** `/signup?plan=pro` keeps the intent as the template
+hand-off does (§12.8: on the device for a day, and through the callback of
+email confirmation and Google sign-in). After sign-up, onboarding runs first
+-- a trial is best spent with a routine -- and then `/plans` opens, where
+`PlanCheckout` offers the trial. **Nothing charges or starts a subscription by
+itself**: the member still presses Subscribe and authorizes on Mercado Pago's
+page. A signed-in visitor is sent by the middleware from `/signup?plan=pro`
+straight to `/plans`.
+
+**Layout.**
+- **Ground:** the page's theme. Two cards on `--surface` with a `--rule`
+  border and the small radius, equal in size and treatment -- nothing
+  coloured, no shadow, no "featured" lift; Pro is told apart by its name, its
+  glyph and its content.
+- **≥ 768:** side by side, up to 960px together, centred; their lists align
+  row by row from the top.
+- **< 768:** stacked, **Free first**, then Pro, so the free promise is read
+  before the price.
+
+**Motion.**
+- *Heading:* line rise and rule draw.
+- *Cards:* when the section is a third in view, the two cards rise 24px and
+  fade in, 120ms apart; their lines appear 40ms apart; the price is shown,
+  never counted (a counting price would be a performance about money).
+- *Reduced motion and no JavaScript:* present at once.
+
+**Assets.** None.
+
+**Data.** Real: `PRO_PRICE`, `SUBSCRIPTION_TRIAL_DAYS`, `PLANS` and
+`PRO_OUTCOMES`, never typed; a test renders the section's numbers from
+contracts and fails when one disagrees.
+
+**Accessibility.** Each card is a region with its `h3` (Free, Pro); the price
+is one readable sentence ("ARS 4,999 a month, first 7 days free"); the glyph
+is `aria-hidden`.
+
+**Acceptance checks.** Every number matches contracts; the Free card comes
+first on phones; nothing is coloured to rank the plans; the Pro hand-off
+reaches `/plans` with the trial offered and charges nothing by itself; a
+signed-in visitor goes straight to `/plans`; the legal links reach their
+pages; Spanish fits both cards at 320 and 768.
+
+**Needs from §33.** Nothing new: §29 and §30 already govern how Pro is
+offered; the site applies them.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
