@@ -82,9 +82,8 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
    existing crest family, the rank decoration on a profile header (§24), and
    one line on what a rank means (attendance, not vanity).
 8. **Start with a programme** — the three starter templates with their days
-   and level; each links to `/signup?template=<slug>` (the template opens after
-   sign-up, as `/routines/new?template=` does today; the exact hand-off is a
-   build decision).
+   and level; each links to `/signup?template=<slug>`, and the template
+   reaches the builder through sign-up and onboarding (§12.8).
 9. **Train with people** — follow, training partners, encouragement,
    messages; privacy first (every setting starts private).
 10. **Free and Pro** — the Free/Pro split from `BILL-02` rendered from
