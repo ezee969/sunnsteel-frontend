@@ -65,5 +65,119 @@
 		"mockTag": "Mock figure",
 		"cellSr": "{value} {label}",
 		"languages": "Languages"
+	},
+	"mock": {
+		"example": "Example"
+	},
+	"verbs": {
+		"heading": "Plan. Train. Measure. Earn.",
+		"words": {
+			"plan": "Plan.",
+			"train": "Train.",
+			"measure": "Measure.",
+			"earn": "Earn."
+		},
+		"plan": {
+			"title": "Build your routine, or start from a template",
+			"body": "Weekly or rotating schedules and rep ranges that progress on their own. With Pro, 8-week blocks and planned deloads.",
+			"link": "See the routine builder",
+			"callout": "{template} · {days, plural, one {# day} other {# days}} a week"
+		},
+		"train": {
+			"title": "Load the bar without the math",
+			"body": "Your last numbers beside every set, a rest timer that starts itself, and warm-ups and plates worked out from your working weight.",
+			"link": "See the workout tracker",
+			"callout": "{weight} · {plates} per side",
+			"plates": "Plates per side",
+			"warmUp": "Warm-up",
+			"bar": "Bar",
+			"working": "Working weight"
+		},
+		"measure": {
+			"title": "See what is really moving",
+			"body": "Strength by estimated 1RM, the muscles you trained each week on a body map, and your weight over time. With Pro, training signals that give numbers, never verdicts.",
+			"link": "See progress",
+			"callout": "{exercise} · e1RM {weight} · +{change} in {weeks} weeks",
+			"chart": "Estimated 1RM"
+		},
+		"earn": {
+			"title": "Records, milestones and ranks you earn by training",
+			"body": "Every record is found in your sets. Milestones and {ranks} ranks reward showing up, never posting.",
+			"link": "See ranks and achievements",
+			"callout": "Rank reached · {rank}",
+			"rankLabel": "Your rank",
+			"milestone": "Milestone earned"
+		}
+	},
+	"tools": {
+		"heading": "Tools for every workout",
+		"progression": {
+			"eyebrow": "Automatic progression",
+			"title": "Reach the top of your range. The weight goes up.",
+			"body": "When every set reaches the top of its rep range, your next workout adds one step, {step} unless you choose another. Fall short and the weight you lifted carries over.",
+			"link": "See automatic progression",
+			"workout": "Workout",
+			"weight": "Weight",
+			"reps": "Reps",
+			"range": "{exercise} · {min}–{max} reps · step {step}",
+			"rise": "+{step}",
+			"next": "Next"
+		},
+		"rest": {
+			"eyebrow": "Rest",
+			"title": "Rest that starts itself",
+			"body": "It starts when you mark a set done and tells you when it's over, even with the screen locked, once notifications are on (on iPhone, in the installed app).",
+			"notifyTitle": "Rest is over",
+			"notifyBody": "{exercise} is up next.",
+			"app": "Sunnsteel",
+			"now": "now"
+		},
+		"supersets": {
+			"eyebrow": "Supersets and circuits",
+			"title": "Link exercises and train in rounds",
+			"body": "Up to {max} exercises in a group, one set of each per round, each keeping its own weights and progression."
+		},
+		"swap": {
+			"eyebrow": "Swap an exercise",
+			"title": "Machine taken? Swap it for today.",
+			"body": "Close alternatives, ranked by movement and muscles. Your routine stays as it is unless you choose to update it."
+		}
+	},
+	"progress": {
+		"heading": "Progress you can read",
+		"map": {
+			"title": "Every set you log lands on the map",
+			"body": "Weekly sets per muscle on a body map, front and back, with the number behind every color, and your estimated 1RM week by week.",
+			"week": "Week {n}",
+			"weeksLabel": "Weeks",
+			"planLine": "{free} weeks free, up to {pro} with Pro.",
+			"strength": "{exercise} · estimated 1RM",
+			"finalList": "Sets per muscle in week {n}",
+			"empty": "No muscle has sets this week.",
+			"untrained": "No sets for {muscles}."
+		},
+		"cards": {
+			"plateaus": {
+				"body": "Lifts with no new best after several sessions, with the rule written above them."
+			},
+			"signals": {
+				"name": "Training signals",
+				"body": "Effort, rep targets, declines and workouts over two weeks against the two before. A change is marked, never explained.",
+				"row": "Average RPE 8.6, up from 7.9"
+			},
+			"deload": {
+				"name": "Deload suggestion",
+				"body": "When a load signal holds, it proposes a lighter week with its dates. Nothing changes until you save it."
+			},
+			"review": {
+				"name": "Training review",
+				"body": "Pick a question and a few workouts. The answer describes your logs, cites every number from them and never guesses a cause.",
+				"finding": "{exercise} went from <figure>{from}</figure> to <figure>{to}</figure> for {reps} reps."
+			}
+		},
+		"tags": {
+			"free": "Free",
+			"pro": "Pro"
+		}
 	}
 }

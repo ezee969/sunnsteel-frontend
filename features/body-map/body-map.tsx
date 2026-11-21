@@ -119,6 +119,54 @@ function Figure({
 	)
 }
 
+/**
+ * The front and back alone, shaded and still: the public site's mock-ups
+ * (SITE-01 §12.4), where nothing is pointed at and the section's text says
+ * what the figure shows.
+ */
+export function BodyMapFigures({
+	sets,
+	className,
+}: {
+	sets: MuscleSets
+	className?: string
+}) {
+	return (
+		<div aria-hidden className={cn('grid grid-cols-2 gap-2', className)}>
+			{[BODY_MAP_FRONT, BODY_MAP_BACK].map((regions, side) => (
+				<svg
+					key={side}
+					viewBox={BODY_MAP_VIEWBOX}
+					className="h-auto w-full"
+					focusable="false"
+				>
+					<path d={BODY_MAP_OUTLINE} className="fill-intensity-0" />
+					{regions.map(({ muscle, d }) => (
+						<path
+							key={muscle}
+							d={d}
+							className={cn(
+								FILL[bodyMapLevel(sets.get(muscle) ?? 0)],
+								'stroke-surface-sunk',
+							)}
+							strokeWidth={1}
+							strokeLinejoin="round"
+							vectorEffect="non-scaling-stroke"
+						/>
+					))}
+					<path
+						d={side === 0 ? BODY_MAP_FRONT_DETAILS : BODY_MAP_BACK_DETAILS}
+						className="fill-none stroke-surface-sunk"
+						strokeWidth={1}
+						strokeLinecap="round"
+						vectorEffect="non-scaling-stroke"
+					/>
+				</svg>
+			))}
+		</div>
+	)
+}
+
 /** The bands of §32, shared by the body map and the weekly matrix. */
 export function BodyMapLegend({ className }: { className?: string }) {
 	const t = useTranslations('progress.bodyMap')

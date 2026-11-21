@@ -65,5 +65,119 @@
 		"mockTag": "Cifra ficticia",
 		"cellSr": "{value} {label}",
 		"languages": "Idiomas"
+	},
+	"mock": {
+		"example": "Ejemplo"
+	},
+	"verbs": {
+		"heading": "Planifica. Entrena. Mide. Gana.",
+		"words": {
+			"plan": "Planifica.",
+			"train": "Entrena.",
+			"measure": "Mide.",
+			"earn": "Gana."
+		},
+		"plan": {
+			"title": "Arma tu rutina o empieza con una plantilla",
+			"body": "Semanas fijas o rotaciones, y rangos de repeticiones que progresan solos. Con Pro, bloques de 8 semanas y descargas planificadas.",
+			"link": "Ver el constructor de rutinas",
+			"callout": "{template} · {days, plural, one {# día} other {# días}} por semana"
+		},
+		"train": {
+			"title": "Carga la barra sin hacer cuentas",
+			"body": "Tus últimos números junto a cada serie, un descanso que arranca solo, y calentamientos y discos calculados desde tu peso de trabajo.",
+			"link": "Ver el registro de entrenamiento",
+			"callout": "{weight} · {plates} por lado",
+			"plates": "Discos por lado",
+			"warmUp": "Calentamiento",
+			"bar": "Barra",
+			"working": "Peso de trabajo"
+		},
+		"measure": {
+			"title": "Mira qué avanza de verdad",
+			"body": "Fuerza por 1RM estimado, los músculos que entrenaste cada semana en un mapa del cuerpo y tu peso a lo largo del tiempo. Con Pro, señales de entrenamiento que dan números, nunca veredictos.",
+			"link": "Ver el progreso",
+			"callout": "{exercise} · 1RM est. {weight} · +{change} en {weeks} semanas",
+			"chart": "1RM estimado"
+		},
+		"earn": {
+			"title": "Récords, logros y rangos que se ganan entrenando",
+			"body": "Cada récord sale de tus series. Los logros y los {ranks} rangos premian que vengas a entrenar, no que publiques.",
+			"link": "Ver rangos y logros",
+			"callout": "Rango alcanzado · {rank}",
+			"rankLabel": "Tu rango",
+			"milestone": "Logro obtenido"
+		}
+	},
+	"tools": {
+		"heading": "Herramientas para cada entrenamiento",
+		"progression": {
+			"eyebrow": "Progresión automática",
+			"title": "Llega al tope de tu rango. El peso sube.",
+			"body": "Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento suma un paso: {step} si no eliges otro. Si no llegas, se mantiene el peso que levantaste.",
+			"link": "Ver la progresión automática",
+			"workout": "Entrenamiento",
+			"weight": "Peso",
+			"reps": "Reps",
+			"range": "{exercise} · {min}–{max} reps · paso {step}",
+			"rise": "+{step}",
+			"next": "Siguiente"
+		},
+		"rest": {
+			"eyebrow": "Descanso",
+			"title": "Un descanso que arranca solo",
+			"body": "Arranca al marcar la serie y te avisa cuando termina, incluso con la pantalla bloqueada, si activaste las notificaciones (en iPhone, con la app instalada).",
+			"notifyTitle": "Terminó el descanso",
+			"notifyBody": "Sigue: {exercise}.",
+			"app": "Sunnsteel",
+			"now": "ahora"
+		},
+		"supersets": {
+			"eyebrow": "Superseries y circuitos",
+			"title": "Enlaza ejercicios y entrena por rondas",
+			"body": "Hasta {max} ejercicios por grupo, una serie de cada uno por ronda, y cada uno conserva sus pesos y su progresión."
+		},
+		"swap": {
+			"eyebrow": "Cambiar un ejercicio",
+			"title": "¿Máquina ocupada? Cámbiala por hoy.",
+			"body": "Alternativas parecidas, ordenadas por movimiento y músculos. Tu rutina queda igual salvo que elijas actualizarla."
+		}
+	},
+	"progress": {
+		"heading": "Un progreso que se puede leer",
+		"map": {
+			"title": "Cada serie que registras llega al mapa",
+			"body": "Series semanales por músculo en un mapa del cuerpo, de frente y de espalda, con el número detrás de cada color, y tu 1RM estimado semana a semana.",
+			"week": "Semana {n}",
+			"weeksLabel": "Semanas",
+			"planLine": "{free} semanas gratis, hasta {pro} con Pro.",
+			"strength": "{exercise} · 1RM estimado",
+			"finalList": "Series por músculo en la semana {n}",
+			"empty": "Ningún músculo tiene series esta semana.",
+			"untrained": "Sin series para {muscles}."
+		},
+		"cards": {
+			"plateaus": {
+				"body": "Ejercicios sin una nueva mejor marca después de varias sesiones, con la regla escrita arriba."
+			},
+			"signals": {
+				"name": "Señales de entrenamiento",
+				"body": "Esfuerzo, objetivos de repeticiones, caídas y entrenamientos en dos semanas frente a las dos anteriores. Un cambio se marca, nunca se explica.",
+				"row": "RPE promedio 8,6, antes 7,9"
+			},
+			"deload": {
+				"name": "Sugerencia de descarga",
+				"body": "Cuando una señal de carga se mantiene, propone una semana más liviana con sus fechas. Nada cambia hasta que la guardas."
+			},
+			"review": {
+				"name": "Revisión del entrenamiento",
+				"body": "Elige una pregunta y algunos entrenamientos. La respuesta describe tus registros, cita cada número y nunca adivina una causa.",
+				"finding": "{exercise} pasó de <figure>{from}</figure> a <figure>{to}</figure> en {reps} repeticiones."
+			}
+		},
+		"tags": {
+			"free": "Free",
+			"pro": "Pro"
+		}
 	}
 }

@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { SiteHero } from '@/features/site/site-hero'
+import { SiteProgress } from '@/features/site/site-progress'
 import { SiteProofBand } from '@/features/site/site-proof-band'
+import { SiteTools } from '@/features/site/site-tools'
 import { SiteTopBar } from '@/features/site/site-top-bar'
+import { SiteVerbs } from '@/features/site/site-verbs'
 import type { Locale } from '@/i18n/config'
 import { siteLandingLive } from '@/lib/site/landing'
 
@@ -37,11 +40,18 @@ export default async function LandingPage({
 	const { locale } = await params
 	setRequestLocale(locale as Locale)
 	return (
-		<div className="site dark">
+		<div className="site">
 			<SiteTopBar />
 			<main>
-				<SiteHero />
-				<SiteProofBand />
+				{/* §33.2: the hero and its proof band are a Night region in both
+				    themes; from the four verbs on, the page follows the visitor's. */}
+				<div className="dark site-night" data-region="night">
+					<SiteHero />
+					<SiteProofBand />
+				</div>
+				<SiteVerbs />
+				<SiteTools />
+				<SiteProgress />
 			</main>
 		</div>
 	)

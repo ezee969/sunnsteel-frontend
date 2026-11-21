@@ -1447,3 +1447,372 @@
     display: none;
   }
 }
+
+/* §33, the sections after the proof band (plan §12.4-§12.6): the page's own
+   theme from here on. Each section rests on its final state; the stages and
+   scripts arrive with the motion phase. */
+.site-night {
+  background: var(--background);
+  color: var(--foreground);
+}
+.type-site-heading {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(28px, 4.6vw, 64px);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+/* The brand's rule under a section heading (it draws in the motion phase). */
+.site-heading::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 2px;
+  margin-top: 24px;
+  background: var(--foreground);
+}
+.site-section {
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: clamp(88px, 10vw, 160px) var(--site-gutter) 0;
+}
+.site-body {
+  margin-top: 12px;
+  max-width: 52ch;
+  color: var(--ink-2);
+}
+.site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 8px;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.site-example {
+  color: var(--ink-3);
+}
+.site-tag {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--ink-2);
+}
+.site-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+
+/* The original phone frame (§33.8): 320px on desktop, 280 and 260 below. */
+.site-device {
+  width: 320px;
+  aspect-ratio: 9 / 18.5;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--rule);
+  border-radius: 36px;
+  background: var(--surface-sunk);
+  padding: 14px 20px;
+}
+.site-device-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-device-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.site-device-screen {
+  padding-top: 18px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.site-screen-title {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+.site-screen-caption {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.site-screen-figure {
+  margin-block: 6px 10px;
+}
+.site-screen-block {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+.site-screen-rows {
+  margin-top: 6px;
+}
+.site-screen-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-callout {
+  position: absolute;
+  left: calc(50% - 160px - 48px);
+  bottom: 56px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 280px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* §12.4 the four verbs. */
+.site-verbs {
+  margin-top: clamp(48px, 6vw, 96px);
+}
+.site-verb {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: center;
+  min-height: 80svh;
+}
+.site-verb-text {
+  grid-column: 1 / 7;
+}
+.site-verb-word {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.site-verb-title {
+  margin-top: 20px;
+}
+.site-verb-stage {
+  position: relative;
+  grid-column: 8 / 13;
+  display: flex;
+  justify-content: center;
+  padding-block: 32px;
+}
+
+/* §12.5 the tools bento. */
+.site-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-tool {
+  grid-column: 8 / 13;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px;
+}
+.site-tool-large {
+  grid-column: 1 / 8;
+  grid-row: 1 / 4;
+}
+.site-tool-text h3 {
+  margin-top: 8px;
+}
+.site-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
+}
+/* The ledger's panel takes the large card's remaining height, its rows
+   centred in it, so the card never opens a gap under its text. */
+.site-tool-large .site-mock {
+  flex: 1;
+  justify-content: center;
+}
+.site-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.site-ledger-table th {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+.site-ledger-table td {
+  padding-block: 15px;
+  border-top: 1px solid var(--rule-faint);
+  white-space: nowrap;
+}
+.site-ledger-table :is(th, td):not(:last-child) {
+  padding-right: 16px;
+}
+.site-ledger-table tr[data-rise] td {
+  border-bottom: 2px solid var(--foreground);
+}
+.site-notification {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.site-superset {
+  border-left: 2px solid var(--foreground);
+  padding-left: 12px;
+}
+
+/* §12.6 progress. */
+.site-progress-stage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 32px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-progress-text {
+  grid-column: 1 / 5;
+}
+.site-progress-map {
+  grid-column: 5 / 13;
+}
+.site-week-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+}
+.site-week {
+  padding: 6px 10px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.site-week[data-current] {
+  border-color: var(--foreground);
+  color: var(--foreground);
+}
+.site-strength {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+.site-analysis-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+.site-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+.site-analysis-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding: 12px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
+}
+.site-outline-mock {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 36px;
+  margin-top: 4px;
+  padding-inline: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+.site-figure-link {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 1023px) {
+  .site-verb {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding-block: 48px;
+  }
+  .site-verb-stage {
+    flex-direction: column;
+    align-items: center;
+    padding-block: 32px 0;
+  }
+  .site-device {
+    width: 280px;
+  }
+  .site-callout {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    margin-top: -28px;
+  }
+  .site-tool,
+  .site-tool-large {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+  .site-mock {
+    margin-top: 0;
+  }
+  .site-progress-text,
+  .site-progress-map {
+    grid-column: 1 / -1;
+  }
+  .site-analysis-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .site-device {
+    width: 260px;
+  }
+  .site-tool,
+  .site-tool-large {
+    display: flex;
+    padding: 20px;
+  }
+  .site-analysis-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

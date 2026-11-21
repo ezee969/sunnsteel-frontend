@@ -16,7 +16,7 @@ import { SiteMenu } from './site-menu'
 export async function SiteTopBar() {
 	const t = await getTranslations('site.topBar')
 	return (
-		<header className="site-bar">
+		<header className="site-bar dark">
 			<a href="#content" className="site-skip type-action">
 				{t('skip')}
 			</a>
