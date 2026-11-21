@@ -3,6 +3,8 @@ import {
 	RENAISSANCE_RANK_DEFINITIONS,
 } from '@sunsteel/contracts'
 
+import { LOCALES } from '@/i18n/config'
+
 /**
  * SITE-01 §12.3: the proof band's four cells. Two usage figures are
  * placeholders the owner chose for the mock-up (2026-11-20) -- no real usage
@@ -15,12 +17,11 @@ export const PLACEHOLDER_FIGURES = { members: 12_400, workouts: 350_000 }
 export const CATALOG_FLOOR = 80
 
 export type ProofLabel =
-	'members' | 'workouts' | 'exercises' | 'milestones' | 'ranks' | 'free'
+	'members' | 'workouts' | 'exercises' | 'milestones' | 'ranks' | 'languages'
 
 export type ProofCell =
 	| { kind: 'number'; value: number; label: ProofLabel; mock: boolean }
 	| { kind: 'floor'; value: number; label: 'exercises' }
-	| { kind: 'free'; label: 'free' }
 
 const RESERVES: ProofCell[] = [
 	{
@@ -56,6 +57,8 @@ export function proofCells(production: boolean): ProofCell[] {
 	return [
 		...(production ? RESERVES : placeholders),
 		{ kind: 'floor', value: CATALOG_FLOOR, label: 'exercises' },
-		{ kind: 'free', label: 'free' },
+		// The owner, 2026-11-21: 'free' is said once in the first viewport, on
+		// the account button, so the fourth cell is a fact of its own.
+		{ kind: 'number', value: LOCALES.length, label: 'languages', mock: false },
 	]
 }

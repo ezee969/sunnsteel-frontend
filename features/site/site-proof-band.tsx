@@ -21,21 +21,13 @@ export async function SiteProofBand() {
 			<ul className="site-proof-row">
 				{cells.map(cell => {
 					const value =
-						cell.kind === 'free'
-							? t('freeValue')
-							: cell.kind === 'floor'
-								? `${format.format(cell.value)}+`
-								: format.format(cell.value)
+						cell.kind === 'floor'
+							? `${format.format(cell.value)}+`
+							: format.format(cell.value)
 					const label = t(cell.label)
 					return (
 						<li key={cell.label} className="site-proof-cell">
-							<span
-								className={
-									cell.kind === 'free' ? 'site-proof-word' : 'type-site-numeral'
-								}
-							>
-								{value}
-							</span>
+							<span className="type-site-numeral">{value}</span>
 							<span className="type-label site-proof-label">{label}</span>
 							{cell.kind === 'number' && cell.mock ? (
 								<span className="site-proof-mock">{t('mockTag')}</span>

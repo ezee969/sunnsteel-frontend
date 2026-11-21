@@ -41,7 +41,7 @@ export async function SiteTopBar() {
 					{t('signIn')}
 				</Link>
 				<Link href="/signup" className="site-filled site-filled-bar">
-					{t('startFree')}
+					{t('start')}
 				</Link>
 			</div>
 		</header>

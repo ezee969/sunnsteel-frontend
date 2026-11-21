@@ -13,12 +13,11 @@
 		"english": "English",
 		"spanish": "Español",
 		"signIn": "Sign in",
-		"startFree": "Start free"
+		"start": "Get started"
 	},
 	"hero": {
-		"eyebrow": "Free to start · No app store needed",
 		"headline": "Statues aren't born. They're <mark>carved</mark>.",
-		"subline": "Plan, log every set, and watch your records and rank grow in a history nobody can fake.",
+		"subline": "Plan, log every set, and watch the work add up: records broken, ranks earned.",
 		"createAccount": "Create a free account",
 		"signIn": "Sign in",
 		"install": "Runs in your browser and installs on any phone, with no app store. <link>How to install</link>",
@@ -37,11 +36,10 @@
 		"members": "Members",
 		"workouts": "Workouts logged",
 		"exercises": "Exercises in the catalog",
-		"freeValue": "Free",
-		"free": "To start",
 		"milestones": "Milestones to earn",
 		"ranks": "Ranks to reach",
 		"mockTag": "Mock figure",
-		"cellSr": "{value} {label}"
+		"cellSr": "{value} {label}",
+		"languages": "Languages"
 	}
 }

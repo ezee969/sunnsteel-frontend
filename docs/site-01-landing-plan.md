@@ -485,7 +485,7 @@ Each phase ends in an owner approval before the next starts.
 | 41 | Brand line (2026-11-21) | "Fórjate" read as corny. The owner wants a voice from today's gym culture -- the gym-rat and teenage lifting scene of Gymshark, YoungLA, the Tren Twins and CBum -- harder-edged, joined to the golden era of bodybuilding, discipline, and the Greek ideal of resembling the gods in mind and body. Of four lines tried over the real hero (Olympus is earned; Statues aren't born, they're carved; Body of a god, mind of a philosopher; Discipline is the aesthetic) the owner chose **"Statues aren't born. They're carved." / "Las estatuas no nacen. Se esculpen."** in Cinzel, the closing band's "Start carving." / "Empieza a esculpir.", and the same line in the app (the splash's tagline and the dashboard's subtitle) |
 | 43 | Build (2026-11-21) | §33 approved for the public site; the hero image is always the real video, never regenerated with AI ("Sí, siempre el video real"); the scrim is baked into the footage so the plate, poster and video are the page's pixels |
 | 45 | Hero built (2026-11-21) | The top bar, hero and proof band in `app/[locale]/(site)` and `features/site/`; Impeccable's hero gate passed at **98%** against the approved comp. Reached only with the preview cookie (`/?site-preview=1`) and `noindex` until `SITE_LANDING=on`; everyone else signed out still goes to Login |
-| 44 | Copy to revise (2026-11-21, open) | The owner, reading the comps: **"free" appears four times in the first viewport** -- the bar's "Start free", the eyebrow's "Free to start", "Create a free account" and the proof band's "Free / To start" -- and is to be said once or twice; and the subline's **"in a history nobody can fake" is corny** and needs a better line. Changed after the hero passes its gate, as a stated decision with the owner (the gate holds the comp's words until then); see the copy deck §2 |
+| 44 | Copy revised (2026-11-21) | The owner, reading the comps: **"free" appears four times in the first viewport** -- the bar's "Start free", the eyebrow's "Free to start", "Create a free account" and the proof band's "Free / To start" -- and is to be said once or twice; and the subline's **"in a history nobody can fake" is corny** and needs a better line. After the hero passed its gate the owner chose: **"free" only on the account button** (the bar says "Get started" / "Empezar", the eyebrow is dropped, the fourth proof cell is the two languages), and the subline **"Plan, log every set, and watch the work add up: records broken, ranks earned." / "Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados."** |
 | 42 | Comps over the real footage (2026-11-21) | Approved: `.impeccable/mocks/comp-a-real-1536.png`, `-390-en.png`, `-390-es.png`, redrawn with row 41's line |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
@@ -549,7 +549,7 @@ scroll position.
 | Link | Pricing | Precios | `/pricing` |
 | Language | EN · ES, the current one marked by an underline and `aria-current`, never by colour alone; names read "English" and "Español" | same | sets `ss-locale` through [locale-cookie.ts](../i18n/locale-cookie.ts) and reloads on the same page (each language is its own static build) |
 | Ghost action | Sign in | Iniciar sesión | `/login` |
-| Filled action | Start free | Empezar gratis | `/signup` |
+| Filled action | Get started | Empezar | `/signup` (was "Start free" until 2026-11-21, row 44) |
 
 A signed-in visitor needs no detection on these static pages: the middleware
 already sends a signed-in `/login` or `/signup` to `/dashboard`, so both
@@ -645,9 +645,8 @@ offer and show both actions; at 1440, also show the product working.
 
 | Part | English | Spanish |
 | --- | --- | --- |
-| Eyebrow (label rank) | FREE TO START · NO APP STORE NEEDED | GRATIS PARA EMPEZAR · SIN TIENDA DE APPS |
 | Headline (`h1`) | Statues aren't born. They're **carved**. | Las estatuas no nacen. **Se esculpen**. |
-| Subline *(draft)* | Plan your training, log every set and watch your records and your rank build up, in a history nobody can fake. | Planifica tu entrenamiento, registra cada serie y mira crecer tus récords y tu rango, en un historial que nadie puede inventar. |
+| Subline | Plan, log every set, and watch the work add up: records broken, ranks earned. | Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados. |
 | Filled action | Create a free account → `/signup` | Crear cuenta gratis → `/signup` |
 | Ghost action | Sign in → `/login` | Iniciar sesión → `/login` |
 | Install line *(draft)* | Works in your browser and installs on any phone, with no app store. **How to install** → `/#install` | Funciona en el navegador y se instala en cualquier teléfono, sin tienda. **Cómo instalarla** → `/#install` |
@@ -802,7 +801,7 @@ and still stand on launch day if no real usage figure is ready.
 | 1 | 12,400 / 12.400 | MEMBERS | MIEMBROS | **placeholder** |
 | 2 | 350,000 / 350.000 | WORKOUTS LOGGED | ENTRENAMIENTOS REGISTRADOS | **placeholder** |
 | 3 | 80+ | EXERCISES IN THE CATALOG | EJERCICIOS EN EL CATÁLOGO | true: the seeded catalog (`exercise-catalog.ts`, 80 today), confirmed against production before launch |
-| 4 | FREE / GRATIS | TO START | PARA EMPEZAR | true |
+| 4 | 2 | LANGUAGES | IDIOMAS | true: `LOCALES` (replaced Free / To start on 2026-11-21, row 44) |
 
 **Reserve facts**, true today and drawn from contracts rather than typed: the
 milestones in the achievement catalog (25) and the ranks on the ladder (6),

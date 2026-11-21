@@ -41,8 +41,7 @@ export async function SiteHero() {
 			<HeroVideo pauseLabel={t('pauseVideo')} playLabel={t('playVideo')} />
 			<div aria-hidden="true" className="site-scrim-more" />
 			<div id="content" className="site-hero-text">
-				<p className="site-eyebrow">{t('eyebrow')}</p>
-				<h1 className="type-site-display site-headline">
+				<h1 className="type-site-display">
 					{t.rich('headline', { mark: chunks => <mark>{chunks}</mark> })}
 				</h1>
 				<p className="type-site-lead site-lead">{t('subline')}</p>

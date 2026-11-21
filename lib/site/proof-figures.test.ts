@@ -13,7 +13,7 @@ describe('proof band cells (SITE-01 §12.3)', () => {
 			'members',
 			'workouts',
 			'exercises',
-			'free',
+			'languages',
 		])
 		expect(cells.slice(0, 2).every(c => c.kind === 'number' && c.mock)).toBe(
 			true,
@@ -26,7 +26,7 @@ describe('proof band cells (SITE-01 §12.3)', () => {
 			'milestones',
 			'ranks',
 			'exercises',
-			'free',
+			'languages',
 		])
 		expect(cells.some(c => c.kind === 'number' && c.mock)).toBe(false)
 		expect(cells[0]).toMatchObject({ value: ACHIEVEMENT_DEFINITIONS.length })

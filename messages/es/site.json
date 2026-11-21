@@ -13,12 +13,11 @@
 		"english": "English",
 		"spanish": "Español",
 		"signIn": "Iniciar sesión",
-		"startFree": "Empezar gratis"
+		"start": "Empezar"
 	},
 	"hero": {
-		"eyebrow": "Gratis para empezar · Sin tienda de apps",
 		"headline": "Las estatuas no nacen. <mark>Se esculpen</mark>.",
-		"subline": "Planifica, registra cada serie y mira crecer tus récords y tu rango en un historial que nadie puede inventar.",
+		"subline": "Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados.",
 		"createAccount": "Crear cuenta gratis",
 		"signIn": "Iniciar sesión",
 		"install": "Funciona en el navegador y se instala en cualquier teléfono, sin tienda de apps. <link>Cómo instalarla</link>",
@@ -37,11 +36,10 @@
 		"members": "Miembros",
 		"workouts": "Entrenamientos registrados",
 		"exercises": "Ejercicios en el catálogo",
-		"freeValue": "Gratis",
-		"free": "Para empezar",
 		"milestones": "Logros por ganar",
 		"ranks": "Rangos por alcanzar",
 		"mockTag": "Cifra ficticia",
-		"cellSr": "{value} {label}"
+		"cellSr": "{value} {label}",
+		"languages": "Idiomas"
 	}
 }

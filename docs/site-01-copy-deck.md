@@ -38,7 +38,7 @@ in sentence case and set in capitals by their rank.
 | `language` | Language | Idioma |
 | `english` / `spanish` | English / Español | English / Español |
 | `signIn` | Sign in | Iniciar sesión |
-| `startFree` | Start free | Empezar gratis |
+| `start` | Get started | Empezar |
 | `openMenu` / `closeMenu` | Open menu / Close menu | Abrir menú / Cerrar menú |
 | `columns.features` | Features | Funciones |
 | `columns.useCases` | Use cases | Casos de uso |
@@ -62,9 +62,8 @@ in sentence case and set in capitals by their rank.
 
 | Key | English | Spanish |
 | --- | --- | --- |
-| `eyebrow` | Free to start · No app store needed | Gratis para empezar · Sin tienda de apps |
 | `headline` | Statues aren't born. They're `<mark>`carved`</mark>`. | Las estatuas no nacen. `<mark>`Se esculpen`</mark>`. |
-| `subline` | Plan, log every set, and watch your records and rank grow in a history nobody can fake. | Planifica, registra cada serie y mira crecer tus récords y tu rango en un historial que nadie puede inventar. |
+| `subline` | Plan, log every set, and watch the work add up: records broken, ranks earned. | Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados. |
 | `createAccount` | Create a free account | Crear cuenta gratis |
 | `signIn` | Sign in | Iniciar sesión |
 | `install` | Runs in your browser and installs on any phone, with no app store. `<link>`How to install`</link>` | Funciona en el navegador y se instala en cualquier teléfono, sin tienda de apps. `<link>`Cómo instalarla`</link>` |
@@ -74,10 +73,11 @@ in sentence case and set in capitals by their rank.
 | `meta.title` | Sunnsteel — Statues aren't born. They're carved. | Sunnsteel — Las estatuas no nacen. Se esculpen. |
 | `meta.description` | A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start. | Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar. |
 
-*Why this subline:* it names the three things a visitor does (plan, log,
-watch) and the one thing only Sunnsteel claims (a history nobody can fake),
-in about 90 characters, so it fits two lines at 390 in both languages. The
-Spanish uses *inventar* rather than *falsificar*, which reads as forgery.
+*Why this subline:* it names what a visitor does (plan, log, watch) and the
+two things the product really gives back for the work -- records detected
+from logged sets, ranks earned by showing up -- in the gym's own words, with
+no promise of a result. It replaced "...in a history nobody can fake", which
+the owner found corny (2026-11-21).
 
 *Why this headline (the owner, 2026-11-21, replacing "Forge yourself. Prove
 it in every set.", which read as corny):* the Greek statue, the golden era's
@@ -87,12 +87,7 @@ reads three lines at 390 in both languages, and the rule sits under
 *carved* / *Se esculpen*, the work. The closing band answers it with "Start
 carving." / "Empieza a esculpir."
 
-**Open (the owner, 2026-11-21; plan §11 row 44):**
-- **"Free" is said four times in the first viewport** -- the top bar's
-  `startFree`, the hero's `eyebrow` and `createAccount`, and the proof band's
-  `freeValue` / `free` -- and should be said once or twice.
-- **"in a history nobody can fake" is corny**; the `subline` needs a better
-  line. Both are rewritten with the owner once the hero passes its gate.
+**Revised with the owner (2026-11-21, plan §11 row 44):** "free" is said once in the first viewport, on the account button (`createAccount`): the top bar says "Get started" / "Empezar", the eyebrow above the headline is gone, and the proof band's fourth cell is the two languages. The subline's "in a history nobody can fake" read as corny and became "watch the work add up: records broken, ranks earned".
 
 ## 3. Proof band — `site.proof`
 
@@ -102,7 +97,7 @@ carving." / "Empieza a esculpir."
 | `members` | Members | Miembros |
 | `workouts` | Workouts logged | Entrenamientos registrados |
 | `exercises` | Exercises in the catalog | Ejercicios en el catálogo |
-| `freeValue` / `free` | Free / To start | Gratis / Para empezar |
+| `languages` | Languages (the figure is the number of languages the app ships in, 2) | Idiomas |
 | `milestones` (reserve) | Milestones to earn | Logros por ganar |
 | `ranks` (reserve) | Ranks to reach | Rangos por alcanzar |
 | `mockTag` | Mock figure | Cifra ficticia |
