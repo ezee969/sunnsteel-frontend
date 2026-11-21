@@ -460,7 +460,7 @@ Each phase ends in an owner approval before the next starts.
 | 16 | Reference review | Boostcamp's whole site reviewed before §12 is written (§13) |
 | 17 | Top bar | A Product menu with Features, Use cases and Plans columns, plus Pricing; transparent over the hero, solid after it (§12.1) |
 | 18 | Hero layout | Text with the animated live-session phone on desktop, text alone on phones (§12.2) |
-| 19 | Headline | "Forge yourself. Prove it in every set." / "Fórjate. Demuéstralo en cada serie." |
+| 19 | Headline | "Statues aren't born. They're carved." / "Las estatuas no nacen. Se esculpen." -- replaced "Forge yourself. Prove it in every set." on 2026-11-21 (row 41) |
 | 20 | Proof band | Two usage placeholders and two true facts, counting up, on the hero's dark ground; production swaps placeholders for reserve true facts (§12.3) |
 | 21 | Four verbs | A fixed stage on desktop, one phone pinned while the verbs scroll; "Planifica · Entrena · Mide · Gana"; Train shows plates and warm-ups (§12.4) |
 | 22 | Section 5 | A tools bento in place of "the workout, in motion": automatic progression large; rest, supersets and swapping small (§12.5) |
@@ -470,7 +470,7 @@ Each phase ends in an owner approval before the next starts.
 | 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
 | 27 | Free and Pro | Two equal cards side by side (Free first on phones); "Try Pro free for 7 days" filled; the Pro intent carried through sign-up to `/plans`, charging nothing by itself (§12.10) |
 | 28 | Questions | One list of twelve, including messages not being end-to-end encrypted and what the AI receives; payment detail on `/pricing` (§12.11) |
-| 29 | Closing band | A second clip on desktop (poster on phones), "Empieza a forjarte.", and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
+| 29 | Closing band | A second clip on desktop (poster on phones), "Start carving." / "Empieza a esculpir." (row 41), and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
 | 30 | Footer | Site map, help, legal pages and the two legal buttons; no seller identification (§12.13) |
 | 31 | Public pages | Four templates and an outline per page, in one pass (§12.14–12.21) |
 | 32 | Feature pages | A guide under an animated header, worked examples computed from the product's own rules (§12.15–12.16) |
@@ -482,6 +482,8 @@ Each phase ends in an owner approval before the next starts.
 | 37 | Encouragement (2026-11-21) | Partner encouragement (`SOC-09`) never appears on the site -- "too corny"; the partners scene shows what partners share and the partner alert instead (§12.9) |
 | 39 | Footage (2026-11-21) | Real, licensed stock: Mixkit's free-licence series in a gym with machines, chosen for its more muscular, more serious models; led by the man, the woman in fewer shots; no chest-press or shoulder-press shots (§7.2) |
 | 40 | Video cut (2026-11-21) | The first cut approved as encoded: the desktop hero, the phone cut and the closing loop, with their posters, in `public/site/video/` (§12.2, §12.12) |
+| 41 | Brand line (2026-11-21) | "Fórjate" read as corny. The owner wants a voice from today's gym culture -- the gym-rat and teenage lifting scene of Gymshark, YoungLA, the Tren Twins and CBum -- harder-edged, joined to the golden era of bodybuilding, discipline, and the Greek ideal of resembling the gods in mind and body. Of four lines tried over the real hero (Olympus is earned; Statues aren't born, they're carved; Body of a god, mind of a philosopher; Discipline is the aesthetic) the owner chose **"Statues aren't born. They're carved." / "Las estatuas no nacen. Se esculpen."** in Cinzel, the closing band's "Start carving." / "Empieza a esculpir.", and the same line in the app (the splash's tagline and the dashboard's subtitle) |
+| 42 | Comps over the real footage (2026-11-21) | Approved: `.impeccable/mocks/comp-a-real-1536.png`, `-390-en.png`, `-390-es.png`, redrawn with row 41's line |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
 which an international English audience may not be able to pay; how Pro is
@@ -641,7 +643,7 @@ offer and show both actions; at 1440, also show the product working.
 | Part | English | Spanish |
 | --- | --- | --- |
 | Eyebrow (label rank) | FREE TO START · NO APP STORE NEEDED | GRATIS PARA EMPEZAR · SIN TIENDA DE APPS |
-| Headline (`h1`) | Forge yourself. Prove it in **every set**. | Fórjate. Demuéstralo en **cada serie**. |
+| Headline (`h1`) | Statues aren't born. They're **carved**. | Las estatuas no nacen. **Se esculpen**. |
 | Subline *(draft)* | Plan your training, log every set and watch your records and your rank build up, in a history nobody can fake. | Planifica tu entrenamiento, registra cada serie y mira crecer tus récords y tu rango, en un historial que nadie puede inventar. |
 | Filled action | Create a free account → `/signup` | Crear cuenta gratis → `/signup` |
 | Ghost action | Sign in → `/login` | Iniciar sesión → `/login` |
@@ -670,7 +672,7 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   about 530px of the 844, the bar included.
 - **Type** (from §33): the headline in a display rank of Cinzel 600 capitals,
   `clamp(30px, 8vw, 88px)`, line-height about 1.02, `text-wrap: balance`,
-  wrapping naturally ("DEMUÉSTRALO EN" is too wide for one line at 320);
+  wrapping naturally (measured at 390: three lines in both languages);
   the subline in a lead rank of Source Sans 3 at 18–20px, at most 52
   characters a line, in Night `--ink-2`; the eyebrow is the label rank; the
   install line body small.
@@ -686,7 +688,7 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   1. 80ms: the eyebrow rises 12px and fades in over 700ms.
   2. 160, 250 and 340ms: the headline's three lines rise from behind a mask
      (each line clipped, translated from 100% to 0) over 900ms.
-  3. About 1.2s: the rule draws under "every set" / "cada serie" from the left
+  3. About 1.2s: the rule draws under "carved" / "se esculpen" from the left
      over 480ms (the rule draw at display scale; §33 records the longer
      duration).
   4. 600ms: the subline rises 12px and fades in over 700ms; 720ms: the
@@ -754,9 +756,9 @@ names, through [catalog.ts](../i18n/catalog.ts)), sets 1 and 2 done at 80 kg ×
 languages. No placeholder figures here; those are
 the proof band's (§12.3).
 
-**SEO.** The headline is the page's `h1`; the title is "Sunnsteel — Forge
-yourself. Prove it in every set." / "Sunnsteel — Fórjate. Demuéstralo en cada
-serie."; the description is the subline.
+**SEO.** The headline is the page's `h1`; the title is "Sunnsteel — Statues
+aren't born. They're carved." / "Sunnsteel — Las estatuas no nacen. Se
+esculpen."; the description is the subline.
 
 **Accessibility.** The video and the mock-up are `aria-hidden`; the video has
 no sound, so no captions. The pause control (44px, after the actions in the
@@ -1610,7 +1612,7 @@ matches the visible text; answers fit at 320 in Spanish.
 ### 12.12 Closing band — `SiteClosing`
 
 *Approved 2026-11-21: a second clip behind it on desktop (its
-poster on phones), the headline "Start forging yourself.", and a QR card on
+poster on phones), the headline "Start forging yourself." (since 2026-11-21 "Start carving.", row 41), and a QR card on
 desktop.*
 
 **Job.** The last push before the footer: the belief restated, the primary
@@ -1618,7 +1620,7 @@ action once more, and -- for a visitor on a computer -- a way to carry the
 site to the phone they will train with.
 
 **Content and copy** (`site.closing`).
-- `h2`: "Start forging yourself." / "Empieza a forjarte." -- the hero's
+- `h2`: "Start carving." / "Empieza a esculpir." -- the hero's
   headline closed into a circle.
 - Subline *(draft)*: "Free to start, in your browser, in English or Spanish."
   / "Gratis para empezar, en tu navegador, en español o inglés."
@@ -1868,7 +1870,7 @@ numbers could contradict.
 
 | Page | Title (EN / ES) |
 | --- | --- |
-| `/` | Sunnsteel — Forge yourself. Prove it in every set. / Sunnsteel — Fórjate. Demuéstralo en cada serie. |
+| `/` | Sunnsteel — Statues aren't born. They're carved. / Sunnsteel — Las estatuas no nacen. Se esculpen. |
 | `/features` | Features — Sunnsteel / Funciones — Sunnsteel |
 | `/features/<slug>` | <Feature> — Sunnsteel / <Función> — Sunnsteel |
 | `/use-cases/<level>` | Sunnsteel for <level> / Sunnsteel para <nivel> |

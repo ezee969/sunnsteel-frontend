@@ -63,7 +63,7 @@ in sentence case and set in capitals by their rank.
 | Key | English | Spanish |
 | --- | --- | --- |
 | `eyebrow` | Free to start · No app store needed | Gratis para empezar · Sin tienda de apps |
-| `headline` | Forge yourself. Prove it in `<mark>`every set`</mark>`. | Fórjate. Demuéstralo en `<mark>`cada serie`</mark>`. |
+| `headline` | Statues aren't born. They're `<mark>`carved`</mark>`. | Las estatuas no nacen. `<mark>`Se esculpen`</mark>`. |
 | `subline` | Plan, log every set, and watch your records and rank grow in a history nobody can fake. | Planifica, registra cada serie y mira crecer tus récords y tu rango en un historial que nadie puede inventar. |
 | `createAccount` | Create a free account | Crear cuenta gratis |
 | `signIn` | Sign in | Iniciar sesión |
@@ -71,13 +71,21 @@ in sentence case and set in capitals by their rank.
 | `pauseVideo` / `playVideo` | Pause background video / Play background video | Pausar el video de fondo / Reproducir el video de fondo |
 | `example` | Example | Ejemplo |
 | `recordCard` | New record · {exercise} {weight} × {reps} | Nuevo récord · {exercise} {weight} × {reps} |
-| `meta.title` | Sunnsteel — Forge yourself. Prove it in every set. | Sunnsteel — Fórjate. Demuéstralo en cada serie. |
+| `meta.title` | Sunnsteel — Statues aren't born. They're carved. | Sunnsteel — Las estatuas no nacen. Se esculpen. |
 | `meta.description` | A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start. | Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar. |
 
 *Why this subline:* it names the three things a visitor does (plan, log,
 watch) and the one thing only Sunnsteel claims (a history nobody can fake),
 in about 90 characters, so it fits two lines at 390 in both languages. The
 Spanish uses *inventar* rather than *falsificar*, which reads as forgery.
+
+*Why this headline (the owner, 2026-11-21, replacing "Forge yourself. Prove
+it in every set.", which read as corny):* the Greek statue, the golden era's
+sculpting and the discipline of the gym in one line, said as process rather
+than a promise of results -- nobody is told what they will look like. It
+reads three lines at 390 in both languages, and the rule sits under
+*carved* / *Se esculpen*, the work. The closing band answers it with "Start
+carving." / "Empieza a esculpir."
 
 ## 3. Proof band — `site.proof`
 
@@ -289,7 +297,7 @@ approval (Safari's Spanish label varies by version).
 
 | Key | English | Spanish |
 | --- | --- | --- |
-| `heading` | Start forging yourself. | Empieza a forjarte. |
+| `heading` | Start carving. | Empieza a esculpir. |
 | `subline` | Free to start, in your browser, in English or Spanish. | Gratis para empezar, en tu navegador, en español o inglés. |
 | `createAccount` / `signIn` | Create a free account / Sign in | Crear cuenta gratis / Iniciar sesión |
 | `install` | How to install | Cómo instalarla |
@@ -307,7 +315,7 @@ approval (Safari's Spanish label varies by version).
 | Key | English | Spanish |
 | --- | --- | --- |
 | `navLabel` | Footer | Pie de página |
-| `tagline` | Forge yourself. Prove it in every set. | Fórjate. Demuéstralo en cada serie. |
+| `tagline` | Statues aren't born. They're carved. | Las estatuas no nacen. Se esculpen. |
 | `columns.product` / `useCases` / `help` / `legal` | Product / Use cases / Help / Legal | Producto / Casos de uso / Ayuda / Legal |
 | `links.questions` | Questions | Preguntas |
 | `links.install` | Install the app | Instalar la app |

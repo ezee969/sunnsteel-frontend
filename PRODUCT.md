@@ -34,6 +34,11 @@ that nobody can fake.
   the AI features describe the member's own logs and cite every number.
 - **Classical humanism × measurable training**: "Build yourself. Prove it
   through action." ([PRODUCT_VISION.md](../PRODUCT_VISION.md)).
+- **The brand line** (the owner, 2026-11-21): **"Statues aren't born.
+  They're carved." / "Las estatuas no nacen. Se esculpen."** -- today's gym
+  culture (the gym-rat and teenage lifting scene), the golden era of
+  bodybuilding and the Greek ideal of mind and body, said as discipline and
+  process. It heads the public site and the app's splash and dashboard.
 
 ## Operating Context
 
@@ -80,8 +85,9 @@ that nobody can fake.
   site's departures from it live only in its amendment §33 (a draft until
   approved). No other document is visual authority, and any DESIGN.md this
   project carries points there.
-- Voice: plain, exact, no hype words; headlines may be bolder than app copy,
-  never less true.
+- Voice: the app's copy stays plain and exact, with no hype words; headlines
+  speak the way the gym does -- short, hard-edged, classical -- and are never
+  a promise of results and never less true ("Fórjate" was dropped as corny).
 - Every capability Pro unlocks is labelled Pro where it is named.
 
 ## Evidence on Hand

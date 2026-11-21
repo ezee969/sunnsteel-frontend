@@ -40,7 +40,7 @@ plan's §5; Pro tagged wherever named; build path comp-first.
 
 **Footage (2026-11-21):** Mixkit's free-licence gym-with-machines series, led by the man, no chest-press or shoulder-press shots (plan §7.2, §11 row 39).
 
-**Comp A over the real footage (2026-11-21, awaiting the owner's approval):** `.impeccable/mocks/comp-a-real-1536.png`, `comp-a-real-390-en.png` and `comp-a-real-390-es.png` -- comp A's composition redrawn over the approved poster frames (source `.impeccable/mocks/src/comp-a-real.html`). Once approved, the 1536 frame is the comp the build is measured against.
+**Approved comp over the real footage (2026-11-21):** `.impeccable/mocks/comp-a-real-1536.png`, with `comp-a-real-390-en.png` and `comp-a-real-390-es.png` for phones -- comp A's composition redrawn over the approved poster frames with the owner's brand line (source `.impeccable/mocks/src/comp-a-real.html`). The 1536 frame is the comp the build is measured against.
 
 ## Direction contract
 
@@ -48,7 +48,7 @@ THESIS: every set becomes evidence. The ground is real, serious training; the pr
 
 OWN-WORLD: the Night ground in both themes for hero and proof band; black-and-white footage on machines under one flat scrim (0.64, measured to 4.5:1 on the brightest frame); Cinzel 600 capitals for the one inscription, Oswald labels and the filled button, Source Sans 3 lead, Bebas Neue numerals; one ink-filled primary, ruled bands, hairlines, 2px radius; honour gold only on the record card.
 
-STORY: the visitor sees someone training, reads "Forge yourself. Prove it in every set.", watches the phone finish a set and log a record, and creates a free account, or signs in.
+STORY: the visitor sees someone training, reads "Statues aren't born. They're carved.", watches the phone finish a set and log a record, and creates a free account, or signs in.
 
 FIRST VIEWPORT: at 1536x864 a transparent bar (lockup, Product, Pricing; EN/ES, Sign in, Start free); the text column left -- eyebrow, three-line h1 near 70px with the rule under "every set", lead, Create a free account filled beside Sign in, install line; the live-session phone right on the hero's lower edge; the video full-bleed, its subject in the right two thirds; pause lower right; the four-cell ruled proof band at the foot. At 390x844 a 56px bar (lockup, Start free, menu), centred text, actions side by side in English and stacked in Spanish, the proof band 2x2 inside the viewport.
 

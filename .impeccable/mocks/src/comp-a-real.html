@@ -79,6 +79,11 @@
 	.desktop .cell .label { margin-top: 12px; font-size: 14px; letter-spacing: 0.14em; }
 	.desktop .cell.word .numeral { font-family: Oswald, sans-serif; font-weight: 500; font-size: 30px; letter-spacing: 0.08em; }
 
+	/* Brand-line trial: the headline in the condensed display face. */
+	.condensed .text h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; letter-spacing: 0.01em; line-height: 0.9; }
+	.desktop.condensed .text h1 { font-size: 112px; }
+	.phone.condensed .text h1 { font-size: 58px; }
+
 	/* The phone mock-up: an original frame, the live session resting on the record. */
 	.device { position: absolute; z-index: 2; width: 202px; left: 1180px; top: 296px; height: 432px; border: 1.5px solid var(--rule); border-bottom: 0; border-radius: 28px 28px 0 0; background: oklch(0.118 0.009 70); padding: 12px 16px; }
 	.device .status { display: flex; justify-content: space-between; font-size: 9px; color: var(--ink-2); font-family: 'Source Sans 3'; }
@@ -177,7 +182,7 @@
 		en: {
 			product: 'Product ⌄', pricing: 'Pricing', signIn: 'Sign in', startFree: 'Start free',
 			eyebrow: 'Free to start · No app store needed',
-			headline: 'Forge yourself. Prove it in <mark>every set</mark>.',
+			headline: "Statues aren't born. They're <mark>carved</mark>.",
 			lead: 'Plan your training, log every set and watch your records and your rank build up, in a history nobody can fake.',
 			create: 'Create a free account',
 			install: 'Works in your browser and installs on any phone, with no app store. <a>How to install</a>',
@@ -187,7 +192,7 @@
 		es: {
 			product: 'Producto ⌄', pricing: 'Precios', signIn: 'Iniciar sesión', startFree: 'Empezar gratis',
 			eyebrow: 'Gratis para empezar · Sin tienda de apps',
-			headline: 'Fórjate. Demuéstralo en <mark>cada serie</mark>.',
+			headline: 'Las estatuas no nacen. <mark>Se esculpen</mark>.',
 			lead: 'Planifica tu entrenamiento, registra cada serie y mira crecer tus récords y tu rango, en un historial que nadie puede inventar.',
 			create: 'Crear cuenta gratis',
 			install: 'Funciona en el navegador y se instala en cualquier teléfono, sin tienda. <a>Cómo instalarla</a>',
@@ -195,8 +200,11 @@
 			n1: '12.400', l1: 'Miembros', n2: '350.000', l2: 'Entrenamientos registrados', l3: 'Ejercicios en el catálogo', n4: 'Gratis', l4: 'Para empezar',
 		},
 	}[lang]
+	// Brand-line trials: ?h=<headline html> replaces the headline, ?font=condensed
+	// sets it in Bebas Neue instead of Cinzel.
+	if (q.get('h')) T.headline = q.get('h')
 	document.documentElement.lang = lang
-	document.body.className = frame + (q.get('stack') === '1' ? ' stack' : '')
+	document.body.className = frame + (q.get('stack') === '1' ? ' stack' : '') + (q.get('font') === 'condensed' ? ' condensed' : '')
 	document.querySelectorAll('[data-t]').forEach(el => { el.innerHTML = T[el.dataset.t] })
 	document.querySelector('[data-lang]').innerHTML = lang === 'en' ? '<b>EN</b> · ES' : 'EN · <b>ES</b>'
 	document.querySelectorAll(frame === 'desktop' ? '[data-phone]' : '[data-desktop]').forEach(el => el.remove())
