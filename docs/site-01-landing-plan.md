@@ -449,6 +449,8 @@ Each phase ends in an owner approval before the next starts.
 | 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
 | 27 | Free and Pro | Two equal cards side by side (Free first on phones); "Try Pro free for 7 days" filled; the Pro intent carried through sign-up to `/plans`, charging nothing by itself (§12.10) |
 | 28 | Questions | One list of twelve, including messages not being end-to-end encrypted and what the AI receives; payment detail on `/pricing` (§12.11) |
+| 29 | Closing band | A second generated clip on desktop (poster on phones), "Empieza a forjarte.", and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
+| 30 | Footer | Site map, help, legal pages and the two legal buttons; no seller identification (§12.13) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1544,6 +1546,123 @@ holding its button; links in answers are real links; an anchor (`#install`,
 the app (a reviewer checks each against its source column before the copy
 deck is approved); `/#install` and `/#free` open their questions; the JSON-LD
 matches the visible text; answers fit at 320 in Spanish.
+
+**Needs from §33.** Nothing new.
+
+### 12.12 Closing band — `SiteClosing`
+
+*Approved 2026-11-21: a second generated clip behind it on desktop (its
+poster on phones), the headline "Start forging yourself.", and a QR card on
+desktop.*
+
+**Job.** The last push before the footer: the belief restated, the primary
+action once more, and -- for a visitor on a computer -- a way to carry the
+site to the phone they will train with.
+
+**Content and copy** (`site.closing`).
+- `h2`: "Start forging yourself." / "Empieza a forjarte." -- the hero's
+  headline closed into a circle.
+- Subline *(draft)*: "Free to start, in your browser, in English or Spanish."
+  / "Gratis para empezar, en tu navegador, en español o inglés."
+- **"Create a free account" / "Crear cuenta gratis"** (filled) → `/signup`;
+  **"Sign in" / "Iniciar sesión"** (ghost) → `/login`; under them "How to
+  install" / "Cómo instalarla" → `/#install`.
+- **The QR card** (from 1024 only): "Open it on your phone" / "Ábrelo en tu
+  teléfono", the code, "Scan it with your camera" / "Escanéalo con la cámara"
+  and the address written out beneath it.
+- The video's pause control, as in the hero.
+
+**What the QR does.** It opens the site on the phone; **no page can install
+itself** -- every browser requires the visitor's own tap. The code points at
+`<PUBLIC_ORIGIN>/?install=1`, and a phone arriving there sees an **install
+helper** at the top of the landing (the `#install` answer, opened, plus one
+action):
+- where the browser offers installation (Chrome, Edge and Samsung Internet on
+  Android fire `beforeinstallprompt`), a one-tap **"Install Sunnsteel" /
+  "Instalar Sunnsteel"** that opens the browser's own install dialog;
+- on iPhone and iPad, where Safari offers no such event, the two steps --
+  Share › Add to Home Screen -- drawn as two small steps, with the note that
+  notifications need the installed app;
+- an already installed app (`display-mode: standalone`) or a computer shows
+  no helper.
+The app has no install prompt today; this one is the site's alone (the app
+could adopt it later, outside `SITE-01`). The code is generated at build as an
+SVG (no runtime library), in `--foreground` on `--surface`, with the quiet zone
+the format needs.
+
+**Layout.**
+- **Ground:** a Night region in both themes over the video and its scrim, as
+  the hero.
+- **≥ 1024:** the `h2`, subline and actions left in columns 1–7; the QR card
+  right in columns 9–12, a ruled `--surface` card with the small radius.
+- **Below 1024:** centred text and actions, no QR card.
+
+**Motion.**
+- *Desktop:* when the band is a third in view, the `h2` rises line by line
+  and its rule draws, the actions rise 8px, the QR card rises 24px and fades
+  in; the clip crossfades in over its poster once it can play, and while the
+  band scrolls into place the video settles from a 1.04 scale to 1 -- the
+  hero's movement in reverse, closing the page.
+- *Phone:* the text sequence over the poster.
+- *Reduced motion, `Save-Data` and no JavaScript:* the poster, everything
+  present.
+
+**Assets.**
+- **The second clip** (desktop only): close-ups -- chalk on hands, plates
+  sliding onto a bar, a collar tightened, a bar set down -- in the hero's
+  grade, a seamless 8–12 s loop, no audio, at most 2 MB, requested only when
+  the band is within one screen; same generation brief and gate as §7.2.
+- **Posters:** desktop and phone, AVIF and WebP, at most 120 KB and 60 KB.
+- **The QR code**, generated at build per environment's `PUBLIC_ORIGIN`.
+
+**Data.** None.
+
+**Accessibility.** The video is `aria-hidden`, with its pause control; the QR
+image's alternative text is the address it opens, also printed under it; the
+install helper's button is the browser's own dialog, and the iPhone steps are
+text with icons.
+
+**Acceptance checks.** The clip is never requested on phones, under reduced
+motion or `Save-Data`, nor before the band approaches; the code opens
+`/?install=1` on the environment's own origin; on Android Chrome the helper's
+button opens the install dialog; on iPhone Safari the steps show; an
+installed app sees no helper.
+
+**Needs from §33.** A second video region; the install helper.
+
+### 12.13 Footer — `SiteFooter`
+
+*Approved 2026-11-21: no seller identification in the footer.*
+
+**Job.** Every public page's way out: the site map, help, the legal pages,
+and the two buttons Argentina's consumer law asks for on every signed-out
+surface (`BILL-07`).
+
+**Content and copy** (`site.footer`).
+- The lockup and the hero's headline in small.
+- **Product / Producto:** All features, the six feature pages, Pricing.
+- **Use cases / Casos de uso:** Beginners, Intermediates, Advanced lifters.
+- **Help / Ayuda:** Questions (`/#questions`), Install the app
+  (`/#install`), Contact -- the support address from `legal-facts.ts`.
+- **Legal:** Terms (`/terminos`), Privacy (`/privacidad`), Refunds
+  (`/reembolsos`).
+- **The bottom row:** `LegalLinks` -- the *botón de arrepentimiento* and the
+  *botón de baja*, named as the law names them in either language -- the
+  language switch, and "© <year> Sunnsteel".
+- **No seller identification** here (the owner's decision). What the legal
+  pages themselves show is a separate decision, outside `SITE-01`.
+
+**Layout.** The page's theme with a `--rule` above. From 1024, the lockup
+then four columns; 768–1023, two by two; below 768, the columns stacked with
+the bottom row last. Link targets at least 44px tall on touch.
+
+**Motion.** None: chrome does not perform.
+
+**Accessibility.** A `<footer>` with a `<nav aria-label>` ("Footer" / "Pie de
+página"); column titles are labels, not headings that break the outline.
+
+**Acceptance checks.** The two legal buttons are on every public page; every
+link resolves; the language switch reloads on the same page.
 
 **Needs from §33.** Nothing new.
 
