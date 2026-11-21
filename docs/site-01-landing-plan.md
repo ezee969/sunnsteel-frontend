@@ -30,8 +30,10 @@ legal pages keep working exactly as they do.
 ## 2. Who it is for, and what it must make them believe
 
 - **Visitor:** someone who lifts (or wants to) and arrived from a shared
-  profile, a shared workout, a search or word of mouth, often on a phone,
-  mostly in Spanish (Argentina is the paying market since `BILL-06`).
+  profile, a shared workout, a search or word of mouth, often on a phone: a
+  varied audience, **in English first** (the owner, 2026-11-21), with Spanish
+  written alongside. Pro is sold in Argentina (ARS, `BILL-06`), which is an
+  open question for that audience (§11).
 - **The one belief** (from [PRODUCT_VISION.md](../../PRODUCT_VISION.md),
   "Build yourself. Prove it through action."): *every set I log becomes
   evidence of who I am becoming — records, ranks and a history nobody can
@@ -454,6 +456,18 @@ Each phase ends in an owner approval before the next starts.
 | 31 | Public pages | Four templates and an outline per page, in one pass (§12.14–12.21) |
 | 32 | Feature pages | A guide under an animated header, worked examples computed from the product's own rules (§12.15–12.16) |
 | 33 | `/pricing` signed in | Redirected to `/plans` (§12.20) |
+| 34 | Audience (2026-11-21) | A varied audience, English first, Spanish written alongside -- replacing "mostly Spanish (Argentina)" in §2; recorded in `PRODUCT.md` |
+| 35 | Evidence (2026-11-21) | None real; everything shown is mock-up, labelled, with placeholders replaced by true facts in production |
+| 36 | Build path (2026-11-21) | Comp-first (`.impeccable/config.json`) |
+
+**Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
+which an international English audience may not be able to pay; how Pro is
+offered to it is undecided (recorded in `PRODUCT.md`).
+
+**Progress:** phase 0 done 2026-11-21 (`PRODUCT.md`, the site's surface brief
+in `.impeccable/surfaces/`, the build path); phase 1's copy deck, part 1 (the
+landing), is drafted in [site-01-copy-deck.md](site-01-copy-deck.md) for the
+owner's approval.
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
