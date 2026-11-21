@@ -13,7 +13,31 @@
 		"english": "English",
 		"spanish": "Español",
 		"signIn": "Sign in",
-		"start": "Get started"
+		"start": "Get started",
+		"openMenu": "Open menu",
+		"closeMenu": "Close menu",
+		"menuTitle": "Menu",
+		"columns": {
+			"features": "Features",
+			"useCases": "Use cases",
+			"plans": "Plans"
+		},
+		"links": {
+			"allFeatures": "All features",
+			"workoutTracker": "Workout tracker",
+			"routineBuilder": "Routine builder",
+			"progression": "Automatic progression",
+			"progress": "Progress",
+			"ranks": "Ranks and achievements",
+			"community": "Training with people",
+			"beginners": "Beginners",
+			"intermediates": "Intermediates",
+			"advanced": "Advanced lifters",
+			"pricing": "Pricing",
+			"isItFree": "Is it free?",
+			"pro": "Pro",
+			"install": "Install the app"
+		}
 	},
 	"hero": {
 		"headline": "Statues aren't born. They're <mark>carved</mark>.",

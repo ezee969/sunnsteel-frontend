@@ -1060,6 +1060,7 @@
    ------------------------------------------------------------------------ */
 .site {
   --site-gutter: clamp(16px, 3.65vw, 56px);
+  min-height: 100svh;
   background: var(--background);
   color: var(--foreground);
 }
@@ -1129,6 +1130,7 @@
 }
 .site-nav {
   display: flex;
+  white-space: nowrap;
   gap: 48px;
   margin-left: 56px;
   font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
@@ -1138,6 +1140,7 @@
 }
 .site-bar-actions {
   display: flex;
+  white-space: nowrap;
   align-items: center;
   gap: 44px;
   margin-left: auto;
@@ -1314,10 +1317,36 @@
   border-bottom: 1px dashed var(--rule);
 }
 
-/* Until the responsive phase: the phone from 1024, the bar's links from 768. */
+/* The menu: a button below 768, a full-height panel from the right (§12.1). */
+.site-menu-button {
+  display: none;
+}
+.site-menu-panel {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 420px);
+  border-left: 1px solid var(--rule);
+}
+
+/* Phones and tablets (plan §12.1-§12.3, the approved 390 comps). Below 1024
+   the language switch and Sign in leave the bar for the menu, which opens
+   there too: at 768 in Spanish they did not fit beside Product and Pricing. */
 @media (max-width: 1023px) {
   .site-phone {
     display: none;
+  }
+  .site-bar-actions > :not(.site-filled):not(.site-menu-button) {
+    display: none;
+  }
+  .site-menu-button {
+    display: grid;
+  }
+  .site-bar-actions {
+    gap: 16px;
   }
 }
 @media (max-width: 767px) {
@@ -1325,8 +1354,18 @@
     height: 56px;
   }
   .site-nav,
-  .site-bar-actions > :not(.site-filled) {
+  .site-bar-actions > :not(.site-filled):not(.site-menu-button) {
     display: none;
+  }
+  .site-bar-actions {
+    gap: 8px;
+  }
+  .site-menu-button {
+    display: grid;
+  }
+  .site-filled-bar {
+    height: 44px;
+    padding-inline: 14px;
   }
   .site-lockup {
     font-size: 17px;
@@ -1339,13 +1378,72 @@
     height: auto;
   }
   .site-hero-text {
+    max-width: none;
     padding: 152px var(--site-gutter) 48px;
     text-align: center;
   }
+  .site-lead {
+    margin-top: 20px;
+    margin-inline: auto;
+  }
   .site-actions {
     justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .site-filled-hero {
+    height: 48px;
+    padding-inline: 24px;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+  .site-install {
+    max-width: 34ch;
+    margin: 20px auto 0;
+    font-size: 14px;
+  }
+  .site-video-control {
+    right: 6px;
+    bottom: 4px;
   }
   .site-proof-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-proof-cell {
+    margin-block: 0;
+    padding: 18px 8px;
+  }
+  .site-proof-cell + .site-proof-cell {
+    border-left: 0;
+  }
+  .site-proof-cell:nth-child(odd) {
+    border-right: 1px solid var(--rule-faint);
+  }
+  .site-proof-cell:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--rule-faint);
+  }
+  .site-proof-label {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+  .site-proof-mock {
+    position: static;
+    margin-top: 6px;
+  }
+}
+/* Spanish runs longer: its two actions stack below 420px (the approved 390 comp). */
+@media (max-width: 419px) {
+  html[lang='es'] .site-actions {
+    flex-direction: column;
+  }
+  html[lang='es'] .site-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Below 360px the lockup keeps the mark; the link keeps its name. */
+@media (max-width: 359px) {
+  .site-lockup .type-wordmark {
+    display: none;
   }
 }

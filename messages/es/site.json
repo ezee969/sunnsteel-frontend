@@ -13,7 +13,31 @@
 		"english": "English",
 		"spanish": "Español",
 		"signIn": "Iniciar sesión",
-		"start": "Empezar"
+		"start": "Empezar",
+		"openMenu": "Abrir menú",
+		"closeMenu": "Cerrar menú",
+		"menuTitle": "Menú",
+		"columns": {
+			"features": "Funciones",
+			"useCases": "Casos de uso",
+			"plans": "Planes"
+		},
+		"links": {
+			"allFeatures": "Todas las funciones",
+			"workoutTracker": "Registro de entrenamiento",
+			"routineBuilder": "Constructor de rutinas",
+			"progression": "Progresión automática",
+			"progress": "Progreso",
+			"ranks": "Rangos y logros",
+			"community": "Entrenar con otros",
+			"beginners": "Principiantes",
+			"intermediates": "Intermedios",
+			"advanced": "Avanzados",
+			"pricing": "Precios",
+			"isItFree": "¿Es gratis?",
+			"pro": "Pro",
+			"install": "Instalar la app"
+		}
 	},
 	"hero": {
 		"headline": "Las estatuas no nacen. <mark>Se esculpen</mark>.",

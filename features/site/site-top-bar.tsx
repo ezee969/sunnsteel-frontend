@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
 
 import { LanguageSwitch } from './language-switch'
+import { SiteMenu } from './site-menu'
 
 /**
  * SITE-01 §12.1: the public site's bar, transparent over the hero with the
@@ -43,6 +44,7 @@ export async function SiteTopBar() {
 				<Link href="/signup" className="site-filled site-filled-bar">
 					{t('start')}
 				</Link>
+				<SiteMenu />
 			</div>
 		</header>
 	)
