@@ -3148,3 +3148,4 @@ decision. An ID is never reused.
 - **2026-11-20 (revision 320):** Specified `SITE-01`'s templates section (plan §12.8): a carousel by level, a "none of these?" card with the Pro draft, and the chosen template carried through sign-up and onboarding into the builder.
 - **2026-11-20 (revision 321):** Specified `SITE-01`'s people section (plan §12.9): three animated scenes and a privacy band that states no default, correcting the plan's earlier "every setting starts private".
 - **2026-11-20 (revision 322):** Specified `SITE-01`'s Free and Pro section (plan §12.10): two equal cards from contracts, the Pro trial as the filled action, and the Pro intent carried through sign-up to `/plans`.
+- **2026-11-20 (revision 323):** Specified `SITE-01`'s questions (plan §12.11): twelve answers sourced from the app and contracts, mirrored as FAQPage structured data.

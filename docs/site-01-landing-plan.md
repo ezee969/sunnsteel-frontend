@@ -448,6 +448,7 @@ Each phase ends in an owner approval before the next starts.
 | 25 | Templates | A carousel by level; "none of these?" offers building your own and describing it (Pro); the chosen template travels through sign-up and onboarding into the builder (§12.8) |
 | 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
 | 27 | Free and Pro | Two equal cards side by side (Free first on phones); "Try Pro free for 7 days" filled; the Pro intent carried through sign-up to `/plans`, charging nothing by itself (§12.10) |
+| 28 | Questions | One list of twelve, including messages not being end-to-end encrypted and what the AI receives; payment detail on `/pricing` (§12.11) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1479,6 +1480,72 @@ pages; Spanish fits both cards at 320 and 768.
 
 **Needs from §33.** Nothing new: §29 and §30 already govern how Pro is
 offered; the site applies them.
+
+### 12.11 Questions — `SiteQuestions` (`id="questions"`)
+
+*Approved 2026-11-20: one list of twelve, in the order people ask; payment
+detail stays on `/pricing`. Answers are draft, but every fact in them is the
+app's and every number comes from contracts.*
+
+**Job.** Answer what stops a visitor from signing up, honestly -- including
+the answers a marketing page usually hides (what the AI receives, what
+messages are, what is not medical advice).
+
+**Content and copy** (`site.questions`). `h2` *(draft)*: "Questions" /
+"Preguntas"; beside it "Something else? Write to us at <the seller's
+contact address>" / "¿Otra cosa? Escríbenos a <…>", the address from
+[legal-facts.ts](../lib/legal/legal-facts.ts), never typed.
+
+| # | Question (EN / ES) | What the answer says | Source |
+| --- | --- | --- | --- |
+| 1 | Is it free? / ¿Es gratis? (`id="free"`) | Yes: logging, progression, history, records, ranks and everything social are free with no card; Pro is optional, its price and trial as §12.10 states them. | `PLANS`, `PRO_PRICE`, `SUBSCRIPTION_TRIAL_DAYS` |
+| 2 | Do I need to download anything? / ¿Tengo que descargar algo? (`id="install"`) | No app store: it runs in the browser and installs from it -- on iPhone, Safari's Share › Add to Home Screen; on Android, the browser's Install app; on a computer, the install icon in the address bar. On iPhone, notifications need the installed app. | `NOTIF-02`'s iOS rule |
+| 3 | Does it work offline? / ¿Funciona sin conexión? | If the signal drops mid-workout you keep logging, and your sets are sent when it returns, as long as the app stays open; it tells you when changes are waiting. | `TRUST-03` |
+| 4 | Is it for beginners? / ¿Sirve si recién empiezo? | Yes: a beginner programme, a first-run recommendation from your days and goals, warm-ups and plate loading worked out for you; it grows with you to blocks and deloads (Pro). | `ROUT-03`, `ONBOARD-01`, `LIVE-13` |
+| 5 | Which languages? / ¿En qué idiomas está? | English and Spanish, switchable at any time. | `I18N-01` |
+| 6 | What does Pro add? / ¿Qué agrega Pro? | The four outcomes and the AI line of §12.10, and a link to `/pricing`. | `PRO_OUTCOMES`, `PLANS` |
+| 7 | How do I cancel? / ¿Cómo cancelo? | From Settings › Account, or with the cancellation button (`/baja`) without signing in; Pro lasts until the end of what you paid and nothing is deleted. Within 10 days of buying, the revocation button (`/arrepentimiento`). | `BILL-04`, `BILL-07`, `REVOCATION_WINDOW_DAYS` |
+| 8 | Who sees my profile and my workouts? / ¿Quién ve mi perfil y mis entrenamientos? | You choose, for each of ten parts of your profile: everyone, followers, or only you. You can block anyone and report anything. No default is stated. | `PROF-06`, `PROF-10` |
+| 9 | Are messages private? / ¿Los mensajes son privados? | They are one to one and stored on our servers; they are **not end-to-end encrypted**. A moderator reads a message only if it is reported, and then only that message and up to five before it, as the person who reported it saw them. | `MSG-01`, `MSG-09` |
+| 10 | What happens to what I give the AI? / ¿Qué pasa con lo que le doy a la IA? | Only for Pro's routine drafts and training reviews: what you write or the workouts you choose are sent to Anthropic to write the answer and are not stored by us -- we keep only that a request was made, to count the month. Answers describe, they don't diagnose. | `INTEL-03`, `INTEL-04`, the app's own disclosure lines |
+| 11 | Can I take my data or delete my account? / ¿Puedo llevarme mis datos o borrar mi cuenta? | Yes: download everything as one file from Settings at any time, and deleting the account is immediate and complete. | `EXPORT-01`, `TRUST-01` |
+| 12 | Is this medical advice? / ¿Esto es consejo médico? | No. Sunnsteel records and describes your training; for pain, injury or health questions, see a professional. | the app's AI disclaimers and the terms |
+
+Each answer links where it points (Settings is described, not linked, to a
+signed-out visitor; `/pricing`, `/baja`, `/arrepentimiento`,
+`/reembolsos`, `/privacidad` are links).
+
+**Layout.**
+- **≥ 1024:** two columns: the `h2` and the contact line in columns 1–4,
+  sticky while the list scrolls; the accordion in columns 5–12.
+- **Below 1024:** the heading, the contact line, then the list.
+- The accordion is the app's `Accordion` (`type="multiple"`, ruled rows,
+  §30.2), each question a `type-panel` trigger with its chevron.
+
+**Motion.**
+- *Heading:* line rise and rule draw.
+- *Entry:* the rows appear 40ms apart (opacity and a 6px rise) the first time
+  the list is in view.
+- *Opening:* as in the app (motion spec §2.7): the height changes at once, the
+  answer fades in over `--motion-fast` and the chevron turns over
+  `--motion-base`. No height animation (§1.2 of the motion spec).
+- *Reduced motion and no JavaScript:* present at once; without JavaScript
+  every answer is open.
+
+**Data and SEO.** The questions and answers are also `FAQPage` JSON-LD,
+generated from the same messages in the page's language, so the two can
+never differ.
+
+**Accessibility.** Radix's accordion semantics; each question is a heading
+holding its button; links in answers are real links; an anchor (`#install`,
+`#free`) opens its question when the page loads on it.
+
+**Acceptance checks.** Every number matches contracts and every fact matches
+the app (a reviewer checks each against its source column before the copy
+deck is approved); `/#install` and `/#free` open their questions; the JSON-LD
+matches the visible text; answers fit at 320 in Spanish.
+
+**Needs from §33.** Nothing new.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
