@@ -351,8 +351,11 @@ Each phase ends in an owner approval before the next starts.
 - **`scripts/generate-landing-assets.mjs`** (new, `sharp`, like
   `generate-brand-icons.mjs`) — every plate to AVIF + WebP at 640/1080/1600/
   2400 widths with fixed aspect ratios (no CLS), plus the per-language OG
-  images, and the hero video as MP4 (H.264) and WebM at phone and desktop
-  sizes with its poster (`ffmpeg`, its availability checked at build).
+  images.
+- **`scripts/generate-site-video.mjs`** -- the hero and closing videos as
+  MP4 (H.264) and WebM (AV1) at phone and desktop sizes, with their posters,
+  from the licensed masters (§12.2). It needs `ffmpeg` and runs locally, never
+  at build; its outputs are committed.
 - **Real product screenshots** — extend
   [e2e/portfolio-targets.ts](../e2e/portfolio-targets.ts) with `site-*` slugs
   captured by `npm run ui:capture:portfolio` at 390×844 (phone frames) and
@@ -724,8 +727,17 @@ decoration. The phone's record (below) is the viewport's one honour mark.
 - **Footage** (§7.2): the desktop cut is the Mixkit shortlist in this order
   -- cable fly, lat pulldown, the woman at a pulldown machine, seated cable
   row -- each trimmed to its strongest 2–3 s; the phone cut is the cable fly
-  alone, cropped to portrait around the man. Black and white with grain,
-  deep blacks. No legible logo, sign or screen in any frame kept.
+  alone, cropped to portrait around the man. Black and white, deep blacks.
+  No legible logo, sign or screen in any frame kept.
+- **Made by** `scripts/generate-site-video.mjs` from the 4K masters, which
+  stay outside every repository (`../site-footage/mixkit`); only its outputs
+  are committed. It frames each cut so the subject sits at two thirds of the
+  width (mirroring a shot where needed), and loops a single shot where its
+  pose and motion repeat -- a crossfade ghosted. **Grain is a CSS layer over
+  the video, never baked in**: per-frame noise multiplies a clip's size.
+  First encode (2026-11-21): the desktop cut 2.8 MB as MP4 and 0.8 MB as AV1,
+  11.2 s; the phone cut 0.42 MB and 0.31 MB, 7.9 s; posters 34–45 KB and
+  14–16 KB.
 - **Phone mock-up:** the live session's presentational set rows and rest bar
   (§7.3), identified at build, in the SVG frame.
 
@@ -1649,8 +1661,9 @@ the format needs.
 **Assets.**
 - **The second clip** (desktop only): a closer shot from the hero's series
   -- Mixkit 100540, the man's back at a machine (§7.2) -- in the hero's
-  grade, a seamless 8–12 s loop, no audio, at most 2 MB, requested only when
-  the band is within one screen.
+  grade, a seamless loop of 6–12 s, no audio, at most 2 MB, requested only
+  when the band is within one screen. First encode: 6.2 s, cut where the
+  pose repeats, 0.75 MB as MP4 and 0.24 MB as AV1.
 - **Posters:** desktop and phone, AVIF and WebP, at most 120 KB and 60 KB.
 - **The QR code**, generated at build per environment's `PUBLIC_ORIGIN`.
 
