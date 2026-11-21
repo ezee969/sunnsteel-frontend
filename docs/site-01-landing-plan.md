@@ -442,6 +442,7 @@ Each phase ends in an owner approval before the next starts.
 | 22 | Section 5 | A tools bento in place of "the workout, in motion": automatic progression large; rest, supersets and swapping small (§12.5) |
 | 23 | Section 6 | A large body map whose weeks advance with the scroll, then four analysis cards tagged Free or Pro; the training review here, the routine draft in the Pro section (§12.6) |
 | 24 | Ranks | A climb with the scroll: each step draws the next crest and dresses a "Your name" profile header in that rank; phones get the ladder and one Artisan header (§12.7) |
+| 25 | Templates | A carousel by level; "none of these?" offers building your own and describing it (Pro); the chosen template travels through sign-up and onboarding into the builder (§12.8) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1194,6 +1195,114 @@ requirements fit at 320.
 **Needs from §33.** A third sticky stage; the site's profile-header mock as
 the one place outside a profile where a rank decoration appears (§24.1 keeps
 decoration to its holder's header).
+
+### 12.8 Start with a programme — `SiteTemplates`
+
+*Approved 2026-11-20: a carousel by level; "none of these?" offers building
+your own and describing it (Pro); choosing a template carries it through
+sign-up into the builder. Copy is draft.*
+
+**Job.** Take a visitor from "this looks good" to "this is my plan": pick a
+programme for your level and start from it the moment the account exists.
+
+**Content and copy** (`site.templates`).
+- `h2` *(draft)*: "Start with a programme" / "Empieza con un programa".
+- Body *(draft)*: "Three programmes to start from, each opening as a draft you
+  can change. The loads are yours to fill: a template can't know your
+  strength." / "Tres programas para empezar; cada uno se abre como un
+  borrador que puedes cambiar. Las cargas las completas tú: una plantilla no
+  puede saber tu fuerza." -- the same promise the app's own templates make.
+- **Level tabs** (`ToggleRow`, §28): Beginner / Principiante · Intermediate /
+  Intermedio · Advanced / Avanzado.
+- **The templates are the app's** (`ROUTINE_TEMPLATES` and the
+  `routines.templates` messages), never retyped -- names, schedule summary,
+  description, day names and each day's exercise count:
+
+  | Level | Template | Schedule |
+  | --- | --- | --- |
+  | Beginner | Full Body Foundations / Fundamentos de cuerpo completo | Monday, Wednesday, Friday · Full body A, B, C |
+  | Intermediate | Upper / Lower / Superior / inferior | Monday, Tuesday, Thursday, Friday · Upper A, Lower A, Upper B, Lower B |
+  | Intermediate | Push / Pull / Legs / Empuje / tirón / piernas | a 3-day rotation, Monday to Saturday, each day twice a week |
+  | Advanced | none | the "none of these?" card alone |
+
+- **A template card:** its name (`h3`), level and schedule summary, a week
+  strip of seven day letters with the training days lit (the rotation lights
+  Monday to Saturday with its days in order), the day list with each day's
+  exercise count, the description, and **"Start with this one" / "Empezar con
+  esta"** -- the region's filled action, shown on the front card only.
+- **The "none of these?" card** ("None of these?" / "¿Ninguna te sirve?"),
+  last at every level and alone under Advanced: **"Build your own" / "Arma la
+  tuya"** (free, outline) → `/signup`, and **"Describe it, get a draft" /
+  "Descríbela y recibe un borrador"** (Pro tag) → `/features/routine-builder`,
+  where the draft is explained. Under Advanced it adds that the 8-week block
+  (Pro tag) is built in the same builder.
+
+**The hand-off.** "Start with this one" goes to `/signup?template=<slug>`
+(`full-body-foundations`, `upper-lower`, `push-pull-legs`):
+- the sign-up page accepts only a slug `routineTemplateBySlug` knows and
+  ignores any other; it keeps the choice on the device (`localStorage`
+  `ss-site-template`, for a day, read in `try`/`catch`, because email
+  confirmation can open in another tab) and passes it on as the callback
+  address of both email confirmation and Google sign-in;
+- onboarding's recommendation step (`ONBOARD-01`) offers the chosen template
+  first -- "You picked Upper / Lower" / "Elegiste Superior / inferior" --
+  instead of computing one, with the weekdays the member gives; its next step
+  opens `/routines/new?template=<slug>` as it does today. This changes a
+  step's content, not the steps, so `ONBOARDING_VERSION` stays;
+- a member who skips onboarding finds the template under Getting Started's
+  "Choose a routine";
+- **a signed-in visitor** is sent by the middleware from
+  `/signup?template=<slug>` straight to `/routines/new?template=<slug>`
+  rather than to the dashboard, with a test beside the existing redirect
+  tests.
+
+**Layout.**
+- **≥ 1024:** the tabs centred above a coverflow: the front card 480px wide;
+  its neighbours at 85% size and 60% opacity, offset left and right and
+  partly behind it; previous and next buttons (44px) at the sides. Clicking
+  a neighbour brings it forward.
+- **768–1023:** the same coverflow with the front card at 420px and the
+  neighbours at 85% and further behind.
+- **< 768:** the tabs full width; the cards in a horizontal scroll-snap row,
+  each about 85% of the width with the next one peeking; the snapped card is
+  the front one.
+
+**Motion.**
+- *Heading:* line rise and rule draw.
+- *Changing level:* the cards of the old level fade and move 24px away while
+  the new ones arrive from 24px the other side (400ms); then the front card's
+  week strip lights its days one after another (60ms apart) and its day rows
+  appear 40ms apart.
+- *Moving the coverflow:* each card translates and scales to its new place
+  (500ms, `--ease-standard`, transform and opacity only), and the new front
+  card lights its week strip as above.
+- *Hover:* colour only (§9.2).
+- *Reduced motion:* instant changes, every card the same size and fully
+  opaque, the week strip already lit.
+- *No JavaScript:* a plain list by level with headings, every template and
+  the "none of these?" card, each with its link.
+
+**Assets.** None; the cards are built from the app's template data and the
+site's type ranks.
+
+**Data.** Real, not synthetic: the three approved templates exactly as the
+builder opens them.
+
+**Accessibility.** The tabs are the app's `ToggleRow`; the carousel is a list
+of cards, each with its `h3`; the previous and next buttons name the template
+they bring forward; a polite live region says "Upper / Lower, 1 of 3" when
+the front card changes; only the front card's action is in the tab order,
+and a neighbour is reached by its own "Show <name>" control.
+
+**Acceptance checks.** Names, days and counts come from the code; the
+hand-off reaches the builder with the chosen template through email sign-up
+and through Google, onboarding offers it first, an unknown slug is ignored,
+and a signed-in visitor lands in the builder; keyboard and swipe both move
+the carousel; Spanish fits the front card at 320 and 1024; the plain list
+without JavaScript.
+
+**Needs from §33.** The coverflow (scaled and dimmed neighbours) on public
+pages.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
