@@ -483,6 +483,7 @@ Each phase ends in an owner approval before the next starts.
 | 39 | Footage (2026-11-21) | Real, licensed stock: Mixkit's free-licence series in a gym with machines, chosen for its more muscular, more serious models; led by the man, the woman in fewer shots; no chest-press or shoulder-press shots (§7.2) |
 | 40 | Video cut (2026-11-21) | The first cut approved as encoded: the desktop hero, the phone cut and the closing loop, with their posters, in `public/site/video/` (§12.2, §12.12) |
 | 41 | Brand line (2026-11-21) | "Fórjate" read as corny. The owner wants a voice from today's gym culture -- the gym-rat and teenage lifting scene of Gymshark, YoungLA, the Tren Twins and CBum -- harder-edged, joined to the golden era of bodybuilding, discipline, and the Greek ideal of resembling the gods in mind and body. Of four lines tried over the real hero (Olympus is earned; Statues aren't born, they're carved; Body of a god, mind of a philosopher; Discipline is the aesthetic) the owner chose **"Statues aren't born. They're carved." / "Las estatuas no nacen. Se esculpen."** in Cinzel, the closing band's "Start carving." / "Empieza a esculpir.", and the same line in the app (the splash's tagline and the dashboard's subtitle) |
+| 43 | Build (2026-11-21) | §33 approved for the public site; the hero image is always the real video, never regenerated with AI ("Sí, siempre el video real"); the scrim is baked into the footage so the plate, poster and video are the page's pixels |
 | 42 | Comps over the real footage (2026-11-21) | Approved: `.impeccable/mocks/comp-a-real-1536.png`, `-390-en.png`, `-390-es.png`, redrawn with row 41's line |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
@@ -512,9 +513,9 @@ else in an approved section is decided.
 
 Sections are numbered as in §4 (12.1 the top bar … 12.13 the footer), and
 the public pages of §4.1 follow. Items a section needs from design-system
-amendment §33 are listed at its end; they are collected in **the draft of §33
-in [ui-design-system.md](ui-design-system.md)** (2026-11-21, not in force until
-the owner approves it with the comps).
+amendment §33 are listed at its end; they are collected in **§33 in
+[ui-design-system.md](ui-design-system.md)**, approved by the owner on
+2026-11-21 with the comps and in force for the public site.
 
 **Free and Pro are always told apart.** Wherever the site names a capability
 Pro unlocks, it carries the Pro tag the app already uses (§29.2's locked
@@ -676,8 +677,8 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   the subline in a lead rank of Source Sans 3 at 18–20px, at most 52
   characters a line, in Night `--ink-2`; the eyebrow is the label rank; the
   install line body small.
-- **The video** fills the hero (`object-fit: cover`) under one flat Night
-  scrim at 0.64 (§33.4, measured on the approved cuts). Each cut is
+- **The video** fills the hero (`object-fit: cover`) with one flat Night
+  scrim at 0.64 baked into the footage (§33.4, measured on the approved cuts). Each cut is
   framed so its subject is clear of the text: the right two thirds on
   desktop, the upper half on phones. Text contrast is measured against the
   brightest frame of each cut and must reach 4.5:1.
@@ -741,9 +742,13 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   First encode (2026-11-21): the desktop cut 2.8 MB as MP4 and 0.8 MB as AV1,
   11.2 s; the phone cut 0.42 MB and 0.31 MB, 7.9 s; posters 34–45 KB and
   14–16 KB. **Approved by the owner and committed as encoded** in
-  `public/site/video/` (§11 row 40). The encoders are not bit-for-bit
-  repeatable, so running the script again writes equivalent files, not the
-  same bytes: run it only to change the cut.
+  `public/site/video/` (§11 row 40). Re-encoded the same day with the scrim
+  baked in (§33.4, §11 row 43) -- the same cut, with the look of the approved
+  comps: 2.7 MB and 0.39 MB, 0.38 MB and 0.13 MB, the closing loop 0.64 MB
+  and 0.11 MB, posters 18–23 KB and 8–10 KB. The build's plate is
+  `assets/plates/hero-video.png`, written by the script's `--plate`. The
+  encoders are not bit-for-bit repeatable, so running the script again writes
+  equivalent files, not the same bytes: run it only to change the cut.
 - **The service worker never caches the clips**: `.mp4` and `.webm` are
   outside `STATIC_ASSET` in `service-worker-policy.ts`, which suits video's
   range requests; keep it so.

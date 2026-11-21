@@ -2798,15 +2798,16 @@ either outlines it in the other (a 2px `--foreground` stroke, the row on
 The panel lays out by its own width (`@container`): from 36rem the list sits
 beside the figure, narrower it stacks under it.
 
-## 33. Amendment — The public site (DRAFT 2026-11-21, `SITE-01`)
+## 33. Amendment — The public site (2026-11-21, `SITE-01`)
 
-**Status: DRAFT -- not in force.** Nothing here applies to any page until the
-owner approves it together with `SITE-01`'s comps (the plan's phase 2); until
-then every rule above stands everywhere. It was drafted from the section
-specification in [site-01-landing-plan.md](site-01-landing-plan.md) §12, whose
-"Needs from §33" lines it collects; the final text is revised from the built
-page (phase 5). When it comes into force, the motion parts are mirrored into
-[ui-motion-spec.md](ui-motion-spec.md) as its next amendment.
+**Status: in force for the public site only, approved by the owner on
+2026-11-21 with `SITE-01`'s comps.** It applies inside the `(site)` route
+group and nowhere else; every rule above still stands for the app. It was
+drafted from the section specification in
+[site-01-landing-plan.md](site-01-landing-plan.md) §12, whose "Needs from
+§33" lines it collects, and its text is revised from the built page (phase
+5). Its motion parts are mirrored in [ui-motion-spec.md](ui-motion-spec.md)
+§9.
 
 ### 33.0 Why
 
@@ -2869,15 +2870,18 @@ buttons, data and body keep their ranks.
   locked option label, a word.
 - **Rank pigments stay marks** (§19): crests in their pigment, names in ink,
   an unreached rank in `ink-3`.
-- **The image scrim**: `--site-scrim`, one flat layer of the Night ground
-  over video and imagery, `oklch(0.155 0.010 70 / 0.64)`. No gradient (§4.3
-  rule 6 stands). **Text over imagery reaches 4.5:1 against the brightest
+- **The image scrim**: one flat layer of the Night ground (`#0f0c08`) at
+  0.64 over video and imagery, **baked into the footage** by
+  `scripts/generate-site-video.mjs` -- the video, its poster and the build's
+  plate are the pixels the page shows, and the files are smaller -- so the
+  page lays no scrim of its own. No gradient (§4.3 rule 6 stands). **Text over imagery reaches 4.5:1 against the brightest
   frame of each video cut**, in both themes: measured 2026-11-21 on the
   approved cuts at five frames a second, the 99.5th-percentile pixel under
   the text column, the desktop hero's LED tubes needing 0.63 and the phone
   cut 0.57. A second layer under the desktop text column only, drafted here
   first, was dropped: its flat edge cut visibly across the subject. Under
-  higher contrast the scrim rises to 0.75.
+  higher contrast the scrim rises to 0.75: `--site-scrim-more`, a CSS layer
+  of the Night ground at 0.31 over the baked 0.64.
 
 ### 33.5 Surfaces
 

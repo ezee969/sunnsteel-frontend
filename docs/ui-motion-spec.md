@@ -471,3 +471,24 @@ mid-slide and settled exactly on the current link's box on four tabs (rects
 equal to the pixel); browser Back restored the previous tab and its marker;
 under reduced motion the marker's computed `transition-property` is the
 colour-and-opacity list only, so it jumps.
+
+## 9. Amendment — the public site (2026-11-21, `SITE-01`)
+
+In force for the `(site)` route group only, with design system §33, which
+the owner approved on 2026-11-21. The rules are design system §33.9 and are
+not restated here; in short, for the public pages alone:
+
+- **Superseded:** the ban on page entrances and per-section fade-ups (§9.2
+  of the design system); "an entrance runs once per region per visit" for
+  the phone mock-up scripts, which replay on re-entry and last at most 5
+  seconds; the ban on JavaScript timers and `requestAnimationFrame` for
+  counting figures and those scripts.
+- **The vocabulary:** load sequences, line rises behind a mask, section
+  reveals, the rule draw at display scale (480ms), counting figures, stage
+  swaps, scroll drift and parallax through CSS scroll-driven animations
+  (never a scroll listener), and video crossfading over its poster.
+- **Still prohibited** (§5 here): transform on hover, glow, animated
+  gradients, `filter` and `backdrop-filter`, animating layout, audio, and any
+  loop past 5 seconds without a pause control.
+- **Both reduced-motion sources** (§3) put every section in its final state:
+  no entrance, no count, no drift, no script and no video -- posters only.

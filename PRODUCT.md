@@ -82,8 +82,8 @@ that nobody can fake.
 - The name **Sunnsteel** and its lockup and mark.
 - **The visual system is [docs/ui-design-system.md](docs/ui-design-system.md)
   and [docs/ui-motion-spec.md](docs/ui-motion-spec.md)**, binding; the public
-  site's departures from it live only in its amendment §33 (a draft until
-  approved). No other document is visual authority, and any DESIGN.md this
+  site's departures from it live only in its amendment §33 (in force for
+  the public site since 2026-11-21). No other document is visual authority, and any DESIGN.md this
   project carries points there.
 - Voice: the app's copy stays plain and exact, with no hype words; headlines
   speak the way the gym does -- short, hard-edged, classical -- and are never

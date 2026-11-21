@@ -1,0 +1,205 @@
+{
+	"regions": [
+		{
+			"id": "hero-video",
+			"kind": "image",
+			"box": {
+				"x": 0,
+				"y": 0,
+				"w": 1,
+				"h": 0.8426
+			},
+			"bleed": true,
+			"note": "full-bleed background video: a man training at a cable machine, black and white under one flat dark scrim at 0.64; ships as the approved video with its poster"
+		},
+		{
+			"id": "lockup",
+			"kind": "chrome",
+			"box": {
+				"x": 0.0339,
+				"y": 0.0231,
+				"w": 0.1543,
+				"h": 0.0509
+			},
+			"note": "the Sunnsteel lockup: the line mark and the SUNNSTEEL wordmark in Cinzel"
+		},
+		{
+			"id": "nav",
+			"kind": "control",
+			"box": {
+				"x": 0.2194,
+				"y": 0.0307,
+				"w": 0.1038,
+				"h": 0.0359
+			},
+			"note": "Product menu trigger with its chevron, and the Pricing link"
+		},
+		{
+			"id": "top-actions",
+			"kind": "control",
+			"box": {
+				"x": 0.7779,
+				"y": 0.022,
+				"w": 0.1883,
+				"h": 0.0532
+			},
+			"note": "EN · ES language switch, the Sign in link and the filled START FREE button"
+		},
+		{
+			"id": "eyebrow",
+			"kind": "text",
+			"box": {
+				"x": 0.0345,
+				"y": 0.1574,
+				"w": 0.4609,
+				"h": 0.0318
+			},
+			"note": "eyebrow label FREE TO START · NO APP STORE NEEDED"
+		},
+		{
+			"id": "headline",
+			"kind": "text",
+			"box": {
+				"x": 0.0345,
+				"y": 0.2078,
+				"w": 0.4609,
+				"h": 0.2571
+			},
+			"note": "three-line Cinzel headline STATUES AREN'T BORN. THEY'RE CARVED. with a rule under CARVED"
+		},
+		{
+			"id": "subline",
+			"kind": "text",
+			"box": {
+				"x": 0.0345,
+				"y": 0.5019,
+				"w": 0.3047,
+				"h": 0.1134
+			},
+			"note": "lead paragraph, three lines"
+		},
+		{
+			"id": "cta-primary",
+			"kind": "control",
+			"box": {
+				"x": 0.0345,
+				"y": 0.6524,
+				"w": 0.1614,
+				"h": 0.0741
+			},
+			"note": "filled CREATE A FREE ACCOUNT button"
+		},
+		{
+			"id": "cta-signin",
+			"kind": "control",
+			"box": {
+				"x": 0.2141,
+				"y": 0.6727,
+				"w": 0.0309,
+				"h": 0.0336
+			},
+			"note": "underlined Sign in link"
+		},
+		{
+			"id": "install-line",
+			"kind": "text",
+			"box": {
+				"x": 0.0345,
+				"y": 0.7496,
+				"w": 0.4609,
+				"h": 0.0353
+			},
+			"note": "install line with the How to install link"
+		},
+		{
+			"id": "phone",
+			"kind": "chrome",
+			"box": {
+				"x": 0.7656,
+				"y": 0.338,
+				"w": 0.1367,
+				"h": 0.5093
+			},
+			"note": "the live-session phone mock-up: an original frame, Squat, three ticked set rows, the rest bar",
+			"container": true
+		},
+		{
+			"id": "record-card",
+			"kind": "control",
+			"box": {
+				"x": 0.7604,
+				"y": 0.7292,
+				"w": 0.1465,
+				"h": 0.0787
+			},
+			"note": "record card: honour arrow, New record · Squat, 85 kg × 5"
+		},
+		{
+			"id": "pause",
+			"kind": "control",
+			"box": {
+				"x": 0.9583,
+				"y": 0.7778,
+				"w": 0.026,
+				"h": 0.0463
+			},
+			"note": "round video pause button"
+		},
+		{
+			"id": "proof-rules",
+			"kind": "chrome",
+			"box": {
+				"x": 0,
+				"y": 0.8426,
+				"w": 1,
+				"h": 0.1574
+			},
+			"container": true,
+			"note": "the proof band's rule above and the hairlines between its four cells"
+		},
+		{
+			"id": "proof-1",
+			"kind": "text",
+			"box": {
+				"x": 0.0893,
+				"y": 0.875,
+				"w": 0.0713,
+				"h": 0.0926
+			},
+			"note": "12,400 numeral over the MEMBERS label"
+		},
+		{
+			"id": "proof-2",
+			"kind": "text",
+			"box": {
+				"x": 0.328,
+				"y": 0.875,
+				"w": 0.0947,
+				"h": 0.0926
+			},
+			"note": "350,000 numeral over the WORKOUTS LOGGED label"
+		},
+		{
+			"id": "proof-3",
+			"kind": "text",
+			"box": {
+				"x": 0.5591,
+				"y": 0.875,
+				"w": 0.1324,
+				"h": 0.0926
+			},
+			"note": "80+ numeral over the EXERCISES IN THE CATALOG label"
+		},
+		{
+			"id": "proof-4",
+			"kind": "text",
+			"box": {
+				"x": 0.8512,
+				"y": 0.8827,
+				"w": 0.0483,
+				"h": 0.0772
+			},
+			"note": "Free over the TO START label"
+		}
+	]
+}

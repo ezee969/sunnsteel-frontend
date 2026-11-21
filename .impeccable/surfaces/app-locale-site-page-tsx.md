@@ -32,8 +32,8 @@ shortlist), graded black and white. No real testimonials, ratings, counts
 or member imagery exist; usage figures are placeholders replaced by true
 facts in production.
 
-**Constraints:** the design system (`docs/ui-design-system.md`) and its draft
-§33 for the site; both languages; WCAG 2.2 AA; the performance budget of the
+**Constraints:** the design system (`docs/ui-design-system.md`) and its §33 for
+the site (in force since 2026-11-21); both languages; WCAG 2.2 AA; the performance budget of the
 plan's §5; Pro tagged wherever named; build path comp-first.
 
 **Approved comp (2026-11-21):** `.impeccable/mocks/comp-a-full-bleed.png` -- the video full-bleed behind the hero, text over its dark left side, the live-session phone on the lower right standing on the proof band. Its composition is the contract; its AI-generated imagery is not (the owner wants real people; see the plan §11).

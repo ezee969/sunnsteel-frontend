@@ -9,7 +9,8 @@
  * SITE_FOOTAGE_DIR); only what this script writes is committed. It needs
  * `ffmpeg` with libx264, libsvtav1 and libwebp on the PATH (or FFMPEG).
  *
- * Every cut is graded to black and white with deeper blacks. Grain is not
+ * Every cut is graded to black and white with deeper blacks, under the site's
+ * scrim (SCRIM). Grain is not
  * baked in: per-frame noise multiplies a clip's size, so the site lays it over
  * the video in CSS instead.
  *
@@ -104,6 +105,16 @@ const DESKTOP_SUBJECT_AT = 0.66
 
 /** The grade: black and white, a touch more contrast, blacks pulled down. */
 const GRADE = 'format=gray,eq=contrast=1.12:brightness=-0.035:gamma=0.94'
+
+/**
+ * The scrim, baked in (design system §33.4): one flat layer of the Night ground
+ * (#0f0c08) at 0.64, measured so text over the brightest frame reaches 4.5:1.
+ * In the footage rather than a CSS layer, so the poster, the video and the
+ * Impeccable plate are the pixels the page shows, and the files are smaller.
+ */
+const SCRIM =
+	'format=yuv444p,drawbox=x=0:y=0:w=iw:h=ih:color=0x0f0c08@0.64:t=fill'
+const LOOK = `${GRADE},${SCRIM}`
 
 function ffmpeg(argv) {
 	const run = spawnSync(
@@ -268,7 +279,7 @@ function heroDesktop() {
 	const inputs = HERO_DESKTOP.flatMap(input)
 	const parts = HERO_DESKTOP.map(
 		(cut, i) =>
-			`[${i}:v]${crop(cut, 16 / 9, DESKTOP_SUBJECT_AT)},scale=1920:1080:flags=lanczos,${GRADE},setsar=1,fps=25[c${i}]`,
+			`[${i}:v]${crop(cut, 16 / 9, DESKTOP_SUBJECT_AT)},scale=1920:1080:flags=lanczos,${LOOK},setsar=1,fps=25[c${i}]`,
 	)
 	const graph = `${parts.join(';')};${HERO_DESKTOP.map((_, i) => `[c${i}]`).join('')}concat=n=${HERO_DESKTOP.length}:v=1:a=0[v]`
 	encode(inputs, graph, 'hero-desktop', { mp4Rate: '2600k', av1Crf: 40 })
@@ -281,7 +292,7 @@ function loop(shot, ratio, at, size, name, rates) {
 		name,
 		`loops ${cut.start.toFixed(2)}s + ${cut.length.toFixed(2)}s`,
 	)
-	const graph = `[0:v]${crop(cut, ratio, at)},scale=${size}:flags=lanczos,${GRADE},setsar=1,fps=${FPS}[v]`
+	const graph = `[0:v]${crop(cut, ratio, at)},scale=${size}:flags=lanczos,${LOOK},setsar=1,fps=${FPS}[v]`
 	encode(input(cut), graph, name, rates)
 }
 
@@ -299,9 +310,32 @@ function sheets() {
 	}
 }
 
+/**
+ * The hero's first frame as Impeccable's plate (`.impeccable/build/spec.json`,
+ * region hero-video): straight from the 4K master, framed and graded as the
+ * cut is, and cropped to what the desktop hero shows -- its 1536x728 box at
+ * 1.5x and more, with `object-fit: cover` taking the 16:9 frame's middle.
+ */
+function plate(path) {
+	const cut = HERO_DESKTOP[0]
+	const [width, height] = [2560, Math.round(2560 / (1536 / 728) / 2) * 2]
+	mkdirSync(dirname(path), { recursive: true })
+	ffmpeg([
+		...input(cut),
+		'-vf',
+		`${crop(cut, 16 / 9, DESKTOP_SUBJECT_AT)},scale=2560:1440:flags=lanczos,${LOOK},crop=${width}:${height}`,
+		'-frames:v',
+		'1',
+		path,
+	])
+	console.log('plate', path, `${width}x${height}`)
+}
+
 mkdirSync(OUT, { recursive: true })
 if (args.includes('--sheets')) {
 	sheets()
+} else if (args.includes('--plate')) {
+	plate(resolve(ROOT, args[args.indexOf('--plate') + 1]))
 } else {
 	heroDesktop()
 	loop(HERO_PHONE, 9 / 16, 0.5, '720:1280', 'hero-phone', {
