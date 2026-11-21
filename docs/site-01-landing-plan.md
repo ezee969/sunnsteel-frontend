@@ -481,6 +481,7 @@ Each phase ends in an owner approval before the next starts.
 | 38 | Hero comp (2026-11-21) | Comp A approved: the video full-bleed, text over its dark side, the phone lower right (`.impeccable/mocks/comp-a-full-bleed.png`). The owner finds AI-generated people too artificial and wants real people training (row 39) |
 | 37 | Encouragement (2026-11-21) | Partner encouragement (`SOC-09`) never appears on the site -- "too corny"; the partners scene shows what partners share and the partner alert instead (§12.9) |
 | 39 | Footage (2026-11-21) | Real, licensed stock: Mixkit's free-licence series in a gym with machines, chosen for its more muscular, more serious models; led by the man, the woman in fewer shots; no chest-press or shoulder-press shots (§7.2) |
+| 40 | Video cut (2026-11-21) | The first cut approved as encoded: the desktop hero, the phone cut and the closing loop, with their posters, in `public/site/video/` (§12.2, §12.12) |
 
 **Open, from §34:** Pro is priced in ARS through Mercado Pago Argentina,
 which an international English audience may not be able to pay; how Pro is
@@ -737,7 +738,13 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   the video, never baked in**: per-frame noise multiplies a clip's size.
   First encode (2026-11-21): the desktop cut 2.8 MB as MP4 and 0.8 MB as AV1,
   11.2 s; the phone cut 0.42 MB and 0.31 MB, 7.9 s; posters 34–45 KB and
-  14–16 KB.
+  14–16 KB. **Approved by the owner and committed as encoded** in
+  `public/site/video/` (§11 row 40). The encoders are not bit-for-bit
+  repeatable, so running the script again writes equivalent files, not the
+  same bytes: run it only to change the cut.
+- **The service worker never caches the clips**: `.mp4` and `.webm` are
+  outside `STATIC_ASSET` in `service-worker-policy.ts`, which suits video's
+  range requests; keep it so.
 - **Phone mock-up:** the live session's presentational set rows and rest bar
   (§7.3), identified at build, in the SVG frame.
 
