@@ -674,8 +674,8 @@ decoration. The phone's record (below) is the viewport's one honour mark.
   the subline in a lead rank of Source Sans 3 at 18–20px, at most 52
   characters a line, in Night `--ink-2`; the eyebrow is the label rank; the
   install line body small.
-- **The video** fills the hero (`object-fit: cover`) under a flat Night scrim;
-  on desktop a second flat layer sits under the text column only. Each cut is
+- **The video** fills the hero (`object-fit: cover`) under one flat Night
+  scrim at 0.64 (§33.4, measured on the approved cuts). Each cut is
   framed so its subject is clear of the text: the right two thirds on
   desktop, the upper half on phones. Text contrast is measured against the
   brightest frame of each cut and must reach 4.5:1.

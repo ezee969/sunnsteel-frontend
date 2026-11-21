@@ -1,0 +1,8 @@
+{
+  "tool": "html composite (Playwright render of .impeccable/mocks/src/comp-a-real.html)",
+  "derivedFrom": "comp-a-full-bleed.png",
+  "imagery": "public/site/video poster frames (Mixkit, Mixkit Stock Video Free License)",
+  "treatment": "comp A's composition over the approved real footage; flat Night scrim at 0.64, no column layer",
+  "viewport": "1536x864",
+  "approved": false
+}

@@ -2869,13 +2869,15 @@ buttons, data and body keep their ranks.
   locked option label, a word.
 - **Rank pigments stay marks** (§19): crests in their pigment, names in ink,
   an unreached rank in `ink-3`.
-- **The image scrim**: `--site-scrim`, a flat layer of the Night ground over
-  video and imagery (starting value `oklch(0.155 0.010 70 / 0.55)`), and on
-  desktop a second flat layer under the text column only. No gradient (§4.3
-  rule 6 stands). The values are fixed with the comps so that **text over
-  imagery reaches 4.5:1 against the brightest frame of each video cut**, in
-  both themes, and recorded here; under higher contrast the scrim rises to
-  0.75.
+- **The image scrim**: `--site-scrim`, one flat layer of the Night ground
+  over video and imagery, `oklch(0.155 0.010 70 / 0.64)`. No gradient (§4.3
+  rule 6 stands). **Text over imagery reaches 4.5:1 against the brightest
+  frame of each video cut**, in both themes: measured 2026-11-21 on the
+  approved cuts at five frames a second, the 99.5th-percentile pixel under
+  the text column, the desktop hero's LED tubes needing 0.63 and the phone
+  cut 0.57. A second layer under the desktop text column only, drafted here
+  first, was dropped: its flat edge cut visibly across the subject. Under
+  higher contrast the scrim rises to 0.75.
 
 ### 33.5 Surfaces
 
