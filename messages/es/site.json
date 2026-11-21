@@ -1,0 +1,47 @@
+{
+	"meta": {
+		"title": "Sunnsteel — Las estatuas no nacen. Se esculpen.",
+		"description": "Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar."
+	},
+	"topBar": {
+		"home": "Sunnsteel, inicio",
+		"skip": "Saltar al contenido",
+		"navLabel": "Principal",
+		"product": "Producto",
+		"pricing": "Precios",
+		"language": "Idioma",
+		"english": "English",
+		"spanish": "Español",
+		"signIn": "Iniciar sesión",
+		"startFree": "Empezar gratis"
+	},
+	"hero": {
+		"eyebrow": "Gratis para empezar · Sin tienda de apps",
+		"headline": "Las estatuas no nacen. <mark>Se esculpen</mark>.",
+		"subline": "Planifica, registra cada serie y mira crecer tus récords y tu rango en un historial que nadie puede inventar.",
+		"createAccount": "Crear cuenta gratis",
+		"signIn": "Iniciar sesión",
+		"install": "Funciona en el navegador y se instala en cualquier teléfono, sin tienda de apps. <link>Cómo instalarla</link>",
+		"pauseVideo": "Pausar el video de fondo",
+		"playVideo": "Reproducir el video de fondo",
+		"example": "Ejemplo",
+		"phoneLabel": "Ejemplo de un entrenamiento en vivo en Sunnsteel",
+		"exercise": "Sentadilla",
+		"live": "Entrenamiento en vivo",
+		"rest": "Descanso",
+		"setDone": "Serie {number} hecha",
+		"recordCard": "Nuevo récord · {exercise}"
+	},
+	"proof": {
+		"label": "En cifras",
+		"members": "Miembros",
+		"workouts": "Entrenamientos registrados",
+		"exercises": "Ejercicios en el catálogo",
+		"freeValue": "Gratis",
+		"free": "Para empezar",
+		"milestones": "Logros por ganar",
+		"ranks": "Rangos por alcanzar",
+		"mockTag": "Cifra ficticia",
+		"cellSr": "{value} {label}"
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"meta": {
+		"title": "Sunnsteel — Statues aren't born. They're carved.",
+		"description": "A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start."
+	},
+	"topBar": {
+		"home": "Sunnsteel, home",
+		"skip": "Skip to content",
+		"navLabel": "Main",
+		"product": "Product",
+		"pricing": "Pricing",
+		"language": "Language",
+		"english": "English",
+		"spanish": "Español",
+		"signIn": "Sign in",
+		"startFree": "Start free"
+	},
+	"hero": {
+		"eyebrow": "Free to start · No app store needed",
+		"headline": "Statues aren't born. They're <mark>carved</mark>.",
+		"subline": "Plan, log every set, and watch your records and rank grow in a history nobody can fake.",
+		"createAccount": "Create a free account",
+		"signIn": "Sign in",
+		"install": "Runs in your browser and installs on any phone, with no app store. <link>How to install</link>",
+		"pauseVideo": "Pause background video",
+		"playVideo": "Play background video",
+		"example": "Example",
+		"phoneLabel": "Example of a live workout in Sunnsteel",
+		"exercise": "Squat",
+		"live": "Live workout",
+		"rest": "Rest",
+		"setDone": "Set {number} done",
+		"recordCard": "New record · {exercise}"
+	},
+	"proof": {
+		"label": "In figures",
+		"members": "Members",
+		"workouts": "Workouts logged",
+		"exercises": "Exercises in the catalog",
+		"freeValue": "Free",
+		"free": "To start",
+		"milestones": "Milestones to earn",
+		"ranks": "Ranks to reach",
+		"mockTag": "Mock figure",
+		"cellSr": "{value} {label}"
+	}
+}

@@ -11,6 +11,7 @@ import enProgress from './en/progress.json'
 import enRoutines from './en/routines.json'
 import enSettings from './en/settings.json'
 import enShell from './en/shell.json'
+import enSite from './en/site.json'
 import enSocial from './en/social.json'
 import enWorkout from './en/workout.json'
 import esAchievements from './es/achievements.json'
@@ -24,6 +25,7 @@ import esProgress from './es/progress.json'
 import esRoutines from './es/routines.json'
 import esSettings from './es/settings.json'
 import esShell from './es/shell.json'
+import esSite from './es/site.json'
 import esSocial from './es/social.json'
 import esWorkout from './es/workout.json'
 
@@ -46,6 +48,7 @@ const en = {
 	onboarding: enOnboarding,
 	messaging: enMessaging,
 	billing: enBilling,
+	site: enSite,
 }
 
 export type Messages = typeof en
@@ -66,5 +69,6 @@ export const MESSAGES: Record<Locale, Messages> = {
 		onboarding: esOnboarding,
 		messaging: esMessaging,
 		billing: esBilling,
+		site: esSite,
 	},
 }

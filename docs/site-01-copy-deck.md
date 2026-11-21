@@ -87,6 +87,13 @@ reads three lines at 390 in both languages, and the rule sits under
 *carved* / *Se esculpen*, the work. The closing band answers it with "Start
 carving." / "Empieza a esculpir."
 
+**Open (the owner, 2026-11-21; plan §11 row 44):**
+- **"Free" is said four times in the first viewport** -- the top bar's
+  `startFree`, the hero's `eyebrow` and `createAccount`, and the proof band's
+  `freeValue` / `free` -- and should be said once or twice.
+- **"in a history nobody can fake" is corny**; the `subline` needs a better
+  line. Both are rewritten with the owner once the hero passes its gate.
+
 ## 3. Proof band — `site.proof`
 
 | Key | English | Spanish |

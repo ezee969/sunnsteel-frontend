@@ -2848,10 +2848,10 @@ loaded (§5.1):
 
 | Rank | Face / weight | Size | Line | Tracking | Case | Use |
 | --- | --- | --- | --- | --- | --- | --- |
-| `type-site-display` | Cinzel 600 | `clamp(30px, 8vw, 88px)` | 1.02 | 0.02em | UPPER | The landing's `h1` |
+| `type-site-display` | Cinzel 600 | `clamp(30px, 8vw, 70px)` (70px is the approved comp's, measured 2026-11-21) | 1.02 | 0.02em | UPPER | The landing's `h1` |
 | `type-site-heading` | Cinzel 600 | `clamp(28px, 4.6vw, 64px)` | 1.05 | 0.03em | UPPER | Section `h2`s and the other pages' `h1` |
 | `type-site-lead` | Source Sans 3 400 | 18px, 20px from `md` | 1.5 | 0 | Sentence | Sublines, at most 52 characters a line |
-| `type-site-numeral` | Bebas Neue 400 | `clamp(40px, 5vw, 64px)` | 0.95 | 0.02em | — | The proof band's figures |
+| `type-site-numeral` | Bebas Neue 400 | `clamp(40px, 2.9vw, 64px)` (44px at 1536, the comp's) | 0.95 | 0.02em | — | The proof band's figures |
 
 Display headings wrap naturally with `text-wrap: balance` and are measured in
 Spanish at 320 and 390; a line that does not fit wraps, and type is never

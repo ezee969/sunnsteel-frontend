@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/i18n/config'
+import {
+	rootDecision,
+	SITE_PREVIEW_COOKIE,
+	SITE_PREVIEW_PARAM,
+	siteLandingLive,
+} from '@/lib/site/landing'
 
 /** next-intl's own request header for the locale (`HEADER_LOCALE_NAME`). */
 export const LOCALE_HEADER = 'X-NEXT-INTL-LOCALE'
@@ -61,13 +67,38 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.redirect(new URL('/dashboard', request.url))
 	}
 
-	// The root has no page of its own. It used to redirect from a Server
-	// Component reading this cookie, which a static `[locale]` build cannot do
-	// per request, so the decision is made here instead.
+	// The root is decided here, by the marker, because a static `[locale]` build
+	// cannot read a cookie per request. SITE-01: a signed-out visitor sees the
+	// landing once it is live, or with the preview cookie; everyone else signed
+	// out still goes to Login (`lib/site/landing.ts`).
 	if (path === '/') {
-		return NextResponse.redirect(
-			new URL(hasValidSession ? '/dashboard' : '/login', request.url),
-		)
+		const decision = rootDecision({
+			signedIn: hasValidSession,
+			live: siteLandingLive(),
+			previewCookie: request.cookies.get(SITE_PREVIEW_COOKIE)?.value,
+			previewParam: request.nextUrl.searchParams.get(SITE_PREVIEW_PARAM),
+		})
+		if (decision.kind === 'preview') {
+			const response = NextResponse.redirect(new URL('/', request.url))
+			if (decision.on) {
+				response.cookies.set(SITE_PREVIEW_COOKIE, '1', {
+					path: '/',
+					maxAge: 60 * 60 * 24 * 30,
+					sameSite: 'lax',
+				})
+			} else {
+				response.cookies.delete(SITE_PREVIEW_COOKIE)
+			}
+			return response
+		}
+		if (decision.kind !== 'landing') {
+			return NextResponse.redirect(
+				new URL(
+					decision.kind === 'dashboard' ? '/dashboard' : '/login',
+					request.url,
+				),
+			)
+		}
 	}
 
 	const locale = resolveLocale({

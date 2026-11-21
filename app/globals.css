@@ -1050,3 +1050,318 @@
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------------
+   §33 The public site (SITE-01): the `(site)` route group only. The hero and
+   the proof band are a Night region (`.dark` on the page wrapper); the scrim
+   is baked into the footage (§33.4), so nothing here darkens the video except
+   the higher-contrast layer. Values are measured off the approved comp
+   (.impeccable/mocks/comp-a-real-1536.png) at 1536x864.
+   ------------------------------------------------------------------------ */
+.site {
+  --site-gutter: clamp(16px, 3.65vw, 56px);
+  background: var(--background);
+  color: var(--foreground);
+}
+.type-site-display {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(30px, 8vw, 70px);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.type-site-display mark {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
+}
+.type-site-lead {
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.type-site-numeral {
+  font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(40px, 2.9vw, 64px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+@media (min-width: 768px) {
+  .type-site-lead {
+    font-size: 1.25rem;
+  }
+}
+
+.site-bar {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 84px;
+  padding-inline: var(--site-gutter);
+}
+.site-skip {
+  position: absolute;
+  left: var(--site-gutter);
+  top: 8px;
+  transform: translateY(-200%);
+  background: var(--background);
+  padding: 8px 12px;
+}
+.site-skip:focus-visible {
+  transform: none;
+}
+.site-lockup {
+  gap: 12px;
+  font-size: 27px;
+}
+.site-lockup-mark {
+  width: 28px;
+  height: 28px;
+}
+.site-nav {
+  display: flex;
+  gap: 48px;
+  margin-left: 56px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.site-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  margin-left: auto;
+}
+.site-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.site-filled:hover {
+  background: var(--primary-hover);
+}
+.site-filled-bar {
+  height: 38px;
+  padding-inline: 24px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.site-filled-hero {
+  height: 56px;
+  padding-inline: 30px;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+.site-ghost {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding-inline: 16px;
+  color: var(--foreground);
+}
+.site-ghost span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.site-hero {
+  position: relative;
+  overflow: hidden;
+  height: max(600px, calc(100svh - 136px));
+}
+.site-scrim-more {
+  display: none;
+}
+:root[data-contrast='more'] .site-scrim-more {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--background) 31%, transparent);
+}
+@media (prefers-contrast: more) {
+  .site-scrim-more {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--background) 31%, transparent);
+  }
+}
+.site-hero-text {
+  position: relative;
+  z-index: 10;
+  max-width: calc(700px + var(--site-gutter));
+  padding: 140px 0 0 calc(var(--site-gutter) + 1px);
+}
+.site-eyebrow {
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.3;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.site-headline {
+  margin-top: 24px;
+}
+.site-lead {
+  margin-top: 40px;
+  max-width: 460px;
+  color: var(--ink-2);
+}
+.site-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+.site-install {
+  margin-top: 28px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.site-install a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-video-control {
+  right: 22px;
+  bottom: 14px;
+}
+
+/* The live-session phone: an original frame standing on the hero's edge. */
+.site-phone {
+  position: absolute;
+  z-index: 10;
+  right: 10vw;
+  bottom: 0;
+  width: 202px;
+  height: 432px;
+}
+.site-phone-frame {
+  height: 100%;
+  border: 1.5px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--surface-sunk);
+  padding: 12px 16px;
+}
+.site-phone-title {
+  margin-top: 28px;
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: 21px;
+  letter-spacing: 0.02em;
+}
+.site-record {
+  position: absolute;
+  left: -8px;
+  top: 338px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 217px;
+  height: 60px;
+  padding-inline: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* The proof band: the hero's dark foot, four ruled cells. */
+.site-proof {
+  border-block: 1px solid var(--rule);
+}
+.site-proof-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 134px;
+}
+.site-proof-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-block: 24px;
+  text-align: center;
+}
+.site-proof-cell + .site-proof-cell {
+  border-left: 1px solid var(--rule-faint);
+}
+.site-proof-label {
+  margin-top: 12px;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+}
+.site-proof-word {
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}
+.site-proof-mock {
+  position: absolute;
+  bottom: -18px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px dashed var(--rule);
+}
+
+/* Until the responsive phase: the phone from 1024, the bar's links from 768. */
+@media (max-width: 1023px) {
+  .site-phone {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .site-bar {
+    height: 56px;
+  }
+  .site-nav,
+  .site-bar-actions > :not(.site-filled) {
+    display: none;
+  }
+  .site-lockup {
+    font-size: 17px;
+  }
+  .site-lockup-mark {
+    width: 22px;
+    height: 22px;
+  }
+  .site-hero {
+    height: auto;
+  }
+  .site-hero-text {
+    padding: 152px var(--site-gutter) 48px;
+    text-align: center;
+  }
+  .site-actions {
+    justify-content: center;
+  }
+  .site-proof-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

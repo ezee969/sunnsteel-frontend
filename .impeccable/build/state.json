@@ -6,7 +6,7 @@
   "direction": null,
   "breakpoint": "1536x864",
   "artifact": null,
-  "phase": "hero",
+  "phase": "sections",
   "phases": {
     "comps": {
       "status": "skipped",
@@ -51,17 +51,139 @@
       "forced": null
     },
     "hero": {
-      "status": "open",
+      "status": "closed",
       "openedAt": "2026-11-21T17:44:12.919Z",
-      "closedAt": null,
-      "attempts": 0,
+      "closedAt": "2026-11-21T21:52:05.307Z",
+      "attempts": 1,
       "notes": [],
-      "gate": null,
-      "forced": null
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "hero 98% (match)",
+        "score": 0.9828,
+        "verdict": "match",
+        "report": ".impeccable/review/diff/hero/report.json",
+        "sideBySide": "C:/Users/Ezequiel/Desktop/Code/sunsteel/sunnsteel-frontend/.impeccable/review/diff/hero/side-by-side.png",
+        "worst": [
+          "nav match 87%",
+          "lockup match 90%",
+          "proof-4 match 90%"
+        ],
+        "worstIds": [
+          "nav",
+          "lockup",
+          "proof-4"
+        ],
+        "worstCrops": [
+          {
+            "id": "nav",
+            "verdict": "match",
+            "score": {
+              "overall": 0.8653,
+              "structure": 0.8642,
+              "color": 0.8962,
+              "colorIntersection": 0.8083,
+              "paletteMatch": 0.9435,
+              "detail": 0.8137,
+              "detailRaw": 0.8241,
+              "detailAdded": 0.0208,
+              "bands": 1
+            },
+            "file": ".impeccable/review/diff/hero/regions/nav.png"
+          },
+          {
+            "id": "lockup",
+            "verdict": "match",
+            "score": {
+              "overall": 0.8967,
+              "structure": 0.8726,
+              "color": 0.9356,
+              "colorIntersection": 0.8757,
+              "paletteMatch": 0.9678,
+              "detail": 0.8297,
+              "detailRaw": 0.8818,
+              "detailAdded": 0.1042,
+              "bands": 1
+            },
+            "file": ".impeccable/review/diff/hero/regions/lockup.png"
+          },
+          {
+            "id": "proof-4",
+            "verdict": "match",
+            "score": {
+              "overall": 0.9035,
+              "structure": 0.8704,
+              "color": 0.9902,
+              "colorIntersection": 1,
+              "paletteMatch": 0.9849,
+              "detail": 0.8052,
+              "detailRaw": 0.8521,
+              "detailAdded": 0.0938,
+              "bands": 1
+            },
+            "file": ".impeccable/review/diff/hero/regions/proof-4.png"
+          }
+        ],
+        "regionVerdicts": {
+          "hero-video": "match",
+          "lockup": "match",
+          "nav": "match",
+          "top-actions": "match",
+          "eyebrow": "match",
+          "headline": "match",
+          "subline": "match",
+          "cta-primary": "match",
+          "cta-signin": "match",
+          "install-line": "match",
+          "phone": "match",
+          "record-card": "match",
+          "pause": "match",
+          "proof-rules": "match",
+          "proof-1": "match",
+          "proof-2": "match",
+          "proof-3": "match",
+          "proof-4": "match"
+        },
+        "at": "2026-11-21T21:52:05.307Z"
+      },
+      "forced": null,
+      "readingsSeen": {},
+      "history": [
+        {
+          "at": "2026-11-21T21:52:05.307Z",
+          "score": 0.9828,
+          "worstIds": [
+            "nav",
+            "lockup",
+            "proof-4"
+          ],
+          "regionVerdicts": {
+            "hero-video": "match",
+            "lockup": "match",
+            "nav": "match",
+            "top-actions": "match",
+            "eyebrow": "match",
+            "headline": "match",
+            "subline": "match",
+            "cta-primary": "match",
+            "cta-signin": "match",
+            "install-line": "match",
+            "phone": "match",
+            "record-card": "match",
+            "pause": "match",
+            "proof-rules": "match",
+            "proof-1": "match",
+            "proof-2": "match",
+            "proof-3": "match",
+            "proof-4": "match"
+          },
+          "artifactHash": null
+        }
+      ]
     },
     "sections": {
-      "status": "pending",
-      "openedAt": null,
+      "status": "open",
+      "openedAt": "2026-11-21T21:52:05.307Z",
       "closedAt": null,
       "attempts": 0,
       "notes": [],

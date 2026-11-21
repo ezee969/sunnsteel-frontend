@@ -104,6 +104,28 @@ describe('the middleware', () => {
 		)
 	})
 
+	it('shows the landing at the root to a signed-out visitor with the preview cookie (SITE-01)', async () => {
+		const preview = await middleware(request('/', { 'ss-site-preview': '1' }))
+		expect(preview.headers.get('location')).toBeNull()
+		expect(preview.headers.get('x-middleware-rewrite')).toBe(
+			'https://sunnsteel.test/en',
+		)
+		const signedIn = await middleware(
+			request('/', { 'ss-site-preview': '1', ss_session: '1' }),
+		)
+		expect(signedIn.headers.get('location')).toBe(
+			'https://sunnsteel.test/dashboard',
+		)
+	})
+
+	it('sets and clears the preview cookie from the address, then cleans it', async () => {
+		const on = await middleware(request('/?site-preview=1'))
+		expect(on.headers.get('location')).toBe('https://sunnsteel.test/')
+		expect(on.cookies.get('ss-site-preview')?.value).toBe('1')
+		const off = await middleware(request('/?site-preview=0'))
+		expect(off.cookies.get('ss-site-preview')?.value).toBe('')
+	})
+
 	it('still guards a protected page before choosing a language', async () => {
 		const res = await middleware(request('/progress/load?range=30'))
 		expect(res.headers.get('location')).toBe(
