@@ -10,7 +10,6 @@ import { CONSUMER_REQUEST_PATHS } from '@/lib/utils/consumer-requests'
 
 import { inlineSegments, legalDocument, legalFactsFor } from './documents'
 import {
-	formatCuit,
 	LEGAL_DOCUMENT_IDS,
 	LEGAL_PATHS,
 	type LegalDocument,
@@ -33,11 +32,6 @@ function allText(doc: LegalDocument): string {
 }
 
 describe('the seller (BILL-07)', () => {
-	it('writes the CUIT as ARCA does', () => {
-		expect(formatCuit(SELLER.cuit)).toBe('20-39422310-8')
-		expect(formatCuit('123')).toBe('123')
-	})
-
 	it('quotes the numbers the server enforces', () => {
 		const facts = legalFactsFor('es')
 		expect(facts.trialDays).toBe(SUBSCRIPTION_TRIAL_DAYS)
@@ -50,14 +44,13 @@ describe('the seller (BILL-07)', () => {
 
 describe('the legal texts (BILL-07)', () => {
 	it.each(LEGAL_DOCUMENT_IDS)(
-		'%s names the seller in both languages and leaves nothing to fill in',
+		'%s gives the contact address in both languages and leaves nothing to fill in',
 		id => {
 			for (const locale of LOCALES) {
 				const text = allText(legalDocument(id, locale))
 				expect(text).toContain(SELLER.email)
-				expect(text).not.toMatch(/undefined|NaN|\{\{|\}\}|\$\{/)
+				expect(text).not.toMatch(/undefined|NaN|\{\{|\}\}|\$\{|CUIT/)
 			}
-			expect(allText(legalDocument('terms', 'es'))).toContain('20-39422310-8')
 		},
 	)
 

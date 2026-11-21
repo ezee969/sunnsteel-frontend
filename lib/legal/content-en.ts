@@ -10,9 +10,9 @@ export function termsEn(f: LegalFacts): LegalDocument {
 		title: 'Terms and conditions',
 		sections: [
 			{
-				heading: 'Who provides the service',
+				heading: 'Questions and complaints',
 				blocks: [
-					`Sunnsteel is a service provided by ${f.name}, CUIT ${f.cuit}, with address at ${f.address}. For questions and complaints, write to ${f.email}.`,
+					`For questions and complaints about Sunnsteel, write to ${f.email}.`,
 				],
 			},
 			{
@@ -127,10 +127,8 @@ export function privacyEn(f: LegalFacts): LegalDocument {
 		title: 'Privacy policy',
 		sections: [
 			{
-				heading: 'Controller',
-				blocks: [
-					`The controller of your data is ${f.name}, CUIT ${f.cuit}, with address at ${f.address}. Write to ${f.email} with any question about your data.`,
-				],
+				heading: 'Contact about your data',
+				blocks: [`Write to ${f.email} with any question about your data.`],
 			},
 			{
 				heading: 'What data we process',
@@ -247,7 +245,7 @@ export function refundsEn(f: LegalFacts): LegalDocument {
 			},
 			{
 				heading: 'Contact',
-				blocks: [`${f.name}, CUIT ${f.cuit}, ${f.address}. Email: ${f.email}.`],
+				blocks: [`Email: ${f.email}.`],
 			},
 		],
 	}

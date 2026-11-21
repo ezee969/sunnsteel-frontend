@@ -6,15 +6,13 @@ import {
 } from '@sunsteel/contracts'
 
 /**
- * BILL-07: who sells Sunnsteel Pro, as Argentina's consumer law asks an
- * online seller to say, and the numbers the legal texts quote. The owner
- * gave these on 2026-11-19; they are public on purpose, because the terms,
- * privacy and refund pages must show them.
+ * BILL-07: how to reach whoever sells Sunnsteel Pro, and the numbers the
+ * legal texts quote. Until 2026-11-21 this also held the seller's name, CUIT
+ * and address, which the texts printed; the owner removed them from the
+ * public pages that day, knowingly, while real charges run (revision 325 of
+ * the roadmap).
  */
 export const SELLER = {
-	name: 'Ezequiel Matías Olivero',
-	cuit: '20394223108',
-	address: 'Estrada 939, Río Cuarto (5800), Córdoba, Argentina',
 	email: 'sunnsteel.support@gmail.com',
 } as const
 
@@ -22,21 +20,10 @@ export const SELLER = {
 export const MINIMUM_AGE = 16
 
 /** When the texts last changed. */
-export const LEGAL_UPDATED = '2026-11-19'
-
-/** `20394223108` as ARCA writes it: `20-39422310-8`. */
-export function formatCuit(cuit: string): string {
-	const digits = cuit.replace(/\D/g, '')
-	return digits.length === 11
-		? `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
-		: cuit
-}
+export const LEGAL_UPDATED = '2026-11-21'
 
 /** Everything a legal text quotes, so no number is typed twice. */
 export interface LegalFacts {
-	name: string
-	cuit: string
-	address: string
 	email: string
 	minimumAge: number
 	price: string
@@ -49,9 +36,6 @@ export function legalFacts(
 	formatPrice: (amount: number) => string,
 ): LegalFacts {
 	return {
-		name: SELLER.name,
-		cuit: formatCuit(SELLER.cuit),
-		address: SELLER.address,
 		email: SELLER.email,
 		minimumAge: MINIMUM_AGE,
 		price: formatPrice(PRO_PRICE.amount),

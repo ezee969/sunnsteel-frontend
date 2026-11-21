@@ -11,9 +11,9 @@ export function termsEs(f: LegalFacts): LegalDocument {
 		title: 'Términos y condiciones',
 		sections: [
 			{
-				heading: 'Quién presta el servicio',
+				heading: 'Consultas y reclamos',
 				blocks: [
-					`Sunnsteel es un servicio prestado por ${f.name}, CUIT ${f.cuit}, con domicilio en ${f.address}. Para consultas y reclamos puedes escribir a ${f.email}.`,
+					`Para consultas y reclamos sobre Sunnsteel puedes escribir a ${f.email}.`,
 				],
 			},
 			{
@@ -128,9 +128,9 @@ export function privacyEs(f: LegalFacts): LegalDocument {
 		title: 'Política de privacidad',
 		sections: [
 			{
-				heading: 'Responsable',
+				heading: 'Contacto sobre tus datos',
 				blocks: [
-					`El responsable de tus datos es ${f.name}, CUIT ${f.cuit}, con domicilio en ${f.address}. Puedes escribir a ${f.email} por cualquier consulta sobre tus datos.`,
+					`Puedes escribir a ${f.email} por cualquier consulta sobre tus datos.`,
 				],
 			},
 			{
@@ -250,7 +250,7 @@ export function refundsEs(f: LegalFacts): LegalDocument {
 			},
 			{
 				heading: 'Contacto',
-				blocks: [`${f.name}, CUIT ${f.cuit}, ${f.address}. Email: ${f.email}.`],
+				blocks: [`Email: ${f.email}.`],
 			},
 		],
 	}
