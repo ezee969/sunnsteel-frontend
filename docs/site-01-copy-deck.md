@@ -2,8 +2,8 @@
 
 Phase 1 of [site-01-landing-plan.md](site-01-landing-plan.md) (§8): every
 string the landing shows, in English and Spanish, written together.
-**Status: draft for the owner's approval** (2026-11-21). Part 2 -- the
-eleven public pages -- follows once this part is approved.
+**Status: approved by the owner on 2026-11-21.** Part 2 -- the eleven
+public pages -- is [site-01-copy-deck-pages.md](site-01-copy-deck-pages.md).
 
 **How to read it.** Each section lists its message keys under `site.<area>`,
 the English and the Spanish. `{name}` is an ICU argument filled from code

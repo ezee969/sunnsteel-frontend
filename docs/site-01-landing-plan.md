@@ -466,8 +466,10 @@ offered to it is undecided (recorded in `PRODUCT.md`).
 
 **Progress:** phase 0 done 2026-11-21 (`PRODUCT.md`, the site's surface brief
 in `.impeccable/surfaces/`, the build path); phase 1's copy deck, part 1 (the
-landing), is drafted in [site-01-copy-deck.md](site-01-copy-deck.md) for the
-owner's approval.
+landing), is [site-01-copy-deck.md](site-01-copy-deck.md), approved by the
+owner on 2026-11-21, and part 2 (the eleven public pages) is
+[site-01-copy-deck-pages.md](site-01-copy-deck-pages.md), drafted for
+approval.
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
