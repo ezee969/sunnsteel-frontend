@@ -441,6 +441,7 @@ Each phase ends in an owner approval before the next starts.
 | 21 | Four verbs | A fixed stage on desktop, one phone pinned while the verbs scroll; "Planifica · Entrena · Mide · Gana"; Train shows plates and warm-ups (§12.4) |
 | 22 | Section 5 | A tools bento in place of "the workout, in motion": automatic progression large; rest, supersets and swapping small (§12.5) |
 | 23 | Section 6 | A large body map whose weeks advance with the scroll, then four analysis cards tagged Free or Pro; the training review here, the routine draft in the Pro section (§12.6) |
+| 24 | Ranks | A climb with the scroll: each step draws the next crest and dresses a "Your name" profile header in that rank; phones get the ladder and one Artisan header (§12.7) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1099,6 +1100,100 @@ cards at 1024 and 320; week 4 without JavaScript or under reduced motion.
 
 **Needs from §33.** A second sticky stage; fill crossfades on the body map;
 the Pro tag on public pages.
+
+### 12.7 Ranks — `SiteRanks`
+
+*Approved 2026-11-20: a climb with the scroll on desktop, where each step
+draws the next crest and dresses a profile header in that rank; six crests and
+one decorated header on phones. Copy is draft.*
+
+**Job.** Tell the transformation story Boostcamp tells with before-and-after
+photos, in Sunnsteel's honest terms: a rank is earned by showing up, and it
+dresses your profile.
+
+**Content and copy** (`site.ranks`).
+- `h2` *(draft)*: "Ranks earned by consistency" / "Rangos que se ganan con
+  constancia".
+- Body *(draft)*: "Six ranks, from Initiate to Laureate, earned by workouts in
+  distinct weeks -- attendance, never how much you lift or how often you
+  post. Your rank dresses your profile, and you choose who sees it." / "Seis
+  rangos, de Iniciado a Laureado, que se ganan con entrenamientos en semanas
+  distintas: asistencia, nunca cuánto levantas ni cuánto publicas. Tu rango
+  viste tu perfil, y tú eliges quién lo ve."
+- **The ladder**, an ordered list of the six, each with its crest, its name
+  and its requirement, all read from contracts' `RENAISSANCE_RANK_DEFINITIONS`
+  and worded by the app's rank messages:
+
+  | Rank | Requirement (contracts) |
+  | --- | --- |
+  | Initiate / Iniciado | where everyone starts |
+  | Apprentice / Aprendiz | 5 workouts in 3 different weeks |
+  | Artisan / Artesano | 15 workouts in 8 different weeks |
+  | Maestro / Maestro | 30 workouts in 16 different weeks |
+  | Virtuoso / Virtuoso | 60 workouts in 32 different weeks |
+  | Laureate / Laureado | 100 workouts in 52 different weeks |
+
+- **The profile header**: the app's own header with its rank decoration
+  (§24), for a member named **"Your name" / "Tu nombre"** (@yourname /
+  @tunombre) with the initials avatar -- no generated face, and an invitation
+  rather than a stranger -- marked "Example", the rank's name in ink under the
+  name and the rank's description (the catalog's) under it.
+- **Who sees it:** the body says the member chooses; the site never states a
+  default, because new accounts and older ones start differently (backend
+  `newAccountDefaults`).
+
+**Layout.**
+- **≥ 1024, the stage:** sticky, about 360svh, six step markers, one per rank.
+  The `h2`, the body and the ladder in columns 1–4; the header in columns
+  5–12, where its decoration lays out by its own width as on a profile
+  (§24.7: the portrait beside the text from 860px of the header's own width,
+  so at 1440 it sits beside, and nearer 1024 above).
+- **Below 1024:** the `h2`, the body, the ladder, then one decorated header
+  in **Artisan** -- the first framed tier, and a light one (34 KB of
+  generated pieces against Laureate's 263 KB) -- in its compact form below
+  600px.
+
+**Motion.**
+- *Desktop stage:* each step marker reaching the centre makes that rank
+  current: its crest in the ladder draws in its pigment (§24.4), the ranks
+  below it stay in theirs and those above stay in `--ink-3` (an unreached rank
+  is ink-3, §19); the header's current decoration fades out (300ms) and the
+  new rank's plays its own entrance (§24.4), and its name and description
+  change; the ambient motion runs only while the header is in view, as on a
+  profile. Scrolling back steps back, the crests above the current one
+  returning to ink-3 at once.
+- *Below 1024:* when the ladder is half in view its six crests draw one after
+  another, 300ms apart; the Artisan header plays its entrance when it is in
+  view; once per entry.
+- *Reduced motion:* the phone layout at every width, final states, no
+  ambient motion (§24.4 already removes it under both sources).
+- *No JavaScript:* the ladder with every crest drawn (inline SVG) and the
+  header undecorated, since the decoration loads with JavaScript.
+
+**Assets and weight.** `RankCrest` and the generated decoration modules
+(`features/profile/rank-decoration/generated/`), each still loaded by its own
+dynamic `import()`: on the desktop stage a rank's module is requested when the
+stage is within one step of it, never on the first load, so the climb fetches
+about 540 KB of generated JSON (an estimated 150 KB compressed) only for a
+visitor who scrolls it all; below 1024 only Artisan's. The weight is measured
+at build and counted in §5's budget for the stage, not the first viewport.
+
+**Data.** Synthetic: "Your name", the initials avatar and the six real ranks;
+no counts of any member.
+
+**Accessibility.** The ladder is a real ordered list, read in order with
+each requirement; crests are `aria-hidden` and never stand without their
+name (§19); the header mock is `aria-hidden`, its role said by the body.
+
+**Acceptance checks.** Every requirement comes from contracts and a test
+holds it; unreached crests are ink-3; no decoration module loads before the
+stage is approached (checked in the network log); the climb steps forwards
+and backwards; below 1024 only Artisan's module loads; Spanish names and
+requirements fit at 320.
+
+**Needs from §33.** A third sticky stage; the site's profile-header mock as
+the one place outside a profile where a rank decoration appears (§24.1 keeps
+decoration to its holder's header).
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
