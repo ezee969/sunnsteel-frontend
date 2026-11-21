@@ -1816,3 +1816,239 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* §12.7 ranks: the text and ladder in columns 1-4, the header in 5-12. */
+.site-ranks {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 40px;
+  align-items: start;
+}
+.site-ranks-text {
+  grid-column: 1 / 6;
+}
+.site-ranks-header {
+  grid-column: 6 / 13;
+  align-self: center;
+}
+.site-ladder {
+  margin-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+.site-ladder-rung {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+/* §12.8 templates: the plain list, before the coverflow. */
+.site-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: 44px;
+  padding-inline: 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+}
+.site-outline:hover {
+  background: var(--surface-sunk);
+}
+.site-templates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-template {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+}
+.site-template > .site-outline:last-child {
+  margin-top: auto;
+}
+.site-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.site-week-strip li {
+  display: grid;
+  place-items: center;
+  height: 28px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.site-week-strip li[data-on] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+.site-template-days {
+  border-top: 1px solid var(--rule);
+}
+
+/* §12.9 people: three scenes, then the privacy band. */
+.site-scenes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+/* Each scene's eyebrow, title, sentence and panel share rows with the other
+   scenes', so the three panels start on one line whatever the text's length. */
+.site-scene {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 8px;
+}
+.site-scene-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 260px;
+  margin-top: 16px;
+  padding: 20px;
+}
+.site-scene-panel > .site-example {
+  align-self: flex-end;
+}
+.site-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.site-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--rule);
+  border-radius: 9999px;
+  background: var(--surface-sunk);
+  color: var(--ink-2);
+}
+.site-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.site-reactions li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding-inline: 10px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.site-reactions li[data-chosen] {
+  border-color: var(--foreground);
+  color: var(--foreground);
+}
+.site-routine-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+.site-privacy {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 40px;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+.site-privacy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--rule-faint);
+}
+/* The app's ToggleRow, drawn still: a ruled row, the chosen option underlined. */
+.site-segmented {
+  display: inline-flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--rule);
+}
+.site-segmented span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-bottom: -1px;
+  padding-inline: 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.site-segmented span[data-on] {
+  border-bottom-color: var(--foreground);
+  color: var(--foreground);
+}
+
+@media (max-width: 1023px) {
+  .site-ranks-text,
+  .site-ranks-header {
+    grid-column: 1 / -1;
+  }
+  .site-templates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-scenes {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  .site-scene + .site-scene {
+    margin-top: 40px;
+  }
+  .site-scene-panel {
+    min-height: 0;
+  }
+  .site-privacy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+@media (max-width: 767px) {
+  .site-templates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-template {
+    padding: 20px;
+  }
+  .site-privacy-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-block: 12px;
+  }
+  .site-segmented span {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 6px;
+  }
+}

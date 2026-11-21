@@ -179,5 +179,67 @@
 			"free": "Free",
 			"pro": "Pro"
 		}
+	},
+	"ranks": {
+		"heading": "Ranks earned by consistency",
+		"body": "{count} ranks, from {first} to {last}, earned by workouts across different weeks: attendance, never how much you lift or how often you post. Your rank dresses your profile, and you choose who sees it.",
+		"ladderLabel": "The ranks, in order",
+		"requirement": "{workouts, plural, one {# workout} other {# workouts}} in {weeks, plural, one {# week} other {# different weeks}}",
+		"firstRank": "Where everyone starts",
+		"profileName": "Your name",
+		"profileHandle": "@yourname",
+		"profileInitials": "YN"
+	},
+	"templates": {
+		"heading": "Start with a program",
+		"body": "Three programs to start from, each opening as a draft you can change. The weights are yours to fill in: a template can't know your strength.",
+		"levels": {
+			"beginner": "Beginner",
+			"intermediate": "Intermediate",
+			"advanced": "Advanced"
+		},
+		"start": "Start with this one",
+		"previous": "Previous program",
+		"next": "Next program",
+		"show": "Show {name}",
+		"position": "{name}, {position} of {total}",
+		"exercises": "{count, plural, one {# exercise} other {# exercises}}",
+		"noneFit": {
+			"title": "None of these?",
+			"build": "Build your own",
+			"describe": "Describe it, get a draft",
+			"advanced": "The 8-week block is built in the same builder."
+		},
+		"handoff": "You picked {template}.",
+		"pro": "Pro"
+	},
+	"people": {
+		"heading": "Train with people",
+		"subline": "Free, like everything you do in a workout.",
+		"name": "Lu",
+		"initials": "LU",
+		"activity": {
+			"eyebrow": "Activity",
+			"title": "Follow people and see them train",
+			"body": "Workouts, records and milestones from people you follow, with {reactions} reactions and comments. There's nothing to post.",
+			"entry": "{name} finished {day} · {records, plural, one {# record} other {# records}}"
+		},
+		"partners": {
+			"eyebrow": "Training partners",
+			"title": "Train with partners",
+			"body": "Up to {max} partners. Each of you chooses what the other sees, and you can be told when a partner finishes a workout.",
+			"shares": "Shares with you: {parts}"
+		},
+		"messages": {
+			"eyebrow": "Messages",
+			"title": "Send what you trained",
+			"body": "One-to-one messages that can carry a routine, a workout, a record, a milestone or a month of training. People you don't follow can only send you a request, and only if you allow it.",
+			"sample": "Try this one",
+			"copied": "In your routines"
+		},
+		"privacy": {
+			"title": "You choose who sees each part",
+			"body": "{count} parts of your profile, each set to Everyone, Followers or Only me. Block anyone, report anything, and delete your account or take your data with you whenever you want."
+		}
 	}
 }

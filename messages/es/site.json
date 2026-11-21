@@ -179,5 +179,67 @@
 			"free": "Free",
 			"pro": "Pro"
 		}
+	},
+	"ranks": {
+		"heading": "Rangos que se ganan con constancia",
+		"body": "{count} rangos, de {first} a {last}, que se ganan con entrenamientos en semanas distintas: asistencia, nunca cuánto levantas ni cuánto publicas. Tu rango viste tu perfil, y tú eliges quién lo ve.",
+		"ladderLabel": "Los rangos, en orden",
+		"requirement": "{workouts, plural, one {# entrenamiento} other {# entrenamientos}} en {weeks, plural, one {# semana} other {# semanas distintas}}",
+		"firstRank": "Donde todos empiezan",
+		"profileName": "Tu nombre",
+		"profileHandle": "@tunombre",
+		"profileInitials": "TN"
+	},
+	"templates": {
+		"heading": "Empieza con un programa",
+		"body": "Tres programas para empezar; cada uno se abre como un borrador que puedes cambiar. Los pesos los completas tú: una plantilla no puede saber tu fuerza.",
+		"levels": {
+			"beginner": "Principiante",
+			"intermediate": "Intermedio",
+			"advanced": "Avanzado"
+		},
+		"start": "Empezar con esta",
+		"previous": "Programa anterior",
+		"next": "Programa siguiente",
+		"show": "Mostrar {name}",
+		"position": "{name}, {position} de {total}",
+		"exercises": "{count, plural, one {# ejercicio} other {# ejercicios}}",
+		"noneFit": {
+			"title": "¿Ninguna te sirve?",
+			"build": "Arma la tuya",
+			"describe": "Descríbela y recibe un borrador",
+			"advanced": "El bloque de 8 semanas se arma en el mismo constructor."
+		},
+		"handoff": "Elegiste {template}.",
+		"pro": "Pro"
+	},
+	"people": {
+		"heading": "Entrena con otros",
+		"subline": "Gratis, como todo lo que haces al entrenar.",
+		"name": "Lu",
+		"initials": "LU",
+		"activity": {
+			"eyebrow": "Actividad",
+			"title": "Sigue a otros y míralos entrenar",
+			"body": "Entrenamientos, récords y logros de la gente que sigues, con {reactions} reacciones y comentarios. No hay nada que publicar.",
+			"entry": "{name} terminó {day} · {records, plural, one {# récord} other {# récords}}"
+		},
+		"partners": {
+			"eyebrow": "Compañeros de entrenamiento",
+			"title": "Entrena con compañeros",
+			"body": "Hasta {max} compañeros. Cada uno elige qué ve el otro, y puedes recibir un aviso cuando un compañero termina un entrenamiento.",
+			"shares": "Comparte contigo: {parts}"
+		},
+		"messages": {
+			"eyebrow": "Mensajes",
+			"title": "Comparte lo que entrenaste",
+			"body": "Mensajes uno a uno que pueden llevar una rutina, un entrenamiento, un récord, un logro o un mes de entrenamiento. Quien no sigues solo puede mandarte una solicitud, y solo si lo permites.",
+			"sample": "Prueba esta",
+			"copied": "En tus rutinas"
+		},
+		"privacy": {
+			"title": "Tú eliges quién ve cada parte",
+			"body": "{count} partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea a quien quieras, denuncia lo que haga falta, y borra tu cuenta o llévate tus datos cuando quieras."
+		}
 	}
 }

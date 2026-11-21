@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { SiteHero } from '@/features/site/site-hero'
+import { SitePeople } from '@/features/site/site-people'
 import { SiteProgress } from '@/features/site/site-progress'
 import { SiteProofBand } from '@/features/site/site-proof-band'
+import { SiteRanks } from '@/features/site/site-ranks'
+import { SiteTemplates } from '@/features/site/site-templates'
 import { SiteTools } from '@/features/site/site-tools'
 import { SiteTopBar } from '@/features/site/site-top-bar'
 import { SiteVerbs } from '@/features/site/site-verbs'
@@ -52,6 +55,9 @@ export default async function LandingPage({
 				<SiteVerbs />
 				<SiteTools />
 				<SiteProgress />
+				<SiteRanks />
+				<SiteTemplates />
+				<SitePeople />
 			</main>
 		</div>
 	)
