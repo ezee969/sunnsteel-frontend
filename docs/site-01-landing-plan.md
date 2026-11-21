@@ -84,8 +84,9 @@ proposal; `impeccable shape` (§8, phase 1) may reorder it with the owner.
 8. **Start with a programme** — the three starter templates with their days
    and level; each links to `/signup?template=<slug>`, and the template
    reaches the builder through sign-up and onboarding (§12.8).
-9. **Train with people** — follow, training partners, encouragement,
-   messages; privacy first (every setting starts private).
+9. **Train with people** (§12.9) — follow, training partners, encouragement,
+   messages; you choose who sees each part. (This line used to say every
+   setting starts private, which is untrue for new accounts.)
 10. **Free and Pro** — the Free/Pro split from `BILL-02` rendered from
     contracts (`PRO_PRICE`, `SUBSCRIPTION_TRIAL_DAYS`), never typed by hand;
     links to the legal pages and to `/pricing`. Founding members are not
@@ -187,8 +188,11 @@ and bolder than app copy, never less true.
   from production (above a threshold the owner sets) or stays replaced --
   decided then.
 - Allowed true facts today: free to start; works in the browser and installs
-  on any phone; works offline with changes saved on reconnect; English and
-  Spanish; your data exportable and deletable; private by default.
+  on any phone; keeps logging when the connection drops and sends the changes
+  when it returns, while the app stays open (`TRUST-03`: waiting changes are
+  held in memory, not stored); English and Spanish; your data exportable and
+  deletable; you choose who sees each part of your profile. Never "private by
+  default": new accounts start at Followers.
 - Every screenshot or mock-up with data is **synthetic and labelled** as an
   example. No real member's name, face, record or message appears.
 - Generated people are allowed (the owner's decision), the hero video's
@@ -442,6 +446,7 @@ Each phase ends in an owner approval before the next starts.
 | 23 | Section 6 | A large body map whose weeks advance with the scroll, then four analysis cards tagged Free or Pro; the training review here, the routine draft in the Pro section (§12.6) |
 | 24 | Ranks | A climb with the scroll: each step draws the next crest and dresses a "Your name" profile header in that rank; phones get the ladder and one Artisan header (§12.7) |
 | 25 | Templates | A carousel by level; "none of these?" offers building your own and describing it (Pro); the chosen template travels through sign-up and onboarding into the builder (§12.8) |
+| 26 | People | Three animated scenes (activity, partners, messages) and a privacy band; message encryption answered in the questions (§12.9) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1302,6 +1307,86 @@ without JavaScript.
 
 **Needs from §33.** The coverflow (scaled and dimmed neighbours) on public
 pages.
+
+### 12.9 Train with people — `SitePeople`
+
+*Approved 2026-11-20: three animated scenes, no sticky stage; a privacy band
+under them; message encryption is answered in the questions. Copy is draft.*
+
+**Job.** Show that training is better with people -- and free -- without
+making the product look like a feed to post to, and say plainly that each
+member decides who sees what.
+
+**Content and copy** (`site.people`).
+- `h2` *(draft)*: "Train with people" / "Entrena con otros"; a line under it:
+  "Free, like everything you do in a workout." / "Gratis, como todo lo que
+  haces al entrenar." (social and messages are outside the Pro split).
+- **Three scenes**, each an eyebrow, an `h3`, one sentence and an animated
+  fragment of the app:
+
+  | Scene | Eyebrow | Title *(draft)* | Sentence *(draft)* | Fragment script (≤ 5 s) |
+  | --- | --- | --- | --- | --- |
+  | Activity | ACTIVITY / ACTIVIDAD | Follow people, see them train / Sigue a otros y míralos entrenar | Workouts, records and milestones from the people you follow, with four reactions and comments -- nothing to post. / Entrenamientos, récords y logros de la gente que sigues, con cuatro reacciones y comentarios: no hay nada que publicar. | An entry slides in -- "Lu finished Push · 3 records" / "Lu terminó Empuje · 3 récords" -- then Strength / Fuerza is tapped and its count goes from 2 to 3 |
+  | Partners | TRAINING PARTNERS / COMPAÑEROS | Train with partners / Entrena con compañeros | Up to 20 partners; each of you grants what the other sees, and encouragement is one of four fixed messages, never free text. / Hasta 20 compañeros; cada uno elige qué ve el otro, y el aliento es uno de cuatro mensajes fijos, nunca texto libre. | Lu's partner card shows the four prompts; "Strong session" / "Gran sesión" is tapped and reads as sent |
+  | Messages | MESSAGES / MENSAJES | Send what you trained / Comparte lo que entrenaste | One-to-one messages that can carry a routine, a workout, a record, a milestone or a month of training; a stranger's first message waits as a request. / Mensajes uno a uno que pueden llevar una rutina, un entrenamiento, un récord, un logro o un mes de entrenamiento; el primer mensaje de alguien que no sigues espera como solicitud. | A message from Lu arrives with the Upper / Lower routine card; the copy action is tapped and the routine is in "your routines" |
+
+  The reactions (Strength, Discipline, Respect, Inspiring / Fuerza,
+  Disciplina, Respeto, Inspirador), the four prompts (Ready to train, Strong
+  session, Good work, Keep going / Listo para entrenar, Gran sesión, Buen
+  trabajo, Sigue así), the limit of 20 and the six kinds a message carries
+  are the app's and contracts' (`TRAINING_PARTNER_ENCOURAGEMENT_KINDS`,
+  `TRAINING_PARTNERS_MAX`), never retyped; so is the clone action's label.
+- **The privacy band**: `h3` *(draft)* "You choose who sees each part" / "Tú
+  eliges quién ve cada parte", and *(draft)* "Ten parts of your profile, each
+  set to Everyone, Followers or Only me. Block anyone, report anything, and
+  delete your account or take your data with you whenever you want." /
+  "Diez partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea
+  a quien quieras, reporta lo que sea, y borra tu cuenta o llévate tus datos
+  cuando quieras." Beside it, three of the app's privacy rows -- Personal
+  records, Workout history, Rank / Récords personales, Historial de
+  entrenamientos, Rango -- each with its three-way choice, as an
+  illustration. **No default is stated**: new accounts start at Followers and
+  older ones differ.
+
+**Layout.**
+- **Ground:** the page's theme. Each fragment sits on a ruled `--surface`
+  panel about 360px tall, built from the app's own components -- not a phone
+  frame, so this section reads differently from the phone-led ones.
+- **≥ 1024:** three columns, each the eyebrow, title, sentence and panel;
+  under them the privacy band across the width, its text left and the three
+  rows right.
+- **768–1023 and < 768:** each scene stacked (text, then panel), then the
+  band with its rows under its text.
+
+**Motion.**
+- *Heading:* line rise and rule draw.
+- *Desktop:* the scenes play as a sequence, one at a time (§7.3) --
+  activity, partners, messages -- about 13 seconds in all, then rest on their
+  final states; again when the section re-enters the view. When the band is
+  in view, its three rows' markers slide one after another (200ms each, the
+  nav-marker slide, §9.1) to different choices, then rest.
+- *Below 1024:* each scene plays when it is half in view; the band likewise.
+- *Reduced motion and no JavaScript:* final states.
+
+**Assets.** Presentational parts of the activity entry and its reactions
+(`SOC-03`/`SOC-04`), the training-partner card and its prompts (`SOC-08`/
+`SOC-09`), the conversation thread and its routine card (`MSG-01`/`MSG-07`)
+and the privacy rows (`PROF-06`, `ToggleRow`), identified at build.
+
+**Data.** Synthetic and labelled "Example": a member "Lu" with an initials
+avatar, a Push day with 3 records, the Upper / Lower routine.
+
+**Accessibility.** Each scene's `h3` and sentence say what its panel shows;
+the panels and the band's rows are `aria-hidden` illustrations, never
+focusable, so nobody tabs into a control that does nothing.
+
+**Acceptance checks.** Every named reaction, prompt, limit and attachment
+kind comes from the app or contracts; no default privacy is claimed; scenes
+play one at a time and end within 5 seconds each; Spanish fits each column
+at 1024 and the stacked panels at 320; final states without JavaScript.
+
+**Needs from §33.** Illustrative, non-interactive copies of controls (the
+privacy rows) on public pages.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
