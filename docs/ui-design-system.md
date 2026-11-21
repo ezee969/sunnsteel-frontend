@@ -2797,3 +2797,208 @@ either outlines it in the other (a 2px `--foreground` stroke, the row on
 
 The panel lays out by its own width (`@container`): from 36rem the list sits
 beside the figure, narrower it stacks under it.
+
+## 33. Amendment — The public site (DRAFT 2026-11-21, `SITE-01`)
+
+**Status: DRAFT -- not in force.** Nothing here applies to any page until the
+owner approves it together with `SITE-01`'s comps (the plan's phase 2); until
+then every rule above stands everywhere. It was drafted from the section
+specification in [site-01-landing-plan.md](site-01-landing-plan.md) §12, whose
+"Needs from §33" lines it collects; the final text is revised from the built
+page (phase 5). When it comes into force, the motion parts are mirrored into
+[ui-motion-spec.md](ui-motion-spec.md) as its next amendment.
+
+### 33.0 Why
+
+The app is a ledger people *operate*; the public site is a page that has to
+*persuade* someone who has never opened the app. The owner decided on
+2026-11-20 that it should be far more animated than the app -- in the way
+Boostcamp's signed-out home is -- with a background video of people training,
+the app's own screens animated in phone frames, and motion declared section
+by section, richest on desktop. Those decisions contradict §9.2 and parts of
+the motion spec on purpose, so they are made here, once, for the site alone,
+rather than as local exceptions.
+
+### 33.1 Scope
+
+- **Only the `(site)` route group**: `/` for a signed-out visitor,
+  `/features` and its six pages, the three `/use-cases` pages and `/pricing`.
+- **Nothing here is precedent for the app.** A pattern this section allows
+  (a page entrance, a scroll stage, a video) stays forbidden on every other
+  route; reviewing an app change against this section is an error.
+- **Unchanged on the site:** every colour role (§4.3), the type faces and
+  loaded weights (§5.1), the radius roles, the single shadow for overlays,
+  the 0ms press and focus, 16px inputs below `md`, both reduced-motion
+  sources and higher contrast.
+
+### 33.2 The Night region
+
+Regions laid over imagery or video -- the hero, the proof band under it, the
+closing band, the page headers -- render with the **Night tokens in both
+themes** (a `.dark` scope, `data-region="night"`), because the image beneath
+is dark either way. The top bar uses that scope while it lies over such a
+region and the page's own theme once it leaves it (§33.6). Everywhere else
+the page follows the visitor's theme.
+
+### 33.3 Type
+
+Three ranks are added, for the site only; every face and weight is already
+loaded (§5.1):
+
+| Rank | Face / weight | Size | Line | Tracking | Case | Use |
+| --- | --- | --- | --- | --- | --- | --- |
+| `type-site-display` | Cinzel 600 | `clamp(30px, 8vw, 88px)` | 1.02 | 0.02em | UPPER | The landing's `h1` |
+| `type-site-heading` | Cinzel 600 | `clamp(28px, 4.6vw, 64px)` | 1.05 | 0.03em | UPPER | Section `h2`s and the other pages' `h1` |
+| `type-site-lead` | Source Sans 3 400 | 18px, 20px from `md` | 1.5 | 0 | Sentence | Sublines, at most 52 characters a line |
+| `type-site-numeral` | Bebas Neue 400 | `clamp(40px, 5vw, 64px)` | 0.95 | 0.02em | — | The proof band's figures |
+
+Display headings wrap naturally with `text-wrap: balance` and are measured in
+Spanish at 320 and 390; a line that does not fit wraps, and type is never
+shrunk to make it fit (the app's rule). Cinzel still appears at most twice a
+screen (§5.3): the page's inscription and its section headings. Labels,
+buttons, data and body keep their ranks.
+
+### 33.4 Colour on the site
+
+- **Roles do not change.** `honour` still means better than planned -- on the
+  site, only a record shown inside an example -- and is still capped at two
+  marks a viewport; a headline's emphasis is the brand's rule drawn under the
+  words, never gold.
+- **Pro is never coloured** (§29.4, §30): a plan is told apart by its name,
+  the `Crown` glyph in `ink-3` and its content, and the Pro tag is §29.2's
+  locked option label, a word.
+- **Rank pigments stay marks** (§19): crests in their pigment, names in ink,
+  an unreached rank in `ink-3`.
+- **The image scrim**: `--site-scrim`, a flat layer of the Night ground over
+  video and imagery (starting value `oklch(0.155 0.010 70 / 0.55)`), and on
+  desktop a second flat layer under the text column only. No gradient (§4.3
+  rule 6 stands). The values are fixed with the comps so that **text over
+  imagery reaches 4.5:1 against the brightest frame of each video cut**, in
+  both themes, and recorded here; under higher contrast the scrim rises to
+  0.75.
+
+### 33.5 Surfaces
+
+- **Boxed cards are allowed on the site** -- the tools bento, the analysis
+  strip, the plan cards, the scenes' panels, the QR card: `--surface` with a
+  `--rule` border and the small radius, **no shadow**; elevation stays tone
+  (§8). Lists inside them stay ruled.
+- **Callout cards** may overlap a phone frame's corner; they are ruled cards,
+  never floating or bobbing.
+- **The coverflow** (templates) may scale its neighbours to 85% and dim them
+  to 60%; under reduced motion every card is full size and opaque.
+- **The mega panel** is an overlay: `--popover`, `shadow-overlay`, small
+  radius.
+- **Plan cards are equal**: same size, border and treatment; no "featured"
+  lift, badge or colour.
+- **Illustrative copies of controls** (the privacy rows, a template's
+  "Use" inside a mock-up) are `aria-hidden` and never focusable or
+  clickable, so nothing invites a tap that does nothing.
+
+### 33.6 The top bar
+
+Transparent with Night tokens over a Night region; once that region's lower
+edge passes under it, the page's ground fades in (`--motion-base`) and its
+bottom rule draws (240ms). It is sticky and never hides on scroll. It is
+present at first paint, never animated in.
+
+### 33.7 Imagery and video
+
+- **Where:** the landing's hero and closing band only. Feature, use-case and
+  pricing headers use the Night ground -- with an animated mock-up where their
+  specification gives one -- never video.
+- **People** are generated and illustrative: never presented as members,
+  their results or testimonials; no logos, branded clothing, recognisable
+  real person or visible screen. A clip whose people look uncanny is rejected
+  at review; licensed stock footage is the fallback, put to the owner.
+- **Weight and loading:** the poster is the LCP element; a clip is requested
+  only after first paint (the hero) or near its band (the closing band);
+  phones get a separate light cut (about 0.6 MB) or, for the closing band, the
+  poster alone; under either reduced-motion source or `Save-Data`, posters
+  only.
+- **Control:** every looping video has a visible pause control (WCAG 2.2.2),
+  44px, after the region's actions in the tab order, remembered on the
+  device.
+- The 2026-10-01 brand material (the bust, stone, steel) may appear as
+  still imagery under the same scrim and contrast rule.
+
+### 33.8 Device frames and mock-ups
+
+- **Frames** are original SVG drawn to the brand's line -- never Apple's or
+  Google's -- at 320px (desktop), 280px and 260px.
+- **Mock-ups are the app's own components** fed synthetic data (a
+  presentational part split from its data hook where needed), never imitations
+  and never connected to the API; each carries the "Example" mark (label rank,
+  `ink-3`).
+- **A mock-up plays a script of at most 5 seconds**, once each time it comes
+  into view; **one script runs at a time per viewport**, so grouped mock-ups
+  play as a sequence; a mock-up is `aria-hidden` and its section's text says
+  what it shows; under reduced motion and without JavaScript it shows its
+  final state.
+
+### 33.9 Motion on the public site (the third motion amendment)
+
+**Superseded, for the site only:** §9.2's ban on page entrances and on
+per-section fade-ups; the motion spec's rule that an entrance runs once per
+region per visit, for mock-up scripts, which replay on re-entry; its rule
+against JavaScript timers and `requestAnimationFrame`, for counting numbers
+and scripts; and §32.4's "nothing animates", for the site's body-map stage.
+
+**The vocabulary**, every value from the section specification:
+
+| Pattern | Duration | Easing | Animates |
+| --- | --- | --- | --- |
+| Load sequence (headers) | 500–1100ms, 80–120ms apart | standard | transform, opacity |
+| Line rise behind a mask | 900ms, lines 90ms apart (60ms on phones) | standard | transform |
+| Section reveal | 600–700ms, a 12px rise | standard | transform, opacity |
+| Rule draw at display scale | 480ms | standard | `scaleX` |
+| Counting a figure | 1200ms | standard | text, formatted by the language each frame |
+| Stage swap | 300ms out, 500ms in, 24px | exit / standard | transform, opacity |
+| Coverflow move | 500ms | standard | transform, opacity |
+| Body-map band change | 400ms | standard | `fill` |
+| Drawing a chart line | 400ms a segment | standard | `stroke-dashoffset` |
+| Scroll drift and parallax | tied to the scroll | the timeline's | transform |
+| Video over its poster | 600ms | standard | opacity |
+
+**The mechanics:** sticky stages advance by step markers crossing the
+viewport's centre (an IntersectionObserver), and drifts are CSS scroll-driven
+animations (`animation-timeline: view()`); **never a scroll listener**, and a
+browser without scroll-driven animations simply scrolls. CSS keyframes and
+transitions first; `framer-motion` (already installed) only where CSS cannot
+sequence; no new animation library unless this section records why.
+
+**Still forbidden on the site:** scale or any transform on hover (hover is
+colour, §9.2), glow, animated gradients, `filter` and `backdrop-filter`,
+animating layout (width, height, margin, padding, grid rows), audio, and
+anything that loops past 5 seconds without a pause control.
+
+**Reduced motion, either source:** every section arrives in its final state
+-- no entrance, no stage behaviour, no count, no drift, no script, no video
+-- laid out as its section specifies. **Without JavaScript:** final states,
+stacked layouts, posters. Chrome (the top bar, the footer) never performs.
+
+### 33.10 Exceptions to other amendments
+
+- **§24.1 (rank decoration)**: the site's "Your name" profile header in the
+  ranks section is the one place outside a member's own header where a rank
+  decoration appears; it is marked "Example" and loads each rank's generated
+  pieces only as the visitor approaches it.
+- **§32 (body map)**: the site's map uses the same tokens, bands and list;
+  only its band changes animate (§33.9).
+
+### 33.11 The install helper
+
+A phone arriving from the closing band's QR code (`/?install=1`) sees the
+"Do I need to download anything?" answer open at the top, with the
+browser's own install dialog behind one button where the browser offers it
+(`beforeinstallprompt`), the two Safari steps on iPhone and iPad, and nothing
+in an installed app or on a computer. No page installs itself.
+
+### 33.12 Verification
+
+§15's gates, plus for the site: the sweep's site routes at the seven widths
+in both themes and both languages; Lighthouse at 95 or more in all four
+categories on phone and desktop (the plan's §5 budget); contrast measured on
+each video cut's brightest frame; a reduced-motion pass and a no-JavaScript
+pass showing final states; and the network log showing that video, rank
+decorations and mock-up islands load only when their sections approach.

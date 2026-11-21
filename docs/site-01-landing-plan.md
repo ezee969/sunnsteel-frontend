@@ -471,8 +471,9 @@ else in an approved section is decided.
 
 Sections are numbered as in §4 (12.1 the top bar … 12.13 the footer), and
 the public pages of §4.1 follow. Items a section needs from design-system
-amendment §33 are listed at its end and collected in a closing list when §33
-is drafted.
+amendment §33 are listed at its end; they are collected in **the draft of §33
+in [ui-design-system.md](ui-design-system.md)** (2026-11-21, not in force until
+the owner approves it with the comps).
 
 **Free and Pro are always told apart.** Wherever the site names a capability
 Pro unlocks, it carries the Pro tag the app already uses (§29.2's locked
