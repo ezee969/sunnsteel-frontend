@@ -451,6 +451,9 @@ Each phase ends in an owner approval before the next starts.
 | 28 | Questions | One list of twelve, including messages not being end-to-end encrypted and what the AI receives; payment detail on `/pricing` (§12.11) |
 | 29 | Closing band | A second generated clip on desktop (poster on phones), "Empieza a forjarte.", and a desktop QR card that opens the site on a phone with an install helper (§12.12) |
 | 30 | Footer | Site map, help, legal pages and the two legal buttons; no seller identification (§12.13) |
+| 31 | Public pages | Four templates and an outline per page, in one pass (§12.14–12.21) |
+| 32 | Feature pages | A guide under an animated header, worked examples computed from the product's own rules (§12.15–12.16) |
+| 33 | `/pricing` signed in | Redirected to `/plans` (§12.20) |
 
 Taken by default, not asked: the headline and positioning line (phase 1
 proposes three); the body map on Progress, since `PROG-15` shipped the same
@@ -1665,6 +1668,158 @@ página"); column titles are labels, not headings that break the outline.
 link resolves; the language switch reloads on the same page.
 
 **Needs from §33.** Nothing new.
+
+---
+
+The public pages of §4.1 follow. *Approved 2026-11-21: four templates and an
+outline per page, written in one pass; feature pages are a guide under an
+animated header; a signed-in visitor to `/pricing` goes to `/plans`.* Their
+copy is draft throughout and is written in the phase 1 copy deck; what is
+fixed here is each page's structure, its proof, its animation and the
+sources its facts come from.
+
+### 12.14 What every public page shares
+
+- **Chrome:** the top bar (§12.1, over a Night header it starts transparent
+  as on the landing), the footer (§12.13), and a **compact closing band** --
+  §12.12's `h2` and actions on the Night ground, without video or QR -- before
+  the footer.
+- **Above the `h1`:** a breadcrumb (Features › Workout tracker), and under the
+  subline an "Updated <month year>" line from a per-page constant changed with
+  the page's content.
+- **Every rule of §5–§7 and §12.0**: the Pro tags from contracts, numbers never
+  typed, synthetic data labelled, both languages written together.
+- **Motion:** each page's header is the cinematic part (its own animated
+  mock-up, the load sequence of §12.2 and the scroll drift); below it, a
+  section's heading rises and its rule draws, and its blocks rise 12px and
+  fade in once per visit. Reduced motion and no JavaScript: present at once.
+- **SEO:** per-language title and description (drafts below), canonical URL,
+  `BreadcrumbList` and `FAQPage` JSON-LD generated from the visible text, an
+  OG image per page generated like the landing's, every page in
+  `sitemap.xml`.
+- **Worked examples are computed, never typed**: where a page shows a table
+  of numbers, it is produced at build by the same pure rule the app or the
+  server uses (contracts, or the restated backend rule with its test, §12.5),
+  so the page cannot show something the product would not do.
+
+### 12.15 Template — a feature page (`/features/<slug>`)
+
+1. **Header** (Night ground, both themes): breadcrumb, the plan tag (Free,
+   Free + Pro, or Pro), the `h1` in a smaller display rank than the landing's,
+   the subline, the updated line; "Start free" (filled) → `/signup` and "See
+   pricing" (ghost) → `/pricing`. Right, from 1024: the feature's animated
+   phone, reusing its landing script (each page names it below); below 1024,
+   under the text. The phone drifts against the scroll as on the hero.
+2. **Overview:** a paragraph of what it is, three highlight cards, and a
+   facts grid (each fact from code: limits, plan, counts).
+3. **How it works:** three to five numbered steps.
+4. **Worked example:** a computed table (see each page).
+5. **What it covers:** a ruled table of what is free, what is Pro and the
+   limits.
+6. **Tips:** three to five lines.
+7. **Related:** two other features and the use case where it matters most.
+8. **Questions:** four to six, with JSON-LD.
+9. Compact closing band.
+
+### 12.16 The six feature pages
+
+| Page | Plan | Header script | Worked example (computed from) | Questions include |
+| --- | --- | --- | --- | --- |
+| **Workout tracker** `/features/workout-tracker` -- *h1 draft:* "Log every set in seconds" / "Registra cada serie en segundos" | Free | The hero's live session (§12.2): a set ticked, rest, a record | The warm-up ramp for a 100 kg working load and the plates per side, from contracts' warm-up and plate rules (`LIVE-13`/`LIVE-20`) | Does the rest alert work with the screen locked (installed app, notifications on)? What if the signal drops (§12.11, 3)? Can I add an exercise mid-workout (no -- swap one or add extra sets, the routine is the plan)? Can I fix a finished workout (the latest, for 48 hours, `SESSION_CORRECTION_WINDOW_HOURS`)? |
+| **Routine builder** `/features/routine-builder` (anchor `#draft`) -- "Build the routine you'll actually follow" / "Arma la rutina que vas a seguir" | Free + Pro | The Plan verb's script (§12.4) | The quality summary of Upper / Lower: weekly sets per muscle from `plannedMuscleSets` over the template | What is a rotation? Can I share or copy routines? Versions (3 Free, 20 Pro)? What does the draft send (§12.11, 10), and its 10 a month on Pro? |
+| **Automatic progression** `/features/progression` -- "The weight goes up when you earn it" / "El peso sube cuando te lo ganas" | Free + Pro | The progression ledger (§12.5) | A: the double-progression ledger (backend rule, tested); B: an 8-week block at a 100 kg reference max, step by step, from contracts' `LP_STEPS` (Pro) | What if I miss my reps (the weight lifted carries over)? Can I switch it off for one exercise? What step does it use? Does a deload move my loads (no)? |
+| **Progress** `/features/progress` -- "Progress you can read" / "Un progreso que se puede leer" | Free + Pro | The body-map weeks (§12.6), in a phone | How one session lands on the body map: Bench Press 3 sets → chest 3, triceps 1.5, front shoulders 1.5, the weighting the app uses (primary 1.0, secondary 0.5) from the catalog | What is estimated 1RM (the app's own definition)? Why do bodyweight sets add no volume? Do signals tell me what is wrong (no: numbers, never causes)? What is Pro here (longer history, measurements, signals, comparisons, review)? |
+| **Ranks and achievements** `/features/ranks` -- "Earned by showing up" / "Se gana apareciendo" | Free | The Artisan crest and its header (§12.7) | The six ranks and the 25 milestones by category, from contracts' `RENAISSANCE_RANK_DEFINITIONS` and milestone thresholds | How is a rank earned (sessions and distinct weeks)? What is a comeback (14 days away, then 3 active days within 14)? Who sees my rank (you choose)? Are records found automatically (yes, from your sets)? |
+| **Training with people** `/features/community` -- "Train with people, on your terms" / "Entrena con otros, a tu manera" | Free | The messages scene (§12.9), in a phone | The ten privacy parts and what each controls, from the app's privacy messages | Are messages end-to-end encrypted (no, §12.11, 9)? Who can message me (people I follow, everyone or nobody)? Can I share a workout with someone without an account (a revocable link)? How do blocks and reports work? |
+
+**Not claimed** on any page: that a rank can never be lost (nothing in the
+code says so yet), any formula the page cannot compute from the app's own
+code, or any count of members.
+
+### 12.17 Template — a use-case page (`/use-cases/<level>`)
+
+1. **Header** (Night): eyebrow "FOR BEGINNERS · FREE" / "PARA PRINCIPIANTES ·
+   GRATIS" (the plan from the page's main tools), the `h1`, the subline, the
+   audience line; "Start with <template>" (filled) →
+   `/signup?template=<slug>` (§12.8's hand-off) or, for advanced, "Start
+   free"; "See every feature" (ghost). Right, from 1024: the level's
+   template card from §12.8, its week lighting day by day.
+2. **Facts band** -- true facts about the programme, never usage numbers:
+   beginners "3 days a week · full body · free"; intermediates "4 to 6 days ·
+   upper/lower or push/pull/legs · free"; advanced "8-week blocks · planned
+   deloads · Pro".
+3. **What changes at this level:** four numbered cards.
+4. **The programme:** the level's template card(s), or for advanced the
+   builder with the 8-week block and deloads (Pro tags).
+5. **Tools for this level:** four cards linking feature pages, tagged.
+6. **Step by step:** five or six numbered steps from sign-up to the next
+   level.
+7. **Next level:** a card to the next use case (advanced links back to the
+   features).
+8. **Questions** with JSON-LD; compact closing band.
+
+### 12.18 The three use-case pages
+
+| Page | `h1` *(draft)* | What changes (four cards, *draft*) | Tools | Step by step ends at |
+| --- | --- | --- | --- | --- |
+| **Beginners** `/use-cases/beginners` | Start lifting with a plan / Empieza a entrenar con un plan | Learn a few movements well; your first loads are yours to find; add weight when every set reaches the top of its range; show up most weeks | Workout tracker (warm-ups, plates), automatic progression, ranks, the template | Moving to the intermediates' page when the full-body sessions stop progressing for several weeks (plateau watch says when) |
+| **Intermediates** `/use-cases/intermediates` | Keep progressing past the first months / Sigue progresando después de los primeros meses | Progress slows; splitting the body lets each muscle get more weekly sets; weekly sets per muscle become the measure; plateaus are read, not guessed | Body map and weekly sets, plateau watch, routine versions, supersets | Trying an 8-week block (Pro) |
+| **Advanced** `/use-cases/advanced` | Plan blocks, deloads and the long game / Planifica bloques, descargas y el largo plazo | Training runs in blocks; deloads are planned, not improvised; blocks are compared with what came before; signals are read over weeks | 8-week blocks, dated training blocks, planned deloads, signals and comparison, the training review (all Pro) | Back to the features overview |
+
+"What changes" is general training sense, written plainly and checked in the
+copy deck: no medical claims, no promised results, nothing a member's own
+numbers could contradict.
+
+### 12.19 The features overview (`/features`)
+
+1. **Header** (Night, lighter: no phone): "Everything Sunnsteel does" / "Todo
+   lo que hace Sunnsteel" *(draft)*, subline, the two actions, and a facts band
+   of true facts (free to start; 80+ exercises; English and Spanish; in your
+   browser).
+2. **The six feature cards**, grouped under the four verbs (Plan: routine
+   builder, progression; Train: workout tracker; Measure: progress; Earn:
+   ranks; and training with people), each a name, one line, its plan tags and
+   a link; each card's small mock-up makes one move as it enters.
+3. **At a glance:** one ruled table of every capability by verb, Free or Pro,
+   generated from the rows `/plans` renders (`plans.ts`) and the always-free
+   list -- the site's master list, and the honest answer to "what is free".
+4. A Free-and-Pro line linking `/pricing`; questions; compact closing band.
+
+### 12.20 Pricing (`/pricing`)
+
+- **A signed-in visitor is redirected to `/plans`** by the middleware (the
+  owner's decision), which already shows their plan, the purchase and the
+  comparison; a test sits beside the other redirect tests.
+- **Header** (Night): eyebrow "PRO · 7 DAYS FREE" / "PRO · 7 DÍAS GRATIS"
+  (trial from contracts), the `h1` *(draft)* "Free to train. Pro to plan
+  further.", the subline; "Try Pro free for 7 days" (filled) →
+  `/signup?plan=pro` (§12.10's hand-off) and "Start free" (ghost). A facts band:
+  the price, the trial and "Cancel any time", from contracts, never counted.
+- **What Pro adds:** the four outcomes with their full descriptions
+  (`billing.offer.outcomes`) and the AI line (§12.10).
+- **The comparison:** the same table `/plans` renders (`plans.ts`, §29.4),
+  read-only, nothing coloured; then what is always free.
+- **Who it is for** *(draft)*: three short profiles -- planning blocks and
+  deloads; wanting the long history and comparisons; wanting drafts and
+  reviews.
+- **Questions:** the app's own `billing.plans.faq` (cancelling, the trial,
+  refunds, how the charge is made, leaving Pro), with `id="free"` and
+  `id="pro"` anchors that the menu links to, and the legal links line.
+- **Motion:** the header's load sequence and the section reveals; nothing
+  about the price moves.
+
+### 12.21 Titles and descriptions (drafts)
+
+| Page | Title (EN / ES) |
+| --- | --- |
+| `/` | Sunnsteel — Forge yourself. Prove it in every set. / Sunnsteel — Fórjate. Demuéstralo en cada serie. |
+| `/features` | Features — Sunnsteel / Funciones — Sunnsteel |
+| `/features/<slug>` | <Feature> — Sunnsteel / <Función> — Sunnsteel |
+| `/use-cases/<level>` | Sunnsteel for <level> / Sunnsteel para <nivel> |
+| `/pricing` | Pricing — Free and Pro — Sunnsteel / Precios — Free y Pro — Sunnsteel |
+
+Each description is the page's subline, at most 155 characters, written in
+the copy deck.
 
 ## 13. Reference review: Boostcamp's public site (2026-11-20)
 
