@@ -211,7 +211,8 @@
 			"advanced": "El bloque de 8 semanas se arma en el mismo constructor."
 		},
 		"handoff": "Elegiste {template}.",
-		"pro": "Pro"
+		"pro": "Pro",
+		"levelsLabel": "Nivel"
 	},
 	"people": {
 		"heading": "Entrena con otros",

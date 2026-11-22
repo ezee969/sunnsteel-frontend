@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useEffect, useState } from 'react'
+import { type CSSProperties, type ReactNode, useEffect, useState } from 'react'
 
 import {
 	Accordion,
@@ -39,13 +39,15 @@ export function SiteQuestionsList({
 			value={open}
 			onValueChange={setOpen}
 			className="site-questions-list"
+			data-reveal="stagger"
 		>
-			{items.map(item => (
+			{items.map((item, index) => (
 				<AccordionItem
 					key={item.id}
 					id={item.id}
 					value={item.id}
 					className="border-rule-faint"
+					style={{ '--i': index } as CSSProperties}
 				>
 					<AccordionTrigger className="min-h-11">
 						{item.question}

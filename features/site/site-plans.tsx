@@ -10,7 +10,7 @@ import { formatPlanPrice } from '@/lib/utils/checkout'
 import { CONSUMER_REQUEST_PATHS } from '@/lib/utils/consumer-requests'
 import { PRO_OUTCOMES } from '@/lib/utils/pro-offer'
 
-import { SiteSectionHeading } from './site-parts'
+import { motionVars, SiteSectionHeading } from './site-parts'
 
 /**
  * SITE-01 §12.10: what is free, what Pro adds and what it costs, plainly
@@ -46,7 +46,7 @@ export async function SitePlans() {
 			<SiteSectionHeading id="plans-heading" className="mt-3">
 				{t('heading')}
 			</SiteSectionHeading>
-			<div className="site-plans">
+			<div className="site-plans" data-reveal="stagger">
 				<section aria-labelledby="plan-free" className="site-card site-plan">
 					<div className="site-plan-head">
 						<h3 id="plan-free" className="type-page">
@@ -55,8 +55,8 @@ export async function SitePlans() {
 						<p className="type-body-sm text-ink-2">{t('free.note')}</p>
 					</div>
 					<ul className="site-plan-lines">
-						{FREE_LINES.map(line => (
-							<li key={line}>
+						{FREE_LINES.map((line, index) => (
+							<li key={line} style={motionVars({ '--l': index })}>
 								<Check className="mt-0.5 size-4 shrink-0" aria-hidden />
 								{t(`free.lines.${line}`, {
 									days: FREE_STRENGTH_RANGE_DAYS,
@@ -100,8 +100,8 @@ export async function SitePlans() {
 						</p>
 					</div>
 					<ul className="site-plan-lines">
-						{PRO_OUTCOMES.map(outcome => (
-							<li key={outcome.key}>
+						{PRO_OUTCOMES.map((outcome, index) => (
+							<li key={outcome.key} style={motionVars({ '--l': index })}>
 								<Check className="mt-0.5 size-4 shrink-0" aria-hidden />
 								<span>
 									<span className="type-panel block">

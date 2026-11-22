@@ -9,7 +9,7 @@ import { LANDING_FACTS, PLAN_TEMPLATE } from '@/lib/site/landing-examples'
 import { PRIVACY_SECTION_LABEL_KEYS } from '@/lib/utils/privacy-overview'
 import { templateText } from '@/lib/utils/routine-templates'
 
-import { ExampleMark, SiteSectionHeading } from './site-parts'
+import { ExampleMark, motionVars, SiteSectionHeading } from './site-parts'
 
 /**
  * SITE-01 §12.9: training is better with people, and free, without looking
@@ -25,13 +25,15 @@ const REACTION_LABEL = {
 	INSPIRING: 'reactionInspiring',
 } as const
 const REACTION_COUNTS = { STRENGTH: 3, DISCIPLINE: 1, RESPECT: 2, INSPIRING: 1 }
+/** Each row's marker slides from `start` to `value` when the band arrives. */
 const PRIVACY_ROWS: Array<{
 	key: 'records' | 'workoutHistory' | 'rank'
 	value: ProfileVisibility
+	start: ProfileVisibility
 }> = [
-	{ key: 'records', value: 'FOLLOWERS' },
-	{ key: 'workoutHistory', value: 'PRIVATE' },
-	{ key: 'rank', value: 'PUBLIC' },
+	{ key: 'records', value: 'FOLLOWERS', start: 'PRIVATE' },
+	{ key: 'workoutHistory', value: 'PRIVATE', start: 'PUBLIC' },
+	{ key: 'rank', value: 'PUBLIC', start: 'PRIVATE' },
 ]
 const AUDIENCES: ProfileVisibility[] = ['PUBLIC', 'FOLLOWERS', 'PRIVATE']
 
@@ -44,16 +46,24 @@ function Scene({
 	title,
 	body,
 	example,
+	seq,
 	children,
 }: {
 	eyebrow: string
 	title: string
 	body: string
 	example: string
+	/** Where this scene's script starts in the desktop sequence. */
+	seq: string
 	children: ReactNode
 }) {
 	return (
-		<li className="site-scene">
+		<li
+			className="site-scene"
+			data-play-when="0.5"
+			data-play-media="(max-width: 1023px)"
+			style={motionVars({ '--seq': seq })}
+		>
 			<p className="type-label text-ink-3">{eyebrow}</p>
 			<h3 className="type-panel">{title}</h3>
 			<p className="type-body-sm site-body mt-0">{body}</p>
@@ -91,23 +101,32 @@ export async function SitePeople() {
 				{t('heading')}
 			</SiteSectionHeading>
 			<p className="type-site-lead site-body">{t('subline')}</p>
-			<ul className="site-scenes">
+			{/* Desktop plays the three scenes one at a time; phones, each as it
+			    comes into view. */}
+			<ul
+				className="site-scenes"
+				data-play-when="0.3"
+				data-play-media="(min-width: 1024px)"
+			>
 				<Scene
+					seq="0s"
 					eyebrow={t('activity.eyebrow')}
 					title={t('activity.title')}
 					body={t('activity.body', { reactions: ACTIVITY_REACTIONS.length })}
 					example={example}
 				>
-					<div className="site-entry">
+					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>
 						<p className="type-body-sm">
 							{t('activity.entry', { name, day: push, records: 3 })}
 						</p>
 					</div>
 					<ul className="site-reactions">
-						{ACTIVITY_REACTIONS.map(reaction => (
+						{ACTIVITY_REACTIONS.map((reaction, index) => (
 							<li
 								key={reaction}
+								className="sx-react"
+								style={motionVars({ '--i': index })}
 								data-chosen={reaction === 'STRENGTH' || undefined}
 							>
 								{tActivity(REACTION_LABEL[reaction])}
@@ -118,12 +137,13 @@ export async function SitePeople() {
 				</Scene>
 
 				<Scene
+					seq="4.2s"
 					eyebrow={t('partners.eyebrow')}
 					title={t('partners.title')}
 					body={t('partners.body', { max: LANDING_FACTS.partnersMax })}
 					example={example}
 				>
-					<div className="site-entry">
+					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>
 						<div className="min-w-0">
 							<p className="type-panel">{name}</p>
@@ -132,7 +152,7 @@ export async function SitePeople() {
 							</p>
 						</div>
 					</div>
-					<div className="site-notification">
+					<div className="site-notification sx-alert">
 						<Bell className="mt-0.5 size-4 shrink-0" />
 						<div className="min-w-0">
 							<p className="type-panel">
@@ -146,17 +166,18 @@ export async function SitePeople() {
 				</Scene>
 
 				<Scene
+					seq="8.4s"
 					eyebrow={t('messages.eyebrow')}
 					title={t('messages.title')}
 					body={t('messages.body')}
 					example={example}
 				>
-					<div className="site-entry">
+					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>
 						<div className="min-w-0 flex-1">
 							<p className="type-panel">{name}</p>
 							<p className="type-body-sm">{t('messages.sample')}</p>
-							<div className="site-routine-card">
+							<div className="site-routine-card sx-card">
 								<p className="type-panel">
 									{templateText(PLAN_TEMPLATE, tTemplates).name}
 								</p>
@@ -174,14 +195,14 @@ export async function SitePeople() {
 							</div>
 						</div>
 					</div>
-					<p className="type-body-sm inline-flex items-center gap-1.5">
+					<p className="type-body-sm sx-done inline-flex items-center gap-1.5">
 						<Check className="size-4" />
 						{t('messages.copied')}
 					</p>
 				</Scene>
 			</ul>
 
-			<div className="site-privacy">
+			<div className="site-privacy" data-reveal="">
 				<div>
 					<h3 className="type-panel">{t('privacy.title')}</h3>
 					<p className="type-body site-body">
@@ -189,8 +210,12 @@ export async function SitePeople() {
 					</p>
 				</div>
 				<ul aria-hidden="true" className="site-privacy-rows">
-					{PRIVACY_ROWS.map(row => (
-						<li key={row.key} className="site-privacy-row">
+					{PRIVACY_ROWS.map((row, index) => (
+						<li
+							key={row.key}
+							className="site-privacy-row"
+							style={motionVars({ '--r': index })}
+						>
 							<span className="type-body-sm">
 								{tPrivacy(PRIVACY_SECTION_LABEL_KEYS[row.key])}
 							</span>
@@ -199,6 +224,7 @@ export async function SitePeople() {
 									<span
 										key={audience}
 										data-on={audience === row.value || undefined}
+										data-start={audience === row.start || undefined}
 										className="type-action"
 									>
 										{tPrivacy(`audience.${audience}`)}

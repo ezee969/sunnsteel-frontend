@@ -5,6 +5,7 @@ import { PUBLIC_ORIGIN } from '@/lib/config/env'
 import { installUrl, qrPath } from '@/lib/site/qr'
 
 import { HeroVideo } from './hero-video'
+import { HeadingWords, motionVars } from './site-parts'
 
 /**
  * SITE-01 §12.12: the last push before the footer -- the hero's headline
@@ -57,11 +58,25 @@ export async function SiteClosing() {
 			<div aria-hidden="true" className="site-scrim-more" />
 			<div className="site-closing-inner">
 				<div className="site-closing-text">
-					<h2 id="closing-heading" className="type-site-heading site-heading">
-						{t('heading')}
+					<h2
+						id="closing-heading"
+						data-reveal=""
+						className="type-site-heading site-heading"
+					>
+						<HeadingWords text={t('heading')} />
 					</h2>
-					<p className="type-site-lead site-lead">{t('subline')}</p>
-					<div className="site-actions">
+					<p
+						className="type-site-lead site-lead"
+						data-reveal="up"
+						style={motionVars({ '--delay': '500ms' })}
+					>
+						{t('subline')}
+					</p>
+					<div
+						className="site-actions"
+						data-reveal="up"
+						style={motionVars({ '--delay': '650ms', '--rise': '8px' })}
+					>
 						<Link href="/signup" className="site-filled site-filled-hero">
 							{t('createAccount')}
 						</Link>
@@ -74,7 +89,11 @@ export async function SiteClosing() {
 					</p>
 				</div>
 				{url && qr ? (
-					<figure className="site-card site-qr">
+					<figure
+						className="site-card site-qr"
+						data-reveal="up"
+						style={motionVars({ '--delay': '400ms', '--rise': '24px' })}
+					>
 						<figcaption className="type-panel">{t('qr.title')}</figcaption>
 						<svg
 							role="img"

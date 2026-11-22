@@ -15,7 +15,8 @@ import {
 	templateText,
 } from '@/lib/utils/routine-templates'
 
-import { PlanTag, SiteCard, SiteSectionHeading } from './site-parts'
+import { motionVars, PlanTag, SiteCard, SiteSectionHeading } from './site-parts'
+import { SiteTemplateCarousel } from './site-template-carousel'
 
 /**
  * SITE-01 §12.8: from "this looks good" to "this is my plan". The templates
@@ -47,70 +48,93 @@ export async function SiteTemplates() {
 				{t('heading')}
 			</SiteSectionHeading>
 			<p className="type-site-lead site-body">{t('body')}</p>
-			<ul className="site-templates">
-				{ROUTINE_TEMPLATES.map(template => {
-					const text = templateText(template, tTemplates)
-					const days = templateWeekdays(template)
-					return (
-						<SiteCard as="li" key={template.slug} className="site-template">
-							<p className="type-label text-ink-3">
-								{t(`levels.${levelOf(template.slug)}`)}
-							</p>
-							<h3 className="type-panel">{text.name}</h3>
-							<p className="type-body-sm text-ink-2">{text.summary}</p>
-							<ol aria-hidden="true" className="site-week-strip">
-								{WEEK.map(day => (
-									<li key={day} data-on={days.includes(day) || undefined}>
-										{weekday(day)}
-									</li>
-								))}
-							</ol>
-							<ul className="site-template-days">
-								{template.days.map(day => (
-									<li key={day.key} className="site-screen-row">
-										<span>{templateDayName(day, tTemplates)}</span>
-										<span className="type-body-sm text-ink-3">
-											{t('exercises', { count: day.exercises.length })}
+			<SiteTemplateCarousel
+				cards={[
+					...ROUTINE_TEMPLATES.map(template => {
+						const text = templateText(template, tTemplates)
+						const days = templateWeekdays(template)
+						const level = levelOf(template.slug)
+						return {
+							id: template.slug,
+							level,
+							name: text.name,
+							node: (
+								<SiteCard as="article" className="site-template">
+									<p className="type-label text-ink-3">
+										{t(`levels.${level}`)}
+									</p>
+									<h3 className="type-panel">{text.name}</h3>
+									<p className="type-body-sm text-ink-2">{text.summary}</p>
+									<ol aria-hidden="true" className="site-week-strip">
+										{WEEK.map((day, index) => (
+											<li
+												key={day}
+												data-on={days.includes(day) || undefined}
+												style={motionVars({ '--d': index })}
+											>
+												{weekday(day)}
+											</li>
+										))}
+									</ol>
+									<ul className="site-template-days">
+										{template.days.map((day, index) => (
+											<li
+												key={day.key}
+												className="site-screen-row"
+												style={motionVars({ '--d': index })}
+											>
+												<span>{templateDayName(day, tTemplates)}</span>
+												<span className="type-body-sm text-ink-3">
+													{t('exercises', { count: day.exercises.length })}
+												</span>
+											</li>
+										))}
+									</ul>
+									<p className="type-body-sm text-ink-2">{text.description}</p>
+									<Link
+										href={`/signup?template=${template.slug}`}
+										className="type-action site-outline site-template-start"
+									>
+										{t('start')}
+									</Link>
+								</SiteCard>
+							),
+						}
+					}),
+					{
+						id: 'none',
+						level: 'all' as const,
+						name: t('noneFit.title'),
+						node: (
+							<SiteCard as="article" className="site-template">
+								<h3 className="type-panel">{t('noneFit.title')}</h3>
+								<Link href="/signup" className="type-action site-outline">
+									{t('noneFit.build')}
+								</Link>
+								<p className="flex items-center gap-3">
+									<Link
+										href="/features/routine-builder"
+										className="type-action site-link mt-0"
+									>
+										{t('noneFit.describe')}
+										<ArrowRight className="size-4" aria-hidden />
+									</Link>
+									<PlanTag>{t('pro')}</PlanTag>
+								</p>
+								<p className="flex items-start justify-between gap-3">
+									<span className="type-body-sm text-ink-2">
+										<span className="type-label mb-1 block text-ink-3">
+											{t('levels.advanced')}
 										</span>
-									</li>
-								))}
-							</ul>
-							<p className="type-body-sm text-ink-2">{text.description}</p>
-							<Link
-								href={`/signup?template=${template.slug}`}
-								className="type-action site-outline"
-							>
-								{t('start')}
-							</Link>
-						</SiteCard>
-					)
-				})}
-				<SiteCard as="li" className="site-template">
-					<h3 className="type-panel">{t('noneFit.title')}</h3>
-					<Link href="/signup" className="type-action site-outline">
-						{t('noneFit.build')}
-					</Link>
-					<p className="flex items-center gap-3">
-						<Link
-							href="/features/routine-builder"
-							className="type-action site-link mt-0"
-						>
-							{t('noneFit.describe')}
-							<ArrowRight className="size-4" aria-hidden />
-						</Link>
-						<PlanTag>{t('pro')}</PlanTag>
-					</p>
-					<p className="flex items-start justify-between gap-3">
-						<span className="type-body-sm text-ink-2">
-							<span className="type-label mb-1 block text-ink-3">
-								{t('levels.advanced')}
-							</span>
-							{t('noneFit.advanced')}
-						</span>
-						<PlanTag>{t('pro')}</PlanTag>
-					</p>
-				</SiteCard>
-			</ul>
+										{t('noneFit.advanced')}
+									</span>
+									<PlanTag>{t('pro')}</PlanTag>
+								</p>
+							</SiteCard>
+						),
+					},
+				]}
+			/>
 		</section>
 	)
 }

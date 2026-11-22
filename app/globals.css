@@ -1700,6 +1700,15 @@
 }
 .site-progress-map {
   grid-column: 5 / 13;
+  grid-row: 1 / 3;
+}
+/* The strength line sits under the week rail, so a pinned stage keeps it in
+   view; stacked, it follows the map. */
+.site-progress-stage > .site-strength {
+  grid-column: 1 / 5;
+  grid-row: 2;
+  align-self: start;
+  margin-top: 0;
 }
 .site-week-rail {
   display: flex;
@@ -1798,8 +1807,10 @@
     margin-top: 0;
   }
   .site-progress-text,
-  .site-progress-map {
+  .site-progress-map,
+  .site-progress-stage > .site-strength {
     grid-column: 1 / -1;
+    grid-row: auto;
   }
   .site-analysis-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2680,5 +2691,292 @@
   .site-anim .site-tool[data-play] {
     --rise: 24px;
     animation: site-up 700ms var(--ease-standard) both;
+  }
+}
+
+/* §12.6 progress: the weeks advanced by markers on a sticky stage (desktop)
+   or played by themselves (phones); every change is a fill, a colour or a
+   drawn segment. */
+.site-progress-scroll,
+.site-ranks-scroll {
+  position: relative;
+}
+.site-week-marker,
+.site-rank-marker {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+}
+.site-week-marker {
+  height: 25%;
+}
+.site-rank-marker {
+  height: calc(100% / 6);
+}
+@media (min-width: 1024px) {
+  .site-progress-scroll[data-mode='stage'] {
+    height: 300svh;
+    margin-top: clamp(40px, 5vw, 72px);
+  }
+  .site-progress-scroll[data-mode='stage'] > .site-progress-stage {
+    position: sticky;
+    top: 96px;
+    margin-top: 0;
+  }
+  .site-ranks-scroll[data-mode='stage'] {
+    height: 360svh;
+  }
+  .site-ranks-scroll[data-mode='stage'] > .site-ranks {
+    position: sticky;
+    top: 120px;
+  }
+}
+.site-anim .site-progress-map path {
+  transition: fill 400ms var(--ease-standard);
+}
+.site-anim .site-week {
+  transition:
+    border-color var(--motion-slow) var(--ease-standard),
+    color var(--motion-slow) var(--ease-standard);
+}
+.site-anim .site-segment {
+  stroke-dasharray: 1;
+  animation: site-draw 400ms var(--ease-standard) both;
+}
+.site-analysis-strip > :nth-child(2) {
+  --i: 1;
+}
+.site-analysis-strip > :nth-child(3) {
+  --i: 2;
+}
+.site-analysis-strip > :nth-child(4) {
+  --i: 3;
+}
+
+/* §12.7 ranks: on the stage each crest takes its pigment as its rank is
+   reached; elsewhere the six draw one after another when the ladder is in
+   view. */
+.site-anim .site-ladder-crest {
+  transition: color var(--motion-slow) var(--ease-standard);
+}
+.site-ladder-rung[data-current] {
+  background: var(--surface);
+}
+.site-anim .site-ranks-scroll[data-mode='still'] .site-ladder:not([data-play]) .site-ladder-crest {
+  clip-path: inset(100% 0 0 0);
+}
+.site-anim .site-ranks-scroll[data-mode='still'] .site-ladder[data-play] .site-ladder-crest {
+  animation: site-unveil 600ms var(--ease-standard) both;
+  animation-delay: calc(var(--i, 0) * 300ms);
+}
+
+/* §12.8 the templates coverflow (from 768 with motion) and the scroll-snap
+   row (phones, reduced motion). The front card's start is the region's one
+   filled action; a neighbour is reached by its own "Show" control. */
+@keyframes site-light {
+  from {
+    border-color: var(--rule-faint);
+    background: transparent;
+    color: var(--ink-3);
+  }
+}
+.site-coverflow-wrap {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+.site-levels {
+  justify-content: center;
+}
+.site-coverflow {
+  position: relative;
+  margin-top: 32px;
+  overflow-x: clip;
+}
+.site-coverflow[data-layout='flow'] {
+  touch-action: pan-y;
+  padding-inline: 56px;
+}
+.site-coverflow[data-layout='flow'] .site-coverflow-track {
+  display: grid;
+  justify-items: center;
+}
+.site-coverflow[data-layout='flow'] .site-coverflow-card {
+  grid-area: 1 / 1;
+  position: relative;
+  width: min(480px, 100%);
+}
+.site-coverflow-card > div,
+.site-coverflow-card .site-template {
+  height: 100%;
+}
+.site-anim .site-coverflow[data-layout='flow'] .site-coverflow-card {
+  transition:
+    transform 500ms var(--ease-standard),
+    opacity 500ms var(--ease-standard);
+}
+.site-coverflow-show {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.site-coverflow-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  color: var(--foreground);
+}
+.site-coverflow-arrow[data-side='previous'] {
+  left: 0;
+}
+.site-coverflow-arrow[data-side='next'] {
+  right: 0;
+}
+.site-coverflow-arrow:hover:not(:disabled) {
+  background: var(--surface);
+}
+.site-coverflow-arrow:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+.site-coverflow-card[data-front] .site-template-start {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.site-coverflow-card[data-front] .site-template-start:hover {
+  background: var(--primary-hover);
+}
+.site-coverflow[data-layout='row'] .site-coverflow-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.site-coverflow[data-layout='row'] .site-coverflow-card {
+  flex: 0 0 min(85%, 420px);
+  scroll-snap-align: center;
+}
+.site-anim .site-coverflow-track {
+  animation: site-slide 400ms var(--ease-standard) both;
+}
+.site-anim .site-coverflow-card[data-front] .site-week-strip li[data-on] {
+  animation: site-light 300ms var(--ease-standard) both;
+  animation-delay: calc(200ms + var(--d, 0) * 60ms);
+}
+.site-anim .site-coverflow-card[data-front] .site-template-days li {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(300ms + var(--d, 0) * 40ms);
+}
+@media (max-width: 1023px) {
+  .site-coverflow[data-layout='flow'] .site-coverflow-card {
+    width: min(420px, 100%);
+  }
+}
+
+/* §12.9 the people scenes: one at a time on desktop, each as it comes into
+   view on phones; the privacy rows' markers slide to their choices. */
+@keyframes site-choose {
+  from {
+    border-color: var(--rule-faint);
+    color: var(--ink-2);
+  }
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-entry {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-react {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 800ms + var(--i, 0) * 100ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-react[data-chosen] {
+  animation:
+    site-fade 300ms var(--ease-standard) both,
+    site-choose 300ms var(--ease-standard) both;
+  animation-delay:
+    calc(var(--seq, 0s) + 800ms),
+    calc(var(--seq, 0s) + 2200ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-alert {
+  animation: site-drop 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1400ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-card {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 800ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-done {
+  animation: site-fade 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 2400ms);
+}
+@media (max-width: 1023px) {
+  .site-scene {
+    --seq: 0s !important;
+  }
+}
+.site-anim .site-segmented span {
+  transition:
+    border-color 200ms var(--ease-standard),
+    color 200ms var(--ease-standard);
+  transition-delay: calc(300ms + var(--r, 0) * 200ms);
+}
+.site-anim .site-privacy:not([data-in]) .site-segmented span[data-start] {
+  border-bottom-color: var(--foreground);
+  color: var(--foreground);
+}
+.site-anim .site-privacy:not([data-in]) .site-segmented span[data-on]:not([data-start]) {
+  border-bottom-color: transparent;
+  color: var(--ink-2);
+}
+
+/* §12.10 plans: the two cards rise in turn, their lines after them; the
+   price is shown, never counted. */
+.site-plans > :nth-child(2) {
+  --i: 1;
+}
+.site-anim .site-plans:not([data-in]) .site-plan-lines li {
+  opacity: 0;
+}
+.site-anim .site-plans[data-in] .site-plan-lines li {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(400ms + var(--i, 0) * 120ms + var(--l, 0) * 40ms);
+}
+
+/* §12.11 questions: the rows arrive 40ms apart, once. */
+.site-questions-list[data-reveal] {
+  --gap: 40ms;
+  --rise: 6px;
+  --dur: 400ms;
+}
+
+/* §12.12 the closing band: the clip settles from 1.04 as the band scrolls
+   into place, the hero's movement in reverse. */
+@keyframes site-settle {
+  from {
+    transform: scale(1.04);
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-anim .site-closing :is(picture img, video) {
+    animation: site-settle linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 50%;
+  }
+}
+@media (max-width: 1023px) {
+  .site-closing .site-heading::after {
+    margin-inline: auto;
+    transform-origin: center;
   }
 }

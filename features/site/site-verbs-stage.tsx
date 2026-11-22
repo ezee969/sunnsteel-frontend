@@ -1,8 +1,9 @@
 'use client'
 
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
 import { SitePhoneFrame } from './site-parts'
+import { useStageStep } from './use-stage-step'
 
 /**
  * SITE-01 §12.4, from 1024px with JavaScript: one phone held at the
@@ -28,25 +29,19 @@ export function SiteVerbsStage({
 	// The first script waits for its panel to reach the centre.
 	const [reached, setReached] = useState(false)
 
-	useEffect(() => {
-		const section = stage.current?.closest('section')
-		if (!section) return
-		const panels = Array.from(
-			section.querySelectorAll<HTMLElement>('[data-verb-panel]'),
-		)
-		const centre = new IntersectionObserver(
-			entries => {
-				for (const entry of entries) {
-					if (!entry.isIntersecting) continue
-					setActive(panels.indexOf(entry.target as HTMLElement))
-					setReached(true)
-				}
-			},
-			{ rootMargin: '-50% 0px -50% 0px' },
-		)
-		panels.forEach(panel => centre.observe(panel))
-		return () => centre.disconnect()
+	const onStep = useCallback((step: number) => {
+		setActive(step)
+		setReached(true)
 	}, [])
+	useStageStep(
+		useCallback(
+			() => stage.current?.closest<HTMLElement>('.site-verbs-grid'),
+			[],
+		),
+		'[data-verb-panel]',
+		true,
+		onStep,
+	)
 
 	useEffect(() => {
 		const section = stage.current?.closest('section')
