@@ -4,6 +4,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SiteClosing } from '@/features/site/site-closing'
 import { SiteFooter } from '@/features/site/site-footer'
 import { SiteHero } from '@/features/site/site-hero'
+import {
+	INSTALL_PROMPT_SCRIPT,
+	SiteInstallHelper,
+} from '@/features/site/site-install-helper'
 import { SiteMotion } from '@/features/site/site-motion'
 import { SitePeople } from '@/features/site/site-people'
 import { SitePlans } from '@/features/site/site-plans'
@@ -54,6 +58,10 @@ export default async function LandingPage({
 				{/* §33.2: the hero and its proof band are a Night region in both
 				    themes; from the four verbs on, the page follows the visitor's. */}
 				<div className="dark site-night" data-region="night">
+					{/* §12.12: the QR code's `?install=1` helper, on phones only; the
+					    browser's install offer is caught before React runs. */}
+					<script dangerouslySetInnerHTML={{ __html: INSTALL_PROMPT_SCRIPT }} />
+					<SiteInstallHelper />
 					<SiteHero />
 					<SiteProofBand />
 				</div>

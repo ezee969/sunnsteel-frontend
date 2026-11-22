@@ -339,9 +339,10 @@
 		"helper": {
 			"title": "Install Sunnsteel on this phone",
 			"install": "Install Sunnsteel",
-			"iosSteps": "1. Tap Share in Safari's toolbar. 2. Choose Add to Home Screen.",
 			"iosNote": "Notifications work once it's installed.",
-			"dismiss": "Not now"
+			"dismiss": "Not now",
+			"iosShare": "Tap Share in Safari's toolbar.",
+			"iosAdd": "Choose Add to Home Screen."
 		}
 	},
 	"footer": {

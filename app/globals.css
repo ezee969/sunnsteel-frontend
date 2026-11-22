@@ -2980,3 +2980,47 @@
     transform-origin: center;
   }
 }
+
+/* §33.11 the install helper: a phone arriving from the QR code sees the way
+   to install at the top of the hero's Night region, clear of the bar. */
+.site-install-helper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 80px var(--site-gutter) 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.site-install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  counter-reset: step;
+}
+.site-install-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 15px;
+}
+.site-install-steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.site-install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+/* Alone, the ghost "Not now" lines up with the text above it. */
+.site-install-actions > .site-ghost:first-child {
+  margin-left: -16px;
+}

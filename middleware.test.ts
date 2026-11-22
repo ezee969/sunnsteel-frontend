@@ -124,6 +124,11 @@ describe('the middleware', () => {
 		expect(on.cookies.get('ss-site-preview')?.value).toBe('1')
 		const off = await middleware(request('/?site-preview=0'))
 		expect(off.cookies.get('ss-site-preview')?.value).toBe('')
+		// The QR's install helper survives turning the preview on (§12.12).
+		const install = await middleware(request('/?site-preview=1&install=1'))
+		expect(install.headers.get('location')).toBe(
+			'https://sunnsteel.test/?install=1',
+		)
 	})
 
 	it('still guards a protected page before choosing a language', async () => {

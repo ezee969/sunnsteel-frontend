@@ -86,7 +86,11 @@ export async function middleware(request: NextRequest) {
 			previewParam: request.nextUrl.searchParams.get(SITE_PREVIEW_PARAM),
 		})
 		if (decision.kind === 'preview') {
-			const response = NextResponse.redirect(new URL('/', request.url))
+			// Everything but the preview switch survives, so a phone opening
+			// `/?site-preview=1&install=1` keeps its install helper.
+			const target = request.nextUrl.clone()
+			target.searchParams.delete(SITE_PREVIEW_PARAM)
+			const response = NextResponse.redirect(target)
 			if (decision.on) {
 				response.cookies.set(SITE_PREVIEW_COOKIE, '1', {
 					path: '/',

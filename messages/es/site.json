@@ -339,9 +339,10 @@
 		"helper": {
 			"title": "Instala Sunnsteel en este teléfono",
 			"install": "Instalar Sunnsteel",
-			"iosSteps": "1. Toca Compartir en la barra de Safari. 2. Elige Agregar a pantalla de inicio.",
 			"iosNote": "Las notificaciones funcionan una vez instalada.",
-			"dismiss": "Ahora no"
+			"dismiss": "Ahora no",
+			"iosShare": "Toca Compartir en la barra de Safari.",
+			"iosAdd": "Elige Agregar a pantalla de inicio."
 		}
 	},
 	"footer": {
