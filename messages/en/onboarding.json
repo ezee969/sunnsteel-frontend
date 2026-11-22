@@ -12,7 +12,8 @@
 		"doneTitle": "You're all set",
 		"doneBody": "There is nothing left to set up. Everything you chose here can be changed in Settings.",
 		"toDashboard": "Go to the dashboard",
-		"loading": "Loading your setup"
+		"loading": "Loading your setup",
+		"toPlans": "See the Pro trial"
 	},
 	"steps": {
 		"units": {
@@ -76,7 +77,9 @@
 			"other": "Choose another template",
 			"build": "Build my own routine",
 			"buildIntro": "The starter routines are strength programmes, so for your goals building your own fits better.",
-			"later": "Not now, go to the dashboard"
+			"later": "Not now, go to the dashboard",
+			"picked": "You picked {template}.",
+			"laterPro": "Not now, see the Pro trial"
 		}
 	},
 	"notice": {

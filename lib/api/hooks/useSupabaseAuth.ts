@@ -40,23 +40,26 @@ export const useSupabaseSignUp = () => {
 			email,
 			password,
 			name,
+			next,
 		}: {
 			email: string
 			password: string
 			name: string
+			/** Where a new account goes first (SITE-01's hand-off). */
+			next?: string
 		}) => {
-			return await supabaseAuthService.signUp(email, password, name, t)
+			return await supabaseAuthService.signUp(email, password, name, t, next)
 		},
-		onSuccess: data => {
+		onSuccess: (data, variables) => {
 			if (data.requiresEmailVerification) {
 				logger.debug('[auth] signup requires verification')
 				router.push('/login?message=verify-email')
 				return
 			}
 
-			logger.debug('[auth] signup succeeded; redirecting to dashboard')
+			logger.debug('[auth] signup succeeded; redirecting')
 			setTimeout(() => {
-				router.push('/dashboard')
+				router.push(sanitizeInternalRedirect(variables?.next))
 			}, 100)
 		},
 	})

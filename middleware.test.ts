@@ -144,6 +144,25 @@ describe('the middleware', () => {
 		expect(res.headers.get('location')).toBe('https://sunnsteel.test/dashboard')
 	})
 
+	it('sends a signed-in visitor from a landing sign-up link where it meant (SITE-01)', async () => {
+		const template = await middleware(
+			request('/signup?template=upper-lower', { ss_session: '1' }),
+		)
+		expect(template.headers.get('location')).toBe(
+			'https://sunnsteel.test/routines/new?template=upper-lower',
+		)
+		const pro = await middleware(
+			request('/signup?plan=pro', { ss_session: '1' }),
+		)
+		expect(pro.headers.get('location')).toBe('https://sunnsteel.test/plans')
+		const unknown = await middleware(
+			request('/signup?template=nope', { ss_session: '1' }),
+		)
+		expect(unknown.headers.get('location')).toBe(
+			'https://sunnsteel.test/dashboard',
+		)
+	})
+
 	it('drops a language typed into the address', async () => {
 		expect(localePrefixOf('/es/dashboard')).toBe('es')
 		expect(localePrefixOf('/esquema')).toBeNull()

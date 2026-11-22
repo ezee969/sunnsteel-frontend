@@ -63,6 +63,8 @@ export class SupabaseAuthService {
 		password: string,
 		name: string,
 		t: Translator<'core.errorMessages'>,
+		/** Where the confirmation link lands (SITE-01's hand-off); app-relative. */
+		callbackUrl?: string,
 	): Promise<AuthResponse> {
 		logger.debug('[auth-service] signUp start', { email })
 
@@ -78,7 +80,13 @@ export class SupabaseAuthService {
 				data: {
 					name,
 				},
-				emailRedirectTo: `${siteUrl}/auth/callback`,
+				// The callback already accepts `callbackUrl` (Google sign-in and
+				// password reset use it), so no new redirect URL is allowed for it.
+				emailRedirectTo: callbackUrl
+					? `${siteUrl}/auth/callback?callbackUrl=${encodeURIComponent(
+							sanitizeInternalRedirect(callbackUrl),
+						)}`
+					: `${siteUrl}/auth/callback`,
 			},
 		})
 

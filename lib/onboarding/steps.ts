@@ -177,6 +177,23 @@ export function recommendStart({
 	}
 }
 
+/**
+ * SITE-01 §12.8: the template a visitor picked on the landing, offered in
+ * place of the computed one. The chosen weekdays go into it on the same rule
+ * as a recommendation: only where its own number of days matches (a
+ * rotation takes any).
+ */
+export function chosenStart(
+	slug: Extract<OnboardingRecommendation, { kind: 'template' }>['slug'],
+	weekdays: readonly number[],
+	templateDays: number,
+	rotation: boolean,
+): OnboardingRecommendation {
+	const days = [...new Set(weekdays)]
+	const fits = days.length > 0 && (rotation || days.length === templateDays)
+	return { kind: 'template', slug, weekdays: fits ? days : null }
+}
+
 /** The routine builder opened on the recommended template and its weekdays. */
 export function recommendationHref(
 	recommendation: OnboardingRecommendation,

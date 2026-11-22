@@ -45,10 +45,16 @@ import {
 import { useUpdateUser } from '@/lib/api/hooks/useUpdateUser'
 import { useWorkoutAnalytics } from '@/lib/api/hooks/useWorkoutAnalytics'
 import {
+	chosenStart,
 	type OnboardingRecommendation,
 	recommendationHref,
 	recommendStart,
 } from '@/lib/onboarding/steps'
+import {
+	afterOnboardingPath,
+	clearHandoff,
+	type SiteHandoff,
+} from '@/lib/site/handoff'
 import { weekdayName } from '@/lib/utils/date'
 import { equipmentLabel } from '@/lib/utils/exercise-equipment'
 import {
@@ -627,21 +633,37 @@ export function TargetStep({
 export function RecommendationStep({
 	profile,
 	days,
+	handoff,
 	onComplete,
 }: {
 	profile: UserProfile
 	days: number[]
+	/** SITE-01: what the visitor chose on the landing, if anything. */
+	handoff: SiteHandoff
 	onComplete: () => void
 }) {
 	const t = useTranslations('onboarding.steps.recommendation')
 	const tTemplates = useTranslations('routines.templates')
 	const tDate = useTranslations('routines.date')
 	const locale = useLocale() as Locale
-	const recommendation: OnboardingRecommendation = recommendStart({
-		goals: profile.trainingIdentity?.goals ?? [],
-		experience: profile.trainingIdentity?.experienceLevel ?? null,
-		weekdays: days,
-	})
+	// A template picked on the landing is offered instead of computing one.
+	const picked = findRoutineTemplate(handoff.template)
+	const recommendation: OnboardingRecommendation = picked
+		? chosenStart(
+				picked.slug as Extract<
+					OnboardingRecommendation,
+					{ kind: 'template' }
+				>['slug'],
+				days,
+				picked.days.length,
+				picked.scheduleMode === 'ROTATION',
+			)
+		: recommendStart({
+				goals: profile.trainingIdentity?.goals ?? [],
+				experience: profile.trainingIdentity?.experienceLevel ?? null,
+				weekdays: days,
+			})
+	const leave = afterOnboardingPath(handoff)
 	const template =
 		recommendation.kind === 'template'
 			? findRoutineTemplate(recommendation.slug)
@@ -670,17 +692,21 @@ export function RecommendationStep({
 			</div>
 			{template && text && recommendation.kind === 'template' ? (
 				<div className="space-y-2">
-					<p className="type-body-sm text-ink-3">{t('intro')}</p>
+					<p className="type-body-sm text-ink-3">
+						{picked ? t('picked', { template: text.name }) : t('intro')}
+					</p>
 					<h3 className="type-panel text-foreground">{text.name}</h3>
 					<p className="type-body max-w-[68ch] text-ink-2">{text.summary}</p>
 					<p className="type-body-sm max-w-[68ch] text-ink-3">
-						{t('reason', {
-							count: new Set(days).size,
-							beginner:
-								profile.trainingIdentity?.experienceLevel === 'BEGINNER'
-									? 'yes'
-									: 'no',
-						})}{' '}
+						{picked
+							? null
+							: t('reason', {
+									count: new Set(days).size,
+									beginner:
+										profile.trainingIdentity?.experienceLevel === 'BEGINNER'
+											? 'yes'
+											: 'no',
+								})}{' '}
 						{recommendation.weekdays?.length
 							? t('onYourDays', {
 									days: weekdayList(recommendation.weekdays),
@@ -695,7 +721,14 @@ export function RecommendationStep({
 			)}
 			<div className="flex flex-wrap items-center gap-3 pt-2">
 				<Button asChild>
-					<Link href={href} onClick={onComplete}>
+					<Link
+						href={href}
+						onClick={() => {
+							// The landing's template has been used; Pro's intent stays.
+							clearHandoff('template')
+							onComplete()
+						}}
+					>
 						{recommendation.kind === 'template' ? t('open') : t('build')}
 					</Link>
 				</Button>
@@ -707,8 +740,8 @@ export function RecommendationStep({
 					</Button>
 				) : null}
 				<Button asChild variant="ghost">
-					<Link href="/dashboard" onClick={onComplete}>
-						{t('later')}
+					<Link href={leave} onClick={onComplete}>
+						{handoff.pro ? t('laterPro') : t('later')}
 					</Link>
 				</Button>
 			</div>

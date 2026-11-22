@@ -15,7 +15,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { ConsentLine } from '@/components/layout/consent-line'
@@ -35,6 +35,13 @@ import {
 	useSupabaseGoogleSignIn,
 	useSupabaseSignUp,
 } from '@/lib/api/hooks/useSupabaseAuth'
+import {
+	afterSignupPath,
+	hasHandoff,
+	loadHandoff,
+	parseHandoff,
+	saveHandoff,
+} from '@/lib/site/handoff'
 import { SignupFormValues, signupSchema } from '@/schema/signup-schema'
 
 // Password strength calculator
@@ -89,6 +96,18 @@ export function SupabaseSignupForm() {
 	} = useSupabaseSignUp()
 	const { mutate: googleSignUp, isPending: isGooglePending } =
 		useSupabaseGoogleSignIn()
+	// SITE-01: a template or Pro chosen on the landing, kept on the device
+	// for a day and carried back from email confirmation and Google sign-in.
+	const [next, setNext] = useState('/dashboard')
+	useEffect(() => {
+		const fromAddress = parseHandoff(
+			new URLSearchParams(window.location.search),
+		)
+		if (hasHandoff(fromAddress)) saveHandoff(fromAddress)
+		setNext(
+			afterSignupPath(hasHandoff(fromAddress) ? fromAddress : loadHandoff()),
+		)
+	}, [])
 	const [showPassword, setShowPassword] = useState(false)
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -109,12 +128,12 @@ export function SupabaseSignupForm() {
 		const { confirmPassword: _confirmPassword, ...userData } = values
 		void _confirmPassword
 
-		signUp(userData)
+		signUp({ ...userData, next })
 	}
 
 	// Handle Google Sign-Up
 	function handleGoogleSignUp() {
-		googleSignUp('/dashboard')
+		googleSignUp(next)
 	}
 
 	// Calculate password strength

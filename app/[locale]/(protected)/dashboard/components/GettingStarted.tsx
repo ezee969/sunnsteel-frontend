@@ -3,8 +3,10 @@
 import { Check, Compass } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 import { useWeightUnit } from '@/hooks/use-weight-unit'
+import { loadHandoff } from '@/lib/site/handoff'
 import { cn } from '@/lib/utils'
 import {
 	type GettingStartedStep,
@@ -33,6 +35,14 @@ export default function GettingStarted({
 }) {
 	const t = useTranslations('planning.gettingStarted')
 	const weightUnit = useWeightUnit()
+	// SITE-01: a template picked on the landing, for a member who skipped
+	// onboarding, opens from "Choose a routine". Read after mount: the device
+	// holds it, the server never does.
+	const [routineHref, setRoutineHref] = useState(STEP_HREF.routine)
+	useEffect(() => {
+		const { template } = loadHandoff()
+		if (template) setRoutineHref(`/routines/new?template=${template}`)
+	}, [])
 	const done = steps.filter(step => step.done).length
 	if (done === steps.length) return null
 
@@ -74,7 +84,9 @@ export default function GettingStarted({
 						<div className="min-w-0">
 							<h3 className="type-panel">
 								<Link
-									href={STEP_HREF[step.id]}
+									href={
+										step.id === 'routine' ? routineHref : STEP_HREF[step.id]
+									}
 									className={cn(
 										'underline-offset-4 hover:underline',
 										step.done ? 'text-ink-3' : 'text-foreground',

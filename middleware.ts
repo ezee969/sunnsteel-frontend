@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { isLocale, LOCALE_COOKIE, resolveLocale } from '@/i18n/config'
+import { signedInSignupTarget } from '@/lib/site/handoff'
 import {
 	rootDecision,
 	SITE_PREVIEW_COOKIE,
@@ -64,7 +65,13 @@ export async function middleware(request: NextRequest) {
 	}
 
 	if (AUTH_PAGES.has(path) && hasValidSession) {
-		return NextResponse.redirect(new URL('/dashboard', request.url))
+		// SITE-01: a landing link to sign-up (`?template=`, `?plan=pro`) goes
+		// where it meant for someone already signed in.
+		const target =
+			path === '/signup'
+				? signedInSignupTarget(request.nextUrl.searchParams)
+				: '/dashboard'
+		return NextResponse.redirect(new URL(target, request.url))
 	}
 
 	// The root is decided here, by the marker, because a static `[locale]` build

@@ -7,7 +7,7 @@ import {
 } from '@sunsteel/contracts'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 
 import HeroSection from '@/components/layout/HeroSection'
 import { InlineError } from '@/components/layout/inline-error'
@@ -23,6 +23,7 @@ import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { useBilling } from '@/lib/api/hooks/useBilling'
+import { clearHandoff } from '@/lib/site/handoff'
 import { checkoutOfferState, formatPlanPrice } from '@/lib/utils/checkout'
 import { currentPlan, PLAN_ROWS } from '@/lib/utils/plans'
 import { PRO_OUTCOMES } from '@/lib/utils/pro-offer'
@@ -40,6 +41,8 @@ const FAQ = ['cancel', 'trial', 'refund', 'charge', 'leaving'] as const
  * account's plan is the server's answer.
  */
 export default function PlansPage() {
+	// SITE-01: the landing's "Try Pro" ends here; the intent has arrived.
+	useEffect(() => clearHandoff('pro'), [])
 	const t = useTranslations('billing.plans')
 	const tOffer = useTranslations('billing.offer')
 	const locale = useLocale() as Locale

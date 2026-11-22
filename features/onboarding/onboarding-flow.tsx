@@ -15,6 +15,15 @@ import {
 	type OnboardingStepId,
 	pendingSteps,
 } from '@/lib/onboarding/steps'
+import {
+	afterOnboardingPath,
+	hasHandoff,
+	loadHandoff,
+	NO_HANDOFF,
+	parseHandoff,
+	saveHandoff,
+	type SiteHandoff,
+} from '@/lib/site/handoff'
 
 import {
 	DaysStep,
@@ -61,13 +70,22 @@ export function OnboardingFlow() {
 	const [queue, setQueue] = useState<OnboardingStep[] | null>(null)
 	const [index, setIndex] = useState(0)
 	const [days, setDays] = useState<number[]>([])
+	// SITE-01: a template or Pro chosen on the landing, from the address sign-up
+	// came back to or from this device.
+	const [handoff, setHandoff] = useState<SiteHandoff>(NO_HANDOFF)
 	const offered = useRef(false)
 
 	useEffect(() => {
 		if (!user || queue) return
 		setQueue(pendingSteps(user.onboarding))
 		setDays(readDays())
+		const fromAddress = parseHandoff(
+			new URLSearchParams(window.location.search),
+		)
+		if (hasHandoff(fromAddress)) saveHandoff(fromAddress)
+		setHandoff(hasHandoff(fromAddress) ? fromAddress : loadHandoff())
 	}, [user, queue])
+	const leave = afterOnboardingPath(handoff)
 
 	// Every step was done on an earlier visit: the version is complete.
 	useEffect(() => {
@@ -148,6 +166,7 @@ export function OnboardingFlow() {
 						key={id}
 						profile={user}
 						days={days}
+						handoff={handoff}
 						onComplete={complete}
 					/>
 				)
@@ -167,7 +186,7 @@ export function OnboardingFlow() {
 					</h1>
 					{step ? (
 						<Link
-							href="/dashboard"
+							href={leave}
 							className="type-body-sm text-ink-2 underline-offset-4 hover:underline"
 						>
 							{t('skipForNow')}
@@ -195,7 +214,9 @@ export function OnboardingFlow() {
 					</h2>
 					<p className="type-body max-w-[68ch] text-ink-2">{t('doneBody')}</p>
 					<Button asChild>
-						<Link href="/dashboard">{t('toDashboard')}</Link>
+						<Link href={leave}>
+							{handoff.pro ? t('toPlans') : t('toDashboard')}
+						</Link>
 					</Button>
 				</section>
 			) : (

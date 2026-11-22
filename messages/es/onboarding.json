@@ -12,7 +12,8 @@
 		"doneTitle": "Todo listo",
 		"doneBody": "No queda nada por configurar. Todo lo que elegiste aquí se puede cambiar en Ajustes.",
 		"toDashboard": "Ir al inicio",
-		"loading": "Cargando tu configuración"
+		"loading": "Cargando tu configuración",
+		"toPlans": "Ver la prueba de Pro"
 	},
 	"steps": {
 		"units": {
@@ -76,7 +77,9 @@
 			"other": "Elegir otra plantilla",
 			"build": "Crear mi propia rutina",
 			"buildIntro": "Las rutinas iniciales son programas de fuerza, así que para tus objetivos te conviene crear la tuya.",
-			"later": "Ahora no, ir al inicio"
+			"later": "Ahora no, ir al inicio",
+			"picked": "Elegiste {template}.",
+			"laterPro": "Ahora no, ver la prueba de Pro"
 		}
 	},
 	"notice": {
