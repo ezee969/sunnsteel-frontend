@@ -18,6 +18,8 @@ import { progressionSchemeLabel } from '@/lib/utils/routine-progression'
 import { templateDayName, templateText } from '@/lib/utils/routine-templates'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
+import { motionVars } from './site-parts'
+
 /**
  * SITE-01 §12.4: the four verbs' phone screens, each resting on the state its
  * script ends on (§7.3) -- the motion phase plays the scripts. Built from the
@@ -36,11 +38,18 @@ export async function PlanScreen() {
 		<>
 			<p className="site-screen-title">{text.name}</p>
 			<p className="site-screen-caption">{text.summary}</p>
-			<div className="site-screen-block">
+			<div
+				className="site-screen-block sx-day"
+				style={motionVars({ '--i': 0 })}
+			>
 				<p className="type-panel">{templateDayName(first, tTemplates)}</p>
 				<ul className="site-screen-rows">
-					{first.exercises.map(exercise => (
-						<li key={exercise.name} className="site-screen-row">
+					{first.exercises.map((exercise, index) => (
+						<li
+							key={exercise.name}
+							className="site-screen-row sx-row"
+							style={motionVars({ '--i': index })}
+						>
 							<span className="truncate">
 								{exerciseLabel(exercise.name, tExercises)}
 							</span>
@@ -53,8 +62,12 @@ export async function PlanScreen() {
 				<p className="site-screen-caption">{progression}</p>
 			</div>
 			<ul className="site-screen-rows">
-				{rest.map(day => (
-					<li key={day.key} className="site-screen-row">
+				{rest.map((day, index) => (
+					<li
+						key={day.key}
+						className="site-screen-row sx-day"
+						style={motionVars({ '--i': index + 1 })}
+					>
 						<span className="type-panel">
 							{templateDayName(day, tTemplates)}
 						</span>
@@ -106,7 +119,8 @@ function PlateBar({ plates }: { plates: readonly number[] }) {
 							width={width}
 							height={height}
 							rx={1}
-							className={weight >= 20 ? 'fill-foreground' : 'fill-ink-2'}
+							className={`sx-plate ${weight >= 20 ? 'fill-foreground' : 'fill-ink-2'}`}
+							style={motionVars({ '--i': index, '--dir': direction })}
 						/>
 					)
 				})
@@ -139,7 +153,11 @@ export async function TrainScreen() {
 			<p className="type-label mt-4 text-ink-3">{t('warmUp')}</p>
 			<ol className="site-screen-rows">
 				{TRAIN_EXAMPLE.ramp.map((set, index) => (
-					<li key={set.weightKg} className="site-screen-row">
+					<li
+						key={set.weightKg}
+						className="site-screen-row sx-ramp"
+						style={motionVars({ '--i': index })}
+					>
 						<span className="type-data">
 							{index === 0 ? t('bar') : kg(set.weightKg)} × {set.reps}
 						</span>
@@ -176,7 +194,7 @@ function StrengthLine({ values }: { values: readonly number[] }) {
 			))}
 			<polyline
 				points={points}
-				className="site-line fill-none stroke-foreground"
+				className="sx-line fill-none stroke-foreground"
 				strokeWidth={2}
 				strokeLinejoin="round"
 				strokeLinecap="round"
@@ -223,11 +241,15 @@ export async function EarnScreen() {
 		<>
 			<p className="site-screen-caption mt-2">{t('rankLabel')}</p>
 			<div className="flex flex-col items-center py-4 text-center">
-				<RankCrest rankId={rank.id} className="size-24" />
-				<p className="site-screen-title mt-3">{title}</p>
-				<p className="site-screen-caption mt-1 max-w-[22ch]">{description}</p>
+				<span className="sx-crest">
+					<RankCrest rankId={rank.id} className="size-24" />
+				</span>
+				<p className="site-screen-title sx-name mt-3">{title}</p>
+				<p className="site-screen-caption sx-name mt-1 max-w-[22ch]">
+					{description}
+				</p>
 			</div>
-			<div className="site-screen-block">
+			<div className="site-screen-block sx-milestone">
 				<p className="type-label text-ink-3">{t('milestone')}</p>
 				<p className="site-screen-row">
 					<span className="type-panel">{milestone.title}</span>

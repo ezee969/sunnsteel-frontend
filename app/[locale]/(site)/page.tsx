@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SiteClosing } from '@/features/site/site-closing'
 import { SiteFooter } from '@/features/site/site-footer'
 import { SiteHero } from '@/features/site/site-hero'
+import { SiteMotion } from '@/features/site/site-motion'
 import { SitePeople } from '@/features/site/site-people'
 import { SitePlans } from '@/features/site/site-plans'
 import { SiteProgress } from '@/features/site/site-progress'
@@ -67,6 +68,7 @@ export default async function LandingPage({
 				<SiteClosing />
 			</main>
 			<SiteFooter />
+			<SiteMotion />
 		</div>
 	)
 }

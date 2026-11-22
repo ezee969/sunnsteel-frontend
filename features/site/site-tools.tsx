@@ -12,7 +12,12 @@ import {
 } from '@/lib/site/landing-examples'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
-import { ExampleMark, SiteCard, SiteSectionHeading } from './site-parts'
+import {
+	ExampleMark,
+	motionVars,
+	SiteCard,
+	SiteSectionHeading,
+} from './site-parts'
 
 /**
  * SITE-01 §12.5: the tools that make a workout easier, as a bento -- the
@@ -70,8 +75,21 @@ export async function SiteTools() {
 	return (
 		<section aria-labelledby="tools-heading" className="site-section">
 			<SiteSectionHeading id="tools-heading">{t('heading')}</SiteSectionHeading>
-			<div className="site-bento">
-				<SiteCard as="article" className="site-tool site-tool-large">
+			{/* Desktop plays the four scripts as one sequence (each card's --seq is
+			    its start); phones play each card on its own. */}
+			<div
+				className="site-bento"
+				data-reveal="stagger"
+				data-play-when="0.3"
+				data-play-media="(min-width: 1024px)"
+			>
+				<SiteCard
+					as="article"
+					className="site-tool site-tool-large"
+					data-play-when="0.5"
+					data-play-media="(max-width: 1023px)"
+					style={motionVars({ '--seq': '0s' })}
+				>
 					<ToolText
 						example={example}
 						eyebrow={t('progression.eyebrow')}
@@ -111,7 +129,12 @@ export async function SiteTools() {
 									const rise =
 										index > 0 && row.weightKg > LEDGER_ROWS[index - 1].weightKg
 									return (
-										<tr key={index} data-rise={rise || undefined}>
+										<tr
+											key={index}
+											data-rise={rise || undefined}
+											className="sx-ledger"
+											style={motionVars({ '--i': index })}
+										>
 											<td className="type-data">{index + 1}</td>
 											<td className="type-data">{kg(row.weightKg)}</td>
 											<td className="type-data">
@@ -144,7 +167,13 @@ export async function SiteTools() {
 					</div>
 				</SiteCard>
 
-				<SiteCard as="article" className="site-tool">
+				<SiteCard
+					as="article"
+					className="site-tool"
+					data-play-when="0.5"
+					data-play-media="(max-width: 1023px)"
+					style={motionVars({ '--seq': '3.8s' })}
+				>
 					<ToolText
 						example={example}
 						eyebrow={t('rest.eyebrow')}
@@ -152,7 +181,7 @@ export async function SiteTools() {
 						body={t('rest.body')}
 					/>
 					<div aria-hidden="true" className="site-mock site-rest">
-						<div className="site-notification">
+						<div className="site-notification sx-notify">
 							<Bell className="mt-0.5 size-4 shrink-0" />
 							<div className="min-w-0">
 								<p className="flex justify-between gap-2 text-[11px] text-ink-3">
@@ -166,13 +195,29 @@ export async function SiteTools() {
 							</div>
 						</div>
 						<div className="flex items-center gap-3">
-							<span className="relative h-[3px] flex-1 bg-rule" />
-							<span className="type-data">0:00</span>
+							<span className="relative h-[3px] flex-1 bg-rule">
+								<span className="site-rest-fill sx-drain" />
+							</span>
+							<span
+								className="type-data"
+								data-count-from="90"
+								data-count-to="0"
+								data-count-ms="2400"
+								data-count-delay="200"
+							>
+								0:00
+							</span>
 						</div>
 					</div>
 				</SiteCard>
 
-				<SiteCard as="article" className="site-tool">
+				<SiteCard
+					as="article"
+					className="site-tool"
+					data-play-when="0.5"
+					data-play-media="(max-width: 1023px)"
+					style={motionVars({ '--seq': '7s' })}
+				>
 					<ToolText
 						example={example}
 						eyebrow={t('supersets.eyebrow')}
@@ -190,7 +235,11 @@ export async function SiteTools() {
 						</p>
 						<ul className="site-superset">
 							{['Barbell Curl', 'Tricep Pushdown'].map((name, index) => (
-								<li key={name} className="site-screen-row">
+								<li
+									key={name}
+									className="site-screen-row sx-round"
+									style={motionVars({ '--i': index })}
+								>
 									<span className="type-data text-ink-3">A{index + 1}</span>
 									<span className="flex-1 truncate">
 										{exerciseLabel(name, tExercises)}
@@ -202,7 +251,13 @@ export async function SiteTools() {
 					</div>
 				</SiteCard>
 
-				<SiteCard as="article" className="site-tool">
+				<SiteCard
+					as="article"
+					className="site-tool"
+					data-play-when="0.5"
+					data-play-media="(max-width: 1023px)"
+					style={motionVars({ '--seq': '8.4s' })}
+				>
 					<ToolText
 						example={example}
 						eyebrow={t('swap.eyebrow')}
@@ -210,7 +265,7 @@ export async function SiteTools() {
 						body={t('swap.body')}
 					/>
 					<div aria-hidden="true" className="site-mock">
-						<div className="site-screen-row">
+						<div className="site-screen-row sx-swap">
 							<div className="min-w-0">
 								<p className="type-panel">
 									{exerciseLabel('Hack Squat', tExercises)}

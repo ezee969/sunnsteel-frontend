@@ -1654,7 +1654,9 @@
 }
 .site-ledger-table {
   width: 100%;
-  border-collapse: collapse;
+  /* Separate borders belong to their cells, so a row's rule arrives with it. */
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
 }
 .site-ledger-table th {
@@ -2280,5 +2282,403 @@
   .site-footer-bottom {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* §33.9 motion on the public site. Everything that moves waits for the
+   runtime (features/site/site-motion.tsx) to set `site-anim` on <html>: with
+   JavaScript and neither reduced-motion source. Layouts that need JavaScript
+   (the stages, the fixed bar) wait for `site-js`. Without either, the page
+   is the final state the server sent. */
+@keyframes site-rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes site-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes site-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise, 12px));
+  }
+}
+@keyframes site-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-slide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@keyframes site-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+@keyframes site-plate {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--dir, 1) * 40px));
+  }
+}
+@keyframes site-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes site-unveil {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes site-drain {
+  from {
+    transform: scaleX(1);
+  }
+}
+
+/* Section headings: each line rises from behind its mask, then the rule
+   draws under it. */
+.site-w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.site-w > span {
+  display: inline-block;
+}
+.site-heading {
+  --line-gap: 90ms;
+}
+.site-heading::after {
+  transform-origin: left center;
+}
+.site-anim .site-heading:not([data-in]) .site-w > span {
+  transform: translateY(110%);
+}
+.site-anim .site-heading:not([data-in])::after {
+  transform: scaleX(0);
+}
+.site-anim .site-heading[data-in] .site-w > span {
+  animation: site-rise 900ms var(--ease-standard) both;
+  animation-delay: calc(var(--line, 0) * var(--line-gap));
+}
+.site-anim .site-heading[data-in]::after {
+  animation: site-rule 480ms var(--ease-standard) both;
+  animation-delay: calc(var(--lines, 1) * var(--line-gap) + 600ms);
+}
+
+/* Entrances: one element, or a list whose children arrive in turn. */
+.site-anim [data-reveal='up']:not([data-in]) {
+  opacity: 0;
+  transform: translateY(var(--rise, 12px));
+}
+.site-anim [data-reveal='up'][data-in] {
+  animation: site-up var(--dur, 600ms) var(--ease-standard) both;
+  animation-delay: var(--delay, 0ms);
+}
+.site-anim [data-reveal='stagger']:not([data-in]) > * {
+  opacity: 0;
+  transform: translateY(var(--rise, 24px));
+}
+.site-anim [data-reveal='stagger'][data-in] > * {
+  animation: site-up var(--dur, 700ms) var(--ease-standard) both;
+  animation-delay: calc(var(--i, 0) * var(--gap, 120ms));
+}
+
+/* The top bar (§33.6): fixed once JavaScript runs, Night over a Night
+   region, then the page's ground with its rule drawn under it. */
+.site-js .site-bar {
+  position: fixed;
+}
+.site-bar::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--rule);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+/* Scrolled, the bar takes a ground: the Night one over a Night region, the
+   page's elsewhere, so nothing reads through it. */
+.site-bar[data-scrolled],
+.site-bar[data-solid] {
+  background: var(--background);
+}
+.site-bar[data-solid]::after {
+  transform: none;
+}
+.site-anim .site-bar {
+  transition: background-color var(--motion-base) var(--ease-standard);
+}
+.site-anim .site-bar :is(a, button, span) {
+  transition: color var(--motion-base) var(--ease-standard);
+}
+.site-anim .site-bar[data-solid]::after {
+  transition: transform 240ms var(--ease-standard);
+}
+
+/* §12.4 the four verbs, stacked: each panel's phone rises and plays its
+   script when it is in view, its callout following. */
+.site-anim .site-verb:not([data-in]) .site-verb-text {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.site-anim .site-verb[data-in] .site-verb-text {
+  animation: site-up 600ms var(--ease-standard) both;
+}
+.site-anim .site-verb-stage:not([data-play]) :is(.site-device, .site-callout) {
+  opacity: 0;
+}
+.site-anim .site-verb-stage[data-play] .site-device {
+  --rise: 32px;
+  animation: site-up 700ms var(--ease-standard) both;
+}
+.site-anim .site-verb-stage[data-play] .site-callout {
+  --rise: 16px;
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: 1900ms;
+}
+
+/* The desktop stage: one phone held at the centre while the panels pass. */
+.site-verbs-stage {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .site-js .site-verbs-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+    margin-top: clamp(48px, 6vw, 96px);
+  }
+  .site-js .site-verbs {
+    grid-column: 1 / 7;
+    grid-row: 1;
+    margin-top: 0;
+  }
+  .site-js .site-verb {
+    display: flex;
+    align-items: center;
+  }
+  .site-js .site-verb-stage {
+    display: none;
+  }
+  .site-js .site-verbs-stage {
+    position: sticky;
+    top: calc(50svh - 330px);
+    grid-column: 7 / 13;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+  }
+  .site-js .site-verb[data-dim] .site-verb-text :is(p, h3, a, span) {
+    color: var(--ink-3);
+  }
+  .site-anim .site-verb .site-verb-text :is(p, h3, a, span) {
+    transition: color var(--motion-base) var(--ease-standard);
+  }
+}
+.site-rail {
+  position: relative;
+  display: grid;
+  grid-template-rows: repeat(4, 56px);
+  border-left: 1px solid var(--rule);
+}
+.site-rail-tick {
+  align-self: center;
+  width: 8px;
+  height: 1px;
+  background: var(--rule);
+}
+.site-rail-mark {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  height: 56px;
+  width: 8px;
+}
+.site-rail-mark::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  background: var(--foreground);
+}
+.site-anim .site-rail-mark {
+  transition: transform var(--motion-slow) var(--ease-standard);
+}
+.site-verbs-stage .site-device {
+  display: flex;
+  flex-direction: column;
+}
+.site-verbs-stage .site-device-screen {
+  position: relative;
+  flex: 1;
+  padding: 0;
+}
+.site-stage-screen {
+  position: absolute;
+  inset: 18px 0 0;
+  opacity: 0;
+  transform: translateY(24px);
+}
+.site-stage-screen[data-state='in'] {
+  opacity: 1;
+  transform: none;
+}
+.site-stage-screen[data-state='past'] {
+  transform: translateY(-24px);
+}
+.site-anim .site-stage-screen {
+  transition:
+    opacity 300ms var(--ease-exit),
+    transform 300ms var(--ease-exit);
+}
+/* The incoming screen waits for most of the outgoing one's exit, so two
+   screens of text are never read over each other. */
+.site-anim .site-stage-screen[data-state='in'] {
+  transition:
+    opacity 500ms var(--ease-standard) 200ms,
+    transform 500ms var(--ease-standard) 200ms;
+}
+.site-stage-callout {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.site-stage-callout[data-state='in'] {
+  opacity: 1;
+  transform: none;
+}
+.site-anim .site-stage-callout {
+  transition:
+    opacity 200ms var(--ease-exit),
+    transform 200ms var(--ease-exit);
+}
+.site-anim .site-stage-callout[data-state='in'] {
+  transition:
+    opacity 500ms var(--ease-standard) 150ms,
+    transform 500ms var(--ease-standard) 150ms;
+}
+
+/* The verbs' scripts (each under 5 seconds), played by `data-play`. */
+.site-anim [data-play] .sx-day {
+  animation: site-slide 400ms var(--ease-standard) both;
+  animation-delay: calc(200ms + var(--i, 0) * 160ms);
+}
+.site-anim [data-play] .sx-row {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(500ms + var(--i, 0) * 90ms);
+}
+.site-anim [data-play] .sx-plate {
+  transform-box: fill-box;
+  animation: site-plate 450ms var(--ease-standard) both;
+  animation-delay: calc(300ms + var(--i, 0) * 450ms);
+}
+.site-anim [data-play] .sx-ramp {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(1400ms + var(--i, 0) * 280ms);
+}
+.site-anim [data-play] .sx-line {
+  stroke-dasharray: 1;
+  animation: site-draw 1600ms var(--ease-standard) both;
+  animation-delay: 200ms;
+}
+.site-anim [data-play] .site-map-region {
+  animation: site-fade 400ms var(--ease-standard) both;
+  animation-delay: calc(1600ms + var(--band, 0) * 250ms);
+}
+.site-anim [data-play] .sx-crest {
+  display: inline-block;
+  animation: site-unveil 900ms var(--ease-standard) both;
+  animation-delay: 200ms;
+}
+.site-anim [data-play] .sx-name {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: 1000ms;
+}
+.site-anim [data-play] .sx-milestone {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: 1500ms;
+}
+
+/* §12.5 the tools bento: the cards arrive in turn (on phones, each as it
+   comes into view), then the four scripts play one at a time. */
+.site-bento > :nth-child(2) {
+  --i: 1;
+}
+.site-bento > :nth-child(3) {
+  --i: 2;
+}
+.site-bento > :nth-child(4) {
+  --i: 3;
+}
+.site-rest-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--foreground);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-ledger > td {
+  animation: site-fade 250ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 600ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-drain {
+  animation: site-drain 2400ms linear both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-notify {
+  animation: site-drop 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 2700ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-round {
+  animation: site-slide 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 500ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-swap {
+  animation: site-slide 450ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+@media (max-width: 1023px) {
+  .site-tool {
+    --seq: 0s !important;
+  }
+  /* Phones: each card's own entrance, not the grid's stagger. */
+  .site-anim .site-bento[data-reveal='stagger']:not([data-in]) > * {
+    opacity: 1;
+    transform: none;
+  }
+  .site-anim .site-bento[data-reveal='stagger'][data-in] > * {
+    animation: none;
+  }
+  .site-anim .site-tool:not([data-play]) {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .site-anim .site-tool[data-play] {
+    --rise: 24px;
+    animation: site-up 700ms var(--ease-standard) both;
   }
 }

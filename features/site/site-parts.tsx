@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { type CSSProperties, Fragment, type ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -14,14 +14,34 @@ export function SiteSectionHeading({
 	className,
 }: {
 	id: string
-	children: ReactNode
+	children: string
 	className?: string
 }) {
 	return (
-		<h2 id={id} className={cn('type-site-heading site-heading', className)}>
-			{children}
+		<h2
+			id={id}
+			data-reveal=""
+			className={cn('type-site-heading site-heading', className)}
+		>
+			<HeadingWords text={children} />
 		</h2>
 	)
+}
+
+/**
+ * A heading's words, each behind its own mask so its line can rise into
+ * place (§33.9); the motion runtime numbers them by line. Read as one string.
+ */
+export function HeadingWords({ text }: { text: string }) {
+	const words = text.split(' ')
+	return words.map((word, index) => (
+		<Fragment key={index}>
+			<span className="site-w">
+				<span>{word}</span>
+			</span>
+			{index < words.length - 1 ? ' ' : null}
+		</Fragment>
+	))
 }
 
 export function ExampleMark({ label }: { label: string }) {
@@ -65,10 +85,23 @@ export function SiteCard({
 	children,
 	className,
 	as: Tag = 'div',
+	...rest
 }: {
 	children: ReactNode
 	className?: string
 	as?: 'div' | 'article' | 'section' | 'li'
+	style?: CSSProperties
+	'data-play-when'?: string
+	'data-play-media'?: string
+	'data-reveal'?: string
 }) {
-	return <Tag className={cn('site-card', className)}>{children}</Tag>
+	return (
+		<Tag className={cn('site-card', className)} {...rest}>
+			{children}
+		</Tag>
+	)
 }
+
+/** Custom properties for a script's timing (`--i`, `--dir`, `--seq`...). */
+export const motionVars = (values: Record<string, string | number>) =>
+	values as CSSProperties

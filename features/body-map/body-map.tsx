@@ -2,7 +2,7 @@
 
 import type { MuscleGroup } from '@sunsteel/contracts'
 import { useLocale, useTranslations } from 'next-intl'
-import { type ReactNode, useState } from 'react'
+import { type CSSProperties, type ReactNode, useState } from 'react'
 
 import type { Locale } from '@/i18n/config'
 import { intlLocale, numberFormatter } from '@/i18n/date-locale'
@@ -147,8 +147,14 @@ export function BodyMapFigures({
 							d={d}
 							className={cn(
 								FILL[bodyMapLevel(sets.get(muscle) ?? 0)],
-								'stroke-surface-sunk',
+								'site-map-region stroke-surface-sunk',
 							)}
+							// The site's script shades the figure band by band.
+							style={
+								{
+									'--band': bodyMapLevel(sets.get(muscle) ?? 0),
+								} as CSSProperties
+							}
 							strokeWidth={1}
 							strokeLinejoin="round"
 							vectorEffect="non-scaling-stroke"

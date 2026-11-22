@@ -19,6 +19,7 @@ import { templateText } from '@/lib/utils/routine-templates'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
 import { SitePhoneFrame, SiteSectionHeading } from './site-parts'
+import { SiteVerbsStage } from './site-verbs-stage'
 import {
 	EarnScreen,
 	MeasureScreen,
@@ -80,45 +81,53 @@ export async function SiteVerbs() {
 
 	return (
 		<section aria-labelledby="verbs-heading" className="site-section">
-			<SiteSectionHeading id="verbs-heading" className="site-verbs-heading">
-				{VERBS.map(({ key }) => (
-					<span key={key} className="site-word">
-						{t(`words.${key}`)}{' '}
-					</span>
-				))}
-			</SiteSectionHeading>
-			<ol className="site-verbs">
-				{VERBS.map(({ key, href, Screen }, index) => (
-					<li key={key} className="site-verb">
-						<div className="site-verb-text">
-							<p aria-hidden="true" className="site-verb-word">
-								<span className="type-data text-ink-3">
-									{String(index + 1).padStart(2, '0')}
-								</span>
-								<span className="type-page">{t(`words.${key}`)}</span>
-							</p>
-							<h3 className="type-panel site-verb-title">
-								{t(`${key}.title`)}
-							</h3>
-							<p className="type-site-lead site-body">
-								{t(`${key}.body`, { ranks: LANDING_FACTS.ranks })}
-							</p>
-							<Link href={href} className="type-action site-link">
-								{t(`${key}.link`)}
-								<ArrowRight className="size-4" aria-hidden />
-							</Link>
-						</div>
-						<div className="site-verb-stage">
-							<SitePhoneFrame example={tMock('example')}>
-								<Screen />
-							</SitePhoneFrame>
-							<p aria-hidden="true" className="site-callout">
-								{callouts[key]}
-							</p>
-						</div>
-					</li>
-				))}
-			</ol>
+			<SiteSectionHeading id="verbs-heading">{t('heading')}</SiteSectionHeading>
+			<div className="site-verbs-grid">
+				<ol className="site-verbs">
+					{VERBS.map(({ key, href, Screen }, index) => (
+						<li
+							key={key}
+							className="site-verb"
+							data-verb-panel=""
+							data-reveal=""
+						>
+							<div className="site-verb-text">
+								<p aria-hidden="true" className="site-verb-word">
+									<span className="type-data text-ink-3">
+										{String(index + 1).padStart(2, '0')}
+									</span>
+									<span className="type-page">{t(`words.${key}`)}</span>
+								</p>
+								<h3 className="type-panel site-verb-title">
+									{t(`${key}.title`)}
+								</h3>
+								<p className="type-site-lead site-body">
+									{t(`${key}.body`, { ranks: LANDING_FACTS.ranks })}
+								</p>
+								<Link href={href} className="type-action site-link">
+									{t(`${key}.link`)}
+									<ArrowRight className="size-4" aria-hidden />
+								</Link>
+							</div>
+							<div className="site-verb-stage" data-play-when="0.5">
+								<SitePhoneFrame example={tMock('example')}>
+									<Screen />
+								</SitePhoneFrame>
+								<p aria-hidden="true" className="site-callout">
+									{callouts[key]}
+								</p>
+							</div>
+						</li>
+					))}
+				</ol>
+				<SiteVerbsStage
+					example={tMock('example')}
+					screens={VERBS.map(({ key, Screen }) => (
+						<Screen key={key} />
+					))}
+					callouts={VERBS.map(({ key }) => callouts[key])}
+				/>
+			</div>
 		</section>
 	)
 }
