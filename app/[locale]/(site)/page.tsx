@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
+import { SiteClosing } from '@/features/site/site-closing'
+import { SiteFooter } from '@/features/site/site-footer'
 import { SiteHero } from '@/features/site/site-hero'
 import { SitePeople } from '@/features/site/site-people'
+import { SitePlans } from '@/features/site/site-plans'
 import { SiteProgress } from '@/features/site/site-progress'
 import { SiteProofBand } from '@/features/site/site-proof-band'
+import { SiteQuestions } from '@/features/site/site-questions'
 import { SiteRanks } from '@/features/site/site-ranks'
 import { SiteTemplates } from '@/features/site/site-templates'
 import { SiteTools } from '@/features/site/site-tools'
@@ -58,7 +62,11 @@ export default async function LandingPage({
 				<SiteRanks />
 				<SiteTemplates />
 				<SitePeople />
+				<SitePlans />
+				<SiteQuestions />
+				<SiteClosing />
 			</main>
+			<SiteFooter />
 		</div>
 	)
 }

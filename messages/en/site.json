@@ -241,5 +241,126 @@
 			"title": "You choose who sees each part",
 			"body": "{count} parts of your profile, each set to Everyone, Followers or Only me. Block anyone, report anything, and delete your account or take your data with you whenever you want."
 		}
+	},
+	"plans": {
+		"eyebrow": "Plans",
+		"heading": "Free to train. Pro to plan further.",
+		"free": {
+			"name": "Free",
+			"note": "No card needed",
+			"lines": {
+				"log": "Log every set, with rest alerts",
+				"progression": "Automatic progression, warm-ups and plates",
+				"record": "History, records, milestones and ranks",
+				"window": "Strength trends for {days} days and muscle history for {weeks} weeks",
+				"social": "Everything social, and messages",
+				"data": "Export your data or delete your account at any time"
+			},
+			"limits": "Up to {versions} routine versions, {goals} goals and {gyms, plural, one {# gym} other {# gyms}}",
+			"action": "Start free"
+		},
+		"pro": {
+			"name": "Pro",
+			"price": "{price} a month",
+			"trial": "First {days} days free, once per account",
+			"cancel": "Cancel any time; Pro lasts until the end of what you paid.",
+			"paid": "Paid with Mercado Pago",
+			"ai": "Includes up to {drafts} routine drafts and {reviews} training reviews a month",
+			"action": "Try Pro free for {days} days",
+			"priceSr": "{price} a month, first {days} days free"
+		},
+		"compare": "See the full comparison"
+	},
+	"questions": {
+		"heading": "Questions",
+		"contact": "Something else? Write to <mail>{email}</mail>.",
+		"items": {
+			"free": {
+				"question": "Is it free?",
+				"answer": "Yes. Logging, progression, your history, records, ranks and everything social are free, with no card. Pro is optional: {price} a month, with the first {days} days free once per account."
+			},
+			"install": {
+				"question": "Do I need to download anything?",
+				"answer": "No app store. Sunnsteel runs in your browser and installs from it: on iPhone, tap Share in Safari and choose Add to Home Screen; on Android, choose Install app in your browser's menu; on a computer, use the install icon in the address bar. On iPhone, notifications need the installed app."
+			},
+			"offline": {
+				"question": "Does it work offline?",
+				"answer": "If the signal drops mid-workout, keep logging: your sets are sent when it comes back, as long as the app stays open, and it tells you when changes are waiting."
+			},
+			"beginners": {
+				"question": "Is it for beginners?",
+				"answer": "Yes. There's a beginner program, a first-run recommendation based on your days and goals, and warm-ups and plates worked out for you. It grows with you to blocks and deloads with Pro."
+			},
+			"languages": {
+				"question": "Which languages?",
+				"answer": "English and Spanish. You can switch at any time."
+			},
+			"pro": {
+				"question": "What does Pro add?",
+				"answer": "Planning ahead with 8-week blocks, training blocks and deloads; comparisons, training signals and reviews; your full history; and routine drafts from a description. <link>See Free and Pro side by side</link>."
+			},
+			"cancel": {
+				"question": "How do I cancel?",
+				"answer": "From Settings, in Account, or with the <cancellation>cancellation button</cancellation> without signing in. Pro lasts until the end of what you paid, and nothing is deleted. Within {revocationDays} days of buying, you can also use the <revocation>revocation button</revocation>."
+			},
+			"privacy": {
+				"question": "Who sees my profile and my workouts?",
+				"answer": "You choose, for each of {count} parts of your profile: everyone, your followers, or only you. You can block anyone and report anything."
+			},
+			"messages": {
+				"question": "Are messages private?",
+				"answer": "They're one to one and stored on our servers; they're not end-to-end encrypted. A moderator reads a message only if it's reported, and then only that message and up to {context} before it, as the person who reported it saw them."
+			},
+			"ai": {
+				"question": "What happens to what I give the AI?",
+				"answer": "Only Pro's routine drafts and training reviews use it. What you write, or the workouts you choose, go to Anthropic to write the answer and aren't stored by us; we keep only that a request was made, to count your month. Answers describe; they don't diagnose."
+			},
+			"data": {
+				"question": "Can I take my data or delete my account?",
+				"answer": "Yes. Download everything as one file from Settings whenever you want, and deleting your account is immediate and complete."
+			},
+			"medical": {
+				"question": "Is this medical advice?",
+				"answer": "No. Sunnsteel records and describes your training. For pain, injury or health questions, see a professional."
+			}
+		}
+	},
+	"closing": {
+		"heading": "Start carving.",
+		"subline": "Free to start, in your browser, in English or Spanish.",
+		"createAccount": "Create a free account",
+		"signIn": "Sign in",
+		"install": "How to install",
+		"qr": {
+			"title": "Open it on your phone",
+			"hint": "Scan it with your camera",
+			"alt": "QR code that opens {url}"
+		},
+		"helper": {
+			"title": "Install Sunnsteel on this phone",
+			"install": "Install Sunnsteel",
+			"iosSteps": "1. Tap Share in Safari's toolbar. 2. Choose Add to Home Screen.",
+			"iosNote": "Notifications work once it's installed.",
+			"dismiss": "Not now"
+		}
+	},
+	"footer": {
+		"navLabel": "Footer",
+		"tagline": "Statues aren't born. They're carved.",
+		"columns": {
+			"product": "Product",
+			"useCases": "Use cases",
+			"help": "Help",
+			"legal": "Legal"
+		},
+		"links": {
+			"questions": "Questions",
+			"install": "Install the app",
+			"contact": "Contact",
+			"terms": "Terms",
+			"privacy": "Privacy",
+			"refunds": "Refunds"
+		},
+		"copyright": "© {year} Sunnsteel"
 	}
 }

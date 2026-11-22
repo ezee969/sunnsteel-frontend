@@ -2052,3 +2052,233 @@
     padding-inline: 6px;
   }
 }
+
+/* §12.10 Free and Pro: equal cards, nothing coloured to rank them. */
+.site-plans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: clamp(40px, 5vw, 72px) auto 0;
+}
+.site-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+}
+.site-plan-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.site-plan-lines {
+  display: flex;
+  flex-direction: column;
+}
+.site-plan-lines li {
+  display: flex;
+  gap: 12px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--rule-faint);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.site-plan-action {
+  margin-top: auto;
+  align-self: stretch;
+}
+.site-plans-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  max-width: 960px;
+  margin: 24px auto 0;
+}
+.site-plans-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  color: var(--ink-3);
+}
+.site-plans-legal a,
+.site-inline-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-plans-legal a:hover,
+.site-inline-link:hover {
+  color: var(--foreground);
+}
+.site-inline-link {
+  color: var(--foreground);
+}
+
+/* §12.11 questions: the heading sticky beside the list from 1024. */
+.site-questions {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 32px;
+}
+.site-questions-head {
+  grid-column: 1 / 5;
+  align-self: start;
+  position: sticky;
+  top: 32px;
+}
+.site-questions-list {
+  grid-column: 5 / 13;
+  border-top: 1px solid var(--rule);
+}
+.site-questions-list [data-slot='accordion-item'] {
+  scroll-margin-top: 24px;
+}
+
+/* §12.12 the closing band: a Night region over its clip. */
+.site-closing {
+  position: relative;
+  overflow: hidden;
+  margin-top: clamp(96px, 12vw, 192px);
+}
+.site-closing-inner {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: center;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  min-height: 560px;
+  margin-inline: auto;
+  padding: 96px var(--site-gutter);
+}
+.site-closing-text {
+  grid-column: 1 / 8;
+}
+.site-closing .site-lead {
+  margin-top: 24px;
+}
+.site-qr {
+  grid-column: 9 / 13;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 300px;
+  justify-self: end;
+  padding: 24px;
+}
+.site-qr-code {
+  width: 168px;
+  height: 168px;
+}
+
+/* §12.13 the footer: the page's theme under a rule. */
+.site-footer {
+  border-top: 1px solid var(--rule);
+}
+.site-footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 40px;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: 64px var(--site-gutter) 40px;
+}
+.site-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.site-footer-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+.site-footer-nav ul {
+  margin-top: 8px;
+}
+.site-footer-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.site-footer-link:hover {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: 20px var(--site-gutter) 32px;
+  border-top: 1px solid var(--rule-faint);
+}
+.site-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+@media (max-width: 1023px) {
+  .site-questions-head,
+  .site-questions-list {
+    grid-column: 1 / -1;
+    position: static;
+  }
+  .site-closing-inner {
+    text-align: center;
+  }
+  .site-closing-text {
+    grid-column: 1 / -1;
+  }
+  .site-closing .site-lead {
+    margin-inline: auto;
+  }
+  .site-closing .site-actions {
+    justify-content: center;
+  }
+  .site-qr {
+    display: none;
+  }
+  .site-footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-footer-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .site-plans {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-plan {
+    padding: 24px 20px;
+  }
+  .site-closing-inner {
+    min-height: 0;
+    padding-block: 72px;
+  }
+  .site-footer-nav {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-footer-link {
+    min-height: 44px;
+  }
+  .site-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

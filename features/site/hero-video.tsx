@@ -6,20 +6,32 @@ import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * SITE-01 §12.2 and §33.7: the hero's background footage. The poster is the
- * LCP element and is always rendered; the clip is requested only after the
- * page's `load`, when the browser is idle, and never under either
- * reduced-motion source or `Save-Data`. Phones get their own light cut. The
- * scrim is baked into every file (§33.4), so nothing is laid over it here.
+ * SITE-01 §12.2, §12.12 and §33.7: a band's background footage. The poster
+ * is always rendered (the hero's is the LCP element); the clip is requested
+ * only after the page's `load`, when the browser is idle -- and, for the
+ * closing band, once the band is within a screen of the viewport -- never
+ * under either reduced-motion source or `Save-Data`. Phones get the hero's
+ * light cut and no closing clip at all. The scrim is baked into every file
+ * (§33.4), so nothing is laid over it here.
  */
-const SOURCES = {
-	phone: {
-		webm: '/site/video/hero-phone.webm',
-		mp4: '/site/video/hero-phone.mp4',
+type Cut = { webm: string; mp4: string }
+const CUTS: Record<'hero' | 'closing', { phone: Cut | null; desktop: Cut }> = {
+	hero: {
+		phone: {
+			webm: '/site/video/hero-phone.webm',
+			mp4: '/site/video/hero-phone.mp4',
+		},
+		desktop: {
+			webm: '/site/video/hero-desktop.webm',
+			mp4: '/site/video/hero-desktop.mp4',
+		},
 	},
-	desktop: {
-		webm: '/site/video/hero-desktop.webm',
-		mp4: '/site/video/hero-desktop.mp4',
+	closing: {
+		phone: null,
+		desktop: {
+			webm: '/site/video/closing-desktop.webm',
+			mp4: '/site/video/closing-desktop.mp4',
+		},
 	},
 }
 
@@ -48,9 +60,11 @@ function whenIdle(run: () => void) {
 export function HeroVideo({
 	pauseLabel,
 	playLabel,
+	cut = 'hero',
 }: {
 	pauseLabel: string
 	playLabel: string
+	cut?: 'hero' | 'closing'
 }) {
 	const video = useRef<HTMLVideoElement>(null)
 	const [enabled, setEnabled] = useState(false)
@@ -59,20 +73,39 @@ export function HeroVideo({
 
 	useEffect(() => {
 		if (prefersStill()) return
-		whenIdle(() => setEnabled(true))
-	}, [])
+		const phone = window.matchMedia(PHONE_QUERY).matches
+		if (phone && !CUTS[cut].phone) return
+		if (cut === 'hero') {
+			whenIdle(() => setEnabled(true))
+			return
+		}
+		const element = video.current
+		if (!element) return
+		const near = new IntersectionObserver(
+			entries => {
+				if (!entries.some(entry => entry.isIntersecting)) return
+				near.disconnect()
+				whenIdle(() => setEnabled(true))
+			},
+			{ rootMargin: '100% 0px' },
+		)
+		near.observe(element)
+		return () => near.disconnect()
+	}, [cut])
 
 	useEffect(() => {
 		const element = video.current
 		if (!enabled || !element) return
-		const cut = window.matchMedia(PHONE_QUERY).matches
-			? SOURCES.phone
-			: SOURCES.desktop
+		const sources = CUTS[cut]
+		const chosen =
+			window.matchMedia(PHONE_QUERY).matches && sources.phone
+				? sources.phone
+				: sources.desktop
 		element.src = element.canPlayType('video/webm; codecs="av01.0.05M.08"')
-			? cut.webm
-			: cut.mp4
+			? chosen.webm
+			: chosen.mp4
 		element.play().catch(() => setPaused(true))
-	}, [enabled])
+	}, [enabled, cut])
 
 	const toggle = () => {
 		const element = video.current

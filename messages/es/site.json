@@ -241,5 +241,126 @@
 			"title": "Tú eliges quién ve cada parte",
 			"body": "{count} partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea a quien quieras, denuncia lo que haga falta, y borra tu cuenta o llévate tus datos cuando quieras."
 		}
+	},
+	"plans": {
+		"eyebrow": "Planes",
+		"heading": "Gratis para entrenar. Pro para planificar más lejos.",
+		"free": {
+			"name": "Free",
+			"note": "Sin tarjeta",
+			"lines": {
+				"log": "Registra cada serie, con avisos de descanso",
+				"progression": "Progresión automática, calentamientos y discos",
+				"record": "Historial, récords, logros y rangos",
+				"window": "Tendencias de fuerza de {days} días e historial muscular de {weeks} semanas",
+				"social": "Todo lo social y los mensajes",
+				"data": "Exporta tus datos o borra tu cuenta cuando quieras"
+			},
+			"limits": "Hasta {versions} versiones de rutina, {goals} objetivos y {gyms, plural, one {# gimnasio} other {# gimnasios}}",
+			"action": "Empezar gratis"
+		},
+		"pro": {
+			"name": "Pro",
+			"price": "{price} por mes",
+			"trial": "Los primeros {days} días gratis, una vez por cuenta",
+			"cancel": "Cancela cuando quieras; Pro dura hasta el final de lo que pagaste.",
+			"paid": "Pago con Mercado Pago",
+			"ai": "Incluye hasta {drafts} borradores de rutina y {reviews} revisiones de entrenamiento por mes",
+			"action": "Probar Pro {days} días gratis",
+			"priceSr": "{price} por mes, los primeros {days} días gratis"
+		},
+		"compare": "Ver la comparación completa"
+	},
+	"questions": {
+		"heading": "Preguntas",
+		"contact": "¿Otra cosa? Escríbenos a <mail>{email}</mail>.",
+		"items": {
+			"free": {
+				"question": "¿Es gratis?",
+				"answer": "Sí. Registrar, la progresión, tu historial, los récords, los rangos y todo lo social son gratis, sin tarjeta. Pro es opcional: {price} por mes, con los primeros {days} días gratis una vez por cuenta."
+			},
+			"install": {
+				"question": "¿Tengo que descargar algo?",
+				"answer": "No hay tienda de apps. Sunnsteel funciona en tu navegador y se instala desde ahí: en iPhone, toca Compartir en Safari y elige Agregar a pantalla de inicio; en Android, elige Instalar app en el menú del navegador; en una computadora, usa el ícono de instalar de la barra de direcciones. En iPhone, las notificaciones necesitan la app instalada."
+			},
+			"offline": {
+				"question": "¿Funciona sin conexión?",
+				"answer": "Si se corta la señal en pleno entrenamiento, sigue registrando: tus series se envían cuando vuelve, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
+			},
+			"beginners": {
+				"question": "¿Sirve si recién empiezo?",
+				"answer": "Sí. Hay un programa para principiantes, una recomendación inicial según tus días y objetivos, y calentamientos y discos calculados por ti. Crece contigo hasta bloques y descargas con Pro."
+			},
+			"languages": {
+				"question": "¿En qué idiomas está?",
+				"answer": "Español e inglés. Puedes cambiar cuando quieras."
+			},
+			"pro": {
+				"question": "¿Qué agrega Pro?",
+				"answer": "Planificar con bloques de 8 semanas, bloques de entrenamiento y descargas; comparaciones, señales de entrenamiento y revisiones; tu historial completo; y borradores de rutina a partir de una descripción. <link>Ver Free y Pro lado a lado</link>."
+			},
+			"cancel": {
+				"question": "¿Cómo cancelo?",
+				"answer": "Desde Ajustes, en Cuenta, o con el <cancellation>botón de baja</cancellation> sin iniciar sesión. Pro dura hasta el final de lo que pagaste y no se borra nada. Dentro de los {revocationDays} días de la compra, también puedes usar el <revocation>botón de arrepentimiento</revocation>."
+			},
+			"privacy": {
+				"question": "¿Quién ve mi perfil y mis entrenamientos?",
+				"answer": "Tú eliges, para cada una de las {count} partes de tu perfil: todos, tus seguidores o solo tú. Puedes bloquear a quien quieras y denunciar lo que haga falta."
+			},
+			"messages": {
+				"question": "¿Los mensajes son privados?",
+				"answer": "Son uno a uno y se guardan en nuestros servidores; no tienen cifrado de extremo a extremo. Un moderador lee un mensaje solo si lo denuncian, y en ese caso solo ese mensaje y hasta {context} anteriores, como los vio quien lo denunció."
+			},
+			"ai": {
+				"question": "¿Qué pasa con lo que le doy a la IA?",
+				"answer": "Solo la usan los borradores de rutina y las revisiones de entrenamiento de Pro. Lo que escribes, o los entrenamientos que eliges, van a Anthropic para escribir la respuesta y no los guardamos; solo registramos que hubo una solicitud, para contar tu mes. Las respuestas describen; no diagnostican."
+			},
+			"data": {
+				"question": "¿Puedo llevarme mis datos o borrar mi cuenta?",
+				"answer": "Sí. Descarga todo en un archivo desde Ajustes cuando quieras, y borrar tu cuenta es inmediato y completo."
+			},
+			"medical": {
+				"question": "¿Esto es consejo médico?",
+				"answer": "No. Sunnsteel registra y describe tu entrenamiento. Ante dolor, lesiones o dudas de salud, consulta a un profesional."
+			}
+		}
+	},
+	"closing": {
+		"heading": "Empieza a esculpir.",
+		"subline": "Gratis para empezar, en tu navegador, en español o inglés.",
+		"createAccount": "Crear cuenta gratis",
+		"signIn": "Iniciar sesión",
+		"install": "Cómo instalarla",
+		"qr": {
+			"title": "Ábrelo en tu teléfono",
+			"hint": "Escanéalo con la cámara",
+			"alt": "Código QR que abre {url}"
+		},
+		"helper": {
+			"title": "Instala Sunnsteel en este teléfono",
+			"install": "Instalar Sunnsteel",
+			"iosSteps": "1. Toca Compartir en la barra de Safari. 2. Elige Agregar a pantalla de inicio.",
+			"iosNote": "Las notificaciones funcionan una vez instalada.",
+			"dismiss": "Ahora no"
+		}
+	},
+	"footer": {
+		"navLabel": "Pie de página",
+		"tagline": "Las estatuas no nacen. Se esculpen.",
+		"columns": {
+			"product": "Producto",
+			"useCases": "Casos de uso",
+			"help": "Ayuda",
+			"legal": "Legal"
+		},
+		"links": {
+			"questions": "Preguntas",
+			"install": "Instalar la app",
+			"contact": "Contacto",
+			"terms": "Términos",
+			"privacy": "Privacidad",
+			"refunds": "Reembolsos"
+		},
+		"copyright": "© {year} Sunnsteel"
 	}
 }
