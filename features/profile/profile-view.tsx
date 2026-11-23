@@ -45,7 +45,6 @@ import {
 } from '@/features/profile/rank-decoration/rank-decoration'
 import {
 	RANK_ACTIONS_CLEARANCE,
-	RANK_COMPACT_TEXT_CLEARANCE,
 	RANK_HEADER_PADDING,
 	RANK_PORTRAIT_MARGIN,
 } from '@/features/profile/rank-decoration/rank-header-layout'
@@ -333,12 +332,7 @@ export function ProfileView(props: ProfileViewProps) {
 					<div
 						className={cn(
 							'min-w-0 flex-1 space-y-1',
-							shareBesidePortrait &&
-								decoration &&
-								cn(
-									'@max-[600px]:col-span-2',
-									RANK_COMPACT_TEXT_CLEARANCE[decoration.tier],
-								),
+							shareBesidePortrait && '@max-[600px]:col-span-2',
 						)}
 					>
 						{/* FIX-02: nothing on UserProfile or PublicUserProfile carries a
@@ -401,7 +395,7 @@ export function ProfileView(props: ProfileViewProps) {
 							'flex flex-wrap gap-3',
 							decoration && RANK_ACTIONS_CLEARANCE[decoration.tier],
 							shareBesidePortrait &&
-								'@max-[600px]:col-start-2 @max-[600px]:row-start-1 @max-[600px]:mb-0 @max-[600px]:self-end @max-[600px]:justify-self-end',
+								'@max-[600px]:col-start-2 @max-[600px]:row-start-1 @max-[600px]:self-end @max-[600px]:justify-self-end',
 						)}
 					>
 						{/* Below a 600px decorated header Share keeps its name for

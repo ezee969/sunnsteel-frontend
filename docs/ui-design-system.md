@@ -1990,6 +1990,34 @@ header still wraps Follow, Message, the partner action and the menu onto
 several rows at 320; a smaller set of visible actions there is a separate
 decision.
 
+### 24.8 One height for every rank (2026-11-23)
+
+The owner's request: every rank's decorated header takes the same height, so
+that changing rank (on the profile, and on the landing's phone, §33) never
+changes the header's size or moves the name. This amends §24.7's measurements,
+which were per rank.
+
+- **The vertical room is one for all six ranks**: each slot takes the most any
+  rank needs. The top and the portrait's top and foot are Laureate's (the head
+  cartouche, the border band, the aureole and ribbons); the foot is Artisan's,
+  whose bottom knots reach furthest in from the last row while the header is a
+  column, and Laureate's again from 860px, where the actions sit beside the
+  text. The per-rank clearances under the actions and the counts are folded
+  into that shared foot.
+- **Only the horizontal room stays the rank's own**: its border band, its
+  corners and its portrait ornament. A rank whose ornament is small leaves the
+  rest of the room empty rather than drawing the header shorter.
+- `features/profile/rank-decoration/rank-header-layout.ts` holds it, and the
+  landing's header (`SiteRankHeader`) reads the same constants.
+
+Measured on the owner's profile with the rank rewritten in the profile read:
+432px at 320 and 390 for every rank (Initiate was 266, Laureate 410), 418 at
+768, 574 at 1024 and 300 at 1440 (Initiate 164, Laureate 300). **Cost:** a
+lower rank's header is as tall as Laureate's, so the first screen on a phone
+shows less below it than §24.7 gave. **Not equal:** content that wraps
+differently at a rank's own width -- a long name only inside Laureate's
+border, or the landing's per-rank description -- still changes the height.
+
 ---
 
 ## 25. Amendment — dashboard hierarchy (2026-10-02)
