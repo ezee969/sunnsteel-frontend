@@ -3093,3 +3093,229 @@
   background: color-mix(in oklch, var(--site-accent) 86%, white);
 }
 
+/* §33.14 Heat, light and depth (the owner, 2026-11-23: "add some extra
+   life ... more colors, depth, animating some of the cards, make it more
+   cinematic"). The page tells the forging of its headline: the carved word
+   heats and cools to gold, each mock-up stands in a pool of light the colour
+   of its subject (gold, verdigris, the shown rank), mock-ups cast one soft
+   shadow and lean toward a fine pointer, the footage and the mock-ups drift
+   with the scroll, and the Night bands carry a film grain. Site only; every
+   movement waits for `site-anim`, and higher contrast drops the grain. */
+@property --site-rank {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+.site {
+  --site-heat: oklch(0.93 0.09 92);
+  --site-ember: oklch(0.64 0.2 42);
+  --site-shadow: oklch(0.3 0.02 70 / 0.22);
+}
+.dark .site,
+.site .dark,
+.site.dark {
+  --site-shadow: oklch(0.06 0.01 70 / 0.7);
+}
+
+/* The forge: the headline's word strikes white-hot, glows ember, and cools
+   to the gold it rests on; every section's rule cools the same way. */
+@keyframes site-forge {
+  0%,
+  8% {
+    color: var(--site-accent);
+    text-shadow: none;
+  }
+  22% {
+    color: var(--site-heat);
+    text-shadow:
+      0 0 0.18em var(--site-heat),
+      0 0 0.6em var(--site-ember);
+  }
+  55% {
+    color: var(--site-ember);
+    text-shadow: 0 0 0.45em color-mix(in oklch, var(--site-ember) 70%, transparent);
+  }
+  100% {
+    color: var(--site-accent);
+    text-shadow: none;
+  }
+}
+@keyframes site-cool {
+  from {
+    background: var(--site-heat);
+  }
+  45% {
+    background: var(--site-ember);
+  }
+}
+.site-anim .site .type-site-display mark {
+  animation: site-forge 2600ms var(--ease-standard) 500ms both;
+}
+.site-anim .site-heading[data-in]::after {
+  animation:
+    site-rule 480ms var(--ease-standard) both,
+    site-cool 1600ms var(--ease-standard) both;
+  animation-delay:
+    calc(var(--lines, 1) * var(--line-gap) + 600ms),
+    calc(var(--lines, 1) * var(--line-gap) + 600ms);
+}
+
+/* Pools of light behind the mock-ups, in the colour of what they show. */
+/* They spill past their columns, never past their section (`clip` keeps
+   the fixed bar and the vertical overflow working, unlike `hidden`). */
+.site,
+.site-section {
+  overflow-x: clip;
+}
+.site-verb-stage,
+.site-progress-map,
+.site-ranks-phone,
+.site-coverflow {
+  position: relative;
+  isolation: isolate;
+}
+.site-verb-stage::before,
+.site-progress-map::before,
+.site-ranks-phone::before,
+.site-coverflow::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -12% -20%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--pool) 52%, transparent),
+    transparent
+  );
+}
+.site-verb-stage {
+  --pool: var(--site-accent);
+}
+.site-verb-stage::before {
+  inset: -10% -24%;
+  opacity: 0.6;
+}
+.site-progress-map {
+  --pool: var(--intensity-3);
+}
+.site-ranks-phone {
+  --pool: var(--site-rank);
+  transition: --site-rank 900ms var(--ease-standard);
+}
+.site-ranks-phone::before {
+  inset: -8% -30%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--site-rank) 46%, transparent),
+    transparent
+  );
+}
+.site-coverflow {
+  --pool: var(--site-accent);
+}
+.site-coverflow::before {
+  inset: 0 18%;
+  opacity: 0.6;
+}
+/* The light follows the phone that is playing. */
+@keyframes site-spot {
+  from {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+.site-anim [data-play] .site-verb-stage::before,
+.site-anim .site-verb[data-play] .site-verb-stage::before {
+  animation: site-spot 3000ms var(--ease-standard) both;
+  animation-delay: var(--seq, 0s);
+}
+/* The closing band glows from below, the forge under the footage. */
+.site-closing::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  inset: auto 0 0;
+  height: 55%;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--site-ember) 26%, transparent),
+    transparent
+  );
+}
+
+/* One soft shadow under every mock-up (site only: the app keeps tone). */
+.site :is(
+    .site-device,
+    .site-phone-frame,
+    .site-record,
+    .site-mock,
+    .site-scene-panel,
+    .site-callout,
+    .site-coverflow-card[data-front] .site-template
+  ) {
+  box-shadow:
+    0 28px 56px -18px var(--site-shadow),
+    0 2px 8px -2px var(--site-shadow);
+}
+
+/* Film grain on the Night bands with footage. */
+.site-hero::after,
+.site-closing::before {
+  content: '';
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-contrast='more'] :is(.site-hero::after, .site-closing::before) {
+  display: none;
+}
+@media (prefers-contrast: more) {
+  .site-hero::after,
+  .site-closing::before {
+    display: none;
+  }
+}
+
+/* A fine pointer tilts a mock-up toward it (the runtime sets the angles). */
+.site-anim [data-tilt] {
+  transform: perspective(1000px) rotateX(var(--tilt-y, 0deg))
+    rotateY(var(--tilt-x, 0deg));
+  transition: transform 400ms var(--ease-standard);
+  will-change: transform;
+}
+
+/* Drift: the footage sinks and the mock-ups rise a little slower than the
+   page, on the browser's own scroll timeline (no scroll listener). */
+@keyframes site-drift {
+  from {
+    translate: 0 56px;
+  }
+  to {
+    translate: 0 -56px;
+  }
+}
+@keyframes site-sink {
+  to {
+    translate: 0 22%;
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-anim :is(.site-verb-stage, .site-ranks-phone, .site-progress-map) {
+    animation: site-drift linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+  .site-anim .site-hero > :is(picture > img, video) {
+    animation: site-sink linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+}

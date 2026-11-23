@@ -69,12 +69,14 @@ export async function SiteTools() {
 				className="site-bento"
 				data-reveal="stagger"
 				data-play-when="0.3"
+				data-loop="10000"
 				data-play-media="(min-width: 1024px)"
 			>
 				<SiteCard
 					as="article"
 					className="site-tool site-tool-large"
 					data-play-when="0.5"
+					data-loop="6500"
 					data-play-media="(max-width: 1023px)"
 					style={motionVars({ '--seq': '0s' })}
 				>
@@ -92,7 +94,11 @@ export async function SiteTools() {
 							<ArrowRight className="size-4" aria-hidden />
 						</Link>
 					</ToolText>
-					<div aria-hidden="true" className="dark site-mock site-ledger">
+					<div
+						aria-hidden="true"
+						data-tilt=""
+						className="dark site-mock site-ledger"
+					>
 						<div>
 							<p className="type-body-sm text-ink-2">
 								{t('progression.range', {
@@ -158,6 +164,7 @@ export async function SiteTools() {
 					as="article"
 					className="site-tool"
 					data-play-when="0.5"
+					data-loop="6500"
 					data-play-media="(max-width: 1023px)"
 					style={motionVars({ '--seq': '2.1s' })}
 				>
@@ -166,7 +173,11 @@ export async function SiteTools() {
 						title={t('rest.title')}
 						body={t('rest.body')}
 					/>
-					<div aria-hidden="true" className="dark site-mock site-rest">
+					<div
+						aria-hidden="true"
+						data-tilt=""
+						className="dark site-mock site-rest"
+					>
 						<div className="site-notification sx-notify">
 							<Bell className="mt-0.5 size-4 shrink-0" />
 							<div className="min-w-0">
@@ -201,6 +212,7 @@ export async function SiteTools() {
 					as="article"
 					className="site-tool"
 					data-play-when="0.5"
+					data-loop="6500"
 					data-play-media="(max-width: 1023px)"
 					style={motionVars({ '--seq': '5.1s' })}
 				>
@@ -209,7 +221,7 @@ export async function SiteTools() {
 						title={t('supersets.title')}
 						body={t('supersets.body', { max: LANDING_FACTS.groupMax })}
 					/>
-					<div aria-hidden="true" className="dark site-mock">
+					<div aria-hidden="true" data-tilt="" className="dark site-mock">
 						<p className="flex items-center justify-between">
 							<span className="type-label text-ink-2">
 								{tRounds('groupLabel', { kind: 'SUPERSET', letter: 'A' })}
@@ -240,6 +252,7 @@ export async function SiteTools() {
 					as="article"
 					className="site-tool"
 					data-play-when="0.5"
+					data-loop="6500"
 					data-play-media="(max-width: 1023px)"
 					style={motionVars({ '--seq': '6.1s' })}
 				>
@@ -248,7 +261,7 @@ export async function SiteTools() {
 						title={t('swap.title')}
 						body={t('swap.body')}
 					/>
-					<div aria-hidden="true" className="dark site-mock">
+					<div aria-hidden="true" data-tilt="" className="dark site-mock">
 						<div className="site-screen-row sx-swap">
 							<div className="min-w-0">
 								<p className="type-panel">

@@ -27,7 +27,13 @@ export async function SiteProofBand() {
 					const label = t(cell.label)
 					return (
 						<li key={cell.label} className="site-proof-cell">
-							<span className="type-site-numeral">{value}</span>
+							<span
+								className="type-site-numeral"
+								data-count-up={cell.value}
+								data-count-suffix={cell.kind === 'floor' ? '+' : undefined}
+							>
+								{value}
+							</span>
 							<span className="type-label site-proof-label">{label}</span>
 							{cell.kind === 'number' && cell.mock ? (
 								<span className="site-proof-mock">{t('mockTag')}</span>

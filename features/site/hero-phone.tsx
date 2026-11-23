@@ -15,7 +15,7 @@ const SETS = [1, 2, 3]
 export async function HeroPhone() {
 	const t = await getTranslations('site.hero')
 	return (
-		<figure aria-label={t('phoneLabel')} className="site-phone">
+		<figure aria-label={t('phoneLabel')} data-tilt="" className="site-phone">
 			<div aria-hidden="true" className="site-phone-frame">
 				<div className="flex items-center justify-between text-[9px] leading-none text-ink-2">
 					<span className="site-device-clock">{PHONE_CLOCK}</span>

@@ -93,7 +93,16 @@ export function SiteRanksStage({
 	return (
 		<div className="site-ranks">
 			<p className="type-site-lead site-body site-ranks-body">{body}</p>
-			<div ref={phone} className="site-ranks-phone">
+			<div
+				ref={phone}
+				className="site-ranks-phone"
+				// The pool of light behind the phone takes the shown rank's pigment.
+				style={
+					{
+						'--site-rank': `var(--rank-${shown.id.toLowerCase()})`,
+					} as CSSProperties
+				}
+			>
 				<SitePhoneFrame className="site-rank-phone">
 					<SiteRankHeader
 						key={shown.id}

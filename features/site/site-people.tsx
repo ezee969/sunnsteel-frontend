@@ -59,13 +59,18 @@ function Scene({
 		<li
 			className="site-scene"
 			data-play-when="0.5"
+			data-loop="6000"
 			data-play-media="(max-width: 1023px)"
 			style={motionVars({ '--seq': seq })}
 		>
 			<p className="type-label text-ink-3">{eyebrow}</p>
 			<h3 className="type-panel">{title}</h3>
 			<p className="type-body-sm site-body mt-0">{body}</p>
-			<div aria-hidden="true" className="dark site-card site-scene-panel">
+			<div
+				aria-hidden="true"
+				data-tilt=""
+				className="dark site-card site-scene-panel"
+			>
 				{children}
 			</div>
 		</li>
@@ -101,6 +106,7 @@ export async function SitePeople() {
 			<ul
 				className="site-scenes"
 				data-play-when="0.3"
+				data-loop="10000"
 				data-play-media="(min-width: 1024px)"
 			>
 				<Scene

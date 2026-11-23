@@ -3062,3 +3062,37 @@ The owner's second review (2026-11-22/23) added:
 - **The headline is "Greatness isn't given. It's forged."** / "La grandeza no
   se regala. Se forja.", gold on the last word(s), and the brand line
   everywhere it was used (title, footer, splash, dashboard).
+
+### 33.14 Heat, light and depth (2026-11-23)
+
+The owner, on the reworked page: "we should add some extra life to it to make
+it more eye catching ... more colors, depth, animating some of the cards, make
+it more cinematic", then "do what you think is best". The page tells the
+forging of its headline. **Site only**; the app's rules stand, and each item
+below is a deliberate exception to §§8-9 for the landing:
+
+- **The forge.** The headline's gold word strikes white-hot (`--site-heat`),
+  glows ember (`--site-ember`) and cools to gold, once, 2.6s from load; every
+  section heading's rule cools from heat to gold as it draws. These are the
+  only glows on the site.
+- **Pools of light behind the mock-ups**, in the colour of what they show: gold
+  behind the verbs' phones (the pool brightens on the phone whose script is
+  playing) and the front template, verdigris (`--intensity-3`) behind the body
+  map, and the shown rank's pigment behind the ranks' phone, easing from one
+  rank to the next. The closing band glows ember from below. Soft radial and
+  linear gradients, never on text, never on controls; Pro is still never
+  coloured.
+- **One soft shadow under every mock-up** (`--site-shadow`: phones, panels,
+  cards over phones, the front template) instead of tone alone.
+- **A fine film grain on the bands with footage** (the hero and the closing),
+  dropped under higher contrast.
+- **Mock-ups lean toward a fine pointer**, at most 6 degrees, and rest flat on
+  touch.
+- **Drift**: the footage sinks and the phones and the body map rise a little
+  slower than the page, on the browser's own scroll timeline (`view()`), never
+  a scroll listener; where it is unsupported nothing moves.
+- **The examples keep running**: a played script plays again every 6-12s while
+  it stays in view (`data-loop`), and the proof band's figures count up once.
+
+Reduced motion (either source) removes every movement above; the colour and
+the light remain.

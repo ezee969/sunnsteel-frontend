@@ -92,6 +92,7 @@ export async function SiteVerbs() {
 			<ol
 				className="site-verbs"
 				data-play-when="0.3"
+				data-loop="12000"
 				data-play-media="(min-width: 1280px)"
 			>
 				{VERBS.map(({ key, href, Screen }, index) => (
@@ -100,6 +101,7 @@ export async function SiteVerbs() {
 						className="site-verb"
 						data-reveal="up"
 						data-play-when="0.5"
+						data-loop="6500"
 						data-play-media="(max-width: 1279px)"
 						style={motionVars({
 							'--seq': `${SEQ_SECONDS[index]}s`,

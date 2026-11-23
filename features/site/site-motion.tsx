@@ -13,7 +13,10 @@ import { useEffect } from 'react'
  * - `data-play-when`: a script, replayed each time it comes back into view
  *   (`data-play` while at least that share of it is visible), on the layout
  *   `data-play-media` names; a countdown inside it (`data-count-from`) runs
- *   from its sequence step's `--seq`.
+ *   from its sequence step's `--seq`. With `data-loop` (ms) it plays again
+ *   every that long while it stays in view, so the examples keep running.
+ * - `data-count-up`: a figure counts up to itself once it is in view.
+ * - `data-tilt`: a mock-up leans toward a fine pointer (§33.14).
  * - `[data-region="night"]`: the top bar takes the Night tokens while it lies
  *   over one, and the page's ground once it leaves (§33.6).
  * - `.site-heading` words are numbered by line so each line rises in turn.
@@ -151,6 +154,33 @@ export function SiteMotion() {
 		cleanups.push(() => reveal.disconnect())
 
 		const countdowns = new Map<Element, () => void>()
+		const loops = new Map<Element, number>()
+		const start = (element: HTMLElement) => {
+			element.setAttribute('data-play', '')
+			element
+				.querySelectorAll<HTMLElement>('[data-count-from]')
+				.forEach(clock => {
+					countdowns.get(clock)?.()
+					countdowns.set(clock, runCountdown(clock))
+				})
+			const every = Number(element.dataset.loop ?? 0)
+			if (every > 0) {
+				loops.set(
+					element,
+					window.setTimeout(() => {
+						// Back to the first frame, then the script again.
+						element.removeAttribute('data-play')
+						void element.offsetWidth
+						start(element)
+					}, every),
+				)
+			}
+		}
+		const stop = (element: HTMLElement) => {
+			element.removeAttribute('data-play')
+			window.clearTimeout(loops.get(element))
+			loops.delete(element)
+		}
 		const plays = document.querySelectorAll<HTMLElement>('[data-play-when]')
 		const play = new IntersectionObserver(
 			entries => {
@@ -165,16 +195,10 @@ export function SiteMotion() {
 					)
 					if (entry.intersectionRatio >= share - 0.01) {
 						if (element.hasAttribute('data-play')) continue
-						element.setAttribute('data-play', '')
-						element
-							.querySelectorAll<HTMLElement>('[data-count-from]')
-							.forEach(clock => {
-								countdowns.get(clock)?.()
-								countdowns.set(clock, runCountdown(clock))
-							})
+						start(element)
 					} else if (!entry.isIntersecting) {
 						// Fully out of view: the script replays on re-entry.
-						element.removeAttribute('data-play')
+						stop(element)
 					}
 				}
 			},
@@ -189,8 +213,72 @@ export function SiteMotion() {
 		})
 		cleanups.push(() => {
 			play.disconnect()
-			countdowns.forEach(stop => stop())
+			countdowns.forEach(halt => halt())
+			loops.forEach(timer => window.clearTimeout(timer))
 		})
+
+		// Figures count up to themselves once, as they come into view.
+		const frames = new Map<Element, number>()
+		const count = new IntersectionObserver(
+			entries => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue
+					count.unobserve(entry.target)
+					const element = entry.target as HTMLElement
+					const final = element.textContent ?? ''
+					const to = Number(element.dataset.countUp)
+					const suffix = element.dataset.countSuffix ?? ''
+					const format = new Intl.NumberFormat(root.lang || 'en')
+					const began = performance.now()
+					const tick = (now: number) => {
+						const progress = Math.min(1, (now - began) / 1400)
+						const eased = 1 - (1 - progress) ** 3
+						element.textContent =
+							progress < 1
+								? `${format.format(Math.round(to * eased))}${suffix}`
+								: final
+						if (progress < 1) frames.set(element, requestAnimationFrame(tick))
+					}
+					frames.set(element, requestAnimationFrame(tick))
+				}
+			},
+			{ threshold: 0.6 },
+		)
+		document
+			.querySelectorAll('[data-count-up]')
+			.forEach(element => count.observe(element))
+		cleanups.push(() => {
+			count.disconnect()
+			frames.forEach(frame => cancelAnimationFrame(frame))
+		})
+
+		// A fine pointer tilts a mock-up toward it, at most 6 degrees.
+		if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+			const tilts = document.querySelectorAll<HTMLElement>('[data-tilt]')
+			const lean = (event: PointerEvent) => {
+				const element = event.currentTarget as HTMLElement
+				const box = element.getBoundingClientRect()
+				const x = (event.clientX - box.left) / box.width - 0.5
+				const y = (event.clientY - box.top) / box.height - 0.5
+				element.style.setProperty('--tilt-x', `${(x * 12).toFixed(2)}deg`)
+				element.style.setProperty('--tilt-y', `${(-y * 12).toFixed(2)}deg`)
+			}
+			const settle = (event: PointerEvent) => {
+				const element = event.currentTarget as HTMLElement
+				element.style.removeProperty('--tilt-x')
+				element.style.removeProperty('--tilt-y')
+			}
+			tilts.forEach(element => {
+				element.addEventListener('pointermove', lean)
+				element.addEventListener('pointerleave', settle)
+			})
+			cleanups.push(() =>
+				tilts.forEach(element => {
+					element.removeEventListener('pointermove', lean)
+					element.removeEventListener('pointerleave', settle)
+				}),
+			)
+		}
 
 		return () => {
 			cleanups.forEach(cleanup => cleanup())
