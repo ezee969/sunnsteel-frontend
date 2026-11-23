@@ -168,6 +168,13 @@ describe('the middleware', () => {
 		)
 	})
 
+	it('sends a signed-in visitor from the public pricing to /plans (SITE-01)', async () => {
+		const member = await middleware(request('/pricing', { ss_session: '1' }))
+		expect(member.headers.get('location')).toBe('https://sunnsteel.test/plans')
+		const visitor = await middleware(request('/pricing'))
+		expect(visitor.headers.get('location')).toBeNull()
+	})
+
 	it('drops a language typed into the address', async () => {
 		expect(localePrefixOf('/es/dashboard')).toBe('es')
 		expect(localePrefixOf('/esquema')).toBeNull()

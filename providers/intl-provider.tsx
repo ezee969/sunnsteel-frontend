@@ -4,7 +4,7 @@ import { IntlErrorCode, NextIntlClientProvider } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import type { Locale } from '@/i18n/config'
-import type { Messages } from '@/messages'
+import type { ClientMessages } from '@/messages'
 
 /**
  * I18N-01: the client half of the translations. Every page here is a client
@@ -23,7 +23,7 @@ export function IntlProvider({
 	children,
 }: {
 	locale: Locale
-	messages: Messages
+	messages: ClientMessages
 	children: ReactNode
 }) {
 	return (

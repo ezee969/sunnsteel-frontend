@@ -21,7 +21,7 @@ import { type Locale, LOCALES } from '@/i18n/config'
 import { PUBLIC_ORIGIN, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
-import type { Messages } from '@/messages'
+import { clientMessages, type Messages } from '@/messages'
 import { AppProvider } from '@/providers/app-provider'
 import { IntlProvider } from '@/providers/intl-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
@@ -215,7 +215,7 @@ export default async function RootLayout({
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<PwaProvider />
-					<IntlProvider locale={locale} messages={messages}>
+					<IntlProvider locale={locale} messages={clientMessages(messages)}>
 						<AppProvider>{children}</AppProvider>
 					</IntlProvider>
 					<DevInjections showPerfPanel={SHOW_PERF_PANEL} />

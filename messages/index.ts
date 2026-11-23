@@ -12,6 +12,7 @@ import enRoutines from './en/routines.json'
 import enSettings from './en/settings.json'
 import enShell from './en/shell.json'
 import enSite from './en/site.json'
+import enSitePages from './en/sitePages.json'
 import enSocial from './en/social.json'
 import enWorkout from './en/workout.json'
 import esAchievements from './es/achievements.json'
@@ -26,6 +27,7 @@ import esRoutines from './es/routines.json'
 import esSettings from './es/settings.json'
 import esShell from './es/shell.json'
 import esSite from './es/site.json'
+import esSitePages from './es/sitePages.json'
 import esSocial from './es/social.json'
 import esWorkout from './es/workout.json'
 
@@ -49,9 +51,21 @@ const en = {
 	messaging: enMessaging,
 	billing: enBilling,
 	site: enSite,
+	sitePages: enSitePages,
 }
 
 export type Messages = typeof en
+
+/**
+ * SITE-01: the public pages' copy is read on the server only, so it is left
+ * out of what the layout hands the browser on every page.
+ */
+export type ClientMessages = Omit<Messages, 'sitePages'>
+export function clientMessages(messages: Messages): ClientMessages {
+	const client: Partial<Messages> = { ...messages }
+	delete client.sitePages
+	return client as ClientMessages
+}
 
 export const MESSAGES: Record<Locale, Messages> = {
 	en,
@@ -70,5 +84,6 @@ export const MESSAGES: Record<Locale, Messages> = {
 		messaging: esMessaging,
 		billing: esBilling,
 		site: esSite,
+		sitePages: esSitePages,
 	},
 }

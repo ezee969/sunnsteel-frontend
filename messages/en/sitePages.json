@@ -1,0 +1,106 @@
+{
+	"shared": {
+		"breadcrumb": {
+			"label": "Breadcrumb",
+			"home": "Home",
+			"features": "Features",
+			"useCases": "Use cases"
+		},
+		"updated": "Updated {date}",
+		"seePricing": "See pricing",
+		"startFree": "Start free",
+		"related": "Related",
+		"questions": "Questions",
+		"howItWorks": "How it works",
+		"workedExample": "Worked example",
+		"whatItCovers": "What's free and what's Pro",
+		"tips": "Tips",
+		"included": "Included",
+		"notIncluded": "Not included",
+		"example": "Example",
+		"tags": {
+			"free": "Free",
+			"pro": "Pro",
+			"freePro": "Free + Pro"
+		}
+	},
+	"featuresIndex": {
+		"meta": {
+			"title": "Features — Sunnsteel",
+			"description": "Everything Sunnsteel does to plan, log, measure and reward your training, with what's free and what's Pro."
+		},
+		"heading": "Everything Sunnsteel does",
+		"subline": "Plan your routine, train with less to think about, read your progress in numbers and earn your rank. Here is all of it, and what each part costs.",
+		"facts": {
+			"free": "Free to start",
+			"exercises": "{count}+ exercises",
+			"browser": "Runs in your browser"
+		},
+		"groups": {
+			"plan": "Plan",
+			"train": "Train",
+			"measure": "Measure",
+			"earn": "Earn",
+			"people": "Together"
+		},
+		"cards": {
+			"routineBuilder": "Weekly or rotating routines, templates, versions and supersets, with a summary of what each week adds up to.",
+			"progression": "Weights that move from what you actually lift, and 8-week blocks with Pro.",
+			"workoutTracker": "Last time beside every set, rest that starts itself, plates and warm-ups worked out.",
+			"progress": "Strength, the body map, records and body weight, with signals and reviews on Pro.",
+			"ranks": "{ranks} ranks and {milestones} milestones earned by training, and records found in your sets.",
+			"community": "Follows, training partners and messages, with each part of your profile shown to whom you choose."
+		},
+		"glance": {
+			"heading": "At a glance",
+			"caption": "Every capability, by what it helps you do, and whether it's in Free or Pro."
+		},
+		"pricingLine": "Training itself is free. Pro adds planning depth, longer history and the AI tools. <link>See pricing</link>",
+		"faq": {
+			"free": {
+				"q": "What's free?",
+				"a": "Everything you do in a workout, your history, records, ranks and everything social. Pro adds planning depth, longer history and the AI tools."
+			},
+			"install": {
+				"q": "Do I need an app store?",
+				"a": "No. It runs in your browser and installs from it on any phone. <link>How to install</link>"
+			},
+			"data": {
+				"q": "Is my data mine?",
+				"a": "Yes. Download everything as one file whenever you want, and delete your account completely at any time."
+			}
+		}
+	},
+	"pricing": {
+		"meta": {
+			"title": "Pricing — Free and Pro — Sunnsteel",
+			"description": "Training is free. Pro adds planning depth, longer history and the AI tools for {price} a month, with {days} days free."
+		},
+		"eyebrow": "Pro · {days} days free",
+		"heading": "Free to train. Pro to plan further.",
+		"subline": "Everything you do in a workout is free. Pro adds planning depth, longer history and the AI tools.",
+		"tryPro": "Try Pro free for {days} days",
+		"startFree": "Start free",
+		"facts": {
+			"price": "{price} a month",
+			"trial": "{days} days free",
+			"cancel": "Cancel any time"
+		},
+		"free": {
+			"heading": "Is it free?",
+			"body": "Yes: logging, progression, history, records, ranks and everything social are free, with no card."
+		},
+		"pro": {
+			"heading": "What Pro adds"
+		},
+		"compare": {
+			"heading": "Free and Pro, row by row"
+		},
+		"who": {
+			"heading": "Who Pro is for",
+			"planners": "Lifters who plan blocks and deloads, and want each block's loads set in advance.",
+			"readers": "Lifters who read their training closely: long history, comparisons and signals.",
+			"ai": "Anyone who wants a routine drafted from a description, or a review of their own workouts."
+		}
+	}
+}

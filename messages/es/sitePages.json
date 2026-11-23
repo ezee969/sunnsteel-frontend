@@ -1,0 +1,106 @@
+{
+	"shared": {
+		"breadcrumb": {
+			"label": "Ruta de navegación",
+			"home": "Inicio",
+			"features": "Funciones",
+			"useCases": "Casos de uso"
+		},
+		"updated": "Actualizado: {date}",
+		"seePricing": "Ver precios",
+		"startFree": "Empezar gratis",
+		"related": "Relacionado",
+		"questions": "Preguntas",
+		"howItWorks": "Cómo funciona",
+		"workedExample": "Ejemplo trabajado",
+		"whatItCovers": "Qué es Free y qué es Pro",
+		"tips": "Consejos",
+		"included": "Incluido",
+		"notIncluded": "No incluido",
+		"example": "Ejemplo",
+		"tags": {
+			"free": "Free",
+			"pro": "Pro",
+			"freePro": "Free + Pro"
+		}
+	},
+	"featuresIndex": {
+		"meta": {
+			"title": "Funciones — Sunnsteel",
+			"description": "Todo lo que hace Sunnsteel para planificar, registrar, medir y premiar tu entrenamiento, con lo que es Free y lo que es Pro."
+		},
+		"heading": "Todo lo que hace Sunnsteel",
+		"subline": "Planifica tu rutina, entrena con menos en qué pensar, lee tu progreso en números y gánate tu rango. Aquí está todo, y lo que cuesta cada parte.",
+		"facts": {
+			"free": "Gratis para empezar",
+			"exercises": "{count}+ ejercicios",
+			"browser": "Funciona en tu navegador"
+		},
+		"groups": {
+			"plan": "Planifica",
+			"train": "Entrena",
+			"measure": "Mide",
+			"earn": "Gana",
+			"people": "Con otros"
+		},
+		"cards": {
+			"routineBuilder": "Rutinas semanales o en rotación, plantillas, versiones y superseries, con un resumen de lo que suma cada semana.",
+			"progression": "Pesos que avanzan según lo que de verdad levantas, y bloques de 8 semanas con Pro.",
+			"workoutTracker": "La vez anterior junto a cada serie, descanso que arranca solo, discos y calentamientos calculados.",
+			"progress": "Fuerza, el mapa del cuerpo, récords y peso corporal, con señales y revisiones en Pro.",
+			"ranks": "{ranks} rangos y {milestones} logros que se ganan entrenando, y récords que salen de tus series.",
+			"community": "Seguidores, compañeros de entrenamiento y mensajes, con cada parte de tu perfil visible para quien elijas."
+		},
+		"glance": {
+			"heading": "De un vistazo",
+			"caption": "Cada función, según lo que te ayuda a hacer, y si está en Free o en Pro."
+		},
+		"pricingLine": "Entrenar es gratis. Pro suma profundidad para planificar, más historial y las herramientas con IA. <link>Ver precios</link>",
+		"faq": {
+			"free": {
+				"q": "¿Qué es gratis?",
+				"a": "Todo lo que haces al entrenar, tu historial, los récords, los rangos y todo lo social. Pro suma profundidad para planificar, más historial y las herramientas con IA."
+			},
+			"install": {
+				"q": "¿Necesito una tienda de apps?",
+				"a": "No. Funciona en tu navegador y se instala desde ahí en cualquier teléfono. <link>Cómo instalarla</link>"
+			},
+			"data": {
+				"q": "¿Mis datos son míos?",
+				"a": "Sí. Descarga todo en un archivo cuando quieras y borra tu cuenta por completo en cualquier momento."
+			}
+		}
+	},
+	"pricing": {
+		"meta": {
+			"title": "Precios — Free y Pro — Sunnsteel",
+			"description": "Entrenar es gratis. Pro suma profundidad para planificar, más historial y las herramientas con IA por {price} por mes, con {days} días gratis."
+		},
+		"eyebrow": "Pro · {days} días gratis",
+		"heading": "Gratis para entrenar. Pro para planificar más lejos.",
+		"subline": "Todo lo que haces al entrenar es gratis. Pro suma profundidad para planificar, más historial y las herramientas con IA.",
+		"tryPro": "Probar Pro {days} días gratis",
+		"startFree": "Empezar gratis",
+		"facts": {
+			"price": "{price} por mes",
+			"trial": "{days} días gratis",
+			"cancel": "Cancela cuando quieras"
+		},
+		"free": {
+			"heading": "¿Es gratis?",
+			"body": "Sí: registrar, la progresión, el historial, los récords, los rangos y todo lo social son gratis, sin tarjeta."
+		},
+		"pro": {
+			"heading": "Qué suma Pro"
+		},
+		"compare": {
+			"heading": "Free y Pro, fila por fila"
+		},
+		"who": {
+			"heading": "Para quién es Pro",
+			"planners": "Quien planifica bloques y descargas, y quiere la carga de cada bloque fijada de antemano.",
+			"readers": "Quien lee su entrenamiento de cerca: historial largo, comparaciones y señales.",
+			"ai": "Quien quiere un borrador de rutina a partir de una descripción, o una revisión de sus propios entrenamientos."
+		}
+	}
+}

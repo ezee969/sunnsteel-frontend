@@ -74,6 +74,12 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.redirect(new URL(target, request.url))
 	}
 
+	// SITE-01 §12.20: a member already has their plan, the purchase and the
+	// comparison on `/plans`; the public pricing page is for visitors.
+	if (path === '/pricing' && hasValidSession) {
+		return NextResponse.redirect(new URL('/plans', request.url))
+	}
+
 	// The root is decided here, by the marker, because a static `[locale]` build
 	// cannot read a cookie per request. SITE-01: a signed-out visitor sees the
 	// landing once it is live, or with the preview cookie; everyone else signed
