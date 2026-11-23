@@ -137,7 +137,7 @@ export async function SitePeople() {
 				</Scene>
 
 				<Scene
-					seq="4.2s"
+					seq="2.4s"
 					eyebrow={t('partners.eyebrow')}
 					title={t('partners.title')}
 					body={t('partners.body', { max: LANDING_FACTS.partnersMax })}
@@ -166,7 +166,7 @@ export async function SitePeople() {
 				</Scene>
 
 				<Scene
-					seq="8.4s"
+					seq="4.1s"
 					eyebrow={t('messages.eyebrow')}
 					title={t('messages.title')}
 					body={t('messages.body')}

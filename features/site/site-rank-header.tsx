@@ -20,9 +20,9 @@ import { rankDecoration } from '@/lib/utils/rank-decoration'
 /**
  * SITE-01 §12.7: the profile header as a profile draws it, dressed in a rank
  * (§24), for "Your name" with the initials avatar -- the one place outside a
- * profile where a decoration appears. Its module loads with JavaScript, so
- * without it the header stands undecorated. `aria-hidden`: the section's
- * text says what it shows.
+ * profile where a decoration appears, shown on a phone's screen as a member
+ * sees it. Its module loads with JavaScript, so without it the header stands
+ * undecorated. `aria-hidden`: the section's text says what it shows.
  */
 export function SiteRankHeader({
 	rankId,
@@ -31,7 +31,6 @@ export function SiteRankHeader({
 	name,
 	handle,
 	initials,
-	example,
 }: {
 	rankId: string
 	rankName: string
@@ -39,7 +38,6 @@ export function SiteRankHeader({
 	name: string
 	handle: string
 	initials: string
-	example: string
 }) {
 	const decoration = rankDecoration({ id: rankId })
 	const assets = useRankDecorationAssets(decoration?.slug)
@@ -49,7 +47,6 @@ export function SiteRankHeader({
 
 	return (
 		<div aria-hidden="true" className="site-rank-header">
-			<p className="type-label site-example mb-2 text-right">{example}</p>
 			<section
 				ref={ref}
 				className={cn(

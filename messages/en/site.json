@@ -45,7 +45,6 @@
 		"createAccount": "Create a free account",
 		"pauseVideo": "Pause background video",
 		"playVideo": "Play background video",
-		"example": "Example",
 		"phoneLabel": "Example of a live workout in Sunnsteel",
 		"exercise": "Squat",
 		"live": "Live workout",
@@ -204,8 +203,16 @@
 		"noneFit": {
 			"title": "None of these?",
 			"build": "Build your own",
-			"describe": "Describe it, get a draft",
-			"advanced": "The 8-week block is built in the same builder."
+			"describe": "Describe it, get a draft"
+		},
+		"block": {
+			"name": "8-week block",
+			"summary": "For one lift you want to push: each week loads a bigger share of your reference max.",
+			"week": "W{number}",
+			"caption": "Share of your reference max, week by week",
+			"range": "From {first} of your reference max in week 1 to {last} in week {weeks}.",
+			"sets": "Three working sets a week; in weeks 1 to 4 the last one goes to as many good reps as you can.",
+			"start": "Start with Pro"
 		},
 		"pro": "Pro",
 		"levelsLabel": "Level"

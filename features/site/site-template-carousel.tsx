@@ -18,7 +18,7 @@ import { prefersStill } from './site-motion'
 
 /**
  * SITE-01 §12.8: the templates by level. Without JavaScript the server's
- * plain list stands (every template, then "none of these?"). With it: the
+ * plain list stands (every card in level order). With it: the
  * level tabs (the app's ToggleRow) over a coverflow from 768 -- the front
  * card full size with the region's filled action, its neighbours at 85% and
  * 60% opacity, reached by their own "Show <name>" control, the previous and
@@ -28,8 +28,8 @@ import { prefersStill } from './site-motion'
  */
 export interface TemplateCard {
 	id: string
-	/** The level it belongs to; "none of these?" belongs to every level. */
-	level: 'beginner' | 'intermediate' | 'advanced' | 'all'
+	/** The level it belongs to. */
+	level: 'beginner' | 'intermediate' | 'advanced'
 	name: string
 	node: ReactNode
 }
@@ -57,9 +57,7 @@ export function SiteTemplateCarousel({ cards }: { cards: TemplateCard[] }) {
 		return () => wide.removeEventListener('change', choose)
 	}, [])
 
-	const shown = cards.filter(
-		card => card.level === level || card.level === 'all',
-	)
+	const shown = cards.filter(card => card.level === level)
 	const last = shown.length - 1
 	const go = (index: number) => {
 		const next = Math.max(0, Math.min(last, index))

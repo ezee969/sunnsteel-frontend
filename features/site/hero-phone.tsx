@@ -1,12 +1,14 @@
 import { ArrowUp, Check } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
+import { PHONE_CLOCK } from './site-parts'
+
 /**
  * SITE-01 §12.2 and §33.8: the live-session phone on the hero's lower edge, an
  * original frame (never a manufacturer's) resting on the state its script ends
- * on -- three sets done, the rest bar, the record. Synthetic data, marked
- * "Example" where the comp has the status bar's clock; `aria-hidden`, with the
- * region named for assistive technology instead.
+ * on -- three sets done, the rest bar, the record. Synthetic data, named as
+ * an example for assistive technology (the frame itself is `aria-hidden`);
+ * no visible "Example" mark since the owner's review of 2026-11-22.
  */
 const SETS = [1, 2, 3]
 
@@ -16,9 +18,7 @@ export async function HeroPhone() {
 		<figure aria-label={t('phoneLabel')} className="site-phone">
 			<div aria-hidden="true" className="site-phone-frame">
 				<div className="flex items-center justify-between text-[9px] leading-none text-ink-2">
-					<span className="type-label text-[8px] text-ink-2">
-						{t('example')}
-					</span>
+					<span className="site-device-clock">{PHONE_CLOCK}</span>
 					<span className="flex items-center gap-1">
 						<span className="flex gap-0.5">
 							{[0, 1, 2].map(dot => (

@@ -172,7 +172,7 @@ export async function SiteTools() {
 					className="site-tool"
 					data-play-when="0.5"
 					data-play-media="(max-width: 1023px)"
-					style={motionVars({ '--seq': '3.8s' })}
+					style={motionVars({ '--seq': '2.1s' })}
 				>
 					<ToolText
 						example={example}
@@ -216,7 +216,7 @@ export async function SiteTools() {
 					className="site-tool"
 					data-play-when="0.5"
 					data-play-media="(max-width: 1023px)"
-					style={motionVars({ '--seq': '7s' })}
+					style={motionVars({ '--seq': '5.1s' })}
 				>
 					<ToolText
 						example={example}
@@ -256,7 +256,7 @@ export async function SiteTools() {
 					className="site-tool"
 					data-play-when="0.5"
 					data-play-media="(max-width: 1023px)"
-					style={motionVars({ '--seq': '8.4s' })}
+					style={motionVars({ '--seq': '6.1s' })}
 				>
 					<ToolText
 						example={example}

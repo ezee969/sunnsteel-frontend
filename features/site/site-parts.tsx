@@ -5,8 +5,7 @@ import { cn } from '@/lib/utils'
 /**
  * SITE-01 §33: the parts every landing section shares -- the section heading
  * in the site's heading rank with the brand's rule under it, the original
- * phone frame of §33.8 with its "Example" mark, and the plan tag (a word,
- * never a colour: §33.4).
+ * phone frame of §33.8, and the plan tag (a word, never a colour: §33.4).
  */
 export function SiteSectionHeading({
 	id,
@@ -49,12 +48,17 @@ export function ExampleMark({ label }: { label: string }) {
 }
 
 /** An original frame drawn to the brand's line, never a manufacturer's. */
+/**
+ * The status bar's clock. A phone carries no "Example" mark any more (the
+ * owner, 2026-11-22: the mark read as a label stuck on the hero); the page's
+ * text and each phone's accessible name say the data is an example.
+ */
+export const PHONE_CLOCK = '7:05'
+
 export function SitePhoneFrame({
-	example,
 	children,
 	className,
 }: {
-	example: string
 	children: ReactNode
 	className?: string
 }) {
@@ -63,7 +67,7 @@ export function SitePhoneFrame({
 		// of the page's ground instead of melting into it.
 		<div aria-hidden="true" className={cn('dark site-device', className)}>
 			<div className="site-device-bar">
-				<ExampleMark label={example} />
+				<span className="site-device-clock">{PHONE_CLOCK}</span>
 				<span className="site-device-status">
 					<span className="flex gap-0.5">
 						{[0, 1, 2].map(dot => (

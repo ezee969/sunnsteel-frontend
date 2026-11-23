@@ -34,8 +34,13 @@ import {
  * sticky stage on 2026-11-22: scrolling through four screens of it was too
  * long. No filled action: the links are link-style.
  */
-/** Each phone's script starts this long after the one before it. */
-const STEP_SECONDS = 4.2
+/**
+ * Where each phone's script starts, in seconds: as the one before it settles,
+ * never after a pause (the owner, 2026-11-22: waiting two seconds between
+ * phones read as the page stalling). Each start is the previous script's last
+ * frame less a short overlap; the scripts' timings are in globals.css (§12.4).
+ */
+const SEQ_SECONDS = [0, 1.15, 3.6, 6.5] as const
 const VERBS = [
 	{ key: 'plan', href: '/features/routine-builder', Screen: PlanScreen },
 	{ key: 'train', href: '/features/workout-tracker', Screen: TrainScreen },
@@ -48,7 +53,6 @@ export async function SiteVerbs() {
 	const tTemplates = await getTranslations('routines.templates')
 	const tExercises = await getTranslations('catalog.exercises')
 	const tRanks = await getTranslations('catalog.ranks')
-	const tMock = await getTranslations('site.mock')
 	const locale = (await getLocale()) as Locale
 	const kg = (value: number) => formatWeight(value, 'KG', locale)
 	const rank = RANKS.find(entry => entry.id === EARN_EXAMPLE.rankId) ?? RANKS[0]
@@ -98,7 +102,7 @@ export async function SiteVerbs() {
 						data-play-when="0.5"
 						data-play-media="(max-width: 1279px)"
 						style={motionVars({
-							'--seq': `${index * STEP_SECONDS}s`,
+							'--seq': `${SEQ_SECONDS[index]}s`,
 							'--delay': `${index * 120}ms`,
 						})}
 					>
@@ -109,7 +113,7 @@ export async function SiteVerbs() {
 							<span className="type-page">{t(`words.${key}`)}</span>
 						</p>
 						<div className="site-verb-stage">
-							<SitePhoneFrame example={tMock('example')}>
+							<SitePhoneFrame>
 								<Screen />
 							</SitePhoneFrame>
 							<p aria-hidden="true" className="site-callout">

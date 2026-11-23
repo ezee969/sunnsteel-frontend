@@ -45,7 +45,6 @@
 		"createAccount": "Crear cuenta gratis",
 		"pauseVideo": "Pausar el video de fondo",
 		"playVideo": "Reproducir el video de fondo",
-		"example": "Ejemplo",
 		"phoneLabel": "Ejemplo de un entrenamiento en vivo en Sunnsteel",
 		"exercise": "Sentadilla",
 		"live": "Entrenamiento en vivo",
@@ -204,8 +203,16 @@
 		"noneFit": {
 			"title": "¿Ninguna te sirve?",
 			"build": "Arma la tuya",
-			"describe": "Descríbela y recibe un borrador",
-			"advanced": "El bloque de 8 semanas se arma en el mismo constructor."
+			"describe": "Descríbela y recibe un borrador"
+		},
+		"block": {
+			"name": "Bloque de 8 semanas",
+			"summary": "Para un ejercicio que quieres empujar: cada semana carga una parte mayor de tu máximo de referencia.",
+			"week": "S{number}",
+			"caption": "Parte de tu máximo de referencia, semana a semana",
+			"range": "Desde el {first} de tu máximo de referencia en la semana 1 hasta el {last} en la semana {weeks}.",
+			"sets": "Tres series de trabajo por semana; en las semanas 1 a 4 la última va a tantas repeticiones buenas como puedas.",
+			"start": "Empezar con Pro"
 		},
 		"pro": "Pro",
 		"levelsLabel": "Nivel"

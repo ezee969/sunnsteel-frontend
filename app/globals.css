@@ -1591,6 +1591,12 @@
   align-items: center;
   justify-content: space-between;
 }
+.site-device-clock {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--ink-2);
+}
 .site-device-status {
   display: flex;
   align-items: center;
@@ -1924,21 +1930,44 @@
   }
 }
 
-/* §12.7 ranks: the text and ladder in columns 1-4, the header in 5-12. */
+/* §12.7 ranks: the lead and the ladder in columns 1-6, the phone in 8-12
+   beside both; one column below 1024 with the phone between the lead and the
+   ladder, so a picked rank shows just above it. */
 .site-ranks {
   margin-top: 8px;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    'body body body body body body . phone phone phone phone phone'
+    'ladder ladder ladder ladder ladder ladder . phone phone phone phone phone';
+  grid-template-rows: auto 1fr;
   column-gap: 24px;
-  row-gap: 40px;
-  align-items: start;
 }
-.site-ranks-text {
-  grid-column: 1 / 6;
+.site-ranks-body {
+  grid-area: body;
 }
-.site-ranks-header {
-  grid-column: 6 / 13;
+.site-ranks-ladder {
+  grid-area: ladder;
+  align-self: start;
+}
+.site-ranks-phone {
+  grid-area: phone;
+  display: flex;
+  justify-content: center;
   align-self: center;
+}
+/* The profile is drawn on the page's ground, as the app draws it. */
+.site-rank-phone {
+  max-width: 320px;
+  background: var(--background);
+}
+.site-rank-line {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
 }
 .site-ladder {
   margin-top: 32px;
@@ -2013,6 +2042,56 @@
 }
 .site-template-days {
   border-top: 1px solid var(--rule);
+}
+/* Advanced: the 8-week block's steps, each bar its share of the reference
+   max (the track is the whole max, so the bars are never exaggerated). */
+.site-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.site-block-bars {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+}
+.site-block-bars li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.site-block-track {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.site-block-fill {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(var(--h, 0) * 100%);
+  background: var(--foreground);
+  transform-origin: bottom;
+}
+/* "None of these?": one line under the cards, at every level. */
+.site-none-fit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 32px;
+  row-gap: 12px;
+  margin-top: 40px;
 }
 
 /* §12.9 people: three scenes, then the privacy band. */
@@ -2126,9 +2205,11 @@
 }
 
 @media (max-width: 1023px) {
-  .site-ranks-text,
-  .site-ranks-header {
-    grid-column: 1 / -1;
+  .site-ranks {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'body' 'phone' 'ladder';
+    grid-template-rows: auto;
+    row-gap: 40px;
   }
   .site-templates {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2617,7 +2698,7 @@
 }
 .site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-ledger > td {
   animation: site-fade 250ms var(--ease-standard) both;
-  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 600ms);
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 350ms);
 }
 .site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-drain {
   animation: site-drain 2400ms linear both;
@@ -2785,6 +2866,15 @@
 .site-anim .site-coverflow-card[data-front] .site-template-days li {
   animation: site-fade 300ms var(--ease-standard) both;
   animation-delay: calc(300ms + var(--d, 0) * 40ms);
+}
+@keyframes site-bar-rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+.site-anim .site-coverflow-card[data-front] .site-block-fill {
+  animation: site-bar-rise 500ms var(--ease-standard) both;
+  animation-delay: calc(200ms + var(--d, 0) * 70ms);
 }
 @media (max-width: 1023px) {
   .site-coverflow[data-layout='flow'] .site-coverflow-card {
