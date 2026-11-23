@@ -291,36 +291,36 @@
 				"answer": "Sí. Registrar, la progresión, tu historial, los récords, los rangos y todo lo social son gratis, sin tarjeta. Pro es opcional: {price} por mes, con los primeros {days} días gratis una vez por cuenta."
 			},
 			"install": {
-				"question": "¿Tengo que descargar algo?",
+				"question": "¿Hay app para iPhone y Android?",
 				"answer": "No hay tienda de apps. Sunnsteel funciona en tu navegador y se instala desde ahí: en iPhone, toca Compartir en Safari y elige Agregar a pantalla de inicio; en Android, elige Instalar app en el menú del navegador; en una computadora, usa el ícono de instalar de la barra de direcciones. En iPhone, las notificaciones necesitan la app instalada."
-			},
-			"offline": {
-				"question": "¿Funciona sin conexión?",
-				"answer": "Si se corta la señal en pleno entrenamiento, sigue registrando: tus series se envían cuando vuelve, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
 			},
 			"beginners": {
 				"question": "¿Sirve si recién empiezo?",
 				"answer": "Sí. Hay un programa para principiantes, una recomendación inicial según tus días y objetivos, y calentamientos y discos calculados por ti. Crece contigo hasta bloques y descargas con Pro."
 			},
-			"languages": {
-				"question": "¿En qué idiomas está?",
-				"answer": "Español e inglés. Puedes cambiar cuando quieras."
+			"progression": {
+				"question": "¿Me dice cuánto peso poner la próxima vez?",
+				"answer": "Sí. Cuando todas las series de un ejercicio llegan al tope de su rango de repeticiones, el siguiente entrenamiento suma un paso: {step} si no eliges otro. Si no llegas, se mantiene el peso que levantaste. Los calentamientos y los discos de cada lado se calculan desde tu peso de trabajo."
+			},
+			"customExercises": {
+				"question": "¿Y si mi ejercicio no está en el catálogo?",
+				"answer": "Créalo. Puedes tener hasta {customMax} ejercicios propios y usarlos en rutinas y entrenamientos como cualquier otro."
+			},
+			"offline": {
+				"question": "¿Funciona sin conexión?",
+				"answer": "Si se corta la señal en pleno entrenamiento, sigue registrando: tus series se envían cuando vuelve, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
 			},
 			"pro": {
 				"question": "¿Qué agrega Pro?",
 				"answer": "Planificar con bloques de 8 semanas, bloques de entrenamiento y descargas; comparaciones, señales de entrenamiento y revisiones; tu historial completo; y borradores de rutina a partir de una descripción. <link>Ver Free y Pro lado a lado</link>."
 			},
 			"cancel": {
-				"question": "¿Cómo cancelo?",
-				"answer": "Desde Ajustes, en Cuenta, o con el <cancellation>botón de baja</cancellation> sin iniciar sesión. Pro dura hasta el final de lo que pagaste y no se borra nada. Dentro de los {revocationDays} días de la compra, también puedes usar el <revocation>botón de arrepentimiento</revocation>."
+				"question": "¿Puedo cancelar Pro cuando quiera?",
+				"answer": "Sí. Desde Ajustes, en Cuenta, o con el <cancellation>botón de baja</cancellation> sin iniciar sesión. Pro dura hasta el final de lo que pagaste y no se borra nada. Dentro de los {revocationDays} días de la compra, también puedes usar el <revocation>botón de arrepentimiento</revocation>."
 			},
 			"privacy": {
 				"question": "¿Quién ve mi perfil y mis entrenamientos?",
 				"answer": "Tú eliges, para cada una de las {count} partes de tu perfil: todos, tus seguidores o solo tú. Puedes bloquear a quien quieras y denunciar lo que haga falta."
-			},
-			"messages": {
-				"question": "¿Los mensajes son privados?",
-				"answer": "Son uno a uno y se guardan en nuestros servidores; no tienen cifrado de extremo a extremo. Un moderador lee un mensaje solo si lo denuncian, y en ese caso solo ese mensaje y hasta {context} anteriores, como los vio quien lo denunció."
 			},
 			"ai": {
 				"question": "¿Qué pasa con lo que le doy a la IA?",
@@ -329,10 +329,6 @@
 			"data": {
 				"question": "¿Puedo llevarme mis datos o borrar mi cuenta?",
 				"answer": "Sí. Descarga todo en un archivo desde Ajustes cuando quieras, y borrar tu cuenta es inmediato y completo."
-			},
-			"medical": {
-				"question": "¿Esto es consejo médico?",
-				"answer": "No. Sunnsteel registra y describe tu entrenamiento. Ante dolor, lesiones o dudas de salud, consulta a un profesional."
 			}
 		}
 	},

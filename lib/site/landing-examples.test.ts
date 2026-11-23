@@ -70,7 +70,7 @@ describe('the landing examples (SITE-01)', () => {
 			groupMax: 6,
 			partnersMax: 20,
 			privacyParts: 10,
-			messageContext: 5,
+			customExercisesMax: 100,
 			revocationDays: 10,
 			trialDays: 7,
 			ranks: 6,

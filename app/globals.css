@@ -1786,6 +1786,25 @@
   align-items: center;
   margin-top: 20px;
 }
+/* The four phones fit the window with their word above them (the owner,
+   2026-11-23: at 300 by 617 they ran past a laptop's screen). `zoom` scales
+   each phone whole, so its screen keeps the layout it was drawn at; a
+   shorter window takes them smaller still. */
+@media (min-width: 768px) {
+  .site-verb-stage .site-device {
+    zoom: 0.86;
+  }
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-verb-stage .site-device {
+    zoom: 0.78;
+  }
+}
+@media (min-width: 768px) and (max-height: 700px) {
+  .site-verb-stage .site-device {
+    zoom: 0.7;
+  }
+}
 .site-verb-title {
   margin-top: 24px;
 }

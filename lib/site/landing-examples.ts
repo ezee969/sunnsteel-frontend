@@ -1,8 +1,8 @@
 import {
 	buildWarmUpRamp,
 	calculatePlateLoading,
+	CUSTOM_EXERCISES_MAX,
 	EXERCISE_GROUP_MAX,
-	MESSAGE_REPORT_CONTEXT_BEFORE,
 	MUSCLE_GROUPS,
 	type MuscleGroup,
 	PLANS,
@@ -181,7 +181,7 @@ export const LANDING_FACTS = {
 	groupMax: EXERCISE_GROUP_MAX,
 	partnersMax: TRAINING_PARTNERS_MAX,
 	privacyParts: Object.keys(PRIVACY_SECTION_LABEL_KEYS).length,
-	messageContext: MESSAGE_REPORT_CONTEXT_BEFORE,
+	customExercisesMax: CUSTOM_EXERCISES_MAX,
 	revocationDays: REVOCATION_WINDOW_DAYS,
 	trialDays: SUBSCRIPTION_TRIAL_DAYS,
 	ranks: RENAISSANCE_RANK_DEFINITIONS.length,

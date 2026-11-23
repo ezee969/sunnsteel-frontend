@@ -8,29 +8,31 @@ import { SELLER } from '@/lib/legal/legal-facts'
 import { LANDING_FACTS } from '@/lib/site/landing-examples'
 import { formatPlanPrice } from '@/lib/utils/checkout'
 import { CONSUMER_REQUEST_PATHS } from '@/lib/utils/consumer-requests'
+import { formatWeight } from '@/lib/utils/weight-unit'
 
 import { SiteSectionHeading } from './site-parts'
 import { SiteQuestionsList } from './site-questions-list'
 
 /**
- * SITE-01 §12.11: what stops a visitor from signing up, answered honestly --
- * what the AI receives, what messages are, what is not medical advice. Every
- * number is contracts' and every fact the app's. The same messages make the
- * page's `FAQPage` JSON-LD, so the two can never differ.
+ * SITE-01 §12.11: what a first-time visitor asks before signing up, answered
+ * honestly (the owner, 2026-11-23: no basics such as the languages, nothing
+ * on medical advice) -- what it costs, how it installs, what it does for the
+ * next workout, what the AI receives. Every number is contracts' and every
+ * fact the app's. The same messages make the page's `FAQPage` JSON-LD, so the
+ * two can never differ.
  */
 const QUESTIONS = [
 	'free',
 	'install',
-	'offline',
 	'beginners',
-	'languages',
+	'progression',
+	'customExercises',
+	'offline',
 	'pro',
 	'cancel',
 	'privacy',
-	'messages',
 	'ai',
 	'data',
-	'medical',
 ] as const
 
 export async function SiteQuestions() {
@@ -41,7 +43,8 @@ export async function SiteQuestions() {
 		days: LANDING_FACTS.trialDays,
 		revocationDays: LANDING_FACTS.revocationDays,
 		count: LANDING_FACTS.privacyParts,
-		context: LANDING_FACTS.messageContext,
+		step: formatWeight(LANDING_FACTS.step, 'KG', locale),
+		customMax: LANDING_FACTS.customExercisesMax,
 	}
 	const link = (href: string) => {
 		const InlineLink = (chunks: ReactNode) => (
