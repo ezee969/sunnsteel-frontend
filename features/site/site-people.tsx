@@ -67,7 +67,7 @@ function Scene({
 			<p className="type-label text-ink-3">{eyebrow}</p>
 			<h3 className="type-panel">{title}</h3>
 			<p className="type-body-sm site-body mt-0">{body}</p>
-			<div aria-hidden="true" className="site-card site-scene-panel">
+			<div aria-hidden="true" className="dark site-card site-scene-panel">
 				<ExampleMark label={example} />
 				{children}
 			</div>

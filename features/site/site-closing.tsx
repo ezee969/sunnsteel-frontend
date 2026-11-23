@@ -77,7 +77,10 @@ export async function SiteClosing() {
 						data-reveal="up"
 						style={motionVars({ '--delay': '650ms', '--rise': '8px' })}
 					>
-						<Link href="/signup" className="site-filled site-filled-hero">
+						<Link
+							href="/signup"
+							className="site-filled site-filled-hero site-filled-accent"
+						>
 							{t('createAccount')}
 						</Link>
 						<Link href="/login" className="site-ghost type-action">

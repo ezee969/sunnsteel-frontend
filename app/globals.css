@@ -1067,9 +1067,53 @@
 /* The browser's own surfaces carry the design too: a selection in the ink of
    the region it is in, and a visible ring on every one of the site's own
    controls (its buttons and links are not the app's primitives). */
+/* The landing's text is not selectable (the owner, 2026-11-22), except the
+   questions -- the support address and the answers are there to be copied. */
+.site {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.site :is(.site-questions, input, textarea) {
+  -webkit-user-select: text;
+  user-select: text;
+}
 .site ::selection {
   background: var(--foreground);
   color: var(--background);
+}
+/* §33.13 the site's accent (the owner, 2026-11-22: "we can afford some extra
+   color"): burnished gold, the golden era's bronze. It marks the one action
+   and what is active or earned in an example -- never Pro, never a rank. A
+   deeper grade on the light ground, a brighter one on Night. */
+.site {
+  --site-accent: oklch(0.6 0.13 78);
+  --site-accent-ink: oklch(0.18 0.012 70);
+}
+.dark .site,
+.site .dark,
+.site.dark {
+  --site-accent: oklch(0.84 0.15 86);
+}
+/* Two classes, so the accent wins over the ink fill declared further down. */
+.site-filled.site-filled-accent {
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-filled.site-filled-accent:hover {
+  background: color-mix(in oklch, var(--site-accent) 86%, white);
+}
+.site .type-site-display mark {
+  color: var(--site-accent);
+}
+/* The bar's Get started waits for the hero's to scroll away. */
+.site-js .site-bar:not([data-cta]) .site-filled-bar {
+  visibility: hidden;
+  opacity: 0;
+}
+.site-anim .site-bar .site-filled-bar {
+  transition:
+    opacity var(--motion-base) var(--ease-standard),
+    visibility var(--motion-base);
 }
 .site :is(a, button, summary):focus-visible {
   outline: 2px solid var(--ring);
@@ -1204,7 +1248,9 @@
 .site-hero {
   position: relative;
   overflow: hidden;
-  height: max(600px, calc(100svh - 136px));
+  /* The whole first screen (the owner, 2026-11-22): the proof band waits
+     below the fold so the footage and the headline land alone. */
+  height: max(600px, 100svh);
 }
 .site-scrim-more {
   display: none;
@@ -1485,9 +1531,9 @@
   content: '';
   display: block;
   width: 72px;
-  height: 2px;
+  height: 3px;
   margin-top: 24px;
-  background: var(--foreground);
+  background: var(--site-accent);
 }
 .site-section {
   max-width: calc(1328px + 2 * var(--site-gutter));
@@ -1526,16 +1572,19 @@
   border-radius: var(--radius-sm);
 }
 
-/* The original phone frame (§33.8): 320px on desktop, 280 and 260 below. */
+/* The original phone frame (§33.8), Night in both themes: as wide as its
+   column, up to 300px. */
 .site-device {
-  width: 320px;
+  width: 100%;
+  max-width: 300px;
   aspect-ratio: 9 / 18.5;
   flex-shrink: 0;
   overflow: hidden;
   border: 1.5px solid var(--rule);
   border-radius: 36px;
   background: var(--surface-sunk);
-  padding: 14px 20px;
+  color: var(--foreground);
+  padding: 14px 18px;
 }
 .site-device-bar {
   display: flex;
@@ -1584,9 +1633,8 @@
   border-bottom: 1px solid var(--rule-faint);
 }
 .site-callout {
-  position: absolute;
-  left: calc(50% - 160px - 48px);
-  bottom: 56px;
+  position: relative;
+  margin: -32px auto 0;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -1601,34 +1649,73 @@
   line-height: 1.35;
 }
 
-/* §12.4 the four verbs. */
+/* §12.4 the four verbs: four phones in a row from 1280, two by two on
+   tablets, a swipe row on phones (the owner, 2026-11-22). */
 .site-verbs {
-  margin-top: clamp(48px, 6vw, 96px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 24px;
+  margin-top: clamp(40px, 5vw, 72px);
 }
 .site-verb {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: 24px;
-  align-items: center;
-  min-height: 80svh;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-.site-verb-text {
-  grid-column: 1 / 7;
+/* In the row, the four columns share their rows, so a two-line callout
+   never pushes one title below the others. */
+@media (min-width: 1280px) {
+  .site-verb {
+    display: grid;
+    grid-row: span 5;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+  .site-verbs {
+    row-gap: 0;
+  }
 }
 .site-verb-word {
   display: flex;
   align-items: baseline;
-  gap: 16px;
+  gap: 12px;
 }
-.site-verb-title {
-  margin-top: 20px;
+.site-verb-word .type-data {
+  color: var(--site-accent);
 }
 .site-verb-stage {
-  position: relative;
-  grid-column: 8 / 13;
   display: flex;
-  justify-content: center;
-  padding-block: 32px;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+.site-verb-title {
+  margin-top: 24px;
+}
+.site-verb .site-body {
+  margin-top: 8px;
+}
+@media (max-width: 1279px) {
+  .site-verbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 56px 32px;
+  }
+}
+@media (max-width: 767px) {
+  .site-verbs {
+    display: flex;
+    gap: 16px;
+    margin-inline: calc(var(--site-gutter) * -1);
+    padding-inline: var(--site-gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--site-gutter);
+    scrollbar-width: none;
+  }
+  .site-verb {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
 }
 
 /* §12.5 the tools bento. */
@@ -1664,9 +1751,14 @@
 }
 /* The ledger's panel takes the large card's remaining height, its rows
    centred in it, so the card never opens a gap under its text. */
+/* The ledger fills its panel: its rows share the large card's height, so
+   no empty block sits under them. */
 .site-tool-large .site-mock {
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
+}
+.site-tool-large .site-ledger-table {
+  flex: 1;
 }
 .site-ledger-table {
   width: 100%;
@@ -1680,7 +1772,7 @@
   font-weight: 500;
 }
 .site-ledger-table td {
-  padding-block: 15px;
+  padding-block: 17px;
   border-top: 1px solid var(--rule-faint);
   white-space: nowrap;
 }
@@ -1733,8 +1825,9 @@
   margin-top: 28px;
 }
 .site-week {
-  padding: 6px 10px;
-  border: 1px solid var(--rule-faint);
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
   border-radius: var(--radius-sm);
   /* A label, so the label face, not Space Mono (which is for measures). */
   font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
@@ -1742,12 +1835,17 @@
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink-2);
   white-space: nowrap;
 }
-.site-week[data-current] {
-  border-color: var(--foreground);
+.site-week:hover {
   color: var(--foreground);
+  border-color: var(--foreground);
+}
+.site-week[aria-pressed='true'] {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
 }
 .site-strength {
   margin-top: 16px;
@@ -1794,27 +1892,6 @@
 }
 
 @media (max-width: 1023px) {
-  .site-verb {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-height: 0;
-    padding-block: 48px;
-  }
-  .site-verb-stage {
-    flex-direction: column;
-    align-items: center;
-    padding-block: 32px 0;
-  }
-  .site-device {
-    width: 280px;
-  }
-  .site-callout {
-    position: relative;
-    left: auto;
-    bottom: auto;
-    margin-top: -28px;
-  }
   .site-tool,
   .site-tool-large {
     grid-column: 1 / -1;
@@ -1837,9 +1914,6 @@
   }
 }
 @media (max-width: 767px) {
-  .site-device {
-    width: 260px;
-  }
   .site-tool,
   .site-tool-large {
     display: flex;
@@ -1874,9 +1948,17 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  width: 100%;
   min-height: 64px;
-  padding-block: 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--rule-faint);
+  text-align: left;
+}
+.site-ladder-rung:hover {
+  background: var(--surface);
+}
+.site-ladder-rung[aria-pressed='true'] {
+  background: color-mix(in oklch, var(--site-accent) 14%, transparent);
 }
 
 /* §12.8 templates: the plain list, before the coverflow. */
@@ -2467,191 +2549,52 @@
   transition: transform 240ms var(--ease-standard);
 }
 
-/* §12.4 the four verbs, stacked: each panel's phone rises and plays its
-   script when it is in view, its callout following. */
-.site-anim .site-verb:not([data-in]) .site-verb-text {
-  opacity: 0;
-  transform: translateY(12px);
-}
-.site-anim .site-verb[data-in] .site-verb-text {
-  animation: site-up 600ms var(--ease-standard) both;
-}
-.site-anim .site-verb-stage:not([data-play]) :is(.site-device, .site-callout) {
-  opacity: 0;
-}
-.site-anim .site-verb-stage[data-play] .site-device {
-  --rise: 32px;
-  animation: site-up 700ms var(--ease-standard) both;
-}
-.site-anim .site-verb-stage[data-play] .site-callout {
-  --rise: 16px;
-  animation: site-up 500ms var(--ease-standard) both;
-  animation-delay: 1900ms;
-}
-
-/* The desktop stage: one phone held at the centre while the panels pass. */
-.site-verbs-stage {
-  display: none;
-}
-@media (min-width: 1024px) {
-  .site-js .site-verbs-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 24px;
-    margin-top: clamp(48px, 6vw, 96px);
-  }
-  .site-js .site-verbs {
-    grid-column: 1 / 7;
-    grid-row: 1;
-    margin-top: 0;
-  }
-  .site-js .site-verb {
-    display: flex;
-    align-items: center;
-  }
-  .site-js .site-verb-stage {
-    display: none;
-  }
-  .site-js .site-verbs-stage {
-    position: sticky;
-    top: calc(50svh - 330px);
-    grid-column: 7 / 13;
-    grid-row: 1;
-    align-self: start;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 48px;
-  }
-  .site-js .site-verb[data-dim] .site-verb-text :is(p, h3, a, span) {
-    color: var(--ink-3);
-  }
-  .site-anim .site-verb .site-verb-text :is(p, h3, a, span) {
-    transition: color var(--motion-base) var(--ease-standard);
+/* §12.4 the four verbs: each column rises as it comes into view; on desktop
+   the four scripts then play one after another (each phone's --seq), on
+   tablets and phones each as its phone comes into view. */
+@media (max-width: 1279px) {
+  .site-verb {
+    --seq: 0s !important;
   }
 }
-.site-rail {
-  position: relative;
-  display: grid;
-  grid-template-rows: repeat(4, 56px);
-  border-left: 1px solid var(--rule);
-}
-.site-rail-tick {
-  align-self: center;
-  width: 8px;
-  height: 1px;
-  background: var(--rule);
-}
-.site-rail-mark {
-  position: absolute;
-  top: 0;
-  left: -4px;
-  height: 56px;
-  width: 8px;
-}
-.site-rail-mark::before {
-  content: '';
-  position: absolute;
-  top: calc(50% - 4px);
-  width: 8px;
-  height: 8px;
-  background: var(--foreground);
-}
-.site-anim .site-rail-mark {
-  transition: transform var(--motion-slow) var(--ease-standard);
-}
-.site-verbs-stage .site-device {
-  display: flex;
-  flex-direction: column;
-}
-.site-verbs-stage .site-device-screen {
-  position: relative;
-  flex: 1;
-  padding: 0;
-}
-.site-stage-screen {
-  position: absolute;
-  inset: 18px 0 0;
-  opacity: 0;
-  transform: translateY(24px);
-}
-.site-stage-screen[data-state='in'] {
-  opacity: 1;
-  transform: none;
-}
-.site-stage-screen[data-state='past'] {
-  transform: translateY(-24px);
-}
-.site-anim .site-stage-screen {
-  transition:
-    opacity 300ms var(--ease-exit),
-    transform 300ms var(--ease-exit);
-}
-/* The incoming screen waits for most of the outgoing one's exit, so two
-   screens of text are never read over each other. */
-.site-anim .site-stage-screen[data-state='in'] {
-  transition:
-    opacity 500ms var(--ease-standard) 200ms,
-    transform 500ms var(--ease-standard) 200ms;
-}
-.site-stage-callout {
-  opacity: 0;
-  transform: translateY(16px);
-}
-.site-stage-callout[data-state='in'] {
-  opacity: 1;
-  transform: none;
-}
-.site-anim .site-stage-callout {
-  transition:
-    opacity 200ms var(--ease-exit),
-    transform 200ms var(--ease-exit);
-}
-.site-anim .site-stage-callout[data-state='in'] {
-  transition:
-    opacity 500ms var(--ease-standard) 150ms,
-    transform 500ms var(--ease-standard) 150ms;
-}
-
-/* The verbs' scripts (each under 5 seconds), played by `data-play`. */
 .site-anim [data-play] .sx-day {
   animation: site-slide 400ms var(--ease-standard) both;
-  animation-delay: calc(200ms + var(--i, 0) * 160ms);
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 160ms);
 }
 .site-anim [data-play] .sx-row {
   animation: site-fade 300ms var(--ease-standard) both;
-  animation-delay: calc(500ms + var(--i, 0) * 90ms);
+  animation-delay: calc(var(--seq, 0s) + 500ms + var(--i, 0) * 90ms);
 }
 .site-anim [data-play] .sx-plate {
   transform-box: fill-box;
   animation: site-plate 450ms var(--ease-standard) both;
-  animation-delay: calc(300ms + var(--i, 0) * 450ms);
+  animation-delay: calc(var(--seq, 0s) + 300ms + var(--i, 0) * 450ms);
 }
 .site-anim [data-play] .sx-ramp {
   animation: site-fade 300ms var(--ease-standard) both;
-  animation-delay: calc(1400ms + var(--i, 0) * 280ms);
+  animation-delay: calc(var(--seq, 0s) + 1400ms + var(--i, 0) * 280ms);
 }
 .site-anim [data-play] .sx-line {
   stroke-dasharray: 1;
   animation: site-draw 1600ms var(--ease-standard) both;
-  animation-delay: 200ms;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
 }
 .site-anim [data-play] .site-map-region {
   animation: site-fade 400ms var(--ease-standard) both;
-  animation-delay: calc(1600ms + var(--band, 0) * 250ms);
+  animation-delay: calc(var(--seq, 0s) + 1600ms + var(--band, 0) * 250ms);
 }
 .site-anim [data-play] .sx-crest {
   display: inline-block;
   animation: site-unveil 900ms var(--ease-standard) both;
-  animation-delay: 200ms;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
 }
 .site-anim [data-play] .sx-name {
   animation: site-up 500ms var(--ease-standard) both;
-  animation-delay: 1000ms;
+  animation-delay: calc(var(--seq, 0s) + 1000ms);
 }
 .site-anim [data-play] .sx-milestone {
   animation: site-up 500ms var(--ease-standard) both;
-  animation-delay: 1500ms;
+  animation-delay: calc(var(--seq, 0s) + 1500ms);
 }
 
 /* §12.5 the tools bento: the cards arrive in turn (on phones, each as it
@@ -2714,49 +2657,15 @@
   }
 }
 
-/* §12.6 progress: the weeks advanced by markers on a sticky stage (desktop)
-   or played by themselves (phones); every change is a fill, a colour or a
-   drawn segment. */
-.site-progress-scroll,
-.site-ranks-scroll {
-  position: relative;
-}
-.site-week-marker,
-.site-rank-marker {
-  position: absolute;
-  left: 0;
-  width: 1px;
-  pointer-events: none;
-}
-.site-week-marker {
-  height: 25%;
-}
-.site-rank-marker {
-  height: calc(100% / 6);
-}
-@media (min-width: 1024px) {
-  .site-progress-scroll[data-mode='stage'] {
-    height: 300svh;
-    margin-top: clamp(40px, 5vw, 72px);
-  }
-  .site-progress-scroll[data-mode='stage'] > .site-progress-stage {
-    position: sticky;
-    top: 96px;
-    margin-top: 0;
-  }
-  .site-ranks-scroll[data-mode='stage'] {
-    height: 360svh;
-  }
-  .site-ranks-scroll[data-mode='stage'] > .site-ranks {
-    position: sticky;
-    top: 120px;
-  }
-}
+/* §12.6 progress and §12.7 ranks: the reader's buttons, and what moves when
+   they change -- a fill, a colour, a drawn segment (the owner replaced the
+   sticky stages with these on 2026-11-22). */
 .site-anim .site-progress-map path {
   transition: fill 400ms var(--ease-standard);
 }
 .site-anim .site-week {
   transition:
+    background-color var(--motion-slow) var(--ease-standard),
     border-color var(--motion-slow) var(--ease-standard),
     color var(--motion-slow) var(--ease-standard);
 }
@@ -2773,22 +2682,8 @@
 .site-analysis-strip > :nth-child(4) {
   --i: 3;
 }
-
-/* §12.7 ranks: on the stage each crest takes its pigment as its rank is
-   reached; elsewhere the six draw one after another when the ladder is in
-   view. */
 .site-anim .site-ladder-crest {
   transition: color var(--motion-slow) var(--ease-standard);
-}
-.site-ladder-rung[data-current] {
-  background: var(--surface);
-}
-.site-anim .site-ranks-scroll[data-mode='still'] .site-ladder:not([data-play]) .site-ladder-crest {
-  clip-path: inset(100% 0 0 0);
-}
-.site-anim .site-ranks-scroll[data-mode='still'] .site-ladder[data-play] .site-ladder-crest {
-  animation: site-unveil 600ms var(--ease-standard) both;
-  animation-delay: calc(var(--i, 0) * 300ms);
 }
 
 /* §12.8 the templates coverflow (from 768 with motion) and the scroll-snap
@@ -2865,16 +2760,6 @@
 .site-coverflow-arrow:disabled {
   color: var(--ink-3);
   cursor: default;
-}
-.site-coverflow-card[data-front] .site-template-start {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.site-coverflow-card[data-front] .site-template-start:hover {
-  background: var(--primary-hover);
 }
 .site-coverflow[data-layout='row'] .site-coverflow-track {
   display: flex;
@@ -3067,3 +2952,63 @@
     padding-inline: 12px;
   }
 }
+
+/* §33.13 the accent at work, and Night mock-ups in both themes (the owner,
+   2026-11-22: "no colors at all ... looks way fuller"): dark panels stand
+   out of the page's ground, and what is active, done or earned in an
+   example takes the gold. Pro, ranks and the body map keep their own roles. */
+.site-mock,
+.site-analysis-mock,
+.site-scene-panel,
+.site-progress-map,
+.site-strength {
+  color: var(--foreground);
+}
+.site-progress-map .site-example {
+  color: var(--ink-3);
+}
+.site-device .sx-plate.fill-foreground {
+  fill: var(--site-accent);
+}
+.site-device .sx-line,
+.site-strength .site-segment {
+  stroke: var(--site-accent);
+}
+.site-strength circle {
+  fill: var(--site-accent);
+}
+.site-device :is(.sx-ramp, .sx-milestone) svg,
+.site-ledger-table svg,
+.site-mock .site-notification svg,
+.site-scene-panel .site-notification svg,
+.site-scene-panel .sx-done svg {
+  color: var(--site-accent);
+}
+.site-ledger-table tr[data-rise] td {
+  border-bottom-color: var(--site-accent);
+  color: var(--site-accent);
+}
+.site-rest-fill {
+  background: var(--site-accent);
+}
+.site-reactions li[data-chosen] {
+  border-color: var(--site-accent);
+  color: var(--site-accent);
+}
+.site-segmented span[data-on] {
+  border-bottom-color: var(--site-accent);
+}
+.site-week-strip li[data-on] {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-coverflow-card[data-front] .site-template-start {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-coverflow-card[data-front] .site-template-start:hover {
+  background: color-mix(in oklch, var(--site-accent) 86%, white);
+}
+

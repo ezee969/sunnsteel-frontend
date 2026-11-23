@@ -41,7 +41,10 @@ export async function SiteTopBar() {
 				<Link href="/login" className="type-action text-foreground">
 					{t('signIn')}
 				</Link>
-				<Link href="/signup" className="site-filled site-filled-bar">
+				<Link
+					href="/signup"
+					className="site-filled site-filled-bar site-filled-accent"
+				>
 					{t('start')}
 				</Link>
 				<SiteMenu />

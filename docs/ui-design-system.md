@@ -3009,3 +3009,35 @@ categories on phone and desktop (the plan's §5 budget); contrast measured on
 each video cut's brightest frame; a reduced-motion pass and a no-JavaScript
 pass showing final states; and the network log showing that video, rank
 decorations and mock-up islands load only when their sections approach.
+
+### 33.13 Colour, density and direct control (2026-11-22)
+
+The owner reviewed the live landing on 2026-11-22 ("looks boring and empty",
+"we can afford some extra color", "scrolling ... is so bad since you have to
+go through entire animations") and decided:
+
+- **One accent, on the site only: burnished gold** (`--site-accent`, a
+  deeper grade on the page's ground, a brighter one on Night;
+  `--site-accent-ink` on it). It marks the hero's carved word, the one filled
+  action of the hero, the bar and the closing band, the rule under every
+  section heading, the selected week and rank, and what is active, done or
+  earned inside an example (plates, the strength line, ticks, the record
+  row, the rest bar). It supersedes §33.4's "never gold" for a headline's
+  emphasis. **Pro is still never coloured** and Pro's "Try Pro" stays ink;
+  rank pigments and the body map's bands keep their roles; honour keeps its
+  meaning inside an example (the record card).
+- **Mock-ups are Night in both themes**: the phones, the tools' panels, the
+  analysis panels, the people scenes and the progress map, so they stand out
+  of the page's ground instead of melting into it.
+- **No scroll-driven stages.** The four verbs are four phones in a row (two
+  by two on tablets, a swipe row on phones) whose scripts play one after
+  another; the progress weeks and the six ranks are buttons the reader picks,
+  playing through once by themselves when in view until one is picked.
+- **The first screen is the footage and the headline alone**: the hero fills
+  the viewport, so the proof band arrives on scroll; it has one action
+  (Create a free account), the bar's Get started appears once that has
+  scrolled away, and the install line left it (the closing band and the
+  questions keep "How to install"). The proof band's fourth cell is the
+  17 muscles of the body map, not the languages.
+- **The landing's text is not selectable**, except the questions (the support
+  address and the answers are there to be copied).

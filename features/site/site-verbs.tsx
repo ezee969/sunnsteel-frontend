@@ -18,8 +18,7 @@ import {
 import { templateText } from '@/lib/utils/routine-templates'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
-import { SitePhoneFrame, SiteSectionHeading } from './site-parts'
-import { SiteVerbsStage } from './site-verbs-stage'
+import { motionVars, SitePhoneFrame, SiteSectionHeading } from './site-parts'
 import {
 	EarnScreen,
 	MeasureScreen,
@@ -29,10 +28,14 @@ import {
 
 /**
  * SITE-01 §12.4: the whole product in four moves, each proven by the app's
- * own screen and sent to its feature page. This is the stacked layout every
- * width shows without JavaScript; the sticky desktop stage and the scripts
- * arrive with the motion phase. No filled action: the links are link-style.
+ * own screen and sent to its feature page. Four phones in a row on desktop,
+ * playing their scripts one after another; two by two on tablets; a swipe row
+ * on phones, each playing as it comes into view. The owner replaced the
+ * sticky stage on 2026-11-22: scrolling through four screens of it was too
+ * long. No filled action: the links are link-style.
  */
+/** Each phone's script starts this long after the one before it. */
+const STEP_SECONDS = 4.2
 const VERBS = [
 	{ key: 'plan', href: '/features/routine-builder', Screen: PlanScreen },
 	{ key: 'train', href: '/features/workout-tracker', Screen: TrainScreen },
@@ -82,52 +85,48 @@ export async function SiteVerbs() {
 	return (
 		<section aria-labelledby="verbs-heading" className="site-section">
 			<SiteSectionHeading id="verbs-heading">{t('heading')}</SiteSectionHeading>
-			<div className="site-verbs-grid">
-				<ol className="site-verbs">
-					{VERBS.map(({ key, href, Screen }, index) => (
-						<li
-							key={key}
-							className="site-verb"
-							data-verb-panel=""
-							data-reveal=""
-						>
-							<div className="site-verb-text">
-								<p aria-hidden="true" className="site-verb-word">
-									<span className="type-data text-ink-3">
-										{String(index + 1).padStart(2, '0')}
-									</span>
-									<span className="type-page">{t(`words.${key}`)}</span>
-								</p>
-								<h3 className="type-panel site-verb-title">
-									{t(`${key}.title`)}
-								</h3>
-								<p className="type-site-lead site-body">
-									{t(`${key}.body`, { ranks: LANDING_FACTS.ranks })}
-								</p>
-								<Link href={href} className="type-action site-link">
-									{t(`${key}.link`)}
-									<ArrowRight className="size-4" aria-hidden />
-								</Link>
-							</div>
-							<div className="site-verb-stage" data-play-when="0.5">
-								<SitePhoneFrame example={tMock('example')}>
-									<Screen />
-								</SitePhoneFrame>
-								<p aria-hidden="true" className="site-callout">
-									{callouts[key]}
-								</p>
-							</div>
-						</li>
-					))}
-				</ol>
-				<SiteVerbsStage
-					example={tMock('example')}
-					screens={VERBS.map(({ key, Screen }) => (
-						<Screen key={key} />
-					))}
-					callouts={VERBS.map(({ key }) => callouts[key])}
-				/>
-			</div>
+			<ol
+				className="site-verbs"
+				data-play-when="0.3"
+				data-play-media="(min-width: 1280px)"
+			>
+				{VERBS.map(({ key, href, Screen }, index) => (
+					<li
+						key={key}
+						className="site-verb"
+						data-reveal="up"
+						data-play-when="0.5"
+						data-play-media="(max-width: 1279px)"
+						style={motionVars({
+							'--seq': `${index * STEP_SECONDS}s`,
+							'--delay': `${index * 120}ms`,
+						})}
+					>
+						<p aria-hidden="true" className="site-verb-word">
+							<span className="type-data">
+								{String(index + 1).padStart(2, '0')}
+							</span>
+							<span className="type-page">{t(`words.${key}`)}</span>
+						</p>
+						<div className="site-verb-stage">
+							<SitePhoneFrame example={tMock('example')}>
+								<Screen />
+							</SitePhoneFrame>
+							<p aria-hidden="true" className="site-callout">
+								{callouts[key]}
+							</p>
+						</div>
+						<h3 className="type-panel site-verb-title">{t(`${key}.title`)}</h3>
+						<p className="type-body site-body">
+							{t(`${key}.body`, { ranks: LANDING_FACTS.ranks })}
+						</p>
+						<Link href={href} className="type-action site-link">
+							{t(`${key}.link`)}
+							<ArrowRight className="size-4" aria-hidden />
+						</Link>
+					</li>
+				))}
+			</ol>
 		</section>
 	)
 }

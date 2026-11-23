@@ -45,19 +45,18 @@ export async function SiteHero() {
 					{t.rich('headline', { mark: chunks => <mark>{chunks}</mark> })}
 				</h1>
 				<p className="type-site-lead site-lead">{t('subline')}</p>
+				{/* One action (the owner, 2026-11-22): Sign in lives in the bar,
+				    and the bar's Get started waits until this one has scrolled
+				    away (`data-hero-cta`, read by the motion runtime). */}
 				<div className="site-actions">
-					<Link href="/signup" className="site-filled site-filled-hero">
+					<Link
+						href="/signup"
+						data-hero-cta=""
+						className="site-filled site-filled-hero site-filled-accent"
+					>
 						{t('createAccount')}
 					</Link>
-					<Link href="/login" className="site-ghost type-action">
-						<span>{t('signIn')}</span>
-					</Link>
 				</div>
-				<p className="site-install">
-					{t.rich('install', {
-						link: chunks => <Link href="/#install">{chunks}</Link>,
-					})}
-				</p>
 			</div>
 			<HeroPhone />
 		</section>

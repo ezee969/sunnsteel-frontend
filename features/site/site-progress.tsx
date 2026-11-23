@@ -42,7 +42,7 @@ function AnalysisCard({
 				<PlanTag>{tag}</PlanTag>
 			</div>
 			<p className="type-body-sm text-ink-2">{body}</p>
-			<div aria-hidden="true" className="site-analysis-mock">
+			<div aria-hidden="true" className="dark site-analysis-mock">
 				{children}
 			</div>
 		</SiteCard>
@@ -61,7 +61,6 @@ export async function SiteProgress() {
 	const kg = (value: number) => formatWeight(value, 'KG', locale)
 	const bench = exerciseLabel(STRENGTH_EXAMPLE.exercise, tExercises)
 	const strength = [...STRENGTH_EXAMPLE.weeklyE1rmKg.slice(-WEEKS.length)]
-	const current = WEEKS[WEEKS.length - 1]
 	const day = dateFormatter(locale, { day: 'numeric', month: 'short' })
 	const deloadDates = `${day.format(new Date(2026, 11, 7))} – ${day.format(new Date(2026, 11, 13))}`
 
@@ -84,7 +83,6 @@ export async function SiteProgress() {
 				strengthValues={strength}
 				strengthLabels={strength.map(kg)}
 				example={tMock('example')}
-				finalListLabel={t('map.finalList', { n: current })}
 			/>
 
 			<ul className="site-analysis-strip" data-reveal="stagger">

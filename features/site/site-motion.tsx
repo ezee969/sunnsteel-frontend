@@ -108,9 +108,20 @@ export function SiteMotion() {
 				bar.toggleAttribute('data-scrolled', !entry.isIntersecting),
 			)
 			top.observe(sentinel)
+			// The bar's Get started repeats the hero's one action, so it shows
+			// only once that has scrolled away (the owner, 2026-11-22).
+			const heroAction = document.querySelector('[data-hero-cta]')
+			const action = heroAction
+				? new IntersectionObserver(([entry]) =>
+						bar.toggleAttribute('data-cta', !entry.isIntersecting),
+					)
+				: null
+			if (heroAction) action?.observe(heroAction)
+			else bar.setAttribute('data-cta', '')
 			cleanups.push(() => {
 				strip.disconnect()
 				top.disconnect()
+				action?.disconnect()
 				sentinel.remove()
 			})
 		}

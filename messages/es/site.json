@@ -43,8 +43,6 @@
 		"headline": "Las estatuas no nacen. <mark>Se esculpen</mark>.",
 		"subline": "Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados.",
 		"createAccount": "Crear cuenta gratis",
-		"signIn": "Iniciar sesión",
-		"install": "Funciona en el navegador y se instala en cualquier teléfono, sin tienda de apps. <link>Cómo instalarla</link>",
 		"pauseVideo": "Pausar el video de fondo",
 		"playVideo": "Reproducir el video de fondo",
 		"example": "Ejemplo",
@@ -64,7 +62,7 @@
 		"ranks": "Rangos por alcanzar",
 		"mockTag": "Cifra ficticia",
 		"cellSr": "{value} {label}",
-		"languages": "Idiomas"
+		"muscles": "Músculos en el mapa del cuerpo"
 	},
 	"mock": {
 		"example": "Ejemplo"
@@ -152,7 +150,6 @@
 			"weeksLabel": "Semanas",
 			"planLine": "{free} semanas gratis, hasta {pro} con Pro.",
 			"strength": "{exercise} · 1RM estimado",
-			"finalList": "Series por músculo en la semana {n}",
 			"empty": "Ningún músculo tiene series esta semana.",
 			"untrained": "Sin series para {muscles}."
 		},
@@ -325,7 +322,7 @@
 		}
 	},
 	"closing": {
-		"heading": "Empieza a esculpir.",
+		"heading": "Tu primera serie te espera.",
 		"subline": "Gratis para empezar, en tu navegador, en español o inglés.",
 		"createAccount": "Crear cuenta gratis",
 		"signIn": "Iniciar sesión",

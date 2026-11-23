@@ -1,9 +1,8 @@
 import {
 	ACHIEVEMENT_DEFINITIONS,
+	MUSCLE_GROUPS,
 	RENAISSANCE_RANK_DEFINITIONS,
 } from '@sunsteel/contracts'
-
-import { LOCALES } from '@/i18n/config'
 
 /**
  * SITE-01 §12.3: the proof band's four cells. Two usage figures are
@@ -17,7 +16,7 @@ export const PLACEHOLDER_FIGURES = { members: 12_400, workouts: 350_000 }
 export const CATALOG_FLOOR = 80
 
 export type ProofLabel =
-	'members' | 'workouts' | 'exercises' | 'milestones' | 'ranks' | 'languages'
+	'members' | 'workouts' | 'exercises' | 'milestones' | 'ranks' | 'muscles'
 
 export type ProofCell =
 	| { kind: 'number'; value: number; label: ProofLabel; mock: boolean }
@@ -57,8 +56,15 @@ export function proofCells(production: boolean): ProofCell[] {
 	return [
 		...(production ? RESERVES : placeholders),
 		{ kind: 'floor', value: CATALOG_FLOOR, label: 'exercises' },
-		// The owner, 2026-11-21: 'free' is said once in the first viewport, on
-		// the account button, so the fourth cell is a fact of its own.
-		{ kind: 'number', value: LOCALES.length, label: 'languages', mock: false },
+		// The fourth cell is a fact of its own: not 'free' (said once, on the
+		// account button, 2026-11-21) and not the languages, which the owner
+		// found nothing to boast about (2026-11-22). The body map tracks every
+		// muscle group of contracts.
+		{
+			kind: 'number',
+			value: MUSCLE_GROUPS.length,
+			label: 'muscles',
+			mock: false,
+		},
 	]
 }

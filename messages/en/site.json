@@ -43,8 +43,6 @@
 		"headline": "Statues aren't born. They're <mark>carved</mark>.",
 		"subline": "Plan, log every set, and watch the work add up: records broken, ranks earned.",
 		"createAccount": "Create a free account",
-		"signIn": "Sign in",
-		"install": "Runs in your browser and installs on any phone, with no app store. <link>How to install</link>",
 		"pauseVideo": "Pause background video",
 		"playVideo": "Play background video",
 		"example": "Example",
@@ -64,7 +62,7 @@
 		"ranks": "Ranks to reach",
 		"mockTag": "Mock figure",
 		"cellSr": "{value} {label}",
-		"languages": "Languages"
+		"muscles": "Muscles on the body map"
 	},
 	"mock": {
 		"example": "Example"
@@ -152,7 +150,6 @@
 			"weeksLabel": "Weeks",
 			"planLine": "{free} weeks free, up to {pro} with Pro.",
 			"strength": "{exercise} · estimated 1RM",
-			"finalList": "Sets per muscle in week {n}",
 			"empty": "No muscle has sets this week.",
 			"untrained": "No sets for {muscles}."
 		},
@@ -325,7 +322,7 @@
 		}
 	},
 	"closing": {
-		"heading": "Start carving.",
+		"heading": "Your first set is waiting.",
 		"subline": "Free to start, in your browser, in English or Spanish.",
 		"createAccount": "Create a free account",
 		"signIn": "Sign in",

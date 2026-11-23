@@ -89,6 +89,8 @@ carving." / "Empieza a esculpir."
 
 **Revised with the owner (2026-11-21, plan §11 row 44):** "free" is said once in the first viewport, on the account button (`createAccount`): the top bar says "Get started" / "Empezar", the eyebrow above the headline is gone, and the proof band's fourth cell is the two languages. The subline's "in a history nobody can fake" read as corny and became "watch the work add up: records broken, ranks earned".
 
+**Revised with the owner (2026-11-22, after the live review):** the hero keeps one action, "Create a free account" (its "Sign in" and the install line are gone; the bar keeps Sign in, the closing band and the questions keep "How to install"); the proof band's fourth cell is `muscles`, "Muscles on the body map" / "Músculos en el mapa del cuerpo", the number from contracts' `MUSCLE_GROUPS`; the plans' eyebrow is gone; and the closing heading is "Your first set is waiting." / "Tu primera serie te espera.", the owner's pick to replace "Start carving.", which read as corny.
+
 ## 3. Proof band — `site.proof`
 
 | Key | English | Spanish |

@@ -1,29 +1,23 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { MuscleMap } from '@/features/body-map/body-map'
 import { MUSCLE_WEEKS, muscleSets } from '@/lib/site/landing-examples'
-import { trainedMuscles } from '@/lib/utils/body-map'
-import { getFriendlyMuscleName } from '@/lib/utils/muscle-groups'
 
 import { prefersStill } from './site-motion'
 import { ExampleMark } from './site-parts'
-import { useStageStep } from './use-stage-step'
 
 /**
- * SITE-01 §12.6: the body map's weeks, advanced by the reader. From 1024 with
- * motion the stage is sticky for about three screens and four invisible
- * markers, one per week, pass the viewport's centre (an IntersectionObserver,
- * never a scroll listener): each muscle's fill crossfades to its new band,
- * the list re-sorts, the strength line draws one more segment, the rail
- * moves; scrolling back steps back. Below 1024 the weeks play by themselves
- * when the map is half in view. Without JavaScript or under reduced motion,
- * week 4 and nothing moves. The figure and its list are `aria-hidden` while
- * they change; the final week's list is read instead.
+ * SITE-01 §12.6: the body map's weeks. The week buttons are the reader's
+ * (the owner, 2026-11-22: a scroll-driven stage made the section a long
+ * scroll and nothing could be picked); with motion allowed, the four weeks
+ * also play by themselves once the map is half in view, until a week is
+ * picked. Each muscle's fill crossfades to its band, the list re-sorts and
+ * the strength line draws a segment a week. Without JavaScript or under
+ * reduced motion it shows week 4 and plays nothing.
  */
-type Mode = 'still' | 'stage' | 'auto'
 const WEEKS = MUSCLE_WEEKS.map((_, index) => index + 1)
 const FINAL = WEEKS.length
 
@@ -73,7 +67,6 @@ export function SiteProgressStage({
 	strengthValues,
 	strengthLabels,
 	example,
-	finalListLabel,
 }: {
 	title: string
 	body: string
@@ -84,37 +77,18 @@ export function SiteProgressStage({
 	strengthValues: number[]
 	strengthLabels: string[]
 	example: string
-	finalListLabel: string
 }) {
 	const t = useTranslations('site.progress.map')
-	const tMuscles = useTranslations('routines.muscles')
-	const tMap = useTranslations('progress.bodyMap')
-	const scroll = useRef<HTMLDivElement>(null)
 	const map = useRef<HTMLDivElement>(null)
-	const [mode, setMode] = useState<Mode>('still')
 	const [week, setWeek] = useState(FINAL)
+	// Once the reader picks a week, the map is theirs: nothing plays over it.
+	const [picked, setPicked] = useState(false)
 
+	// The weeks play by themselves, 1.2s apart, when the map is half in view
+	// (once per entry), with motion allowed and nothing picked yet.
 	useEffect(() => {
-		if (prefersStill()) return
-		const next: Mode = window.matchMedia('(min-width: 1024px)').matches
-			? 'stage'
-			: 'auto'
-		setMode(next)
+		if (picked || prefersStill() || !map.current) return
 		setWeek(1)
-	}, [])
-
-	// The desktop stage: a week per marker crossing the viewport's centre.
-	const onStep = useCallback((step: number) => setWeek(step + 1), [])
-	useStageStep(
-		useCallback(() => scroll.current, []),
-		'[data-week-marker]',
-		mode === 'stage',
-		onStep,
-	)
-
-	// Phones and tablets: the weeks play by themselves, 1.2s apart.
-	useEffect(() => {
-		if (mode !== 'auto' || !map.current) return
 		let timers: number[] = []
 		const clear = () => {
 			timers.forEach(timer => window.clearTimeout(timer))
@@ -138,70 +112,58 @@ export function SiteProgressStage({
 			watch.disconnect()
 			clear()
 		}
-	}, [mode])
+	}, [picked])
 
-	const final = trainedMuscles(muscleSets(MUSCLE_WEEKS[FINAL - 1]))
+	const pick = (next: number) => {
+		setPicked(true)
+		setWeek(next)
+	}
 
 	return (
-		<div ref={scroll} className="site-progress-scroll" data-mode={mode}>
-			{mode === 'stage'
-				? WEEKS.map(marker => (
-						<div
-							key={marker}
-							aria-hidden="true"
-							data-week-marker=""
-							className="site-week-marker"
-							style={{ top: `${((marker - 1) * 100) / WEEKS.length}%` }}
-						/>
-					))
-				: null}
-			<div className="site-progress-stage">
-				<div className="site-progress-text">
-					<h3 className="type-panel">{title}</h3>
-					<p className="type-body site-body">{body}</p>
-					<div className="site-week-rail">
-						<p className="type-label text-ink-3">{weeksLabel}</p>
-						<ol aria-hidden="true" className="flex flex-wrap gap-1">
-							{weekLabels.map((label, index) => (
-								<li
-									key={label}
-									data-current={index + 1 === week || undefined}
-									className="site-week"
-								>
-									{label}
-								</li>
-							))}
-						</ol>
-						<p className="type-body-sm text-ink-3">{planLine}</p>
-					</div>
-				</div>
-				<div ref={map} className="site-progress-map">
-					<div className="mb-2 flex justify-end">
-						<ExampleMark label={example} />
-					</div>
-					<div aria-hidden="true">
-						<MuscleMap
-							sets={muscleSets(MUSCLE_WEEKS[week - 1])}
-							emptyText={t('empty')}
-							untrainedText={muscles => t('untrained', { muscles })}
-						/>
-					</div>
-					<ul aria-label={finalListLabel} className="sr-only">
-						{final.map(row => (
-							<li key={row.muscle}>
-								{getFriendlyMuscleName(row.muscle, tMuscles)}:{' '}
-								{tMap('sets', { sets: row.sets, formatted: String(row.sets) })}
-							</li>
-						))}
-					</ul>
-				</div>
-				<div className="site-strength">
-					<p className="flex items-baseline justify-between gap-3">
-						<span className="type-body-sm text-ink-2">{strengthLabel}</span>
-						<span className="type-data-strong">{strengthLabels[week - 1]}</span>
+		<div className="site-progress-stage">
+			<div className="site-progress-text">
+				<h3 className="type-panel">{title}</h3>
+				<p className="type-body site-body">{body}</p>
+				<div className="site-week-rail">
+					<p className="type-label text-ink-3" id="site-weeks-label">
+						{weeksLabel}
 					</p>
-					<StrengthLine values={strengthValues} week={week} />
+					<div
+						role="group"
+						aria-labelledby="site-weeks-label"
+						className="flex flex-wrap gap-1"
+					>
+						{weekLabels.map((label, index) => (
+							<button
+								key={label}
+								type="button"
+								aria-pressed={index + 1 === week}
+								onClick={() => pick(index + 1)}
+								className="site-week"
+							>
+								{label}
+							</button>
+						))}
+					</div>
+					<p className="type-body-sm text-ink-3">{planLine}</p>
 				</div>
+			</div>
+			<div ref={map} className="dark site-progress-map">
+				<div className="mb-2 flex justify-end">
+					<ExampleMark label={example} />
+				</div>
+				<MuscleMap
+					sets={muscleSets(MUSCLE_WEEKS[week - 1])}
+					emptyText={t('empty')}
+					untrainedText={muscles => t('untrained', { muscles })}
+				/>
+			</div>
+			<div className="dark site-strength">
+				<p className="flex items-baseline justify-between gap-3">
+					<span className="type-body-sm text-ink-2">{strengthLabel}</span>
+					<span className="type-data-strong">{strengthLabels[week - 1]}</span>
+				</p>
+				<StrengthLine values={strengthValues} week={week} />
 			</div>
 		</div>
 	)

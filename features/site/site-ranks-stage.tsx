@@ -1,28 +1,20 @@
 'use client'
 
-import {
-	type CSSProperties,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from 'react'
+import { type CSSProperties, useEffect, useRef, useState } from 'react'
 
 import { RankCrest } from '@/features/achievements/rank-crest'
 
 import { prefersStill } from './site-motion'
 import { SiteRankHeader } from './site-rank-header'
-import { useStageStep } from './use-stage-step'
 
 /**
- * SITE-01 §12.7: the climb. From 1024 with motion the section is a sticky
- * stage for about three and a half screens, and six markers, one per rank,
- * pass the viewport's centre: that rank becomes current, its crest and the
- * ones below it draw in their pigments while those above stay in ink-3 (an
- * unreached rank is ink-3, §19), and the profile header changes to that
- * rank's decoration, which plays its own entrance. Scrolling back steps
- * back. Elsewhere -- phones, tablets, reduced motion, no JavaScript -- the
- * ladder is all drawn and the header wears Artisan, the first framed tier.
+ * SITE-01 §12.7: the six ranks, each a button that dresses the "Your name"
+ * header in it (the owner, 2026-11-22: a scroll-driven climb made the
+ * section a long scroll, and no rank could be picked). With motion allowed,
+ * the ladder also climbs by itself once when it is half in view, until a rank
+ * is picked. The ranks up to the shown one are in their pigments, those
+ * above in ink-3 (an unreached rank is ink-3, §19). Without JavaScript or
+ * under reduced motion the header rests on Artisan, the first framed tier.
  */
 export interface SiteRank {
 	id: string
@@ -31,7 +23,7 @@ export interface SiteRank {
 	requirement: string
 }
 
-type Mode = 'still' | 'stage'
+const CLIMB_STEP_MS = 1400
 
 export function SiteRanksStage({
 	body,
@@ -46,83 +38,89 @@ export function SiteRanksStage({
 	restingRank: string
 	header: { name: string; handle: string; initials: string; example: string }
 }) {
-	const scroll = useRef<HTMLDivElement>(null)
-	const [mode, setMode] = useState<Mode>('still')
+	const ladder = useRef<HTMLOListElement>(null)
 	const resting = Math.max(
 		0,
 		ranks.findIndex(rank => rank.id === restingRank),
 	)
 	const [current, setCurrent] = useState(resting)
+	const [picked, setPicked] = useState(false)
 
+	// The climb: Initiate to Laureate, once per entry, until a rank is picked.
 	useEffect(() => {
-		if (prefersStill() || !window.matchMedia('(min-width: 1024px)').matches)
-			return
-		setMode('stage')
-		setCurrent(0)
-	}, [])
-
-	useStageStep(
-		useCallback(() => scroll.current, []),
-		'[data-rank-marker]',
-		mode === 'stage',
-		setCurrent,
-	)
+		if (picked || prefersStill() || !ladder.current) return
+		let timers: number[] = []
+		const clear = () => {
+			timers.forEach(timer => window.clearTimeout(timer))
+			timers = []
+		}
+		const watch = new IntersectionObserver(
+			([entry]) => {
+				if (entry.intersectionRatio >= 0.5 && timers.length === 0) {
+					setCurrent(0)
+					timers = ranks
+						.slice(1)
+						.map((_, index) =>
+							window.setTimeout(
+								() => setCurrent(index + 1),
+								(index + 1) * CLIMB_STEP_MS,
+							),
+						)
+				} else if (!entry.isIntersecting) {
+					clear()
+				}
+			},
+			{ threshold: [0, 0.5] },
+		)
+		watch.observe(ladder.current)
+		return () => {
+			watch.disconnect()
+			clear()
+		}
+	}, [picked, ranks])
 
 	const shown = ranks[current]
-	const reached = (index: number) => mode === 'still' || index <= current
 
 	return (
-		<div ref={scroll} className="site-ranks-scroll" data-mode={mode}>
-			{mode === 'stage'
-				? ranks.map((rank, index) => (
-						<div
-							key={rank.id}
-							aria-hidden="true"
-							data-rank-marker=""
-							className="site-rank-marker"
-							style={{ top: `${(index * 100) / ranks.length}%` }}
-						/>
-					))
-				: null}
-			<div className="site-ranks">
-				<div className="site-ranks-text">
-					<p className="type-site-lead site-body">{body}</p>
-					<ol
-						aria-label={ladderLabel}
-						className="site-ladder"
-						data-play-when="0.5"
-					>
-						{ranks.map((rank, index) => (
-							<li
-								key={rank.id}
+		<div className="site-ranks">
+			<div className="site-ranks-text">
+				<p className="type-site-lead site-body">{body}</p>
+				<ol ref={ladder} aria-label={ladderLabel} className="site-ladder">
+					{ranks.map((rank, index) => (
+						<li key={rank.id} style={{ '--i': index } as CSSProperties}>
+							<button
+								type="button"
+								aria-pressed={index === current}
+								onClick={() => {
+									setPicked(true)
+									setCurrent(index)
+								}}
 								className="site-ladder-rung"
-								data-current={
-									(mode === 'stage' && index === current) || undefined
-								}
-								style={{ '--i': index } as CSSProperties}
 							>
 								<RankCrest
 									rankId={rank.id}
-									reached={reached(index)}
+									reached={index <= current}
 									className="site-ladder-crest size-9 shrink-0"
 								/>
-								<div className="min-w-0">
-									<p className="type-panel">{rank.title}</p>
-									<p className="type-body-sm text-ink-2">{rank.requirement}</p>
-								</div>
-							</li>
-						))}
-					</ol>
-				</div>
-				<div className="site-ranks-header">
-					<SiteRankHeader
-						key={shown.id}
-						rankId={shown.id}
-						rankName={shown.title}
-						rankDescription={shown.description}
-						{...header}
-					/>
-				</div>
+								<span className="min-w-0 text-left">
+									<span className="type-panel block">{rank.title}</span>
+									<span className="type-body-sm block text-ink-2">
+										{rank.requirement}
+									</span>
+								</span>
+							</button>
+						</li>
+					))}
+				</ol>
+			</div>
+			<div className="site-ranks-header">
+				<SiteRankHeader
+					key={shown.id}
+					rankId={shown.id}
+					rankName={shown.title}
+					rankDescription={shown.description}
+					{...header}
+				/>
 			</div>
 		</div>
 	)

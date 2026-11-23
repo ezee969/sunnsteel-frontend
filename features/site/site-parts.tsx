@@ -59,7 +59,9 @@ export function SitePhoneFrame({
 	className?: string
 }) {
 	return (
-		<div aria-hidden="true" className={cn('site-device', className)}>
+		// Night in both themes (the owner, 2026-11-22): dark devices stand out
+		// of the page's ground instead of melting into it.
+		<div aria-hidden="true" className={cn('dark site-device', className)}>
 			<div className="site-device-bar">
 				<ExampleMark label={example} />
 				<span className="site-device-status">
