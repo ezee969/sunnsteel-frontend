@@ -3024,3 +3024,23 @@
 .site-install-actions > .site-ghost:first-child {
   margin-left: -16px;
 }
+
+/* The ledger at phone widths: Spanish's "ENTRENAMIENTO" heading and three
+   ticked twelves overflowed 320 (the sweep, 2026-11-22). The headings may
+   break, the cells sit closer, the type stays its size. */
+@media (max-width: 479px) {
+  .site-ledger-table th {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .site-ledger-table :is(th, td):not(:last-child) {
+    padding-right: 8px;
+  }
+  .site-ledger-table .flex {
+    column-gap: 6px;
+  }
+  .site-tool .site-mock {
+    padding-inline: 12px;
+  }
+}

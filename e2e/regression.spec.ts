@@ -441,11 +441,21 @@ type SweepRoute = {
 	 * is swept again under higher contrast and larger controls.
 	 */
 	storage?: Record<string, string>
+	/** Cookies a signed-out visitor carries (the landing's preview switch). */
+	cookies?: Record<string, string>
 }
 
 const DISPLAY_PREFERENCES = { 'ss-contrast': 'more', 'ss-controls': 'large' }
 
 const ROUTES: SweepRoute[] = [
+	// SITE-01: the public landing, reached by its preview cookie until launch
+	// (`SITE_LANDING=on`); every section, at every width and in both themes.
+	{
+		slug: 'site',
+		path: () => '/',
+		signedOut: true,
+		cookies: { 'ss-site-preview': '1' },
+	},
 	{ slug: 'login', path: () => '/login', signedOut: true },
 	{ slug: 'signup', path: () => '/signup', signedOut: true },
 	{ slug: 'forgot-password', path: () => '/forgot-password', signedOut: true },
@@ -652,6 +662,15 @@ for (const route of ROUTES) {
 					storageState: undefined,
 				})
 				context.setDefaultNavigationTimeout(90_000)
+				if (route.cookies) {
+					await context.addCookies(
+						Object.entries(route.cookies).map(([name, value]) => ({
+							name,
+							value,
+							url: BASE_URL,
+						})),
+					)
+				}
 				try {
 					const visitor = await context.newPage()
 					const log = watchConsole(visitor)

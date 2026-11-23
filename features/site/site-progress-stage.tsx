@@ -161,7 +161,7 @@ export function SiteProgressStage({
 					<p className="type-body site-body">{body}</p>
 					<div className="site-week-rail">
 						<p className="type-label text-ink-3">{weeksLabel}</p>
-						<ol aria-hidden="true" className="flex gap-1">
+						<ol aria-hidden="true" className="flex flex-wrap gap-1">
 							{weekLabels.map((label, index) => (
 								<li
 									key={label}
