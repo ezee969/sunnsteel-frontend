@@ -106,7 +106,7 @@
 	"interludes": {
 		"chalk": {
 			"first": "Cada repetición.",
-			"second": "Anotada."
+			"second": "Registrada."
 		},
 		"bar": {
 			"workouts": "<n>{count}</n> entrenamientos.",
@@ -228,7 +228,7 @@
 	"people": {
 		"heading": "Entrena con otros",
 		"subline": "Gratis, como todo lo que haces al entrenar.",
-		"name": "Lu",
+		"name": "Lucas",
 		"initials": "LU",
 		"activity": {
 			"eyebrow": "Actividad",

@@ -1383,15 +1383,69 @@
 .site-menu-button {
   display: none;
 }
+/* The whole screen, edge to edge (the owner, 2026-11-23: a 420px panel left
+   a strip of the page showing on a wide phone), fading in and out as
+   Boostcamp's menu does -- no slide -- with its list a beat behind. */
 .site-menu-panel {
   position: fixed;
-  inset-block: 0;
-  right: 0;
+  inset: 0;
   z-index: 50;
   display: flex;
   flex-direction: column;
-  width: min(100%, 420px);
-  border-left: 1px solid var(--rule);
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+.site-menu-top {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: 84px;
+  padding-inline: var(--site-gutter);
+}
+.site-menu-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px var(--site-gutter) 32px;
+}
+@keyframes site-menu-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-menu-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes site-menu-x {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+}
+.site-menu-panel[data-state='open'] {
+  animation: site-menu-in 300ms linear both;
+}
+.site-menu-panel[data-state='closed'] {
+  animation: site-menu-out 200ms linear both;
+}
+.site-menu-panel[data-state='open'] .site-menu-body {
+  animation: site-menu-in 250ms cubic-bezier(0.2, 0.6, 0.3, 1) 60ms both;
+}
+.site-menu-panel[data-state='open'] .site-menu-close svg {
+  animation: site-menu-x 300ms cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-menu-panel,
+  .site-menu-panel * {
+    animation: none !important;
+  }
+}
+:root[data-motion='reduce'] :is(.site-menu-panel, .site-menu-panel *) {
+  animation: none !important;
 }
 
 /* Phones and tablets (plan §12.1-§12.3, the approved 390 comps). Below 1024
@@ -1412,7 +1466,8 @@
   }
 }
 @media (max-width: 767px) {
-  .site-bar {
+  .site-bar,
+  .site-menu-top {
     height: 56px;
   }
   .site-nav,
@@ -1443,6 +1498,24 @@
     max-width: none;
     padding: 152px var(--site-gutter) 48px;
     text-align: center;
+  }
+  /* The first screen is the hero and its figures, nothing of the next
+     section (the owner, 2026-11-23): the Night region fills the smallest
+     viewport and the hero takes what the proof band leaves, its text
+     centred in it. */
+  .site-night:has(> .site-hero) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+  .site-night > .site-hero {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .site-night > .site-hero .site-hero-text {
+    padding-block: 104px 72px;
   }
   .site-lead {
     margin-top: 20px;
@@ -1726,12 +1799,21 @@
   }
 }
 @media (max-width: 767px) {
+  /* A row that only swipes sideways (the owner, 2026-11-23): overflow-x
+     alone leaves the other axis on auto, and the pools and the drift gave
+     it height to scroll, so it moved every way and caught the page's
+     vertical swipe. The block padding keeps the pools from being clipped. */
   .site-verbs {
     display: flex;
     gap: 16px;
     margin-inline: calc(var(--site-gutter) * -1);
-    padding-inline: var(--site-gutter);
+    margin-top: calc(clamp(40px, 5vw, 72px) - 32px);
+    margin-bottom: -32px;
+    padding: 32px var(--site-gutter);
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--site-gutter);
     scrollbar-width: none;
@@ -1739,6 +1821,9 @@
   .site-verb {
     flex: 0 0 82%;
     scroll-snap-align: start;
+  }
+  .site-anim .site-verbs .site-verb-stage {
+    animation: none;
   }
 }
 
@@ -2864,6 +2949,10 @@
   justify-content: safe center;
   gap: 12px;
   overflow-x: auto;
+  /* Sideways only, as the verbs' row (the owner, 2026-11-23). */
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }

@@ -604,7 +604,14 @@ These addresses fix the slugs §4.1 left open.
   way in on a phone):** below 1024 Sign in holds the bar while the hero's own
   action is in view, and Get started takes its place once that scrolls away
   (in Spanish at 390 the two do not fit together); the menu lists Sign in
-  first, above the groups, where a phone's toolbar cannot cover it.
+  first, above the groups, where a phone's toolbar cannot cover it. **Revised
+  again the same day:** the menu is the whole screen, edge to edge (420px left
+  a strip of the page showing on a 430px phone), and opens as Boostcamp's
+  does -- a fade of 300ms with its list a beat behind, no slide -- under a
+  copy of the bar whose menu button has become the close button. Below 768
+  the hero and the proof band together fill the first screen (`100svh`), the
+  hero's text centred in what the band leaves, so the next section's heading
+  waits below the fold.
 - **Over the hero** the bar has no ground and renders with the Night tokens in
   both themes (a `.dark` scope), because the video beneath is dark either
   way. **Once the hero's lower edge passes under it** (an

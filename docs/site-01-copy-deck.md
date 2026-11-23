@@ -140,7 +140,7 @@ Added with the owner's footage approval (2026-11-23, design system §33.15): two
 | Key | English | Spanish |
 | --- | --- | --- |
 | `chalk.first` | Every rep. | Cada repetición. |
-| `chalk.second` | Written down. | Anotada. |
+| `chalk.second` | Written down. | Registrada. |
 | `bar.workouts` | `<n>{count}</n>` workouts. | `<n>{count}</n>` entrenamientos. |
 | `bar.weeks` | `<n>{count}</n>` different weeks. | `<n>{count}</n>` semanas distintas. |
 | `bar.rank` | {rank}. | {rank}. |
@@ -233,6 +233,8 @@ Template names, schedules, descriptions and day names are the app's
 | --- | --- | --- |
 | `heading` | Train with people | Entrena con otros |
 | `subline` | Free, like everything you do in a workout. | Gratis, como todo lo que haces al entrenar. |
+| `name` | Lucas | Lucas |
+| `initials` | LU | LU |
 | `activity.eyebrow` | Activity | Actividad |
 | `activity.title` | Follow people and see them train | Sigue a otros y míralos entrenar |
 | `activity.body` | Workouts, records and milestones from people you follow, with {reactions} reactions and comments. There's nothing to post. | Entrenamientos, récords y logros de la gente que sigues, con {reactions} reacciones y comentarios. No hay nada que publicar. |
@@ -251,7 +253,9 @@ Template names, schedules, descriptions and day names are the app's
 
 The four reactions, the partner limit, the partner alert's wording and the
 privacy rows' names are the app's and contracts' (§12.9). **Partner
-encouragement is never mentioned on the site** (the owner, 2026-11-21).
+encouragement is never mentioned on the site** (the owner, 2026-11-21). The example member is "Lucas", a common man's name in both languages
+(the owner, 2026-11-23, in place of "Lu"); the chalk band's Spanish second
+line is "Registrada." (the owner's word, in place of "Anotada.").
 
 ## 10. Free and Pro — `site.plans`
 

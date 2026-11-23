@@ -3106,7 +3106,7 @@ line at display size and nothing to click. It is not a section: it has no
 heading and no action, and the page reads the same without it.
 
 - **Chalk**, after the four verbs and before the tools: "Every rep. Written
-  down." / "Cada repetición. Anotada.", the second line the site's gold mark.
+  down." / "Cada repetición. Registrada.", the second line the site's gold mark.
 - **The bar**, after progress and before the ranks: "100 workouts. 52
   different weeks. Laureate." / "100 entrenamientos. 52 semanas distintas.
   Laureado." -- the top rank's real requirement, read from the contracts
