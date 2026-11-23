@@ -22,7 +22,11 @@
 			"free": "Free",
 			"pro": "Pro",
 			"freePro": "Free + Pro"
-		}
+		},
+		"overview": "Overview",
+		"steps": "Step by step",
+		"highlights": "Highlights",
+		"relatedUseCase": "Where it matters most"
 	},
 	"featuresIndex": {
 		"meta": {
@@ -101,6 +105,424 @@
 			"planners": "Lifters who plan blocks and deloads, and want each block's loads set in advance.",
 			"readers": "Lifters who read their training closely: long history, comparisons and signals.",
 			"ai": "Anyone who wants a routine drafted from a description, or a review of their own workouts."
+		}
+	},
+	"features": {
+		"workoutTracker": {
+			"meta": {
+				"title": "Workout tracker — Sunnsteel",
+				"description": "Log every set in seconds: last time beside each set, a rest timer that starts itself, plates and warm-ups worked out. Free."
+			},
+			"heading": "Log every set in seconds",
+			"subline": "The workout screen shows your last numbers, starts the rest timer, loads the bar for you and keeps going when the signal drops.",
+			"overview": "It's built for one hand between sets. Each exercise states today's prescription once, shows what you did last time beside every set, and saves a set the moment you mark it.",
+			"highlights": {
+				"last": {
+					"title": "Last time, beside every set",
+					"body": "The weight and reps from your last workout sit next to each set, so you know what to beat."
+				},
+				"rest": {
+					"title": "Rest that starts itself",
+					"body": "Marking a set starts the timer, and with notifications on it tells you when rest is over, even with the screen locked."
+				},
+				"plates": {
+					"title": "Plates and warm-ups worked out",
+					"body": "The plate calculator loads each side from your gym's plates, and warm-ups can follow your working weight."
+				}
+			},
+			"facts": {
+				"plan": "Free",
+				"kinds": "{count} set kinds: working, warm-up, drop, optional",
+				"extra": "Up to {max} extra sets per exercise",
+				"corrections": "Your latest workout can be corrected for {hours} hours"
+			},
+			"steps": {
+				"1": "Start today's workout from your dashboard or your schedule.",
+				"2": "Each exercise shows its prescription once, and your last numbers beside every set.",
+				"3": "Type the weight and reps and mark the set: it saves at once and the rest timer starts.",
+				"4": "Swap an exercise, add an extra set or write a note when the day calls for it.",
+				"5": "Finish and read your recap: totals, records and what moves next time."
+			},
+			"example": {
+				"title": "Warm-ups and plates for a 100 kg working set",
+				"caption": "Worked out by the rule the workout screen uses, with a 20 kg bar and a standard set of plates.",
+				"columns": "Step · Weight · Reps · Plates per side",
+				"working": "Working set",
+				"bar": "Bar only"
+			},
+			"covers": {
+				"all": "Everything in a workout is free."
+			},
+			"tips": {
+				"1": "Log the weight you actually lifted: progression reads what you did, not what was planned.",
+				"2": "Mark a set only when it's done; a skipped set never moves your routine.",
+				"3": "Training with gloves or chalk? Turn on larger controls in Settings.",
+				"4": "Use a note for what the numbers can't say."
+			},
+			"faq": {
+				"locked": {
+					"q": "Does the rest alert work with the screen locked?",
+					"a": "Yes, once notifications are on. On iPhone, notifications need the installed app. The alert says rest is over and what comes next; it doesn't show a countdown."
+				},
+				"signal": {
+					"q": "What if the signal drops?",
+					"a": "Keep logging. Your sets are sent when the connection returns, as long as the app stays open, and it tells you when changes are waiting."
+				},
+				"add": {
+					"q": "Can I add an exercise mid-workout?",
+					"a": "Not a new one: the routine is the plan. You can swap an exercise for today, add extra sets, or change the routine for next time."
+				},
+				"fix": {
+					"q": "Can I fix a finished workout?",
+					"a": "Your latest one, for {hours} hours and until you start another. Records and progression are worked out again from the corrected sets."
+				},
+				"forgot": {
+					"q": "I forgot to log a workout.",
+					"a": "You can log a past workout of one of your routines afterwards, with the date and the sets you did."
+				}
+			}
+		},
+		"routineBuilder": {
+			"meta": {
+				"title": "Routine builder — Sunnsteel",
+				"description": "Build weekly or rotating routines from scratch or a template, with a summary of weekly sets, duration and equipment. Drafts from a description on Pro."
+			},
+			"heading": "Build the routine you'll actually follow",
+			"subline": "Weekly or rotating, from scratch or a template, with a summary that tells you what each week adds up to before you save it.",
+			"overview": "A routine is your plan: its days, each day's exercises, and for each exercise its sets, reps, rest and how it progresses. Everything you train starts here.",
+			"highlights": {
+				"schedule": {
+					"title": "Weekly or rotation",
+					"body": "Train on set weekdays, or run your days in order on any day you train."
+				},
+				"templates": {
+					"title": "Start from a template",
+					"body": "{count} programs open as drafts, with every weight left for you to fill in."
+				},
+				"summary": {
+					"title": "Know what you planned",
+					"body": "Weekly sets per muscle, an estimated length for each day and the equipment it needs, before you save."
+				}
+			},
+			"facts": {
+				"days": "Up to {max} days per routine",
+				"versions": "{free} saved versions on Free, {pro} on Pro",
+				"custom": "Up to {max} exercises of your own",
+				"drafts": "{count} routine drafts a month on Pro"
+			},
+			"steps": {
+				"1": "Choose weekly or rotation, and your training days.",
+				"2": "Add exercises from the catalog, or create your own.",
+				"3": "Set sets, reps or a rep range, rest, and how each exercise progresses.",
+				"4": "Link exercises into supersets or circuits if you train them in rounds.",
+				"5": "Read the summary and create it. Nothing is saved until you do."
+			},
+			"example": {
+				"title": "What Upper / Lower plans each week",
+				"caption": "Weekly sets per muscle, counted as the app counts them: each set counts 1 for a primary muscle and 0.5 for a secondary one.",
+				"columns": "Muscle · Weekly sets"
+			},
+			"draft": {
+				"heading": "Describe it, get a draft",
+				"body": "Tell it what you want -- days, goal, equipment -- and a draft opens in the builder, every weight left blank. Your text goes to Anthropic to write the draft and isn't stored. It's a starting point, not medical advice."
+			},
+			"covers": {
+				"rows": "Weekly and rotating routines · templates · your own exercises: Free and Pro. Saved versions: {free} / {pro}. Routine drafts: Pro, {drafts} a month. Training blocks and 8-week blocks: Pro."
+			},
+			"tips": {
+				"1": "Leave weights blank on a new routine: your first workout sets them.",
+				"2": "Train on different days each week? Use a rotation.",
+				"3": "Save a version before a big change; you can compare it and restore it later."
+			},
+			"faq": {
+				"rotation": {
+					"q": "What is a rotation?",
+					"a": "Days that run in order whenever you train, instead of on fixed weekdays. A missed day doesn't get skipped: the next one waits for you."
+				},
+				"share": {
+					"q": "Can I share or copy a routine?",
+					"a": "Yes. Share it with a link or on your profile, and anyone allowed to see it can copy it into their own routines. A copy is independent: your training never travels with it."
+				},
+				"versions": {
+					"q": "How many versions can I keep?",
+					"a": "{free} per routine on Free and {pro} on Pro. Older versions you already have are kept."
+				},
+				"draft": {
+					"q": "What does a draft send?",
+					"a": "Only the text you write, to Anthropic, to write the draft; it isn't stored. The draft arrives with no weights, and nothing is saved until you create the routine."
+				}
+			}
+		},
+		"progression": {
+			"meta": {
+				"title": "Automatic progression — Sunnsteel",
+				"description": "Double progression moves your weights from what you actually lift. With Pro, 8-week blocks set each week's load from a reference max."
+			},
+			"heading": "The weight goes up when you earn it",
+			"subline": "Double progression moves your weights from what you actually lift. With Pro, an 8-week block sets every week's load from a reference max.",
+			"overview": "Each exercise chooses how it progresses. Most progress by double progression: work up the rep range at one weight, then add weight. The app does the arithmetic at the end of each workout, from the sets you marked done.",
+			"highlights": {
+				"double": {
+					"title": "Double progression",
+					"body": "When every set reaches the top of its range, the next workout adds one step."
+				},
+				"perSet": {
+					"title": "Set by set, if you prefer",
+					"body": "Dynamic double progression moves each set on its own."
+				},
+				"block": {
+					"title": "8-week blocks",
+					"body": "Eight weeks of loads from a reference max, ending in an estimate of your new max."
+				}
+			},
+			"facts": {
+				"step": "Default step: {step}",
+				"schemes": "Double, set by set, 8-week block or none",
+				"block": "A block is {weeks} weeks, {sets} working sets a week",
+				"deload": "Progression pauses during a deload"
+			},
+			"steps": {
+				"1": "Give the exercise a rep range, such as 8–12, and a step.",
+				"2": "Train, and mark each set with the weight and reps you did.",
+				"3": "When every working set reaches the top of the range, the next workout's weight rises by the step.",
+				"4": "If they don't, the weight you lifted stays, and you work up the range again."
+			},
+			"example": {
+				"title": "Double progression on 3 × 8–12, workout by workout",
+				"caption": "Bench Press with a 2.5 kg step, checked against the rule the server applies.",
+				"columns": "Workout · Weight · Reps · Next workout"
+			},
+			"block": {
+				"heading": "An 8-week block from a 100 kg reference max",
+				"caption": "Three working sets a week at the week's share of your reference max, rounded to your step. Weeks 1–4 keep 2–3 reps in reserve and end with a set of as many good reps as you can; weeks 5–8 keep 1–2 in reserve.",
+				"columns": "Week · Share · Load · Reps in reserve",
+				"amrap": "As many good reps as you can"
+			},
+			"covers": {
+				"rows": "Double and set-by-set progression: Free and Pro. 8-week blocks and planned deloads: Pro."
+			},
+			"tips": {
+				"1": "Pick a step your gym can load: 2.5 kg on a barbell, less where you have smaller plates.",
+				"2": "Log the reps you really did; rounding up moves the weight before you're ready.",
+				"3": "A swapped exercise never moves the prescription, so swapping is safe."
+			},
+			"faq": {
+				"miss": {
+					"q": "What if I miss my reps?",
+					"a": "The weight you lifted carries over and nothing goes up. Work up the range again at that weight."
+				},
+				"off": {
+					"q": "Can I switch it off for one exercise?",
+					"a": "Yes. Each exercise has its own setting, and \"None\" keeps its weights where you put them."
+				},
+				"step": {
+					"q": "What step does it use?",
+					"a": "The one you set for the exercise, {step} unless you choose another."
+				},
+				"deload": {
+					"q": "Does a deload move my weights?",
+					"a": "No. Progression pauses for deload workouts, so the plan you lightened keeps its weights."
+				}
+			}
+		},
+		"progress": {
+			"meta": {
+				"title": "Progress — Sunnsteel",
+				"description": "Strength trends, a body map of weekly sets, records and body weight, each with the number behind it. Signals, comparisons and reviews on Pro."
+			},
+			"heading": "Progress you can read",
+			"subline": "Strength, muscles, records and body weight, each with the number behind it, and analysis that states what changed, never why.",
+			"overview": "Everything here is read from the sets you logged. Every chart says what it counts, and every flag prints the rule that raised it.",
+			"highlights": {
+				"strength": {
+					"title": "Strength over time",
+					"body": "Your estimated 1RM per exercise, with every record that moved it."
+				},
+				"map": {
+					"title": "The body map",
+					"body": "Weekly sets per muscle, front and back, beside the number behind each color."
+				},
+				"plateaus": {
+					"title": "Plateau watch",
+					"body": "Lifts with no new best after several sessions, with the rule written above them."
+				}
+			},
+			"facts": {
+				"strength": "Strength history: {days} days on Free, longer on Pro",
+				"muscles": "Muscle history: {free} weeks on Free, {pro} on Pro",
+				"goals": "Goals: {free} on Free, {pro} on Pro",
+				"reviews": "Training reviews: {count} a month on Pro"
+			},
+			"steps": {
+				"1": "Log your workouts; records are found in your sets as you go.",
+				"2": "Read strength by exercise, and each exercise's own page with its history.",
+				"3": "Check the body map each week to see where your sets went.",
+				"4": "Let plateau watch tell you which lifts have stopped setting bests.",
+				"5": "With Pro, compare blocks and sessions, read your training signals and ask for a review."
+			},
+			"example": {
+				"title": "How one workout lands on the body map",
+				"caption": "Bench Press, 3 working sets: each set counts 1 for its primary muscles and 0.5 for its secondary ones; warm-ups don't count.",
+				"columns": "Muscle · Role · Sets counted",
+				"primary": "Primary",
+				"secondary": "Secondary"
+			},
+			"covers": {
+				"rows": "Records, plateau watch, body weight: Free and Pro. Strength trends: {days} days / longer. Body map: {free} weeks / {pro}. Goals: {freeGoals} / {proGoals}. Body measurements beyond weight, training signals and the deload suggestion, comparisons, goal suggestions, training reviews: Pro."
+			},
+			"tips": {
+				"1": "Log RPE on your hard sets to see effort in signals and reviews.",
+				"2": "Weigh yourself in the same conditions each time for a cleaner line.",
+				"3": "A plateau flag is a fact to look at, not a verdict."
+			},
+			"faq": {
+				"e1rm": {
+					"q": "What is estimated 1RM?",
+					"a": "The heaviest single rep a set suggests, worked out from its weight and reps. It's an estimate, not a lift you tried."
+				},
+				"bodyweight": {
+					"q": "Why don't bodyweight sets add volume?",
+					"a": "Volume is the load you added times the reps. A bodyweight set counts as a set but adds no load."
+				},
+				"signals": {
+					"q": "Do signals tell me what's wrong?",
+					"a": "No. They show what changed, with the numbers and the rule; the reason is yours to judge."
+				},
+				"pro": {
+					"q": "What's Pro here?",
+					"a": "Longer history, body measurements beyond weight, training signals and the deload suggestion, comparisons, goal suggestions and training reviews."
+				}
+			}
+		},
+		"ranks": {
+			"meta": {
+				"title": "Ranks and achievements — Sunnsteel",
+				"description": "{ranks} ranks and {milestones} milestones earned by training, comebacks recognized, and records found in your sets. Free."
+			},
+			"heading": "Earned by showing up",
+			"subline": "{ranks} ranks and {milestones} milestones, earned from your workouts, and records found in your sets. Nothing here is for posting.",
+			"overview": "A rank rewards attendance: workouts across different weeks. Milestones mark totals you reach. Records are detected from your sets the moment you set one.",
+			"highlights": {
+				"ranks": {
+					"title": "{ranks} ranks",
+					"body": "From {first} to {last}, each with its crest, earned by workouts in different weeks."
+				},
+				"milestones": {
+					"title": "{milestones} milestones",
+					"body": "Workouts, sets, volume, records and streaks, each in steps."
+				},
+				"comebacks": {
+					"title": "Comebacks",
+					"body": "Time away is never punished: coming back is recognized."
+				}
+			},
+			"facts": {
+				"comeback": "A comeback: {active} active days within {window} days, after {away} days away",
+				"featured": "Feature up to {max} accomplishments on your profile",
+				"plan": "Free"
+			},
+			"steps": {
+				"1": "Train: every week you work out counts as an active week, however many workouts it holds.",
+				"2": "Reach a rank's workouts and active weeks, and the rank is yours.",
+				"3": "Milestones arrive as your totals cross them.",
+				"4": "Choose who sees your rank, and feature what you're proud of on your profile."
+			},
+			"example": {
+				"title": "The ladder and the milestones",
+				"caption": "Read from the app's own catalog.",
+				"ladderColumns": "Rank · Workouts · Different weeks",
+				"milestoneColumns": "Category · Steps"
+			},
+			"covers": {
+				"all": "Ranks, milestones, comebacks and records are free."
+			},
+			"tips": {
+				"1": "Consistency beats bursts: three weeks with one workout each count more toward a rank than one week with three.",
+				"2": "Don't chase a streak at the cost of rest; the milestones will wait."
+			},
+			"faq": {
+				"earned": {
+					"q": "How is a rank earned?",
+					"a": "By a number of workouts spread over a number of different weeks; both have to be met."
+				},
+				"comeback": {
+					"q": "What is a comeback?",
+					"a": "After {away} days or more without training, {active} active days within {window} days record a comeback."
+				},
+				"who": {
+					"q": "Who sees my rank?",
+					"a": "You choose: everyone, your followers, or only you."
+				},
+				"records": {
+					"q": "Are records found automatically?",
+					"a": "Yes, from your sets, as you train. If you correct a workout, its records are worked out again."
+				}
+			}
+		},
+		"community": {
+			"meta": {
+				"title": "Training with people — Sunnsteel",
+				"description": "Follow people, train with partners and send what you trained, with each part of your profile shown only to whom you choose. Free."
+			},
+			"heading": "Train with people, on your terms",
+			"subline": "Follow, train with partners and send what you trained, with each part of your profile shown only to whom you choose.",
+			"overview": "Your activity comes from what you train, not from posts. Followers see what you let them; partners see what you grant; messages carry the real thing.",
+			"highlights": {
+				"activity": {
+					"title": "Activity",
+					"body": "Workouts, records and milestones from people you follow, with {reactions} reactions and comments."
+				},
+				"partners": {
+					"title": "Training partners",
+					"body": "Up to {max} partners, each choosing what the other sees, with an alert when a partner finishes a workout if you want one."
+				},
+				"messages": {
+					"title": "Messages",
+					"body": "One to one, carrying a routine, a workout, a record, a milestone, a comeback or a month of training."
+				}
+			},
+			"facts": {
+				"privacy": "{count} parts of your profile, each with its own audience",
+				"partners": "Up to {max} training partners",
+				"message": "Messages up to {max} characters",
+				"plan": "Free"
+			},
+			"steps": {
+				"1": "Follow people you train with or admire.",
+				"2": "See their workouts, records and milestones, and react or comment.",
+				"3": "Become training partners and choose what each of you sees.",
+				"4": "Send a routine, a workout or a record in a message, or share a workout with a link."
+			},
+			"example": {
+				"title": "Your profile, part by part",
+				"caption": "Each part has its own audience: Everyone, Followers or Only me.",
+				"columns": "Part · What it controls"
+			},
+			"covers": {
+				"all": "Everything social, and messages, is free."
+			},
+			"tips": {
+				"1": "Set each part of your profile once in Settings; you can change it any time.",
+				"2": "A share link shows only the parts you pick, and you can revoke it."
+			},
+			"faq": {
+				"encrypted": {
+					"q": "Are messages end-to-end encrypted?",
+					"a": "No. They're stored on our servers. A moderator reads a message only if it's reported, and then only that message and up to {context} before it."
+				},
+				"who": {
+					"q": "Who can message me?",
+					"a": "You choose: people you follow, everyone (people you don't follow arrive as requests), or nobody."
+				},
+				"share": {
+					"q": "Can I share a workout with someone without an account?",
+					"a": "Yes, with a link that shows only the parts you pick. You can revoke it, and it stops working at once."
+				},
+				"blocks": {
+					"q": "How do blocks and reports work?",
+					"a": "A block hides you from each other everywhere and removes follows both ways. A report goes to a moderator, who reads only what it's about."
+				}
+			}
 		}
 	}
 }

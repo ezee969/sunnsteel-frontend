@@ -3966,3 +3966,100 @@
 .site-feature-card:hover .site-feature-card-arrow {
   transform: translateX(4px);
 }
+
+/* §12.15 a feature page: the header's phone, the steps, a computed
+   example's ruled table, what each plan covers and the tips. */
+.site-page-phone {
+  display: flex;
+  justify-content: center;
+}
+.site-page-phone .site-device {
+  max-width: 280px;
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-page-phone .site-device {
+    zoom: 0.82;
+  }
+}
+.site-page-facts-light {
+  margin-top: 28px;
+  color: var(--ink-2);
+}
+.site-page-steps {
+  display: grid;
+  gap: 0;
+  max-width: 760px;
+  border-top: 1px solid var(--rule);
+}
+.site-page-steps li {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-page-step-number {
+  color: var(--site-accent);
+}
+.site-example {
+  max-width: 760px;
+  overflow-x: auto;
+}
+.site-example + .site-example {
+  margin-top: 40px;
+}
+.site-example-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.site-example-table caption {
+  margin-bottom: 16px;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.site-example-table th,
+.site-example-table td {
+  padding: 12px 16px 12px 0;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-example-table thead th {
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom-color: var(--rule);
+}
+.site-example-table tbody th {
+  font-weight: 400;
+  color: var(--foreground);
+}
+.site-example-table td {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.site-page-covers {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+}
+.site-page-covers li {
+  display: flex;
+  gap: 12px;
+}
+.site-page-tips {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  padding-left: 20px;
+  list-style: disc;
+}
+.site-page-tips li::marker {
+  color: var(--site-accent);
+}
