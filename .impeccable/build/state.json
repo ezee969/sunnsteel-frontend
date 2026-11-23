@@ -6,7 +6,7 @@
   "direction": null,
   "breakpoint": "1536x864",
   "artifact": null,
-  "phase": "responsive",
+  "phase": "review",
   "phases": {
     "comps": {
       "status": "skipped",
@@ -215,10 +215,10 @@
       "forced": null
     },
     "responsive": {
-      "status": "open",
+      "status": "closed",
       "openedAt": "2026-11-23T00:44:11.434Z",
-      "closedAt": null,
-      "attempts": 4,
+      "closedAt": "2026-11-23T01:03:53.368Z",
+      "attempts": 6,
       "notes": [],
       "gate": {
         "ok": false,
@@ -230,21 +230,38 @@
         "summary": "desktop 82% (match)",
         "score": 0.824,
         "sideBySide": "C:/Users/Ezequiel/Desktop/Code/sunsteel/sunnsteel-frontend/.impeccable/review/diff/desktop/side-by-side.png",
-        "at": "2026-11-23T00:45:34.112Z"
+        "at": "2026-11-23T01:03:53.352Z"
       },
-      "forced": null
+      "forced": {
+        "at": "2026-11-23T01:03:53.358Z",
+        "reason": "The user changed the approved comp's hero on 2026-11-21: \"debemos cambiar la repeticion de la palabra Gratis en la landing ... dice Gratis en 3 lugares distintos\", choosing \"Solo en el botón\" (the comp's eyebrow removed) and the subline \"Mira cómo suma el trabajo\"; on 2026-11-22 the user said \"Yes, close it\" for this gate. The missing eyebrow and the shifted Sign in and record card follow from that change.",
+        "reasons": [
+          "at desktop width, region eyebrow is missing",
+          "at desktop width, region cta-signin is missing",
+          "at desktop width, region record-card is missing"
+        ]
+      }
     },
     "review": {
-      "status": "pending",
-      "openedAt": null,
-      "closedAt": null,
+      "status": "closed",
+      "openedAt": "2026-11-23T01:03:53.368Z",
+      "closedAt": "2026-11-23T01:04:08.202Z",
       "attempts": 0,
-      "notes": [],
+      "notes": [
+        {
+          "at": "2026-11-23T01:04:07.961Z",
+          "text": "Finish review (inline, 2026-11-22): against the direction contract, section 33 and the craft floor. Fixed: the bar's ink in light theme (Product, Pricing), focus rings on the site's controls, themed selection, the templates row centring and front card, the Plans eyebrow, the week chips' face. Kept by the approved plan: the tools and people eyebrows, the verbs' 01-04 numbers, the heading entrance on every section. Not built: the verbs' and tools' scroll drift, counting the body map's numbers, the superset round ticking."
+        }
+      ],
       "gate": null,
       "forced": null
     }
   },
-  "finish": null,
+  "finish": {
+    "disposition": "ship",
+    "at": "2026-11-23T01:04:08.192Z",
+    "phaseAtFinish": "review"
+  },
   "plates": {
     "hero-video": {
       "status": "ok",
