@@ -18,7 +18,12 @@ import { SiteRankHeader } from './site-rank-header'
  * itself once when the phone is mostly in view, until a rank is picked. The
  * ranks up to the shown one are in their pigments, those above in ink-3 (an
  * unreached rank is ink-3, §19). Without JavaScript or under reduced motion
- * the phone rests on Artisan, the first framed tier.
+ * the phone rests on Artisan, the first framed tier. All six ranks are drawn
+ * in one place on the screen and the shown one crossfades in (the owner,
+ * 2026-11-23): the phone keeps the tallest one's height, so changing rank
+ * never moves what is on it -- the headers share one height since ACH-11,
+ * but a description of one or two lines, or a name that wraps inside
+ * Laureate's border, still differ.
  */
 export interface SiteRank {
 	id: string
@@ -104,45 +109,59 @@ export function SiteRanksStage({
 				}
 			>
 				<SitePhoneFrame className="site-rank-phone">
-					<SiteRankHeader
-						key={shown.id}
-						rankId={shown.id}
-						rankName={shown.title}
-						rankDescription={shown.description}
-						{...header}
-					/>
-					<div className="site-rank-line">
-						<div className="flex items-center gap-3">
-							<RankCrest rankId={shown.id} className="size-10 shrink-0" />
-							<div className="min-w-0">
-								<p className="type-body-sm text-ink-3">{labels.current}</p>
-								<p className="type-panel text-foreground">{shown.title}</p>
-								<p className="type-body-sm tabular-nums text-ink-2">
-									{shown.evidence}
-								</p>
-							</div>
-						</div>
-						<div className="flex items-center gap-3 border-t border-rule-faint pt-3">
-							{shown.next ? (
-								<>
-									<RankCrest
-										rankId={shown.next.id}
-										reached={false}
-										className="size-8 shrink-0"
-									/>
-									<div className="min-w-0">
-										<p className="type-body-sm text-ink-3">
-											{shown.next.label}
-										</p>
-										<p className="type-body-sm tabular-nums text-foreground">
-											{shown.next.requirements}
-										</p>
+					<div className="site-rank-stack">
+						{ranks.map((rank, index) => (
+							<div
+								key={rank.id}
+								className="site-rank-panel"
+								data-shown={index === current ? '' : undefined}
+							>
+								<SiteRankHeader
+									rankId={rank.id}
+									rankName={rank.title}
+									rankDescription={rank.description}
+									active={index === current}
+									{...header}
+								/>
+								<div className="site-rank-line">
+									<div className="flex items-center gap-3">
+										<RankCrest rankId={rank.id} className="size-10 shrink-0" />
+										<div className="min-w-0">
+											<p className="type-body-sm text-ink-3">
+												{labels.current}
+											</p>
+											<p className="type-panel text-foreground">{rank.title}</p>
+											<p className="type-body-sm tabular-nums text-ink-2">
+												{rank.evidence}
+											</p>
+										</div>
 									</div>
-								</>
-							) : (
-								<p className="type-body-sm text-ink-2">{labels.highest}</p>
-							)}
-						</div>
+									<div className="flex items-center gap-3 border-t border-rule-faint pt-3">
+										{rank.next ? (
+											<>
+												<RankCrest
+													rankId={rank.next.id}
+													reached={false}
+													className="size-8 shrink-0"
+												/>
+												<div className="min-w-0">
+													<p className="type-body-sm text-ink-3">
+														{rank.next.label}
+													</p>
+													<p className="type-body-sm tabular-nums text-foreground">
+														{rank.next.requirements}
+													</p>
+												</div>
+											</>
+										) : (
+											<p className="type-body-sm text-ink-2">
+												{labels.highest}
+											</p>
+										)}
+									</div>
+								</div>
+							</div>
+						))}
 					</div>
 				</SitePhoneFrame>
 			</div>

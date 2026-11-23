@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { RankCrest } from '@/features/achievements/rank-crest'
@@ -22,7 +22,9 @@ import { rankDecoration } from '@/lib/utils/rank-decoration'
  * (§24), for "Your name" with the initials avatar -- the one place outside a
  * profile where a decoration appears, shown on a phone's screen as a member
  * sees it. Its module loads with JavaScript, so without it the header stands
- * undecorated. `aria-hidden`: the section's text says what it shows.
+ * undecorated. `aria-hidden`: the section's text says what it shows. The
+ * ranks phone draws all six at once, one shown (`active`): only that one's
+ * decoration plays.
  */
 export function SiteRankHeader({
 	rankId,
@@ -31,6 +33,7 @@ export function SiteRankHeader({
 	name,
 	handle,
 	initials,
+	active = true,
 }: {
 	rankId: string
 	rankName: string
@@ -38,11 +41,16 @@ export function SiteRankHeader({
 	name: string
 	handle: string
 	initials: string
+	active?: boolean
 }) {
 	const decoration = rankDecoration({ id: rankId })
 	const assets = useRankDecorationAssets(decoration?.slug)
 	const ref = useRef<HTMLElement>(null)
-	useRankDecorationMotion(ref, assets !== null)
+	useRankDecorationMotion(ref, assets !== null && active)
+	// The hook only starts the motion; a header put away stops it again.
+	useEffect(() => {
+		if (!active) ref.current?.removeAttribute('data-playing')
+	}, [active])
 	const tier = decoration?.tier ?? 0
 
 	return (

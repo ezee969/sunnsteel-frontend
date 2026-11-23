@@ -2083,6 +2083,41 @@
   max-width: 320px;
   background: var(--background);
 }
+/* All six ranks in one cell: the screen keeps the tallest one's height, so
+   changing rank never moves the phone, and the shown one crossfades in. */
+/* Two shared rows, header and rank line (a subgrid): each row is as tall as
+   its tallest rank's, so the rank line starts at the same height for every
+   rank and in both languages. */
+.site-rank-stack {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+.site-rank-panel {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  display: grid;
+  grid-template-rows: subgrid;
+  min-width: 0;
+}
+/* The next-rank row keeps two lines' room, so Laureate's one-line "highest
+   rank" sits where the others' rows do. */
+.site-rank-panel .site-rank-line > :last-child {
+  min-height: 3.5rem;
+}
+.site-rank-panel:not([data-shown]) {
+  visibility: hidden;
+  opacity: 0;
+}
+.site-anim .site-rank-panel {
+  transition:
+    opacity 300ms var(--ease-standard),
+    visibility 0s linear 300ms;
+}
+.site-anim .site-rank-panel[data-shown] {
+  transition:
+    opacity 450ms var(--ease-standard) 80ms,
+    visibility 0s;
+}
 .site-rank-line {
   display: flex;
   flex-direction: column;
