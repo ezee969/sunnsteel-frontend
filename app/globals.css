@@ -3454,6 +3454,25 @@
     animation-range: exit 0% exit 100%;
   }
 }
+/* The verbs' phones rise only to where they rest, never past it: lifted
+   56px higher they slid over their word (the owner, 2026-11-23). */
+@keyframes site-drift-settle {
+  from {
+    translate: 0 56px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 768px) {
+    .site-anim .site-verbs .site-verb-stage {
+      animation: site-drift-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 50%;
+    }
+  }
+}
 
 /* §33.15 Interludes: a letterboxed Night band of footage between two
    sections, one line at display size and nothing to click. */
