@@ -42,10 +42,7 @@ export async function SitePlans() {
 			className="site-section"
 			id="plans"
 		>
-			<p className="type-label text-ink-3">{t('eyebrow')}</p>
-			<SiteSectionHeading id="plans-heading" className="mt-3">
-				{t('heading')}
-			</SiteSectionHeading>
+			<SiteSectionHeading id="plans-heading">{t('heading')}</SiteSectionHeading>
 			<div className="site-plans" data-reveal="stagger">
 				<section aria-labelledby="plan-free" className="site-card site-plan">
 					<div className="site-plan-head">

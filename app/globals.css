@@ -1064,6 +1064,18 @@
   background: var(--background);
   color: var(--foreground);
 }
+/* The browser's own surfaces carry the design too: a selection in the ink of
+   the region it is in, and a visible ring on every one of the site's own
+   controls (its buttons and links are not the app's primitives). */
+.site ::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+.site :is(a, button, summary):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
 .type-site-display {
   font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
   font-weight: 600;
@@ -1104,6 +1116,10 @@
   inset-inline: 0;
   top: 0;
   z-index: 20;
+  /* Its own ink: under a light page the bar takes the Night tokens, and text
+     without a colour of its own (Product, Pricing) would otherwise inherit
+     the page's dark ink, computed outside the bar. */
+  color: var(--foreground);
   display: flex;
   align-items: center;
   height: 84px;
@@ -1720,8 +1736,12 @@
   padding: 6px 10px;
   border: 1px solid var(--rule-faint);
   border-radius: var(--radius-sm);
-  font-family: var(--font-space-mono), ui-monospace, monospace;
+  /* A label, so the label face, not Space Mono (which is for measures). */
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
   font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink-3);
   white-space: nowrap;
 }
@@ -2858,6 +2878,9 @@
 }
 .site-coverflow[data-layout='row'] .site-coverflow-track {
   display: flex;
+  /* A wide screen under reduced motion holds every card: centre them, and
+     still scroll from the first when they do not fit. */
+  justify-content: safe center;
   gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;

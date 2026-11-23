@@ -6,7 +6,7 @@
   "direction": null,
   "breakpoint": "1536x864",
   "artifact": null,
-  "phase": "sections",
+  "phase": "responsive",
   "phases": {
     "comps": {
       "status": "skipped",
@@ -182,30 +182,56 @@
       ]
     },
     "sections": {
-      "status": "open",
+      "status": "closed",
       "openedAt": "2026-11-21T21:52:05.307Z",
-      "closedAt": null,
-      "attempts": 0,
-      "notes": [],
-      "gate": null,
+      "closedAt": "2026-11-23T00:44:06.956Z",
+      "attempts": 1,
+      "notes": [
+        {
+          "at": "2026-11-23T00:44:06.676Z",
+          "text": "Sections, motion and responsive built 2026-11-22: ten sections after the proof band, three sticky stages, the templates coverflow, the install helper; scoped regression sweep 98/98 EN, 98/98 ES after two 320px fixes. Finish review applied five fixes (templates row centring and front card, focus rings, selection, the Plans eyebrow removed, week chips in the label face)."
+        }
+      ],
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "no mechanical gate",
+        "at": "2026-11-23T00:44:06.956Z"
+      },
       "forced": null
     },
     "motion": {
-      "status": "pending",
-      "openedAt": null,
-      "closedAt": null,
-      "attempts": 0,
+      "status": "closed",
+      "openedAt": "2026-11-23T00:44:06.956Z",
+      "closedAt": "2026-11-23T00:44:11.434Z",
+      "attempts": 1,
       "notes": [],
-      "gate": null,
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "no mechanical gate",
+        "at": "2026-11-23T00:44:11.434Z"
+      },
       "forced": null
     },
     "responsive": {
-      "status": "pending",
-      "openedAt": null,
+      "status": "open",
+      "openedAt": "2026-11-23T00:44:11.434Z",
       "closedAt": null,
-      "attempts": 0,
+      "attempts": 4,
       "notes": [],
-      "gate": null,
+      "gate": {
+        "ok": false,
+        "reasons": [
+          "at desktop width, region eyebrow is missing",
+          "at desktop width, region cta-signin is missing",
+          "at desktop width, region record-card is missing"
+        ],
+        "summary": "desktop 82% (match)",
+        "score": 0.824,
+        "sideBySide": "C:/Users/Ezequiel/Desktop/Code/sunsteel/sunnsteel-frontend/.impeccable/review/diff/desktop/side-by-side.png",
+        "at": "2026-11-23T00:45:34.112Z"
+      },
       "forced": null
     },
     "review": {

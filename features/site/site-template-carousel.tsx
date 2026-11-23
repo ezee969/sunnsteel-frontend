@@ -83,7 +83,9 @@ export function SiteTemplateCarousel({ cards }: { cards: TemplateCard[] }) {
 					if (entry.isIntersecting) setFront(items.indexOf(entry.target))
 				}
 			},
-			{ root: row.current, threshold: 0.6 },
+			// The card crossing the row's centre line is the front one; with
+			// several fully in view (a wide screen) a share would pick the last.
+			{ root: row.current, rootMargin: '0px -50% 0px -50%' },
 		)
 		items.forEach(item => snap.observe(item))
 		return () => snap.disconnect()
