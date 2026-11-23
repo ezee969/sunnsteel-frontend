@@ -3099,11 +3099,12 @@ it more cinematic", then "do what you think is best". The page tells the
 forging of its headline. **Site only**; the app's rules stand, and each item
 below is a deliberate exception to §§8-9 for the landing:
 
-- **The forge.** The headline's gold word warms to ember (`--site-ember`)
-  with a soft glow and settles back to gold, once, in one quick, even swell
-  of 1.1s from 250ms after load (the owner, 2026-11-23: the first version,
-  white-hot then ember over 2.6s, took too long); every section heading's
-  rule cools from ember to gold in 0.9s as it draws. These are the
+- **The forge.** The headline's gold word arrives hot, in ember
+  (`--site-ember`) with a soft glow, and cools to gold, once, in 1.1s from
+  250ms after load (the owner, 2026-11-23: start from the orange-red, then
+  the final colour; the first version, white-hot then ember over 2.6s, took
+  too long); every section heading's rule cools from ember to gold in 0.9s
+  as it draws. These are the
   only glows on the site.
 - **Pools of light behind the mock-ups**, in the colour of what they show: gold
   behind the verbs' phones (the pool brightens on the phone whose script is

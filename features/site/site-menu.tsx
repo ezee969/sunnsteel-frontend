@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dialog'
 
 import { LanguageSwitch } from './language-switch'
+import { SITE_NAV_GROUPS as GROUPS } from './site-nav-groups'
 
 /**
  * SITE-01 §12.1, below 1024: the bar's menu, the whole screen in the Night
@@ -31,37 +32,6 @@ import { LanguageSwitch } from './language-switch'
  * accordion groups, and Pricing and the language switch follow. Get started
  * stays the bar's one filled control.
  */
-const GROUPS = [
-	{
-		id: 'features',
-		links: [
-			['allFeatures', '/features'],
-			['workoutTracker', '/features/workout-tracker'],
-			['routineBuilder', '/features/routine-builder'],
-			['progression', '/features/progression'],
-			['progress', '/features/progress'],
-			['ranks', '/features/ranks'],
-			['community', '/features/community'],
-		],
-	},
-	{
-		id: 'useCases',
-		links: [
-			['beginners', '/use-cases/beginners'],
-			['intermediates', '/use-cases/intermediates'],
-			['advanced', '/use-cases/advanced'],
-		],
-	},
-	{
-		id: 'plans',
-		links: [
-			['pricing', '/pricing'],
-			['isItFree', '/pricing#free'],
-			['pro', '/pricing#pro'],
-			['install', '/#install'],
-		],
-	},
-] as const
 
 export function SiteMenu() {
 	const t = useTranslations('site.topBar')

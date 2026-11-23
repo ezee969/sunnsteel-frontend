@@ -1198,6 +1198,102 @@
   font-size: 15px;
   letter-spacing: 0.02em;
 }
+/* §12.1 the Product panel, as Boostcamp's bar opens its own (the owner,
+   2026-11-23): hovering or focusing Product turns it gold, flips its chevron
+   and, after 150ms, unfolds a Night panel of three columns from the top
+   (200ms, scaleY 0.8 to 1 with a fade); it folds away 100ms after the
+   pointer leaves. CSS only. The panel's top padding is the bridge the
+   pointer crosses from the trigger. Below 1024 the menu button lists the
+   same pages. */
+.site-product {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.site-product-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 200ms var(--ease-standard);
+}
+.site-product-chevron {
+  transition: transform 200ms var(--ease-standard);
+}
+.site-product-panel {
+  position: absolute;
+  top: 100%;
+  left: -28px;
+  z-index: 30;
+  padding-top: 36px;
+  color: var(--foreground);
+  visibility: hidden;
+  opacity: 0;
+  transform: scaleY(0.8);
+  transform-origin: top left;
+  pointer-events: none;
+  transition:
+    opacity 200ms cubic-bezier(0.755, 0.05, 0.855, 0.06) 100ms,
+    transform 200ms cubic-bezier(0.755, 0.05, 0.855, 0.06) 100ms,
+    visibility 0s linear 300ms;
+}
+.site-product:is(:hover, :focus-within) .site-product-panel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 200ms cubic-bezier(0.23, 1, 0.32, 1) 150ms,
+    transform 200ms cubic-bezier(0.23, 1, 0.32, 1) 150ms,
+    visibility 0s linear 150ms;
+}
+.site-product:is(:hover, :focus-within) .site-product-trigger {
+  color: var(--site-accent);
+}
+.site-product:is(:hover, :focus-within) .site-product-chevron {
+  transform: rotate(180deg);
+}
+.site-product-inner {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  column-gap: 64px;
+  padding: 24px 32px 22px 28px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: 0 16px 40px oklch(0 0 0 / 0.45);
+}
+.site-product-label {
+  margin-bottom: 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-accent);
+}
+.site-product-link {
+  display: block;
+  padding: 7px 0;
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  transition: color 150ms var(--ease-standard);
+}
+.site-product-link:hover {
+  color: var(--foreground);
+}
+@media (max-width: 1023px) {
+  .site-product-panel {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-product-panel,
+  .site-product:is(:hover, :focus-within) .site-product-panel {
+    transform: none;
+    transition: visibility 0s;
+  }
+}
 .site-bar-actions {
   display: flex;
   white-space: nowrap;
@@ -3304,22 +3400,17 @@
   --site-shadow: oklch(0.06 0.01 70 / 0.7);
 }
 
-/* The forge: the headline's word warms to ember and settles back to the
-   gold it rests on in one quick, even swell (the owner, 2026-11-23: the
-   first version, white-hot then ember over 2.6s, took too long); every
-   section's rule cools the same way as it draws. */
+/* The forge: the headline's word arrives hot, in ember with a soft glow, and
+   cools to the gold it rests on (the owner, 2026-11-23: start from the
+   orange-red, then the final colour; the first version, white-hot then ember
+   over 2.6s, took too long); every section's rule cools the same way as it
+   draws. */
 @keyframes site-forge {
-  0% {
-    color: var(--site-accent);
-    text-shadow: 0 0 0 transparent;
-    animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
-  }
-  35% {
+  from {
     color: var(--site-ember);
     text-shadow: 0 0 0.4em color-mix(in oklch, var(--site-ember) 60%, transparent);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  100% {
+  to {
     color: var(--site-accent);
     text-shadow: 0 0 0 transparent;
   }
@@ -3330,7 +3421,7 @@
   }
 }
 .site-anim .site .type-site-display mark {
-  animation: site-forge 1100ms linear 250ms both;
+  animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) 250ms both;
 }
 .site-anim .site-heading[data-in]::after {
   animation:
@@ -3624,7 +3715,7 @@
   animation: none;
 }
 .site-anim .site .site-interlude-line[data-in] mark {
-  animation: site-forge 1100ms linear both;
+  animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) both;
   animation-delay: calc(var(--line, 0) * 180ms + 350ms);
 }
 /* As the band scrolls into place the bars close in to the 2.4:1 frame and
