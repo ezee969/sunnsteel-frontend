@@ -103,6 +103,17 @@
 			"milestone": "Milestone earned"
 		}
 	},
+	"interludes": {
+		"chalk": {
+			"first": "Every rep.",
+			"second": "Written down."
+		},
+		"bar": {
+			"workouts": "<n>{count}</n> workouts.",
+			"weeks": "<n>{count}</n> different weeks.",
+			"rank": "{rank}."
+		}
+	},
 	"tools": {
 		"heading": "Tools for every workout",
 		"progression": {

@@ -8,6 +8,7 @@ import {
 	INSTALL_PROMPT_SCRIPT,
 	SiteInstallHelper,
 } from '@/features/site/site-install-helper'
+import { SiteInterlude } from '@/features/site/site-interlude'
 import { SiteMotion } from '@/features/site/site-motion'
 import { SitePeople } from '@/features/site/site-people'
 import { SitePlans } from '@/features/site/site-plans'
@@ -66,8 +67,11 @@ export default async function LandingPage({
 					<SiteProofBand />
 				</div>
 				<SiteVerbs />
+				{/* §33.15: two interludes of footage pace the long middle. */}
+				<SiteInterlude cut="chalk" />
 				<SiteTools />
 				<SiteProgress />
+				<SiteInterlude cut="bar" />
 				<SiteRanks />
 				<SiteTemplates />
 				<SitePeople />

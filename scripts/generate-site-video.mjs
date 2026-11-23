@@ -2,7 +2,7 @@
  * Cuts, grades and encodes the public site's background videos (SITE-01, plan
  * §7.2, §12.2 and §12.12) from the licensed stock masters, with their posters.
  *
- *   node scripts/generate-site-video.mjs [--out <dir>] [--sheets]
+ *   node scripts/generate-site-video.mjs [--out <dir>] [--sheets | --interludes]
  *
  * The masters are Mixkit's 4K files (Mixkit Stock Video Free License), kept
  * outside every repository in `../site-footage/mixkit` (override with
@@ -15,7 +15,8 @@
  * the video in CSS instead.
  *
  * `--sheets` writes a contact sheet per master (one frame a second) to the
- * output folder instead, for choosing the seconds each cut uses.
+ * output folder instead, for choosing the seconds each cut uses;
+ * `--interludes` writes only the two interludes' clips and posters (§33.15).
  */
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, statSync, writeFileSync } from 'node:fs'
@@ -39,15 +40,24 @@ const OUT = resolve(
 		: 'public/site/video',
 )
 
-/** The masters, by Mixkit id, all 4096x2160 at 25 fps. */
+/**
+ * The masters, by Mixkit id, with their frame size. The machine series is
+ * 4096x2160 at 25 fps; the interludes' close-ups (2026-11-23) are Full HD at
+ * 23.976, one of them portrait. Every cut is resampled to 25 fps.
+ */
+const UHD = { width: 4096, height: 2160 }
+const FHD = { width: 1920, height: 1080 }
 const MASTER = {
-	cableFly: 'mixkit-100546-cable-fly-2160.mp4',
-	latPulldown: 'mixkit-100549-lat-pulldown-2160.mp4',
-	seatedRow: 'mixkit-100550-seated-cable-row-2160.mp4',
-	womanPulldown: 'mixkit-100523-woman-pulldown-2160.mp4',
-	backAtMachine: 'mixkit-100540-back-at-machine-2160.mp4',
+	cableFly: { file: 'mixkit-100546-cable-fly-2160.mp4', ...UHD },
+	latPulldown: { file: 'mixkit-100549-lat-pulldown-2160.mp4', ...UHD },
+	seatedRow: { file: 'mixkit-100550-seated-cable-row-2160.mp4', ...UHD },
+	womanPulldown: { file: 'mixkit-100523-woman-pulldown-2160.mp4', ...UHD },
+	backAtMachine: { file: 'mixkit-100540-back-at-machine-2160.mp4', ...UHD },
+	chalkHands: { file: 'mixkit-44420-chalk-hands-1080.mp4', ...FHD },
+	chalkBag: { file: 'mixkit-50921-chalk-bag-1080.mp4', ...FHD },
+	plates: { file: 'mixkit-40788-plates-1080.mp4', width: 1080, height: 1920 },
+	barbell: { file: 'mixkit-40250-bar-dark-room-1080.mp4', ...FHD },
 }
-const SOURCE = { width: 4096, height: 2160 }
 
 /**
  * A cut: `start` and `length` in seconds of its master; `subject`, the
@@ -98,6 +108,35 @@ const CLOSING = {
 	max: 12,
 	subject: 0.45,
 }
+
+/**
+ * The interludes (§33.15, 2026-11-23): two letterboxed bands between
+ * sections, framed at 2.4:1 and shown on computers only (a phone gets the
+ * poster). Chalk is a three-shot montage before the tools -- the clap, the
+ * bag, a plate -- each cut on its strongest stretch and before the vest's
+ * stripes come into view; the bar is one slow descent played forward and
+ * back, so the loop is a rep with no seam. `subjectY` places a portrait
+ * master's strip, as `subject` does across.
+ */
+const INTERLUDE = { width: 1920, height: 800 }
+const CHALK = [
+	{ master: 'chalkHands', start: 0.2, length: 2.8, subject: 0.42 },
+	{ master: 'chalkBag', start: 2.2, length: 2.6, subject: 0.45 },
+	{ master: 'plates', start: 3.2, length: 2.4, subject: 0.5, subjectY: 0.42 },
+]
+const BAR = { master: 'barbell', start: 5, length: 6, subject: 0.5 }
+/**
+ * The phone posters, 4:5, a still of each band's strongest frame. The plate's
+ * is set low enough to leave out the shelf's lettered medicine balls (and the
+ * model's face).
+ */
+const CHALK_PHONE = {
+	master: 'plates',
+	start: 3.6,
+	subject: 0.5,
+	subjectY: 0.56,
+}
+const BAR_PHONE = { master: 'barbell', start: 8, subject: 0.5 }
 const FPS = 25
 
 /** Where the subject sits in the output frame (plan §12.2: the right two thirds). */
@@ -137,7 +176,7 @@ function findLoop({ master, from, to, min, max }) {
 		'-t',
 		String(to - from),
 		'-i',
-		join(MASTERS, MASTER[master]),
+		join(MASTERS, MASTER[master].file),
 		'-vf',
 		`fps=${FPS},scale=${w}:${h},format=gray`,
 		'-f',
@@ -171,16 +210,32 @@ function findLoop({ master, from, to, min, max }) {
 	}
 }
 
-/** The crop that puts `subject` at `at` of a `ratio` (w/h) frame, `zoom` in. */
-function crop({ subject, zoom = 1, flip = false }, ratio, at) {
-	const height = Math.round(SOURCE.height / zoom / 2) * 2
-	const width = Math.round((height * ratio) / 2) * 2
-	const centre = (flip ? 1 - subject : subject) * SOURCE.width
+/**
+ * The crop that puts `subject` at `at` of a `ratio` (w/h) frame, `zoom` in.
+ * A frame wider than its master keeps the master's whole width instead, and
+ * `subjectY` then places it down the master (the centre by default).
+ */
+function crop(
+	{ master, subject, subjectY = 0.5, zoom = 1, flip = false },
+	ratio,
+	at,
+) {
+	const source = MASTER[master]
+	let height = Math.round(source.height / zoom / 2) * 2
+	let width = Math.round((height * ratio) / 2) * 2
+	if (width > source.width) {
+		width = source.width
+		height = Math.round(width / ratio / 2) * 2
+	}
+	const centre = (flip ? 1 - subject : subject) * source.width
 	const x = Math.min(
 		Math.max(Math.round(centre - at * width), 0),
-		SOURCE.width - width,
+		source.width - width,
 	)
-	const y = Math.round((SOURCE.height - height) / 2)
+	const y = Math.min(
+		Math.max(Math.round(subjectY * source.height - height / 2), 0),
+		source.height - height,
+	)
 	return `${flip ? 'hflip,' : ''}crop=${width}:${height}:${x}:${y}`
 }
 
@@ -190,7 +245,7 @@ const input = cut => [
 	'-t',
 	String(cut.length),
 	'-i',
-	join(MASTERS, MASTER[cut.master]),
+	join(MASTERS, MASTER[cut.master].file),
 ]
 
 /** Encodes one filter graph's [v] to MP4 (H.264) and WebM (AV1). */
@@ -240,19 +295,8 @@ function encode(inputs, graph, name, { mp4Rate, av1Crf }) {
 	])
 }
 
-/** The first frame of a written clip, as AVIF and WebP under `maxKb`. */
-async function poster(clip, name, maxKb, resize) {
-	const png = ffmpeg([
-		'-i',
-		join(OUT, clip),
-		'-frames:v',
-		'1',
-		'-f',
-		'image2pipe',
-		'-c:v',
-		'png',
-		'-',
-	])
+/** A PNG as AVIF and WebP under `maxKb`, cropped to `resize` if given. */
+async function writeImage(png, name, maxKb, resize) {
 	let image = sharp(png)
 	if (resize)
 		image = image.resize(resize.width, resize.height, { fit: 'cover' })
@@ -273,6 +317,38 @@ async function poster(clip, name, maxKb, resize) {
 			quality -= 6
 		}
 	}
+}
+
+/** The first frame of a written clip, as AVIF and WebP under `maxKb`. */
+async function poster(clip, name, maxKb, resize) {
+	const png = ffmpeg([
+		'-i',
+		join(OUT, clip),
+		'-frames:v',
+		'1',
+		'-f',
+		'image2pipe',
+		'-c:v',
+		'png',
+		'-',
+	])
+	await writeImage(png, name, maxKb, resize)
+}
+
+/** One graded frame of a master at `shot.start`, framed `ratio` at `size`. */
+function still(shot, ratio, size) {
+	return ffmpeg([
+		...input({ ...shot, length: 0.2 }),
+		'-vf',
+		`${crop(shot, ratio, 0.5)},scale=${size}:flags=lanczos,${LOOK},format=rgb24`,
+		'-frames:v',
+		'1',
+		'-f',
+		'image2pipe',
+		'-c:v',
+		'png',
+		'-',
+	])
 }
 
 function heroDesktop() {
@@ -297,7 +373,7 @@ function loop(shot, ratio, at, size, name, rates) {
 }
 
 function sheets() {
-	for (const [key, file] of Object.entries(MASTER)) {
+	for (const [key, { file }] of Object.entries(MASTER)) {
 		ffmpeg([
 			'-i',
 			join(MASTERS, file),
@@ -331,9 +407,57 @@ function plate(path) {
 	console.log('plate', path, `${width}x${height}`)
 }
 
+/** §33.15: the chalk montage, its three shots cut one into the next. */
+function interludeChalk() {
+	const { width, height } = INTERLUDE
+	const inputs = CHALK.flatMap(input)
+	const parts = CHALK.map(
+		(cut, i) =>
+			`[${i}:v]${crop(cut, width / height, 0.5)},scale=${width}:${height}:flags=lanczos,${LOOK},setsar=1,fps=${FPS}[c${i}]`,
+	)
+	const graph = `${parts.join(';')};${CHALK.map((_, i) => `[c${i}]`).join('')}concat=n=${CHALK.length}:v=1:a=0[v]`
+	encode(inputs, graph, 'interlude-chalk', { mp4Rate: '1600k', av1Crf: 42 })
+}
+
+/** §33.15: the bar's descent and, reversed, its rise -- a loop with no cut. */
+function interludeBar() {
+	const { width, height } = INTERLUDE
+	const graph = `[0:v]${crop(BAR, width / height, 0.5)},scale=${width}:${height}:flags=lanczos,${LOOK},setsar=1,fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0[v]`
+	encode(input(BAR), graph, 'interlude-bar', { mp4Rate: '1200k', av1Crf: 44 })
+}
+
+async function interludes() {
+	interludeChalk()
+	interludeBar()
+	await poster('interlude-chalk.mp4', 'interlude-chalk-poster', 100)
+	await poster('interlude-bar.mp4', 'interlude-bar-poster', 100)
+	await writeImage(
+		still(CHALK_PHONE, 4 / 5, '720:900'),
+		'interlude-chalk-phone-poster',
+		60,
+	)
+	await writeImage(
+		still(BAR_PHONE, 4 / 5, '720:900'),
+		'interlude-bar-phone-poster',
+		60,
+	)
+	for (const name of ['interlude-chalk', 'interlude-bar'].flatMap(n => [
+		`${n}.mp4`,
+		`${n}.webm`,
+	])) {
+		console.log(
+			name,
+			`${(statSync(join(OUT, name)).size / 1048576).toFixed(2)} MB`,
+		)
+	}
+}
+
 mkdirSync(OUT, { recursive: true })
 if (args.includes('--sheets')) {
 	sheets()
+} else if (args.includes('--interludes')) {
+	// Only the interludes: the hero and closing cuts stay as approved.
+	await interludes()
 } else if (args.includes('--plate')) {
 	plate(resolve(ROOT, args[args.indexOf('--plate') + 1]))
 } else {

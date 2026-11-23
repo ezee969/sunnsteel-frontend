@@ -103,6 +103,17 @@
 			"milestone": "Logro obtenido"
 		}
 	},
+	"interludes": {
+		"chalk": {
+			"first": "Cada repetición.",
+			"second": "Anotada."
+		},
+		"bar": {
+			"workouts": "<n>{count}</n> entrenamientos.",
+			"weeks": "<n>{count}</n> semanas distintas.",
+			"rank": "{rank}."
+		}
+	},
 	"tools": {
 		"heading": "Herramientas para cada entrenamiento",
 		"progression": {

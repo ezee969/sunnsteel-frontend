@@ -6,16 +6,18 @@ import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * SITE-01 §12.2, §12.12 and §33.7: a band's background footage. The poster
- * is always rendered (the hero's is the LCP element); the clip is requested
- * only after the page's `load`, when the browser is idle -- and, for the
- * closing band, once the band is within a screen of the viewport -- never
+ * SITE-01 §12.2, §12.12, §33.7 and §33.15: a band's background footage. The
+ * poster is always rendered (the hero's is the LCP element); the clip is
+ * requested only after the page's `load`, when the browser is idle -- and,
+ * for every band but the hero, once the band is within a screen of the
+ * viewport -- never
  * under either reduced-motion source or `Save-Data`. Phones get the hero's
  * light cut and no closing clip at all. The scrim is baked into every file
  * (§33.4), so nothing is laid over it here.
  */
 type Cut = { webm: string; mp4: string }
-const CUTS: Record<'hero' | 'closing', { phone: Cut | null; desktop: Cut }> = {
+type Band = 'hero' | 'closing' | 'chalk' | 'bar'
+const CUTS: Record<Band, { phone: Cut | null; desktop: Cut }> = {
 	hero: {
 		phone: {
 			webm: '/site/video/hero-phone.webm',
@@ -31,6 +33,21 @@ const CUTS: Record<'hero' | 'closing', { phone: Cut | null; desktop: Cut }> = {
 		desktop: {
 			webm: '/site/video/closing-desktop.webm',
 			mp4: '/site/video/closing-desktop.mp4',
+		},
+	},
+	// §33.15: the interludes, computers only, like the closing band.
+	chalk: {
+		phone: null,
+		desktop: {
+			webm: '/site/video/interlude-chalk.webm',
+			mp4: '/site/video/interlude-chalk.mp4',
+		},
+	},
+	bar: {
+		phone: null,
+		desktop: {
+			webm: '/site/video/interlude-bar.webm',
+			mp4: '/site/video/interlude-bar.mp4',
 		},
 	},
 }
@@ -64,7 +81,7 @@ export function HeroVideo({
 }: {
 	pauseLabel: string
 	playLabel: string
-	cut?: 'hero' | 'closing'
+	cut?: Band
 }) {
 	const video = useRef<HTMLVideoElement>(null)
 	const [enabled, setEnabled] = useState(false)

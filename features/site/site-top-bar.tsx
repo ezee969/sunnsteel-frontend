@@ -11,7 +11,9 @@ import { SiteMenu } from './site-menu'
  * SITE-01 §12.1: the public site's bar, transparent over the hero with the
  * Night tokens (the hero's `.dark` scope). Until the Product panel is built
  * (the sections phase), Product is a link to /features -- the bar's own
- * no-JavaScript behaviour.
+ * no-JavaScript behaviour. Below 1024 Sign in holds the bar until Get
+ * started takes its place (the owner, 2026-11-23: a returning member found
+ * no way in on a phone); the menu lists it first.
  */
 export async function SiteTopBar() {
 	const t = await getTranslations('site.topBar')
@@ -38,7 +40,10 @@ export async function SiteTopBar() {
 					label={t('language')}
 					names={{ en: t('english'), es: t('spanish') }}
 				/>
-				<Link href="/login" className="type-action text-foreground">
+				<Link
+					href="/login"
+					className="site-bar-signin type-action text-foreground"
+				>
 					{t('signIn')}
 				</Link>
 				<Link

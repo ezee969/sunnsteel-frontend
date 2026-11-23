@@ -1509,6 +1509,27 @@
     display: none;
   }
 }
+/* Below 1024 Sign in holds the bar until Get started takes its place (the
+   owner, 2026-11-23: a member coming back found no way in on a phone). The
+   two never share the bar: in Spanish at 390 they do not fit together. */
+@keyframes site-bar-swap {
+  from {
+    opacity: 0;
+  }
+}
+@media (max-width: 1023px) {
+  .site-js .site-bar:not([data-cta]) .site-bar-signin {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-js .site-bar:not([data-cta]) .site-filled-bar {
+    display: none;
+  }
+  .site-anim .site-bar :is(.site-bar-signin, .site-filled-bar) {
+    animation: site-bar-swap 240ms var(--ease-standard);
+  }
+}
 
 /* §33, the sections after the proof band (plan §12.4-§12.6): the page's own
    theme from here on. Each section rests on its final state; the stages and
@@ -3262,9 +3283,11 @@
     0 2px 8px -2px var(--site-shadow);
 }
 
-/* Film grain on the Night bands with footage. */
+/* Film grain on the Night bands with footage (the interludes' is a layer of
+   its own: their pseudo-elements are the letterbox). */
 .site-hero::after,
-.site-closing::before {
+.site-closing::before,
+.site-grain {
   content: '';
   position: absolute;
   z-index: 6;
@@ -3274,12 +3297,16 @@
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-:root[data-contrast='more'] :is(.site-hero::after, .site-closing::before) {
+/* Spelled out: a pseudo-element inside :is() drops the whole rule. */
+:root[data-contrast='more'] .site-hero::after,
+:root[data-contrast='more'] .site-closing::before,
+:root[data-contrast='more'] .site-grain {
   display: none;
 }
 @media (prefers-contrast: more) {
   .site-hero::after,
-  .site-closing::before {
+  .site-closing::before,
+  .site-grain {
     display: none;
   }
 }
@@ -3317,5 +3344,135 @@
     animation: site-sink linear both;
     animation-timeline: view();
     animation-range: exit 0% exit 100%;
+  }
+}
+
+/* §33.15 Interludes: a letterboxed Night band of footage between two
+   sections, one line at display size and nothing to click. */
+.site-interlude {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2.4 / 1;
+  /* A set width: left to auto, the 440px floor carries across the ratio as
+     a 1056px width and the band runs off a narrower window. */
+  width: 100%;
+  min-height: 440px;
+  max-height: 86svh;
+  margin-top: clamp(88px, 10vw, 160px);
+}
+/* One cell for every child in flow, so the line centres on the band. */
+.site-interlude > * {
+  grid-area: 1 / 1;
+}
+@media (max-width: 767px) {
+  .site-interlude {
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+    max-height: none;
+  }
+}
+/* The letterbox: two bars, each edged with a hairline of gold. */
+.site-interlude::before,
+.site-interlude::after {
+  content: '';
+  position: absolute;
+  z-index: 8;
+  inset-inline: 0;
+  height: 7%;
+  pointer-events: none;
+  background: oklch(0.07 0.004 70);
+}
+.site-interlude::before {
+  top: 0;
+  transform-origin: top;
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--site-accent) 28%, transparent);
+}
+.site-interlude::after {
+  bottom: 0;
+  transform-origin: bottom;
+  box-shadow: 0 -1px 0 color-mix(in oklch, var(--site-accent) 28%, transparent);
+}
+.site-interlude .site-video-control {
+  bottom: 4px;
+}
+.site-interlude-line {
+  position: relative;
+  z-index: 10;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  padding-inline: var(--site-gutter);
+  font-size: clamp(24px, 7.2vw, 92px);
+  line-height: 1.04;
+  text-align: center;
+}
+.site-interlude-figure {
+  color: var(--site-accent);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+/* On a phone the figure stands over its word, twice its size, so "100"
+   never breaks from the line alone. */
+@media (max-width: 767px) {
+  .site-interlude-figure {
+    display: block;
+    font-size: 2em;
+    line-height: 1;
+  }
+}
+/* The top rank's name strikes in its own pigment, not the site's gold. */
+.site .site-interlude-rank {
+  --site-accent: var(--rank-laureate);
+}
+/* Each line rises from behind its own mask, in turn. */
+.site-l {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.site-l > span {
+  display: inline-block;
+}
+.site-anim [data-reveal='lines']:not([data-in]) .site-l > span {
+  transform: translateY(110%);
+}
+.site-anim [data-reveal='lines'][data-in] .site-l > span {
+  animation: site-rise 1000ms var(--ease-standard) both;
+  animation-delay: calc(var(--line, 0) * 180ms);
+}
+/* The forge strikes when the line arrives, not at page load. */
+.site-anim .site .site-interlude-line mark {
+  animation: none;
+}
+.site-anim .site .site-interlude-line[data-in] mark {
+  animation: site-forge 2600ms var(--ease-standard) both;
+  animation-delay: calc(var(--line, 0) * 180ms + 500ms);
+}
+/* As the band scrolls into place the bars close in to the 2.4:1 frame and
+   the footage pulls back to rest: the shutter opening. */
+@keyframes site-shutter {
+  from {
+    transform: scaleY(3.6);
+  }
+}
+@keyframes site-pull-back {
+  from {
+    transform: scale(1.14);
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-interlude {
+    view-timeline: --site-interlude block;
+  }
+  .site-anim .site-interlude::before,
+  .site-anim .site-interlude::after {
+    animation: site-shutter linear both;
+    animation-timeline: --site-interlude;
+    animation-range: entry 15% cover 45%;
+  }
+  .site-anim .site-interlude :is(picture img, video) {
+    animation: site-pull-back linear both;
+    animation-timeline: --site-interlude;
+    animation-range: entry 0% cover 50%;
   }
 }

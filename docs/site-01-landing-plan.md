@@ -266,6 +266,16 @@ more serious:
   The cable towers carry the manufacturer's small printed labels, unreadable
   under the grade and scrim; each cut is checked for legible text at review.
 
+**Interlude footage (the owner, 2026-11-23).** The two interludes
+(design system §33.15) use four more Mixkit clips under the same free licence,
+approved by the owner as a contact sheet before download, Full HD masters in
+the same folder: 44420 chalk clapped from the hands, 50921 a hand in the chalk
+bag and 40788 a plate on the bar (portrait) for the chalk montage before the
+tools; 40250 a loaded bar in a dark room for the band before the ranks. Two
+stronger close-ups, 47891 and 47484, were left out because they carry the
+restricted licence. Cuts end before the vest's stripes come into view, and the
+phone poster of the plate sits below the shelf's lettered medicine balls.
+
 The 2026-10-01 material (the `final-4a` "presencia" bust, the monument under
 construction) may serve other sections, such as Ranks.
 
@@ -590,7 +600,11 @@ These addresses fix the slugs §4.1 left open.
   menu" / "Abrir menú"). The menu is the existing drawer primitive, full
   height: the three columns as accordion groups, Pricing, the language switch
   and Sign in as a full-width outline. Start free stays the bar's one filled
-  control.
+  control. **Revised 2026-11-23 (the owner: a member coming back found no
+  way in on a phone):** below 1024 Sign in holds the bar while the hero's own
+  action is in view, and Get started takes its place once that scrolls away
+  (in Spanish at 390 the two do not fit together); the menu lists Sign in
+  first, above the groups, where a phone's toolbar cannot cover it.
 - **Over the hero** the bar has no ground and renders with the Night tokens in
   both themes (a `.dark` scope), because the video beneath is dark either
   way. **Once the hero's lower edge passes under it** (an

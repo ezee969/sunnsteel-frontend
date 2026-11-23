@@ -26,8 +26,9 @@ import { LanguageSwitch } from './language-switch'
  * SITE-01 §12.1, below 768: the bar's menu, a full-height panel from the
  * right over the scrim (Radix Dialog: focus moves in, Escape and the scrim
  * close it, focus returns to the button). The Product panel's three columns
- * become accordion groups; Pricing, the language switch and Sign in follow.
- * Get started stays the bar's one filled control.
+ * become accordion groups; Pricing and the language switch follow. Sign in
+ * leads the panel (the owner, 2026-11-23). Get started stays the bar's one
+ * filled control.
  */
 const GROUPS = [
 	{
@@ -88,6 +89,18 @@ export function SiteMenu() {
 							<X className="size-[22px]" aria-hidden />
 						</DialogClose>
 					</div>
+					{/* First, not at the foot: a member coming back looks for it before
+					    anything else, and a phone's toolbar can cover the bottom. */}
+					<div className="px-4 pb-2">
+						<DialogClose asChild>
+							<Link
+								href="/login"
+								className="type-action flex h-12 w-full items-center justify-center rounded-sm border border-rule text-foreground hover:bg-surface"
+							>
+								{t('signIn')}
+							</Link>
+						</DialogClose>
+					</div>
 					<nav
 						aria-label={t('navLabel')}
 						className="flex-1 overflow-y-auto px-4"
@@ -137,16 +150,6 @@ export function SiteMenu() {
 							/>
 						</div>
 					</nav>
-					<div className="p-4">
-						<DialogClose asChild>
-							<Link
-								href="/login"
-								className="type-action flex h-12 w-full items-center justify-center rounded-sm border border-rule text-foreground hover:bg-surface"
-							>
-								{t('signIn')}
-							</Link>
-						</DialogClose>
-					</div>
 				</DialogPrimitive.Content>
 			</DialogPortal>
 		</Dialog>

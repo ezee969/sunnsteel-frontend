@@ -133,6 +133,18 @@ The placeholder figures (12,400 members; 350,000 workouts) are values in
 | `earn.link` | See ranks and achievements | Ver rangos y logros |
 | `earn.callout` | Rank reached · {rank} | Rango alcanzado · {rank} |
 
+## 4b. Interludes — `site.interludes`
+
+Added with the owner's footage approval (2026-11-23, design system §33.15): two letterboxed bands of footage between sections, one line each, nothing to click. The figures and the rank's name are filled from the contracts' top rank (`minimumSessions`, `minimumActiveWeeks`, the catalog's title), so the line stays true if the ladder changes; `<n>` marks the figure that counts up.
+
+| Key | English | Spanish |
+| --- | --- | --- |
+| `chalk.first` | Every rep. | Cada repetición. |
+| `chalk.second` | Written down. | Anotada. |
+| `bar.workouts` | `<n>{count}</n>` workouts. | `<n>{count}</n>` entrenamientos. |
+| `bar.weeks` | `<n>{count}</n>` different weeks. | `<n>{count}</n>` semanas distintas. |
+| `bar.rank` | {rank}. | {rank}. |
+
 ## 5. Tools for every workout — `site.tools`
 
 | Key | English | Spanish |
