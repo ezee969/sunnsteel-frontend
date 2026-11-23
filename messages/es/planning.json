@@ -185,7 +185,7 @@
 	},
 	"dashboardPage": {
 		"heroTitle": "Inicio",
-		"heroSubtitle": "Las estatuas no nacen. Se esculpen.",
+		"heroSubtitle": "La grandeza no se regala. Se forja.",
 		"bootstrapError": "No pudimos preparar tu progreso de entrenamiento. Inténtalo de nuevo.",
 		"retry": "Reintentar",
 		"welcomeNamed": "¡Te damos la bienvenida de nuevo, {name}!",

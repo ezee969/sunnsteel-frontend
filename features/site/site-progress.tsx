@@ -51,7 +51,6 @@ function AnalysisCard({
 
 export async function SiteProgress() {
 	const t = await getTranslations('site.progress')
-	const tMock = await getTranslations('site.mock')
 	const tExercises = await getTranslations('catalog.exercises')
 	const tPlateaus = await getTranslations('planning.plateaus')
 	const tSignals = await getTranslations('progress.signals')
@@ -82,7 +81,6 @@ export async function SiteProgress() {
 				strengthLabel={t('map.strength', { exercise: bench })}
 				strengthValues={strength}
 				strengthLabels={strength.map(kg)}
-				example={tMock('example')}
 			/>
 
 			<ul className="site-analysis-strip" data-reveal="stagger">

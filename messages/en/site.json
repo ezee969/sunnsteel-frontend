@@ -1,6 +1,6 @@
 {
 	"meta": {
-		"title": "Sunnsteel — Statues aren't born. They're carved.",
+		"title": "Sunnsteel — Greatness isn't given. It's forged.",
 		"description": "A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start."
 	},
 	"topBar": {
@@ -40,7 +40,7 @@
 		}
 	},
 	"hero": {
-		"headline": "Statues aren't born. They're <mark>carved</mark>.",
+		"headline": "Greatness isn't given. It's <mark>forged</mark>.",
 		"subline": "Plan, log every set, and watch the work add up: records broken, ranks earned.",
 		"createAccount": "Create a free account",
 		"pauseVideo": "Pause background video",
@@ -62,9 +62,6 @@
 		"mockTag": "Mock figure",
 		"cellSr": "{value} {label}",
 		"muscles": "Muscles on the body map"
-	},
-	"mock": {
-		"example": "Example"
 	},
 	"verbs": {
 		"heading": "Plan. Train. Measure. Earn.",
@@ -350,7 +347,7 @@
 	},
 	"footer": {
 		"navLabel": "Footer",
-		"tagline": "Statues aren't born. They're carved.",
+		"tagline": "Greatness isn't given. It's forged.",
 		"columns": {
 			"product": "Product",
 			"useCases": "Use cases",

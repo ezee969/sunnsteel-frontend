@@ -9,7 +9,7 @@ import { LANDING_FACTS, PLAN_TEMPLATE } from '@/lib/site/landing-examples'
 import { PRIVACY_SECTION_LABEL_KEYS } from '@/lib/utils/privacy-overview'
 import { templateText } from '@/lib/utils/routine-templates'
 
-import { ExampleMark, motionVars, SiteSectionHeading } from './site-parts'
+import { motionVars, SiteSectionHeading } from './site-parts'
 
 /**
  * SITE-01 §12.9: training is better with people, and free, without looking
@@ -45,14 +45,12 @@ function Scene({
 	eyebrow,
 	title,
 	body,
-	example,
 	seq,
 	children,
 }: {
 	eyebrow: string
 	title: string
 	body: string
-	example: string
 	/** Where this scene's script starts in the desktop sequence. */
 	seq: string
 	children: ReactNode
@@ -68,7 +66,6 @@ function Scene({
 			<h3 className="type-panel">{title}</h3>
 			<p className="type-body-sm site-body mt-0">{body}</p>
 			<div aria-hidden="true" className="dark site-card site-scene-panel">
-				<ExampleMark label={example} />
 				{children}
 			</div>
 		</li>
@@ -77,7 +74,6 @@ function Scene({
 
 export async function SitePeople() {
 	const t = await getTranslations('site.people')
-	const tMock = await getTranslations('site.mock')
 	const tActivity = await getTranslations('social.activity')
 	const tNotifications = await getTranslations('social.notifications')
 	const tPartners = await getTranslations('settings.trainingPartners')
@@ -85,7 +81,6 @@ export async function SitePeople() {
 	const tTemplates = await getTranslations('routines.templates')
 	const tPrivacy = await getTranslations('settings.privacyOverview')
 	const locale = (await getLocale()) as Locale
-	const example = tMock('example')
 	const name = t('name')
 	const push = tTemplates('days.push')
 	const parts = new Intl.ListFormat(intlLocale(locale), {
@@ -113,7 +108,6 @@ export async function SitePeople() {
 					eyebrow={t('activity.eyebrow')}
 					title={t('activity.title')}
 					body={t('activity.body', { reactions: ACTIVITY_REACTIONS.length })}
-					example={example}
 				>
 					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>
@@ -141,7 +135,6 @@ export async function SitePeople() {
 					eyebrow={t('partners.eyebrow')}
 					title={t('partners.title')}
 					body={t('partners.body', { max: LANDING_FACTS.partnersMax })}
-					example={example}
 				>
 					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>
@@ -170,7 +163,6 @@ export async function SitePeople() {
 					eyebrow={t('messages.eyebrow')}
 					title={t('messages.title')}
 					body={t('messages.body')}
-					example={example}
 				>
 					<div className="site-entry sx-entry">
 						<Initials>{t('initials')}</Initials>

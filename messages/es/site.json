@@ -1,6 +1,6 @@
 {
 	"meta": {
-		"title": "Sunnsteel — Las estatuas no nacen. Se esculpen.",
+		"title": "Sunnsteel — La grandeza no se regala. Se forja.",
 		"description": "Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar."
 	},
 	"topBar": {
@@ -40,7 +40,7 @@
 		}
 	},
 	"hero": {
-		"headline": "Las estatuas no nacen. <mark>Se esculpen</mark>.",
+		"headline": "La grandeza no se regala. <mark>Se forja</mark>.",
 		"subline": "Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados.",
 		"createAccount": "Crear cuenta gratis",
 		"pauseVideo": "Pausar el video de fondo",
@@ -62,9 +62,6 @@
 		"mockTag": "Cifra ficticia",
 		"cellSr": "{value} {label}",
 		"muscles": "Músculos en el mapa del cuerpo"
-	},
-	"mock": {
-		"example": "Ejemplo"
 	},
 	"verbs": {
 		"heading": "Planifica. Entrena. Mide. Gana.",
@@ -350,7 +347,7 @@
 	},
 	"footer": {
 		"navLabel": "Pie de página",
-		"tagline": "Las estatuas no nacen. Se esculpen.",
+		"tagline": "La grandeza no se regala. Se forja.",
 		"columns": {
 			"product": "Producto",
 			"useCases": "Casos de uso",

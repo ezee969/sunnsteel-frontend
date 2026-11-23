@@ -3041,3 +3041,24 @@ go through entire animations") and decided:
   17 muscles of the body map, not the languages.
 - **The landing's text is not selectable**, except the questions (the support
   address and the answers are there to be copied).
+
+The owner's second review (2026-11-22/23) added:
+
+- **No "Example" mark anywhere on the landing.** It read as a label stuck on
+  the hero. Phones show a clock in its place; every mock-up stays
+  `aria-hidden`, and the hero phone's accessible name still says it is an
+  example. This supersedes §33.8's mark.
+- **The ranks' profile header sits on a phone** over the dashboard's rank
+  line (DASH-11's wording: current rank and evidence, the next rank's
+  requirements), so an undecorated rank has a frame like the decorated ones.
+  Below 1024 the phone stands between the lead and the ladder.
+- **Templates:** Advanced, which has no starter template, shows the 8-week
+  block (Pro) as bars of `LP_STEPS`, each its share of the reference max on a
+  track that is the whole max. "None of these?" is a line under the cards
+  for every level, never a card in the carousel.
+- **Scripts in a sequence start as the one before ends** (about 100ms
+  later), never after a pause; each section's starts are measured from its
+  scripts' real lengths.
+- **The headline is "Greatness isn't given. It's forged."** / "La grandeza no
+  se regala. Se forja.", gold on the last word(s), and the brand line
+  everywhere it was used (title, footer, splash, dashboard).

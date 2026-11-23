@@ -1556,9 +1556,6 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
 }
-.site-example {
-  color: var(--ink-3);
-}
 .site-tag {
   flex-shrink: 0;
   padding: 3px 8px;
@@ -2116,9 +2113,6 @@
   min-height: 260px;
   margin-top: 16px;
   padding: 20px;
-}
-.site-scene-panel > .site-example {
-  align-self: flex-end;
 }
 .site-entry {
   display: flex;
@@ -3053,9 +3047,6 @@
 .site-progress-map,
 .site-strength {
   color: var(--foreground);
-}
-.site-progress-map .site-example {
-  color: var(--ink-3);
 }
 .site-device .sx-plate.fill-foreground {
   fill: var(--site-accent);

@@ -185,7 +185,7 @@
 	},
 	"dashboardPage": {
 		"heroTitle": "Dashboard",
-		"heroSubtitle": "Statues aren't born. They're carved.",
+		"heroSubtitle": "Greatness isn't given. It's forged.",
 		"bootstrapError": "Unable to prepare your workout progress. Please try again.",
 		"retry": "Retry",
 		"welcomeNamed": "Welcome back, {name}!",

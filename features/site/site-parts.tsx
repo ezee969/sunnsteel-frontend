@@ -43,15 +43,11 @@ export function HeadingWords({ text }: { text: string }) {
 	))
 }
 
-export function ExampleMark({ label }: { label: string }) {
-	return <span className="type-label site-example">{label}</span>
-}
-
 /** An original frame drawn to the brand's line, never a manufacturer's. */
 /**
  * The status bar's clock. A phone carries no "Example" mark any more (the
- * owner, 2026-11-22: the mark read as a label stuck on the hero); the page's
- * text and each phone's accessible name say the data is an example.
+ * owner, 2026-11-22, and on every mock-up the next day); the hero phone's
+ * accessible name says it is an example, every other mock-up is aria-hidden.
  */
 export const PHONE_CLOCK = '7:05'
 

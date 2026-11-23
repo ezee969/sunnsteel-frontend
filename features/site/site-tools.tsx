@@ -12,12 +12,7 @@ import {
 } from '@/lib/site/landing-examples'
 import { formatWeight } from '@/lib/utils/weight-unit'
 
-import {
-	ExampleMark,
-	motionVars,
-	SiteCard,
-	SiteSectionHeading,
-} from './site-parts'
+import { motionVars, SiteCard, SiteSectionHeading } from './site-parts'
 
 /**
  * SITE-01 §12.5: the tools that make a workout easier, as a bento -- the
@@ -28,14 +23,12 @@ import {
  */
 function ToolText({
 	eyebrow,
-	example,
 	title,
 	body,
 	large = false,
 	children,
 }: {
 	eyebrow: string
-	example: string
 	title: string
 	body: string
 	large?: boolean
@@ -43,10 +36,7 @@ function ToolText({
 }) {
 	return (
 		<div className="site-tool-text">
-			<p className="flex items-baseline justify-between gap-3">
-				<span className="type-label text-ink-3">{eyebrow}</span>
-				<ExampleMark label={example} />
-			</p>
+			<p className="type-label text-ink-3">{eyebrow}</p>
 			<h3 className="type-panel">{title}</h3>
 			<p
 				className={
@@ -62,7 +52,6 @@ function ToolText({
 
 export async function SiteTools() {
 	const t = await getTranslations('site.tools')
-	const tMock = await getTranslations('site.mock')
 	const tExercises = await getTranslations('catalog.exercises')
 	const tRounds = await getTranslations('workout.rounds')
 	const tGroup = await getTranslations('workout.exerciseGroup')
@@ -70,7 +59,6 @@ export async function SiteTools() {
 	const kg = (value: number) => formatWeight(value, 'KG', locale)
 	const step = kg(LANDING_FACTS.step)
 	const bench = exerciseLabel('Bench Press', tExercises)
-	const example = tMock('example')
 
 	return (
 		<section aria-labelledby="tools-heading" className="site-section">
@@ -91,7 +79,6 @@ export async function SiteTools() {
 					style={motionVars({ '--seq': '0s' })}
 				>
 					<ToolText
-						example={example}
 						eyebrow={t('progression.eyebrow')}
 						title={t('progression.title')}
 						body={t('progression.body', { step })}
@@ -175,7 +162,6 @@ export async function SiteTools() {
 					style={motionVars({ '--seq': '2.1s' })}
 				>
 					<ToolText
-						example={example}
 						eyebrow={t('rest.eyebrow')}
 						title={t('rest.title')}
 						body={t('rest.body')}
@@ -219,7 +205,6 @@ export async function SiteTools() {
 					style={motionVars({ '--seq': '5.1s' })}
 				>
 					<ToolText
-						example={example}
 						eyebrow={t('supersets.eyebrow')}
 						title={t('supersets.title')}
 						body={t('supersets.body', { max: LANDING_FACTS.groupMax })}
@@ -259,7 +244,6 @@ export async function SiteTools() {
 					style={motionVars({ '--seq': '6.1s' })}
 				>
 					<ToolText
-						example={example}
 						eyebrow={t('swap.eyebrow')}
 						title={t('swap.title')}
 						body={t('swap.body')}

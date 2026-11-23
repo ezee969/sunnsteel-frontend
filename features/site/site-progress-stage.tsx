@@ -7,7 +7,6 @@ import { MuscleMap } from '@/features/body-map/body-map'
 import { MUSCLE_WEEKS, muscleSets } from '@/lib/site/landing-examples'
 
 import { prefersStill } from './site-motion'
-import { ExampleMark } from './site-parts'
 
 /**
  * SITE-01 §12.6: the body map's weeks. The week buttons are the reader's
@@ -66,7 +65,6 @@ export function SiteProgressStage({
 	strengthLabel,
 	strengthValues,
 	strengthLabels,
-	example,
 }: {
 	title: string
 	body: string
@@ -76,7 +74,6 @@ export function SiteProgressStage({
 	strengthLabel: string
 	strengthValues: number[]
 	strengthLabels: string[]
-	example: string
 }) {
 	const t = useTranslations('site.progress.map')
 	const map = useRef<HTMLDivElement>(null)
@@ -149,9 +146,6 @@ export function SiteProgressStage({
 				</div>
 			</div>
 			<div ref={map} className="dark site-progress-map">
-				<div className="mb-2 flex justify-end">
-					<ExampleMark label={example} />
-				</div>
 				<MuscleMap
 					sets={muscleSets(MUSCLE_WEEKS[week - 1])}
 					emptyText={t('empty')}

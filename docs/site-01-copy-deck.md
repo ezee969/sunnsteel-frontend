@@ -62,7 +62,7 @@ in sentence case and set in capitals by their rank.
 
 | Key | English | Spanish |
 | --- | --- | --- |
-| `headline` | Statues aren't born. They're `<mark>`carved`</mark>`. | Las estatuas no nacen. `<mark>`Se esculpen`</mark>`. |
+| `headline` | Greatness isn't given. It's `<mark>`forged`</mark>`. | La grandeza no se regala. `<mark>`Se forja`</mark>`. |
 | `subline` | Plan, log every set, and watch the work add up: records broken, ranks earned. | Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados. |
 | `createAccount` | Create a free account | Crear cuenta gratis |
 | `signIn` | Sign in | Iniciar sesión |
@@ -70,7 +70,7 @@ in sentence case and set in capitals by their rank.
 | `pauseVideo` / `playVideo` | Pause background video / Play background video | Pausar el video de fondo / Reproducir el video de fondo |
 | `example` | Example | Ejemplo |
 | `recordCard` | New record · {exercise} {weight} × {reps} | Nuevo récord · {exercise} {weight} × {reps} |
-| `meta.title` | Sunnsteel — Statues aren't born. They're carved. | Sunnsteel — Las estatuas no nacen. Se esculpen. |
+| `meta.title` | Sunnsteel — Greatness isn't given. It's forged. | Sunnsteel — La grandeza no se regala. Se forja. |
 | `meta.description` | A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start. | Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar. |
 
 *Why this subline:* it names what a visitor does (plan, log, watch) and the
@@ -90,6 +90,8 @@ carving." / "Empieza a esculpir."
 **Revised with the owner (2026-11-21, plan §11 row 44):** "free" is said once in the first viewport, on the account button (`createAccount`): the top bar says "Get started" / "Empezar", the eyebrow above the headline is gone, and the proof band's fourth cell is the two languages. The subline's "in a history nobody can fake" read as corny and became "watch the work add up: records broken, ranks earned".
 
 **Revised with the owner (2026-11-22, after the live review):** the hero keeps one action, "Create a free account" (its "Sign in" and the install line are gone; the bar keeps Sign in, the closing band and the questions keep "How to install"); the proof band's fourth cell is `muscles`, "Muscles on the body map" / "Músculos en el mapa del cuerpo", the number from contracts' `MUSCLE_GROUPS`; the plans' eyebrow is gone; and the closing heading is "Your first set is waiting." / "Tu primera serie te espera.", the owner's pick to replace "Start carving.", which read as corny.
+
+**Revised with the owner (2026-11-23, second live review):** the headline is "Greatness isn't given. It's <mark>forged</mark>." / "La grandeza no se regala. <mark>Se forja</mark>." (the owner's own line), also as the page title, the footer's tagline, the splash and the dashboard's subtitle; `mock.example` and `hero.example` are gone with every "Example" mark; `templates.noneFit.advanced` gave way to `templates.block` (the 8-week block card under Advanced).
 
 ## 3. Proof band — `site.proof`
 
@@ -319,7 +321,7 @@ approval (Safari's Spanish label varies by version).
 | Key | English | Spanish |
 | --- | --- | --- |
 | `navLabel` | Footer | Pie de página |
-| `tagline` | Statues aren't born. They're carved. | Las estatuas no nacen. Se esculpen. |
+| `tagline` | Greatness isn't given. It's forged. | La grandeza no se regala. Se forja. |
 | `columns.product` / `useCases` / `help` / `legal` | Product / Use cases / Help / Legal | Producto / Casos de uso / Ayuda / Legal |
 | `links.questions` | Questions | Preguntas |
 | `links.install` | Install the app | Instalar la app |
