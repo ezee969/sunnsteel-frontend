@@ -2083,6 +2083,29 @@
   max-width: 320px;
   background: var(--background);
 }
+/* Its own height, not the frame's 9:18.5: the profile and the rank line
+   need 34px more than that shape holds, and the last row was cut off. */
+.site-device.site-rank-phone {
+  aspect-ratio: auto;
+  height: auto;
+}
+/* Like the verbs' phones, it scales whole to fit the window (the owner,
+   2026-11-23: at 658px tall it ran past a laptop's screen). */
+@media (min-width: 768px) {
+  .site-rank-phone {
+    zoom: 0.84;
+  }
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-rank-phone {
+    zoom: 0.74;
+  }
+}
+@media (min-width: 768px) and (max-height: 700px) {
+  .site-rank-phone {
+    zoom: 0.66;
+  }
+}
 /* All six ranks in one cell: the screen keeps the tallest one's height, so
    changing rank never moves the phone, and the shown one crossfades in. */
 /* Two shared rows, header and rank line (a subgrid): each row is as tall as
@@ -3281,44 +3304,38 @@
   --site-shadow: oklch(0.06 0.01 70 / 0.7);
 }
 
-/* The forge: the headline's word strikes white-hot, glows ember, and cools
-   to the gold it rests on; every section's rule cools the same way. */
+/* The forge: the headline's word warms to ember and settles back to the
+   gold it rests on in one quick, even swell (the owner, 2026-11-23: the
+   first version, white-hot then ember over 2.6s, took too long); every
+   section's rule cools the same way as it draws. */
 @keyframes site-forge {
-  0%,
-  8% {
+  0% {
     color: var(--site-accent);
-    text-shadow: none;
+    text-shadow: 0 0 0 transparent;
+    animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
   }
-  22% {
-    color: var(--site-heat);
-    text-shadow:
-      0 0 0.18em var(--site-heat),
-      0 0 0.6em var(--site-ember);
-  }
-  55% {
+  35% {
     color: var(--site-ember);
-    text-shadow: 0 0 0.45em color-mix(in oklch, var(--site-ember) 70%, transparent);
+    text-shadow: 0 0 0.4em color-mix(in oklch, var(--site-ember) 60%, transparent);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
   100% {
     color: var(--site-accent);
-    text-shadow: none;
+    text-shadow: 0 0 0 transparent;
   }
 }
 @keyframes site-cool {
   from {
-    background: var(--site-heat);
-  }
-  45% {
     background: var(--site-ember);
   }
 }
 .site-anim .site .type-site-display mark {
-  animation: site-forge 2600ms var(--ease-standard) 500ms both;
+  animation: site-forge 1100ms linear 250ms both;
 }
 .site-anim .site-heading[data-in]::after {
   animation:
     site-rule 480ms var(--ease-standard) both,
-    site-cool 1600ms var(--ease-standard) both;
+    site-cool 900ms var(--ease-standard) both;
   animation-delay:
     calc(var(--lines, 1) * var(--line-gap) + 600ms),
     calc(var(--lines, 1) * var(--line-gap) + 600ms);
@@ -3607,8 +3624,8 @@
   animation: none;
 }
 .site-anim .site .site-interlude-line[data-in] mark {
-  animation: site-forge 2600ms var(--ease-standard) both;
-  animation-delay: calc(var(--line, 0) * 180ms + 500ms);
+  animation: site-forge 1100ms linear both;
+  animation-delay: calc(var(--line, 0) * 180ms + 350ms);
 }
 /* As the band scrolls into place the bars close in to the 2.4:1 frame and
    the footage pulls back to rest: the shutter opening. */
