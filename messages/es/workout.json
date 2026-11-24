@@ -331,7 +331,8 @@
 		"problemInvalid": "Ingresa una fecha y una hora.",
 		"problemBeforeEarliest": "Un entrenamiento termina después de su última serie, a las {time}.",
 		"problemFuture": "Un entrenamiento no puede terminar en el futuro.",
-		"problemOnlyEarlier": "Solo puede ser antes de las {time}."
+		"problemOnlyEarlier": "Solo puede ser antes de las {time}.",
+		"lateSetsNote": "Las series que marcaste después de esta hora, hasta las {time}, quedan registradas a esta hora."
 	},
 	"sessionLoadingSkeleton": {
 		"loadingAria": "Cargando datos de la sesión"

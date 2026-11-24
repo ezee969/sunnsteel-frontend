@@ -5,7 +5,12 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { Locale } from '@/i18n/config'
-import { describeEndTime, toDateTimeLocal } from '@/lib/utils/workout-end-time'
+import {
+	describeEndTime,
+	endsBeforeLastSet,
+	formatEndTime,
+	toDateTimeLocal,
+} from '@/lib/utils/workout-end-time'
 
 /**
  * LIVE-24: when the workout ended, as a local date and time to the minute.
@@ -23,6 +28,7 @@ export function WorkoutEndTimeField({
 	startedAt,
 	lastSet,
 	problem,
+	lateSets = false,
 }: {
 	id: string
 	label: string
@@ -36,6 +42,11 @@ export function WorkoutEndTimeField({
 	/** The last completed set, which the hint names; null before the first. */
 	lastSet: Date | null
 	problem?: string | null
+	/**
+	 * Finishing: an end before the last set records the sets ticked after it
+	 * at the end, and the field says so.
+	 */
+	lateSets?: boolean
 }) {
 	const t = useTranslations('workout.endTime')
 	const locale = useLocale() as Locale
@@ -59,6 +70,11 @@ export function WorkoutEndTimeField({
 			<p id={hintId} className="type-body-sm text-ink-3">
 				{describeEndTime({ startedAt, lastSet, value }, locale, t)}
 			</p>
+			{lateSets && !problem && endsBeforeLastSet(value, lastSet) ? (
+				<p className="type-body-sm text-ink-2">
+					{t('lateSetsNote', { time: formatEndTime(lastSet!, locale) })}
+				</p>
+			) : null}
 			{problem ? (
 				<p id={errorId} role="alert" className="type-body-sm text-destructive">
 					{problem}

@@ -331,7 +331,8 @@
 		"problemInvalid": "Enter a date and a time.",
 		"problemBeforeEarliest": "A workout ends after its last set, at {time}.",
 		"problemFuture": "A workout can’t end in the future.",
-		"problemOnlyEarlier": "It can only move earlier than {time}."
+		"problemOnlyEarlier": "It can only move earlier than {time}.",
+		"lateSetsNote": "Sets you ticked after this time, up to {time}, are recorded at it."
 	},
 	"sessionLoadingSkeleton": {
 		"loadingAria": "Loading session data"

@@ -236,6 +236,7 @@ export function StaleSessionRecoveryDialog({
 						startedAt={sessionDetails.startedAt}
 						lastSet={endTimeline.lastSet}
 						problem={endProblem}
+						lateSets
 					/>
 				) : null}
 				<AlertDialogFooter>

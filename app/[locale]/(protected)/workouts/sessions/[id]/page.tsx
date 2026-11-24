@@ -811,6 +811,7 @@ export default function ActiveSessionPage() {
 							startedAt={session.startedAt}
 							lastSet={endTime.timeline.lastSet}
 							problem={endTime.problem}
+							lateSets
 						/>
 					) : undefined
 				}

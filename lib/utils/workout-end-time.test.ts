@@ -6,6 +6,7 @@ import {
 	chosenEnd,
 	describeEndTime,
 	describeEndTimeProblem,
+	endsBeforeLastSet,
 	finishTimeline,
 	fromDateTimeLocal,
 	toDateTimeLocal,
@@ -26,12 +27,13 @@ describe('where a workout in progress stands (LIVE-24)', () => {
 		{ isCompleted: false, completedAt: at(11, 59).toISOString() },
 	]
 
-	it('ends no earlier than the last completed set, and asks after a pause', () => {
+	it('ends as early as the start, names the last set, and asks after a pause', () => {
 		const timeline = finishTimeline(
 			{ startedAt, lastActivityAt: at(11, 22).toISOString(), setLogs },
 			at(19, 30),
 		)
-		expect(timeline.earliest).toEqual(at(11, 20, 40))
+		// 2026-11-24: sets ticked after the chosen end were logged late.
+		expect(timeline.earliest).toEqual(at(10, 0))
 		expect(timeline.lastSet).toEqual(at(11, 20, 40))
 		expect(timeline.lastActivity).toEqual(at(11, 22))
 		expect(timeline.asks).toBe(true)
@@ -157,5 +159,17 @@ describe('the end time is said in both languages', () => {
 				es,
 			),
 		).toBe('Ingresa una fecha y una hora.')
+	})
+})
+
+describe('an end before the last set (2026-11-24)', () => {
+	it('is noted only when the chosen minute is before the last set', () => {
+		const lastSet = at(23, 58)
+		expect(endsBeforeLastSet(toDateTimeLocal(at(12, 30)), lastSet)).toBe(true)
+		expect(endsBeforeLastSet(toDateTimeLocal(at(23, 58, 30)), lastSet)).toBe(
+			false,
+		)
+		expect(endsBeforeLastSet(toDateTimeLocal(at(12, 30)), null)).toBe(false)
+		expect(endsBeforeLastSet('', lastSet)).toBe(false)
 	})
 })

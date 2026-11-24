@@ -20,7 +20,10 @@ interface LoggedSet {
 }
 
 export interface FinishTimeline {
-	/** The earliest the workout can end: its start or its last completed set. */
+	/**
+	 * The earliest a finish can end: the workout's start. Sets ticked after
+	 * the chosen end were logged late, and the server records them at it.
+	 */
 	earliest: Date
 	/** The last completed set, or null before the first. */
 	lastSet: Date | null
@@ -39,23 +42,24 @@ export function finishTimeline(
 	},
 	now: Date = new Date(),
 ): FinishTimeline {
-	const earliest = earliestWorkoutEnd({
+	const afterLastSet = earliestWorkoutEnd({
 		startedAt: input.startedAt,
 		completedAts: (input.setLogs ?? [])
 			.filter(log => log.isCompleted)
 			.map(log => log.completedAt),
 	})
+	const earliest = new Date(input.startedAt)
 	const saved = input.lastActivityAt
 		? new Date(input.lastActivityAt).getTime()
 		: Number.NaN
 	const lastActivity = new Date(
 		Number.isFinite(saved)
-			? Math.min(Math.max(saved, earliest.getTime()), now.getTime())
-			: earliest.getTime(),
+			? Math.min(Math.max(saved, afterLastSet.getTime()), now.getTime())
+			: afterLastSet.getTime(),
 	)
 	return {
 		earliest,
-		lastSet: lastSetOf(earliest, input.startedAt),
+		lastSet: lastSetOf(afterLastSet, input.startedAt),
 		lastActivity,
 		asks: finishNeedsEndTime(lastActivity, now),
 	}
@@ -176,4 +180,16 @@ export function describeEndTimeProblem(
 	return bounds.finishing
 		? t('problemFuture')
 		: t('problemOnlyEarlier', { time: formatEndTime(bounds.latest, locale) })
+}
+
+/**
+ * Whether the chosen end falls before the last completed set: those sets were
+ * ticked late, and finishing records them at the end.
+ */
+export function endsBeforeLastSet(
+	value: string,
+	lastSet: Date | null,
+): boolean {
+	const end = fromDateTimeLocal(value)
+	return !!end && !!lastSet && end.getTime() < minuteOf(lastSet)
 }
