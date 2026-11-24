@@ -14,7 +14,7 @@ import {
 } from '@/components/layout/root-document'
 import { type Locale, LOCALES } from '@/i18n/config'
 import { type Messages, siteMessages } from '@/messages'
-import { IntlProvider } from '@/providers/intl-provider'
+import { SiteRootProviders } from '@/providers/site-root-providers'
 
 /**
  * SITE-01: the public site's own root layout, beside the app's
@@ -51,9 +51,9 @@ export default async function SiteRootLayout({
 	const messages = (await getMessages({ locale })) as Messages
 	return (
 		<RootDocument locale={locale}>
-			<IntlProvider locale={locale} messages={siteMessages(messages)}>
+			<SiteRootProviders locale={locale} messages={siteMessages(messages)}>
 				{children}
-			</IntlProvider>
+			</SiteRootProviders>
 		</RootDocument>
 	)
 }

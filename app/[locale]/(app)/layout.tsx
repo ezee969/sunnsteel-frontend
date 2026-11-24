@@ -13,8 +13,7 @@ import {
 } from '@/components/layout/root-document'
 import { type Locale, LOCALES } from '@/i18n/config'
 import { type Messages, rootMessages } from '@/messages'
-import { AppProvider } from '@/providers/app-provider'
-import { IntlProvider } from '@/providers/intl-provider'
+import { AppRootProviders } from '@/providers/app-root-providers'
 
 /**
  * The app's root layout: every page but the public site's, which has a root
@@ -52,9 +51,9 @@ export default async function AppRootLayout({
 	const messages = (await getMessages({ locale })) as Messages
 	return (
 		<RootDocument locale={locale}>
-			<IntlProvider locale={locale} messages={rootMessages(messages)}>
-				<AppProvider>{children}</AppProvider>
-			</IntlProvider>
+			<AppRootProviders locale={locale} messages={rootMessages(messages)}>
+				{children}
+			</AppRootProviders>
 		</RootDocument>
 	)
 }

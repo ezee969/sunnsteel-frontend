@@ -9,21 +9,20 @@ import {
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import DevInjections from '@/components/dev-injections'
 import { type Locale, LOCALES } from '@/i18n/config'
-import { PUBLIC_ORIGIN, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
+import { PUBLIC_ORIGIN } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
-import { PwaProvider } from '@/providers/pwa-provider'
-import { ThemeProvider } from '@/providers/theme-provider'
 
 /**
  * SITE-01: the document both root layouts render -- the app's
  * (app/[locale]/(app)/layout.tsx) and the public site's
  * (app/[locale]/(site)/layout.tsx). They are separate roots so each loads its
  * own stylesheet and providers, and Next makes a move between them a full
- * page load; what every page shares (fonts, the pre-paint scripts, the theme,
- * the service worker, the metadata) lives here once.
+ * page load; what every page shares (fonts, the pre-paint scripts, the
+ * metadata) lives here once. The providers are each root's own client
+ * boundary (`AppRootProviders`, `SiteRootProviders`), passed as children:
+ * see providers/root-shell.tsx for why this renders none itself.
  */
 
 const oswald = Oswald({
@@ -192,11 +191,7 @@ export function RootDocument({
 				className={`${FONT_VARIABLES} antialiased`}
 				suppressHydrationWarning
 			>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<PwaProvider />
-					{children}
-					<DevInjections showPerfPanel={SHOULD_SHOW_PERFORMANCE_PANEL} />
-				</ThemeProvider>
+				{children}
 			</body>
 		</html>
 	)
