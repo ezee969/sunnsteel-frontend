@@ -235,7 +235,8 @@
 		"addSet": "Agregar serie",
 		"moveUp": "Subir",
 		"moveDown": "Bajar",
-		"removeExercise": "Eliminar ejercicio"
+		"removeExercise": "Eliminar ejercicio",
+		"leaveGroup": "Sacar {kind, select, SUPERSET {de la superserie} other {del circuito}}"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Cambiar ejercicio",
@@ -532,10 +533,11 @@
 		"movedTitle": "{exercise} movido",
 		"movedDescription": "{plan} mantiene este orden desde el próximo entrenamiento.",
 		"moveFailedTitle": "No se movió",
-		"moveSplitsGroup": "Mover {exercise} lo saca de su superserie o circuito. ¿Moverlo igualmente?",
-		"moveSplitsTitle": "¿Separar el grupo?",
-		"moveKeep": "Dejarlo",
-		"moveAnyway": "Moverlo",
+		"groupMovedTitle": "{group} cambió de lugar",
+		"groupMoreForAria": "Más para {group}",
+		"moveGroupUp": "Subir",
+		"moveGroupDown": "Bajar",
+		"leftGroupTitle": "{exercise} salió {kind, select, SUPERSET {de la superserie} other {del circuito}}",
 		"removeSetTitle": "¿Eliminar la serie {number}?",
 		"removeSetBody": "{exercise} pierde esta serie hoy y {plan} indica una serie menos desde el próximo entrenamiento. Las series siguientes suben un lugar.",
 		"removeSetConfirm": "Eliminar serie",

@@ -1,6 +1,7 @@
 'use client'
 
 import {
+	type ExerciseGroupKind,
 	type LinearPeriodizationState,
 	matchSetRefusal,
 	matchTarget,
@@ -18,6 +19,7 @@ import {
 	NotebookPen,
 	Plus,
 	Trash2,
+	Unlink,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -133,6 +135,11 @@ interface ExerciseGroupProps {
 	 */
 	onRemoveExercise?: () => void
 	/**
+	 * LIVE-29: take the exercise out of its superset or circuit on purpose; it
+	 * goes on its own right after the group. Absent outside a group.
+	 */
+	onLeaveGroup?: { kind: ExerciseGroupKind; onSelect: () => void }
+	/**
 	 * LIVE-15: take back an added set. Omitted when the session cannot change,
 	 * which also hides Add set.
 	 */
@@ -178,6 +185,7 @@ export const ExerciseGroup = ({
 	onMoveDown,
 	onRemoveSetForGood,
 	onRemoveExercise,
+	onLeaveGroup,
 	onRemoveSet,
 	roundLine,
 	upNext,
@@ -252,6 +260,12 @@ export const ExerciseGroup = ({
 	// UX-21: one menu per exercise on a phone, as under larger controls.
 	const grouped = useCompactWorkout()
 	// LIVE-28: last in either menu, apart from what changes nothing for good.
+	const leaveGroupItem = onLeaveGroup ? (
+		<DropdownMenuItem onSelect={() => onLeaveGroup.onSelect()}>
+			<Unlink aria-hidden />
+			{t('leaveGroup', { kind: onLeaveGroup.kind })}
+		</DropdownMenuItem>
+	) : null
 	const removeExerciseItem = onRemoveExercise ? (
 		<>
 			<DropdownMenuSeparator />
@@ -453,6 +467,7 @@ export const ExerciseGroup = ({
 											{t('moveDown')}
 										</DropdownMenuItem>
 									) : null}
+									{leaveGroupItem}
 									{removeExerciseItem}
 								</DropdownMenuContent>
 							</DropdownMenu>
@@ -511,9 +526,9 @@ export const ExerciseGroup = ({
 								instruction={instruction}
 							/>
 
-							{/* LIVE-25/LIVE-28: one control that opens the moves and
+							{/* LIVE-25/LIVE-28/LIVE-29: one control that opens the moves and
 							    the removal, rather than more glyphs in the header. */}
-							{onMoveUp || onMoveDown || onRemoveExercise ? (
+							{onMoveUp || onMoveDown || onLeaveGroup || onRemoveExercise ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
@@ -540,6 +555,7 @@ export const ExerciseGroup = ({
 												{t('moveDown')}
 											</DropdownMenuItem>
 										) : null}
+										{leaveGroupItem}
 										{removeExerciseItem}
 									</DropdownMenuContent>
 								</DropdownMenu>

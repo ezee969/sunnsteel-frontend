@@ -235,7 +235,8 @@
 		"addSet": "Add set",
 		"moveUp": "Move up",
 		"moveDown": "Move down",
-		"removeExercise": "Remove exercise"
+		"removeExercise": "Remove exercise",
+		"leaveGroup": "Take out of the {kind, select, SUPERSET {superset} other {circuit}}"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Swap Exercise",
@@ -532,10 +533,11 @@
 		"movedTitle": "{exercise} moved",
 		"movedDescription": "{plan} keeps this order from the next workout.",
 		"moveFailedTitle": "Not moved",
-		"moveSplitsGroup": "Moving {exercise} takes it out of its superset or circuit. Move it anyway?",
-		"moveSplitsTitle": "Split the group?",
-		"moveKeep": "Keep it",
-		"moveAnyway": "Move it",
+		"groupMovedTitle": "{group} moved",
+		"groupMoreForAria": "More for {group}",
+		"moveGroupUp": "Move up",
+		"moveGroupDown": "Move down",
+		"leftGroupTitle": "{exercise} left the {kind, select, SUPERSET {superset} other {circuit}}",
 		"removeSetTitle": "Remove set {number}?",
 		"removeSetBody": "{exercise} loses this set today, and {plan} prescribes one set fewer from the next workout. The sets after it move up.",
 		"removeSetConfirm": "Remove set",

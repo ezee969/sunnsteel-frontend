@@ -2,6 +2,7 @@ import type {
 	AddSessionExerciseRequest,
 	CorrectSessionRequest,
 	CorrectSessionResponse,
+	DayOrder,
 	DeloadSuggestionResponse,
 	LogPastWorkoutRequest,
 	LogPastWorkoutResponse,
@@ -892,9 +893,13 @@ export const useRemoveSessionExercise = (id: string) =>
 		workoutService.removeSessionExercise(id, routineExerciseId),
 	)
 
+// LIVE-29: the order and the links kept, from `movedDay` and its siblings.
 export const useReorderSessionExercises = (id: string) =>
-	useSessionDayEdit(id, (routineExerciseIds: string[]) =>
-		workoutService.reorderSessionExercises(id, { routineExerciseIds }),
+	useSessionDayEdit(id, (order: DayOrder) =>
+		workoutService.reorderSessionExercises(id, {
+			routineExerciseIds: order.ids,
+			linkedToNext: order.linkedToNext,
+		}),
 	)
 
 export const useRevertExerciseSubstitution = (id: string) => {

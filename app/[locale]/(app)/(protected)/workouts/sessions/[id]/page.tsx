@@ -1,13 +1,16 @@
 'use client'
 
 import {
+	type DayOrder,
 	type ExerciseGroup as ExerciseGroupContract,
 	exerciseGroups,
+	movedDay,
+	movedGroupDay,
 	removalChangesGroup,
-	reorderBreaksLinks,
 	routineDayLabel,
+	ungroupedDay,
 } from '@sunsteel/contracts'
-import { Plus } from 'lucide-react'
+import { ArrowDown, ArrowUp, MoreHorizontal, Plus } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -23,6 +26,12 @@ import {
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/toast'
 import { AddSessionExerciseDialog } from '@/features/workout/add-session-exercise-dialog'
 import { ExerciseGroup } from '@/features/workout/exercise-group'
@@ -209,10 +218,6 @@ export default function ActiveSessionPage() {
 	// LIVE-25: the day can change during the workout -- an exercise added for
 	// good, an exercise moved -- and the routine follows.
 	const [addingExercise, setAddingExercise] = useState(false)
-	const [pendingMove, setPendingMove] = useState<{
-		ids: string[]
-		name: string
-	} | null>(null)
 	const reorder = useReorderSessionExercises(idParam)
 	// LIVE-27: a prescribed set removed for good, once confirmed.
 	const removeSet = useRemoveSessionSet(idParam)
@@ -470,11 +475,11 @@ export default function ActiveSessionPage() {
 	const PlanName = planName[0].toUpperCase() + planName.slice(1)
 	const canEditDay = session.status === 'IN_PROGRESS'
 
-	const commitMove = (ids: string[], name: string) =>
-		reorder.mutate(ids, {
+	const commitMove = (order: DayOrder, title: string) =>
+		reorder.mutate(order, {
 			onSuccess: () =>
 				push({
-					title: t('movedTitle', { exercise: name }),
+					title,
 					description: t('movedDescription', { plan: PlanName }),
 					variant: 'success',
 				}),
@@ -486,17 +491,23 @@ export default function ActiveSessionPage() {
 				}),
 		})
 
-	// LIVE-25: one place up or down; a move that would split a superset or
-	// circuit asks first (ROUT-12 keeps a pair only while side by side).
-	const moveExercise = (index: number, delta: -1 | 1) => {
-		const ids = groupedLogs.map(group => group.exerciseId)
-		const to = index + delta
-		if (to < 0 || to >= ids.length || reorder.isPending) return
-		;[ids[index], ids[to]] = [ids[to], ids[index]]
-		const name = exerciseLabel(groupedLogs[index].exerciseName, tEx)
-		if (reorderBreaksLinks(day.exercises, ids)) setPendingMove({ ids, name })
-		else commitMove(ids, name)
-	}
+	// LIVE-25/LIVE-29: one place up or down, as the list shows it. A group is
+	// one place: an exercise on its own jumps it whole, a member moves inside
+	// it, and the group moves as one from its header. No move splits a group;
+	// leaving one is its own action.
+	const daySlots = roundSlots.map(slot => ({
+		id: slot.exerciseId,
+		linkedToNext: slot.linkedToNext,
+	}))
+	const groupKindAt = (index: number) =>
+		exerciseGroups(roundSlots).find(group => group.indices.includes(index))
+			?.kind ?? 'SUPERSET'
+	const runOrder = (order: DayOrder | null, title: string) =>
+		canEditDay && order
+			? () => {
+					if (!reorder.isPending) commitMove(order, title)
+				}
+			: undefined
 
 	// LIVE-22: one exercise of the list, inside or outside a group.
 	const renderExercise = (group: GroupedExerciseLogs, groupIndex: number) => {
@@ -624,16 +635,26 @@ export default function ActiveSessionPage() {
 								})
 						: undefined
 				}
-				onMoveUp={
-					canEditDay && groupIndex > 0
-						? () => moveExercise(groupIndex, -1)
+				onMoveUp={runOrder(
+					movedDay(daySlots, group.exerciseId, -1),
+					t('movedTitle', { exercise: exerciseLabel(group.exerciseName, tEx) }),
+				)}
+				onMoveDown={runOrder(
+					movedDay(daySlots, group.exerciseId, 1),
+					t('movedTitle', { exercise: exerciseLabel(group.exerciseName, tEx) }),
+				)}
+				onLeaveGroup={(() => {
+					const leave = runOrder(
+						ungroupedDay(daySlots, group.exerciseId),
+						t('leftGroupTitle', {
+							exercise: exerciseLabel(group.exerciseName, tEx),
+							kind: groupKindAt(groupIndex),
+						}),
+					)
+					return leave
+						? { kind: groupKindAt(groupIndex), onSelect: leave }
 						: undefined
-				}
-				onMoveDown={
-					canEditDay && groupIndex < groupedLogs.length - 1
-						? () => moveExercise(groupIndex, 1)
-						: undefined
-				}
+				})()}
 				linearBlock={
 					group.linearPeriodization
 						? {
@@ -744,10 +765,58 @@ export default function ActiveSessionPage() {
 										: 'border-l-rule'
 								}`}
 							>
-								<p className="type-body-sm px-1 pt-2 text-ink-2">
-									{run.label}
-									{run.round ? ` · ${run.round}` : ''}
-								</p>
+								<div className="flex items-start justify-between gap-2">
+									<p className="type-body-sm px-1 pt-2 text-ink-2">
+										{run.label}
+										{run.round ? ` · ${run.round}` : ''}
+									</p>
+									{/* LIVE-29: the group moves as one, its links kept. */}
+									{(() => {
+										const first = groupedLogs[run.indices[0]].exerciseId
+										const title = t('groupMovedTitle', {
+											group: run.label ?? '',
+										})
+										const up = runOrder(
+											movedGroupDay(daySlots, first, -1),
+											title,
+										)
+										const down = runOrder(
+											movedGroupDay(daySlots, first, 1),
+											title,
+										)
+										return up || down ? (
+											<DropdownMenu>
+												<DropdownMenuTrigger asChild>
+													<Button
+														type="button"
+														variant="ghost"
+														size="icon"
+														className="size-11 md:size-10"
+														aria-label={t('groupMoreForAria', {
+															group: run.label ?? '',
+														})}
+													>
+														<MoreHorizontal className="size-5" aria-hidden />
+													</Button>
+												</DropdownMenuTrigger>
+												<DropdownMenuContent align="end">
+													{up ? (
+														<DropdownMenuItem onSelect={() => up()}>
+															<ArrowUp aria-hidden />
+															{t('moveGroupUp')}
+														</DropdownMenuItem>
+													) : null}
+													{down ? (
+														<DropdownMenuItem onSelect={() => down()}>
+															<ArrowDown aria-hidden />
+															{t('moveGroupDown')}
+														</DropdownMenuItem>
+													) : null}
+												</DropdownMenuContent>
+											</DropdownMenu>
+										) : null
+									})()}
+								</div>
 								{run.indices.map(index =>
 									renderExercise(groupedLogs[index], index),
 								)}
@@ -877,35 +946,6 @@ export default function ActiveSessionPage() {
 				onOpenChange={setAddingExercise}
 				plan={planName}
 			/>
-			<AlertDialog
-				open={!!pendingMove}
-				onOpenChange={open => {
-					if (!open) setPendingMove(null)
-				}}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{t('moveSplitsTitle')}</AlertDialogTitle>
-						<AlertDialogDescription>
-							{pendingMove
-								? t('moveSplitsGroup', { exercise: pendingMove.name })
-								: null}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>{t('moveKeep')}</AlertDialogCancel>
-						<Button
-							type="button"
-							onClick={() => {
-								if (pendingMove) commitMove(pendingMove.ids, pendingMove.name)
-								setPendingMove(null)
-							}}
-						>
-							{t('moveAnyway')}
-						</Button>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
 			<AlertDialog
 				open={!!pendingRemoval}
 				onOpenChange={open => {
