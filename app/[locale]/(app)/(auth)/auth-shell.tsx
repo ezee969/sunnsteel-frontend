@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { SunnsteelLockup } from '@/components/brand/sunnsteel-lockup'
@@ -30,7 +31,11 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
 			<header className="flex h-14 shrink-0 items-center justify-between border-b border-rule px-4 md:h-16 md:px-8">
-				<SunnsteelLockup className="text-xl text-foreground" />
+				{/* SITE-01: the name leads to the landing, a separate root (a full
+				    page load), so nothing is prefetched. */}
+				<Link href="/" prefetch={false} aria-label="Sunnsteel">
+					<SunnsteelLockup className="text-xl text-foreground" />
+				</Link>
 				{mounted ? (
 					<ModeToggle />
 				) : (
