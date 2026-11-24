@@ -193,6 +193,7 @@ export function AddSessionExerciseDialog({
 						) : (
 							<ExercisePickerDropdown
 								ref={pickerRef}
+								inline
 								isOpen={pickerOpen}
 								onToggle={() => setPickerOpen(value => !value)}
 								onClose={() => setPickerOpen(false)}

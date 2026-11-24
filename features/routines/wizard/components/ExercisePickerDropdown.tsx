@@ -24,6 +24,12 @@ export interface ExercisePickerDropdownProps {
 	exercises: Exercise[]
 	isLoading: boolean
 	onSelect: (exerciseId: string) => void
+	/**
+	 * Lay the list out in the flow instead of floating over the page. A
+	 * dialog scrolls its own content, so an absolutely placed list is cut at
+	 * the dialog's edge; in flow the dialog simply grows and scrolls.
+	 */
+	inline?: boolean
 }
 
 export const ExercisePickerDropdown = forwardRef<
@@ -39,6 +45,7 @@ export const ExercisePickerDropdown = forwardRef<
 		exercises,
 		isLoading,
 		onSelect,
+		inline = false,
 	},
 	ref,
 ) {
@@ -100,7 +107,13 @@ export const ExercisePickerDropdown = forwardRef<
 			</Button>
 
 			{isOpen && (
-				<div className="absolute top-full left-0 z-50 mt-2 max-h-[400px] w-full overflow-hidden rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 sm:right-0 sm:left-auto sm:w-[400px] dark:shadow-none">
+				<div
+					className={
+						inline
+							? 'mt-2 w-full overflow-hidden rounded-md border border-rule bg-popover'
+							: 'absolute top-full left-0 z-50 mt-2 max-h-[400px] w-full overflow-hidden rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 sm:right-0 sm:left-auto sm:w-[400px] dark:shadow-none'
+					}
+				>
 					<div className="p-3 border-b">
 						<Input
 							aria-label={t('searchLabel')}
