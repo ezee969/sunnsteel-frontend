@@ -524,5 +524,160 @@
 				}
 			}
 		}
+	},
+	"useCases": {
+		"shared": {
+			"whatChanges": "Qué cambia en este nivel",
+			"program": "El programa",
+			"tools": "Herramientas para este nivel",
+			"stepByStep": "Paso a paso",
+			"next": "Siguiente nivel",
+			"startWith": "Empezar con {template}",
+			"seeFeatures": "Ver todas las funciones"
+		},
+		"beginners": {
+			"meta": {
+				"title": "Sunnsteel para principiantes",
+				"description": "Un programa de cuerpo completo tres días por semana, los pesos calculados por ti y un progreso que se ve desde el primer mes."
+			},
+			"eyebrow": "Para principiantes · Gratis",
+			"heading": "Empieza a entrenar con un plan",
+			"subline": "Un programa de cuerpo completo tres días por semana, los pesos calculados por ti y un progreso que se ve desde el primer mes.",
+			"audience": "Para quien está en sus primeros meses de entrenamiento",
+			"facts": "3 días por semana · Cuerpo completo · Gratis",
+			"changes": {
+				"1": {
+					"title": "Aprende bien pocos movimientos",
+					"body": "Una lista corta de ejercicios, repetida, los enseña más rápido que la variedad."
+				},
+				"2": {
+					"title": "Tus primeros pesos los encuentras tú",
+					"body": "Las plantillas dejan todos los pesos en blanco; tu primer entrenamiento los define."
+				},
+				"3": {
+					"title": "Suma peso cuando te lo ganas",
+					"body": "Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento suma un paso."
+				},
+				"4": {
+					"title": "Aparece casi todas las semanas",
+					"body": "Los rangos premian entrenamientos en semanas distintas, no sesiones largas."
+				}
+			},
+			"steps": {
+				"1": "Crea una cuenta gratis y dile tus días y objetivos.",
+				"2": "Empieza con Fundamentos de cuerpo completo, o el programa que te recomiende.",
+				"3": "En tu primer entrenamiento, encuentra un peso que puedas hacer bien para el mínimo de cada rango.",
+				"4": "Entrena tres días por semana; deja que la progresión mueva los pesos.",
+				"5": "Cuando el control de estancamiento marque un ejercicio durante semanas, lee la página de intermedios."
+			},
+			"next": "¿Listo para más? Intermedios",
+			"faq": {
+				"gym": {
+					"q": "¿Necesito un gimnasio?",
+					"a": "Fundamentos de cuerpo completo usa equipamiento común de gimnasio. Puedes armar tu propia rutina con lo que tengas, y los discos de tu gimnasio se guardan para la calculadora."
+				},
+				"weights": {
+					"q": "¿Cómo sé mis pesos iniciales?",
+					"a": "Tu primer entrenamiento los encuentra: elige un peso que puedas hacer bien en el mínimo del rango y regístralo."
+				}
+			}
+		},
+		"intermediates": {
+			"meta": {
+				"title": "Sunnsteel para intermedios",
+				"description": "Divide tu semana, sigue las series semanales por músculo y lee tus estancamientos como números, no como suposiciones."
+			},
+			"eyebrow": "Para intermedios · Gratis",
+			"heading": "Sigue progresando después de los primeros meses",
+			"subline": "Divide tu semana, sigue las series semanales por músculo y lee tus estancamientos como números, no como suposiciones.",
+			"audience": "Para quien siente que su primer programa dejó de avanzar",
+			"facts": "4 a 6 días por semana · Superior/inferior o empuje/tirón/piernas · Gratis",
+			"changes": {
+				"1": {
+					"title": "El progreso se hace más lento",
+					"body": "Sumar peso cada semana se termina; subir un rango lleva más tiempo."
+				},
+				"2": {
+					"title": "Divide el cuerpo",
+					"body": "Superior/inferior o empuje/tirón/piernas le dan a cada músculo más series semanales."
+				},
+				"3": {
+					"title": "Las series semanales pasan a ser la medida",
+					"body": "Cuántas series recibe cada músculo en una semana importa más que un entrenamiento suelto."
+				},
+				"4": {
+					"title": "Los estancamientos se leen, no se adivinan",
+					"body": "Un ejercicio que deja de marcar mejores registros se señala con sus números."
+				}
+			},
+			"steps": {
+				"1": "Elige Superior / inferior o Empuje / tirón / piernas, o arma tu propia división.",
+				"2": "Usa tus pesos actuales como pesos iniciales de la rutina nueva.",
+				"3": "Mira el mapa del cuerpo cada semana y ajusta series donde un músculo se queda corto.",
+				"4": "Guarda una versión antes de cada cambio, para poder comparar.",
+				"5": "Cuando un ejercicio se estanca por semanas, prueba un bloque de 8 semanas (Pro)."
+			},
+			"next": "¿Listo para bloques y descargas? Avanzados",
+			"faq": {
+				"split": {
+					"q": "¿Superior/inferior o empuje/tirón/piernas?",
+					"a": "Superior / inferior son cuatro días fijos; Empuje / tirón / piernas es una rotación, cada día dos veces por semana. Elige la que encaje con los días que tienes."
+				}
+			}
+		},
+		"advanced": {
+			"meta": {
+				"title": "Sunnsteel para avanzados",
+				"description": "Bloques de 8 semanas desde un máximo de referencia, descargas planificadas y comparaciones que ponen cada bloque al lado del anterior."
+			},
+			"eyebrow": "Para avanzados · Pro",
+			"heading": "Planifica bloques, descargas y el largo plazo",
+			"subline": "Bloques de 8 semanas desde un máximo de referencia, descargas planificadas y comparaciones que ponen cada bloque al lado del anterior.",
+			"audience": "Para quien planifica su entrenamiento por bloques",
+			"facts": "Bloques de 8 semanas · Descargas planificadas · Pro",
+			"changes": {
+				"1": {
+					"title": "El entrenamiento va por bloques",
+					"body": "Las semanas se planifican de antemano, cada una con su carga."
+				},
+				"2": {
+					"title": "Las descargas se planifican, no se improvisan",
+					"body": "Una semana más liviana entra al calendario antes de que la necesites."
+				},
+				"3": {
+					"title": "Los bloques se comparan",
+					"body": "Cada bloque va al lado del anterior, con sus números y sin veredicto."
+				},
+				"4": {
+					"title": "Las señales se leen en semanas",
+					"body": "Esfuerzo, objetivos de reps y caídas, dos semanas frente a las dos anteriores."
+				}
+			},
+			"steps": {
+				"1": "Arma tu rutina, o empieza con una plantilla que vas a cambiar.",
+				"2": "Dale a tus ejercicios principales un bloque de 8 semanas desde un máximo de referencia.",
+				"3": "Planifica una descarga donde el bloque la pida.",
+				"4": "Al final del bloque, lee la estimación y elige qué sigue.",
+				"5": "Compara el bloque con el anterior y pide una revisión de los entrenamientos que elijas."
+			},
+			"next": "Volver a todas las funciones",
+			"faq": {
+				"template": {
+					"q": "¿Hay una plantilla avanzada?",
+					"a": "No: el entrenamiento avanzado lo armas tú. El constructor, el bloque de 8 semanas y las descargas son donde lo armas."
+				}
+			}
+		},
+		"tools": {
+			"bodyMap": "El mapa del cuerpo",
+			"plateaus": "Control de estancamiento",
+			"versions": "Versiones de rutina",
+			"supersets": "Superseries",
+			"eightWeek": "Bloques de 8 semanas",
+			"trainingBlocks": "Bloques de entrenamiento",
+			"deloads": "Descargas planificadas",
+			"signals": "Señales y comparaciones",
+			"review": "Revisión del entrenamiento"
+		}
 	}
 }

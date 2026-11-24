@@ -26,7 +26,8 @@ import { SiteTopBar } from '../site-top-bar'
 
 export interface Crumb {
 	label: string
-	href: string
+	/** A crumb with no page of its own (Use cases) is plain text. */
+	href?: string
 }
 
 /** Per-language title, description and canonical address of a public page. */
@@ -89,12 +90,14 @@ export async function SitePageShell({
 					data={{
 						'@context': 'https://schema.org',
 						'@type': 'BreadcrumbList',
-						itemListElement: trail.map((crumb, index) => ({
-							'@type': 'ListItem',
-							position: index + 1,
-							name: crumb.label,
-							item: `${PUBLIC_ORIGIN}${crumb.href}`,
-						})),
+						itemListElement: trail
+							.filter(crumb => crumb.href)
+							.map((crumb, index) => ({
+								'@type': 'ListItem',
+								position: index + 1,
+								name: crumb.label,
+								item: `${PUBLIC_ORIGIN}${crumb.href}`,
+							})),
 					}}
 				/>
 			) : null}
@@ -117,7 +120,10 @@ export async function SitePageHeader({
 	title: string
 	subline: string
 	updated?: string
-	actions: { primary: Crumb; secondary?: Crumb }
+	actions: {
+		primary: { label: string; href: string }
+		secondary?: { label: string; href: string }
+	}
 	facts?: string[]
 	aside?: ReactNode
 }) {
@@ -133,14 +139,16 @@ export async function SitePageHeader({
 					<nav aria-label={t('breadcrumb.label')} className="site-breadcrumb">
 						<ol>
 							{crumbs.map((crumb, index) => (
-								<li key={crumb.href}>
+								<li key={crumb.label}>
 									{index > 0 ? (
 										<ChevronRight className="size-3.5" aria-hidden />
 									) : null}
 									{index === crumbs.length - 1 ? (
 										<span aria-current="page">{crumb.label}</span>
-									) : (
+									) : crumb.href ? (
 										<Link href={crumb.href}>{crumb.label}</Link>
+									) : (
+										<span>{crumb.label}</span>
 									)}
 								</li>
 							))}

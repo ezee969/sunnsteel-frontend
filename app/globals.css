@@ -4063,3 +4063,32 @@
 .site-page-tips li::marker {
   color: var(--site-accent);
 }
+
+/* §12.17 a use-case page: the level's program card beside the header,
+   four numbered changes, the program and the next level. */
+.site-page-card-aside {
+  display: flex;
+  justify-content: center;
+}
+.site-page-card-aside .site-template {
+  width: min(100%, 400px);
+}
+@media (min-width: 1024px) {
+  .site-page-cards-four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .site-page-cards-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.site-page-programs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  max-width: 1040px;
+}
+.site-page-next {
+  max-width: 520px;
+}

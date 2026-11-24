@@ -524,5 +524,160 @@
 				}
 			}
 		}
+	},
+	"useCases": {
+		"shared": {
+			"whatChanges": "What changes at this level",
+			"program": "The program",
+			"tools": "Tools for this level",
+			"stepByStep": "Step by step",
+			"next": "Next level",
+			"startWith": "Start with {template}",
+			"seeFeatures": "See every feature"
+		},
+		"beginners": {
+			"meta": {
+				"title": "Sunnsteel for beginners",
+				"description": "A full-body program three days a week, the weights worked out for you, and progress you can see from the first month."
+			},
+			"eyebrow": "For beginners · Free",
+			"heading": "Start lifting with a plan",
+			"subline": "A full-body program three days a week, the weights worked out for you, and progress you can see from the first month.",
+			"audience": "For anyone in their first months of lifting",
+			"facts": "3 days a week · Full body · Free",
+			"changes": {
+				"1": {
+					"title": "Learn a few movements well",
+					"body": "A short list of exercises, repeated, teaches them faster than variety."
+				},
+				"2": {
+					"title": "Your first weights are yours to find",
+					"body": "Templates leave every weight blank; your first workout sets them."
+				},
+				"3": {
+					"title": "Add weight when you've earned it",
+					"body": "When every set reaches the top of its range, the next workout adds a step."
+				},
+				"4": {
+					"title": "Show up most weeks",
+					"body": "Ranks reward workouts across different weeks, not long sessions."
+				}
+			},
+			"steps": {
+				"1": "Create a free account and tell it your days and goals.",
+				"2": "Start with Full Body Foundations, or the program it recommends.",
+				"3": "In your first workout, find a weight you can do with good form for the low end of each range.",
+				"4": "Train three days a week; let progression move the weights.",
+				"5": "When plateau watch flags a lift for weeks, read the intermediates' page."
+			},
+			"next": "Ready for more? Intermediates",
+			"faq": {
+				"gym": {
+					"q": "Do I need a gym?",
+					"a": "Full Body Foundations uses common gym equipment. You can build your own routine for what you have, and your gym's plates are saved for the plate calculator."
+				},
+				"weights": {
+					"q": "How do I know my starting weights?",
+					"a": "Your first workout finds them: pick a weight you can do with good form at the low end of the range, and log it."
+				}
+			}
+		},
+		"intermediates": {
+			"meta": {
+				"title": "Sunnsteel for intermediates",
+				"description": "Split your week, track weekly sets per muscle and read your plateaus as numbers, not guesses."
+			},
+			"eyebrow": "For intermediates · Free",
+			"heading": "Keep progressing past the first months",
+			"subline": "Split your week, track weekly sets per muscle and read your plateaus as numbers, not guesses.",
+			"audience": "For lifters whose first program has stopped moving",
+			"facts": "4 to 6 days a week · Upper/lower or push/pull/legs · Free",
+			"changes": {
+				"1": {
+					"title": "Progress slows",
+					"body": "Adding weight every week stops; a range takes longer to climb."
+				},
+				"2": {
+					"title": "Split the body",
+					"body": "Upper/lower or push/pull/legs give each muscle more weekly sets."
+				},
+				"3": {
+					"title": "Weekly sets become the measure",
+					"body": "How many sets each muscle gets in a week matters more than any single workout."
+				},
+				"4": {
+					"title": "Plateaus are read, not guessed",
+					"body": "A lift that stops setting bests is flagged with its numbers."
+				}
+			},
+			"steps": {
+				"1": "Choose Upper / Lower or Push / Pull / Legs, or build your own split.",
+				"2": "Use your current weights as the new routine's starting weights.",
+				"3": "Check the body map weekly and adjust sets where a muscle falls short.",
+				"4": "Save a version before each change, so you can compare.",
+				"5": "When a lift stalls for weeks, try an 8-week block (Pro)."
+			},
+			"next": "Ready for blocks and deloads? Advanced",
+			"faq": {
+				"split": {
+					"q": "Upper/lower or push/pull/legs?",
+					"a": "Upper / Lower is four days on set weekdays; Push / Pull / Legs is a rotation, each day twice a week. Choose the one that fits the days you have."
+				}
+			}
+		},
+		"advanced": {
+			"meta": {
+				"title": "Sunnsteel for advanced lifters",
+				"description": "8-week blocks from a reference max, planned deloads, and comparisons that put each block beside the one before."
+			},
+			"eyebrow": "For advanced lifters · Pro",
+			"heading": "Plan blocks, deloads and the long game",
+			"subline": "8-week blocks from a reference max, planned deloads, and comparisons that put each block beside the one before.",
+			"audience": "For lifters who plan their training in blocks",
+			"facts": "8-week blocks · Planned deloads · Pro",
+			"changes": {
+				"1": {
+					"title": "Training runs in blocks",
+					"body": "Weeks are planned in advance, each with its own load."
+				},
+				"2": {
+					"title": "Deloads are planned, not improvised",
+					"body": "A lighter week goes on the calendar before you need it."
+				},
+				"3": {
+					"title": "Blocks are compared",
+					"body": "Each block sits beside the one before, with its numbers and no verdict."
+				},
+				"4": {
+					"title": "Signals are read over weeks",
+					"body": "Effort, rep targets and declines, two weeks against the two before."
+				}
+			},
+			"steps": {
+				"1": "Build your routine, or start from a template you'll change.",
+				"2": "Give your main lifts an 8-week block from a reference max.",
+				"3": "Plan a deload where the block calls for one.",
+				"4": "At the end of the block, read the estimate and choose what comes next.",
+				"5": "Compare the block with the one before, and ask for a review of the workouts you choose."
+			},
+			"next": "Back to every feature",
+			"faq": {
+				"template": {
+					"q": "Is there an advanced template?",
+					"a": "No: advanced training is yours to build. The builder, the 8-week block and deloads are where you build it."
+				}
+			}
+		},
+		"tools": {
+			"bodyMap": "The body map",
+			"plateaus": "Plateau watch",
+			"versions": "Routine versions",
+			"supersets": "Supersets",
+			"eightWeek": "8-week blocks",
+			"trainingBlocks": "Training blocks",
+			"deloads": "Planned deloads",
+			"signals": "Signals and comparisons",
+			"review": "Training review"
+		}
 	}
 }

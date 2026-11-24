@@ -7,11 +7,13 @@ import type { Locale } from '@/i18n/config'
 import { dateFormatter, numberFormatter } from '@/i18n/date-locale'
 import {
 	TEMPLATE_LEVELS,
+	type TemplateLevel,
 	templatesForLevel,
 	templateWeekdays,
 } from '@/lib/site/landing-examples'
 import {
 	ROUTINE_TEMPLATES,
+	type RoutineTemplate,
 	templateDayName,
 	templateText,
 } from '@/lib/utils/routine-templates'
@@ -36,13 +38,6 @@ const WEEK = [1, 2, 3, 4, 5, 6, 0]
 export async function SiteTemplates() {
 	const t = await getTranslations('site.templates')
 	const tTemplates = await getTranslations('routines.templates')
-	const locale = (await getLocale()) as Locale
-	const letter = dateFormatter(locale, { weekday: 'narrow' })
-	// 2026-11-15 was a Sunday: day N of that week is weekday N.
-	const weekday = (day: number) => letter.format(new Date(2026, 10, 15 + day))
-	const percent = numberFormatter(locale, { style: 'percent' })
-	const firstStep = LP_STEPS[0]
-	const lastStep = LP_STEPS[LP_STEPS.length - 1]
 	const levelOf = (slug: string) =>
 		TEMPLATE_LEVELS.find(level =>
 			templatesForLevel(level).some(template => template.slug === slug),
@@ -58,105 +53,19 @@ export async function SiteTemplates() {
 				cards={[
 					...ROUTINE_TEMPLATES.map(template => {
 						const text = templateText(template, tTemplates)
-						const days = templateWeekdays(template)
 						const level = levelOf(template.slug)
 						return {
 							id: template.slug,
 							level,
 							name: text.name,
-							node: (
-								<SiteCard as="article" className="site-template">
-									<p className="type-label text-ink-3">
-										{t(`levels.${level}`)}
-									</p>
-									<h3 className="type-panel">{text.name}</h3>
-									<p className="type-body-sm text-ink-2">{text.summary}</p>
-									<ol aria-hidden="true" className="site-week-strip">
-										{WEEK.map((day, index) => (
-											<li
-												key={day}
-												data-on={days.includes(day) || undefined}
-												style={motionVars({ '--d': index })}
-											>
-												{weekday(day)}
-											</li>
-										))}
-									</ol>
-									<ul className="site-template-days">
-										{template.days.map((day, index) => (
-											<li
-												key={day.key}
-												className="site-screen-row"
-												style={motionVars({ '--d': index })}
-											>
-												<span>{templateDayName(day, tTemplates)}</span>
-												<span className="type-body-sm text-ink-3">
-													{t('exercises', { count: day.exercises.length })}
-												</span>
-											</li>
-										))}
-									</ul>
-									<p className="type-body-sm text-ink-2">{text.description}</p>
-									<Link
-										href={`/signup?template=${template.slug}`}
-										className="type-action site-outline site-template-start"
-									>
-										{t('start')}
-									</Link>
-								</SiteCard>
-							),
+							node: <TemplateCardNode template={template} level={level} />,
 						}
 					}),
 					{
 						id: 'block',
 						level: 'advanced' as const,
 						name: t('block.name'),
-						node: (
-							<SiteCard as="article" className="site-template">
-								<p className="type-label text-ink-3">{t('levels.advanced')}</p>
-								<div className="flex items-start justify-between gap-3">
-									<h3 className="type-panel">{t('block.name')}</h3>
-									<PlanTag>{t('pro')}</PlanTag>
-								</div>
-								<p className="type-body-sm text-ink-2">{t('block.summary')}</p>
-								<figure className="site-block">
-									<ol aria-hidden="true" className="site-block-bars">
-										{LP_STEPS.map((step, index) => (
-											<li
-												key={step.step}
-												style={motionVars({
-													'--d': index,
-													'--h': step.percentage,
-												})}
-											>
-												<span>{percent.format(step.percentage)}</span>
-												<span className="site-block-track">
-													<span className="site-block-fill" />
-												</span>
-												<span>{t('block.week', { number: step.step })}</span>
-											</li>
-										))}
-									</ol>
-									<figcaption className="type-body-sm text-ink-3">
-										<span aria-hidden="true">{t('block.caption')}</span>
-										<span className="sr-only">
-											{t('block.range', {
-												first: percent.format(firstStep.percentage),
-												last: percent.format(lastStep.percentage),
-												weeks: LP_STEPS.length,
-											})}
-										</span>
-									</figcaption>
-								</figure>
-								<p className="type-body-sm text-ink-2">{t('block.sets')}</p>
-								<Link
-									href="/signup?plan=pro"
-									className="type-action site-outline"
-								>
-									{t('block.start')}
-								</Link>
-							</SiteCard>
-						),
+						node: <BlockCardNode />,
 					},
 				]}
 			/>
@@ -178,5 +87,118 @@ export async function SiteTemplates() {
 				</p>
 			</div>
 		</section>
+	)
+}
+
+/**
+ * One template's card, as the landing's coverflow shows it and the use-case
+ * pages (§12.17) reuse it: its level, name, week and days, and the hand-off
+ * into sign-up.
+ */
+export async function TemplateCardNode({
+	template,
+	level,
+}: {
+	template: RoutineTemplate
+	level: TemplateLevel
+}) {
+	const t = await getTranslations('site.templates')
+	const tTemplates = await getTranslations('routines.templates')
+	const locale = (await getLocale()) as Locale
+	const letter = dateFormatter(locale, { weekday: 'narrow' })
+	// 2026-11-15 was a Sunday: day N of that week is weekday N.
+	const weekday = (day: number) => letter.format(new Date(2026, 10, 15 + day))
+	const text = templateText(template, tTemplates)
+	const days = templateWeekdays(template)
+	return (
+		<SiteCard as="article" className="site-template">
+			<p className="type-label text-ink-3">{t(`levels.${level}`)}</p>
+			<h3 className="type-panel">{text.name}</h3>
+			<p className="type-body-sm text-ink-2">{text.summary}</p>
+			<ol aria-hidden="true" className="site-week-strip">
+				{WEEK.map((day, index) => (
+					<li
+						key={day}
+						data-on={days.includes(day) || undefined}
+						style={motionVars({ '--d': index })}
+					>
+						{weekday(day)}
+					</li>
+				))}
+			</ol>
+			<ul className="site-template-days">
+				{template.days.map((day, index) => (
+					<li
+						key={day.key}
+						className="site-screen-row"
+						style={motionVars({ '--d': index })}
+					>
+						<span>{templateDayName(day, tTemplates)}</span>
+						<span className="type-body-sm text-ink-3">
+							{t('exercises', { count: day.exercises.length })}
+						</span>
+					</li>
+				))}
+			</ul>
+			<p className="type-body-sm text-ink-2">{text.description}</p>
+			<Link
+				href={`/signup?template=${template.slug}`}
+				className="type-action site-outline site-template-start"
+			>
+				{t('start')}
+			</Link>
+		</SiteCard>
+	)
+}
+
+/** Advanced's card: the 8-week block (Pro), from contracts' `LP_STEPS`. */
+export async function BlockCardNode() {
+	const t = await getTranslations('site.templates')
+	const locale = (await getLocale()) as Locale
+	const percent = numberFormatter(locale, { style: 'percent' })
+	const firstStep = LP_STEPS[0]
+	const lastStep = LP_STEPS[LP_STEPS.length - 1]
+	return (
+		<SiteCard as="article" className="site-template">
+			<p className="type-label text-ink-3">{t('levels.advanced')}</p>
+			<div className="flex items-start justify-between gap-3">
+				<h3 className="type-panel">{t('block.name')}</h3>
+				<PlanTag>{t('pro')}</PlanTag>
+			</div>
+			<p className="type-body-sm text-ink-2">{t('block.summary')}</p>
+			<figure className="site-block">
+				<ol aria-hidden="true" className="site-block-bars">
+					{LP_STEPS.map((step, index) => (
+						<li
+							key={step.step}
+							style={motionVars({
+								'--d': index,
+								'--h': step.percentage,
+							})}
+						>
+							<span>{percent.format(step.percentage)}</span>
+							<span className="site-block-track">
+								<span className="site-block-fill" />
+							</span>
+							<span>{t('block.week', { number: step.step })}</span>
+						</li>
+					))}
+				</ol>
+				<figcaption className="type-body-sm text-ink-3">
+					<span aria-hidden="true">{t('block.caption')}</span>
+					<span className="sr-only">
+						{t('block.range', {
+							first: percent.format(firstStep.percentage),
+							last: percent.format(lastStep.percentage),
+							weeks: LP_STEPS.length,
+						})}
+					</span>
+				</figcaption>
+			</figure>
+			<p className="type-body-sm text-ink-2">{t('block.sets')}</p>
+			<Link href="/signup?plan=pro" className="type-action site-outline">
+				{t('block.start')}
+			</Link>
+		</SiteCard>
 	)
 }
