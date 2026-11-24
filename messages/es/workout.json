@@ -235,8 +235,7 @@
 		"addSet": "Agregar serie",
 		"moveUp": "Subir",
 		"moveDown": "Bajar",
-		"moveAria": "Mover {exercise}",
-		"moveTitle": "Mover en el día"
+		"removeExercise": "Eliminar ejercicio"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Cambiar ejercicio",
@@ -543,7 +542,17 @@
 		"removeSetKeep": "Dejarla",
 		"removedTitle": "Serie eliminada",
 		"removedDescription": "{plan} tiene una serie menos de {exercise}.",
-		"removeFailedTitle": "No se eliminó la serie"
+		"removeFailedTitle": "No se eliminó la serie",
+		"removeExerciseTitle": "¿Eliminar {exercise}?",
+		"removeExerciseBody": "Sale del entrenamiento de hoy con {sets, plural, one {su serie} other {sus # series}}, y {plan} ya no lo tiene desde el próximo entrenamiento.",
+		"removeExerciseDone": "{done, plural, one {La serie que hiciste no cuenta.} other {Las # series que hiciste no cuentan.}}",
+		"removeExerciseBlock": "Su bloque de 8 semanas termina con él.",
+		"removeExerciseGroup": "Sale de su superserie o circuito.",
+		"removeExerciseConfirm": "Eliminar ejercicio",
+		"removeExerciseKeep": "Dejarlo",
+		"exerciseRemovedTitle": "{exercise} eliminado",
+		"exerciseRemovedDescription": "{plan} ya no lo tiene desde el próximo entrenamiento.",
+		"removeExerciseFailedTitle": "No se eliminó el ejercicio"
 	},
 	"errors": {
 		"workoutsFailedTitle": "No se pudieron cargar los entrenamientos",

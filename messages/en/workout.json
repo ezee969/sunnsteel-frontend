@@ -235,8 +235,7 @@
 		"addSet": "Add set",
 		"moveUp": "Move up",
 		"moveDown": "Move down",
-		"moveAria": "Move {exercise}",
-		"moveTitle": "Move in the day"
+		"removeExercise": "Remove exercise"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Swap Exercise",
@@ -543,7 +542,17 @@
 		"removeSetKeep": "Keep it",
 		"removedTitle": "Set removed",
 		"removedDescription": "{plan} has one set fewer for {exercise}.",
-		"removeFailedTitle": "Set not removed"
+		"removeFailedTitle": "Set not removed",
+		"removeExerciseTitle": "Remove {exercise}?",
+		"removeExerciseBody": "It leaves today's workout with {sets, plural, one {its set} other {its # sets}}, and {plan} no longer has it from the next workout.",
+		"removeExerciseDone": "{done, plural, one {The set you did doesn't count.} other {The # sets you did don't count.}}",
+		"removeExerciseBlock": "Its 8-week block ends with it.",
+		"removeExerciseGroup": "It leaves its superset or circuit.",
+		"removeExerciseConfirm": "Remove exercise",
+		"removeExerciseKeep": "Keep it",
+		"exerciseRemovedTitle": "{exercise} removed",
+		"exerciseRemovedDescription": "{plan} no longer has it from the next workout.",
+		"removeExerciseFailedTitle": "Exercise not removed"
 	},
 	"errors": {
 		"workoutsFailedTitle": "Failed to load workouts",

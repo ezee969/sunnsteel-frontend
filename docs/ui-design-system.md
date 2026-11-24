@@ -2479,6 +2479,7 @@ role or a motion; it places existing parts.
   control (§28.1) -- opening a dialog with the builder's picker, sets, reps
   and load, and rest and progression under More options (UX-20).
 - **Removing a set** (`LIVE-27`) is a destructive "Remove set" item in the set's own menu (§27.3), under the kinds, on a set not yet done; an alert dialog names the plan that changes, with a solid destructive confirm.
+- **Removing an exercise** (`LIVE-28`) is a destructive "Remove exercise" item, last and after a separator, in the exercise's **More for <exercise>** menu. The standard header's move control became that More menu (the `MoreHorizontal` glyph, holding Move up, Move down and the removal), so the header keeps one control for every change to the day; gym mode and phones already had the More menu. It is absent on the day's only exercise, which can only be swapped. The alert dialog says how many sets go and the plan that loses it, then only what applies: the done sets that stop counting, the 8-week block that ends with it, the superset or circuit it leaves. The toast names the plan, as a move does.
 - **The builder** shows a match set's reps and load cells as text ("Matches
   set 2", "Set 2's load") and offers Match in the kind select only where one
   may stand.

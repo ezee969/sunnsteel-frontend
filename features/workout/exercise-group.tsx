@@ -11,13 +11,13 @@ import {
 	ArrowDown,
 	ArrowLeftRight,
 	ArrowUp,
-	ArrowUpDown,
 	Calculator,
 	ChevronDown,
 	ChevronRight,
 	MoreHorizontal,
 	NotebookPen,
 	Plus,
+	Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -28,6 +28,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { StatusMark } from '@/components/ui/status-mark'
@@ -127,6 +128,11 @@ interface ExerciseGroupProps {
 	/** LIVE-27: remove a prescribed set that is not done, for good. */
 	onRemoveSetForGood?: (setNumber: number) => void
 	/**
+	 * LIVE-28: remove the exercise with all its sets, for good. Absent when it
+	 * is the day's only exercise, which can only be swapped.
+	 */
+	onRemoveExercise?: () => void
+	/**
 	 * LIVE-15: take back an added set. Omitted when the session cannot change,
 	 * which also hides Add set.
 	 */
@@ -171,6 +177,7 @@ export const ExerciseGroup = ({
 	onMoveUp,
 	onMoveDown,
 	onRemoveSetForGood,
+	onRemoveExercise,
 	onRemoveSet,
 	roundLine,
 	upNext,
@@ -244,6 +251,19 @@ export const ExerciseGroup = ({
 	// into one More menu, so the header keeps the exercise and one control.
 	// UX-21: one menu per exercise on a phone, as under larger controls.
 	const grouped = useCompactWorkout()
+	// LIVE-28: last in either menu, apart from what changes nothing for good.
+	const removeExerciseItem = onRemoveExercise ? (
+		<>
+			<DropdownMenuSeparator />
+			<DropdownMenuItem
+				variant="destructive"
+				onSelect={() => onRemoveExercise()}
+			>
+				<Trash2 aria-hidden />
+				{t('removeExercise')}
+			</DropdownMenuItem>
+		</>
+	) : null
 	const [openTool, setOpenTool] = useState<'plates' | 'note' | null>(null)
 	const nextWeightedSet =
 		sets.find(
@@ -433,6 +453,7 @@ export const ExerciseGroup = ({
 											{t('moveDown')}
 										</DropdownMenuItem>
 									) : null}
+									{removeExerciseItem}
 								</DropdownMenuContent>
 							</DropdownMenu>
 							{calculatorTarget ? (
@@ -490,9 +511,9 @@ export const ExerciseGroup = ({
 								instruction={instruction}
 							/>
 
-							{/* LIVE-25: one control that opens the moves, rather than
-							    two more glyphs in the header. */}
-							{onMoveUp || onMoveDown ? (
+							{/* LIVE-25/LIVE-28: one control that opens the moves and
+							    the removal, rather than more glyphs in the header. */}
+							{onMoveUp || onMoveDown || onRemoveExercise ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
@@ -500,11 +521,10 @@ export const ExerciseGroup = ({
 											variant="ghost"
 											size="icon"
 											className="size-11 md:size-10"
-											aria-label={t('moveAria', { exercise: exerciseName })}
-											title={t('moveTitle')}
+											aria-label={t('moreForAria', { exercise: exerciseName })}
 											onClick={event => event.stopPropagation()}
 										>
-											<ArrowUpDown className="h-4 w-4" aria-hidden />
+											<MoreHorizontal className="size-5" aria-hidden />
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
@@ -520,6 +540,7 @@ export const ExerciseGroup = ({
 												{t('moveDown')}
 											</DropdownMenuItem>
 										) : null}
+										{removeExerciseItem}
 									</DropdownMenuContent>
 								</DropdownMenu>
 							) : null}

@@ -3,6 +3,7 @@
 import {
 	type ExerciseGroup as ExerciseGroupContract,
 	exerciseGroups,
+	removalChangesGroup,
 	reorderBreaksLinks,
 	routineDayLabel,
 } from '@sunsteel/contracts'
@@ -49,6 +50,7 @@ import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import {
 	useDeleteSetLog,
 	usePreviousPerformance,
+	useRemoveSessionExercise,
 	useRemoveSessionSet,
 	useReorderSessionExercises,
 	useSession,
@@ -218,6 +220,16 @@ export default function ActiveSessionPage() {
 		routineExerciseId: string
 		setNumber: number
 		name: string
+	} | null>(null)
+	// LIVE-28: an exercise removed for good with all its sets, once confirmed.
+	const removeExercise = useRemoveSessionExercise(idParam)
+	const [pendingExerciseRemoval, setPendingExerciseRemoval] = useState<{
+		routineExerciseId: string
+		name: string
+		sets: number
+		done: number
+		block: boolean
+		group: boolean
 	} | null>(null)
 
 	// Handlers
@@ -598,6 +610,20 @@ export default function ActiveSessionPage() {
 								})
 						: undefined
 				}
+				onRemoveExercise={
+					// A day keeps one exercise: the last one can only be swapped.
+					canEditDay && groupedLogs.length > 1
+						? () =>
+								setPendingExerciseRemoval({
+									routineExerciseId: group.exerciseId,
+									name: exerciseLabel(group.exerciseName, tEx),
+									sets: totalSets,
+									done: completedSets,
+									block: Boolean(slot && sessionLinearBlock(slot).state),
+									group: removalChangesGroup(day.exercises, group.exerciseId),
+								})
+						: undefined
+				}
 				onMoveUp={
 					canEditDay && groupIndex > 0
 						? () => moveExercise(groupIndex, -1)
@@ -940,6 +966,84 @@ export default function ActiveSessionPage() {
 							}}
 						>
 							{t('removeSetConfirm')}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+			<AlertDialog
+				open={!!pendingExerciseRemoval}
+				onOpenChange={open => {
+					if (!open && !removeExercise.isPending)
+						setPendingExerciseRemoval(null)
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{pendingExerciseRemoval
+								? t('removeExerciseTitle', {
+										exercise: pendingExerciseRemoval.name,
+									})
+								: null}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{pendingExerciseRemoval
+								? [
+										t('removeExerciseBody', {
+											sets: pendingExerciseRemoval.sets,
+											plan: planName,
+										}),
+										pendingExerciseRemoval.done > 0
+											? t('removeExerciseDone', {
+													done: pendingExerciseRemoval.done,
+												})
+											: null,
+										pendingExerciseRemoval.block
+											? t('removeExerciseBlock')
+											: null,
+										pendingExerciseRemoval.group
+											? t('removeExerciseGroup')
+											: null,
+									]
+										.filter(Boolean)
+										.join(' ')
+								: null}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={removeExercise.isPending}>
+							{t('removeExerciseKeep')}
+						</AlertDialogCancel>
+						<Button
+							type="button"
+							variant="destructiveSolid"
+							disabled={removeExercise.isPending}
+							onClick={() => {
+								if (!pendingExerciseRemoval) return
+								const { routineExerciseId, name } = pendingExerciseRemoval
+								removeExercise.mutate(routineExerciseId, {
+									onSuccess: () => {
+										setPendingExerciseRemoval(null)
+										push({
+											title: t('exerciseRemovedTitle', { exercise: name }),
+											description: t('exerciseRemovedDescription', {
+												plan: PlanName,
+											}),
+											variant: 'success',
+										})
+									},
+									onError: error => {
+										setPendingExerciseRemoval(null)
+										push({
+											title: t('removeExerciseFailedTitle'),
+											description: errorText(error),
+											variant: 'destructive',
+										})
+									},
+								})
+							}}
+						>
+							{t('removeExerciseConfirm')}
 						</Button>
 					</AlertDialogFooter>
 				</AlertDialogContent>

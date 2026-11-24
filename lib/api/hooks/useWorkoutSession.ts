@@ -887,6 +887,11 @@ export const useRemoveSessionSet = (id: string) =>
 		}) => workoutService.removeSessionSet(id, routineExerciseId, setNumber),
 	)
 
+export const useRemoveSessionExercise = (id: string) =>
+	useSessionDayEdit(id, (routineExerciseId: string) =>
+		workoutService.removeSessionExercise(id, routineExerciseId),
+	)
+
 export const useReorderSessionExercises = (id: string) =>
 	useSessionDayEdit(id, (routineExerciseIds: string[]) =>
 		workoutService.reorderSessionExercises(id, { routineExerciseIds }),

@@ -528,7 +528,8 @@
 		"SET_REMOVE_DONE": "A done set cannot be removed; untick it first",
 		"SET_REMOVE_LAST": "An exercise keeps at least one set",
 		"SET_REMOVE_LINEAR_BLOCK": "The working sets of an 8-week block cannot be removed",
-		"SET_REMOVE_NOT_PRESCRIBED": "That set is not part of the prescription"
+		"SET_REMOVE_NOT_PRESCRIBED": "That set is not part of the prescription",
+		"DAY_EDIT_LAST_EXERCISE": "A day keeps at least one exercise; swap it instead"
 	},
 	"glossary": {
 		"label": "Terms:",

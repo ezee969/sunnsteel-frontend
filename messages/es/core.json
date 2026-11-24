@@ -528,7 +528,8 @@
 		"SET_REMOVE_DONE": "Una serie hecha no se puede eliminar; desmárcala primero",
 		"SET_REMOVE_LAST": "Un ejercicio conserva al menos una serie",
 		"SET_REMOVE_LINEAR_BLOCK": "Las series efectivas de un bloque de 8 semanas no se pueden eliminar",
-		"SET_REMOVE_NOT_PRESCRIBED": "Esa serie no es parte de lo indicado"
+		"SET_REMOVE_NOT_PRESCRIBED": "Esa serie no es parte de lo indicado",
+		"DAY_EDIT_LAST_EXERCISE": "Un día conserva al menos un ejercicio; cámbialo en su lugar"
 	},
 	"glossary": {
 		"label": "Términos:",

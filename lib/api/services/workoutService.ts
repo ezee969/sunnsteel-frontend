@@ -484,6 +484,16 @@ export const workoutService = {
 			{ method: 'DELETE', secure: true },
 		),
 
+	/** LIVE-28: remove an exercise with all its sets, for good. */
+	removeSessionExercise: async (
+		id: string,
+		routineExerciseId: string,
+	): Promise<SessionDayEditResponse> =>
+		httpClient.request<SessionDayEditResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercises/${routineExerciseId}`,
+			{ method: 'DELETE', secure: true },
+		),
+
 	/** LIVE-25: the day's exercises in a new order, the routine's from the next workout. */
 	reorderSessionExercises: async (
 		id: string,
