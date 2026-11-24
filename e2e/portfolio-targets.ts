@@ -280,6 +280,45 @@ async function startScratchSession(
 }
 
 export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
+	// SITE-01: the public site, as a visitor with no session sees it. The
+	// landing is opened with the preview switch, which a local stack without
+	// `SITE_LANDING=on` needs; the other pages are open to anyone.
+	{
+		slug: 'site',
+		route: '/?site-preview=1',
+		features: ['SITE-01'],
+		signedOut: true,
+		ready: [/Train with a plan/, 'Start free'],
+		caption:
+			'The public landing: licensed gym footage under the headline, one action to start free, and the live workout on a phone.',
+	},
+	{
+		slug: 'site-features',
+		route: '/features',
+		features: ['SITE-01'],
+		signedOut: true,
+		ready: ['Everything Sunnsteel does'],
+		caption:
+			"The features index: what the app does in four moves, each with its own page, and what each part costs.",
+	},
+	{
+		slug: 'site-feature-page',
+		route: '/features/workout-tracker',
+		features: ['SITE-01'],
+		signedOut: true,
+		ready: ['Log every set in seconds'],
+		caption:
+			"A feature page: the workout tracker's header, its facts and a phone running the app's own screen.",
+	},
+	{
+		slug: 'site-pricing',
+		route: '/pricing',
+		features: ['SITE-01', 'BILL-02'],
+		signedOut: true,
+		ready: ['Free to train. Pro to plan further.', 'Is it free?'],
+		caption:
+			'Pricing for a visitor: what is free, what Pro adds and costs, and the same Free and Pro table the app shows on /plans.',
+	},
 	{
 		slug: 'login',
 		route: '/login',

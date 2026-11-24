@@ -31,7 +31,6 @@ export function LanguageSwitch({
 					<button
 						type="button"
 						lang={locale}
-						aria-label={names[locale]}
 						aria-current={locale === current ? 'true' : undefined}
 						onClick={() => {
 							if (locale === current) return
@@ -44,7 +43,11 @@ export function LanguageSwitch({
 								'text-foreground underline underline-offset-[5px]',
 						)}
 					>
+						{/* The name starts with what the button shows ("EN English"),
+						    so a voice command naming the label reaches it (WCAG 2.5.3;
+						    an `aria-label` of the language alone did not). */}
 						{locale.toUpperCase()}
+						<span className="sr-only"> {names[locale]}</span>
 					</button>
 				</li>
 			))}

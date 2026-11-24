@@ -185,10 +185,9 @@ export default async function PricingPage({ params }: Params) {
 					plain: answers[key].plain,
 				}))}
 			/>
-			<nav
-				aria-label={tLegal('label')}
-				className="site-page-legal type-body-sm"
-			>
+			{/* A line of links, not a landmark: the footer's legal nav already
+			    carries this label. */}
+			<p className="site-page-legal type-body-sm">
 				<Link href={LEGAL_PATHS.refunds}>{tLegal('refunds')}</Link>
 				<Link href={CONSUMER_REQUEST_PATHS.CANCELLATION}>
 					{tLegal('cancellation')}
@@ -196,7 +195,7 @@ export default async function PricingPage({ params }: Params) {
 				<Link href={CONSUMER_REQUEST_PATHS.REVOCATION}>
 					{tLegal('revocation')}
 				</Link>
-			</nav>
+			</p>
 		</SitePageShell>
 	)
 }

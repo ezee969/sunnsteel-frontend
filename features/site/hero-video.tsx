@@ -131,6 +131,12 @@ export function HeroVideo({
 
 	return (
 		<>
+			{/* One pixel shorter than the poster under it, on purpose: Chrome
+			    counts a video's first frame as a contentful paint, and a clip a
+			    hair larger than its poster became the page's Largest Contentful
+			    Paint seconds after the poster had painted (Lighthouse,
+			    2026-11-24: 7.2s on a phone). Smaller, it never replaces it; the
+			    strip it leaves is the poster's own darkest edge. */}
 			<video
 				ref={video}
 				aria-hidden="true"
@@ -140,7 +146,7 @@ export function HeroVideo({
 				preload="none"
 				onPlaying={() => setShown(true)}
 				className={cn(
-					'absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-[600ms] ease-standard',
+					'absolute inset-x-0 top-0 h-[calc(100%-1px)] w-full object-cover opacity-0 transition-opacity duration-[600ms] ease-standard',
 					shown && 'opacity-100',
 				)}
 			/>

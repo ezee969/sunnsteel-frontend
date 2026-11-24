@@ -4,7 +4,7 @@ import { IntlErrorCode, NextIntlClientProvider } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import type { Locale } from '@/i18n/config'
-import type { ClientMessages } from '@/messages'
+import type { ClientMessages, RootMessages, SiteMessages } from '@/messages'
 
 /**
  * I18N-01: the client half of the translations. Every page here is a client
@@ -15,7 +15,9 @@ import type { ClientMessages } from '@/messages'
  * zone and the environment-fallback warning is expected rather than a fault.
  * The messages are passed from the server layout for the one language in use,
  * never imported here, so the client bundle does not carry every language;
- * `messages.test.ts` is what keeps a key from going missing.
+ * `messages.test.ts` is what keeps a key from going missing. Since SITE-01
+ * the root gives `core` only and each route group nests its own provider
+ * with the areas it reads (`AppMessages`, the site's layout).
  */
 export function IntlProvider({
 	locale,
@@ -23,7 +25,7 @@ export function IntlProvider({
 	children,
 }: {
 	locale: Locale
-	messages: ClientMessages
+	messages: ClientMessages | RootMessages | SiteMessages
 	children: ReactNode
 }) {
 	return (

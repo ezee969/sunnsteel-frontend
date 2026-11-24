@@ -102,6 +102,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 			{mounted && (
 				<div
 					className="fixed bottom-4 right-4 z-[9999] flex w-80 flex-col gap-3 max-md:bottom-[calc(4.5rem+env(safe-area-inset-bottom))]"
+					role="region"
 					aria-live="polite"
 					aria-relevant="additions removals"
 					aria-label={tCommon('notifications')}

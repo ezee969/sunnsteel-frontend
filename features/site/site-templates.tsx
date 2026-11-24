@@ -93,14 +93,17 @@ export async function SiteTemplates() {
 /**
  * One template's card, as the landing's coverflow shows it and the use-case
  * pages (§12.17) reuse it: its level, name, week and days, and the hand-off
- * into sign-up.
+ * into sign-up. `heading` is `p` where the card stands before the page's
+ * first `h2` (a use-case page's header), so the outline never skips a level.
  */
 export async function TemplateCardNode({
 	template,
 	level,
+	heading: Heading = 'h3',
 }: {
 	template: RoutineTemplate
 	level: TemplateLevel
+	heading?: 'h3' | 'p'
 }) {
 	const t = await getTranslations('site.templates')
 	const tTemplates = await getTranslations('routines.templates')
@@ -113,7 +116,7 @@ export async function TemplateCardNode({
 	return (
 		<SiteCard as="article" className="site-template">
 			<p className="type-label text-ink-3">{t(`levels.${level}`)}</p>
-			<h3 className="type-panel">{text.name}</h3>
+			<Heading className="type-panel">{text.name}</Heading>
 			<p className="type-body-sm text-ink-2">{text.summary}</p>
 			<ol aria-hidden="true" className="site-week-strip">
 				{WEEK.map((day, index) => (
@@ -152,7 +155,11 @@ export async function TemplateCardNode({
 }
 
 /** Advanced's card: the 8-week block (Pro), from contracts' `LP_STEPS`. */
-export async function BlockCardNode() {
+export async function BlockCardNode({
+	heading: Heading = 'h3',
+}: {
+	heading?: 'h3' | 'p'
+} = {}) {
 	const t = await getTranslations('site.templates')
 	const locale = (await getLocale()) as Locale
 	const percent = numberFormatter(locale, { style: 'percent' })
@@ -162,7 +169,7 @@ export async function BlockCardNode() {
 		<SiteCard as="article" className="site-template">
 			<p className="type-label text-ink-3">{t('levels.advanced')}</p>
 			<div className="flex items-start justify-between gap-3">
-				<h3 className="type-panel">{t('block.name')}</h3>
+				<Heading className="type-panel">{t('block.name')}</Heading>
 				<PlanTag>{t('pro')}</PlanTag>
 			</div>
 			{/* The range is said once, in the summary (the owner, 2026-11-23);

@@ -133,10 +133,9 @@ export async function SitePlans() {
 					{t('compare')}
 					<ArrowRight className="size-4" aria-hidden />
 				</Link>
-				<nav
-					aria-label={tLegal('label')}
-					className="site-plans-legal type-body-sm"
-				>
+				{/* A line of links, not a landmark: the footer's legal nav already
+				    carries this label, and two landmarks may not share one. */}
+				<p className="site-plans-legal type-body-sm">
 					<Link href={LEGAL_PATHS.refunds}>{tLegal('refunds')}</Link>
 					<Link href={CONSUMER_REQUEST_PATHS.CANCELLATION}>
 						{tLegal('cancellation')}
@@ -144,7 +143,7 @@ export async function SitePlans() {
 					<Link href={CONSUMER_REQUEST_PATHS.REVOCATION}>
 						{tLegal('revocation')}
 					</Link>
-				</nav>
+				</p>
 			</div>
 		</section>
 	)

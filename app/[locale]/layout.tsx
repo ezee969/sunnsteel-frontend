@@ -21,8 +21,8 @@ import { type Locale, LOCALES } from '@/i18n/config'
 import { PUBLIC_ORIGIN, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
-import { clientMessages, type Messages } from '@/messages'
-import { AppProvider } from '@/providers/app-provider'
+import { type Messages, rootMessages } from '@/messages'
+import { AppProviderGate } from '@/providers/app-provider-gate'
 import { IntlProvider } from '@/providers/intl-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
@@ -215,8 +215,10 @@ export default async function RootLayout({
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<PwaProvider />
-					<IntlProvider locale={locale} messages={clientMessages(messages)}>
-						<AppProvider>{children}</AppProvider>
+					{/* SITE-01: `core` only here; each route group adds what it reads,
+					    and the app's providers skip the public site. */}
+					<IntlProvider locale={locale} messages={rootMessages(messages)}>
+						<AppProviderGate>{children}</AppProviderGate>
 					</IntlProvider>
 					<DevInjections showPerfPanel={SHOW_PERF_PANEL} />
 				</ThemeProvider>

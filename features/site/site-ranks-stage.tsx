@@ -23,7 +23,11 @@ import { SiteRankHeader } from './site-rank-header'
  * 2026-11-23): the phone keeps the tallest one's height, so changing rank
  * never moves what is on it -- the headers share one height since ACH-11,
  * but a description of one or two lines, or a name that wraps inside
- * Laureate's border, still differ.
+ * Laureate's border, still differ. A rank's decoration is fetched only once
+ * the phone is within a screen of the viewport, and then only the shown rank
+ * and the next one (or one a pointer or the keyboard reaches on the ladder):
+ * fetched at page load, the six were most of the page's DOM and its main-
+ * thread time (Lighthouse, 2026-11-24).
  */
 export interface SiteRank {
 	id: string
@@ -59,6 +63,37 @@ export function SiteRanksStage({
 	)
 	const [current, setCurrent] = useState(resting)
 	const [picked, setPicked] = useState(false)
+	const [near, setNear] = useState(false)
+	const [wanted, setWanted] = useState<readonly number[]>([])
+	const want = (...indexes: number[]) =>
+		setWanted(previous => {
+			const add = indexes.filter(
+				index => index < ranks.length && !previous.includes(index),
+			)
+			return add.length ? [...previous, ...add] : previous
+		})
+
+	// Nothing is fetched until the phone is within a screen of the viewport.
+	useEffect(() => {
+		const element = phone.current
+		if (!element) return
+		const watch = new IntersectionObserver(
+			entries => {
+				if (!entries.some(entry => entry.isIntersecting)) return
+				watch.disconnect()
+				setNear(true)
+			},
+			{ rootMargin: '100% 0px' },
+		)
+		watch.observe(element)
+		return () => watch.disconnect()
+	}, [])
+
+	// The shown rank and the one the climb shows next.
+	useEffect(() => {
+		if (near) want(current, current + 1)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [near, current])
 
 	// The climb: Initiate to Laureate, once per entry, until a rank is picked.
 	useEffect(() => {
@@ -121,6 +156,7 @@ export function SiteRanksStage({
 									rankName={rank.title}
 									rankDescription={rank.description}
 									active={index === current}
+									load={wanted.includes(index)}
 									{...header}
 								/>
 								<div className="site-rank-line">
@@ -171,6 +207,8 @@ export function SiteRanksStage({
 						<button
 							type="button"
 							aria-pressed={index === current}
+							onPointerEnter={() => want(index)}
+							onFocus={() => want(index)}
 							onClick={() => {
 								setPicked(true)
 								setCurrent(index)

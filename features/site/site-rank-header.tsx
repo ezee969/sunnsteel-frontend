@@ -24,7 +24,9 @@ import { rankDecoration } from '@/lib/utils/rank-decoration'
  * sees it. Its module loads with JavaScript, so without it the header stands
  * undecorated. `aria-hidden`: the section's text says what it shows. The
  * ranks phone draws all six at once, one shown (`active`): only that one's
- * decoration plays.
+ * decoration plays, and a decoration is fetched only once the stage asks
+ * for it (`load`): all six at page load were 6,500 SVG nodes and half a
+ * megabyte of script before the visitor had scrolled anywhere near them.
  */
 export function SiteRankHeader({
 	rankId,
@@ -34,6 +36,7 @@ export function SiteRankHeader({
 	handle,
 	initials,
 	active = true,
+	load = true,
 }: {
 	rankId: string
 	rankName: string
@@ -42,9 +45,10 @@ export function SiteRankHeader({
 	handle: string
 	initials: string
 	active?: boolean
+	load?: boolean
 }) {
 	const decoration = rankDecoration({ id: rankId })
-	const assets = useRankDecorationAssets(decoration?.slug)
+	const assets = useRankDecorationAssets(load ? decoration?.slug : undefined)
 	const ref = useRef<HTMLElement>(null)
 	useRankDecorationMotion(ref, assets !== null && active)
 	// The hook only starts the motion; a header put away stops it again.

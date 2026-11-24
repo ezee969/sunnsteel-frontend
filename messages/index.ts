@@ -67,6 +67,36 @@ export function clientMessages(messages: Messages): ClientMessages {
 	return client as ClientMessages
 }
 
+/**
+ * SITE-01: what the root layout hands the browser on every page -- only
+ * `core`, which the root error boundary and the toasts read. Each app route
+ * group adds the rest (`AppMessages`), and the public site its own areas
+ * (`siteMessages`), so the landing no longer carries the app's whole
+ * vocabulary (Lighthouse, 2026-11-24: about 270 KB of it, on every visit).
+ */
+export type RootMessages = Pick<Messages, 'core'>
+export function rootMessages(messages: Messages): RootMessages {
+	return { core: messages.core }
+}
+
+/**
+ * The public site's client components read `site`, the body map's labels
+ * (`progress.bodyMap`, `routines.muscles`) and, through the root error
+ * boundary, `core`; nothing else reaches the browser on a site page.
+ */
+export type SiteMessages = Pick<Messages, 'core' | 'site'> & {
+	progress: Pick<Messages['progress'], 'bodyMap'>
+	routines: Pick<Messages['routines'], 'muscles'>
+}
+export function siteMessages(messages: Messages): SiteMessages {
+	return {
+		core: messages.core,
+		site: messages.site,
+		progress: { bodyMap: messages.progress.bodyMap },
+		routines: { muscles: messages.routines.muscles },
+	}
+}
+
 export const MESSAGES: Record<Locale, Messages> = {
 	en,
 	es: {

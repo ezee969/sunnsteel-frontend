@@ -188,9 +188,9 @@ export async function UseCasePage({
 				aside={
 					<div className="site-page-card-aside" data-play-when="0.4">
 						{first ? (
-							<TemplateCardNode template={first} level={level} />
+							<TemplateCardNode template={first} level={level} heading="p" />
 						) : (
-							<BlockCardNode />
+							<BlockCardNode heading="p" />
 						)}
 					</div>
 				}
