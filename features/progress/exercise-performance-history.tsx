@@ -4,6 +4,7 @@ import type {
 	ExercisePerformanceSession,
 	WeightUnit,
 } from '@sunsteel/contracts'
+import { formatRepsDone } from '@sunsteel/contracts'
 import {
 	CalendarDays,
 	Clock3,
@@ -140,8 +141,8 @@ function PerformanceSessionCard({
 										<span>{set.setNumber}</span>
 										<span>
 											{set.weightKg != null && set.weightKg > 0
-												? `${formatWeightAmount(set.weightKg, weightUnit, locale, 2)} ${unitLabel} × ${set.reps}`
-												: t('bodyweight', { reps: set.reps })}
+												? `${formatWeightAmount(set.weightKg, weightUnit, locale, 2)} ${unitLabel} × ${formatRepsDone(set)}`
+												: t('bodyweight', { reps: formatRepsDone(set) })}
 										</span>
 										<span className="text-right">{set.rpe ?? '—'}</span>
 									</li>

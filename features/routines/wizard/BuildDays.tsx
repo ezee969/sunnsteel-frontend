@@ -404,7 +404,7 @@ export function BuildDays({ data, onUpdate }: BuildDaysProps) {
 											/>
 										</div>
 										<GlossaryLine
-											terms={['rir', 'progression', 'setKinds']}
+											terms={['rir', 'progression', 'setKinds', 'matchSet']}
 											className="mb-3"
 										/>
 										<ExerciseList

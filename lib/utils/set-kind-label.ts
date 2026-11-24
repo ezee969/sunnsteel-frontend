@@ -14,6 +14,7 @@ const SET_KIND_KEYS = {
 	WARMUP: 'WARMUP',
 	DROP: 'DROP',
 	OPTIONAL: 'OPTIONAL',
+	MATCH: 'MATCH',
 } as const satisfies Record<SetKind, MessageKey<'workout.setKinds'>>
 
 export function setKindLabel(

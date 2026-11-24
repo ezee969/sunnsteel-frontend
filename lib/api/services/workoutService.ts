@@ -1,4 +1,5 @@
 import type {
+	AddSessionExerciseRequest,
 	CorrectSessionRequest,
 	CorrectSessionResponse,
 	CreateSessionShareRequest,
@@ -10,7 +11,9 @@ import type {
 	PersonalGoalsResponse,
 	PlateausResponse,
 	RemoveLoggedWorkoutResponse,
+	ReorderSessionExercisesRequest,
 	SessionCorrectionsResponse,
+	SessionDayEditResponse,
 	SessionShare,
 	SessionShareListResponse,
 	SharedSessionRecap,
@@ -459,6 +462,26 @@ export const workoutService = {
 			},
 		)
 	},
+
+	/** LIVE-25: add an exercise to the day being trained, for good. */
+	addSessionExercise: async (
+		id: string,
+		data: AddSessionExerciseRequest,
+	): Promise<SessionDayEditResponse> =>
+		httpClient.request<SessionDayEditResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercises`,
+			{ method: 'POST', body: JSON.stringify(data), secure: true },
+		),
+
+	/** LIVE-25: the day's exercises in a new order, the routine's from the next workout. */
+	reorderSessionExercises: async (
+		id: string,
+		data: ReorderSessionExercisesRequest,
+	): Promise<SessionDayEditResponse> =>
+		httpClient.request<SessionDayEditResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercise-order`,
+			{ method: 'PUT', body: JSON.stringify(data), secure: true },
+		),
 
 	listSessions: async (
 		params: ListSessionsParams,

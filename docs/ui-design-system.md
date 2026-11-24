@@ -2452,6 +2452,36 @@ John Doe test account, in headless Chromium:
 - **Not verified:** the keyboard staying open on a real phone (iOS Safari and
   Android Chrome) and a screen reader pass; both need a device.
 
+### 27.9 Match sets and changing the day (2026-11-23, `LIVE-26`, `LIVE-25`)
+
+Authorised with the two items. Nothing here adds a token, a radius, a colour
+role or a motion; it places existing parts.
+
+- **A match set is a set row.** Its kind reads under its number like any
+  kind ("Match"); its reps caption is its target, "Match 18", from the
+  target set's logged reps, or "Matches set 2" until that set has reps. It
+  has no weight caption: its load is the target set's, offered as the
+  field's suggestion (§27.3). No RIR.
+- **Mini-sets sit under the row, inside its rule**, once the set is ticked
+  short of its target or holds any: one line -- "Pause a few breaths…" while
+  it is current, "3 short of 18…" once the member has moved on, or a success
+  check and "Matched" -- with "16 of 18" in `type-data` at its end; then the
+  mini-set fields, each a bounded field (§26.5) after a quiet "+", the last
+  one with a remove glyph, and a ghost "Mini-set" fill-style control while
+  the reps fall short. **No countdown between mini-sets**: a few breaths is
+  not a timer, and the exercise's own rest still runs after each tick.
+- **Moving an exercise** is a "Move up" / "Move down" pair: inside the
+  phone's and gym mode's one exercise menu (§23.7), and from `md` behind one
+  glyph control in the exercise header rather than two more glyphs. A move
+  that would split a superset or circuit asks first in an alert dialog.
+- **"Add an exercise to this day"** is one outline control after the
+  exercise list -- never filled: Finish keeps the region's one filled
+  control (§28.1) -- opening a dialog with the builder's picker, sets, reps
+  and load, and rest and progression under More options (UX-20).
+- **The builder** shows a match set's reps and load cells as text ("Matches
+  set 2", "Set 2's load") and offers Match in the kind select only where one
+  may stand.
+
 ## 28. Amendment — Core workflows (2026-10-10)
 
 **Status: in force.** From the owner-approved [UI/UX audit](ui-audit-2026-10.md)

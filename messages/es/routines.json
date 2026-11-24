@@ -114,6 +114,7 @@
 		"kindWARMUP": "{count, plural, one {# de calentamiento} other {# de calentamiento}}",
 		"kindDROP": "{count, plural, one {# descendente} other {# descendentes}}",
 		"kindOPTIONAL": "{count, plural, one {# opcional} other {# opcionales}}",
+		"kindMATCH": "{count, plural, one {# de igualación} other {# de igualación}}",
 		"progressionLinear": "bloque de 8 semanas (LP)",
 		"exerciseReferenceMaxChange": "{name}: máximo de referencia {from} → {to}",
 		"exerciseBlockStepChange": "{name}: paso del bloque de 8 semanas {from} → {to}"
@@ -647,7 +648,11 @@
 		"kindAria": "Tipo de la serie {number}",
 		"rest": "Descanso",
 		"setsHeading": "Series",
-		"lpTarget": "Objetivo"
+		"lpTarget": "Objetivo",
+		"matchTarget": "Iguala la serie {number}",
+		"matchLoad": "Carga de la serie {number}",
+		"matchHeavyNote": "Las series de igualación encajan mejor en ejercicios de aislamiento y máquinas que en sentadillas, bisagras u olímpicos pesados.",
+		"matchLabel": "Objetivo"
 	},
 	"presets": {
 		"dayPush": "Empuje",

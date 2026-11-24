@@ -1,6 +1,6 @@
 'use client'
 
-import type { WeightUnit } from '@sunsteel/contracts'
+import { formatRepsDone, type WeightUnit } from '@sunsteel/contracts'
 import { Check, Minus } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -93,7 +93,10 @@ export function SetComparisonRow({
 					{t('repsCaption')}
 				</div>
 				<div className="type-data type-data-strong text-foreground">
-					{formatReps(performedSet?.reps)}
+					{/* LIVE-26: a match set reads 13 + 3 + 2. */}
+					{performedSet?.matchReps?.length
+						? formatRepsDone(performedSet)
+						: formatReps(performedSet?.reps)}
 				</div>
 			</div>
 

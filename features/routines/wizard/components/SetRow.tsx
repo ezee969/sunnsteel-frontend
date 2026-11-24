@@ -84,6 +84,16 @@ interface SetRowProps {
 	 * `target` is "RIR 2–3", "AMRAP · RIR 0" or the recovery step's reps.
 	 */
 	lpWorking?: { target: string | null }
+	/**
+	 * LIVE-26: Match is offered only where a match set may stand -- after a
+	 * working set, at most three in a row, never on an 8-week block.
+	 */
+	matchAllowed: boolean
+	/**
+	 * LIVE-26: on a match set, the set it matches. It has no load or reps of
+	 * its own, so the row names that set instead of offering fields.
+	 */
+	matchTargetSetNumber?: number | null
 }
 
 /**
@@ -121,7 +131,10 @@ export function SetRow({
 	weightLocked,
 	advanced,
 	lpWorking,
+	matchAllowed,
+	matchTargetSetNumber,
 }: SetRowProps) {
+	const isMatch = set.kind === 'MATCH'
 	const t = useTranslations('routines.setRow')
 	const tKinds = useTranslations('workout.setKinds')
 	const tBuilder = useTranslations('routines.builder')
@@ -203,7 +216,9 @@ export function SetRow({
 								<SelectValue className="truncate" />
 							</SelectTrigger>
 							<SelectContent>
-								{SET_KINDS.map(kind => (
+								{SET_KINDS.filter(
+									kind => kind !== 'MATCH' || isMatch || matchAllowed,
+								).map(kind => (
 									<SelectItem key={kind} value={kind}>
 										{setKindLabel(kind, tKinds)}
 									</SelectItem>
@@ -213,8 +228,9 @@ export function SetRow({
 					</div>
 
 					{/* ROUT-17: a block's set has no rep type to choose; the empty
-					    cell keeps the one-line row on its column tracks. */}
-					{lpWorking ? (
+					    cell keeps the one-line row on its column tracks. LIVE-26:
+					    nor has a match set. */}
+					{lpWorking || isMatch ? (
 						<div aria-hidden className="hidden lg:block" />
 					) : (
 						<div className="min-w-[104px] flex-1 sm:min-w-0">
@@ -249,13 +265,21 @@ export function SetRow({
 						<Label className="lg:hidden">
 							{lpWorking
 								? t('lpTarget')
-								: set.repType === 'FIXED'
-									? t('reps')
-									: t('repsRange')}
+								: isMatch
+									? t('matchLabel')
+									: set.repType === 'FIXED'
+										? t('reps')
+										: t('repsRange')}
 						</Label>
 						{lpWorking ? (
 							<p className="type-data flex min-h-10 items-center text-foreground sm:min-h-8">
 								{lpWorking.target ?? '—'}
+							</p>
+						) : isMatch ? (
+							<p className="type-body-sm flex min-h-10 items-center text-foreground sm:min-h-8">
+								{matchTargetSetNumber
+									? t('matchTarget', { number: matchTargetSetNumber })
+									: '—'}
 							</p>
 						) : set.repType === 'FIXED' ? (
 							<div className="flex items-center gap-2 w-full">
@@ -388,7 +412,16 @@ export function SetRow({
 									unit: weightUnit === 'LB' ? 'lb' : 'kg',
 								})}
 							</Label>
-							<div className="flex items-center gap-2 w-full">
+							{isMatch ? (
+								<p className="type-body-sm flex min-h-10 items-center text-ink-2 sm:min-h-8">
+									{matchTargetSetNumber
+										? t('matchLoad', { number: matchTargetSetNumber })
+										: '—'}
+								</p>
+							) : null}
+							<div
+								className={`flex items-center gap-2 w-full ${isMatch ? 'hidden' : ''}`}
+							>
 								<Button
 									type="button"
 									variant="outline"
@@ -429,8 +462,9 @@ export function SetRow({
 							</div>
 						</div>
 
-						{/* RIR Column; ROUT-17: a block's target is in the reps cell. */}
-						{lpWorking ? (
+						{/* RIR Column; ROUT-17: a block's target is in the reps cell.
+						    LIVE-26: a match set goes close to failure, so it takes none. */}
+						{lpWorking || isMatch ? (
 							<div aria-hidden className="hidden lg:block" />
 						) : (
 							<div

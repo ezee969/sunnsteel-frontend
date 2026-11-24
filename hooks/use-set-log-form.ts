@@ -46,6 +46,12 @@ interface UseSetLogFormProps {
 	 * one-tap logging stays.
 	 */
 	suggestedWeightKg?: number | null
+	/**
+	 * LIVE-26: the set is a match set, whose mini-sets travel with every save
+	 * so a save of its first effort never drops them.
+	 */
+	isMatch?: boolean
+	initialMatchReps?: number[]
 	onSave: (payload: UpsertSetLogPayload) => void
 	/**
 	 * Fired when a set is ticked. LIVE-22: `viaKeyboard` says the tick came
@@ -82,6 +88,12 @@ interface UseSetLogFormReturn {
 	fill: (values: SetValues) => void
 	/** LIVE-12: change what the set is for, saved at once with its values. */
 	changeKind: (kind: SetKind) => void
+	/** LIVE-26: a match set's mini-sets as typed, one field each. */
+	matchRepsState: string[]
+	setMiniSet: (index: number, value: string) => void
+	/** LIVE-26: add an empty mini-set field, or take the last one back (saved at once). */
+	addMiniSet: () => void
+	removeMiniSet: (index: number) => void
 
 	// Validation
 	isValid: boolean
@@ -109,6 +121,8 @@ export const useSetLogForm = ({
 	weightUnit,
 	fixedWeightKg,
 	suggestedWeightKg,
+	isMatch = false,
+	initialMatchReps,
 	onSave,
 	onSetCompleted,
 }: UseSetLogFormProps): UseSetLogFormReturn => {
@@ -137,6 +151,23 @@ export const useSetLogForm = ({
 	)
 	// LIVE-21: a tick was refused for an empty field; cleared by the next tick.
 	const [tickRefused, setTickRefused] = useState(false)
+	// LIVE-26: the mini-sets as typed. Only filled fields are saved.
+	const [matchRepsState, setMatchRepsState] = useState<string[]>(() =>
+		(initialMatchReps ?? []).map(String),
+	)
+	const matchRepsOf = useCallback(
+		(values: string[]) =>
+			values.map(value => Number(value)).filter(value => value > 0),
+		[],
+	)
+	const matchKey = useCallback(
+		(values: string[]) => matchRepsOf(values).join(','),
+		[matchRepsOf],
+	)
+	const debouncedMatch = useDebounce(
+		matchRepsState.join(','),
+		DEBOUNCE_DELAYS.SET_LOG_SAVE,
+	)
 
 	// Debounced values for auto-save
 	const debouncedReps = useDebounce(repsState, DEBOUNCE_DELAYS.SET_LOG_SAVE)
@@ -178,11 +209,13 @@ export const useSetLogForm = ({
 		weight: fixedWeightKg ?? initialWeight,
 		rpe: initialRpe,
 		isCompleted: initialIsCompleted,
+		matchReps: (initialMatchReps ?? []).join(','),
 	})
 
 	// Sync lastSavedRef when initial values change (from external updates/refetch)
 	useEffect(() => {
 		lastSavedRef.current = {
+			...lastSavedRef.current,
 			reps: initialReps,
 			weight: fixedWeightKg ?? initialWeight,
 			rpe: initialRpe,
@@ -213,9 +246,23 @@ export const useSetLogForm = ({
 			// An empty box means "not recorded", never RPE 0.
 			rpe: rpe === '' ? undefined : Number(rpe),
 			isCompleted,
+			// LIVE-26: a match set's mini-sets go with every save of it.
+			...(isMatch ? { matchReps: matchRepsOf(matchRepsState) } : {}),
 		}),
-		[routineExerciseId, exerciseId, setNumber, weightOf],
+		[
+			routineExerciseId,
+			exerciseId,
+			setNumber,
+			weightOf,
+			isMatch,
+			matchRepsOf,
+			matchRepsState,
+		],
 	)
+	const savedMatch = (payload: UpsertSetLogPayload) =>
+		payload.matchReps
+			? payload.matchReps.join(',')
+			: lastSavedRef.current.matchReps
 
 	// Validate current form state
 	const currentPayload = createPayload(
@@ -255,7 +302,8 @@ export const useSetLogForm = ({
 			isWeightUnitTransition ||
 			debouncedWeight !== weightState ||
 			debouncedReps !== repsState ||
-			debouncedRpe !== rpeState
+			debouncedRpe !== rpeState ||
+			debouncedMatch !== matchRepsState.join(',')
 		)
 			return
 
@@ -270,7 +318,8 @@ export const useSetLogForm = ({
 			currentReps !== lastSavedRef.current.reps ||
 			!areCanonicalWeightsEqual(currentWeight, lastSavedRef.current.weight) ||
 			norm(currentRpe) !== norm(lastSavedRef.current.rpe) ||
-			isCompletedState !== lastSavedRef.current.isCompleted
+			isCompletedState !== lastSavedRef.current.isCompleted ||
+			(isMatch && matchKey(matchRepsState) !== lastSavedRef.current.matchReps)
 
 		if (!hasChanged) {
 			return
@@ -291,9 +340,14 @@ export const useSetLogForm = ({
 				weight: currentWeight,
 				rpe: currentRpe,
 				isCompleted: isCompletedState,
+				matchReps: savedMatch(payload),
 			}
 		}
 	}, [
+		debouncedMatch,
+		matchRepsState,
+		matchKey,
+		isMatch,
 		debouncedReps,
 		debouncedWeight,
 		debouncedRpe,
@@ -377,6 +431,7 @@ export const useSetLogForm = ({
 			markSetPending(sessionId, routineExerciseId, setNumber)
 			onSaveRef.current(payload)
 			lastSavedRef.current = {
+				...lastSavedRef.current,
 				reps: payload.reps,
 				weight: payload.weight,
 				rpe: payload.rpe,
@@ -414,6 +469,7 @@ export const useSetLogForm = ({
 		markSetPending(sessionId, routineExerciseId, setNumber)
 		onSaveRef.current(payload)
 		lastSavedRef.current = {
+			...lastSavedRef.current,
 			reps: payload.reps,
 			weight: payload.weight,
 			rpe: payload.rpe,
@@ -452,6 +508,7 @@ export const useSetLogForm = ({
 			markSetPending(sessionId, routineExerciseId, setNumber)
 			onSaveRef.current({ ...payload, kind })
 			lastSavedRef.current = {
+				...lastSavedRef.current,
 				reps: payload.reps,
 				weight: payload.weight,
 				rpe: payload.rpe,
@@ -469,6 +526,49 @@ export const useSetLogForm = ({
 			setNumber,
 			weightOf,
 			t,
+		],
+	)
+
+	// LIVE-26: typing a mini-set saves on the debounce like any field; adding
+	// a field saves nothing until it holds reps; taking one back saves at once.
+	const setMiniSet = useCallback((index: number, value: string) => {
+		setMatchRepsState(current =>
+			current.map((item, at) => (at === index ? value : item)),
+		)
+	}, [])
+
+	const addMiniSet = useCallback(() => {
+		setMatchRepsState(current => [...current, ''])
+	}, [])
+
+	const removeMiniSet = useCallback(
+		(index: number) => {
+			const next = matchRepsState.filter((_, at) => at !== index)
+			setMatchRepsState(next)
+			const payload = {
+				...createPayload(repsState, weightState, rpeState, isCompletedState),
+				matchReps: matchRepsOf(next),
+			}
+			if (!validateSetLogPayload(payload, t).isValid) return
+			markSetPending(sessionId, routineExerciseId, setNumber)
+			onSaveRef.current(payload)
+			lastSavedRef.current = {
+				...lastSavedRef.current,
+				matchReps: payload.matchReps.join(','),
+			}
+		},
+		[
+			matchRepsState,
+			matchRepsOf,
+			createPayload,
+			repsState,
+			weightState,
+			rpeState,
+			isCompletedState,
+			t,
+			sessionId,
+			routineExerciseId,
+			setNumber,
 		],
 	)
 
@@ -506,6 +606,7 @@ export const useSetLogForm = ({
 				const w = weightOf(tickWeight)
 				const r = rpeState === '' ? undefined : Number(rpeState)
 				lastSavedRef.current = {
+					...lastSavedRef.current,
 					reps: Number(repsState) || 0,
 					weight: w,
 					rpe: r,
@@ -546,6 +647,10 @@ export const useSetLogForm = ({
 		fill,
 		changeKind,
 		retrySave,
+		matchRepsState,
+		setMiniSet,
+		addMiniSet,
+		removeMiniSet,
 
 		// Validation
 		isValid: validation.isValid,

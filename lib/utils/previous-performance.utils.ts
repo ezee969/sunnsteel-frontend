@@ -1,4 +1,4 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import { formatRepsDone, type WeightUnit } from '@sunsteel/contracts'
 
 import type { Locale } from '@/i18n/config'
 import type { Translator } from '@/i18n/translator'
@@ -31,7 +31,10 @@ export function formatPreviousPerformance(
 	t: Translator<'workout.previousPerformance'>,
 	locale: Locale,
 ): string {
-	const reps = t('repsValue', { count: previous.reps })
+	// LIVE-26: a match set reads "13 + 3 + 2 reps".
+	const reps = previous.matchReps?.length
+		? t('matchRepsValue', { value: formatRepsDone(previous) })
+		: t('repsValue', { count: previous.reps })
 	const weight =
 		previous.weight === null ||
 		previous.weight === undefined ||

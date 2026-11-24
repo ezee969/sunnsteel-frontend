@@ -273,6 +273,7 @@ export function groupSetLogsByExercise(
 				plannedRir: tpl.rir,
 				isExtra: false,
 				kind: log?.kind ?? tpl.kind ?? 'WORKING',
+				matchReps: log?.matchReps ?? [],
 				workingIndex: workingIndexes.get(tpl.setNumber) ?? null,
 				// LIVE-22: nothing logged a weight yet, so the one shown is the
 				// prescription's. A cast below hides a missing field; keep this.
@@ -297,6 +298,7 @@ export function groupSetLogsByExercise(
 			plannedRir: null,
 			isExtra: true,
 			kind: log.kind ?? 'WORKING',
+			matchReps: log.matchReps ?? [],
 			workingIndex: null,
 			weightIsSuggestion: false,
 		}))

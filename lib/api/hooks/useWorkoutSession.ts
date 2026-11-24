@@ -1,4 +1,5 @@
 import type {
+	AddSessionExerciseRequest,
 	CorrectSessionRequest,
 	CorrectSessionResponse,
 	DeloadSuggestionResponse,
@@ -8,6 +9,7 @@ import type {
 	PlateausResponse,
 	RemoveLoggedWorkoutResponse,
 	SessionCorrectionsResponse,
+	SessionDayEditResponse,
 	SubstituteSessionExerciseRequest,
 	SubstituteSessionExerciseResponse,
 	TrainingSignalsResponse,
@@ -727,6 +729,7 @@ export const useUpsertSetLog = (id: string) => {
 										// The server leaves an omitted RPE as it was.
 										rpe: data.rpe ?? l.rpe,
 										kind: data.kind ?? l.kind,
+										matchReps: data.matchReps ?? l.matchReps,
 										isCompleted:
 											typeof data.isCompleted === 'boolean'
 												? data.isCompleted
@@ -748,6 +751,7 @@ export const useUpsertSetLog = (id: string) => {
 								rpe: data.rpe ?? null,
 								// Omitted, the row keeps its prescription's kind (LIVE-12).
 								kind: data.kind,
+								matchReps: data.matchReps ?? [],
 								isCompleted: !!data.isCompleted,
 								createdAt: now,
 								updatedAt: now,
@@ -847,6 +851,34 @@ export const useSubstituteExercise = (id: string, routineId?: string) => {
 		},
 	})
 }
+
+/**
+ * LIVE-25: a change to the day being trained is a routine change, so the
+ * routine's reads refresh with the workout's.
+ */
+const useSessionDayEdit = <T>(
+	id: string,
+	mutationFn: (data: T) => Promise<SessionDayEditResponse>,
+) => {
+	const qc = useQueryClient()
+	return useMutation({
+		mutationFn,
+		onSuccess: (result: SessionDayEditResponse) => {
+			qc.setQueryData(qk.session(id), result.session as WorkoutSession)
+			qc.invalidateQueries({ queryKey: ['routines'] })
+		},
+	})
+}
+
+export const useAddSessionExercise = (id: string) =>
+	useSessionDayEdit(id, (data: AddSessionExerciseRequest) =>
+		workoutService.addSessionExercise(id, data),
+	)
+
+export const useReorderSessionExercises = (id: string) =>
+	useSessionDayEdit(id, (routineExerciseIds: string[]) =>
+		workoutService.reorderSessionExercises(id, { routineExerciseIds }),
+	)
 
 export const useRevertExerciseSubstitution = (id: string) => {
 	const qc = useQueryClient()

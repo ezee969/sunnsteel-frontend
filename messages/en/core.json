@@ -1,7 +1,10 @@
 {
 	"saveStatus": {
+		"unsaved": "Unsaved",
 		"saving": "Saving…",
-		"saved": "Saved"
+		"saved": "Saved",
+		"error": "Error",
+		"waiting": "Waiting for connection"
 	},
 	"common": {
 		"loading": "Loading",
@@ -266,13 +269,6 @@
 		"singleEstimated1RmTitle": "New estimated 1RM record",
 		"multipleTitle": "{count} new personal records"
 	},
-	"saveStatus": {
-		"unsaved": "Unsaved",
-		"saving": "Saving…",
-		"saved": "Saved",
-		"error": "Error",
-		"waiting": "Waiting for connection"
-	},
 	"setLogValidation": {
 		"routineExerciseIdRequired": "Routine exercise ID is required",
 		"exerciseIdRequired": "Exercise ID is required",
@@ -519,7 +515,16 @@
 		"TRAINING_REVIEW_NO_EFFORT_DATA": "Those workouts have no rep targets or RPE to compare effort with",
 		"TRAINING_REVIEW_NOT_ENOUGH": "Those workouts don't show enough to answer that. It still used one of this month's reviews.",
 		"TRAINING_REVIEW_FAILED": "We couldn't write a review from those workouts; try again.",
-		"CONSUMER_REQUEST_INVALID": "Check your name and email and try again"
+		"CONSUMER_REQUEST_INVALID": "Check your name and email and try again",
+		"MATCH_SET_PLACEMENT": "A match set follows a working set",
+		"MATCH_SETS_MAX": "A working set takes at most {max} match sets",
+		"MATCH_SET_LINEAR_BLOCK": "An exercise on an 8-week block takes no match sets",
+		"MATCH_MINI_SETS_MAX": "A match set takes at most {max} mini-sets",
+		"MATCH_MINI_SETS_NOT_MATCH": "Only a match set takes mini-sets",
+		"DAY_EDIT_SESSION_NOT_ACTIVE": "The day can only be changed during an active workout",
+		"DAY_EDIT_EXERCISES_MAX": "A day can hold at most {max} exercises",
+		"DAY_EDIT_ORDER_MISMATCH": "The new order must name every exercise of the day once",
+		"DAY_EDIT_LINEAR_BLOCK": "An 8-week block starts from the routine builder, not during a workout"
 	},
 	"glossary": {
 		"label": "Terms:",
@@ -554,6 +559,10 @@
 		"rotation": {
 			"term": "Rotation",
 			"definition": "A rotation runs its days in order instead of on fixed weekdays. The next day is the one after the last you finished."
+		},
+		"matchSet": {
+			"term": "Match set",
+			"definition": "A match set (myo-rep match) comes after a full rest and lifts the same weight as the working set before it. If you fall short of that set’s reps, pause a few breaths and add mini-sets until the reps add up. It counts as one set, every rep counts toward volume, and it never moves a load."
 		}
 	}
 }

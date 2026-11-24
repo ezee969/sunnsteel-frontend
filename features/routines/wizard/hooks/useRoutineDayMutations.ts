@@ -2,6 +2,7 @@ import {
 	followWorkingLoad,
 	isSetKind,
 	type LinearPeriodizationState,
+	matchSetRefusal,
 	type WarmUpEquipment,
 	type WeightUnit,
 } from '@sunsteel/contracts'
@@ -239,6 +240,40 @@ export function useRoutineDayMutations({
 
 				const lastSet = exercise.sets[exercise.sets.length - 1]
 				const newSetNumber = exercise.sets.length + 1
+				// LIVE-26: after a match set the next one is another match set
+				// while one may stand there, else a working set like a set after
+				// it would be.
+				if (lastSet?.kind === 'MATCH') {
+					const asMatch = { setNumber: newSetNumber, kind: 'MATCH' as const }
+					const fits =
+						matchSetRefusal([...exercise.sets, asMatch], false) === null
+					exercise.sets.push(
+						fits
+							? {
+									setNumber: newSetNumber,
+									repType: 'FIXED',
+									reps: null,
+									minReps: null,
+									maxReps: null,
+									weight: null,
+									rir: null,
+									kind: 'MATCH',
+								}
+							: {
+									setNumber: newSetNumber,
+									repType: 'FIXED',
+									reps: 10,
+									minReps: null,
+									maxReps: null,
+									weight: exercise.sets.find(set => set.kind === 'WORKING')
+										?.weight,
+									rir: null,
+									kind: 'WORKING',
+								},
+					)
+					syncDoubleProgressionWeights(exercise)
+					return
+				}
 				const newSet = {
 					setNumber: newSetNumber,
 					repType: lastSet?.repType ?? 'FIXED',
@@ -469,9 +504,22 @@ export function useRoutineDayMutations({
 					}
 					if (value !== '') syncDoubleProgressionWeights(exercise)
 				} else if (field === 'kind') {
+					const wasMatch = set.kind === 'MATCH'
 					set.kind = isSetKind(value) ? value : 'WORKING'
 					// Only a warm-up follows the working load.
 					if (set.kind !== 'WARMUP') set.warmUpShare = null
+					// LIVE-26: a match set has no load or reps of its own; a set
+					// that stops being one gets a prescription back.
+					if (set.kind === 'MATCH') {
+						set.repType = 'FIXED'
+						set.reps = null
+						set.minReps = null
+						set.maxReps = null
+						set.weight = null
+						set.rir = null
+					} else if (wasMatch) {
+						set.reps = 10
+					}
 					syncDoubleProgressionWeights(exercise)
 				} else if (field === 'rir') {
 					if (value === null || value === '') {

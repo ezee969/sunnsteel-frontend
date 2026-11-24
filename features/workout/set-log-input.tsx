@@ -2,11 +2,13 @@
 
 import {
 	isSetKind,
+	MATCH_MINI_SETS_MAX,
+	repsDone,
 	SET_KINDS,
 	type SetKind,
 	type WeightUnit,
 } from '@sunsteel/contracts'
-import { ChevronDown, WifiOff, X } from 'lucide-react'
+import { Check, ChevronDown, Plus, WifiOff, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
@@ -78,6 +80,15 @@ interface SetLogInputProps extends LogRowProps {
 	showRir?: boolean
 	/** LIVE-22: the prescription's weight, kg, shown as a suggestion until edited or ticked. */
 	suggestedWeight?: number | null
+	/**
+	 * LIVE-26: on a match set, its target -- the target set's logged reps,
+	 * null until that set has some -- and that set's number.
+	 */
+	match?: { target: number | null; targetSetNumber: number | null }
+	/** LIVE-26: a match set's mini-sets as saved. */
+	matchReps?: number[]
+	/** LIVE-26: whether this set may be made a match set here. */
+	matchAllowed?: boolean
 }
 
 export type SetRowState = 'current' | 'done' | 'upcoming'
@@ -221,9 +232,13 @@ export const SetLogInput = ({
 	showWeightTarget = true,
 	showRir = true,
 	suggestedWeight,
+	match,
+	matchReps,
+	matchAllowed = false,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
+	const isMatch = kind === 'MATCH'
 	const locale = useLocale() as Locale
 	const t = useTranslations('workout.setLogInput')
 	const tKinds = useTranslations('workout.setKinds')
@@ -241,6 +256,10 @@ export const SetLogInput = ({
 		fill,
 		changeKind,
 		retrySave,
+		matchRepsState,
+		setMiniSet,
+		addMiniSet,
+		removeMiniSet,
 		isValid,
 		validationError,
 		validationField,
@@ -259,7 +278,22 @@ export const SetLogInput = ({
 		weightUnit,
 		fixedWeightKg: linearBlock?.loadKg,
 		suggestedWeightKg: suggestedWeight,
+		isMatch,
+		initialMatchReps: matchReps,
 	})
+	// LIVE-26: how far the match set has come against its target.
+	const matchTarget = isMatch ? (match?.target ?? null) : null
+	const miniSets = matchRepsState
+		.map(value => Number(value))
+		.filter(value => value > 0)
+	const matchDone = repsDone({
+		reps: Number(repsState) || 0,
+		matchReps: miniSets,
+	})
+	const showMiniSets =
+		matchTarget !== null &&
+		(matchRepsState.length > 0 ||
+			(isCompletedState && (Number(repsState) || 0) < matchTarget))
 
 	const tSaveStatus = useTranslations('core.saveStatus')
 	const tPrev = useTranslations('workout.previousPerformance')
@@ -455,7 +489,9 @@ export const SetLogInput = ({
 										if (isSetKind(value) && value !== kind) changeKind(value)
 									}}
 								>
-									{SET_KINDS.map(option => (
+									{SET_KINDS.filter(
+										option => option !== 'MATCH' || isMatch || matchAllowed,
+									).map(option => (
 										<DropdownMenuRadioItem key={option} value={option}>
 											{tKinds(option)}
 										</DropdownMenuRadioItem>
@@ -524,7 +560,9 @@ export const SetLogInput = ({
 						placeholder={isCurrent ? t('repsPlaceholder') : QUIET_PLACEHOLDER}
 						aria-invalid={repsInvalid || undefined}
 						aria-describedby={describedBy(
-							linearBlock || isExtra || showRepsTarget ? repsTargetId : null,
+							linearBlock || isExtra || isMatch || showRepsTarget
+								? repsTargetId
+								: null,
 							repsInvalid,
 						)}
 						value={repsState}
@@ -537,21 +575,27 @@ export const SetLogInput = ({
 					{/* LIVE-22 (§27.3): a target the exercise's line already states is
 					not repeated on the row; a different one, a block's step and an
 					extra set's "no target" still are. */}
-					{linearBlock || isExtra || showRepsTarget ? (
+					{linearBlock || isExtra || isMatch || showRepsTarget ? (
 						<span
 							id={repsTargetId}
 							className="type-body-sm text-center text-ink-3"
 						>
 							{linearBlock
 								? (linearBlock.target ?? t('noTarget'))
-								: isExtra
-									? t('noTarget')
-									: plannedMinReps && plannedMaxReps
-										? t('targetRange', {
-												min: plannedMinReps,
-												max: plannedMaxReps,
+								: isMatch
+									? matchTarget !== null
+										? t('matchTarget', { value: matchTarget })
+										: t('matchTargetWaiting', {
+												number: match?.targetSetNumber ?? setNumber - 1,
 											})
-										: t('targetReps', { value: plannedRepsText })}
+									: isExtra
+										? t('noTarget')
+										: plannedMinReps && plannedMaxReps
+											? t('targetRange', {
+													min: plannedMinReps,
+													max: plannedMaxReps,
+												})
+											: t('targetReps', { value: plannedRepsText })}
 						</span>
 					) : null}
 				</div>
@@ -611,7 +655,9 @@ export const SetLogInput = ({
 								}
 								aria-invalid={weightInvalid || undefined}
 								aria-describedby={describedBy(
-									isExtra || showWeightTarget ? weightTargetId : null,
+									!isMatch && (isExtra || showWeightTarget)
+										? weightTargetId
+										: null,
 									weightInvalid,
 								)}
 								value={weightState}
@@ -621,7 +667,7 @@ export const SetLogInput = ({
 									weightInvalid ? FIELD_INVALID_CLASS : ''
 								}`}
 							/>
-							{isExtra || showWeightTarget ? (
+							{!isMatch && (isExtra || showWeightTarget) ? (
 								<span
 									id={weightTargetId}
 									className="type-body-sm text-center text-ink-3"
@@ -697,6 +743,102 @@ export const SetLogInput = ({
 					/>
 				</div>
 			</div>
+
+			{/* LIVE-26 (§27.3 amendment): a match set short of its target takes
+			    mini-sets a few breaths apart, one field at a time, under its
+			    row. There is no countdown: a few breaths is not a timer. */}
+			{showMiniSets && matchTarget !== null ? (
+				<div className="mt-2 border-t border-rule-faint pt-1.5">
+					<div className="type-body-sm flex items-center justify-between gap-2">
+						<span
+							className={
+								matchDone >= matchTarget
+									? 'flex items-center gap-1 text-success'
+									: 'text-ink-3'
+							}
+						>
+							{matchDone >= matchTarget ? (
+								<>
+									<Check className="size-4 shrink-0" aria-hidden />
+									{t('matchDone')}
+								</>
+							) : isCurrent ? (
+								t('matchPause')
+							) : (
+								t('matchShort', {
+									missing: matchTarget - matchDone,
+									target: matchTarget,
+								})
+							)}
+						</span>
+						<span className="type-data text-ink-2" aria-live="polite">
+							{t('matchProgress', { done: matchDone, target: matchTarget })}
+						</span>
+					</div>
+					<div className="mt-1 flex flex-wrap items-center gap-1">
+						{matchRepsState.map((value, index) => (
+							<div key={index} className="flex items-center gap-1">
+								<span aria-hidden className="type-data text-ink-3">
+									+
+								</span>
+								<Input
+									id={`${repsId}-mini-${index}`}
+									type="number"
+									inputMode="numeric"
+									enterKeyHint="done"
+									aria-label={t('miniSetAria', {
+										index: index + 1,
+										number: setNumber,
+										exercise: exerciseName,
+									})}
+									placeholder={QUIET_PLACEHOLDER}
+									value={value}
+									onChange={e => setMiniSet(index, e.target.value)}
+									className={`${FIELD_CLASS} ${FIELD_BOUNDED_CLASS} w-14 md:w-14`}
+								/>
+								{index === matchRepsState.length - 1 ? (
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										className={FILL_CLASS}
+										aria-label={t('removeMiniSetAria', {
+											index: index + 1,
+											number: setNumber,
+										})}
+										onClick={() => removeMiniSet(index)}
+									>
+										<X className="h-4 w-4" aria-hidden />
+									</Button>
+								) : null}
+							</div>
+						))}
+						{matchRepsState.length < MATCH_MINI_SETS_MAX &&
+						matchDone < matchTarget ? (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className={FILL_CLASS}
+								aria-label={t('addMiniSetAria', {
+									number: setNumber,
+									exercise: exerciseName,
+								})}
+								onClick={() => {
+									addMiniSet()
+									// The new field takes the focus, so the reps go straight in.
+									requestAnimationFrame(() =>
+										focusField(`${repsId}-mini-${matchRepsState.length}`),
+									)
+								}}
+							>
+								<Plus className="h-4 w-4" aria-hidden />
+								{t('addMiniSet')}
+							</Button>
+						) : null}
+					</div>
+				</div>
+			) : null}
 
 			{/* LIVE-22 (§27.3): "Last time" belongs to the set being done. */}
 			{previousPerformance && isCurrent ? (

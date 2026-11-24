@@ -3,14 +3,27 @@
 import {
 	type ExerciseGroup as ExerciseGroupContract,
 	exerciseGroups,
+	reorderBreaksLinks,
 	routineDayLabel,
 } from '@sunsteel/contracts'
+import { Plus } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { GlossaryLine } from '@/components/layout/glossary-line'
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { AddSessionExerciseDialog } from '@/features/workout/add-session-exercise-dialog'
 import { ExerciseGroup } from '@/features/workout/exercise-group'
 import {
 	ExerciseSwapDialog,
@@ -36,6 +49,7 @@ import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import {
 	useDeleteSetLog,
 	usePreviousPerformance,
+	useReorderSessionExercises,
 	useSession,
 	useUpsertSetLog,
 } from '@/lib/api/hooks/useWorkoutSession'
@@ -109,6 +123,7 @@ export default function ActiveSessionPage() {
 	const tPrescription = useTranslations('workout.prescription')
 	const tEndTime = useTranslations('workout.endTime')
 	const tEx = useTranslations('catalog.exercises')
+	const tSwap = useTranslations('workout.exerciseSwap')
 	const params = useParams<{ id: string | string[] }>()
 	const router = useRouter()
 	const idParam = Array.isArray(params.id) ? params.id[0] : params.id
@@ -188,6 +203,14 @@ export default function ActiveSessionPage() {
 
 	// LIVE-11: the slot whose exercise is being swapped, if any.
 	const [swapTarget, setSwapTarget] = useState<SwapTarget | null>(null)
+	// LIVE-25: the day can change during the workout -- an exercise added for
+	// good, an exercise moved -- and the routine follows.
+	const [addingExercise, setAddingExercise] = useState(false)
+	const [pendingMove, setPendingMove] = useState<{
+		ids: string[]
+		name: string
+	} | null>(null)
+	const reorder = useReorderSessionExercises(idParam)
 
 	// Handlers
 	const handleSaveSetLog = useCallback(
@@ -418,6 +441,43 @@ export default function ActiveSessionPage() {
 		)
 	}
 
+	// LIVE-25: the plan a change of the day is written to, as the swap names it.
+	const planName = session.temporaryOverride
+		? tSwap('planDeload')
+		: session.trainingBlock?.name
+			? tSwap('planBlock', { name: session.trainingBlock.name })
+			: tSwap('planRoutine')
+	const PlanName = planName[0].toUpperCase() + planName.slice(1)
+	const canEditDay = session.status === 'IN_PROGRESS'
+
+	const commitMove = (ids: string[], name: string) =>
+		reorder.mutate(ids, {
+			onSuccess: () =>
+				push({
+					title: t('movedTitle', { exercise: name }),
+					description: t('movedDescription', { plan: PlanName }),
+					variant: 'success',
+				}),
+			onError: error =>
+				push({
+					title: t('moveFailedTitle'),
+					description: errorText(error),
+					variant: 'destructive',
+				}),
+		})
+
+	// LIVE-25: one place up or down; a move that would split a superset or
+	// circuit asks first (ROUT-12 keeps a pair only while side by side).
+	const moveExercise = (index: number, delta: -1 | 1) => {
+		const ids = groupedLogs.map(group => group.exerciseId)
+		const to = index + delta
+		if (to < 0 || to >= ids.length || reorder.isPending) return
+		;[ids[index], ids[to]] = [ids[to], ids[index]]
+		const name = exerciseLabel(groupedLogs[index].exerciseName, tEx)
+		if (reorderBreaksLinks(day.exercises, ids)) setPendingMove({ ids, name })
+		else commitMove(ids, name)
+	}
+
 	// LIVE-22: one exercise of the list, inside or outside a group.
 	const renderExercise = (group: GroupedExerciseLogs, groupIndex: number) => {
 		const status = roundStatus(roundSlots, groupIndex)
@@ -519,6 +579,16 @@ export default function ActiveSessionPage() {
 				}
 				onRemoveSet={
 					session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
+				}
+				onMoveUp={
+					canEditDay && groupIndex > 0
+						? () => moveExercise(groupIndex, -1)
+						: undefined
+				}
+				onMoveDown={
+					canEditDay && groupIndex < groupedLogs.length - 1
+						? () => moveExercise(groupIndex, 1)
+						: undefined
 				}
 				linearBlock={
 					group.linearPeriodization
@@ -644,10 +714,32 @@ export default function ActiveSessionPage() {
 					)}
 				</div>
 
+				{/* LIVE-25: an exercise joins the day for good; never a primary
+				    action, which belongs to finishing (§28.1). */}
+				{canEditDay ? (
+					<Button
+						type="button"
+						variant="outline"
+						className="w-full md:max-w-3xl"
+						onClick={() => setAddingExercise(true)}
+					>
+						<Plus className="h-4 w-4" aria-hidden />
+						{t('addExercise')}
+					</Button>
+				) : null}
+
 				{/* UX-18: the terms the set rows use, defined one tap away.
 				LIVE-22 (§27.5): after the work, so the first exercise is reached
 				sooner; the definitions are unchanged. */}
-				<GlossaryLine terms={['rpe', 'rir', 'setKinds']} />
+				<GlossaryLine
+					terms={
+						groupedLogs.some(group =>
+							group.sets.some(set => set.kind === 'MATCH'),
+						)
+							? ['rpe', 'rir', 'setKinds', 'matchSet']
+							: ['rpe', 'rir', 'setKinds']
+					}
+				/>
 
 				{/* LIVE-16: the note about the whole workout, written as it happens. */}
 				<section aria-labelledby="workout-note-heading" className="space-y-3">
@@ -734,6 +826,41 @@ export default function ActiveSessionPage() {
 					.flatMap(group => (group.sets[0] ? [group.sets[0].exerciseId] : []))}
 				onClose={() => setSwapTarget(null)}
 			/>
+			<AddSessionExerciseDialog
+				sessionId={session.id}
+				open={addingExercise}
+				onOpenChange={setAddingExercise}
+				plan={planName}
+			/>
+			<AlertDialog
+				open={!!pendingMove}
+				onOpenChange={open => {
+					if (!open) setPendingMove(null)
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{t('moveSplitsTitle')}</AlertDialogTitle>
+						<AlertDialogDescription>
+							{pendingMove
+								? t('moveSplitsGroup', { exercise: pendingMove.name })
+								: null}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t('moveKeep')}</AlertDialogCancel>
+						<Button
+							type="button"
+							onClick={() => {
+								if (pendingMove) commitMove(pendingMove.ids, pendingMove.name)
+								setPendingMove(null)
+							}}
+						>
+							{t('moveAnyway')}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 			<SessionRecapDialog
 				recap={recap}
 				onContinue={completeRecap}

@@ -5,6 +5,7 @@ import type {
 	SessionComparisonSet,
 	WeightUnit,
 } from '@sunsteel/contracts'
+import { formatRepsDone } from '@sunsteel/contracts'
 import { GitCompareArrows, NotebookPen } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -120,8 +121,8 @@ function formatSet(
 	if (!set) return t('notCompleted')
 	const performance =
 		set.weightKg != null && set.weightKg > 0
-			? `${formatWeightAmount(set.weightKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)} × ${set.reps}`
-			: t('bodyweight', { reps: set.reps })
+			? `${formatWeightAmount(set.weightKg, weightUnit, locale)} ${getWeightUnitLabel(weightUnit)} × ${formatRepsDone(set)}`
+			: t('bodyweight', { reps: formatRepsDone(set) })
 	return set.rpe != null
 		? t('withRpe', { performance, rpe: set.rpe })
 		: performance

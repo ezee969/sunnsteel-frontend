@@ -9,6 +9,7 @@ export const GLOSSARY_TERMS = [
 	'estimated1rm',
 	'progression',
 	'setKinds',
+	'matchSet',
 	'deload',
 	'trainingBlock',
 	'rotation',

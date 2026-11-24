@@ -58,7 +58,8 @@
 		"sessionRecap": "Resumen de la sesión"
 	},
 	"previousPerformance": {
-		"repsValue": "{count, plural, one {# repetición} other {# repeticiones}}"
+		"repsValue": "{count, plural, one {# repetición} other {# repeticiones}}",
+		"matchRepsValue": "{value} reps"
 	},
 	"notes": {
 		"exerciseScope": "Solo este entrenamiento la conserva. La nota de tu rutina para este ejercicio se mantiene igual.",
@@ -231,7 +232,11 @@
 		"swapTitle": "Cambiar ejercicio",
 		"complete": "Completo",
 		"addSetAria": "Agregar una serie a {exercise}",
-		"addSet": "Agregar serie"
+		"addSet": "Agregar serie",
+		"moveUp": "Subir",
+		"moveDown": "Bajar",
+		"moveAria": "Mover {exercise}",
+		"moveTitle": "Mover en el día"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Cambiar ejercicio",
@@ -375,7 +380,17 @@
 		"columnSet": "Serie",
 		"waitingSaving": "Esperando conexión. Esta serie se guardará cuando vuelvas a estar en línea.",
 		"retrySave": "Reintentar",
-		"retrySaveLabel": "Volver a guardar la serie {set}"
+		"retrySaveLabel": "Volver a guardar la serie {set}",
+		"matchTarget": "Igualar {value}",
+		"matchTargetWaiting": "Iguala la serie {number}",
+		"matchProgress": "{done} de {target}",
+		"addMiniSet": "Mini-serie",
+		"addMiniSetAria": "Añadir una mini-serie a la serie {number}, {exercise}",
+		"miniSetAria": "Reps de la mini-serie {index}, serie {number}, {exercise}",
+		"removeMiniSetAria": "Quitar la mini-serie {index} de la serie {number}",
+		"matchPause": "Haz una pausa de unas respiraciones y sigue hasta sumar las reps.",
+		"matchShort": "Te faltan {missing} para {target}. Puedes dejarlo así.",
+		"matchDone": "Igualada"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",
@@ -511,7 +526,15 @@
 		"couldNotRemoveSetTitle": "No se pudo quitar la serie",
 		"tryAgain": "Inténtalo de nuevo.",
 		"nextSetFallback": "Tu próxima serie",
-		"exercisesHeading": "Ejercicios"
+		"exercisesHeading": "Ejercicios",
+		"addExercise": "Añadir un ejercicio a este día",
+		"movedTitle": "{exercise} movido",
+		"movedDescription": "{plan} mantiene este orden desde el próximo entrenamiento.",
+		"moveFailedTitle": "No se movió",
+		"moveSplitsGroup": "Mover {exercise} lo saca de su superserie o circuito. ¿Moverlo igualmente?",
+		"moveSplitsTitle": "¿Separar el grupo?",
+		"moveKeep": "Dejarlo",
+		"moveAnyway": "Moverlo"
 	},
 	"errors": {
 		"workoutsFailedTitle": "No se pudieron cargar los entrenamientos",
@@ -529,7 +552,8 @@
 		"WORKING": "Efectiva",
 		"WARMUP": "Calentamiento",
 		"DROP": "Descendente",
-		"OPTIONAL": "Opcional"
+		"OPTIONAL": "Opcional",
+		"MATCH": "Igualación"
 	},
 	"linearBlock": {
 		"positionLine": "{position} · {percent}",
@@ -559,5 +583,30 @@
 		"range": "{min}–{max}",
 		"rir": "RIR {value}",
 		"rest": "descanso {time}"
+	},
+	"addExercise": {
+		"title": "Añadir un ejercicio",
+		"description": "Se suma a {plan} de forma permanente, al final de este día, y al entrenamiento de hoy ahora mismo.",
+		"exerciseLabel": "Ejercicio",
+		"change": "Cambiar",
+		"sets": "Series",
+		"reps": "Reps",
+		"weight": "Peso ({unit})",
+		"moreOptions": "Más opciones",
+		"fewerOptions": "Menos opciones",
+		"rest": "Descanso (segundos)",
+		"progression": "Progresión",
+		"endNote": "Muévelo desde el final con su control Mover.",
+		"cancel": "Cancelar",
+		"add": "Añadir ejercicio",
+		"adding": "Añadiendo…",
+		"addedTitle": "{exercise} añadido",
+		"addedDescription": "{plan} lo tiene desde ahora.",
+		"failedTitle": "No se añadió el ejercicio",
+		"schemes": {
+			"NONE": "Ninguna",
+			"DOUBLE_PROGRESSION": "Doble progresión",
+			"DYNAMIC_DOUBLE_PROGRESSION": "Doble progresión serie a serie"
+		}
 	}
 }

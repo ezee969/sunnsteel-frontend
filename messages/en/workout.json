@@ -58,7 +58,8 @@
 		"sessionRecap": "Session recap"
 	},
 	"previousPerformance": {
-		"repsValue": "{count, plural, one {# rep} other {# reps}}"
+		"repsValue": "{count, plural, one {# rep} other {# reps}}",
+		"matchRepsValue": "{value} reps"
 	},
 	"notes": {
 		"exerciseScope": "Only this workout keeps it. Your routine’s note for this exercise stays as it is.",
@@ -231,7 +232,11 @@
 		"swapTitle": "Swap exercise",
 		"complete": "Complete",
 		"addSetAria": "Add a set to {exercise}",
-		"addSet": "Add set"
+		"addSet": "Add set",
+		"moveUp": "Move up",
+		"moveDown": "Move down",
+		"moveAria": "Move {exercise}",
+		"moveTitle": "Move in the day"
 	},
 	"exerciseSwap": {
 		"dialogTitle": "Swap Exercise",
@@ -375,7 +380,17 @@
 		"columnSet": "Set",
 		"waitingSaving": "Waiting for connection. This set saves when you're back online.",
 		"retrySave": "Try again",
-		"retrySaveLabel": "Try saving set {set} again"
+		"retrySaveLabel": "Try saving set {set} again",
+		"matchTarget": "Match {value}",
+		"matchTargetWaiting": "Matches set {number}",
+		"matchProgress": "{done} of {target}",
+		"addMiniSet": "Mini-set",
+		"addMiniSetAria": "Add a mini-set to set {number}, {exercise}",
+		"miniSetAria": "Mini-set {index} reps, set {number}, {exercise}",
+		"removeMiniSetAria": "Remove mini-set {index} of set {number}",
+		"matchPause": "Pause a few breaths, then go again until the reps add up.",
+		"matchShort": "{missing} short of {target}. You can leave it there.",
+		"matchDone": "Matched"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",
@@ -511,7 +526,15 @@
 		"couldNotRemoveSetTitle": "Could not remove the set",
 		"tryAgain": "Try again.",
 		"nextSetFallback": "Your next set",
-		"exercisesHeading": "Exercises"
+		"exercisesHeading": "Exercises",
+		"addExercise": "Add an exercise to this day",
+		"movedTitle": "{exercise} moved",
+		"movedDescription": "{plan} keeps this order from the next workout.",
+		"moveFailedTitle": "Not moved",
+		"moveSplitsGroup": "Moving {exercise} takes it out of its superset or circuit. Move it anyway?",
+		"moveSplitsTitle": "Split the group?",
+		"moveKeep": "Keep it",
+		"moveAnyway": "Move it"
 	},
 	"errors": {
 		"workoutsFailedTitle": "Failed to load workouts",
@@ -529,7 +552,8 @@
 		"WORKING": "Working",
 		"WARMUP": "Warm-up",
 		"DROP": "Drop",
-		"OPTIONAL": "Optional"
+		"OPTIONAL": "Optional",
+		"MATCH": "Match"
 	},
 	"linearBlock": {
 		"positionLine": "{position} · {percent}",
@@ -559,5 +583,30 @@
 		"range": "{min}–{max}",
 		"rir": "RIR {value}",
 		"rest": "rest {time}"
+	},
+	"addExercise": {
+		"title": "Add an exercise",
+		"description": "It joins {plan} for good, at the end of this day, and today's workout now.",
+		"exerciseLabel": "Exercise",
+		"change": "Change",
+		"sets": "Sets",
+		"reps": "Reps",
+		"weight": "Weight ({unit})",
+		"moreOptions": "More options",
+		"fewerOptions": "Fewer options",
+		"rest": "Rest (seconds)",
+		"progression": "Progression",
+		"endNote": "Move it from the end with its Move control.",
+		"cancel": "Cancel",
+		"add": "Add exercise",
+		"adding": "Adding…",
+		"addedTitle": "{exercise} added",
+		"addedDescription": "{plan} has it from now on.",
+		"failedTitle": "Exercise not added",
+		"schemes": {
+			"NONE": "None",
+			"DOUBLE_PROGRESSION": "Double progression",
+			"DYNAMIC_DOUBLE_PROGRESSION": "Set-by-set double progression"
+		}
 	}
 }

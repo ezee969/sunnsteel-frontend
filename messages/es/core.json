@@ -1,7 +1,10 @@
 {
 	"saveStatus": {
+		"unsaved": "Sin guardar",
 		"saving": "Guardando…",
-		"saved": "Guardado"
+		"saved": "Guardado",
+		"error": "Error",
+		"waiting": "Esperando conexión"
 	},
 	"common": {
 		"loading": "Cargando",
@@ -266,13 +269,6 @@
 		"singleEstimated1RmTitle": "Nuevo récord de 1RM estimado",
 		"multipleTitle": "{count} récords personales nuevos"
 	},
-	"saveStatus": {
-		"unsaved": "Sin guardar",
-		"saving": "Guardando…",
-		"saved": "Guardado",
-		"error": "Error",
-		"waiting": "Esperando conexión"
-	},
 	"setLogValidation": {
 		"routineExerciseIdRequired": "Se requiere el ID del ejercicio de la rutina",
 		"exerciseIdRequired": "Se requiere el ID del ejercicio",
@@ -519,7 +515,16 @@
 		"TRAINING_REVIEW_NO_EFFORT_DATA": "Esos entrenamientos no tienen objetivos de repeticiones ni RPE con los que comparar el esfuerzo",
 		"TRAINING_REVIEW_NOT_ENOUGH": "Esos entrenamientos no muestran lo suficiente para responder eso. Igual usó una de las revisiones de este mes.",
 		"TRAINING_REVIEW_FAILED": "No pudimos escribir una revisión con esos entrenamientos; inténtalo de nuevo.",
-		"CONSUMER_REQUEST_INVALID": "Revisa tu nombre y tu email e inténtalo de nuevo"
+		"CONSUMER_REQUEST_INVALID": "Revisa tu nombre y tu email e inténtalo de nuevo",
+		"MATCH_SET_PLACEMENT": "Una serie de igualación va después de una serie efectiva",
+		"MATCH_SETS_MAX": "Una serie efectiva admite como máximo {max} series de igualación",
+		"MATCH_SET_LINEAR_BLOCK": "Un ejercicio en un bloque de 8 semanas no admite series de igualación",
+		"MATCH_MINI_SETS_MAX": "Una serie de igualación admite como máximo {max} mini-series",
+		"MATCH_MINI_SETS_NOT_MATCH": "Solo una serie de igualación admite mini-series",
+		"DAY_EDIT_SESSION_NOT_ACTIVE": "El día solo se puede cambiar durante un entrenamiento en curso",
+		"DAY_EDIT_EXERCISES_MAX": "Un día admite como máximo {max} ejercicios",
+		"DAY_EDIT_ORDER_MISMATCH": "El nuevo orden debe nombrar cada ejercicio del día una vez",
+		"DAY_EDIT_LINEAR_BLOCK": "Un bloque de 8 semanas se empieza desde el editor de rutinas, no durante un entrenamiento"
 	},
 	"glossary": {
 		"label": "Términos:",
@@ -554,6 +559,10 @@
 		"rotation": {
 			"term": "Rotación",
 			"definition": "Una rotación sigue sus días en orden en lugar de días fijos de la semana. El siguiente día es el que viene después del último que terminaste."
+		},
+		"matchSet": {
+			"term": "Serie de igualación",
+			"definition": "Una serie de igualación (myo-reps match) llega tras un descanso completo y levanta el mismo peso que la serie efectiva anterior. Si te quedas corto de sus reps, haz una pausa de unas respiraciones y añade mini-series hasta sumarlas. Cuenta como una serie, todas sus reps cuentan para el volumen y nunca mueve una carga."
 		}
 	}
 }

@@ -1,4 +1,8 @@
-import type { WeightUnit } from '@sunsteel/contracts'
+import {
+	matchSetRefusal,
+	matchTargetSetNumber,
+	type WeightUnit,
+} from '@sunsteel/contracts'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -104,6 +108,7 @@ export function SetListSection({
 }: SetListSectionProps) {
 	const t = useTranslations('routines.builder')
 	const tBlock = useTranslations('routines.linearBlock')
+	const tRow = useTranslations('routines.setRow')
 	// ROUT-17: the block's working sets are read-only, numbered among
 	// themselves for their targets.
 	const linear = isLinearExercise(exercise)
@@ -183,6 +188,22 @@ export function SetListSection({
 										exercise.warmUpsFollowLoad,
 									)}
 									advanced={advanced}
+									matchAllowed={
+										!linear &&
+										matchSetRefusal(
+											exercise.sets.map((other, index) =>
+												index === setIndex
+													? { ...other, kind: 'MATCH' as const }
+													: other,
+											),
+											false,
+										) === null
+									}
+									matchTargetSetNumber={
+										set.kind === 'MATCH'
+											? matchTargetSetNumber(exercise.sets, set.setNumber)
+											: undefined
+									}
 									lpWorking={
 										isLpWorkingSet(exercise, set)
 											? {
@@ -198,6 +219,15 @@ export function SetListSection({
 							</div>
 						))}
 					</div>
+
+					{/* LIVE-26: a note, never a block -- the method suits isolation
+					    and machine work. */}
+					{exercise.sets.some(set => set.kind === 'MATCH') &&
+					(equipmentRequired ?? []).includes('barbell') ? (
+						<p className="type-body-sm mt-2 text-ink-3">
+							{tRow('matchHeavyNote')}
+						</p>
+					) : null}
 
 					<div className="mt-3 pt-3 border-t border-rule sm:border-0">
 						{linear ? (

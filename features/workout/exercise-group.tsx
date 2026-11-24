@@ -2,10 +2,16 @@
 
 import {
 	type LinearPeriodizationState,
+	matchSetRefusal,
+	matchTarget,
+	matchTargetSetNumber,
 	type SetKind,
 } from '@sunsteel/contracts'
 import {
+	ArrowDown,
 	ArrowLeftRight,
+	ArrowUp,
+	ArrowUpDown,
 	Calculator,
 	ChevronDown,
 	ChevronRight,
@@ -72,6 +78,8 @@ interface ExerciseGroupProps {
 		plannedRir?: number | null
 		isExtra?: boolean
 		kind: SetKind
+		/** LIVE-26: a match set's mini-sets. */
+		matchReps?: number[]
 		/** ROUT-17: 0-based place among the working sets; null for a warm-up. */
 		workingIndex?: number | null
 		/** LIVE-22: the weight shown is the prescription's, not a logged one. */
@@ -110,6 +118,12 @@ interface ExerciseGroupProps {
 	substitutedFrom?: string | null
 	/** Opens the swap dialog; omitted when the session cannot change. */
 	onSwapRequest?: () => void
+	/**
+	 * LIVE-25: move the exercise one place in the day, for this workout and
+	 * the routine from the next one. Absent at the day's top or bottom.
+	 */
+	onMoveUp?: () => void
+	onMoveDown?: () => void
 	/**
 	 * LIVE-15: take back an added set. Omitted when the session cannot change,
 	 * which also hides Add set.
@@ -152,6 +166,8 @@ export const ExerciseGroup = ({
 	sessionNote,
 	substitutedFrom,
 	onSwapRequest,
+	onMoveUp,
+	onMoveDown,
 	onRemoveSet,
 	roundLine,
 	upNext,
@@ -208,6 +224,13 @@ export const ExerciseGroup = ({
 		locale,
 		tLine,
 	)
+	// LIVE-26: a match set lifts its target set's load -- the weight logged on
+	// that set, else the one it was prescribed.
+	const matchLoad = (setNumber: number) => {
+		const target = matchTargetSetNumber(sets, setNumber)
+		const set = sets.find(candidate => candidate.setNumber === target)
+		return set?.weight ?? set?.plannedWeight ?? null
+	}
 	const rowState = (set: ExerciseGroupProps['sets'][number]): SetRowState =>
 		set.setNumber === currentSetNumber
 			? 'current'
@@ -395,6 +418,18 @@ export const ExerciseGroup = ({
 										<NotebookPen aria-hidden />
 										{sessionNote ? t('editNote') : t('addNote')}
 									</DropdownMenuItem>
+									{onMoveUp ? (
+										<DropdownMenuItem onSelect={() => onMoveUp()}>
+											<ArrowUp aria-hidden />
+											{t('moveUp')}
+										</DropdownMenuItem>
+									) : null}
+									{onMoveDown ? (
+										<DropdownMenuItem onSelect={() => onMoveDown()}>
+											<ArrowDown aria-hidden />
+											{t('moveDown')}
+										</DropdownMenuItem>
+									) : null}
 								</DropdownMenuContent>
 							</DropdownMenu>
 							{calculatorTarget ? (
@@ -451,6 +486,40 @@ export const ExerciseGroup = ({
 								note={sessionNote ?? null}
 								instruction={instruction}
 							/>
+
+							{/* LIVE-25: one control that opens the moves, rather than
+							    two more glyphs in the header. */}
+							{onMoveUp || onMoveDown ? (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon"
+											className="size-11 md:size-10"
+											aria-label={t('moveAria', { exercise: exerciseName })}
+											title={t('moveTitle')}
+											onClick={event => event.stopPropagation()}
+										>
+											<ArrowUpDown className="h-4 w-4" aria-hidden />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										{onMoveUp ? (
+											<DropdownMenuItem onSelect={() => onMoveUp()}>
+												<ArrowUp aria-hidden />
+												{t('moveUp')}
+											</DropdownMenuItem>
+										) : null}
+										{onMoveDown ? (
+											<DropdownMenuItem onSelect={() => onMoveDown()}>
+												<ArrowDown aria-hidden />
+												{t('moveDown')}
+											</DropdownMenuItem>
+										) : null}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							) : null}
 						</>
 					)}
 
@@ -504,7 +573,34 @@ export const ExerciseGroup = ({
 									: set.weight
 							}
 							suggestedWeight={
-								set.weightIsSuggestion ? set.plannedWeight : null
+								set.kind === 'MATCH'
+									? matchLoad(set.setNumber)
+									: set.weightIsSuggestion
+										? set.plannedWeight
+										: null
+							}
+							match={
+								set.kind === 'MATCH'
+									? {
+											target: matchTarget(sets, set.setNumber),
+											targetSetNumber: matchTargetSetNumber(
+												sets,
+												set.setNumber,
+											),
+										}
+									: undefined
+							}
+							matchReps={set.matchReps}
+							matchAllowed={
+								!blockSet(set) &&
+								matchSetRefusal(
+									sets.map(other =>
+										other === set
+											? { ...other, kind: 'MATCH' as const }
+											: other,
+									),
+									false,
+								) === null
 							}
 							state={rowState(set)}
 							showRepsTarget={!matchesPrescription(set, prescription).reps}

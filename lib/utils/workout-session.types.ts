@@ -13,6 +13,8 @@ export type UpsertSetLogPayload = {
 	isCompleted?: boolean
 	/** LIVE-12: changes the set's kind; omitted, it keeps its own. */
 	kind?: SetKind
+	/** LIVE-26: a match set's mini-sets, replacing the stored ones. */
+	matchReps?: number[]
 }
 
 export type LogRowProps = {
@@ -91,6 +93,8 @@ export type GroupedExerciseLogs = {
 		isExtra?: boolean
 		/** LIVE-12: what the set is for in this workout. */
 		kind: SetKind
+		/** LIVE-26: a match set's mini-sets after its first effort. */
+		matchReps: number[]
 		/**
 		 * ROUT-17: the set's 0-based place among the prescription's working
 		 * (non-warm-up) sets, which picks its target in an 8-week block; null

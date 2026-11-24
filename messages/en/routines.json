@@ -114,6 +114,7 @@
 		"kindWARMUP": "{count, plural, one {# warm-up} other {# warm-up}}",
 		"kindDROP": "{count, plural, one {# drop} other {# drop}}",
 		"kindOPTIONAL": "{count, plural, one {# optional} other {# optional}}",
+		"kindMATCH": "{count, plural, one {# match} other {# match}}",
 		"progressionLinear": "8-week block (LP)",
 		"exerciseReferenceMaxChange": "{name}: reference max {from} → {to}",
 		"exerciseBlockStepChange": "{name}: 8-week block step {from} → {to}"
@@ -647,7 +648,11 @@
 		"kindAria": "Set {number} kind",
 		"rest": "Rest",
 		"setsHeading": "Sets",
-		"lpTarget": "Target"
+		"lpTarget": "Target",
+		"matchTarget": "Matches set {number}",
+		"matchLoad": "Set {number}’s load",
+		"matchHeavyNote": "Match sets suit isolation and machine work better than heavy squats, hinges or Olympic lifts.",
+		"matchLabel": "Target"
 	},
 	"presets": {
 		"dayPush": "Push",
