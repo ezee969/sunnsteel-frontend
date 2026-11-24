@@ -1,6 +1,6 @@
 {
 	"meta": {
-		"title": "Sunnsteel — La grandeza no se regala. Se forja.",
+		"title": "Sunnsteel — Entrená con un plan. Dejá las cuentas a Sunnsteel.",
 		"description": "Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar."
 	},
 	"topBar": {
@@ -40,9 +40,9 @@
 		}
 	},
 	"hero": {
-		"headline": "La grandeza no se regala. <mark>Se forja</mark>.",
-		"subline": "Planifica, registra cada serie y mira cómo suma el trabajo: récords superados, rangos ganados.",
-		"createAccount": "Crear cuenta gratis",
+		"headline": "Entrená con un plan. <mark>Dejá las cuentas a Sunnsteel</mark>.",
+		"subline": "Armá tu rutina, registrá cada serie y dejá que Sunnsteel calcule la progresión, los calentamientos y los discos mientras entrenás.",
+		"createAccount": "Empezá gratis",
 		"pauseVideo": "Pausar el video de fondo",
 		"playVideo": "Reproducir el video de fondo",
 		"phoneLabel": "Ejemplo de un entrenamiento en vivo en Sunnsteel",
@@ -88,15 +88,15 @@
 			"working": "Peso de trabajo"
 		},
 		"measure": {
-			"title": "Mira qué avanza de verdad",
-			"body": "Fuerza por 1RM estimado, los músculos que entrenaste cada semana en un mapa del cuerpo y tu peso a lo largo del tiempo. Con Pro, señales de entrenamiento que dan números, nunca veredictos.",
+			"title": "Seguí tu fuerza a lo largo del tiempo",
+			"body": "Seguí tu 1RM estimado, las series semanales por músculo y tu peso a lo largo del tiempo. Pro suma comparaciones e indicadores de entrenamiento basados en tus registros.",
 			"link": "Ver el progreso",
 			"callout": "{exercise} · 1RM est. {weight} · +{change} en {weeks} semanas",
 			"chart": "1RM estimado"
 		},
 		"earn": {
 			"title": "Récords, logros y rangos que se ganan entrenando",
-			"body": "Cada récord sale de tus series. Los logros y los {ranks} rangos premian que vengas a entrenar, no que publiques.",
+			"body": "Tus récords se calculan a partir de las series que registrás. Sumá hitos y rangos entrenando con constancia.",
 			"link": "Ver rangos y logros",
 			"callout": "Rango alcanzado · {rank}",
 			"rankLabel": "Tu rango",
@@ -105,21 +105,21 @@
 	},
 	"interludes": {
 		"chalk": {
-			"first": "Cada repetición.",
-			"second": "Registrada."
+			"first": "Registrá cada serie.",
+			"second": "Seguí tu progreso."
 		},
 		"bar": {
-			"workouts": "<n>{count}</n> entrenamientos.",
-			"weeks": "<n>{count}</n> semanas distintas.",
-			"rank": "{rank}."
+			"workouts": "<n>{count}</n> entrenamientos en",
+			"weeks": "<n>{count}</n> semanas para alcanzar",
+			"rank": "el rango {rank}."
 		}
 	},
 	"tools": {
 		"heading": "Herramientas para cada entrenamiento",
 		"progression": {
 			"eyebrow": "Progresión automática",
-			"title": "Llega al tope de tu rango. El peso sube.",
-			"body": "Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento suma un paso: {step} si no eliges otro. Si no llegas, se mantiene el peso que levantaste.",
+			"title": "Progresá cuando alcances tu objetivo de repeticiones.",
+			"body": "Cuando completás todas las series en el máximo del rango de repeticiones, Sunnsteel aumenta un paso el peso de tu próximo entrenamiento —{step} de forma predeterminada—. Si no llegás, mantenés el peso que levantaste.",
 			"link": "Ver la progresión automática",
 			"workout": "Entrenamiento",
 			"weight": "Peso",
@@ -130,8 +130,8 @@
 		},
 		"rest": {
 			"eyebrow": "Descanso",
-			"title": "Un descanso que arranca solo",
-			"body": "Arranca al marcar la serie y te avisa cuando termina, incluso con la pantalla bloqueada, si activaste las notificaciones (en iPhone, con la app instalada).",
+			"title": "Temporizador de descanso automático",
+			"body": "El temporizador empieza cuando marcás una serie como completada. Con las notificaciones activadas, te avisa cuando termina el descanso, incluso con la pantalla bloqueada. En iPhone, instalá Sunnsteel para recibir avisos.",
 			"notifyTitle": "Terminó el descanso",
 			"notifyBody": "Sigue: {exercise}.",
 			"app": "Sunnsteel",
@@ -144,15 +144,15 @@
 		},
 		"swap": {
 			"eyebrow": "Cambiar un ejercicio",
-			"title": "¿Máquina ocupada? Cámbiala por hoy.",
-			"body": "Alternativas parecidas, ordenadas por movimiento y músculos. Tu rutina queda igual salvo que elijas actualizarla."
+			"title": "Buscá un ejercicio alternativo",
+			"body": "Consultá alternativas ordenadas por patrón de movimiento y músculos trabajados. Tu rutina solo cambia si elegís actualizarla."
 		}
 	},
 	"progress": {
 		"heading": "Un progreso que se puede leer",
 		"map": {
-			"title": "Cada serie que registras llega al mapa",
-			"body": "Series semanales por músculo en un mapa del cuerpo, de frente y de espalda, con el número detrás de cada color, y tu 1RM estimado semana a semana.",
+			"title": "Mirá cuánto entrenaste cada músculo esta semana",
+			"body": "Consultá las series semanales por músculo en los mapas frontal y posterior, y seguí la evolución de tu 1RM estimado.",
 			"week": "Semana {n}",
 			"weeksLabel": "Semanas",
 			"planLine": "{free} semanas gratis, hasta {pro} con Pro.",
@@ -162,20 +162,20 @@
 		},
 		"cards": {
 			"plateaus": {
-				"body": "Ejercicios sin una nueva mejor marca después de varias sesiones, con la regla escrita arriba."
+				"body": "Mirá qué ejercicios no registran un nuevo récord después de varias sesiones y consultá el criterio usado para marcarlos."
 			},
 			"signals": {
 				"name": "Señales de entrenamiento",
-				"body": "Esfuerzo, objetivos de repeticiones, caídas y entrenamientos en dos semanas frente a las dos anteriores. Un cambio se marca, nunca se explica.",
+				"body": "Compará el esfuerzo, los objetivos de repeticiones, los descensos y los entrenamientos de las últimas dos semanas con los de las dos anteriores.",
 				"row": "RPE promedio 8,6, antes 7,9"
 			},
 			"deload": {
 				"name": "Sugerencia de descarga",
-				"body": "Cuando una señal de carga se mantiene, propone una semana más liviana con sus fechas. Nada cambia hasta que la guardas."
+				"body": "Si una señal de carga persiste, Pro te sugiere una semana más liviana y muestra las fechas. Tu plan solo cambia si guardás la sugerencia."
 			},
 			"review": {
 				"name": "Revisión del entrenamiento",
-				"body": "Elige una pregunta y algunos entrenamientos. La respuesta describe tus registros, cita cada número y nunca adivina una causa.",
+				"body": "Elegí una pregunta y los entrenamientos que querés revisar. Sunnsteel resume tus registros y cita los datos en los que se basa la respuesta.",
 				"finding": "{exercise} pasó de <figure>{from}</figure> a <figure>{to}</figure> en {reps} repeticiones."
 			}
 		},
@@ -186,7 +186,7 @@
 	},
 	"ranks": {
 		"heading": "Rangos que se ganan con constancia",
-		"body": "{count} rangos, de {first} a {last}, que se ganan con entrenamientos en semanas distintas: asistencia, nunca cuánto levantas ni cuánto publicas. Tu rango viste tu perfil, y tú eliges quién lo ve.",
+		"body": "Alcanzá uno de los {count} rangos completando entrenamientos en distintas semanas. El rango aparece en tu perfil y vos elegís quién puede verlo.",
 		"ladderLabel": "Los rangos, en orden",
 		"requirement": "{workouts, plural, one {# entrenamiento} other {# entrenamientos}} en {weeks, plural, one {# semana} other {# semanas distintas}}",
 		"firstRank": "Donde todos empiezan",
@@ -196,7 +196,7 @@
 	},
 	"templates": {
 		"heading": "Empieza con un programa",
-		"body": "Tres programas para empezar; cada uno se abre como un borrador que puedes cambiar. Los pesos los completas tú: una plantilla no puede saber tu fuerza.",
+		"body": "Elegí una plantilla inicial y adaptala a tu entrenamiento. Agregá los pesos que usás antes de empezar.",
 		"levels": {
 			"beginner": "Principiante",
 			"intermediate": "Intermedio",
@@ -215,10 +215,8 @@
 		},
 		"block": {
 			"name": "Bloque de 8 semanas",
-			"summary": "Para un ejercicio que quieres empujar: cada semana carga una parte mayor de tu máximo de referencia.",
+			"summary": "Seguí una progresión de {weeks} semanas para un ejercicio: empezá en el {first} y llegá al {last} de tu máximo de referencia.",
 			"week": "S{number}",
-			"caption": "Parte de tu máximo de referencia, semana a semana",
-			"range": "Desde el {first} de tu máximo de referencia en la semana 1 hasta el {last} en la semana {weeks}.",
 			"sets": "Tres series de trabajo por semana; en las semanas 1 a 4 la última va a tantas repeticiones buenas como puedas.",
 			"start": "Empezar con Pro"
 		},
@@ -227,13 +225,13 @@
 	},
 	"people": {
 		"heading": "Entrena con otros",
-		"subline": "Gratis, como todo lo que haces al entrenar.",
+		"subline": "Todas las funciones sociales están incluidas en el plan gratis.",
 		"name": "Lucas",
 		"initials": "LU",
 		"activity": {
 			"eyebrow": "Actividad",
 			"title": "Sigue a otros y míralos entrenar",
-			"body": "Entrenamientos, récords y logros de la gente que sigues, con {reactions} reacciones y comentarios. No hay nada que publicar.",
+			"body": "Mirá los entrenamientos, récords e hitos de las personas que seguís. Reaccioná con una de las {reactions} opciones o dejá un comentario.",
 			"entry": "{name} terminó {day} · {records, plural, one {# récord} other {# récords}}"
 		},
 		"partners": {
@@ -245,17 +243,17 @@
 		"messages": {
 			"eyebrow": "Mensajes",
 			"title": "Comparte lo que entrenaste",
-			"body": "Mensajes uno a uno que pueden llevar una rutina, un entrenamiento, un récord, un logro o un mes de entrenamiento. Quien no sigues solo puede mandarte una solicitud, y solo si lo permites.",
+			"body": "Compartí rutinas, entrenamientos, récords, hitos o un mes de actividad en mensajes privados. Las personas que no seguís solo pueden enviarte una solicitud, si vos lo permitís.",
 			"sample": "Prueba esta",
 			"copied": "En tus rutinas"
 		},
 		"privacy": {
 			"title": "Tú eliges quién ve cada parte",
-			"body": "{count} partes de tu perfil, cada una en Todos, Seguidores o Solo yo. Bloquea a quien quieras, denuncia lo que haga falta, y borra tu cuenta o llévate tus datos cuando quieras."
+			"body": "Elegí quién puede ver cada una de las {count} secciones de tu perfil: todos, tus seguidores o solo vos. Podés bloquear cuentas, denunciar contenido, exportar tus datos o eliminar la cuenta cuando quieras."
 		}
 	},
 	"plans": {
-		"heading": "Gratis para entrenar. Pro para planificar más lejos.",
+		"heading": "Entrená gratis. Planificá a largo plazo con Pro.",
 		"free": {
 			"name": "Free",
 			"note": "Sin tarjeta",
@@ -264,7 +262,7 @@
 				"progression": "Progresión automática, calentamientos y discos",
 				"record": "Historial, récords, logros y rangos",
 				"window": "Tendencias de fuerza de {days} días e historial muscular de {weeks} semanas",
-				"social": "Todo lo social y los mensajes",
+				"social": "Todas las funciones sociales y los mensajes",
 				"data": "Exporta tus datos o borra tu cuenta cuando quieras"
 			},
 			"limits": "Hasta {versions} versiones de rutina, {goals} objetivos y {gyms, plural, one {# gimnasio} other {# gimnasios}}",
@@ -274,13 +272,30 @@
 			"name": "Pro",
 			"price": "{price} por mes",
 			"trial": "Los primeros {days} días gratis, una vez por cuenta",
-			"cancel": "Cancela cuando quieras; Pro dura hasta el final de lo que pagaste.",
-			"paid": "Pago con Mercado Pago",
+			"cancel": "Cancelá cuando quieras. Pro sigue activo hasta el final del período que pagaste. Los pagos se procesan mediante Mercado Pago.",
 			"ai": "Incluye hasta {drafts} borradores de rutina y {reviews} revisiones de entrenamiento por mes",
-			"action": "Probar Pro {days} días gratis",
+			"action": "Probá Pro gratis por {days} días",
 			"priceSr": "{price} por mes, los primeros {days} días gratis"
 		},
-		"compare": "Ver la comparación completa"
+		"compare": "Ver la comparación completa",
+		"outcomes": {
+			"plan": {
+				"title": "Planifica con anticipación",
+				"short": "Bloques de entrenamiento, descargas planificadas y bloques de 8 semanas"
+			},
+			"compare": {
+				"title": "Compara y ajusta",
+				"short": "Comparaciones, señales de entrenamiento y revisiones"
+			},
+			"history": {
+				"title": "Accedé a todo tu historial de entrenamiento",
+				"short": "Historial de fuerza y músculos más allá de los límites del plan gratis"
+			},
+			"yours": {
+				"title": "Personalizá tu panel",
+				"short": "Ordená el panel a tu gusto y guardá borradores de rutinas"
+			}
+		}
 	},
 	"questions": {
 		"heading": "Preguntas",
@@ -292,11 +307,11 @@
 			},
 			"install": {
 				"question": "¿Hay app para iPhone y Android?",
-				"answer": "No hay tienda de apps. Sunnsteel funciona en tu navegador y se instala desde ahí: en iPhone, toca Compartir en Safari y elige Agregar a pantalla de inicio; en Android, elige Instalar app en el menú del navegador; en una computadora, usa el ícono de instalar de la barra de direcciones. En iPhone, las notificaciones necesitan la app instalada."
+				"answer": "Sunnsteel es una aplicación web que podés instalar desde el navegador. En iPhone, abrila en Safari, tocá Compartir y elegí Agregar a pantalla de inicio. En Android, elegí Instalar aplicación desde el menú del navegador. En una computadora, usá el ícono de instalación de la barra de direcciones. En iPhone, las notificaciones funcionan desde la app instalada."
 			},
 			"beginners": {
 				"question": "¿Sirve si recién empiezo?",
-				"answer": "Sí. Hay un programa para principiantes, una recomendación inicial según tus días y objetivos, y calentamientos y discos calculados por ti. Crece contigo hasta bloques y descargas con Pro."
+				"answer": "Sí. Podés empezar con el programa para principiantes o recibir una recomendación según tus días disponibles y objetivos. Sunnsteel también calcula los calentamientos y los discos. Pro suma bloques de entrenamiento y semanas de descarga."
 			},
 			"progression": {
 				"question": "¿Me dice cuánto peso poner la próxima vez?",
@@ -312,11 +327,11 @@
 			},
 			"pro": {
 				"question": "¿Qué agrega Pro?",
-				"answer": "Planificar con bloques de 8 semanas, bloques de entrenamiento y descargas; comparaciones, señales de entrenamiento y revisiones; tu historial completo; y borradores de rutina a partir de una descripción. <link>Ver Free y Pro lado a lado</link>."
+				"answer": "Pro suma bloques de 8 semanas y de entrenamiento, semanas de descarga planificadas, comparaciones y análisis de entrenamientos, acceso a todo tu historial y borradores de rutinas a partir de una descripción. <link>Ver Free y Pro lado a lado</link>."
 			},
 			"cancel": {
 				"question": "¿Puedo cancelar Pro cuando quiera?",
-				"answer": "Sí. Desde Ajustes, en Cuenta, o con el <cancellation>botón de baja</cancellation> sin iniciar sesión. Pro dura hasta el final de lo que pagaste y no se borra nada. Dentro de los {revocationDays} días de la compra, también puedes usar el <revocation>botón de arrepentimiento</revocation>."
+				"answer": "Sí. Cancelá desde Ajustes, en Cuenta, o usá la <cancellation>página de baja</cancellation> sin iniciar sesión. Pro sigue activo hasta el final del período que pagaste y tus datos no se eliminan. Dentro de los {revocationDays} días de la compra, también podés usar el <revocation>botón de arrepentimiento</revocation>."
 			},
 			"privacy": {
 				"question": "¿Quién ve mi perfil y mis entrenamientos?",
@@ -324,17 +339,17 @@
 			},
 			"ai": {
 				"question": "¿Qué pasa con lo que le doy a la IA?",
-				"answer": "Solo la usan los borradores de rutina y las revisiones de entrenamiento de Pro. Lo que escribes, o los entrenamientos que eliges, van a Anthropic para escribir la respuesta y no los guardamos; solo registramos que hubo una solicitud, para contar tu mes. Las respuestas describen; no diagnostican."
+				"answer": "Los borradores de rutinas y análisis de entrenamiento de Pro envían a Anthropic el texto que escribís o los entrenamientos que seleccionás para generar una respuesta. Sunnsteel no almacena ese contenido; solo registra que se hizo una solicitud para contarla en tu límite mensual. Las respuestas resumen tus registros y no hacen diagnósticos."
 			},
 			"data": {
 				"question": "¿Puedo llevarme mis datos o borrar mi cuenta?",
-				"answer": "Sí. Descarga todo en un archivo desde Ajustes cuando quieras, y borrar tu cuenta es inmediato y completo."
+				"answer": "Descargá todos tus datos en un solo archivo desde Ajustes cuando quieras. La eliminación de la cuenta es inmediata y completa."
 			}
 		}
 	},
 	"closing": {
-		"heading": "Tu primera serie te espera.",
-		"subline": "Gratis para empezar, en tu navegador, en español o inglés.",
+		"heading": "Planificá tu próximo entrenamiento.",
+		"subline": "Empezá gratis desde el navegador. Disponible en inglés y español.",
 		"createAccount": "Crear cuenta gratis",
 		"signIn": "Iniciar sesión",
 		"install": "Cómo instalarla",
@@ -354,7 +369,7 @@
 	},
 	"footer": {
 		"navLabel": "Pie de página",
-		"tagline": "La grandeza no se regala. Se forja.",
+		"tagline": "Entrená con un plan. Dejá las cuentas a Sunnsteel.",
 		"columns": {
 			"product": "Producto",
 			"useCases": "Casos de uso",

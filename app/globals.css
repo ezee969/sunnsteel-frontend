@@ -1672,9 +1672,10 @@
     justify-content: center;
   }
 }
-/* Below 360px the lockup keeps the mark; the link keeps its name. */
+/* Below 360px the bar's lockup keeps the mark; the link keeps its name. The
+   footer has the room, so it keeps the wordmark. */
 @media (max-width: 359px) {
-  .site-lockup .type-wordmark {
+  .site-bar .site-lockup .type-wordmark {
     display: none;
   }
 }
@@ -4091,4 +4092,50 @@
 }
 .site-page-next {
   max-width: 520px;
+}
+
+/* §12.7 on a phone: the ladder becomes a strip of six crests above the
+   phone, with the chosen rank named once under it (the owner, 2026-11-23:
+   six full rows under the phone made the section too long). */
+.site-ranks-current {
+  display: none;
+}
+@media (max-width: 767px) {
+  .site-ranks {
+    grid-template-areas: 'body' 'ladder' 'current' 'phone';
+    row-gap: 0;
+  }
+  .site-ranks-ladder {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 28px;
+    border-top: 0;
+  }
+  .site-ranks-ladder .site-ladder-rung {
+    justify-content: center;
+    min-height: 56px;
+    padding: 8px 0;
+    border: 1px solid var(--rule-faint);
+    border-radius: var(--radius-sm);
+  }
+  .site-ranks-ladder .site-ladder-rung[aria-pressed='true'] {
+    border-color: var(--rule);
+  }
+  .site-ranks-ladder .site-ladder-rung > span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .site-ranks-current {
+    grid-area: current;
+    display: block;
+    margin: 14px 0 28px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.4;
+  }
 }

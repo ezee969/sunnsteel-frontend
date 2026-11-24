@@ -192,6 +192,14 @@ export function SiteRanksStage({
 					</li>
 				))}
 			</ol>
+			{/* On a phone the ladder is a strip of crests and the chosen rank is
+			    named here, once (the owner, 2026-11-23: six full rows under the
+			    phone made the section too long). The buttons keep their names
+			    for screen readers. */}
+			<p aria-hidden="true" className="site-ranks-current">
+				<span className="type-panel text-foreground">{shown.title}</span>
+				<span className="text-ink-2"> · {shown.requirement}</span>
+			</p>
 		</div>
 	)
 }

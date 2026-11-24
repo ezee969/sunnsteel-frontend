@@ -1,6 +1,6 @@
 {
 	"meta": {
-		"title": "Sunnsteel — Greatness isn't given. It's forged.",
+		"title": "Sunnsteel — Train with a plan. Leave the math to Sunnsteel.",
 		"description": "A workout tracker where every set becomes evidence: plan, log, and watch records, ranks and your history grow. Free to start."
 	},
 	"topBar": {
@@ -40,9 +40,9 @@
 		}
 	},
 	"hero": {
-		"headline": "Greatness isn't given. It's <mark>forged</mark>.",
-		"subline": "Plan, log every set, and watch the work add up: records broken, ranks earned.",
-		"createAccount": "Create a free account",
+		"headline": "Train with a plan. <mark>Leave the math to Sunnsteel</mark>.",
+		"subline": "Build a routine, log every set, and let Sunnsteel calculate your progression, warm-ups, and plates as you train.",
+		"createAccount": "Start free",
 		"pauseVideo": "Pause background video",
 		"playVideo": "Play background video",
 		"phoneLabel": "Example of a live workout in Sunnsteel",
@@ -88,15 +88,15 @@
 			"working": "Working weight"
 		},
 		"measure": {
-			"title": "See what is really moving",
-			"body": "Strength by estimated 1RM, the muscles you trained each week on a body map, and your weight over time. With Pro, training signals that give numbers, never verdicts.",
+			"title": "Track your strength over time",
+			"body": "Track estimated 1RM, weekly sets by muscle, and body weight over time. Pro adds comparisons and training signals based on your logs.",
 			"link": "See progress",
 			"callout": "{exercise} · e1RM {weight} · +{change} in {weeks} weeks",
 			"chart": "Estimated 1RM"
 		},
 		"earn": {
 			"title": "Records, milestones and ranks you earn by training",
-			"body": "Every record is found in your sets. Milestones and {ranks} ranks reward showing up, never posting.",
+			"body": "Records come from your logged sets. Earn milestones and ranks by training consistently.",
 			"link": "See ranks and achievements",
 			"callout": "Rank reached · {rank}",
 			"rankLabel": "Your rank",
@@ -105,21 +105,21 @@
 	},
 	"interludes": {
 		"chalk": {
-			"first": "Every rep.",
-			"second": "Written down."
+			"first": "Log every set.",
+			"second": "Track your progress."
 		},
 		"bar": {
-			"workouts": "<n>{count}</n> workouts.",
-			"weeks": "<n>{count}</n> different weeks.",
-			"rank": "{rank}."
+			"workouts": "<n>{count}</n> workouts across",
+			"weeks": "<n>{count}</n> weeks to earn the",
+			"rank": "{rank} rank."
 		}
 	},
 	"tools": {
 		"heading": "Tools for every workout",
 		"progression": {
 			"eyebrow": "Automatic progression",
-			"title": "Reach the top of your range. The weight goes up.",
-			"body": "When every set reaches the top of its rep range, your next workout adds one step, {step} unless you choose another. Fall short and the weight you lifted carries over.",
+			"title": "Progress when you reach your rep target.",
+			"body": "When every set reaches the top of its rep range, your next workout adds one step—{step} by default. If you fall short, your weight carries over.",
 			"link": "See automatic progression",
 			"workout": "Workout",
 			"weight": "Weight",
@@ -130,8 +130,8 @@
 		},
 		"rest": {
 			"eyebrow": "Rest",
-			"title": "Rest that starts itself",
-			"body": "It starts when you mark a set done and tells you when it's over, even with the screen locked, once notifications are on (on iPhone, in the installed app).",
+			"title": "Automatic rest timers",
+			"body": "The timer starts when you mark a set complete. With notifications on, it alerts you when rest is over, including when your screen is locked. On iPhone, install Sunnsteel to receive alerts.",
 			"notifyTitle": "Rest is over",
 			"notifyBody": "{exercise} is up next.",
 			"app": "Sunnsteel",
@@ -144,15 +144,15 @@
 		},
 		"swap": {
 			"eyebrow": "Swap an exercise",
-			"title": "Machine taken? Swap it for today.",
-			"body": "Close alternatives, ranked by movement and muscles. Your routine stays as it is unless you choose to update it."
+			"title": "Find an alternative exercise",
+			"body": "See alternatives ranked by movement and muscles worked. Your routine changes only if you choose to update it."
 		}
 	},
 	"progress": {
 		"heading": "Progress you can read",
 		"map": {
-			"title": "Every set you log lands on the map",
-			"body": "Weekly sets per muscle on a body map, front and back, with the number behind every color, and your estimated 1RM week by week.",
+			"title": "See your weekly training by muscle",
+			"body": "View weekly sets by muscle on front and back body maps, plus estimated 1RM trends over time.",
 			"week": "Week {n}",
 			"weeksLabel": "Weeks",
 			"planLine": "{free} weeks free, up to {pro} with Pro.",
@@ -162,20 +162,20 @@
 		},
 		"cards": {
 			"plateaus": {
-				"body": "Lifts with no new best after several sessions, with the rule written above them."
+				"body": "See lifts with no new best in several sessions, along with the rule used to flag them."
 			},
 			"signals": {
 				"name": "Training signals",
-				"body": "Effort, rep targets, declines and workouts over two weeks against the two before. A change is marked, never explained.",
+				"body": "Compare effort, rep targets, declines, and workouts across the last two weeks and the two before.",
 				"row": "Average RPE 8.6, up from 7.9"
 			},
 			"deload": {
 				"name": "Deload suggestion",
-				"body": "When a load signal holds, it proposes a lighter week with its dates. Nothing changes until you save it."
+				"body": "If a load signal persists, Pro suggests a lighter week and shows the dates. Your plan changes only if you save it."
 			},
 			"review": {
 				"name": "Training review",
-				"body": "Pick a question and a few workouts. The answer describes your logs, cites every number from them and never guesses a cause.",
+				"body": "Choose a question and the workouts to review. Sunnsteel summarizes your logs and cites the numbers behind its answer.",
 				"finding": "{exercise} went from <figure>{from}</figure> to <figure>{to}</figure> for {reps} reps."
 			}
 		},
@@ -186,7 +186,7 @@
 	},
 	"ranks": {
 		"heading": "Ranks earned by consistency",
-		"body": "{count} ranks, from {first} to {last}, earned by workouts across different weeks: attendance, never how much you lift or how often you post. Your rank dresses your profile, and you choose who sees it.",
+		"body": "Earn one of {count} ranks by completing workouts across different weeks. Your rank appears on your profile, and you choose who can see it.",
 		"ladderLabel": "The ranks, in order",
 		"requirement": "{workouts, plural, one {# workout} other {# workouts}} in {weeks, plural, one {# week} other {# different weeks}}",
 		"firstRank": "Where everyone starts",
@@ -196,7 +196,7 @@
 	},
 	"templates": {
 		"heading": "Start with a program",
-		"body": "Three programs to start from, each opening as a draft you can change. The weights are yours to fill in: a template can't know your strength.",
+		"body": "Choose a starting template and edit it to fit your training. Add your working weights before you begin.",
 		"levels": {
 			"beginner": "Beginner",
 			"intermediate": "Intermediate",
@@ -215,10 +215,8 @@
 		},
 		"block": {
 			"name": "8-week block",
-			"summary": "For one lift you want to push: each week loads a bigger share of your reference max.",
+			"summary": "Build an {weeks}-week progression for one lift, increasing from {first} to {last} of your reference max.",
 			"week": "W{number}",
-			"caption": "Share of your reference max, week by week",
-			"range": "From {first} of your reference max in week 1 to {last} in week {weeks}.",
 			"sets": "Three working sets a week; in weeks 1 to 4 the last one goes to as many good reps as you can.",
 			"start": "Start with Pro"
 		},
@@ -227,13 +225,13 @@
 	},
 	"people": {
 		"heading": "Train with people",
-		"subline": "Free, like everything you do in a workout.",
+		"subline": "All social features are included in the free plan.",
 		"name": "Lucas",
 		"initials": "LU",
 		"activity": {
 			"eyebrow": "Activity",
 			"title": "Follow people and see them train",
-			"body": "Workouts, records and milestones from people you follow, with {reactions} reactions and comments. There's nothing to post.",
+			"body": "See workouts, records, and milestones from people you follow. Choose from {reactions} reactions or leave a comment.",
 			"entry": "{name} finished {day} · {records, plural, one {# record} other {# records}}"
 		},
 		"partners": {
@@ -245,17 +243,17 @@
 		"messages": {
 			"eyebrow": "Messages",
 			"title": "Send what you trained",
-			"body": "One-to-one messages that can carry a routine, a workout, a record, a milestone or a month of training. People you don't follow can only send you a request, and only if you allow it.",
+			"body": "Send routines, workouts, records, milestones, or a month of training in a one-to-one message. People you don't follow can message you only with a request, if you allow it.",
 			"sample": "Try this one",
 			"copied": "In your routines"
 		},
 		"privacy": {
 			"title": "You choose who sees each part",
-			"body": "{count} parts of your profile, each set to Everyone, Followers or Only me. Block anyone, report anything, and delete your account or take your data with you whenever you want."
+			"body": "Set the visibility of each of {count} profile sections to Everyone, Followers, or Only me. Block accounts, report content, or export or delete your account at any time."
 		}
 	},
 	"plans": {
-		"heading": "Free to train. Pro to plan further.",
+		"heading": "Train free. Get more planning with Pro.",
 		"free": {
 			"name": "Free",
 			"note": "No card needed",
@@ -264,7 +262,7 @@
 				"progression": "Automatic progression, warm-ups and plates",
 				"record": "History, records, milestones and ranks",
 				"window": "Strength trends for {days} days and muscle history for {weeks} weeks",
-				"social": "Everything social, and messages",
+				"social": "All social features and messages",
 				"data": "Export your data or delete your account at any time"
 			},
 			"limits": "Up to {versions} routine versions, {goals} goals and {gyms, plural, one {# gym} other {# gyms}}",
@@ -274,13 +272,30 @@
 			"name": "Pro",
 			"price": "{price} a month",
 			"trial": "First {days} days free, once per account",
-			"cancel": "Cancel any time; Pro lasts until the end of what you paid.",
-			"paid": "Paid with Mercado Pago",
+			"cancel": "Cancel anytime. Pro remains active until the end of your paid period. Payments are processed by Mercado Pago.",
 			"ai": "Includes up to {drafts} routine drafts and {reviews} training reviews a month",
-			"action": "Try Pro free for {days} days",
+			"action": "Start your {days}-day free trial",
 			"priceSr": "{price} a month, first {days} days free"
 		},
-		"compare": "See the full comparison"
+		"compare": "See the full comparison",
+		"outcomes": {
+			"plan": {
+				"title": "Plan ahead",
+				"short": "Training blocks, planned deloads and 8-week blocks"
+			},
+			"compare": {
+				"title": "Compare and adjust",
+				"short": "Comparisons, training signals and workout reviews"
+			},
+			"history": {
+				"title": "Access your full training history",
+				"short": "Strength trends and muscle history beyond the Free plan limits"
+			},
+			"yours": {
+				"title": "Customize your dashboard",
+				"short": "Reorder your dashboard and save routine drafts"
+			}
+		}
 	},
 	"questions": {
 		"heading": "Questions",
@@ -292,11 +307,11 @@
 			},
 			"install": {
 				"question": "Is there an app for iPhone and Android?",
-				"answer": "No app store. Sunnsteel runs in your browser and installs from it: on iPhone, tap Share in Safari and choose Add to Home Screen; on Android, choose Install app in your browser's menu; on a computer, use the install icon in the address bar. On iPhone, notifications need the installed app."
+				"answer": "Sunnsteel is a web app you can install from your browser. On iPhone, open it in Safari, tap Share, then Add to Home Screen. On Android, choose Install app from your browser menu. On a computer, use the install icon in the address bar. On iPhone, notifications work in the installed app."
 			},
 			"beginners": {
 				"question": "Is it for beginners?",
-				"answer": "Yes. There's a beginner program, a first-run recommendation based on your days and goals, and warm-ups and plates worked out for you. It grows with you to blocks and deloads with Pro."
+				"answer": "Yes. Start with the beginner program or get a recommendation based on your schedule and goals. Sunnsteel also calculates warm-ups and plates. Pro adds training blocks and deloads."
 			},
 			"progression": {
 				"question": "Does it tell me how much to lift next?",
@@ -312,11 +327,11 @@
 			},
 			"pro": {
 				"question": "What does Pro add?",
-				"answer": "Planning ahead with 8-week blocks, training blocks and deloads; comparisons, training signals and reviews; your full history; and routine drafts from a description. <link>See Free and Pro side by side</link>."
+				"answer": "Pro adds 8-week and training blocks, planned deloads, workout comparisons and reviews, access to your full history, and routine drafts from a description. <link>See Free and Pro side by side</link>."
 			},
 			"cancel": {
 				"question": "Can I cancel Pro at any time?",
-				"answer": "Yes. From Settings, in Account, or with the <cancellation>cancellation button</cancellation> without signing in. Pro lasts until the end of what you paid, and nothing is deleted. Within {revocationDays} days of buying, you can also use the <revocation>revocation button</revocation>."
+				"answer": "Yes. Cancel in Settings under Account, or use the <cancellation>cancellation page</cancellation> without signing in. Pro remains active until the end of your paid period, and your account data is not deleted. Within {revocationDays} days of purchase, you can also use the <revocation>purchase revocation page</revocation>."
 			},
 			"privacy": {
 				"question": "Who sees my profile and my workouts?",
@@ -324,17 +339,17 @@
 			},
 			"ai": {
 				"question": "What happens to what I give the AI?",
-				"answer": "Only Pro's routine drafts and training reviews use it. What you write, or the workouts you choose, go to Anthropic to write the answer and aren't stored by us; we keep only that a request was made, to count your month. Answers describe; they don't diagnose."
+				"answer": "Pro's routine drafts and training reviews send the text you provide—or the workouts you select—to Anthropic to generate a response. Sunnsteel does not store that content; it records that a request was made to track your monthly limit. Responses summarize your logs and do not diagnose."
 			},
 			"data": {
 				"question": "Can I take my data or delete my account?",
-				"answer": "Yes. Download everything as one file from Settings whenever you want, and deleting your account is immediate and complete."
+				"answer": "Download all your data as one file from Settings at any time. Account deletion is immediate and complete."
 			}
 		}
 	},
 	"closing": {
-		"heading": "Your first set is waiting.",
-		"subline": "Free to start, in your browser, in English or Spanish.",
+		"heading": "Plan your next workout.",
+		"subline": "Start free in your browser. Available in English and Spanish.",
 		"createAccount": "Create a free account",
 		"signIn": "Sign in",
 		"install": "How to install",
@@ -354,7 +369,7 @@
 	},
 	"footer": {
 		"navLabel": "Footer",
-		"tagline": "Greatness isn't given. It's forged.",
+		"tagline": "Train with a plan. Leave the math to Sunnsteel.",
 		"columns": {
 			"product": "Product",
 			"useCases": "Use cases",

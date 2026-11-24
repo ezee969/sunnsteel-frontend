@@ -30,7 +30,9 @@ const FREE_LINES = [
 
 export async function SitePlans() {
 	const t = await getTranslations('site.plans')
-	const tOutcomes = await getTranslations('billing.offer.outcomes')
+	// The site words the outcomes its own way (the owner, 2026-11-23); the
+	// app's offer keeps `billing.offer.outcomes`.
+	const tOutcomes = await getTranslations('site.plans.outcomes')
 	const tLegal = await getTranslations('core.legalLinks')
 	const locale = (await getLocale()) as Locale
 	const price = formatPlanPrice(PRO_PRICE, locale)
@@ -117,9 +119,7 @@ export async function SitePlans() {
 							reviews: LANDING_FACTS.proReviews,
 						})}
 					</p>
-					<p className="type-body-sm text-ink-2">
-						{t('pro.cancel')} {t('pro.paid')}.
-					</p>
+					<p className="type-body-sm text-ink-2">{t('pro.cancel')}</p>
 					<Link
 						href="/signup?plan=pro"
 						className="site-filled site-filled-hero site-plan-action"

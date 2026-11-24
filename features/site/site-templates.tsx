@@ -165,7 +165,15 @@ export async function BlockCardNode() {
 				<h3 className="type-panel">{t('block.name')}</h3>
 				<PlanTag>{t('pro')}</PlanTag>
 			</div>
-			<p className="type-body-sm text-ink-2">{t('block.summary')}</p>
+			{/* The range is said once, in the summary (the owner, 2026-11-23);
+			    the bars below show it and are hidden from screen readers. */}
+			<p className="type-body-sm text-ink-2">
+				{t('block.summary', {
+					weeks: LP_STEPS.length,
+					first: percent.format(firstStep.percentage),
+					last: percent.format(lastStep.percentage),
+				})}
+			</p>
 			<figure className="site-block">
 				<ol aria-hidden="true" className="site-block-bars">
 					{LP_STEPS.map((step, index) => (
@@ -184,16 +192,6 @@ export async function BlockCardNode() {
 						</li>
 					))}
 				</ol>
-				<figcaption className="type-body-sm text-ink-3">
-					<span aria-hidden="true">{t('block.caption')}</span>
-					<span className="sr-only">
-						{t('block.range', {
-							first: percent.format(firstStep.percentage),
-							last: percent.format(lastStep.percentage),
-							weeks: LP_STEPS.length,
-						})}
-					</span>
-				</figcaption>
 			</figure>
 			<p className="type-body-sm text-ink-2">{t('block.sets')}</p>
 			<Link href="/signup?plan=pro" className="type-action site-outline">
