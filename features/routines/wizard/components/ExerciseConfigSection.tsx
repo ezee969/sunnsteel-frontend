@@ -39,6 +39,11 @@ interface ExerciseConfigSectionProps {
 		exerciseIndex: number,
 		state: LinearPeriodizationState,
 	) => void
+	/**
+	 * LIVE-25: an exercise added during a workout cannot start an 8-week block,
+	 * which needs the builder's reference max, so the scheme is not offered.
+	 */
+	allowLinear?: boolean
 }
 
 /**
@@ -72,6 +77,7 @@ export function ExerciseConfigSection({
 	exerciseName,
 	rotation,
 	onSetLinearPeriodization,
+	allowLinear = true,
 }: ExerciseConfigSectionProps) {
 	const t = useTranslations('routines.builder')
 	// Local state for rest time input: allow free typing (digits and ":")
@@ -139,6 +145,7 @@ export function ExerciseConfigSection({
 					progressionScheme={exercise.progressionScheme}
 					exerciseIndex={exerciseIndex}
 					onUpdateProgressionScheme={onUpdateProgressionScheme}
+					allowLinear={allowLinear}
 				/>
 			) : null}
 

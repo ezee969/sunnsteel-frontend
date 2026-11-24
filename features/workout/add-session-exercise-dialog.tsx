@@ -1,6 +1,9 @@
 'use client'
 
-import type { AddSessionExerciseSet } from '@sunsteel/contracts'
+import type {
+	AddSessionExerciseRequest,
+	AddSessionExerciseSet,
+} from '@sunsteel/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState } from 'react'
 
@@ -13,40 +16,62 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import { useToast } from '@/components/ui/toast'
+import { ExerciseConfigSection } from '@/features/routines/wizard/components/ExerciseConfigSection'
 import { ExercisePickerDropdown } from '@/features/routines/wizard/components/ExercisePickerDropdown'
+import { SetListSection } from '@/features/routines/wizard/components/SetListSection'
+import { useExerciseCardState } from '@/features/routines/wizard/hooks/useExerciseCardState'
+import { useRoutineDayMutations } from '@/features/routines/wizard/hooks/useRoutineDayMutations'
+import type {
+	RoutineWizardData,
+	RoutineWizardExercise,
+} from '@/features/routines/wizard/types'
+import { usesAdvancedOptions } from '@/features/routines/wizard/utils/advanced-options'
+import { routineSetRequest } from '@/features/routines/wizard/utils/routine-summary'
 import { useApiErrorMessage } from '@/hooks/use-api-error-message'
 import { useWeightUnit } from '@/hooks/use-weight-unit'
 import { exerciseLabel } from '@/i18n/catalog'
 import { useExercises } from '@/lib/api/hooks'
 import { useAddSessionExercise } from '@/lib/api/hooks/useWorkoutSession'
+import type { Exercise } from '@/lib/api/types'
 import { pickableExercises } from '@/lib/utils/custom-exercises'
-import { sanitizeDecimalInput } from '@/lib/utils/decimal-input'
 import { matchesExerciseName } from '@/lib/utils/exercise-catalog'
-import { getWeightUnitLabel, parseWeightInput } from '@/lib/utils/weight-unit'
+import { parseTime } from '@/lib/utils/time'
 
-type Scheme = 'NONE' | 'DOUBLE_PROGRESSION' | 'DYNAMIC_DOUBLE_PROGRESSION'
+/** The most rest the server takes for an exercise added here, in seconds. */
+const REST_MAX_SECONDS = 600
 
-const clampInt = (
-	value: string,
-	min: number,
-	max: number,
-	fallback: number,
-) => {
-	const parsed = Number.parseInt(value, 10)
-	return Number.isFinite(parsed)
-		? Math.min(max, Math.max(min, parsed))
-		: fallback
+/**
+ * The added exercise lives in a one-day builder draft, so the builder's own
+ * mutations -- sets, rep ranges, kinds, RIR, rest, progression -- edit it
+ * exactly as Build Days does.
+ */
+const EMPTY_DRAFT: RoutineWizardData = {
+	name: '',
+	scheduleMode: 'WEEKLY',
+	trainingDays: [0],
+	restDays: [],
+	rotationWeekdays: [],
+	days: [{ slot: 0, exercises: [] }],
 }
+
+type AddableScheme = AddSessionExerciseRequest['progressionScheme']
+
+/** The draft's exercise as the add route takes it. */
+const addRequest = (
+	exercise: RoutineWizardExercise,
+): AddSessionExerciseRequest => ({
+	exerciseId: exercise.exerciseId,
+	restSeconds: Math.min(exercise.restSeconds, REST_MAX_SECONDS),
+	// The dialog never offers an 8-week block (`allowLinear={false}`).
+	progressionScheme: exercise.progressionScheme as AddableScheme,
+	minWeightIncrement: exercise.minWeightIncrement,
+	...(exercise.note?.trim() ? { note: exercise.note.trim() } : {}),
+	sets: exercise.sets.map(
+		set => routineSetRequest(exercise, set) as AddSessionExerciseSet,
+	),
+})
 
 interface AddSessionExerciseDialogProps {
 	sessionId: string
@@ -59,9 +84,10 @@ interface AddSessionExerciseDialogProps {
 /**
  * LIVE-25: add an exercise to the day being trained, for good. It joins the
  * plan in force at the end of the day -- the move controls take it from
- * there -- and today's workout at once. The builder's picker chooses it; its
- * sets are asked for the way the builder asks, with rest and progression
- * under More options (UX-20). An exercise for today only is not offered.
+ * there -- and today's workout at once. The builder's picker chooses it and
+ * the builder's own exercise editor prescribes it (sets, rep ranges, kinds and
+ * RIR, rest and progression under More options), so it reads the same as in
+ * Build Days. An exercise for today only is not offered.
  */
 export function AddSessionExerciseDialog({
 	sessionId,
@@ -71,23 +97,25 @@ export function AddSessionExerciseDialog({
 }: AddSessionExerciseDialogProps) {
 	const t = useTranslations('workout.addExercise')
 	const tEx = useTranslations('catalog.exercises')
-	const tScheme = useTranslations('workout.addExercise.schemes')
 	const errorText = useApiErrorMessage()
 	const { push } = useToast()
-	const unit = useWeightUnit()
+	const weightUnit = useWeightUnit()
 	const { data: exercises, isLoading } = useExercises()
 	const add = useAddSessionExercise(sessionId)
 	const pickerRef = useRef<HTMLDivElement>(null)
 
 	const [pickerOpen, setPickerOpen] = useState(false)
+	const [changing, setChanging] = useState(false)
 	const [search, setSearch] = useState('')
-	const [exerciseId, setExerciseId] = useState<string | null>(null)
-	const [sets, setSets] = useState('3')
-	const [reps, setReps] = useState('10')
-	const [weight, setWeight] = useState('')
-	const [more, setMore] = useState(false)
-	const [rest, setRest] = useState('90')
-	const [scheme, setScheme] = useState<Scheme>('NONE')
+	const [draft, setDraft] = useState<RoutineWizardData>(EMPTY_DRAFT)
+
+	const mutations = useRoutineDayMutations({
+		data: draft,
+		onUpdate: updates => setDraft(current => ({ ...current, ...updates })),
+		selectedDayIndex: 0,
+		trainingDays: draft.trainingDays,
+		weightUnit,
+	})
 
 	const label = useMemo(() => (name: string) => exerciseLabel(name, tEx), [tEx])
 	const filtered = useMemo(() => {
@@ -99,18 +127,20 @@ export function AddSessionExerciseDialog({
 				)
 			: pickable
 	}, [exercises, search, label])
-	const chosen = (exercises ?? []).find(exercise => exercise.id === exerciseId)
+
+	const draftExercise = draft.days[0]?.exercises[0]
+	const chosen = draftExercise
+		? (exercises ?? []).find(
+				exercise => exercise.id === draftExercise.exerciseId,
+			)
+		: undefined
+	const picking = !draftExercise || changing
 
 	const reset = () => {
 		setPickerOpen(false)
+		setChanging(false)
 		setSearch('')
-		setExerciseId(null)
-		setSets('3')
-		setReps('10')
-		setWeight('')
-		setMore(false)
-		setRest('90')
-		setScheme('NONE')
+		setDraft(EMPTY_DRAFT)
 	}
 	const close = (next: boolean) => {
 		if (add.isPending) return
@@ -118,197 +148,103 @@ export function AddSessionExerciseDialog({
 		onOpenChange(next)
 	}
 
+	const choose = (id: string) => {
+		// Changing keeps the sets and options already written, as the
+		// builder's own change does.
+		if (draftExercise) mutations.updateExercise(0, id)
+		else mutations.addExercise(id)
+		setPickerOpen(false)
+		setChanging(false)
+		setSearch('')
+	}
+
 	const submit = () => {
-		if (!chosen) return
-		const count = clampInt(sets, 1, 10, 3)
-		const repsValue = clampInt(reps, 1, 50, 10)
-		const weightKg = parseWeightInput(weight, unit)
-		const prescription: AddSessionExerciseSet[] = Array.from(
-			{ length: count },
-			(_, index) => ({
-				setNumber: index + 1,
-				repType: 'FIXED',
-				reps: repsValue,
-				weight: weightKg ?? null,
-				kind: 'WORKING',
-			}),
-		)
-		add.mutate(
-			{
-				exerciseId: chosen.id,
-				restSeconds: clampInt(rest, 0, 600, 90),
-				progressionScheme: scheme,
-				sets: prescription,
-			},
-			{
-				onSuccess: () => {
-					push({
-						title: t('addedTitle', { exercise: label(chosen.name) }),
-						description: t('addedDescription', {
-							plan: plan[0].toUpperCase() + plan.slice(1),
-						}),
-						variant: 'success',
-					})
-					reset()
-					onOpenChange(false)
-				},
-				onError: error =>
-					push({
-						title: t('failedTitle'),
-						description: errorText(error),
-						variant: 'destructive',
+		if (!draftExercise || !chosen) return
+		add.mutate(addRequest(draftExercise), {
+			onSuccess: () => {
+				push({
+					title: t('addedTitle', { exercise: label(chosen.name) }),
+					description: t('addedDescription', {
+						plan: plan[0].toUpperCase() + plan.slice(1),
 					}),
+					variant: 'success',
+				})
+				reset()
+				onOpenChange(false)
 			},
-		)
+			onError: error =>
+				push({
+					title: t('failedTitle'),
+					description: errorText(error),
+					variant: 'destructive',
+				}),
+		})
 	}
 
 	return (
 		<Dialog open={open} onOpenChange={close}>
-			<DialogContent className="flex h-[min(34rem,calc(100dvh-2rem))] flex-col overflow-y-auto sm:max-w-md">
+			<DialogContent className="flex h-[min(40rem,calc(100dvh-2rem))] flex-col sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>{t('title')}</DialogTitle>
 					<DialogDescription>{t('description', { plan })}</DialogDescription>
 				</DialogHeader>
 
-				<div className="flex min-h-0 flex-1 flex-col gap-4">
+				{/* The one scrolling region: the title and the actions stay put
+				    whatever the sets need (the inset keeps focus rings visible). */}
+				<div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1">
 					<div
 						className={
-							chosen
-								? 'flex flex-col gap-2'
-								: 'flex min-h-0 flex-1 flex-col gap-2'
+							picking
+								? 'flex min-h-0 flex-1 flex-col gap-2'
+								: 'flex flex-col gap-2'
 						}
 					>
 						<Label>{t('exerciseLabel')}</Label>
-						{chosen ? (
+						{picking ? (
+							<ExercisePickerDropdown
+								ref={pickerRef}
+								inline
+								isOpen={pickerOpen}
+								onToggle={() => {
+									// Closing the picker mid-change goes back to the exercise.
+									if (pickerOpen && draftExercise) setChanging(false)
+									setPickerOpen(value => !value)
+								}}
+								onClose={() => setPickerOpen(false)}
+								searchValue={search}
+								onSearchChange={setSearch}
+								exercises={filtered}
+								isLoading={isLoading}
+								onSelect={choose}
+							/>
+						) : (
 							<div className="flex items-center justify-between gap-3 border-y border-rule-faint py-2">
 								<span className="text-sm font-medium text-foreground">
-									{label(chosen.name)}
+									{chosen ? label(chosen.name) : null}
 								</span>
 								<Button
 									type="button"
 									variant="ghost"
 									size="sm"
 									onClick={() => {
-										setExerciseId(null)
+										setChanging(true)
 										setPickerOpen(true)
 									}}
 								>
 									{t('change')}
 								</Button>
 							</div>
-						) : (
-							<ExercisePickerDropdown
-								ref={pickerRef}
-								inline
-								isOpen={pickerOpen}
-								onToggle={() => setPickerOpen(value => !value)}
-								onClose={() => setPickerOpen(false)}
-								searchValue={search}
-								onSearchChange={setSearch}
-								exercises={filtered}
-								isLoading={isLoading}
-								onSelect={id => {
-									setExerciseId(id)
-									setPickerOpen(false)
-								}}
-							/>
 						)}
 					</div>
 
-					{chosen ? (
+					{draftExercise && !picking ? (
 						<>
-							<div className="grid grid-cols-3 gap-3">
-								<div className="space-y-1">
-									<Label htmlFor="add-exercise-sets">{t('sets')}</Label>
-									<Input
-										id="add-exercise-sets"
-										inputMode="numeric"
-										value={sets}
-										onChange={event =>
-											setSets(event.target.value.replace(/[^0-9]/g, ''))
-										}
-										className="text-center"
-									/>
-								</div>
-								<div className="space-y-1">
-									<Label htmlFor="add-exercise-reps">{t('reps')}</Label>
-									<Input
-										id="add-exercise-reps"
-										inputMode="numeric"
-										value={reps}
-										onChange={event =>
-											setReps(event.target.value.replace(/[^0-9]/g, ''))
-										}
-										className="text-center"
-									/>
-								</div>
-								<div className="space-y-1">
-									<Label htmlFor="add-exercise-weight">
-										{t('weight', { unit: getWeightUnitLabel(unit) })}
-									</Label>
-									<Input
-										id="add-exercise-weight"
-										inputMode="decimal"
-										autoComplete="off"
-										placeholder="0"
-										value={weight}
-										onChange={event =>
-											setWeight(sanitizeDecimalInput(event.target.value))
-										}
-										className="text-center"
-									/>
-								</div>
-							</div>
-
-							<Button
-								type="button"
-								variant="link"
-								className="type-body-sm h-auto p-0"
-								aria-expanded={more}
-								onClick={() => setMore(value => !value)}
-							>
-								{more ? t('fewerOptions') : t('moreOptions')}
-							</Button>
-							{more ? (
-								<div className="grid grid-cols-2 gap-3">
-									<div className="space-y-1">
-										<Label htmlFor="add-exercise-rest">{t('rest')}</Label>
-										<Input
-											id="add-exercise-rest"
-											inputMode="numeric"
-											value={rest}
-											onChange={event =>
-												setRest(event.target.value.replace(/[^0-9]/g, ''))
-											}
-											className="text-center"
-										/>
-									</div>
-									<div className="space-y-1">
-										<Label>{t('progression')}</Label>
-										<Select
-											value={scheme}
-											onValueChange={value => setScheme(value as Scheme)}
-										>
-											<SelectTrigger aria-label={t('progression')}>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{(
-													[
-														'NONE',
-														'DOUBLE_PROGRESSION',
-														'DYNAMIC_DOUBLE_PROGRESSION',
-													] as const
-												).map(option => (
-													<SelectItem key={option} value={option}>
-														{tScheme(option)}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</div>
-								</div>
-							) : null}
+							<AddedExerciseEditor
+								exercise={draftExercise}
+								exerciseData={chosen}
+								weightUnit={weightUnit}
+								mutations={mutations}
+							/>
 							<p className="type-body-sm text-ink-3">{t('endNote')}</p>
 						</>
 					) : null}
@@ -326,12 +262,106 @@ export function AddSessionExerciseDialog({
 					<Button
 						type="button"
 						onClick={submit}
-						disabled={!chosen || add.isPending}
+						disabled={!chosen || picking || add.isPending}
 					>
 						{add.isPending ? t('adding') : t('add')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
+	)
+}
+
+/**
+ * The Build Days exercise editor (`WizardExerciseCard`'s body) for the one
+ * exercise being added: its options and its sets, with More options folding
+ * as the builder folds them (UX-20).
+ */
+function AddedExerciseEditor({
+	exercise,
+	exerciseData,
+	weightUnit,
+	mutations,
+}: {
+	exercise: RoutineWizardExercise
+	exerciseData?: Exercise
+	weightUnit: ReturnType<typeof useWeightUnit>
+	mutations: ReturnType<typeof useRoutineDayMutations>
+}) {
+	const tEx = useTranslations('catalog.exercises')
+	const tCard = useTranslations('routines.exerciseCard')
+	const {
+		registerSetRowRef,
+		setsExpanded,
+		toggleSetsExpanded,
+		handleAddSet,
+		weightIncInput,
+		handleWeightIncChange,
+		handleWeightIncBlur,
+	} = useExerciseCardState({
+		exercise,
+		exerciseIndex: 0,
+		tabIndex: 0,
+		onAddSet: mutations.addSet,
+		onUpdateMinWeightIncrement: mutations.updateMinWeightIncrement,
+		weightUnit,
+	})
+	// UX-20 (§23.6): folded unless something folded is in use.
+	const inUse = usesAdvancedOptions(exercise)
+	const [opened, setOpened] = useState(false)
+	const advanced = inUse || opened
+	const exerciseName = exerciseData?.name
+		? exerciseLabel(exerciseData.name, tEx)
+		: tCard('thisExercise')
+
+	return (
+		<div>
+			<ExerciseConfigSection
+				exercise={exercise}
+				exerciseIndex={0}
+				weightIncInput={weightIncInput}
+				weightUnit={weightUnit}
+				onWeightIncChange={handleWeightIncChange}
+				onWeightIncBlur={handleWeightIncBlur}
+				onUpdateRestTime={(index, value) =>
+					mutations.setRestSeconds(index, parseTime(value))
+				}
+				onUpdateNote={mutations.updateExerciseNote}
+				onUpdateProgressionScheme={mutations.updateProgressionScheme}
+				advanced={advanced}
+				onToggleAdvanced={inUse ? null : () => setOpened(value => !value)}
+				exerciseName={exerciseName}
+				rotation={false}
+				onSetLinearPeriodization={mutations.setLinearPeriodization}
+				allowLinear={false}
+			/>
+			<SetListSection
+				advanced={advanced}
+				weightUnit={weightUnit}
+				exercise={exercise}
+				exerciseIndex={0}
+				tabIndex={0}
+				setsExpanded={setsExpanded}
+				onToggleSets={toggleSetsExpanded}
+				onAddSet={handleAddSet}
+				exerciseName={exerciseName}
+				equipmentRequired={exerciseData?.equipmentRequired}
+				onReplaceWarmUps={(warmUps, followLoad) =>
+					mutations.replaceWarmUps(0, warmUps, followLoad)
+				}
+				onSetWarmUpsFollowLoad={followLoad =>
+					mutations.setWarmUpsFollowLoad(0, followLoad)
+				}
+				registerSetRowRef={registerSetRowRef}
+				onUpdateSet={mutations.updateSet}
+				onValidateMinMaxReps={mutations.validateMinMaxReps}
+				onStepFixedReps={mutations.stepFixedReps}
+				onStepRangeReps={mutations.stepRangeReps}
+				onStepWeight={mutations.stepWeight}
+				onRemoveSetAnimated={mutations.removeSet}
+				isRemovingSet={() => false}
+				warmUpTools={false}
+			/>
+		</div>
 	)
 }

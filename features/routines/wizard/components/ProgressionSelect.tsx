@@ -17,12 +17,15 @@ interface Props {
 		exerciseIndex: number,
 		scheme: ProgressionScheme,
 	) => void
+	/** LIVE-25: false where an 8-week block cannot be started. */
+	allowLinear?: boolean
 }
 
 export function ProgressionSelect({
 	progressionScheme,
 	exerciseIndex,
 	onUpdateProgressionScheme,
+	allowLinear = true,
 }: Props) {
 	const t = useTranslations('routines.builder')
 	return (
@@ -60,9 +63,11 @@ export function ProgressionSelect({
 					</SelectItem>
 					{/* ROUT-17: the Spanish name leads with "Bloque LP" so the
 					    trigger's ellipsis at 390 still says which scheme it is. */}
-					<SelectItem value="LINEAR_PERIODIZATION">
-						{t('progressionLinear')}
-					</SelectItem>
+					{allowLinear ? (
+						<SelectItem value="LINEAR_PERIODIZATION">
+							{t('progressionLinear')}
+						</SelectItem>
+					) : null}
 				</SelectContent>
 			</Select>
 		</div>

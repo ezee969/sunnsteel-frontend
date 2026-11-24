@@ -1,6 +1,6 @@
 import { CreateRoutineRequest } from '@/lib/api/types'
 
-import type { RoutineWizardData } from '../types'
+import type { RoutineWizardData, RoutineWizardExercise } from '../types'
 import { isLpWorkingSet } from './linear-block'
 
 export interface RoutineTotals {
@@ -68,45 +68,55 @@ export const buildRoutineRequest = (
 					exercise.progressionScheme === 'LINEAR_PERIODIZATION'
 						? (exercise.linearPeriodization ?? null)
 						: null,
-				sets: exercise.sets.map(set => {
-					const baseSet = {
-						setNumber: set.setNumber,
-						...(set.weight !== undefined &&
-							set.weight !== null && { weight: set.weight }),
-						...(set.rir !== undefined && set.rir !== null && { rir: set.rir }),
-						// LIVE-12: sent always, so editing a set back to working sticks.
-						kind: set.kind ?? 'WORKING',
-						// LIVE-20: a generated warm-up's share of the working load.
-						...(set.kind === 'WARMUP' && typeof set.warmUpShare === 'number'
-							? { warmUpShare: set.warmUpShare }
-							: {}),
-					}
-
-					// ROUT-17: a block's working sets have no rep target.
-					if (isLpWorkingSet(exercise, set)) {
-						return {
-							...baseSet,
-							repType: 'FIXED' as const,
-							reps: set.reps ?? null,
-						}
-					}
-
-					if (set.repType === 'FIXED') {
-						return {
-							...baseSet,
-							repType: 'FIXED' as const,
-							reps: set.reps ?? 0,
-						}
-					}
-
-					return {
-						...baseSet,
-						repType: 'RANGE' as const,
-						minReps: set.minReps ?? 0,
-						maxReps: set.maxReps ?? 0,
-					}
-				}),
+				sets: exercise.sets.map(set => routineSetRequest(exercise, set)),
 			})),
 		})),
+	}
+}
+
+/**
+ * One set of a builder exercise as a routine write takes it. The live
+ * workout's add-exercise dialog (LIVE-25) sends its sets through this too, so
+ * a set reads the same whichever screen wrote it.
+ */
+export const routineSetRequest = (
+	exercise: RoutineWizardExercise,
+	set: RoutineWizardExercise['sets'][number],
+) => {
+	const baseSet = {
+		setNumber: set.setNumber,
+		...(set.weight !== undefined &&
+			set.weight !== null && { weight: set.weight }),
+		...(set.rir !== undefined && set.rir !== null && { rir: set.rir }),
+		// LIVE-12: sent always, so editing a set back to working sticks.
+		kind: set.kind ?? 'WORKING',
+		// LIVE-20: a generated warm-up's share of the working load.
+		...(set.kind === 'WARMUP' && typeof set.warmUpShare === 'number'
+			? { warmUpShare: set.warmUpShare }
+			: {}),
+	}
+
+	// ROUT-17: a block's working sets have no rep target.
+	if (isLpWorkingSet(exercise, set)) {
+		return {
+			...baseSet,
+			repType: 'FIXED' as const,
+			reps: set.reps ?? null,
+		}
+	}
+
+	if (set.repType === 'FIXED') {
+		return {
+			...baseSet,
+			repType: 'FIXED' as const,
+			reps: set.reps ?? 0,
+		}
+	}
+
+	return {
+		...baseSet,
+		repType: 'RANGE' as const,
+		minReps: set.minReps ?? 0,
+		maxReps: set.maxReps ?? 0,
 	}
 }

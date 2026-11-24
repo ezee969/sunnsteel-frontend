@@ -607,24 +607,12 @@
 		"description": "Se suma a {plan} de forma permanente, al final de este día, y al entrenamiento de hoy ahora mismo.",
 		"exerciseLabel": "Ejercicio",
 		"change": "Cambiar",
-		"sets": "Series",
-		"reps": "Reps",
-		"weight": "Peso ({unit})",
-		"moreOptions": "Más opciones",
-		"fewerOptions": "Menos opciones",
-		"rest": "Descanso (segundos)",
-		"progression": "Progresión",
 		"endNote": "Muévelo desde el final con su control Mover.",
 		"cancel": "Cancelar",
 		"add": "Añadir ejercicio",
 		"adding": "Añadiendo…",
 		"addedTitle": "{exercise} añadido",
 		"addedDescription": "{plan} lo tiene desde ahora.",
-		"failedTitle": "No se añadió el ejercicio",
-		"schemes": {
-			"NONE": "Ninguna",
-			"DOUBLE_PROGRESSION": "Doble progresión",
-			"DYNAMIC_DOUBLE_PROGRESSION": "Doble progresión serie a serie"
-		}
+		"failedTitle": "No se añadió el ejercicio"
 	}
 }

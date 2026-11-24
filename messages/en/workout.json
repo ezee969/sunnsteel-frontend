@@ -607,24 +607,12 @@
 		"description": "It joins {plan} for good, at the end of this day, and today's workout now.",
 		"exerciseLabel": "Exercise",
 		"change": "Change",
-		"sets": "Sets",
-		"reps": "Reps",
-		"weight": "Weight ({unit})",
-		"moreOptions": "More options",
-		"fewerOptions": "Fewer options",
-		"rest": "Rest (seconds)",
-		"progression": "Progression",
 		"endNote": "Move it from the end with its Move control.",
 		"cancel": "Cancel",
 		"add": "Add exercise",
 		"adding": "Adding…",
 		"addedTitle": "{exercise} added",
 		"addedDescription": "{plan} has it from now on.",
-		"failedTitle": "Exercise not added",
-		"schemes": {
-			"NONE": "None",
-			"DOUBLE_PROGRESSION": "Double progression",
-			"DYNAMIC_DOUBLE_PROGRESSION": "Set-by-set double progression"
-		}
+		"failedTitle": "Exercise not added"
 	}
 }

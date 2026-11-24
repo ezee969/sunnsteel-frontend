@@ -63,6 +63,12 @@ interface SetListSectionProps {
 	onStepWeight: (exerciseIndex: number, setIndex: number, delta: number) => void
 	onRemoveSetAnimated: (exerciseIndex: number, setIndex: number) => void
 	isRemovingSet: (exerciseIndex: number, setIndex: number) => boolean
+	/**
+	 * LIVE-25: the generated warm-up ramp and its following. An exercise added
+	 * during a workout has no way to store that its warm-ups follow the load,
+	 * so it offers neither; a warm-up set can still be written by hand.
+	 */
+	warmUpTools?: boolean
 }
 
 /**
@@ -105,6 +111,7 @@ export function SetListSection({
 	onStepWeight,
 	onRemoveSetAnimated,
 	isRemovingSet,
+	warmUpTools = true,
 }: SetListSectionProps) {
 	const t = useTranslations('routines.builder')
 	const tBlock = useTranslations('routines.linearBlock')
@@ -246,7 +253,7 @@ export function SetListSection({
 								{t('addSet')}
 							</Button>
 						)}
-						{advanced ? (
+						{advanced && warmUpTools ? (
 							<WarmUpRampDialog
 								exerciseName={exerciseName}
 								sets={exercise.sets}
@@ -259,7 +266,8 @@ export function SetListSection({
 						) : null}
 						{/* LIVE-20: only generated warm-ups know their share, so only
 						    they can follow; hand-written ones keep their loads. */}
-						{exercise.sets.some(
+						{warmUpTools &&
+						exercise.sets.some(
 							set =>
 								set.kind === 'WARMUP' && typeof set.warmUpShare === 'number',
 						) ? (
