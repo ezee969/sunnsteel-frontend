@@ -27,7 +27,8 @@ import { SiteRankHeader } from './site-rank-header'
  * the phone is within a screen of the viewport, and then only the shown rank
  * and the next one (or one a pointer or the keyboard reaches on the ladder):
  * fetched at page load, the six were most of the page's DOM and its main-
- * thread time (Lighthouse, 2026-11-24).
+ * thread time (Lighthouse, 2026-11-24). Until then only the shown rank's
+ * panel is drawn at all.
  */
 export interface SiteRank {
 	id: string
@@ -145,59 +146,71 @@ export function SiteRanksStage({
 			>
 				<SitePhoneFrame className="site-rank-phone">
 					<div className="site-rank-stack">
-						{ranks.map((rank, index) => (
-							<div
-								key={rank.id}
-								className="site-rank-panel"
-								data-shown={index === current ? '' : undefined}
-							>
-								<SiteRankHeader
-									rankId={rank.id}
-									rankName={rank.title}
-									rankDescription={rank.description}
-									active={index === current}
-									load={wanted.includes(index)}
-									{...header}
-								/>
-								<div className="site-rank-line">
-									<div className="flex items-center gap-3">
-										<RankCrest rankId={rank.id} className="size-10 shrink-0" />
-										<div className="min-w-0">
-											<p className="type-body-sm text-ink-3">
-												{labels.current}
-											</p>
-											<p className="type-panel text-foreground">{rank.title}</p>
-											<p className="type-body-sm tabular-nums text-ink-2">
-												{rank.evidence}
-											</p>
+						{ranks.map((rank, index) =>
+							// Until the phone is within a screen, only the shown rank is
+							// drawn: the five others were 300 of the landing's 1,800
+							// elements, hydrated for a screen nobody had reached. They
+							// arrive a screen early, so the stack takes the tallest
+							// one's height before anyone sees it.
+							near || index === current ? (
+								<div
+									key={rank.id}
+									className="site-rank-panel"
+									data-shown={index === current ? '' : undefined}
+								>
+									<SiteRankHeader
+										rankId={rank.id}
+										rankName={rank.title}
+										rankDescription={rank.description}
+										active={index === current}
+										load={wanted.includes(index)}
+										{...header}
+									/>
+									<div className="site-rank-line">
+										<div className="flex items-center gap-3">
+											<RankCrest
+												rankId={rank.id}
+												className="size-10 shrink-0"
+											/>
+											<div className="min-w-0">
+												<p className="type-body-sm text-ink-3">
+													{labels.current}
+												</p>
+												<p className="type-panel text-foreground">
+													{rank.title}
+												</p>
+												<p className="type-body-sm tabular-nums text-ink-2">
+													{rank.evidence}
+												</p>
+											</div>
+										</div>
+										<div className="flex items-center gap-3 border-t border-rule-faint pt-3">
+											{rank.next ? (
+												<>
+													<RankCrest
+														rankId={rank.next.id}
+														reached={false}
+														className="size-8 shrink-0"
+													/>
+													<div className="min-w-0">
+														<p className="type-body-sm text-ink-3">
+															{rank.next.label}
+														</p>
+														<p className="type-body-sm tabular-nums text-foreground">
+															{rank.next.requirements}
+														</p>
+													</div>
+												</>
+											) : (
+												<p className="type-body-sm text-ink-2">
+													{labels.highest}
+												</p>
+											)}
 										</div>
 									</div>
-									<div className="flex items-center gap-3 border-t border-rule-faint pt-3">
-										{rank.next ? (
-											<>
-												<RankCrest
-													rankId={rank.next.id}
-													reached={false}
-													className="size-8 shrink-0"
-												/>
-												<div className="min-w-0">
-													<p className="type-body-sm text-ink-3">
-														{rank.next.label}
-													</p>
-													<p className="type-body-sm tabular-nums text-foreground">
-														{rank.next.requirements}
-													</p>
-												</div>
-											</>
-										) : (
-											<p className="type-body-sm text-ink-2">
-												{labels.highest}
-											</p>
-										)}
-									</div>
 								</div>
-							</div>
-						))}
+							) : null,
+						)}
 					</div>
 				</SitePhoneFrame>
 			</div>
