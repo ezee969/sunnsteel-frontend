@@ -67,11 +67,12 @@ export default async function LandingPage({
 					<SiteProofBand />
 				</div>
 				<SiteVerbs />
-				{/* §33.15: two interludes of footage pace the long middle. */}
+				{/* §33.15: an interlude of footage paces the long middle (the
+				    second, before the ranks, was removed by the owner on
+				    2026-11-23). */}
 				<SiteInterlude cut="chalk" />
 				<SiteTools />
 				<SiteProgress />
-				<SiteInterlude cut="bar" />
 				<SiteRanks />
 				<SiteTemplates />
 				<SitePeople />

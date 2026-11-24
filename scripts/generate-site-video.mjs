@@ -56,7 +56,6 @@ const MASTER = {
 	chalkHands: { file: 'mixkit-44420-chalk-hands-1080.mp4', ...FHD },
 	chalkBag: { file: 'mixkit-50921-chalk-bag-1080.mp4', ...FHD },
 	plates: { file: 'mixkit-40788-plates-1080.mp4', width: 1080, height: 1920 },
-	barbell: { file: 'mixkit-40250-bar-dark-room-1080.mp4', ...FHD },
 }
 
 /**
@@ -110,13 +109,13 @@ const CLOSING = {
 }
 
 /**
- * The interludes (§33.15, 2026-11-23): two letterboxed bands between
- * sections, framed at 2.4:1 and shown on computers only (a phone gets the
- * poster). Chalk is a three-shot montage before the tools -- the clap, the
- * bag, a plate -- each cut on its strongest stretch and before the vest's
- * stripes come into view; the bar is one slow descent played forward and
- * back, so the loop is a rep with no seam. `subjectY` places a portrait
- * master's strip, as `subject` does across.
+ * The interlude (§33.15, 2026-11-23): a letterboxed band between sections,
+ * framed at 2.4:1 and shown on computers only (a phone gets the poster).
+ * Chalk is a three-shot montage before the tools -- the clap, the bag, a
+ * plate -- each cut on its strongest stretch and before the vest's stripes
+ * come into view. (The bar's band before the ranks was removed by the owner
+ * the same day.) `subjectY` places a portrait master's strip, as `subject`
+ * does across.
  */
 const INTERLUDE = { width: 1920, height: 800 }
 const CHALK = [
@@ -124,10 +123,8 @@ const CHALK = [
 	{ master: 'chalkBag', start: 2.2, length: 2.6, subject: 0.45 },
 	{ master: 'plates', start: 3.2, length: 2.4, subject: 0.5, subjectY: 0.42 },
 ]
-const BAR = { master: 'barbell', start: 5, length: 6, subject: 0.5 }
 /**
- * The phone posters, 4:5, a still of each band's strongest frame. The plate's
- * is set low enough to leave out the shelf's lettered medicine balls (and the
+ * The phone poster, 4:5, a still of the band's strongest frame, set low enough to leave out the shelf's lettered medicine balls (and the
  * model's face).
  */
 const CHALK_PHONE = {
@@ -136,7 +133,6 @@ const CHALK_PHONE = {
 	subject: 0.5,
 	subjectY: 0.56,
 }
-const BAR_PHONE = { master: 'barbell', start: 8, subject: 0.5 }
 const FPS = 25
 
 /** Where the subject sits in the output frame (plan §12.2: the right two thirds). */
@@ -419,29 +415,15 @@ function interludeChalk() {
 	encode(inputs, graph, 'interlude-chalk', { mp4Rate: '1600k', av1Crf: 42 })
 }
 
-/** §33.15: the bar's descent and, reversed, its rise -- a loop with no cut. */
-function interludeBar() {
-	const { width, height } = INTERLUDE
-	const graph = `[0:v]${crop(BAR, width / height, 0.5)},scale=${width}:${height}:flags=lanczos,${LOOK},setsar=1,fps=${FPS},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0[v]`
-	encode(input(BAR), graph, 'interlude-bar', { mp4Rate: '1200k', av1Crf: 44 })
-}
-
 async function interludes() {
 	interludeChalk()
-	interludeBar()
 	await poster('interlude-chalk.mp4', 'interlude-chalk-poster', 100)
-	await poster('interlude-bar.mp4', 'interlude-bar-poster', 100)
 	await writeImage(
 		still(CHALK_PHONE, 4 / 5, '720:900'),
 		'interlude-chalk-phone-poster',
 		60,
 	)
-	await writeImage(
-		still(BAR_PHONE, 4 / 5, '720:900'),
-		'interlude-bar-phone-poster',
-		60,
-	)
-	for (const name of ['interlude-chalk', 'interlude-bar'].flatMap(n => [
+	for (const name of ['interlude-chalk'].flatMap(n => [
 		`${n}.mp4`,
 		`${n}.webm`,
 	])) {

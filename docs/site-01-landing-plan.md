@@ -271,7 +271,8 @@ more serious:
 approved by the owner as a contact sheet before download, Full HD masters in
 the same folder: 44420 chalk clapped from the hands, 50921 a hand in the chalk
 bag and 40788 a plate on the bar (portrait) for the chalk montage before the
-tools; 40250 a loaded bar in a dark room for the band before the ranks. Two
+tools; 40250 a loaded bar in a dark room for the band before the ranks, which
+the owner removed the same day (the master stays in the folder, unused). Two
 stronger close-ups, 47891 and 47484, were left out because they carry the
 restricted licence. Cuts end before the vest's stripes come into view, and the
 phone poster of the plate sits below the shelf's lettered medicine balls.

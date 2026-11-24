@@ -3744,23 +3744,6 @@
   line-height: 1.04;
   text-align: center;
 }
-.site-interlude-figure {
-  color: var(--site-accent);
-  font-variant-numeric: lining-nums tabular-nums;
-}
-/* On a phone the figure stands over its word, twice its size, so "100"
-   never breaks from the line alone. */
-@media (max-width: 767px) {
-  .site-interlude-figure {
-    display: block;
-    font-size: 2em;
-    line-height: 1;
-  }
-}
-/* The top rank's name strikes in its own pigment, not the site's gold. */
-.site .site-interlude-rank {
-  --site-accent: var(--rank-laureate);
-}
 /* Each line rises from behind its own mask, in turn. */
 .site-l {
   display: block;

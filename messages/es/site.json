@@ -107,11 +107,6 @@
 		"chalk": {
 			"first": "Registrá cada serie.",
 			"second": "Seguí tu progreso."
-		},
-		"bar": {
-			"workouts": "<n>{count}</n> entrenamientos en",
-			"weeks": "<n>{count}</n> semanas para alcanzar",
-			"rank": "el rango {rank}."
 		}
 	},
 	"tools": {

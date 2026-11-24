@@ -107,11 +107,6 @@
 		"chalk": {
 			"first": "Log every set.",
 			"second": "Track your progress."
-		},
-		"bar": {
-			"workouts": "<n>{count}</n> workouts across",
-			"weeks": "<n>{count}</n> weeks to earn the",
-			"rank": "{rank} rank."
 		}
 	},
 	"tools": {

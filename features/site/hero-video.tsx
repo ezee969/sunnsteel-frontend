@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
  * (§33.4), so nothing is laid over it here.
  */
 type Cut = { webm: string; mp4: string }
-type Band = 'hero' | 'closing' | 'chalk' | 'bar'
+type Band = 'hero' | 'closing' | 'chalk'
 const CUTS: Record<Band, { phone: Cut | null; desktop: Cut }> = {
 	hero: {
 		phone: {
@@ -35,19 +35,12 @@ const CUTS: Record<Band, { phone: Cut | null; desktop: Cut }> = {
 			mp4: '/site/video/closing-desktop.mp4',
 		},
 	},
-	// §33.15: the interludes, computers only, like the closing band.
+	// §33.15: the interlude, computers only, like the closing band.
 	chalk: {
 		phone: null,
 		desktop: {
 			webm: '/site/video/interlude-chalk.webm',
 			mp4: '/site/video/interlude-chalk.mp4',
-		},
-	},
-	bar: {
-		phone: null,
-		desktop: {
-			webm: '/site/video/interlude-bar.webm',
-			mp4: '/site/video/interlude-bar.mp4',
 		},
 	},
 }

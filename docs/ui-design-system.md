@@ -3166,18 +3166,17 @@ the light remain.
 ### 33.15 Interludes (2026-11-23)
 
 The last part of the "more cinematic" pass (§33.14), approved with the
-footage: **two interludes** pace the long middle of the landing. An interlude
+footage: **an interlude** paces the long middle of the landing. An interlude
 is a full-bleed **Night band of footage, letterboxed to 2.4:1**, carrying one
 line at display size and nothing to click. It is not a section: it has no
 heading and no action, and the page reads the same without it.
 
 - **Chalk**, after the four verbs and before the tools: "Every rep. Written
   down." / "Cada repetición. Registrada.", the second line the site's gold mark.
-- **The bar**, after progress and before the ranks: "100 workouts. 52
-  different weeks. Laureate." / "100 entrenamientos. 52 semanas distintas.
-  Laureado." -- the top rank's real requirement, read from the contracts
-  (`minimumSessions`, `minimumActiveWeeks`), its figures counting up and the
-  rank's name striking in its own pigment (`--rank-laureate`) instead of gold.
+- **The bar**, a second band after progress and before the ranks (the top
+  rank's requirement counted up, the rank's name in its own pigment), was
+  **removed by the owner on 2026-11-23**: it repeated the ranks section that
+  follows it. Its footage and copy are gone with it.
 - **Footage**: licensed stock like the hero's (§7.2 of the plan), graded and
   scrimmed the same way and cut by `scripts/generate-site-video.mjs
   --interludes`. Computers play the clip, requested within a screen of the
@@ -3188,9 +3187,7 @@ heading and no action, and the page reads the same without it.
   pulls back from 1.14 to rest (a named `view-timeline`, transform only); each
   line then rises from its own mask and the gold word forges as it lands
   (§33.14), not at page load. Grain as on the other footage bands.
-- **Type**: the display face at `clamp(24px, 7.2vw, 92px)`, centred; on a phone
-  a figure stands over its word at twice the size, so "100" never breaks from
-  its line alone.
+- **Type**: the display face at `clamp(24px, 7.2vw, 92px)`, centred.
 
 Reduced motion (either source) shows the poster, the bars at rest and the
 lines in place.

@@ -139,15 +139,12 @@ The placeholder figures (12,400 members; 350,000 workouts) are values in
 
 ## 4b. Interludes — `site.interludes`
 
-Added with the owner's footage approval (2026-11-23, design system §33.15): two letterboxed bands of footage between sections, one line each, nothing to click. The figures and the rank's name are filled from the contracts' top rank (`minimumSessions`, `minimumActiveWeeks`, the catalog's title), so the line stays true if the ladder changes; `<n>` marks the figure that counts up.
+Added with the owner's footage approval (2026-11-23, design system §33.15): a letterboxed band of footage between sections, one line, nothing to click. The second band, `bar` (before the ranks, the top rank's requirement), was removed by the owner the same day, with its keys; the rows below are the original wording, superseded by the rewrite note in part 1.
 
 | Key | English | Spanish |
 | --- | --- | --- |
 | `chalk.first` | Every rep. | Cada repetición. |
 | `chalk.second` | Written down. | Registrada. |
-| `bar.workouts` | `<n>{count}</n>` workouts. | `<n>{count}</n>` entrenamientos. |
-| `bar.weeks` | `<n>{count}</n>` different weeks. | `<n>{count}</n>` semanas distintas. |
-| `bar.rank` | {rank}. | {rank}. |
 
 ## 5. Tools for every workout — `site.tools`
 
