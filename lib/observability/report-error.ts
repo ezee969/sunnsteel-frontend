@@ -1,5 +1,6 @@
-import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
+
+import { withSentry } from './sentry-browser'
 
 /**
  * PLAT-02: an error boundary reports what it caught, unless it is the API
@@ -12,7 +13,7 @@ export function shouldReport(error: unknown): boolean {
 }
 
 export function reportBoundaryError(error: unknown): void {
-	if (shouldReport(error)) Sentry.captureException(error)
+	if (shouldReport(error)) withSentry(sentry => sentry.captureException(error))
 }
 
 /** Reports an error boundary's error once per error it receives. */

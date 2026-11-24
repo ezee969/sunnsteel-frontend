@@ -1,8 +1,8 @@
 'use client'
 
-import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
+import { withSentry } from '@/lib/observability/sentry-browser'
 import { useSupabaseAuth } from '@/providers/supabase-auth-provider'
 
 /**
@@ -15,8 +15,8 @@ export function ObservabilityUser() {
 	const id = user?.id ?? null
 
 	useEffect(() => {
-		Sentry.setUser(id ? { id } : null)
-		return () => Sentry.setUser(null)
+		withSentry(sentry => sentry.setUser(id ? { id } : null))
+		return () => withSentry(sentry => sentry.setUser(null))
 	}, [id])
 
 	return null

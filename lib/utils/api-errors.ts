@@ -5,7 +5,7 @@ import {
 } from '@sunsteel/contracts'
 
 import type { MessageKey, Translator } from '@/i18n/translator'
-import { HttpError } from '@/lib/api/services/httpClient'
+import { HttpError } from '@/lib/api/services/http-error'
 
 type ApiErrorKey = MessageKey<'core.apiErrors'>
 
