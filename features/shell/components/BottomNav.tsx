@@ -4,7 +4,7 @@ import { type LucideIcon, MoreHorizontal, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
-import { useTodaysWorkouts } from '@/app/[locale]/(protected)/dashboard/hooks/useTodaysWorkouts'
+import { useTodaysWorkouts } from '@/app/[locale]/(app)/(protected)/dashboard/hooks/useTodaysWorkouts'
 import {
 	ClassicalIcon,
 	type ClassicalIconName,

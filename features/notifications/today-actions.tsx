@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-import { useTodaysWorkouts } from '@/app/[locale]/(protected)/dashboard/hooks/useTodaysWorkouts'
+import { useTodaysWorkouts } from '@/app/[locale]/(app)/(protected)/dashboard/hooks/useTodaysWorkouts'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStartSession } from '@/lib/api/hooks/useWorkoutSession'

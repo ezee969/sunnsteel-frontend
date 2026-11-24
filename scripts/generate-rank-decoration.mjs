@@ -5,7 +5,7 @@
 // Two kinds of asset come out of it:
 // - pieces: inline SVG markup in placeholder colours (#010101 the rank
 //   pigment, #020202 the ground the ornament is cut into, #030303 shading),
-//   which globals.css maps to tokens, so a token change needs no regeneration;
+//   which app/styles/shared.css maps to tokens, so a token change needs no regeneration;
 // - tiles: repeating bands and grounds as luminance masks (white = pigment,
 //   black = nothing), painted in the pigment by CSS.
 import { mkdirSync, writeFileSync } from 'node:fs'

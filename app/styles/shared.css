@@ -1,0 +1,1055 @@
+/* The design system every page shares: the tokens, type ranks, base and
+   component layers, motion and the rank decoration. Imported by both entry
+   stylesheets -- app/globals.css (the app) and app/site.css (the public
+   site) -- each of which is its own Tailwind build (SITE-01). */
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+/* A11Y-02 (§22): the device's larger-controls choice, and higher contrast from
+   the device or the OS. Components use them only where a size or a boundary
+   changes; colour changes come from the tokens below, not from these. */
+@custom-variant large-controls (&:where([data-controls='large'] *));
+@custom-variant contrast-more {
+  &:where([data-contrast='more'] *) {
+    @slot;
+  }
+  @media (prefers-contrast: more) {
+    @slot;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-source-sans);
+  --font-mono: var(--font-space-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Design System v1.0 §11.1 - roles shadcn has no equivalent for. Each
+     semantic role has a text grade cleared to 4.5:1 and, where it is also drawn
+     as a mark, a `-strong` grade cleared to 3:1. `--warning-strong` has no text
+     grade on purpose: gold and amber cannot be separated by hue under
+     colour-vision deficiency, so warning is a mark only (§4.3 rule 4). */
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-rule: var(--rule);
+  --color-rule-faint: var(--rule-faint);
+  /* PROG-15 (§32): how much a muscle was trained, a verdigris ramp. Steps
+     are fixed weekly-set bands, never relative to the week. */
+  --color-intensity-0: var(--intensity-0);
+  --color-intensity-1: var(--intensity-1);
+  --color-intensity-2: var(--intensity-2);
+  --color-intensity-3: var(--intensity-3);
+  --color-intensity-4: var(--intensity-4);
+  --color-intensity-5: var(--intensity-5);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-primary-hover: var(--primary-hover);
+  --color-success: var(--success);
+  --color-success-strong: var(--success-strong);
+  --color-honour: var(--honour);
+  --color-honour-strong: var(--honour-strong);
+  --color-warning-strong: var(--warning-strong);
+  --color-scrim: var(--scrim);
+
+  /* §19. Rank identity (ACH-09): one mark-grade pigment per Renaissance rank,
+     cleared to 3:1 and never used as text. A rank colour means that rank and
+     nothing else, and only a rank the member holds is drawn in it. */
+  --color-rank-initiate: var(--rank-initiate);
+  --color-rank-apprentice: var(--rank-apprentice);
+  --color-rank-artisan: var(--rank-artisan);
+  --color-rank-maestro: var(--rank-maestro);
+  --color-rank-virtuoso: var(--rank-virtuoso);
+  --color-rank-laureate: var(--rank-laureate);
+
+  /* §7. Explicit rather than derived from `--radius`, which is retired. `lg`
+     and `xl` collapse onto 4px rather than being deleted, so the 36 existing
+     `rounded-lg`/`rounded-xl` sites re-point instead of breaking; Phase 15
+     normalises them to `rounded-md` with no visual effect. */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+
+  /* `--ease-*` IS a Tailwind v4 theme namespace, so these emit `ease-standard`
+     and `ease-exit`. `--duration-*` is NOT - motion durations are plain custom
+     properties below, consumed as `duration-[var(--motion-*)]`. See §9.5; this
+     is the TD-28/TD-29 silent-failure class. */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --shadow-overlay: 0 16px 40px -12px oklch(0.235 0.014 62 / 0.32);
+}
+
+/* Design System v1.0 - LOCKED. docs/ui-design-system.md
+   Light: "Stone" (§4.1). Every text role clears WCAG AA 4.5:1 against
+   --background, --surface and --surface-sunk; every mark clears 3:1. Figures
+   in §4.4, computed from the oklch->sRGB transform. */
+:root {
+  --background: oklch(0.935 0.012 88);
+  --foreground: oklch(0.235 0.014 62);
+  --surface: oklch(0.975 0.008 88);
+  --surface-sunk: oklch(0.893 0.014 86);
+  --card: oklch(0.975 0.008 88);
+  --card-foreground: oklch(0.235 0.014 62);
+  --popover: oklch(0.975 0.008 88);
+  --popover-foreground: oklch(0.235 0.014 62);
+  --primary: oklch(0.235 0.014 62);
+  --primary-hover: oklch(0.17 0.014 62);
+  --primary-foreground: oklch(0.975 0.008 88);
+  --secondary: oklch(0.912 0.01 87);
+  --secondary-foreground: oklch(0.235 0.014 62);
+  --muted: oklch(0.912 0.01 87);
+  --muted-foreground: oklch(0.4 0.013 62);
+  --accent: oklch(0.912 0.01 87);
+  --accent-foreground: oklch(0.235 0.014 62);
+  --ink-2: oklch(0.4 0.013 62);
+  --ink-3: oklch(0.48 0.012 70);
+  --rule: oklch(0.75 0.014 84);
+  --rule-faint: oklch(0.84 0.01 86);
+  --border: oklch(0.75 0.014 84);
+  --input: oklch(0.75 0.014 84);
+  --ring: oklch(0.235 0.014 62);
+  --success: oklch(0.48 0.1 152);
+  --success-strong: oklch(0.56 0.11 152);
+  --honour: oklch(0.455 0.09 90);
+  --honour-strong: oklch(0.575 0.115 90);
+  --warning-strong: oklch(0.56 0.13 52);
+  --destructive: oklch(0.495 0.17 28);
+  /* §2.1 - this equalled --destructive, so destructive-on-destructive was
+     invisible in light mode only. Verified 6.22:1. */
+  --destructive-foreground: oklch(0.975 0.008 88);
+  --scrim: oklch(0.235 0.014 62 / 0.42);
+  /* §19.1 rank pigments, cheapest to dearest. */
+  --rank-initiate: oklch(0.53 0.02 240);
+  --rank-apprentice: oklch(0.53 0.08 203);
+  --rank-artisan: oklch(0.5 0.115 248);
+  --rank-maestro: oklch(0.47 0.155 274);
+  --rank-virtuoso: oklch(0.48 0.15 308);
+  --rank-laureate: oklch(0.36 0.12 318);
+
+  --sidebar: oklch(0.935 0.012 88);
+  --sidebar-foreground: oklch(0.235 0.014 62);
+  --sidebar-primary: oklch(0.235 0.014 62);
+  --sidebar-primary-foreground: oklch(0.975 0.008 88);
+  --sidebar-accent: oklch(0.975 0.008 88);
+  --sidebar-accent-foreground: oklch(0.235 0.014 62);
+  --sidebar-border: oklch(0.75 0.014 84);
+  --sidebar-ring: oklch(0.235 0.014 62);
+
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --content-max: 1200px;
+  --field-max: 96px;
+  --cluster-max: 480px;
+
+  /* PROG-15 (§32): verdigris, the owner's choice of 2026-11-20. One hue (185)
+     no role uses, getting darker and fuller band by band; 0 is the untrained
+     figure, a neutral a step off the panel. */
+  --intensity-0: oklch(0.88 0.01 86);
+  --intensity-1: oklch(0.8 0.06 185);
+  --intensity-2: oklch(0.69 0.09 185);
+  --intensity-3: oklch(0.58 0.1 185);
+  --intensity-4: oklch(0.47 0.09 185);
+  --intensity-5: oklch(0.36 0.08 185);
+}
+
+/* Dark: "Night" (§4.2). A remap of the same roles, not an inversion. Gold and
+   crimson both lift, because the light values vanish on a dark ground, and the
+   focus ring becomes the honour mark because ink does not read as a ring
+   against near-black. */
+.dark {
+  --background: oklch(0.155 0.01 70);
+  --foreground: oklch(0.94 0.01 88);
+  --surface: oklch(0.205 0.011 70);
+  --surface-sunk: oklch(0.118 0.009 70);
+  --card: oklch(0.205 0.011 70);
+  --card-foreground: oklch(0.94 0.01 88);
+  --popover: oklch(0.205 0.011 70);
+  --popover-foreground: oklch(0.94 0.01 88);
+  --primary: oklch(0.94 0.01 88);
+  --primary-hover: oklch(0.87 0.01 88);
+  --primary-foreground: oklch(0.155 0.01 70);
+  --secondary: oklch(0.248 0.011 70);
+  --secondary-foreground: oklch(0.94 0.01 88);
+  --muted: oklch(0.248 0.011 70);
+  --muted-foreground: oklch(0.79 0.01 84);
+  --accent: oklch(0.248 0.011 70);
+  --accent-foreground: oklch(0.94 0.01 88);
+  --ink-2: oklch(0.79 0.01 84);
+  --ink-3: oklch(0.64 0.01 80);
+  --rule: oklch(0.37 0.012 72);
+  --rule-faint: oklch(0.295 0.01 72);
+  --border: oklch(0.37 0.012 72);
+  --input: oklch(0.37 0.012 72);
+  --ring: oklch(0.84 0.11 90);
+  --success: oklch(0.775 0.095 152);
+  --success-strong: oklch(0.74 0.105 152);
+  --honour: oklch(0.8 0.1 90);
+  --honour-strong: oklch(0.84 0.11 90);
+  --warning-strong: oklch(0.76 0.125 52);
+  --destructive: oklch(0.66 0.15 28);
+  --destructive-foreground: oklch(0.155 0.01 70);
+  --scrim: oklch(0.075 0.006 70 / 0.62);
+  --rank-initiate: oklch(0.76 0.02 240);
+  --rank-apprentice: oklch(0.77 0.08 203);
+  --rank-artisan: oklch(0.74 0.105 248);
+  --rank-maestro: oklch(0.7 0.135 274);
+  --rank-virtuoso: oklch(0.72 0.135 308);
+  --rank-laureate: oklch(0.66 0.1 316);
+
+  --sidebar: oklch(0.155 0.01 70);
+  --sidebar-foreground: oklch(0.94 0.01 88);
+  --sidebar-primary: oklch(0.94 0.01 88);
+  --sidebar-primary-foreground: oklch(0.155 0.01 70);
+  --sidebar-accent: oklch(0.205 0.011 70);
+  --sidebar-accent-foreground: oklch(0.94 0.01 88);
+  --sidebar-border: oklch(0.37 0.012 72);
+  --sidebar-ring: oklch(0.84 0.11 90);
+
+  /* PROG-15 (§32): in Night the bands get lighter and fuller instead. */
+  --intensity-0: oklch(0.3 0.008 70);
+  --intensity-1: oklch(0.42 0.05 185);
+  --intensity-2: oklch(0.52 0.08 185);
+  --intensity-3: oklch(0.62 0.1 185);
+  --intensity-4: oklch(0.73 0.11 185);
+  --intensity-5: oklch(0.84 0.11 185);
+}
+
+/* A11Y-02 (§22): higher contrast. Every text role clears 7:1 against
+   --background, --surface and --surface-sunk, every mark 4.5:1, rules 3:1 and
+   faint rules 2:1, in both themes; ink-2 stays a step above ink-3. Applied by
+   the device choice (`data-contrast="more"`) and by the OS
+   (`prefers-contrast: more`); the two blocks below are the same values and
+   change together, like the reduced-motion pair. `:not(.dark)` keeps the light
+   values from overriding Night, which has the same specificity otherwise. */
+:root[data-contrast='more']:not(.dark) {
+  --ink-2: oklch(0.32 0.013 62);
+  --muted-foreground: oklch(0.32 0.013 62);
+  --ink-3: oklch(0.385 0.012 70);
+  --success: oklch(0.375 0.1 152);
+  --success-strong: oklch(0.475 0.11 152);
+  --honour: oklch(0.385 0.09 90);
+  --honour-strong: oklch(0.49 0.115 90);
+  --warning-strong: oklch(0.5 0.13 52);
+  --destructive: oklch(0.4 0.17 28);
+  --rule: oklch(0.58 0.014 84);
+  --border: oklch(0.58 0.014 84);
+  --input: oklch(0.58 0.014 84);
+  --sidebar-border: oklch(0.58 0.014 84);
+  --rule-faint: oklch(0.685 0.01 86);
+  /* ACH-11 (§22.2): the three light rank pigments under 4.5:1 as marks. */
+  --rank-initiate: oklch(0.485 0.02 240);
+  --rank-apprentice: oklch(0.475 0.08 203);
+  --rank-artisan: oklch(0.485 0.115 248);
+}
+:root.dark[data-contrast='more'] {
+  --ink-2: oklch(0.85 0.01 84);
+  --muted-foreground: oklch(0.85 0.01 84);
+  --ink-3: oklch(0.715 0.01 80);
+  --destructive: oklch(0.735 0.15 28);
+  --rule: oklch(0.51 0.012 72);
+  --border: oklch(0.51 0.012 72);
+  --input: oklch(0.51 0.012 72);
+  --sidebar-border: oklch(0.51 0.012 72);
+  --rule-faint: oklch(0.415 0.01 72);
+}
+@media (prefers-contrast: more) {
+  :root:not(.dark) {
+    --ink-2: oklch(0.32 0.013 62);
+    --muted-foreground: oklch(0.32 0.013 62);
+    --ink-3: oklch(0.385 0.012 70);
+    --success: oklch(0.375 0.1 152);
+    --success-strong: oklch(0.475 0.11 152);
+    --honour: oklch(0.385 0.09 90);
+    --honour-strong: oklch(0.49 0.115 90);
+    --warning-strong: oklch(0.5 0.13 52);
+    --destructive: oklch(0.4 0.17 28);
+    --rule: oklch(0.58 0.014 84);
+    --border: oklch(0.58 0.014 84);
+    --input: oklch(0.58 0.014 84);
+    --sidebar-border: oklch(0.58 0.014 84);
+    --rule-faint: oklch(0.685 0.01 86);
+    /* ACH-11 (§22.2): the three light rank pigments under 4.5:1 as marks. */
+    --rank-initiate: oklch(0.485 0.02 240);
+    --rank-apprentice: oklch(0.475 0.08 203);
+    --rank-artisan: oklch(0.485 0.115 248);
+  }
+  :root.dark {
+    --ink-2: oklch(0.85 0.01 84);
+    --muted-foreground: oklch(0.85 0.01 84);
+    --ink-3: oklch(0.715 0.01 80);
+    --destructive: oklch(0.735 0.15 28);
+    --rule: oklch(0.51 0.012 72);
+    --border: oklch(0.51 0.012 72);
+    --input: oklch(0.51 0.012 72);
+    --sidebar-border: oklch(0.51 0.012 72);
+    --rule-faint: oklch(0.415 0.01 72);
+  }
+}
+
+/* A11Y-02 (§22): under higher contrast every focused control also takes a
+   solid 3px outline in the focus-ring colour, because several primitives draw
+   their ring at 40% and a translucent 2px ring is the first thing bright light
+   washes out. */
+:root[data-contrast='more'] :focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (prefers-contrast: more) {
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* `font-sans` is Source Sans 3, the body face (§5.2, amended by §23). It must
+     be set here: next/font declares its variables on <body>, while preflight
+     sets the family on <html>, where the variable does not exist - so unranked
+     text used to fall back to the system UI font (TD-39). Inputs inherit it
+     via preflight. */
+  body {
+    @apply bg-background font-sans text-foreground transition-colors;
+    transition-duration: var(--motion-slow);
+  }
+  /* Make interactive elements clearly clickable */
+  button,
+  [role='button'],
+  a,
+  summary,
+  [data-slot='button'],
+  [data-clickable='true'],
+  [aria-haspopup],
+  [aria-controls] {
+    @apply cursor-pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'],
+  [disabled] {
+    @apply cursor-not-allowed;
+  }
+}
+
+@layer components {
+  /* Type ranks (v1.0 §5.2). Classes, not element selectors: heading level is
+     document structure and rank is appearance, so the two stay independent.
+     The global `h1`-`h4` Bebas rule these replaced was deleted in Phase 15
+     (§5.5), once every heading carried a rank — a heading without one now
+     falls back to the body face, not to Bebas. Only loaded weights are used:
+     Cinzel ships 600 and 900, Bebas Neue 400, Space Mono 400 and 700. Asking
+     for an absent weight synthesises silently. */
+  .type-page {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+  .type-section {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  /* v1.1: an inscription that wraps balances its lines rather than leaving
+     one word alone on the last (§11.11 wraps the masthead below `lg`). */
+  .type-page,
+  .type-section {
+    text-wrap: balance;
+  }
+  .type-panel {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  /* §5.3: region-level captions only, never inside a repeated row - that is
+     what produced the micro-cap chatter Phase 5 flagged. */
+  .type-label {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  /* §5.2 Body: running text that is the point of its row, such as a message.
+     UX-24: messages and onboarding used this class before it existed, so
+     they rendered in whatever face they inherited. */
+  .type-body {
+    font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  /* The caption rank inside a repeated row: sentence case, untracked. */
+  /* UX-16 (§23.3): 14px, up from 13. Source Sans 3 sets a lower x-height than
+     the condensed Oswald it replaced (UX-14), so at 13px the captions that
+     carry most of the app's explanations read smaller than before. */
+  .type-body-sm {
+    font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  /* A paragraph stops at a readable measure. Centred and right-aligned ones
+     keep their alignment inside it rather than drifting left of the text
+     they belong to. */
+  p.type-body-sm {
+    max-width: 70ch;
+  }
+  /* Attribute selectors so a responsive `lg:text-right` counts too; below
+     that breakpoint a column is narrower than the measure, so the margin has
+     nothing to move. */
+  [class*='text-center'] p.type-body-sm,
+  p.type-body-sm[class*='text-center'] {
+    margin-inline: auto;
+  }
+  [class*='text-right'] p.type-body-sm,
+  p.type-body-sm[class*='text-right'] {
+    margin-left: auto;
+  }
+  /* One number face per line: a number inside a sentence takes the sentence's
+     face, with tabular figures, instead of switching to Space Mono mid-line.
+     Data that stands alone (set fields, timers, columns) keeps Space Mono. */
+  .type-body-sm span.type-data,
+  .type-body-sm span.type-data-strong {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-body-sm span.type-data-strong {
+    font-weight: 600;
+  }
+  .type-data {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-data-strong {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .type-numeral {
+    font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 2.5rem;
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+  }
+  /* v1.0 §5.2 names a Wordmark rank but §11.2 listed no class for it, so the
+     sidebar carried it as an inline style with a literal family name.
+
+     Re-cut 2026-09-17 with the owner from Cinzel 900/0.05em to 600/0.12em, and
+     the wordmark is now half of a lockup (§11.10). Two measured reasons: Cinzel
+     is a Trajan-derived display face, and at the 20px the shell actually renders
+     it 900 closes the counters of S, E and the two Ns; and heavy Roman capitals
+     need 0.10-0.18em to separate at that size, not the 0.05em of a body label.
+     The mark, not the weight, now carries the wordmark's authority. */
+  .type-wordmark {
+    font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    /* letter-spacing adds its gap after the last letter too, which throws off
+       optical centring (the splash) and the gap to anything right of it. */
+    margin-right: -0.12em;
+  }
+  .type-button {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  /* UX-15 (§23.2): every control that is not a filled action -- outline,
+     secondary, ghost, link and the destructive outline. Sentence case and
+     untracked, so the one filled primary in a region is the only uppercase
+     control and stands out without a new colour. */
+  .type-action {
+    font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: none;
+  }
+
+  @media (min-width: 768px) {
+    .type-page {
+      font-size: 2rem;
+    }
+    .type-section {
+      font-size: 1.125rem;
+    }
+    .type-panel {
+      font-size: 1rem;
+    }
+    .type-numeral {
+      font-size: 3.25rem;
+    }
+  }
+
+  /* Structure (§11.2). The double rule appears once per page, under the page
+     inscription. */
+  /* Motion spec §2.9 signature 1: the rule draws in from the left, once per
+     region per visit. The border stays in the box but transparent, so the
+     drawn rule is an overlay and the heading's height never changes. A
+     mount-time animation, not a transition - a re-render keeps the same class
+     string and therefore cannot replay it (§1.3 rule 1). */
+  .rule-heading {
+    position: relative;
+    border-bottom: 3px double transparent;
+  }
+  .rule-heading::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
+    border-bottom: 3px double var(--rule);
+    transform-origin: left;
+    animation: rule-draw 240ms var(--ease-standard) backwards;
+  }
+  .rule-row {
+    border-bottom: 1px solid var(--rule-faint);
+  }
+  .rule-row:last-child {
+    border-bottom: 0;
+  }
+  /* Status marks. `success` = done as planned; `honour` = better than planned,
+     at most two per viewport; `warning` = risk, and the only form warning takes
+     because it has no text grade (§4.3). */
+  .mark {
+    border-left: 3px solid transparent;
+  }
+  /* LIVE-22 (§27.2): the current exercise and set carry the action colour as
+     a mark -- the one place `--primary` is a mark rather than a fill. */
+  .mark-current {
+    border-left-color: var(--primary);
+  }
+  .mark-success {
+    border-left-color: var(--success-strong);
+  }
+  .mark-honour {
+    border-left-color: var(--honour-strong);
+  }
+  .mark-warning {
+    border-left-color: var(--warning-strong);
+  }
+
+  /* Motion spec §2.9 signature 2. The mark fills top to bottom rather than
+     appearing. The 3px border stays transparent and holds the space; the fill
+     is an overlay bar, so nothing reflows when a set completes. Applied only on
+     the session's exercise section (`exercise-group.tsx`); the set row and
+     every other `.mark` consumer keep the static border.
+     A React re-render does not restart this: the class string is unchanged, and
+     `groupSetLogsByExercise` rebuilding its objects cannot retrigger a CSS
+     animation (§1.3 rule 1). */
+  .mark-fill {
+    position: relative;
+  }
+  .mark-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -3px;
+    width: 3px;
+    background: var(--success-strong);
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  .mark-fill.mark-success::before {
+    animation: mark-fill var(--motion-slow) var(--ease-standard) forwards;
+  }
+
+  /* LIVE-21: where a superset or circuit hands over. The exercise the screen
+     glides to holds a neutral tint while the scroll runs, then settles back
+     to its own tone. Colour only (§1.2), so reduced motion keeps it: there the
+     scroll is instant and the tint shorter, because the duration is built on
+     --motion-slow, which the reduction sets to 120ms. */
+  [data-arriving] {
+    animation: arrival-cue calc(var(--motion-slow) * 4) var(--ease-standard);
+  }
+
+
+  /* The one classical device the direction keeps: gold brackets, one pair per
+     screen, on the page inscription rather than around a photograph. A
+     rank-decorated profile header sets --corner-bracket to the rank pigment
+     (ACH-11, §24.3). */
+  .corner-brackets {
+    position: relative;
+  }
+  .corner-brackets::before,
+  .corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-color: var(--corner-bracket, var(--honour-strong));
+    border-style: solid;
+    pointer-events: none;
+  }
+  .corner-brackets::before {
+    top: -0.25rem;
+    left: -0.5rem;
+    border-width: 1px 0 0 1px;
+  }
+  .corner-brackets::after {
+    right: -0.5rem;
+    bottom: -0.25rem;
+    border-width: 0 1px 1px 0;
+  }
+  /* v1.1: on an inscription the closing bracket follows the last word
+     rather than the box's corner. A heading that wraps keeps its box at the
+     column's width, so a box-corner bracket floated far right of the text it
+     closes. Inline, with a negative right margin, it costs no line width.
+     The splash lockup, a box rather than a line, keeps the corner. */
+  h1.corner-brackets::after {
+    position: static;
+    display: inline-block;
+    vertical-align: -0.3em;
+    margin-right: -0.5rem;
+  }
+
+  /* §5.4: a live duration's string length changes as it ticks, which shifts its
+     neighbours. Reserve the slot. */
+  .duration-slot {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    min-width: 9ch;
+    display: inline-block;
+  }
+
+  /* Layout (§10). */
+  .ledger-page {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .ledger-page {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .ledger-page {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* v1.1 §26.3: one gutter. The protected shell's <main> pads its content by
+     --shell-gutter, 16px on a phone (the topbar's own edge) and 24px from
+     `sm`. A row pinned at the top of <main> cancels it with these two rather
+     than with literal negative margins that had to follow the shell by hand:
+     `.shell-pin` sticks flush under the topbar, `.shell-bleed` reaches the
+     column's edges and restores the gutter inside. Outside the shell the
+     variable is unset and both fall back to nothing. */
+  .shell-main {
+    --shell-gutter: 1rem;
+    padding: var(--shell-gutter);
+  }
+  @media (min-width: 640px) {
+    .shell-main {
+      --shell-gutter: 1.5rem;
+    }
+  }
+  .shell-pin {
+    position: sticky;
+    top: calc(-1 * var(--shell-gutter, 0px));
+  }
+  .shell-bleed {
+    margin-inline: calc(-1 * var(--shell-gutter, 0px));
+    padding-inline: var(--shell-gutter, 0px);
+  }
+  /* `.ledger-page` was added to the shell's gutter, which gave the workout
+     screen, a routine page and a history detail a 28px phone gutter where
+     every other page had the shell's alone. */
+  @media (max-width: 767.98px) {
+    .shell-main .ledger-page {
+      padding-inline: 0;
+    }
+  }
+}
+
+/* Scrollbar-hidden utility for mobile horizontal scroll containers */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Motion spec §2.8 / §4. The four keyframes are the closed inventory; a fifth
+   needs a defect report against the spec, not a silent addition. */
+@keyframes pulse-opacity {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes arrival-cue {
+  0%,
+  60% {
+    background-color: var(--accent);
+  }
+}
+@keyframes mark-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* The only two infinite animations in the app (§2.8). Both are single-property
+   and neither carries information - the LOADING label and the skeleton's
+   position do. */
+.animate-pulse-opacity {
+  animation: pulse-opacity 1600ms ease-in-out infinite;
+}
+.animate-spin-slow {
+  animation: spin 800ms linear infinite;
+}
+
+/* Motion spec §2.2. On a touch PWA neither hover nor focus-visible fires, so an
+   affordance revealed by hover does not exist there at all. */
+@media (pointer: coarse) {
+  .hover-reveal {
+    opacity: 1;
+  }
+}
+
+/* Motion spec §3. Not a blanket 1ms override: colour and opacity survive at
+   `--motion-fast`, because colour at 120ms is not vestibular load and killing
+   it removes feedback rather than motion. What goes is transform and the
+   keyframe animations. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 120ms;
+    --motion-base: 120ms;
+    --motion-slow: 120ms;
+  }
+  .animate-pulse-opacity,
+  .animate-spin-slow,
+  .animate-spin,
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  .rule-heading::after,
+  .mark-fill.mark-success::before {
+    animation: none !important;
+  }
+  /* The mark is simply there, at its final state -- on a completed row only.
+     LIVE-22: unscoped, it drew the completion mark on every exercise, so under
+     reduced motion an untouched one read as done. */
+  .mark-fill.mark-success::before {
+    transform: scaleY(1);
+  }
+  /* Overlays become opacity-only: no scale, no side translate (§3). */
+  *,
+  *::before,
+  *::after {
+    --tw-enter-scale: 1 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke, opacity !important;
+  }
+}
+
+/* A11Y-01: the same reduction when the device preference in Settings sets
+   `data-motion="reduce"` on <html> (lib/utils/motion-preference.ts). CSS cannot
+   share one block between a media query and a selector, so this mirrors the
+   block above rule for rule — change both together. */
+:root[data-motion='reduce'] {
+  --motion-fast: 120ms;
+  --motion-base: 120ms;
+  --motion-slow: 120ms;
+}
+:root[data-motion='reduce'] .animate-pulse-opacity,
+:root[data-motion='reduce'] .animate-spin-slow,
+:root[data-motion='reduce'] .animate-spin,
+:root[data-motion='reduce'] .animate-pulse,
+:root[data-motion='reduce'] .animate-ping,
+:root[data-motion='reduce'] .animate-bounce,
+:root[data-motion='reduce'] .rule-heading::after,
+:root[data-motion='reduce'] .mark-fill.mark-success::before {
+  animation: none !important;
+}
+:root[data-motion='reduce'] .mark-fill.mark-success::before {
+  transform: scaleY(1);
+}
+:root[data-motion='reduce'] *,
+:root[data-motion='reduce'] *::before,
+:root[data-motion='reduce'] *::after {
+  --tw-enter-scale: 1 !important;
+  --tw-exit-scale: 1 !important;
+  --tw-enter-translate-x: 0 !important;
+  --tw-enter-translate-y: 0 !important;
+  --tw-exit-translate-x: 0 !important;
+  --tw-exit-translate-y: 0 !important;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity !important;
+}
+
+/* ACH-11 (design system §24): the rank decoration of the profile header.
+   The generated pieces draw in placeholder colours, mapped here to tokens:
+   #010101 the holder's rank pigment, #020202 the ground the ornament is cut
+   into, #030303 shading. Tiles are luminance masks painted in the pigment.
+   `.rank-deco` sits on the header section; it sets --rank-pigment, --rank-cut
+   --rank-draw and the ground opacities for the rank it shows
+   (lib/utils/rank-decoration.ts). */
+.rank-deco {
+  --rank-shade: var(--foreground);
+  --rank-field: 0.1;
+  --rank-field-strong: 0.15;
+  --rank-ground-opacity: var(--rank-ground-day);
+}
+.dark .rank-deco {
+  --rank-shade: var(--surface-sunk);
+  --rank-field: 0.14;
+  --rank-field-strong: 0.2;
+  --rank-ground-opacity: var(--rank-ground-night);
+}
+.rank-deco [fill='#010101'] {
+  fill: var(--rank-pigment);
+}
+.rank-deco [stroke='#010101'] {
+  stroke: var(--rank-pigment);
+}
+.rank-deco [fill='#020202'] {
+  fill: var(--rank-cut);
+}
+.rank-deco [stroke='#020202'] {
+  stroke: var(--rank-cut);
+}
+.rank-deco [fill='#030303'] {
+  fill: var(--rank-shade);
+}
+.rank-deco [stroke='#030303'] {
+  stroke: var(--rank-shade);
+}
+.rank-deco .field2 {
+  fill-opacity: var(--rank-field-strong);
+}
+.rank-deco-paint {
+  background-color: var(--rank-pigment);
+  mask-mode: luminance;
+}
+.rank-deco-field {
+  background-color: color-mix(
+    in oklab,
+    var(--rank-pigment) calc(var(--rank-field) * 100%),
+    transparent
+  );
+}
+.rank-deco-band {
+  border-color: color-mix(
+    in oklab,
+    var(--rank-pigment) calc(var(--rank-field) * 100%),
+    transparent
+  );
+}
+.rank-deco-line {
+  border-color: var(--rank-pigment);
+}
+.rank-deco-base {
+  background-color: var(--rank-cut);
+}
+.rank-deco-ground {
+  opacity: var(--rank-ground-opacity);
+}
+.rank-deco-piece {
+  position: absolute;
+  overflow: visible;
+}
+.rank-deco .spin {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Entrance, once each time the header mounts: the frame draws in from the
+   left (the rule draw, longer for a richer rank), the corners and the head
+   appear as it passes, the portrait ornament turns into place, and the
+   festoons, aureole and ground come last. Text never moves. */
+@keyframes rank-deco-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes rank-deco-appear {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rank-deco-settle {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg);
+  }
+}
+@keyframes rank-deco-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rank-deco-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes rank-deco-twinkle {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes rank-deco-roll {
+  to {
+    mask-position: var(--rank-roll) 0;
+  }
+}
+.rank-deco[data-playing] [data-part='frame'] {
+  animation: rank-deco-draw var(--rank-draw) var(--ease-standard) both;
+}
+.rank-deco[data-playing] [data-part='corners'],
+.rank-deco[data-playing] [data-part='head'] {
+  animation: rank-deco-appear var(--motion-slow) var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.5);
+}
+.rank-deco[data-playing] [data-part='ring'] {
+  animation: rank-deco-settle calc(var(--rank-draw) + 120ms)
+    var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.25);
+}
+.rank-deco[data-playing] [data-part='garland'] {
+  animation: rank-deco-draw 640ms var(--ease-standard) both;
+  animation-delay: var(--rank-draw);
+}
+.rank-deco[data-playing] [data-part='aureole'],
+.rank-deco[data-playing] [data-part='ground'] {
+  animation: rank-deco-appear 600ms var(--ease-standard) both;
+  animation-delay: calc(var(--rank-draw) * 0.8);
+}
+/* Ambient, only while the header is on screen: every rank moves two motifs
+   at one tempo (§24.4). Off screen the rules do not apply at all, so nothing
+   runs there; the entrance is never held back by visibility. */
+.rank-deco[data-inview] .spin {
+  animation: rank-deco-turn 160s linear infinite;
+}
+.rank-deco[data-inview] .breathe {
+  animation: rank-deco-breathe 8s ease-in-out infinite;
+}
+.rank-deco[data-inview] .rank-deco-twinkle {
+  animation: rank-deco-twinkle 9s ease-in-out infinite;
+}
+.rank-deco[data-inview] .rank-deco-twinkle-late {
+  animation: rank-deco-twinkle 9s ease-in-out -4.5s infinite;
+}
+.rank-deco[data-inview] .rank-deco-roll {
+  animation: rank-deco-roll 7s linear infinite;
+}
+/* Reduced motion from either source: the finished decoration, at once. The
+   two blocks change together, like the reduced-motion pair above. */
+@media (prefers-reduced-motion: reduce) {
+  .rank-deco *,
+  .rank-deco *::before {
+    animation: none !important;
+  }
+}
+:root[data-motion='reduce'] .rank-deco * {
+  animation: none !important;
+}
+/* Higher contrast (§24.5): the ground pattern, every field tint and the
+   aureole go, leaving the text column on the plain ground. */
+:root[data-contrast='more'] .rank-deco {
+  --rank-field: 0;
+  --rank-field-strong: 0;
+}
+:root[data-contrast='more'] .rank-deco [data-part='ground'],
+:root[data-contrast='more'] .rank-deco [data-part='aureole'] {
+  display: none;
+}
+@media (prefers-contrast: more) {
+  .rank-deco {
+    --rank-field: 0 !important;
+    --rank-field-strong: 0 !important;
+  }
+  .rank-deco [data-part='ground'],
+  .rank-deco [data-part='aureole'] {
+    display: none;
+  }
+}
+/* A browser that cannot read a tile as a luminance mask would paint the whole
+   tile; it shows the decoration without its bands and grounds instead. */
+@supports not (mask-mode: luminance) {
+  .rank-deco-paint {
+    display: none;
+  }
+}

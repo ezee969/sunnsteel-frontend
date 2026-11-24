@@ -27,7 +27,15 @@ import {
 const routeExists = (href: string) => {
 	const path = href.split(/[?#]/)[0].replace(/^\//, '')
 	return existsSync(
-		join(process.cwd(), 'app', '[locale]', '(protected)', path, 'page.tsx'),
+		join(
+			process.cwd(),
+			'app',
+			'[locale]',
+			'(app)',
+			'(protected)',
+			path,
+			'page.tsx',
+		),
 	)
 }
 

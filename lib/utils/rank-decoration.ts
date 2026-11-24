@@ -23,7 +23,7 @@ export interface RankDecoration {
 	slug: RankDecorationSlug
 	/** Artisan and above turn the header into a framed panel. */
 	framed: boolean
-	/** The custom properties the header section carries (globals.css). */
+	/** The custom properties the header section carries (app/styles/shared.css). */
 	style: CSSProperties
 }
 

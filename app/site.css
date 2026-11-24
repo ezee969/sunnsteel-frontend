@@ -1,0 +1,18 @@
+/* SITE-01: the public site's stylesheet, loaded by its own root layout
+   (app/[locale]/(site)/layout.tsx). It is a Tailwind build of its own over
+   only what the site renders, so a visitor never downloads the app's
+   utilities and rules; the app never downloads these. A file the site
+   imports outside these sources renders unstyled, which site-css.test.ts
+   catches. */
+@import 'tailwindcss' source(none);
+@import './styles/shared.css';
+@import './styles/public-site.css';
+
+@source './[locale]/(site)';
+@source '../features/site';
+@source '../features/body-map';
+@source '../features/achievements';
+@source '../features/profile/rank-decoration';
+@source '../features/billing';
+@source '../components';
+@source '../lib';

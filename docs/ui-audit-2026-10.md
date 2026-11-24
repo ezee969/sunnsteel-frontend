@@ -98,7 +98,7 @@ dependencies or breakpoints. Sequenced after the in-flight `LIVE-21` lands.
 | M15 | Icon family switches per view: Dashboard = classical `pillar-icon` in Sidebar, lucide `Home` in BottomNav; sidebar mixes classical (7) and lucide | `Sidebar.tsx:81-149`, `BottomNav.tsx:32-38` |
 | M16 | 101 lucide icons with neither `aria-hidden` nor a label | top: `wizard/components/SetRow.tsx` (12), auth forms (10), `RoutineCard.tsx` (6), `select.tsx` (4) |
 | M17 | Dialog/AlertDialog descriptions are raw `text-sm text-ink-2`, not `type-body-sm`; `HeroSection` subtitle raw `text-sm sm:text-base`; BottomNav labels raw `text-xs font-medium`; 138 raw `text-*` sizes in 51 files | `dialog.tsx:135`, `alert-dialog.tsx:115`, `HeroSection.tsx`, `BottomNav.tsx:85` |
-| M18 | Empty / inline-error / loading states have no single pattern: `EmptyModule` (18 uses) vs ~40 bespoke empties; no shared inline error (`PageError` local to `own-activity.tsx:55`); 6 `loading.tsx` disagree (dashboard spinner vs skeletons; 3/6 announce status; `history/loading.tsx:5` double gutter) | `components/layout/empty-module.tsx`, `app/[locale]/(protected)/**/loading.tsx` |
+| M18 | Empty / inline-error / loading states have no single pattern: `EmptyModule` (18 uses) vs ~40 bespoke empties; no shared inline error (`PageError` local to `own-activity.tsx:55`); 6 `loading.tsx` disagree (dashboard spinner vs skeletons; 3/6 announce status; `history/loading.tsx:5` double gutter) | `components/layout/empty-module.tsx`, `app/[locale]/(app)/(protected)/**/loading.tsx` |
 | M19 | Docs drift: §11.2 code block still says `type-body-sm` = Oswald 13/1.45 (code: Source Sans 14/1.5); CLAUDE.md lists a non-existent `heading-classical` utility | `docs/ui-design-system.md` §11.2, `CLAUDE.md` Gotchas |
 
 **Clean areas (verified):** 0 raw palette classes, 0 generic shadows, 0
@@ -177,7 +177,7 @@ dialogs (§11.9), Radix semantics preserved.
 
 ## 6. Active Workout — deep dive (P0)
 
-Sources: code trace of `app/[locale]/(protected)/workouts/sessions/[id]/page.tsx`,
+Sources: code trace of `app/[locale]/(app)/(protected)/workouts/sessions/[id]/page.tsx`,
 `features/workout/{session-header,session-action-card,exercise-group,set-log-input,rest-timer-bar,session-notes}.tsx`,
 `hooks/{use-set-log-form,use-compact-workout,use-collapsible-exercises,use-rest-timer}.ts`,
 `lib/utils/{session-rounds,session-progress.utils}.ts`; captures
@@ -497,7 +497,7 @@ Each phase is an independent, mergeable slice per the repo's "Closing a slice"
   3. B3 + B4 (containment + prescription line + column header) — §27.
   4. B2 (current state + focus hand-off) and B12 (suggested vs logged).
   5. B13 (superset container), B18 (glossary).
-- **Files:** `app/[locale]/(protected)/workouts/sessions/[id]/page.tsx`;
+- **Files:** `app/[locale]/(app)/(protected)/workouts/sessions/[id]/page.tsx`;
   `features/workout/{session-header,session-action-card,exercise-group,set-log-input,rest-timer-bar,session-confirmation-dialog}.tsx`;
   `hooks/{use-set-log-form,use-collapsible-exercises,use-compact-workout}.ts`;
   pure logic in `lib/utils/session-rounds.ts` (reuse `nextSetAfter`) + new
@@ -530,7 +530,7 @@ Each phase is an independent, mergeable slice per the repo's "Closing a slice"
   (B22/B23), Schedule entries (StatusMark), i18n leaks (B32).
 - **Files:** `features/routines/components/RoutineCard.tsx`, `features/routines/wizard/**`
   (`BuildDays.tsx`, `WizardExerciseCard.tsx`, `SetRow.tsx`, `ExerciseList.tsx`),
-  `app/[locale]/(protected)/routines/{new,edit/[id]}/page.tsx`, `components/ui/stepper.tsx`,
+  `app/[locale]/(app)/(protected)/routines/{new,edit/[id]}/page.tsx`, `components/ui/stepper.tsx`,
   `features/schedule/schedule-week-view.tsx`, `components/layout/HeroSection.tsx` call sites.
 - **Acceptance:** one filled control per viewport on /routines; builder ≤ 2 Cinzel and
   the first exercise card visible at 1440×900 on step 3; no `rounded-md`/gradient/

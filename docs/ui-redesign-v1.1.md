@@ -37,7 +37,7 @@ with the reason.
 
 | Family | Route / surface | Source owner | Status | What changed, or why it is retained |
 | --- | --- | --- | --- | --- |
-| Shell | Protected layout, `<main>` | `app/[locale]/(protected)/layout.tsx` | implemented—verified | One gutter (16/24) aligned with the topbar; `shell-pin`/`shell-bleed` (§26.3) |
+| Shell | Protected layout, `<main>` | `app/[locale]/(app)/(protected)/layout.tsx` | implemented—verified | One gutter (16/24) aligned with the topbar; `shell-pin`/`shell-bleed` (§26.3) |
 | Shell | Topbar | `features/shell/components/Header.tsx` | implemented—verified | Running head (§26.2); phone search proportion and ellipsis; decorative icons `aria-hidden` |
 | Shell | Bottom bar | `BottomNav.tsx` | implemented—verified | One sliding marker; `touch-manipulation` |
 | Shell | Sidebar, More drawer | `Sidebar.tsx` | reviewed—retained | Grouped index, sliding marker, focus trap and Escape already meet §11.10 and the skills; verified focus in/out |
@@ -68,7 +68,7 @@ with the reason.
 | Community | Activity, Notifications, Search, relationship lists | `features/activity`, `features/notifications`, `search` | reviewed—retained | Ruled lists, honest empty states |
 | Settings | All five tabs | `features/settings/*` | reviewed—retained | Panels per §11.5; pinned tabs now on `shell-pin` |
 | Moderation | Queue | `features/moderation/*` | reviewed—retained | Decision controls already sentence-case outlines; seen as moderator only |
-| Entry | Login, signup, forgot, reset, callback | `app/[locale]/(auth)/*` | reviewed—retained | Coherent with the system in both themes; bracket fix applies |
+| Entry | Login, signup, forgot, reset, callback | `app/[locale]/(app)/(auth)/*` | reviewed—retained | Coherent with the system in both themes; bracket fix applies |
 | Exceptional | Offline, not found, route error | `offline`, `not-found.tsx`, `error.tsx` | reviewed—retained | Not-found and offline captured; route error not provoked |
 | Public | `/shared/routines/[token]`, `/shared/sessions/[token]` | `(public)/shared/*`, `SharedRoutineView`, `shared-session-view.tsx` | implemented—verified | Real links, signed out, 320 (Spanish), 390, 1440, both themes. The two pages now open the same way: a sentence-case attribution over the page inscription (`b6eab9f`) |
 

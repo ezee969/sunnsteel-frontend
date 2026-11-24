@@ -17,7 +17,7 @@ import type {
 /*
  * ACH-11, design system §24. The ornament is generated
  * (scripts/generate-rank-decoration.mjs): pieces are SVG markup in placeholder
- * colours that globals.css maps to the rank's tokens, tiles are luminance
+ * colours that app/styles/shared.css maps to the rank's tokens, tiles are luminance
  * masks painted in the pigment. Each rank's module is its own chunk, so a
  * profile loads only the rank it shows. Everything here is decorative: it is
  * aria-hidden, never interactive and never carries the rank alone - the crest

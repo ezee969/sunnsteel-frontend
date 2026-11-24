@@ -1,6 +1,4 @@
-import '../globals.css'
-
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import {
 	Bebas_Neue,
 	Cinzel,
@@ -8,24 +6,25 @@ import {
 	Source_Sans_3,
 	Space_Mono,
 } from 'next/font/google'
-import { notFound } from 'next/navigation'
-import { hasLocale } from 'next-intl'
-import {
-	getMessages,
-	getTranslations,
-	setRequestLocale,
-} from 'next-intl/server'
+import { getTranslations } from 'next-intl/server'
+import type { ReactNode } from 'react'
 
 import DevInjections from '@/components/dev-injections'
 import { type Locale, LOCALES } from '@/i18n/config'
 import { PUBLIC_ORIGIN, SHOULD_SHOW_PERFORMANCE_PANEL } from '@/lib/config/env'
 import { DISPLAY_PREFERENCE_SCRIPT } from '@/lib/utils/display-preference'
 import { MOTION_PREFERENCE_SCRIPT } from '@/lib/utils/motion-preference'
-import { type Messages, rootMessages } from '@/messages'
-import { AppProviderGate } from '@/providers/app-provider-gate'
-import { IntlProvider } from '@/providers/intl-provider'
 import { PwaProvider } from '@/providers/pwa-provider'
 import { ThemeProvider } from '@/providers/theme-provider'
+
+/**
+ * SITE-01: the document both root layouts render -- the app's
+ * (app/[locale]/(app)/layout.tsx) and the public site's
+ * (app/[locale]/(site)/layout.tsx). They are separate roots so each loads its
+ * own stylesheet and providers, and Next makes a move between them a full
+ * page load; what every page shares (fonts, the pre-paint scripts, the theme,
+ * the service worker, the metadata) lives here once.
+ */
 
 const oswald = Oswald({
 	variable: '--font-oswald',
@@ -71,11 +70,7 @@ const cinzel = Cinzel({
 	display: 'swap',
 })
 
-import { Viewport } from 'next'
-
-// Client-only dev helpers are rendered via DevInjections
-
-const SHOW_PERF_PANEL = SHOULD_SHOW_PERFORMANCE_PANEL
+const FONT_VARIABLES = `${oswald.variable} ${sourceSans.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable}`
 
 /**
  * I18N-03: title, description and the OpenGraph alt text follow the language;
@@ -84,16 +79,8 @@ const SHOW_PERF_PANEL = SHOULD_SHOW_PERFORMANCE_PANEL
  * renders in, `en_US` or `es_ES` -- it read `es_ES` even for English before
  * this, which was never corrected until translation made it visible.
  */
-export async function generateMetadata({
-	params,
-}: {
-	params: Promise<{ locale: string }>
-}): Promise<Metadata> {
-	const { locale } = await params
-	const t = await getTranslations({
-		locale: locale as Locale,
-		namespace: 'core.metadata',
-	})
+export async function rootMetadata(locale: Locale): Promise<Metadata> {
+	const t = await getTranslations({ locale, namespace: 'core.metadata' })
 	const title = t('title')
 	const description = t('description')
 
@@ -160,7 +147,7 @@ export async function generateMetadata({
 	}
 }
 
-export const viewport: Viewport = {
+export const ROOT_VIEWPORT: Viewport = {
 	themeColor: [
 		{ media: '(prefers-color-scheme: light)', color: '#ede9e1' },
 		{ media: '(prefers-color-scheme: dark)', color: '#0f0c08' },
@@ -173,31 +160,23 @@ export const viewport: Viewport = {
 // carries the language: middleware.ts rewrites `/dashboard` to
 // `/<locale>/dashboard` from the `ss-locale` cookie, so the pages stay static
 // and served from the CDN, and every link stays as it was.
-export function generateStaticParams() {
+export function rootStaticParams() {
 	return LOCALES.map(locale => ({ locale }))
 }
 
-export const dynamicParams = false
-
-export default async function RootLayout({
+export function RootDocument({
+	locale,
 	children,
-	params,
-}: Readonly<{
-	children: React.ReactNode
-	params: Promise<{ locale: string }>
-}>) {
-	const { locale } = await params
-	if (!hasLocale(LOCALES, locale)) notFound()
-	// Lets next-intl read the language from the segment rather than from the
-	// request, which is what keeps the page static.
-	setRequestLocale(locale)
-	// The language is passed rather than read back from the request, so a
-	// dynamically rendered page cannot fall back to English.
-	const messages = (await getMessages({ locale })) as Messages
+}: {
+	locale: Locale
+	children: ReactNode
+}) {
 	// `lang` is the page's language on the first byte, so screen readers
 	// pronounce it right. It said "es" over English text until I18N-01.
 	return (
 		<html lang={locale} suppressHydrationWarning>
+			{/* Rendered only by the two root layouts, where <head> belongs. */}
+			{/* eslint-disable-next-line @next/next/no-head-element */}
 			<head>
 				{/* A11Y-01: apply the device's stored reduce-motion choice before the
 				    first paint, the way next-themes applies the theme. */}
@@ -210,17 +189,13 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body
-				className={`${oswald.variable} ${sourceSans.variable} ${spaceMono.variable} ${bebasNeue.variable} ${cinzel.variable} antialiased`}
+				className={`${FONT_VARIABLES} antialiased`}
 				suppressHydrationWarning
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<PwaProvider />
-					{/* SITE-01: `core` only here; each route group adds what it reads,
-					    and the app's providers skip the public site. */}
-					<IntlProvider locale={locale} messages={rootMessages(messages)}>
-						<AppProviderGate>{children}</AppProviderGate>
-					</IntlProvider>
-					<DevInjections showPerfPanel={SHOW_PERF_PANEL} />
+					{children}
+					<DevInjections showPerfPanel={SHOULD_SHOW_PERFORMANCE_PANEL} />
 				</ThemeProvider>
 			</body>
 		</html>

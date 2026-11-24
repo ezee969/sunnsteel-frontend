@@ -941,7 +941,7 @@ so nobody re-derives them:
 Non-negotiable, because each corresponds to a defect this project has already
 shipped once.
 
-1. **Compiled-stylesheet check.** After any change to `globals.css`, confirm the
+1. **Compiled-stylesheet check.** After any change to the stylesheets (`app/styles/`, `app/globals.css`, `app/site.css`), confirm the
    new selectors are in the served CSS before trusting a screenshot. An undefined
    variant emits nothing and no error (TD-28, TD-29), and in Phase 4 a stale
    Turbopack compile silently dropped the entire appended block after a
@@ -1128,7 +1128,7 @@ Size the mark to roughly **1.2× the wordmark's cap height** — at `text-xl` th
 ### 18.3 Consequences
 
 - **900 is no longer loaded.** The wordmark was its only consumer, so
-  [app/[locale]/layout.tsx](../app/[locale]/layout.tsx) now requests Cinzel 600 alone. The identity
+  [app/[locale]/(app)/layout.tsx](../app/[locale]/(app)/layout.tsx) now requests Cinzel 600 alone. The identity
   change is net *negative* in font bytes; §13 item 4 is untouched, because no
   weight was added.
 - **The public header drops the word below `sm`** and shows the mark alone. TD-35

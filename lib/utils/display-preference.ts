@@ -13,7 +13,7 @@ export type ControlSizePreference = 'standard' | 'large'
 
 export const CONTRAST_PREFERENCE_STORAGE_KEY = 'ss-contrast'
 export const CONTROL_SIZE_STORAGE_KEY = 'ss-controls'
-/** Set on <html> as `data-contrast="more"`; `globals.css` mirrors the media query. */
+/** Set on <html> as `data-contrast="more"`; `app/styles/shared.css` mirrors the media query. */
 export const CONTRAST_ATTRIBUTE = 'data-contrast'
 /** Set on <html> as `data-controls="large"`; read by the `large-controls:` variant. */
 export const CONTROL_SIZE_ATTRIBUTE = 'data-controls'

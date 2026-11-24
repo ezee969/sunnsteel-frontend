@@ -321,7 +321,7 @@ Locked behaviour (§9.3), resolved per surface:
 | Superset hand-off (LIVE-21) | The scroll is instant (`behavior: 'auto'`, from `useMotionPreference`); the arrival tint stays, as colour, and shortens with `--motion-slow` to 480ms |
 
 Implementation: one `@media (prefers-reduced-motion: reduce)` block in
-`globals.css` that (a) sets the three `--motion-*` properties to `120ms`,
+`app/styles/shared.css` that (a) sets the three `--motion-*` properties to `120ms`,
 (b) disables the transform/width keyframe animations by name
 (`animation: none` on the spinner, pulse, rule-draw and mark-fill classes), and
 (c) zeroes enter/exit scale and translate variables

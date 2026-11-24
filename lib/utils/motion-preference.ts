@@ -6,7 +6,7 @@
 export type MotionPreference = 'system' | 'reduce'
 
 export const MOTION_PREFERENCE_STORAGE_KEY = 'ss-motion'
-/** Set on <html> as `data-motion="reduce"`; `globals.css` mirrors the media block. */
+/** Set on <html> as `data-motion="reduce"`; `app/styles/shared.css` mirrors the media block. */
 export const MOTION_ATTRIBUTE = 'data-motion'
 export const MOTION_PREFERENCE_EVENT = 'ss-motion-change'
 

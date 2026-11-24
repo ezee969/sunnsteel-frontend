@@ -38,7 +38,7 @@ import {
  * Where each phone's script starts, in seconds: as the one before it settles,
  * never after a pause (the owner, 2026-11-22: waiting two seconds between
  * phones read as the page stalling). Each start is the previous script's last
- * frame less a short overlap; the scripts' timings are in globals.css (§12.4).
+ * frame less a short overlap; the scripts' timings are in app/styles/public-site.css (§12.4).
  */
 const SEQ_SECONDS = [0, 1.15, 3.6, 6.5] as const
 const VERBS = [

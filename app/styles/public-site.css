@@ -1,0 +1,3141 @@
+/* SITE-01: the public site's own rules, imported only by app/site.css, so the
+   app never downloads them and the site never downloads the app's. */
+
+/* ------------------------------------------------------------------------
+   §33 The public site (SITE-01): the `(site)` route group only. The hero and
+   the proof band are a Night region (`.dark` on the page wrapper); the scrim
+   is baked into the footage (§33.4), so nothing here darkens the video except
+   the higher-contrast layer. Values are measured off the approved comp
+   (.impeccable/mocks/comp-a-real-1536.png) at 1536x864.
+   ------------------------------------------------------------------------ */
+.site {
+  --site-gutter: clamp(16px, 3.65vw, 56px);
+  min-height: 100svh;
+  background: var(--background);
+  color: var(--foreground);
+}
+/* The browser's own surfaces carry the design too: a selection in the ink of
+   the region it is in, and a visible ring on every one of the site's own
+   controls (its buttons and links are not the app's primitives). */
+/* The landing's text is not selectable (the owner, 2026-11-22), except the
+   questions -- the support address and the answers are there to be copied. */
+.site {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.site :is(.site-questions, input, textarea) {
+  -webkit-user-select: text;
+  user-select: text;
+}
+.site ::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+/* §33.13 the site's accent (the owner, 2026-11-22: "we can afford some extra
+   color"): burnished gold, the golden era's bronze. It marks the one action
+   and what is active or earned in an example -- never Pro, never a rank. A
+   deeper grade on the light ground, a brighter one on Night. */
+.site {
+  --site-accent: oklch(0.6 0.13 78);
+  --site-accent-ink: oklch(0.18 0.012 70);
+}
+.dark .site,
+.site .dark,
+.site.dark {
+  --site-accent: oklch(0.84 0.15 86);
+}
+/* Two classes, so the accent wins over the ink fill declared further down. */
+.site-filled.site-filled-accent {
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-filled.site-filled-accent:hover {
+  background: color-mix(in oklch, var(--site-accent) 86%, white);
+}
+.site .type-site-display mark {
+  color: var(--site-accent);
+}
+/* The bar's Get started waits for the hero's to scroll away. */
+.site-js .site-bar:not([data-cta]) .site-filled-bar {
+  visibility: hidden;
+  opacity: 0;
+}
+.site-anim .site-bar .site-filled-bar {
+  transition:
+    opacity var(--motion-base) var(--ease-standard),
+    visibility var(--motion-base);
+}
+.site :is(a, button, summary):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+.type-site-display {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(30px, 8vw, 70px);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.type-site-display mark {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.16em;
+}
+.type-site-lead {
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.type-site-numeral {
+  font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(40px, 2.9vw, 64px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+@media (min-width: 768px) {
+  .type-site-lead {
+    font-size: 1.25rem;
+  }
+}
+
+.site-bar {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 20;
+  /* Its own ink: under a light page the bar takes the Night tokens, and text
+     without a colour of its own (Product, Pricing) would otherwise inherit
+     the page's dark ink, computed outside the bar. */
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  height: 84px;
+  padding-inline: var(--site-gutter);
+}
+.site-skip {
+  position: absolute;
+  left: var(--site-gutter);
+  top: 8px;
+  transform: translateY(-200%);
+  background: var(--background);
+  padding: 8px 12px;
+}
+.site-skip:focus-visible {
+  transform: none;
+}
+.site-lockup {
+  gap: 12px;
+  font-size: 27px;
+}
+.site-lockup-mark {
+  width: 28px;
+  height: 28px;
+}
+.site-nav {
+  display: flex;
+  white-space: nowrap;
+  gap: 48px;
+  margin-left: 56px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+/* §12.1 the Product panel, as Boostcamp's bar opens its own (the owner,
+   2026-11-23): hovering or focusing Product turns it gold, flips its chevron
+   and, after 150ms, unfolds a Night panel of three columns from the top
+   (200ms, scaleY 0.8 to 1 with a fade); it folds away 100ms after the
+   pointer leaves. CSS only. The panel's top padding is the bridge the
+   pointer crosses from the trigger. Below 1024 the menu button lists the
+   same pages. */
+.site-product {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.site-product-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 200ms var(--ease-standard);
+}
+.site-product-chevron {
+  transition: transform 200ms var(--ease-standard);
+}
+.site-product-panel {
+  position: absolute;
+  top: 100%;
+  left: -28px;
+  z-index: 30;
+  padding-top: 36px;
+  color: var(--foreground);
+  visibility: hidden;
+  opacity: 0;
+  transform: scaleY(0.8);
+  transform-origin: top left;
+  pointer-events: none;
+  transition:
+    opacity 200ms cubic-bezier(0.755, 0.05, 0.855, 0.06) 100ms,
+    transform 200ms cubic-bezier(0.755, 0.05, 0.855, 0.06) 100ms,
+    visibility 0s linear 300ms;
+}
+.site-product:is(:hover, :focus-within) .site-product-panel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 200ms cubic-bezier(0.23, 1, 0.32, 1) 150ms,
+    transform 200ms cubic-bezier(0.23, 1, 0.32, 1) 150ms,
+    visibility 0s linear 150ms;
+}
+.site-product:is(:hover, :focus-within) .site-product-trigger {
+  color: var(--site-accent);
+}
+.site-product:is(:hover, :focus-within) .site-product-chevron {
+  transform: rotate(180deg);
+}
+.site-product-inner {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  column-gap: 64px;
+  padding: 24px 32px 22px 28px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--background);
+  box-shadow: 0 16px 40px oklch(0 0 0 / 0.45);
+}
+.site-product-label {
+  margin-bottom: 12px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-accent);
+}
+.site-product-link {
+  display: block;
+  padding: 7px 0;
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  transition: color 150ms var(--ease-standard);
+}
+.site-product-link:hover {
+  color: var(--foreground);
+}
+@media (max-width: 1023px) {
+  .site-product-panel {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-product-panel,
+  .site-product:is(:hover, :focus-within) .site-product-panel {
+    transform: none;
+    transition: visibility 0s;
+  }
+}
+.site-bar-actions {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 44px;
+  margin-left: auto;
+}
+.site-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.site-filled:hover {
+  background: var(--primary-hover);
+}
+.site-filled-bar {
+  height: 38px;
+  padding-inline: 24px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.site-filled-hero {
+  height: 56px;
+  padding-inline: 30px;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+.site-ghost {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding-inline: 16px;
+  color: var(--foreground);
+}
+.site-ghost span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.site-hero {
+  position: relative;
+  overflow: hidden;
+  /* The whole first screen (the owner, 2026-11-22): the proof band waits
+     below the fold so the footage and the headline land alone. */
+  height: max(600px, 100svh);
+}
+.site-scrim-more {
+  display: none;
+}
+:root[data-contrast='more'] .site-scrim-more {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--background) 31%, transparent);
+}
+@media (prefers-contrast: more) {
+  .site-scrim-more {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklch, var(--background) 31%, transparent);
+  }
+}
+.site-hero-text {
+  position: relative;
+  z-index: 10;
+  max-width: calc(700px + var(--site-gutter));
+  /* The headline sits where the comp put it (y 183): the eyebrow above it was
+     dropped on 2026-11-21 so "free" is said once. */
+  padding: 183px 0 0 calc(var(--site-gutter) + 1px);
+}
+.site-lead {
+  margin-top: 40px;
+  max-width: 460px;
+  color: var(--ink-2);
+}
+.site-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+.site-install {
+  margin-top: 28px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.site-install a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-video-control {
+  right: 22px;
+  bottom: 14px;
+}
+
+/* The live-session phone: an original frame standing on the hero's edge. */
+.site-phone {
+  position: absolute;
+  z-index: 10;
+  right: 10vw;
+  bottom: 0;
+  width: 202px;
+  height: 432px;
+}
+.site-phone-frame {
+  height: 100%;
+  border: 1.5px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--surface-sunk);
+  padding: 12px 16px;
+}
+.site-phone-title {
+  margin-top: 28px;
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: 21px;
+  letter-spacing: 0.02em;
+}
+.site-record {
+  position: absolute;
+  left: -8px;
+  top: 338px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 217px;
+  height: 60px;
+  padding-inline: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+/* The proof band: the hero's dark foot, four ruled cells. */
+.site-proof {
+  border-block: 1px solid var(--rule);
+}
+.site-proof-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 134px;
+}
+.site-proof-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-block: 24px;
+  text-align: center;
+}
+.site-proof-cell + .site-proof-cell {
+  border-left: 1px solid var(--rule-faint);
+}
+.site-proof-label {
+  margin-top: 12px;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+}
+.site-proof-mock {
+  position: absolute;
+  bottom: -18px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px dashed var(--rule);
+}
+
+/* The menu: a button below 768, a full-height panel from the right (§12.1). */
+.site-menu-button {
+  display: none;
+}
+/* The whole screen, edge to edge (the owner, 2026-11-23: a 420px panel left
+   a strip of the page showing on a wide phone), fading in and out as
+   Boostcamp's menu does -- no slide -- with its list a beat behind. */
+.site-menu-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+.site-menu-top {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: 84px;
+  padding-inline: var(--site-gutter);
+}
+.site-menu-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px var(--site-gutter) 32px;
+}
+@keyframes site-menu-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-menu-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes site-menu-x {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+}
+.site-menu-panel[data-state='open'] {
+  animation: site-menu-in 300ms linear both;
+}
+.site-menu-panel[data-state='closed'] {
+  animation: site-menu-out 200ms linear both;
+}
+.site-menu-panel[data-state='open'] .site-menu-body {
+  animation: site-menu-in 250ms cubic-bezier(0.2, 0.6, 0.3, 1) 60ms both;
+}
+.site-menu-panel[data-state='open'] .site-menu-close svg {
+  animation: site-menu-x 300ms cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-menu-panel,
+  .site-menu-panel * {
+    animation: none !important;
+  }
+}
+:root[data-motion='reduce'] :is(.site-menu-panel, .site-menu-panel *) {
+  animation: none !important;
+}
+
+/* Phones and tablets (plan §12.1-§12.3, the approved 390 comps). Below 1024
+   the language switch and Sign in leave the bar for the menu, which opens
+   there too: at 768 in Spanish they did not fit beside Product and Pricing. */
+@media (max-width: 1023px) {
+  .site-phone {
+    display: none;
+  }
+  .site-bar-actions > :not(.site-filled):not(.site-menu-button) {
+    display: none;
+  }
+  .site-menu-button {
+    display: grid;
+  }
+  .site-bar-actions {
+    gap: 16px;
+  }
+}
+@media (max-width: 767px) {
+  .site-bar,
+  .site-menu-top {
+    height: 56px;
+  }
+  .site-nav,
+  .site-bar-actions > :not(.site-filled):not(.site-menu-button) {
+    display: none;
+  }
+  .site-bar-actions {
+    gap: 8px;
+  }
+  .site-menu-button {
+    display: grid;
+  }
+  .site-filled-bar {
+    height: 44px;
+    padding-inline: 14px;
+  }
+  .site-lockup {
+    font-size: 17px;
+  }
+  .site-lockup-mark {
+    width: 22px;
+    height: 22px;
+  }
+  .site-hero {
+    height: auto;
+  }
+  .site-hero-text {
+    max-width: none;
+    padding: 152px var(--site-gutter) 48px;
+    text-align: center;
+  }
+  /* The first screen is the hero and its figures, nothing of the next
+     section (the owner, 2026-11-23): the Night region fills the smallest
+     viewport and the hero takes what the proof band leaves, its text
+     centred in it. */
+  .site-night:has(> .site-hero) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+  .site-night > .site-hero {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .site-night > .site-hero .site-hero-text {
+    padding-block: 104px 72px;
+  }
+  .site-lead {
+    margin-top: 20px;
+    margin-inline: auto;
+  }
+  .site-actions {
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .site-filled-hero {
+    height: 48px;
+    padding-inline: 24px;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+  .site-install {
+    max-width: 34ch;
+    margin: 20px auto 0;
+    font-size: 14px;
+  }
+  .site-video-control {
+    right: 6px;
+    bottom: 4px;
+  }
+  .site-proof-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-proof-cell {
+    margin-block: 0;
+    padding: 18px 8px;
+  }
+  .site-proof-cell + .site-proof-cell {
+    border-left: 0;
+  }
+  .site-proof-cell:nth-child(odd) {
+    border-right: 1px solid var(--rule-faint);
+  }
+  .site-proof-cell:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--rule-faint);
+  }
+  .site-proof-label {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+  .site-proof-mock {
+    position: static;
+    margin-top: 6px;
+  }
+}
+/* Spanish runs longer: its two actions stack below 420px (the approved 390 comp). */
+@media (max-width: 419px) {
+  html[lang='es'] .site-actions {
+    flex-direction: column;
+  }
+  html[lang='es'] .site-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Below 360px the bar's lockup keeps the mark; the link keeps its name. The
+   footer has the room, so it keeps the wordmark. */
+@media (max-width: 359px) {
+  .site-bar .site-lockup .type-wordmark {
+    display: none;
+  }
+}
+/* Below 1024 Sign in holds the bar until Get started takes its place (the
+   owner, 2026-11-23: a member coming back found no way in on a phone). The
+   two never share the bar: in Spanish at 390 they do not fit together. */
+@keyframes site-bar-swap {
+  from {
+    opacity: 0;
+  }
+}
+@media (max-width: 1023px) {
+  .site-js .site-bar:not([data-cta]) .site-bar-signin {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-js .site-bar:not([data-cta]) .site-filled-bar {
+    display: none;
+  }
+  .site-anim .site-bar :is(.site-bar-signin, .site-filled-bar) {
+    animation: site-bar-swap 240ms var(--ease-standard);
+  }
+}
+
+/* §33, the sections after the proof band (plan §12.4-§12.6): the page's own
+   theme from here on. Each section rests on its final state; the stages and
+   scripts arrive with the motion phase. */
+.site-night {
+  background: var(--background);
+  color: var(--foreground);
+}
+.type-site-heading {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(28px, 4.6vw, 64px);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+/* The brand's rule under a section heading (it draws in the motion phase). */
+.site-heading::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 3px;
+  margin-top: 24px;
+  background: var(--site-accent);
+}
+.site-section {
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: clamp(88px, 10vw, 160px) var(--site-gutter) 0;
+}
+.site-body {
+  margin-top: 12px;
+  max-width: 52ch;
+  color: var(--ink-2);
+}
+.site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 8px;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.site-tag {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--ink-2);
+}
+.site-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+
+/* The original phone frame (§33.8), Night in both themes: as wide as its
+   column, up to 300px. */
+.site-device {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 9 / 18.5;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--rule);
+  border-radius: 36px;
+  background: var(--surface-sunk);
+  color: var(--foreground);
+  padding: 14px 18px;
+}
+.site-device-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-device-clock {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--ink-2);
+}
+.site-device-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.site-device-screen {
+  padding-top: 18px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.site-screen-title {
+  font-family: var(--font-cinzel), 'Cinzel', ui-serif, Georgia, serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+.site-screen-caption {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.site-screen-figure {
+  margin-block: 6px 10px;
+}
+.site-screen-block {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+.site-screen-rows {
+  margin-top: 6px;
+}
+.site-screen-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-callout {
+  position: relative;
+  margin: -32px auto 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 280px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* §12.4 the four verbs: four phones in a row from 1280, two by two on
+   tablets, a swipe row on phones (the owner, 2026-11-22). */
+.site-verbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 24px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-verb {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* In the row, the four columns share their rows, so a two-line callout
+   never pushes one title below the others. */
+@media (min-width: 1280px) {
+  .site-verb {
+    display: grid;
+    grid-row: span 5;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+  .site-verbs {
+    row-gap: 0;
+  }
+}
+.site-verb-word {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.site-verb-word .type-data {
+  color: var(--site-accent);
+}
+.site-verb-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+/* The four phones fit the window with their word above them (the owner,
+   2026-11-23: at 300 by 617 they ran past a laptop's screen). `zoom` scales
+   each phone whole, so its screen keeps the layout it was drawn at; a
+   shorter window takes them smaller still. */
+@media (min-width: 768px) {
+  .site-verb-stage .site-device {
+    zoom: 0.86;
+  }
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-verb-stage .site-device {
+    zoom: 0.78;
+  }
+}
+@media (min-width: 768px) and (max-height: 700px) {
+  .site-verb-stage .site-device {
+    zoom: 0.7;
+  }
+}
+.site-verb-title {
+  margin-top: 24px;
+}
+.site-verb .site-body {
+  margin-top: 8px;
+}
+@media (max-width: 1279px) {
+  .site-verbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 56px 32px;
+  }
+}
+@media (max-width: 767px) {
+  /* A row that only swipes sideways (the owner, 2026-11-23): overflow-x
+     alone leaves the other axis on auto, and the pools and the drift gave
+     it height to scroll, so it moved every way and caught the page's
+     vertical swipe. The block padding keeps the pools from being clipped. */
+  .site-verbs {
+    display: flex;
+    gap: 16px;
+    margin-inline: calc(var(--site-gutter) * -1);
+    margin-top: calc(clamp(40px, 5vw, 72px) - 32px);
+    margin-bottom: -32px;
+    padding: 32px var(--site-gutter);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--site-gutter);
+    scrollbar-width: none;
+  }
+  .site-verb {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
+  .site-anim .site-verbs .site-verb-stage {
+    animation: none;
+  }
+}
+/* On a phone a slide fits the window from its word to its description (the
+   owner, 2026-11-23: the description fell below the screen). The screens'
+   empty foot is cut (9 / 15.5 still holds the tallest, the plan's), the gaps
+   tighten, and the phone is zoomed to what the window has left: the small
+   viewport less the bar (56), 16px above and below, and the word, callout,
+   title and description, which wrap to more lines as the window narrows
+   (215px at 430 wide, 0.75px more for each pixel narrower), over the
+   phone's 517px. `zoom` scales it whole, as on desktop, and the callout's
+   overlap scales with it so it never covers the screen's last row. Where
+   `zoom` cannot take that ratio, steps of the same rule stand in. */
+@media (max-width: 767px) {
+  .site-verb-stage {
+    --verb-zoom: 1;
+    margin-top: 12px;
+  }
+  .site-verb-stage .site-device {
+    aspect-ratio: 9 / 15.5;
+    zoom: var(--verb-zoom);
+  }
+  .site-verb-stage .site-callout {
+    margin-top: calc(-32px * var(--verb-zoom));
+  }
+  .site-verb-title {
+    margin-top: 16px;
+  }
+}
+@media (max-width: 767px) and (max-height: 835px) {
+  .site-verb-stage {
+    --verb-zoom: 0.9;
+  }
+}
+@media (max-width: 767px) and (max-height: 783px) {
+  .site-verb-stage {
+    --verb-zoom: 0.8;
+  }
+}
+@media (max-width: 767px) and (max-height: 732px) {
+  .site-verb-stage {
+    --verb-zoom: 0.7;
+  }
+}
+@media (max-width: 767px) and (max-height: 680px) {
+  .site-verb-stage {
+    --verb-zoom: 0.6;
+  }
+}
+@media (max-width: 767px) and (max-height: 628px) {
+  .site-verb-stage {
+    --verb-zoom: 0.5;
+  }
+}
+@supports (zoom: tan(atan2(1px, 1px))) {
+  @media (max-width: 767px) {
+    .site-verb-stage {
+      --verb-zoom: clamp(
+        0.5,
+        tan(
+          atan2(
+            100svh - 303px - max(0px, (430px - 100vw) * 0.75),
+            517px
+          )
+        ),
+        1
+      );
+    }
+  }
+}
+
+/* §12.5 the tools bento. */
+.site-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-tool {
+  grid-column: 8 / 13;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px;
+}
+.site-tool-large {
+  grid-column: 1 / 8;
+  grid-row: 1 / 4;
+}
+.site-tool-text h3 {
+  margin-top: 8px;
+}
+.site-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
+}
+/* The ledger's panel takes the large card's remaining height, its rows
+   centred in it, so the card never opens a gap under its text. */
+/* The ledger fills its panel: its rows share the large card's height, so
+   no empty block sits under them. */
+.site-tool-large .site-mock {
+  flex: 1;
+  justify-content: flex-start;
+}
+.site-tool-large .site-ledger-table {
+  flex: 1;
+}
+.site-ledger-table {
+  width: 100%;
+  /* Separate borders belong to their cells, so a row's rule arrives with it. */
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+.site-ledger-table th {
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+.site-ledger-table td {
+  padding-block: 17px;
+  border-top: 1px solid var(--rule-faint);
+  white-space: nowrap;
+}
+.site-ledger-table :is(th, td):not(:last-child) {
+  padding-right: 16px;
+}
+.site-ledger-table tr[data-rise] td {
+  border-bottom: 2px solid var(--foreground);
+}
+.site-notification {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.site-superset {
+  border-left: 2px solid var(--foreground);
+  padding-left: 12px;
+}
+
+/* §12.6 progress. */
+.site-progress-stage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 32px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-progress-text {
+  grid-column: 1 / 5;
+}
+.site-progress-map {
+  grid-column: 5 / 13;
+  grid-row: 1 / 3;
+}
+/* The strength line sits under the week rail, so a pinned stage keeps it in
+   view; stacked, it follows the map. */
+.site-progress-stage > .site-strength {
+  grid-column: 1 / 5;
+  grid-row: 2;
+  align-self: start;
+  margin-top: 0;
+}
+.site-week-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+}
+.site-week {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  /* A label, so the label face, not Space Mono (which is for measures). */
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.site-week:hover {
+  color: var(--foreground);
+  border-color: var(--foreground);
+}
+.site-week[aria-pressed='true'] {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-strength {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+.site-analysis-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+.site-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+.site-analysis-mock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding: 12px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
+}
+.site-outline-mock {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 36px;
+  margin-top: 4px;
+  padding-inline: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+.site-figure-link {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 1023px) {
+  .site-tool,
+  .site-tool-large {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+  .site-mock {
+    margin-top: 0;
+  }
+  .site-progress-text,
+  .site-progress-map,
+  .site-progress-stage > .site-strength {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .site-analysis-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .site-tool,
+  .site-tool-large {
+    display: flex;
+    padding: 20px;
+  }
+  .site-analysis-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* §12.7 ranks: the lead and the ladder in columns 1-6, the phone in 8-12
+   beside both; one column below 1024 with the phone between the lead and the
+   ladder, so a picked rank shows just above it. */
+.site-ranks {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    'body body body body body body . phone phone phone phone phone'
+    'ladder ladder ladder ladder ladder ladder . phone phone phone phone phone';
+  grid-template-rows: auto 1fr;
+  column-gap: 24px;
+}
+.site-ranks-body {
+  grid-area: body;
+}
+.site-ranks-ladder {
+  grid-area: ladder;
+  align-self: start;
+}
+.site-ranks-phone {
+  grid-area: phone;
+  display: flex;
+  justify-content: center;
+  align-self: center;
+}
+/* The profile is drawn on the page's ground, as the app draws it. */
+.site-rank-phone {
+  max-width: 320px;
+  background: var(--background);
+}
+/* Its own height, not the frame's 9:18.5: the profile and the rank line
+   need 34px more than that shape holds, and the last row was cut off. */
+.site-device.site-rank-phone {
+  aspect-ratio: auto;
+  height: auto;
+}
+/* Like the verbs' phones, it scales whole to fit the window (the owner,
+   2026-11-23: at 658px tall it ran past a laptop's screen). */
+@media (min-width: 768px) {
+  .site-rank-phone {
+    zoom: 0.84;
+  }
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-rank-phone {
+    zoom: 0.74;
+  }
+}
+@media (min-width: 768px) and (max-height: 700px) {
+  .site-rank-phone {
+    zoom: 0.66;
+  }
+}
+/* All six ranks in one cell: the screen keeps the tallest one's height, so
+   changing rank never moves the phone, and the shown one crossfades in. */
+/* Two shared rows, header and rank line (a subgrid): each row is as tall as
+   its tallest rank's, so the rank line starts at the same height for every
+   rank and in both languages. */
+.site-rank-stack {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+.site-rank-panel {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  display: grid;
+  grid-template-rows: subgrid;
+  min-width: 0;
+}
+/* The next-rank row keeps two lines' room, so Laureate's one-line "highest
+   rank" sits where the others' rows do. */
+.site-rank-panel .site-rank-line > :last-child {
+  min-height: 3.5rem;
+}
+.site-rank-panel:not([data-shown]) {
+  visibility: hidden;
+  opacity: 0;
+}
+.site-anim .site-rank-panel {
+  transition:
+    opacity 300ms var(--ease-standard),
+    visibility 0s linear 300ms;
+}
+.site-anim .site-rank-panel[data-shown] {
+  transition:
+    opacity 450ms var(--ease-standard) 80ms,
+    visibility 0s;
+}
+.site-rank-line {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+.site-ladder {
+  margin-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+.site-ladder-rung {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule-faint);
+  text-align: left;
+}
+.site-ladder-rung:hover {
+  background: var(--surface);
+}
+.site-ladder-rung[aria-pressed='true'] {
+  background: color-mix(in oklch, var(--site-accent) 14%, transparent);
+}
+
+/* §12.8 templates: the plain list, before the coverflow. */
+.site-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: 44px;
+  padding-inline: 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+}
+.site-outline:hover {
+  background: var(--surface-sunk);
+}
+.site-templates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.site-template {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+}
+.site-template > .site-outline:last-child {
+  margin-top: auto;
+}
+.site-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.site-week-strip li {
+  display: grid;
+  place-items: center;
+  height: 28px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.site-week-strip li[data-on] {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+.site-template-days {
+  border-top: 1px solid var(--rule);
+}
+/* Advanced: the 8-week block's steps, each bar its share of the reference
+   max (the track is the whole max, so the bars are never exaggerated). */
+.site-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.site-block-bars {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+}
+.site-block-bars li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.site-block-track {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.site-block-fill {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(var(--h, 0) * 100%);
+  background: var(--foreground);
+  transform-origin: bottom;
+}
+/* "None of these?": one line under the cards, at every level. */
+.site-none-fit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 32px;
+  row-gap: 12px;
+  margin-top: 40px;
+}
+
+/* §12.9 people: three scenes, then the privacy band. */
+.site-scenes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+/* Each scene's eyebrow, title, sentence and panel share rows with the other
+   scenes', so the three panels start on one line whatever the text's length. */
+.site-scene {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 8px;
+}
+.site-scene-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 260px;
+  margin-top: 16px;
+  padding: 20px;
+}
+.site-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.site-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--rule);
+  border-radius: 9999px;
+  background: var(--surface-sunk);
+  color: var(--ink-2);
+}
+.site-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.site-reactions li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding-inline: 10px;
+  border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.site-reactions li[data-chosen] {
+  border-color: var(--foreground);
+  color: var(--foreground);
+}
+.site-routine-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+}
+.site-privacy {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 40px;
+  align-items: center;
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+.site-privacy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--rule-faint);
+}
+/* The app's ToggleRow, drawn still: a ruled row, the chosen option underlined. */
+.site-segmented {
+  display: inline-flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--rule);
+}
+.site-segmented span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-bottom: -1px;
+  padding-inline: 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.site-segmented span[data-on] {
+  border-bottom-color: var(--foreground);
+  color: var(--foreground);
+}
+
+@media (max-width: 1023px) {
+  .site-ranks {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'body' 'phone' 'ladder';
+    grid-template-rows: auto;
+    row-gap: 40px;
+  }
+  .site-templates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-scenes {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  .site-scene + .site-scene {
+    margin-top: 40px;
+  }
+  .site-scene-panel {
+    min-height: 0;
+  }
+  .site-privacy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+@media (max-width: 767px) {
+  .site-templates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-template {
+    padding: 20px;
+  }
+  .site-privacy-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-block: 12px;
+  }
+  .site-segmented span {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 6px;
+  }
+}
+
+/* §12.10 Free and Pro: equal cards, nothing coloured to rank them. */
+.site-plans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: clamp(40px, 5vw, 72px) auto 0;
+}
+.site-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+}
+.site-plan-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.site-plan-lines {
+  display: flex;
+  flex-direction: column;
+}
+.site-plan-lines li {
+  display: flex;
+  gap: 12px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--rule-faint);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.site-plan-action {
+  margin-top: auto;
+  align-self: stretch;
+}
+.site-plans-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  max-width: 960px;
+  margin: 24px auto 0;
+}
+.site-plans-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  color: var(--ink-3);
+}
+.site-plans-legal a,
+.site-inline-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-plans-legal a:hover,
+.site-inline-link:hover {
+  color: var(--foreground);
+}
+.site-inline-link {
+  color: var(--foreground);
+}
+
+/* §12.11 questions: the heading sticky beside the list from 1024. */
+.site-questions {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 32px;
+}
+.site-questions-head {
+  grid-column: 1 / 5;
+  align-self: start;
+  position: sticky;
+  top: 32px;
+}
+.site-questions-list {
+  grid-column: 5 / 13;
+  border-top: 1px solid var(--rule);
+}
+.site-questions-list [data-slot='accordion-item'] {
+  scroll-margin-top: 24px;
+}
+
+/* §12.12 the closing band: a Night region over its clip. */
+.site-closing {
+  position: relative;
+  overflow: hidden;
+  margin-top: clamp(96px, 12vw, 192px);
+}
+.site-closing-inner {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: center;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  min-height: 560px;
+  margin-inline: auto;
+  padding: 96px var(--site-gutter);
+}
+.site-closing-text {
+  grid-column: 1 / 8;
+}
+.site-closing .site-lead {
+  margin-top: 24px;
+}
+.site-qr {
+  grid-column: 9 / 13;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 300px;
+  justify-self: end;
+  padding: 24px;
+}
+.site-qr-code {
+  width: 168px;
+  height: 168px;
+}
+
+/* §12.13 the footer: the page's theme under a rule. */
+.site-footer {
+  border-top: 1px solid var(--rule);
+}
+.site-footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 40px;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: 64px var(--site-gutter) 40px;
+}
+.site-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.site-footer-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+.site-footer-nav ul {
+  margin-top: 8px;
+}
+.site-footer-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.site-footer-link:hover {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin-inline: auto;
+  padding: 20px var(--site-gutter) 32px;
+  border-top: 1px solid var(--rule-faint);
+}
+.site-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+@media (max-width: 1023px) {
+  .site-questions-head,
+  .site-questions-list {
+    grid-column: 1 / -1;
+    position: static;
+  }
+  .site-closing-inner {
+    text-align: center;
+  }
+  .site-closing-text {
+    grid-column: 1 / -1;
+  }
+  .site-closing .site-lead {
+    margin-inline: auto;
+  }
+  .site-closing .site-actions {
+    justify-content: center;
+  }
+  .site-qr {
+    display: none;
+  }
+  .site-footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-footer-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .site-plans {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-plan {
+    padding: 24px 20px;
+  }
+  .site-closing-inner {
+    min-height: 0;
+    padding-block: 72px;
+  }
+  .site-footer-nav {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-footer-link {
+    min-height: 44px;
+  }
+  .site-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* §33.9 motion on the public site. Everything that moves waits for the
+   runtime (features/site/site-motion.tsx) to set `site-anim` on <html>: with
+   JavaScript and neither reduced-motion source. Layouts that need JavaScript
+   (the stages, the fixed bar) wait for `site-js`. Without either, the page
+   is the final state the server sent. */
+@keyframes site-rise {
+  from {
+    transform: translateY(110%);
+  }
+}
+@keyframes site-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes site-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise, 12px));
+  }
+}
+@keyframes site-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-slide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+@keyframes site-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+@keyframes site-plate {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--dir, 1) * 40px));
+  }
+}
+@keyframes site-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes site-unveil {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes site-drain {
+  from {
+    transform: scaleX(1);
+  }
+}
+
+/* Section headings: each line rises from behind its mask, then the rule
+   draws under it. */
+.site-w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.site-w > span {
+  display: inline-block;
+}
+.site-heading {
+  --line-gap: 90ms;
+}
+.site-heading::after {
+  transform-origin: left center;
+}
+.site-anim .site-heading:not([data-in]) .site-w > span {
+  transform: translateY(110%);
+}
+.site-anim .site-heading:not([data-in])::after {
+  transform: scaleX(0);
+}
+.site-anim .site-heading[data-in] .site-w > span {
+  animation: site-rise 900ms var(--ease-standard) both;
+  animation-delay: calc(var(--line, 0) * var(--line-gap));
+}
+.site-anim .site-heading[data-in]::after {
+  animation: site-rule 480ms var(--ease-standard) both;
+  animation-delay: calc(var(--lines, 1) * var(--line-gap) + 600ms);
+}
+
+/* Entrances: one element, or a list whose children arrive in turn. */
+.site-anim [data-reveal='up']:not([data-in]) {
+  opacity: 0;
+  transform: translateY(var(--rise, 12px));
+}
+.site-anim [data-reveal='up'][data-in] {
+  animation: site-up var(--dur, 600ms) var(--ease-standard) both;
+  animation-delay: var(--delay, 0ms);
+}
+.site-anim [data-reveal='stagger']:not([data-in]) > * {
+  opacity: 0;
+  transform: translateY(var(--rise, 24px));
+}
+.site-anim [data-reveal='stagger'][data-in] > * {
+  animation: site-up var(--dur, 700ms) var(--ease-standard) both;
+  animation-delay: calc(var(--i, 0) * var(--gap, 120ms));
+}
+
+/* The top bar (§33.6): fixed once JavaScript runs, Night over a Night
+   region, then the page's ground with its rule drawn under it. */
+.site-js .site-bar {
+  position: fixed;
+}
+.site-bar::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--rule);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+/* Scrolled, the bar takes a ground: the Night one over a Night region, the
+   page's elsewhere, so nothing reads through it. */
+.site-bar[data-scrolled],
+.site-bar[data-solid] {
+  background: var(--background);
+}
+.site-bar[data-solid]::after {
+  transform: none;
+}
+.site-anim .site-bar {
+  transition: background-color var(--motion-base) var(--ease-standard);
+}
+.site-anim .site-bar :is(a, button, span) {
+  transition: color var(--motion-base) var(--ease-standard);
+}
+.site-anim .site-bar[data-solid]::after {
+  transition: transform 240ms var(--ease-standard);
+}
+
+/* §12.4 the four verbs: each column rises as it comes into view; on desktop
+   the four scripts then play one after another (each phone's --seq), on
+   tablets and phones each as its phone comes into view. */
+@media (max-width: 1279px) {
+  .site-verb {
+    --seq: 0s !important;
+  }
+}
+.site-anim [data-play] .sx-day {
+  animation: site-slide 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 160ms);
+}
+.site-anim [data-play] .sx-row {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 500ms + var(--i, 0) * 90ms);
+}
+.site-anim [data-play] .sx-plate {
+  transform-box: fill-box;
+  animation: site-plate 450ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 300ms + var(--i, 0) * 450ms);
+}
+.site-anim [data-play] .sx-ramp {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1400ms + var(--i, 0) * 280ms);
+}
+.site-anim [data-play] .sx-line {
+  stroke-dasharray: 1;
+  animation: site-draw 1600ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim [data-play] .site-map-region {
+  animation: site-fade 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1600ms + var(--band, 0) * 250ms);
+}
+.site-anim [data-play] .sx-crest {
+  display: inline-block;
+  animation: site-unveil 900ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim [data-play] .sx-name {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1000ms);
+}
+.site-anim [data-play] .sx-milestone {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1500ms);
+}
+
+/* §12.5 the tools bento: the cards arrive in turn (on phones, each as it
+   comes into view), then the four scripts play one at a time. */
+.site-bento > :nth-child(2) {
+  --i: 1;
+}
+.site-bento > :nth-child(3) {
+  --i: 2;
+}
+.site-bento > :nth-child(4) {
+  --i: 3;
+}
+.site-rest-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--foreground);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-ledger > td {
+  animation: site-fade 250ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 350ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-drain {
+  animation: site-drain 2400ms linear both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-notify {
+  animation: site-drop 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 2700ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-round {
+  animation: site-slide 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms + var(--i, 0) * 500ms);
+}
+.site-anim :is(.site-bento[data-play], .site-tool[data-play]) .sx-swap {
+  animation: site-slide 450ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+@media (max-width: 1023px) {
+  .site-tool {
+    --seq: 0s !important;
+  }
+  /* Phones: each card's own entrance, not the grid's stagger. */
+  .site-anim .site-bento[data-reveal='stagger']:not([data-in]) > * {
+    opacity: 1;
+    transform: none;
+  }
+  .site-anim .site-bento[data-reveal='stagger'][data-in] > * {
+    animation: none;
+  }
+  .site-anim .site-tool:not([data-play]) {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .site-anim .site-tool[data-play] {
+    --rise: 24px;
+    animation: site-up 700ms var(--ease-standard) both;
+  }
+}
+
+/* §12.6 progress and §12.7 ranks: the reader's buttons, and what moves when
+   they change -- a fill, a colour, a drawn segment (the owner replaced the
+   sticky stages with these on 2026-11-22). */
+.site-anim .site-progress-map path {
+  transition: fill 400ms var(--ease-standard);
+}
+.site-anim .site-week {
+  transition:
+    background-color var(--motion-slow) var(--ease-standard),
+    border-color var(--motion-slow) var(--ease-standard),
+    color var(--motion-slow) var(--ease-standard);
+}
+.site-anim .site-segment {
+  stroke-dasharray: 1;
+  animation: site-draw 400ms var(--ease-standard) both;
+}
+.site-analysis-strip > :nth-child(2) {
+  --i: 1;
+}
+.site-analysis-strip > :nth-child(3) {
+  --i: 2;
+}
+.site-analysis-strip > :nth-child(4) {
+  --i: 3;
+}
+.site-anim .site-ladder-crest {
+  transition: color var(--motion-slow) var(--ease-standard);
+}
+
+/* §12.8 the templates coverflow (from 768 with motion) and the scroll-snap
+   row (phones, reduced motion). The front card's start is the region's one
+   filled action; a neighbour is reached by its own "Show" control. */
+@keyframes site-light {
+  from {
+    border-color: var(--rule-faint);
+    background: transparent;
+    color: var(--ink-3);
+  }
+}
+.site-coverflow-wrap {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+.site-levels {
+  justify-content: center;
+}
+.site-coverflow {
+  position: relative;
+  margin-top: 32px;
+  overflow-x: clip;
+}
+.site-coverflow[data-layout='flow'] {
+  touch-action: pan-y;
+  padding-inline: 56px;
+}
+.site-coverflow[data-layout='flow'] .site-coverflow-track {
+  display: grid;
+  justify-items: center;
+}
+.site-coverflow[data-layout='flow'] .site-coverflow-card {
+  grid-area: 1 / 1;
+  position: relative;
+  width: min(480px, 100%);
+}
+.site-coverflow-card > div,
+.site-coverflow-card .site-template {
+  height: 100%;
+}
+.site-anim .site-coverflow[data-layout='flow'] .site-coverflow-card {
+  transition:
+    transform 500ms var(--ease-standard),
+    opacity 500ms var(--ease-standard);
+}
+.site-coverflow-show {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.site-coverflow-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  color: var(--foreground);
+}
+.site-coverflow-arrow[data-side='previous'] {
+  left: 0;
+}
+.site-coverflow-arrow[data-side='next'] {
+  right: 0;
+}
+.site-coverflow-arrow:hover:not(:disabled) {
+  background: var(--surface);
+}
+.site-coverflow-arrow:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+.site-coverflow[data-layout='row'] .site-coverflow-track {
+  display: flex;
+  /* A wide screen under reduced motion holds every card: centre them, and
+     still scroll from the first when they do not fit. */
+  justify-content: safe center;
+  gap: 12px;
+  overflow-x: auto;
+  /* Sideways only, as the verbs' row (the owner, 2026-11-23). */
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.site-coverflow[data-layout='row'] .site-coverflow-card {
+  flex: 0 0 min(85%, 420px);
+  scroll-snap-align: center;
+}
+.site-anim .site-coverflow-track {
+  animation: site-slide 400ms var(--ease-standard) both;
+}
+.site-anim .site-coverflow-card[data-front] .site-week-strip li[data-on] {
+  animation: site-light 300ms var(--ease-standard) both;
+  animation-delay: calc(200ms + var(--d, 0) * 60ms);
+}
+.site-anim .site-coverflow-card[data-front] .site-template-days li {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(300ms + var(--d, 0) * 40ms);
+}
+@keyframes site-bar-rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+.site-anim .site-coverflow-card[data-front] .site-block-fill {
+  animation: site-bar-rise 500ms var(--ease-standard) both;
+  animation-delay: calc(200ms + var(--d, 0) * 70ms);
+}
+@media (max-width: 1023px) {
+  .site-coverflow[data-layout='flow'] .site-coverflow-card {
+    width: min(420px, 100%);
+  }
+}
+
+/* §12.9 the people scenes: one at a time on desktop, each as it comes into
+   view on phones; the privacy rows' markers slide to their choices. */
+@keyframes site-choose {
+  from {
+    border-color: var(--rule-faint);
+    color: var(--ink-2);
+  }
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-entry {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 200ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-react {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 800ms + var(--i, 0) * 100ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-react[data-chosen] {
+  animation:
+    site-fade 300ms var(--ease-standard) both,
+    site-choose 300ms var(--ease-standard) both;
+  animation-delay:
+    calc(var(--seq, 0s) + 800ms),
+    calc(var(--seq, 0s) + 2200ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-alert {
+  animation: site-drop 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 1400ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-card {
+  animation: site-up 500ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 800ms);
+}
+.site-anim :is(.site-scenes[data-play], .site-scene[data-play]) .sx-done {
+  animation: site-fade 400ms var(--ease-standard) both;
+  animation-delay: calc(var(--seq, 0s) + 2400ms);
+}
+@media (max-width: 1023px) {
+  .site-scene {
+    --seq: 0s !important;
+  }
+}
+.site-anim .site-segmented span {
+  transition:
+    border-color 200ms var(--ease-standard),
+    color 200ms var(--ease-standard);
+  transition-delay: calc(300ms + var(--r, 0) * 200ms);
+}
+.site-anim .site-privacy:not([data-in]) .site-segmented span[data-start] {
+  border-bottom-color: var(--foreground);
+  color: var(--foreground);
+}
+.site-anim .site-privacy:not([data-in]) .site-segmented span[data-on]:not([data-start]) {
+  border-bottom-color: transparent;
+  color: var(--ink-2);
+}
+
+/* §12.10 plans: the two cards rise in turn, their lines after them; the
+   price is shown, never counted. */
+.site-plans > :nth-child(2) {
+  --i: 1;
+}
+.site-anim .site-plans:not([data-in]) .site-plan-lines li {
+  opacity: 0;
+}
+.site-anim .site-plans[data-in] .site-plan-lines li {
+  animation: site-fade 300ms var(--ease-standard) both;
+  animation-delay: calc(400ms + var(--i, 0) * 120ms + var(--l, 0) * 40ms);
+}
+
+/* §12.11 questions: the rows arrive 40ms apart, once. */
+.site-questions-list[data-reveal] {
+  --gap: 40ms;
+  --rise: 6px;
+  --dur: 400ms;
+}
+
+/* §12.12 the closing band: the clip settles from 1.04 as the band scrolls
+   into place, the hero's movement in reverse. */
+@keyframes site-settle {
+  from {
+    transform: scale(1.04);
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-anim .site-closing :is(picture img, video) {
+    animation: site-settle linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 50%;
+  }
+}
+@media (max-width: 1023px) {
+  .site-closing .site-heading::after {
+    margin-inline: auto;
+    transform-origin: center;
+  }
+}
+
+/* §33.11 the install helper: a phone arriving from the QR code sees the way
+   to install at the top of the hero's Night region, clear of the bar. */
+.site-install-helper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 80px var(--site-gutter) 32px;
+  border-bottom: 1px solid var(--rule);
+}
+.site-install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  counter-reset: step;
+}
+.site-install-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 15px;
+}
+.site-install-steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.site-install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+/* Alone, the ghost "Not now" lines up with the text above it. */
+.site-install-actions > .site-ghost:first-child {
+  margin-left: -16px;
+}
+
+/* The ledger at phone widths: Spanish's "ENTRENAMIENTO" heading and three
+   ticked twelves overflowed 320 (the sweep, 2026-11-22). The headings may
+   break, the cells sit closer, the type stays its size. */
+@media (max-width: 479px) {
+  .site-ledger-table th {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .site-ledger-table :is(th, td):not(:last-child) {
+    padding-right: 8px;
+  }
+  .site-ledger-table .flex {
+    column-gap: 6px;
+  }
+  .site-tool .site-mock {
+    padding-inline: 12px;
+  }
+}
+
+/* §33.13 the accent at work, and Night mock-ups in both themes (the owner,
+   2026-11-22: "no colors at all ... looks way fuller"): dark panels stand
+   out of the page's ground, and what is active, done or earned in an
+   example takes the gold. Pro, ranks and the body map keep their own roles. */
+.site-mock,
+.site-analysis-mock,
+.site-scene-panel,
+.site-progress-map,
+.site-strength {
+  color: var(--foreground);
+}
+.site-device .sx-plate.fill-foreground {
+  fill: var(--site-accent);
+}
+.site-device .sx-line,
+.site-strength .site-segment {
+  stroke: var(--site-accent);
+}
+.site-strength circle {
+  fill: var(--site-accent);
+}
+.site-device :is(.sx-ramp, .sx-milestone) svg,
+.site-ledger-table svg,
+.site-mock .site-notification svg,
+.site-scene-panel .site-notification svg,
+.site-scene-panel .sx-done svg {
+  color: var(--site-accent);
+}
+.site-ledger-table tr[data-rise] td {
+  border-bottom-color: var(--site-accent);
+  color: var(--site-accent);
+}
+.site-rest-fill {
+  background: var(--site-accent);
+}
+.site-reactions li[data-chosen] {
+  border-color: var(--site-accent);
+  color: var(--site-accent);
+}
+.site-segmented span[data-on] {
+  border-bottom-color: var(--site-accent);
+}
+.site-week-strip li[data-on] {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-coverflow-card[data-front] .site-template-start {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-accent-ink);
+}
+.site-coverflow-card[data-front] .site-template-start:hover {
+  background: color-mix(in oklch, var(--site-accent) 86%, white);
+}
+
+/* §33.14 Heat, light and depth (the owner, 2026-11-23: "add some extra
+   life ... more colors, depth, animating some of the cards, make it more
+   cinematic"). The page tells the forging of its headline: the carved word
+   heats and cools to gold, each mock-up stands in a pool of light the colour
+   of its subject (gold, verdigris, the shown rank), mock-ups cast one soft
+   shadow and lean toward a fine pointer, the footage and the mock-ups drift
+   with the scroll, and the Night bands carry a film grain. Site only; every
+   movement waits for `site-anim`, and higher contrast drops the grain. */
+@property --site-rank {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+.site {
+  --site-heat: oklch(0.93 0.09 92);
+  --site-ember: oklch(0.64 0.2 42);
+  --site-shadow: oklch(0.3 0.02 70 / 0.22);
+}
+.dark .site,
+.site .dark,
+.site.dark {
+  --site-shadow: oklch(0.06 0.01 70 / 0.7);
+}
+
+/* The forge: the headline's word arrives hot, in ember with a soft glow, and
+   cools to the gold it rests on (the owner, 2026-11-23: start from the
+   orange-red, then the final colour; the first version, white-hot then ember
+   over 2.6s, took too long); every section's rule cools the same way as it
+   draws. */
+@keyframes site-forge {
+  from {
+    color: var(--site-ember);
+    text-shadow: 0 0 0.4em color-mix(in oklch, var(--site-ember) 60%, transparent);
+  }
+  to {
+    color: var(--site-accent);
+    text-shadow: 0 0 0 transparent;
+  }
+}
+@keyframes site-cool {
+  from {
+    background: var(--site-ember);
+  }
+}
+.site-anim .site .type-site-display mark {
+  animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) 250ms both;
+}
+.site-anim .site-heading[data-in]::after {
+  animation:
+    site-rule 480ms var(--ease-standard) both,
+    site-cool 900ms var(--ease-standard) both;
+  animation-delay:
+    calc(var(--lines, 1) * var(--line-gap) + 600ms),
+    calc(var(--lines, 1) * var(--line-gap) + 600ms);
+}
+
+/* Pools of light behind the mock-ups, in the colour of what they show. */
+/* They spill past their columns, never past their section (`clip` keeps
+   the fixed bar and the vertical overflow working, unlike `hidden`). */
+.site,
+.site-section {
+  overflow-x: clip;
+}
+.site-verb-stage,
+.site-progress-map,
+.site-ranks-phone,
+.site-coverflow {
+  position: relative;
+  isolation: isolate;
+}
+.site-verb-stage::before,
+.site-progress-map::before,
+.site-ranks-phone::before,
+.site-coverflow::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -12% -20%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--pool) 52%, transparent),
+    transparent
+  );
+}
+.site-verb-stage {
+  --pool: var(--site-accent);
+}
+.site-verb-stage::before {
+  inset: -10% -24%;
+  opacity: 0.6;
+}
+.site-progress-map {
+  --pool: var(--intensity-3);
+}
+.site-ranks-phone {
+  --pool: var(--site-rank);
+  transition: --site-rank 900ms var(--ease-standard);
+}
+.site-ranks-phone::before {
+  inset: -8% -30%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--site-rank) 46%, transparent),
+    transparent
+  );
+}
+.site-coverflow {
+  --pool: var(--site-accent);
+}
+.site-coverflow::before {
+  inset: 0 18%;
+  opacity: 0.6;
+}
+/* The light follows the phone that is playing. */
+@keyframes site-spot {
+  from {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+.site-anim [data-play] .site-verb-stage::before,
+.site-anim .site-verb[data-play] .site-verb-stage::before {
+  animation: site-spot 3000ms var(--ease-standard) both;
+  animation-delay: var(--seq, 0s);
+}
+/* The closing band glows from below, the forge under the footage. */
+.site-closing::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  inset: auto 0 0;
+  height: 55%;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--site-ember) 26%, transparent),
+    transparent
+  );
+}
+
+/* One soft shadow under every mock-up (site only: the app keeps tone). */
+.site :is(
+    .site-device,
+    .site-phone-frame,
+    .site-record,
+    .site-mock,
+    .site-scene-panel,
+    .site-callout,
+    .site-coverflow-card[data-front] .site-template
+  ) {
+  box-shadow:
+    0 28px 56px -18px var(--site-shadow),
+    0 2px 8px -2px var(--site-shadow);
+}
+
+/* Film grain on the Night bands with footage (the interludes' is a layer of
+   its own: their pseudo-elements are the letterbox). */
+.site-hero::after,
+.site-closing::before,
+.site-grain {
+  content: '';
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Spelled out: a pseudo-element inside :is() drops the whole rule. */
+:root[data-contrast='more'] .site-hero::after,
+:root[data-contrast='more'] .site-closing::before,
+:root[data-contrast='more'] .site-grain {
+  display: none;
+}
+@media (prefers-contrast: more) {
+  .site-hero::after,
+  .site-closing::before,
+  .site-grain {
+    display: none;
+  }
+}
+
+/* A fine pointer tilts a mock-up toward it (the runtime sets the angles). */
+.site-anim [data-tilt] {
+  transform: perspective(1000px) rotateX(var(--tilt-y, 0deg))
+    rotateY(var(--tilt-x, 0deg));
+  transition: transform 400ms var(--ease-standard);
+  will-change: transform;
+}
+
+/* Drift: the footage sinks and the mock-ups rise a little slower than the
+   page, on the browser's own scroll timeline (no scroll listener). */
+@keyframes site-drift {
+  from {
+    translate: 0 56px;
+  }
+  to {
+    translate: 0 -56px;
+  }
+}
+@keyframes site-sink {
+  to {
+    translate: 0 22%;
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-anim :is(.site-verb-stage, .site-ranks-phone, .site-progress-map) {
+    animation: site-drift linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+  .site-anim .site-hero > :is(picture > img, video) {
+    animation: site-sink linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+}
+/* The verbs' phones rise only to where they rest, never past it: lifted
+   56px higher they slid over their word (the owner, 2026-11-23). */
+@keyframes site-drift-settle {
+  from {
+    translate: 0 56px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 768px) {
+    .site-anim .site-verbs .site-verb-stage {
+      animation: site-drift-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 50%;
+    }
+  }
+}
+
+/* §33.15 Interludes: a letterboxed Night band of footage between two
+   sections, one line at display size and nothing to click. */
+.site-interlude {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2.4 / 1;
+  /* A set width: left to auto, the 440px floor carries across the ratio as
+     a 1056px width and the band runs off a narrower window. */
+  width: 100%;
+  min-height: 440px;
+  max-height: 86svh;
+  margin-top: clamp(88px, 10vw, 160px);
+}
+/* One cell for every child in flow, so the line centres on the band. */
+.site-interlude > * {
+  grid-area: 1 / 1;
+}
+@media (max-width: 767px) {
+  .site-interlude {
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+    max-height: none;
+  }
+}
+/* The letterbox: two bars, each edged with a hairline of gold. */
+.site-interlude::before,
+.site-interlude::after {
+  content: '';
+  position: absolute;
+  z-index: 8;
+  inset-inline: 0;
+  height: 7%;
+  pointer-events: none;
+  background: oklch(0.07 0.004 70);
+}
+.site-interlude::before {
+  top: 0;
+  transform-origin: top;
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--site-accent) 28%, transparent);
+}
+.site-interlude::after {
+  bottom: 0;
+  transform-origin: bottom;
+  box-shadow: 0 -1px 0 color-mix(in oklch, var(--site-accent) 28%, transparent);
+}
+.site-interlude .site-video-control {
+  bottom: 4px;
+}
+.site-interlude-line {
+  position: relative;
+  z-index: 10;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  padding-inline: var(--site-gutter);
+  font-size: clamp(24px, 7.2vw, 92px);
+  line-height: 1.04;
+  text-align: center;
+}
+/* Each line rises from behind its own mask, in turn. */
+.site-l {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.site-l > span {
+  display: inline-block;
+}
+.site-anim [data-reveal='lines']:not([data-in]) .site-l > span {
+  transform: translateY(110%);
+}
+.site-anim [data-reveal='lines'][data-in] .site-l > span {
+  animation: site-rise 1000ms var(--ease-standard) both;
+  animation-delay: calc(var(--line, 0) * 180ms);
+}
+/* The forge strikes when the line arrives, not at page load. */
+.site-anim .site .site-interlude-line mark {
+  animation: none;
+}
+.site-anim .site .site-interlude-line[data-in] mark {
+  animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: calc(var(--line, 0) * 180ms + 350ms);
+}
+/* As the band scrolls into place the bars close in to the 2.4:1 frame and
+   the footage pulls back to rest: the shutter opening. */
+@keyframes site-shutter {
+  from {
+    transform: scaleY(3.6);
+  }
+}
+@keyframes site-pull-back {
+  from {
+    transform: scale(1.14);
+  }
+}
+@supports (animation-timeline: view()) {
+  .site-interlude {
+    view-timeline: --site-interlude block;
+  }
+  .site-anim .site-interlude::before,
+  .site-anim .site-interlude::after {
+    animation: site-shutter linear both;
+    animation-timeline: --site-interlude;
+    animation-range: entry 15% cover 45%;
+  }
+  .site-anim .site-interlude :is(picture img, video) {
+    animation: site-pull-back linear both;
+    animation-timeline: --site-interlude;
+    animation-range: entry 0% cover 50%;
+  }
+}
+
+/* §12.14 the public pages beyond the landing: a Night header under the
+   bar -- breadcrumb, the page's `h1` a rank below the landing's, subline,
+   "Updated", the two actions and a facts band -- then ruled sections, the
+   questions and a compact closing band. */
+.site-page-header {
+  position: relative;
+  overflow: hidden;
+  padding: calc(84px + clamp(40px, 6vw, 88px)) var(--site-gutter)
+    clamp(56px, 7vw, 96px);
+}
+.site-page-header::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10% auto auto;
+  width: 70%;
+  height: 120%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklch, var(--site-accent) 14%, transparent),
+    transparent
+  );
+}
+.site-page-header-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+  max-width: 1328px;
+  margin-inline: auto;
+}
+@media (min-width: 1024px) {
+  .site-page-header[data-has-aside] .site-page-header-inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+.site-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.site-breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.site-breadcrumb a:hover {
+  color: var(--foreground);
+}
+.site-breadcrumb [aria-current] {
+  color: var(--ink-2);
+}
+.site-page-eyebrow {
+  margin-top: 28px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-accent);
+}
+.site-page-title {
+  margin-top: 20px;
+  font-size: clamp(32px, 5.2vw, 64px);
+}
+.site-page-eyebrow + .site-page-title {
+  margin-top: 12px;
+}
+.site-page-subline {
+  margin-top: 28px;
+  max-width: 620px;
+}
+.site-page-updated {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+.site-page-actions {
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+.site-page-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.site-page-section-body {
+  margin-top: clamp(28px, 4vw, 48px);
+}
+.site-page-section-body > * + * {
+  margin-top: 20px;
+}
+.site-page-lead,
+.site-page-note {
+  max-width: 720px;
+}
+.site-page-note {
+  color: var(--ink-2);
+}
+.site-page-outcomes {
+  display: grid;
+  gap: 24px 40px;
+}
+.site-page-outcomes li {
+  display: flex;
+  gap: 12px;
+}
+.site-page-cards {
+  display: grid;
+  gap: 16px;
+}
+.site-page-card {
+  padding: 22px 24px;
+}
+@media (min-width: 768px) {
+  .site-page-outcomes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-page-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.site-page-questions {
+  max-width: 880px;
+  margin-top: clamp(28px, 4vw, 48px);
+}
+.site-page-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  max-width: calc(1328px + 2 * var(--site-gutter));
+  margin: 24px auto 0;
+  padding-inline: var(--site-gutter);
+  color: var(--ink-2);
+}
+.site-page-legal a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.site-closing-compact {
+  margin-top: clamp(96px, 12vw, 160px);
+  padding: clamp(72px, 9vw, 120px) var(--site-gutter);
+}
+.site-closing-compact-inner {
+  max-width: 1328px;
+  margin-inline: auto;
+}
+.site-closing-compact .site-lead {
+  margin-top: 24px;
+}
+
+/* §12.19 the features overview: the six pages in one grid, each labelled
+   with its verb. */
+.site-feature-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .site-feature-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .site-feature-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.site-feature-card-verb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.site-feature-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 22px 24px 56px;
+  transition: border-color 200ms var(--ease-standard);
+}
+.site-feature-card:hover {
+  border-color: var(--ink-3);
+}
+.site-feature-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-feature-card-arrow {
+  position: absolute;
+  bottom: 22px;
+  left: 24px;
+  color: var(--ink-2);
+  transition: transform 200ms var(--ease-standard);
+}
+.site-feature-card:hover .site-feature-card-arrow {
+  transform: translateX(4px);
+}
+
+/* §12.15 a feature page: the header's phone, the steps, a computed
+   example's ruled table, what each plan covers and the tips. */
+.site-page-phone {
+  display: flex;
+  justify-content: center;
+}
+.site-page-phone .site-device {
+  max-width: 280px;
+}
+@media (min-width: 768px) and (max-height: 820px) {
+  .site-page-phone .site-device {
+    zoom: 0.82;
+  }
+}
+.site-page-facts-light {
+  margin-top: 28px;
+  color: var(--ink-2);
+}
+.site-page-steps {
+  display: grid;
+  gap: 0;
+  max-width: 760px;
+  border-top: 1px solid var(--rule);
+}
+.site-page-steps li {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-page-step-number {
+  color: var(--site-accent);
+}
+.site-example {
+  max-width: 760px;
+  overflow-x: auto;
+}
+.site-example + .site-example {
+  margin-top: 40px;
+}
+.site-example-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.site-example-table caption {
+  margin-bottom: 16px;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.site-example-table th,
+.site-example-table td {
+  padding: 12px 16px 12px 0;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.site-example-table thead th {
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom-color: var(--rule);
+}
+.site-example-table tbody th {
+  font-weight: 400;
+  color: var(--foreground);
+}
+.site-example-table td {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.site-page-covers {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+}
+.site-page-covers li {
+  display: flex;
+  gap: 12px;
+}
+.site-page-tips {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  padding-left: 20px;
+  list-style: disc;
+}
+.site-page-tips li::marker {
+  color: var(--site-accent);
+}
+
+/* §12.17 a use-case page: the level's program card beside the header,
+   four numbered changes, the program and the next level. */
+.site-page-card-aside {
+  display: flex;
+  justify-content: center;
+}
+.site-page-card-aside .site-template {
+  width: min(100%, 400px);
+}
+@media (min-width: 1024px) {
+  .site-page-cards-four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .site-page-cards-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.site-page-programs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  max-width: 1040px;
+}
+.site-page-next {
+  max-width: 520px;
+}
+
+/* §12.7 on a phone: the ladder becomes a strip of six crests above the
+   phone, with the chosen rank named once under it (the owner, 2026-11-23:
+   six full rows under the phone made the section too long). */
+.site-ranks-current {
+  display: none;
+}
+@media (max-width: 767px) {
+  .site-ranks {
+    grid-template-areas: 'body' 'ladder' 'current' 'phone';
+    row-gap: 0;
+  }
+  .site-ranks-ladder {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 28px;
+    border-top: 0;
+  }
+  .site-ranks-ladder .site-ladder-rung {
+    justify-content: center;
+    min-height: 56px;
+    padding: 8px 0;
+    border: 1px solid var(--rule-faint);
+    border-radius: var(--radius-sm);
+  }
+  .site-ranks-ladder .site-ladder-rung[aria-pressed='true'] {
+    border-color: var(--rule);
+  }
+  .site-ranks-ladder .site-ladder-rung > span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .site-ranks-current {
+    grid-area: current;
+    display: block;
+    margin: 14px 0 28px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+}
