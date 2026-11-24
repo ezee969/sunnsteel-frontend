@@ -473,6 +473,17 @@ export const workoutService = {
 			{ method: 'POST', body: JSON.stringify(data), secure: true },
 		),
 
+	/** LIVE-27: remove a prescribed set that is not done, for good. */
+	removeSessionSet: async (
+		id: string,
+		routineExerciseId: string,
+		setNumber: number,
+	): Promise<SessionDayEditResponse> =>
+		httpClient.request<SessionDayEditResponse>(
+			`${WORKOUTS_API_URL}/sessions/${id}/exercises/${routineExerciseId}/sets/${setNumber}`,
+			{ method: 'DELETE', secure: true },
+		),
+
 	/** LIVE-25: the day's exercises in a new order, the routine's from the next workout. */
 	reorderSessionExercises: async (
 		id: string,

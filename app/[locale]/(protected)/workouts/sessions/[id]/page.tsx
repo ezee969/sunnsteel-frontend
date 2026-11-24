@@ -49,6 +49,7 @@ import { useRestAlert } from '@/lib/api/hooks/useRestAlert'
 import {
 	useDeleteSetLog,
 	usePreviousPerformance,
+	useRemoveSessionSet,
 	useReorderSessionExercises,
 	useSession,
 	useUpsertSetLog,
@@ -211,6 +212,13 @@ export default function ActiveSessionPage() {
 		name: string
 	} | null>(null)
 	const reorder = useReorderSessionExercises(idParam)
+	// LIVE-27: a prescribed set removed for good, once confirmed.
+	const removeSet = useRemoveSessionSet(idParam)
+	const [pendingRemoval, setPendingRemoval] = useState<{
+		routineExerciseId: string
+		setNumber: number
+		name: string
+	} | null>(null)
 
 	// Handlers
 	const handleSaveSetLog = useCallback(
@@ -580,6 +588,16 @@ export default function ActiveSessionPage() {
 				onRemoveSet={
 					session.status === 'IN_PROGRESS' ? handleRemoveSet : undefined
 				}
+				onRemoveSetForGood={
+					canEditDay
+						? setNumber =>
+								setPendingRemoval({
+									routineExerciseId: group.exerciseId,
+									setNumber,
+									name: exerciseLabel(group.exerciseName, tEx),
+								})
+						: undefined
+				}
 				onMoveUp={
 					canEditDay && groupIndex > 0
 						? () => moveExercise(groupIndex, -1)
@@ -858,6 +876,70 @@ export default function ActiveSessionPage() {
 							}}
 						>
 							{t('moveAnyway')}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+			<AlertDialog
+				open={!!pendingRemoval}
+				onOpenChange={open => {
+					if (!open && !removeSet.isPending) setPendingRemoval(null)
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{pendingRemoval
+								? t('removeSetTitle', { number: pendingRemoval.setNumber })
+								: null}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{pendingRemoval
+								? t('removeSetBody', {
+										exercise: pendingRemoval.name,
+										plan: planName,
+									})
+								: null}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={removeSet.isPending}>
+							{t('removeSetKeep')}
+						</AlertDialogCancel>
+						<Button
+							type="button"
+							variant="destructiveSolid"
+							disabled={removeSet.isPending}
+							onClick={() => {
+								if (!pendingRemoval) return
+								const { routineExerciseId, setNumber, name } = pendingRemoval
+								removeSet.mutate(
+									{ routineExerciseId, setNumber },
+									{
+										onSuccess: () => {
+											setPendingRemoval(null)
+											push({
+												title: t('removedTitle'),
+												description: t('removedDescription', {
+													plan: PlanName,
+													exercise: name,
+												}),
+												variant: 'success',
+											})
+										},
+										onError: error => {
+											setPendingRemoval(null)
+											push({
+												title: t('removeFailedTitle'),
+												description: errorText(error),
+												variant: 'destructive',
+											})
+										},
+									},
+								)
+							}}
+						>
+							{t('removeSetConfirm')}
 						</Button>
 					</AlertDialogFooter>
 				</AlertDialogContent>

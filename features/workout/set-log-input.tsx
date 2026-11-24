@@ -8,7 +8,7 @@ import {
 	type SetKind,
 	type WeightUnit,
 } from '@sunsteel/contracts'
-import { Check, ChevronDown, Plus, WifiOff, X } from 'lucide-react'
+import { Check, ChevronDown, Plus, Trash2, WifiOff, X } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
@@ -89,6 +89,11 @@ interface SetLogInputProps extends LogRowProps {
 	matchReps?: number[]
 	/** LIVE-26: whether this set may be made a match set here. */
 	matchAllowed?: boolean
+	/**
+	 * LIVE-27: remove this prescribed set for good -- today and from the plan.
+	 * Present only on a set that is not done and may go.
+	 */
+	onRemoveForGood?: () => void
 }
 
 export type SetRowState = 'current' | 'done' | 'upcoming'
@@ -235,6 +240,7 @@ export const SetLogInput = ({
 	match,
 	matchReps,
 	matchAllowed = false,
+	onRemoveForGood,
 	onSave,
 	onSetCompleted,
 }: SetLogInputProps) => {
@@ -497,6 +503,18 @@ export const SetLogInput = ({
 										</DropdownMenuRadioItem>
 									))}
 								</DropdownMenuRadioGroup>
+								{onRemoveForGood ? (
+									<>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem
+											variant="destructive"
+											onSelect={onRemoveForGood}
+										>
+											<Trash2 className="h-4 w-4" aria-hidden />
+											{t('removeSetForGood')}
+										</DropdownMenuItem>
+									</>
+								) : null}
 								{/* LIVE-22: off the current set, the fills and Remove live
 								    here at every width. */}
 								{(grouped || !isCurrent) &&

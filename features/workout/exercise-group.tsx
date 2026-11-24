@@ -124,6 +124,8 @@ interface ExerciseGroupProps {
 	 */
 	onMoveUp?: () => void
 	onMoveDown?: () => void
+	/** LIVE-27: remove a prescribed set that is not done, for good. */
+	onRemoveSetForGood?: (setNumber: number) => void
 	/**
 	 * LIVE-15: take back an added set. Omitted when the session cannot change,
 	 * which also hides Add set.
@@ -168,6 +170,7 @@ export const ExerciseGroup = ({
 	onSwapRequest,
 	onMoveUp,
 	onMoveDown,
+	onRemoveSetForGood,
 	onRemoveSet,
 	roundLine,
 	upNext,
@@ -591,6 +594,15 @@ export const ExerciseGroup = ({
 									: undefined
 							}
 							matchReps={set.matchReps}
+							onRemoveForGood={
+								onRemoveSetForGood &&
+								!set.isExtra &&
+								!set.isCompleted &&
+								!blockSet(set) &&
+								sets.filter(other => !other.isExtra).length > 1
+									? () => onRemoveSetForGood(set.setNumber)
+									: undefined
+							}
 							matchAllowed={
 								!blockSet(set) &&
 								matchSetRefusal(

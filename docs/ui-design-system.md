@@ -2478,6 +2478,7 @@ role or a motion; it places existing parts.
   exercise list -- never filled: Finish keeps the region's one filled
   control (§28.1) -- opening a dialog with the builder's picker, sets, reps
   and load, and rest and progression under More options (UX-20).
+- **Removing a set** (`LIVE-27`) is a destructive "Remove set" item in the set's own menu (§27.3), under the kinds, on a set not yet done; an alert dialog names the plan that changes, with a solid destructive confirm.
 - **The builder** shows a match set's reps and load cells as text ("Matches
   set 2", "Set 2's load") and offers Match in the kind select only where one
   may stand.

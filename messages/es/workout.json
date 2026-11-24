@@ -391,7 +391,8 @@
 		"removeMiniSetAria": "Quitar la mini-serie {index} de la serie {number}",
 		"matchPause": "Haz una pausa de unas respiraciones y sigue hasta sumar las reps.",
 		"matchShort": "Te faltan {missing} para {target}. Puedes dejarlo así.",
-		"matchDone": "Igualada"
+		"matchDone": "Igualada",
+		"removeSetForGood": "Eliminar serie"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Entrenamiento compartido",
@@ -535,7 +536,14 @@
 		"moveSplitsGroup": "Mover {exercise} lo saca de su superserie o circuito. ¿Moverlo igualmente?",
 		"moveSplitsTitle": "¿Separar el grupo?",
 		"moveKeep": "Dejarlo",
-		"moveAnyway": "Moverlo"
+		"moveAnyway": "Moverlo",
+		"removeSetTitle": "¿Eliminar la serie {number}?",
+		"removeSetBody": "{exercise} pierde esta serie hoy y {plan} indica una serie menos desde el próximo entrenamiento. Las series siguientes suben un lugar.",
+		"removeSetConfirm": "Eliminar serie",
+		"removeSetKeep": "Dejarla",
+		"removedTitle": "Serie eliminada",
+		"removedDescription": "{plan} tiene una serie menos de {exercise}.",
+		"removeFailedTitle": "No se eliminó la serie"
 	},
 	"errors": {
 		"workoutsFailedTitle": "No se pudieron cargar los entrenamientos",

@@ -524,7 +524,11 @@
 		"DAY_EDIT_SESSION_NOT_ACTIVE": "The day can only be changed during an active workout",
 		"DAY_EDIT_EXERCISES_MAX": "A day can hold at most {max} exercises",
 		"DAY_EDIT_ORDER_MISMATCH": "The new order must name every exercise of the day once",
-		"DAY_EDIT_LINEAR_BLOCK": "An 8-week block starts from the routine builder, not during a workout"
+		"DAY_EDIT_LINEAR_BLOCK": "An 8-week block starts from the routine builder, not during a workout",
+		"SET_REMOVE_DONE": "A done set cannot be removed; untick it first",
+		"SET_REMOVE_LAST": "An exercise keeps at least one set",
+		"SET_REMOVE_LINEAR_BLOCK": "The working sets of an 8-week block cannot be removed",
+		"SET_REMOVE_NOT_PRESCRIBED": "That set is not part of the prescription"
 	},
 	"glossary": {
 		"label": "Terms:",

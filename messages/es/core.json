@@ -524,7 +524,11 @@
 		"DAY_EDIT_SESSION_NOT_ACTIVE": "El día solo se puede cambiar durante un entrenamiento en curso",
 		"DAY_EDIT_EXERCISES_MAX": "Un día admite como máximo {max} ejercicios",
 		"DAY_EDIT_ORDER_MISMATCH": "El nuevo orden debe nombrar cada ejercicio del día una vez",
-		"DAY_EDIT_LINEAR_BLOCK": "Un bloque de 8 semanas se empieza desde el editor de rutinas, no durante un entrenamiento"
+		"DAY_EDIT_LINEAR_BLOCK": "Un bloque de 8 semanas se empieza desde el editor de rutinas, no durante un entrenamiento",
+		"SET_REMOVE_DONE": "Una serie hecha no se puede eliminar; desmárcala primero",
+		"SET_REMOVE_LAST": "Un ejercicio conserva al menos una serie",
+		"SET_REMOVE_LINEAR_BLOCK": "Las series efectivas de un bloque de 8 semanas no se pueden eliminar",
+		"SET_REMOVE_NOT_PRESCRIBED": "Esa serie no es parte de lo indicado"
 	},
 	"glossary": {
 		"label": "Términos:",

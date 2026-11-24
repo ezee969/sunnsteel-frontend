@@ -391,7 +391,8 @@
 		"removeMiniSetAria": "Remove mini-set {index} of set {number}",
 		"matchPause": "Pause a few breaths, then go again until the reps add up.",
 		"matchShort": "{missing} short of {target}. You can leave it there.",
-		"matchDone": "Matched"
+		"matchDone": "Matched",
+		"removeSetForGood": "Remove set"
 	},
 	"sharedSessionView": {
 		"sharedWorkout": "Shared workout",
@@ -535,7 +536,14 @@
 		"moveSplitsGroup": "Moving {exercise} takes it out of its superset or circuit. Move it anyway?",
 		"moveSplitsTitle": "Split the group?",
 		"moveKeep": "Keep it",
-		"moveAnyway": "Move it"
+		"moveAnyway": "Move it",
+		"removeSetTitle": "Remove set {number}?",
+		"removeSetBody": "{exercise} loses this set today, and {plan} prescribes one set fewer from the next workout. The sets after it move up.",
+		"removeSetConfirm": "Remove set",
+		"removeSetKeep": "Keep it",
+		"removedTitle": "Set removed",
+		"removedDescription": "{plan} has one set fewer for {exercise}.",
+		"removeFailedTitle": "Set not removed"
 	},
 	"errors": {
 		"workoutsFailedTitle": "Failed to load workouts",
