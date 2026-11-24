@@ -78,12 +78,17 @@ export async function SiteClosing() {
 						style={motionVars({ '--delay': '650ms', '--rise': '8px' })}
 					>
 						<Link
+							prefetch={false}
 							href="/signup"
 							className="site-filled site-filled-hero site-filled-accent"
 						>
 							{t('createAccount')}
 						</Link>
-						<Link href="/login" className="site-ghost type-action">
+						<Link
+							prefetch={false}
+							href="/login"
+							className="site-ghost type-action"
+						>
 							<span>{t('signIn')}</span>
 						</Link>
 					</div>

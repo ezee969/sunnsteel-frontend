@@ -74,6 +74,7 @@ export function SiteMenu() {
 						    bottom. */}
 						<DialogClose asChild>
 							<Link
+								prefetch={false}
 								href="/login"
 								className="type-action flex h-12 w-full items-center justify-center rounded-sm border border-rule text-foreground hover:bg-surface"
 							>

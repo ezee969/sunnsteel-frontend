@@ -72,6 +72,7 @@ export async function SitePlans() {
 						})}
 					</p>
 					<Link
+						prefetch={false}
 						href="/signup"
 						className="type-action site-outline site-plan-action"
 					>
@@ -121,6 +122,7 @@ export async function SitePlans() {
 					</p>
 					<p className="type-body-sm text-ink-2">{t('pro.cancel')}</p>
 					<Link
+						prefetch={false}
 						href="/signup?plan=pro"
 						className="site-filled site-filled-hero site-plan-action"
 					>

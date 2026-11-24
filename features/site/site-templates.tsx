@@ -71,7 +71,11 @@ export async function SiteTemplates() {
 			/>
 			<div className="site-none-fit">
 				<p className="type-panel">{t('noneFit.title')}</p>
-				<Link href="/signup" className="type-action site-link mt-0">
+				<Link
+					prefetch={false}
+					href="/signup"
+					className="type-action site-link mt-0"
+				>
 					{t('noneFit.build')}
 					<ArrowRight className="size-4" aria-hidden />
 				</Link>
@@ -145,6 +149,7 @@ export async function TemplateCardNode({
 			</ul>
 			<p className="type-body-sm text-ink-2">{text.description}</p>
 			<Link
+				prefetch={false}
 				href={`/signup?template=${template.slug}`}
 				className="type-action site-outline site-template-start"
 			>
@@ -201,7 +206,11 @@ export async function BlockCardNode({
 				</ol>
 			</figure>
 			<p className="type-body-sm text-ink-2">{t('block.sets')}</p>
-			<Link href="/signup?plan=pro" className="type-action site-outline">
+			<Link
+				prefetch={false}
+				href="/signup?plan=pro"
+				className="type-action site-outline"
+			>
 				{t('block.start')}
 			</Link>
 		</SiteCard>

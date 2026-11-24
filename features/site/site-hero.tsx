@@ -50,6 +50,7 @@ export async function SiteHero() {
 				    away (`data-hero-cta`, read by the motion runtime). */}
 				<div className="site-actions">
 					<Link
+						prefetch={false}
 						href="/signup"
 						data-hero-cta=""
 						className="site-filled site-filled-hero site-filled-accent"

@@ -70,12 +70,14 @@ export async function SiteTopBar() {
 					names={{ en: t('english'), es: t('spanish') }}
 				/>
 				<Link
+					prefetch={false}
 					href="/login"
 					className="site-bar-signin type-action text-foreground"
 				>
 					{t('signIn')}
 				</Link>
 				<Link
+					prefetch={false}
 					href="/signup"
 					className="site-filled site-filled-bar site-filled-accent"
 				>

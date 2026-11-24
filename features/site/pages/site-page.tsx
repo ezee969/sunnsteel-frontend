@@ -8,6 +8,7 @@ import type { Locale } from '@/i18n/config'
 import { dateFormatter } from '@/i18n/date-locale'
 import { PUBLIC_ORIGIN } from '@/lib/config/env'
 import { siteLandingLive } from '@/lib/site/landing'
+import { isSitePath } from '@/lib/site/site-paths'
 import { cn } from '@/lib/utils'
 
 import { SiteFooter } from '../site-footer'
@@ -175,6 +176,7 @@ export async function SitePageHeader({
 						    landing (`data-hero-cta`). */}
 						<Link
 							href={actions.primary.href}
+							prefetch={isSitePath(actions.primary.href) ? undefined : false}
 							data-hero-cta=""
 							className="site-filled site-filled-hero site-filled-accent"
 						>
@@ -183,6 +185,9 @@ export async function SitePageHeader({
 						{actions.secondary ? (
 							<Link
 								href={actions.secondary.href}
+								prefetch={
+									isSitePath(actions.secondary.href) ? undefined : false
+								}
 								className="site-ghost type-action"
 							>
 								<span>{actions.secondary.label}</span>
@@ -292,12 +297,17 @@ async function SiteClosingCompact() {
 				<p className="type-site-lead site-lead">{t('subline')}</p>
 				<div className="site-actions">
 					<Link
+						prefetch={false}
 						href="/signup"
 						className="site-filled site-filled-hero site-filled-accent"
 					>
 						{t('createAccount')}
 					</Link>
-					<Link href="/login" className="site-ghost type-action">
+					<Link
+						prefetch={false}
+						href="/login"
+						className="site-ghost type-action"
+					>
 						<span>{t('signIn')}</span>
 					</Link>
 				</div>
