@@ -3091,6 +3091,11 @@ go through entire animations") and decided:
   by two on tablets, a swipe row on phones) whose scripts play one after
   another; the progress weeks and the six ranks are buttons the reader picks,
   playing through once by themselves when in view until one is picked.
+- **A verb's slide fits a phone's window** (the owner, 2026-11-23): its word,
+  phone and description show together. On phones the screens' empty foot is
+  cut (9 / 15.5) and the phone is zoomed to the window's small viewport less
+  the bar and the slide's text, between 0.5 and 1, with steps by height where
+  `zoom` cannot take the ratio.
 - **The first screen is the footage and the headline alone**: the hero fills
   the viewport, so the proof band arrives on scroll; it has one action
   (Create a free account), the bar's Get started appears once that has

@@ -1942,6 +1942,73 @@
     animation: none;
   }
 }
+/* On a phone a slide fits the window from its word to its description (the
+   owner, 2026-11-23: the description fell below the screen). The screens'
+   empty foot is cut (9 / 15.5 still holds the tallest, the plan's), the gaps
+   tighten, and the phone is zoomed to what the window has left: the small
+   viewport less the bar (56), 16px above and below, and the word, callout,
+   title and description, which wrap to more lines as the window narrows
+   (215px at 430 wide, 0.75px more for each pixel narrower), over the
+   phone's 517px. `zoom` scales it whole, as on desktop, and the callout's
+   overlap scales with it so it never covers the screen's last row. Where
+   `zoom` cannot take that ratio, steps of the same rule stand in. */
+@media (max-width: 767px) {
+  .site-verb-stage {
+    --verb-zoom: 1;
+    margin-top: 12px;
+  }
+  .site-verb-stage .site-device {
+    aspect-ratio: 9 / 15.5;
+    zoom: var(--verb-zoom);
+  }
+  .site-verb-stage .site-callout {
+    margin-top: calc(-32px * var(--verb-zoom));
+  }
+  .site-verb-title {
+    margin-top: 16px;
+  }
+}
+@media (max-width: 767px) and (max-height: 835px) {
+  .site-verb-stage {
+    --verb-zoom: 0.9;
+  }
+}
+@media (max-width: 767px) and (max-height: 783px) {
+  .site-verb-stage {
+    --verb-zoom: 0.8;
+  }
+}
+@media (max-width: 767px) and (max-height: 732px) {
+  .site-verb-stage {
+    --verb-zoom: 0.7;
+  }
+}
+@media (max-width: 767px) and (max-height: 680px) {
+  .site-verb-stage {
+    --verb-zoom: 0.6;
+  }
+}
+@media (max-width: 767px) and (max-height: 628px) {
+  .site-verb-stage {
+    --verb-zoom: 0.5;
+  }
+}
+@supports (zoom: tan(atan2(1px, 1px))) {
+  @media (max-width: 767px) {
+    .site-verb-stage {
+      --verb-zoom: clamp(
+        0.5,
+        tan(
+          atan2(
+            100svh - 303px - max(0px, (430px - 100vw) * 0.75),
+            517px
+          )
+        ),
+        1
+      );
+    }
+  }
+}
 
 /* §12.5 the tools bento. */
 .site-bento {
