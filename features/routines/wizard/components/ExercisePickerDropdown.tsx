@@ -89,7 +89,14 @@ export const ExercisePickerDropdown = forwardRef<
 	}, [isOpen])
 
 	return (
-		<div className="relative w-full sm:w-auto" ref={ref}>
+		<div
+			className={
+				inline
+					? 'flex min-h-0 w-full flex-1 flex-col'
+					: 'relative w-full sm:w-auto'
+			}
+			ref={ref}
+		>
 			<Button
 				onClick={onToggle}
 				variant="outline"
@@ -110,11 +117,11 @@ export const ExercisePickerDropdown = forwardRef<
 				<div
 					className={
 						inline
-							? 'mt-2 w-full overflow-hidden rounded-md border border-rule bg-popover'
+							? 'mt-2 flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-md border border-rule bg-popover'
 							: 'absolute top-full left-0 z-50 mt-2 max-h-[400px] w-full overflow-hidden rounded-md border border-rule bg-popover shadow-overlay duration-[var(--motion-base)] animate-in fade-in-0 zoom-in-95 sm:right-0 sm:left-auto sm:w-[400px] dark:shadow-none'
 					}
 				>
-					<div className="p-3 border-b">
+					<div className="shrink-0 p-3 border-b">
 						<Input
 							aria-label={t('searchLabel')}
 							placeholder={t('searchPlaceholder')}
@@ -124,7 +131,13 @@ export const ExercisePickerDropdown = forwardRef<
 							ref={inputRef}
 						/>
 					</div>
-					<div className="max-h-[260px] overflow-y-auto p-2">
+					<div
+						className={
+							inline
+								? 'min-h-0 flex-1 overflow-y-auto p-2'
+								: 'max-h-[260px] overflow-y-auto p-2'
+						}
+					>
 						{isLoading ? (
 							<div className="flex items-center justify-center gap-2 py-6 text-sm text-ink-3">
 								<Loader2 aria-hidden className="h-4 w-4 animate-spin" />

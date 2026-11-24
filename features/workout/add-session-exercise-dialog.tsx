@@ -164,14 +164,20 @@ export function AddSessionExerciseDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={close}>
-			<DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">
+			<DialogContent className="flex h-[min(34rem,calc(100dvh-2rem))] flex-col overflow-y-auto sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>{t('title')}</DialogTitle>
 					<DialogDescription>{t('description', { plan })}</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-4">
-					<div className="space-y-2">
+				<div className="flex min-h-0 flex-1 flex-col gap-4">
+					<div
+						className={
+							chosen
+								? 'flex flex-col gap-2'
+								: 'flex min-h-0 flex-1 flex-col gap-2'
+						}
+					>
 						<Label>{t('exerciseLabel')}</Label>
 						{chosen ? (
 							<div className="flex items-center justify-between gap-3 border-y border-rule-faint py-2">
