@@ -3,6 +3,47 @@
 	"mutatedAt": "2026-10-09T12:13:58.250Z",
 	"screenshots": [
 		{
+			"slug": "site",
+			"route": "/?site-preview=1",
+			"features": [
+				"SITE-01"
+			],
+			"capturedAt": "2026-11-24T12:35:36.018Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "site-features",
+			"route": "/features",
+			"features": [
+				"SITE-01"
+			],
+			"capturedAt": "2026-11-24T12:35:45.161Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "site-feature-page",
+			"route": "/features/workout-tracker",
+			"features": [
+				"SITE-01"
+			],
+			"capturedAt": "2026-11-24T12:35:50.278Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "site-pricing",
+			"route": "/pricing",
+			"features": [
+				"SITE-01",
+				"BILL-02"
+			],
+			"capturedAt": "2026-11-24T12:35:54.619Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
 			"slug": "login",
 			"route": "/login",
 			"features": [
