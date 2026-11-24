@@ -299,7 +299,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		signedOut: true,
 		ready: ['Everything Sunnsteel does'],
 		caption:
-			"The features index: what the app does in four moves, each with its own page, and what each part costs.",
+			'The features index: what the app does in four moves, each with its own page, and what each part costs.',
 	},
 	{
 		slug: 'site-feature-page',
