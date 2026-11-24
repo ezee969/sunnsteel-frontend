@@ -1,7 +1,7 @@
 {
 	"meta": {
 		"title": "Sunnsteel — Entrená con un plan. Dejá las cuentas a Sunnsteel.",
-		"description": "Un registro de entrenamiento donde cada serie es evidencia: planifica, registra y mira crecer tus récords, tu rango y tu historial. Gratis para empezar."
+		"description": "Un registro de entrenamiento donde cada serie es evidencia: planificá, registrá y mirá crecer tus récords, tu rango y tu historial. Gratis para empezar."
 	},
 	"topBar": {
 		"home": "Sunnsteel, inicio",
@@ -40,7 +40,7 @@
 		}
 	},
 	"hero": {
-		"headline": "Entrená con un plan. <mark>Dejá las cuentas a Sunnsteel</mark>.",
+		"headline": "Entrená con un plan. Dejá las cuentas a <mark>Sunnsteel</mark>.",
 		"subline": "Armá tu rutina, registrá cada serie y dejá que Sunnsteel calcule la progresión, los calentamientos y los discos mientras entrenás.",
 		"createAccount": "Empezá gratis",
 		"pauseVideo": "Pausar el video de fondo",
@@ -64,21 +64,21 @@
 		"muscles": "Músculos en el mapa del cuerpo"
 	},
 	"verbs": {
-		"heading": "Planifica. Entrena. Mide. Gana.",
+		"heading": "Planificá. Entrená. Medí. Ganá.",
 		"words": {
-			"plan": "Planifica.",
-			"train": "Entrena.",
-			"measure": "Mide.",
-			"earn": "Gana."
+			"plan": "Planificá.",
+			"train": "Entrená.",
+			"measure": "Medí.",
+			"earn": "Ganá."
 		},
 		"plan": {
-			"title": "Arma tu rutina o empieza con una plantilla",
+			"title": "Armá tu rutina o empezá con una plantilla",
 			"body": "Semanas fijas o rotaciones, y rangos de repeticiones que progresan solos. Con Pro, bloques de 8 semanas y descargas planificadas.",
 			"link": "Ver el constructor de rutinas",
 			"callout": "{template} · {days, plural, one {# día} other {# días}} por semana"
 		},
 		"train": {
-			"title": "Carga la barra sin hacer cuentas",
+			"title": "Cargá la barra sin hacer cuentas",
 			"body": "Tus últimos números junto a cada serie, un descanso que arranca solo, y calentamientos y discos calculados desde tu peso de trabajo.",
 			"link": "Ver el registro de entrenamiento",
 			"callout": "{weight} · {plates} por lado",
@@ -139,7 +139,7 @@
 		},
 		"supersets": {
 			"eyebrow": "Superseries y circuitos",
-			"title": "Enlaza ejercicios y entrena por rondas",
+			"title": "Enlazá ejercicios y entrená por rondas",
 			"body": "Hasta {max} ejercicios por grupo, una serie de cada uno por ronda, y cada uno conserva sus pesos y su progresión."
 		},
 		"swap": {
@@ -195,7 +195,7 @@
 		"profileInitials": "TN"
 	},
 	"templates": {
-		"heading": "Empieza con un programa",
+		"heading": "Empezá con un programa",
 		"body": "Elegí una plantilla inicial y adaptala a tu entrenamiento. Agregá los pesos que usás antes de empezar.",
 		"levels": {
 			"beginner": "Principiante",
@@ -210,8 +210,8 @@
 		"exercises": "{count, plural, one {# ejercicio} other {# ejercicios}}",
 		"noneFit": {
 			"title": "¿Ninguna te sirve?",
-			"build": "Arma la tuya",
-			"describe": "Descríbela y recibe un borrador"
+			"build": "Armá la tuya",
+			"describe": "Describila y recibí un borrador"
 		},
 		"block": {
 			"name": "Bloque de 8 semanas",
@@ -224,31 +224,31 @@
 		"levelsLabel": "Nivel"
 	},
 	"people": {
-		"heading": "Entrena con otros",
+		"heading": "Entrená con otros",
 		"subline": "Todas las funciones sociales están incluidas en el plan gratis.",
 		"name": "Lucas",
 		"initials": "LU",
 		"activity": {
 			"eyebrow": "Actividad",
-			"title": "Sigue a otros y míralos entrenar",
+			"title": "Seguí a otros y miralos entrenar",
 			"body": "Mirá los entrenamientos, récords e hitos de las personas que seguís. Reaccioná con una de las {reactions} opciones o dejá un comentario.",
 			"entry": "{name} terminó {day} · {records, plural, one {# récord} other {# récords}}"
 		},
 		"partners": {
 			"eyebrow": "Compañeros de entrenamiento",
-			"title": "Entrena con compañeros",
-			"body": "Hasta {max} compañeros. Cada uno elige qué ve el otro, y puedes recibir un aviso cuando un compañero termina un entrenamiento.",
-			"shares": "Comparte contigo: {parts}"
+			"title": "Entrená con compañeros",
+			"body": "Hasta {max} compañeros. Cada uno elige qué ve el otro, y podés recibir un aviso cuando un compañero termina un entrenamiento.",
+			"shares": "Comparte con vos: {parts}"
 		},
 		"messages": {
 			"eyebrow": "Mensajes",
-			"title": "Comparte lo que entrenaste",
+			"title": "Compartí lo que entrenaste",
 			"body": "Compartí rutinas, entrenamientos, récords, hitos o un mes de actividad en mensajes privados. Las personas que no seguís solo pueden enviarte una solicitud, si vos lo permitís.",
-			"sample": "Prueba esta",
+			"sample": "Probá esta",
 			"copied": "En tus rutinas"
 		},
 		"privacy": {
-			"title": "Tú eliges quién ve cada parte",
+			"title": "Vos elegís quién ve cada parte",
 			"body": "Elegí quién puede ver cada una de las {count} secciones de tu perfil: todos, tus seguidores o solo vos. Podés bloquear cuentas, denunciar contenido, exportar tus datos o eliminar la cuenta cuando quieras."
 		}
 	},
@@ -258,12 +258,12 @@
 			"name": "Free",
 			"note": "Sin tarjeta",
 			"lines": {
-				"log": "Registra cada serie, con avisos de descanso",
+				"log": "Registrá cada serie, con avisos de descanso",
 				"progression": "Progresión automática, calentamientos y discos",
 				"record": "Historial, récords, logros y rangos",
 				"window": "Tendencias de fuerza de {days} días e historial muscular de {weeks} semanas",
 				"social": "Todas las funciones sociales y los mensajes",
-				"data": "Exporta tus datos o borra tu cuenta cuando quieras"
+				"data": "Exportá tus datos o borrá tu cuenta cuando quieras"
 			},
 			"limits": "Hasta {versions} versiones de rutina, {goals} objetivos y {gyms, plural, one {# gimnasio} other {# gimnasios}}",
 			"action": "Empezar gratis"
@@ -280,11 +280,11 @@
 		"compare": "Ver la comparación completa",
 		"outcomes": {
 			"plan": {
-				"title": "Planifica con anticipación",
+				"title": "Planificá con anticipación",
 				"short": "Bloques de entrenamiento, descargas planificadas y bloques de 8 semanas"
 			},
 			"compare": {
-				"title": "Compara y ajusta",
+				"title": "Compará y ajustá",
 				"short": "Comparaciones, señales de entrenamiento y revisiones"
 			},
 			"history": {
@@ -299,7 +299,7 @@
 	},
 	"questions": {
 		"heading": "Preguntas",
-		"contact": "¿Otra cosa? Escríbenos a <mail>{email}</mail>.",
+		"contact": "¿Otra cosa? Escribinos a <mail>{email}</mail>.",
 		"items": {
 			"free": {
 				"question": "¿Es gratis?",
@@ -315,15 +315,15 @@
 			},
 			"progression": {
 				"question": "¿Me dice cuánto peso poner la próxima vez?",
-				"answer": "Sí. Cuando todas las series de un ejercicio llegan al tope de su rango de repeticiones, el siguiente entrenamiento suma un paso: {step} si no eliges otro. Si no llegas, se mantiene el peso que levantaste. Los calentamientos y los discos de cada lado se calculan desde tu peso de trabajo."
+				"answer": "Sí. Cuando todas las series de un ejercicio llegan al tope de su rango de repeticiones, el siguiente entrenamiento suma un paso: {step} si no elegís otro. Si no llegás, se mantiene el peso que levantaste. Los calentamientos y los discos de cada lado se calculan desde tu peso de trabajo."
 			},
 			"customExercises": {
 				"question": "¿Y si mi ejercicio no está en el catálogo?",
-				"answer": "Créalo. Puedes tener hasta {customMax} ejercicios propios y usarlos en rutinas y entrenamientos como cualquier otro."
+				"answer": "Crealo. Podés tener hasta {customMax} ejercicios propios y usarlos en rutinas y entrenamientos como cualquier otro."
 			},
 			"offline": {
 				"question": "¿Funciona sin conexión?",
-				"answer": "Si se corta la señal en pleno entrenamiento, sigue registrando: tus series se envían cuando vuelve, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
+				"answer": "Si se corta la señal en pleno entrenamiento, seguí registrando: tus series se envían cuando vuelve, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
 			},
 			"pro": {
 				"question": "¿Qué agrega Pro?",
@@ -335,7 +335,7 @@
 			},
 			"privacy": {
 				"question": "¿Quién ve mi perfil y mis entrenamientos?",
-				"answer": "Tú eliges, para cada una de las {count} partes de tu perfil: todos, tus seguidores o solo tú. Puedes bloquear a quien quieras y denunciar lo que haga falta."
+				"answer": "Vos elegís, para cada una de las {count} partes de tu perfil: todos, tus seguidores o solo vos. Podés bloquear a quien quieras y denunciar lo que haga falta."
 			},
 			"ai": {
 				"question": "¿Qué pasa con lo que le doy a la IA?",
@@ -354,17 +354,17 @@
 		"signIn": "Iniciar sesión",
 		"install": "Cómo instalarla",
 		"qr": {
-			"title": "Ábrelo en tu teléfono",
-			"hint": "Escanéalo con la cámara",
+			"title": "Abrilo en tu teléfono",
+			"hint": "Escanealo con la cámara",
 			"alt": "Código QR que abre {url}"
 		},
 		"helper": {
-			"title": "Instala Sunnsteel en este teléfono",
+			"title": "Instalá Sunnsteel en este teléfono",
 			"install": "Instalar Sunnsteel",
 			"iosNote": "Las notificaciones funcionan una vez instalada.",
 			"dismiss": "Ahora no",
-			"iosShare": "Toca Compartir en la barra de Safari.",
-			"iosAdd": "Elige Agregar a pantalla de inicio."
+			"iosShare": "Tocá Compartir en la barra de Safari.",
+			"iosAdd": "Elegí Agregar a pantalla de inicio."
 		}
 	},
 	"footer": {

@@ -34,22 +34,22 @@
 			"description": "Todo lo que hace Sunnsteel para planificar, registrar, medir y premiar tu entrenamiento, con lo que es Free y lo que es Pro."
 		},
 		"heading": "Todo lo que hace Sunnsteel",
-		"subline": "Planifica tu rutina, entrena con menos en qué pensar, lee tu progreso en números y gánate tu rango. Aquí está todo, y lo que cuesta cada parte.",
+		"subline": "Planificá tu rutina, entrená con menos en qué pensar, leé tu progreso en números y ganate tu rango. Acá está todo, y lo que cuesta cada parte.",
 		"facts": {
 			"free": "Gratis para empezar",
 			"exercises": "{count}+ ejercicios",
 			"browser": "Funciona en tu navegador"
 		},
 		"groups": {
-			"plan": "Planifica",
-			"train": "Entrena",
-			"measure": "Mide",
-			"earn": "Gana",
+			"plan": "Planificá",
+			"train": "Entrená",
+			"measure": "Medí",
+			"earn": "Ganá",
 			"people": "Con otros"
 		},
 		"cards": {
 			"routineBuilder": "Rutinas semanales o en rotación, plantillas, versiones y superseries, con un resumen de lo que suma cada semana.",
-			"progression": "Pesos que avanzan según lo que de verdad levantas, y bloques de 8 semanas con Pro.",
+			"progression": "Pesos que avanzan según lo que de verdad levantás, y bloques de 8 semanas con Pro.",
 			"workoutTracker": "La vez anterior junto a cada serie, descanso que arranca solo, discos y calentamientos calculados.",
 			"progress": "Fuerza, el mapa del cuerpo, récords y peso corporal, con señales y revisiones en Pro.",
 			"ranks": "{ranks} rangos y {milestones} logros que se ganan entrenando, y récords que salen de tus series.",
@@ -63,7 +63,7 @@
 		"faq": {
 			"free": {
 				"q": "¿Qué es gratis?",
-				"a": "Todo lo que haces al entrenar, tu historial, los récords, los rangos y todo lo social. Pro suma profundidad para planificar, más historial y las herramientas con IA."
+				"a": "Todo lo que hacés al entrenar, tu historial, los récords, los rangos y todo lo social. Pro suma profundidad para planificar, más historial y las herramientas con IA."
 			},
 			"install": {
 				"q": "¿Necesito una tienda de apps?",
@@ -71,7 +71,7 @@
 			},
 			"data": {
 				"q": "¿Mis datos son míos?",
-				"a": "Sí. Descarga todo en un archivo cuando quieras y borra tu cuenta por completo en cualquier momento."
+				"a": "Sí. Descargá todo en un archivo cuando quieras y borrá tu cuenta por completo en cualquier momento."
 			}
 		}
 	},
@@ -82,13 +82,13 @@
 		},
 		"eyebrow": "Pro · {days} días gratis",
 		"heading": "Gratis para entrenar. Pro para planificar más lejos.",
-		"subline": "Todo lo que haces al entrenar es gratis. Pro suma profundidad para planificar, más historial y las herramientas con IA.",
+		"subline": "Todo lo que hacés al entrenar es gratis. Pro suma profundidad para planificar, más historial y las herramientas con IA.",
 		"tryPro": "Probar Pro {days} días gratis",
 		"startFree": "Empezar gratis",
 		"facts": {
 			"price": "{price} por mes",
 			"trial": "{days} días gratis",
-			"cancel": "Cancela cuando quieras"
+			"cancel": "Cancelá cuando quieras"
 		},
 		"free": {
 			"heading": "¿Es gratis?",
@@ -105,21 +105,33 @@
 			"planners": "Quien planifica bloques y descargas, y quiere la carga de cada bloque fijada de antemano.",
 			"readers": "Quien lee su entrenamiento de cerca: historial largo, comparaciones y señales.",
 			"ai": "Quien quiere un borrador de rutina a partir de una descripción, o una revisión de sus propios entrenamientos."
+		},
+		"faq": {
+			"cancel": "Sí, desde <settings>Ajustes › Cuenta</settings> o la <cancellation>página de baja</cancellation>. Después de eso no se renueva nada, y conservás Pro hasta el final de lo que pagaste o de la prueba gratis.",
+			"trial": "La primera suscripción de una cuenta empieza con {days} días gratis. Mercado Pago verifica tu tarjeta sin cobrarte, y el primer cobro llega cuando termina la prueba; si cancelás antes, no se cobra nada.",
+			"refund": "Dentro de los {days} días desde que te suscribís podés revocar la compra desde la <revocation>página de arrepentimiento</revocation>, sin dar motivos, y te devolvemos lo cobrado. Los detalles están en la <refunds>política de reembolsos</refunds>.",
+			"charge": "Mercado Pago cobra {price} cada mes a la tarjeta o la cuenta que elijas en su página. Sunnsteel nunca ve tu tarjeta."
+		},
+		"outcomes": {
+			"plan": "Bloques de entrenamiento con fecha, descargas planificadas y bloques de 8 semanas que fijan las cargas de cada semana.",
+			"compare": "Compará bloques y sesiones, leé tus señales de entrenamiento, recibí sugerencias de objetivos y revisá los entrenamientos que elijas a partir de tus datos.",
+			"history": "Tendencias de fuerza de más de 90 días, historial muscular de más de cuatro semanas y todas las medidas corporales.",
+			"yours": "Inicio en tu orden, borradores de rutina a partir de tus palabras y más versiones de rutinas, objetivos y gimnasios."
 		}
 	},
 	"features": {
 		"workoutTracker": {
 			"meta": {
 				"title": "Registro de entrenamiento — Sunnsteel",
-				"description": "Registra cada serie en segundos: la vez anterior junto a cada serie, un descanso que arranca solo, discos y calentamientos calculados. Gratis."
+				"description": "Registrá cada serie en segundos: la vez anterior junto a cada serie, un descanso que arranca solo, discos y calentamientos calculados. Gratis."
 			},
-			"heading": "Registra cada serie en segundos",
+			"heading": "Registrá cada serie en segundos",
 			"subline": "La pantalla del entrenamiento muestra tus últimos números, arranca el descanso, te carga la barra y sigue funcionando si se corta la señal.",
-			"overview": "Está pensada para una mano entre series. Cada ejercicio dice la prescripción de hoy una sola vez, muestra lo que hiciste la vez anterior junto a cada serie y guarda una serie en cuanto la marcas.",
+			"overview": "Está pensada para una mano entre series. Cada ejercicio dice la prescripción de hoy una sola vez, muestra lo que hiciste la vez anterior junto a cada serie y guarda una serie en cuanto la marcás.",
 			"highlights": {
 				"last": {
 					"title": "La vez anterior, junto a cada serie",
-					"body": "El peso y las reps de tu último entrenamiento están al lado de cada serie, así sabes qué superar."
+					"body": "El peso y las reps de tu último entrenamiento están al lado de cada serie, así sabés qué superar."
 				},
 				"rest": {
 					"title": "Un descanso que arranca solo",
@@ -137,11 +149,11 @@
 				"corrections": "Tu último entrenamiento se puede corregir durante {hours} horas"
 			},
 			"steps": {
-				"1": "Empieza el entrenamiento de hoy desde tu inicio o tu calendario.",
+				"1": "Empezá el entrenamiento de hoy desde tu inicio o tu calendario.",
 				"2": "Cada ejercicio muestra su prescripción una vez, y tus últimos números junto a cada serie.",
-				"3": "Escribe el peso y las reps y marca la serie: se guarda al instante y arranca el descanso.",
-				"4": "Cambia un ejercicio, agrega una serie extra o escribe una nota cuando el día lo pida.",
-				"5": "Termina y lee tu resumen: totales, récords y lo que cambia la próxima vez."
+				"3": "Escribí el peso y las reps y marcá la serie: se guarda al instante y arranca el descanso.",
+				"4": "Cambiá un ejercicio, agregá una serie extra o escribí una nota cuando el día lo pida.",
+				"5": "Terminá y leé tu resumen: totales, récords y lo que cambia la próxima vez."
 			},
 			"example": {
 				"title": "Calentamientos y discos para una serie de 100 kg",
@@ -154,10 +166,10 @@
 				"all": "Todo lo que pasa en un entrenamiento es gratis."
 			},
 			"tips": {
-				"1": "Registra el peso que levantaste de verdad: la progresión lee lo que hiciste, no lo planificado.",
-				"2": "Marca una serie solo cuando la terminaste; una serie salteada nunca mueve tu rutina.",
-				"3": "¿Entrenas con guantes o magnesio? Activa los controles más grandes en Ajustes.",
-				"4": "Usa una nota para lo que los números no dicen."
+				"1": "Registrá el peso que levantaste de verdad: la progresión lee lo que hiciste, no lo planificado.",
+				"2": "Marcá una serie solo cuando la terminaste; una serie salteada nunca mueve tu rutina.",
+				"3": "¿Entrenás con guantes o magnesio? Activá los controles más grandes en Ajustes.",
+				"4": "Usá una nota para lo que los números no dicen."
 			},
 			"faq": {
 				"locked": {
@@ -166,11 +178,11 @@
 				},
 				"signal": {
 					"q": "¿Y si se corta la señal?",
-					"a": "Sigue registrando. Tus series se envían cuando vuelve la conexión, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
+					"a": "Seguí registrando. Tus series se envían cuando vuelve la conexión, mientras la app siga abierta, y te avisa cuando hay cambios esperando."
 				},
 				"add": {
 					"q": "¿Puedo agregar un ejercicio en pleno entrenamiento?",
-					"a": "Uno nuevo no: la rutina es el plan. Puedes cambiar un ejercicio por hoy, agregar series extra o cambiar la rutina para la próxima."
+					"a": "Uno nuevo no: la rutina es el plan. Podés cambiar un ejercicio por hoy, agregar series extra o cambiar la rutina para la próxima."
 				},
 				"fix": {
 					"q": "¿Puedo corregir un entrenamiento terminado?",
@@ -178,29 +190,29 @@
 				},
 				"forgot": {
 					"q": "Me olvidé de registrar un entrenamiento.",
-					"a": "Puedes registrar después un entrenamiento pasado de una de tus rutinas, con la fecha y las series que hiciste."
+					"a": "Podés registrar después un entrenamiento pasado de una de tus rutinas, con la fecha y las series que hiciste."
 				}
 			}
 		},
 		"routineBuilder": {
 			"meta": {
 				"title": "Constructor de rutinas — Sunnsteel",
-				"description": "Arma rutinas semanales o en rotación desde cero o con una plantilla, con un resumen de series semanales, duración y equipamiento. Borradores desde una descripción en Pro."
+				"description": "Armá rutinas semanales o en rotación desde cero o con una plantilla, con un resumen de series semanales, duración y equipamiento. Borradores desde una descripción en Pro."
 			},
-			"heading": "Arma la rutina que vas a seguir",
+			"heading": "Armá la rutina que vas a seguir",
 			"subline": "Semanal o en rotación, desde cero o con una plantilla, con un resumen que te dice lo que suma cada semana antes de guardarla.",
-			"overview": "Una rutina es tu plan: sus días, los ejercicios de cada día y, para cada ejercicio, sus series, reps, descanso y cómo progresa. Todo lo que entrenas empieza aquí.",
+			"overview": "Una rutina es tu plan: sus días, los ejercicios de cada día y, para cada ejercicio, sus series, reps, descanso y cómo progresa. Todo lo que entrenás empieza acá.",
 			"highlights": {
 				"schedule": {
 					"title": "Semanal o en rotación",
-					"body": "Entrena en días fijos de la semana, o haz tus días en orden cualquier día que entrenes."
+					"body": "Entrená en días fijos de la semana, o hacé tus días en orden cualquier día que entrenes."
 				},
 				"templates": {
-					"title": "Empieza con una plantilla",
-					"body": "{count} programas se abren como borradores, con todos los pesos para que los completes tú."
+					"title": "Empezá con una plantilla",
+					"body": "{count} programas se abren como borradores, con todos los pesos para que los completes vos."
 				},
 				"summary": {
-					"title": "Sabe lo que planificaste",
+					"title": "Sabé lo que planificaste",
 					"body": "Series semanales por músculo, una duración estimada de cada día y el equipamiento que necesita, antes de guardar."
 				}
 			},
@@ -211,11 +223,11 @@
 				"drafts": "{count} borradores de rutina por mes en Pro"
 			},
 			"steps": {
-				"1": "Elige semanal o rotación, y tus días de entrenamiento.",
-				"2": "Agrega ejercicios del catálogo, o crea los tuyos.",
-				"3": "Define series, reps o un rango de reps, descanso y cómo progresa cada ejercicio.",
-				"4": "Enlaza ejercicios en superseries o circuitos si los haces por rondas.",
-				"5": "Lee el resumen y créala. No se guarda nada hasta que lo haces."
+				"1": "Elegí semanal o rotación, y tus días de entrenamiento.",
+				"2": "Agregá ejercicios del catálogo, o creá los tuyos.",
+				"3": "Definí series, reps o un rango de reps, descanso y cómo progresa cada ejercicio.",
+				"4": "Enlazá ejercicios en superseries o circuitos si los hacés por rondas.",
+				"5": "Leé el resumen y creala. No se guarda nada hasta que lo hacés."
 			},
 			"example": {
 				"title": "Qué planifica Superior / inferior cada semana",
@@ -223,51 +235,51 @@
 				"columns": "Músculo · Series semanales"
 			},
 			"draft": {
-				"heading": "Descríbela y recibe un borrador",
-				"body": "Cuéntale qué quieres (días, objetivo, equipamiento) y se abre un borrador en el constructor, con todos los pesos en blanco. Tu texto va a Anthropic para escribir el borrador y no se guarda. Es un punto de partida, no un consejo médico."
+				"heading": "Describila y recibí un borrador",
+				"body": "Contale qué querés (días, objetivo, equipamiento) y se abre un borrador en el constructor, con todos los pesos en blanco. Tu texto va a Anthropic para escribir el borrador y no se guarda. Es un punto de partida, no un consejo médico."
 			},
 			"covers": {
 				"rows": "Rutinas semanales y en rotación · plantillas · ejercicios propios: Free y Pro. Versiones guardadas: {free} / {pro}. Borradores de rutina: Pro, {drafts} por mes. Bloques de entrenamiento y de 8 semanas: Pro."
 			},
 			"tips": {
-				"1": "Deja los pesos en blanco en una rutina nueva: tu primer entrenamiento los define.",
-				"2": "¿Entrenas días distintos cada semana? Usa una rotación.",
-				"3": "Guarda una versión antes de un cambio grande; después puedes compararla y restaurarla."
+				"1": "Dejá los pesos en blanco en una rutina nueva: tu primer entrenamiento los define.",
+				"2": "¿Entrenás días distintos cada semana? Usá una rotación.",
+				"3": "Guardá una versión antes de un cambio grande; después podés compararla y restaurarla."
 			},
 			"faq": {
 				"rotation": {
 					"q": "¿Qué es una rotación?",
-					"a": "Días que se hacen en orden cada vez que entrenas, en lugar de en días fijos. Un día que no hiciste no se saltea: el siguiente te espera."
+					"a": "Días que se hacen en orden cada vez que entrenás, en lugar de en días fijos. Un día que no hiciste no se saltea: el siguiente te espera."
 				},
 				"share": {
 					"q": "¿Puedo compartir o copiar una rutina?",
-					"a": "Sí. Compártela con un enlace o en tu perfil, y quien pueda verla puede copiarla a sus rutinas. Una copia es independiente: tu entrenamiento nunca viaja con ella."
+					"a": "Sí. Compartila con un enlace o en tu perfil, y quien pueda verla puede copiarla a sus rutinas. Una copia es independiente: tu entrenamiento nunca viaja con ella."
 				},
 				"versions": {
 					"q": "¿Cuántas versiones puedo guardar?",
-					"a": "{free} por rutina en Free y {pro} en Pro. Las versiones que ya tienes se conservan."
+					"a": "{free} por rutina en Free y {pro} en Pro. Las versiones que ya tenés se conservan."
 				},
 				"draft": {
 					"q": "¿Qué envía un borrador?",
-					"a": "Solo el texto que escribes, a Anthropic, para escribir el borrador; no se guarda. El borrador llega sin pesos y no se guarda nada hasta que creas la rutina."
+					"a": "Solo el texto que escribís, a Anthropic, para escribir el borrador; no se guarda. El borrador llega sin pesos y no se guarda nada hasta que creás la rutina."
 				}
 			}
 		},
 		"progression": {
 			"meta": {
 				"title": "Progresión automática — Sunnsteel",
-				"description": "La doble progresión mueve tus pesos según lo que de verdad levantas. Con Pro, los bloques de 8 semanas fijan la carga de cada semana desde un máximo de referencia."
+				"description": "La doble progresión mueve tus pesos según lo que de verdad levantás. Con Pro, los bloques de 8 semanas fijan la carga de cada semana desde un máximo de referencia."
 			},
-			"heading": "El peso sube cuando te lo ganas",
-			"subline": "La doble progresión mueve tus pesos según lo que de verdad levantas. Con Pro, un bloque de 8 semanas fija la carga de cada semana desde un máximo de referencia.",
-			"overview": "Cada ejercicio elige cómo progresa. La mayoría lo hace con doble progresión: subes reps dentro del rango con un mismo peso y después agregas peso. La app hace la cuenta al final de cada entrenamiento, con las series que marcaste.",
+			"heading": "El peso sube cuando te lo ganás",
+			"subline": "La doble progresión mueve tus pesos según lo que de verdad levantás. Con Pro, un bloque de 8 semanas fija la carga de cada semana desde un máximo de referencia.",
+			"overview": "Cada ejercicio elige cómo progresa. La mayoría lo hace con doble progresión: subís reps dentro del rango con un mismo peso y después agregás peso. La app hace la cuenta al final de cada entrenamiento, con las series que marcaste.",
 			"highlights": {
 				"double": {
 					"title": "Doble progresión",
 					"body": "Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento suma un paso."
 				},
 				"perSet": {
-					"title": "Serie por serie, si prefieres",
+					"title": "Serie por serie, si preferís",
 					"body": "La doble progresión dinámica mueve cada serie por separado."
 				},
 				"block": {
@@ -283,9 +295,9 @@
 			},
 			"steps": {
 				"1": "Dale al ejercicio un rango de reps, como 8–12, y un paso.",
-				"2": "Entrena y marca cada serie con el peso y las reps que hiciste.",
+				"2": "Entrená y marcá cada serie con el peso y las reps que hiciste.",
 				"3": "Cuando todas las series efectivas llegan al tope del rango, el peso del siguiente entrenamiento sube un paso.",
-				"4": "Si no llegan, se mantiene el peso que levantaste y vuelves a subir dentro del rango."
+				"4": "Si no llegan, se mantiene el peso que levantaste y volvés a subir dentro del rango."
 			},
 			"example": {
 				"title": "Doble progresión en 3 × 8–12, entrenamiento a entrenamiento",
@@ -302,14 +314,14 @@
 				"rows": "Progresión doble y serie por serie: Free y Pro. Bloques de 8 semanas y descargas planificadas: Pro."
 			},
 			"tips": {
-				"1": "Elige un paso que tu gimnasio pueda cargar: 2,5 kg en una barra, menos si tienes discos más chicos.",
-				"2": "Registra las reps que de verdad hiciste; redondear hacia arriba mueve el peso antes de tiempo.",
+				"1": "Elegí un paso que tu gimnasio pueda cargar: 2,5 kg en una barra, menos si tenés discos más chicos.",
+				"2": "Registrá las reps que de verdad hiciste; redondear hacia arriba mueve el peso antes de tiempo.",
 				"3": "Un ejercicio cambiado nunca mueve la prescripción, así que cambiar es seguro."
 			},
 			"faq": {
 				"miss": {
 					"q": "¿Y si no llego a las reps?",
-					"a": "Se mantiene el peso que levantaste y nada sube. Vuelve a subir dentro del rango con ese peso."
+					"a": "Se mantiene el peso que levantaste y nada sube. Volvé a subir dentro del rango con ese peso."
 				},
 				"off": {
 					"q": "¿Puedo apagarla para un ejercicio?",
@@ -317,7 +329,7 @@
 				},
 				"step": {
 					"q": "¿Qué paso usa?",
-					"a": "El que definiste para el ejercicio, {step} si no eliges otro."
+					"a": "El que definiste para el ejercicio, {step} si no elegís otro."
 				},
 				"deload": {
 					"q": "¿Una descarga mueve mis pesos?",
@@ -354,11 +366,11 @@
 				"reviews": "Revisiones de entrenamiento: {count} por mes en Pro"
 			},
 			"steps": {
-				"1": "Registra tus entrenamientos; los récords salen de tus series a medida que avanzas.",
-				"2": "Lee la fuerza por ejercicio, y la página de cada ejercicio con su historial.",
-				"3": "Mira el mapa del cuerpo cada semana para ver adónde fueron tus series.",
-				"4": "Deja que el control de estancamiento te diga qué ejercicios dejaron de marcar mejores registros.",
-				"5": "Con Pro, compara bloques y sesiones, lee tus señales de entrenamiento y pide una revisión."
+				"1": "Registrá tus entrenamientos; los récords salen de tus series a medida que avanzás.",
+				"2": "Leé la fuerza por ejercicio, y la página de cada ejercicio con su historial.",
+				"3": "Mirá el mapa del cuerpo cada semana para ver adónde fueron tus series.",
+				"4": "Dejá que el control de estancamiento te diga qué ejercicios dejaron de marcar mejores registros.",
+				"5": "Con Pro, compará bloques y sesiones, leé tus señales de entrenamiento y pedí una revisión."
 			},
 			"example": {
 				"title": "Cómo un entrenamiento llega al mapa del cuerpo",
@@ -371,8 +383,8 @@
 				"rows": "Récords, control de estancamiento, peso corporal: Free y Pro. Tendencias de fuerza: {days} días / más. Mapa del cuerpo: {free} semanas / {pro}. Objetivos: {freeGoals} / {proGoals}. Medidas además del peso, señales de entrenamiento y sugerencia de descarga, comparaciones, sugerencias de objetivos, revisiones: Pro."
 			},
 			"tips": {
-				"1": "Registra el RPE en tus series duras para ver el esfuerzo en señales y revisiones.",
-				"2": "Pésate siempre en las mismas condiciones para una línea más clara.",
+				"1": "Registrá el RPE en tus series duras para ver el esfuerzo en señales y revisiones.",
+				"2": "Pesate siempre en las mismas condiciones para una línea más clara.",
 				"3": "Un aviso de estancamiento es un dato para mirar, no un veredicto."
 			},
 			"faq": {
@@ -386,10 +398,10 @@
 				},
 				"signals": {
 					"q": "¿Las señales me dicen qué está mal?",
-					"a": "No. Muestran qué cambió, con los números y la regla; el porqué lo juzgas tú."
+					"a": "No. Muestran qué cambió, con los números y la regla; el porqué lo juzgás vos."
 				},
 				"pro": {
-					"q": "¿Qué es Pro aquí?",
+					"q": "¿Qué es Pro acá?",
 					"a": "Más historial, medidas además del peso, señales de entrenamiento y sugerencia de descarga, comparaciones, sugerencias de objetivos y revisiones de entrenamiento."
 				}
 			}
@@ -401,7 +413,7 @@
 			},
 			"heading": "Se gana con constancia",
 			"subline": "{ranks} rangos y {milestones} logros que se ganan con tus entrenamientos, y récords que salen de tus series. Nada de esto es para publicar.",
-			"overview": "Un rango premia la asistencia: entrenamientos en semanas distintas. Los logros marcan totales que alcanzas. Los récords se detectan en tus series en el momento en que los haces.",
+			"overview": "Un rango premia la asistencia: entrenamientos en semanas distintas. Los logros marcan totales que alcanzás. Los récords se detectan en tus series en el momento en que los hacés.",
 			"highlights": {
 				"ranks": {
 					"title": "{ranks} rangos",
@@ -418,14 +430,14 @@
 			},
 			"facts": {
 				"comeback": "Un regreso: {active} días activos en {window} días, después de {away} días afuera",
-				"featured": "Destaca hasta {max} logros en tu perfil",
+				"featured": "Destacá hasta {max} logros en tu perfil",
 				"plan": "Free"
 			},
 			"steps": {
-				"1": "Entrena: cada semana en la que entrenas cuenta como semana activa, sin importar cuántos entrenamientos tenga.",
-				"2": "Alcanza los entrenamientos y las semanas activas de un rango, y el rango es tuyo.",
+				"1": "Entrená: cada semana en la que entrenás cuenta como semana activa, sin importar cuántos entrenamientos tenga.",
+				"2": "Alcanzá los entrenamientos y las semanas activas de un rango, y el rango es tuyo.",
 				"3": "Los logros llegan a medida que tus totales los superan.",
-				"4": "Elige quién ve tu rango y destaca en tu perfil lo que te enorgullece."
+				"4": "Elegí quién ve tu rango y destacá en tu perfil lo que te enorgullece."
 			},
 			"example": {
 				"title": "La escalera y los logros",
@@ -451,30 +463,30 @@
 				},
 				"who": {
 					"q": "¿Quién ve mi rango?",
-					"a": "Tú eliges: todos, tus seguidores o solo tú."
+					"a": "Vos elegís: todos, tus seguidores o solo vos."
 				},
 				"records": {
 					"q": "¿Los récords se detectan solos?",
-					"a": "Sí, en tus series, mientras entrenas. Si corriges un entrenamiento, sus récords se recalculan."
+					"a": "Sí, en tus series, mientras entrenás. Si corregís un entrenamiento, sus récords se recalculan."
 				}
 			}
 		},
 		"community": {
 			"meta": {
 				"title": "Entrenar con otros — Sunnsteel",
-				"description": "Sigue a otros, entrena con compañeros y comparte lo que entrenaste, con cada parte de tu perfil visible solo para quien elijas. Gratis."
+				"description": "Seguí a otros, entrená con compañeros y compartí lo que entrenaste, con cada parte de tu perfil visible solo para quien elijas. Gratis."
 			},
-			"heading": "Entrena con otros, a tu manera",
-			"subline": "Sigue, entrena con compañeros y comparte lo que entrenaste, con cada parte de tu perfil visible solo para quien elijas.",
-			"overview": "Tu actividad sale de lo que entrenas, no de publicaciones. Tus seguidores ven lo que les permites; tus compañeros, lo que les das; y los mensajes llevan lo real.",
+			"heading": "Entrená con otros, a tu manera",
+			"subline": "Seguí, entrená con compañeros y compartí lo que entrenaste, con cada parte de tu perfil visible solo para quien elijas.",
+			"overview": "Tu actividad sale de lo que entrenás, no de publicaciones. Tus seguidores ven lo que les permitís; tus compañeros, lo que les das; y los mensajes llevan lo real.",
 			"highlights": {
 				"activity": {
 					"title": "Actividad",
-					"body": "Entrenamientos, récords y logros de la gente que sigues, con {reactions} reacciones y comentarios."
+					"body": "Entrenamientos, récords y logros de la gente que seguís, con {reactions} reacciones y comentarios."
 				},
 				"partners": {
 					"title": "Compañeros de entrenamiento",
-					"body": "Hasta {max} compañeros, cada uno elige qué ve el otro, con un aviso cuando un compañero termina un entrenamiento, si lo quieres."
+					"body": "Hasta {max} compañeros, cada uno elige qué ve el otro, con un aviso cuando un compañero termina un entrenamiento, si lo querés."
 				},
 				"messages": {
 					"title": "Mensajes",
@@ -488,10 +500,10 @@
 				"plan": "Free"
 			},
 			"steps": {
-				"1": "Sigue a la gente con la que entrenas o que admiras.",
-				"2": "Mira sus entrenamientos, récords y logros, y reacciona o comenta.",
+				"1": "Seguí a la gente con la que entrenás o que admirás.",
+				"2": "Mirá sus entrenamientos, récords y logros, y reaccioná o comentá.",
 				"3": "Háganse compañeros de entrenamiento y elijan qué ve cada uno.",
-				"4": "Manda una rutina, un entrenamiento o un récord en un mensaje, o comparte un entrenamiento con un enlace."
+				"4": "Mandá una rutina, un entrenamiento o un récord en un mensaje, o compartí un entrenamiento con un enlace."
 			},
 			"example": {
 				"title": "Tu perfil, parte por parte",
@@ -502,8 +514,8 @@
 				"all": "Todo lo social, y los mensajes, es gratis."
 			},
 			"tips": {
-				"1": "Configura cada parte de tu perfil una vez en Ajustes; puedes cambiarla cuando quieras.",
-				"2": "Un enlace compartido muestra solo las partes que eliges, y puedes revocarlo."
+				"1": "Configurá cada parte de tu perfil una vez en Ajustes; podés cambiarla cuando quieras.",
+				"2": "Un enlace compartido muestra solo las partes que elegís, y podés revocarlo."
 			},
 			"faq": {
 				"encrypted": {
@@ -512,11 +524,11 @@
 				},
 				"who": {
 					"q": "¿Quién me puede escribir?",
-					"a": "Tú eliges: la gente que sigues, todos (quien no sigues llega como solicitud) o nadie."
+					"a": "Vos elegís: la gente que seguís, todos (quien no seguís llega como solicitud) o nadie."
 				},
 				"share": {
 					"q": "¿Puedo compartir un entrenamiento con alguien sin cuenta?",
-					"a": "Sí, con un enlace que muestra solo las partes que eliges. Puedes revocarlo y deja de funcionar al instante."
+					"a": "Sí, con un enlace que muestra solo las partes que elegís. Podés revocarlo y deja de funcionar al instante."
 				},
 				"blocks": {
 					"q": "¿Cómo funcionan los bloqueos y las denuncias?",
@@ -538,58 +550,58 @@
 		"beginners": {
 			"meta": {
 				"title": "Sunnsteel para principiantes",
-				"description": "Un programa de cuerpo completo tres días por semana, los pesos calculados por ti y un progreso que se ve desde el primer mes."
+				"description": "Un programa de cuerpo completo tres días por semana, los pesos calculados por vos y un progreso que se ve desde el primer mes."
 			},
 			"eyebrow": "Para principiantes · Gratis",
-			"heading": "Empieza a entrenar con un plan",
-			"subline": "Un programa de cuerpo completo tres días por semana, los pesos calculados por ti y un progreso que se ve desde el primer mes.",
+			"heading": "Empezá a entrenar con un plan",
+			"subline": "Un programa de cuerpo completo tres días por semana, los pesos calculados por vos y un progreso que se ve desde el primer mes.",
 			"audience": "Para quien está en sus primeros meses de entrenamiento",
 			"facts": "3 días por semana · Cuerpo completo · Gratis",
 			"changes": {
 				"1": {
-					"title": "Aprende bien pocos movimientos",
+					"title": "Aprendé bien pocos movimientos",
 					"body": "Una lista corta de ejercicios, repetida, los enseña más rápido que la variedad."
 				},
 				"2": {
-					"title": "Tus primeros pesos los encuentras tú",
+					"title": "Tus primeros pesos los encontrás vos",
 					"body": "Las plantillas dejan todos los pesos en blanco; tu primer entrenamiento los define."
 				},
 				"3": {
-					"title": "Suma peso cuando te lo ganas",
+					"title": "Sumá peso cuando te lo ganás",
 					"body": "Cuando todas las series llegan al tope de su rango, el siguiente entrenamiento suma un paso."
 				},
 				"4": {
-					"title": "Aparece casi todas las semanas",
+					"title": "Aparecé casi todas las semanas",
 					"body": "Los rangos premian entrenamientos en semanas distintas, no sesiones largas."
 				}
 			},
 			"steps": {
-				"1": "Crea una cuenta gratis y dile tus días y objetivos.",
-				"2": "Empieza con Fundamentos de cuerpo completo, o el programa que te recomiende.",
-				"3": "En tu primer entrenamiento, encuentra un peso que puedas hacer bien para el mínimo de cada rango.",
-				"4": "Entrena tres días por semana; deja que la progresión mueva los pesos.",
-				"5": "Cuando el control de estancamiento marque un ejercicio durante semanas, lee la página de intermedios."
+				"1": "Creá una cuenta gratis y decile tus días y objetivos.",
+				"2": "Empezá con Fundamentos de cuerpo completo, o el programa que te recomiende.",
+				"3": "En tu primer entrenamiento, encontrá un peso que puedas hacer bien para el mínimo de cada rango.",
+				"4": "Entrená tres días por semana; dejá que la progresión mueva los pesos.",
+				"5": "Cuando el control de estancamiento marque un ejercicio durante semanas, leé la página de intermedios."
 			},
 			"next": "¿Listo para más? Intermedios",
 			"faq": {
 				"gym": {
 					"q": "¿Necesito un gimnasio?",
-					"a": "Fundamentos de cuerpo completo usa equipamiento común de gimnasio. Puedes armar tu propia rutina con lo que tengas, y los discos de tu gimnasio se guardan para la calculadora."
+					"a": "Fundamentos de cuerpo completo usa equipamiento común de gimnasio. Podés armar tu propia rutina con lo que tengas, y los discos de tu gimnasio se guardan para la calculadora."
 				},
 				"weights": {
 					"q": "¿Cómo sé mis pesos iniciales?",
-					"a": "Tu primer entrenamiento los encuentra: elige un peso que puedas hacer bien en el mínimo del rango y regístralo."
+					"a": "Tu primer entrenamiento los encuentra: elegí un peso que puedas hacer bien en el mínimo del rango y registralo."
 				}
 			}
 		},
 		"intermediates": {
 			"meta": {
 				"title": "Sunnsteel para intermedios",
-				"description": "Divide tu semana, sigue las series semanales por músculo y lee tus estancamientos como números, no como suposiciones."
+				"description": "Dividí tu semana, seguí las series semanales por músculo y leé tus estancamientos como números, no como suposiciones."
 			},
 			"eyebrow": "Para intermedios · Gratis",
-			"heading": "Sigue progresando después de los primeros meses",
-			"subline": "Divide tu semana, sigue las series semanales por músculo y lee tus estancamientos como números, no como suposiciones.",
+			"heading": "Seguí progresando después de los primeros meses",
+			"subline": "Dividí tu semana, seguí las series semanales por músculo y leé tus estancamientos como números, no como suposiciones.",
 			"audience": "Para quien siente que su primer programa dejó de avanzar",
 			"facts": "4 a 6 días por semana · Superior/inferior o empuje/tirón/piernas · Gratis",
 			"changes": {
@@ -598,7 +610,7 @@
 					"body": "Sumar peso cada semana se termina; subir un rango lleva más tiempo."
 				},
 				"2": {
-					"title": "Divide el cuerpo",
+					"title": "Dividí el cuerpo",
 					"body": "Superior/inferior o empuje/tirón/piernas le dan a cada músculo más series semanales."
 				},
 				"3": {
@@ -611,17 +623,17 @@
 				}
 			},
 			"steps": {
-				"1": "Elige Superior / inferior o Empuje / tirón / piernas, o arma tu propia división.",
-				"2": "Usa tus pesos actuales como pesos iniciales de la rutina nueva.",
-				"3": "Mira el mapa del cuerpo cada semana y ajusta series donde un músculo se queda corto.",
-				"4": "Guarda una versión antes de cada cambio, para poder comparar.",
-				"5": "Cuando un ejercicio se estanca por semanas, prueba un bloque de 8 semanas (Pro)."
+				"1": "Elegí Superior / inferior o Empuje / tirón / piernas, o armá tu propia división.",
+				"2": "Usá tus pesos actuales como pesos iniciales de la rutina nueva.",
+				"3": "Mirá el mapa del cuerpo cada semana y ajustá series donde un músculo se queda corto.",
+				"4": "Guardá una versión antes de cada cambio, para poder comparar.",
+				"5": "Cuando un ejercicio se estanca por semanas, probá un bloque de 8 semanas (Pro)."
 			},
 			"next": "¿Listo para bloques y descargas? Avanzados",
 			"faq": {
 				"split": {
 					"q": "¿Superior/inferior o empuje/tirón/piernas?",
-					"a": "Superior / inferior son cuatro días fijos; Empuje / tirón / piernas es una rotación, cada día dos veces por semana. Elige la que encaje con los días que tienes."
+					"a": "Superior / inferior son cuatro días fijos; Empuje / tirón / piernas es una rotación, cada día dos veces por semana. Elegí la que encaje con los días que tenés."
 				}
 			}
 		},
@@ -631,7 +643,7 @@
 				"description": "Bloques de 8 semanas desde un máximo de referencia, descargas planificadas y comparaciones que ponen cada bloque al lado del anterior."
 			},
 			"eyebrow": "Para avanzados · Pro",
-			"heading": "Planifica bloques, descargas y el largo plazo",
+			"heading": "Planificá bloques, descargas y el largo plazo",
 			"subline": "Bloques de 8 semanas desde un máximo de referencia, descargas planificadas y comparaciones que ponen cada bloque al lado del anterior.",
 			"audience": "Para quien planifica su entrenamiento por bloques",
 			"facts": "Bloques de 8 semanas · Descargas planificadas · Pro",
@@ -654,17 +666,17 @@
 				}
 			},
 			"steps": {
-				"1": "Arma tu rutina, o empieza con una plantilla que vas a cambiar.",
+				"1": "Armá tu rutina, o empezá con una plantilla que vas a cambiar.",
 				"2": "Dale a tus ejercicios principales un bloque de 8 semanas desde un máximo de referencia.",
-				"3": "Planifica una descarga donde el bloque la pida.",
-				"4": "Al final del bloque, lee la estimación y elige qué sigue.",
-				"5": "Compara el bloque con el anterior y pide una revisión de los entrenamientos que elijas."
+				"3": "Planificá una descarga donde el bloque la pida.",
+				"4": "Al final del bloque, leé la estimación y elegí qué sigue.",
+				"5": "Compará el bloque con el anterior y pedí una revisión de los entrenamientos que elijas."
 			},
 			"next": "Volver a todas las funciones",
 			"faq": {
 				"template": {
 					"q": "¿Hay una plantilla avanzada?",
-					"a": "No: el entrenamiento avanzado lo armas tú. El constructor, el bloque de 8 semanas y las descargas son donde lo armas."
+					"a": "No: el entrenamiento avanzado lo armás vos. El constructor, el bloque de 8 semanas y las descargas son donde lo armás."
 				}
 			}
 		},

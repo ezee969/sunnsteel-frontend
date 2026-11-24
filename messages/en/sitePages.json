@@ -105,6 +105,18 @@
 			"planners": "Lifters who plan blocks and deloads, and want each block's loads set in advance.",
 			"readers": "Lifters who read their training closely: long history, comparisons and signals.",
 			"ai": "Anyone who wants a routine drafted from a description, or a review of their own workouts."
+		},
+		"faq": {
+			"cancel": "Yes, from <settings>Settings › Account</settings> or the <cancellation>cancellation page</cancellation>. Nothing renews after that, and you keep Pro until the end of what you paid for, or of the free trial.",
+			"trial": "An account's first subscription starts with {days} days free. Mercado Pago checks your card without charging it, and the first charge comes when the trial ends; cancel before then and nothing is charged.",
+			"refund": "Within {days} days of subscribing you can revoke the purchase from the <revocation>revocation page</revocation>, with no reason needed, and what was charged is refunded. The <refunds>refund policy</refunds> has the details.",
+			"charge": "Mercado Pago charges {price} each month to the card or account you choose on its page. Sunnsteel never sees your card."
+		},
+		"outcomes": {
+			"plan": "Dated training blocks, planned deloads and 8-week blocks that set each week's loads.",
+			"compare": "Compare blocks and sessions, read your training signals, get goal suggestions and have chosen workouts reviewed from your own data.",
+			"history": "Strength trends past 90 days, muscle history past four weeks and every body measurement.",
+			"yours": "Your dashboard in your order, routine drafts from your own words, and more routine versions, goals and gyms."
 		}
 	},
 	"features": {

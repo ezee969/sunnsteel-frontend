@@ -243,7 +243,8 @@ which wins over this summary.
    `viewport - 256` widths, and run the scoped sweep in Spanish as well
    (`UI_LOCALE=es npm run ui:regression -- -g "<pattern>"`). Prefer a shorter
    Spanish phrasing to a truncation; never fix it by shrinking type.
-8. **Spanish is neutral Latin American with *tú***, and the glossary decides the
+8. **Spanish is neutral Latin American with *tú*** (the public site, `site` and
+   `sitePages`, is rioplatense *voseo* by the owner's decision), and the glossary decides the
    words (Dashboard is **Inicio**, Settings **Ajustes**, Warm-up
    **Calentamiento**, Deload **Descarga**...).
 9. **Text the server writes with nobody's page open** (push notifications, the

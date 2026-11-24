@@ -29,8 +29,10 @@ import { PRO_OUTCOMES } from '@/lib/utils/pro-offer'
 /**
  * SITE-01 §12.20: what is free, what Pro adds and what it costs, for a
  * visitor who is not signed in (a member is sent to `/plans` by the
- * middleware). The comparison is the very table `/plans` renders, the
- * outcomes and questions the app's own; every number is contracts'.
+ * middleware). The comparison is the very table `/plans` renders and the
+ * questions are the app's; the answers and outcomes are the site's own copies
+ * (Spanish in voseo, like the rest of the site) so the app's wording stays
+ * its own. Every number is contracts'.
  */
 const UPDATED = '2026-11'
 const FAQ = ['cancel', 'trial', 'refund', 'charge', 'leaving'] as const
@@ -60,7 +62,6 @@ export default async function PricingPage({ params }: Params) {
 	const t = await getTranslations('sitePages.pricing')
 	const tBar = await getTranslations('site.topBar')
 	const tPlans = await getTranslations('billing.plans')
-	const tOffer = await getTranslations('billing.offer')
 	const tSitePlans = await getTranslations('site.plans')
 	const tLegal = await getTranslations('core.legalLinks')
 	const price = formatPlanPrice(PRO_PRICE, locale as Locale)
@@ -80,33 +81,30 @@ export default async function PricingPage({ params }: Params) {
 		{ rich: ReactNode; plain: string }
 	> = {
 		cancel: {
-			rich: tPlans.rich('faq.cancel.a', {
+			rich: t.rich('faq.cancel', {
 				settings: link('/settings/account'),
 				cancellation: link(CONSUMER_REQUEST_PATHS.CANCELLATION),
 			}),
-			plain: tPlans.markup(
-				'faq.cancel.a',
-				plainTags(['settings', 'cancellation']),
-			),
+			plain: t.markup('faq.cancel', plainTags(['settings', 'cancellation'])),
 		},
 		trial: {
-			rich: tPlans('faq.trial.a', { days }),
-			plain: tPlans('faq.trial.a', { days }),
+			rich: t('faq.trial', { days }),
+			plain: t('faq.trial', { days }),
 		},
 		refund: {
-			rich: tPlans.rich('faq.refund.a', {
+			rich: t.rich('faq.refund', {
 				days: REVOCATION_WINDOW_DAYS,
 				revocation: link(CONSUMER_REQUEST_PATHS.REVOCATION),
 				refunds: link(LEGAL_PATHS.refunds),
 			}),
-			plain: tPlans.markup('faq.refund.a', {
+			plain: t.markup('faq.refund', {
 				days: REVOCATION_WINDOW_DAYS,
 				...plainTags(['revocation', 'refunds']),
 			}),
 		},
 		charge: {
-			rich: tPlans('faq.charge.a', { price }),
-			plain: tPlans('faq.charge.a', { price }),
+			rich: t('faq.charge', { price }),
+			plain: t('faq.charge', { price }),
 		},
 		leaving: { rich: tPlans('downgrade'), plain: tPlans('downgrade') },
 	}
@@ -147,10 +145,10 @@ export default async function PricingPage({ params }: Params) {
 							<Check className="mt-1 size-4 shrink-0" aria-hidden />
 							<span>
 								<span className="type-panel block text-foreground">
-									{tOffer(`outcomes.${outcome.key}.title`)}
+									{tSitePlans(`outcomes.${outcome.key}.title`)}
 								</span>
 								<span className="type-body text-ink-2">
-									{tOffer(`outcomes.${outcome.key}.description`)}
+									{t(`outcomes.${outcome.key}`)}
 								</span>
 							</span>
 						</li>
