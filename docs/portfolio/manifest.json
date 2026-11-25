@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-11-25T03:15:36.623Z",
+	"mutatedAt": "2026-11-25T03:22:48.026Z",
 	"screenshots": [
 		{
 			"slug": "site",
@@ -495,7 +495,7 @@
 				"LIVE-05",
 				"LIVE-22"
 			],
-			"capturedAt": "2026-11-25T03:15:13.267Z",
+			"capturedAt": "2026-11-25T03:22:24.955Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -505,7 +505,7 @@
 			"features": [
 				"LIVE-15"
 			],
-			"capturedAt": "2026-11-25T03:15:26.759Z",
+			"capturedAt": "2026-11-25T03:22:37.841Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -515,7 +515,7 @@
 			"features": [
 				"LIVE-12"
 			],
-			"capturedAt": "2026-11-25T03:15:40.352Z",
+			"capturedAt": "2026-11-25T03:22:51.889Z",
 			"width": 1440,
 			"height": 900
 		}

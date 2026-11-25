@@ -235,12 +235,19 @@ async function startScratchSession(
 				const line = row
 					.locator('xpath=ancestor::*[.//h3][1]')
 					.getByText(/^\d+ × \d+/)
-				const target = (await caption.count())
+				// The caption may name a load ("Target: 40 kg") rather than reps,
+				// and its number must never be typed as reps: only a caption that
+				// says "reps" counts, else the prescription line's low end.
+				const captionText = (await caption.count())
 					? await caption.first().innerText()
-					: (((await line.count())
-							? (await line.first().innerText()).match(/× (\d+)/)?.[1]
-							: '') ?? '')
-				await reps.fill(target.match(/\d+/)?.[0] ?? '8')
+					: ''
+				const lineText = (await line.count())
+					? await line.first().innerText()
+					: ''
+				const target =
+					captionText.match(/(\d+)(?:[–-]\d+)?\s*reps/i)?.[1] ??
+					lineText.match(/× (\d+)/)?.[1]
+				await reps.fill(target ?? '8')
 			}
 			const weight = row.getByLabel(/: weight in /)
 			// LIVE-22: a pre-filled target is a suggestion shown as the
