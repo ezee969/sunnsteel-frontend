@@ -1,6 +1,6 @@
 {
 	"generatedBy": "npm run ui:capture:portfolio",
-	"mutatedAt": "2026-11-25T02:13:40.504Z",
+	"mutatedAt": "2026-11-25T03:15:36.623Z",
 	"screenshots": [
 		{
 			"slug": "site",
@@ -8,7 +8,7 @@
 			"features": [
 				"SITE-01"
 			],
-			"capturedAt": "2026-11-25T02:09:36.638Z",
+			"capturedAt": "2026-11-25T03:10:56.733Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -18,7 +18,7 @@
 			"features": [
 				"SITE-01"
 			],
-			"capturedAt": "2026-11-25T02:09:39.620Z",
+			"capturedAt": "2026-11-25T03:10:59.814Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -28,7 +28,7 @@
 			"features": [
 				"SITE-01"
 			],
-			"capturedAt": "2026-11-25T02:09:42.785Z",
+			"capturedAt": "2026-11-25T03:11:02.878Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -39,7 +39,7 @@
 				"SITE-01",
 				"BILL-02"
 			],
-			"capturedAt": "2026-11-25T02:09:46.248Z",
+			"capturedAt": "2026-11-25T03:11:06.249Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -50,7 +50,7 @@
 				"CORE-01",
 				"FIX-11"
 			],
-			"capturedAt": "2026-11-25T02:09:49.287Z",
+			"capturedAt": "2026-11-25T03:11:09.298Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -69,7 +69,7 @@
 				"DASH-06",
 				"CORE-03"
 			],
-			"capturedAt": "2026-11-25T02:09:53.113Z",
+			"capturedAt": "2026-11-25T03:11:13.100Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -80,7 +80,7 @@
 				"DASH-05",
 				"PREF-03"
 			],
-			"capturedAt": "2026-11-25T02:09:56.862Z",
+			"capturedAt": "2026-11-25T03:11:17.278Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -90,7 +90,7 @@
 			"features": [
 				"ROUT-03"
 			],
-			"capturedAt": "2026-11-25T02:10:04.029Z",
+			"capturedAt": "2026-11-25T03:11:25.150Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -100,7 +100,7 @@
 			"features": [
 				"INTEL-03"
 			],
-			"capturedAt": "2026-11-25T02:10:07.579Z",
+			"capturedAt": "2026-11-25T03:11:28.928Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -112,7 +112,7 @@
 				"ROUT-02",
 				"ROUT-11"
 			],
-			"capturedAt": "2026-11-25T02:10:19.424Z",
+			"capturedAt": "2026-11-25T03:11:34.548Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -123,7 +123,7 @@
 				"LIVE-13",
 				"LIVE-20"
 			],
-			"capturedAt": "2026-11-25T02:10:29.836Z",
+			"capturedAt": "2026-11-25T03:11:44.877Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -134,7 +134,7 @@
 				"ROUT-17",
 				"ROUT-20"
 			],
-			"capturedAt": "2026-11-25T02:10:40.194Z",
+			"capturedAt": "2026-11-25T03:11:56.082Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -148,7 +148,7 @@
 				"ROUT-09",
 				"ROUT-15"
 			],
-			"capturedAt": "2026-11-25T02:10:51.488Z",
+			"capturedAt": "2026-11-25T03:12:03.675Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -159,7 +159,7 @@
 				"PROG-11",
 				"ROUT-09"
 			],
-			"capturedAt": "2026-11-25T02:10:59.343Z",
+			"capturedAt": "2026-11-25T03:12:12.150Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -169,7 +169,7 @@
 			"features": [
 				"ROUT-16"
 			],
-			"capturedAt": "2026-11-25T02:11:07.282Z",
+			"capturedAt": "2026-11-25T03:12:20.505Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -179,7 +179,7 @@
 			"features": [
 				"HIST-01"
 			],
-			"capturedAt": "2026-11-25T02:11:14.705Z",
+			"capturedAt": "2026-11-25T03:12:28.546Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -189,7 +189,7 @@
 			"features": [
 				"NAV-01"
 			],
-			"capturedAt": "2026-11-25T02:11:18.289Z",
+			"capturedAt": "2026-11-25T03:12:33.083Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -202,7 +202,7 @@
 				"SOC-07",
 				"LIVE-17"
 			],
-			"capturedAt": "2026-11-25T02:11:21.943Z",
+			"capturedAt": "2026-11-25T03:12:36.627Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -215,7 +215,7 @@
 				"PROG-10",
 				"UX-11"
 			],
-			"capturedAt": "2026-11-25T02:11:25.446Z",
+			"capturedAt": "2026-11-25T03:12:40.440Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -228,7 +228,7 @@
 				"PROG-07",
 				"UX-11"
 			],
-			"capturedAt": "2026-11-25T02:11:28.760Z",
+			"capturedAt": "2026-11-25T03:12:44.502Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -240,7 +240,7 @@
 				"PROG-04",
 				"UX-11"
 			],
-			"capturedAt": "2026-11-25T02:11:32.304Z",
+			"capturedAt": "2026-11-25T03:12:48.425Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -249,11 +249,19 @@
 			"route": "/progress/workouts",
 			"features": [
 				"PROG-05",
-				"PROG-06",
-				"INTEL-04",
 				"UX-11"
 			],
-			"capturedAt": "2026-11-25T02:11:35.841Z",
+			"capturedAt": "2026-11-25T03:12:52.391Z",
+			"width": 1440,
+			"height": 900
+		},
+		{
+			"slug": "training-review",
+			"route": "/progress/workouts",
+			"features": [
+				"INTEL-04"
+			],
+			"capturedAt": "2026-11-25T03:12:56.214Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -268,7 +276,7 @@
 				"NAV-05",
 				"ROUT-15"
 			],
-			"capturedAt": "2026-11-25T02:11:39.548Z",
+			"capturedAt": "2026-11-25T03:13:04.619Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -282,7 +290,7 @@
 				"ACH-05",
 				"ACH-09"
 			],
-			"capturedAt": "2026-11-25T02:11:43.161Z",
+			"capturedAt": "2026-11-25T03:13:08.316Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -293,7 +301,7 @@
 				"BILL-02",
 				"BILL-05"
 			],
-			"capturedAt": "2026-11-25T02:11:46.475Z",
+			"capturedAt": "2026-11-25T03:13:14.315Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -304,7 +312,7 @@
 				"NOTIF-01",
 				"SOC-09"
 			],
-			"capturedAt": "2026-11-25T02:11:50.267Z",
+			"capturedAt": "2026-11-25T03:13:21.988Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -315,7 +323,7 @@
 				"MSG-01",
 				"MSG-06"
 			],
-			"capturedAt": "2026-11-25T02:11:53.851Z",
+			"capturedAt": "2026-11-25T03:13:25.244Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -326,7 +334,7 @@
 				"MSG-01",
 				"MSG-09"
 			],
-			"capturedAt": "2026-11-25T02:12:00.922Z",
+			"capturedAt": "2026-11-25T03:13:29.619Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -338,7 +346,7 @@
 				"SOC-04",
 				"SOC-06"
 			],
-			"capturedAt": "2026-11-25T02:12:08.140Z",
+			"capturedAt": "2026-11-25T03:13:37.950Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -349,7 +357,7 @@
 				"TRUST-04",
 				"PROF-10"
 			],
-			"capturedAt": "2026-11-25T02:12:11.045Z",
+			"capturedAt": "2026-11-25T03:13:41.875Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -361,7 +369,7 @@
 				"EXER-07",
 				"PROG-02"
 			],
-			"capturedAt": "2026-11-25T02:12:13.969Z",
+			"capturedAt": "2026-11-25T03:13:45.364Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -371,7 +379,7 @@
 			"features": [
 				"EXER-06"
 			],
-			"capturedAt": "2026-11-25T02:12:17.685Z",
+			"capturedAt": "2026-11-25T03:13:49.495Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -381,7 +389,7 @@
 			"features": [
 				"PROG-12"
 			],
-			"capturedAt": "2026-11-25T02:12:25.149Z",
+			"capturedAt": "2026-11-25T03:13:57.490Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -392,7 +400,7 @@
 				"PROG-10",
 				"PROG-09"
 			],
-			"capturedAt": "2026-11-25T02:12:33.194Z",
+			"capturedAt": "2026-11-25T03:14:05.330Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -403,7 +411,7 @@
 				"SOC-08",
 				"SOC-09"
 			],
-			"capturedAt": "2026-11-25T02:12:40.731Z",
+			"capturedAt": "2026-11-25T03:14:12.995Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -430,7 +438,7 @@
 				"LIVE-18",
 				"A11Y-01"
 			],
-			"capturedAt": "2026-11-25T02:12:47.326Z",
+			"capturedAt": "2026-11-25T03:14:37.314Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -442,7 +450,7 @@
 				"PROF-09",
 				"UX-12"
 			],
-			"capturedAt": "2026-11-25T02:12:50.834Z",
+			"capturedAt": "2026-11-25T03:14:41.743Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -452,7 +460,7 @@
 			"features": [
 				"SOC-08"
 			],
-			"capturedAt": "2026-11-25T02:12:54.471Z",
+			"capturedAt": "2026-11-25T03:14:45.476Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -462,7 +470,7 @@
 			"features": [
 				"EXPORT-01"
 			],
-			"capturedAt": "2026-11-25T02:13:01.253Z",
+			"capturedAt": "2026-11-25T03:14:53.420Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -472,7 +480,7 @@
 			"features": [
 				"TRUST-01"
 			],
-			"capturedAt": "2026-11-25T02:13:08.804Z",
+			"capturedAt": "2026-11-25T03:15:01.580Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -487,7 +495,7 @@
 				"LIVE-05",
 				"LIVE-22"
 			],
-			"capturedAt": "2026-11-25T02:13:19.555Z",
+			"capturedAt": "2026-11-25T03:15:13.267Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -497,7 +505,7 @@
 			"features": [
 				"LIVE-15"
 			],
-			"capturedAt": "2026-11-25T02:13:31.704Z",
+			"capturedAt": "2026-11-25T03:15:26.759Z",
 			"width": 1440,
 			"height": 900
 		},
@@ -507,7 +515,7 @@
 			"features": [
 				"LIVE-12"
 			],
-			"capturedAt": "2026-11-25T02:13:43.833Z",
+			"capturedAt": "2026-11-25T03:15:40.352Z",
 			"width": 1440,
 			"height": 900
 		}
