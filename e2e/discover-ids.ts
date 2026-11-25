@@ -70,9 +70,18 @@ export async function discoverIds(browser: Browser): Promise<Ids> {
 		// Built from the contract's own pattern: a hand-written `[a-z0-9_]` stopped
 		// at the first hyphen of "codex-prof03-0909" and sent the members check to
 		// a profile that does not exist.
+		// The handle renders after the profile query, which can still be in
+		// flight at `networkidle`: on 2026-11-25 the text was read too early and
+		// `member-profile` failed with no :username. Wait for it.
 		await page.goto('/profile', { waitUntil: 'networkidle' })
-		const text = await page.locator('main').innerText()
 		const username = new RegExp(`@(${USERNAME_PATTERN_SOURCE.slice(1, -1)})`)
+		await page
+			.locator('main')
+			.getByText(username)
+			.first()
+			.waitFor({ timeout: 15_000 })
+			.catch(() => {})
+		const text = await page.locator('main').innerText()
 		found.username = text.match(username)?.[1]
 
 		// MSG-01: the owner's newest conversation, when they have one.

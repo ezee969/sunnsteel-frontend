@@ -331,7 +331,7 @@ function scrollToHeading(name: string) {
 }
 
 /**
- * `/plans` without the "Test mode" line. A local backend runs Mercado Pago in
+ * `/plans` (and the plan card on `/settings/account`) without the "Test mode" line. A local backend runs Mercado Pago in
  * its sandbox (`MERCADO_PAGO_SANDBOX=true`, the only mode a local stack may
  * use), so `GET /billing/me` answers `checkout.testMode: true` and the page
  * says payments are not real. Production runs live and never shows it, so the
@@ -829,6 +829,8 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'settings-display',
 		route: '/settings/account',
 		features: ['A11Y-02', 'LIVE-18', 'A11Y-01'],
+		// Your plan, at the top of this tab, reads the same `GET /billing/me`.
+		setup: withoutSandboxNotice,
 		ready: ['Display', 'Higher contrast', 'Larger controls'],
 		caption:
 			"This device's display choices: higher contrast, which also follows the operating system, and larger controls, which turn the workout screen into gym mode.",
