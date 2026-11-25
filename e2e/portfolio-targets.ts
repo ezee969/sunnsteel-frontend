@@ -171,9 +171,7 @@ async function startScratchSession(
 		}
 		await expect(extra).toHaveCount(0)
 	}
-	const cleanup: Cleanup = async () => {
-		await page.keyboard.press('Escape')
-		await removeExtra()
+	const untick = async () => {
 		for (const label of logged) {
 			const box = page.getByRole('checkbox', { name: label, exact: true })
 			if (!(await box.count())) {
@@ -186,7 +184,7 @@ async function startScratchSession(
 					})
 					.getByRole('button', { expanded: false })
 					.first()
-					.click()
+					.click({ timeout: 15_000 })
 				await expect(box).toBeVisible()
 			}
 			if ((await box.getAttribute('data-state')) === 'checked') {
@@ -202,8 +200,24 @@ async function startScratchSession(
 					.toBe('unchecked')
 			}
 		}
-		await page.waitForLoadState('networkidle')
-		await discard()
+	}
+	const cleanup: Cleanup = async () => {
+		// An open menu (live-session-set-kinds) hides the rest of the page from
+		// the accessibility tree until it has closed, so every set's checkbox
+		// reads as absent and the folded-exercise branch below waits for a
+		// toggle that is not collapsed: the 2026-11-24 timeout, which left the
+		// session running. Wait for the menu to be gone first.
+		await page.keyboard.press('Escape')
+		await expect(page.getByRole('menu')).toHaveCount(0)
+		try {
+			await removeExtra()
+			await untick()
+			await page.waitForLoadState('networkidle')
+		} finally {
+			// Whatever went wrong above, the scratch session never outlives the
+			// target: a live session would put its Resume banner on every frame.
+			await discard()
+		}
 	}
 
 	try {
@@ -277,6 +291,60 @@ async function startScratchSession(
 	}
 
 	return cleanup
+}
+
+/**
+ * Brings the section an `h2` names to the top of the content, under the top
+ * bar, for a frame of something below the fold. It scrolls whichever element
+ * actually scrolls, so it does not depend on the shell's layout.
+ */
+function scrollToHeading(name: string) {
+	return async (page: Page) => {
+		const heading = page.getByRole('heading', { level: 2, name, exact: true })
+		await expect(heading).toBeVisible()
+		await heading.evaluate(element => {
+			const TOP_BAR_CLEARANCE = 96
+			let scroller: HTMLElement | null = element.parentElement
+			while (scroller) {
+				const { overflowY } = getComputedStyle(scroller)
+				if (
+					/(auto|scroll)/.test(overflowY) &&
+					scroller.scrollHeight > scroller.clientHeight
+				)
+					break
+				scroller = scroller.parentElement
+			}
+			const target = scroller ?? document.scrollingElement ?? document.body
+			const offset =
+				element.getBoundingClientRect().top -
+				(scroller ? scroller.getBoundingClientRect().top : 0)
+			target.scrollTop += offset - TOP_BAR_CLEARANCE
+		})
+	}
+}
+
+/**
+ * `/plans` without the "Test mode" line. A local backend runs Mercado Pago in
+ * its sandbox (`MERCADO_PAGO_SANDBOX=true`, the only mode a local stack may
+ * use), so `GET /billing/me` answers `checkout.testMode: true` and the page
+ * says payments are not real. Production runs live and never shows it, so the
+ * frame drops it by answering `testMode: false` to this page's read and
+ * nothing else; every other field is the server's own. Nothing is bought:
+ * no control is pressed. docs/portfolio/README.md, "Plans".
+ */
+async function withoutSandboxNotice(page: Page): Promise<Cleanup> {
+	const billingRead = /\/billing\/me(\?|$)/
+	await page.route(billingRead, async route => {
+		const response = await route.fetch()
+		const body = await response.json()
+		if (body?.checkout) body.checkout.testMode = false
+		await route.fulfill({ response, json: body })
+	})
+	await page.reload({ waitUntil: 'networkidle' })
+	await expect(page.getByText(/^Test mode:/)).toHaveCount(0)
+	return async () => {
+		await page.unroute(billingRead)
+	}
 }
 
 export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
@@ -550,12 +618,29 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 			'How the work spreads across muscles and weeks, with volume compared by muscle, routine and exercise.',
 	},
 	{
+		// The top of the tab: the month's consistency. The review further down
+		// the same page is its own frame, `training-review`.
 		slug: 'progress-workouts',
 		route: '/progress/workouts',
-		features: ['PROG-05', 'PROG-06', 'INTEL-04', 'UX-11'],
-		ready: ['Training review'],
+		features: ['PROG-05', 'UX-11'],
+		ready: ['Consistency', /Trained on \d+ of \d+ days/],
 		caption:
-			'Which days were trained, two sessions compared, and a review of the workouts you pick that cites every number it states.',
+			'Which days of the month were trained, each marked completed, ended early, not logged, planned, rest, moved or skipped.',
+	},
+	{
+		slug: 'training-review',
+		route: '/progress/workouts',
+		features: ['INTEL-04'],
+		setup: scrollToHeading('Training review'),
+		ready: [
+			'Training review',
+			'What changed',
+			'Progress',
+			'Effort',
+			/left this month\. Renews on/,
+		],
+		caption:
+			'A review of the workouts you pick, against one of three fixed questions, with the month’s remaining reviews stated beside the button.',
 	},
 	{
 		slug: 'schedule-week',
@@ -584,6 +669,7 @@ export const PORTFOLIO_TARGETS: PortfolioTarget[] = [
 		slug: 'plans',
 		route: '/plans',
 		features: ['BILL-02', 'BILL-05'],
+		setup: withoutSandboxNotice,
 		ready: ['Free and Pro compared'],
 		caption:
 			'What Pro adds as outcomes, the questions a buyer asks about cancelling, the trial and refunds, then Free and Pro compared row by row.',

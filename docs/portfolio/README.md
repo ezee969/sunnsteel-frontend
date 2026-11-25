@@ -1,7 +1,7 @@
 # Portfolio captures
 
 `npm run ui:capture:portfolio` photographs the app for the Sunnsteel case study
-in the owner's portfolio (`web_portfolio_next`, which sits beside this workspace
+in the owner's portfolio (`personal-portfolio`, which sits beside this workspace
 on the development machine). It writes 1440×900 dark viewport frames to
 `screenshots/<slug>.png` and regenerates `manifest.json` (slug, route, roadmap
 IDs, capture time, pixel size). It is not part of CI or `npm run verify`.
@@ -32,6 +32,17 @@ days and a 0-day streak.
 ```bash
 cd ../sunnsteel-backend && npm run db:teardown:portfolio && npm run db:seed:portfolio
 ```
+
+**The seed's owner is the account the capture signs in with.** The backend's
+`OWNER_EMAIL` (`prisma/portfolio-seed.constants.ts`) defaults to
+`eze.olivero96@outlook.com`, the account the local stack signs in with and the
+one `npm run ui:login` saves. Until 2026-11-24 it defaulted to an old Gmail
+row that nobody can sign in with, so a seed run without `SEED_OWNER_EMAIL`
+filled an account the capture never photographs. `SEED_OWNER_EMAIL` still
+overrides it; if you sign in as anyone else, seed that account the same way.
+The owner's display name is real data, not scrubbed like the email: it shows
+on the `dashboard` frame (the masthead greets the member by name), so check it
+reads as it should be published.
 
 The capture enforces it: `assertSeedNewerThanLastCapture` in
 [e2e/preconditions.ts](../../e2e/preconditions.ts) refuses to start when the
@@ -78,6 +89,22 @@ owner's email with `eze@sunnsteel.app` through a MutationObserver, because
 React re-renders restore the text. A target fails if the email is still
 anywhere in the page's HTML or in a form field.
 
+## Frames that need a setup step
+
+- **`training-review`** shows Progress › Workouts scrolled to the Training
+  review: the question picker, its three questions and the month's quota line.
+  `progress-workouts` keeps the top of the same tab, the Consistency calendar.
+  The review needs a Pro account with reviews left this month; one with none
+  left shows the quota notice instead and fails `ready`.
+- **`plans`** hides the "Test mode" line. A local backend runs Mercado Pago in
+  its sandbox (`MERCADO_PAGO_SANDBOX=true`; a local stack never runs live), so
+  `GET /billing/me` answers `checkout.testMode: true` and the page says no
+  money is charged. Production runs live and never shows it. The setup step
+  (`withoutSandboxNotice`) answers that one read with `testMode: false` and
+  every other field as the server sent it, then reloads. Nothing is pressed
+  and nothing is bought. Do not turn the local backend live to get this frame:
+  live mode charges real money.
+
 ## Check every frame
 
 Each target declares a `ready` list: text that must be visible before the shot
@@ -98,6 +125,13 @@ A setup step may open a wizard step or start a scratch session and log sets.
 It **never presses Finish**: finishing runs the progression engine and
 rewrites the next session's prescriptions. It discards the scratch session
 afterwards.
+
+The cleanup always discards, even when unticking the logged sets fails, so a
+failed target cannot leave a session in progress. It first waits for any open
+menu to close: `live-session-set-kinds` photographs the set's kind menu open,
+and while a menu is open the rest of the page is hidden from the accessibility
+tree, so every set read as missing. That is why the target timed out on
+2026-11-24 and left its session running.
 
 Starting a session can still land on a page that does not route into it, so
 the live-session setup recovers through `/workouts`, which replaces itself with
