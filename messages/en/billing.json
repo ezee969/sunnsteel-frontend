@@ -48,6 +48,10 @@
 		"ROUTINE_DRAFTS": {
 			"name": "Routine drafts",
 			"description": "Describe your goals and constraints and open a draft routine to edit."
+		},
+		"TRAINING_REVIEW": {
+			"name": "Training review",
+			"description": "Pick a few finished workouts and a question, and read what your logs show, with every number linked to its workout."
 		}
 	},
 	"limits": {

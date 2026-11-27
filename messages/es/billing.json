@@ -48,6 +48,10 @@
 		"ROUTINE_DRAFTS": {
 			"name": "Borradores de rutina",
 			"description": "Describe tus objetivos y limitaciones y abre un borrador de rutina para editarlo."
+		},
+		"TRAINING_REVIEW": {
+			"name": "Revisión del entrenamiento",
+			"description": "Elige algunos entrenamientos terminados y una pregunta, y lee lo que muestran tus registros, con cada número enlazado a su entrenamiento."
 		}
 	},
 	"limits": {

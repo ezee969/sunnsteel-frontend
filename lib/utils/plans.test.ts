@@ -2,6 +2,7 @@ import { FEATURE_KEYS, PLAN_LIMIT_KEYS, PRO_PRICE } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
+import { MESSAGES } from '@/messages'
 
 import { currentPlan, PLAN_ROWS } from './plans'
 
@@ -55,6 +56,26 @@ describe('BILL-02 plans', () => {
 					expect(t(`${row.key}.free` as 'strength.free')).not.toBe('')
 					expect(t(`${row.key}.pro` as 'strength.pro')).not.toBe('')
 				}
+			}
+		}
+	})
+
+	it('names and describes every capability in both languages for its locked module', () => {
+		// LockedModule reads billing.features.<key>, and only a Free account
+		// renders it, so a missing key goes unseen on a Pro account.
+		for (const locale of ['en', 'es'] as const) {
+			const features: Record<
+				string,
+				{ name?: unknown; description?: unknown }
+			> = MESSAGES[locale].billing.features
+			for (const key of FEATURE_KEYS) {
+				expect(features[key]?.name, `${locale} ${key}.name`).toEqual(
+					expect.stringMatching(/\S/),
+				)
+				expect(
+					features[key]?.description,
+					`${locale} ${key}.description`,
+				).toEqual(expect.stringMatching(/\S/))
 			}
 		}
 	})
