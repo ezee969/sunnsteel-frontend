@@ -4,6 +4,7 @@ import type {
 	EarnedAchievement,
 	RenaissanceRankProgress,
 } from '@sunsteel/contracts'
+import { renaissanceRankProgress } from '@sunsteel/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { translatorFor } from '@/i18n/translator'
@@ -259,6 +260,7 @@ describe('achievement presentation', () => {
 				description: 'Learning the craft through regular practice.',
 				minimumSessions: 5,
 				minimumActiveWeeks: 3,
+				minimumCompletedSets: 0,
 			},
 			nextRank: {
 				id: 'ARTISAN',
@@ -266,11 +268,14 @@ describe('achievement presentation', () => {
 				description: 'Building a dependable training practice.',
 				minimumSessions: 15,
 				minimumActiveWeeks: 8,
+				minimumCompletedSets: 0,
 			},
 			completedSessions: 10,
 			activeWeeks: 7,
 			sessionsRemaining: 5,
 			activeWeeksRemaining: 1,
+			completedSets: 0,
+			setsRemaining: 0,
 		} satisfies RenaissanceRankProgress
 
 		expect(formatRankEvidence(rank, tRank)).toBe('10 sessions · 7 active weeks')
@@ -287,12 +292,15 @@ describe('achievement presentation', () => {
 				description: 'A lasting training practice recorded in the ledger.',
 				minimumSessions: 100,
 				minimumActiveWeeks: 52,
+				minimumCompletedSets: 0,
 			},
 			nextRank: null,
 			completedSessions: 120,
 			activeWeeks: 60,
 			sessionsRemaining: 0,
 			activeWeeksRemaining: 0,
+			completedSets: 0,
+			setsRemaining: 0,
 		} satisfies RenaissanceRankProgress
 
 		expect(formatNextRankRequirements(rank, tRank)).toBeNull()
@@ -330,6 +338,7 @@ describe('achievement presentation', () => {
 				description: 'Learning the craft through regular practice.',
 				minimumSessions: 5,
 				minimumActiveWeeks: 3,
+				minimumCompletedSets: 0,
 			},
 			nextRank: {
 				id: 'ARTISAN',
@@ -337,11 +346,14 @@ describe('achievement presentation', () => {
 				description: 'Building a dependable training practice.',
 				minimumSessions: 15,
 				minimumActiveWeeks: 8,
+				minimumCompletedSets: 0,
 			},
 			completedSessions: 10,
 			activeWeeks: 7,
 			sessionsRemaining: 1,
 			activeWeeksRemaining: 0,
+			completedSets: 0,
+			setsRemaining: 0,
 		} satisfies RenaissanceRankProgress
 
 		expect(formatMilestoneProgressEvidence(progress, 'es', esProgress)).toBe(
@@ -361,6 +373,57 @@ describe('achievement presentation', () => {
 		)
 		expect(formatNextRankRequirements(rank, esRank)).toBe(
 			'1 sesión más · Requisito de semanas activas cumplido',
+		)
+	})
+})
+
+describe('rank sets (ACH-12)', () => {
+	const at = (completedSessions: number, activeWeeks: number, sets: number) =>
+		renaissanceRankProgress({
+			completedSessions,
+			activeWeeks,
+			completedSets: sets,
+		})
+
+	it('names no sets while neither the rank held nor the next asks for them', () => {
+		const apprentice = at(10, 7, 40)
+		expect(formatRankEvidence(apprentice, tRank)).toBe(
+			'10 sessions · 7 active weeks',
+		)
+		expect(formatNextRankRequirements(apprentice, tRank)).toBe(
+			'5 more sessions · 1 more active week',
+		)
+	})
+
+	it('names the sets the next rank asks for, met or not, in both languages', () => {
+		const artisan = at(30, 16, 99)
+		expect(artisan.currentRank.id).toBe('ARTISAN')
+		expect(formatRankEvidence(artisan, tRank)).toBe(
+			'30 sessions · 16 active weeks · 99 sets',
+		)
+		expect(formatNextRankRequirements(artisan, tRank)).toBe(
+			'Session requirement met · Active-week requirement met · 1 more completed set',
+		)
+		expect(formatNextRankRequirements(artisan, esRank)).toBe(
+			'Requisito de sesiones cumplido · Requisito de semanas activas cumplido · 1 serie completada más',
+		)
+		const short = at(20, 10, 150)
+		expect(formatNextRankRequirements(short, tRank)).toBe(
+			'10 more sessions · 6 more active weeks · Set requirement met',
+		)
+	})
+
+	it('keeps a reached rank and words what the next one needs from the totals', () => {
+		const kept = renaissanceRankProgress(
+			{ completedSessions: 28, activeWeeks: 15, completedSets: 90 },
+			'MAESTRO',
+		)
+		expect(kept.currentRank.id).toBe('MAESTRO')
+		expect(formatRankEvidence(kept, esRank)).toBe(
+			'28 sesiones · 15 semanas activas · 90 series',
+		)
+		expect(formatNextRankRequirements(kept, tRank)).toBe(
+			'32 more sessions · 17 more active weeks · 160 more completed sets',
 		)
 	})
 })

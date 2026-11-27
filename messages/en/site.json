@@ -184,6 +184,7 @@
 		"body": "Earn one of {count} ranks by completing workouts across different weeks. Your rank appears on your profile, and you choose who can see it.",
 		"ladderLabel": "The ranks, in order",
 		"requirement": "{workouts, plural, one {# workout} other {# workouts}} in {weeks, plural, one {# week} other {# different weeks}}",
+		"requirementSets": "{workouts, plural, one {# workout} other {# workouts}} in {weeks, plural, one {# week} other {# different weeks}}, {sets, plural, one {# set} other {# sets}} done",
 		"firstRank": "Where everyone starts",
 		"profileName": "Your name",
 		"profileHandle": "@yourname",

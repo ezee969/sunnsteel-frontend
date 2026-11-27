@@ -162,14 +162,22 @@ export function formatComebackEvidence(
 	})
 }
 
+/**
+ * ACH-12: completed sets are part of a rank from Maestro, so they are named
+ * only where the rank held or the next one asks for them.
+ */
+const asksForSets = (rank: RenaissanceRankProgress): boolean =>
+	rank.currentRank.minimumCompletedSets > 0 ||
+	(rank.nextRank?.minimumCompletedSets ?? 0) > 0
+
 export function formatRankEvidence(
 	rank: RenaissanceRankProgress,
 	t: Translator<'achievements.rank'>,
 ): string {
-	return t('evidence', {
-		sessions: rank.completedSessions,
-		weeks: rank.activeWeeks,
-	})
+	const values = { sessions: rank.completedSessions, weeks: rank.activeWeeks }
+	return asksForSets(rank)
+		? t('evidenceWithSets', { ...values, sets: rank.completedSets })
+		: t('evidence', values)
 }
 
 export function formatNextRankRequirements(
@@ -184,5 +192,10 @@ export function formatNextRankRequirements(
 	const weeks = rank.activeWeeksRemaining
 		? t('nextWeeks', { count: rank.activeWeeksRemaining })
 		: t('nextWeeksMet')
-	return t('nextJoin', { sessions, weeks })
+	if (rank.nextRank.minimumCompletedSets === 0)
+		return t('nextJoin', { sessions, weeks })
+	const sets = rank.setsRemaining
+		? t('nextSets', { count: rank.setsRemaining })
+		: t('nextSetsMet')
+	return t('nextJoinSets', { sessions, weeks, sets })
 }

@@ -184,6 +184,7 @@
 		"body": "Alcanzá uno de los {count} rangos completando entrenamientos en distintas semanas. El rango aparece en tu perfil y vos elegís quién puede verlo.",
 		"ladderLabel": "Los rangos, en orden",
 		"requirement": "{workouts, plural, one {# entrenamiento} other {# entrenamientos}} en {weeks, plural, one {# semana} other {# semanas distintas}}",
+		"requirementSets": "{workouts, plural, one {# entrenamiento} other {# entrenamientos}} en {weeks, plural, one {# semana} other {# semanas distintas}}, {sets, plural, one {# serie hecha} other {# series hechas}}",
 		"firstRank": "Donde todos empiezan",
 		"profileName": "Tu nombre",
 		"profileHandle": "@tunombre",

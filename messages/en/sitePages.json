@@ -435,14 +435,14 @@
 			},
 			"steps": {
 				"1": "Train: every week you work out counts as an active week, however many workouts it holds.",
-				"2": "Reach a rank's workouts and active weeks, and the rank is yours.",
+				"2": "Reach a rank's workouts and active weeks, and from Maestro its sets, and the rank is yours for good.",
 				"3": "Milestones arrive as your totals cross them.",
 				"4": "Choose who sees your rank, and feature what you're proud of on your profile."
 			},
 			"example": {
 				"title": "The ladder and the milestones",
 				"caption": "Read from the app's own catalog.",
-				"ladderColumns": "Rank · Workouts · Different weeks",
+				"ladderColumns": "Rank · Workouts · Different weeks · Sets",
 				"milestoneColumns": "Category · Steps"
 			},
 			"covers": {
@@ -455,7 +455,7 @@
 			"faq": {
 				"earned": {
 					"q": "How is a rank earned?",
-					"a": "By a number of workouts spread over a number of different weeks; both have to be met."
+					"a": "By a number of workouts spread over a number of different weeks, and from Maestro a number of completed sets; all of them have to be met. A workout counts once it has a completed set, and a rank you reach is never taken back."
 				},
 				"comeback": {
 					"q": "What is a comeback?",

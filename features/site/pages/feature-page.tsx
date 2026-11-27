@@ -451,6 +451,7 @@ export async function FeaturePage({
 						rankText(rank, tRanks).title,
 						String(rank.minimumSessions),
 						String(rank.minimumActiveWeeks),
+						String(rank.minimumCompletedSets),
 					])}
 				/>
 				<ExampleTable

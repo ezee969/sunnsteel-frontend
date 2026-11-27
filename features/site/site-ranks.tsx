@@ -1,4 +1,4 @@
-import type { RenaissanceRankProgress } from '@sunsteel/contracts'
+import { renaissanceRankProgress } from '@sunsteel/contracts'
 import { getTranslations } from 'next-intl/server'
 
 import { rankText } from '@/i18n/catalog'
@@ -29,17 +29,12 @@ export async function SiteRanks() {
 	const ranks: SiteRank[] = RANKS.map((rank, index) => {
 		const text = rankText(rank, tRanks)
 		const next = RANKS[index + 1] ?? null
-		// A member exactly on this rank's requirement.
-		const progress: RenaissanceRankProgress = {
-			currentRank: rank,
-			nextRank: next,
+		// A member exactly on this rank's requirement, through the app's rule.
+		const progress = renaissanceRankProgress({
 			completedSessions: rank.minimumSessions,
 			activeWeeks: rank.minimumActiveWeeks,
-			sessionsRemaining: next ? next.minimumSessions - rank.minimumSessions : 0,
-			activeWeeksRemaining: next
-				? next.minimumActiveWeeks - rank.minimumActiveWeeks
-				: 0,
-		}
+			completedSets: rank.minimumCompletedSets,
+		})
 		const requirements = formatNextRankRequirements(progress, tRank)
 		return {
 			id: rank.id,
@@ -48,10 +43,16 @@ export async function SiteRanks() {
 			requirement:
 				rank.minimumSessions === 0
 					? t('firstRank')
-					: t('requirement', {
-							workouts: rank.minimumSessions,
-							weeks: rank.minimumActiveWeeks,
-						}),
+					: rank.minimumCompletedSets > 0
+						? t('requirementSets', {
+								workouts: rank.minimumSessions,
+								weeks: rank.minimumActiveWeeks,
+								sets: rank.minimumCompletedSets,
+							})
+						: t('requirement', {
+								workouts: rank.minimumSessions,
+								weeks: rank.minimumActiveWeeks,
+							}),
 			evidence: formatRankEvidence(progress, tRank),
 			next:
 				next && requirements

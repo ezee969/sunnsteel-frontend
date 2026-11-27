@@ -435,14 +435,14 @@
 			},
 			"steps": {
 				"1": "Entrená: cada semana en la que entrenás cuenta como semana activa, sin importar cuántos entrenamientos tenga.",
-				"2": "Alcanzá los entrenamientos y las semanas activas de un rango, y el rango es tuyo.",
+				"2": "Alcanzá los entrenamientos y las semanas activas de un rango, y desde Maestro sus series, y el rango es tuyo para siempre.",
 				"3": "Los logros llegan a medida que tus totales los superan.",
 				"4": "Elegí quién ve tu rango y destacá en tu perfil lo que te enorgullece."
 			},
 			"example": {
 				"title": "La escalera y los logros",
 				"caption": "Tomado del catálogo de la app.",
-				"ladderColumns": "Rango · Entrenamientos · Semanas distintas",
+				"ladderColumns": "Rango · Entrenamientos · Semanas distintas · Series",
 				"milestoneColumns": "Categoría · Etapas"
 			},
 			"covers": {
@@ -455,7 +455,7 @@
 			"faq": {
 				"earned": {
 					"q": "¿Cómo se gana un rango?",
-					"a": "Con una cantidad de entrenamientos repartidos en una cantidad de semanas distintas; hay que cumplir las dos."
+					"a": "Con una cantidad de entrenamientos repartidos en una cantidad de semanas distintas y, desde Maestro, una cantidad de series completadas; hay que cumplir todo. Un entrenamiento cuenta cuando tiene una serie completada, y el rango que alcanzás nunca se pierde."
 				},
 				"comeback": {
 					"q": "¿Qué es un regreso?",

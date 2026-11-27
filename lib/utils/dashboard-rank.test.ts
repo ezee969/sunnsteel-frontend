@@ -23,6 +23,7 @@ const rank: RenaissanceRankProgress = {
 		description: 'Learning the craft.',
 		minimumSessions: 10,
 		minimumActiveWeeks: 6,
+		minimumCompletedSets: 0,
 	},
 	nextRank: {
 		id: 'ARTISAN',
@@ -30,11 +31,14 @@ const rank: RenaissanceRankProgress = {
 		description: 'A steady hand.',
 		minimumSessions: 25,
 		minimumActiveWeeks: 14,
+		minimumCompletedSets: 0,
 	},
 	completedSessions: 18,
 	activeWeeks: 9,
 	sessionsRemaining: 7,
 	activeWeeksRemaining: 5,
+	completedSets: 0,
+	setsRemaining: 0,
 }
 
 const response = (
@@ -85,6 +89,8 @@ describe('dashboard rank (DASH-11)', () => {
 					nextRank: null,
 					sessionsRemaining: 0,
 					activeWeeksRemaining: 0,
+					completedSets: 0,
+					setsRemaining: 0,
 				},
 			}),
 		)
