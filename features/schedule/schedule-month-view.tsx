@@ -109,60 +109,64 @@ export function ScheduleMonthView({
 	const consistency = month ? describeConsistency(month, t) : null
 	return (
 		<section aria-labelledby={headingId} className="space-y-4">
-			<div className="rule-row flex flex-wrap items-end justify-between gap-3 pb-2">
-				<div>
+			{/* The month controls sit in the heading's row, above the summary, and
+			    take a row of their own below `sm` whatever the month is called.
+			    The summary's length changes with the month (one that has not
+			    begun has no consistency line), so controls placed after it moved
+			    between clicks and a quick second click landed on the legend. */}
+			<div className="rule-row space-y-1 pb-2">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
 					<h2 id={headingId} className="type-section text-foreground">
 						{heading ?? monthLabel}
 					</h2>
-					<p className="type-body-sm mt-1 text-ink-3" aria-live="polite">
-						{month
-							? [
-									heading ? formatMonth(month.monthStart, locale) : null,
-									describeMonthTotals(month.totals, t),
-								]
-									.filter(Boolean)
-									.join(' · ')
-							: ' '}
-					</p>
-					{consistency ? (
-						<p className="type-body-sm text-ink-2">{consistency}</p>
-					) : null}
+					<div
+						role="group"
+						aria-label={t('monthGroup')}
+						className="flex items-center gap-1"
+					>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="size-11 sm:size-9"
+							aria-label={t('previousMonth')}
+							onClick={onPrevious}
+						>
+							<ChevronLeft className="size-4" aria-hidden />
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							disabled={isCurrentMonth}
+							onClick={onToday}
+						>
+							{t('thisMonth')}
+						</Button>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="size-11 sm:size-9"
+							aria-label={t('followingMonth')}
+							onClick={onNext}
+						>
+							<ChevronRight className="size-4" aria-hidden />
+						</Button>
+					</div>
 				</div>
-				<div
-					role="group"
-					aria-label={t('monthGroup')}
-					className="flex items-center gap-1"
-				>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						className="size-11 sm:size-9"
-						aria-label={t('previousMonth')}
-						onClick={onPrevious}
-					>
-						<ChevronLeft className="size-4" aria-hidden />
-					</Button>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						disabled={isCurrentMonth}
-						onClick={onToday}
-					>
-						{t('thisMonth')}
-					</Button>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						className="size-11 sm:size-9"
-						aria-label={t('followingMonth')}
-						onClick={onNext}
-					>
-						<ChevronRight className="size-4" aria-hidden />
-					</Button>
-				</div>
+				<p className="type-body-sm text-ink-3" aria-live="polite">
+					{month
+						? [
+								heading ? formatMonth(month.monthStart, locale) : null,
+								describeMonthTotals(month.totals, t),
+							]
+								.filter(Boolean)
+								.join(' · ')
+						: ' '}
+				</p>
+				{/* Kept, empty, for a month without one, so the grid stays put. */}
+				<p className="type-body-sm text-ink-2">{consistency ?? ' '}</p>
 			</div>
 
 			<ul
