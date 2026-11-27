@@ -67,6 +67,7 @@ export default function DashboardRank() {
 			</h2>
 			<Link
 				href="/achievements"
+				data-clickable="true"
 				className="group flex flex-col gap-4 border-y border-rule px-1 py-4 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:items-center sm:gap-6"
 			>
 				<div className="flex min-w-0 flex-1 items-center gap-4">

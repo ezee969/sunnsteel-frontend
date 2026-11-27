@@ -140,6 +140,7 @@ export default function WeekStrip() {
 										href={day.href}
 										aria-label={day.label}
 										aria-current={day.isToday ? 'date' : undefined}
+										data-clickable="true"
 										className={cn(
 											'flex h-16 flex-col items-center justify-center gap-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-20',
 											// Today is a ring plus its accessible name, never colour alone.

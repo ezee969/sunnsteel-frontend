@@ -50,6 +50,7 @@ function ResultRow({
 			<Link
 				href={href}
 				onClick={() => record.mutate(recordAs)}
+				data-clickable="true"
 				className="group flex min-w-0 items-center gap-3 rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 			>
 				{leading}

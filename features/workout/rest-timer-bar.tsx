@@ -69,7 +69,9 @@ export const RestTimerBar = ({
 			{/* The gutter restored inside, so the row lines up with the page's
 			    content above it (v1.1 §26.3). */}
 			<div className="px-[var(--shell-gutter,0px)]">
-				<div className="ledger-page flex items-center gap-3 py-3">
+				{/* UX-27 (§34): a ticking readout between the controls tapped
+				    while resting, so none of it selects. */}
+				<div className="ledger-page flex select-none items-center gap-3 py-3">
 					<div className="flex flex-col">
 						<span className="type-label text-ink-3">
 							{isOver ? t('restOver') : t('resting')}

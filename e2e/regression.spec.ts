@@ -599,12 +599,53 @@ async function expectSoundLayout(page: Page) {
 				)
 			})
 			.map(h => (h.textContent ?? '').trim())
+		// UX-27 (§34): controls do not select and content does. The public
+		// site keeps its own rule (§33.13), so it is not held to this one.
+		const site = document.querySelector('.site') !== null
+		const shown = (element: Element) => {
+			const rect = element.getBoundingClientRect()
+			return rect.width > 0 && rect.height > 0
+		}
+		// The used value: `auto` takes its parent's `none` and a field's `text`.
+		const selectable = (element: Element) => {
+			for (
+				let node: Element | null = element;
+				node;
+				node = node.parentElement
+			) {
+				const value = getComputedStyle(node).userSelect
+				if (value === 'none') return false
+				if (value === 'text' || value === 'all' || value === 'contain')
+					return true
+			}
+			return true
+		}
+		const selectableControls = site
+			? []
+			: [
+					...document.querySelectorAll(
+						"button, [role='tab'], [data-clickable='true']",
+					),
+				]
+					.filter(shown)
+					.filter(element => !element.classList.contains('select-text'))
+					.filter(selectable)
+					.slice(0, 5)
+					.map(label)
+		const lockedHeadings = site
+			? []
+			: [...document.querySelectorAll('h1')]
+					.filter(shown)
+					.filter(h => !selectable(h))
+					.map(h => (h.textContent ?? '').trim())
 		return {
 			width,
 			document: doc.scrollWidth,
 			main: main && { scroll: main.scrollWidth, client: main.clientWidth },
 			offenders,
 			headings,
+			selectableControls,
+			lockedHeadings,
 			text: (main ?? document.body).innerText.trim().length,
 		}
 	})
@@ -622,6 +663,19 @@ async function expectSoundLayout(page: Page) {
 	expect
 		.soft(m.headings, 'exactly one visible h1 (Phase 13 outline rule)')
 		.toHaveLength(1)
+	expect
+		.soft(m.selectableControls, 'controls whose label selects (UX-27, §34)')
+		.toEqual([])
+	expect
+		.soft(m.lockedHeadings, 'a page heading that cannot be selected (UX-27)')
+		.toEqual([])
+}
+
+/** UX-27 (§34): the text a double-click on `target` left selected. */
+async function selectedByDoubleClick(page: Page, target: Locator) {
+	await page.evaluate(() => window.getSelection()?.removeAllRanges())
+	await target.dblclick()
+	return page.evaluate(() => window.getSelection()?.toString() ?? '')
 }
 
 for (const route of ROUTES) {
@@ -1077,6 +1131,45 @@ for (const width of REGRESSION_WIDTHS) {
 			'background-color',
 			'sidebar item',
 		)
+	})
+
+	// UX-27 (§34): a double-click on a control selects nothing, and one on
+	// the page's heading still selects it. Each control is one a second click
+	// leaves harmless: a choice already made, a month further on, a fold
+	// undone.
+	test(`selection @ ${width}`, async ({ page }) => {
+		await prepare(page, width, 'light')
+		await load(page, '/schedule')
+
+		const month = page.getByRole('button', {
+			name: msg('planning.schedulePage.month'),
+			exact: true,
+		})
+		expect
+			.soft(await selectedByDoubleClick(page, month), 'Week/Month toggle')
+			.toBe('')
+		const following = page.getByRole('button', {
+			name: msg('planning.scheduleMonth.followingMonth'),
+		})
+		expect
+			.soft(await selectedByDoubleClick(page, following), 'next month')
+			.toBe('')
+		expect
+			.soft(
+				await selectedByDoubleClick(
+					page,
+					page.getByRole('heading', { level: 1 }),
+				),
+				'the page heading no longer selects',
+			)
+			.not.toBe('')
+
+		expect(ids.history, 'needs at least one finished session').toBeTruthy()
+		await load(page, `/workouts/sessions/${ids.history}`)
+		const fold = page.locator('main button[aria-expanded][id$="-toggle"]')
+		expect
+			.soft(await selectedByDoubleClick(page, fold.first()), 'exercise fold')
+			.toBe('')
 	})
 
 	for (const theme of THEMES) {

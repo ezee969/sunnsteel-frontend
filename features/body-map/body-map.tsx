@@ -137,7 +137,9 @@ export function BodyMapFigures({
 				<svg
 					key={side}
 					viewBox={BODY_MAP_VIEWBOX}
-					className="h-auto w-full"
+					// UX-27 (§34): its muscles are tapped, so a quick second tap
+					// never starts a selection.
+					className="h-auto w-full select-none"
 					focusable="false"
 				>
 					<path d={BODY_MAP_OUTLINE} className="fill-intensity-0" />

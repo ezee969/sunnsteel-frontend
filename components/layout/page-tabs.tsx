@@ -128,6 +128,7 @@ export function PageTabs({
 								href={tab.href}
 								scroll={false}
 								aria-current={isCurrent ? 'page' : undefined}
+								data-clickable="true"
 								className={cn(
 									'type-button -mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-3 outline-none transition-colors duration-[var(--motion-fast)] ease-standard focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:min-h-10 md:max-lg:px-2.5',
 									isCurrent

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { useControlSelectionGuard } from '@/hooks/use-control-selection-guard'
 import type { Locale } from '@/i18n/config'
 import type { RootMessages } from '@/messages'
 
@@ -23,6 +24,7 @@ export function AppRootProviders({
 	messages: RootMessages
 	children: ReactNode
 }) {
+	useControlSelectionGuard()
 	return (
 		<RootShell>
 			<IntlProvider locale={locale} messages={messages}>

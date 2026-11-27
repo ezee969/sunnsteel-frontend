@@ -110,6 +110,7 @@ export function ConversationList({
 										? t('openWithNew', { name })
 										: t('openWith', { name })
 								}
+								data-clickable="true"
 								className="group flex min-w-0 items-center gap-3 rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 							>
 								<MemberAvatar member={conversation.counterpart} />

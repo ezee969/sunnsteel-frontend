@@ -80,6 +80,7 @@ export function RecentSearches() {
 						<Link
 							href={entry.href}
 							onClick={() => record.mutate(recentTarget(entry))}
+							data-clickable="true"
 							className="flex min-w-0 flex-1 items-center gap-3 rounded-sm py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 						>
 							<EntryContent entry={entry} />

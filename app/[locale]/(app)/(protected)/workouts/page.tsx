@@ -84,6 +84,7 @@ export default function WorkoutsIndexPage() {
 							<Link
 								href={href}
 								{...(preload ? preloadOnHover(preload) : {})}
+								data-clickable="true"
 								className="type-action flex min-h-11 items-center justify-between gap-2 py-2 text-foreground hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 							>
 								{label}

@@ -1,0 +1,54 @@
+/* UX-27 (design system §34): in the app, controls do not select and content
+   does. A double-click on a tab, a stepper or a day cell selected its label
+   and read as a broken app; a long-press on iOS opened the copy callout. Names,
+   weights, notes, messages and answers stay selectable, because members copy
+   them. Imported only by app/globals.css: the public site keeps its own rule
+   (§33.13, public-site.css).
+
+   Every control is caught by what it is, so a new one needs nothing. A link
+   that is a whole row, cell or tile says so with data-clickable="true"; a link
+   inside a sentence never does, and stays selectable. :where() keeps all of
+   this at zero specificity, so a control whose text must be copied takes
+   `select-text` at its call site. */
+@layer base {
+  :where(
+      button,
+      summary,
+      label,
+      [role='button'],
+      [role='tab'],
+      [role='option'],
+      [role='menuitem'],
+      [role='menuitemcheckbox'],
+      [role='menuitemradio'],
+      [role='checkbox'],
+      [role='radio'],
+      [role='switch'],
+      [data-slot='button'],
+      [data-clickable='true']
+    ) {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* A field inside a control (a label wrapping its input) is still typed in,
+     and its value selected and copied. */
+  :where(
+      input,
+      textarea,
+      select,
+      [contenteditable]:not([contenteditable='false'])
+    ) {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
+  /* The ink on paper Input and the site already use; both tokens re-value in
+     Night and under higher contrast. */
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+}

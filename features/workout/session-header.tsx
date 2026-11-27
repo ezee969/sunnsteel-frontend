@@ -90,8 +90,10 @@ export const SessionHeader = ({
 					</div>
 
 					{/* Right side - Status and stats. Labels above mono values, so the
-					    figures are the scannable rank rather than their captions. */}
-					<div className="flex shrink-0 items-center gap-4 lg:gap-6">
+					    figures are the scannable rank rather than their captions.
+					    UX-27 (§34): ticking readouts beside Finish, so none of it
+					    selects; the routine's name above still does. */}
+					<div className="flex shrink-0 select-none items-center gap-4 lg:gap-6">
 						<div className="hidden text-right lg:block">
 							<p className="type-body-sm text-ink-3">{t('elapsed')}</p>
 							{/* §5.4 (UX-24): the elapsed string changes length as it

@@ -174,7 +174,8 @@ function BodyWeightChart({
 						role="img"
 						aria-labelledby={`${id}-title ${id}-summary`}
 						viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
-						className="h-auto w-full overflow-visible"
+						// UX-27 (§34): the axis text belongs to the drawing.
+						className="h-auto w-full select-none overflow-visible"
 					>
 						<line
 							x1={CHART_PADDING}

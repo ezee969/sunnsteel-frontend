@@ -145,6 +145,7 @@ export function BottomNav({
 								: label
 						}
 						onClick={() => onNavigateStart?.()}
+						data-clickable="true"
 						className={itemClass(active)}
 					>
 						{glyph(group, active)}

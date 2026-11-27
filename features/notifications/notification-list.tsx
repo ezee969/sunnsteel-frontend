@@ -128,6 +128,7 @@ function NotificationRow({
 				onClick={() => {
 					if (unread) onOpen(notification.id)
 				}}
+				data-clickable="true"
 				className="group flex min-w-0 gap-3"
 			>
 				<NotificationSummary notification={notification} now={now} />

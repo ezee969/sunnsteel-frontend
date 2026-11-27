@@ -797,6 +797,7 @@ function ProfileCount({
 	return (
 		<Link
 			href={href}
+			data-clickable="true"
 			className="group flex items-baseline gap-1.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 		>
 			{content}

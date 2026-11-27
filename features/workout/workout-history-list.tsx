@@ -174,6 +174,7 @@ export function WorkoutHistoryList({
 									]
 										.filter(Boolean)
 										.join(', ')}
+									data-clickable="true"
 									className={cn(
 										'rule-row mark block py-3 pl-3 pr-1 transition-colors duration-[var(--motion-fast)] ease-standard hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
 										statusMarkRule(statusState(s.status)),

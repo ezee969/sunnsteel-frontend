@@ -123,6 +123,7 @@ export function AuthorHeader({ entry }: { entry: ActivityEntry }) {
 		<div className="flex items-start justify-between gap-3">
 			<Link
 				href={`/profile/${encodeURIComponent(author.username)}`}
+				data-clickable="true"
 				className="group flex min-w-0 items-center gap-3 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 			>
 				<Avatar className="size-8 shrink-0 border border-rule">

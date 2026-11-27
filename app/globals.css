@@ -3,5 +3,6 @@
    whole tree for the app's utilities, all but the site's own components. */
 @import 'tailwindcss';
 @import './styles/shared.css';
+@import './styles/selection.css';
 
 @source not '../features/site';

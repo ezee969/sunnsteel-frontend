@@ -42,6 +42,7 @@ export function SharedSessionView({ shared }: { shared: SharedSessionRecap }) {
 				</p>
 				<Link
 					href={profilePath}
+					data-clickable="true"
 					className="group flex w-fit items-center gap-3 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 				>
 					<Avatar className="h-10 w-10 shrink-0 border border-rule">

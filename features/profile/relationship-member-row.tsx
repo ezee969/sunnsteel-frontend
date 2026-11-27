@@ -51,6 +51,7 @@ export function RelationshipMemberRow({
 		<li className="rule-row flex items-center gap-3 py-3">
 			<Link
 				href={`/profile/${encodeURIComponent(member.username)}`}
+				data-clickable="true"
 				className="group flex min-w-0 flex-1 items-center gap-3 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 			>
 				<Avatar className="h-10 w-10 shrink-0 border border-rule">

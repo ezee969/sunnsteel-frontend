@@ -115,6 +115,7 @@ export function TrainingPartnerSharedSections({
 								<Link
 									key={routine.routineId}
 									href={profileRoutineHref(identifier, routine.routineId)}
+									data-clickable="true"
 									className="rule-row block py-3 text-foreground transition-colors duration-[var(--motion-fast)] ease-standard hover:text-primary"
 								>
 									<span className="type-panel block">{routine.name}</span>

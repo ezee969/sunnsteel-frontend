@@ -3244,3 +3244,65 @@ page in Spanish, with each cut seeked every 0.2s:
   (§12.2), not a cut-off. Phones get no product detail in the hero: the
   owner made their first screen the footage, the headline, one action and
   the figures (§33.13), and the subline already names what is calculated.
+
+## 34. Amendment — Text selection in the app (2026-11-27, `UX-27`)
+
+**Status: in force.** The owner's question of 2026-11-27: should the signed-in
+app stop text being selected, as the landing does (§33.13)? Not everywhere.
+A double-click on a tab, a stepper, a week-strip day or +15s selected its
+label and read as a broken app, and a long-press on iOS opened the copy
+callout; but members copy real content -- exercise and routine names,
+weights, notes, messages, the answers on `/plans`. So **controls do not
+select, and content does.** The landing is a showcase and turns selection off
+almost everywhere; the app is a tool, and only its controls do. No token,
+face, radius or motion changes.
+
+### 34.1 The rule
+
+- **A control does not select.** One app-only rule,
+  [selection.css](../app/styles/selection.css) (imported by `globals.css`,
+  never by `site.css`), catches every control by what it is: `button`,
+  `summary`, `label`, the roles `button`, `tab`, `option`, `menuitem`
+  (and its checkbox and radio kinds), `checkbox`, `radio` and `switch`, and
+  `[data-slot='button']` (a `Button asChild` link). A new control needs
+  nothing.
+- **A link that is a whole row, cell or tile is a control**, and says so
+  with `data-clickable="true"`: the bottom bar, page tabs, the week strip's
+  days, notification, conversation, history, search and member rows, the
+  dashboard rank. Its destination holds the text worth copying. **A link
+  inside a sentence never carries it** and stays selectable, which is why the
+  rule names no bare `a`.
+- **Fields always select**: an `input`, `textarea`, `select` or
+  contenteditable inside a control is reset to `text`.
+- **iOS's long-press callout is off on controls**, whole-row links included,
+  so a press-and-hold on a nav item no longer offers a link preview. That
+  suits an app installed to the home screen.
+- **A few things that are not controls are drawn as part of one** and take
+  `select-none` where they are written: the rest bar's ticking countdown and
+  the workout masthead's elapsed time and sets (the routine's name beside
+  them still selects), the body map, and the strength and body-weight charts,
+  whose axis text belongs to the drawing.
+- **A double- or triple-click on a control selects nothing beside it
+  either.** Chromium answers one on unselectable text by selecting the
+  nearest selectable line (measured: a triple-click on Schedule's disabled
+  This month selected the legend under it).
+  [useControlSelectionGuard](../hooks/use-control-selection-guard.ts),
+  mounted once in the app root, cancels the default of the second and third
+  press on a control -- never the first, which focuses and starts a drag, and
+  never on a field or `select-text`. A disabled `Button` takes no pointer
+  events, so the guard finds it under the pointer by its box. The click itself
+  still fires.
+- **A selection is ink on paper**: `::selection` uses `--primary` on
+  `--primary-foreground`, the pair `Input` and the site already used, so it
+  re-values in Night and under higher contrast.
+
+### 34.2 What never changes
+
+- **Never `select-none` on a page, a section or a card of content**, and
+  never on a heading, a name, a number, a note or a message.
+- **The rule has zero specificity** (`:where()`), so a control whose text
+  must be copied takes `select-text` at its call site; none needs it today.
+- The sweep holds it on every route, width and theme (every visible button,
+  tab and `data-clickable` link does not select; the page's `h1` does), and
+  its `selection` suite double-clicks controls that a second click leaves
+  harmless and the page heading.
