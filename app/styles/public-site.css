@@ -79,12 +79,21 @@
   text-transform: uppercase;
   text-wrap: balance;
 }
+/* The brand's rule under the carved word: drawn as a layer of its own so it
+   can draw from the left (§12.2), in the word's colour as it cools. */
 .type-site-display mark {
+  position: relative;
   background: none;
   color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.16em;
+}
+.type-site-display mark::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.155em;
+  height: 0.06em;
+  background: currentColor;
+  transform-origin: left center;
 }
 .type-site-lead {
   font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
@@ -328,6 +337,14 @@
   max-width: 460px;
   color: var(--ink-2);
 }
+/* §33.4: text over footage reaches 4.5:1 on the cut's brightest frame. The
+   subline in ink-2 did not (2026-11-27, every 0.2s of both hero cuts, the
+   99.5th-percentile pixel under it: 3.3-3.7:1 at 390, 768, 1024 and 1265,
+   below 4.5:1 for 70-83% of the loop); in the Night foreground its worst
+   frame is 5.4:1. Size and face keep it under the headline. */
+.site-hero .site-lead {
+  color: var(--foreground);
+}
 .site-actions {
   display: flex;
   align-items: center;
@@ -509,6 +526,17 @@
   }
   .site-bar-actions {
     gap: 16px;
+  }
+}
+/* A tablet standing up shows the phone as a computer does (2026-11-27): the
+   hero fills the viewport (§33.13), so at 768x1024 the text alone left a
+   third of the first screen as empty footage. From 1000px tall the phone's
+   top clears the subline in either language; 16px further in than on a
+   computer, its record card clears the pause control. */
+@media (min-width: 768px) and (max-width: 1023px) and (min-height: 1000px) {
+  .site-phone {
+    display: block;
+    right: calc(10vw + 16px);
   }
 }
 @media (max-width: 767px) {
@@ -2438,8 +2466,144 @@
     background: var(--site-ember);
   }
 }
-.site-anim .site .type-site-display mark {
-  animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) 250ms both;
+/* §12.2 the hero's load sequence, at first paint in CSS -- not behind the
+   runtime's `site-anim`, which arrives with hydration and would show the
+   final state for a moment before taking it away. Both reduced-motion
+   sources (the media query and the stored choice the pre-paint script sets)
+   keep the final state. Each headline word rises from its mask in turn, the
+   carved word hot and cooling to gold as it lands, its rule drawing after;
+   the subline and the action follow, and the phone rises last. */
+.site-hero {
+  --hero-first: 120ms;
+  --hero-gap: 60ms;
+  --hero-rise: 900ms;
+  --hero-lead: 620ms;
+  --hero-action: 760ms;
+}
+@media (max-width: 767px) {
+  .site-hero {
+    --hero-first: 80ms;
+    --hero-gap: 45ms;
+    --hero-rise: 700ms;
+    --hero-lead: 400ms;
+    --hero-action: 480ms;
+  }
+}
+/* The word's mask clips only below it, so the forge's glow is not cut at
+   its sides and top. */
+.site-hero .site-w {
+  overflow: visible;
+  clip-path: inset(-0.6em -0.6em 0 -0.6em);
+}
+/* Deeper than the headings' 110%: Cinzel's accents (the Á of ENTRENÁ) stand
+   above the line box and showed over the mask in the first frame. */
+@keyframes site-hero-word {
+  from {
+    transform: translateY(150%);
+  }
+}
+@keyframes site-hero-phone {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion='reduce']) .site-hero .site-w > span {
+    animation: site-hero-word var(--hero-rise) var(--ease-standard) both;
+    animation-delay: calc(var(--hero-first) + var(--i, 0) * var(--hero-gap));
+  }
+  :root:not([data-motion='reduce']) .site-hero h1 mark {
+    animation: site-forge 1100ms cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: calc(
+      var(--hero-first) + var(--i, 0) * var(--hero-gap) + 200ms
+    );
+  }
+  :root:not([data-motion='reduce']) .site-hero h1 mark::after {
+    animation: site-rule 480ms var(--ease-standard) both;
+    animation-delay: calc(
+      var(--hero-first) + var(--i, 0) * var(--hero-gap) + 650ms
+    );
+  }
+  :root:not([data-motion='reduce']) .site-hero .site-lead {
+    animation: site-up 700ms var(--ease-standard) var(--hero-lead) both;
+  }
+  :root:not([data-motion='reduce']) .site-hero .site-actions {
+    --rise: 8px;
+    animation: site-up 600ms var(--ease-standard) var(--hero-action) both;
+  }
+  :root:not([data-motion='reduce']) .site-phone-frame {
+    animation: site-hero-phone 1000ms var(--ease-standard) 700ms both;
+  }
+}
+
+/* The phone's script (§12.2, 3.4s): the third set is ticked, the rest bar
+   appears and runs down, and the record that set made rises under the
+   phone. The first run starts once the phone has risen; the runtime's
+   replays (`data-play`, again every 9s in view and on each return) use the
+   same frames under other names, so every start begins from the first. */
+.site-phone-set svg {
+  color: var(--site-accent);
+}
+.site-phone-rest {
+  position: absolute;
+  inset: 0;
+  background: var(--site-accent);
+  transform: scaleX(0.6);
+  transform-origin: left center;
+}
+@keyframes site-hero-drain {
+  from {
+    transform: scaleX(1);
+  }
+}
+@keyframes site-hero-again-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-hero-again-drain {
+  from {
+    transform: scaleX(1);
+  }
+}
+@keyframes site-hero-again-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion='reduce']) .site-phone {
+    --script: 1900ms;
+  }
+  :root:not([data-motion='reduce']) .site-phone .sx-hero-tick {
+    animation: site-fade 250ms var(--ease-standard) var(--script) both;
+  }
+  :root:not([data-motion='reduce']) .site-phone .sx-hero-rest {
+    animation: site-fade 300ms var(--ease-standard) calc(var(--script) + 200ms)
+      both;
+  }
+  :root:not([data-motion='reduce']) .site-phone .site-phone-rest {
+    animation: site-hero-drain 1600ms linear calc(var(--script) + 300ms) both;
+  }
+  :root:not([data-motion='reduce']) .site-phone .site-record {
+    --rise: 16px;
+    animation: site-up 500ms var(--ease-standard) calc(var(--script) + 1100ms)
+      both;
+  }
+  .site-anim .site-phone[data-play] {
+    --script: 1400ms;
+  }
+  .site-anim .site-phone[data-play] :is(.sx-hero-tick, .sx-hero-rest) {
+    animation-name: site-hero-again-fade;
+  }
+  .site-anim .site-phone[data-play] .site-phone-rest {
+    animation-name: site-hero-again-drain;
+  }
+  .site-anim .site-phone[data-play] .site-record {
+    animation-name: site-hero-again-up;
+  }
 }
 .site-anim .site-heading[data-in]::after {
   animation:

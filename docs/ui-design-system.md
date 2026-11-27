@@ -3194,3 +3194,53 @@ heading and no action, and the page reads the same without it.
 
 Reduced motion (either source) shows the poster, the bars at rest and the
 lines in place.
+
+### 33.16 The hero, measured at four sizes (2026-11-27)
+
+The owner asked for the hero to be reviewed at 390×844, 768×1024, 1024×768
+and 1265×713 against four hypotheses, changing only what the evidence
+supported, and for an impressive first screen. Measured on the deployed
+page in Spanish, with each cut seeked every 0.2s:
+
+- **The subline is in the Night foreground over footage, not `--ink-2`.**
+  §33.4's own measure (the 99.5th-percentile pixel under the text, against
+  the brightest frame) put the subline at 3.3-3.7:1 on every size, under
+  4.5:1 for 70-83% of the loop; the headline held 4.8:1 and more. In the
+  foreground its worst frame is 5.4:1 (5.9:1 on the phone cut). A defect
+  fix: size and face keep it under the headline, and no layer was added
+  over the footage (§33.4's dropped second scrim stays dropped).
+- **A tablet standing up shows the hero phone** (768-1023 wide and at least
+  1000 tall, 16px further in than on a computer so its record card clears
+  the pause control). With the hero filling the viewport (§33.13), the text
+  alone left the lower third of 768×1024 as empty footage; the phone fills
+  it with the product working and never overlaps the text in either
+  language. Below 1000 tall, and on phones, the text stands alone as
+  before. This supersedes the plan's "768-1023: the text alone" (§12.2).
+- **The hero's load sequence and the phone's script are built** as the plan
+  specified them (§12.2), with two changes: the headline rises **word by
+  word** (60ms apart, 45ms on phones, from 150% so Cinzel's accents stay
+  hidden), because lines are not known before layout and this runs **at
+  first paint in CSS** -- behind `site-anim` it would show the final state
+  until hydration and then take it away. Both reduced-motion sources are
+  read in CSS (the media query and the attribute the pre-paint script sets).
+  The carved word rises hot and cools to gold as it lands (§33.14's forge,
+  now timed to its word), then its rule draws (480ms); the subline and the
+  action follow, the phone rises last, and its script ticks the heavier
+  third set, runs the rest bar down and raises the record that set made
+  (3.4s; the runtime replays it every 9s in view and on each return). The
+  phone's ticks and rest bar take the site's gold, as §33.13 says examples'
+  do; its third set is 85 kg, so the 85 kg record follows from it. The
+  mask clips only below a word so the forge's glow is not cut.
+- **The pause control follows the action in the tab order** and **a pause
+  is remembered on the device** for every band's footage (§33.7 asked for
+  both; neither held). A remembered pause keeps the poster and downloads
+  nothing until played; reduced motion asked for mid-play stops the clip.
+- **Kept as it was:** the video's crop at 768×1024 -- the subject's face
+  sits beside the headline's last letters, not behind them, the headline
+  holds 4.8:1 there, and every portrait crop of the 16:9 cut either moves
+  the subject behind the text or off the frame (a tablet cut would need new
+  encodes from the masters); no extra scrim (§33.4). The phone at 1024×768
+  standing on the hero's edge is the composition of every computer size
+  (§12.2), not a cut-off. Phones get no product detail in the hero: the
+  owner made their first screen the footage, the headline, one action and
+  the figures (§33.13), and the subline already names what is calculated.

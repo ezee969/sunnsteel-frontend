@@ -46,10 +46,36 @@ const CUTS: Record<Band, { phone: Cut | null; desktop: Cut }> = {
 }
 
 const PHONE_QUERY = '(max-width: 767px)'
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)'
+
+/**
+ * §33.7: a pause is remembered on the device, for every band's footage --
+ * a visitor who stopped the hero finds the later bands stopped too. Only the
+ * visitor's own choice is kept, never a browser that refused to autoplay;
+ * blocked storage forgets it.
+ */
+const PAUSED_KEY = 'ss-site-video-paused'
+
+function rememberedPause() {
+	try {
+		return window.localStorage.getItem(PAUSED_KEY) === '1'
+	} catch {
+		return false
+	}
+}
+
+function rememberPause(paused: boolean) {
+	try {
+		if (paused) window.localStorage.setItem(PAUSED_KEY, '1')
+		else window.localStorage.removeItem(PAUSED_KEY)
+	} catch {
+		// Blocked storage: the choice lasts for this page only.
+	}
+}
 
 function prefersStill() {
 	const reduce =
-		window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+		window.matchMedia(REDUCE_QUERY).matches ||
 		document.documentElement.dataset.motion === 'reduce'
 	const saveData = (
 		navigator as Navigator & { connection?: { saveData?: boolean } }
@@ -111,10 +137,25 @@ export function HeroVideo({
 			window.matchMedia(PHONE_QUERY).matches && sources.phone
 				? sources.phone
 				: sources.desktop
+		// With `preload="none"` a paused clip downloads nothing until played;
+		// the poster stays in its place.
 		element.src = element.canPlayType('video/webm; codecs="av01.0.05M.08"')
 			? chosen.webm
 			: chosen.mp4
+		if (rememberedPause()) {
+			setPaused(true)
+			return
+		}
 		element.play().catch(() => setPaused(true))
+		// Reduced motion asked for while the clip plays stops it (§33.9).
+		const reduce = window.matchMedia(REDUCE_QUERY)
+		const still = () => {
+			if (!reduce.matches) return
+			element.pause()
+			setPaused(true)
+		}
+		reduce.addEventListener('change', still)
+		return () => reduce.removeEventListener('change', still)
 	}, [enabled, cut])
 
 	const toggle = () => {
@@ -123,9 +164,11 @@ export function HeroVideo({
 		if (element.paused) {
 			void element.play()
 			setPaused(false)
+			rememberPause(false)
 		} else {
 			element.pause()
 			setPaused(true)
+			rememberPause(true)
 		}
 	}
 

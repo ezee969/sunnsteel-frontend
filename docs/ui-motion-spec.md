@@ -492,3 +492,8 @@ not restated here; in short, for the public pages alone:
   loop past 5 seconds without a pause control.
 - **Both reduced-motion sources** (§3) put every section in its final state:
   no entrance, no count, no drift, no script and no video -- posters only.
+- **The hero's load sequence runs at first paint in CSS** (design system
+  §33.16, 2026-11-27): its words rise one by one and the phone's script
+  plays once before the runtime arrives, both read from the media query and
+  the pre-paint `data-motion` attribute, so hydration never takes the final
+  state away; the runtime only replays the phone's script.
